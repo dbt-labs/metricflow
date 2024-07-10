@@ -7,7 +7,7 @@ from typing import Optional
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
-from metricflow_semantics.specs.spec_classes import DEFAULT_TIME_GRANULARITY
+from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY
 
 from metricflow.sql.sql_table import SqlTable
 

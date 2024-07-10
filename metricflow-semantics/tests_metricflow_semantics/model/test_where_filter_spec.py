@@ -48,15 +48,13 @@ from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow_semantics.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.specs.dimension_spec import DimensionSpec
+from metricflow_semantics.specs.entity_spec import EntitySpec
+from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
+from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
-from metricflow_semantics.specs.spec_classes import (
-    DimensionSpec,
-    EntitySpec,
-    GroupByMetricSpec,
-    LinkableInstanceSpec,
-    TimeDimensionSpec,
-    WhereFilterSpec,
-)
+from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
+from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.specs.where_filter.where_filter_transform import WhereSpecFactory
 
 from tests_metricflow_semantics.specs.conftest import EXAMPLE_FILTER_LOCATION

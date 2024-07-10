@@ -12,10 +12,8 @@ from __future__ import annotations
 
 from dbt_semantic_interfaces.protocols.measure import Measure
 
-from metricflow_semantics.specs.spec_classes import (
-    MeasureSpec,
-    NonAdditiveDimensionSpec,
-)
+from metricflow_semantics.specs.measure_spec import MeasureSpec
+from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDimensionSpec
 
 
 class MeasureConverter:

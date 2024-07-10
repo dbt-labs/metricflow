@@ -4,8 +4,8 @@ from typing import Sequence
 
 from typing_extensions import override
 
+from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
-from metricflow_semantics.specs.spec_classes import InstanceSpec
 
 
 class MatchListSpecPattern(SpecPattern):

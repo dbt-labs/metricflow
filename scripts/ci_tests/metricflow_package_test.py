@@ -9,16 +9,14 @@ from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSe
 from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_validation_ready_semantic_manifest
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from dbt_semantic_interfaces.protocols import SemanticManifest, SemanticModel
+from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
+from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
-from metricflow_semantics.specs.spec_classes import (
-    DimensionSpec,
-    EntityReference,
-    MetricSpec,
-)
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver

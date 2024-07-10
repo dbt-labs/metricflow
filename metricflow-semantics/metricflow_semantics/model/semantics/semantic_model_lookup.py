@@ -24,15 +24,12 @@ from metricflow_semantics.errors.error_classes import InvalidSemanticModelError
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantics.element_group import ElementGrouper
 from metricflow_semantics.model.spec_converters import MeasureConverter
-from metricflow_semantics.specs.spec_classes import (
-    DEFAULT_TIME_GRANULARITY,
-    DimensionSpec,
-    EntitySpec,
-    LinkableInstanceSpec,
-    MeasureSpec,
-    NonAdditiveDimensionSpec,
-    TimeDimensionSpec,
-)
+from metricflow_semantics.specs.dimension_spec import DimensionSpec
+from metricflow_semantics.specs.entity_spec import EntitySpec
+from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
+from metricflow_semantics.specs.measure_spec import MeasureSpec
+from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDimensionSpec
+from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY, TimeDimensionSpec
 
 logger = logging.getLogger(__name__)
 

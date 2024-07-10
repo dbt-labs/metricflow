@@ -6,7 +6,9 @@ from dbt_semantic_interfaces.references import SemanticModelReference
 from metricflow_semantics.assert_one_arg import assert_exactly_one_arg_set
 from metricflow_semantics.instances import EntityInstance, InstanceSet
 from metricflow_semantics.specs.column_assoc import ColumnAssociation
-from metricflow_semantics.specs.spec_classes import DimensionSpec, EntitySpec, TimeDimensionSpec
+from metricflow_semantics.specs.dimension_spec import DimensionSpec
+from metricflow_semantics.specs.entity_spec import EntitySpec
+from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from typing_extensions import override
 
 from metricflow.dataset.dataset_classes import DataSet

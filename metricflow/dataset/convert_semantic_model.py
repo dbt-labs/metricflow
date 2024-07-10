@@ -10,6 +10,7 @@ from dbt_semantic_interfaces.protocols.entity import Entity
 from dbt_semantic_interfaces.protocols.measure import Measure
 from dbt_semantic_interfaces.protocols.semantic_model import SemanticModel
 from dbt_semantic_interfaces.references import (
+    EntityReference,
     SemanticModelElementReference,
     SemanticModelReference,
 )
@@ -28,13 +29,9 @@ from metricflow_semantics.instances import (
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.model.spec_converters import MeasureConverter
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
-from metricflow_semantics.specs.spec_classes import (
-    DEFAULT_TIME_GRANULARITY,
-    DimensionSpec,
-    EntityReference,
-    EntitySpec,
-    TimeDimensionSpec,
-)
+from metricflow_semantics.specs.dimension_spec import DimensionSpec
+from metricflow_semantics.specs.entity_spec import EntitySpec
+from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY, TimeDimensionSpec
 
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.dataset.sql_dataset import SqlDataSet

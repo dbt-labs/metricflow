@@ -6,10 +6,8 @@ from dbt_semantic_interfaces.references import MetricReference
 from typing_extensions import override
 
 from metricflow_semantics.naming.naming_scheme import QueryItemNamingScheme
+from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.patterns.metric_pattern import MetricSpecPattern
-from metricflow_semantics.specs.spec_classes import (
-    InstanceSpec,
-)
 from metricflow_semantics.specs.spec_set import group_spec_by_type
 
 

@@ -11,8 +11,8 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from more_itertools import is_sorted
 from typing_extensions import override
 
+from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
-from metricflow_semantics.specs.spec_classes import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.spec_set import group_specs_by_type
 
 logger = logging.getLogger(__name__)

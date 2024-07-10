@@ -10,15 +10,12 @@ from dbt_semantic_interfaces.references import MeasureReference, MetricReference
 from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.merger import Mergeable
-from metricflow_semantics.specs.spec_classes import (
-    DimensionSpec,
-    EntitySpec,
-    GroupByMetricSpec,
-    InstanceSpec,
-    LinkableInstanceSpec,
-    TimeDimensionSpec,
-)
+from metricflow_semantics.specs.dimension_spec import DimensionSpec
+from metricflow_semantics.specs.entity_spec import EntitySpec
+from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
+from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
+from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 
 if typing.TYPE_CHECKING:
     from metricflow_semantics.model.semantics.metric_lookup import MetricLookup

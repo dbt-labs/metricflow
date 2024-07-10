@@ -27,11 +27,11 @@ from metricflow_semantics.query.issues.issues_base import (
     MetricFlowQueryResolutionIssueSet,
 )
 from metricflow_semantics.query.suggestion_generator import QueryItemSuggestionGenerator
+from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.patterns.minimum_time_grain import MinimumTimeGrainPattern
 from metricflow_semantics.specs.patterns.no_group_by_metric import NoGroupByMetricPattern
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.specs.patterns.typed_patterns import TimeDimensionPattern
-from metricflow_semantics.specs.spec_classes import LinkableInstanceSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet, group_specs_by_type
 
 logger = logging.getLogger(__name__)

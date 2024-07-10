@@ -8,22 +8,19 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
-from dbt_semantic_interfaces.references import MeasureReference
+from dbt_semantic_interfaces.references import EntityReference, MeasureReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.errors.error_classes import UnableToSatisfyQueryError
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.specs.dimension_spec import DimensionSpec
+from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
+from metricflow_semantics.specs.metric_spec import MetricSpec
+from metricflow_semantics.specs.order_by_spec import OrderBySpec
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
-from metricflow_semantics.specs.spec_classes import (
-    DimensionSpec,
-    EntityReference,
-    GroupByMetricSpec,
-    MetricSpec,
-    OrderBySpec,
-    TimeDimensionSpec,
-)
+from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.metric_time_dimension import (
     MTD_SPEC_DAY,

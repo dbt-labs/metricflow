@@ -7,8 +7,8 @@ from dbt_semantic_interfaces.references import TimeDimensionReference
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
-from metricflow_semantics.specs.spec_classes import GroupByMetricSpec
 
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode

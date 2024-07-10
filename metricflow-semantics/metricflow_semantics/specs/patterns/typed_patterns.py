@@ -13,12 +13,12 @@ from dbt_semantic_interfaces.references import EntityReference
 from typing_extensions import override
 
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
+from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.patterns.entity_link_pattern import (
     EntityLinkPattern,
     EntityLinkPatternParameterSet,
     ParameterSetField,
 )
-from metricflow_semantics.specs.spec_classes import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.spec_set import group_specs_by_type
 
 

@@ -4,7 +4,7 @@ from dbt_semantic_interfaces.references import TimeDimensionReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 
-from metricflow_semantics.specs.spec_classes import TimeDimensionSpec
+from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 
 # Shortcuts for referring to the metric time dimension.
 MTD = MetricFlowReservedKeywords.METRIC_TIME.value

@@ -20,15 +20,12 @@ from metricflow_semantics.model.semantics.linkable_element import (
     LinkableEntity,
     LinkableMetric,
 )
+from metricflow_semantics.specs.dimension_spec import DimensionSpec
+from metricflow_semantics.specs.entity_spec import EntitySpec
+from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
+from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
-from metricflow_semantics.specs.spec_classes import (
-    DimensionSpec,
-    EntitySpec,
-    GroupByMetricSpec,
-    InstanceSpec,
-    LinkableInstanceSpec,
-    TimeDimensionSpec,
-)
+from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 
 logger = logging.getLogger(__name__)
 

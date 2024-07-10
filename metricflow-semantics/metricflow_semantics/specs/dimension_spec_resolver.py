@@ -12,7 +12,8 @@ from dbt_semantic_interfaces.references import DimensionReference, EntityReferen
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 
-from metricflow_semantics.specs.spec_classes import DEFAULT_TIME_GRANULARITY, DimensionSpec, TimeDimensionSpec
+from metricflow_semantics.specs.dimension_spec import DimensionSpec
+from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY, TimeDimensionSpec
 
 
 class DimensionSpecResolver:

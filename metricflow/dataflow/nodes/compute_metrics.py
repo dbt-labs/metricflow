@@ -5,7 +5,8 @@ from typing import Sequence, Set, Tuple
 
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
-from metricflow_semantics.specs.spec_classes import LinkableInstanceSpec, MetricSpec
+from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
+from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.visitor import VisitorOutputT
 from typing_extensions import override
 

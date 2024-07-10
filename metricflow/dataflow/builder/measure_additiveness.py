@@ -4,7 +4,8 @@ import collections
 from dataclasses import dataclass
 from typing import Dict, Optional, Sequence, Tuple
 
-from metricflow_semantics.specs.spec_classes import MeasureSpec, NonAdditiveDimensionSpec
+from metricflow_semantics.specs.measure_spec import MeasureSpec
+from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDimensionSpec
 
 
 @dataclass(frozen=True)

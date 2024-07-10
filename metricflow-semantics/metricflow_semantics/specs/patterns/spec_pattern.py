@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Sequence
 
 if TYPE_CHECKING:
-    from metricflow_semantics.specs.spec_classes import InstanceSpec
+    from metricflow_semantics.specs.instance_spec import InstanceSpec
 
 
 class SpecPattern(ABC):

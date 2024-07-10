@@ -20,7 +20,7 @@ from metricflow_semantics.query.issues.parsing.offset_metric_requires_metric_tim
 )
 from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import ResolverInputForQuery
 from metricflow_semantics.query.validation_rules.base_validation_rule import PostResolutionQueryValidationRule
-from metricflow_semantics.specs.spec_classes import TimeDimensionSpec
+from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 
 
 class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):

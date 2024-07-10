@@ -9,7 +9,7 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 from metricflow_semantics.instances import InstanceSet, TimeDimensionInstance
-from metricflow_semantics.specs.spec_classes import TimeDimensionSpec
+from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 
 logger = logging.getLogger(__name__)
 

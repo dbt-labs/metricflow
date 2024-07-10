@@ -10,13 +10,11 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from typing_extensions import override
 
 from metricflow_semantics.naming.naming_scheme import QueryItemNamingScheme
+from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.patterns.entity_link_pattern import (
     EntityLinkPattern,
     EntityLinkPatternParameterSet,
     ParameterSetField,
-)
-from metricflow_semantics.specs.spec_classes import (
-    InstanceSpec,
 )
 from metricflow_semantics.specs.spec_set import InstanceSpecSet, InstanceSpecSetTransform, group_spec_by_type
 

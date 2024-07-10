@@ -6,11 +6,9 @@ from typing import Mapping
 import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.references import EntityReference
+from metricflow_semantics.specs.dimension_spec import DimensionSpec
+from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
-from metricflow_semantics.specs.spec_classes import (
-    DimensionSpec,
-    MetricSpec,
-)
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_plan_snapshot_text_equal
 

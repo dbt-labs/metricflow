@@ -7,7 +7,7 @@ from typing import Iterator, List, Optional, Sequence, Union
 from dbt_semantic_interfaces.references import SemanticModelReference
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId
-from metricflow_semantics.specs.spec_classes import WhereFilterSpec
+from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver

@@ -5,12 +5,10 @@ from dataclasses import dataclass
 from typing import List, Sequence, Tuple
 
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
+from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.partition_spec_set import PartitionSpecSet
-from metricflow_semantics.specs.spec_classes import (
-    DimensionSpec,
-    TimeDimensionSpec,
-)
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
+from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 
 from metricflow.dataset.dataset_classes import DataSet
 
