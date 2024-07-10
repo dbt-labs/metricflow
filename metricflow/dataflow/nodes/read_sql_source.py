@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import textwrap
+from dataclasses import dataclass
 from typing import Optional, Sequence
 
 import jinja2
@@ -14,17 +15,28 @@ from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNode
 from metricflow.dataset.sql_dataset import SqlDataSet
 
 
+@dataclass(frozen=True)
 class ReadSqlSourceNode(DataflowPlanNode):
-    """A source node where data from an SQL table or SQL query is read and output."""
+    """A source node where data from an SQL table or SQL query is read and output.
 
-    def __init__(self, data_set: SqlDataSet) -> None:
-        """Constructor.
+    Attributes:
+        data_set: Dataset describing the SQL table / SQL query.
+    """
 
-        Args:
-            data_set: dataset describing the SQL table / SQL query
-        """
-        self._dataset = data_set
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=())
+    data_set: SqlDataSet
+
+    def __post_init__(self) -> None:  # noqa: D105
+        super().__post_init__()
+        assert len(self.parent_nodes) == 0
+
+    @staticmethod
+    def create(  # noqa: D102
+        data_set: SqlDataSet,
+    ) -> ReadSqlSourceNode:
+        return ReadSqlSourceNode(
+            parent_nodes=(),
+            data_set=data_set,
+        )
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D102
@@ -38,11 +50,6 @@ class ReadSqlSourceNode(DataflowPlanNode):
     def _input_semantic_model(self) -> Optional[SemanticModelReference]:
         """Return the semantic model serving as direct input for this node, if one exists."""
         return self.data_set.semantic_model_reference
-
-    @property
-    def data_set(self) -> SqlDataSet:
-        """Return the data set that this source represents and is passed to the child nodes."""
-        return self._dataset
 
     def __str__(self) -> str:  # noqa: D105
         return jinja2.Template(
@@ -66,4 +73,4 @@ class ReadSqlSourceNode(DataflowPlanNode):
 
     def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> ReadSqlSourceNode:  # noqa: D102
         assert len(new_parent_nodes) == 0
-        return ReadSqlSourceNode(data_set=self.data_set)
+        return ReadSqlSourceNode.create(data_set=self.data_set)

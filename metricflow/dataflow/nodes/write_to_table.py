@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Sequence
 
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
@@ -12,23 +13,29 @@ from metricflow.dataflow.dataflow_plan import (
 from metricflow.sql.sql_table import SqlTable
 
 
+@dataclass(frozen=True)
 class WriteToResultTableNode(DataflowPlanNode):
-    """A node where incoming data gets written to a table."""
+    """A node where incoming data gets written to a table.
 
-    def __init__(
-        self,
+    Attributes:
+        output_sql_table: The table where the computed metrics should be written to.
+    """
+
+    output_sql_table: SqlTable
+
+    def __post_init__(self) -> None:  # noqa: D105
+        super().__post_init__()
+        assert len(self.parent_nodes) == 1
+
+    @staticmethod
+    def create(  # noqa: D102
         parent_node: DataflowPlanNode,
         output_sql_table: SqlTable,
-    ) -> None:
-        """Constructor.
-
-        Args:
-            parent_node: node that outputs the computed metrics.
-            output_sql_table: the table where the computed metrics should be written to.
-        """
-        self._parent_node = parent_node
-        self._output_sql_table = output_sql_table
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=(parent_node,))
+    ) -> WriteToResultTableNode:
+        return WriteToResultTableNode(
+            parent_nodes=(parent_node,),
+            output_sql_table=output_sql_table,
+        )
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D102
@@ -43,18 +50,13 @@ class WriteToResultTableNode(DataflowPlanNode):
 
     @property
     def parent_node(self) -> DataflowPlanNode:  # noqa: D102
-        assert len(self.parent_nodes) == 1
-        return self._parent_node
-
-    @property
-    def output_sql_table(self) -> SqlTable:  # noqa: D102
-        return self._output_sql_table
+        return self.parent_nodes[0]
 
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
         return isinstance(other_node, self.__class__) and other_node.output_sql_table == self.output_sql_table
 
     def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> WriteToResultTableNode:  # noqa: D102
-        return WriteToResultTableNode(
+        return WriteToResultTableNode.create(
             parent_node=new_parent_nodes[0],
             output_sql_table=self.output_sql_table,
         )

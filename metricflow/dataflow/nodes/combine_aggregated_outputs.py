@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Sequence
 
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
@@ -11,19 +12,21 @@ from metricflow.dataflow.dataflow_plan import (
 )
 
 
+@dataclass(frozen=True)
 class CombineAggregatedOutputsNode(DataflowPlanNode):
     """Combines metrics from different nodes into a single output."""
 
-    def __init__(  # noqa: D107
-        self,
-        parent_nodes: Sequence[DataflowPlanNode],
-    ) -> None:
-        num_parents = len(parent_nodes)
+    def __post_init__(self) -> None:  # noqa: D105
+        super().__post_init__()
+        num_parents = len(self.parent_nodes)
         assert num_parents > 1, (
             "The CombineAggregatedOutputsNode is intended to merge the output datasets from 2 or more nodes, but this "
             f"node is being initialized with with only {num_parents} parent(s)."
         )
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=parent_nodes)
+
+    @staticmethod
+    def create(parent_nodes: Sequence[DataflowPlanNode]) -> CombineAggregatedOutputsNode:  # noqa: D102
+        return CombineAggregatedOutputsNode(parent_nodes=tuple(parent_nodes))
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D102
@@ -42,4 +45,4 @@ class CombineAggregatedOutputsNode(DataflowPlanNode):
     def with_new_parents(  # noqa: D102
         self, new_parent_nodes: Sequence[DataflowPlanNode]
     ) -> CombineAggregatedOutputsNode:
-        return CombineAggregatedOutputsNode(parent_nodes=new_parent_nodes)
+        return CombineAggregatedOutputsNode(parent_nodes=tuple(new_parent_nodes))

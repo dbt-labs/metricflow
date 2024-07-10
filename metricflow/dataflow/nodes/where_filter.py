@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Sequence
 
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
@@ -10,31 +11,33 @@ from metricflow_semantics.visitor import VisitorOutputT
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNodeVisitor
 
 
+@dataclass(frozen=True)
 class WhereConstraintNode(DataflowPlanNode):
-    """Remove rows using a WHERE clause."""
+    """Remove rows using a WHERE clause.
 
-    def __init__(
-        self,
+    Attributes:
+        where_specs: Specifications for the WHERE clause to filter rows.
+        always_apply: Indicator if the WHERE clause should always be applied.
+    """
+
+    where_specs: Sequence[WhereFilterSpec]
+    always_apply: bool
+
+    def __post_init__(self) -> None:  # noqa: D105
+        super().__post_init__()
+        assert len(self.parent_nodes) == 1
+
+    @staticmethod
+    def create(  # noqa: D102
         parent_node: DataflowPlanNode,
         where_specs: Sequence[WhereFilterSpec],
         always_apply: bool = False,
-    ) -> None:
-        """Initializer.
-
-        WhereConstraintNodes must always have exactly one parent, since they always wrap a single subquery input.
-
-        The always_apply parameter serves as an indicator for a WhereConstraintNode that is added to a plan in order
-        to clean up null outputs from a pre-join filter. For example, when doing time spine joins to fill null values
-        for metric outputs sometimes that join will result in rows with null values for various dimension attributes.
-        By re-applying the filter expression after the join step we will discard those unexpected output rows created
-        by the join (rather than the underlying inputs). In this case, we must ensure that the filters defined in this
-        node are always applied at the moment this node is processed, regardless of whether or not they've been pushed
-        down through the DAG.
-        """
-        self._where_specs = where_specs
-        self.parent_node = parent_node
-        self.always_apply = always_apply
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=(parent_node,))
+    ) -> WhereConstraintNode:
+        return WhereConstraintNode(
+            parent_nodes=(parent_node,),
+            where_specs=where_specs,
+            always_apply=always_apply,
+        )
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D102
@@ -43,7 +46,7 @@ class WhereConstraintNode(DataflowPlanNode):
     @property
     def where(self) -> WhereFilterSpec:
         """Returns the specs for the elements that it should pass."""
-        return WhereFilterSpec.merge_iterable(self._where_specs)
+        return WhereFilterSpec.merge_iterable(self.where_specs)
 
     @property
     def input_where_specs(self) -> Sequence[WhereFilterSpec]:
@@ -53,7 +56,7 @@ class WhereConstraintNode(DataflowPlanNode):
         for pushdown operations on the filter spec level. We merge them for things like rendering and node comparisons,
         but in some cases we may be able to push down a subset of the input specs for efficiency reasons.
         """
-        return self._where_specs
+        return self.where_specs
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_where_constraint_node(self)
@@ -63,6 +66,10 @@ class WhereConstraintNode(DataflowPlanNode):
         # Can't put the where condition here as it can cause rendering issues when there are SQL execution parameters.
         # e.g. "Constrain Output with WHERE listing__country = :1"
         return "Constrain Output with WHERE"
+
+    @property
+    def parent_node(self) -> DataflowPlanNode:  # noqa: D102
+        return self.parent_nodes[0]
 
     @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
@@ -80,6 +87,8 @@ class WhereConstraintNode(DataflowPlanNode):
 
     def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> WhereConstraintNode:  # noqa: D102
         assert len(new_parent_nodes) == 1
-        return WhereConstraintNode(
-            parent_node=new_parent_nodes[0], where_specs=self.input_where_specs, always_apply=self.always_apply
+        return WhereConstraintNode.create(
+            parent_node=new_parent_nodes[0],
+            where_specs=self.input_where_specs,
+            always_apply=self.always_apply,
         )

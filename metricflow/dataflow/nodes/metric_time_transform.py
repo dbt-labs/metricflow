@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Sequence
 
 from dbt_semantic_interfaces.references import TimeDimensionReference
@@ -10,6 +11,7 @@ from metricflow_semantics.visitor import VisitorOutputT
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNodeVisitor
 
 
+@dataclass(frozen=True)
 class MetricTimeDimensionTransformNode(DataflowPlanNode):
     """A node transforms the input data set so that it contains the metric time dimension and relevant measures.
 
@@ -19,42 +21,47 @@ class MetricTimeDimensionTransformNode(DataflowPlanNode):
 
     Output: a data set similar to the input data set, but includes the configured aggregation time dimension as the
     metric time dimension and only contains measures that are defined to use it.
+
+    Attributes:
+        aggregation_time_dimension_reference: The time dimension that measures in the input should be aggregated to.
     """
 
-    def __init__(  # noqa: D107
-        self,
+    aggregation_time_dimension_reference: TimeDimensionReference
+
+    def __post_init__(self) -> None:  # noqa: D105
+        super().__post_init__()
+        assert len(self.parent_nodes) == 1
+
+    @staticmethod
+    def create(  # noqa: D102
         parent_node: DataflowPlanNode,
         aggregation_time_dimension_reference: TimeDimensionReference,
-    ) -> None:
-        self._aggregation_time_dimension_reference = aggregation_time_dimension_reference
-        self._parent_node = parent_node
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=[parent_node])
+    ) -> MetricTimeDimensionTransformNode:
+        return MetricTimeDimensionTransformNode(
+            parent_nodes=(parent_node,),
+            aggregation_time_dimension_reference=aggregation_time_dimension_reference,
+        )
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D102
         return StaticIdPrefix.DATAFLOW_NODE_SET_MEASURE_AGGREGATION_TIME
-
-    @property
-    def aggregation_time_dimension_reference(self) -> TimeDimensionReference:
-        """The time dimension that measures in the input should be aggregated to."""
-        return self._aggregation_time_dimension_reference
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_metric_time_dimension_transform_node(self)
 
     @property
     def description(self) -> str:  # noqa: D102
-        return f"Metric Time Dimension '{self.aggregation_time_dimension_reference.element_name}'" ""
+        return f"Metric Time Dimension '{self.aggregation_time_dimension_reference.element_name}'"
+
+    @property
+    def parent_node(self) -> DataflowPlanNode:  # noqa: D102
+        return self.parent_nodes[0]
 
     @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
         return tuple(super().displayed_properties) + (
             DisplayedProperty("aggregation_time_dimension", self.aggregation_time_dimension_reference.element_name),
         )
-
-    @property
-    def parent_node(self) -> DataflowPlanNode:  # noqa: D102
-        return self._parent_node
 
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
         return (
@@ -66,7 +73,7 @@ class MetricTimeDimensionTransformNode(DataflowPlanNode):
         self, new_parent_nodes: Sequence[DataflowPlanNode]
     ) -> MetricTimeDimensionTransformNode:  # noqa: D102
         assert len(new_parent_nodes) == 1
-        return MetricTimeDimensionTransformNode(
+        return MetricTimeDimensionTransformNode.create(
             parent_node=new_parent_nodes[0],
             aggregation_time_dimension_reference=self.aggregation_time_dimension_reference,
         )

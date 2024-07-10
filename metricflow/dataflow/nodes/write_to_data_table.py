@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Sequence
 
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
@@ -11,12 +12,21 @@ from metricflow.dataflow.dataflow_plan import (
 )
 
 
+@dataclass(frozen=True)
 class WriteToResultDataTableNode(DataflowPlanNode):
     """A node where incoming data gets written to a data_table."""
 
-    def __init__(self, parent_node: DataflowPlanNode) -> None:  # noqa: D107
-        self._parent_node = parent_node
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=(parent_node,))
+    def __post_init__(self) -> None:  # noqa: D105
+        super().__post_init__()
+        assert len(self.parent_nodes) == 1
+
+    @staticmethod
+    def create(  # noqa: D102
+        parent_node: DataflowPlanNode,
+    ) -> WriteToResultDataTableNode:
+        return WriteToResultDataTableNode(
+            parent_nodes=(parent_node,),
+        )
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D102
@@ -31,8 +41,7 @@ class WriteToResultDataTableNode(DataflowPlanNode):
 
     @property
     def parent_node(self) -> DataflowPlanNode:  # noqa: D102
-        assert len(self.parent_nodes) == 1
-        return self._parent_node
+        return self.parent_nodes[0]
 
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
         return isinstance(other_node, self.__class__)
@@ -41,4 +50,4 @@ class WriteToResultDataTableNode(DataflowPlanNode):
         self, new_parent_nodes: Sequence[DataflowPlanNode]
     ) -> WriteToResultDataTableNode:
         assert len(new_parent_nodes) == 1
-        return WriteToResultDataTableNode(parent_node=new_parent_nodes[0])
+        return WriteToResultDataTableNode.create(parent_node=new_parent_nodes[0])
