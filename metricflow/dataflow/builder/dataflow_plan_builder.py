@@ -50,7 +50,7 @@ from metricflow_semantics.specs.spec_classes import (
     WhereFilterSpec,
 )
 from metricflow_semantics.specs.spec_set import InstanceSpecSet, group_specs_by_type
-from metricflow_semantics.specs.where_filter_transform import WhereSpecFactory
+from metricflow_semantics.specs.where_filter.where_filter_transform import WhereSpecFactory
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.time.dateutil_adjuster import DateutilTimePeriodAdjuster
 

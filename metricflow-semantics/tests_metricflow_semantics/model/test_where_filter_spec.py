@@ -57,7 +57,7 @@ from metricflow_semantics.specs.spec_classes import (
     TimeDimensionSpec,
     WhereFilterSpec,
 )
-from metricflow_semantics.specs.where_filter_transform import WhereSpecFactory
+from metricflow_semantics.specs.where_filter.where_filter_transform import WhereSpecFactory
 
 from tests_metricflow_semantics.specs.conftest import EXAMPLE_FILTER_LOCATION
 

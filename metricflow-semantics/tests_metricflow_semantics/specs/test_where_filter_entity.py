@@ -7,7 +7,7 @@ from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec
 )
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.rendered_spec_tracker import RenderedSpecTracker
-from metricflow_semantics.specs.where_filter_entity import WhereFilterEntity
+from metricflow_semantics.specs.where_filter.where_filter_entity import WhereFilterEntity
 
 from tests_metricflow_semantics.specs.conftest import EXAMPLE_FILTER_LOCATION
 
