@@ -41,11 +41,6 @@ class TimeDimensionParameter(ProtocolHint[TimeDimensionQueryParameter]):
     grain: Optional[TimeGranularity] = None
     date_part: Optional[DatePart] = None
 
-    def __post_init__(self) -> None:  # noqa: D105
-        parsed_name = StructuredLinkableSpecName.from_name(self.name)
-        if parsed_name.time_granularity:
-            raise ValueError("Must use object syntax for `grain` parameter if `date_part` is requested.")
-
     @property
     def query_resolver_input(self) -> ResolverInputForGroupByItem:  # noqa: D102
         fields_to_compare = [
@@ -53,7 +48,6 @@ class TimeDimensionParameter(ProtocolHint[TimeDimensionQueryParameter]):
             ParameterSetField.ENTITY_LINKS,
             ParameterSetField.DATE_PART,
         ]
-        # Is this left out because it needs to be resplved? If so document that.
         if self.grain is not None:
             fields_to_compare.append(ParameterSetField.TIME_GRANULARITY)
 

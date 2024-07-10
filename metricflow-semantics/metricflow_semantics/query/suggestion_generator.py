@@ -10,8 +10,9 @@ from dbt_semantic_interfaces.references import MetricReference
 from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow_semantics.naming.naming_scheme import QueryItemNamingScheme
 from metricflow_semantics.query.similarity import top_fuzzy_matches
-from metricflow_semantics.specs.patterns.default_time_granularity import DefaultTimeGranularityPattern
 from metricflow_semantics.specs.patterns.match_list_pattern import MatchListSpecPattern
+from metricflow_semantics.specs.patterns.metric_time_default_granularity import MetricTimeDefaultGranularityPattern
+from metricflow_semantics.specs.patterns.min_time_grain import MinimumTimeGrainPattern
 from metricflow_semantics.specs.patterns.no_group_by_metric import NoGroupByMetricPattern
 from metricflow_semantics.specs.patterns.none_date_part import NoneDatePartPattern
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
@@ -61,11 +62,16 @@ class QueryItemSuggestionGenerator:
     def candidate_filters(self) -> Tuple[SpecPattern, ...]:
         """Filters to apply before determining suggestions.
 
-        These eensure we don't get multiple suggestions that are similar, but with different grains or date_parts.
+        These ensure we don't get multiple suggestions that are similar, but with different grains or date_parts.
         """
         default_filters = (
-            DefaultTimeGranularityPattern(metric_lookup=self._metric_lookup, queried_metrics=self._queried_metrics),
             NoneDatePartPattern(),
+            # MetricTimeDefaultGranularityPattern must come before MinimumTimeGrainPattern to ensure we don't remove the
+            # default grain from candiate set prematurely.
+            MetricTimeDefaultGranularityPattern(
+                metric_lookup=self._metric_lookup, queried_metrics=self._queried_metrics
+            ),
+            MinimumTimeGrainPattern(),
         )
         if self._query_part is QueryPartForSuggestions.WHERE_FILTER:
             return default_filters

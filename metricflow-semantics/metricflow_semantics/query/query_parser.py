@@ -52,8 +52,8 @@ from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import (
     ResolverInputForQuery,
     ResolverInputForQueryLevelWhereFilterIntersection,
 )
-from metricflow_semantics.specs.patterns.base_time_grain import MinimumTimeGrainPattern
 from metricflow_semantics.specs.patterns.metric_time_pattern import MetricTimePattern
+from metricflow_semantics.specs.patterns.min_time_grain import MinimumTimeGrainPattern
 from metricflow_semantics.specs.patterns.none_date_part import NoneDatePartPattern
 from metricflow_semantics.specs.query_param_implementations import DimensionOrEntityParameter, MetricParameter
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
@@ -187,7 +187,7 @@ class MetricFlowQueryParser:
                 manifest_lookup=self._manifest_lookup,
                 resolution_dag=resolution_dag,
             )
-            metric_time_granularity = group_by_item_resolver.resolve_default_metric_time_grain(
+            metric_time_granularity = group_by_item_resolver.resolve_min_metric_time_grain(
                 metrics_in_query=metrics_in_query
             )
 
