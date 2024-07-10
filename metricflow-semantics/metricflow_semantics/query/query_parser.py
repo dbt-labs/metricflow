@@ -52,7 +52,7 @@ from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import (
     ResolverInputForQuery,
     ResolverInputForQueryLevelWhereFilterIntersection,
 )
-from metricflow_semantics.specs.patterns.base_time_grain import BaseTimeGrainPattern
+from metricflow_semantics.specs.patterns.base_time_grain import MinimumTimeGrainPattern
 from metricflow_semantics.specs.patterns.metric_time_pattern import MetricTimePattern
 from metricflow_semantics.specs.patterns.none_date_part import NoneDatePartPattern
 from metricflow_semantics.specs.query_param_implementations import DimensionOrEntityParameter, MetricParameter
@@ -154,7 +154,7 @@ class MetricFlowQueryParser:
 
         for pattern_to_apply in (
             MetricTimePattern(),
-            BaseTimeGrainPattern(),
+            MinimumTimeGrainPattern(),
             NoneDatePartPattern(),
         ):
             matching_specs = pattern_to_apply.match(matching_specs)
@@ -165,7 +165,7 @@ class MetricFlowQueryParser:
 
         assert (
             len(time_dimension_specs) == 1
-        ), f"Bug with DefaultTimeGranularityPattern - should have returned exactly 1 spec but got {time_dimension_specs}"
+        ), f"Bug with MinimumTimeGrainPattern - should have returned exactly 1 spec but got {time_dimension_specs}"
 
         return time_dimension_specs[0].time_granularity
 
@@ -182,8 +182,7 @@ class MetricFlowQueryParser:
         """
         metric_time_granularity = self._get_smallest_requested_metric_time_granularity(time_dimension_specs_in_query)
         if metric_time_granularity is None:
-            # This indicates there were no metric time specs in the query with granularity specified, so use
-            # the queried metrics to figure out what the granularity will be resolved to.
+            # This indicates there were no metric time specs in the query, so use smallest available granularity for metric_time.
             group_by_item_resolver = GroupByItemResolver(
                 manifest_lookup=self._manifest_lookup,
                 resolution_dag=resolution_dag,
@@ -507,11 +506,7 @@ class MetricFlowQueryParser:
                 ),
             )
             logger.info(f"Time constraint after adjustment is: {time_constraint}")
-
-            return ParseQueryResult(
-                query_spec=query_spec.with_time_range_constraint(time_constraint),
-                queried_semantic_models=query_resolution.queried_semantic_models,
-            )
+            query_spec = query_spec.with_time_range_constraint(time_constraint)
 
         return ParseQueryResult(
             query_spec=query_spec,

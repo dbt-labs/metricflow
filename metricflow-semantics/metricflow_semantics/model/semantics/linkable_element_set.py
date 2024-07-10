@@ -386,7 +386,7 @@ class LinkableElementSet(SemanticModelDerivation):
         """
         start_time = time.time()
 
-        # Spec patterns need all specs to match properly e.g. `DefaultTimeGranularityPattern`.
+        # Spec patterns need all specs to match properly e.g. `MinimumTimeGrainPattern`.
         matching_specs: Sequence[InstanceSpec] = self.specs
 
         for spec_pattern in spec_patterns:
