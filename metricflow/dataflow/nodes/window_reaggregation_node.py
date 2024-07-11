@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Sequence, Set
 
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
@@ -14,32 +15,45 @@ from metricflow.dataflow.dataflow_plan import (
 from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 
 
+@dataclass(frozen=True)
 class WindowReaggregationNode(DataflowPlanNode):
     """A node that re-aggregates metrics using window functions.
 
     Currently used for calculating cumulative metrics at various granularities.
+
+    Attributes:
+        metric_spec: Specification of the metric to be re-aggregated.
+        order_by_spec: Specification of the time dimension to order by.
+        partition_by_specs: Specifications of the instances to partition by.
     """
 
-    def __init__(  # noqa: D107
-        self,
+    metric_spec: MetricSpec
+    order_by_spec: TimeDimensionSpec
+    partition_by_specs: Sequence[InstanceSpec]
+
+    def __post_init__(self) -> None:  # noqa: D105
+        super().__post_init__()
+        assert len(self.parent_nodes) == 1
+        if self.order_by_spec in self.partition_by_specs:
+            raise ValueError(
+                "Order by spec found in partition by specs for WindowAggregationNode. This indicates internal misconfiguration"
+                f" because reaggregation should not be needed in this circumstance. Order by spec: {self.order_by_spec}; "
+                f"Partition by specs:{self.partition_by_specs}"
+            )
+
+    @staticmethod
+    def create(  # noqa: D102
         parent_node: ComputeMetricsNode,
         metric_spec: MetricSpec,
         order_by_spec: TimeDimensionSpec,
         partition_by_specs: Sequence[InstanceSpec],
-    ) -> None:
-        if order_by_spec in partition_by_specs:
-            raise ValueError(
-                "Order by spec found in parition by specs for WindowAggregationNode. This indicates internal misconfiguration"
-                f" because reaggregation should not be needed in this circumstance. Order by spec: {order_by_spec}; "
-                f"Partition by specs:{partition_by_specs}"
-            )
-
-        self.parent_node = parent_node
-        self.metric_spec = metric_spec
-        self.order_by_spec = order_by_spec
-        self.partition_by_specs = partition_by_specs
-
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=(self.parent_node,))
+    ) -> WindowReaggregationNode:
+        return WindowReaggregationNode(
+            parent_nodes=(parent_node,),
+            metric_spec=metric_spec,
+            order_by_spec=order_by_spec,
+            partition_by_specs=partition_by_specs,
+        )
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D102
@@ -53,6 +67,10 @@ class WindowReaggregationNode(DataflowPlanNode):
         return """Re-aggregate Metrics via Window Functions"""
 
     @property
+    def parent_node(self) -> DataflowPlanNode:  # noqa: D102
+        return self.parent_nodes[0]
+
+    @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
         return tuple(super().displayed_properties) + (
             DisplayedProperty("metric_spec", self.metric_spec),
@@ -63,7 +81,7 @@ class WindowReaggregationNode(DataflowPlanNode):
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
         return (
             isinstance(other_node, self.__class__)
-            and other_node.parent_node == self.parent_node
+            and other_node.parent_nodes == self.parent_nodes
             and other_node.metric_spec == self.metric_spec
             and other_node.order_by_spec == self.order_by_spec
             and other_node.partition_by_specs == self.partition_by_specs
@@ -75,7 +93,7 @@ class WindowReaggregationNode(DataflowPlanNode):
         assert isinstance(
             new_parent_node, ComputeMetricsNode
         ), "WindowReaggregationNode can only have ComputeMetricsNode as parent node."
-        return WindowReaggregationNode(
+        return WindowReaggregationNode.create(
             parent_node=new_parent_node,
             metric_spec=self.metric_spec,
             order_by_spec=self.order_by_spec,

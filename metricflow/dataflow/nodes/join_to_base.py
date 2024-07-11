@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Optional, Sequence, Tuple
+from typing import Optional, Sequence, Tuple
 
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
-from metricflow_semantics.dag.mf_dag import DisplayedProperty, NodeId
+from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.specs.spec_classes import LinklessEntitySpec, TimeDimensionSpec
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.visitor import VisitorOutputT
@@ -42,30 +42,29 @@ class JoinDescription:
             raise RuntimeError("`join_on_entity` is required unless using CROSS JOIN.")
 
 
+@dataclass(frozen=True)
 class JoinOnEntitiesNode(DataflowPlanNode):
-    """A node that joins data from other nodes via the entities in the inputs."""
+    """A node that joins data from other nodes via the entities in the inputs.
 
-    def __init__(
-        self,
+    Attributes:
+        left_node: Node with standard output.
+        join_targets: Other sources that should be joined to this node.
+    """
+
+    left_node: DataflowPlanNode
+    join_targets: Tuple[JoinDescription, ...]
+
+    @staticmethod
+    def create(  # noqa: D102
         left_node: DataflowPlanNode,
         join_targets: Sequence[JoinDescription],
-        node_id: Optional[NodeId] = None,
-    ) -> None:
-        """Constructor.
-
-        Args:
-            left_node: node with standard output
-            join_targets: other sources that should be joined to this node.
-            node_id: Override the node ID with this value
-        """
-        self._left_node = left_node
-        self._join_targets = tuple(join_targets)
-
-        # Doing a list comprehension throws a type error, so doing it this way.
-        parent_nodes: List[DataflowPlanNode] = [self._left_node]
-        for join_target in self._join_targets:
-            parent_nodes.append(join_target.join_node)
-        super().__init__(node_id=node_id or self.create_unique_id(), parent_nodes=parent_nodes)
+    ) -> JoinOnEntitiesNode:
+        parent_nodes = [left_node] + [join_target.join_node for join_target in join_targets]
+        return JoinOnEntitiesNode(
+            parent_nodes=tuple(parent_nodes),
+            left_node=left_node,
+            join_targets=tuple(join_targets),
+        )
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D102
@@ -79,18 +78,10 @@ class JoinOnEntitiesNode(DataflowPlanNode):
         return """Join Standard Outputs"""
 
     @property
-    def left_node(self) -> DataflowPlanNode:  # noqa: D102
-        return self._left_node
-
-    @property
-    def join_targets(self) -> Sequence[JoinDescription]:  # noqa: D102
-        return self._join_targets
-
-    @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
         return tuple(super().displayed_properties) + tuple(
             DisplayedProperty(f"join{i}_for_node_id_{join_description.join_node.node_id}", join_description)
-            for i, join_description in enumerate(self._join_targets)
+            for i, join_description in enumerate(self.join_targets)
         )
 
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
@@ -113,9 +104,9 @@ class JoinOnEntitiesNode(DataflowPlanNode):
         assert len(new_parent_nodes) > 1
         new_left_node = new_parent_nodes[0]
         new_join_nodes = new_parent_nodes[1:]
-        assert len(new_join_nodes) == len(self._join_targets)
+        assert len(new_join_nodes) == len(self.join_targets)
 
-        return JoinOnEntitiesNode(
+        return JoinOnEntitiesNode.create(
             left_node=new_left_node,
             join_targets=[
                 JoinDescription(
@@ -126,6 +117,6 @@ class JoinOnEntitiesNode(DataflowPlanNode):
                     validity_window=old_join_target.validity_window,
                     join_type=old_join_target.join_type,
                 )
-                for i, old_join_target in enumerate(self._join_targets)
+                for i, old_join_target in enumerate(self.join_targets)
             ],
         )

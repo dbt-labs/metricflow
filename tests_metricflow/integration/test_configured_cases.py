@@ -97,8 +97,8 @@ class CheckQueryHelpers:
         granularity: TimeGranularity,
     ) -> str:
         """Renders a date subtract expression."""
-        expr = SqlSubtractTimeIntervalExpression(
-            arg=SqlColumnReferenceExpression(SqlColumnReference(table_alias, column_alias)),
+        expr = SqlSubtractTimeIntervalExpression.create(
+            arg=SqlColumnReferenceExpression.create(SqlColumnReference(table_alias, column_alias)),
             count=count,
             granularity=granularity,
         )
@@ -106,10 +106,10 @@ class CheckQueryHelpers:
 
     def render_date_trunc(self, expr: str, granularity: TimeGranularity) -> str:
         """Return the DATE_TRUNC() call that can be used for converting the given expr to the granularity."""
-        renderable_expr = SqlDateTruncExpression(
+        renderable_expr = SqlDateTruncExpression.create(
             time_granularity=granularity,
-            arg=SqlCastToTimestampExpression(
-                arg=SqlStringExpression(
+            arg=SqlCastToTimestampExpression.create(
+                arg=SqlStringExpression.create(
                     sql_expr=expr,
                     requires_parenthesis=False,
                 )
@@ -119,10 +119,10 @@ class CheckQueryHelpers:
 
     def render_extract(self, expr: str, date_part: DatePart) -> str:
         """Return the EXTRACT call that can be used for converting the given expr to the date_part."""
-        renderable_expr = SqlExtractExpression(
+        renderable_expr = SqlExtractExpression.create(
             date_part=date_part,
-            arg=SqlCastToTimestampExpression(
-                arg=SqlStringExpression(
+            arg=SqlCastToTimestampExpression.create(
+                arg=SqlStringExpression.create(
                     sql_expr=expr,
                     requires_parenthesis=False,
                 )
@@ -142,8 +142,8 @@ class CheckQueryHelpers:
             )
         )
 
-        renderable_expr = SqlPercentileExpression(
-            order_by_arg=SqlStringExpression(
+        renderable_expr = SqlPercentileExpression.create(
+            order_by_arg=SqlStringExpression.create(
                 sql_expr=expr,
                 requires_parenthesis=False,
             ),
@@ -191,7 +191,7 @@ class CheckQueryHelpers:
 
     def generate_random_uuid(self) -> str:
         """Returns the generate random UUID SQL function."""
-        expr = SqlGenerateUuidExpression()
+        expr = SqlGenerateUuidExpression.create()
         return self._sql_client.sql_query_plan_renderer.expr_renderer.render_sql_expr(expr).sql
 
 

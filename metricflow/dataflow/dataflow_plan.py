@@ -5,11 +5,12 @@ from __future__ import annotations
 import logging
 import typing
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from typing import FrozenSet, Generic, Optional, Sequence, Set, Type, TypeVar
 
 import more_itertools
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
-from metricflow_semantics.dag.mf_dag import DagId, DagNode, MetricFlowDag, NodeId
+from metricflow_semantics.dag.mf_dag import DagId, DagNode, MetricFlowDag
 from metricflow_semantics.visitor import Visitable, VisitorOutputT
 
 if typing.TYPE_CHECKING:
@@ -42,27 +43,13 @@ logger = logging.getLogger(__name__)
 NodeSelfT = TypeVar("NodeSelfT", bound="DataflowPlanNode")
 
 
-class DataflowPlanNode(DagNode, Visitable, ABC):
+@dataclass(frozen=True)
+class DataflowPlanNode(DagNode["DataflowPlanNode"], Visitable, ABC):
     """A node in the graph representation of the dataflow.
 
     Each node in the graph performs an operation from the data that comes from the parent nodes, and the result is
     passed to the child nodes. The flow of data starts from source nodes, and ends at sink nodes.
     """
-
-    def __init__(self, node_id: NodeId, parent_nodes: Sequence[DataflowPlanNode]) -> None:
-        """Constructor.
-
-        Args:
-            node_id: the ID for the node
-            parent_nodes: data comes from the parent nodes.
-        """
-        self._parent_nodes = tuple(parent_nodes)
-        super().__init__(node_id=node_id)
-
-    @property
-    def parent_nodes(self) -> Sequence[DataflowPlanNode]:
-        """Return the nodes where data for this node comes from."""
-        return self._parent_nodes
 
     @property
     def _input_semantic_model(self) -> Optional[SemanticModelReference]:

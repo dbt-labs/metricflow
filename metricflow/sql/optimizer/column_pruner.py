@@ -98,12 +98,12 @@ class SqlColumnPrunerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
             else:
                 pruned_join_descriptions.append(join_description)
 
-        return SqlSelectStatementNode(
+        return SqlSelectStatementNode.create(
             description=node.description,
             select_columns=pruned_select_columns,
             from_source=pruned_from_source,
             from_source_alias=node.from_source_alias,
-            joins_descs=tuple(pruned_join_descriptions),
+            join_descs=tuple(pruned_join_descriptions),
             group_bys=node.group_bys,
             order_bys=node.order_bys,
             where=node.where,
@@ -178,12 +178,12 @@ class SqlColumnPrunerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
                 )
             )
 
-        return SqlSelectStatementNode(
+        return SqlSelectStatementNode.create(
             description=node.description,
             select_columns=tuple(pruned_select_columns),
             from_source=pruned_from_source,
             from_source_alias=node.from_source_alias,
-            joins_descs=tuple(pruned_join_descriptions),
+            join_descs=tuple(pruned_join_descriptions),
             group_bys=node.group_bys,
             order_bys=node.order_bys,
             where=node.where,
@@ -200,7 +200,7 @@ class SqlColumnPrunerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
         return node
 
     def visit_create_table_as_node(self, node: SqlCreateTableAsNode) -> SqlQueryPlanNode:  # noqa: D102
-        return SqlCreateTableAsNode(
+        return SqlCreateTableAsNode.create(
             sql_table=node.sql_table,
             parent_node=node.parent_node.accept(self),
         )

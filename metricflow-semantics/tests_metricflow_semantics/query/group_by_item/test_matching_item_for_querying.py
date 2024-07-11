@@ -131,7 +131,7 @@ def test_missing_parent_for_metric(
     or measures). However, in the event of a validation gap upstream, we sometimes encounter inscrutable errors
     caused by missing parent nodes for these input types, so we add a more informative error and test for it here.
     """
-    metric_node = MetricGroupByItemResolutionNode(
+    metric_node = MetricGroupByItemResolutionNode.create(
         metric_reference=MetricReference(element_name="bad_metric"), metric_input_location=None, parent_nodes=tuple()
     )
     resolution_dag = GroupByItemResolutionDag(sink_node=metric_node)

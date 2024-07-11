@@ -65,7 +65,7 @@ class RewritableSqlClauses:
         if len(all_where_clauses) == 1:
             return all_where_clauses[0]
         elif len(all_where_clauses) > 1:
-            return SqlLogicalExpression(
+            return SqlLogicalExpression.create(
                 operator=SqlLogicalOperator.AND,
                 args=tuple(all_where_clauses),
             )
@@ -93,12 +93,12 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
         node: SqlSelectStatementNode,
     ) -> SqlSelectStatementNode:
         """Apply the reducing operation to the parent select statements."""
-        return SqlSelectStatementNode(
+        return SqlSelectStatementNode.create(
             description=node.description,
             select_columns=node.select_columns,
             from_source=node.from_source.accept(self),
             from_source_alias=node.from_source_alias,
-            joins_descs=tuple(
+            join_descs=tuple(
                 SqlJoinDescription(
                     right_source=x.right_source.accept(self),
                     right_source_alias=x.right_source_alias,
@@ -401,7 +401,7 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
         # For type checking. The above conditionals should ensure the below.
         assert node_where
         assert parent_node_where
-        return SqlLogicalExpression(operator=SqlLogicalOperator.AND, args=(node_where, parent_node_where))
+        return SqlLogicalExpression.create(operator=SqlLogicalOperator.AND, args=(node_where, parent_node_where))
 
     @staticmethod
     def _find_matching_select_column(
@@ -568,12 +568,12 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
                 for x in new_join_descs
             ]
 
-        return SqlSelectStatementNode(
+        return SqlSelectStatementNode.create(
             description=node.description,
             select_columns=tuple(clauses_to_rewrite.select_columns),
             from_source=from_source,
             from_source_alias=from_source_alias,
-            joins_descs=tuple(new_join_descs),
+            join_descs=tuple(new_join_descs),
             group_bys=tuple(clauses_to_rewrite.group_bys),
             order_bys=tuple(clauses_to_rewrite.order_bys),
             where=clauses_to_rewrite.combine_wheres(additional_where_clauses),
@@ -656,7 +656,7 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
 
                 new_order_bys.append(
                     SqlOrderByDescription(
-                        expr=SqlColumnAliasReferenceExpression(column_alias=matching_select_column.column_alias),
+                        expr=SqlColumnAliasReferenceExpression.create(column_alias=matching_select_column.column_alias),
                         desc=order_by_item.desc,
                     )
                 )
@@ -681,14 +681,14 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
         elif parent_select_node.group_bys:
             new_group_bys = parent_select_node.group_bys
 
-        return SqlSelectStatementNode(
+        return SqlSelectStatementNode.create(
             description="\n".join([parent_select_node.description, node_with_reduced_parents.description]),
             select_columns=SqlRewritingSubQueryReducerVisitor._rewrite_select_columns(
                 old_select_columns=node.select_columns, column_replacements=column_replacements
             ),
             from_source=parent_select_node.from_source,
             from_source_alias=parent_select_node.from_source_alias,
-            joins_descs=parent_select_node.join_descs,
+            join_descs=parent_select_node.join_descs,
             group_bys=new_group_bys,
             order_bys=tuple(new_order_bys),
             where=SqlRewritingSubQueryReducerVisitor._rewrite_where(
@@ -707,7 +707,7 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
         return node
 
     def visit_create_table_as_node(self, node: SqlCreateTableAsNode) -> SqlQueryPlanNode:  # noqa: D102
-        return SqlCreateTableAsNode(
+        return SqlCreateTableAsNode.create(
             sql_table=node.sql_table,
             parent_node=node.parent_node.accept(self),
         )
@@ -735,7 +735,7 @@ class SqlGroupByRewritingVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
             if matching_select_column:
                 new_group_bys.append(
                     SqlSelectColumn(
-                        expr=SqlColumnAliasReferenceExpression(column_alias=matching_select_column.column_alias),
+                        expr=SqlColumnAliasReferenceExpression.create(column_alias=matching_select_column.column_alias),
                         column_alias=matching_select_column.column_alias,
                     )
                 )
@@ -743,12 +743,12 @@ class SqlGroupByRewritingVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
                 logger.info(f"Did not find matching select for {group_by} in:\n{indent(node.structure_text())}")
                 new_group_bys.append(group_by)
 
-        return SqlSelectStatementNode(
+        return SqlSelectStatementNode.create(
             description=node.description,
             select_columns=node.select_columns,
             from_source=node.from_source.accept(self),
             from_source_alias=node.from_source_alias,
-            joins_descs=tuple(
+            join_descs=tuple(
                 SqlJoinDescription(
                     right_source=x.right_source.accept(self),
                     right_source_alias=x.right_source_alias,
@@ -771,7 +771,7 @@ class SqlGroupByRewritingVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
         return node
 
     def visit_create_table_as_node(self, node: SqlCreateTableAsNode) -> SqlQueryPlanNode:  # noqa: D102
-        return SqlCreateTableAsNode(
+        return SqlCreateTableAsNode.create(
             sql_table=node.sql_table,
             parent_node=node.parent_node.accept(self),
         )

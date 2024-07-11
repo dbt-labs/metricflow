@@ -5,10 +5,10 @@ from __future__ import annotations
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Generic, List, Optional, Sequence, Tuple
+from typing import Generic, Optional, Sequence, Tuple
 
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
-from metricflow_semantics.dag.mf_dag import DagId, DagNode, DisplayedProperty, MetricFlowDag, NodeId
+from metricflow_semantics.dag.mf_dag import DagId, DagNode, DisplayedProperty, MetricFlowDag
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.visitor import VisitorOutputT
 from typing_extensions import override
@@ -19,7 +19,8 @@ from metricflow.sql.sql_table import SqlTable
 logger = logging.getLogger(__name__)
 
 
-class SqlQueryPlanNode(DagNode, ABC):
+@dataclass(frozen=True)
+class SqlQueryPlanNode(DagNode["SqlQueryPlanNode"], ABC):
     """Modeling a SQL query plan like a data flow plan as well.
 
     In that model:
@@ -32,14 +33,6 @@ class SqlQueryPlanNode(DagNode, ABC):
 
     Is there an existing library that can do this?
     """
-
-    def __init__(self, node_id: NodeId, parent_nodes: Sequence[SqlQueryPlanNode]) -> None:  # noqa: D107
-        self._parent_nodes = parent_nodes
-        super().__init__(node_id=node_id)
-
-    @property
-    def parent_nodes(self) -> List[SqlQueryPlanNode]:  # noqa: D102
-        return list(self._parent_nodes)
 
     @abstractmethod
     def accept(self, visitor: SqlQueryPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:
@@ -108,41 +101,59 @@ class SqlOrderByDescription:  # noqa: D101
     desc: bool
 
 
+@dataclass(frozen=True)
 class SqlSelectStatementNode(SqlQueryPlanNode):
-    """Represents an SQL Select statement."""
+    """Represents an SQL Select statement.
 
-    def __init__(  # noqa: D107
-        self,
+    Attributes:
+        select_columns: The columns to select.
+        from_source: The source of the data for the select statement.
+        from_source_alias: Alias for the from source.
+        join_descs: Descriptions of the joins to perform.
+        group_bys: The columns to group by.
+        order_bys: The columns to order by.
+        where: The where clause expression.
+        limit: The limit of the number of rows to return.
+        distinct: Whether the select statement should return distinct rows.
+    """
+
+    _description: str
+    select_columns: Tuple[SqlSelectColumn, ...]
+    from_source: SqlQueryPlanNode
+    from_source_alias: str
+    join_descs: Tuple[SqlJoinDescription, ...]
+    group_bys: Tuple[SqlSelectColumn, ...]
+    order_bys: Tuple[SqlOrderByDescription, ...]
+    where: Optional[SqlExpressionNode]
+    limit: Optional[int]
+    distinct: bool
+
+    @staticmethod
+    def create(  # noqa: D102
         description: str,
         select_columns: Tuple[SqlSelectColumn, ...],
         from_source: SqlQueryPlanNode,
         from_source_alias: str,
-        joins_descs: Tuple[SqlJoinDescription, ...] = (),
+        join_descs: Tuple[SqlJoinDescription, ...] = (),
         group_bys: Tuple[SqlSelectColumn, ...] = (),
         order_bys: Tuple[SqlOrderByDescription, ...] = (),
         where: Optional[SqlExpressionNode] = None,
         limit: Optional[int] = None,
         distinct: bool = False,
-    ) -> None:
-        self._description = description
-        assert select_columns
-        self._select_columns = select_columns
-        # Sources that belong in a from clause. CTEs could be captured in a separate field.
-        self._from_source = from_source
-        self._from_source_alias = from_source_alias
-        self._join_descs = joins_descs
-        self._group_bys = group_bys
-        self._where = where
-        self._order_bys = order_bys
-        self._distinct = distinct
-
-        if limit is not None:
-            assert limit >= 0
-        self._limit = limit
-
-        super().__init__(
-            node_id=self.create_unique_id(),
-            parent_nodes=[self._from_source] + [x.right_source for x in self._join_descs],
+    ) -> SqlSelectStatementNode:
+        parent_nodes = [from_source] + [x.right_source for x in join_descs]
+        return SqlSelectStatementNode(
+            parent_nodes=tuple(parent_nodes),
+            _description=description,
+            select_columns=select_columns,
+            from_source=from_source,
+            from_source_alias=from_source_alias,
+            join_descs=join_descs,
+            group_bys=group_bys,
+            order_bys=order_bys,
+            where=where,
+            limit=limit,
+            distinct=distinct,
         )
 
     @classmethod
@@ -150,49 +161,17 @@ class SqlSelectStatementNode(SqlQueryPlanNode):
         return StaticIdPrefix.SQL_PLAN_SELECT_STATEMENT_ID_PREFIX
 
     @property
-    def description(self) -> str:  # noqa: D102
-        return self._description
-
-    @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
         return (
             tuple(super().displayed_properties)
-            + tuple(DisplayedProperty(f"col{i}", column) for i, column in enumerate(self._select_columns))
+            + tuple(DisplayedProperty(f"col{i}", column) for i, column in enumerate(self.select_columns))
             + (DisplayedProperty("from_source", self.from_source),)
-            + tuple(DisplayedProperty(f"join_{i}", join_desc) for i, join_desc in enumerate(self._join_descs))
-            + tuple(DisplayedProperty(f"group_by{i}", group_by) for i, group_by in enumerate(self._group_bys))
-            + (DisplayedProperty("where", self._where),)
-            + tuple(DisplayedProperty(f"order_by{i}", order_by) for i, order_by in enumerate(self._order_bys))
-            + (DisplayedProperty("distinct", self._distinct),)
+            + tuple(DisplayedProperty(f"join_{i}", join_desc) for i, join_desc in enumerate(self.join_descs))
+            + tuple(DisplayedProperty(f"group_by{i}", group_by) for i, group_by in enumerate(self.group_bys))
+            + (DisplayedProperty("where", self.where),)
+            + tuple(DisplayedProperty(f"order_by{i}", order_by) for i, order_by in enumerate(self.order_bys))
+            + (DisplayedProperty("distinct", self.distinct),)
         )
-
-    @property
-    def select_columns(self) -> Tuple[SqlSelectColumn, ...]:  # noqa: D102
-        return self._select_columns
-
-    @property
-    def from_source(self) -> SqlQueryPlanNode:  # noqa: D102
-        return self._from_source
-
-    @property
-    def from_source_alias(self) -> str:  # noqa: D102
-        return self._from_source_alias
-
-    @property
-    def join_descs(self) -> Tuple[SqlJoinDescription, ...]:  # noqa: D102
-        return self._join_descs
-
-    @property
-    def group_bys(self) -> Tuple[SqlSelectColumn, ...]:  # noqa: D102
-        return self._group_bys
-
-    @property
-    def where(self) -> Optional[SqlExpressionNode]:  # noqa: D102
-        return self._where
-
-    @property
-    def order_bys(self) -> Tuple[SqlOrderByDescription, ...]:  # noqa: D102
-        return self._order_bys
 
     def accept(self, visitor: SqlQueryPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_select_statement_node(self)
@@ -202,24 +181,27 @@ class SqlSelectStatementNode(SqlQueryPlanNode):
         return False
 
     @property
-    def limit(self) -> Optional[int]:  # noqa: D102
-        return self._limit
-
-    @property
     def as_select_node(self) -> Optional[SqlSelectStatementNode]:  # noqa: D102
         return self
 
     @property
-    def distinct(self) -> bool:  # noqa: D102
-        return self._distinct
+    @override
+    def description(self) -> str:
+        return self._description
 
 
+@dataclass(frozen=True)
 class SqlTableFromClauseNode(SqlQueryPlanNode):
     """An SQL table that can go in the FROM clause."""
 
-    def __init__(self, sql_table: SqlTable) -> None:  # noqa: D107
-        self._sql_table = sql_table
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=[])
+    sql_table: SqlTable
+
+    @staticmethod
+    def create(sql_table: SqlTable) -> SqlTableFromClauseNode:  # noqa: D102
+        return SqlTableFromClauseNode(
+            parent_nodes=(),
+            sql_table=sql_table,
+        )
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D102
@@ -227,18 +209,14 @@ class SqlTableFromClauseNode(SqlQueryPlanNode):
 
     @property
     def description(self) -> str:  # noqa: D102
-        return f"Read from {self._sql_table.sql}"
+        return f"Read from {self.sql_table.sql}"
 
     @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
-        return tuple(super().displayed_properties) + (DisplayedProperty("table_id", self._sql_table.sql),)
+        return tuple(super().displayed_properties) + (DisplayedProperty("table_id", self.sql_table.sql),)
 
     def accept(self, visitor: SqlQueryPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_table_from_clause_node(self)
-
-    @property
-    def sql_table(self) -> SqlTable:  # noqa: D102
-        return self._sql_table
 
     @property
     def is_table(self) -> bool:  # noqa: D102
@@ -249,12 +227,22 @@ class SqlTableFromClauseNode(SqlQueryPlanNode):
         return None
 
 
+@dataclass(frozen=True)
 class SqlSelectQueryFromClauseNode(SqlQueryPlanNode):
-    """An SQL select query that can go in the FROM clause."""
+    """An SQL select query that can go in the FROM clause.
 
-    def __init__(self, select_query: str) -> None:  # noqa: D107
-        self._select_query = select_query
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=[])
+    Attributes:
+        select_query: The SQL select query to include in the FROM clause.
+    """
+
+    select_query: str
+
+    @staticmethod
+    def create(select_query: str) -> SqlSelectQueryFromClauseNode:  # noqa: D102
+        return SqlSelectQueryFromClauseNode(
+            parent_nodes=(),
+            select_query=select_query,
+        )
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D102
@@ -268,10 +256,6 @@ class SqlSelectQueryFromClauseNode(SqlQueryPlanNode):
         return visitor.visit_query_from_clause_node(self)
 
     @property
-    def select_query(self) -> str:  # noqa: D102
-        return self._select_query
-
-    @property
     def is_table(self) -> bool:  # noqa: D102
         return False
 
@@ -280,13 +264,27 @@ class SqlSelectQueryFromClauseNode(SqlQueryPlanNode):
         return None
 
 
+@dataclass(frozen=True)
 class SqlCreateTableAsNode(SqlQueryPlanNode):
-    """An SQL select query that can go in the FROM clause."""
+    """An SQL node representing a CREATE TABLE AS statement.
 
-    def __init__(self, sql_table: SqlTable, parent_node: SqlQueryPlanNode) -> None:  # noqa: D107
-        self._sql_table = sql_table
-        self._parent_node = parent_node
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=(self._parent_node,))
+    Attributes:
+        sql_table: The SQL table to create.
+        parent_node: The parent query plan node.
+    """
+
+    sql_table: SqlTable
+
+    def __post_init__(self) -> None:  # noqa: D105
+        super().__post_init__()
+        assert len(self.parent_nodes) == 1
+
+    @staticmethod
+    def create(sql_table: SqlTable, parent_node: SqlQueryPlanNode) -> SqlCreateTableAsNode:  # noqa: D102
+        return SqlCreateTableAsNode(
+            parent_nodes=(parent_node,),
+            sql_table=sql_table,
+        )
 
     @override
     def accept(self, visitor: SqlQueryPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:
@@ -307,19 +305,14 @@ class SqlCreateTableAsNode(SqlQueryPlanNode):
     def description(self) -> str:
         return f"Create table {repr(self.sql_table.sql)}"
 
+    @property
+    def parent_node(self) -> SqlQueryPlanNode:  # noqa: D102
+        return self.parent_nodes[0]
+
     @classmethod
     @override
     def id_prefix(cls) -> IdPrefix:
         return StaticIdPrefix.SQL_PLAN_CREATE_TABLE_AS_ID_PREFIX
-
-    @property
-    def sql_table(self) -> SqlTable:
-        """Return the table that this statement would create."""
-        return self._sql_table
-
-    @property
-    def parent_node(self) -> SqlQueryPlanNode:  # noqa: D102
-        return self._parent_node
 
 
 class SqlQueryPlan(MetricFlowDag[SqlQueryPlanNode]):

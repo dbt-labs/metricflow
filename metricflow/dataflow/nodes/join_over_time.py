@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Optional, Sequence
 
 from dbt_semantic_interfaces.protocols import MetricTimeWindow
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
-from metricflow_semantics.dag.mf_dag import DisplayedProperty, NodeId
+from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.specs.spec_classes import TimeDimensionSpec
 from metricflow_semantics.visitor import VisitorOutputT
@@ -13,43 +14,46 @@ from metricflow_semantics.visitor import VisitorOutputT
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNodeVisitor
 
 
+@dataclass(frozen=True)
 class JoinOverTimeRangeNode(DataflowPlanNode):
-    """A node that allows for cumulative metric computation by doing a self join across a cumulative date range."""
+    """A node that allows for cumulative metric computation by doing a self join across a cumulative date range.
 
-    def __init__(
-        self,
+    Attributes:
+        queried_agg_time_dimension_specs: Time dimension specs that will be selected from the time spine table.
+        window: Time window to join over.
+        grain_to_date: Indicates time range should start from the beginning of this time granularity (e.g., month to day).
+        time_range_constraint: Time range to aggregate over.
+    """
+
+    queried_agg_time_dimension_specs: Sequence[TimeDimensionSpec]
+    window: Optional[MetricTimeWindow]
+    grain_to_date: Optional[TimeGranularity]
+    time_range_constraint: Optional[TimeRangeConstraint]
+
+    def __post_init__(self) -> None:  # noqa: D105
+        super().__post_init__()
+        assert len(self.parent_nodes) == 1
+
+    @staticmethod
+    def create(  # noqa: D102
         parent_node: DataflowPlanNode,
         queried_agg_time_dimension_specs: Sequence[TimeDimensionSpec],
-        window: Optional[MetricTimeWindow],
-        grain_to_date: Optional[TimeGranularity],
-        node_id: Optional[NodeId] = None,
+        window: Optional[MetricTimeWindow] = None,
+        grain_to_date: Optional[TimeGranularity] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
-    ) -> None:
-        """Constructor.
-
-        Args:
-            parent_node: node with standard output
-            window: time window to join over
-            grain_to_date: indicates time range should start from the beginning of this time granularity
-            (eg month to day)
-            node_id: Override the node ID with this value
-            time_range_constraint: time range to aggregate over
-            queried_agg_time_dimension_specs: time dimension specs that will be selected from time spine table
-        """
+    ) -> JoinOverTimeRangeNode:
         if window and grain_to_date:
             raise RuntimeError(
                 f"This node cannot be initialized with both window and grain_to_date set. This configuration should "
                 f"have been prevented by model validation. window: {window}. grain_to_date: {grain_to_date}."
             )
-        self._parent_node = parent_node
-        self._grain_to_date = grain_to_date
-        self._window = window
-        self.time_range_constraint = time_range_constraint
-        self.queried_agg_time_dimension_specs = queried_agg_time_dimension_specs
-
-        # Doing a list comprehension throws a type error, so doing it this way.
-        parent_nodes: Sequence[DataflowPlanNode] = (self._parent_node,)
-        super().__init__(node_id=node_id or self.create_unique_id(), parent_nodes=parent_nodes)
+        return JoinOverTimeRangeNode(
+            parent_nodes=(parent_node,),
+            queried_agg_time_dimension_specs=queried_agg_time_dimension_specs,
+            window=window,
+            grain_to_date=grain_to_date,
+            time_range_constraint=time_range_constraint,
+        )
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D102
@@ -59,20 +63,12 @@ class JoinOverTimeRangeNode(DataflowPlanNode):
         return visitor.visit_join_over_time_range_node(self)
 
     @property
-    def grain_to_date(self) -> Optional[TimeGranularity]:  # noqa: D102
-        return self._grain_to_date
-
-    @property
     def description(self) -> str:  # noqa: D102
         return """Join Self Over Time Range"""
 
     @property
     def parent_node(self) -> DataflowPlanNode:  # noqa: D102
-        return self._parent_node
-
-    @property
-    def window(self) -> Optional[MetricTimeWindow]:  # noqa: D102
-        return self._window
+        return self.parent_nodes[0]
 
     @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
@@ -99,7 +95,7 @@ class JoinOverTimeRangeNode(DataflowPlanNode):
 
     def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> JoinOverTimeRangeNode:  # noqa: D102
         assert len(new_parent_nodes) == 1
-        return JoinOverTimeRangeNode(
+        return JoinOverTimeRangeNode.create(
             parent_node=new_parent_nodes[0],
             window=self.window,
             grain_to_date=self.grain_to_date,

@@ -148,7 +148,7 @@ class SourceScanOptimizer(
         optimized_parent_result: OptimizeBranchResult = node.parent_node.accept(self)
         if optimized_parent_result.optimized_branch is not None:
             return OptimizeBranchResult(
-                optimized_branch=ComputeMetricsNode(
+                optimized_branch=ComputeMetricsNode.create(
                     parent_node=optimized_parent_result.optimized_branch,
                     metric_specs=node.metric_specs,
                     for_group_by_source_node=node.for_group_by_source_node,
@@ -264,7 +264,7 @@ class SourceScanOptimizer(
             return OptimizeBranchResult(optimized_branch=combined_parent_branches[0])
 
         return OptimizeBranchResult(
-            optimized_branch=CombineAggregatedOutputsNode(parent_nodes=combined_parent_branches)
+            optimized_branch=CombineAggregatedOutputsNode.create(parent_nodes=combined_parent_branches)
         )
 
     def visit_constrain_time_range_node(self, node: ConstrainTimeRangeNode) -> OptimizeBranchResult:  # noqa: D102

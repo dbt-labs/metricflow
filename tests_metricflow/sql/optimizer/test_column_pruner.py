@@ -70,51 +70,51 @@ def base_select_statement() -> SqlSelectStatementNode:
     ON
       from_source.join_col = joined_source.join_col
     """
-    return SqlSelectStatementNode(
+    return SqlSelectStatementNode.create(
         description="test0",
         select_columns=(
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="from_source", column_name="col0")
                 ),
                 column_alias="from_source_col0",
             ),
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="from_source", column_name="col1")
                 ),
                 column_alias="from_source_col1",
             ),
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="from_source", column_name="join_col")
                 ),
                 column_alias="from_source_join_col",
             ),
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="joined_source", column_name="col0")
                 ),
                 column_alias="joined_source_col0",
             ),
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="joined_source", column_name="col1")
                 ),
                 column_alias="joined_source_col1",
             ),
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="joined_source", column_name="join_col")
                 ),
                 column_alias="joined_source_join_col",
             ),
         ),
-        from_source=SqlSelectStatementNode(
+        from_source=SqlSelectStatementNode.create(
             description="from_source",
             select_columns=(
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(
                             table_alias="from_source_table",
                             column_name="col0",
@@ -123,7 +123,7 @@ def base_select_statement() -> SqlSelectStatementNode:
                     column_alias="col0",
                 ),
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(
                             table_alias="from_source_table",
                             column_name="col1",
@@ -132,7 +132,7 @@ def base_select_statement() -> SqlSelectStatementNode:
                     column_alias="col1",
                 ),
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(
                             table_alias="from_source_table",
                             column_name="join_col",
@@ -141,17 +141,19 @@ def base_select_statement() -> SqlSelectStatementNode:
                     column_alias="join_col",
                 ),
             ),
-            from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="from_source_table")),
+            from_source=SqlTableFromClauseNode.create(
+                sql_table=SqlTable(schema_name="demo", table_name="from_source_table")
+            ),
             from_source_alias="from_source_table",
         ),
         from_source_alias="from_source",
-        joins_descs=(
+        join_descs=(
             SqlJoinDescription(
-                right_source=SqlSelectStatementNode(
+                right_source=SqlSelectStatementNode.create(
                     description="joined_source",
                     select_columns=(
                         SqlSelectColumn(
-                            expr=SqlColumnReferenceExpression(
+                            expr=SqlColumnReferenceExpression.create(
                                 col_ref=SqlColumnReference(
                                     table_alias="joined_source_table",
                                     column_name="col0",
@@ -160,7 +162,7 @@ def base_select_statement() -> SqlSelectStatementNode:
                             column_alias="col0",
                         ),
                         SqlSelectColumn(
-                            expr=SqlColumnReferenceExpression(
+                            expr=SqlColumnReferenceExpression.create(
                                 col_ref=SqlColumnReference(
                                     table_alias="joined_source_table",
                                     column_name="col1",
@@ -169,7 +171,7 @@ def base_select_statement() -> SqlSelectStatementNode:
                             column_alias="col1",
                         ),
                         SqlSelectColumn(
-                            expr=SqlColumnReferenceExpression(
+                            expr=SqlColumnReferenceExpression.create(
                                 col_ref=SqlColumnReference(
                                     table_alias="joined_source_table",
                                     column_name="join_col",
@@ -178,18 +180,18 @@ def base_select_statement() -> SqlSelectStatementNode:
                             column_alias="join_col",
                         ),
                     ),
-                    from_source=SqlTableFromClauseNode(
+                    from_source=SqlTableFromClauseNode.create(
                         sql_table=SqlTable(schema_name="demo", table_name="joined_source_table")
                     ),
                     from_source_alias="joined_source_table",
                 ),
                 right_source_alias="joined_source",
-                on_condition=SqlComparisonExpression(
-                    left_expr=SqlColumnReferenceExpression(
+                on_condition=SqlComparisonExpression.create(
+                    left_expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(table_alias="from_source", column_name="join_col")
                     ),
                     comparison=SqlComparison.EQUALS,
-                    right_expr=SqlColumnReferenceExpression(
+                    right_expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(table_alias="joined_source", column_name="join_col")
                     ),
                 ),
@@ -228,29 +230,29 @@ def test_prune_from_source(
     base_select_statement: SqlSelectStatementNode,
 ) -> None:
     """Tests a case where columns should be pruned from the FROM clause."""
-    select_statement_with_some_from_source_column_removed = SqlSelectStatementNode(
+    select_statement_with_some_from_source_column_removed = SqlSelectStatementNode.create(
         description="test0",
         select_columns=(
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="from_source", column_name="col0")
                 ),
                 column_alias="from_source_col0",
             ),
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="joined_source", column_name="col0")
                 ),
                 column_alias="joined_source_col0",
             ),
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="joined_source", column_name="col1")
                 ),
                 column_alias="joined_source_col1",
             ),
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="joined_source", column_name="join_col")
                 ),
                 column_alias="joined_source_join_col",
@@ -258,7 +260,7 @@ def test_prune_from_source(
         ),
         from_source=base_select_statement.from_source,
         from_source_alias=base_select_statement.from_source_alias,
-        joins_descs=base_select_statement.join_descs,
+        join_descs=base_select_statement.join_descs,
         group_bys=base_select_statement.group_bys,
         order_bys=base_select_statement.order_bys,
         where=base_select_statement.where,
@@ -287,29 +289,29 @@ def test_prune_joined_source(
     base_select_statement: SqlSelectStatementNode,
 ) -> None:
     """Tests a case where columns should be pruned from the JOIN clause."""
-    select_statement_with_some_joined_source_column_removed = SqlSelectStatementNode(
+    select_statement_with_some_joined_source_column_removed = SqlSelectStatementNode.create(
         description="test0",
         select_columns=(
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="from_source", column_name="col0")
                 ),
                 column_alias="from_source_col0",
             ),
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="from_source", column_name="col1")
                 ),
                 column_alias="from_source_col1",
             ),
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="from_source", column_name="join_col")
                 ),
                 column_alias="from_source_join_col",
             ),
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="joined_source", column_name="col0")
                 ),
                 column_alias="joined_source_col0",
@@ -317,7 +319,7 @@ def test_prune_joined_source(
         ),
         from_source=base_select_statement.from_source,
         from_source_alias=base_select_statement.from_source_alias,
-        joins_descs=base_select_statement.join_descs,
+        join_descs=base_select_statement.join_descs,
         group_bys=base_select_statement.group_bys,
         order_bys=base_select_statement.order_bys,
         where=base_select_statement.where,
@@ -346,11 +348,11 @@ def test_dont_prune_if_in_where(
     base_select_statement: SqlSelectStatementNode,
 ) -> None:
     """Tests that columns aren't pruned from parent sources if columns are used in a where."""
-    select_statement_with_other_exprs = SqlSelectStatementNode(
+    select_statement_with_other_exprs = SqlSelectStatementNode.create(
         description="test0",
         select_columns=(
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="from_source", column_name="col0")
                 ),
                 column_alias="from_source_col0",
@@ -358,9 +360,11 @@ def test_dont_prune_if_in_where(
         ),
         from_source=base_select_statement.from_source,
         from_source_alias=base_select_statement.from_source_alias,
-        joins_descs=base_select_statement.join_descs,
-        where=SqlIsNullExpression(
-            SqlColumnReferenceExpression(col_ref=SqlColumnReference(table_alias="from_source", column_name="col1"))
+        join_descs=base_select_statement.join_descs,
+        where=SqlIsNullExpression.create(
+            SqlColumnReferenceExpression.create(
+                col_ref=SqlColumnReference(table_alias="from_source", column_name="col1")
+            )
         ),
         group_bys=base_select_statement.group_bys,
         order_bys=base_select_statement.order_bys,
@@ -389,17 +393,17 @@ def test_dont_prune_with_str_expr(
     base_select_statement: SqlSelectStatementNode,
 ) -> None:
     """Tests that columns aren't pruned from parent sources if there's a string expression in the select."""
-    select_statement_with_other_exprs = SqlSelectStatementNode(
+    select_statement_with_other_exprs = SqlSelectStatementNode.create(
         description="test0",
         select_columns=(
             SqlSelectColumn(
-                expr=SqlStringExpression("from_source.col0", requires_parenthesis=False),
+                expr=SqlStringExpression.create("from_source.col0", requires_parenthesis=False),
                 column_alias="some_string_expr",
             ),
         ),
         from_source=base_select_statement.from_source,
         from_source_alias=base_select_statement.from_source_alias,
-        joins_descs=base_select_statement.join_descs,
+        join_descs=base_select_statement.join_descs,
         where=base_select_statement.where,
         group_bys=base_select_statement.group_bys,
         order_bys=base_select_statement.order_bys,
@@ -428,17 +432,17 @@ def test_prune_with_str_expr(
     base_select_statement: SqlSelectStatementNode,
 ) -> None:
     """Tests that columns are from parent sources if there's a string expression in the select with known cols."""
-    select_statement_with_other_exprs = SqlSelectStatementNode(
+    select_statement_with_other_exprs = SqlSelectStatementNode.create(
         description="test0",
         select_columns=(
             SqlSelectColumn(
-                expr=SqlStringExpression("from_source.col0", requires_parenthesis=False, used_columns=("col0",)),
+                expr=SqlStringExpression.create("from_source.col0", requires_parenthesis=False, used_columns=("col0",)),
                 column_alias="some_string_expr",
             ),
         ),
         from_source=base_select_statement.from_source,
         from_source_alias=base_select_statement.from_source_alias,
-        joins_descs=base_select_statement.join_descs,
+        join_descs=base_select_statement.join_descs,
         where=base_select_statement.where,
         group_bys=base_select_statement.group_bys,
         order_bys=base_select_statement.order_bys,
@@ -486,19 +490,19 @@ def string_select_statement() -> SqlSelectStatementNode:
     ON
       from_source.join_col = joined_source.join_col
     """
-    return SqlSelectStatementNode(
+    return SqlSelectStatementNode.create(
         description="test0",
         select_columns=(
             SqlSelectColumn(
-                expr=SqlStringExpression(sql_expr="col0", used_columns=("col0",)),
+                expr=SqlStringExpression.create(sql_expr="col0", used_columns=("col0",)),
                 column_alias="from_source_col0",
             ),
         ),
-        from_source=SqlSelectStatementNode(
+        from_source=SqlSelectStatementNode.create(
             description="from_source",
             select_columns=(
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(
                             table_alias="from_source_table",
                             column_name="col0",
@@ -507,7 +511,7 @@ def string_select_statement() -> SqlSelectStatementNode:
                     column_alias="col0",
                 ),
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(
                             table_alias="from_source_table",
                             column_name="col1",
@@ -516,7 +520,7 @@ def string_select_statement() -> SqlSelectStatementNode:
                     column_alias="col1",
                 ),
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(
                             table_alias="from_source_table",
                             column_name="join_col",
@@ -525,17 +529,19 @@ def string_select_statement() -> SqlSelectStatementNode:
                     column_alias="join_col",
                 ),
             ),
-            from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="from_source_table")),
+            from_source=SqlTableFromClauseNode.create(
+                sql_table=SqlTable(schema_name="demo", table_name="from_source_table")
+            ),
             from_source_alias="from_source_table",
         ),
         from_source_alias="from_source",
-        joins_descs=(
+        join_descs=(
             SqlJoinDescription(
-                right_source=SqlSelectStatementNode(
+                right_source=SqlSelectStatementNode.create(
                     description="joined_source",
                     select_columns=(
                         SqlSelectColumn(
-                            expr=SqlColumnReferenceExpression(
+                            expr=SqlColumnReferenceExpression.create(
                                 col_ref=SqlColumnReference(
                                     table_alias="joined_source_table",
                                     column_name="col2",
@@ -544,7 +550,7 @@ def string_select_statement() -> SqlSelectStatementNode:
                             column_alias="col0",
                         ),
                         SqlSelectColumn(
-                            expr=SqlColumnReferenceExpression(
+                            expr=SqlColumnReferenceExpression.create(
                                 col_ref=SqlColumnReference(
                                     table_alias="joined_source_table",
                                     column_name="col3",
@@ -553,7 +559,7 @@ def string_select_statement() -> SqlSelectStatementNode:
                             column_alias="col1",
                         ),
                         SqlSelectColumn(
-                            expr=SqlColumnReferenceExpression(
+                            expr=SqlColumnReferenceExpression.create(
                                 col_ref=SqlColumnReference(
                                     table_alias="joined_source_table",
                                     column_name="join_col",
@@ -562,18 +568,18 @@ def string_select_statement() -> SqlSelectStatementNode:
                             column_alias="join_col",
                         ),
                     ),
-                    from_source=SqlTableFromClauseNode(
+                    from_source=SqlTableFromClauseNode.create(
                         sql_table=SqlTable(schema_name="demo", table_name="joined_source_table")
                     ),
                     from_source_alias="joined_source_table",
                 ),
                 right_source_alias="joined_source",
-                on_condition=SqlComparisonExpression(
-                    left_expr=SqlColumnReferenceExpression(
+                on_condition=SqlComparisonExpression.create(
+                    left_expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(table_alias="from_source", column_name="join_col")
                     ),
                     comparison=SqlComparison.EQUALS,
-                    right_expr=SqlColumnReferenceExpression(
+                    right_expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(table_alias="joined_source", column_name="join_col")
                     ),
                 ),
@@ -631,19 +637,19 @@ def grandparent_pruning_select_statement() -> SqlSelectStatementNode:
       ) src1
     ) src2
     """
-    return SqlSelectStatementNode(
+    return SqlSelectStatementNode.create(
         description="src2",
         select_columns=(
             SqlSelectColumn(
-                expr=SqlStringExpression(sql_expr="col0"),
+                expr=SqlStringExpression.create(sql_expr="col0"),
                 column_alias="col0",
             ),
         ),
-        from_source=SqlSelectStatementNode(
+        from_source=SqlSelectStatementNode.create(
             description="src1",
             select_columns=(
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(
                             table_alias="src1",
                             column_name="col0",
@@ -652,7 +658,7 @@ def grandparent_pruning_select_statement() -> SqlSelectStatementNode:
                     column_alias="col0",
                 ),
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(
                             table_alias="src1",
                             column_name="col1",
@@ -661,11 +667,11 @@ def grandparent_pruning_select_statement() -> SqlSelectStatementNode:
                     column_alias="col1",
                 ),
             ),
-            from_source=SqlSelectStatementNode(
+            from_source=SqlSelectStatementNode.create(
                 description="src0",
                 select_columns=(
                     SqlSelectColumn(
-                        expr=SqlColumnReferenceExpression(
+                        expr=SqlColumnReferenceExpression.create(
                             col_ref=SqlColumnReference(
                                 table_alias="src0",
                                 column_name="col0",
@@ -674,7 +680,7 @@ def grandparent_pruning_select_statement() -> SqlSelectStatementNode:
                         column_alias="col0",
                     ),
                     SqlSelectColumn(
-                        expr=SqlColumnReferenceExpression(
+                        expr=SqlColumnReferenceExpression.create(
                             col_ref=SqlColumnReference(
                                 table_alias="src0",
                                 column_name="col1",
@@ -683,7 +689,7 @@ def grandparent_pruning_select_statement() -> SqlSelectStatementNode:
                         column_alias="col1",
                     ),
                     SqlSelectColumn(
-                        expr=SqlColumnReferenceExpression(
+                        expr=SqlColumnReferenceExpression.create(
                             col_ref=SqlColumnReference(
                                 table_alias="src0",
                                 column_name="col2",
@@ -692,7 +698,7 @@ def grandparent_pruning_select_statement() -> SqlSelectStatementNode:
                         column_alias="col2",
                     ),
                 ),
-                from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="src0")),
+                from_source=SqlTableFromClauseNode.create(sql_table=SqlTable(schema_name="demo", table_name="src0")),
                 from_source_alias="src0",
             ),
             from_source_alias="src1",
@@ -751,23 +757,25 @@ def join_grandparent_pruning_select_statement() -> SqlSelectStatementNode:
     ON
       src3.join_col = src4.join_col
     """
-    return SqlSelectStatementNode(
+    return SqlSelectStatementNode.create(
         description="4",
         select_columns=(
             SqlSelectColumn(
-                expr=SqlStringExpression(sql_expr="col0"),
+                expr=SqlStringExpression.create(sql_expr="col0"),
                 column_alias="col0",
             ),
         ),
-        from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="from_source_table")),
+        from_source=SqlTableFromClauseNode.create(
+            sql_table=SqlTable(schema_name="demo", table_name="from_source_table")
+        ),
         from_source_alias="src3",
-        joins_descs=(
+        join_descs=(
             SqlJoinDescription(
-                right_source=SqlSelectStatementNode(
+                right_source=SqlSelectStatementNode.create(
                     description="src1",
                     select_columns=(
                         SqlSelectColumn(
-                            expr=SqlColumnReferenceExpression(
+                            expr=SqlColumnReferenceExpression.create(
                                 col_ref=SqlColumnReference(
                                     table_alias="src1",
                                     column_name="col0",
@@ -776,7 +784,7 @@ def join_grandparent_pruning_select_statement() -> SqlSelectStatementNode:
                             column_alias="col0",
                         ),
                         SqlSelectColumn(
-                            expr=SqlColumnReferenceExpression(
+                            expr=SqlColumnReferenceExpression.create(
                                 col_ref=SqlColumnReference(
                                     table_alias="src1",
                                     column_name="join_col",
@@ -785,11 +793,11 @@ def join_grandparent_pruning_select_statement() -> SqlSelectStatementNode:
                             column_alias="join_col",
                         ),
                     ),
-                    from_source=SqlSelectStatementNode(
+                    from_source=SqlSelectStatementNode.create(
                         description="src0",
                         select_columns=(
                             SqlSelectColumn(
-                                expr=SqlColumnReferenceExpression(
+                                expr=SqlColumnReferenceExpression.create(
                                     col_ref=SqlColumnReference(
                                         table_alias="src0",
                                         column_name="col0",
@@ -798,7 +806,7 @@ def join_grandparent_pruning_select_statement() -> SqlSelectStatementNode:
                                 column_alias="col0",
                             ),
                             SqlSelectColumn(
-                                expr=SqlColumnReferenceExpression(
+                                expr=SqlColumnReferenceExpression.create(
                                     col_ref=SqlColumnReference(
                                         table_alias="src0",
                                         column_name="col1",
@@ -807,7 +815,7 @@ def join_grandparent_pruning_select_statement() -> SqlSelectStatementNode:
                                 column_alias="col1",
                             ),
                             SqlSelectColumn(
-                                expr=SqlColumnReferenceExpression(
+                                expr=SqlColumnReferenceExpression.create(
                                     col_ref=SqlColumnReference(
                                         table_alias="src0",
                                         column_name="join_col",
@@ -816,18 +824,20 @@ def join_grandparent_pruning_select_statement() -> SqlSelectStatementNode:
                                 column_alias="join_col",
                             ),
                         ),
-                        from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="src0")),
+                        from_source=SqlTableFromClauseNode.create(
+                            sql_table=SqlTable(schema_name="demo", table_name="src0")
+                        ),
                         from_source_alias="src0",
                     ),
                     from_source_alias="src1",
                 ),
                 right_source_alias="src4",
-                on_condition=SqlComparisonExpression(
-                    left_expr=SqlColumnReferenceExpression(
+                on_condition=SqlComparisonExpression.create(
+                    left_expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(table_alias="src3", column_name="join_col")
                     ),
                     comparison=SqlComparison.EQUALS,
-                    right_expr=SqlColumnReferenceExpression(
+                    right_expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(table_alias="src4", column_name="join_col")
                     ),
                 ),
@@ -866,33 +876,35 @@ def test_prune_distinct_select(
     column_pruner: SqlColumnPrunerOptimizer,
 ) -> None:
     """Test that distinct select node shouldn't be pruned."""
-    select_node = SqlSelectStatementNode(
+    select_node = SqlSelectStatementNode.create(
         description="test0",
         select_columns=(
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="a", column_name="booking_value")
                 ),
                 column_alias="booking_value",
             ),
         ),
-        from_source=SqlSelectStatementNode(
+        from_source=SqlSelectStatementNode.create(
             description="test1",
             select_columns=(
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(table_alias="a", column_name="booking_value")
                     ),
                     column_alias="booking_value",
                 ),
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(table_alias="a", column_name="bookings")
                     ),
                     column_alias="bookings",
                 ),
             ),
-            from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
+            from_source=SqlTableFromClauseNode.create(
+                sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")
+            ),
             from_source_alias="a",
             distinct=True,
         ),

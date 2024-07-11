@@ -30,7 +30,7 @@ def test_metric_time_dimension_transform_node_using_primary_time(
     source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
-    metric_time_dimension_transform_node = MetricTimeDimensionTransformNode(
+    metric_time_dimension_transform_node = MetricTimeDimensionTransformNode.create(
         parent_node=source_node, aggregation_time_dimension_reference=TimeDimensionReference(element_name="ds")
     )
     convert_and_check(
@@ -54,7 +54,7 @@ def test_metric_time_dimension_transform_node_using_non_primary_time(
     source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
-    metric_time_dimension_transform_node = MetricTimeDimensionTransformNode(
+    metric_time_dimension_transform_node = MetricTimeDimensionTransformNode.create(
         parent_node=source_node,
         aggregation_time_dimension_reference=TimeDimensionReference(element_name="paid_at"),
     )

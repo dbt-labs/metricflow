@@ -25,7 +25,7 @@ def make_coalesced_expr(table_aliases: Sequence[str], column_alias: str) -> SqlE
     COALESCE(a.is_instant, b.is_instant)
     """
     if len(table_aliases) == 1:
-        return SqlColumnReferenceExpression(
+        return SqlColumnReferenceExpression.create(
             col_ref=SqlColumnReference(
                 table_alias=table_aliases[0],
                 column_name=column_alias,
@@ -35,14 +35,14 @@ def make_coalesced_expr(table_aliases: Sequence[str], column_alias: str) -> SqlE
         columns_to_coalesce: List[SqlExpressionNode] = []
         for table_alias in table_aliases:
             columns_to_coalesce.append(
-                SqlColumnReferenceExpression(
+                SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(
                         table_alias=table_alias,
                         column_name=column_alias,
                     )
                 )
             )
-        return SqlAggregateFunctionExpression(
+        return SqlAggregateFunctionExpression.create(
             sql_function=SqlFunction.COALESCE,
             sql_function_args=columns_to_coalesce,
         )

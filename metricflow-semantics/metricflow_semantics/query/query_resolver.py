@@ -381,7 +381,7 @@ class MetricFlowQueryResolver:
 
         # Define a resolution path for issues where the input is considered to be the whole query.
         query_resolution_path = MetricFlowQueryResolutionPath.from_path_item(
-            QueryGroupByItemResolutionNode(
+            QueryGroupByItemResolutionNode.create(
                 parent_nodes=(),
                 metrics_in_query=tuple(metric_input.spec_pattern.metric_reference for metric_input in metric_inputs),
                 where_filter_intersection=query_level_filter_input.where_filter_intersection,

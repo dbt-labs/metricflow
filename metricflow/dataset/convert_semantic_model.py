@@ -169,15 +169,15 @@ class SemanticModelToDataSetConverter:
                 "FALSE",
                 "NULL",
             ):
-                return SqlColumnReferenceExpression(
+                return SqlColumnReferenceExpression.create(
                     SqlColumnReference(
                         table_alias=table_alias,
                         column_name=element_expr,
                     )
                 )
-            return SqlStringExpression(sql_expr=element_expr)
+            return SqlStringExpression.create(sql_expr=element_expr)
 
-        return SqlColumnReferenceExpression(
+        return SqlColumnReferenceExpression.create(
             SqlColumnReference(
                 table_alias=table_alias,
                 column_name=element_name,
@@ -368,7 +368,7 @@ class SemanticModelToDataSetConverter:
 
                 select_columns.append(
                     SqlSelectColumn(
-                        expr=SqlExtractExpression(date_part=date_part, arg=dimension_select_expr),
+                        expr=SqlExtractExpression.create(date_part=date_part, arg=dimension_select_expr),
                         column_alias=time_dimension_instance.associated_column.column_name,
                     )
                 )
@@ -379,7 +379,7 @@ class SemanticModelToDataSetConverter:
         self, time_granularity: TimeGranularity, expr: SqlExpressionNode, column_alias: str
     ) -> SqlSelectColumn:
         return SqlSelectColumn(
-            expr=SqlDateTruncExpression(time_granularity=time_granularity, arg=expr), column_alias=column_alias
+            expr=SqlDateTruncExpression.create(time_granularity=time_granularity, arg=expr), column_alias=column_alias
         )
 
     def _create_entity_instances(
@@ -493,9 +493,11 @@ class SemanticModelToDataSetConverter:
             all_select_columns.extend(select_columns)
 
         # Generate the "from" clause depending on whether it's an SQL query or an SQL table.
-        from_source = SqlTableFromClauseNode(sql_table=SqlTable.from_string(semantic_model.node_relation.relation_name))
+        from_source = SqlTableFromClauseNode.create(
+            sql_table=SqlTable.from_string(semantic_model.node_relation.relation_name)
+        )
 
-        select_statement_node = SqlSelectStatementNode(
+        select_statement_node = SqlSelectStatementNode.create(
             description=f"Read Elements From Semantic Model '{semantic_model.name}'",
             select_columns=tuple(all_select_columns),
             from_source=from_source,
@@ -549,10 +551,10 @@ class SemanticModelToDataSetConverter:
 
         return SqlDataSet(
             instance_set=InstanceSet(time_dimension_instances=tuple(time_dimension_instances)),
-            sql_select_node=SqlSelectStatementNode(
+            sql_select_node=SqlSelectStatementNode.create(
                 description=TIME_SPINE_DATA_SET_DESCRIPTION,
                 select_columns=tuple(select_columns),
-                from_source=SqlTableFromClauseNode(sql_table=time_spine_source.spine_table),
+                from_source=SqlTableFromClauseNode.create(sql_table=time_spine_source.spine_table),
                 from_source_alias=from_source_alias,
             ),
         )

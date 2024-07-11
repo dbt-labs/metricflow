@@ -27,12 +27,12 @@ class SqlSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
         node: SqlSelectStatementNode,
     ) -> SqlSelectStatementNode:
         """Apply the reducing operation to the parent select statements."""
-        return SqlSelectStatementNode(
+        return SqlSelectStatementNode.create(
             description=node.description,
             select_columns=node.select_columns,
             from_source=node.from_source.accept(self),
             from_source_alias=node.from_source_alias,
-            joins_descs=tuple(
+            join_descs=tuple(
                 SqlJoinDescription(
                     right_source=x.right_source.accept(self),
                     right_source_alias=x.right_source_alias,
@@ -158,7 +158,7 @@ class SqlSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
                     return node_with_reduced_parents
                 new_order_by.append(
                     SqlOrderByDescription(
-                        expr=SqlColumnReferenceExpression(
+                        expr=SqlColumnReferenceExpression.create(
                             SqlColumnReference(
                                 table_alias=table_alias_in_parent,
                                 column_name=order_by_item_expr.col_ref.column_name,
@@ -175,12 +175,12 @@ class SqlSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
         elif parent_select_node.limit is not None:
             new_limit = min(new_limit, parent_select_node.limit)
 
-        return SqlSelectStatementNode(
+        return SqlSelectStatementNode.create(
             description="\n".join([parent_select_node.description, node_with_reduced_parents.description]),
             select_columns=parent_select_node.select_columns,
             from_source=parent_select_node.from_source,
             from_source_alias=parent_select_node.from_source_alias,
-            joins_descs=parent_select_node.join_descs,
+            join_descs=parent_select_node.join_descs,
             group_bys=parent_select_node.group_bys,
             order_bys=tuple(new_order_by),
             where=parent_select_node.where,
@@ -195,7 +195,7 @@ class SqlSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
         return node
 
     def visit_create_table_as_node(self, node: SqlCreateTableAsNode) -> SqlQueryPlanNode:  # noqa: D102
-        return SqlCreateTableAsNode(
+        return SqlCreateTableAsNode.create(
             sql_table=node.sql_table,
             parent_node=node.parent_node.accept(self),
         )

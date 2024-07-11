@@ -53,27 +53,27 @@ def base_select_statement() -> SqlSelectStatementNode:
     ON
       from_source.join_col = joined_source.join_col
     """
-    return SqlSelectStatementNode(
+    return SqlSelectStatementNode.create(
         description="test0",
         select_columns=(
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="from_source", column_name="col0")
                 ),
                 column_alias="from_source_col0",
             ),
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="joined_source", column_name="col0")
                 ),
                 column_alias="joined_source_col0",
             ),
         ),
-        from_source=SqlSelectStatementNode(
+        from_source=SqlSelectStatementNode.create(
             description="from_source",
             select_columns=(
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(
                             table_alias="from_source_table",
                             column_name="col0",
@@ -82,7 +82,7 @@ def base_select_statement() -> SqlSelectStatementNode:
                     column_alias="col0",
                 ),
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(
                             table_alias="from_source_table",
                             column_name="join_col",
@@ -91,17 +91,19 @@ def base_select_statement() -> SqlSelectStatementNode:
                     column_alias="join_col",
                 ),
             ),
-            from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="from_source_table")),
+            from_source=SqlTableFromClauseNode.create(
+                sql_table=SqlTable(schema_name="demo", table_name="from_source_table")
+            ),
             from_source_alias="from_source_table",
         ),
         from_source_alias="from_source",
-        joins_descs=(
+        join_descs=(
             SqlJoinDescription(
-                right_source=SqlSelectStatementNode(
+                right_source=SqlSelectStatementNode.create(
                     description="joined_source",
                     select_columns=(
                         SqlSelectColumn(
-                            expr=SqlColumnReferenceExpression(
+                            expr=SqlColumnReferenceExpression.create(
                                 col_ref=SqlColumnReference(
                                     table_alias="joined_source_table",
                                     column_name="col0",
@@ -110,7 +112,7 @@ def base_select_statement() -> SqlSelectStatementNode:
                             column_alias="col0",
                         ),
                         SqlSelectColumn(
-                            expr=SqlColumnReferenceExpression(
+                            expr=SqlColumnReferenceExpression.create(
                                 col_ref=SqlColumnReference(
                                     table_alias="joined_source_table",
                                     column_name="join_col",
@@ -119,18 +121,18 @@ def base_select_statement() -> SqlSelectStatementNode:
                             column_alias="join_col",
                         ),
                     ),
-                    from_source=SqlTableFromClauseNode(
+                    from_source=SqlTableFromClauseNode.create(
                         sql_table=SqlTable(schema_name="demo", table_name="joined_source_table")
                     ),
                     from_source_alias="joined_source_table",
                 ),
                 right_source_alias="joined_source",
-                on_condition=SqlComparisonExpression(
-                    left_expr=SqlColumnReferenceExpression(
+                on_condition=SqlComparisonExpression.create(
+                    left_expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(table_alias="from_source", column_name="join_col")
                     ),
                     comparison=SqlComparison.EQUALS,
-                    right_expr=SqlColumnReferenceExpression(
+                    right_expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(table_alias="joined_source", column_name="join_col")
                     ),
                 ),

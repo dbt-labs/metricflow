@@ -3,12 +3,12 @@ from __future__ import annotations
 import itertools
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Generic, Sequence, Tuple
+from typing import TYPE_CHECKING, Generic, Tuple
 
 from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.merger import Mergeable
-from metricflow_semantics.dag.mf_dag import DagNode, NodeId
+from metricflow_semantics.dag.mf_dag import DagNode
 from metricflow_semantics.visitor import Visitable, VisitorOutputT
 
 if TYPE_CHECKING:
@@ -26,14 +26,14 @@ if TYPE_CHECKING:
     )
 
 
-class GroupByItemResolutionNode(DagNode, Visitable, ABC):
+@dataclass(frozen=True)
+class GroupByItemResolutionNode(DagNode["GroupByItemResolutionNode"], Visitable, ABC):
     """Base node type for nodes in a GroupByItemResolutionDag.
 
     See GroupByItemResolutionDag for more details.
     """
 
-    def __init__(self) -> None:  # noqa: D107
-        super().__init__(node_id=NodeId.create_unique(self.__class__.id_prefix()))
+    parent_nodes: Tuple[GroupByItemResolutionNode, ...]
 
     @abstractmethod
     def accept(self, visitor: GroupByItemResolutionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:
@@ -44,11 +44,6 @@ class GroupByItemResolutionNode(DagNode, Visitable, ABC):
     @abstractmethod
     def ui_description(self) -> str:
         """A string that can be used to describe this node as a path element in the UI."""
-        raise NotImplementedError
-
-    @property
-    @abstractmethod
-    def parent_nodes(self) -> Sequence[GroupByItemResolutionNode]:  # noqa: D102
         raise NotImplementedError
 
     @abstractmethod

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Sequence
 
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
@@ -11,6 +12,7 @@ from metricflow.dataflow.dataflow_plan import DataflowPlanNodeVisitor
 from metricflow.dataflow.nodes.aggregate_measures import DataflowPlanNode
 
 
+@dataclass(frozen=True)
 class ConstrainTimeRangeNode(DataflowPlanNode):
     """Constrains the time range of the input data set.
 
@@ -18,13 +20,21 @@ class ConstrainTimeRangeNode(DataflowPlanNode):
     includes sales for a specific range of dates.
     """
 
-    def __init__(  # noqa: D107
-        self,
+    time_range_constraint: TimeRangeConstraint
+
+    def __post_init__(self) -> None:  # noqa: D105
+        super().__post_init__()
+        assert len(self.parent_nodes) == 1
+
+    @staticmethod
+    def create(  # noqa: D102
         parent_node: DataflowPlanNode,
         time_range_constraint: TimeRangeConstraint,
-    ) -> None:
-        self._time_range_constraint = time_range_constraint
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=(parent_node,))
+    ) -> ConstrainTimeRangeNode:
+        return ConstrainTimeRangeNode(
+            parent_nodes=(parent_node,),
+            time_range_constraint=time_range_constraint,
+        )
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D102
@@ -41,12 +51,7 @@ class ConstrainTimeRangeNode(DataflowPlanNode):
         )
 
     @property
-    def time_range_constraint(self) -> TimeRangeConstraint:  # noqa: D102
-        return self._time_range_constraint
-
-    @property
     def parent_node(self) -> DataflowPlanNode:  # noqa: D102
-        assert len(self.parent_nodes) == 1
         return self.parent_nodes[0]
 
     @property
@@ -62,6 +67,6 @@ class ConstrainTimeRangeNode(DataflowPlanNode):
     def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> ConstrainTimeRangeNode:  # noqa: D102
         assert len(new_parent_nodes) == 1
         return ConstrainTimeRangeNode(
-            parent_node=new_parent_nodes[0],
+            parent_nodes=tuple(new_parent_nodes),
             time_range_constraint=self.time_range_constraint,
         )

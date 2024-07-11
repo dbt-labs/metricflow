@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Optional, Sequence
 
 from dbt_semantic_interfaces.type_enums import AggregationType
@@ -11,6 +12,7 @@ from metricflow_semantics.visitor import VisitorOutputT
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNodeVisitor
 
 
+@dataclass(frozen=True)
 class SemiAdditiveJoinNode(DataflowPlanNode):
     """A node that performs a row filter by aggregating a given non-additive dimension.
 
@@ -24,9 +26,9 @@ class SemiAdditiveJoinNode(DataflowPlanNode):
 
     Data transformation example,
     | date       | account_balance | user |                             | date       | account_balance | user |
-    |:-----------|-----------------|-----:|     entity_specs:       |:-----------|-----------------|-----:|
+    |:-----------|-----------------|-----:|     entity_specs:           |:-----------|-----------------|-----:|
     | 2019-12-31 |            1000 |    u1|       - user                | 2020-01-03 |            2000 |    u1|
-    | 2020-01-03 |            2000 |    u1| ->  time_dimension_spec: -> | 2020-01-12              1500 |    u2|
+    | 2020-01-03 |            2000 |    u1| ->  time_dimension_spec: -> | 2020-01-12 |            1500 |    u2|
     | 2020-01-09 |            3000 |    u2|       - date                | 2020-01-12 |            1000 |    u3|
     | 2020-01-12 |            1500 |    u2|     agg_by_function:
     | 2020-01-12 |            1000 |    u3|       - MAX
@@ -37,7 +39,7 @@ class SemiAdditiveJoinNode(DataflowPlanNode):
 
     Data transformation example,
     | date       | account_balance | user |                             | date       | account_balance |
-    |:-----------|-----------------|-----:|     entity_specs:       |:-----------|----------------:|
+    |:-----------|-----------------|-----:|     entity_specs:           |:-----------|----------------:|
     | 2019-12-31 |            1000 |    u1|                             | 2020-01-12 |            2500 |
     | 2020-01-03 |            2000 |    u1| ->  time_dimension_spec: ->
     | 2020-01-09 |            3000 |    u2|       - date
@@ -50,7 +52,7 @@ class SemiAdditiveJoinNode(DataflowPlanNode):
 
     Data transformation example,
     | date       | account_balance | user |                                  | date       | account_balance |
-    |:-----------|-----------------|-----:|     entity_specs:            |:-----------|----------------:|
+    |:-----------|-----------------|-----:|     entity_specs:                |:-----------|----------------:|
     | 2019-12-31 |            1500 |    u1|     time_dimension_spec:         | 2019-12-31 |            1500 |
     | 2020-01-03 |            2000 |    u1| ->    - date                  -> | 2020-01-07 |            3000 |
     | 2020-01-09 |            3000 |    u2|     agg_by_function:             | 2020-01-14 |            3250 |
@@ -58,34 +60,38 @@ class SemiAdditiveJoinNode(DataflowPlanNode):
     | 2020-01-14 |            1250 |    u3|     queried_time_dimension_spec:
     | 2020-01-14 |            2000 |    u2|       - date__week
     | 2020-01-15 |            4000 |    u1|
+
+    Attributes:
+        entity_specs: The entities to group the join by.
+        time_dimension_spec: The time dimension used for row filtering via an aggregation.
+        agg_by_function: The aggregation function used on the time dimension.
+        queried_time_dimension_spec: The group by provided in the query used to build the windows we want to filter on.
     """
 
-    def __init__(
-        self,
+    entity_specs: Sequence[LinklessEntitySpec]
+    time_dimension_spec: TimeDimensionSpec
+    agg_by_function: AggregationType
+    queried_time_dimension_spec: Optional[TimeDimensionSpec]
+
+    def __post_init__(self) -> None:  # noqa: D105
+        super().__post_init__()
+        assert len(self.parent_nodes) == 1
+
+    @staticmethod
+    def create(  # noqa: D102
         parent_node: DataflowPlanNode,
         entity_specs: Sequence[LinklessEntitySpec],
         time_dimension_spec: TimeDimensionSpec,
         agg_by_function: AggregationType,
         queried_time_dimension_spec: Optional[TimeDimensionSpec] = None,
-    ) -> None:
-        """Constructor.
-
-        Args:
-            parent_node: node with standard output
-            entity_specs: the entities to group the join by
-            time_dimension_spec: the time dimension used for row filtering via an aggregation
-            agg_by_function: the aggregation function used on the time dimension
-            queried_time_dimension_spec: The group by provided in the query used to build the windows we want to filter on.
-        """
-        self._parent_node = parent_node
-        self._entity_specs = tuple(entity_specs)
-        self._time_dimension_spec = time_dimension_spec
-        self._agg_by_function = agg_by_function
-        self._queried_time_dimension_spec = queried_time_dimension_spec
-
-        # Doing a list comprehension throws a type error, so doing it this way.
-        parent_nodes: Sequence[DataflowPlanNode] = (self._parent_node,)
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=parent_nodes)
+    ) -> SemiAdditiveJoinNode:
+        return SemiAdditiveJoinNode(
+            parent_nodes=(parent_node,),
+            entity_specs=tuple(entity_specs),
+            time_dimension_spec=time_dimension_spec,
+            agg_by_function=agg_by_function,
+            queried_time_dimension_spec=queried_time_dimension_spec,
+        )
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D102
@@ -100,23 +106,7 @@ class SemiAdditiveJoinNode(DataflowPlanNode):
 
     @property
     def parent_node(self) -> DataflowPlanNode:  # noqa: D102
-        return self._parent_node
-
-    @property
-    def entity_specs(self) -> Sequence[LinklessEntitySpec]:  # noqa: D102
-        return self._entity_specs
-
-    @property
-    def time_dimension_spec(self) -> TimeDimensionSpec:  # noqa: D102
-        return self._time_dimension_spec
-
-    @property
-    def agg_by_function(self) -> AggregationType:  # noqa: D102
-        return self._agg_by_function
-
-    @property
-    def queried_time_dimension_spec(self) -> Optional[TimeDimensionSpec]:  # noqa: D102
-        return self._queried_time_dimension_spec
+        return self.parent_nodes[0]
 
     @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
@@ -127,8 +117,7 @@ class SemiAdditiveJoinNode(DataflowPlanNode):
             return False
 
         return (
-            isinstance(other_node, self.__class__)
-            and other_node.entity_specs == self.entity_specs
+            other_node.entity_specs == self.entity_specs
             and other_node.time_dimension_spec == self.time_dimension_spec
             and other_node.agg_by_function == self.agg_by_function
             and other_node.queried_time_dimension_spec == self.queried_time_dimension_spec
@@ -137,7 +126,7 @@ class SemiAdditiveJoinNode(DataflowPlanNode):
     def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> SemiAdditiveJoinNode:  # noqa: D102
         assert len(new_parent_nodes) == 1
 
-        return SemiAdditiveJoinNode(
+        return SemiAdditiveJoinNode.create(
             parent_node=new_parent_nodes[0],
             entity_specs=self.entity_specs,
             time_dimension_spec=self.time_dimension_spec,

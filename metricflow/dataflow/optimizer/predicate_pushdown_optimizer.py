@@ -312,7 +312,7 @@ class PredicatePushdownOptimizer(
         optimized_node = self._default_handler(node=node, pushdown_state=updated_pushdown_state)
         if len(filters_to_apply) > 0:
             return OptimizeBranchResult(
-                optimized_branch=WhereConstraintNode(
+                optimized_branch=WhereConstraintNode.create(
                     parent_node=optimized_node.optimized_branch, where_specs=filters_to_apply
                 )
             )
@@ -397,7 +397,7 @@ class PredicatePushdownOptimizer(
                 )
             elif len(filter_specs_to_apply) > 0:
                 optimized_node = OptimizeBranchResult(
-                    optimized_branch=WhereConstraintNode(
+                    optimized_branch=WhereConstraintNode.create(
                         parent_node=optimized_parent.optimized_branch, where_specs=filter_specs_to_apply
                     )
                 )

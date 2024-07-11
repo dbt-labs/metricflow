@@ -97,30 +97,30 @@ class SqlQueryPlanJoinBuilder:
 
         and_conditions: List[SqlExpressionNode] = []
         for column_equality_description in column_equality_descriptions:
-            left_column = SqlColumnReferenceExpression(
+            left_column = SqlColumnReferenceExpression.create(
                 SqlColumnReference(
                     table_alias=left_source_alias,
                     column_name=column_equality_description.left_column_alias,
                 )
             )
-            right_column = SqlColumnReferenceExpression(
+            right_column = SqlColumnReferenceExpression.create(
                 SqlColumnReference(
                     table_alias=right_source_alias,
                     column_name=column_equality_description.right_column_alias,
                 )
             )
-            column_equality_expression = SqlComparisonExpression(
+            column_equality_expression = SqlComparisonExpression.create(
                 left_expr=left_column,
                 comparison=SqlComparison.EQUALS,
                 right_expr=right_column,
             )
             if column_equality_description.treat_nulls_as_equal:
-                null_comparison_expression = SqlLogicalExpression(
+                null_comparison_expression = SqlLogicalExpression.create(
                     operator=SqlLogicalOperator.AND,
-                    args=(SqlIsNullExpression(arg=left_column), SqlIsNullExpression(arg=right_column)),
+                    args=(SqlIsNullExpression.create(arg=left_column), SqlIsNullExpression.create(arg=right_column)),
                 )
                 and_conditions.append(
-                    SqlLogicalExpression(
+                    SqlLogicalExpression.create(
                         operator=SqlLogicalOperator.OR, args=(column_equality_expression, null_comparison_expression)
                     )
                 )
@@ -135,7 +135,7 @@ class SqlQueryPlanJoinBuilder:
         elif len(and_conditions) == 1:
             on_condition = and_conditions[0]
         else:
-            on_condition = SqlLogicalExpression(operator=SqlLogicalOperator.AND, args=tuple(and_conditions))
+            on_condition = SqlLogicalExpression.create(operator=SqlLogicalOperator.AND, args=tuple(and_conditions))
 
         return SqlJoinDescription(
             right_source=right_source_node,
@@ -287,32 +287,32 @@ class SqlQueryPlanJoinBuilder:
             {start_dimension_name} >= metric_time AND ({end_dimension_name} < metric_time OR {end_dimension_name} IS NULL)
 
         """
-        left_time_column_expr = SqlColumnReferenceExpression(
+        left_time_column_expr = SqlColumnReferenceExpression.create(
             SqlColumnReference(table_alias=left_source_alias, column_name=left_source_time_dimension_name)
         )
-        window_start_column_expr = SqlColumnReferenceExpression(
+        window_start_column_expr = SqlColumnReferenceExpression.create(
             SqlColumnReference(table_alias=right_source_alias, column_name=window_start_dimension_name)
         )
-        window_end_column_expr = SqlColumnReferenceExpression(
+        window_end_column_expr = SqlColumnReferenceExpression.create(
             SqlColumnReference(table_alias=right_source_alias, column_name=window_end_dimension_name)
         )
 
-        window_start_condition = SqlComparisonExpression(
+        window_start_condition = SqlComparisonExpression.create(
             left_expr=left_time_column_expr,
             comparison=SqlComparison.GREATER_THAN_OR_EQUALS,
             right_expr=window_start_column_expr,
         )
-        window_end_by_time = SqlComparisonExpression(
+        window_end_by_time = SqlComparisonExpression.create(
             left_expr=left_time_column_expr,
             comparison=SqlComparison.LESS_THAN,
             right_expr=window_end_column_expr,
         )
-        window_end_is_null = SqlIsNullExpression(window_end_column_expr)
-        window_end_condition = SqlLogicalExpression(
+        window_end_is_null = SqlIsNullExpression.create(window_end_column_expr)
+        window_end_condition = SqlLogicalExpression.create(
             operator=SqlLogicalOperator.OR, args=(window_end_by_time, window_end_is_null)
         )
 
-        return SqlLogicalExpression(
+        return SqlLogicalExpression.create(
             operator=SqlLogicalOperator.AND, args=(window_start_condition, window_end_condition)
         )
 
@@ -346,7 +346,7 @@ class SqlQueryPlanJoinBuilder:
                 for colname in column_names
             ]
             on_condition = (
-                SqlLogicalExpression(operator=SqlLogicalOperator.AND, args=tuple(equality_exprs))
+                SqlLogicalExpression.create(operator=SqlLogicalOperator.AND, args=tuple(equality_exprs))
                 if len(equality_exprs) > 1
                 else equality_exprs[0]
             )
@@ -403,10 +403,10 @@ class SqlQueryPlanJoinBuilder:
 
         The latter scenario consolidates the rows keyed by 'c' into a single entry.
         """
-        return SqlComparisonExpression(
+        return SqlComparisonExpression.create(
             left_expr=make_coalesced_expr(table_aliases_in_coalesce, column_alias),
             comparison=SqlComparison.EQUALS,
-            right_expr=SqlColumnReferenceExpression(
+            right_expr=SqlColumnReferenceExpression.create(
                 col_ref=SqlColumnReference(
                     table_alias=right_table_alias,
                     column_name=column_alias,
@@ -430,13 +430,13 @@ class SqlQueryPlanJoinBuilder:
         """
         if window or grain_to_date:
             assert_exactly_one_arg_set(window=window, grain_to_date=grain_to_date)
-        base_column_expr = SqlColumnReferenceExpression(
+        base_column_expr = SqlColumnReferenceExpression.create(
             SqlColumnReference(
                 table_alias=base_data_set.alias,
                 column_name=base_data_set.metric_time_column_name,
             )
         )
-        time_comparison_column_expr = SqlColumnReferenceExpression(
+        time_comparison_column_expr = SqlColumnReferenceExpression.create(
             SqlColumnReference(
                 table_alias=time_comparison_dataset.alias,
                 column_name=time_comparison_dataset.metric_time_column_name,
@@ -445,7 +445,7 @@ class SqlQueryPlanJoinBuilder:
 
         # Comparison expression against the endpoint of the cumulative time range,
         # meaning the base metrc time must always be BEFORE the comparison metric time
-        end_of_range_comparison_expression = SqlComparisonExpression(
+        end_of_range_comparison_expression = SqlComparisonExpression.create(
             left_expr=base_column_expr,
             comparison=SqlComparison.LESS_THAN_OR_EQUALS,
             right_expr=time_comparison_column_expr,
@@ -453,10 +453,10 @@ class SqlQueryPlanJoinBuilder:
 
         comparison_expressions: List[SqlComparisonExpression] = [end_of_range_comparison_expression]
         if window:
-            start_of_range_comparison_expr = SqlComparisonExpression(
+            start_of_range_comparison_expr = SqlComparisonExpression.create(
                 left_expr=base_column_expr,
                 comparison=SqlComparison.GREATER_THAN,
-                right_expr=SqlSubtractTimeIntervalExpression(
+                right_expr=SqlSubtractTimeIntervalExpression.create(
                     arg=time_comparison_column_expr,
                     count=window.count,
                     granularity=window.granularity,
@@ -464,14 +464,16 @@ class SqlQueryPlanJoinBuilder:
             )
             comparison_expressions.append(start_of_range_comparison_expr)
         elif grain_to_date:
-            start_of_range_comparison_expr = SqlComparisonExpression(
+            start_of_range_comparison_expr = SqlComparisonExpression.create(
                 left_expr=base_column_expr,
                 comparison=SqlComparison.GREATER_THAN_OR_EQUALS,
-                right_expr=SqlDateTruncExpression(arg=time_comparison_column_expr, time_granularity=grain_to_date),
+                right_expr=SqlDateTruncExpression.create(
+                    arg=time_comparison_column_expr, time_granularity=grain_to_date
+                ),
             )
             comparison_expressions.append(start_of_range_comparison_expr)
 
-        return SqlLogicalExpression(
+        return SqlLogicalExpression.create(
             operator=SqlLogicalOperator.AND,
             args=tuple(comparison_expressions),
         )
@@ -537,23 +539,23 @@ class SqlQueryPlanJoinBuilder:
         parent_alias: str,
     ) -> SqlJoinDescription:
         """Build join expression used to join a metric to a time spine dataset."""
-        left_expr: SqlExpressionNode = SqlColumnReferenceExpression(
+        left_expr: SqlExpressionNode = SqlColumnReferenceExpression.create(
             col_ref=SqlColumnReference(table_alias=time_spine_alias, column_name=agg_time_dimension_column_name)
         )
         if node.offset_window:
-            left_expr = SqlSubtractTimeIntervalExpression(
+            left_expr = SqlSubtractTimeIntervalExpression.create(
                 arg=left_expr, count=node.offset_window.count, granularity=node.offset_window.granularity
             )
         elif node.offset_to_grain:
-            left_expr = SqlDateTruncExpression(time_granularity=node.offset_to_grain, arg=left_expr)
+            left_expr = SqlDateTruncExpression.create(time_granularity=node.offset_to_grain, arg=left_expr)
 
         return SqlJoinDescription(
             right_source=parent_sql_select_node,
             right_source_alias=parent_alias,
-            on_condition=SqlComparisonExpression(
+            on_condition=SqlComparisonExpression.create(
                 left_expr=left_expr,
                 comparison=SqlComparison.EQUALS,
-                right_expr=SqlColumnReferenceExpression(
+                right_expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias=parent_alias, column_name=agg_time_dimension_column_name)
                 ),
             ),

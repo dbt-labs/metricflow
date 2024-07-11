@@ -51,7 +51,7 @@ def test_view_sql_generated_at_a_node(
 
     # Show SQL and spec set at a source node.
     bookings_source_data_set = to_data_set_converter.create_sql_source_data_set(bookings_semantic_model)
-    read_source_node = ReadSqlSourceNode(bookings_source_data_set)
+    read_source_node = ReadSqlSourceNode.create(bookings_source_data_set)
     conversion_result = to_sql_plan_converter.convert_to_sql_query_plan(
         sql_engine_type=sql_client.sql_engine_type,
         dataflow_plan_node=read_source_node,
@@ -63,13 +63,13 @@ def test_view_sql_generated_at_a_node(
     logger.info(f"SQL generated at {read_source_node} is:\n\n{sql_at_read_node}")
     logger.info(f"Spec set at {read_source_node} is:\n\n{mf_pformat(spec_set_at_read_node)}")
 
-    metric_time_node = MetricTimeDimensionTransformNode(
+    metric_time_node = MetricTimeDimensionTransformNode.create(
         parent_node=read_source_node,
         aggregation_time_dimension_reference=TimeDimensionReference(element_name="ds"),
     )
 
     # Show SQL and spec set at a filter node.
-    filter_elements_node = FilterElementsNode(
+    filter_elements_node = FilterElementsNode.create(
         parent_node=metric_time_node,
         include_specs=InstanceSpecSet(
             time_dimension_specs=(

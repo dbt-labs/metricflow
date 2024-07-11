@@ -37,8 +37,8 @@ def test_cast_to_timestamp(
     """Tests rendering of the cast to timestamp expression in a query."""
     select_columns = [
         SqlSelectColumn(
-            expr=SqlCastToTimestampExpression(
-                arg=SqlStringLiteralExpression(
+            expr=SqlCastToTimestampExpression.create(
+                arg=SqlStringLiteralExpression.create(
                     literal_value="2020-01-01",
                 )
             ),
@@ -46,7 +46,7 @@ def test_cast_to_timestamp(
         ),
     ]
 
-    from_source = SqlTableFromClauseNode(sql_table=SqlTable(schema_name="foo", table_name="bar"))
+    from_source = SqlTableFromClauseNode.create(sql_table=SqlTable(schema_name="foo", table_name="bar"))
     from_source_alias = "a"
     joins_descs: List[SqlJoinDescription] = []
     where = None
@@ -56,12 +56,12 @@ def test_cast_to_timestamp(
     assert_rendered_sql_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
-        sql_plan_node=SqlSelectStatementNode(
+        sql_plan_node=SqlSelectStatementNode.create(
             description="Test Cast to Timestamp Expression",
             select_columns=tuple(select_columns),
             from_source=from_source,
             from_source_alias=from_source_alias,
-            joins_descs=tuple(joins_descs),
+            join_descs=tuple(joins_descs),
             where=where,
             group_bys=tuple(group_bys),
             order_bys=tuple(order_bys),
@@ -80,17 +80,17 @@ def test_generate_uuid(
     """Tests rendering of the generate uuid expression in a query."""
     select_columns = [
         SqlSelectColumn(
-            expr=SqlGenerateUuidExpression(),
+            expr=SqlGenerateUuidExpression.create(),
             column_alias="uuid",
         ),
     ]
-    from_source = SqlTableFromClauseNode(sql_table=SqlTable(schema_name="foo", table_name="bar"))
+    from_source = SqlTableFromClauseNode.create(sql_table=SqlTable(schema_name="foo", table_name="bar"))
     from_source_alias = "a"
 
     assert_rendered_sql_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
-        sql_plan_node=SqlSelectStatementNode(
+        sql_plan_node=SqlSelectStatementNode.create(
             description="Test Generate UUID Expression",
             select_columns=tuple(select_columns),
             from_source=from_source,
@@ -115,8 +115,8 @@ def test_continuous_percentile_expr(
 
     select_columns = [
         SqlSelectColumn(
-            expr=SqlPercentileExpression(
-                order_by_arg=SqlColumnReferenceExpression(SqlColumnReference("a", "col0")),
+            expr=SqlPercentileExpression.create(
+                order_by_arg=SqlColumnReferenceExpression.create(SqlColumnReference("a", "col0")),
                 percentile_args=SqlPercentileExpressionArgument(
                     percentile=0.5, function_type=SqlPercentileFunctionType.CONTINUOUS
                 ),
@@ -125,7 +125,7 @@ def test_continuous_percentile_expr(
         ),
     ]
 
-    from_source = SqlTableFromClauseNode(sql_table=SqlTable(schema_name="foo", table_name="bar"))
+    from_source = SqlTableFromClauseNode.create(sql_table=SqlTable(schema_name="foo", table_name="bar"))
     from_source_alias = "a"
     joins_descs: List[SqlJoinDescription] = []
     where = None
@@ -135,12 +135,12 @@ def test_continuous_percentile_expr(
     assert_rendered_sql_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
-        sql_plan_node=SqlSelectStatementNode(
+        sql_plan_node=SqlSelectStatementNode.create(
             description="Test Continuous Percentile Expression",
             select_columns=tuple(select_columns),
             from_source=from_source,
             from_source_alias=from_source_alias,
-            joins_descs=tuple(joins_descs),
+            join_descs=tuple(joins_descs),
             where=where,
             group_bys=tuple(group_bys),
             order_bys=tuple(order_bys),
@@ -164,8 +164,8 @@ def test_discrete_percentile_expr(
 
     select_columns = [
         SqlSelectColumn(
-            expr=SqlPercentileExpression(
-                order_by_arg=SqlColumnReferenceExpression(SqlColumnReference("a", "col0")),
+            expr=SqlPercentileExpression.create(
+                order_by_arg=SqlColumnReferenceExpression.create(SqlColumnReference("a", "col0")),
                 percentile_args=SqlPercentileExpressionArgument(
                     percentile=0.5, function_type=SqlPercentileFunctionType.DISCRETE
                 ),
@@ -174,7 +174,7 @@ def test_discrete_percentile_expr(
         ),
     ]
 
-    from_source = SqlTableFromClauseNode(sql_table=SqlTable(schema_name="foo", table_name="bar"))
+    from_source = SqlTableFromClauseNode.create(sql_table=SqlTable(schema_name="foo", table_name="bar"))
     from_source_alias = "a"
     joins_descs: List[SqlJoinDescription] = []
     where = None
@@ -184,12 +184,12 @@ def test_discrete_percentile_expr(
     assert_rendered_sql_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
-        sql_plan_node=SqlSelectStatementNode(
+        sql_plan_node=SqlSelectStatementNode.create(
             description="Test Discrete Percentile Expression",
             select_columns=tuple(select_columns),
             from_source=from_source,
             from_source_alias=from_source_alias,
-            joins_descs=tuple(joins_descs),
+            join_descs=tuple(joins_descs),
             where=where,
             group_bys=tuple(group_bys),
             order_bys=tuple(order_bys),
@@ -213,8 +213,8 @@ def test_approximate_continuous_percentile_expr(
 
     select_columns = [
         SqlSelectColumn(
-            expr=SqlPercentileExpression(
-                order_by_arg=SqlColumnReferenceExpression(SqlColumnReference("a", "col0")),
+            expr=SqlPercentileExpression.create(
+                order_by_arg=SqlColumnReferenceExpression.create(SqlColumnReference("a", "col0")),
                 percentile_args=SqlPercentileExpressionArgument(
                     percentile=0.5, function_type=SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS
                 ),
@@ -223,7 +223,7 @@ def test_approximate_continuous_percentile_expr(
         ),
     ]
 
-    from_source = SqlTableFromClauseNode(sql_table=SqlTable(schema_name="foo", table_name="bar"))
+    from_source = SqlTableFromClauseNode.create(sql_table=SqlTable(schema_name="foo", table_name="bar"))
     from_source_alias = "a"
     joins_descs: List[SqlJoinDescription] = []
     where = None
@@ -233,12 +233,12 @@ def test_approximate_continuous_percentile_expr(
     assert_rendered_sql_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
-        sql_plan_node=SqlSelectStatementNode(
+        sql_plan_node=SqlSelectStatementNode.create(
             description="Test Approximate Continuous Percentile Expression",
             select_columns=tuple(select_columns),
             from_source=from_source,
             from_source_alias=from_source_alias,
-            joins_descs=tuple(joins_descs),
+            join_descs=tuple(joins_descs),
             where=where,
             group_bys=tuple(group_bys),
             order_bys=tuple(order_bys),
@@ -262,8 +262,8 @@ def test_approximate_discrete_percentile_expr(
 
     select_columns = [
         SqlSelectColumn(
-            expr=SqlPercentileExpression(
-                order_by_arg=SqlColumnReferenceExpression(SqlColumnReference("a", "col0")),
+            expr=SqlPercentileExpression.create(
+                order_by_arg=SqlColumnReferenceExpression.create(SqlColumnReference("a", "col0")),
                 percentile_args=SqlPercentileExpressionArgument(
                     percentile=0.5, function_type=SqlPercentileFunctionType.APPROXIMATE_DISCRETE
                 ),
@@ -272,7 +272,7 @@ def test_approximate_discrete_percentile_expr(
         ),
     ]
 
-    from_source = SqlTableFromClauseNode(sql_table=SqlTable(schema_name="foo", table_name="bar"))
+    from_source = SqlTableFromClauseNode.create(sql_table=SqlTable(schema_name="foo", table_name="bar"))
     from_source_alias = "a"
     joins_descs: List[SqlJoinDescription] = []
     where = None
@@ -282,12 +282,12 @@ def test_approximate_discrete_percentile_expr(
     assert_rendered_sql_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
-        sql_plan_node=SqlSelectStatementNode(
+        sql_plan_node=SqlSelectStatementNode.create(
             description="Test Approximate Discrete Percentile Expression",
             select_columns=tuple(select_columns),
             from_source=from_source,
             from_source_alias=from_source_alias,
-            joins_descs=tuple(joins_descs),
+            join_descs=tuple(joins_descs),
             where=where,
             group_bys=tuple(group_bys),
             order_bys=tuple(order_bys),

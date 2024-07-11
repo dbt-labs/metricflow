@@ -162,7 +162,7 @@ class CreateSelectColumnsForInstances(InstanceSetTransform[SelectColumnSet]):
                 input_column_name = self._output_to_input_column_mapping[output_column_name]
             select_columns.append(
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(SqlColumnReference(self._table_alias, input_column_name)),
+                    expr=SqlColumnReferenceExpression.create(SqlColumnReference(self._table_alias, input_column_name)),
                     column_alias=output_column_name,
                 )
             )
@@ -223,7 +223,7 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
         measure = self._semantic_model_lookup.get_measure(measure_instance.spec.reference)
         aggregation_type = measure.agg
 
-        expression_to_get_measure = SqlColumnReferenceExpression(
+        expression_to_get_measure = SqlColumnReferenceExpression.create(
             SqlColumnReference(self._table_alias, column_name_in_table)
         )
 
@@ -824,7 +824,7 @@ class CreateSqlColumnReferencesForInstances(InstanceSetTransform[Tuple[SqlColumn
             self._column_resolver.resolve_spec(spec).column_name for spec in instance_set.spec_set.all_specs
         ]
         return tuple(
-            SqlColumnReferenceExpression(
+            SqlColumnReferenceExpression.create(
                 SqlColumnReference(
                     table_alias=self._table_alias,
                     column_name=column_name,
@@ -854,7 +854,7 @@ class CreateSelectColumnForCombineOutputNode(InstanceSetTransform[SelectColumnSe
     def _create_select_column(self, spec: InstanceSpec, fill_nulls_with: Optional[int] = None) -> SqlSelectColumn:
         """Creates the select column for the given spec and the fill value."""
         column_name = self._column_resolver.resolve_spec(spec).column_name
-        column_reference_expression = SqlColumnReferenceExpression(
+        column_reference_expression = SqlColumnReferenceExpression.create(
             col_ref=SqlColumnReference(
                 table_alias=self._table_alias,
                 column_name=column_name,
@@ -864,11 +864,11 @@ class CreateSelectColumnForCombineOutputNode(InstanceSetTransform[SelectColumnSe
             aggregation_type=AggregationType.MAX, sql_column_expression=column_reference_expression
         )
         if fill_nulls_with is not None:
-            select_expression = SqlAggregateFunctionExpression(
+            select_expression = SqlAggregateFunctionExpression.create(
                 sql_function=SqlFunction.COALESCE,
                 sql_function_args=[
                     select_expression,
-                    SqlStringExpression(str(fill_nulls_with)),
+                    SqlStringExpression.create(str(fill_nulls_with)),
                 ],
             )
         return SqlSelectColumn(

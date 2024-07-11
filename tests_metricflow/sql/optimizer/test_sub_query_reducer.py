@@ -46,39 +46,43 @@ def base_select_statement() -> SqlSelectStatementNode:
     ) src2
     ORDER BY src2.col0
     """
-    return SqlSelectStatementNode(
+    return SqlSelectStatementNode.create(
         description="src3",
         select_columns=(
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(col_ref=SqlColumnReference(table_alias="src2", column_name="col0")),
+                expr=SqlColumnReferenceExpression.create(
+                    col_ref=SqlColumnReference(table_alias="src2", column_name="col0")
+                ),
                 column_alias="col0",
             ),
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(col_ref=SqlColumnReference(table_alias="src2", column_name="col1")),
+                expr=SqlColumnReferenceExpression.create(
+                    col_ref=SqlColumnReference(table_alias="src2", column_name="col1")
+                ),
                 column_alias="col1",
             ),
         ),
-        from_source=SqlSelectStatementNode(
+        from_source=SqlSelectStatementNode.create(
             description="src2",
             select_columns=(
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(table_alias="src1", column_name="col0")
                     ),
                     column_alias="col0",
                 ),
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(table_alias="src1", column_name="col1")
                     ),
                     column_alias="col1",
                 ),
             ),
-            from_source=SqlSelectStatementNode(
+            from_source=SqlSelectStatementNode.create(
                 description="src1",
                 select_columns=(
                     SqlSelectColumn(
-                        expr=SqlColumnReferenceExpression(
+                        expr=SqlColumnReferenceExpression.create(
                             col_ref=SqlColumnReference(
                                 table_alias="src0",
                                 column_name="col0",
@@ -87,7 +91,7 @@ def base_select_statement() -> SqlSelectStatementNode:
                         column_alias="col0",
                     ),
                     SqlSelectColumn(
-                        expr=SqlColumnReferenceExpression(
+                        expr=SqlColumnReferenceExpression.create(
                             col_ref=SqlColumnReference(
                                 table_alias="src0",
                                 column_name="col1",
@@ -96,7 +100,7 @@ def base_select_statement() -> SqlSelectStatementNode:
                         column_alias="col1",
                     ),
                 ),
-                from_source=SqlTableFromClauseNode(
+                from_source=SqlTableFromClauseNode.create(
                     sql_table=SqlTable(schema_name="demo", table_name="from_source_table")
                 ),
                 from_source_alias="src0",
@@ -108,7 +112,7 @@ def base_select_statement() -> SqlSelectStatementNode:
         from_source_alias="src2",
         order_bys=(
             SqlOrderByDescription(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     SqlColumnReference(
                         table_alias="src2",
                         column_name="col0",
@@ -163,47 +167,53 @@ def rewrite_order_by_statement() -> SqlSelectStatementNode:
     ORDER BY
     src2.col1
     """
-    return SqlSelectStatementNode(
+    return SqlSelectStatementNode.create(
         description="src3",
         select_columns=(
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(col_ref=SqlColumnReference(table_alias="src2", column_name="col0")),
+                expr=SqlColumnReferenceExpression.create(
+                    col_ref=SqlColumnReference(table_alias="src2", column_name="col0")
+                ),
                 column_alias="col0",
             ),
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(col_ref=SqlColumnReference(table_alias="src2", column_name="col1")),
+                expr=SqlColumnReferenceExpression.create(
+                    col_ref=SqlColumnReference(table_alias="src2", column_name="col1")
+                ),
                 column_alias="col1",
             ),
         ),
         from_source=(
-            SqlSelectStatementNode(
+            SqlSelectStatementNode.create(
                 description="src2",
                 select_columns=(
                     SqlSelectColumn(
-                        expr=SqlColumnReferenceExpression(
+                        expr=SqlColumnReferenceExpression.create(
                             col_ref=SqlColumnReference(table_alias="src0", column_name="col0")
                         ),
                         column_alias="col0",
                     ),
                     SqlSelectColumn(
-                        expr=SqlColumnReferenceExpression(
+                        expr=SqlColumnReferenceExpression.create(
                             col_ref=SqlColumnReference(table_alias="src1", column_name="col1")
                         ),
                         column_alias="col1",
                     ),
                 ),
-                from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="src0")),
+                from_source=SqlTableFromClauseNode.create(sql_table=SqlTable(schema_name="demo", table_name="src0")),
                 from_source_alias="src0",
-                joins_descs=(
+                join_descs=(
                     SqlJoinDescription(
-                        right_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="src1")),
+                        right_source=SqlTableFromClauseNode.create(
+                            sql_table=SqlTable(schema_name="demo", table_name="src1")
+                        ),
                         right_source_alias="src1",
-                        on_condition=SqlComparisonExpression(
-                            left_expr=SqlColumnReferenceExpression(
+                        on_condition=SqlComparisonExpression.create(
+                            left_expr=SqlColumnReferenceExpression.create(
                                 col_ref=SqlColumnReference(table_alias="src0", column_name="join_col")
                             ),
                             comparison=SqlComparison.EQUALS,
-                            right_expr=SqlColumnReferenceExpression(
+                            right_expr=SqlColumnReferenceExpression.create(
                                 col_ref=SqlColumnReference(table_alias="src1", column_name="join_col")
                             ),
                         ),
@@ -215,7 +225,7 @@ def rewrite_order_by_statement() -> SqlSelectStatementNode:
         from_source_alias="src2",
         order_bys=(
             SqlOrderByDescription(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     SqlColumnReference(
                         table_alias="src2",
                         column_name="col1",
@@ -255,33 +265,35 @@ def test_distinct_select_node_is_not_reduced(
     mf_test_configuration: MetricFlowTestConfiguration,
 ) -> None:
     """Tests to ensure distinct select node doesn't get overwritten."""
-    select_node = SqlSelectStatementNode(
+    select_node = SqlSelectStatementNode.create(
         description="test0",
         select_columns=(
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="a", column_name="booking_value")
                 ),
                 column_alias="booking_value",
             ),
         ),
-        from_source=SqlSelectStatementNode(
+        from_source=SqlSelectStatementNode.create(
             description="test1",
             select_columns=(
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(table_alias="a", column_name="booking_value")
                     ),
                     column_alias="booking_value",
                 ),
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(table_alias="a", column_name="bookings")
                     ),
                     column_alias="bookings",
                 ),
             ),
-            from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
+            from_source=SqlTableFromClauseNode.create(
+                sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")
+            ),
             from_source_alias="a",
             distinct=True,
         ),

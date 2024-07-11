@@ -7,13 +7,15 @@ import logging
 import textwrap
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, Generic, Sequence, TypeVar
+from typing import Any, Generic, Optional, Sequence, Tuple, TypeVar
 
 import jinja2
+from typing_extensions import override
 
 from metricflow_semantics.dag.dag_to_text import MetricFlowDagTextFormatter
 from metricflow_semantics.dag.id_prefix import IdPrefix
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
+from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
 from metricflow_semantics.visitor import VisitorOutputT
 
 logger = logging.getLogger(__name__)
@@ -52,16 +54,30 @@ class DagNodeVisitor(Generic[VisitorOutputT], ABC):
         pass
 
 
-class DagNode(ABC):
+DagNodeT = TypeVar("DagNodeT", bound="DagNode")
+
+
+@dataclass(frozen=True)
+class DagNode(MetricFlowPrettyFormattable, Generic[DagNodeT], ABC):
     """A node in a DAG. These should be immutable."""
 
-    def __init__(self, node_id: NodeId) -> None:  # noqa: D107
-        self._node_id = node_id
+    parent_nodes: Tuple[DagNodeT, ...]
+
+    def __post_init__(self) -> None:  # noqa: D105
+        object.__setattr__(self, "_post_init_node_id", self.create_unique_id())
 
     @property
     def node_id(self) -> NodeId:
-        """ID for uniquely identifying a given node."""
-        return self._node_id
+        """ID for uniquely identifying a given node.
+
+        Ideally, this field would have a default value. However, setting a default field in this class means that all
+        subclasses would have to have default values for all the fields as default fields must come at the end.
+        This issue is resolved in Python 3.10 with `kw_only`, so this can be updated once this project's minimum Python
+        version is 3.10.
+
+        Set via `__setattr___` in  `__post__init__` to workaround limitations of frozen dataclasses.
+        """
+        return getattr(self, "_post_init_node_id")
 
     @property
     @abstractmethod
@@ -85,14 +101,6 @@ class DagNode(ABC):
             properties=self.displayed_properties,
         )
 
-    @property
-    @abstractmethod
-    def parent_nodes(self) -> Sequence[DagNode]:  # noqa: D102
-        pass
-
-    def __repr__(self) -> str:  # noqa: D105
-        return f"{self.__class__.__name__}(node_id={self.node_id})"
-
     @classmethod
     @abstractmethod
     def id_prefix(cls) -> IdPrefix:
@@ -114,6 +122,11 @@ class DagNode(ABC):
     def structure_text(self, formatter: MetricFlowDagTextFormatter = MetricFlowDagTextFormatter()) -> str:
         """Return a text representation that shows the structure of the DAG component starting from this node."""
         return formatter.dag_component_to_text(self)
+
+    @property
+    @override
+    def pretty_format(self) -> Optional[str]:
+        return f"{self.__class__.__name__}(node_id={self.node_id.id_str})"
 
 
 def make_graphviz_label(
@@ -173,9 +186,6 @@ class DagId:
     @staticmethod
     def from_id_prefix(id_prefix: IdPrefix) -> DagId:  # noqa: D102
         return DagId(id_str=SequentialIdGenerator.create_next_id(id_prefix).str_value)
-
-
-DagNodeT = TypeVar("DagNodeT", bound=DagNode)
 
 
 class MetricFlowDag(Generic[DagNodeT]):

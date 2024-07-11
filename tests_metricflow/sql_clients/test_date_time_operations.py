@@ -44,8 +44,8 @@ def _extract_data_table_value(df: MetricFlowDataTable) -> Any:  # type: ignore[m
 
 
 def _build_date_trunc_expression(date_string: str, time_granularity: TimeGranularity) -> SqlDateTruncExpression:
-    cast_expr = SqlCastToTimestampExpression(SqlStringLiteralExpression(literal_value=date_string))
-    return SqlDateTruncExpression(time_granularity=time_granularity, arg=cast_expr)
+    cast_expr = SqlCastToTimestampExpression.create(SqlStringLiteralExpression.create(literal_value=date_string))
+    return SqlDateTruncExpression.create(time_granularity=time_granularity, arg=cast_expr)
 
 
 def test_date_trunc_to_year(sql_client: SqlClient) -> None:
@@ -118,8 +118,8 @@ def test_date_trunc_to_week(sql_client: SqlClient, input: str, expected: datetim
 
 
 def _build_extract_expression(date_string: str, date_part: DatePart) -> SqlExtractExpression:
-    cast_expr = SqlCastToTimestampExpression(SqlStringLiteralExpression(literal_value=date_string))
-    return SqlExtractExpression(date_part=date_part, arg=cast_expr)
+    cast_expr = SqlCastToTimestampExpression.create(SqlStringLiteralExpression.create(literal_value=date_string))
+    return SqlExtractExpression.create(date_part=date_part, arg=cast_expr)
 
 
 def test_date_part_year(sql_client: SqlClient) -> None:

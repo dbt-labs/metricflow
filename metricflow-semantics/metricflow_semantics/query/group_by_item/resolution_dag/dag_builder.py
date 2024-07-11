@@ -56,19 +56,19 @@ class GroupByItemResolutionDagBuilder:
                 )
 
             source_candidates_for_measure_nodes = tuple(
-                MeasureGroupByItemSourceNode(
+                MeasureGroupByItemSourceNode.create(
                     measure_reference=measure_reference,
                     child_metric_reference=metric_reference,
                 )
                 for measure_reference in measure_references_for_metric
             )
-            return MetricGroupByItemResolutionNode(
+            return MetricGroupByItemResolutionNode.create(
                 metric_reference=metric_reference,
                 metric_input_location=metric_input_location,
                 parent_nodes=source_candidates_for_measure_nodes,
             )
         # For a derived metric, the parents are other metrics.
-        return MetricGroupByItemResolutionNode(
+        return MetricGroupByItemResolutionNode.create(
             metric_reference=metric_reference,
             metric_input_location=metric_input_location,
             parent_nodes=tuple(
@@ -88,12 +88,12 @@ class GroupByItemResolutionDagBuilder:
     ) -> QueryGroupByItemResolutionNode:
         """Builds a DAG component that represents the resolution flow for a query."""
         if len(metric_references) == 0:
-            return QueryGroupByItemResolutionNode(
-                parent_nodes=(NoMetricsGroupByItemSourceNode(),),
+            return QueryGroupByItemResolutionNode.create(
+                parent_nodes=(NoMetricsGroupByItemSourceNode.create(),),
                 metrics_in_query=metric_references,
                 where_filter_intersection=where_filter_intersection,
             )
-        return QueryGroupByItemResolutionNode(
+        return QueryGroupByItemResolutionNode.create(
             parent_nodes=tuple(
                 self._build_dag_component_for_metric(
                     metric_reference=metric_reference,
