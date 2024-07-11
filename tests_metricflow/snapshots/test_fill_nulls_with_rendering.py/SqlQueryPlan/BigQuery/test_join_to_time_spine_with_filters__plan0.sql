@@ -8,36 +8,38 @@ FROM (
     subq_9.metric_time__day
     , subq_9.bookings
   FROM (
-    -- Constrain Output with WHERE
+    -- Join to Time Spine Dataset
     SELECT
-      subq_8.metric_time__day
-      , subq_8.bookings
+      subq_7.metric_time__day AS metric_time__day
+      , subq_6.bookings AS bookings
     FROM (
-      -- Join to Time Spine Dataset
+      -- Time Spine
       SELECT
-        subq_6.metric_time__day AS metric_time__day
-        , subq_5.bookings AS bookings
+        subq_8.ds AS metric_time__day
+      FROM ***************************.mf_time_spine subq_8
+      WHERE subq_8.ds BETWEEN '2020-01-03' AND '2020-01-05'
+    ) subq_7
+    LEFT OUTER JOIN (
+      -- Aggregate Measures
+      SELECT
+        subq_5.metric_time__day
+        , SUM(subq_5.bookings) AS bookings
       FROM (
-        -- Time Spine
-        SELECT
-          subq_7.ds AS metric_time__day
-        FROM ***************************.mf_time_spine subq_7
-        WHERE subq_7.ds BETWEEN '2020-01-03' AND '2020-01-05'
-      ) subq_6
-      LEFT OUTER JOIN (
-        -- Aggregate Measures
+        -- Pass Only Elements: ['bookings', 'metric_time__day']
         SELECT
           subq_4.metric_time__day
-          , SUM(subq_4.bookings) AS bookings
+          , subq_4.bookings
         FROM (
           -- Constrain Output with WHERE
           SELECT
             subq_3.metric_time__day
+            , subq_3.metric_time__week
             , subq_3.bookings
           FROM (
-            -- Pass Only Elements: ['bookings', 'metric_time__day']
+            -- Pass Only Elements: ['bookings', 'metric_time__day', 'metric_time__week']
             SELECT
               subq_2.metric_time__day
+              , subq_2.metric_time__week
               , subq_2.bookings
             FROM (
               -- Constrain Time Range to [2020-01-03T00:00:00, 2020-01-05T00:00:00]
@@ -338,15 +340,14 @@ FROM (
               WHERE subq_1.metric_time__day BETWEEN '2020-01-03' AND '2020-01-05'
             ) subq_2
           ) subq_3
-          WHERE metric_time__day > '2020-01-01'
+          WHERE metric_time__week > '2020-01-01'
         ) subq_4
-        GROUP BY
-          metric_time__day
       ) subq_5
-      ON
-        subq_6.metric_time__day = subq_5.metric_time__day
-    ) subq_8
-    WHERE metric_time__day > '2020-01-01'
+      GROUP BY
+        metric_time__day
+    ) subq_6
+    ON
+      subq_7.metric_time__day = subq_6.metric_time__day
   ) subq_9
   WHERE subq_9.metric_time__day BETWEEN '2020-01-03' AND '2020-01-05'
 ) subq_10
