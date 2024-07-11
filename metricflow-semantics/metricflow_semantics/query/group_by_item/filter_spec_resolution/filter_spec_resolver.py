@@ -347,6 +347,7 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
                 input_str=group_by_item_in_where_filter.object_builder_str,
                 spec_pattern=group_by_item_in_where_filter.spec_pattern,
                 resolution_node=current_node,
+                filter_location=filter_location,
             )
             # The paths in the issue set are generated relative to the current node. For error messaging, it seems more
             # helpful for those paths to be relative to the query. To do, we have to add nodes from the resolution path.

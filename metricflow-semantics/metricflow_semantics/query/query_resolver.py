@@ -52,9 +52,8 @@ from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import (
     ResolverInputForQueryLevelWhereFilterIntersection,
     ResolverInputForWhereFilterIntersection,
 )
-from metricflow_semantics.query.suggestion_generator import QueryItemSuggestionGenerator
+from metricflow_semantics.query.suggestion_generator import QueryItemSuggestionGenerator, QueryPartForSuggestions
 from metricflow_semantics.query.validation_rules.query_validator import PostResolutionQueryValidator
-from metricflow_semantics.specs.patterns.match_list_pattern import MatchListSpecPattern
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_classes import (
     InstanceSpec,
@@ -149,21 +148,20 @@ class MetricFlowQueryResolver:
             )
         return ResolveMetricOrGroupByItemsResult(input_to_issue_set_mapping=InputToIssueSetMapping.empty_instance())
 
-    @staticmethod
     def _resolve_group_by_item_input(
+        self,
         group_by_item_input: ResolverInputForGroupByItem,
         group_by_item_resolver: GroupByItemResolver,
         valid_group_by_item_specs_for_querying: Sequence[LinkableInstanceSpec],
+        queried_metrics: Sequence[MetricReference],
     ) -> GroupByItemResolution:
         suggestion_generator = QueryItemSuggestionGenerator(
             input_naming_scheme=group_by_item_input.input_obj_naming_scheme,
             input_str=str(group_by_item_input.input_obj),
-            candidate_filters=QueryItemSuggestionGenerator.GROUP_BY_ITEM_CANDIDATE_FILTERS
-            + (
-                MatchListSpecPattern(
-                    listed_specs=valid_group_by_item_specs_for_querying,
-                ),
-            ),
+            query_part=QueryPartForSuggestions.GROUP_BY,
+            metric_lookup=self._manifest_lookup.metric_lookup,
+            queried_metrics=queried_metrics,
+            valid_group_by_item_specs_for_querying=valid_group_by_item_specs_for_querying,
         )
         return group_by_item_resolver.resolve_matching_item_for_querying(
             spec_pattern=group_by_item_input.spec_pattern,
@@ -190,7 +188,9 @@ class MetricFlowQueryResolver:
                 suggestion_generator = QueryItemSuggestionGenerator(
                     input_naming_scheme=MetricNamingScheme(),
                     input_str=str(metric_input.input_obj),
-                    candidate_filters=(),
+                    query_part=QueryPartForSuggestions.METRIC,
+                    metric_lookup=self._manifest_lookup.metric_lookup,
+                    queried_metrics=tuple(metric_input.spec_pattern.metric_reference for metric_input in metric_inputs),
                 )
                 metric_suggestions = suggestion_generator.input_suggestions(candidate_specs=available_metric_specs)
                 input_to_issue_set_mapping_items.append(
@@ -238,10 +238,11 @@ class MetricFlowQueryResolver:
         group_by_item_specs: List[LinkableInstanceSpec] = []
         linkable_element_sets: List[LinkableElementSet] = []
         for group_by_item_input in group_by_item_inputs:
-            resolution = MetricFlowQueryResolver._resolve_group_by_item_input(
+            resolution = self._resolve_group_by_item_input(
                 group_by_item_resolver=group_by_item_resolver,
                 group_by_item_input=group_by_item_input,
                 valid_group_by_item_specs_for_querying=valid_group_by_item_specs_for_querying,
+                queried_metrics=metric_references,
             )
             if resolution.issue_set.has_issues:
                 input_to_issue_set_mapping_items.append(

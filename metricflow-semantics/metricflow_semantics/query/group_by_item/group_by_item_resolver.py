@@ -20,13 +20,14 @@ from metricflow_semantics.query.group_by_item.candidate_push_down.push_down_visi
     PushDownResult,
     _PushDownGroupByItemCandidatesVisitor,
 )
+from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow_semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag, ResolutionDagSinkNode
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow_semantics.query.issues.group_by_item_resolver.ambiguous_group_by_item import AmbiguousGroupByItemIssue
 from metricflow_semantics.query.issues.issues_base import (
     MetricFlowQueryResolutionIssueSet,
 )
-from metricflow_semantics.query.suggestion_generator import QueryItemSuggestionGenerator
+from metricflow_semantics.query.suggestion_generator import QueryItemSuggestionGenerator, QueryPartForSuggestions
 from metricflow_semantics.specs.patterns.minimum_time_grain import MinimumTimeGrainPattern
 from metricflow_semantics.specs.patterns.no_group_by_metric import NoGroupByMetricPattern
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
@@ -135,6 +136,7 @@ class GroupByItemResolver:
         input_str: str,
         spec_pattern: SpecPattern,
         resolution_node: ResolutionDagSinkNode,
+        filter_location: WhereFilterLocation,
     ) -> GroupByItemResolution:
         """Returns the spec that matches the spec_pattern associated with the filter in the given node.
 
@@ -147,7 +149,9 @@ class GroupByItemResolver:
         suggestion_generator = QueryItemSuggestionGenerator(
             input_naming_scheme=ObjectBuilderNamingScheme(),
             input_str=input_str,
-            candidate_filters=QueryItemSuggestionGenerator.FILTER_ITEM_CANDIDATE_FILTERS,
+            query_part=QueryPartForSuggestions.WHERE_FILTER,
+            metric_lookup=self._manifest_lookup.metric_lookup,
+            queried_metrics=filter_location.metric_references,
         )
 
         push_down_visitor = _PushDownGroupByItemCandidatesVisitor(
