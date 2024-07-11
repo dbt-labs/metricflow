@@ -2,12 +2,16 @@ from __future__ import annotations
 
 import logging
 import textwrap
+from dataclasses import dataclass
+from typing import Optional
 
 from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimension
 from dbt_semantic_interfaces.type_enums import DimensionType
 from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat, mf_pformat_many
 from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_DAY
+from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 
@@ -179,3 +183,19 @@ def test_pformat_many_with_strings() -> None:  # noqa: D103
         ).rstrip()
         == result
     )
+
+
+def test_custom_pretty_print() -> None:
+    """Check that `MetricFlowPrettyFormattable` can be used to override the result when using MF's pretty-printer."""
+
+    @dataclass(frozen=True)
+    class _ExampleDataclass(MetricFlowPrettyFormattable):
+        field_0: float
+
+        @property
+        @override
+        def pretty_format(self) -> Optional[str]:
+            """Only show 2 decimal points when pretty printing."""
+            return f"{self.__class__.__name__}({self.field_0:.2f})"
+
+    assert mf_pformat(_ExampleDataclass(1.2345)) == f"{_ExampleDataclass.__name__}(1.23)"
