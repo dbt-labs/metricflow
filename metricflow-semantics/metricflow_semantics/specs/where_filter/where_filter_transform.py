@@ -13,6 +13,7 @@ from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec
     FilterSpecResolutionLookUp,
 )
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.rendered_spec_tracker import RenderedSpecTracker
 from metricflow_semantics.specs.where_filter.where_filter_dimension import WhereFilterDimensionFactory
 from metricflow_semantics.specs.where_filter.where_filter_entity import WhereFilterEntityFactory
@@ -108,7 +109,7 @@ class WhereSpecFactory:
                 WhereFilterSpec(
                     where_sql=where_sql,
                     bind_parameters=SqlBindParameters(),
-                    linkable_specs=rendered_specs,
+                    linkable_spec_set=LinkableSpecSet.create_from_specs(rendered_specs),
                     linkable_elements=linkable_elements,
                 )
             )

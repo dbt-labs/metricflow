@@ -10,6 +10,7 @@ from metricflow_semantics.collection_helpers.dedupe import ordered_dedupe
 from metricflow_semantics.collection_helpers.merger import Mergeable
 from metricflow_semantics.model.semantics.linkable_element import LinkableElement
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
+from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
 
 
@@ -45,8 +46,12 @@ class WhereFilterSpec(Mergeable, SerializableDataclass):
     # quoted identifiers later.
     where_sql: str
     bind_parameters: SqlBindParameters
-    linkable_specs: Tuple[LinkableInstanceSpec, ...]
     linkable_elements: Tuple[LinkableElement, ...]
+    linkable_spec_set: LinkableSpecSet
+
+    @property
+    def linkable_specs(self) -> Tuple[LinkableInstanceSpec, ...]:  # noqa: D102
+        return self.linkable_spec_set.as_tuple
 
     def merge(self, other: WhereFilterSpec) -> WhereFilterSpec:  # noqa: D102
         if self == WhereFilterSpec.empty_instance():
@@ -61,7 +66,7 @@ class WhereFilterSpec(Mergeable, SerializableDataclass):
         return WhereFilterSpec(
             where_sql=f"({self.where_sql}) AND ({other.where_sql})",
             bind_parameters=self.bind_parameters.combine(other.bind_parameters),
-            linkable_specs=ordered_dedupe(self.linkable_specs, other.linkable_specs),
+            linkable_spec_set=self.linkable_spec_set.merge(other.linkable_spec_set).dedupe(),
             linkable_elements=ordered_dedupe(self.linkable_elements, other.linkable_elements),
         )
 
@@ -75,6 +80,6 @@ class WhereFilterSpec(Mergeable, SerializableDataclass):
         return WhereFilterSpec(
             where_sql="TRUE",
             bind_parameters=SqlBindParameters(),
-            linkable_specs=(),
+            linkable_spec_set=LinkableSpecSet(),
             linkable_elements=(),
         )
