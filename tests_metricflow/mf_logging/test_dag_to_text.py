@@ -70,11 +70,16 @@ def test_multithread_dag_to_text() -> None:
         <SqlQueryPlan>
             <SqlSelectStatementNode>
                 <!-- description =  -->
-                <!--   test -->
-                <!-- node_id =  -->
-                <!--   ss_0 -->
-                <!-- col0 =                                                                                        -->
-                <!--   SqlSelectColumn(expr=SqlStringExpression(node_id=str_0 sql_expr='foo'), column_alias='bar') -->
+                <!--   'test' -->
+                <!-- node_id =          -->
+                <!--   NodeId(          -->
+                <!--     id_str='ss_0', -->
+                <!--   )                -->
+                <!-- col0 =                                                      -->
+                <!--   SqlSelectColumn(                                          -->
+                <!--     expr=SqlStringExpression(node_id=str_0 sql_expr='foo'), -->
+                <!--     column_alias='bar',                                     -->
+                <!--   )                                                         -->
                 <!-- from_source =                           -->
                 <!--   SqlTableFromClauseNode(node_id=tfc_0) -->
                 <!-- where =  -->
@@ -82,12 +87,16 @@ def test_multithread_dag_to_text() -> None:
                 <!-- distinct =  -->
                 <!--   False -->
                 <SqlTableFromClauseNode>
-                    <!-- description =            -->
-                    <!--   Read from schema.table -->
-                    <!-- node_id =  -->
-                    <!--   tfc_0 -->
-                    <!-- table_id =     -->
-                    <!--   schema.table -->
+                    <!-- description =      -->
+                    <!--   ('Read '         -->
+                    <!--    'from '         -->
+                    <!--    'schema.table') -->
+                    <!-- node_id =           -->
+                    <!--   NodeId(           -->
+                    <!--     id_str='tfc_0', -->
+                    <!--   )                 -->
+                    <!-- table_id =       -->
+                    <!--   'schema.table' -->
                 </SqlTableFromClauseNode>
             </SqlSelectStatementNode>
         </SqlQueryPlan>

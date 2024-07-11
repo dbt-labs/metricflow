@@ -34,7 +34,7 @@ class MaxWidthTracker:
     def update_max_width_for_indented_section(self, indent_prefix: str) -> Iterator[None]:
         """Context manager used to wrap the code that prints an indented section."""
         previous_max_width = self._current_max_width
-        self._current_max_width = max(0, self._current_max_width - len(indent_prefix))
+        self._current_max_width = max(1, self._current_max_width - len(indent_prefix))
         yield None
         self._current_max_width = previous_max_width
 
@@ -101,7 +101,7 @@ class MetricFlowDagTextFormatter:
                 displayed_property.value,
                 # The string representation of displayed_property.value will be wrapped with "<!-- ", " -->" so subtract
                 # the width of those.
-                max_line_length=max_width - len("<!-- ") - len(" -->"),
+                max_line_length=max(1, max_width - len("<!-- ") - len(" -->")),
                 indent_prefix=self._value_indent_prefix,
             )
 
