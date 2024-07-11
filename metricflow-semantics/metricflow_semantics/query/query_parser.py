@@ -11,7 +11,7 @@ from dbt_semantic_interfaces.implementations.filters.where_filter import (
 )
 from dbt_semantic_interfaces.protocols import SavedQuery
 from dbt_semantic_interfaces.protocols.where_filter import WhereFilter
-from dbt_semantic_interfaces.references import SemanticModelReference
+from dbt_semantic_interfaces.references import MetricReference, SemanticModelReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 
 from metricflow_semantics.assert_one_arg import assert_at_most_one_arg_set
@@ -53,7 +53,7 @@ from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import (
     ResolverInputForQueryLevelWhereFilterIntersection,
 )
 from metricflow_semantics.specs.patterns.metric_time_pattern import MetricTimePattern
-from metricflow_semantics.specs.patterns.minimum_time_grain import MinimumTimeGrainPattern
+from metricflow_semantics.specs.patterns.min_time_grain import MinimumTimeGrainPattern
 from metricflow_semantics.specs.patterns.none_date_part import NoneDatePartPattern
 from metricflow_semantics.specs.query_param_implementations import DimensionOrEntityParameter, MetricParameter
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
@@ -147,8 +147,9 @@ class MetricFlowQueryParser:
 
         return matching_saved_queries[0]
 
-    @staticmethod
-    def _metric_time_granularity(time_dimension_specs: Sequence[TimeDimensionSpec]) -> Optional[TimeGranularity]:
+    def _get_smallest_requested_metric_time_granularity(
+        self, time_dimension_specs: Sequence[TimeDimensionSpec]
+    ) -> Optional[TimeGranularity]:
         matching_specs: Sequence[InstanceSpec] = time_dimension_specs
 
         for pattern_to_apply in (
@@ -173,19 +174,23 @@ class MetricFlowQueryParser:
         resolution_dag: GroupByItemResolutionDag,
         time_dimension_specs_in_query: Sequence[TimeDimensionSpec],
         time_constraint: TimeRangeConstraint,
+        metrics_in_query: Sequence[MetricReference],
     ) -> TimeRangeConstraint:
-        metric_time_granularity = MetricFlowQueryParser._metric_time_granularity(time_dimension_specs_in_query)
+        """Change the time range so that the ends are at the ends of the requested time granularity windows.
+
+        e.g. [2020-01-15, 2020-2-15] with MONTH granularity -> [2020-01-01, 2020-02-29]
+        """
+        metric_time_granularity = self._get_smallest_requested_metric_time_granularity(time_dimension_specs_in_query)
         if metric_time_granularity is None:
+            # This indicates there were no metric time specs in the query, so use smallest available granularity for metric_time.
             group_by_item_resolver = GroupByItemResolver(
                 manifest_lookup=self._manifest_lookup,
                 resolution_dag=resolution_dag,
             )
-            metric_time_granularity = group_by_item_resolver.resolve_min_metric_time_grain()
+            metric_time_granularity = group_by_item_resolver.resolve_min_metric_time_grain(
+                metrics_in_query=metrics_in_query
+            )
 
-        """Change the time range so that the ends are at the ends of the appropriate time granularity windows.
-
-        e.g. [2020-01-15, 2020-2-15] with MONTH granularity -> [2020-01-01, 2020-02-29]
-        """
         return self._time_period_adjuster.expand_time_constraint_to_fill_granularity(
             time_constraint=time_constraint,
             granularity=metric_time_granularity,
@@ -495,13 +500,13 @@ class MetricFlowQueryParser:
                 resolution_dag=query_resolution.resolution_dag,
                 time_dimension_specs_in_query=query_spec.time_dimension_specs,
                 time_constraint=time_constraint,
+                metrics_in_query=tuple(
+                    metric_resolver_input.spec_pattern.metric_reference
+                    for metric_resolver_input in resolver_inputs_for_metrics
+                ),
             )
             logger.info(f"Time constraint after adjustment is: {time_constraint}")
-
-            return ParseQueryResult(
-                query_spec=query_spec.with_time_range_constraint(time_constraint),
-                queried_semantic_models=query_resolution.queried_semantic_models,
-            )
+            query_spec = query_spec.with_time_range_constraint(time_constraint)
 
         return ParseQueryResult(
             query_spec=query_spec,

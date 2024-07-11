@@ -163,9 +163,11 @@ class MetricFlowQueryResolver:
             queried_metrics=queried_metrics,
             valid_group_by_item_specs_for_querying=valid_group_by_item_specs_for_querying,
         )
+
         return group_by_item_resolver.resolve_matching_item_for_querying(
             spec_pattern=group_by_item_input.spec_pattern,
             suggestion_generator=suggestion_generator,
+            queried_metrics=queried_metrics,
         )
 
     def _resolve_metric_inputs(
