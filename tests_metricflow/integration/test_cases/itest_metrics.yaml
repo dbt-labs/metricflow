@@ -1143,17 +1143,22 @@ integration_test:
   group_by_objs: [{"name": "metric_time"}]
   check_query: |
     SELECT
-      subq_5.ds AS metric_time__day
+      subq_4.metric_time__week
       , COALESCE(subq_3.bookings, 0) AS bookings_fill_nulls_with_0
-    FROM {{ source_schema }}.mf_time_spine subq_5
+    FROM (
+      SELECT
+        {{ render_date_trunc("ds", TimeGranularity.WEEK) }} AS metric_time__week
+      FROM {{ source_schema }}.mf_time_spine subq_5
+      GROUP BY {{ render_date_trunc("ds", TimeGranularity.WEEK) }}
+    ) subq_4
     LEFT OUTER JOIN (
       SELECT
-        {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
+        {{ render_date_trunc("ds", TimeGranularity.WEEK) }} AS metric_time__week
         , SUM(1) AS bookings
-      FROM {{ source_schema }}.fct_bookings bookings_source_src_1
-      GROUP BY 1
+      FROM {{ source_schema }}.fct_bookings
+      GROUP BY {{ render_date_trunc("ds", TimeGranularity.WEEK) }}
     ) subq_3
-    ON subq_5.ds = subq_3.metric_time__day
+    ON subq_4.metric_time__week = subq_3.metric_time__week
 ---
 integration_test:
   name: simple_fill_nulls_with_0_month
@@ -1343,32 +1348,32 @@ integration_test:
   group_by_objs: [{"name": "metric_time"}]
   check_query: |
     SELECT
-      COALESCE(subq_7.metric_time__day, subq_12.metric_time__day) AS metric_time__day
+      COALESCE(subq_7.metric_time__week, subq_12.metric_time__week) AS metric_time__week
       , COALESCE(MAX(subq_7.bookings_fill_nulls_with_0), 0) AS bookings_fill_nulls_with_0
       , MAX(subq_12.views) AS views
     FROM (
       SELECT
-        subq_5.ds AS metric_time__day
+        {{ render_date_trunc("subq_5.ds", TimeGranularity.WEEK) }} AS metric_time__week
         , COALESCE(subq_3.bookings, 0) AS bookings_fill_nulls_with_0
       FROM {{ source_schema }}.mf_time_spine subq_5
       LEFT OUTER JOIN (
         SELECT
-          {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
+          {{ render_date_trunc("ds", TimeGranularity.WEEK) }} AS metric_time__week
           , SUM(1) AS bookings
         FROM {{ source_schema }}.fct_bookings bookings_source_src_1
         GROUP BY 1
       ) subq_3
-      ON subq_5.ds = subq_3.metric_time__day
+      ON {{ render_date_trunc("subq_5.ds", TimeGranularity.WEEK) }} = subq_3.metric_time__week
     ) subq_7
     FULL OUTER JOIN (
       SELECT
-        {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
+        {{ render_date_trunc("ds", TimeGranularity.WEEK) }} AS metric_time__week
         , SUM(1) AS views
       FROM {{ source_schema }}.fct_views views_source_src_9
       GROUP BY 1
     ) subq_12
-    ON subq_7.metric_time__day = subq_12.metric_time__day
-    GROUP BY COALESCE(subq_7.metric_time__day, subq_12.metric_time__day)
+    ON subq_7.metric_time__week = subq_12.metric_time__week
+    GROUP BY COALESCE(subq_7.metric_time__week, subq_12.metric_time__week)
 ---
 integration_test:
   name: fill_nulls_with_0_multi_metric_query_with_nesting
