@@ -79,7 +79,7 @@ def test_branch_state_propagation(branch_state_tracker: PredicatePushdownBranchS
             WhereFilterSpec(
                 where_sql="x is true",
                 bind_parameters=SqlBindParameters(),
-                linkable_elements=(),
+                linkable_element_unions=(),
                 linkable_spec_set=LinkableSpecSet(),
             ),
         ),
@@ -116,13 +116,13 @@ def test_applied_filter_back_propagation(branch_state_tracker: PredicatePushdown
     where_spec_x_is_true = WhereFilterSpec(
         where_sql="x is true",
         bind_parameters=SqlBindParameters(),
-        linkable_elements=(),
+        linkable_element_unions=(),
         linkable_spec_set=LinkableSpecSet(),
     )
     where_spec_y_is_null = WhereFilterSpec(
         where_sql="y is null",
         bind_parameters=SqlBindParameters(),
-        linkable_elements=(),
+        linkable_element_unions=(),
         linkable_spec_set=LinkableSpecSet(),
     )
 

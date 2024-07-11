@@ -22,6 +22,7 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
 
+from metricflow_semantics.assert_one_arg import assert_exactly_one_arg_set
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
 from metricflow_semantics.workarounds.reference import sorted_semantic_model_references
@@ -130,6 +131,12 @@ class LinkableElement(SemanticModelDerivation, SerializableDataclass, ABC):
         """
         raise NotImplementedError
 
+    @property
+    @abstractmethod
+    def as_union(self) -> LinkableElementUnion:
+        """Return `self` in a union-type container for better serialization support."""
+        raise NotImplementedError
+
 
 @dataclass(frozen=True)
 class LinkableDimension(LinkableElement, SerializableDataclass):
@@ -213,6 +220,11 @@ class LinkableDimension(LinkableElement, SerializableDataclass):
             else SemanticModelDerivation.VIRTUAL_SEMANTIC_MODEL_REFERENCE
         )
 
+    @property
+    @override
+    def as_union(self) -> LinkableElementUnion:
+        return LinkableElementUnion(linkable_dimension=self)
+
 
 @dataclass(frozen=True)
 class LinkableEntity(LinkableElement, SerializableDataclass):
@@ -266,6 +278,11 @@ class LinkableEntity(LinkableElement, SerializableDataclass):
     @override
     def semantic_model_origin(self) -> SemanticModelReference:
         return self.defined_in_semantic_model
+
+    @property
+    @override
+    def as_union(self) -> LinkableElementUnion:
+        return LinkableElementUnion(linkable_entity=self)
 
 
 @dataclass(frozen=True)
@@ -354,6 +371,38 @@ class LinkableMetric(LinkableElement, SerializableDataclass):
         Includes the `join_on_entity`, which will always be the last entity link.
         """
         return self.join_path.metric_subquery_entity_links
+
+    @property
+    @override
+    def as_union(self) -> LinkableElementUnion:
+        return LinkableElementUnion(linkable_metric=self)
+
+
+@dataclass(frozen=True)
+class LinkableElementUnion(SerializableDataclass):
+    """A union type to use in classes that require a concrete implementation for serialization."""
+
+    linkable_dimension: Optional[LinkableDimension] = None
+    linkable_entity: Optional[LinkableEntity] = None
+    linkable_metric: Optional[LinkableMetric] = None
+
+    def __post_init__(self) -> None:  # noqa: D105
+        assert_exactly_one_arg_set(
+            linkable_dimension=self.linkable_dimension,
+            linkable_entity=self.linkable_entity,
+            linkable_metric=self.linkable_metric,
+        )
+
+    @property
+    def linkable_element(self) -> LinkableElement:  # noqa: D102
+        if self.linkable_dimension is not None:
+            return self.linkable_dimension
+        elif self.linkable_entity is not None:
+            return self.linkable_entity
+        elif self.linkable_metric is not None:
+            return self.linkable_metric
+
+        assert False, "All fields are None - this should have been caught in object initialization."
 
 
 @dataclass(frozen=True)

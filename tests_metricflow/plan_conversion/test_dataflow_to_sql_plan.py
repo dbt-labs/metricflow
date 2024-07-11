@@ -201,7 +201,7 @@ def test_filter_with_where_constraint_node(
                         ),
                     ),
                 ),
-                linkable_elements=(
+                linkable_element_unions=(
                     LinkableDimension.create(
                         defined_in_semantic_model=SemanticModelReference("bookings_source"),
                         element_name="ds",
@@ -213,7 +213,7 @@ def test_filter_with_where_constraint_node(
                         join_path=SemanticModelJoinPath(
                             left_semantic_model_reference=SemanticModelReference("bookings_source"),
                         ),
-                    ),
+                    ).as_union,
                 ),
             ),
         ),
