@@ -40,6 +40,9 @@ class MinimumTimeGrainPattern(SpecPattern):
 
     This pattern helps to implement matching of group-by-items for where filters - in those cases, an ambiguously
     specified group-by-item can only match to time dimension spec with the base grain.
+
+    Also, this is currently used to help implement restrictions on cumulative metrics where they can only be queried
+    by the base grain of metric_time.
     """
 
     @override
