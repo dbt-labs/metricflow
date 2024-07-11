@@ -202,7 +202,7 @@ def test_filter_with_where_constraint_node(
                     ),
                 ),
                 linkable_elements=(
-                    LinkableDimension(
+                    LinkableDimension.create(
                         defined_in_semantic_model=SemanticModelReference("bookings_source"),
                         element_name="ds",
                         dimension_type=DimensionType.TIME,

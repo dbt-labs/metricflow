@@ -69,7 +69,7 @@ def _generate_linkable_time_dimensions(
             properties.add(LinkableElementProperty.DERIVED_TIME_GRANULARITY)
 
         linkable_dimensions.append(
-            LinkableDimension(
+            LinkableDimension.create(
                 defined_in_semantic_model=semantic_model_origin,
                 element_name=dimension.reference.element_name,
                 dimension_type=DimensionType.TIME,
@@ -77,7 +77,7 @@ def _generate_linkable_time_dimensions(
                 join_path=join_path,
                 time_granularity=time_granularity,
                 date_part=None,
-                properties=frozenset(properties),
+                properties=tuple(sorted(properties)),
             )
         )
 
@@ -85,7 +85,7 @@ def _generate_linkable_time_dimensions(
         for date_part in DatePart:
             if time_granularity.to_int() <= date_part.to_int():
                 linkable_dimensions.append(
-                    LinkableDimension(
+                    LinkableDimension.create(
                         defined_in_semantic_model=semantic_model_origin,
                         element_name=dimension.reference.element_name,
                         dimension_type=DimensionType.TIME,
@@ -305,7 +305,7 @@ class ValidLinkableSpecResolver:
             if join_path_has_path_links and entity_reference in using_join_path.entity_links:
                 continue
             for metric_subquery_join_path_element in self._joinable_metrics_for_entities[entity_reference]:
-                linkable_metric = LinkableMetric(
+                linkable_metric = LinkableMetric.create(
                     properties=properties,
                     join_path=SemanticModelToMetricSubqueryJoinPath(
                         metric_subquery_join_path_element=metric_subquery_join_path_element,
@@ -328,7 +328,7 @@ class ValidLinkableSpecResolver:
         linkable_entities = []
         for entity in semantic_model.entities:
             linkable_entities.append(
-                LinkableEntity(
+                LinkableEntity.create(
                     defined_in_semantic_model=semantic_model.reference,
                     element_name=entity.reference.element_name,
                     entity_links=(),
@@ -343,7 +343,7 @@ class ValidLinkableSpecResolver:
                 if entity_link == entity.reference:
                     continue
                 linkable_entities.append(
-                    LinkableEntity(
+                    LinkableEntity.create(
                         defined_in_semantic_model=semantic_model.reference,
                         element_name=entity.reference.element_name,
                         entity_links=(entity_link,),
@@ -360,7 +360,7 @@ class ValidLinkableSpecResolver:
                 dimension_type = dimension.type
                 if dimension_type is DimensionType.CATEGORICAL:
                     linkable_dimensions.append(
-                        LinkableDimension(
+                        LinkableDimension.create(
                             defined_in_semantic_model=semantic_model.reference,
                             element_name=dimension.reference.element_name,
                             dimension_type=DimensionType.CATEGORICAL,
@@ -492,7 +492,7 @@ class ValidLinkableSpecResolver:
                     date_part=date_part,
                 )
                 path_key_to_linkable_dimensions[path_key].append(
-                    LinkableDimension(
+                    LinkableDimension.create(
                         defined_in_semantic_model=measure_semantic_model.reference if measure_semantic_model else None,
                         element_name=MetricFlowReservedKeywords.METRIC_TIME.value,
                         dimension_type=DimensionType.TIME,
@@ -719,7 +719,7 @@ class ValidLinkableSpecResolver:
             dimension_type = dimension.type
             if dimension_type == DimensionType.CATEGORICAL:
                 linkable_dimensions.append(
-                    LinkableDimension(
+                    LinkableDimension.create(
                         defined_in_semantic_model=semantic_model.reference,
                         element_name=dimension.reference.element_name,
                         dimension_type=DimensionType.CATEGORICAL,
@@ -747,7 +747,7 @@ class ValidLinkableSpecResolver:
             # Avoid creating "booking_id__booking_id"
             if entity.reference != join_path.last_entity_link:
                 linkable_entities.append(
-                    LinkableEntity(
+                    LinkableEntity.create(
                         defined_in_semantic_model=semantic_model.reference,
                         element_name=entity.reference.element_name,
                         entity_links=join_path.entity_links,

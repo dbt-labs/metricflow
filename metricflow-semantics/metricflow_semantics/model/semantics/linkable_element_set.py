@@ -237,11 +237,11 @@ class LinkableElementSet(SemanticModelDerivation):
             filtered_linkable_dimensions = tuple(
                 linkable_dimension
                 for linkable_dimension in linkable_dimensions
-                if len(linkable_dimension.properties.intersection(with_any_of)) > 0
-                and len(linkable_dimension.properties.intersection(without_any_of)) == 0
+                if len(linkable_dimension.property_set.intersection(with_any_of)) > 0
+                and len(linkable_dimension.property_set.intersection(without_any_of)) == 0
                 and (
                     len(without_all_of) == 0
-                    or linkable_dimension.properties.intersection(without_all_of) != without_all_of
+                    or linkable_dimension.property_set.intersection(without_all_of) != without_all_of
                 )
             )
             if len(filtered_linkable_dimensions) > 0:
@@ -251,11 +251,11 @@ class LinkableElementSet(SemanticModelDerivation):
             filtered_linkable_entities = tuple(
                 linkable_entity
                 for linkable_entity in linkable_entities
-                if len(linkable_entity.properties.intersection(with_any_of)) > 0
-                and len(linkable_entity.properties.intersection(without_any_of)) == 0
+                if len(linkable_entity.property_set.intersection(with_any_of)) > 0
+                and len(linkable_entity.property_set.intersection(without_any_of)) == 0
                 and (
                     len(without_all_of) == 0
-                    or linkable_entity.properties.intersection(without_all_of) != without_all_of
+                    or linkable_entity.property_set.intersection(without_all_of) != without_all_of
                 )
             )
             if len(filtered_linkable_entities) > 0:
@@ -265,11 +265,11 @@ class LinkableElementSet(SemanticModelDerivation):
             filtered_linkable_metrics = tuple(
                 linkable_metric
                 for linkable_metric in linkable_metrics
-                if len(linkable_metric.properties.intersection(with_any_of)) > 0
-                and len(linkable_metric.properties.intersection(without_any_of)) == 0
+                if len(linkable_metric.property_set.intersection(with_any_of)) > 0
+                and len(linkable_metric.property_set.intersection(without_any_of)) == 0
                 and (
                     len(without_all_of) == 0
-                    or linkable_metric.properties.intersection(without_all_of) != without_all_of
+                    or linkable_metric.property_set.intersection(without_all_of) != without_all_of
                 )
             )
             if len(filtered_linkable_metrics) > 0:
