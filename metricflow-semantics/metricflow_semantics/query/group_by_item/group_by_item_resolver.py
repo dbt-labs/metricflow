@@ -6,7 +6,7 @@ from typing import Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.call_parameter_sets import TimeDimensionCallParameterSet
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
-from dbt_semantic_interfaces.references import SemanticModelReference, TimeDimensionReference
+from dbt_semantic_interfaces.references import MetricReference, SemanticModelReference, TimeDimensionReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from typing_extensions import override
 
@@ -27,6 +27,7 @@ from metricflow_semantics.query.issues.issues_base import (
     MetricFlowQueryResolutionIssueSet,
 )
 from metricflow_semantics.query.suggestion_generator import QueryItemSuggestionGenerator
+from metricflow_semantics.specs.patterns.metric_time_default_granularity import MetricTimeDefaultGranularityPattern
 from metricflow_semantics.specs.patterns.minimum_time_grain import MinimumTimeGrainPattern
 from metricflow_semantics.specs.patterns.no_group_by_metric import NoGroupByMetricPattern
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
@@ -80,11 +81,15 @@ class GroupByItemResolver:
         self,
         spec_pattern: SpecPattern,
         suggestion_generator: Optional[QueryItemSuggestionGenerator],
+        queried_metrics: Sequence[MetricReference],
+        only_use_minimum_grain: bool = False,
     ) -> GroupByItemResolution:
-        """Returns the spec that corresponds the one described by spec_pattern and is valid for the query.
+        """Returns the spec that corresponds to the one described by spec_pattern and is valid for the query.
 
         For queries, if the pattern matches to a spec for the same element at different grains, the spec with the finest
-        common grain is returned.
+        common grain is returned, unless the spec is metric_time, in which case the default grain is returned.
+
+        If only_use_minimum_grain is True, will use minimum grain instead of default for metric_time, too.
         """
         push_down_visitor = _PushDownGroupByItemCandidatesVisitor(
             manifest_lookup=self._manifest_lookup,
@@ -101,9 +106,18 @@ class GroupByItemResolver:
                 issue_set=push_down_result.issue_set,
             )
 
-        push_down_result = push_down_result.filter_candidates_by_pattern(
-            MinimumTimeGrainPattern(),
-        )
+        filters_to_use: Tuple[SpecPattern, ...] = (MinimumTimeGrainPattern(),)
+        if not only_use_minimum_grain:
+            # Default pattern must come first to avoid removing default grain options prematurely.
+            filters_to_use = (
+                MetricTimeDefaultGranularityPattern(
+                    metric_lookup=self._manifest_lookup.metric_lookup, queried_metrics=queried_metrics
+                ),
+            ) + filters_to_use
+
+        for filter_to_use in filters_to_use:
+            push_down_result = push_down_result.filter_candidates_by_pattern(filter_to_use)
+
         logger.info(
             f"Spec pattern:\n"
             f"{indent(mf_pformat(spec_pattern))}\n"
@@ -152,7 +166,15 @@ class GroupByItemResolver:
 
         push_down_visitor = _PushDownGroupByItemCandidatesVisitor(
             manifest_lookup=self._manifest_lookup,
-            source_spec_patterns=(spec_pattern, MinimumTimeGrainPattern()),
+            source_spec_patterns=(
+                spec_pattern,
+                # MetricTimeDefaultGranularityPattern must come before MinimumTimeGrainPattern to ensure we don't remove the
+                # default grain from candiate set prematurely.
+                MetricTimeDefaultGranularityPattern(
+                    metric_lookup=self._manifest_lookup.metric_lookup, queried_metrics=filter_location.metric_references
+                ),
+                MinimumTimeGrainPattern(),
+            ),
             suggestion_generator=suggestion_generator,
         )
 
@@ -210,16 +232,18 @@ class GroupByItemResolver:
             issue_set=push_down_result.issue_set,
         )
 
-    def resolve_min_metric_time_grain(self) -> TimeGranularity:
+    def resolve_min_metric_time_grain(self, metrics_in_query: Sequence[MetricReference]) -> TimeGranularity:
         """Returns the finest time grain of metric_time for querying."""
         metric_time_grain_resolution = self.resolve_matching_item_for_querying(
             spec_pattern=TimeDimensionPattern.from_call_parameter_set(
                 TimeDimensionCallParameterSet(
                     entity_path=(),
                     time_dimension_reference=TimeDimensionReference(element_name=METRIC_TIME_ELEMENT_NAME),
-                )
+                ),
             ),
             suggestion_generator=None,
+            queried_metrics=metrics_in_query,
+            only_use_minimum_grain=True,
         )
         metric_time_spec_set = (
             group_specs_by_type((metric_time_grain_resolution.spec,))
