@@ -5,35 +5,40 @@
         <ComputeMetricsNode>
             <!-- description = 'Compute Metrics via Expressions' -->
             <!-- node_id = NodeId(id_str='cm_0') -->
-            <!-- metric_spec =                                                                  -->
-            <!--   MetricSpec(                                                                  -->
-            <!--     element_name='bookings',                                                   -->
-            <!--     filter_specs=(                                                             -->
-            <!--       WhereFilterSpec(                                                         -->
-            <!--         where_sql="metric_time__day = '2024-01-01'",                           -->
-            <!--         bind_parameters=SqlBindParameters(),                                   -->
-            <!--         linkable_specs=(                                                       -->
-            <!--           TimeDimensionSpec(element_name='metric_time', time_granularity=DAY), -->
-            <!--         ),                                                                     -->
-            <!--         linkable_elements=(                                                    -->
-            <!--           LinkableDimension(                                                   -->
-            <!--             defined_in_semantic_model=SemanticModelReference(                  -->
-            <!--               semantic_model_name='bookings_source',                           -->
-            <!--             ),                                                                 -->
-            <!--             element_name='metric_time',                                        -->
-            <!--             dimension_type=TIME,                                               -->
-            <!--             join_path=SemanticModelJoinPath(                                   -->
-            <!--               left_semantic_model_reference=SemanticModelReference(            -->
-            <!--                 semantic_model_name='bookings_source',                         -->
-            <!--               ),                                                               -->
-            <!--             ),                                                                 -->
-            <!--             properties=frozenset('METRIC_TIME',),                              -->
-            <!--             time_granularity=DAY,                                              -->
-            <!--           ),                                                                   -->
-            <!--         ),                                                                     -->
-            <!--       ),                                                                       -->
-            <!--     ),                                                                         -->
-            <!--   )                                                                            -->
+            <!-- metric_spec =                                                       -->
+            <!--   MetricSpec(                                                       -->
+            <!--     element_name='bookings',                                        -->
+            <!--     filter_specs=(                                                  -->
+            <!--       WhereFilterSpec(                                              -->
+            <!--         where_sql="metric_time__day = '2024-01-01'",                -->
+            <!--         bind_parameters=SqlBindParameters(),                        -->
+            <!--         linkable_elements=(                                         -->
+            <!--           LinkableDimension(                                        -->
+            <!--             defined_in_semantic_model=SemanticModelReference(       -->
+            <!--               semantic_model_name='bookings_source',                -->
+            <!--             ),                                                      -->
+            <!--             element_name='metric_time',                             -->
+            <!--             dimension_type=TIME,                                    -->
+            <!--             join_path=SemanticModelJoinPath(                        -->
+            <!--               left_semantic_model_reference=SemanticModelReference( -->
+            <!--                 semantic_model_name='bookings_source',              -->
+            <!--               ),                                                    -->
+            <!--             ),                                                      -->
+            <!--             properties=frozenset('METRIC_TIME',),                   -->
+            <!--             time_granularity=DAY,                                   -->
+            <!--           ),                                                        -->
+            <!--         ),                                                          -->
+            <!--         linkable_spec_set=LinkableSpecSet(                          -->
+            <!--           time_dimension_specs=(                                    -->
+            <!--             TimeDimensionSpec(                                      -->
+            <!--               element_name='metric_time',                           -->
+            <!--               time_granularity=DAY,                                 -->
+            <!--             ),                                                      -->
+            <!--           ),                                                        -->
+            <!--         ),                                                          -->
+            <!--       ),                                                            -->
+            <!--     ),                                                              -->
+            <!--   )                                                                 -->
             <AggregateMeasuresNode>
                 <!-- description = 'Aggregate Measures' -->
                 <!-- node_id = NodeId(id_str='am_0') -->
@@ -50,28 +55,35 @@
                     <WhereConstraintNode>
                         <!-- description = 'Constrain Output with WHERE' -->
                         <!-- node_id = NodeId(id_str='wcc_0') -->
-                        <!-- where_condition =                                                                          -->
-                        <!--   WhereFilterSpec(                                                                         -->
-                        <!--     where_sql="metric_time__day = '2024-01-01'",                                           -->
-                        <!--     bind_parameters=SqlBindParameters(),                                                   -->
-                        <!--     linkable_specs=(TimeDimensionSpec(element_name='metric_time', time_granularity=DAY),), -->
-                        <!--     linkable_elements=(                                                                    -->
-                        <!--       LinkableDimension(                                                                   -->
-                        <!--         defined_in_semantic_model=SemanticModelReference(                                  -->
-                        <!--           semantic_model_name='bookings_source',                                           -->
-                        <!--         ),                                                                                 -->
-                        <!--         element_name='metric_time',                                                        -->
-                        <!--         dimension_type=TIME,                                                               -->
-                        <!--         join_path=SemanticModelJoinPath(                                                   -->
-                        <!--           left_semantic_model_reference=SemanticModelReference(                            -->
-                        <!--             semantic_model_name='bookings_source',                                         -->
-                        <!--           ),                                                                               -->
-                        <!--         ),                                                                                 -->
-                        <!--         properties=frozenset('METRIC_TIME',),                                              -->
-                        <!--         time_granularity=DAY,                                                              -->
-                        <!--       ),                                                                                   -->
-                        <!--     ),                                                                                     -->
-                        <!--   )                                                                                        -->
+                        <!-- where_condition =                                               -->
+                        <!--   WhereFilterSpec(                                              -->
+                        <!--     where_sql="metric_time__day = '2024-01-01'",                -->
+                        <!--     bind_parameters=SqlBindParameters(),                        -->
+                        <!--     linkable_elements=(                                         -->
+                        <!--       LinkableDimension(                                        -->
+                        <!--         defined_in_semantic_model=SemanticModelReference(       -->
+                        <!--           semantic_model_name='bookings_source',                -->
+                        <!--         ),                                                      -->
+                        <!--         element_name='metric_time',                             -->
+                        <!--         dimension_type=TIME,                                    -->
+                        <!--         join_path=SemanticModelJoinPath(                        -->
+                        <!--           left_semantic_model_reference=SemanticModelReference( -->
+                        <!--             semantic_model_name='bookings_source',              -->
+                        <!--           ),                                                    -->
+                        <!--         ),                                                      -->
+                        <!--         properties=frozenset('METRIC_TIME',),                   -->
+                        <!--         time_granularity=DAY,                                   -->
+                        <!--       ),                                                        -->
+                        <!--     ),                                                          -->
+                        <!--     linkable_spec_set=LinkableSpecSet(                          -->
+                        <!--       time_dimension_specs=(                                    -->
+                        <!--         TimeDimensionSpec(                                      -->
+                        <!--           element_name='metric_time',                           -->
+                        <!--           time_granularity=DAY,                                 -->
+                        <!--         ),                                                      -->
+                        <!--       ),                                                        -->
+                        <!--     ),                                                          -->
+                        <!--   )                                                             -->
                         <FilterElementsNode>
                             <!-- description =                                                                       -->
                             <!--   "Pass Only Elements: ['bookings', 'listing__country_latest', 'metric_time__day']" -->

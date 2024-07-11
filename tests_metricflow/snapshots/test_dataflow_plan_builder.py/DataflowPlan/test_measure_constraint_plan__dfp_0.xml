@@ -12,50 +12,56 @@
                 <ComputeMetricsNode>
                     <!-- description = 'Compute Metrics via Expressions' -->
                     <!-- node_id = NodeId(id_str='cm_0') -->
-                    <!-- metric_spec =                                                        -->
-                    <!--   MetricSpec(                                                        -->
-                    <!--     element_name='average_booking_value',                            -->
-                    <!--     filter_specs=(                                                   -->
-                    <!--       WhereFilterSpec(                                               -->
-                    <!--         where_sql='listing__is_lux_latest',                          -->
-                    <!--         bind_parameters=SqlBindParameters(),                         -->
-                    <!--         linkable_specs=(                                             -->
-                    <!--           DimensionSpec(                                             -->
-                    <!--             element_name='is_lux_latest',                            -->
-                    <!--             entity_links=(EntityReference(element_name='listing'),), -->
-                    <!--           ),                                                         -->
-                    <!--         ),                                                           -->
-                    <!--         linkable_elements=(                                          -->
-                    <!--           LinkableDimension(                                         -->
-                    <!--             defined_in_semantic_model=SemanticModelReference(        -->
-                    <!--               semantic_model_name='listings_latest',                 -->
-                    <!--             ),                                                       -->
-                    <!--             element_name='is_lux_latest',                            -->
-                    <!--             dimension_type=CATEGORICAL,                              -->
-                    <!--             entity_links=(                                           -->
-                    <!--               EntityReference(element_name='listing'),               -->
-                    <!--             ),                                                       -->
-                    <!--             join_path=SemanticModelJoinPath(                         -->
-                    <!--               left_semantic_model_reference=SemanticModelReference(  -->
-                    <!--                 semantic_model_name='bookings_source',               -->
-                    <!--               ),                                                     -->
-                    <!--               path_elements=(                                        -->
-                    <!--                 SemanticModelJoinPathElement(                        -->
-                    <!--                   semantic_model_reference=SemanticModelReference(   -->
-                    <!--                     semantic_model_name='listings_latest',           -->
-                    <!--                   ),                                                 -->
-                    <!--                   join_on_entity=EntityReference(                    -->
-                    <!--                     element_name='listing',                          -->
-                    <!--                   ),                                                 -->
-                    <!--                 ),                                                   -->
-                    <!--               ),                                                     -->
-                    <!--             ),                                                       -->
-                    <!--             properties=frozenset('JOINED',),                         -->
-                    <!--           ),                                                         -->
-                    <!--         ),                                                           -->
-                    <!--       ),                                                             -->
-                    <!--     ),                                                               -->
-                    <!--   )                                                                  -->
+                    <!-- metric_spec =                                                       -->
+                    <!--   MetricSpec(                                                       -->
+                    <!--     element_name='average_booking_value',                           -->
+                    <!--     filter_specs=(                                                  -->
+                    <!--       WhereFilterSpec(                                              -->
+                    <!--         where_sql='listing__is_lux_latest',                         -->
+                    <!--         bind_parameters=SqlBindParameters(),                        -->
+                    <!--         linkable_elements=(                                         -->
+                    <!--           LinkableDimension(                                        -->
+                    <!--             defined_in_semantic_model=SemanticModelReference(       -->
+                    <!--               semantic_model_name='listings_latest',                -->
+                    <!--             ),                                                      -->
+                    <!--             element_name='is_lux_latest',                           -->
+                    <!--             dimension_type=CATEGORICAL,                             -->
+                    <!--             entity_links=(                                          -->
+                    <!--               EntityReference(element_name='listing'),              -->
+                    <!--             ),                                                      -->
+                    <!--             join_path=SemanticModelJoinPath(                        -->
+                    <!--               left_semantic_model_reference=SemanticModelReference( -->
+                    <!--                 semantic_model_name='bookings_source',              -->
+                    <!--               ),                                                    -->
+                    <!--               path_elements=(                                       -->
+                    <!--                 SemanticModelJoinPathElement(                       -->
+                    <!--                   semantic_model_reference=SemanticModelReference(  -->
+                    <!--                     semantic_model_name='listings_latest',          -->
+                    <!--                   ),                                                -->
+                    <!--                   join_on_entity=EntityReference(                   -->
+                    <!--                     element_name='listing',                         -->
+                    <!--                   ),                                                -->
+                    <!--                 ),                                                  -->
+                    <!--               ),                                                    -->
+                    <!--             ),                                                      -->
+                    <!--             properties=frozenset('JOINED',),                        -->
+                    <!--           ),                                                        -->
+                    <!--         ),                                                          -->
+                    <!--         linkable_spec_set=LinkableSpecSet(                          -->
+                    <!--           dimension_specs=(                                         -->
+                    <!--             DimensionSpec(                                          -->
+                    <!--               element_name='is_lux_latest',                         -->
+                    <!--               entity_links=(                                        -->
+                    <!--                 EntityReference(                                    -->
+                    <!--                   element_name='listing',                           -->
+                    <!--                 ),                                                  -->
+                    <!--               ),                                                    -->
+                    <!--             ),                                                      -->
+                    <!--           ),                                                        -->
+                    <!--         ),                                                          -->
+                    <!--       ),                                                            -->
+                    <!--     ),                                                              -->
+                    <!--   )                                                                 -->
                     <AggregateMeasuresNode>
                         <!-- description = 'Aggregate Measures' -->
                         <!-- node_id = NodeId(id_str='am_0') -->
@@ -72,12 +78,6 @@
                                 <!--   WhereFilterSpec(                                               -->
                                 <!--     where_sql='listing__is_lux_latest',                          -->
                                 <!--     bind_parameters=SqlBindParameters(),                         -->
-                                <!--     linkable_specs=(                                             -->
-                                <!--       DimensionSpec(                                             -->
-                                <!--         element_name='is_lux_latest',                            -->
-                                <!--         entity_links=(EntityReference(element_name='listing'),), -->
-                                <!--       ),                                                         -->
-                                <!--     ),                                                           -->
                                 <!--     linkable_elements=(                                          -->
                                 <!--       LinkableDimension(                                         -->
                                 <!--         defined_in_semantic_model=SemanticModelReference(        -->
@@ -102,6 +102,18 @@
                                 <!--           ),                                                     -->
                                 <!--         ),                                                       -->
                                 <!--         properties=frozenset('JOINED',),                         -->
+                                <!--       ),                                                         -->
+                                <!--     ),                                                           -->
+                                <!--     linkable_spec_set=LinkableSpecSet(                           -->
+                                <!--       dimension_specs=(                                          -->
+                                <!--         DimensionSpec(                                           -->
+                                <!--           element_name='is_lux_latest',                          -->
+                                <!--           entity_links=(                                         -->
+                                <!--             EntityReference(                                     -->
+                                <!--               element_name='listing',                            -->
+                                <!--             ),                                                   -->
+                                <!--           ),                                                     -->
+                                <!--         ),                                                       -->
                                 <!--       ),                                                         -->
                                 <!--     ),                                                           -->
                                 <!--   )                                                              -->
@@ -177,50 +189,56 @@
                 <ComputeMetricsNode>
                     <!-- description = 'Compute Metrics via Expressions' -->
                     <!-- node_id = NodeId(id_str='cm_1') -->
-                    <!-- metric_spec =                                                        -->
-                    <!--   MetricSpec(                                                        -->
-                    <!--     element_name='bookings',                                         -->
-                    <!--     filter_specs=(                                                   -->
-                    <!--       WhereFilterSpec(                                               -->
-                    <!--         where_sql='listing__is_lux_latest',                          -->
-                    <!--         bind_parameters=SqlBindParameters(),                         -->
-                    <!--         linkable_specs=(                                             -->
-                    <!--           DimensionSpec(                                             -->
-                    <!--             element_name='is_lux_latest',                            -->
-                    <!--             entity_links=(EntityReference(element_name='listing'),), -->
-                    <!--           ),                                                         -->
-                    <!--         ),                                                           -->
-                    <!--         linkable_elements=(                                          -->
-                    <!--           LinkableDimension(                                         -->
-                    <!--             defined_in_semantic_model=SemanticModelReference(        -->
-                    <!--               semantic_model_name='listings_latest',                 -->
-                    <!--             ),                                                       -->
-                    <!--             element_name='is_lux_latest',                            -->
-                    <!--             dimension_type=CATEGORICAL,                              -->
-                    <!--             entity_links=(                                           -->
-                    <!--               EntityReference(element_name='listing'),               -->
-                    <!--             ),                                                       -->
-                    <!--             join_path=SemanticModelJoinPath(                         -->
-                    <!--               left_semantic_model_reference=SemanticModelReference(  -->
-                    <!--                 semantic_model_name='bookings_source',               -->
-                    <!--               ),                                                     -->
-                    <!--               path_elements=(                                        -->
-                    <!--                 SemanticModelJoinPathElement(                        -->
-                    <!--                   semantic_model_reference=SemanticModelReference(   -->
-                    <!--                     semantic_model_name='listings_latest',           -->
-                    <!--                   ),                                                 -->
-                    <!--                   join_on_entity=EntityReference(                    -->
-                    <!--                     element_name='listing',                          -->
-                    <!--                   ),                                                 -->
-                    <!--                 ),                                                   -->
-                    <!--               ),                                                     -->
-                    <!--             ),                                                       -->
-                    <!--             properties=frozenset('JOINED',),                         -->
-                    <!--           ),                                                         -->
-                    <!--         ),                                                           -->
-                    <!--       ),                                                             -->
-                    <!--     ),                                                               -->
-                    <!--   )                                                                  -->
+                    <!-- metric_spec =                                                       -->
+                    <!--   MetricSpec(                                                       -->
+                    <!--     element_name='bookings',                                        -->
+                    <!--     filter_specs=(                                                  -->
+                    <!--       WhereFilterSpec(                                              -->
+                    <!--         where_sql='listing__is_lux_latest',                         -->
+                    <!--         bind_parameters=SqlBindParameters(),                        -->
+                    <!--         linkable_elements=(                                         -->
+                    <!--           LinkableDimension(                                        -->
+                    <!--             defined_in_semantic_model=SemanticModelReference(       -->
+                    <!--               semantic_model_name='listings_latest',                -->
+                    <!--             ),                                                      -->
+                    <!--             element_name='is_lux_latest',                           -->
+                    <!--             dimension_type=CATEGORICAL,                             -->
+                    <!--             entity_links=(                                          -->
+                    <!--               EntityReference(element_name='listing'),              -->
+                    <!--             ),                                                      -->
+                    <!--             join_path=SemanticModelJoinPath(                        -->
+                    <!--               left_semantic_model_reference=SemanticModelReference( -->
+                    <!--                 semantic_model_name='bookings_source',              -->
+                    <!--               ),                                                    -->
+                    <!--               path_elements=(                                       -->
+                    <!--                 SemanticModelJoinPathElement(                       -->
+                    <!--                   semantic_model_reference=SemanticModelReference(  -->
+                    <!--                     semantic_model_name='listings_latest',          -->
+                    <!--                   ),                                                -->
+                    <!--                   join_on_entity=EntityReference(                   -->
+                    <!--                     element_name='listing',                         -->
+                    <!--                   ),                                                -->
+                    <!--                 ),                                                  -->
+                    <!--               ),                                                    -->
+                    <!--             ),                                                      -->
+                    <!--             properties=frozenset('JOINED',),                        -->
+                    <!--           ),                                                        -->
+                    <!--         ),                                                          -->
+                    <!--         linkable_spec_set=LinkableSpecSet(                          -->
+                    <!--           dimension_specs=(                                         -->
+                    <!--             DimensionSpec(                                          -->
+                    <!--               element_name='is_lux_latest',                         -->
+                    <!--               entity_links=(                                        -->
+                    <!--                 EntityReference(                                    -->
+                    <!--                   element_name='listing',                           -->
+                    <!--                 ),                                                  -->
+                    <!--               ),                                                    -->
+                    <!--             ),                                                      -->
+                    <!--           ),                                                        -->
+                    <!--         ),                                                          -->
+                    <!--       ),                                                            -->
+                    <!--     ),                                                              -->
+                    <!--   )                                                                 -->
                     <AggregateMeasuresNode>
                         <!-- description = 'Aggregate Measures' -->
                         <!-- node_id = NodeId(id_str='am_1') -->
@@ -237,12 +255,6 @@
                                 <!--   WhereFilterSpec(                                               -->
                                 <!--     where_sql='listing__is_lux_latest',                          -->
                                 <!--     bind_parameters=SqlBindParameters(),                         -->
-                                <!--     linkable_specs=(                                             -->
-                                <!--       DimensionSpec(                                             -->
-                                <!--         element_name='is_lux_latest',                            -->
-                                <!--         entity_links=(EntityReference(element_name='listing'),), -->
-                                <!--       ),                                                         -->
-                                <!--     ),                                                           -->
                                 <!--     linkable_elements=(                                          -->
                                 <!--       LinkableDimension(                                         -->
                                 <!--         defined_in_semantic_model=SemanticModelReference(        -->
@@ -267,6 +279,18 @@
                                 <!--           ),                                                     -->
                                 <!--         ),                                                       -->
                                 <!--         properties=frozenset('JOINED',),                         -->
+                                <!--       ),                                                         -->
+                                <!--     ),                                                           -->
+                                <!--     linkable_spec_set=LinkableSpecSet(                           -->
+                                <!--       dimension_specs=(                                          -->
+                                <!--         DimensionSpec(                                           -->
+                                <!--           element_name='is_lux_latest',                          -->
+                                <!--           entity_links=(                                         -->
+                                <!--             EntityReference(                                     -->
+                                <!--               element_name='listing',                            -->
+                                <!--             ),                                                   -->
+                                <!--           ),                                                     -->
+                                <!--         ),                                                       -->
                                 <!--       ),                                                         -->
                                 <!--     ),                                                           -->
                                 <!--   )                                                              -->

@@ -12,12 +12,6 @@
             <!--       WhereFilterSpec(                                               -->
             <!--         where_sql='booking__is_instant',                             -->
             <!--         bind_parameters=SqlBindParameters(),                         -->
-            <!--         linkable_specs=(                                             -->
-            <!--           DimensionSpec(                                             -->
-            <!--             element_name='is_instant',                               -->
-            <!--             entity_links=(EntityReference(element_name='booking'),), -->
-            <!--           ),                                                         -->
-            <!--         ),                                                           -->
             <!--         linkable_elements=(                                          -->
             <!--           LinkableDimension(                                         -->
             <!--             defined_in_semantic_model=SemanticModelReference(        -->
@@ -32,6 +26,18 @@
             <!--               ),                                                     -->
             <!--             ),                                                       -->
             <!--             properties=frozenset('LOCAL',),                          -->
+            <!--           ),                                                         -->
+            <!--         ),                                                           -->
+            <!--         linkable_spec_set=LinkableSpecSet(                           -->
+            <!--           dimension_specs=(                                          -->
+            <!--             DimensionSpec(                                           -->
+            <!--               element_name='is_instant',                             -->
+            <!--               entity_links=(                                         -->
+            <!--                 EntityReference(                                     -->
+            <!--                   element_name='booking',                            -->
+            <!--                 ),                                                   -->
+            <!--               ),                                                     -->
+            <!--             ),                                                       -->
             <!--           ),                                                         -->
             <!--         ),                                                           -->
             <!--       ),                                                             -->
@@ -57,12 +63,6 @@
                         <!--   WhereFilterSpec(                                               -->
                         <!--     where_sql='booking__is_instant',                             -->
                         <!--     bind_parameters=SqlBindParameters(),                         -->
-                        <!--     linkable_specs=(                                             -->
-                        <!--       DimensionSpec(                                             -->
-                        <!--         element_name='is_instant',                               -->
-                        <!--         entity_links=(EntityReference(element_name='booking'),), -->
-                        <!--       ),                                                         -->
-                        <!--     ),                                                           -->
                         <!--     linkable_elements=(                                          -->
                         <!--       LinkableDimension(                                         -->
                         <!--         defined_in_semantic_model=SemanticModelReference(        -->
@@ -77,6 +77,18 @@
                         <!--           ),                                                     -->
                         <!--         ),                                                       -->
                         <!--         properties=frozenset('LOCAL',),                          -->
+                        <!--       ),                                                         -->
+                        <!--     ),                                                           -->
+                        <!--     linkable_spec_set=LinkableSpecSet(                           -->
+                        <!--       dimension_specs=(                                          -->
+                        <!--         DimensionSpec(                                           -->
+                        <!--           element_name='is_instant',                             -->
+                        <!--           entity_links=(                                         -->
+                        <!--             EntityReference(                                     -->
+                        <!--               element_name='booking',                            -->
+                        <!--             ),                                                   -->
+                        <!--           ),                                                     -->
+                        <!--         ),                                                       -->
                         <!--       ),                                                         -->
                         <!--     ),                                                           -->
                         <!--   )                                                              -->
