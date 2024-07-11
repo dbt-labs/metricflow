@@ -211,17 +211,17 @@ class MetricLookup:
 
         return minimum_queryable_granularity
 
-    def get_default_granularity_for_metrics(
+    def get_default_time_granularity_for_metrics(
         self, metric_references: Sequence[MetricReference]
     ) -> Optional[TimeGranularity]:
         """When querying a group of metrics, the default granularity will be the largest of the metrics' default granularities."""
         max_default_granularity: Optional[TimeGranularity] = None
         for metric_reference in metric_references:
-            default_granularity = self.get_metric(metric_reference).default_granularity
+            time_granularity = self.get_metric(metric_reference).time_granularity
             assert (
-                default_granularity
-            ), f"No default_granularity set for {metric_reference}. Something has been misconfigured."
-            if not max_default_granularity or default_granularity.to_int() > max_default_granularity.to_int():
-                max_default_granularity = default_granularity
+                time_granularity
+            ), f"No time_granularity set for {metric_reference}. Something has been misconfigured."
+            if not max_default_granularity or time_granularity.to_int() > max_default_granularity.to_int():
+                max_default_granularity = time_granularity
 
         return max_default_granularity

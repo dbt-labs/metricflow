@@ -85,7 +85,7 @@ BOOKINGS_YAML = textwrap.dedent(
       type_params:
         measure: bookings
       filter: "{{ Dimension('booking__is_instant') }}"
-      default_granularity: year
+      time_granularity: year
     ---
     metric:
       name: month_bookings
@@ -663,16 +663,16 @@ def test_invalid_group_by_metric(bookings_query_parser: MetricFlowQueryParser) -
         )
 
 
-def test_default_granularity(bookings_query_parser: MetricFlowQueryParser) -> None:
+def test_default_metric_time_granularity(bookings_query_parser: MetricFlowQueryParser) -> None:
     """Tests different scenarios using default granularity."""
-    # Metric with default_granularity set
+    # Metric with time_granularity set
     query_spec = bookings_query_parser.parse_and_validate_query(
         metric_names=("instant_bookings",), group_by_names=("metric_time",)
     ).query_spec
     assert len(query_spec.time_dimension_specs) == 1
     assert query_spec.time_dimension_specs[0] == MTD_SPEC_YEAR
 
-    # Metric without default_granularity set
+    # Metric without time_granularity set
     query_spec = bookings_query_parser.parse_and_validate_query(
         metric_names=("month_bookings",), group_by_names=("metric_time",)
     ).query_spec

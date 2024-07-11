@@ -19,14 +19,14 @@ from metricflow_semantics.specs.spec_classes import (
 from metricflow_semantics.specs.spec_set import group_specs_by_type
 
 
-class MetricTimeDefaultGranularityPattern(SpecPattern):
+class DefaultMetricTimeGranularityPattern(SpecPattern):
     """A pattern that matches metric_time specs if they have the default granularity for the requested metrics.
 
     This is used to determine the granularity that should be used for metric_time if no granularity is specified.
     Spec passes through if granularity is already selected or if no metrics were queried, since no default is needed.
     All non-metric_time specs are passed through.
 
-    e.g., if a metric with default_granularity MONTH is queried
+    e.g., if a metric with time_granularity MONTH is queried
 
     inputs:
         [
@@ -53,11 +53,13 @@ class MetricTimeDefaultGranularityPattern(SpecPattern):
 
     @override
     def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[InstanceSpec]:
-        default_granularity_for_metrics = self._metric_lookup.get_default_granularity_for_metrics(self._queried_metrics)
+        time_granularity_for_metrics = self._metric_lookup.get_default_time_granularity_for_metrics(
+            self._queried_metrics
+        )
         spec_set = group_specs_by_type(candidate_specs)
 
         # If there are no metrics or metric_time specs in the query, skip this filter.
-        if not (default_granularity_for_metrics and spec_set.metric_time_specs):
+        if not (time_granularity_for_metrics and spec_set.metric_time_specs):
             return candidate_specs
 
         spec_key_to_grains: Dict[TimeDimensionSpecComparisonKey, Set[TimeGranularity]] = defaultdict(set)
@@ -69,12 +71,12 @@ class MetricTimeDefaultGranularityPattern(SpecPattern):
 
         matched_metric_time_specs: List[TimeDimensionSpec] = []
         for spec_key, time_grains in spec_key_to_grains.items():
-            if default_granularity_for_metrics in time_grains:
+            if time_granularity_for_metrics in time_grains:
                 matched_metric_time_specs.append(
-                    spec_key_to_specs[spec_key][0].with_grain(default_granularity_for_metrics)
+                    spec_key_to_specs[spec_key][0].with_grain(time_granularity_for_metrics)
                 )
             else:
-                # If default_granularity is not in the available options, then time granularity was specified in the request
+                # If time_granularity is not in the available options, then time granularity was specified in the request
                 # and a default is not needed here. Pass all options through for this spec key.
                 matched_metric_time_specs.extend(spec_key_to_specs[spec_key])
 

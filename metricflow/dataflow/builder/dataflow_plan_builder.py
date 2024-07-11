@@ -437,13 +437,13 @@ class DataflowPlanBuilder:
         queried_agg_time_dimensions = queried_linkable_specs.included_agg_time_dimension_specs_for_metric(
             metric_reference=metric_spec.reference, metric_lookup=self._metric_lookup
         )
-        query_includes_agg_time_dimension_with_default_granularity = False
+        query_includes_agg_time_dimension_with_time_granularity = False
         for time_dimension_spec in queried_agg_time_dimensions:
             if time_dimension_spec.time_granularity == default_granularity:
-                query_includes_agg_time_dimension_with_default_granularity = True
+                query_includes_agg_time_dimension_with_time_granularity = True
                 break
 
-        if query_includes_agg_time_dimension_with_default_granularity or not queried_agg_time_dimensions:
+        if query_includes_agg_time_dimension_with_time_granularity or not queried_agg_time_dimensions:
             return self._build_base_metric_output_node(
                 metric_spec=metric_spec,
                 queried_linkable_specs=queried_linkable_specs,

@@ -28,7 +28,7 @@ from metricflow_semantics.query.issues.issues_base import (
     MetricFlowQueryResolutionIssueSet,
 )
 from metricflow_semantics.query.suggestion_generator import QueryItemSuggestionGenerator, QueryPartForSuggestions
-from metricflow_semantics.specs.patterns.metric_time_default_granularity import MetricTimeDefaultGranularityPattern
+from metricflow_semantics.specs.patterns.default_metric_time_granularity import DefaultMetricTimeGranularityPattern
 from metricflow_semantics.specs.patterns.min_time_grain import MinimumTimeGrainPattern
 from metricflow_semantics.specs.patterns.no_group_by_metric import NoGroupByMetricPattern
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
@@ -111,7 +111,7 @@ class GroupByItemResolver:
         if not only_use_minimum_grain:
             # Default pattern must come first to avoid removing default grain options prematurely.
             filters_to_use = (
-                MetricTimeDefaultGranularityPattern(
+                DefaultMetricTimeGranularityPattern(
                     metric_lookup=self._manifest_lookup.metric_lookup, queried_metrics=queried_metrics
                 ),
             ) + filters_to_use
@@ -172,9 +172,9 @@ class GroupByItemResolver:
             manifest_lookup=self._manifest_lookup,
             source_spec_patterns=(
                 spec_pattern,
-                # MetricTimeDefaultGranularityPattern must come before MinimumTimeGrainPattern to ensure we don't remove the
+                # DefaultMetricTimeGranularityPattern must come before MinimumTimeGrainPattern to ensure we don't remove the
                 # default grain from candiate set prematurely.
-                MetricTimeDefaultGranularityPattern(
+                DefaultMetricTimeGranularityPattern(
                     metric_lookup=self._manifest_lookup.metric_lookup, queried_metrics=filter_location.metric_references
                 ),
                 MinimumTimeGrainPattern(),

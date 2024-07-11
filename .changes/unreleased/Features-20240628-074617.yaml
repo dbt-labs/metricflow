@@ -1,5 +1,5 @@
 kind: Features
-body: Use default_granularity to resolve metric_time.
+body: Use time_granularity to resolve metric_time.
 time: 2024-06-28T07:46:17.768805-07:00
 custom:
   Author: courtneyholcomb
