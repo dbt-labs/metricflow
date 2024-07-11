@@ -124,15 +124,6 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
     def is_subset_of(self, other_set: LinkableSpecSet) -> bool:  # noqa: D102
         return set(self.as_tuple).issubset(set(other_set.as_tuple))
 
-    @property
-    def as_spec_set(self) -> InstanceSpecSet:  # noqa: D102
-        return InstanceSpecSet(
-            dimension_specs=self.dimension_specs,
-            time_dimension_specs=self.time_dimension_specs,
-            entity_specs=self.entity_specs,
-            group_by_metric_specs=self.group_by_metric_specs,
-        )
-
     def difference(self, other: LinkableSpecSet) -> LinkableSpecSet:  # noqa: D102
         return LinkableSpecSet(
             dimension_specs=tuple(set(self.dimension_specs) - set(other.dimension_specs)),

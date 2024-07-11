@@ -338,7 +338,7 @@ class DataflowPlanBuilder:
         filtered_unaggregated_base_node = FilterElementsNode.create(
             parent_node=unaggregated_base_measure_node,
             include_specs=group_specs_by_type(required_local_specs)
-            .merge(base_required_linkable_specs.as_spec_set)
+            .merge(InstanceSpecSet.create_from_specs(base_required_linkable_specs.as_tuple))
             .dedupe(),
         )
 
@@ -645,7 +645,7 @@ class DataflowPlanBuilder:
                 output_node = FilterElementsNode.create(
                     parent_node=output_node,
                     include_specs=InstanceSpecSet(metric_specs=(metric_spec,)).merge(
-                        queried_linkable_specs.as_spec_set
+                        InstanceSpecSet.create_from_specs(queried_linkable_specs.as_tuple)
                     ),
                 )
         return output_node
@@ -792,7 +792,9 @@ class DataflowPlanBuilder:
             )
 
         output_node = FilterElementsNode.create(
-            parent_node=output_node, include_specs=query_spec.linkable_specs.as_spec_set, distinct=True
+            parent_node=output_node,
+            include_specs=InstanceSpecSet.create_from_specs(query_spec.linkable_specs.as_tuple),
+            distinct=True,
         )
 
         if query_spec.min_max_only:
@@ -1506,7 +1508,7 @@ class DataflowPlanBuilder:
             )
 
             specs_to_keep_after_join = InstanceSpecSet(measure_specs=(measure_spec,)).merge(
-                required_linkable_specs.as_spec_set,
+                InstanceSpecSet.create_from_specs(required_linkable_specs.as_tuple),
             )
 
             after_join_filtered_node = FilterElementsNode.create(
@@ -1569,7 +1571,9 @@ class DataflowPlanBuilder:
             # e.g. for "bookings" by "ds" where "is_instant", "is_instant" should not be in the results.
             pre_aggregate_node = FilterElementsNode.create(
                 parent_node=pre_aggregate_node,
-                include_specs=InstanceSpecSet(measure_specs=(measure_spec,)).merge(queried_linkable_specs.as_spec_set),
+                include_specs=InstanceSpecSet(measure_specs=(measure_spec,)).merge(
+                    InstanceSpecSet.create_from_specs(queried_linkable_specs.as_tuple)
+                ),
             )
 
         aggregate_measures_node = AggregateMeasuresNode.create(
