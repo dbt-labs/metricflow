@@ -52,8 +52,8 @@ from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import (
     ResolverInputForQuery,
     ResolverInputForQueryLevelWhereFilterIntersection,
 )
-from metricflow_semantics.specs.patterns.base_time_grain import BaseTimeGrainPattern
 from metricflow_semantics.specs.patterns.metric_time_pattern import MetricTimePattern
+from metricflow_semantics.specs.patterns.minimum_time_grain import MinimumTimeGrainPattern
 from metricflow_semantics.specs.patterns.none_date_part import NoneDatePartPattern
 from metricflow_semantics.specs.query_param_implementations import DimensionOrEntityParameter, MetricParameter
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
@@ -153,7 +153,7 @@ class MetricFlowQueryParser:
 
         for pattern_to_apply in (
             MetricTimePattern(),
-            BaseTimeGrainPattern(),
+            MinimumTimeGrainPattern(),
             NoneDatePartPattern(),
         ):
             matching_specs = pattern_to_apply.match(matching_specs)
@@ -164,7 +164,7 @@ class MetricFlowQueryParser:
 
         assert (
             len(time_dimension_specs) == 1
-        ), f"Bug with BaseTimeGrainPattern - should have returned exactly 1 spec but got {time_dimension_specs}"
+        ), f"Bug with MinimumTimeGrainPattern - should have returned exactly 1 spec but got {time_dimension_specs}"
 
         return time_dimension_specs[0].time_granularity
 
