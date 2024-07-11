@@ -294,8 +294,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         input_data_set_alias = self._next_unique_table_alias()
 
         # Find requested agg_time_dimensions in parent instance set.
-        # For now, will use instance with smallest granularity in time spine join.
-        # TODO: use metric's default_grain once that property is available.
+        # Will use instance with smallest granularity in time spine join.
         agg_time_dimension_instance_for_join: Optional[TimeDimensionInstance] = None
         requested_agg_time_dimension_instances: Tuple[TimeDimensionInstance, ...] = ()
         for instance in input_data_set.instance_set.time_dimension_instances:
