@@ -114,6 +114,7 @@ metric:
   type: simple
   type_params:
     measure: largest_listing
+  default_granularity: month
 ---
 metric:
   name: "identity_verifications"
@@ -626,6 +627,7 @@ metric:
       name: bookings
       join_to_timespine: true
       fill_nulls_with: 0
+  default_granularity: week
 ---
 metric:
   name: every_two_days_bookers_fill_nulls_with_0
@@ -780,3 +782,4 @@ metric:
     denominator:
       name: listings
   filter: "{{ Metric('views', ['listing']) }} > 10"
+  default_granularity: week
