@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Dict, List, Sequence, Set
+from typing import Dict, Sequence, Set, Tuple
 
 from dbt_semantic_interfaces.references import MetricReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
@@ -53,34 +53,36 @@ class MetricTimeDefaultGranularityPattern(SpecPattern):
 
     @override
     def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[InstanceSpec]:
-        default_granularity_for_metrics = self._metric_lookup.get_default_granularity_for_metrics(self._queried_metrics)
+        # TODO: using placeholder grain option for now
+        max_metric_default_time_granularity = max((TimeGranularity.DAY,))
         spec_set = group_specs_by_type(candidate_specs)
 
+        # TODO: is this needed?
         # If there are no metrics or metric_time specs in the query, skip this filter.
-        if not (default_granularity_for_metrics and spec_set.metric_time_specs):
+        if not (max_metric_default_time_granularity and spec_set.metric_time_specs):
             return candidate_specs
 
         spec_key_to_grains: Dict[TimeDimensionSpecComparisonKey, Set[TimeGranularity]] = defaultdict(set)
-        spec_key_to_specs: Dict[TimeDimensionSpecComparisonKey, List[TimeDimensionSpec]] = defaultdict(list)
+        spec_key_to_specs: Dict[TimeDimensionSpecComparisonKey, Tuple[TimeDimensionSpec, ...]] = defaultdict(tuple)
         for metric_time_spec in spec_set.metric_time_specs:
             spec_key = metric_time_spec.comparison_key(exclude_fields=(TimeDimensionSpecField.TIME_GRANULARITY,))
             spec_key_to_grains[spec_key].add(metric_time_spec.time_granularity)
-            spec_key_to_specs[spec_key].append(metric_time_spec)
+            spec_key_to_specs[spec_key] += (metric_time_spec,)
 
-        matched_metric_time_specs: List[TimeDimensionSpec] = []
+        matched_metric_time_specs: Tuple[TimeDimensionSpec, ...] = ()
         for spec_key, time_grains in spec_key_to_grains.items():
-            if default_granularity_for_metrics in time_grains:
-                matched_metric_time_specs.append(
-                    spec_key_to_specs[spec_key][0].with_grain(default_granularity_for_metrics)
+            if max_metric_default_time_granularity in time_grains:
+                matched_metric_time_specs += (
+                    spec_key_to_specs[spec_key][0].with_grain(max_metric_default_time_granularity),
                 )
             else:
                 # If default_granularity is not in the available options, then time granularity was specified in the request
                 # and a default is not needed here. Pass all options through for this spec key.
-                matched_metric_time_specs.extend(spec_key_to_specs[spec_key])
+                matched_metric_time_specs += spec_key_to_specs[spec_key]
 
         matching_specs: Sequence[LinkableInstanceSpec] = (
             spec_set.dimension_specs
-            + tuple(matched_metric_time_specs)
+            + matched_metric_time_specs
             + tuple(spec for spec in spec_set.time_dimension_specs if not spec.is_metric_time)
             + spec_set.entity_specs
             + spec_set.group_by_metric_specs
