@@ -7,6 +7,7 @@ from typing import Dict, FrozenSet, Iterator, List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums import MetricType
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
 
 from metricflow_semantics.mf_logging.formatting import indent
@@ -60,6 +61,8 @@ class PushDownResult:
     candidate_set: GroupByItemCandidateSet
     # The issues seen so far while pushing down the result / resolving the ambiguity.
     issue_set: MetricFlowQueryResolutionIssueSet
+    # The largest default time granularity of the metrics seen in the DAG so far. Used to resolve metric_time.
+    max_metric_default_time_granularity: Optional[TimeGranularity] = None
 
     def __post_init__(self) -> None:  # noqa: D105
         # If there are no errors, there should be a candidate spec in each candidate set.
@@ -75,6 +78,7 @@ class PushDownResult:
         return PushDownResult(
             candidate_set=self.candidate_set.filter_candidates_by_pattern(spec_pattern),
             issue_set=self.issue_set,
+            max_metric_default_time_granularity=self.max_metric_default_time_granularity,
         )
 
     def filter_candidates_by_patterns(self, spec_patterns: Sequence[SpecPattern]) -> PushDownResult:
@@ -89,6 +93,7 @@ class PushDownResult:
         return PushDownResult(
             candidate_set=candidate_set,
             issue_set=self.issue_set,
+            max_metric_default_time_granularity=self.max_metric_default_time_granularity,
         )
 
 
@@ -248,10 +253,19 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
                 NoParentCandidates.from_parameters(query_resolution_path=current_traversal_path)
             )
 
+        metric_default_time_granularities = {
+            parent_candidate_set.max_metric_default_time_granularity
+            for parent_candidate_set in push_down_results_from_parents.values()
+            if parent_candidate_set.max_metric_default_time_granularity
+        }
+        max_metric_default_time_granularity = (
+            max(metric_default_time_granularities) if metric_default_time_granularities else None
+        )
         if merged_issue_set.has_errors:
             return PushDownResult(
                 candidate_set=GroupByItemCandidateSet.empty_instance(),
                 issue_set=merged_issue_set,
+                max_metric_default_time_granularity=max_metric_default_time_granularity,
             )
 
         parent_candidate_sets = tuple(
@@ -274,10 +288,12 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
                         parent_issues=(),
                     )
                 ),
+                max_metric_default_time_granularity=max_metric_default_time_granularity,
             )
         return PushDownResult(
             candidate_set=intersected_candidate_set,
             issue_set=merged_issue_set,
+            max_metric_default_time_granularity=max_metric_default_time_granularity,
         )
 
     @override
@@ -353,10 +369,18 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
                     )
                 )
 
+            # If time granularity is not set for the metric, defaults to DAY if available, else the smallest available granularity.
+            # Note: ignores any granularity set on input metrics.
+            metric_default_time_granularity = metric.time_granularity or max(
+                TimeGranularity.DAY,
+                self._semantic_manifest_lookup.metric_lookup.get_min_queryable_time_granularity(node.metric_reference),
+            )
+
             if matched_items.spec_count == 0:
                 return PushDownResult(
                     candidate_set=GroupByItemCandidateSet.empty_instance(),
                     issue_set=MetricFlowQueryResolutionIssueSet.merge_iterable(issue_sets_to_merge),
+                    max_metric_default_time_granularity=metric_default_time_granularity,
                 )
 
             return PushDownResult(
@@ -366,6 +390,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
                     path_from_leaf_node=current_traversal_path,
                 ),
                 issue_set=MetricFlowQueryResolutionIssueSet.merge_iterable(issue_sets_to_merge),
+                max_metric_default_time_granularity=metric_default_time_granularity,
             )
 
     @override
