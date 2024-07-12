@@ -570,7 +570,6 @@ class MetricSpec(InstanceSpec):  # noqa: D101
     alias: Optional[str] = None
     offset_window: Optional[PydanticMetricTimeWindow] = None
     offset_to_grain: Optional[TimeGranularity] = None
-    default_granularity: Optional[TimeGranularity] = None
 
     @staticmethod
     def from_element_name(element_name: str) -> MetricSpec:  # noqa: D102
@@ -603,7 +602,6 @@ class MetricSpec(InstanceSpec):  # noqa: D101
             element_name=self.element_name,
             filter_specs=self.filter_specs,
             alias=self.alias,
-            default_granularity=self.default_granularity,
         )
 
 
