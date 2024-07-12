@@ -146,7 +146,9 @@ class MetricFlowQueryParser:
         return matching_saved_queries[0]
 
     @staticmethod
-    def _metric_time_granularity(time_dimension_specs: Sequence[TimeDimensionSpec]) -> Optional[TimeGranularity]:
+    def _get_smallest_requested_metric_time_granularity(
+        time_dimension_specs: Sequence[TimeDimensionSpec],
+    ) -> Optional[TimeGranularity]:
         matching_specs: Sequence[InstanceSpec] = time_dimension_specs
 
         for pattern_to_apply in (
@@ -172,18 +174,21 @@ class MetricFlowQueryParser:
         time_dimension_specs_in_query: Sequence[TimeDimensionSpec],
         time_constraint: TimeRangeConstraint,
     ) -> TimeRangeConstraint:
-        metric_time_granularity = MetricFlowQueryParser._metric_time_granularity(time_dimension_specs_in_query)
+        """Change the time range so that the ends are at the ends of the requested time granularity windows.
+
+        e.g. [2020-01-15, 2020-2-15] with MONTH granularity -> [2020-01-01, 2020-02-29]
+        """
+        metric_time_granularity = MetricFlowQueryParser._get_smallest_requested_metric_time_granularity(
+            time_dimension_specs_in_query
+        )
         if metric_time_granularity is None:
+            # This indicates there were no metric time specs in the query, so use smallest available granularity for metric_time.
             group_by_item_resolver = GroupByItemResolver(
                 manifest_lookup=self._manifest_lookup,
                 resolution_dag=resolution_dag,
             )
             metric_time_granularity = group_by_item_resolver.resolve_min_metric_time_grain()
 
-        """Change the time range so that the ends are at the ends of the appropriate time granularity windows.
-
-        e.g. [2020-01-15, 2020-2-15] with MONTH granularity -> [2020-01-01, 2020-02-29]
-        """
         return self._time_period_adjuster.expand_time_constraint_to_fill_granularity(
             time_constraint=time_constraint,
             granularity=metric_time_granularity,
