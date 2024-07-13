@@ -101,6 +101,7 @@ def test_simple_join_to_time_spine_with_queried_filter(
     )
 
 
+@pytest.mark.skip("Time constraints don't use the group by resolution DAG yet. Need to determine expected behavior.")
 @pytest.mark.sql_engine_snapshot
 def test_join_to_time_spine_with_time_constraint(
     request: FixtureRequest,

@@ -83,7 +83,7 @@ BOOKINGS_YAML = textwrap.dedent(
       type_params:
         measure: bookings
       filter: "{{ Dimension('booking__is_instant') }}"
-      default_granularity: year
+      time_granularity: year
     ---
     metric:
       name: month_bookings
