@@ -39,7 +39,7 @@ from metricflow_semantics.specs.patterns.entity_link_pattern import (
     EntityLinkPatternParameterSet,
     ParameterSetField,
 )
-from metricflow_semantics.specs.spec_classes import TimeDimensionSpec
+from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from more_itertools import bucket
 
 AMBIGUOUS_NAME = "ambiguous"

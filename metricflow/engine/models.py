@@ -24,11 +24,12 @@ from dbt_semantic_interfaces.protocols.saved_query import (
     SavedQueryQueryParams,
 )
 from dbt_semantic_interfaces.protocols.where_filter import WhereFilterIntersection
+from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.transformations.add_input_metric_measures import AddInputMetricMeasuresRule
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.entity_type import EntityType
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
-from metricflow_semantics.specs.spec_classes import DimensionSpec, EntityReference
+from metricflow_semantics.specs.dimension_spec import DimensionSpec
 
 
 @dataclass(frozen=True)

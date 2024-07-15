@@ -31,26 +31,25 @@ from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec
     FilterSpecResolutionLookUp,
 )
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.specs.constant_property_spec import ConstantPropertySpec
+from metricflow_semantics.specs.entity_spec import EntitySpec, LinklessEntitySpec
+from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
-from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
-from metricflow_semantics.specs.spec_classes import (
-    ConstantPropertySpec,
+from metricflow_semantics.specs.measure_spec import (
     CumulativeMeasureDescription,
-    EntitySpec,
     JoinToTimeSpineDescription,
-    LinkableInstanceSpec,
-    LinklessEntitySpec,
     MeasureSpec,
-    MetadataSpec,
     MetricInputMeasureSpec,
-    MetricSpec,
-    NonAdditiveDimensionSpec,
-    OrderBySpec,
-    TimeDimensionSpec,
-    WhereFilterSpec,
 )
+from metricflow_semantics.specs.metadata_spec import MetadataSpec
+from metricflow_semantics.specs.metric_spec import MetricSpec
+from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDimensionSpec
+from metricflow_semantics.specs.order_by_spec import OrderBySpec
+from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet, group_specs_by_type
-from metricflow_semantics.specs.where_filter_transform import WhereSpecFactory
+from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
+from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
+from metricflow_semantics.specs.where_filter.where_filter_transform import WhereSpecFactory
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.time.dateutil_adjuster import DateutilTimePeriodAdjuster
 

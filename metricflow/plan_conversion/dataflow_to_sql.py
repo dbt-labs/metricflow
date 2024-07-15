@@ -31,15 +31,13 @@ from metricflow_semantics.specs.column_assoc import (
     ColumnAssociation,
     ColumnAssociationResolver,
 )
-from metricflow_semantics.specs.spec_classes import (
-    GroupByMetricSpec,
-    InstanceSpec,
-    MeasureSpec,
-    MetadataSpec,
-    MetricSpec,
-    TimeDimensionSpec,
-)
+from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
+from metricflow_semantics.specs.instance_spec import InstanceSpec
+from metricflow_semantics.specs.measure_spec import MeasureSpec
+from metricflow_semantics.specs.metadata_spec import MetadataSpec
+from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
+from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.time.time_constants import ISO8601_PYTHON_FORMAT
 

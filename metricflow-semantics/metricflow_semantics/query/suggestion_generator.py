@@ -5,11 +5,11 @@ from typing import Sequence, Tuple
 
 from metricflow_semantics.naming.naming_scheme import QueryItemNamingScheme
 from metricflow_semantics.query.similarity import top_fuzzy_matches
+from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.patterns.minimum_time_grain import MinimumTimeGrainPattern
 from metricflow_semantics.specs.patterns.no_group_by_metric import NoGroupByMetricPattern
 from metricflow_semantics.specs.patterns.none_date_part import NoneDatePartPattern
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
-from metricflow_semantics.specs.spec_classes import InstanceSpec
 
 logger = logging.getLogger(__name__)
 

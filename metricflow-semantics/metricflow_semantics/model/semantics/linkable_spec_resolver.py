@@ -11,6 +11,7 @@ from dbt_semantic_interfaces.protocols.metric import Metric
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.protocols.semantic_model import SemanticModel
 from dbt_semantic_interfaces.references import (
+    EntityReference,
     MeasureReference,
     MetricReference,
     SemanticModelReference,
@@ -38,10 +39,7 @@ from metricflow_semantics.model.semantics.linkable_element import (
 )
 from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
-from metricflow_semantics.specs.spec_classes import (
-    DEFAULT_TIME_GRANULARITY,
-    EntityReference,
-)
+from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY
 
 if TYPE_CHECKING:
     from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup

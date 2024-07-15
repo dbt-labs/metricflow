@@ -15,19 +15,16 @@ from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.model.semantics.linkable_element import LinkableDimension, SemanticModelJoinPath
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.specs.dimension_spec import DimensionSpec
+from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
+from metricflow_semantics.specs.measure_spec import MeasureSpec, MetricInputMeasureSpec
+from metricflow_semantics.specs.metric_spec import MetricSpec
+from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDimensionSpec
+from metricflow_semantics.specs.order_by_spec import OrderBySpec
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
-from metricflow_semantics.specs.spec_classes import (
-    DimensionSpec,
-    LinklessEntitySpec,
-    MeasureSpec,
-    MetricInputMeasureSpec,
-    MetricSpec,
-    NonAdditiveDimensionSpec,
-    OrderBySpec,
-    TimeDimensionSpec,
-    WhereFilterSpec,
-)
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
+from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
+from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration

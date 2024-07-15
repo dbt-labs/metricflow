@@ -15,7 +15,7 @@ from metricflow_semantics.visitor import Visitable, VisitorOutputT
 
 if typing.TYPE_CHECKING:
     from dbt_semantic_interfaces.references import SemanticModelReference
-    from metricflow_semantics.specs.spec_classes import LinkableInstanceSpec
+    from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 
     from metricflow.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
     from metricflow.dataflow.nodes.aggregate_measures import AggregateMeasuresNode

@@ -19,7 +19,7 @@ from metricflow_semantics.model.semantics.linkable_spec_resolver import (
 )
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
-from metricflow_semantics.specs.spec_classes import TimeDimensionSpec
+from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 
 logger = logging.getLogger(__name__)
 

@@ -12,8 +12,8 @@ from metricflow_semantics.model.semantic_model_derivation import SemanticModelDe
 from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
 from metricflow_semantics.query.group_by_item.path_prefixable import PathPrefixable
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
+from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
-from metricflow_semantics.specs.spec_classes import LinkableInstanceSpec
 
 logger = logging.getLogger(__name__)
 

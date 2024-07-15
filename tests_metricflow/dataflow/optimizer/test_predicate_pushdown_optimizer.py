@@ -8,9 +8,7 @@ from dbt_semantic_interfaces.implementations.filters.where_filter import Pydanti
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
-from metricflow_semantics.specs.spec_classes import (
-    WhereFilterSpec,
-)
+from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_plan_snapshot_text_equal

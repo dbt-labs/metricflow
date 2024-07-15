@@ -12,9 +12,11 @@ from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
-from metricflow_semantics.specs.spec_classes import LinkableInstanceSpec, LinklessEntitySpec, WhereFilterSpec
+from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
+from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.spec_set import group_specs_by_type
 from metricflow_semantics.specs.spec_set_transforms import ToElementNameSet
+from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver

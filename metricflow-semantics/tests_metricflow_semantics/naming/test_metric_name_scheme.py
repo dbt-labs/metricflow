@@ -4,7 +4,9 @@ from typing import Sequence
 
 import pytest
 from metricflow_semantics.naming.metric_scheme import MetricNamingScheme
-from metricflow_semantics.specs.spec_classes import DimensionSpec, InstanceSpec, MetricSpec
+from metricflow_semantics.specs.dimension_spec import DimensionSpec
+from metricflow_semantics.specs.instance_spec import InstanceSpec
+from metricflow_semantics.specs.metric_spec import MetricSpec
 
 
 @pytest.fixture(scope="session")

@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import List, Sequence, Tuple
 
 from metricflow_semantics.model.semantics.linkable_element import LinkableElement
-from metricflow_semantics.specs.spec_classes import LinkableInstanceSpec
+from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 
 
 class RenderedSpecTracker:

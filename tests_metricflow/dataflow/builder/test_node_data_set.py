@@ -13,10 +13,8 @@ from metricflow_semantics.instances import (
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociation
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
-from metricflow_semantics.specs.spec_classes import (
-    LinklessEntitySpec,
-    MeasureSpec,
-)
+from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
+from metricflow_semantics.specs.measure_spec import MeasureSpec
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_spec_set_snapshot_equal

@@ -54,14 +54,11 @@ from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import (
 )
 from metricflow_semantics.query.suggestion_generator import QueryItemSuggestionGenerator
 from metricflow_semantics.query.validation_rules.query_validator import PostResolutionQueryValidator
+from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
+from metricflow_semantics.specs.metric_spec import MetricSpec
+from metricflow_semantics.specs.order_by_spec import OrderBySpec
 from metricflow_semantics.specs.patterns.match_list_pattern import MatchListSpecPattern
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
-from metricflow_semantics.specs.spec_classes import (
-    InstanceSpec,
-    LinkableInstanceSpec,
-    MetricSpec,
-    OrderBySpec,
-)
 from metricflow_semantics.specs.spec_set import group_specs_by_type
 from metricflow_semantics.workarounds.reference import sorted_semantic_model_references
 

@@ -18,19 +18,17 @@ from dbt_semantic_interfaces.references import (
 )
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
+from metricflow_semantics.specs.dimension_spec import DimensionSpec
+from metricflow_semantics.specs.entity_spec import EntitySpec
+from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
+from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.patterns.typed_patterns import (
     DimensionPattern,
     EntityPattern,
     GroupByMetricPattern,
     TimeDimensionPattern,
 )
-from metricflow_semantics.specs.spec_classes import (
-    DimensionSpec,
-    EntitySpec,
-    GroupByMetricSpec,
-    LinkableInstanceSpec,
-    TimeDimensionSpec,
-)
+from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 
 logger = logging.getLogger(__name__)
 

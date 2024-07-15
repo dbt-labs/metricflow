@@ -5,7 +5,7 @@ from typing import Sequence
 
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
-from metricflow_semantics.specs.spec_classes import WhereFilterSpec
+from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.visitor import VisitorOutputT
 
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNodeVisitor

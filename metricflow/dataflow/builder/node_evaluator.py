@@ -26,10 +26,8 @@ from metricflow_semantics.instances import InstanceSet
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
-from metricflow_semantics.specs.spec_classes import (
-    LinkableInstanceSpec,
-    LinklessEntitySpec,
-)
+from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
+from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.spec_set import group_specs_by_type
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 

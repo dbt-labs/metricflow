@@ -52,17 +52,15 @@ from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import (
     ResolverInputForQuery,
     ResolverInputForQueryLevelWhereFilterIntersection,
 )
+from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
+from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.patterns.metric_time_pattern import MetricTimePattern
 from metricflow_semantics.specs.patterns.minimum_time_grain import MinimumTimeGrainPattern
 from metricflow_semantics.specs.patterns.none_date_part import NoneDatePartPattern
 from metricflow_semantics.specs.query_param_implementations import DimensionOrEntityParameter, MetricParameter
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
-from metricflow_semantics.specs.spec_classes import (
-    GroupByMetricSpec,
-    InstanceSpec,
-    TimeDimensionSpec,
-)
 from metricflow_semantics.specs.spec_set import group_specs_by_type
+from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.time.dateutil_adjuster import DateutilTimePeriodAdjuster
 
 logger = logging.getLogger(__name__)

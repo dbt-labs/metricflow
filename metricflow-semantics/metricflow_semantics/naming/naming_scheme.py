@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Optional
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 
 if TYPE_CHECKING:
-    from metricflow_semantics.specs.spec_classes import InstanceSpec
+    from metricflow_semantics.specs.instance_spec import InstanceSpec
 
 
 class QueryItemNamingScheme(ABC):

@@ -3,20 +3,16 @@ from __future__ import annotations
 from typing import Sequence
 
 import pytest
+from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-from metricflow_semantics.specs.spec_classes import (
-    DimensionSpec,
-    EntityReference,
-    EntitySpec,
-    GroupByMetricSpec,
-    InstanceSpec,
-    LinkableInstanceSpec,
-    LinklessEntitySpec,
-    MeasureSpec,
-    MetricSpec,
-    TimeDimensionSpec,
-)
+from metricflow_semantics.specs.dimension_spec import DimensionSpec
+from metricflow_semantics.specs.entity_spec import EntitySpec, LinklessEntitySpec
+from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
+from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
+from metricflow_semantics.specs.measure_spec import MeasureSpec
+from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
+from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 
 
 @pytest.fixture

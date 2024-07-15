@@ -17,14 +17,12 @@ from dbt_semantic_interfaces.validations.semantic_manifest_validator import Sema
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.query_exceptions import InvalidQueryException
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
+from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.query_param_implementations import (
     DimensionOrEntityParameter,
     MetricParameter,
     OrderByParameter,
     TimeDimensionParameter,
-)
-from metricflow_semantics.specs.spec_classes import (
-    DimensionSpec,
 )
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.example_project_configuration import (

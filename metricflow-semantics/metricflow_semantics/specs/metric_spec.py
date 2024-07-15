@@ -1,0 +1,51 @@
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Optional, Tuple
+
+from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
+from dbt_semantic_interfaces.references import MetricReference
+from dbt_semantic_interfaces.type_enums import TimeGranularity
+
+from metricflow_semantics.specs.instance_spec import InstanceSpec, InstanceSpecVisitor
+from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
+from metricflow_semantics.visitor import VisitorOutputT
+
+
+@dataclass(frozen=True)
+class MetricSpec(InstanceSpec):  # noqa: D101
+    # Time-over-time could go here
+    element_name: str
+    filter_specs: Tuple[WhereFilterSpec, ...] = ()
+    alias: Optional[str] = None
+    offset_window: Optional[PydanticMetricTimeWindow] = None
+    offset_to_grain: Optional[TimeGranularity] = None
+
+    @staticmethod
+    def from_element_name(element_name: str) -> MetricSpec:  # noqa: D102
+        return MetricSpec(element_name=element_name)
+
+    @property
+    def qualified_name(self) -> str:  # noqa: D102
+        return self.element_name
+
+    @staticmethod
+    def from_reference(reference: MetricReference) -> MetricSpec:
+        """Initialize from a metric reference instance."""
+        return MetricSpec(element_name=reference.element_name)
+
+    def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
+        return visitor.visit_metric_spec(self)
+
+    @property
+    def reference(self) -> MetricReference:
+        """Return the reference object that is used for referencing the associated metric in the manifest."""
+        return MetricReference(element_name=self.element_name)
+
+    @property
+    def has_time_offset(self) -> bool:  # noqa: D102
+        return bool(self.offset_window or self.offset_to_grain)
+
+    def without_offset(self) -> MetricSpec:
+        """Represents the metric spec with any time offsets removed."""
+        return MetricSpec(element_name=self.element_name, filter_specs=self.filter_specs, alias=self.alias)

@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from itertools import chain
 from typing import Dict, List, Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.references import MetricReference, SemanticModelReference
+from dbt_semantic_interfaces.references import EntityReference, MetricReference, SemanticModelReference
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
@@ -29,19 +29,13 @@ from metricflow_semantics.instances import (
 from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
-from metricflow_semantics.specs.spec_classes import (
-    DimensionSpec,
-    EntityReference,
-    EntitySpec,
-    GroupByMetricSpec,
-    InstanceSpec,
-    LinkableInstanceSpec,
-    LinklessEntitySpec,
-    MeasureSpec,
-    MetricInputMeasureSpec,
-    TimeDimensionSpec,
-)
+from metricflow_semantics.specs.dimension_spec import DimensionSpec
+from metricflow_semantics.specs.entity_spec import EntitySpec, LinklessEntitySpec
+from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
+from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
+from metricflow_semantics.specs.measure_spec import MeasureSpec, MetricInputMeasureSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
+from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from more_itertools import bucket
 
 from metricflow.dataflow.nodes.join_to_base import ValidityWindowJoinDescription

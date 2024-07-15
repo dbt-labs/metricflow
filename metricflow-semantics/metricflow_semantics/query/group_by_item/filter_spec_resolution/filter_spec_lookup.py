@@ -26,7 +26,7 @@ from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 
 if TYPE_CHECKING:
     from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
-    from metricflow_semantics.specs.spec_classes import LinkableInstanceSpec
+    from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 
 logger = logging.getLogger(__name__)
 

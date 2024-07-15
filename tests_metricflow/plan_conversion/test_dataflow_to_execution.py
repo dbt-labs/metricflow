@@ -2,15 +2,13 @@ from __future__ import annotations
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+from dbt_semantic_interfaces.references import EntityReference
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
+from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
-from metricflow_semantics.specs.spec_classes import (
-    DimensionSpec,
-    EntityReference,
-    MetricSpec,
-    TimeDimensionSpec,
-)
+from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder

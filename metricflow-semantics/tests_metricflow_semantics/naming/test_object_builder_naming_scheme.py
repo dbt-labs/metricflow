@@ -7,13 +7,11 @@ from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
-from metricflow_semantics.specs.spec_classes import (
-    DimensionSpec,
-    EntitySpec,
-    GroupByMetricSpec,
-    LinkableInstanceSpec,
-    TimeDimensionSpec,
-)
+from metricflow_semantics.specs.dimension_spec import DimensionSpec
+from metricflow_semantics.specs.entity_spec import EntitySpec
+from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
+from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
+from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_MONTH, MTD_SPEC_WEEK, MTD_SPEC_YEAR
 
 

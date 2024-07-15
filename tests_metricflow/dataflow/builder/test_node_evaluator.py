@@ -4,17 +4,14 @@ import logging
 from typing import Mapping, Sequence
 
 import pytest
+from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
-from metricflow_semantics.specs.spec_classes import (
-    DimensionSpec,
-    EntityReference,
-    EntitySpec,
-    LinkableInstanceSpec,
-    LinklessEntitySpec,
-    TimeDimensionSpec,
-)
+from metricflow_semantics.specs.entity_spec import EntitySpec, LinklessEntitySpec
+from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
+from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver

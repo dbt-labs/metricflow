@@ -11,17 +11,15 @@ from dbt_semantic_interfaces.references import MetricModelReference, SemanticMod
 
 from metricflow_semantics.aggregation_properties import AggregationState
 from metricflow_semantics.specs.column_assoc import ColumnAssociation
-from metricflow_semantics.specs.spec_classes import (
-    DimensionSpec,
-    EntitySpec,
-    GroupByMetricSpec,
-    InstanceSpec,
-    MeasureSpec,
-    MetadataSpec,
-    MetricSpec,
-    TimeDimensionSpec,
-)
+from metricflow_semantics.specs.dimension_spec import DimensionSpec
+from metricflow_semantics.specs.entity_spec import EntitySpec
+from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
+from metricflow_semantics.specs.instance_spec import InstanceSpec
+from metricflow_semantics.specs.measure_spec import MeasureSpec
+from metricflow_semantics.specs.metadata_spec import MetadataSpec
+from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
+from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 
 # Type for the specification used in the instance.
 SpecT = TypeVar("SpecT", bound=InstanceSpec)
