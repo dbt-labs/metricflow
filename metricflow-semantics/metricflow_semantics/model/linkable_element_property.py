@@ -30,14 +30,4 @@ class LinkableElementProperty(Enum):
 
     @staticmethod
     def all_properties() -> FrozenSet[LinkableElementProperty]:  # noqa: D102
-        return frozenset(
-            {
-                LinkableElementProperty.LOCAL,
-                LinkableElementProperty.LOCAL_LINKED,
-                LinkableElementProperty.JOINED,
-                LinkableElementProperty.MULTI_HOP,
-                LinkableElementProperty.DERIVED_TIME_GRANULARITY,
-                LinkableElementProperty.METRIC_TIME,
-                LinkableElementProperty.METRIC,
-            }
-        )
+        return frozenset({linkable_element_property for linkable_element_property in LinkableElementProperty})
