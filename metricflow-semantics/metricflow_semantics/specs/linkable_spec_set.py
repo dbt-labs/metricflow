@@ -135,9 +135,6 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
             group_by_metric_specs=tuple(set(self.group_by_metric_specs) - set(other.group_by_metric_specs)),
         )
 
-    def __len__(self) -> int:  # noqa: D105
-        return len(self.dimension_specs) + len(self.time_dimension_specs) + len(self.entity_specs)
-
     @staticmethod
     def create_from_specs(specs: Sequence[LinkableInstanceSpec]) -> LinkableSpecSet:  # noqa: D102
         return _group_specs_by_type(specs)
