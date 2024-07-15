@@ -27,7 +27,7 @@ from metricflow_semantics.query.issues.issues_base import (
     MetricFlowQueryResolutionIssueSet,
 )
 from metricflow_semantics.query.suggestion_generator import QueryItemSuggestionGenerator
-from metricflow_semantics.specs.patterns.base_time_grain import BaseTimeGrainPattern
+from metricflow_semantics.specs.patterns.minimum_time_grain import MinimumTimeGrainPattern
 from metricflow_semantics.specs.patterns.no_group_by_metric import NoGroupByMetricPattern
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.specs.patterns.typed_patterns import TimeDimensionPattern
@@ -102,7 +102,7 @@ class GroupByItemResolver:
             )
 
         push_down_result = push_down_result.filter_candidates_by_pattern(
-            BaseTimeGrainPattern(),
+            MinimumTimeGrainPattern(),
         )
         logger.info(
             f"Spec pattern:\n"
@@ -152,7 +152,7 @@ class GroupByItemResolver:
 
         push_down_visitor = _PushDownGroupByItemCandidatesVisitor(
             manifest_lookup=self._manifest_lookup,
-            source_spec_patterns=(spec_pattern, BaseTimeGrainPattern()),
+            source_spec_patterns=(spec_pattern, MinimumTimeGrainPattern()),
             suggestion_generator=suggestion_generator,
         )
 

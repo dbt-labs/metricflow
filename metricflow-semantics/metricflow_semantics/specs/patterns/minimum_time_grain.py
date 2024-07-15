@@ -6,7 +6,6 @@ from typing import Dict, List, Sequence, Set
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from typing_extensions import override
 
-from metricflow_semantics.specs.patterns.metric_time_pattern import MetricTimePattern
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.specs.spec_classes import (
     InstanceSpec,
@@ -18,7 +17,7 @@ from metricflow_semantics.specs.spec_classes import (
 from metricflow_semantics.specs.spec_set import group_specs_by_type
 
 
-class BaseTimeGrainPattern(SpecPattern):
+class MinimumTimeGrainPattern(SpecPattern):
     """A pattern that matches linkable specs, but for time dimension specs, only the one with the finest grain.
 
     e.g.
@@ -41,30 +40,10 @@ class BaseTimeGrainPattern(SpecPattern):
 
     This pattern helps to implement matching of group-by-items for where filters - in those cases, an ambiguously
     specified group-by-item can only match to time dimension spec with the base grain.
-
-    Also, this is currently used to help implement restrictions on cumulative metrics where they can only be queried
-    by the base grain of metric_time.
     """
-
-    def __init__(self, only_apply_for_metric_time: bool = False) -> None:
-        """Initializer.
-
-        Args:
-            only_apply_for_metric_time: If set, only remove time dimension specs with a non-base grain if it's for
-            metric_time. This parameter is useful for implementing restrictions on cumulative metrics as they can only
-            be queried by the base grain of metric_time.
-            TODO: This is a little odd. This can be replaced once composite patterns are supported.
-        """
-        self._only_apply_for_metric_time = only_apply_for_metric_time
 
     @override
     def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[InstanceSpec]:
-        if self._only_apply_for_metric_time:
-            metric_time_specs = MetricTimePattern().match(candidate_specs)
-            other_specs = tuple(spec for spec in candidate_specs if spec not in metric_time_specs)
-
-            return other_specs + tuple(BaseTimeGrainPattern(only_apply_for_metric_time=False).match(metric_time_specs))
-
         spec_set = group_specs_by_type(candidate_specs)
 
         spec_key_to_grains: Dict[TimeDimensionSpecComparisonKey, Set[TimeGranularity]] = defaultdict(set)
