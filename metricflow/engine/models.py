@@ -16,7 +16,7 @@ from dbt_semantic_interfaces.protocols.export import Export
 from dbt_semantic_interfaces.protocols.measure import MeasureAggregationParameters
 from dbt_semantic_interfaces.protocols.metadata import Metadata
 from dbt_semantic_interfaces.protocols.metric import Metric as SemanticManifestMetric
-from dbt_semantic_interfaces.protocols.metric import MetricInputMeasure, MetricType, MetricTypeParams
+from dbt_semantic_interfaces.protocols.metric import MetricConfig, MetricInputMeasure, MetricType, MetricTypeParams
 from dbt_semantic_interfaces.protocols.saved_query import (
     SavedQuery as SemanticManifestSavedQuery,
 )
@@ -44,6 +44,7 @@ class Metric:
     metadata: Optional[Metadata]
     dimensions: List[Dimension]
     label: Optional[str]
+    config: Optional[MetricConfig]
 
     @classmethod
     def from_pydantic(cls, pydantic_metric: SemanticManifestMetric, dimensions: List[Dimension]) -> Metric:
@@ -57,6 +58,7 @@ class Metric:
             metadata=pydantic_metric.metadata,
             dimensions=dimensions,
             label=pydantic_metric.label,
+            config=pydantic_metric.config,
         )
 
     @property
