@@ -12,7 +12,7 @@ from dbt_semantic_interfaces.protocols.dimension import DimensionType
 from dbt_semantic_interfaces.references import (
     DimensionReference,
     EntityReference,
-    LinkableElementReference,
+    GroupByMetricReference,
     MetricReference,
     SemanticModelReference,
 )
@@ -215,17 +215,6 @@ class LinkableEntity(LinkableElement, SerializableDataclass):
     @override
     def semantic_model_origin(self) -> SemanticModelReference:
         return self.defined_in_semantic_model
-
-
-# TODO: add to DSI
-@dataclass(frozen=True)
-class GroupByMetricReference(LinkableElementReference):
-    """Represents a group by metric.
-
-    Different from MetricReference because it inherits linkable element attributes.
-    """
-
-    pass
 
 
 @dataclass(frozen=True)
