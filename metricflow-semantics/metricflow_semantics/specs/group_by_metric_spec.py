@@ -4,14 +4,10 @@ from dataclasses import dataclass
 from typing import Any, Tuple
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
-from dbt_semantic_interfaces.references import EntityReference
+from dbt_semantic_interfaces.references import EntityReference, GroupByMetricReference
 from typing_extensions import override
 
-from metricflow_semantics.model.semantics.linkable_element import (
-    ElementPathKey,
-    GroupByMetricReference,
-    LinkableElementType,
-)
+from metricflow_semantics.model.semantics.linkable_element import ElementPathKey, LinkableElementType
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.instance_spec import InstanceSpecVisitor, LinkableInstanceSpec
