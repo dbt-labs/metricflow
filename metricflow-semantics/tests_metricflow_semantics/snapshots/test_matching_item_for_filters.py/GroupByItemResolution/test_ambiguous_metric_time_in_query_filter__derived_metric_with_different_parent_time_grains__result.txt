@@ -1,108 +1,44 @@
 GroupByItemResolution(
-  linkable_element_set=LinkableElementSet(),
-  issue_set=MetricFlowQueryResolutionIssueSet(
-    issues=(
-      NoCommonItemsInParents(
-        issue_type=ERROR,
-        query_resolution_path=MetricFlowQueryResolutionPath(
-          resolution_path_nodes=(
-            QueryGroupByItemResolutionNode(node_id=qr_5),
-            MetricGroupByItemResolutionNode(node_id=mtr_10),
+  spec=TimeDimensionSpec(element_name='metric_time', time_granularity=YEAR),
+  linkable_element_set=LinkableElementSet(
+    path_key_to_linkable_dimensions={
+      ElementPathKey(
+        element_name='metric_time',
+        element_type=TIME_DIMENSION,
+        time_granularity=YEAR,
+      ): (
+        LinkableDimension(
+          defined_in_semantic_model=SemanticModelReference(
+            semantic_model_name='monthly_measures_source',
           ),
+          element_name='metric_time',
+          dimension_type=TIME,
+          join_path=SemanticModelJoinPath(
+            left_semantic_model_reference=SemanticModelReference(
+              semantic_model_name='monthly_measures_source',
+            ),
+          ),
+          properties=frozenset(
+            'DERIVED_TIME_GRANULARITY',
+            'METRIC_TIME',
+          ),
+          time_granularity=YEAR,
         ),
-        parent_candidate_sets=(
-          GroupByItemCandidateSet(
-            linkable_element_set=LinkableElementSet(
-              path_key_to_linkable_dimensions={
-                ElementPathKey(
-                  element_name='metric_time',
-                  element_type=TIME_DIMENSION,
-                  time_granularity=MONTH,
-                ): (
-                  LinkableDimension(
-                    defined_in_semantic_model=SemanticModelReference(
-                      semantic_model_name='monthly_measures_source',
-                    ),
-                    element_name='metric_time',
-                    dimension_type=TIME,
-                    join_path=SemanticModelJoinPath(
-                      left_semantic_model_reference=SemanticModelReference(
-                        semantic_model_name='monthly_measures_source',
-                      ),
-                    ),
-                    properties=frozenset(
-                      'METRIC_TIME',
-                    ),
-                    time_granularity=MONTH,
-                  ),
-                ),
-              },
-            ),
-            measure_paths=(
-              MetricFlowQueryResolutionPath(
-                resolution_path_nodes=(
-                  QueryGroupByItemResolutionNode(node_id=qr_5),
-                  MetricGroupByItemResolutionNode(node_id=mtr_10),
-                  MetricGroupByItemResolutionNode(node_id=mtr_8),
-                  MeasureGroupByItemSourceNode(node_id=msr_7),
-                ),
-              ),
-            ),
-            path_from_leaf_node=MetricFlowQueryResolutionPath(
-              resolution_path_nodes=(
-                QueryGroupByItemResolutionNode(node_id=qr_5),
-                MetricGroupByItemResolutionNode(node_id=mtr_10),
-                MetricGroupByItemResolutionNode(node_id=mtr_8),
-              ),
+        LinkableDimension(
+          defined_in_semantic_model=SemanticModelReference(
+            semantic_model_name='yearly_measure_source',
+          ),
+          element_name='metric_time',
+          dimension_type=TIME,
+          join_path=SemanticModelJoinPath(
+            left_semantic_model_reference=SemanticModelReference(
+              semantic_model_name='yearly_measure_source',
             ),
           ),
-          GroupByItemCandidateSet(
-            linkable_element_set=LinkableElementSet(
-              path_key_to_linkable_dimensions={
-                ElementPathKey(
-                  element_name='metric_time',
-                  element_type=TIME_DIMENSION,
-                  time_granularity=YEAR,
-                ): (
-                  LinkableDimension(
-                    defined_in_semantic_model=SemanticModelReference(
-                      semantic_model_name='yearly_measure_source',
-                    ),
-                    element_name='metric_time',
-                    dimension_type=TIME,
-                    join_path=SemanticModelJoinPath(
-                      left_semantic_model_reference=SemanticModelReference(
-                        semantic_model_name='yearly_measure_source',
-                      ),
-                    ),
-                    properties=frozenset(
-                      'METRIC_TIME',
-                    ),
-                    time_granularity=YEAR,
-                  ),
-                ),
-              },
-            ),
-            measure_paths=(
-              MetricFlowQueryResolutionPath(
-                resolution_path_nodes=(
-                  QueryGroupByItemResolutionNode(node_id=qr_5),
-                  MetricGroupByItemResolutionNode(node_id=mtr_10),
-                  MetricGroupByItemResolutionNode(node_id=mtr_9),
-                  MeasureGroupByItemSourceNode(node_id=msr_8),
-                ),
-              ),
-            ),
-            path_from_leaf_node=MetricFlowQueryResolutionPath(
-              resolution_path_nodes=(
-                QueryGroupByItemResolutionNode(node_id=qr_5),
-                MetricGroupByItemResolutionNode(node_id=mtr_10),
-                MetricGroupByItemResolutionNode(node_id=mtr_9),
-              ),
-            ),
-          ),
+          properties=frozenset('METRIC_TIME',),
+          time_granularity=YEAR,
         ),
       ),
-    ),
+    },
   ),
 )

@@ -28,6 +28,7 @@ from metricflow_semantics.query.issues.issues_base import (
 )
 from metricflow_semantics.query.suggestion_generator import QueryItemSuggestionGenerator
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
+from metricflow_semantics.specs.patterns.metric_time_default_granularity import MetricTimeDefaultGranularityPattern
 from metricflow_semantics.specs.patterns.minimum_time_grain import MinimumTimeGrainPattern
 from metricflow_semantics.specs.patterns.no_group_by_metric import NoGroupByMetricPattern
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
@@ -81,10 +82,10 @@ class GroupByItemResolver:
         spec_pattern: SpecPattern,
         suggestion_generator: Optional[QueryItemSuggestionGenerator],
     ) -> GroupByItemResolution:
-        """Returns the spec that corresponds the one described by spec_pattern and is valid for the query.
+        """Returns the spec that corresponds to the one described by spec_pattern and is valid for the query.
 
         For queries, if the pattern matches to a spec for the same element at different grains, the spec with the finest
-        common grain is returned.
+        common grain is returned, unless the spec is metric_time, in which case the default grain is returned.
         """
         push_down_visitor = _PushDownGroupByItemCandidatesVisitor(
             manifest_lookup=self._manifest_lookup,
@@ -101,9 +102,13 @@ class GroupByItemResolver:
                 issue_set=push_down_result.issue_set,
             )
 
-        push_down_result = push_down_result.filter_candidates_by_pattern(
+        for candidate_filter in (
+            # Default pattern must come first to avoid removing default grain options prematurely.
+            MetricTimeDefaultGranularityPattern(push_down_result.max_metric_default_time_granularity),
             MinimumTimeGrainPattern(),
-        )
+        ):
+            push_down_result = push_down_result.filter_candidates_by_pattern(candidate_filter)
+
         logger.info(
             f"Spec pattern:\n"
             f"{indent(mf_pformat(spec_pattern))}\n"
@@ -152,11 +157,18 @@ class GroupByItemResolver:
 
         push_down_visitor = _PushDownGroupByItemCandidatesVisitor(
             manifest_lookup=self._manifest_lookup,
-            source_spec_patterns=(spec_pattern, MinimumTimeGrainPattern()),
+            source_spec_patterns=(spec_pattern,),
             suggestion_generator=suggestion_generator,
         )
 
         push_down_result: PushDownResult = resolution_node.accept(push_down_visitor)
+
+        for candidate_filter in (
+            # Default pattern must come first to avoid removing default grain options prematurely.
+            MetricTimeDefaultGranularityPattern(push_down_result.max_metric_default_time_granularity),
+            MinimumTimeGrainPattern(),
+        ):
+            push_down_result = push_down_result.filter_candidates_by_pattern(candidate_filter)
 
         if push_down_result.candidate_set.num_candidates == 0:
             return GroupByItemResolution(
