@@ -238,7 +238,7 @@ class DataWarehouseTaskBuilder:
                             ),
                             element_type=SemanticModelElementType.DIMENSION,
                         ),
-                        error_message=f"Unable to query dimension `{spec.element_name}` on semantic model `{semantic_model.name}` in data warehouse",
+                        error_message=f"Unable to query dimension `{spec.qualified_name}` on semantic model `{semantic_model.name}` in data warehouse",
                     )
                 )
 
