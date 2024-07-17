@@ -1,0 +1,7 @@
+MetricFlowQuerySpec(
+  metric_specs=(MetricSpec(element_name='derived_metric_with_time_granularity'),),
+  time_dimension_specs=(TimeDimensionSpec(element_name='metric_time', time_granularity=YEAR),),
+  filter_intersection=PydanticWhereFilterIntersection(),
+  filter_spec_resolution_lookup=FilterSpecResolutionLookUp(),
+  min_max_only=False,
+)
