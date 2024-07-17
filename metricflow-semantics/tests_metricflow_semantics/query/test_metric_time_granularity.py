@@ -114,3 +114,61 @@ def test_non_metric_time_ignores_default_granularity(  # noqa: D103
         obj_id="result_0",
         obj=query_spec,
     )
+
+
+def test_simple_metric_with_defined_metric_time_filter(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    ambiguous_resolution_query_parser: MetricFlowQueryParser,
+) -> None:
+    """Tests that a simple metric's metric_time filter defined in its YAML uses metric's default granularity."""
+    query_spec = ambiguous_resolution_query_parser.parse_and_validate_query(
+        metric_names=["simple_metric_with_time_granularity_and_metric_time_filter"]
+    ).query_spec
+
+    assert_object_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        obj_id="result_0",
+        obj=query_spec,
+    )
+
+
+def test_derived_metric_with_defined_metric_time_filter(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    ambiguous_resolution_query_parser: MetricFlowQueryParser,
+) -> None:
+    """Tests that a derived metric's metric_time filter defined in its YAML uses outer metric's default granularity."""
+    query_spec = ambiguous_resolution_query_parser.parse_and_validate_query(
+        metric_names=["derived_metric_with_time_granularity_and_outer_metric_time_filter"]
+    ).query_spec
+
+    assert_object_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        obj_id="result_0",
+        obj=query_spec,
+    )
+
+
+def test_derived_metric_with_defined_metric_time_filter_on_input_metric(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    ambiguous_resolution_query_parser: MetricFlowQueryParser,
+) -> None:
+    """Tests a derived metric with a metric_time filter on its input metric.
+
+    Should use the outer metric's default granularity.
+    Should always use the default granularity for the object where the filter is defined.
+    """
+    query_spec = ambiguous_resolution_query_parser.parse_and_validate_query(
+        metric_names=["derived_metric_with_time_granularity_and_inner_metric_time_filter"]
+    ).query_spec
+    assert 0, "this don't werk"
+    assert_object_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        obj_id="result_0",
+        obj=query_spec,
+    )
