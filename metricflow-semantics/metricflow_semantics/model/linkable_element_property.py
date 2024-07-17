@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import FrozenSet
+from typing import Any, FrozenSet
 
 
 class LinkableElementProperty(Enum):
@@ -31,3 +31,10 @@ class LinkableElementProperty(Enum):
     @staticmethod
     def all_properties() -> FrozenSet[LinkableElementProperty]:  # noqa: D102
         return frozenset({linkable_element_property for linkable_element_property in LinkableElementProperty})
+
+    def __lt__(self, other: Any) -> bool:  # type: ignore[misc]
+        """When ordering, order by the enum name."""
+        if not isinstance(other, LinkableElementProperty):
+            return NotImplemented
+
+        return self.name < other.name

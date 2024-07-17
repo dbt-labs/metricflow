@@ -14,6 +14,7 @@
             <!--         bind_parameters=SqlBindParameters(),                        -->
             <!--         linkable_elements=(                                         -->
             <!--           LinkableDimension(                                        -->
+            <!--             properties=(METRIC_TIME,),                              -->
             <!--             defined_in_semantic_model=SemanticModelReference(       -->
             <!--               semantic_model_name='bookings_source',                -->
             <!--             ),                                                      -->
@@ -24,7 +25,6 @@
             <!--                 semantic_model_name='bookings_source',              -->
             <!--               ),                                                    -->
             <!--             ),                                                      -->
-            <!--             properties=frozenset('METRIC_TIME',),                   -->
             <!--             time_granularity=DAY,                                   -->
             <!--           ),                                                        -->
             <!--         ),                                                          -->
@@ -53,6 +53,7 @@
                     <!--     bind_parameters=SqlBindParameters(),                        -->
                     <!--     linkable_elements=(                                         -->
                     <!--       LinkableDimension(                                        -->
+                    <!--         properties=(METRIC_TIME,),                              -->
                     <!--         defined_in_semantic_model=SemanticModelReference(       -->
                     <!--           semantic_model_name='bookings_source',                -->
                     <!--         ),                                                      -->
@@ -63,7 +64,6 @@
                     <!--             semantic_model_name='bookings_source',              -->
                     <!--           ),                                                    -->
                     <!--         ),                                                      -->
-                    <!--         properties=frozenset('METRIC_TIME',),                   -->
                     <!--         time_granularity=DAY,                                   -->
                     <!--       ),                                                        -->
                     <!--     ),                                                          -->
@@ -103,6 +103,7 @@
                                 <!--     bind_parameters=SqlBindParameters(),                        -->
                                 <!--     linkable_elements=(                                         -->
                                 <!--       LinkableDimension(                                        -->
+                                <!--         properties=(METRIC_TIME,),                              -->
                                 <!--         defined_in_semantic_model=SemanticModelReference(       -->
                                 <!--           semantic_model_name='bookings_source',                -->
                                 <!--         ),                                                      -->
@@ -113,7 +114,6 @@
                                 <!--             semantic_model_name='bookings_source',              -->
                                 <!--           ),                                                    -->
                                 <!--         ),                                                      -->
-                                <!--         properties=frozenset('METRIC_TIME',),                   -->
                                 <!--         time_granularity=DAY,                                   -->
                                 <!--       ),                                                        -->
                                 <!--     ),                                                          -->

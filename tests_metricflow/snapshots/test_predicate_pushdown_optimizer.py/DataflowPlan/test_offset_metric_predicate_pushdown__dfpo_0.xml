@@ -14,6 +14,7 @@
             <!--         bind_parameters=SqlBindParameters(),                         -->
             <!--         linkable_elements=(                                          -->
             <!--           LinkableDimension(                                         -->
+            <!--             properties=(LOCAL,),                                     -->
             <!--             defined_in_semantic_model=SemanticModelReference(        -->
             <!--               semantic_model_name='bookings_source',                 -->
             <!--             ),                                                       -->
@@ -25,7 +26,6 @@
             <!--                 semantic_model_name='bookings_source',               -->
             <!--               ),                                                     -->
             <!--             ),                                                       -->
-            <!--             properties=frozenset('LOCAL',),                          -->
             <!--           ),                                                         -->
             <!--         ),                                                           -->
             <!--         linkable_spec_set=LinkableSpecSet(                           -->
@@ -58,6 +58,7 @@
                     <!--         bind_parameters=SqlBindParameters(),                        -->
                     <!--         linkable_elements=(                                         -->
                     <!--           LinkableDimension(                                        -->
+                    <!--             properties=(LOCAL,),                                    -->
                     <!--             defined_in_semantic_model=SemanticModelReference(       -->
                     <!--               semantic_model_name='bookings_source',                -->
                     <!--             ),                                                      -->
@@ -71,7 +72,6 @@
                     <!--                 semantic_model_name='bookings_source',              -->
                     <!--               ),                                                    -->
                     <!--             ),                                                      -->
-                    <!--             properties=frozenset('LOCAL',),                         -->
                     <!--           ),                                                        -->
                     <!--         ),                                                          -->
                     <!--         linkable_spec_set=LinkableSpecSet(                          -->
@@ -155,6 +155,7 @@
                                             <!--     bind_parameters=SqlBindParameters(),                        -->
                                             <!--     linkable_elements=(                                         -->
                                             <!--       LinkableDimension(                                        -->
+                                            <!--         properties=(LOCAL,),                                    -->
                                             <!--         defined_in_semantic_model=SemanticModelReference(       -->
                                             <!--           semantic_model_name='bookings_source',                -->
                                             <!--         ),                                                      -->
@@ -170,7 +171,6 @@
                                             <!--             semantic_model_name='bookings_source',              -->
                                             <!--           ),                                                    -->
                                             <!--         ),                                                      -->
-                                            <!--         properties=frozenset('LOCAL',),                         -->
                                             <!--       ),                                                        -->
                                             <!--     ),                                                          -->
                                             <!--     linkable_spec_set=LinkableSpecSet(                          -->
@@ -233,6 +233,7 @@
                     <!--         bind_parameters=SqlBindParameters(),                           -->
                     <!--         linkable_elements=(                                            -->
                     <!--           LinkableDimension(                                           -->
+                    <!--             properties=(LOCAL,),                                       -->
                     <!--             defined_in_semantic_model=SemanticModelReference(          -->
                     <!--               semantic_model_name='bookings_source',                   -->
                     <!--             ),                                                         -->
@@ -246,7 +247,6 @@
                     <!--                 semantic_model_name='bookings_source',                 -->
                     <!--               ),                                                       -->
                     <!--             ),                                                         -->
-                    <!--             properties=frozenset('LOCAL',),                            -->
                     <!--           ),                                                           -->
                     <!--         ),                                                             -->
                     <!--         linkable_spec_set=LinkableSpecSet(                             -->
@@ -290,6 +290,7 @@
                                 <!--     bind_parameters=SqlBindParameters(),                         -->
                                 <!--     linkable_elements=(                                          -->
                                 <!--       LinkableDimension(                                         -->
+                                <!--         properties=(LOCAL,),                                     -->
                                 <!--         defined_in_semantic_model=SemanticModelReference(        -->
                                 <!--           semantic_model_name='bookings_source',                 -->
                                 <!--         ),                                                       -->
@@ -301,7 +302,6 @@
                                 <!--             semantic_model_name='bookings_source',               -->
                                 <!--           ),                                                     -->
                                 <!--         ),                                                       -->
-                                <!--         properties=frozenset('LOCAL',),                          -->
                                 <!--       ),                                                         -->
                                 <!--     ),                                                           -->
                                 <!--     linkable_spec_set=LinkableSpecSet(                           -->

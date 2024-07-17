@@ -56,14 +56,14 @@ _base_metric_reference = MetricReference(element_name="base_metric")
 
 
 # Entities
-_base_entity = LinkableEntity(
+_base_entity = LinkableEntity.create(
     element_name=_base_entity_reference.element_name,
     defined_in_semantic_model=_base_semantic_model,
     entity_links=(),
     join_path=SemanticModelJoinPath(left_semantic_model_reference=_measure_semantic_model),
     properties=frozenset([LinkableElementProperty.ENTITY]),
 )
-_ambiguous_entity = LinkableEntity(
+_ambiguous_entity = LinkableEntity.create(
     element_name=AMBIGUOUS_NAME,
     defined_in_semantic_model=_base_semantic_model,
     entity_links=(_base_entity_reference,),
@@ -71,7 +71,7 @@ _ambiguous_entity = LinkableEntity(
     properties=frozenset([LinkableElementProperty.ENTITY, LinkableElementProperty.LOCAL_LINKED]),
 )
 # For testing deduplication on entities
-_ambiguous_entity_with_join_path = LinkableEntity(
+_ambiguous_entity_with_join_path = LinkableEntity.create(
     element_name=AMBIGUOUS_NAME,
     defined_in_semantic_model=_base_semantic_model,
     entity_links=(_base_entity_reference,),
@@ -88,7 +88,7 @@ _ambiguous_entity_with_join_path = LinkableEntity(
 )
 
 # Dimensions
-_categorical_dimension = LinkableDimension(
+_categorical_dimension = LinkableDimension.create(
     element_name=_base_dimension_reference.element_name,
     entity_links=(_base_entity_reference,),
     dimension_type=DimensionType.CATEGORICAL,
@@ -98,7 +98,7 @@ _categorical_dimension = LinkableDimension(
     time_granularity=None,
     date_part=None,
 )
-_time_dimension = LinkableDimension(
+_time_dimension = LinkableDimension.create(
     element_name=_time_dimension_reference.element_name,
     entity_links=(_base_entity_reference,),
     dimension_type=DimensionType.TIME,
@@ -109,7 +109,7 @@ _time_dimension = LinkableDimension(
     date_part=None,
 )
 # Resolves to the same local linked name name as _ambiguous_entity
-_ambiguous_categorical_dimension = LinkableDimension(
+_ambiguous_categorical_dimension = LinkableDimension.create(
     element_name=AMBIGUOUS_NAME,
     entity_links=(_base_entity_reference,),
     dimension_type=DimensionType.CATEGORICAL,
@@ -121,7 +121,7 @@ _ambiguous_categorical_dimension = LinkableDimension(
 )
 # The opposite direction of the join for ambiguous_entity_with_join_path
 # For testing deduplication on dimensions
-_ambiguous_categorical_dimension_with_join_path = LinkableDimension(
+_ambiguous_categorical_dimension_with_join_path = LinkableDimension.create(
     element_name=AMBIGUOUS_NAME,
     entity_links=(_base_entity_reference,),
     dimension_type=DimensionType.CATEGORICAL,
@@ -140,7 +140,7 @@ _ambiguous_categorical_dimension_with_join_path = LinkableDimension(
 )
 
 # Metrics
-_base_metric = LinkableMetric(
+_base_metric = LinkableMetric.create(
     properties=frozenset([LinkableElementProperty.METRIC, LinkableElementProperty.JOINED]),
     join_path=SemanticModelToMetricSubqueryJoinPath(
         metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
@@ -152,7 +152,7 @@ _base_metric = LinkableMetric(
         semantic_model_join_path=SemanticModelJoinPath(left_semantic_model_reference=_base_semantic_model),
     ),
 )
-_ambiguous_metric = LinkableMetric(
+_ambiguous_metric = LinkableMetric.create(
     properties=frozenset([LinkableElementProperty.METRIC, LinkableElementProperty.JOINED]),
     join_path=SemanticModelToMetricSubqueryJoinPath(
         metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
@@ -165,7 +165,7 @@ _ambiguous_metric = LinkableMetric(
     ),
 )
 # For testing deduplication on metrics
-_ambiguous_metric_with_join_path = LinkableMetric(
+_ambiguous_metric_with_join_path = LinkableMetric.create(
     properties=frozenset([LinkableElementProperty.METRIC, LinkableElementProperty.JOINED]),
     join_path=SemanticModelToMetricSubqueryJoinPath(
         metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
@@ -575,7 +575,7 @@ def linkable_set() -> LinkableElementSet:  # noqa: D103
                 entity_links=(entity_0,),
                 element_type=LinkableElementType.DIMENSION,
             ): (
-                LinkableDimension(
+                LinkableDimension.create(
                     defined_in_semantic_model=SemanticModelReference("dimension_source"),
                     element_name="dimension_element",
                     dimension_type=DimensionType.CATEGORICAL,
@@ -600,7 +600,7 @@ def linkable_set() -> LinkableElementSet:  # noqa: D103
                 element_type=LinkableElementType.TIME_DIMENSION,
                 time_granularity=TimeGranularity.DAY,
             ): (
-                LinkableDimension(
+                LinkableDimension.create(
                     defined_in_semantic_model=SemanticModelReference("time_dimension_source"),
                     element_name="time_dimension_element",
                     dimension_type=DimensionType.TIME,
@@ -626,7 +626,7 @@ def linkable_set() -> LinkableElementSet:  # noqa: D103
                 entity_links=(entity_2,),
                 element_type=LinkableElementType.ENTITY,
             ): (
-                LinkableEntity(
+                LinkableEntity.create(
                     defined_in_semantic_model=SemanticModelReference("entity_source"),
                     element_name="entity_element",
                     entity_links=(entity_2,),
@@ -650,7 +650,7 @@ def linkable_set() -> LinkableElementSet:  # noqa: D103
                 element_type=LinkableElementType.METRIC,
                 metric_subquery_entity_links=(entity_2,),
             ): (
-                LinkableMetric(
+                LinkableMetric.create(
                     properties=frozenset([LinkableElementProperty.METRIC, LinkableElementProperty.JOINED]),
                     join_path=SemanticModelToMetricSubqueryJoinPath(
                         metric_subquery_join_path_element=MetricSubqueryJoinPathElement(

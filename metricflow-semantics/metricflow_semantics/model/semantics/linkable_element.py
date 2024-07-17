@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import collections
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from typing import FrozenSet, Optional, Sequence, Tuple
+from functools import cached_property
+from typing import FrozenSet, Iterable, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
@@ -98,6 +100,19 @@ class SemanticModelJoinPathElement(SerializableDataclass):
 class LinkableElement(SemanticModelDerivation, SerializableDataclass, ABC):
     """An entity / dimension that may have been joined by entities."""
 
+    properties: Tuple[LinkableElementProperty, ...]
+
+    def __post_init__(self) -> None:  # noqa: D105
+        if len(self.property_set) != len(self.properties):
+            duplicate_properties = [item for item, count in collections.Counter(self.properties).items() if count > 1]
+            assert False, f"Found duplicate properties {duplicate_properties} in {self.properties}"
+
+        assert self.properties == tuple(sorted(self.properties)), f"Properties are not sorted: {self.properties}"
+
+    @cached_property
+    def property_set(self) -> FrozenSet[LinkableElementProperty]:  # noqa: D102
+        return frozenset(self.properties)
+
     @property
     @abstractmethod
     def element_type(self) -> LinkableElementType:
@@ -126,9 +141,30 @@ class LinkableDimension(LinkableElement, SerializableDataclass):
     dimension_type: DimensionType
     entity_links: Tuple[EntityReference, ...]
     join_path: SemanticModelJoinPath
-    properties: FrozenSet[LinkableElementProperty]
     time_granularity: Optional[TimeGranularity]
     date_part: Optional[DatePart]
+
+    @staticmethod
+    def create(  # noqa: D102
+        properties: Iterable[LinkableElementProperty],
+        defined_in_semantic_model: Optional[SemanticModelReference],
+        element_name: str,
+        dimension_type: DimensionType,
+        entity_links: Tuple[EntityReference, ...],
+        join_path: SemanticModelJoinPath,
+        time_granularity: Optional[TimeGranularity],
+        date_part: Optional[DatePart],
+    ) -> LinkableDimension:
+        return LinkableDimension(
+            properties=tuple(sorted(set(properties))),
+            defined_in_semantic_model=defined_in_semantic_model,
+            element_name=element_name,
+            dimension_type=dimension_type,
+            entity_links=entity_links,
+            join_path=join_path,
+            time_granularity=time_granularity,
+            date_part=date_part,
+        )
 
     @property
     @override
@@ -185,9 +221,24 @@ class LinkableEntity(LinkableElement, SerializableDataclass):
     # The semantic model where this entity was defined.
     defined_in_semantic_model: SemanticModelReference
     element_name: str
-    properties: FrozenSet[LinkableElementProperty]
     entity_links: Tuple[EntityReference, ...]
     join_path: SemanticModelJoinPath
+
+    @staticmethod
+    def create(  # noqa: D102
+        properties: Iterable[LinkableElementProperty],
+        defined_in_semantic_model: SemanticModelReference,
+        element_name: str,
+        entity_links: Tuple[EntityReference, ...],
+        join_path: SemanticModelJoinPath,
+    ) -> LinkableEntity:
+        return LinkableEntity(
+            properties=tuple(sorted(set(properties))),
+            defined_in_semantic_model=defined_in_semantic_model,
+            element_name=element_name,
+            entity_links=entity_links,
+            join_path=join_path,
+        )
 
     @property
     @override
@@ -221,15 +272,24 @@ class LinkableEntity(LinkableElement, SerializableDataclass):
 class LinkableMetric(LinkableElement, SerializableDataclass):
     """Describes how a metric can be realized by joining based on entity links."""
 
-    properties: FrozenSet[LinkableElementProperty]
     join_path: SemanticModelToMetricSubqueryJoinPath
+
+    @staticmethod
+    def create(  # noqa: D102
+        properties: Iterable[LinkableElementProperty], join_path: SemanticModelToMetricSubqueryJoinPath
+    ) -> LinkableMetric:
+        return LinkableMetric(
+            properties=tuple(sorted(set(properties))),
+            join_path=join_path,
+        )
 
     def __post_init__(self) -> None:
         """Ensure expected LinkableElementProperties have been set.
 
         LinkableMetrics always require a join to a metric subquery.
         """
-        assert {LinkableElementProperty.METRIC, LinkableElementProperty.JOINED}.issubset(self.properties)
+        super().__post_init__()
+        assert {LinkableElementProperty.METRIC, LinkableElementProperty.JOINED}.issubset(self.property_set)
 
     @property
     @override
