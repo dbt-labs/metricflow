@@ -21,6 +21,7 @@
                     <!--         bind_parameters=SqlBindParameters(),                        -->
                     <!--         linkable_elements=(                                         -->
                     <!--           LinkableDimension(                                        -->
+                    <!--             properties=(JOINED,),                                   -->
                     <!--             defined_in_semantic_model=SemanticModelReference(       -->
                     <!--               semantic_model_name='listings_latest',                -->
                     <!--             ),                                                      -->
@@ -44,7 +45,6 @@
                     <!--                 ),                                                  -->
                     <!--               ),                                                    -->
                     <!--             ),                                                      -->
-                    <!--             properties=frozenset('JOINED',),                        -->
                     <!--           ),                                                        -->
                     <!--         ),                                                          -->
                     <!--         linkable_spec_set=LinkableSpecSet(                          -->
@@ -80,6 +80,7 @@
                                 <!--     bind_parameters=SqlBindParameters(),                         -->
                                 <!--     linkable_elements=(                                          -->
                                 <!--       LinkableDimension(                                         -->
+                                <!--         properties=(JOINED,),                                    -->
                                 <!--         defined_in_semantic_model=SemanticModelReference(        -->
                                 <!--           semantic_model_name='listings_latest',                 -->
                                 <!--         ),                                                       -->
@@ -101,7 +102,6 @@
                                 <!--             ),                                                   -->
                                 <!--           ),                                                     -->
                                 <!--         ),                                                       -->
-                                <!--         properties=frozenset('JOINED',),                         -->
                                 <!--       ),                                                         -->
                                 <!--     ),                                                           -->
                                 <!--     linkable_spec_set=LinkableSpecSet(                           -->
@@ -198,6 +198,7 @@
                     <!--         bind_parameters=SqlBindParameters(),                        -->
                     <!--         linkable_elements=(                                         -->
                     <!--           LinkableDimension(                                        -->
+                    <!--             properties=(JOINED,),                                   -->
                     <!--             defined_in_semantic_model=SemanticModelReference(       -->
                     <!--               semantic_model_name='listings_latest',                -->
                     <!--             ),                                                      -->
@@ -221,7 +222,6 @@
                     <!--                 ),                                                  -->
                     <!--               ),                                                    -->
                     <!--             ),                                                      -->
-                    <!--             properties=frozenset('JOINED',),                        -->
                     <!--           ),                                                        -->
                     <!--         ),                                                          -->
                     <!--         linkable_spec_set=LinkableSpecSet(                          -->
@@ -257,6 +257,7 @@
                                 <!--     bind_parameters=SqlBindParameters(),                         -->
                                 <!--     linkable_elements=(                                          -->
                                 <!--       LinkableDimension(                                         -->
+                                <!--         properties=(JOINED,),                                    -->
                                 <!--         defined_in_semantic_model=SemanticModelReference(        -->
                                 <!--           semantic_model_name='listings_latest',                 -->
                                 <!--         ),                                                       -->
@@ -278,7 +279,6 @@
                                 <!--             ),                                                   -->
                                 <!--           ),                                                     -->
                                 <!--         ),                                                       -->
-                                <!--         properties=frozenset('JOINED',),                         -->
                                 <!--       ),                                                         -->
                                 <!--     ),                                                           -->
                                 <!--     linkable_spec_set=LinkableSpecSet(                           -->

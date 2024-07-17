@@ -54,6 +54,9 @@ ParseQueryResult(
                 ),
               ): (
                 LinkableDimension(
+                  properties=(
+                    LOCAL,
+                  ),
                   defined_in_semantic_model=SemanticModelReference(
                     semantic_model_name='bookings_source',
                   ),
@@ -68,9 +71,6 @@ ParseQueryResult(
                     left_semantic_model_reference=SemanticModelReference(
                       semantic_model_name='bookings_source',
                     ),
-                  ),
-                  properties=frozenset(
-                    'LOCAL',
                   ),
                 ),
               ),

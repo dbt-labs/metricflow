@@ -30,6 +30,9 @@ FilterSpecResolutionLookUp(
             time_granularity=MONTH,
           ): (
             LinkableDimension(
+              properties=(
+                METRIC_TIME,
+              ),
               defined_in_semantic_model=SemanticModelReference(
                 semantic_model_name='monthly_measures_source',
               ),
@@ -39,9 +42,6 @@ FilterSpecResolutionLookUp(
                 left_semantic_model_reference=SemanticModelReference(
                   semantic_model_name='monthly_measures_source',
                 ),
-              ),
-              properties=frozenset(
-                'METRIC_TIME',
               ),
               time_granularity=MONTH,
             ),
@@ -93,6 +93,9 @@ FilterSpecResolutionLookUp(
             time_granularity=MONTH,
           ): (
             LinkableDimension(
+              properties=(
+                METRIC_TIME,
+              ),
               defined_in_semantic_model=SemanticModelReference(
                 semantic_model_name='monthly_measures_source',
               ),
@@ -102,9 +105,6 @@ FilterSpecResolutionLookUp(
                 left_semantic_model_reference=SemanticModelReference(
                   semantic_model_name='monthly_measures_source',
                 ),
-              ),
-              properties=frozenset(
-                'METRIC_TIME',
               ),
               time_granularity=MONTH,
             ),
