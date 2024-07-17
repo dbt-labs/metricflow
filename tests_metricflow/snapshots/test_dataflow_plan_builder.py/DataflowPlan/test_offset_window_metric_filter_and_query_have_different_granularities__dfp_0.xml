@@ -5,35 +5,40 @@
         <ComputeMetricsNode>
             <!-- description = 'Compute Metrics via Expressions' -->
             <!-- node_id = NodeId(id_str='cm_2') -->
-            <!-- metric_spec =                                                                  -->
-            <!--   MetricSpec(                                                                  -->
-            <!--     element_name='booking_fees_last_week_per_booker_this_week',                -->
-            <!--     filter_specs=(                                                             -->
-            <!--       WhereFilterSpec(                                                         -->
-            <!--         where_sql="metric_time__day = '2020-01-01'",                           -->
-            <!--         bind_parameters=SqlBindParameters(),                                   -->
-            <!--         linkable_specs=(                                                       -->
-            <!--           TimeDimensionSpec(element_name='metric_time', time_granularity=DAY), -->
-            <!--         ),                                                                     -->
-            <!--         linkable_elements=(                                                    -->
-            <!--           LinkableDimension(                                                   -->
-            <!--             defined_in_semantic_model=SemanticModelReference(                  -->
-            <!--               semantic_model_name='bookings_source',                           -->
-            <!--             ),                                                                 -->
-            <!--             element_name='metric_time',                                        -->
-            <!--             dimension_type=TIME,                                               -->
-            <!--             join_path=SemanticModelJoinPath(                                   -->
-            <!--               left_semantic_model_reference=SemanticModelReference(            -->
-            <!--                 semantic_model_name='bookings_source',                         -->
-            <!--               ),                                                               -->
-            <!--             ),                                                                 -->
-            <!--             properties=frozenset('METRIC_TIME',),                              -->
-            <!--             time_granularity=DAY,                                              -->
-            <!--           ),                                                                   -->
-            <!--         ),                                                                     -->
-            <!--       ),                                                                       -->
-            <!--     ),                                                                         -->
-            <!--   )                                                                            -->
+            <!-- metric_spec =                                                       -->
+            <!--   MetricSpec(                                                       -->
+            <!--     element_name='booking_fees_last_week_per_booker_this_week',     -->
+            <!--     filter_specs=(                                                  -->
+            <!--       WhereFilterSpec(                                              -->
+            <!--         where_sql="metric_time__day = '2020-01-01'",                -->
+            <!--         bind_parameters=SqlBindParameters(),                        -->
+            <!--         linkable_elements=(                                         -->
+            <!--           LinkableDimension(                                        -->
+            <!--             defined_in_semantic_model=SemanticModelReference(       -->
+            <!--               semantic_model_name='bookings_source',                -->
+            <!--             ),                                                      -->
+            <!--             element_name='metric_time',                             -->
+            <!--             dimension_type=TIME,                                    -->
+            <!--             join_path=SemanticModelJoinPath(                        -->
+            <!--               left_semantic_model_reference=SemanticModelReference( -->
+            <!--                 semantic_model_name='bookings_source',              -->
+            <!--               ),                                                    -->
+            <!--             ),                                                      -->
+            <!--             properties=frozenset('METRIC_TIME',),                   -->
+            <!--             time_granularity=DAY,                                   -->
+            <!--           ),                                                        -->
+            <!--         ),                                                          -->
+            <!--         linkable_spec_set=LinkableSpecSet(                          -->
+            <!--           time_dimension_specs=(                                    -->
+            <!--             TimeDimensionSpec(                                      -->
+            <!--               element_name='metric_time',                           -->
+            <!--               time_granularity=DAY,                                 -->
+            <!--             ),                                                      -->
+            <!--           ),                                                        -->
+            <!--         ),                                                          -->
+            <!--       ),                                                            -->
+            <!--     ),                                                              -->
+            <!--   )                                                                 -->
             <CombineAggregatedOutputsNode>
                 <!-- description = 'Combine Aggregated Outputs' -->
                 <!-- node_id = NodeId(id_str='cao_0') -->
@@ -47,12 +52,6 @@
                     <!--       WhereFilterSpec(                                                 -->
                     <!--         where_sql="metric_time__day = '2020-01-01'",                   -->
                     <!--         bind_parameters=SqlBindParameters(),                           -->
-                    <!--         linkable_specs=(                                               -->
-                    <!--           TimeDimensionSpec(                                           -->
-                    <!--             element_name='metric_time',                                -->
-                    <!--             time_granularity=DAY,                                      -->
-                    <!--           ),                                                           -->
-                    <!--         ),                                                             -->
                     <!--         linkable_elements=(                                            -->
                     <!--           LinkableDimension(                                           -->
                     <!--             defined_in_semantic_model=SemanticModelReference(          -->
@@ -67,6 +66,14 @@
                     <!--             ),                                                         -->
                     <!--             properties=frozenset('METRIC_TIME',),                      -->
                     <!--             time_granularity=DAY,                                      -->
+                    <!--           ),                                                           -->
+                    <!--         ),                                                             -->
+                    <!--         linkable_spec_set=LinkableSpecSet(                             -->
+                    <!--           time_dimension_specs=(                                       -->
+                    <!--             TimeDimensionSpec(                                         -->
+                    <!--               element_name='metric_time',                              -->
+                    <!--               time_granularity=DAY,                                    -->
+                    <!--             ),                                                         -->
                     <!--           ),                                                           -->
                     <!--         ),                                                             -->
                     <!--       ),                                                               -->
@@ -89,12 +96,6 @@
                                 <!--   WhereFilterSpec(                                              -->
                                 <!--     where_sql="metric_time__day = '2020-01-01'",                -->
                                 <!--     bind_parameters=SqlBindParameters(),                        -->
-                                <!--     linkable_specs=(                                            -->
-                                <!--       TimeDimensionSpec(                                        -->
-                                <!--         element_name='metric_time',                             -->
-                                <!--         time_granularity=DAY,                                   -->
-                                <!--       ),                                                        -->
-                                <!--     ),                                                          -->
                                 <!--     linkable_elements=(                                         -->
                                 <!--       LinkableDimension(                                        -->
                                 <!--         defined_in_semantic_model=SemanticModelReference(       -->
@@ -109,6 +110,14 @@
                                 <!--         ),                                                      -->
                                 <!--         properties=frozenset('METRIC_TIME',),                   -->
                                 <!--         time_granularity=DAY,                                   -->
+                                <!--       ),                                                        -->
+                                <!--     ),                                                          -->
+                                <!--     linkable_spec_set=LinkableSpecSet(                          -->
+                                <!--       time_dimension_specs=(                                    -->
+                                <!--         TimeDimensionSpec(                                      -->
+                                <!--           element_name='metric_time',                           -->
+                                <!--           time_granularity=DAY,                                 -->
+                                <!--         ),                                                      -->
                                 <!--       ),                                                        -->
                                 <!--     ),                                                          -->
                                 <!--   )                                                             -->
@@ -159,12 +168,6 @@
                     <!--       WhereFilterSpec(                                              -->
                     <!--         where_sql="metric_time__day = '2020-01-01'",                -->
                     <!--         bind_parameters=SqlBindParameters(),                        -->
-                    <!--         linkable_specs=(                                            -->
-                    <!--           TimeDimensionSpec(                                        -->
-                    <!--             element_name='metric_time',                             -->
-                    <!--             time_granularity=DAY,                                   -->
-                    <!--           ),                                                        -->
-                    <!--         ),                                                          -->
                     <!--         linkable_elements=(                                         -->
                     <!--           LinkableDimension(                                        -->
                     <!--             defined_in_semantic_model=SemanticModelReference(       -->
@@ -179,6 +182,14 @@
                     <!--             ),                                                      -->
                     <!--             properties=frozenset('METRIC_TIME',),                   -->
                     <!--             time_granularity=DAY,                                   -->
+                    <!--           ),                                                        -->
+                    <!--         ),                                                          -->
+                    <!--         linkable_spec_set=LinkableSpecSet(                          -->
+                    <!--           time_dimension_specs=(                                    -->
+                    <!--             TimeDimensionSpec(                                      -->
+                    <!--               element_name='metric_time',                           -->
+                    <!--               time_granularity=DAY,                                 -->
+                    <!--             ),                                                      -->
                     <!--           ),                                                        -->
                     <!--         ),                                                          -->
                     <!--       ),                                                            -->
@@ -200,12 +211,6 @@
                                 <!--   WhereFilterSpec(                                              -->
                                 <!--     where_sql="metric_time__day = '2020-01-01'",                -->
                                 <!--     bind_parameters=SqlBindParameters(),                        -->
-                                <!--     linkable_specs=(                                            -->
-                                <!--       TimeDimensionSpec(                                        -->
-                                <!--         element_name='metric_time',                             -->
-                                <!--         time_granularity=DAY,                                   -->
-                                <!--       ),                                                        -->
-                                <!--     ),                                                          -->
                                 <!--     linkable_elements=(                                         -->
                                 <!--       LinkableDimension(                                        -->
                                 <!--         defined_in_semantic_model=SemanticModelReference(       -->
@@ -220,6 +225,14 @@
                                 <!--         ),                                                      -->
                                 <!--         properties=frozenset('METRIC_TIME',),                   -->
                                 <!--         time_granularity=DAY,                                   -->
+                                <!--       ),                                                        -->
+                                <!--     ),                                                          -->
+                                <!--     linkable_spec_set=LinkableSpecSet(                          -->
+                                <!--       time_dimension_specs=(                                    -->
+                                <!--         TimeDimensionSpec(                                      -->
+                                <!--           element_name='metric_time',                           -->
+                                <!--           time_granularity=DAY,                                 -->
+                                <!--         ),                                                      -->
                                 <!--       ),                                                        -->
                                 <!--     ),                                                          -->
                                 <!--   )                                                             -->

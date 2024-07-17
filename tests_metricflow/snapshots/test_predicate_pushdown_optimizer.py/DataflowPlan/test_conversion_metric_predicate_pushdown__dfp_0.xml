@@ -12,12 +12,6 @@
             <!--       WhereFilterSpec(                                              -->
             <!--         where_sql="visit__referrer_id = '123456'",                  -->
             <!--         bind_parameters=SqlBindParameters(),                        -->
-            <!--         linkable_specs=(                                            -->
-            <!--           DimensionSpec(                                            -->
-            <!--             element_name='referrer_id',                             -->
-            <!--             entity_links=(EntityReference(element_name='visit'),),  -->
-            <!--           ),                                                        -->
-            <!--         ),                                                          -->
             <!--         linkable_elements=(                                         -->
             <!--           LinkableDimension(                                        -->
             <!--             defined_in_semantic_model=SemanticModelReference(       -->
@@ -32,6 +26,18 @@
             <!--               ),                                                    -->
             <!--             ),                                                      -->
             <!--             properties=frozenset('LOCAL',),                         -->
+            <!--           ),                                                        -->
+            <!--         ),                                                          -->
+            <!--         linkable_spec_set=LinkableSpecSet(                          -->
+            <!--           dimension_specs=(                                         -->
+            <!--             DimensionSpec(                                          -->
+            <!--               element_name='referrer_id',                           -->
+            <!--               entity_links=(                                        -->
+            <!--                 EntityReference(                                    -->
+            <!--                   element_name='visit',                             -->
+            <!--                 ),                                                  -->
+            <!--               ),                                                    -->
+            <!--             ),                                                      -->
             <!--           ),                                                        -->
             <!--         ),                                                          -->
             <!--       ),                                                            -->
@@ -62,12 +68,6 @@
                             <!--   WhereFilterSpec(                                              -->
                             <!--     where_sql="visit__referrer_id = '123456'",                  -->
                             <!--     bind_parameters=SqlBindParameters(),                        -->
-                            <!--     linkable_specs=(                                            -->
-                            <!--       DimensionSpec(                                            -->
-                            <!--         element_name='referrer_id',                             -->
-                            <!--         entity_links=(EntityReference(element_name='visit'),),  -->
-                            <!--       ),                                                        -->
-                            <!--     ),                                                          -->
                             <!--     linkable_elements=(                                         -->
                             <!--       LinkableDimension(                                        -->
                             <!--         defined_in_semantic_model=SemanticModelReference(       -->
@@ -82,6 +82,18 @@
                             <!--           ),                                                    -->
                             <!--         ),                                                      -->
                             <!--         properties=frozenset('LOCAL',),                         -->
+                            <!--       ),                                                        -->
+                            <!--     ),                                                          -->
+                            <!--     linkable_spec_set=LinkableSpecSet(                          -->
+                            <!--       dimension_specs=(                                         -->
+                            <!--         DimensionSpec(                                          -->
+                            <!--           element_name='referrer_id',                           -->
+                            <!--           entity_links=(                                        -->
+                            <!--             EntityReference(                                    -->
+                            <!--               element_name='visit',                             -->
+                            <!--             ),                                                  -->
+                            <!--           ),                                                    -->
+                            <!--         ),                                                      -->
                             <!--       ),                                                        -->
                             <!--     ),                                                          -->
                             <!--   )                                                             -->

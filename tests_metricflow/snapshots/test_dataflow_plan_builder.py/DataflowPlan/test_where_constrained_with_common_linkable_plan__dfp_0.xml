@@ -12,12 +12,6 @@
             <!--       WhereFilterSpec(                                               -->
             <!--         where_sql="listing__country_latest = 'us'",                  -->
             <!--         bind_parameters=SqlBindParameters(),                         -->
-            <!--         linkable_specs=(                                             -->
-            <!--           DimensionSpec(                                             -->
-            <!--             element_name='country_latest',                           -->
-            <!--             entity_links=(EntityReference(element_name='listing'),), -->
-            <!--           ),                                                         -->
-            <!--         ),                                                           -->
             <!--         linkable_elements=(                                          -->
             <!--           LinkableDimension(                                         -->
             <!--             defined_in_semantic_model=SemanticModelReference(        -->
@@ -44,6 +38,18 @@
             <!--             properties=frozenset('JOINED',),                         -->
             <!--           ),                                                         -->
             <!--         ),                                                           -->
+            <!--         linkable_spec_set=LinkableSpecSet(                           -->
+            <!--           dimension_specs=(                                          -->
+            <!--             DimensionSpec(                                           -->
+            <!--               element_name='country_latest',                         -->
+            <!--               entity_links=(                                         -->
+            <!--                 EntityReference(                                     -->
+            <!--                   element_name='listing',                            -->
+            <!--                 ),                                                   -->
+            <!--               ),                                                     -->
+            <!--             ),                                                       -->
+            <!--           ),                                                         -->
+            <!--         ),                                                           -->
             <!--       ),                                                             -->
             <!--     ),                                                               -->
             <!--   )                                                                  -->
@@ -57,12 +63,6 @@
                     <!--   WhereFilterSpec(                                               -->
                     <!--     where_sql="listing__country_latest = 'us'",                  -->
                     <!--     bind_parameters=SqlBindParameters(),                         -->
-                    <!--     linkable_specs=(                                             -->
-                    <!--       DimensionSpec(                                             -->
-                    <!--         element_name='country_latest',                           -->
-                    <!--         entity_links=(EntityReference(element_name='listing'),), -->
-                    <!--       ),                                                         -->
-                    <!--     ),                                                           -->
                     <!--     linkable_elements=(                                          -->
                     <!--       LinkableDimension(                                         -->
                     <!--         defined_in_semantic_model=SemanticModelReference(        -->
@@ -87,6 +87,18 @@
                     <!--           ),                                                     -->
                     <!--         ),                                                       -->
                     <!--         properties=frozenset('JOINED',),                         -->
+                    <!--       ),                                                         -->
+                    <!--     ),                                                           -->
+                    <!--     linkable_spec_set=LinkableSpecSet(                           -->
+                    <!--       dimension_specs=(                                          -->
+                    <!--         DimensionSpec(                                           -->
+                    <!--           element_name='country_latest',                         -->
+                    <!--           entity_links=(                                         -->
+                    <!--             EntityReference(                                     -->
+                    <!--               element_name='listing',                            -->
+                    <!--             ),                                                   -->
+                    <!--           ),                                                     -->
+                    <!--         ),                                                       -->
                     <!--       ),                                                         -->
                     <!--     ),                                                           -->
                     <!--   )                                                              -->

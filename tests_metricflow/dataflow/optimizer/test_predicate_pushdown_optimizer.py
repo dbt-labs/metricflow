@@ -7,6 +7,7 @@ from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
+from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
@@ -76,7 +77,10 @@ def test_branch_state_propagation(branch_state_tracker: PredicatePushdownBranchS
         original_pushdown_state=base_state,
         where_filter_specs=(
             WhereFilterSpec(
-                where_sql="x is true", bind_parameters=SqlBindParameters(), linkable_elements=(), linkable_specs=()
+                where_sql="x is true",
+                bind_parameters=SqlBindParameters(),
+                linkable_elements=(),
+                linkable_spec_set=LinkableSpecSet(),
             ),
         ),
     )
@@ -110,10 +114,16 @@ def test_applied_filter_back_propagation(branch_state_tracker: PredicatePushdown
     """
     base_state = branch_state_tracker.last_pushdown_state
     where_spec_x_is_true = WhereFilterSpec(
-        where_sql="x is true", bind_parameters=SqlBindParameters(), linkable_elements=(), linkable_specs=()
+        where_sql="x is true",
+        bind_parameters=SqlBindParameters(),
+        linkable_elements=(),
+        linkable_spec_set=LinkableSpecSet(),
     )
     where_spec_y_is_null = WhereFilterSpec(
-        where_sql="y is null", bind_parameters=SqlBindParameters(), linkable_elements=(), linkable_specs=()
+        where_sql="y is null",
+        bind_parameters=SqlBindParameters(),
+        linkable_elements=(),
+        linkable_spec_set=LinkableSpecSet(),
     )
 
     where_state = PredicatePushdownState.with_where_filter_specs(

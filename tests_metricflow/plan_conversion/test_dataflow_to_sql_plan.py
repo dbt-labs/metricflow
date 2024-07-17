@@ -17,6 +17,7 @@ from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
+from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.measure_spec import MeasureSpec, MetricInputMeasureSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDimensionSpec
@@ -191,11 +192,13 @@ def test_filter_with_where_constraint_node(
             WhereFilterSpec(
                 where_sql="booking__ds__day = '2020-01-01'",
                 bind_parameters=SqlBindParameters(),
-                linkable_specs=(
-                    TimeDimensionSpec(
-                        element_name="ds",
-                        entity_links=(EntityReference(element_name="booking"),),
-                        time_granularity=TimeGranularity.DAY,
+                linkable_spec_set=LinkableSpecSet(
+                    time_dimension_specs=(
+                        TimeDimensionSpec(
+                            element_name="ds",
+                            entity_links=(EntityReference(element_name="booking"),),
+                            time_granularity=TimeGranularity.DAY,
+                        ),
                     ),
                 ),
                 linkable_elements=(

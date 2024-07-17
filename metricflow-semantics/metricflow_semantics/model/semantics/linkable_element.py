@@ -87,7 +87,7 @@ class ElementPathKey:
 
 
 @dataclass(frozen=True)
-class SemanticModelJoinPathElement:
+class SemanticModelJoinPathElement(SerializableDataclass):
     """Describes joining a semantic model by the given entity."""
 
     semantic_model_reference: SemanticModelReference
@@ -297,7 +297,7 @@ class LinkableMetric(LinkableElement, SerializableDataclass):
 
 
 @dataclass(frozen=True)
-class SemanticModelJoinPath(SemanticModelDerivation):
+class SemanticModelJoinPath(SemanticModelDerivation, SerializableDataclass):
     """Describes a series of joins between the measure semantic model, and other semantic models by entity.
 
     For example:
@@ -357,14 +357,14 @@ class SemanticModelJoinPath(SemanticModelDerivation):
 
 
 @dataclass(frozen=True)
-class MetricSubqueryJoinPathElement:
+class MetricSubqueryJoinPathElement(SerializableDataclass):
     """Describes joining from a semantic model to a metric subquery.
 
     Args:
         metric_reference: The metric that's aggregated in the subquery.
         derived_from_semantic_models: The semantic models that the measure's input metrics are defined in.
         join_on_entity: The entity that the metric is grouped by in the subquery. This will be updated in V2 to allow a list
-            of entitites & dimensions.
+            of entities & dimensions.
         entity_links: Sequence of entities joined to get from a metric source to the `join_on_entity`. Should not include
             the `join_on_entity`.
         metric_to_entity_join_path: Describes the join path used in the subquery to join the metric to the `join_on_entity`.
@@ -384,7 +384,7 @@ class MetricSubqueryJoinPathElement:
 
 
 @dataclass(frozen=True)
-class SemanticModelToMetricSubqueryJoinPath:
+class SemanticModelToMetricSubqueryJoinPath(SerializableDataclass):
     """Describes how to join from a semantic model to a metric subquery.
 
     Starts with semantic model join path, if needed. Always ends with metric subquery join path.
