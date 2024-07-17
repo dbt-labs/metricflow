@@ -110,7 +110,7 @@ class WhereSpecFactory:
                     where_sql=where_sql,
                     bind_parameters=SqlBindParameters(),
                     linkable_spec_set=LinkableSpecSet.create_from_specs(rendered_specs),
-                    linkable_elements=linkable_elements,
+                    linkable_element_unions=tuple(linkable_element.as_union for linkable_element in linkable_elements),
                 )
             )
 
