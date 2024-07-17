@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import collections
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -102,8 +103,11 @@ class LinkableElement(SemanticModelDerivation, SerializableDataclass, ABC):
     properties: Tuple[LinkableElementProperty, ...]
 
     def __post_init__(self) -> None:  # noqa: D105
-        assert len(self.property_set) == len(self.properties)
-        assert self.properties == tuple(sorted(self.properties))
+        if len(self.property_set) != len(self.properties):
+            duplicate_properties = [item for item, count in collections.Counter(self.properties).items() if count > 1]
+            assert False, f"Found duplicate properties {duplicate_properties} in {self.properties}"
+
+        assert self.properties == tuple(sorted(self.properties)), f"Properties are not sorted: {self.properties}"
 
     @cached_property
     def property_set(self) -> FrozenSet[LinkableElementProperty]:  # noqa: D102
