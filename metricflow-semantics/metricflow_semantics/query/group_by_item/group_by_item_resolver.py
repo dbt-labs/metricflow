@@ -20,6 +20,7 @@ from metricflow_semantics.query.group_by_item.candidate_push_down.push_down_visi
     PushDownResult,
     _PushDownGroupByItemCandidatesVisitor,
 )
+from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow_semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag, ResolutionDagSinkNode
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow_semantics.query.issues.group_by_item_resolver.ambiguous_group_by_item import AmbiguousGroupByItemIssue
@@ -140,6 +141,7 @@ class GroupByItemResolver:
         input_str: str,
         spec_pattern: SpecPattern,
         resolution_node: ResolutionDagSinkNode,
+        filter_location: WhereFilterLocation,
     ) -> GroupByItemResolution:
         """Returns the spec that matches the spec_pattern associated with the filter in the given node.
 
@@ -159,6 +161,7 @@ class GroupByItemResolver:
             manifest_lookup=self._manifest_lookup,
             source_spec_patterns=(spec_pattern,),
             suggestion_generator=suggestion_generator,
+            filter_location=filter_location,
         )
 
         push_down_result: PushDownResult = resolution_node.accept(push_down_visitor)
