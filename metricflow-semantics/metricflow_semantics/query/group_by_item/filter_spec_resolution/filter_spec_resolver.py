@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import itertools
 import logging
-from typing import List, Sequence
+from collections import defaultdict
+from typing import Dict, List, Sequence, Set
 
 from dbt_semantic_interfaces.call_parameter_sets import FilterCallParameterSets, MetricCallParameterSet
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
-from dbt_semantic_interfaces.protocols import WhereFilter, WhereFilterIntersection
+from dbt_semantic_interfaces.protocols import WhereFilter
 from dbt_semantic_interfaces.references import EntityReference
 from typing_extensions import override
 
@@ -14,7 +15,9 @@ from metricflow_semantics.mf_logging.runtime import log_runtime
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.naming.object_builder_str import ObjectBuilderNameConverter
 from metricflow_semantics.query.group_by_item.candidate_push_down.push_down_visitor import DagTraversalPathTracker
-from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
+from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import (
+    WhereFilterLocation,
+)
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_pattern_factory import (
     WhereFilterPatternFactory,
 )
@@ -235,8 +238,7 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
                 self._resolve_specs_for_where_filters(
                     current_node=node,
                     resolution_path=resolution_path,
-                    filter_location=WhereFilterLocation.for_metric(node.metric_reference),
-                    where_filter_intersection=self._get_where_filters_at_metric_node(node),
+                    where_filters_and_locations=self._get_where_filters_at_metric_node(node),
                 )
             )
 
@@ -255,8 +257,11 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
                 self._resolve_specs_for_where_filters(
                     current_node=node,
                     resolution_path=resolution_path,
-                    filter_location=WhereFilterLocation.for_query(node.metrics_in_query),
-                    where_filter_intersection=node.where_filter_intersection,
+                    where_filters_and_locations={
+                        WhereFilterLocation.for_query(node.metrics_in_query): set(
+                            node.where_filter_intersection.where_filters
+                        )
+                    },
                 )
             )
 
@@ -268,38 +273,44 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
 
     def _get_where_filters_at_metric_node(
         self, metric_node: MetricGroupByItemResolutionNode
-    ) -> WhereFilterIntersection:
+    ) -> Dict[WhereFilterLocation, Set[WhereFilter]]:
         """Return the filters used with a metric in the manifest.
 
         A derived metric definition can have a filter for an input metric, and we'll need to resolve that when the
         dataflow plan is built.
         """
-        where_filters: List[WhereFilter] = []
+        where_filters_and_locations: Dict[WhereFilterLocation, Set[WhereFilter]] = defaultdict(set)
         metric = self._manifest_lookup.metric_lookup.get_metric(metric_node.metric_reference)
 
+        metric_filter_location = WhereFilterLocation.for_metric(metric_reference=metric_node.metric_reference)
         if metric.input_measures is not None:
             for input_measure in metric.input_measures:
                 if input_measure.filter is not None:
-                    where_filters.extend(input_measure.filter.where_filters)
+                    for input_measure_where_filter in input_measure.filter.where_filters:
+                        where_filters_and_locations[metric_filter_location].add(input_measure_where_filter)
 
         if metric.filter is not None:
-            where_filters.extend(metric.filter.where_filters)
+            for metric_where_filter in metric.filter.where_filters:
+                where_filters_and_locations[metric_filter_location].add(metric_where_filter)
 
         # This is a metric that is an input metric for a derived metric. The derived metric is the child node of this
         # metric node.
         if metric_node.metric_input_location is not None:
             child_metric_input = metric_node.metric_input_location.get_metric_input(self._manifest_lookup.metric_lookup)
             if child_metric_input.filter is not None:
-                where_filters.extend(child_metric_input.filter.where_filters)
+                input_metric_filter_location = WhereFilterLocation.for_input_metric(
+                    input_metric_reference=metric_node.metric_reference
+                )
+                for input_metric_where_filter in child_metric_input.filter.where_filters:
+                    where_filters_and_locations[input_metric_filter_location].add(input_metric_where_filter)
 
-        return PydanticWhereFilterIntersection(where_filters=where_filters)
+        return where_filters_and_locations
 
     def _resolve_specs_for_where_filters(
         self,
         current_node: ResolutionDagSinkNode,
         resolution_path: MetricFlowQueryResolutionPath,
-        filter_location: WhereFilterLocation,
-        where_filter_intersection: WhereFilterIntersection,
+        where_filters_and_locations: Dict[WhereFilterLocation, Set[WhereFilter]],
     ) -> FilterSpecResolutionLookUp:
         """Given the filters at a particular node, build the spec lookup for those filters.
 
@@ -313,62 +324,81 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
             resolution_dag=resolution_dag,
         )
         non_parsable_resolutions: List[NonParsableFilterResolution] = []
-        filter_call_parameter_sets_to_merge: List[FilterCallParameterSets] = []
-
-        for where_filter in where_filter_intersection.where_filters:
-            try:
-                filter_call_parameter_sets = where_filter.call_parameter_sets
-            except Exception as e:
-                non_parsable_resolutions.append(
-                    NonParsableFilterResolution(
-                        filter_location_path=resolution_path,
-                        where_filter_intersection=where_filter_intersection,
-                        issue_set=MetricFlowQueryResolutionIssueSet.from_issue(
-                            WhereFilterParsingIssue.from_parameters(
-                                where_filter=where_filter,
-                                parse_exception=e,
-                                query_resolution_path=resolution_path,
-                            )
-                        ),
-                    )
-                )
-                continue
-            filter_call_parameter_sets_to_merge.append(filter_call_parameter_sets)
-
-        deduped_filter_call_parameter_sets = _ResolveWhereFilterSpecVisitor._dedupe_filter_call_parameter_sets(
-            filter_call_parameter_sets_to_merge
+        filter_call_parameter_sets_by_location: Dict[WhereFilterLocation, List[FilterCallParameterSets]] = defaultdict(
+            list
         )
+        # No input metric in locations when we get here
+        for location, where_filters in where_filters_and_locations.items():
+            for where_filter in where_filters:
+                try:
+                    filter_call_parameter_sets = where_filter.call_parameter_sets
+                except Exception as e:
+                    non_parsable_resolutions.append(
+                        NonParsableFilterResolution(
+                            filter_location_path=resolution_path,
+                            where_filter_intersection=PydanticWhereFilterIntersection(
+                                where_filters=list(
+                                    {
+                                        where_filter
+                                        for where_filter_set in where_filters_and_locations.values()
+                                        for where_filter in where_filter_set
+                                    }
+                                )
+                            ),
+                            issue_set=MetricFlowQueryResolutionIssueSet.from_issue(
+                                WhereFilterParsingIssue.from_parameters(
+                                    where_filter=where_filter,
+                                    parse_exception=e,
+                                    query_resolution_path=resolution_path,
+                                )
+                            ),
+                        )
+                    )
+                    continue
+                filter_call_parameter_sets_by_location[location].append(filter_call_parameter_sets)
+
+        deduped_filter_call_parameter_sets_by_location = {
+            location: _ResolveWhereFilterSpecVisitor._dedupe_filter_call_parameter_sets(filter_call_parameter_sets_list)
+            for location, filter_call_parameter_sets_list in filter_call_parameter_sets_by_location.items()
+        }
 
         resolutions: List[FilterSpecResolution] = []
-        for group_by_item_in_where_filter in self._map_filter_parameter_sets_to_pattern(
-            filter_call_parameter_sets=deduped_filter_call_parameter_sets,
-        ):
-            group_by_item_resolution = group_by_item_resolver.resolve_matching_item_for_filters(
-                input_str=group_by_item_in_where_filter.object_builder_str,
-                spec_pattern=group_by_item_in_where_filter.spec_pattern,
-                resolution_node=current_node,
-            )
-            # The paths in the issue set are generated relative to the current node. For error messaging, it seems more
-            # helpful for those paths to be relative to the query. To do, we have to add nodes from the resolution path.
-            # e.g. if the current node is B, and the resolution path is [A, B], an issue might have the relative path
-            # [B, C]. To join those paths to produce [A, B, C], the path prefix should be [A].
-            path_prefix = MetricFlowQueryResolutionPath(
-                resolution_path_nodes=resolution_path.resolution_path_nodes[:-1]
-            )
-            resolutions.append(
-                FilterSpecResolution(
-                    lookup_key=ResolvedSpecLookUpKey(
-                        filter_location=filter_location,
-                        call_parameter_set=group_by_item_in_where_filter.call_parameter_set,
-                    ),
-                    filter_location_path=resolution_path,
-                    resolved_linkable_element_set=group_by_item_resolution.linkable_element_set,
-                    where_filter_intersection=where_filter_intersection,
+        for (
+            filter_location,
+            deduped_filter_call_parameter_sets,
+        ) in deduped_filter_call_parameter_sets_by_location.items():
+            for group_by_item_in_where_filter in self._map_filter_parameter_sets_to_pattern(
+                filter_call_parameter_sets=deduped_filter_call_parameter_sets,
+            ):
+                group_by_item_resolution = group_by_item_resolver.resolve_matching_item_for_filters(
+                    input_str=group_by_item_in_where_filter.object_builder_str,
                     spec_pattern=group_by_item_in_where_filter.spec_pattern,
-                    issue_set=group_by_item_resolution.issue_set.with_path_prefix(path_prefix),
-                    object_builder_str=group_by_item_in_where_filter.object_builder_str,
+                    resolution_node=current_node,
+                    filter_location=filter_location,
                 )
-            )
+                # The paths in the issue set are generated relative to the current node. For error messaging, it seems more
+                # helpful for those paths to be relative to the query. To do, we have to add nodes from the resolution path.
+                # e.g. if the current node is B, and the resolution path is [A, B], an issue might have the relative path
+                # [B, C]. To join those paths to produce [A, B, C], the path prefix should be [A].
+                path_prefix = MetricFlowQueryResolutionPath(
+                    resolution_path_nodes=resolution_path.resolution_path_nodes[:-1]
+                )
+                resolutions.append(
+                    FilterSpecResolution(
+                        lookup_key=ResolvedSpecLookUpKey(
+                            filter_location=filter_location,
+                            call_parameter_set=group_by_item_in_where_filter.call_parameter_set,
+                        ),
+                        filter_location_path=resolution_path,
+                        resolved_linkable_element_set=group_by_item_resolution.linkable_element_set,
+                        where_filter_intersection=PydanticWhereFilterIntersection(
+                            where_filters=list(where_filters_and_locations[filter_location])
+                        ),
+                        spec_pattern=group_by_item_in_where_filter.spec_pattern,
+                        issue_set=group_by_item_resolution.issue_set.with_path_prefix(path_prefix),
+                        object_builder_str=group_by_item_in_where_filter.object_builder_str,
+                    )
+                )
 
         if any(resolution.issue_set.has_errors for resolution in resolutions) or len(non_parsable_resolutions) > 0:
             return FilterSpecResolutionLookUp(
