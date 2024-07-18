@@ -6,6 +6,7 @@ MetricFlowQuerySpec(
       FilterSpecResolution(
         lookup_key=ResolvedSpecLookUpKey(
           filter_location=WhereFilterLocation(
+            location_type=METRIC,
             metric_references=(
               MetricReference(
                 element_name='simple_metric_with_time_granularity_and_metric_time_filter',

@@ -3,6 +3,7 @@ FilterSpecResolutionLookUp(
     FilterSpecResolution(
       lookup_key=ResolvedSpecLookUpKey(
         filter_location=WhereFilterLocation(
+          location_type=METRIC,
           metric_references=(
             MetricReference(
               element_name='derived_metric_with_same_parent_time_grains',

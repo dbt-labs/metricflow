@@ -18,6 +18,7 @@ ParseQueryResult(
         FilterSpecResolution(
           lookup_key=ResolvedSpecLookUpKey(
             filter_location=WhereFilterLocation(
+              location_type=QUERY,
               metric_references=(
                 MetricReference(
                   element_name='bookings',

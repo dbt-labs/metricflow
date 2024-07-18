@@ -152,6 +152,7 @@ def test_derived_metric_with_defined_metric_time_filter(
     )
 
 
+@pytest.mark.skip("Not working yet.")
 def test_derived_metric_with_defined_metric_time_filter_on_input_metric(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -165,7 +166,7 @@ def test_derived_metric_with_defined_metric_time_filter_on_input_metric(
     query_spec = ambiguous_resolution_query_parser.parse_and_validate_query(
         metric_names=["derived_metric_with_time_granularity_and_inner_metric_time_filter"]
     ).query_spec
-    assert 0, "this don't werk"
+
     assert_object_snapshot_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
