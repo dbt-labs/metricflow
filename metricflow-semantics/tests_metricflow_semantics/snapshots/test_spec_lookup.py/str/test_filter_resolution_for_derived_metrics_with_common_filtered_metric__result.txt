@@ -3,7 +3,7 @@ FilterSpecResolutionLookUp(
     FilterSpecResolution(
       lookup_key=ResolvedSpecLookUpKey(
         filter_location=WhereFilterLocation(
-          location_type=METRIC,
+          location_type=INPUT_METRIC,
           metric_references=(
             MetricReference(
               element_name='monthly_metric_0',
@@ -67,7 +67,7 @@ FilterSpecResolutionLookUp(
     FilterSpecResolution(
       lookup_key=ResolvedSpecLookUpKey(
         filter_location=WhereFilterLocation(
-          location_type=METRIC,
+          location_type=INPUT_METRIC,
           metric_references=(
             MetricReference(
               element_name='monthly_metric_0',

@@ -9,8 +9,12 @@ from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.naming.naming_scheme import QueryItemNamingScheme
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
+from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow_semantics.query.group_by_item.group_by_item_resolver import GroupByItemResolver
 from metricflow_semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
+from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.query_resolution_node import (
+    QueryGroupByItemResolutionNode,
+)
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_snapshot_equal
 
@@ -38,10 +42,12 @@ def test_ambiguous_metric_time_in_query_filter(  # noqa: D103
     input_str = f"TimeDimension('{METRIC_TIME_ELEMENT_NAME}')"
     spec_pattern = ObjectBuilderNamingScheme().spec_pattern(input_str)
 
+    assert isinstance(resolution_dag.sink_node, QueryGroupByItemResolutionNode)
     result = group_by_item_resolver.resolve_matching_item_for_filters(
         input_str=input_str,
         spec_pattern=spec_pattern,
         resolution_node=resolution_dag.sink_node,
+        filter_location=WhereFilterLocation.for_query(resolution_dag.sink_node.metrics_in_query),
     )
 
     assert_object_snapshot_equal(
