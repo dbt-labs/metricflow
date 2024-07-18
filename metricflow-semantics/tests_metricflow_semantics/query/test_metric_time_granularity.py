@@ -152,7 +152,6 @@ def test_derived_metric_with_defined_metric_time_filter(
     )
 
 
-@pytest.mark.skip("Not working yet.")
 def test_derived_metric_with_defined_metric_time_filter_on_input_metric(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,

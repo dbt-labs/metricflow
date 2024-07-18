@@ -2215,3 +2215,15 @@ integration_test:
       GROUP BY {{ render_date_trunc("ds", TimeGranularity.DAY) }}
     ) a ON b.ds = a.ds
     WHERE {{ render_between_time_constraint("b.ds", "2020-01-03", "2020-01-03") }}
+---
+integration_test:
+  name: metric_time_filter_on_input_metric
+  description: Test a metric with a filter defined on its input metric.
+  model: SIMPLE_MODEL
+  metrics: ["bookings_dec_19_2019"]
+  check_query: |
+    SELECT
+      SUM(1) AS bookings_dec_19_2019
+    FROM {{ source_schema }}.fct_bookings
+    WHERE ({{ render_date_trunc("ds", TimeGranularity.DAY) }} < '2012-12-20')
+      AND ({{ render_date_trunc("ds", TimeGranularity.WEEK) }} > '2019-12-18')
