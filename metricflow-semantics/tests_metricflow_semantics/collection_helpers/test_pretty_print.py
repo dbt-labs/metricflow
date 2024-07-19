@@ -141,12 +141,10 @@ def test_pformat_many() -> None:  # noqa: D103
         textwrap.dedent(
             """\
             Example description:
-
-            object_0:
-              (1, 2, 3)
-
-            object_1:
-              {4: 5}
+              object_0:
+                (1, 2, 3)
+              object_1:
+                {4: 5}
             """
         ).rstrip()
         == result
@@ -160,10 +158,9 @@ def test_pformat_many_with_raw_strings() -> None:  # noqa: D103
         textwrap.dedent(
             """\
             Example description:
-
-            object_0:
-              foo
-              bar
+              object_0:
+                foo
+                bar
             """
         ).rstrip()
         == result
@@ -176,9 +173,8 @@ def test_pformat_many_with_strings() -> None:  # noqa: D103
         textwrap.dedent(
             """\
             Example description:
-
-            object_0:
-              'foo\\nbar'
+              object_0:
+                'foo\\nbar'
             """
         ).rstrip()
         == result
