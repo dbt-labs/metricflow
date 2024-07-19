@@ -466,5 +466,5 @@ def mf_pformat_many(  # type: ignore
             ),
         )
         item_block = "\n".join(item_block_lines)
-        lines.append(item_block)
-    return "\n\n".join(lines)
+        lines.append(indent(item_block))
+    return "\n".join(lines)
