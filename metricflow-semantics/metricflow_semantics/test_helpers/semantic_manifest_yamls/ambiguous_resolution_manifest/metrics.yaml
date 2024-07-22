@@ -120,3 +120,37 @@ metric:
     metrics:
       - name: simple_metric_with_default_time_granularity
       - name: monthly_metric_0
+---
+metric:
+  name: simple_metric_with_default_time_granularity_and_metric_time_filter
+  description: Simple metric with time granularity and metric_time filter
+  type: simple
+  type_params:
+    measure: monthly_measure_1
+  time_granularity: quarter
+  filter: |
+    {{ TimeDimension('metric_time') }} > '2020-01-01'
+---
+metric:
+  name: derived_metric_with_time_granularity_and_outer_metric_time_filter
+  description: Derived metric with time granularity
+  type: derived
+  time_granularity: year
+  type_params:
+    expr: simple_metric_with_default_time_granularity * 2
+    metrics:
+      - name: simple_metric_with_default_time_granularity
+  filter: |
+    {{ TimeDimension('metric_time') }} > '2020-01-01'
+---
+metric:
+  name: derived_metric_with_time_granularity_and_inner_metric_time_filter
+  description: Derived metric with time granularity
+  type: derived
+  time_granularity: year
+  type_params:
+    expr: simple_metric_with_default_time_granularity_and_metric_time_filter * 2
+    metrics:
+      - name: simple_metric_with_default_time_granularity_and_metric_time_filter
+        filter: |
+          {{ TimeDimension('metric_time') }} = '2020-01-01'

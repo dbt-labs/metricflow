@@ -1284,7 +1284,7 @@ class DataflowPlanBuilder:
 
         for input_metric in metric.input_metrics:
             filter_specs = filter_spec_factory.create_from_where_filter_intersection(
-                filter_location=WhereFilterLocation.for_metric(input_metric.as_reference),
+                filter_location=WhereFilterLocation.for_input_metric(input_metric_reference=input_metric.as_reference),
                 filter_intersection=input_metric.filter,
             )
 

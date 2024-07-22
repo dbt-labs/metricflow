@@ -11,7 +11,6 @@ from dbt_semantic_interfaces.call_parameter_sets import (
     TimeDimensionCallParameterSet,
 )
 from dbt_semantic_interfaces.protocols import WhereFilterIntersection
-from dbt_semantic_interfaces.references import MetricReference
 from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.merger import Mergeable
@@ -160,28 +159,6 @@ class ResolvedSpecLookUpKey:
     ) -> ResolvedSpecLookUpKey:
         return ResolvedSpecLookUpKey(
             filter_location=filter_location,
-            call_parameter_set=call_parameter_set,
-        )
-
-    @staticmethod
-    def for_metric_filter(
-        metric_reference: MetricReference, call_parameter_set: CallParameterSet
-    ) -> ResolvedSpecLookUpKey:
-        """Create a key related to a filter in a metric definition."""
-        return ResolvedSpecLookUpKey(
-            filter_location=WhereFilterLocation.for_metric(
-                metric_reference,
-            ),
-            call_parameter_set=call_parameter_set,
-        )
-
-    @staticmethod
-    def for_query_filter(
-        metrics_in_query: Sequence[MetricReference], call_parameter_set: CallParameterSet
-    ) -> ResolvedSpecLookUpKey:
-        """Create a key related to a filter for a query."""
-        return ResolvedSpecLookUpKey(
-            filter_location=WhereFilterLocation.for_query(metrics_in_query),
             call_parameter_set=call_parameter_set,
         )
 

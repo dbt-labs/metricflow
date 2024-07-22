@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import Dict, FrozenSet, Iterator, List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
+from dbt_semantic_interfaces.references import MetricReference
 from dbt_semantic_interfaces.type_enums import MetricType
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
@@ -15,6 +16,10 @@ from metricflow_semantics.mf_logging.pretty_print import mf_pformat, mf_pformat_
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.group_by_item.candidate_push_down.group_by_item_candidate import GroupByItemCandidateSet
+from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import (
+    WhereFilterLocation,
+    WhereFilterLocationType,
+)
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.base_node import (
     GroupByItemResolutionNode,
     GroupByItemResolutionNodeVisitor,
@@ -135,6 +140,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
         source_spec_patterns: Sequence[SpecPattern] = (),
         with_any_property: Optional[FrozenSet[LinkableElementProperty]] = None,
         without_any_property: Optional[FrozenSet[LinkableElementProperty]] = None,
+        filter_location: Optional[WhereFilterLocation] = None,
     ) -> None:
         """Initializer.
 
@@ -146,6 +152,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
             with_any_property: Only consider group-by-items with these properties from the measure nodes.
             without_any_property:  Only consider group-by-items without any of these properties (see
             LinkableElementProperty).
+            filter_location: If resolving a where filter item, where this filter was defined.
         """
         self._semantic_manifest_lookup = manifest_lookup
         self._source_spec_patterns = tuple(source_spec_patterns)
@@ -153,6 +160,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
         self._with_any_property = with_any_property
         self._without_any_property = without_any_property
         self._suggestion_generator = suggestion_generator
+        self._filter_location = filter_location
 
     @override
     def visit_measure_node(self, node: MeasureGroupByItemSourceNode) -> PushDownResult:
@@ -369,11 +377,24 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
                     )
                 )
 
+            metric_to_use_for_time_granularity_resolution = metric
+            # If this is resolving a filter defined on an input metric, use the outer metric's time_granularity.
+            if (
+                node.metric_input_location
+                and self._filter_location
+                and self._filter_location.location_type == WhereFilterLocationType.INPUT_METRIC
+            ):
+                metric_to_use_for_time_granularity_resolution = self._semantic_manifest_lookup.metric_lookup.get_metric(
+                    node.metric_input_location.derived_metric_reference
+                )
+
             # If time granularity is not set for the metric, defaults to DAY if available, else the smallest available granularity.
             # Note: ignores any granularity set on input metrics.
-            metric_default_time_granularity = metric.time_granularity or max(
+            metric_default_time_granularity = metric_to_use_for_time_granularity_resolution.time_granularity or max(
                 TimeGranularity.DAY,
-                self._semantic_manifest_lookup.metric_lookup.get_min_queryable_time_granularity(node.metric_reference),
+                self._semantic_manifest_lookup.metric_lookup.get_min_queryable_time_granularity(
+                    MetricReference(metric_to_use_for_time_granularity_resolution.name)
+                ),
             )
 
             if matched_items.spec_count == 0:
