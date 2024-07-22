@@ -8,7 +8,7 @@ integration_test:
   check_query: |
     SELECT
       MAX(capacity) as largest_listing
-      , created_at AS metric_time__day
+      , {{ render_date_trunc("created_at", TimeGranularity.MONTH) }} AS metric_time__month
     FROM {{ source_schema }}.dim_listings_latest
     GROUP BY
       2

@@ -1,0 +1,13 @@
+MetricFlowQuerySpec(
+  metric_specs=(MetricSpec(element_name='largest_listing'),),
+  time_dimension_specs=(
+    TimeDimensionSpec(
+      element_name='ds',
+      entity_links=(EntityReference(element_name='listing'),),
+      time_granularity=DAY,
+    ),
+  ),
+  filter_intersection=PydanticWhereFilterIntersection(),
+  filter_spec_resolution_lookup=FilterSpecResolutionLookUp(),
+  min_max_only=False,
+)
