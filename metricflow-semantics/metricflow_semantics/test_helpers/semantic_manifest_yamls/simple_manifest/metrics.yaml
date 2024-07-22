@@ -793,7 +793,7 @@ metric:
   filter: "{{ TimeDimension('metric_time') }} < '2012-12-20'"
 ---
 metric:
-  name: bookings_dec_19_2019
+  name: bookings_between_dec_18_2019_and_dec_20_2019
   description: Bookings starting in 2020. Used to test a metric with different types of ambiguous filters in on its input metric.
   type: derived
   type_params:
