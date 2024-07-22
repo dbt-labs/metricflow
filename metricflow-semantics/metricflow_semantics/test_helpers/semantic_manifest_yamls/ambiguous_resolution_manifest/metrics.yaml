@@ -94,7 +94,7 @@ metric:
         filter: "{{ TimeDimension('metric_time') }} = '2020-01-01'"
 ---
 metric:
-  name: simple_metric_with_time_granularity
+  name: simple_metric_with_default_time_granularity
   description: Simple metric with time granularity
   type: simple
   type_params:
@@ -107,16 +107,16 @@ metric:
   type: derived
   time_granularity: year
   type_params:
-    expr: simple_metric_with_time_granularity * 2
+    expr: simple_metric_with_default_time_granularity * 2
     metrics:
-      - name: simple_metric_with_time_granularity
+      - name: simple_metric_with_default_time_granularity
 ---
 metric:
   name: derived_metric_without_time_granularity
   description: Derived metric without time granularity
   type: derived
   type_params:
-    expr: simple_metric_with_time_granularity * monthly_metric_0
+    expr: simple_metric_with_default_time_granularity * monthly_metric_0
     metrics:
-      - name: simple_metric_with_time_granularity
+      - name: simple_metric_with_default_time_granularity
       - name: monthly_metric_0
