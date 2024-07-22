@@ -51,10 +51,6 @@ BOOKINGS_YAML = textwrap.dedent(
           expr: "1"
           agg: sum
           create_metric: true
-        - name: monthly_bookings
-          expr: "1"
-          agg: sum
-          agg_time_dimension: ds_month
 
       dimensions:
         - name: is_instant
@@ -63,10 +59,6 @@ BOOKINGS_YAML = textwrap.dedent(
           type: time
           type_params:
             time_granularity: day
-        - name: ds_month
-          type: time
-          type_params:
-            time_granularity: month
 
       primary_entity: booking
 
@@ -74,32 +66,6 @@ BOOKINGS_YAML = textwrap.dedent(
         - name: listing
           type: foreign
           expr: listing_id
-
-    ---
-    metric:
-      name: instant_bookings
-      description: instant bookings
-      type: simple
-      type_params:
-        measure: bookings
-      filter: "{{ Dimension('booking__is_instant') }}"
-    ---
-    metric:
-      name: month_bookings
-      description: monthly bookings
-      type: simple
-      type_params:
-        measure: monthly_bookings
-    ---
-    metric:
-      name: instant_plus_months_bookings
-      description: instant plus month bookings
-      type: derived
-      type_params:
-        expr: instant_bookings + month_bookings
-        metrics:
-          - name: instant_bookings
-          - name: month_bookings
     """
 )
 
