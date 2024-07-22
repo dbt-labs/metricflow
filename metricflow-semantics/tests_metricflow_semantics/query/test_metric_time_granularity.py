@@ -123,7 +123,7 @@ def test_simple_metric_with_defined_metric_time_filter(
 ) -> None:
     """Tests that a simple metric's metric_time filter defined in its YAML uses metric's default granularity."""
     query_spec = ambiguous_resolution_query_parser.parse_and_validate_query(
-        metric_names=["simple_metric_with_time_granularity_and_metric_time_filter"]
+        metric_names=["simple_metric_with_default_time_granularity_and_metric_time_filter"]
     ).query_spec
 
     assert_object_snapshot_equal(

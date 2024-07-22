@@ -1,5 +1,5 @@
 MetricFlowQuerySpec(
-  metric_specs=(MetricSpec(element_name='simple_metric_with_time_granularity_and_metric_time_filter'),),
+  metric_specs=(MetricSpec(element_name='simple_metric_with_default_time_granularity_and_metric_time_filter'),),
   filter_intersection=PydanticWhereFilterIntersection(),
   filter_spec_resolution_lookup=FilterSpecResolutionLookUp(
     spec_resolutions=(
@@ -9,7 +9,7 @@ MetricFlowQuerySpec(
             location_type=METRIC,
             metric_references=(
               MetricReference(
-                element_name='simple_metric_with_time_granularity_and_metric_time_filter',
+                element_name='simple_metric_with_default_time_granularity_and_metric_time_filter',
               ),
             ),
           ),
@@ -34,6 +34,10 @@ MetricFlowQuerySpec(
               time_granularity=QUARTER,
             ): (
               LinkableDimension(
+                properties=(
+                  DERIVED_TIME_GRANULARITY,
+                  METRIC_TIME,
+                ),
                 defined_in_semantic_model=SemanticModelReference(
                   semantic_model_name='monthly_measures_source',
                 ),
@@ -43,10 +47,6 @@ MetricFlowQuerySpec(
                   left_semantic_model_reference=SemanticModelReference(
                     semantic_model_name='monthly_measures_source',
                   ),
-                ),
-                properties=frozenset(
-                  'DERIVED_TIME_GRANULARITY',
-                  'METRIC_TIME',
                 ),
                 time_granularity=QUARTER,
               ),
