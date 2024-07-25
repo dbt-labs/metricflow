@@ -1,0 +1,6 @@
+kind: Features
+body: Support multiple time spines with different granularities.
+time: 2024-07-25T16:00:38.07984-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1348"
