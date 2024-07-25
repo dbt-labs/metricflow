@@ -2,11 +2,10 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Optional
+from typing import Dict, Optional
 
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY
 
 from metricflow.sql.sql_table import SqlTable
@@ -34,26 +33,42 @@ class TimeSpineSource:
         return SqlTable(schema_name=self.schema_name, table_name=self.table_name, db_name=self.db_name)
 
     @staticmethod
-    def create_from_manifest(semantic_manifest: SemanticManifest) -> TimeSpineSource:
+    def create_from_manifest(semantic_manifest: SemanticManifest) -> Dict[TimeGranularity, TimeSpineSource]:
         """Creates a time spine source based on what's in the manifest."""
-        time_spine_table_configurations = semantic_manifest.project_configuration.time_spine_table_configurations
+        time_spine_sources = {
+            time_spine.primary_column.time_granularity: TimeSpineSource(
+                schema_name=time_spine.node_relation.schema_name,
+                table_name=time_spine.node_relation.relation_name,  # is relation name the table name? double check
+                db_name=time_spine.node_relation.database,
+                time_column_name=time_spine.primary_column.name,
+                time_column_granularity=time_spine.primary_column.time_granularity,
+            )
+            for time_spine in semantic_manifest.project_configuration.time_spines
+        }
 
-        if not (
-            len(time_spine_table_configurations) == 1
-            and time_spine_table_configurations[0].grain == DEFAULT_TIME_GRANULARITY
-        ):
-            raise NotImplementedError(
-                f"Only a single time spine table configuration with {DEFAULT_TIME_GRANULARITY} is currently "
-                f"supported. Got:\n"
-                f"{mf_pformat(time_spine_table_configurations)}"
+        # For backward compatibility: if legacy time spine config exists in the manifest, add that time spine here for
+        # backward compatibility. Ignore it if there is a new time spine config with the same granularity.
+        legacy_time_spines = semantic_manifest.project_configuration.time_spine_table_configurations
+        for legacy_time_spine in legacy_time_spines:
+            if not time_spine_sources.get(legacy_time_spine.grain):
+                time_spine_table = SqlTable.from_string(legacy_time_spine.location)
+                time_spine_sources[legacy_time_spine.grain] = TimeSpineSource(
+                    schema_name=time_spine_table.schema_name,
+                    table_name=time_spine_table.table_name,
+                    db_name=time_spine_table.db_name,
+                    time_column_name=legacy_time_spine.column_name,
+                    time_column_granularity=legacy_time_spine.grain,
+                )
+
+        # Sanity check: this should have been validated during manifest parsing.
+        if not time_spine_sources:
+            raise RuntimeError(
+                "At least one time spine must be configured to use the semantic layer, but none were found."
             )
 
-        time_spine_table_configuration = time_spine_table_configurations[0]
-        time_spine_table = SqlTable.from_string(time_spine_table_configuration.location)
-        return TimeSpineSource(
-            schema_name=time_spine_table.schema_name,
-            table_name=time_spine_table.table_name,
-            db_name=time_spine_table.db_name,
-            time_column_name=time_spine_table_configuration.column_name,
-            time_column_granularity=time_spine_table_configuration.grain,
-        )
+        return time_spine_sources
+
+
+# DSI validations to add:
+# - Check that there is only one time spine for each granularity option
+# - Check that there is a time spine defined at minimum DAY

@@ -44,7 +44,6 @@ from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConv
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
-from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
 
 
@@ -59,7 +58,6 @@ class QueryRenderingTools:
     semantic_manifest_lookup: SemanticManifestLookup
     source_node_builder: SourceNodeBuilder
     converter: SemanticModelToDataSetConverter
-    time_spine_source: TimeSpineSource
     plan_converter: DataflowToSqlQueryPlanConverter
 
     def __init__(self, manifest: SemanticManifest) -> None:  # noqa: D107
@@ -68,7 +66,6 @@ class QueryRenderingTools:
             column_association_resolver=DunderColumnAssociationResolver(self.semantic_manifest_lookup),
             semantic_manifest_lookup=self.semantic_manifest_lookup,
         )
-        self.time_spine_source = TimeSpineSource.create_from_manifest(manifest)
         self.converter = SemanticModelToDataSetConverter(
             column_association_resolver=DunderColumnAssociationResolver(
                 semantic_manifest_lookup=self.semantic_manifest_lookup

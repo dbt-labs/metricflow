@@ -48,7 +48,7 @@ def node_evaluator(
         ].semantic_manifest_lookup.semantic_model_lookup,
         nodes_available_for_joins=tuple(mf_engine_fixture.read_node_mapping.values()),
         node_data_set_resolver=node_data_set_resolver,
-        time_spine_node=mf_engine_fixture.source_node_set.time_spine_node,
+        time_spine_nodes=mf_engine_fixture.source_node_set.time_spine_nodes_tuple,
     )
 
 
@@ -72,7 +72,7 @@ def make_multihop_node_evaluator(
         desired_linkable_specs=desired_linkable_specs,
         nodes=source_node_set.source_nodes_for_metric_queries,
         metric_time_dimension_reference=DataSet.metric_time_dimension_reference(),
-        time_spine_node=source_node_set.time_spine_node,
+        time_spine_nodes=source_node_set.time_spine_nodes_tuple,
     )
 
     nodes_available_for_joins = list(
@@ -87,7 +87,7 @@ def make_multihop_node_evaluator(
         semantic_model_lookup=semantic_manifest_lookup_with_multihop_links.semantic_model_lookup,
         nodes_available_for_joins=nodes_available_for_joins,
         node_data_set_resolver=node_data_set_resolver,
-        time_spine_node=source_node_set.time_spine_node,
+        time_spine_nodes=source_node_set.time_spine_nodes_tuple,
     )
 
 
@@ -518,7 +518,7 @@ def test_node_evaluator_with_scd_target(
         # Use all nodes in the simple model as candidates for joins.
         nodes_available_for_joins=tuple(mf_engine_fixture.read_node_mapping.values()),
         node_data_set_resolver=node_data_set_resolver,
-        time_spine_node=mf_engine_fixture.source_node_set.time_spine_node,
+        time_spine_nodes=mf_engine_fixture.source_node_set.time_spine_nodes_tuple,
     )
 
     evaluation = node_evaluator.evaluate_node(
