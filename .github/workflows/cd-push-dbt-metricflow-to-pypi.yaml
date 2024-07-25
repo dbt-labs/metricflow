@@ -1,9 +1,10 @@
-name: Publish Metricflow Release
+name: Publish dbt-metricflow Release
 on:
   workflow_dispatch:
   push:
+    # Tag format is <package>/v<pep440_semantic_version>
     tags:
-      - "*"
+      - "dbt-metricflow/v[0-9]+.[0-9]+.[0-9]+*"
 
 env:
   PYTHON_VERSION: "3.8"
@@ -21,8 +22,6 @@ jobs:
         with:
           python-version: "${{ env.PYTHON_VERSION }}"
 
-      - name: Hatch Publish `metricflow`
+      - name: Hatch Publish `dbt-metricflow`
+        working-directory: ./dbt-metricflow
         run: hatch build && hatch publish
-        env:
-          HATCH_INDEX_USER: __token__
-          HATCH_INDEX_AUTH: ${{ secrets.PYPI_API_TOKEN }}
