@@ -1,11 +1,11 @@
 GroupByItemResolution(
-  spec=TimeDimensionSpec(element_name='metric_time', time_granularity=DAY),
+  spec=TimeDimensionSpec(element_name='metric_time', time_granularity=NANOSECOND),
   linkable_element_set=LinkableElementSet(
     path_key_to_linkable_dimensions={
       ElementPathKey(
         element_name='metric_time',
         element_type=TIME_DIMENSION,
-        time_granularity=DAY,
+        time_granularity=NANOSECOND,
       ): (
         LinkableDimension(
           properties=(METRIC_TIME,),
@@ -16,7 +16,7 @@ GroupByItemResolution(
               semantic_model_name='__VIRTUAL__',
             ),
           ),
-          time_granularity=DAY,
+          time_granularity=NANOSECOND,
         ),
       ),
     },

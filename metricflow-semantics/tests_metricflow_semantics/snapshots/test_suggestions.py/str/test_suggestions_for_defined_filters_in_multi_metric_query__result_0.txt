@@ -18,8 +18,8 @@ Error #1:
         "TimeDimension('listing__created_at', 'day')",
         "Dimension('listing__is_lux_latest')",
         "TimeDimension('listing__ds', 'day')",
+        "TimeDimension('user__archived_at', 'hour')",
         "TimeDimension('user__created_at', 'day')",
-        "TimeDimension('user__ds_latest', 'day')",
       ]
 
   Query Input:
