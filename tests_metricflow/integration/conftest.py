@@ -8,9 +8,9 @@ from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifest
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.time_helpers import ConfigurableTimeSource
+from metricflow_semantics.time.time_spine_source import TimeSpineSource
 
 from metricflow.engine.metricflow_engine import MetricFlowEngine
-from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
 
 

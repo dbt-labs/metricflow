@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from metricflow_semantics.sql.sql_table import SqlTable
+
 from metricflow.sql.sql_column import SqlColumn
-from metricflow.sql.sql_table import SqlTable
 
 
 def test_sql_column() -> None:  # noqa: D103
