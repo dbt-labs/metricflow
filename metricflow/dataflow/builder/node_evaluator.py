@@ -168,7 +168,7 @@ class NodeEvaluatorForLinkableInstances:
         semantic_model_lookup: SemanticModelLookup,
         nodes_available_for_joins: Sequence[DataflowPlanNode],
         node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver,
-        time_spine_node: MetricTimeDimensionTransformNode,
+        time_spine_nodes: Sequence[MetricTimeDimensionTransformNode],
     ) -> None:
         """Initializer.
 
@@ -185,7 +185,7 @@ class NodeEvaluatorForLinkableInstances:
         self._node_data_set_resolver = node_data_set_resolver
         self._partition_resolver = PartitionJoinResolver(self._semantic_model_lookup)
         self._join_evaluator = SemanticModelJoinEvaluator(self._semantic_model_lookup)
-        self._time_spine_node = time_spine_node
+        self._time_spine_nodes = time_spine_nodes
 
     def _find_joinable_candidate_nodes_that_can_satisfy_linkable_specs(
         self,
@@ -201,7 +201,7 @@ class NodeEvaluatorForLinkableInstances:
         left_node_spec_set = left_node_instance_set.spec_set
         for right_node in self._nodes_available_for_joins:
             # If right node is time spine source node, use cross join.
-            if right_node == self._time_spine_node:
+            if right_node in self._time_spine_nodes:
                 needed_metric_time_specs = group_specs_by_type(needed_linkable_specs).metric_time_specs
                 candidates_for_join.append(
                     JoinLinkableInstancesRecipe(

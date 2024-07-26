@@ -368,7 +368,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             DunderColumnAssociationResolver(semantic_manifest_lookup)
         )
         self._time_source = time_source
-        self._time_spine_source = TimeSpineSource.create_from_manifest(semantic_manifest_lookup.semantic_manifest)
+        self._time_spine_sources = TimeSpineSource.create_from_manifest(semantic_manifest_lookup.semantic_manifest)
         self._source_data_sets: List[SemanticModelDataSet] = []
         converter = SemanticModelToDataSetConverter(column_association_resolver=self._column_association_resolver)
         for semantic_model in sorted(

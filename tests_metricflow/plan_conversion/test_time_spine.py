@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import textwrap
 
+from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 
@@ -14,7 +15,9 @@ def test_date_spine_date_range(  # noqa: D103
     simple_semantic_manifest_lookup: SemanticManifestLookup,
     create_source_tables: None,
 ) -> None:
-    time_spine_source = TimeSpineSource.create_from_manifest(simple_semantic_manifest_lookup.semantic_manifest)
+    time_spine_source = TimeSpineSource.create_from_manifest(simple_semantic_manifest_lookup.semantic_manifest)[
+        TimeGranularity.DAY
+    ]
     range_df = sql_client.query(
         textwrap.dedent(
             f"""\

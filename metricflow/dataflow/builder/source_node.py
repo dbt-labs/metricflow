@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Sequence, Tuple
+from typing import List, Mapping, Sequence, Tuple
 
 from dbt_semantic_interfaces.references import TimeDimensionReference
+from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
@@ -36,14 +37,16 @@ class SourceNodeSet:
     # below. See usage in `DataflowPlanBuilder`.
     source_nodes_for_group_by_item_queries: Tuple[DataflowPlanNode, ...]
 
-    # Provides the time spine.
-    time_spine_node: MetricTimeDimensionTransformNode
+    # Provides the time spines.
+    time_spine_nodes: Mapping[TimeGranularity, MetricTimeDimensionTransformNode]
 
     @property
     def all_nodes(self) -> Sequence[DataflowPlanNode]:  # noqa: D102
-        return (
-            self.source_nodes_for_metric_queries + self.source_nodes_for_group_by_item_queries + (self.time_spine_node,)
-        )
+        return self.source_nodes_for_metric_queries + self.source_nodes_for_group_by_item_queries
+
+    @property
+    def time_spine_nodes_tuple(self) -> Tuple[MetricTimeDimensionTransformNode, ...]:  # noqa: D102
+        return tuple(self.time_spine_nodes.values())
 
 
 class SourceNodeBuilder:
@@ -56,13 +59,16 @@ class SourceNodeBuilder:
     ) -> None:
         self._semantic_manifest_lookup = semantic_manifest_lookup
         data_set_converter = SemanticModelToDataSetConverter(column_association_resolver)
-        time_spine_source = TimeSpineSource.create_from_manifest(semantic_manifest_lookup.semantic_manifest)
-        time_spine_data_set = data_set_converter.build_time_spine_source_data_set(time_spine_source)
-        time_dim_reference = TimeDimensionReference(element_name=time_spine_source.time_column_name)
-        self._time_spine_source_node = MetricTimeDimensionTransformNode.create(
-            parent_node=ReadSqlSourceNode.create(data_set=time_spine_data_set),
-            aggregation_time_dimension_reference=time_dim_reference,
-        )
+        self._time_spine_source_nodes = {}
+        for granularity, time_spine_source in TimeSpineSource.create_from_manifest(
+            semantic_manifest_lookup.semantic_manifest
+        ).items():
+            data_set = data_set_converter.build_time_spine_source_data_set(time_spine_source)
+            self._time_spine_source_nodes[granularity] = MetricTimeDimensionTransformNode.create(
+                parent_node=ReadSqlSourceNode.create(data_set),
+                aggregation_time_dimension_reference=TimeDimensionReference(time_spine_source.time_column_name),
+            )
+
         self._query_parser = MetricFlowQueryParser(semantic_manifest_lookup)
 
     def create_from_data_sets(self, data_sets: Sequence[SemanticModelDataSet]) -> SourceNodeSet:
@@ -93,8 +99,9 @@ class SourceNodeBuilder:
                     source_nodes_for_metric_queries.append(metric_time_transform_node)
 
         return SourceNodeSet(
-            time_spine_node=self._time_spine_source_node,
-            source_nodes_for_group_by_item_queries=tuple(group_by_item_source_nodes) + (self._time_spine_source_node,),
+            time_spine_nodes=self._time_spine_source_nodes,
+            source_nodes_for_group_by_item_queries=tuple(group_by_item_source_nodes)
+            + tuple(self._time_spine_source_nodes.values()),
             source_nodes_for_metric_queries=tuple(source_nodes_for_metric_queries),
         )
 

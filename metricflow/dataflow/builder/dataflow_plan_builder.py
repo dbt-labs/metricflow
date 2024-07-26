@@ -996,7 +996,7 @@ class DataflowPlanBuilder:
             desired_linkable_specs=linkable_specs,
             nodes=candidate_nodes_for_right_side_of_join,
             metric_time_dimension_reference=self._metric_time_dimension_reference,
-            time_spine_node=self._source_node_set.time_spine_node,
+            time_spine_nodes=self._source_node_set.time_spine_nodes_tuple,
         )
         logger.info(
             f"After removing unnecessary nodes, there are {len(candidate_nodes_for_right_side_of_join)} candidate "
@@ -1034,7 +1034,7 @@ class DataflowPlanBuilder:
             semantic_model_lookup=self._semantic_model_lookup,
             nodes_available_for_joins=self._sort_by_suitability(candidate_nodes_for_right_side_of_join),
             node_data_set_resolver=self._node_data_set_resolver,
-            time_spine_node=self._source_node_set.time_spine_node,
+            time_spine_nodes=self._source_node_set.time_spine_nodes_tuple,
         )
 
         # Dict from the node that contains the source node to the evaluation results.

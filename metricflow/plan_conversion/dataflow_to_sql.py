@@ -183,7 +183,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         self._semantic_manifest_lookup = semantic_manifest_lookup
         self._metric_lookup = semantic_manifest_lookup.metric_lookup
         self._semantic_model_lookup = semantic_manifest_lookup.semantic_model_lookup
-        self._time_spine_source = TimeSpineSource.create_from_manifest(semantic_manifest_lookup.semantic_manifest)
+        self._time_spine_sources = TimeSpineSource.create_from_manifest(semantic_manifest_lookup.semantic_manifest)
 
     @property
     def column_association_resolver(self) -> ColumnAssociationResolver:  # noqa: D102
@@ -222,24 +222,49 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         """Return the next unique table alias to use in generating queries."""
         return SequentialIdGenerator.create_next_id(StaticIdPrefix.SUB_QUERY).str_value
 
+    def _choose_time_spine_source(
+        self, agg_time_dimension_instances: Tuple[TimeDimensionInstance, ...]
+    ) -> TimeSpineSource:
+        """Determine which time spine source to use when building time spine dataset.
+
+        Will choose the time spine with the largest granularity that can be used to get the smallest granularity requested
+        in the agg time dimension instances. Example:
+        - Time spines available: SECOND, MINUTE, DAY
+        - Agg time dimension granularity needed for request: HOUR, DAY
+        --> Selected time spine: MINUTE
+        """
+        assert (
+            agg_time_dimension_instances
+        ), "Building time spine dataset requires agg_time_dimension_instances, but none were found."
+        smallest_agg_time_grain = min(dim.spec.time_granularity for dim in agg_time_dimension_instances)
+        compatible_time_spine_grains = [
+            grain for grain in self._time_spine_sources.keys() if grain.to_int() <= smallest_agg_time_grain.to_int()
+        ]
+        if not compatible_time_spine_grains:
+            raise RuntimeError(
+                # TODO: update docs link when new docs are available
+                f"This query requires a time spine with granularity {smallest_agg_time_grain.name} or smaller, which is not configured. "
+                f"The smallest available time spine granularity is {min(self._time_spine_sources.keys()).name}, which is too large."
+                "See documentation for how to configure a new time spine: https://docs.getdbt.com/docs/build/metricflow-time-spine"
+            )
+        return self._time_spine_sources[max(compatible_time_spine_grains)]
+
     def _make_time_spine_data_set(
         self,
         agg_time_dimension_instances: Tuple[TimeDimensionInstance, ...],
-        time_spine_source: TimeSpineSource,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
     ) -> SqlDataSet:
-        """Make a time spine data set, which contains all date/time values like '2020-01-01', '2020-01-02'...
+        """Returns a dataset with a datetime column for each agg_time_dimension granularity requested.
 
-        Returns a dataset with a column selected for each agg_time_dimension requested.
         Column alias will use 'metric_time' or the agg_time_dimension name depending on which the user requested.
         """
         time_spine_instance_set = InstanceSet(time_dimension_instances=agg_time_dimension_instances)
         time_spine_table_alias = self._next_unique_table_alias()
 
+        time_spine_source = self._choose_time_spine_source(agg_time_dimension_instances)
         column_expr = SqlColumnReferenceExpression.from_table_and_column_names(
             table_alias=time_spine_table_alias, column_name=time_spine_source.time_column_name
         )
-
         select_columns: Tuple[SqlSelectColumn, ...] = ()
         apply_group_by = False
         for agg_time_dimension_instance in agg_time_dimension_instances:
@@ -314,7 +339,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         # Assemble time_spine dataset with requested agg time dimension instances selected.
         time_spine_data_set = self._make_time_spine_data_set(
             agg_time_dimension_instances=requested_agg_time_dimension_instances,
-            time_spine_source=self._time_spine_source,
             time_range_constraint=node.time_range_constraint,
         )
         table_alias_to_instance_set[time_spine_data_set_alias] = time_spine_data_set.instance_set
@@ -1234,7 +1258,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         time_spine_alias = self._next_unique_table_alias()
         time_spine_dataset = self._make_time_spine_data_set(
             agg_time_dimension_instances=(agg_time_dimension_instance_for_join,),
-            time_spine_source=self._time_spine_source,
             time_range_constraint=node.time_range_constraint,
         )
 

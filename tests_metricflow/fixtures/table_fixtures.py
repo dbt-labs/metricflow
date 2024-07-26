@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 
 import pytest
+from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
@@ -41,7 +42,9 @@ def check_time_spine_source(
     The time spine table is defined in a table snapshot YAML file and is restored to the source schema based on that
     definition. The definition in the YAML should align with the definition in the time_spine_source fixture.
     """
-    time_spine_source = TimeSpineSource.create_from_manifest(simple_semantic_manifest_lookup.semantic_manifest)
+    time_spine_source = TimeSpineSource.create_from_manifest(simple_semantic_manifest_lookup.semantic_manifest)[
+        TimeGranularity.DAY
+    ]
     assert (
         time_spine_source.schema_name == mf_test_configuration.mf_source_schema
     ), "The time spine source table should be in the source schema"
