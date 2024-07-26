@@ -1,6 +1,8 @@
 {
   'dimension_references': [
     'account_type',
+    'archived_at',
+    'bio_added_ts',
     'capacity_latest',
     'company_name',
     'country_latest',
@@ -12,6 +14,10 @@
     'home_state_latest',
     'is_instant',
     'is_lux_latest',
+    'last_hosted_ts',
+    'last_login_ts',
+    'last_profile_edit_ts',
+    'last_property_view_ts',
     'paid_at',
     'referrer_id',
     'verification_type',
