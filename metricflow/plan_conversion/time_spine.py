@@ -67,8 +67,3 @@ class TimeSpineSource:
             )
 
         return time_spine_sources
-
-
-# DSI validations to add:
-# - Check that there is only one time spine for each granularity option
-# - Check that there is a time spine defined at minimum DAY
