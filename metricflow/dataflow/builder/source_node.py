@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, Sequence, Tuple
+from typing import List, Mapping, Sequence, Tuple
 
 from dbt_semantic_interfaces.references import TimeDimensionReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
@@ -38,7 +38,7 @@ class SourceNodeSet:
     source_nodes_for_group_by_item_queries: Tuple[DataflowPlanNode, ...]
 
     # Provides the time spines.
-    time_spine_nodes: Dict[TimeGranularity, MetricTimeDimensionTransformNode]
+    time_spine_nodes: Mapping[TimeGranularity, MetricTimeDimensionTransformNode]
 
     @property
     def all_nodes(self) -> Sequence[DataflowPlanNode]:  # noqa: D102
@@ -59,19 +59,16 @@ class SourceNodeBuilder:
     ) -> None:
         self._semantic_manifest_lookup = semantic_manifest_lookup
         data_set_converter = SemanticModelToDataSetConverter(column_association_resolver)
-        self._time_spine_source_nodes = {
-            granularity: MetricTimeDimensionTransformNode.create(
-                parent_node=ReadSqlSourceNode.create(
-                    data_set=data_set_converter.build_time_spine_source_data_set(time_spine_source)
-                ),
-                aggregation_time_dimension_reference=TimeDimensionReference(
-                    element_name=time_spine_source.time_column_name
-                ),
+        self._time_spine_source_nodes = {}
+        for granularity, time_spine_source in TimeSpineSource.create_from_manifest(
+            semantic_manifest_lookup.semantic_manifest
+        ).items():
+            data_set = data_set_converter.build_time_spine_source_data_set(time_spine_source)
+            self._time_spine_source_nodes[granularity] = MetricTimeDimensionTransformNode.create(
+                parent_node=ReadSqlSourceNode.create(data_set),
+                aggregation_time_dimension_reference=TimeDimensionReference(time_spine_source.time_column_name),
             )
-            for granularity, time_spine_source in TimeSpineSource.create_from_manifest(
-                semantic_manifest_lookup.semantic_manifest
-            ).items()
-        }
+
         self._query_parser = MetricFlowQueryParser(semantic_manifest_lookup)
 
     def create_from_data_sets(self, data_sets: Sequence[SemanticModelDataSet]) -> SourceNodeSet:

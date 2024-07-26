@@ -38,7 +38,7 @@ class TimeSpineSource:
         time_spine_sources = {
             time_spine.primary_column.time_granularity: TimeSpineSource(
                 schema_name=time_spine.node_relation.schema_name,
-                table_name=time_spine.node_relation.relation_name,  # is relation name the table name? double check
+                table_name=time_spine.node_relation.relation_name,
                 db_name=time_spine.node_relation.database,
                 time_column_name=time_spine.primary_column.name,
                 time_column_granularity=time_spine.primary_column.time_granularity,
@@ -50,7 +50,7 @@ class TimeSpineSource:
         # backward compatibility. Ignore it if there is a new time spine config with the same granularity.
         legacy_time_spines = semantic_manifest.project_configuration.time_spine_table_configurations
         for legacy_time_spine in legacy_time_spines:
-            if not time_spine_sources.get(legacy_time_spine.grain):
+            if legacy_time_spine.grain not in time_spine_sources:
                 time_spine_table = SqlTable.from_string(legacy_time_spine.location)
                 time_spine_sources[legacy_time_spine.grain] = TimeSpineSource(
                     schema_name=time_spine_table.schema_name,
