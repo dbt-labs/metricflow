@@ -9,11 +9,11 @@ from typing import List, Optional, Sequence, Tuple
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId, DagNode, DisplayedProperty, MetricFlowDag, NodeId
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
+from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.visitor import Visitable
 
 from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.sql.sql_table import SqlTable
 
 logger = logging.getLogger(__name__)
 

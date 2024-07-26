@@ -18,9 +18,7 @@ from metricflow_semantics.mf_logging.formatting import indent
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow_semantics.model.semantics.linkable_element import (
-    LinkableDimension,
-)
+from metricflow_semantics.model.semantics.linkable_element import LinkableDimension
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.protocols.query_parameter import GroupByParameter, MetricQueryParameter, OrderByQueryParameter
@@ -32,7 +30,9 @@ from metricflow_semantics.specs.dunder_column_association_resolver import Dunder
 from metricflow_semantics.specs.query_param_implementations import SavedQueryParameter
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
+from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.time.time_source import TimeSource
+from metricflow_semantics.time.time_spine_source import TimeSpineSource
 
 from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
@@ -52,10 +52,8 @@ from metricflow.execution.dataflow_to_execution import (
 from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
 from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
-from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
-from metricflow.sql.sql_table import SqlTable
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
 

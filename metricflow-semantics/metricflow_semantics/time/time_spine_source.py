@@ -6,9 +6,9 @@ from typing import Dict, Optional
 
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY
 
-from metricflow.sql.sql_table import SqlTable
+from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY
+from metricflow_semantics.sql.sql_table import SqlTable
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +38,7 @@ class TimeSpineSource:
         time_spine_sources = {
             time_spine.primary_column.time_granularity: TimeSpineSource(
                 schema_name=time_spine.node_relation.schema_name,
-                table_name=time_spine.node_relation.relation_name,
+                table_name=time_spine.node_relation.alias,
                 db_name=time_spine.node_relation.database,
                 time_column_name=time_spine.primary_column.name,
                 time_column_granularity=time_spine.primary_column.time_granularity,

@@ -32,10 +32,11 @@ from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY, TimeDimensionSpec
+from metricflow_semantics.sql.sql_table import SqlTable
+from metricflow_semantics.time.time_spine_source import TIME_SPINE_DATA_SET_DESCRIPTION, TimeSpineSource
 
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.dataset.sql_dataset import SqlDataSet
-from metricflow.plan_conversion.time_spine import TIME_SPINE_DATA_SET_DESCRIPTION, TimeSpineSource
 from metricflow.sql.sql_exprs import (
     SqlColumnReference,
     SqlColumnReferenceExpression,
@@ -49,7 +50,6 @@ from metricflow.sql.sql_plan import (
     SqlSelectStatementNode,
     SqlTableFromClauseNode,
 )
-from metricflow.sql.sql_table import SqlTable
 
 logger = logging.getLogger(__name__)
 
