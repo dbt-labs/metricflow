@@ -9,6 +9,11 @@ from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 # Shortcuts for referring to the metric time dimension.
 MTD = MetricFlowReservedKeywords.METRIC_TIME.value
 MTD_REFERENCE = TimeDimensionReference(element_name=MetricFlowReservedKeywords.METRIC_TIME.value)
+MTD_SPEC_NANOSECOND = TimeDimensionSpec(
+    element_name=MetricFlowReservedKeywords.METRIC_TIME.value,
+    entity_links=(),
+    time_granularity=TimeGranularity.NANOSECOND,
+)
 MTD_SPEC_DAY = TimeDimensionSpec(
     element_name=MetricFlowReservedKeywords.METRIC_TIME.value, entity_links=(), time_granularity=TimeGranularity.DAY
 )
