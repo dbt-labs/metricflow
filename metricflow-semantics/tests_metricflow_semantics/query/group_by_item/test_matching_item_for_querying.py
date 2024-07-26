@@ -17,7 +17,7 @@ from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.me
     MetricGroupByItemResolutionNode,
 )
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
-from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_MONTH, MTD_SPEC_YEAR
+from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_MONTH, MTD_SPEC_NANOSECOND, MTD_SPEC_YEAR
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_snapshot_equal
 
 from tests_metricflow_semantics.query.group_by_item.conftest import AmbiguousResolutionQueryId
@@ -46,7 +46,7 @@ def test_ambiguous_metric_time_in_query(  # noqa: D103
     )
 
     if case_id is AmbiguousResolutionQueryId.NO_METRICS:
-        assert result.spec == MTD_SPEC_DAY
+        assert result.spec == MTD_SPEC_NANOSECOND
     elif case_id is AmbiguousResolutionQueryId.SIMPLE_METRIC:
         assert result.spec == MTD_SPEC_MONTH
     elif case_id is AmbiguousResolutionQueryId.METRICS_WITH_SAME_TIME_GRAINS:
