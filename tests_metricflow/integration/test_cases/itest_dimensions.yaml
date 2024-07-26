@@ -394,3 +394,10 @@ integration_test:
     FROM {{ source_schema }}.dim_users
     GROUP BY
       {{ render_date_trunc("bio_added_ts", TimeGranularity.SECOND) }}
+
+# - [ ] nanosecond - will need to skip for some engines
+# - [ ] millisecond - will need to skip for some engines
+# - [ ] microsecond
+# - [ ] second
+# - [ ] minute
+# - [x] hour
