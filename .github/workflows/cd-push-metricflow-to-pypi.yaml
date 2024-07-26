@@ -25,6 +25,3 @@ jobs:
 
       - name: Hatch Publish `metricflow`
         run: hatch build && hatch publish
-        env:
-          HATCH_INDEX_USER: __token__
-          HATCH_INDEX_AUTH: ${{ secrets.PYPI_API_TOKEN }}
