@@ -5,11 +5,12 @@ import logging
 import time
 from typing import Optional
 
+from metricflow_semantics.sql.sql_table import SqlTable
+
 from dbt_metricflow.cli.dbt_connectors.adapter_backed_client import AdapterBackedSqlClient
 from metricflow.data_table.mf_column import ColumnDescription
 from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.protocols.sql_client import SqlEngine
-from metricflow.sql.sql_table import SqlTable
 
 logger = logging.getLogger(__name__)
 
