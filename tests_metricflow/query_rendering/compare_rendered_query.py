@@ -23,10 +23,10 @@ def render_and_check(
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
     query_spec: MetricFlowQuerySpec,
-    is_distinct_values_plan: bool = False,
 ) -> None:
     """Renders an engine-specific query output from a given query, in both basic and optimized forms."""
     # Build and convert dataflow plan without optimizers
+    is_distinct_values_plan = not query_spec.metric_specs
     if is_distinct_values_plan:
         base_plan = dataflow_plan_builder.build_plan_for_distinct_values(query_spec=query_spec)
     else:
