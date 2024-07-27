@@ -5,3 +5,40 @@ project_configuration:
     - location: $source_schema.mf_time_spine
       column_name: ds
       grain: day
+  time_spines:
+    - node_relation:
+        alias: mf_time_spine_nanosecond
+        schema_name: $source_schema
+      primary_column:
+        name: ts
+        time_granularity: nanosecond
+    - node_relation:
+        alias: mf_time_spine_microsecond
+        schema_name: $source_schema
+      primary_column:
+        name: ts
+        time_granularity: microsecond
+    - node_relation:
+        alias: mf_time_spine_millisecond
+        schema_name: $source_schema
+      primary_column:
+        name: ts
+        time_granularity: millisecond
+    - node_relation:
+        alias: mf_time_spine_second
+        schema_name: $source_schema
+      primary_column:
+        name: ts
+        time_granularity: second
+    - node_relation:
+        alias: mf_time_spine_minute
+        schema_name: $source_schema
+      primary_column:
+        name: ts
+        time_granularity: minute
+    - node_relation:
+        alias: mf_time_spine_hour
+        schema_name: $source_schema
+      primary_column:
+        name: ts
+        time_granularity: hour
