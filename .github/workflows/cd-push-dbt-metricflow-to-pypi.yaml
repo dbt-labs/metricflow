@@ -32,3 +32,5 @@ jobs:
 
       - name: Publish `dbt-metricflow` package to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: ./dbt-metricflow/dist/
