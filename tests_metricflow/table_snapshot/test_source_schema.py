@@ -4,10 +4,10 @@ import logging
 import warnings
 
 import pytest
+from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
-from metricflow.sql.sql_table import SqlTable
 from tests_metricflow.fixtures.table_fixtures import CONFIGURED_SOURCE_TABLE_SNAPSHOT_REPOSITORY
 from tests_metricflow.source_schema_tools import get_populate_source_schema_shell_command
 from tests_metricflow.sql.compare_data_table import assert_data_tables_equal

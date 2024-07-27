@@ -3,6 +3,7 @@ from __future__ import annotations
 from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.random_id import random_id
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
+from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.data_table.mf_table import MetricFlowDataTable
@@ -14,7 +15,6 @@ from metricflow.execution.execution_plan import (
 )
 from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
-from metricflow.sql.sql_table import SqlTable
 from tests_metricflow.sql.compare_data_table import assert_data_tables_equal
 
 

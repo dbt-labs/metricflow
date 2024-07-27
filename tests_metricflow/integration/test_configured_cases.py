@@ -15,9 +15,9 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.protocols.query_parameter import DimensionOrEntityQueryParameter
 from metricflow_semantics.specs.query_param_implementations import DimensionOrEntityParameter, TimeDimensionParameter
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.time.time_spine_source import TimeSpineSource
 
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest
-from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_exprs import (
     SqlCastToTimestampExpression,

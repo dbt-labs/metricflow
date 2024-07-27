@@ -51,6 +51,7 @@ from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.specs.where_filter.where_filter_transform import WhereSpecFactory
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
+from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.time.dateutil_adjuster import DateutilTimePeriodAdjuster
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
@@ -91,7 +92,6 @@ from metricflow.plan_conversion.node_processor import (
     PredicatePushdownState,
     PreJoinNodeProcessor,
 )
-from metricflow.sql.sql_table import SqlTable
 
 logger = logging.getLogger(__name__)
 

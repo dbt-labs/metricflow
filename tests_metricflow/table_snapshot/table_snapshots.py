@@ -13,10 +13,10 @@ import yaml
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.implementations.base import FrozenBaseModel
 from metricflow_semantics.specs.non_additive_dimension_spec import hash_items
+from metricflow_semantics.sql.sql_table import SqlTable
 
 from metricflow.data_table.column_types import CellValue
 from metricflow.data_table.mf_table import MetricFlowDataTable
-from metricflow.sql.sql_table import SqlTable
 from tests_metricflow.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 
 logger = logging.getLogger(__name__)

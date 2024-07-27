@@ -8,8 +8,8 @@ import pytest
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.time.time_spine_source import TimeSpineSource
 
-from metricflow.plan_conversion.time_spine import TimeSpineSource
 from tests_metricflow.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 from tests_metricflow.source_schema_tools import create_tables_listed_in_table_snapshot_repository
 from tests_metricflow.table_snapshot.table_snapshots import (

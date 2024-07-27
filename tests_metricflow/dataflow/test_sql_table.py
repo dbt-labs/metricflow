@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 import pytest
-
-from metricflow.sql.sql_table import SqlTable
+from metricflow_semantics.sql.sql_table import SqlTable
 
 
 def test_sql_table() -> None:  # noqa: D103

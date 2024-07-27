@@ -4,13 +4,13 @@ from dataclasses import dataclass
 from typing import Sequence
 
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
+from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.visitor import VisitorOutputT
 
 from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
     DataflowPlanNodeVisitor,
 )
-from metricflow.sql.sql_table import SqlTable
 
 
 @dataclass(frozen=True)

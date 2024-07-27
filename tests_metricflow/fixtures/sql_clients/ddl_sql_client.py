@@ -3,9 +3,10 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import Optional, Protocol
 
+from metricflow_semantics.sql.sql_table import SqlTable
+
 from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.sql.sql_table import SqlTable
 
 
 class SqlClientWithDDLMethods(SqlClient, Protocol):

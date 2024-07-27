@@ -40,6 +40,7 @@ from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.time.time_constants import ISO8601_PYTHON_FORMAT
+from metricflow_semantics.time.time_spine_source import TIME_SPINE_DATA_SET_DESCRIPTION, TimeSpineSource
 
 from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
@@ -101,7 +102,6 @@ from metricflow.plan_conversion.sql_join_builder import (
     ColumnEqualityDescription,
     SqlQueryPlanJoinBuilder,
 )
-from metricflow.plan_conversion.time_spine import TIME_SPINE_DATA_SET_DESCRIPTION, TimeSpineSource
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.sql.optimizer.optimization_levels import (
     SqlQueryOptimizationLevel,

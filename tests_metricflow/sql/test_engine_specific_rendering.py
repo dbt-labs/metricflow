@@ -4,6 +4,7 @@ from typing import List
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.protocols.sql_client import SqlClient
@@ -24,7 +25,6 @@ from metricflow.sql.sql_plan import (
     SqlSelectStatementNode,
     SqlTableFromClauseNode,
 )
-from metricflow.sql.sql_table import SqlTable
 from tests_metricflow.sql.compare_sql_plan import assert_rendered_sql_equal
 
 
