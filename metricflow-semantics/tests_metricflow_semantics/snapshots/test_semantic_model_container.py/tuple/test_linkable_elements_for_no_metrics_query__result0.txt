@@ -435,7 +435,7 @@
   'lux_listing__listing__lux_listing__twice_bookings_fill_nulls_with_0_without_time_spine',
   'lux_listing__listing__lux_listing__views',
   'lux_listing__listing__lux_listing__views_times_booking_value',
-  'metric_time__day',
+  'metric_time__nanosecond',
   'revenue_instance__ds__day',
   'revenue_instance__ds__extract_day',
   'revenue_instance__ds__extract_dow',

@@ -203,6 +203,3 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
     @property
     def is_metric_time(self) -> bool:  # noqa: D102
         return self.element_name == METRIC_TIME_ELEMENT_NAME
-
-
-DEFAULT_TIME_GRANULARITY = TimeGranularity.DAY
