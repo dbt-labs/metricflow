@@ -200,14 +200,19 @@ class NodeEvaluatorForLinkableInstances:
         candidates_for_join: List[JoinLinkableInstancesRecipe] = []
         left_node_spec_set = left_node_instance_set.spec_set
         for right_node in self._nodes_available_for_joins:
+            data_set_in_right_node: SqlDataSet = self._node_data_set_resolver.get_output_data_set(right_node)
+            linkable_specs_in_right_node = data_set_in_right_node.instance_set.spec_set.linkable_specs
+
             # If right node is time spine source node, use cross join.
             if right_node in self._time_spine_nodes:
-                needed_metric_time_specs = group_specs_by_type(needed_linkable_specs).metric_time_specs
+                satisfiable_metric_time_specs = set(needed_linkable_specs).intersection(
+                    set(linkable_specs_in_right_node)
+                )
                 candidates_for_join.append(
                     JoinLinkableInstancesRecipe(
                         node_to_join=right_node,
                         join_on_entity=None,
-                        satisfiable_linkable_specs=list(needed_metric_time_specs),
+                        satisfiable_linkable_specs=list(satisfiable_metric_time_specs),
                         join_on_partition_dimensions=(),
                         join_on_partition_time_dimensions=(),
                         join_type=SqlJoinType.CROSS_JOIN,
@@ -215,8 +220,6 @@ class NodeEvaluatorForLinkableInstances:
                 )
                 continue
 
-            data_set_in_right_node: SqlDataSet = self._node_data_set_resolver.get_output_data_set(right_node)
-            linkable_specs_in_right_node = data_set_in_right_node.instance_set.spec_set.linkable_specs
             entity_specs_in_right_node = data_set_in_right_node.instance_set.spec_set.entity_specs
 
             # For each unlinked entity in the data set, create a candidate for joining.

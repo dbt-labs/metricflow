@@ -104,7 +104,7 @@ class SemanticModelToDataSetConverter:
         self,
         element_name: str,
         entity_links: Tuple[EntityReference, ...],
-        time_granularity: TimeGranularity = DEFAULT_TIME_GRANULARITY,
+        time_granularity: TimeGranularity,
         date_part: Optional[DatePart] = None,
         semantic_model_name: Optional[str] = None,
     ) -> TimeDimensionInstance:
@@ -332,7 +332,7 @@ class SemanticModelToDataSetConverter:
     ) -> Tuple[List[TimeDimensionInstance], List[SqlSelectColumn]]:
         time_dimension_instances: List[TimeDimensionInstance] = []
         select_columns: List[SqlSelectColumn] = []
-        # Add time dimensions with a smaller granularity for ease in query resolution
+        # Add time dimensions with a larger granularity for ease in query resolution
         for time_granularity in TimeGranularity:
             if time_granularity.to_int() > defined_time_granularity.to_int():
                 time_dimension_instance = self._create_time_dimension_instance(
