@@ -235,13 +235,14 @@ def test_case(
     name: str,
     mf_test_configuration: MetricFlowTestConfiguration,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
-    time_spine_source: TimeSpineSource,
+    time_spine_sources: Mapping[TimeGranularity, TimeSpineSource],
     sql_client: SqlClient,
     create_source_tables: bool,
 ) -> None:
     """Runs all integration tests configured in the test case YAML directory."""
     case = CONFIGURED_INTEGRATION_TESTS_REPOSITORY.get_test_case(name)
     logger.info(f"Running integration test case: '{case.name}' from file '{case.file_path}'")
+    time_spine_source = time_spine_sources[TimeGranularity.DAY]
 
     missing_required_features = filter_not_supported_features(sql_client, case.required_features)
     if missing_required_features:
