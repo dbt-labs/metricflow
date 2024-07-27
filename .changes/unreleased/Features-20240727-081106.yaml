@@ -1,0 +1,6 @@
+kind: Features
+body: Enable sub-daily queries without metrics.
+time: 2024-07-27T08:11:06.357653-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1359"
