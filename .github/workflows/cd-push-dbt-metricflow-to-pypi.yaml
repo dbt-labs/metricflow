@@ -12,7 +12,11 @@ env:
 jobs:
   pypi-publish:
     runs-on: ubuntu-latest
-    environment: Pypi Publish
+    environment:
+      name: Pypi Publish
+      url: https://pypi.org/p/dbt-metricflow
+    permissions:
+      id-token: write
     steps:
       - name: Check-out the repo
         uses: actions/checkout@v3
@@ -22,6 +26,9 @@ jobs:
         with:
           python-version: "${{ env.PYTHON_VERSION }}"
 
-      - name: Hatch Publish `dbt-metricflow`
+      - name: Build `dbt-metricflow` package
         working-directory: ./dbt-metricflow
-        run: hatch build && hatch publish
+        run: hatch build
+
+      - name: Publish `dbt-metricflow` package to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
