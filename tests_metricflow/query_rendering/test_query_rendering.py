@@ -178,7 +178,6 @@ def test_distinct_values(
         sql_client=sql_client,
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
-        is_distinct_values_plan=True,
     )
 
 
@@ -457,7 +456,6 @@ def test_min_max_only_categorical(
         sql_client=sql_client,
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
-        is_distinct_values_plan=True,
     )
 
 
@@ -488,7 +486,6 @@ def test_min_max_only_time(
         sql_client=sql_client,
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
-        is_distinct_values_plan=True,
     )
 
 
@@ -519,7 +516,6 @@ def test_min_max_only_time_quarter(
         sql_client=sql_client,
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
-        is_distinct_values_plan=True,
     )
 
 
@@ -544,7 +540,6 @@ def test_min_max_metric_time(
         sql_client=sql_client,
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
-        is_distinct_values_plan=True,
     )
 
 
@@ -569,5 +564,4 @@ def test_min_max_metric_time_week(
         sql_client=sql_client,
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
-        is_distinct_values_plan=True,
     )
