@@ -105,12 +105,16 @@ def time_spine_sources(  # noqa: D103
     }
     # Current time spines
     for granularity in TimeGranularity:
-        if granularity.to_int() < legacy_time_spine_grain.to_int():
-            time_spine_sources[granularity] = TimeSpineSource(
-                schema_name=mf_test_configuration.mf_source_schema,
-                table_name=f"{time_spine_base_table_name}_{granularity.value}",
-                time_column_name="ts",
-                time_column_granularity=granularity,
-            )
+        if (
+            granularity in sql_client.sql_engine_type.unsupported_granularities
+            or granularity.to_int() >= legacy_time_spine_grain.to_int()
+        ):
+            continue
+        time_spine_sources[granularity] = TimeSpineSource(
+            schema_name=mf_test_configuration.mf_source_schema,
+            table_name=f"{time_spine_base_table_name}_{granularity.value}",
+            time_column_name="ts",
+            time_column_granularity=granularity,
+        )
 
     return time_spine_sources
