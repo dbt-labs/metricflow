@@ -8,10 +8,12 @@ from __future__ import annotations
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
+from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
@@ -88,6 +90,56 @@ def test_offset_window_with_date_part(  # noqa: D103
         metric_specs=(MetricSpec(element_name="bookings_growth_2_weeks"),),
         time_dimension_specs=(
             DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.DAY, date_part=DatePart.DOW),
+        ),
+    )
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_sub_daily_metric_time(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    query_spec = MetricFlowQuerySpec(
+        time_dimension_specs=(DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.MILLISECOND),),
+    )
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_sub_daily_dimension(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    query_spec = MetricFlowQuerySpec(
+        time_dimension_specs=(
+            TimeDimensionSpec(
+                element_name="bio_added_ts",
+                time_granularity=TimeGranularity.SECOND,
+                entity_links=(EntityReference("user"),),
+            ),
         ),
     )
 
