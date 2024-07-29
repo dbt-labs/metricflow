@@ -205,9 +205,9 @@ class NodeEvaluatorForLinkableInstances:
 
             # If right node is time spine source node, use cross join.
             if right_node in self._time_spine_nodes:
-                satisfiable_metric_time_specs = set(needed_linkable_specs).intersection(
-                    set(linkable_specs_in_right_node)
-                )
+                satisfiable_metric_time_specs = [
+                    spec for spec in linkable_specs_in_right_node if spec in needed_linkable_specs
+                ]
                 candidates_for_join.append(
                     JoinLinkableInstancesRecipe(
                         node_to_join=right_node,
