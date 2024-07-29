@@ -370,3 +370,27 @@ integration_test:
     ) outer_subq
     WHERE listing__bookings > 2
     GROUP BY listing
+---
+integration_test:
+  name: sub_daily_metric_time
+  description: Query metric_time alone with a sub-daily granularity
+  model: SIMPLE_MODEL
+  group_bys: ["metric_time__hour"]
+  check_query: |
+    SELECT
+      {{ render_date_trunc("ts", TimeGranularity.HOUR) }} AS metric_time__hour
+    FROM {{ source_schema }}.mf_time_spine_hour
+    GROUP BY
+      {{ render_date_trunc("ts", TimeGranularity.HOUR) }}
+---
+integration_test:
+  name: sub_daily_time_dimension
+  description: Query a time dimension alone with a sub-daily granularity
+  model: SIMPLE_MODEL
+  group_bys: ["user__bio_added_ts__second"]
+  check_query: |
+    SELECT
+      {{ render_date_trunc("bio_added_ts", TimeGranularity.SECOND) }} AS user__bio_added_ts__second
+    FROM {{ source_schema }}.dim_users
+    GROUP BY
+      {{ render_date_trunc("bio_added_ts", TimeGranularity.SECOND) }}
