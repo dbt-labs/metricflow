@@ -1,0 +1,34 @@
+name: Publish Metricflow Release
+on:
+  workflow_dispatch:
+  push:
+    # MetricFlow historically tagged releases with v<pep440_semantic_version>
+    # We restrict to this for now and assume any tag without a package identifier is MetricFlow itself
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+*"
+
+env:
+  PYTHON_VERSION: "3.8"
+
+jobs:
+  pypi-publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: Pypi Publish
+      url: https://pypi.org/p/metricflow
+    permissions:
+      id-token: write
+    steps:
+      - name: Check-out the repo
+        uses: actions/checkout@v3
+
+      - name: Setup Python ${{ env.PYTHON_VERSION }} Environment
+        uses: ./.github/actions/setup-python-env
+        with:
+          python-version: "${{ env.PYTHON_VERSION }}"
+
+      - name: Build `metricflow` package
+        run: hatch build
+
+      - name: Publish `metricflow` package to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
