@@ -8,7 +8,7 @@ GroupByItemResolution(
         time_granularity=DAY,
       ): (
         LinkableDimension(
-          properties=(METRIC_TIME,),
+          properties=(DERIVED_TIME_GRANULARITY, METRIC_TIME),
           element_name='metric_time',
           dimension_type=TIME,
           join_path=SemanticModelJoinPath(

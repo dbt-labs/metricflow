@@ -101,7 +101,12 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
 
     @property
     def without_entity_links(self) -> TimeDimensionSpec:  # noqa: D102
-        return TimeDimensionSpec.from_name(self.element_name)
+        return TimeDimensionSpec(
+            element_name=self.element_name,
+            time_granularity=self.time_granularity,
+            date_part=self.date_part,
+            entity_links=(),
+        )
 
     @staticmethod
     def from_name(name: str) -> TimeDimensionSpec:  # noqa: D102

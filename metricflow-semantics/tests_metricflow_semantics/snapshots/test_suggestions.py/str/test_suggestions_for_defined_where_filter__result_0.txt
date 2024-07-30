@@ -19,7 +19,7 @@ Error #1:
         "Dimension('listing__is_lux_latest')",
         "TimeDimension('listing__ds', 'day')",
         "Dimension('listing__country_latest')",
-        "TimeDimension('user__created_at', 'day')",
+        "TimeDimension('user__archived_at', 'hour')",
       ]
 
   Query Input:

@@ -10,6 +10,7 @@ from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInsta
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.specs.spec_set import group_specs_by_type
 from metricflow_semantics.specs.time_dimension_spec import (
+    DEFAULT_TIME_GRANULARITY,
     TimeDimensionSpec,
     TimeDimensionSpecComparisonKey,
     TimeDimensionSpecField,
@@ -47,9 +48,12 @@ class MetricTimeDefaultGranularityPattern(SpecPattern):
     def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[InstanceSpec]:
         spec_set = group_specs_by_type(candidate_specs)
 
-        # If there are no metrics or metric_time specs in the query, skip this filter.
-        if not (self._max_metric_default_time_granularity and spec_set.metric_time_specs):
+        # If there are no metric_time specs in the query, skip this filter.
+        if not spec_set.metric_time_specs:
             return candidate_specs
+
+        # If there are metrics in the query, use max metric default. For no-metric queries, use standard default.
+        default_granularity = self._max_metric_default_time_granularity or DEFAULT_TIME_GRANULARITY
 
         spec_key_to_grains: Dict[TimeDimensionSpecComparisonKey, Set[TimeGranularity]] = defaultdict(set)
         spec_key_to_specs: Dict[TimeDimensionSpecComparisonKey, Tuple[TimeDimensionSpec, ...]] = defaultdict(tuple)
@@ -60,10 +64,8 @@ class MetricTimeDefaultGranularityPattern(SpecPattern):
 
         matched_metric_time_specs: Tuple[TimeDimensionSpec, ...] = ()
         for spec_key, time_grains in spec_key_to_grains.items():
-            if self._max_metric_default_time_granularity in time_grains:
-                matched_metric_time_specs += (
-                    spec_key_to_specs[spec_key][0].with_grain(self._max_metric_default_time_granularity),
-                )
+            if default_granularity in time_grains:
+                matched_metric_time_specs += (spec_key_to_specs[spec_key][0].with_grain(default_granularity),)
             else:
                 # If default_granularity is not in the available options, then time granularity was specified in the request
                 # and a default is not needed here. Pass all options through for this spec key.

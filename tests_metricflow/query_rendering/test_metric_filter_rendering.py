@@ -226,7 +226,6 @@ def test_distinct_values_query_with_metric_filter(
         sql_client=sql_client,
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
-        is_distinct_values_plan=True,
     )
 
 
