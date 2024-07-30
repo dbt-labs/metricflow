@@ -151,3 +151,64 @@ def test_sub_daily_dimension(  # noqa: D103
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_simple_metric_with_sub_daily_dimension(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    query_spec = MetricFlowQuerySpec(
+        metric_specs=(MetricSpec("new_users"),),
+        time_dimension_specs=(
+            TimeDimensionSpec(
+                element_name="archived_at",
+                time_granularity=TimeGranularity.HOUR,
+                entity_links=(EntityReference("user"),),
+            ),
+        ),
+    )
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_simple_metric_with_joined_sub_daily_dimension(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    query_spec = MetricFlowQuerySpec(
+        metric_specs=(MetricSpec("bookings"),),
+        time_dimension_specs=(
+            TimeDimensionSpec(
+                element_name="bio_added_ts",
+                time_granularity=TimeGranularity.MINUTE,
+                entity_links=(
+                    EntityReference("listing"),
+                    EntityReference("user"),
+                ),
+            ),
+        ),
+    )
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
