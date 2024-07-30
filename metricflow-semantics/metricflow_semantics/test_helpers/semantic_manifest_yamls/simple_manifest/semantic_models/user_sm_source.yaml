@@ -54,3 +54,55 @@ semantic_model:
       expr: "1"
       agg: SUM
       create_metric: true
+    - name: archived_users
+      expr: "1"
+      agg: SUM
+      create_metric: true
+      agg_time_dimension: archived_at
+---
+metric:
+  name: subdaily_cumulative_window_metric
+  description: cumulative window metric with a sub-daily agg time dim
+  type: cumulative
+  type_params:
+    measure: archived_users
+    cumulative_type_params:
+      window: 3 hours
+---
+metric:
+  name: subdaily_cumulative_grain_to_date_metric
+  description: cumulative grain to date metric with a sub-daily agg time dim
+  type: cumulative
+  type_params:
+    measure: archived_users
+    cumulative_type_params:
+      grain_to_date: hour
+---
+metric:
+  name: subdaily_offset_window_metric
+  description: offset window metric with a sub-daily agg time dim
+  type: derived
+  type_params:
+    expr: archived_users
+    metrics:
+      - name: archived_users
+        offset_window: 1 hour
+---
+metric:
+  name: subdaily_offset_grain_to_date_metric
+  description: offset grain to date metric with a sub-daily agg time dim
+  type: derived
+  type_params:
+    expr: archived_users
+    metrics:
+      - name: archived_users
+        offset_to_grain: hour
+---
+metric:
+  name: subdaily_join_to_time_spine_metric
+  description: simple metric with sub-daily agg time dim that joins to time spine
+  type: simple
+  type_params:
+    measure:
+      name: archived_users
+      join_to_timespine: true
