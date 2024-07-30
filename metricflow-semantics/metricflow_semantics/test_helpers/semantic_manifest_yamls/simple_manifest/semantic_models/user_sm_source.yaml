@@ -7,6 +7,9 @@ semantic_model:
     schema_name: $source_schema
     alias: dim_users
 
+  defaults:
+    agg_time_dimension: created_at
+
   dimensions:
     - name: ds
       type: time
@@ -45,3 +48,9 @@ semantic_model:
     - name: user
       type: primary
       expr: user_id
+
+  measures:
+    - name: new_users
+      expr: "1"
+      agg: SUM
+      create_metric: true

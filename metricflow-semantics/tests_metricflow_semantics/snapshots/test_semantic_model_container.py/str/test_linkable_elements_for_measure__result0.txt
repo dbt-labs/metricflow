@@ -182,6 +182,7 @@ Model Join-Path                             Entity Links                        
 ('listings_latest',)                        ("('user',)", "('user',)")                     largest_listing                                                                       ['JOINED', 'METRIC']
 ('listings_latest',)                        ("('user',)", "('user',)")                     listings                                                                              ['JOINED', 'METRIC']
 ('listings_latest',)                        ("('user',)", "('user',)")                     lux_listings                                                                          ['JOINED', 'METRIC']
+('listings_latest',)                        ("('user',)", "('user',)")                     new_users                                                                             ['JOINED', 'METRIC']
 ('listings_latest',)                        ("('user',)", "('user',)")                     popular_listing_bookings_per_booker                                                   ['JOINED', 'METRIC']
 ('listings_latest',)                        ("('user',)", "('user',)")                     regional_starting_balance_ratios                                                      ['JOINED', 'METRIC']
 ('listings_latest',)                        ("('user',)", "('user',)")                     revenue                                                                               ['JOINED', 'METRIC']

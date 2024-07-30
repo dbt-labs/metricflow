@@ -2215,3 +2215,53 @@ integration_test:
       GROUP BY {{ render_date_trunc("ds", TimeGranularity.DAY) }}
     ) a ON b.ds = a.ds
     WHERE {{ render_between_time_constraint("b.ds", "2020-01-03", "2020-01-03") }}
+---
+integration_test:
+  name: simple_metric_with_sub_daily_dimension
+  description: Tests querying a metric with a sub-daily dimension
+  model: SIMPLE_MODEL
+  metrics: ["new_users"]
+  group_bys: ["user__last_profile_edit_ts__millisecond"]
+  check_query: |
+    SELECT
+      {{ render_date_trunc("last_profile_edit_ts", TimeGranularity.MILLISECOND) }} AS user__last_profile_edit_ts__millisecond
+      , SUM(1) AS new_users
+    FROM {{ source_schema }}.dim_users
+    GROUP BY {{ render_date_trunc("last_profile_edit_ts", TimeGranularity.MILLISECOND) }}
+---
+integration_test:
+  name: simple_metric_with_joined_sub_daily_dimension
+  description: Tests querying a metric with a sub-daily dimension that requires a join
+  model: SIMPLE_MODEL
+  metrics: ["bookings"]
+  group_bys: ["user__last_login_ts__minute"]
+  check_query: |
+    SELECT
+      subq_8.user__last_login_ts__minute AS listing__user__last_login_ts__minute
+      , SUM(subq_2.bookings) AS bookings
+    FROM (
+      SELECT
+       {{ render_date_trunc("ds_partitioned", TimeGranularity.DAY) }} AS ds_partitioned__day
+        , listing_id AS listing
+        , 1 AS bookings
+      FROM {{ source_schema }}.fct_bookings
+    ) subq_2
+    LEFT OUTER JOIN (
+      SELECT
+        {{ render_date_trunc("u.ds_partitioned", TimeGranularity.DAY) }} AS user__ds_partitioned__day
+        , {{ render_date_trunc("u.last_login_ts", TimeGranularity.MINUTE) }} AS user__last_login_ts__minute
+        , l.listing_id AS listing
+      FROM {{ source_schema }}.dim_listings_latest l
+      LEFT OUTER JOIN
+        {{ source_schema }}.dim_users u
+      ON
+        l.user_id = u.user_id
+    ) subq_8
+    ON
+      (
+        subq_2.listing = subq_8.listing
+      ) AND (
+        subq_2.ds_partitioned__day = subq_8.user__ds_partitioned__day
+      )
+    GROUP BY
+      subq_8.user__last_login_ts__minute

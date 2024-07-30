@@ -4,7 +4,8 @@ SELECT
 FROM (
   -- Read Elements From Semantic Model 'users_ds_source'
   SELECT
-    DATETIME_TRUNC(users_ds_source_src_28000.ds, day) AS ds__day
+    1 AS new_users
+    , DATETIME_TRUNC(users_ds_source_src_28000.ds, day) AS ds__day
     , DATETIME_TRUNC(users_ds_source_src_28000.ds, isoweek) AS ds__week
     , DATETIME_TRUNC(users_ds_source_src_28000.ds, month) AS ds__month
     , DATETIME_TRUNC(users_ds_source_src_28000.ds, quarter) AS ds__quarter
