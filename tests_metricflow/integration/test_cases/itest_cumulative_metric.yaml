@@ -610,7 +610,7 @@ integration_test:
         , 1 AS archived_users
       FROM {{ source_schema }}.dim_users
     ) subq_1
-    ON (subq_1.metric_time__hour <= subq_3.ts) AND (subq_1.metric_time__hour > subq_3.ts - INTERVAL 3 hour)
+    ON (subq_1.metric_time__hour <= subq_3.ts) AND (subq_1.metric_time__hour > {{ render_date_sub("subq_3", "Ts", 3, TimeGranularity.HOUR) }})
     GROUP BY subq_3.ts
 ---
 integration_test:
