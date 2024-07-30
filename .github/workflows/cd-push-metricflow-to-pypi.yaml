@@ -13,7 +13,11 @@ env:
 jobs:
   pypi-publish:
     runs-on: ubuntu-latest
-    environment: Pypi Publish
+    environment:
+      name: Pypi Publish
+      url: https://pypi.org/p/metricflow
+    permissions:
+      id-token: write
     steps:
       - name: Check-out the repo
         uses: actions/checkout@v3
@@ -23,5 +27,8 @@ jobs:
         with:
           python-version: "${{ env.PYTHON_VERSION }}"
 
-      - name: Hatch Publish `metricflow`
-        run: hatch build && hatch publish
+      - name: Build `metricflow` package
+        run: hatch build
+
+      - name: Publish `metricflow` package to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
