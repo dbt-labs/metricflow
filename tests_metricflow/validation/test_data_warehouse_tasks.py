@@ -63,7 +63,9 @@ def test_task_runner(sql_client: SqlClient, mf_test_configuration: MetricFlowTes
         return ("SELECT 'foo' AS foo", SqlBindParameters())
 
     tasks = [
-        DataWarehouseValidationTask(query_and_params_callable=good_query, error_message="Could not select foo"),
+        DataWarehouseValidationTask(
+            query_and_params_callable=good_query, description="Validating foo", error_message="Could not select foo"
+        ),
     ]
 
     issues = dw_validator.run_tasks(tasks=tasks)
@@ -73,7 +75,9 @@ def test_task_runner(sql_client: SqlClient, mf_test_configuration: MetricFlowTes
         return ("SELECT (true) AS col1 FROM doesnt_exist", SqlBindParameters())
 
     err_msg_bad = "Could not access table 'doesnt_exist' in data warehouse"
-    bad_task = DataWarehouseValidationTask(query_and_params_callable=bad_query, error_message=err_msg_bad)
+    bad_task = DataWarehouseValidationTask(
+        query_and_params_callable=bad_query, description="Validating foo", error_message=err_msg_bad
+    )
 
     tasks.append(bad_task)
     issues = dw_validator.run_tasks(tasks=tasks)
