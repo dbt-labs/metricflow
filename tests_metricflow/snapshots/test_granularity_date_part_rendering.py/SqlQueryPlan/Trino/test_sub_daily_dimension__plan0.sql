@@ -5,6 +5,7 @@ FROM (
   -- Read Elements From Semantic Model 'users_ds_source'
   SELECT
     1 AS new_users
+    , 1 AS archived_users
     , DATE_TRUNC('day', users_ds_source_src_28000.ds) AS ds__day
     , DATE_TRUNC('week', users_ds_source_src_28000.ds) AS ds__week
     , DATE_TRUNC('month', users_ds_source_src_28000.ds) AS ds__month
