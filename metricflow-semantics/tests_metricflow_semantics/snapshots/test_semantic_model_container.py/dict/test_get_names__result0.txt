@@ -41,6 +41,7 @@
     'max_booking_value',
     'median_booking_value',
     'min_booking_value',
+    'new_users',
     'referred_bookings',
     'smallest_listing',
     'total_account_balance_first_day',

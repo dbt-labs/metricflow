@@ -9,7 +9,7 @@ semantic_model:
 
   defaults:
     agg_time_dimension: created_at
-    
+
   dimensions:
     - name: ds
       type: time

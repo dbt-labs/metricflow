@@ -2265,4 +2265,3 @@ integration_test:
       )
     GROUP BY
       subq_8.user__last_login_ts__minute
-
