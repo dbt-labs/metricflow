@@ -87,6 +87,7 @@ class DataWarehouseValidationTask:
 
     query_and_params_callable: Callable[[], Tuple[str, SqlBindParameters]]
     error_message: str
+    description: str
     context: Optional[ValidationContext] = None
     on_fail_subtasks: List[DataWarehouseValidationTask] = field(default_factory=lambda: [])
 
@@ -155,6 +156,7 @@ class DataWarehouseTaskBuilder:
                         semantic_model=SemanticModelReference(semantic_model_name=semantic_model.name),
                     ),
                     error_message=f"Unable to access semantic model `{semantic_model.name}` in data warehouse",
+                    description=f"Validating semantic_model {semantic_model.name}",
                 )
             )
 
@@ -236,6 +238,7 @@ class DataWarehouseTaskBuilder:
                             element_type=SemanticModelElementType.DIMENSION,
                         ),
                         error_message=f"Unable to query dimension `{spec.qualified_name}` on semantic model `{semantic_model.name}` in data warehouse",
+                        description=f"Validating dimension `{spec.qualified_name}` in semantic_model `{semantic_model.name}`",
                     )
                 )
 
@@ -261,6 +264,7 @@ class DataWarehouseTaskBuilder:
                     ),
                     error_message=f"Failed to query dimensions in data warehouse for semantic model `{semantic_model.name}`",
                     on_fail_subtasks=semantic_model_sub_tasks,
+                    description=f"Validating all dimensions in semantic_model `{semantic_model.name}`",
                 )
             )
         return tasks
@@ -317,6 +321,7 @@ class DataWarehouseTaskBuilder:
                             element_type=SemanticModelElementType.ENTITY,
                         ),
                         error_message=f"Unable to query entity `{spec.element_name}` on semantic model `{semantic_model.name}` in data warehouse",
+                        description=f"Validating entity `{spec.element_name}` in semantic_model `{semantic_model.name}`",
                     )
                 )
 
@@ -341,6 +346,7 @@ class DataWarehouseTaskBuilder:
                     ),
                     error_message=f"Failed to query entities in data warehouse for semantic model `{semantic_model.name}`",
                     on_fail_subtasks=semantic_model_sub_tasks,
+                    description=f"Validating all entities in semantic_model `{semantic_model.name}`",
                 )
             )
         return tasks
@@ -413,6 +419,7 @@ class DataWarehouseTaskBuilder:
                             element_type=SemanticModelElementType.MEASURE,
                         ),
                         error_message=f"Unable to query measure `{spec.element_name}` on semantic model `{semantic_model.name}` in data warehouse",
+                        description=f"Validating measure `{spec.element_name}` in semantic_model `{semantic_model.name}`",
                     )
                 )
 
@@ -435,6 +442,7 @@ class DataWarehouseTaskBuilder:
                         ),
                         error_message=f"Failed to query measures in data warehouse for semantic model `{semantic_model.name}`",
                         on_fail_subtasks=source_node_to_sub_task[source_node],
+                        description=f"Validating all measures in semantic_model `{semantic_model.name}`",
                     )
                 )
         return tasks
@@ -478,7 +486,8 @@ class DataWarehouseTaskBuilder:
                         file_context=FileContext.from_metadata(metadata=metric.metadata),
                         metric=MetricModelReference(metric_name=metric.name),
                     ),
-                    error_message=f"Unable to query metric `{metric.name}`.",
+                    error_message=f"Unable to query metric `{metric.name}`",
+                    description=f"Validating metric `{metric.name}`",
                 )
             )
         return tasks
@@ -513,7 +522,8 @@ class DataWarehouseTaskBuilder:
                         element_type=SavedQueryElementType.METRIC,
                         element_value=saved_query.name,
                     ),
-                    error_message=f"Unable to query saved query `{saved_query.name}`.",
+                    error_message=f"Unable to query saved query `{saved_query.name}`",
+                    description=f"Validating saved_query `{saved_query.name}`",
                 )
             )
         return tasks
