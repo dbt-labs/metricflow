@@ -2265,3 +2265,68 @@ integration_test:
       )
     GROUP BY
       subq_8.user__last_login_ts__minute
+---
+integration_test:
+  name: subdaily_offset_window_metric
+  description: test a subdaily offset window metric
+  model: SIMPLE_MODEL
+  metrics: ["subdaily_offset_window_metric"]
+  group_bys: ["metric_time__hour"]
+  check_query: |
+    SELECT
+      subq_3.ts AS metric_time__hour
+      , SUM(subq_1.archived_users) AS subdaily_offset_window_metric
+    FROM {{ source_schema }}.mf_time_spine_hour subq_3
+    INNER JOIN (
+      SELECT
+       {{ render_date_trunc("archived_at", TimeGranularity.HOUR) }} AS metric_time__hour
+        , 1 AS archived_users
+      FROM {{ source_schema }}.dim_users
+    ) subq_1
+    ON {{ render_date_sub("subq_3", "ts", 1, TimeGranularity.HOUR) }} = subq_1.metric_time__hour
+    GROUP BY subq_3.ts
+---
+integration_test:
+  name: subdaily_offset_grain_to_date_metric
+  description: test a subdaily offset to grain metric
+  model: SIMPLE_MODEL
+  metrics: ["subdaily_offset_grain_to_date_metric"]
+  group_bys: ["metric_time__hour"]
+  check_query: |
+    SELECT
+      subq_3.ts AS metric_time__hour
+      , SUM(subq_1.archived_users) AS subdaily_offset_grain_to_date_metric
+    FROM {{ source_schema }}.mf_time_spine_hour subq_3
+    INNER JOIN (
+      SELECT
+        {{ render_date_trunc("archived_at", TimeGranularity.HOUR) }} AS metric_time__hour
+        , 1 AS archived_users
+      FROM {{ source_schema }}.dim_users
+    ) subq_1
+    ON  {{ render_date_trunc("subq_3.ts", TimeGranularity.HOUR) }} = subq_1.metric_time__hour
+    GROUP BY subq_3.ts
+---
+integration_test:
+  name: subdaily_join_to_time_spine_metric
+  description: test a subdaily join to time spine metric
+  model: SIMPLE_MODEL
+  metrics: ["subdaily_join_to_time_spine_metric"]
+  group_bys: ["metric_time__hour"]
+  check_query: |
+    SELECT
+      subq_5.ts AS metric_time__hour
+      , subq_3.archived_users AS subdaily_join_to_time_spine_metric
+    FROM {{ source_schema }}.mf_time_spine_hour subq_5
+    LEFT OUTER JOIN (
+      SELECT
+        metric_time__hour
+        , SUM(archived_users) AS archived_users
+      FROM (
+        SELECT
+          {{ render_date_trunc("archived_at", TimeGranularity.HOUR) }} AS metric_time__hour
+          , 1 AS archived_users
+        FROM {{ source_schema }}.dim_users
+      ) subq_2
+      GROUP BY metric_time__hour
+    ) subq_3
+    ON subq_5.ts = subq_3.metric_time__hour
