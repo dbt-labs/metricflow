@@ -13,7 +13,7 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_plan_snapshot_text_equal
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from tests_metricflow.dataflow_plan_to_svg import display_graph_if_requested
+from tests_metricflow.dataflow_plan_to_svg import display_dag_if_requested
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 from tests_metricflow.fixtures.sql_client_fixtures import sql_client  # noqa: F401, F403
 
@@ -52,7 +52,7 @@ def test_cyclic_join(
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
-    display_graph_if_requested(
+    display_dag_if_requested(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,

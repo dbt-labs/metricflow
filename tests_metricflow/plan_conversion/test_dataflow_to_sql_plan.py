@@ -53,7 +53,7 @@ from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTable
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
-from tests_metricflow.dataflow_plan_to_svg import display_graph_if_requested
+from tests_metricflow.dataflow_plan_to_svg import display_dag_if_requested
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 from tests_metricflow.sql.compare_sql_plan import assert_rendered_sql_from_plan_equal, assert_sql_plan_text_equal
 
@@ -74,7 +74,7 @@ def convert_and_check(
         optimization_level=SqlQueryOptimizationLevel.O0,
     )
     sql_query_plan = conversion_result.sql_plan
-    display_graph_if_requested(
+    display_dag_if_requested(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dag_graph=sql_query_plan,
@@ -101,7 +101,7 @@ def convert_and_check(
         optimization_level=SqlQueryOptimizationLevel.O4,
     )
     sql_query_plan = conversion_result.sql_plan
-    display_graph_if_requested(
+    display_dag_if_requested(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dag_graph=sql_query_plan,
@@ -550,7 +550,7 @@ def test_compute_metrics_node_simple_expr(
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
-    display_graph_if_requested(
+    display_dag_if_requested(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
@@ -625,7 +625,7 @@ def test_join_to_time_spine_node_without_offset(
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
-    display_graph_if_requested(
+    display_dag_if_requested(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
@@ -700,7 +700,7 @@ def test_join_to_time_spine_node_with_offset_window(
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
-    display_graph_if_requested(
+    display_dag_if_requested(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
@@ -776,7 +776,7 @@ def test_join_to_time_spine_node_with_offset_to_grain(
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
-    display_graph_if_requested(
+    display_dag_if_requested(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,

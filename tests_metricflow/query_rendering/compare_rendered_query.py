@@ -12,7 +12,7 @@ from metricflow.dataflow.optimizer.dataflow_optimizer_factory import DataflowPla
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
-from tests_metricflow.dataflow_plan_to_svg import display_graph_if_requested
+from tests_metricflow.dataflow_plan_to_svg import display_dag_if_requested
 from tests_metricflow.sql.compare_sql_plan import assert_rendered_sql_from_plan_equal
 
 
@@ -38,7 +38,7 @@ def render_and_check(
         sql_query_plan_id=DagId.from_str("plan0"),
     )
     sql_query_plan = conversion_result.sql_plan
-    display_graph_if_requested(
+    display_dag_if_requested(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dag_graph=sql_query_plan,
@@ -67,7 +67,7 @@ def render_and_check(
         sql_query_plan_id=DagId.from_str("plan0_optimized"),
     )
     sql_query_plan = conversion_result.sql_plan
-    display_graph_if_requested(
+    display_dag_if_requested(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dag_graph=sql_query_plan,

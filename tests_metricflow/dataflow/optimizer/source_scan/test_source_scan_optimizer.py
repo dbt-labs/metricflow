@@ -42,7 +42,7 @@ from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTable
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import SourceScanOptimizer
 from metricflow.dataset.dataset_classes import DataSet
-from tests_metricflow.dataflow_plan_to_svg import display_graph_if_requested
+from tests_metricflow.dataflow_plan_to_svg import display_dag_if_requested
 
 logger = logging.getLogger(__name__)
 
@@ -131,7 +131,7 @@ def check_optimization(  # noqa: D103
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
-    display_graph_if_requested(
+    display_dag_if_requested(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
@@ -150,7 +150,7 @@ def check_optimization(  # noqa: D103
         plan_snapshot_text=optimized_dataflow_plan.structure_text(),
     )
 
-    display_graph_if_requested(
+    display_dag_if_requested(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dag_graph=optimized_dataflow_plan,

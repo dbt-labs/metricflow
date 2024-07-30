@@ -21,7 +21,7 @@ from metricflow.dataflow.optimizer.source_scan.cm_branch_combiner import (
     ComputeMetricsBranchCombiner,
     ComputeMetricsBranchCombinerResult,
 )
-from tests_metricflow.dataflow_plan_to_svg import display_graph_if_requested
+from tests_metricflow.dataflow_plan_to_svg import display_dag_if_requested
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 
 
@@ -54,7 +54,7 @@ def test_read_sql_source_combination(
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
-    display_graph_if_requested(
+    display_dag_if_requested(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
@@ -92,7 +92,7 @@ def test_filter_combination(
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
-    display_graph_if_requested(
+    display_dag_if_requested(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,

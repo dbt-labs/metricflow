@@ -8,7 +8,7 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 from metricflow_semantics.test_helpers.snapshot_helpers import snapshot_path_prefix
 
 
-def display_graph_if_requested(
+def display_dag_if_requested(
     mf_test_configuration: MetricFlowTestConfiguration,
     request: FixtureRequest,
     dag_graph: DagGraphT,
