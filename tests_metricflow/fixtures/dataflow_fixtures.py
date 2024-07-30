@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Mapping
 
 import pytest
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
@@ -90,7 +91,30 @@ def scd_query_parser(  # noqa: D103
 
 
 @pytest.fixture(scope="session")
-def time_spine_source(  # noqa: D103
+def time_spine_sources(  # noqa: D103
     sql_client: SqlClient, mf_test_configuration: MetricFlowTestConfiguration  # noqa: F811
-) -> TimeSpineSource:
-    return TimeSpineSource(schema_name=mf_test_configuration.mf_source_schema, table_name="mf_time_spine")
+) -> Mapping[TimeGranularity, TimeSpineSource]:
+    legacy_time_spine_grain = TimeGranularity.DAY
+    time_spine_base_table_name = "mf_time_spine"
+    print("expected schema name:", mf_test_configuration.mf_source_schema)
+    # Legacy time spine
+    time_spine_sources = {
+        legacy_time_spine_grain: TimeSpineSource(
+            schema_name=mf_test_configuration.mf_source_schema, table_name=time_spine_base_table_name
+        )
+    }
+    # Current time spines
+    for granularity in TimeGranularity:
+        if (
+            granularity in sql_client.sql_engine_type.unsupported_granularities
+            or granularity.to_int() >= legacy_time_spine_grain.to_int()
+        ):
+            continue
+        time_spine_sources[granularity] = TimeSpineSource(
+            schema_name=mf_test_configuration.mf_source_schema,
+            table_name=f"{time_spine_base_table_name}_{granularity.value}",
+            time_column_name="ts",
+            time_column_granularity=granularity,
+        )
+
+    return time_spine_sources

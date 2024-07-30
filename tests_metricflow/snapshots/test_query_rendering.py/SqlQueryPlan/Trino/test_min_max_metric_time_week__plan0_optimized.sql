@@ -8,7 +8,7 @@ FROM (
   -- Pass Only Elements: ['metric_time__week',]
   SELECT
     DATE_TRUNC('week', ds) AS metric_time__week
-  FROM ***************************.mf_time_spine time_spine_src_28000
+  FROM ***************************.mf_time_spine time_spine_src_28006
   GROUP BY
     DATE_TRUNC('week', ds)
 ) subq_5

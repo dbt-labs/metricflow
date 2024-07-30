@@ -40,6 +40,7 @@ from metricflow_semantics.model.semantics.linkable_element import (
 from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
 from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY
+from metricflow_semantics.time.time_spine_source import TimeSpineSource
 
 if TYPE_CHECKING:
     from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
@@ -124,6 +125,7 @@ class ValidLinkableSpecResolver:
         # Sort semantic models by name for consistency in building derived objects.
         self._semantic_models = sorted(self._semantic_manifest.semantic_models, key=lambda x: x.name)
         self._join_evaluator = SemanticModelJoinEvaluator(semantic_model_lookup)
+        self._time_spine_sources = TimeSpineSource.create_from_manifest(self._semantic_manifest)
 
         assert max_entity_links >= 0
         self._max_entity_links = max_entity_links
@@ -454,6 +456,7 @@ class ValidLinkableSpecResolver:
         on what aggregation time dimension was used to define the measure.
         """
         measure_semantic_model: Optional[SemanticModel] = None
+        defined_granularity: Optional[TimeGranularity] = None
         if measure_reference:
             measure_semantic_model = self._get_semantic_model_for_measure(measure_reference)
             measure_agg_time_dimension_reference = measure_semantic_model.checked_agg_time_dimension_for_measure(
@@ -463,15 +466,20 @@ class ValidLinkableSpecResolver:
                 semantic_model=measure_semantic_model,
                 time_dimension_reference=measure_agg_time_dimension_reference,
             )
+            possible_metric_time_granularities = tuple(
+                time_granularity
+                for time_granularity in TimeGranularity
+                if defined_granularity.is_smaller_than_or_equal(time_granularity)
+            )
         else:
-            defined_granularity = DEFAULT_TIME_GRANULARITY
-
-        # It's possible to aggregate measures to coarser time granularities (except with cumulative metrics).
-        possible_metric_time_granularities = tuple(
-            time_granularity
-            for time_granularity in TimeGranularity
-            if defined_granularity.is_smaller_than_or_equal(time_granularity)
-        )
+            # If querying metric_time without metrics, will query from time spines.
+            # Defaults to DAY granularity if available in time spines, else smallest available granularity.
+            min_time_spine_granularity = min(self._time_spine_sources.keys())
+            possible_metric_time_granularities = tuple(
+                time_granularity
+                for time_granularity in TimeGranularity
+                if min_time_spine_granularity.is_smaller_than_or_equal(time_granularity)
+            )
 
         # For each of the possible time granularities, create a LinkableDimension.
         path_key_to_linkable_dimensions: Dict[ElementPathKey, List[LinkableDimension]] = defaultdict(list)

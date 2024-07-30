@@ -783,22 +783,3 @@ metric:
       name: listings
   filter: "{{ Metric('views', ['listing']) }} > 10"
   time_granularity: week
----
-metric:
-  name: bookings_before_dec_20_2019
-  description: Bookings up to the end of 2022
-  type: simple
-  type_params:
-    measure: bookings
-  filter: "{{ TimeDimension('metric_time') }} < '2012-12-20'"
----
-metric:
-  name: bookings_between_dec_18_2019_and_dec_20_2019
-  description: Bookings starting in 2020. Used to test a metric with different types of ambiguous filters in on its input metric.
-  type: derived
-  type_params:
-    expr: bookings_before_dec_20_2019
-    metrics:
-      - name: bookings_before_dec_20_2019
-        filter: "{{ TimeDimension('metric_time') }} > '2019-12-18'"
-  time_granularity: week

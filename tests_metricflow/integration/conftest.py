@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Mapping
 
 import pytest
 from dbt_semantic_interfaces.test_utils import as_datetime
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
@@ -29,7 +31,7 @@ def it_helpers(  # noqa: D103
     sql_client: SqlClient,
     create_source_tables: bool,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
-    time_spine_source: TimeSpineSource,
+    time_spine_sources: Mapping[TimeGranularity, TimeSpineSource],
     mf_test_configuration: MetricFlowTestConfiguration,
 ) -> IntegrationTestHelpers:
     return IntegrationTestHelpers(

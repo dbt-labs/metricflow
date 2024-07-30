@@ -23,6 +23,23 @@ semantic_model:
         time_granularity: day
     - name: home_state
       type: categorical
+    - name: last_profile_edit_ts
+      type: time
+      type_params:
+        time_granularity: millisecond
+    - name: bio_added_ts
+      type: time
+      type_params:
+        time_granularity: second
+    - name: last_login_ts
+      type: time
+      type_params:
+        time_granularity: minute
+    - name: archived_at
+      type: time
+      type_params:
+        time_granularity: hour
+
 
   entities:
     - name: user

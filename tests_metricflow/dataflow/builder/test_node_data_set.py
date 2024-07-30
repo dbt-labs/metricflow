@@ -5,6 +5,7 @@ from typing import Mapping
 
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.references import SemanticModelElementReference
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.aggregation_properties import AggregationState
 from metricflow_semantics.instances import (
     InstanceSet,
@@ -38,7 +39,7 @@ logger = logging.getLogger(__name__)
 
 def test_no_parent_node_data_set(
     simple_semantic_manifest_lookup: SemanticManifestLookup,
-    time_spine_source: TimeSpineSource,
+    time_spine_sources: Mapping[TimeGranularity, TimeSpineSource],
 ) -> None:
     """Tests getting the data set from a single node."""
     resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
@@ -93,7 +94,7 @@ def test_joined_node_data_set(
     mf_test_configuration: MetricFlowTestConfiguration,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     simple_semantic_manifest_lookup: SemanticManifestLookup,
-    time_spine_source: TimeSpineSource,
+    time_spine_sources: Mapping[TimeGranularity, TimeSpineSource],
 ) -> None:
     """Tests getting the data set from a dataflow plan with a join."""
     resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
