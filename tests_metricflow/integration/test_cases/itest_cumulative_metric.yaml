@@ -592,3 +592,43 @@ integration_test:
         , metric_time__year
         , t2mr
     ) subq_9
+---
+integration_test:
+  name: subdaily_cumulative_window_metric
+  description: test a subdaily cumulative window metric
+  model: SIMPLE_MODEL
+  metrics: ["subdaily_cumulative_window_metric"]
+  group_bys: ["metric_time__hour"]
+  check_query: |
+    SELECT
+      subq_3.ts AS metric_time__hour
+      , SUM(subq_1.archived_users) AS subdaily_cumulative_window_metric
+    FROM {{ source_schema }}.mf_time_spine_hour subq_3
+    INNER JOIN (
+      SELECT
+        {{ render_date_trunc("archived_at", TimeGranularity.HOUR) }} AS metric_time__hour
+        , 1 AS archived_users
+      FROM {{ source_schema }}.dim_users
+    ) subq_1
+    ON (subq_1.metric_time__hour <= subq_3.ts) AND (subq_1.metric_time__hour > {{ render_date_sub("subq_3", "Ts", 3, TimeGranularity.HOUR) }})
+    GROUP BY subq_3.ts
+---
+integration_test:
+  name: subdaily_cumulative_grain_to_date_metric
+  description: test a subdaily cumulative grain_to_date metric
+  model: SIMPLE_MODEL
+  metrics: ["subdaily_cumulative_grain_to_date_metric"]
+  group_bys: ["metric_time__hour"]
+  check_query: |
+    SELECT
+      subq_3.ts AS metric_time__hour
+      , SUM(subq_1.archived_users) AS subdaily_cumulative_grain_to_date_metric
+    FROM {{ source_schema }}.mf_time_spine_hour subq_3
+    INNER JOIN (
+      SELECT
+        {{ render_date_trunc("archived_at", TimeGranularity.HOUR) }} AS metric_time__hour
+        , 1 AS archived_users
+      FROM {{ source_schema }}.dim_users
+    ) subq_1
+    ON (subq_1.metric_time__hour <= subq_3.ts) AND (subq_1.metric_time__hour >= {{ render_date_trunc("subq_3.ts", TimeGranularity.HOUR) }})
+    GROUP BY subq_3.ts

@@ -321,7 +321,7 @@
                                 <!-- node_id = NodeId(id_str='ss_28011') -->
                                 <!-- col0 =                                                      -->
                                 <!--   SqlSelectColumn(                                          -->
-                                <!--     expr=SqlStringExpression(node_id=str_28008 sql_expr=1), -->
+                                <!--     expr=SqlStringExpression(node_id=str_28009 sql_expr=1), -->
                                 <!--     column_alias='visits',                                  -->
                                 <!--   )                                                         -->
                                 <!-- col1 =                                                   -->
@@ -860,7 +860,7 @@
                                             <!-- node_id = NodeId(id_str='ss_28011') -->
                                             <!-- col0 =                                                      -->
                                             <!--   SqlSelectColumn(                                          -->
-                                            <!--     expr=SqlStringExpression(node_id=str_28008 sql_expr=1), -->
+                                            <!--     expr=SqlStringExpression(node_id=str_28009 sql_expr=1), -->
                                             <!--     column_alias='visits',                                  -->
                                             <!--   )                                                         -->
                                             <!-- col1 =                                                   -->

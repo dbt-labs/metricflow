@@ -24,6 +24,7 @@
     'account_balance',
     'approximate_continuous_booking_value_p99',
     'approximate_discrete_booking_value_p99',
+    'archived_users',
     'average_booking_value',
     'bookers',
     'booking_payments',

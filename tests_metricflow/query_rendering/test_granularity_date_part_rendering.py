@@ -212,3 +212,118 @@ def test_simple_metric_with_joined_sub_daily_dimension(  # noqa: D103
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_subdaily_cumulative_window_metric(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    query_spec = MetricFlowQuerySpec(
+        metric_specs=(MetricSpec("subdaily_cumulative_window_metric"),),
+        time_dimension_specs=(DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.HOUR),),
+    )
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_subdaily_cumulative_grain_to_date_metric(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    query_spec = MetricFlowQuerySpec(
+        metric_specs=(MetricSpec("subdaily_cumulative_grain_to_date_metric"),),
+        time_dimension_specs=(DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.HOUR),),
+    )
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_subdaily_offset_window_metric(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    query_spec = MetricFlowQuerySpec(
+        metric_specs=(MetricSpec("subdaily_offset_window_metric"),),
+        time_dimension_specs=(DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.HOUR),),
+    )
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_subdaily_offset_to_grain_metric(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    query_spec = MetricFlowQuerySpec(
+        metric_specs=(MetricSpec("subdaily_offset_grain_to_date_metric"),),
+        time_dimension_specs=(DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.HOUR),),
+    )
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_subdaily_join_to_time_spine_metric(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    query_spec = MetricFlowQuerySpec(
+        metric_specs=(MetricSpec("subdaily_join_to_time_spine_metric"),),
+        time_dimension_specs=(DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.HOUR),),
+    )
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )

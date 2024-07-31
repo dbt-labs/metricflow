@@ -2183,7 +2183,7 @@
                                         <!-- node_id = NodeId(id_str='ss_28010') -->
                                         <!-- col0 =                                                      -->
                                         <!--   SqlSelectColumn(                                          -->
-                                        <!--     expr=SqlStringExpression(node_id=str_28007 sql_expr=1), -->
+                                        <!--     expr=SqlStringExpression(node_id=str_28008 sql_expr=1), -->
                                         <!--     column_alias='views',                                   -->
                                         <!--   )                                                         -->
                                         <!-- col1 =                                             -->
