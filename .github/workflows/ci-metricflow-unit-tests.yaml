@@ -84,3 +84,20 @@ jobs:
 
       - name: Test `metricflow` Package
         run: bash scripts/ci_tests/metricflow_package_test.sh
+
+
+  metricflow-project-configuration-tests:
+    name: MetricFlow Project Configuration Tests
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Check-out the repo
+        uses: actions/checkout@v3
+
+      - name: Setup Python ${{ inputs.python-version }} Environment
+        uses: ./.github/actions/setup-python-env
+        with:
+          python-version: 3.12
+
+      - name: Check Dev Dependencies
+        run: hatch run dev-env:python scripts/ci_tests/metricflow_semantics_package_test.sh
