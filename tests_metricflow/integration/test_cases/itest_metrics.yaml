@@ -1704,7 +1704,7 @@ integration_test:
       SELECT
         ds AS metric_time__day
       FROM {{ source_schema }}.mf_time_spine subq_6
-      WHERE {{ render_between_time_constraint("ds", "2019-12-19", "2020-01-02") }}
+      WHERE {{ render_time_constraint("ds", "2019-12-19", "2020-01-02") }}
     ) subq_5
     INNER JOIN (
       SELECT
@@ -2192,7 +2192,7 @@ integration_test:
     SELECT
       SUM(1) AS bookings_join_to_time_spine
     FROM {{ source_schema }}.fct_bookings
-    WHERE {{ render_between_time_constraint("ds", "2020-01-03", "2020-01-03") }}
+    WHERE {{ render_time_constraint("ds", "2020-01-03", "2020-01-03") }}
 ---
 integration_test:
   name: join_to_time_spine_with_queried_time_constraint
@@ -2211,10 +2211,10 @@ integration_test:
         {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS ds
         , SUM(1) AS bookings
       FROM {{ source_schema }}.fct_bookings
-      WHERE {{ render_between_time_constraint("ds", "2020-01-03", "2020-01-03") }}
+      WHERE {{ render_time_constraint("ds", "2020-01-03", "2020-01-03") }}
       GROUP BY {{ render_date_trunc("ds", TimeGranularity.DAY) }}
     ) a ON b.ds = a.ds
-    WHERE {{ render_between_time_constraint("b.ds", "2020-01-03", "2020-01-03") }}
+    WHERE {{ render_time_constraint("b.ds", "2020-01-03", "2020-01-03") }}
 ---
 integration_test:
   name: simple_metric_with_sub_daily_dimension
