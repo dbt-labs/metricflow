@@ -344,7 +344,8 @@ class MetricFlowQueryParser:
         order_by: Optional[Sequence[OrderByQueryParameter]],
         min_max_only: bool,
     ) -> ParseQueryResult:
-        # TODO: validate min_max_only - can only be called for non-metric queries
+        if min_max_only and (metric_names or metrics):
+            raise InvalidQueryException("Cannot use min_max_only param for queries with metrics.")
         assert_at_most_one_arg_set(metric_names=metric_names, metrics=metrics)
         assert_at_most_one_arg_set(group_by_names=group_by_names, group_by=group_by)
         assert_at_most_one_arg_set(order_by_names=order_by_names, order_by=order_by)
