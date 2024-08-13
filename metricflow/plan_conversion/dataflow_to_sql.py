@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime as dt
 import logging
 from collections import OrderedDict
 from typing import List, Optional, Sequence, Set, Tuple, Union
@@ -39,7 +40,7 @@ from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
-from metricflow_semantics.time.time_constants import ISO8601_PYTHON_FORMAT
+from metricflow_semantics.time.time_constants import ISO8601_PYTHON_FORMAT, ISO8601_PYTHON_TS_FORMAT
 from metricflow_semantics.time.time_spine_source import TIME_SPINE_DATA_SET_DESCRIPTION, TimeSpineSource
 
 from metricflow.dataflow.dataflow_plan import (
@@ -146,20 +147,32 @@ logger = logging.getLogger(__name__)
 def _make_time_range_comparison_expr(
     table_alias: str, column_alias: str, time_range_constraint: TimeRangeConstraint
 ) -> SqlExpressionNode:
-    """Build an expression like "ds BETWEEN CAST('2020-01-01' AS TIMESTAMP) AND CAST('2020-01-02' AS TIMESTAMP)."""
-    # TODO: Update when adding < day granularity support.
+    """Build an expression like "ds BETWEEN CAST('2020-01-01' AS TIMESTAMP) AND CAST('2020-01-02' AS TIMESTAMP).
+
+    If the constraint uses day or larger grain, only render to the date level. Otherwise, render to the timestamp level.
+    """
+
+    def strip_time_from_dt(ts: dt.datetime) -> dt.datetime:
+        date_obj = ts.date()
+        return dt.datetime(date_obj.year, date_obj.month, date_obj.day)
+
+    constraint_uses_day_or_larger_grain = True
+    for constraint_input in (time_range_constraint.start_time, time_range_constraint.end_time):
+        if strip_time_from_dt(constraint_input) != constraint_input:
+            constraint_uses_day_or_larger_grain = False
+            break
+
+    time_format_to_render = ISO8601_PYTHON_FORMAT if constraint_uses_day_or_larger_grain else ISO8601_PYTHON_TS_FORMAT
+
     return SqlBetweenExpression.create(
         column_arg=SqlColumnReferenceExpression.create(
-            SqlColumnReference(
-                table_alias=table_alias,
-                column_name=column_alias,
-            )
+            SqlColumnReference(table_alias=table_alias, column_name=column_alias)
         ),
         start_expr=SqlStringLiteralExpression.create(
-            literal_value=time_range_constraint.start_time.strftime(ISO8601_PYTHON_FORMAT),
+            literal_value=time_range_constraint.start_time.strftime(time_format_to_render),
         ),
         end_expr=SqlStringLiteralExpression.create(
-            literal_value=time_range_constraint.end_time.strftime(ISO8601_PYTHON_FORMAT),
+            literal_value=time_range_constraint.end_time.strftime(time_format_to_render),
         ),
     )
 
