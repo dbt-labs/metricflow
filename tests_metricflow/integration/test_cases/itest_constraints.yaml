@@ -240,7 +240,7 @@ integration_test:
     SELECT
       {{ render_date_trunc("ts", TimeGranularity.SECOND) }} AS metric_time__second
     FROM {{ source_schema }}.mf_time_spine_second
-    WHERE {{ render_date_trunc("ts", TimeGranularity.SECOND) }} BETWEEN '2020-01-01 00:00:02' AND '2020-01-01 00:00:08'
+    WHERE {{ render_time_constraint(render_date_trunc("ts", TimeGranularity.SECOND), "2020-01-01 00:00:02", "2020-01-01 00:00:08") }}
     GROUP BY {{ render_date_trunc("ts", TimeGranularity.SECOND) }}
 ---
 integration_test:
@@ -262,4 +262,27 @@ integration_test:
       FROM {{ source_schema }}.dim_users
       GROUP BY metric_time__hour
     ) subq_4 ON ts = subq_4.metric_time__hour
-    WHERE ts BETWEEN '2020-01-01 02:00:00' AND '2020-01-03 05:00:00'
+    WHERE {{ render_time_constraint("ts", "2020-01-01 02:00:00", "2020-01-03 05:00:00") }}
+---
+integration_test:
+  name: test_subdaily_time_constraint_adjusted
+  description: Tests a sub-daily time constraint that requires adjusting.
+  model: SIMPLE_MODEL
+  metrics: ["subdaily_join_to_time_spine_metric"]
+  group_bys: ["metric_time__hour"]
+  time_constraint: ["2020-01-01 02:00:25", "2020-01-03 05:00:53"]
+  check_query: |
+    SELECT
+      ts AS metric_time__hour
+      , subdaily_join_to_time_spine_metric
+    FROM {{ source_schema }}.mf_time_spine_hour
+    LEFT OUTER JOIN (
+      SELECT
+        {{ render_date_trunc("archived_at", TimeGranularity.HOUR) }} AS metric_time__hour
+        , SUM(1) AS subdaily_join_to_time_spine_metric
+      FROM {{ source_schema }}.dim_users
+      WHERE {{ render_time_constraint(render_date_trunc("archived_at", TimeGranularity.HOUR), "2020-01-01 02:00:00", "2020-01-03 05:59:59") }}
+      GROUP BY {{ render_date_trunc("archived_at", TimeGranularity.HOUR) }}
+    ) subq_4
+    ON ts = subq_4.metric_time__hour
+    WHERE {{ render_time_constraint("ts", "2020-01-01 02:00:00", "2020-01-03 05:59:59") }}

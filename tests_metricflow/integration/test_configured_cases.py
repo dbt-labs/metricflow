@@ -57,12 +57,14 @@ class CheckQueryHelpers:
     ) -> str:
         """Render an expression like "ds >='2020-01-01' AND ds < '2020-01-02'" for start_time = stop_time = '2020-01-01'."""
         start_expr = self.cast_to_ts(f"{start_time}")
-        time_format = "%Y-%m-%d"
-        stop_time_plus_one_day = (
-            datetime.datetime.strptime(stop_time, time_format) + datetime.timedelta(days=1)
-        ).strftime(time_format)
+        time_format = "%Y-%m-%d" if len(start_time) == 10 else "%Y-%m-%d %H:%M:%S"
+        stop_time_dt = datetime.datetime.strptime(stop_time, time_format)
+        if len(start_time) == 10:
+            stop_time = (stop_time_dt + datetime.timedelta(days=1)).strftime(time_format)
+        else:
+            stop_time = (stop_time_dt + datetime.timedelta(seconds=1)).strftime(time_format)
 
-        stop_expr = self.cast_to_ts(f"{stop_time_plus_one_day}")
+        stop_expr = self.cast_to_ts(f"{stop_time}")
         return f"{self.cast_expr_to_ts(expr)} >= {start_expr} AND {self.cast_expr_to_ts(expr)} < {stop_expr}"
 
     def cast_expr_to_ts(self, expr: str) -> str:
