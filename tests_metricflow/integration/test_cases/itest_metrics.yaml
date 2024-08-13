@@ -2330,3 +2330,5 @@ integration_test:
       GROUP BY metric_time__hour
     ) subq_3
     ON subq_5.ts = subq_3.metric_time__hour
+
+# test_subdaiy_metric_default_granularity
