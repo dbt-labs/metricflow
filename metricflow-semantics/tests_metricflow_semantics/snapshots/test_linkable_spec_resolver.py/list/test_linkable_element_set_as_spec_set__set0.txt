@@ -456,6 +456,8 @@
   'user__revenue_all_time',
   'user__revenue_instance__user__revenue',
   'user__revenue_instance__user__revenue_all_time',
+  'user__simple_subdaily_metric_default_day',
+  'user__simple_subdaily_metric_default_hour',
   'user__smallest_listing',
   'user__subdaily_join_to_time_spine_metric',
   'user__total_account_balance_first_day',
