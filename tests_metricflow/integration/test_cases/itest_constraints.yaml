@@ -229,3 +229,37 @@ integration_test:
     FROM {{ source_schema }}.fct_bookings b
     LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest l ON b.listing_id = l.listing_id
     WHERE NOT b.is_instant AND (NOT l.is_lux OR l.is_lux IS NULL)
+---
+integration_test:
+  name: test_subdaily_time_constraint
+  description: Test a sub-daily time constraint on a no-metric query.
+  model: SIMPLE_MODEL
+  group_bys: ["metric_time__second"]
+  time_constraint: ["2020-01-01 00:00:02", "2020-01-01 00:00:08"]
+  check_query: |
+    SELECT
+      {{ render_date_trunc("ts", TimeGranularity.SECOND) }} AS metric_time__second
+    FROM {{ source_schema }}.mf_time_spine_second
+    WHERE {{ render_date_trunc("ts", TimeGranularity.SECOND) }} BETWEEN '2020-01-01 00:00:02' AND '2020-01-01 00:00:08'
+    GROUP BY {{ render_date_trunc("ts", TimeGranularity.SECOND) }}
+---
+integration_test:
+  name: test_subdaily_time_constraint_with_metric
+  description: Test a sub-daily time constraint on a metric query.
+  model: SIMPLE_MODEL
+  metrics: ["subdaily_join_to_time_spine_metric"]
+  group_bys: ["metric_time__hour"]
+  time_constraint: ["2020-01-01 02:00:00", "2020-01-03 05:00:00"]
+  check_query: |
+    SELECT
+      ts AS metric_time__hour
+      , archived_users AS subdaily_join_to_time_spine_metric
+    FROM {{ source_schema }}.mf_time_spine_hour
+    LEFT OUTER JOIN (
+      SELECT
+        {{ render_date_trunc("archived_at", TimeGranularity.HOUR) }} AS metric_time__hour
+        , SUM(1) AS archived_users
+      FROM {{ source_schema }}.dim_users
+      GROUP BY metric_time__hour
+    ) subq_4 ON ts = subq_4.metric_time__hour
+    WHERE ts BETWEEN '2020-01-01 02:00:00' AND '2020-01-03 05:00:00'

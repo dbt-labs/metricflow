@@ -6,11 +6,14 @@ the rendered output against snapshot files.
 
 from __future__ import annotations
 
+import datetime as dt
+
 import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
@@ -317,6 +320,57 @@ def test_subdaily_join_to_time_spine_metric(  # noqa: D103
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec("subdaily_join_to_time_spine_metric"),),
         time_dimension_specs=(DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.HOUR),),
+    )
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_subdaily_time_constraint_without_metrics(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    query_spec = MetricFlowQuerySpec(
+        time_dimension_specs=(DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.SECOND),),
+        time_range_constraint=TimeRangeConstraint(
+            start_time=dt.datetime(2020, 1, 1, 0, 0, 2), end_time=dt.datetime(2020, 1, 1, 0, 0, 8)
+        ),
+    )
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_subdaily_time_constraint_with_metric(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    query_spec = MetricFlowQuerySpec(
+        metric_specs=(MetricSpec("subdaily_join_to_time_spine_metric"),),
+        time_dimension_specs=(DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.HOUR),),
+        time_range_constraint=TimeRangeConstraint(
+            start_time=dt.datetime(2020, 1, 1, 2), end_time=dt.datetime(2020, 1, 1, 5)
+        ),
     )
 
     render_and_check(
