@@ -90,9 +90,9 @@ class DateutilTimePeriodAdjuster(TimePeriodAdjuster):
         elif time_granularity is TimeGranularity.SECOND:
             return date_to_adjust
         elif time_granularity is TimeGranularity.MINUTE:
-            return date_to_adjust + relativedelta(second=0, microsecond=0)
+            return date_to_adjust + relativedelta(second=0)
         elif time_granularity is TimeGranularity.HOUR:
-            return date_to_adjust + relativedelta(minute=0, second=0, microsecond=0)
+            return date_to_adjust + relativedelta(minute=0, second=0)
         elif time_granularity is TimeGranularity.DAY:
             return date_to_adjust
         elif time_granularity is TimeGranularity.WEEK:
@@ -141,9 +141,9 @@ class DateutilTimePeriodAdjuster(TimePeriodAdjuster):
         elif time_granularity is TimeGranularity.SECOND:
             return date_to_adjust
         elif time_granularity is TimeGranularity.MINUTE:
-            return date_to_adjust + relativedelta(second=59, microsecond=999999)
+            return date_to_adjust + relativedelta(second=59)
         elif time_granularity is TimeGranularity.HOUR:
-            return date_to_adjust + relativedelta(minute=59, second=59, microsecond=999999)
+            return date_to_adjust + relativedelta(minute=59, second=59)
         elif time_granularity is TimeGranularity.DAY:
             return date_to_adjust
         elif time_granularity is TimeGranularity.WEEK:
