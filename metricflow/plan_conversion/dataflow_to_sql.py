@@ -242,7 +242,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         ]
         if not compatible_time_spine_grains:
             raise RuntimeError(
-                # TODO: update docs link when new docs are available
                 f"This query requires a time spine with granularity {smallest_agg_time_grain.name} or smaller, which is not configured. "
                 f"The smallest available time spine granularity is {min(self._time_spine_sources.keys()).name}, which is too large."
                 "See documentation for how to configure a new time spine: https://docs.getdbt.com/docs/build/metricflow-time-spine"
