@@ -260,7 +260,7 @@ integration_test:
         {{ render_date_trunc("archived_at", TimeGranularity.HOUR) }} AS metric_time__hour
         , SUM(1) AS archived_users
       FROM {{ source_schema }}.dim_users
-      GROUP BY metric_time__hour
+      GROUP BY {{ render_date_trunc("archived_at", TimeGranularity.HOUR) }}
     ) subq_4 ON ts = subq_4.metric_time__hour
     WHERE {{ render_time_constraint("ts", "2020-01-01 02:00:00", "2020-01-03 05:00:00") }}
 ---
