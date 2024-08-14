@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-from copy import deepcopy
 from typing import Optional
 
 import dateutil.relativedelta
@@ -75,7 +74,6 @@ class DateutilTimePeriodAdjuster(TimePeriodAdjuster):
             time_granularity: The granularity of the time dimension that will be constrained.
             date_to_adjust: The time constraint start date.
         """
-        date_to_adjust = deepcopy(date_to_adjust)
         # Strip time data that is irrelevant to avoid rendering an unnecessarily complex time constraint.
         date_to_adjust = date_to_adjust.replace(microsecond=0)
         if time_granularity.to_int() >= TimeGranularity.DAY.to_int():
@@ -126,7 +124,6 @@ class DateutilTimePeriodAdjuster(TimePeriodAdjuster):
             time_granularity: The granularity of the time dimension that will be constrained.
             date_to_adjust: The time constraint end date.
         """
-        date_to_adjust = deepcopy(date_to_adjust)
         # Strip time data that is irrelevant to avoid rendering an unnecessarily complex time constraint.
         date_to_adjust = date_to_adjust.replace(microsecond=0)
         if time_granularity.to_int() >= TimeGranularity.DAY.to_int():
