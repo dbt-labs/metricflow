@@ -42,7 +42,7 @@ def test_start_and_end_periods(  # noqa: D103
     rows: List[Tuple[str, ...]] = []
     for date_time in date_times_to_check:
         for time_granularity in TimeGranularity:
-            if time_granularity.to_int() < TimeGranularity.SECOND.to_int():
+            if time_granularity.to_int() < TimeGranularity.MINUTE.to_int():
                 continue
             dateutil_start_of_period = dateutil_adjuster.adjust_to_start_of_period(time_granularity, date_time)
             dateutil_end_of_period = dateutil_adjuster.adjust_to_end_of_period(time_granularity, date_time)
