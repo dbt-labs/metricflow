@@ -2346,7 +2346,7 @@ integration_test:
 ---
 integration_test:
   name: subdaily_metric_default_granularity
-  description: test that a subdaily metric without explicit default granularity defaults to DAY
+  description: test that a subdaily metric with an explicit default granularity uses its specified default
   model: SIMPLE_MODEL
   metrics: ["simple_subdaily_metric_default_hour"]
   group_bys: ["metric_time"]
