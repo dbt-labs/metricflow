@@ -2330,3 +2330,29 @@ integration_test:
       GROUP BY metric_time__hour
     ) subq_3
     ON subq_5.ts = subq_3.metric_time__hour
+---
+integration_test:
+  name: subdaily_metric_defaults_to_day_granularity
+  description: test that a subdaily metric without explicit default granularity defaults to DAY
+  model: SIMPLE_MODEL
+  metrics: ["simple_subdaily_metric_default_day"]
+  group_bys: ["metric_time"]
+  check_query: |
+    SELECT
+      {{ render_date_trunc("archived_at", TimeGranularity.DAY) }} AS metric_time__day
+      , SUM(1) AS simple_subdaily_metric_default_day
+    FROM {{ source_schema }}.dim_users
+    GROUP BY {{ render_date_trunc("archived_at", TimeGranularity.DAY) }}
+---
+integration_test:
+  name: subdaily_metric_default_granularity
+  description: test that a subdaily metric with an explicit default granularity uses its specified default
+  model: SIMPLE_MODEL
+  metrics: ["simple_subdaily_metric_default_hour"]
+  group_bys: ["metric_time"]
+  check_query: |
+    SELECT
+      {{ render_date_trunc("archived_at", TimeGranularity.HOUR) }} AS metric_time__hour
+      , SUM(1) AS simple_subdaily_metric_default_hour
+    FROM {{ source_schema }}.dim_users
+    GROUP BY {{ render_date_trunc("archived_at", TimeGranularity.HOUR) }}

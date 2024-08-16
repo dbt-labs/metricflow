@@ -188,6 +188,8 @@ Model Join-Path                             Entity Links                        
 ('listings_latest',)                        ("('user',)", "('user',)")                     regional_starting_balance_ratios                                                      ['JOINED', 'METRIC']
 ('listings_latest',)                        ("('user',)", "('user',)")                     revenue                                                                               ['JOINED', 'METRIC']
 ('listings_latest',)                        ("('user',)", "('user',)")                     revenue_all_time                                                                      ['JOINED', 'METRIC']
+('listings_latest',)                        ("('user',)", "('user',)")                     simple_subdaily_metric_default_day                                                    ['JOINED', 'METRIC']
+('listings_latest',)                        ("('user',)", "('user',)")                     simple_subdaily_metric_default_hour                                                   ['JOINED', 'METRIC']
 ('listings_latest',)                        ("('user',)", "('user',)")                     smallest_listing                                                                      ['JOINED', 'METRIC']
 ('listings_latest',)                        ("('user',)", "('user',)")                     subdaily_join_to_time_spine_metric                                                    ['JOINED', 'METRIC']
 ('listings_latest',)                        ("('user',)", "('user',)")                     total_account_balance_first_day                                                       ['JOINED', 'METRIC']

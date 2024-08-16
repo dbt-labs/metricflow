@@ -381,3 +381,26 @@ def test_subdaily_time_constraint_with_metric(  # noqa: D103
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_subdaily_granularity_overrides_metric_default_granularity(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    query_spec = MetricFlowQuerySpec(
+        metric_specs=(MetricSpec("subdaily_join_to_time_spine_metric"),),
+        time_dimension_specs=(DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.HOUR),),
+    )
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
