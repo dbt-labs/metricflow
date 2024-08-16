@@ -1,0 +1,6 @@
+kind: Features
+body: Enable sub-daily time constraints.
+time: 2024-08-13T16:48:01.624855-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1367"

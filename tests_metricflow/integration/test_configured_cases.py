@@ -57,29 +57,15 @@ class CheckQueryHelpers:
     ) -> str:
         """Render an expression like "ds >='2020-01-01' AND ds < '2020-01-02'" for start_time = stop_time = '2020-01-01'."""
         start_expr = self.cast_to_ts(f"{start_time}")
-        time_format = "%Y-%m-%d"
-        stop_time_plus_one_day = (
-            datetime.datetime.strptime(stop_time, time_format) + datetime.timedelta(days=1)
-        ).strftime(time_format)
+        time_format = "%Y-%m-%d" if len(start_time) == 10 else "%Y-%m-%d %H:%M:%S"
+        stop_time_dt = datetime.datetime.strptime(stop_time, time_format)
+        if len(start_time) == 10:
+            stop_time = (stop_time_dt + datetime.timedelta(days=1)).strftime(time_format)
+        else:
+            stop_time = (stop_time_dt + datetime.timedelta(seconds=1)).strftime(time_format)
 
-        stop_expr = self.cast_to_ts(f"{stop_time_plus_one_day}")
-        return f"{self.cast_expr_to_ts(expr)} >= {start_expr} AND {self.cast_expr_to_ts(expr)} < {stop_expr}"
-
-    def render_between_time_constraint(
-        self,
-        expr: str,
-        start_time: str,
-        stop_time: str,
-    ) -> str:
-        """Render an expression like "ds between timestamp '2020-01-01' AND timestamp '2020-01-02'".
-
-        This will cast the literals as needed for each engine, and provide an alternative to incrementing
-        the date as we do in render_time_constraint. Using BETWEEN is more robust for cases involving potentially
-        mixed granularities.
-        """
-        start_expr = self.cast_to_ts(f"{start_time}")
         stop_expr = self.cast_to_ts(f"{stop_time}")
-        return f"{expr} BETWEEN {start_expr} AND {stop_expr}"
+        return f"{self.cast_expr_to_ts(expr)} >= {start_expr} AND {self.cast_expr_to_ts(expr)} < {stop_expr}"
 
     def cast_expr_to_ts(self, expr: str) -> str:
         """Returns the expression as a new expression cast to the timestamp type, if applicable for the DB."""
@@ -295,7 +281,6 @@ def test_case(
                 ).render(
                     source_schema=mf_test_configuration.mf_source_schema,
                     render_time_constraint=check_query_helpers.render_time_constraint,
-                    render_between_time_constraint=check_query_helpers.render_between_time_constraint,
                     TimeGranularity=TimeGranularity,
                     DatePart=DatePart,
                     render_date_sub=check_query_helpers.render_date_sub,
@@ -328,7 +313,6 @@ def test_case(
         ).render(
             source_schema=mf_test_configuration.mf_source_schema,
             render_time_constraint=check_query_helpers.render_time_constraint,
-            render_between_time_constraint=check_query_helpers.render_between_time_constraint,
             TimeGranularity=TimeGranularity,
             DatePart=DatePart,
             render_date_sub=check_query_helpers.render_date_sub,
