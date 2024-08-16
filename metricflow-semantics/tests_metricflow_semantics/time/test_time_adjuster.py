@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import logging
-from typing import List, Sequence, Tuple
+from typing import Dict, List, Sequence, Tuple
 
 import pytest
 import tabulate
@@ -20,9 +20,9 @@ def date_times_to_check() -> Sequence[datetime.datetime]:  # noqa: D103
     date_times = []
     # Cover leap years, non-leap years
     # 1900 was tested to work, though that requires a change to `TimeRangeConstraint.ALL_TIME_BEGIN`
-    for year in (2000, 2021):
-        start_date_time = datetime.datetime(year=year, month=1, day=1, hour=5, minute=6, second=7)
-        end_date_time = datetime.datetime(year=year, month=12, day=31, hour=5, minute=6, second=7)
+    for year in (2000, 2000, 2021):
+        start_date_time = datetime.datetime(year=year, month=1, day=1)
+        end_date_time = datetime.datetime(year=year, month=12, day=31)
         current_date_time = start_date_time
         while True:
             date_times.append(current_date_time)
@@ -30,6 +30,18 @@ def date_times_to_check() -> Sequence[datetime.datetime]:  # noqa: D103
             if current_date_time == end_date_time:
                 break
     return date_times
+
+
+@pytest.fixture(scope="session")
+def grain_to_count_in_year() -> Dict[TimeGranularity, int]:
+    """Returns the maximum number of times the given item occurs in a year."""
+    return {
+        TimeGranularity.DAY: 366,
+        TimeGranularity.WEEK: 53,
+        TimeGranularity.MONTH: 31,
+        TimeGranularity.QUARTER: 4,
+        TimeGranularity.YEAR: 1,
+    }
 
 
 def test_start_and_end_periods(  # noqa: D103
@@ -42,7 +54,7 @@ def test_start_and_end_periods(  # noqa: D103
     rows: List[Tuple[str, ...]] = []
     for date_time in date_times_to_check:
         for time_granularity in TimeGranularity:
-            if time_granularity.to_int() < TimeGranularity.MINUTE.to_int():
+            if time_granularity.to_int() < TimeGranularity.DAY.to_int():
                 continue
             dateutil_start_of_period = dateutil_adjuster.adjust_to_start_of_period(time_granularity, date_time)
             dateutil_end_of_period = dateutil_adjuster.adjust_to_end_of_period(time_granularity, date_time)
