@@ -109,7 +109,7 @@ metric:
 ---
 metric:
   name: simple_subdaily_metric_default_day
-  description: simple metric with sub-daily agg time dim that joins to time spine
+  description: simple metric with sub-daily agg time dim that doesn't specify default granularity
   type: simple
   type_params:
     measure:
@@ -117,7 +117,7 @@ metric:
 ---
 metric:
   name: simple_subdaily_metric_default_hour
-  description: simple metric with sub-daily agg time dim that joins to time spine
+  description: simple metric with sub-daily agg time dim that has an explicit default granularity
   type: simple
   type_params:
     measure:
