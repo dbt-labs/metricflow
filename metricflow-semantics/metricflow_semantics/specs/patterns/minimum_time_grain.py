@@ -49,8 +49,10 @@ class MinimumTimeGrainPattern(SpecPattern):
         spec_key_to_specs: Dict[TimeDimensionSpecComparisonKey, List[TimeDimensionSpec]] = defaultdict(list)
         for time_dimension_spec in spec_set.time_dimension_specs:
             spec_key = time_dimension_spec.comparison_key(exclude_fields=(TimeDimensionSpecField.TIME_GRANULARITY,))
-            spec_key_to_grains[spec_key].add(time_dimension_spec.time_granularity)
-            spec_key_to_specs[spec_key].append(time_dimension_spec)
+            if time_dimension_spec.time_granularity:
+                spec_key_to_grains[spec_key].add(time_dimension_spec.time_granularity)
+                spec_key_to_specs[spec_key].append(time_dimension_spec)
+            # TODO: Handle custom granularity
 
         matched_time_dimension_specs: List[TimeDimensionSpec] = []
         for spec_key, time_grains in spec_key_to_grains.items():

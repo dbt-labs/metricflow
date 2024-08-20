@@ -16,6 +16,8 @@ from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.instance_spec import InstanceSpecVisitor
 from metricflow_semantics.visitor import VisitorOutputT
 
+StandardOrCustomGranularity = Union[TimeGranularity, str]
+
 
 class TimeDimensionSpecField(Enum):
     """Fields of the time dimension spec.
@@ -83,11 +85,16 @@ DEFAULT_TIME_GRANULARITY = TimeGranularity.DAY
 
 @dataclass(frozen=True)
 class TimeDimensionSpec(DimensionSpec):  # noqa: D101
-    time_granularity: TimeGranularity = DEFAULT_TIME_GRANULARITY
+    time_granularity: Optional[TimeGranularity] = None
+    custom_granularity: Optional[str] = None
     date_part: Optional[DatePart] = None
 
     # Used for semi-additive joins. Some more thought is needed, but this may be useful in InstanceSpec.
     aggregation_state: Optional[AggregationState] = None
+
+    def __post_init__(self) -> None:  # noqa: D105
+        if self.time_granularity and self.custom_granularity:
+            raise ValueError("TimeDimensionSpec can't have both a standard time granularity and a custom granularity.")
 
     @property
     def without_first_entity_link(self) -> TimeDimensionSpec:  # noqa: D102
@@ -208,6 +215,3 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
     @property
     def is_metric_time(self) -> bool:  # noqa: D102
         return self.element_name == METRIC_TIME_ELEMENT_NAME
-
-
-DEFAULT_TIME_GRANULARITY = TimeGranularity.DAY

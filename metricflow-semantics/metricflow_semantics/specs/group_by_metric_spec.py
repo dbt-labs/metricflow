@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Tuple
 
-from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.references import EntityReference, GroupByMetricReference
 from typing_extensions import override
 
@@ -15,7 +14,7 @@ from metricflow_semantics.visitor import VisitorOutputT
 
 
 @dataclass(frozen=True)
-class GroupByMetricSpec(LinkableInstanceSpec, SerializableDataclass):
+class GroupByMetricSpec(LinkableInstanceSpec):
     """Metric used in group by or where filter.
 
     Args:

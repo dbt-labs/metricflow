@@ -14,7 +14,7 @@ from metricflow_semantics.visitor import VisitorOutputT
 
 
 @dataclass(frozen=True)
-class EntitySpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D101
+class EntitySpec(LinkableInstanceSpec):  # noqa: D101
     @property
     def without_first_entity_link(self) -> EntitySpec:  # noqa: D102
         assert len(self.entity_links) > 0, f"Spec does not have any entity links: {self}"

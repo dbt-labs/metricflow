@@ -151,9 +151,11 @@ class _DunderNameTransform(InstanceSpecSetTransform[Sequence[str]]):
             items = list(entity_link.element_name for entity_link in time_dimension_spec.entity_links) + [
                 time_dimension_spec.element_name
             ]
-            if time_dimension_spec.date_part is not None:
+            if time_dimension_spec.date_part:
                 items.append(DunderNamingScheme.date_part_suffix(date_part=time_dimension_spec.date_part))
-            else:
+            elif time_dimension_spec.custom_granularity:
+                items.append(time_dimension_spec.custom_granularity)
+            elif time_dimension_spec.time_granularity:
                 items.append(time_dimension_spec.time_granularity.value)
             names_to_return.append(DUNDER.join(items))
 

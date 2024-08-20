@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Tuple
 
-from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.references import DimensionReference, EntityReference
 from typing_extensions import override
 
@@ -14,7 +13,7 @@ from metricflow_semantics.visitor import VisitorOutputT
 
 
 @dataclass(frozen=True)
-class DimensionSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D101
+class DimensionSpec(LinkableInstanceSpec):  # noqa: D101
     element_name: str
     entity_links: Tuple[EntityReference, ...]
 
