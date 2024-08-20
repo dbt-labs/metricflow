@@ -22,3 +22,21 @@ saved_query:
       - trailing_2_months_revenue
     group_by:
       - TimeDimension('metric_time', 'day')
+---
+saved_query:
+  name: saved_query_with_metric_joins_and_filter
+  description: |
+    Saved query that includes multiple metrics from different input sources requiring a metric join and
+    a query-level filter on a mix of categorical and time dimension filters.
+    Note this will not run on Trino due to the invalid filter construction - Trino will not cast string literals
+    to timestamp types the way other engines do.
+  query_params:
+    metrics:
+      - bookings
+      - views
+      - bookings_per_view
+    group_by:
+      - Dimension('listing__capacity_latest')
+    where:
+      - "{{ Dimension('listing__is_lux_latest') }}"
+      - "{{ TimeDimension('metric_time', 'day') }} >= '2020-01-02'"

@@ -4,6 +4,7 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
+from metricflow_semantics.specs.query_param_implementations import SavedQueryParameter
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
@@ -299,6 +300,39 @@ def test_simple_join_to_time_spine_pushdown_filter_application(
         where_constraint=PydanticWhereFilter(
             where_sql_template="{{ Dimension('booking__is_instant') }}",
         ),
+    )
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=parsed_query.query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_saved_query_with_metric_joins_and_filter(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    query_parser: MetricFlowQueryParser,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    """Tests rendering a query where we join to a time spine and query the filter input.
+
+    This should produce a SQL query that applies the filter outside of the time spine join.
+    """
+    parsed_query = query_parser.parse_and_validate_saved_query(
+        saved_query_parameter=SavedQueryParameter("saved_query_with_metric_joins_and_filter"),
+        where_filter=None,
+        limit=None,
+        time_constraint_start=None,
+        time_constraint_end=None,
+        order_by_names=None,
+        order_by_parameters=None,
     )
 
     render_and_check(
