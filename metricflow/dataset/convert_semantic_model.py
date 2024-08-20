@@ -516,8 +516,8 @@ class SemanticModelToDataSetConverter:
     def build_time_spine_source_data_set(self, time_spine_source: TimeSpineSource) -> SqlDataSet:
         """Build data set for time spine."""
         from_source_alias = SequentialIdGenerator.create_next_id(StaticIdPrefix.TIME_SPINE_SOURCE).str_value
-        defined_time_granularity = time_spine_source.time_column_granularity
-        time_column_name = time_spine_source.time_column_name
+        defined_time_granularity = time_spine_source.base_granularity
+        time_column_name = time_spine_source.base_granularity_column
 
         time_dimension_instances: List[TimeDimensionInstance] = []
         select_columns: List[SqlSelectColumn] = []
@@ -545,6 +545,8 @@ class SemanticModelToDataSetConverter:
         )
         time_dimension_instances.extend(new_instances)
         select_columns.extend(new_columns)
+
+        # Add custom granularities
 
         return SqlDataSet(
             instance_set=InstanceSet(time_dimension_instances=tuple(time_dimension_instances)),

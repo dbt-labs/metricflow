@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Dict, Optional
+from typing import Dict, Optional, Sequence
 
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
@@ -17,15 +17,19 @@ TIME_SPINE_DATA_SET_DESCRIPTION = "Time Spine"
 
 @dataclass(frozen=True)
 class TimeSpineSource:
-    """Defines a source table containing all timestamps to use for computing cumulative metrics."""
+    """A calendar table. Should contain at least one column with dates/times that map to a standard granularity.
+
+    Dates should be contiguous. May also contain custom granularity columns.
+    """
 
     schema_name: str
     table_name: str = "mf_time_spine"
-    # Name of the column in the table that contains the dates.
-    time_column_name: str = "ds"
-    # The time granularity of the dates in the spine table.
-    time_column_granularity: TimeGranularity = DEFAULT_TIME_GRANULARITY
+    # Name of the column in the table that contains date/time values that map to a standard granularity.
+    base_granularity_column: str = "ds"
+    # The time granularity of base granularity column.
+    base_granularity: TimeGranularity = DEFAULT_TIME_GRANULARITY
     db_name: Optional[str] = None
+    custom_granularity_columns: Sequence[str] = ()
 
     @property
     def spine_table(self) -> SqlTable:
@@ -40,8 +44,9 @@ class TimeSpineSource:
                 schema_name=time_spine.node_relation.schema_name,
                 table_name=time_spine.node_relation.alias,
                 db_name=time_spine.node_relation.database,
-                time_column_name=time_spine.primary_column.name,
-                time_column_granularity=time_spine.primary_column.time_granularity,
+                base_granularity_column=time_spine.primary_column.name,
+                base_granularity=time_spine.primary_column.time_granularity,
+                custom_granularity_columns=[column.name for column in time_spine.custom_granularity_columns],
             )
             for time_spine in semantic_manifest.project_configuration.time_spines
         }
@@ -56,8 +61,8 @@ class TimeSpineSource:
                     schema_name=time_spine_table.schema_name,
                     table_name=time_spine_table.table_name,
                     db_name=time_spine_table.db_name,
-                    time_column_name=legacy_time_spine.column_name,
-                    time_column_granularity=legacy_time_spine.grain,
+                    base_granularity_column=legacy_time_spine.column_name,
+                    base_granularity=legacy_time_spine.grain,
                 )
 
         # Sanity check: this should have been validated during manifest parsing.

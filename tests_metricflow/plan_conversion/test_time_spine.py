@@ -22,8 +22,8 @@ def test_date_spine_date_range(  # noqa: D103
         textwrap.dedent(
             f"""\
             SELECT
-                MIN({time_spine_source.time_column_name})
-                , MAX({time_spine_source.time_column_name})
+                MIN({time_spine_source.base_granularity_column})
+                , MAX({time_spine_source.base_granularity_column})
             FROM {time_spine_source.spine_table.sql}
             """,
         )
