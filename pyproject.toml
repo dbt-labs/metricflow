@@ -79,7 +79,7 @@ dependencies = [
   "update-checker>=0.18.0, <0.19.0",
   # Bug with mypy: https://github.com/pallets/click/issues/2558#issuecomment-1656546003
   "click>=8.1.6",
-  "dbt-core @ git+https://github.com/dbt-labs/dbt-core@e53420c1d073dc81609ae7aa84cef6ee09650576#subdirectory=core",
+  "dbt-core @ git+https://github.com/dbt-labs/dbt-core@84eb0ff6720ec82ce4015c2657d512bf51381732#subdirectory=core",
   "dbt-duckdb>=1.8.0, <1.9.0",
 ]
 
