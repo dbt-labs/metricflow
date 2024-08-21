@@ -66,7 +66,7 @@ class SourceNodeBuilder:
             data_set = data_set_converter.build_time_spine_source_data_set(time_spine_source)
             self._time_spine_source_nodes[granularity] = MetricTimeDimensionTransformNode.create(
                 parent_node=ReadSqlSourceNode.create(data_set),
-                aggregation_time_dimension_reference=TimeDimensionReference(time_spine_source.time_column_name),
+                aggregation_time_dimension_reference=TimeDimensionReference(time_spine_source.base_column),
             )
 
         self._query_parser = MetricFlowQueryParser(semantic_manifest_lookup)

@@ -96,7 +96,7 @@ def time_spine_sources(  # noqa: D103
 ) -> Mapping[TimeGranularity, TimeSpineSource]:
     legacy_time_spine_grain = TimeGranularity.DAY
     time_spine_base_table_name = "mf_time_spine"
-    print("expected schema name:", mf_test_configuration.mf_source_schema)
+
     # Legacy time spine
     time_spine_sources = {
         legacy_time_spine_grain: TimeSpineSource(
@@ -113,8 +113,8 @@ def time_spine_sources(  # noqa: D103
         time_spine_sources[granularity] = TimeSpineSource(
             schema_name=mf_test_configuration.mf_source_schema,
             table_name=f"{time_spine_base_table_name}_{granularity.value}",
-            time_column_name="ts",
-            time_column_granularity=granularity,
+            base_column="ts",
+            base_granularity=granularity,
         )
 
     return time_spine_sources

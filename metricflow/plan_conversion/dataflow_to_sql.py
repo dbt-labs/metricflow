@@ -275,7 +275,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
         time_spine_source = self._choose_time_spine_source(agg_time_dimension_instances)
         column_expr = SqlColumnReferenceExpression.from_table_and_column_names(
-            table_alias=time_spine_table_alias, column_name=time_spine_source.time_column_name
+            table_alias=time_spine_table_alias, column_name=time_spine_source.base_column
         )
         select_columns: Tuple[SqlSelectColumn, ...] = ()
         apply_group_by = False
@@ -283,7 +283,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             column_alias = self.column_association_resolver.resolve_spec(agg_time_dimension_instance.spec).column_name
             # If the requested granularity is the same as the granularity of the spine, do a direct select.
             # TODO: also handle date part.
-            if agg_time_dimension_instance.spec.time_granularity == time_spine_source.time_column_granularity:
+            if agg_time_dimension_instance.spec.time_granularity == time_spine_source.base_granularity:
                 select_columns += (SqlSelectColumn(expr=column_expr, column_alias=column_alias),)
             # If any columns have a different granularity, apply a DATE_TRUNC() and aggregate via group_by.
             else:
@@ -308,7 +308,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 where=(
                     _make_time_range_comparison_expr(
                         table_alias=time_spine_table_alias,
-                        column_alias=time_spine_source.time_column_name,
+                        column_alias=time_spine_source.base_column,
                         time_range_constraint=time_range_constraint,
                     )
                     if time_range_constraint
