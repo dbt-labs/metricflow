@@ -925,8 +925,9 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         assert all(
             [set(x.data_set.instance_set.spec_set.linkable_specs) == set(linkable_specs) for x in join_data_sets]
         ), (
-            "All join data sets should have the same set of linkable instances as the from dataset since all values are coalesced. "
-            f"Got from dataset: {from_data_set}\nGot join datasets: {join_data_sets}"
+            "All join data sets should have the same set of linkable instances as the from dataset since all values are coalesced.\n"
+            f"From dataset instance set: {from_data_set.data_set.instance_set}\n"
+            f"Join dataset instance sets: {[join_data_set.data_set.instance_set for join_data_set in join_data_sets]}"
         )
 
         linkable_spec_set = from_data_set.data_set.instance_set.spec_set.transform(SelectOnlyLinkableSpecs())
