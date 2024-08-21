@@ -640,12 +640,15 @@ class UpdateMeasureFillNullsWith(InstanceSetTransform[InstanceSet]):
         """Update all measure instances with the corresponding fill_nulls_with value."""
         updated_instances: List[MeasureInstance] = []
         for instance in measure_instances:
-            matches = [spec for spec in self.metric_input_measure_specs if spec.measure_spec == instance.spec]
-            assert len(matches) == 1, f"Matched with {matches} for measure instance {instance}. "
-            "We should always have 1 direct match for each measure instance and input measure."
+            # There might be multiple matching specs, but they'll all have the same fill_nulls_with value so we can use any of them.
+            matching_specs = [spec for spec in self.metric_input_measure_specs if spec.measure_spec == instance.spec]
+            assert (
+                len(matching_specs) >= 1
+            ), f"Found no matching input measure spec for measure instance {instance}. Something has been misconfigured."
+
             measure_spec = MeasureSpec(
                 element_name=instance.spec.element_name,
-                fill_nulls_with=matches[0].fill_nulls_with,
+                fill_nulls_with=matching_specs[0].fill_nulls_with,
                 non_additive_dimension_spec=instance.spec.non_additive_dimension_spec,
             )
             updated_instances.append(
