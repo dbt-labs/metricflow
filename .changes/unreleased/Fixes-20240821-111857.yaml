@@ -1,0 +1,7 @@
+kind: Fixes
+body: Allow metrics with matching input measures where one is cumulative and one is
+  not.
+time: 2024-08-21T11:18:57.795215-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1374"
