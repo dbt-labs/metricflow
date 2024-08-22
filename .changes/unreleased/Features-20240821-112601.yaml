@@ -1,0 +1,7 @@
+kind: Features
+body: Support combining AggregateMeasuresNodes where metric input measures have aliases,
+  so long as there are no duplicates.
+time: 2024-08-21T11:26:01.714888-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1375"
