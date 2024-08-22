@@ -361,7 +361,7 @@ class DataflowPlanBuilder:
         # Aggregate the conversion events with the JoinConversionEventsNode as the source node
         recipe_with_join_conversion_source_node = DataflowRecipe(
             source_node=join_conversion_node,
-            required_local_linkable_specs=base_measure_recipe.required_local_linkable_specs,
+            required_local_linkable_specs=queried_linkable_specs.as_tuple,
             join_linkable_instances_recipes=base_measure_recipe.join_linkable_instances_recipes,
         )
         # TODO: Refine conversion metric configuration to fit into the standard dataflow plan building model
