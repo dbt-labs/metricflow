@@ -38,7 +38,6 @@ from metricflow_semantics.specs.measure_spec import MeasureSpec
 from metricflow_semantics.specs.metadata_spec import MetadataSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
-from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.time.time_constants import ISO8601_PYTHON_FORMAT, ISO8601_PYTHON_TS_FORMAT
 from metricflow_semantics.time.time_spine_source import TIME_SPINE_DATA_SET_DESCRIPTION, TimeSpineSource
@@ -1408,12 +1407,8 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             # Apply date_part to time spine column select expression.
             if time_dimension_spec.date_part:
                 select_expr = SqlExtractExpression.create(date_part=time_dimension_spec.date_part, arg=select_expr)
-            time_dim_spec = TimeDimensionSpec(
-                element_name=original_time_spine_dim_instance.spec.element_name,
-                entity_links=original_time_spine_dim_instance.spec.entity_links,
-                time_granularity=time_dimension_spec.time_granularity,
-                date_part=time_dimension_spec.date_part,
-                aggregation_state=original_time_spine_dim_instance.spec.aggregation_state,
+            time_dim_spec = original_time_spine_dim_instance.spec.with_grain_and_date_part(
+                time_granularity=time_dimension_spec.time_granularity, date_part=time_dimension_spec.date_part
             )
             time_spine_dim_instance = TimeDimensionInstance(
                 defined_from=original_time_spine_dim_instance.defined_from,
