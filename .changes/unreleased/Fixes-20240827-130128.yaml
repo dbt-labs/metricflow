@@ -1,0 +1,6 @@
+kind: Fixes
+body: 'Bug fix: ensure that granularity requested for non-additive dimension is respected.'
+time: 2024-08-27T13:01:28.743199-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1383"
