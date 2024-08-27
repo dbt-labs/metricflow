@@ -2,15 +2,11 @@ from __future__ import annotations
 
 from abc import ABC
 from dataclasses import dataclass
-from typing import Optional, Sequence
+from typing import Sequence
 
-from dbt_semantic_interfaces.protocols import MetricTimeWindow
-from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
-from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
-from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.visitor import VisitorOutputT
 
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNodeVisitor
@@ -20,7 +16,7 @@ from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNode
 class JoinToCustomGranularityNode(DataflowPlanNode, ABC):
     """Join parent dataset to time spine dataset to convert time dimension to a custom granularity."""
 
-    time_dimension_spec: Sequence[TimeDimensionSpec]
+    time_dimension_spec: TimeDimensionSpec
 
     @staticmethod
     def create(  # noqa: D102
@@ -42,7 +38,7 @@ class JoinToCustomGranularityNode(DataflowPlanNode, ABC):
     @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
         return tuple(super().displayed_properties) + (
-            DisplayedProperty("time_dimension_spec", self.time_dimension_spec)
+            DisplayedProperty("time_dimension_spec", self.time_dimension_spec),
         )
 
     @property
@@ -57,5 +53,5 @@ class JoinToCustomGranularityNode(DataflowPlanNode, ABC):
     ) -> JoinToCustomGranularityNode:
         assert len(new_parent_nodes) == 1, "JoinToCustomGranularity accepts exactly one parent node."
         return JoinToCustomGranularityNode.create(
-            parent_node=new_parent_nodes[0], time_dimension=self.time_dimension_spec
+            parent_node=new_parent_nodes[0], time_dimension_spec=self.time_dimension_spec
         )

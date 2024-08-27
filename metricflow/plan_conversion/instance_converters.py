@@ -744,8 +744,26 @@ class AddMetrics(InstanceSetTransform[InstanceSet]):
         )
 
 
+class AddTimeDimension(InstanceSetTransform[InstanceSet]):
+    """Adds the given time dimension instances to the instance set."""
+
+    def __init__(self, time_dimension_instance: TimeDimensionInstance) -> None:  # noqa: D107
+        self._time_dimension_instance = time_dimension_instance
+
+    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D102
+        return InstanceSet(
+            measure_instances=instance_set.measure_instances,
+            dimension_instances=instance_set.dimension_instances,
+            time_dimension_instances=instance_set.time_dimension_instances + (self._time_dimension_instance,),
+            entity_instances=instance_set.entity_instances,
+            group_by_metric_instances=instance_set.group_by_metric_instances,
+            metric_instances=instance_set.metric_instances,
+            metadata_instances=instance_set.metadata_instances,
+        )
+
+
 class AddGroupByMetric(InstanceSetTransform[InstanceSet]):
-    """Adds the given metric instances to the instance set."""
+    """Adds the given group by metric instances to the instance set."""
 
     def __init__(self, group_by_metric_instance: GroupByMetricInstance) -> None:  # noqa: D107
         self._group_by_metric_instance = group_by_metric_instance

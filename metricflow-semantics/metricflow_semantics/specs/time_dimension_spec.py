@@ -162,6 +162,17 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
             aggregation_state=self.aggregation_state,
         )
 
+    def with_grain_and_date_part(  # noqa: D102
+        self, time_granularity: TimeGranularity, date_part: Optional[DatePart]
+    ) -> TimeDimensionSpec:
+        return TimeDimensionSpec(
+            element_name=self.element_name,
+            entity_links=self.entity_links,
+            time_granularity=time_granularity,
+            date_part=date_part,
+            aggregation_state=self.aggregation_state,
+        )
+
     def with_aggregation_state(self, aggregation_state: AggregationState) -> TimeDimensionSpec:  # noqa: D102
         return TimeDimensionSpec(
             element_name=self.element_name,

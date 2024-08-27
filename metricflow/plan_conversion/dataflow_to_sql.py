@@ -38,7 +38,6 @@ from metricflow_semantics.specs.measure_spec import MeasureSpec
 from metricflow_semantics.specs.metadata_spec import MetadataSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
-from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.time.time_constants import ISO8601_PYTHON_FORMAT, ISO8601_PYTHON_TS_FORMAT
 from metricflow_semantics.time.time_spine_source import TIME_SPINE_DATA_SET_DESCRIPTION, TimeSpineSource
@@ -56,6 +55,7 @@ from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
 from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
 from metricflow.dataflow.nodes.join_to_base import JoinOnEntitiesNode
+from metricflow.dataflow.nodes.join_to_custom_granularity import JoinToCustomGranularityNode
 from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataflow.nodes.min_max import MinMaxNode
@@ -1380,12 +1380,9 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             # Apply date_part to time spine column select expression.
             if time_dimension_spec.date_part:
                 select_expr = SqlExtractExpression.create(date_part=time_dimension_spec.date_part, arg=select_expr)
-            time_dim_spec = TimeDimensionSpec(
-                element_name=original_time_spine_dim_instance.spec.element_name,
-                entity_links=original_time_spine_dim_instance.spec.entity_links,
-                time_granularity=time_dimension_spec.time_granularity,
+            time_dim_spec = original_time_spine_dim_instance.spec.with_grain_and_date_part(
+                time_dimension_spec.time_granularity,
                 date_part=time_dimension_spec.date_part,
-                aggregation_state=original_time_spine_dim_instance.spec.aggregation_state,
             )
             time_spine_dim_instance = TimeDimensionInstance(
                 defined_from=original_time_spine_dim_instance.defined_from,
@@ -1407,6 +1404,64 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 from_source_alias=time_spine_alias,
                 join_descs=(join_description,),
                 where=where_filter,
+            ),
+        )
+
+    def visit_join_to_custom_granularity_node(self, node: JoinToCustomGranularityNode) -> SqlDataSet:  # noqa: D102
+        parent_data_set = node.parent_node.accept(self)
+        parent_alias = self._next_unique_table_alias()
+
+        parent_time_dimension_instance: Optional[TimeDimensionInstance] = None
+        for instance in parent_data_set.instance_set.time_dimension_instances:
+            if instance.spec == node.time_dimension_spec:
+                parent_time_dimension_instance = instance
+                break
+        assert parent_time_dimension_instance, (
+            "JoinToCustomGranularityNode's expected time_dimension_spec not found in parent dataset instances. "
+            "This indicates internal misconfiguration."
+        )
+
+        time_spine_dataset = self._make_time_spine_data_set(
+            agg_time_dimension_instances=(parent_time_dimension_instance,)
+        )
+        assert (
+            time_spine_dataset.instance_set.time_dimension_instances
+        ), "No time dimensions found in time spine dataset. This indicates internal misconfiguration."
+        time_spine_instance = time_spine_dataset.instance_set.time_dimension_instances[0]
+
+        time_spine_alias = self._next_unique_table_alias()
+        join_description = SqlJoinDescription(
+            right_source=time_spine_dataset.checked_sql_select_node,
+            right_source_alias=time_spine_alias,
+            on_condition=SqlComparisonExpression.create(
+                left_expr=SqlColumnReferenceExpression.from_table_and_column_names(
+                    table_alias=parent_alias,
+                    column_name=parent_time_dimension_instance.associated_column.column_name,
+                ),
+                comparison=SqlComparison.EQUALS,
+                right_expr=SqlColumnReferenceExpression.from_table_and_column_names(
+                    table_alias=time_spine_alias,
+                    column_name=time_spine_instance.associated_column.column_name,
+                ),
+            ),
+            join_type=SqlJoinType.LEFT_OUTER,
+        )
+
+        parent_instance_set = parent_data_set.instance_set.transform(
+            FilterElements(exclude_specs=InstanceSpecSet(time_dimension_specs=(parent_time_dimension_instance.spec,)))
+        )
+        time_spine_instance_set = InstanceSet(time_dimension_instances=(time_spine_instance,))
+        return SqlDataSet(
+            instance_set=InstanceSet.merge([time_spine_instance_set, parent_instance_set]),
+            sql_select_node=SqlSelectStatementNode.create(
+                description=node.description,
+                select_columns=create_select_columns_for_instance_sets(
+                    self._column_association_resolver,
+                    OrderedDict({parent_alias: parent_instance_set, time_spine_alias: time_spine_instance_set}),
+                ),
+                from_source=parent_data_set.checked_sql_select_node,
+                from_source_alias=parent_alias,
+                join_descs=(join_description,),
             ),
         )
 
