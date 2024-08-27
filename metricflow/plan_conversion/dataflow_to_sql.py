@@ -1411,7 +1411,62 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         )
 
     def visit_join_to_custom_granularity_node(self, node: JoinToCustomGranularityNode) -> SqlDataSet:  # noqa: D102
-        pass  # TODO in later commit
+        parent_data_set = node.parent_node.accept(self)
+        parent_alias = self._next_unique_table_alias()
+
+        parent_time_dimension_instance: Optional[TimeDimensionInstance] = None
+        for instance in parent_data_set.instance_set.time_dimension_instances:
+            if instance.spec == node.time_dimension_spec:
+                parent_time_dimension_instance = instance
+                break
+        assert parent_time_dimension_instance, (
+            "JoinToCustomGranularityNode's expected time_dimension_spec not found in parent dataset instances. "
+            "This indicates internal misconfiguration."
+        )
+
+        time_spine_dataset = self._make_time_spine_data_set(
+            agg_time_dimension_instances=(parent_time_dimension_instance,)
+        )
+        assert (
+            time_spine_dataset.instance_set.time_dimension_instances
+        ), "No time dimensions found in time spine dataset. This indicates internal misconfiguration."
+        time_spine_instance = time_spine_dataset.instance_set.time_dimension_instances[0]
+
+        time_spine_alias = self._next_unique_table_alias()
+        join_description = SqlJoinDescription(
+            right_source=time_spine_dataset.checked_sql_select_node,
+            right_source_alias=time_spine_alias,
+            on_condition=SqlComparisonExpression.create(
+                left_expr=SqlColumnReferenceExpression.from_table_and_column_names(
+                    table_alias=parent_alias,
+                    column_name=parent_time_dimension_instance.associated_column.column_name,
+                ),
+                comparison=SqlComparison.EQUALS,
+                right_expr=SqlColumnReferenceExpression.from_table_and_column_names(
+                    table_alias=time_spine_alias,
+                    column_name=time_spine_instance.associated_column.column_name,
+                ),
+            ),
+            join_type=SqlJoinType.LEFT_OUTER,
+        )
+
+        parent_instance_set = parent_data_set.instance_set.transform(
+            FilterElements(exclude_specs=InstanceSpecSet(time_dimension_specs=(parent_time_dimension_instance.spec,)))
+        )
+        time_spine_instance_set = InstanceSet(time_dimension_instances=(time_spine_instance,))
+        return SqlDataSet(
+            instance_set=InstanceSet.merge([time_spine_instance_set, parent_instance_set]),
+            sql_select_node=SqlSelectStatementNode.create(
+                description=node.description,
+                select_columns=create_select_columns_for_instance_sets(
+                    self._column_association_resolver,
+                    OrderedDict({parent_alias: parent_instance_set, time_spine_alias: time_spine_instance_set}),
+                ),
+                from_source=parent_data_set.checked_sql_select_node,
+                from_source_alias=parent_alias,
+                join_descs=(join_description,),
+            ),
+        )
 
     def visit_min_max_node(self, node: MinMaxNode) -> SqlDataSet:  # noqa: D102
         parent_data_set = node.parent_node.accept(self)
