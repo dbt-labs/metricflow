@@ -74,6 +74,7 @@ from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
 from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
 from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinOnEntitiesNode
+from metricflow.dataflow.nodes.join_to_custom_granularity import JoinToCustomGranularityNode
 from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
 from metricflow.dataflow.nodes.min_max import MinMaxNode
 from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
@@ -782,6 +783,13 @@ class DataflowPlanBuilder:
         output_node = dataflow_recipe.source_node
         if dataflow_recipe.join_targets:
             output_node = JoinOnEntitiesNode.create(left_node=output_node, join_targets=dataflow_recipe.join_targets)
+
+        for time_dimension_spec in required_linkable_specs.time_dimension_specs:
+            # TODO: Update conditional when avail - if the time dimension spec has a custom granularity
+            if False:
+                output_node = JoinToCustomGranularityNode.create(
+                    parent_node=output_node, time_dimension_spec=time_dimension_spec
+                )
 
         if len(query_level_filter_specs) > 0:
             output_node = WhereConstraintNode.create(parent_node=output_node, where_specs=query_level_filter_specs)
@@ -1516,6 +1524,13 @@ class DataflowPlanBuilder:
             unaggregated_measure_node = after_join_filtered_node
         else:
             unaggregated_measure_node = filtered_measure_source_node
+
+        for time_dimension_spec in queried_linkable_specs.time_dimension_specs:
+            # TODO: Update conditional when avail - if the time dimension spec has a custom granularity
+            if False:
+                unaggregated_measure_node = JoinToCustomGranularityNode.create(
+                    parent_node=unaggregated_measure_node, time_dimension_spec=time_dimension_spec
+                )
 
         # If time constraint was previously adjusted for cumulative window or grain, apply original time constraint
         # here. Can skip if metric is being aggregated over all time.
