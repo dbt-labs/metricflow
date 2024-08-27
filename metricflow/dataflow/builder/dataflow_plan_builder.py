@@ -1551,6 +1551,11 @@ class DataflowPlanBuilder:
                 non_additive_dimension_spec=non_additive_dimension_spec,
             )
             time_dimension_spec = TimeDimensionSpec.from_name(non_additive_dimension_spec.name)
+            if queried_time_dimension_spec:
+                time_dimension_spec = time_dimension_spec.with_grain_and_date_part(
+                    time_granularity=queried_time_dimension_spec.time_granularity,
+                    date_part=queried_time_dimension_spec.date_part,
+                )
             window_groupings = tuple(
                 LinklessEntitySpec.from_element_name(name) for name in non_additive_dimension_spec.window_groupings
             )
