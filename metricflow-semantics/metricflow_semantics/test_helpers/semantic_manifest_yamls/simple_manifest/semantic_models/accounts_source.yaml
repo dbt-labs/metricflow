@@ -46,7 +46,7 @@ semantic_model:
         time_granularity: day
     - name: ds_month
       type: time
-      expr: DATE_TRUNC(ds, 'month')
+      expr: DATE_TRUNC('month', ds)
       type_params:
         time_granularity: month
     - name: account_type
