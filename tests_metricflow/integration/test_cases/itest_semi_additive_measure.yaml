@@ -259,3 +259,24 @@ integration_test:
       b.ds = d.ds__complete
     GROUP BY
       b.account_type
+---
+integration_test:
+  name: non_default_grain
+  description: Tests selecting a semi-additive measure with an agg_time_dimension that has non-default grain
+  model: SIMPLE_MODEL
+  metrics: ["total_account_balance_first_day"]
+  check_query: |
+    SELECT
+      SUM(subq_2.total_account_balance_first_day) AS total_account_balance_first_day
+    FROM (
+      SELECT
+        {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS ds__day
+        , account_balance AS total_account_balance_first_day
+      FROM {{ source_schema }}.fct_accounts
+    ) subq_2
+    INNER JOIN (
+      SELECT
+        MIN({{ render_date_trunc("ds", TimeGranularity.DAY) }}) AS ds__day__complete
+      FROM {{ source_schema }}.fct_accounts
+    ) subq_4
+    ON subq_2.ds__day = subq_4.ds__day__complete
