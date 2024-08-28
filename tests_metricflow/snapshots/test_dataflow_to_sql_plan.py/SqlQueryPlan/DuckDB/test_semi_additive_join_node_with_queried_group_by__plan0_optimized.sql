@@ -11,6 +11,12 @@ SELECT
   , subq_3.ds__extract_day AS ds__extract_day
   , subq_3.ds__extract_dow AS ds__extract_dow
   , subq_3.ds__extract_doy AS ds__extract_doy
+  , subq_3.ds_month__month AS ds_month__month
+  , subq_3.ds_month__quarter AS ds_month__quarter
+  , subq_3.ds_month__year AS ds_month__year
+  , subq_3.ds_month__extract_year AS ds_month__extract_year
+  , subq_3.ds_month__extract_quarter AS ds_month__extract_quarter
+  , subq_3.ds_month__extract_month AS ds_month__extract_month
   , subq_3.account__ds__day AS account__ds__day
   , subq_3.account__ds__week AS account__ds__week
   , subq_3.account__ds__month AS account__ds__month
@@ -22,6 +28,12 @@ SELECT
   , subq_3.account__ds__extract_day AS account__ds__extract_day
   , subq_3.account__ds__extract_dow AS account__ds__extract_dow
   , subq_3.account__ds__extract_doy AS account__ds__extract_doy
+  , subq_3.account__ds_month__month AS account__ds_month__month
+  , subq_3.account__ds_month__quarter AS account__ds_month__quarter
+  , subq_3.account__ds_month__year AS account__ds_month__year
+  , subq_3.account__ds_month__extract_year AS account__ds_month__extract_year
+  , subq_3.account__ds_month__extract_quarter AS account__ds_month__extract_quarter
+  , subq_3.account__ds_month__extract_month AS account__ds_month__extract_month
   , subq_3.user AS user
   , subq_3.account__user AS account__user
   , subq_3.account_type AS account_type
@@ -29,12 +41,14 @@ SELECT
   , subq_3.account_balance AS account_balance
   , subq_3.total_account_balance_first_day AS total_account_balance_first_day
   , subq_3.current_account_balance_by_user AS current_account_balance_by_user
+  , subq_3.total_account_balance_first_day_of_month AS total_account_balance_first_day_of_month
 FROM (
   -- Read Elements From Semantic Model 'accounts_source'
   SELECT
     account_balance
     , account_balance AS total_account_balance_first_day
     , account_balance AS current_account_balance_by_user
+    , account_balance AS total_account_balance_first_day_of_month
     , DATE_TRUNC('day', ds) AS ds__day
     , DATE_TRUNC('week', ds) AS ds__week
     , DATE_TRUNC('month', ds) AS ds__month
@@ -46,6 +60,12 @@ FROM (
     , EXTRACT(day FROM ds) AS ds__extract_day
     , EXTRACT(isodow FROM ds) AS ds__extract_dow
     , EXTRACT(doy FROM ds) AS ds__extract_doy
+    , DATE_TRUNC('month', ds_month) AS ds_month__month
+    , DATE_TRUNC('quarter', ds_month) AS ds_month__quarter
+    , DATE_TRUNC('year', ds_month) AS ds_month__year
+    , EXTRACT(year FROM ds_month) AS ds_month__extract_year
+    , EXTRACT(quarter FROM ds_month) AS ds_month__extract_quarter
+    , EXTRACT(month FROM ds_month) AS ds_month__extract_month
     , account_type
     , DATE_TRUNC('day', ds) AS account__ds__day
     , DATE_TRUNC('week', ds) AS account__ds__week
@@ -58,6 +78,12 @@ FROM (
     , EXTRACT(day FROM ds) AS account__ds__extract_day
     , EXTRACT(isodow FROM ds) AS account__ds__extract_dow
     , EXTRACT(doy FROM ds) AS account__ds__extract_doy
+    , DATE_TRUNC('month', ds_month) AS account__ds_month__month
+    , DATE_TRUNC('quarter', ds_month) AS account__ds_month__quarter
+    , DATE_TRUNC('year', ds_month) AS account__ds_month__year
+    , EXTRACT(year FROM ds_month) AS account__ds_month__extract_year
+    , EXTRACT(quarter FROM ds_month) AS account__ds_month__extract_quarter
+    , EXTRACT(month FROM ds_month) AS account__ds_month__extract_month
     , account_type AS account__account_type
     , user_id AS user
     , user_id AS account__user
