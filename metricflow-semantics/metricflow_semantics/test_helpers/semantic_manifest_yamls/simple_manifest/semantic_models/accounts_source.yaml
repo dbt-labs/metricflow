@@ -30,11 +30,25 @@ semantic_model:
         window_groupings:
           - user
 
+    - name: total_account_balance_first_day_of_month
+      agg: sum
+      expr: account_balance
+      agg_time_dimension: ds_month
+      non_additive_dimension:
+        name: ds_month
+        window_choice: min
+      create_metric: true
+
   dimensions:
     - name: ds
       type: time
       type_params:
         time_granularity: day
+    - name: ds_month
+      type: time
+      expr: DATE_TRUNC(ds, 'month')
+      type_params:
+        time_granularity: month
     - name: account_type
       type: categorical
 
