@@ -64,7 +64,7 @@ def check_time_spine_source(
 
     assert len(time_spine_snapshot.column_definitions) == 1
     time_column = time_spine_snapshot.column_definitions[0]
-    assert time_column.name == time_spine_source.time_column_name
+    assert time_column.name == time_spine_source.base_column
 
 
 @pytest.fixture(scope="session")
