@@ -1348,8 +1348,13 @@ class DataflowPlanBuilder:
         for filter_spec in filter_specs:
             linkable_spec_sets_to_merge.append(LinkableSpecSet.create_from_specs(filter_spec.linkable_specs))
         if non_additive_dimension_spec:
+            non_additive_dimension_grain = self._semantic_model_lookup.get_defined_time_granularity(
+                TimeDimensionReference(non_additive_dimension_spec.name)
+            )
             linkable_spec_sets_to_merge.append(
-                LinkableSpecSet.create_from_specs(non_additive_dimension_spec.linkable_specs)
+                LinkableSpecSet.create_from_specs(
+                    non_additive_dimension_spec.linkable_specs(non_additive_dimension_grain)
+                )
             )
 
         extraneous_linkable_specs = LinkableSpecSet.merge_iterable(linkable_spec_sets_to_merge).dedupe()
