@@ -26,7 +26,10 @@
             <!--                   semantic_model_name='bookings_source',              -->
             <!--                 ),                                                    -->
             <!--               ),                                                      -->
-            <!--               time_granularity=DAY,                                   -->
+            <!--               time_granularity=ExpandedTimeGranularity(               -->
+            <!--                 name='day',                                           -->
+            <!--                 base_granularity=DAY,                                 -->
+            <!--               ),                                                      -->
             <!--             ),                                                        -->
             <!--           ),                                                          -->
             <!--         ),                                                            -->
@@ -65,7 +68,10 @@
                 <!--                   semantic_model_name='bookings_source',              -->
                 <!--                 ),                                                    -->
                 <!--               ),                                                      -->
-                <!--               time_granularity=DAY,                                   -->
+                <!--               time_granularity=ExpandedTimeGranularity(               -->
+                <!--                 name='day',                                           -->
+                <!--                 base_granularity=DAY,                                 -->
+                <!--               ),                                                      -->
                 <!--             ),                                                        -->
                 <!--           ),                                                          -->
                 <!--         ),                                                            -->
@@ -112,7 +118,10 @@
                             <!--               semantic_model_name='bookings_source',              -->
                             <!--             ),                                                    -->
                             <!--           ),                                                      -->
-                            <!--           time_granularity=DAY,                                   -->
+                            <!--           time_granularity=ExpandedTimeGranularity(               -->
+                            <!--             name='day',                                           -->
+                            <!--             base_granularity=DAY,                                 -->
+                            <!--           ),                                                      -->
                             <!--         ),                                                        -->
                             <!--       ),                                                          -->
                             <!--     ),                                                            -->

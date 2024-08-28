@@ -40,6 +40,7 @@ from metricflow_semantics.model.semantics.linkable_element import (
 from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
 from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
 
 if TYPE_CHECKING:
@@ -76,7 +77,7 @@ def _generate_linkable_time_dimensions(
                 dimension_type=DimensionType.TIME,
                 entity_links=entity_links,
                 join_path=join_path,
-                time_granularity=time_granularity,
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(time_granularity),
                 date_part=None,
                 properties=tuple(sorted(properties)),
             )
@@ -92,7 +93,7 @@ def _generate_linkable_time_dimensions(
                         dimension_type=DimensionType.TIME,
                         entity_links=entity_links,
                         join_path=join_path,
-                        time_granularity=time_granularity,
+                        time_granularity=ExpandedTimeGranularity.from_time_granularity(time_granularity),
                         date_part=date_part,
                         properties=frozenset(properties),
                     )
@@ -496,7 +497,7 @@ class ValidLinkableSpecResolver:
                     element_name=MetricFlowReservedKeywords.METRIC_TIME.value,
                     element_type=LinkableElementType.TIME_DIMENSION,
                     entity_links=(),
-                    time_granularity=time_granularity,
+                    time_granularity=ExpandedTimeGranularity.from_time_granularity(time_granularity),
                     date_part=date_part,
                 )
                 path_key_to_linkable_dimensions[path_key].append(
@@ -524,7 +525,7 @@ class ValidLinkableSpecResolver:
                                 }
                             )
                         ),
-                        time_granularity=time_granularity,
+                        time_granularity=ExpandedTimeGranularity.from_time_granularity(time_granularity),
                         date_part=date_part,
                     )
                 )

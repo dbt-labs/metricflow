@@ -5,7 +5,10 @@ GroupByItemResolution(
       ElementPathKey(
         element_name='metric_time',
         element_type=TIME_DIMENSION,
-        time_granularity=DAY,
+        time_granularity=ExpandedTimeGranularity(
+          name='day',
+          base_granularity=DAY,
+        ),
       ): (
         LinkableDimension(
           properties=(DERIVED_TIME_GRANULARITY, METRIC_TIME),
@@ -16,7 +19,10 @@ GroupByItemResolution(
               semantic_model_name='__VIRTUAL__',
             ),
           ),
-          time_granularity=DAY,
+          time_granularity=ExpandedTimeGranularity(
+            name='day',
+            base_granularity=DAY,
+          ),
         ),
       ),
     },

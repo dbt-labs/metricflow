@@ -17,6 +17,7 @@ from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameter, SqlBindParameters, SqlBindParameterValue
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 
 def test_where_filter_spec_serialization() -> None:  # noqa: D103
@@ -45,7 +46,7 @@ def test_where_filter_spec_serialization() -> None:  # noqa: D103
                         ),
                     ),
                     date_part=DatePart.DAY,
-                    time_granularity=TimeGranularity.DAY,
+                    time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
                 ),
             ),
         ),

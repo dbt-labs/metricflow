@@ -31,7 +31,10 @@ MetricFlowQuerySpec(
             ElementPathKey(
               element_name='metric_time',
               element_type=TIME_DIMENSION,
-              time_granularity=QUARTER,
+              time_granularity=ExpandedTimeGranularity(
+                name='quarter',
+                base_granularity=QUARTER,
+              ),
             ): (
               LinkableDimension(
                 properties=(
@@ -48,7 +51,10 @@ MetricFlowQuerySpec(
                     semantic_model_name='monthly_measures_source',
                   ),
                 ),
-                time_granularity=QUARTER,
+                time_granularity=ExpandedTimeGranularity(
+                  name='quarter',
+                  base_granularity=QUARTER,
+                ),
               ),
             ),
           },

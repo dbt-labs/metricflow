@@ -355,10 +355,12 @@ class LinkableElementSet(SemanticModelDerivation):
             )
         elif path_key.element_type is LinkableElementType.TIME_DIMENSION:
             assert path_key.time_granularity is not None
+            # TODO: [custom granularity] Remove block against custom granularity values
+            assert not path_key.time_granularity.is_custom_granularity, "Custom granularities are not yet supported!"
             return TimeDimensionSpec(
                 element_name=path_key.element_name,
                 entity_links=path_key.entity_links,
-                time_granularity=path_key.time_granularity,
+                time_granularity=path_key.time_granularity.base_granularity,
                 date_part=path_key.date_part,
             )
         elif path_key.element_type is LinkableElementType.ENTITY:

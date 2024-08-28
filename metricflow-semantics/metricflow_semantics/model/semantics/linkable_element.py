@@ -19,12 +19,12 @@ from dbt_semantic_interfaces.references import (
     SemanticModelReference,
 )
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
 
 from metricflow_semantics.assert_one_arg import assert_exactly_one_arg_set
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.workarounds.reference import sorted_semantic_model_references
 
 logger = logging.getLogger(__name__)
@@ -64,7 +64,7 @@ class ElementPathKey:
     element_name: str
     element_type: LinkableElementType
     entity_links: Tuple[EntityReference, ...]
-    time_granularity: Optional[TimeGranularity] = None
+    time_granularity: Optional[ExpandedTimeGranularity] = None
     date_part: Optional[DatePart] = None
     metric_subquery_entity_links: Tuple[EntityReference, ...] = ()
 
@@ -148,7 +148,7 @@ class LinkableDimension(LinkableElement, SerializableDataclass):
     dimension_type: DimensionType
     entity_links: Tuple[EntityReference, ...]
     join_path: SemanticModelJoinPath
-    time_granularity: Optional[TimeGranularity]
+    time_granularity: Optional[ExpandedTimeGranularity]
     date_part: Optional[DatePart]
 
     @staticmethod
@@ -159,7 +159,7 @@ class LinkableDimension(LinkableElement, SerializableDataclass):
         dimension_type: DimensionType,
         entity_links: Tuple[EntityReference, ...],
         join_path: SemanticModelJoinPath,
-        time_granularity: Optional[TimeGranularity],
+        time_granularity: Optional[ExpandedTimeGranularity],
         date_part: Optional[DatePart],
     ) -> LinkableDimension:
         return LinkableDimension(

@@ -31,6 +31,7 @@ from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_DAY
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_plan_snapshot_text_equal
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan import (
@@ -208,7 +209,7 @@ def test_filter_with_where_constraint_node(
                         dimension_type=DimensionType.TIME,
                         entity_links=(EntityReference(element_name="booking"),),
                         properties=frozenset(),
-                        time_granularity=TimeGranularity.DAY,
+                        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
                         date_part=None,
                         join_path=SemanticModelJoinPath(
                             left_semantic_model_reference=SemanticModelReference("bookings_source"),

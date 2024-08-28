@@ -5,7 +5,10 @@ GroupByItemResolution(
       ElementPathKey(
         element_name='metric_time',
         element_type=TIME_DIMENSION,
-        time_granularity=MONTH,
+        time_granularity=ExpandedTimeGranularity(
+          name='month',
+          base_granularity=MONTH,
+        ),
       ): (
         LinkableDimension(
           properties=(METRIC_TIME,),
@@ -19,7 +22,10 @@ GroupByItemResolution(
               semantic_model_name='monthly_measures_source',
             ),
           ),
-          time_granularity=MONTH,
+          time_granularity=ExpandedTimeGranularity(
+            name='month',
+            base_granularity=MONTH,
+          ),
         ),
       ),
     },
