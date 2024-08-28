@@ -5,7 +5,7 @@ from hashlib import sha1
 from typing import Any, Sequence, Tuple
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
-from dbt_semantic_interfaces.type_enums import AggregationType
+from dbt_semantic_interfaces.type_enums import AggregationType, TimeGranularity
 
 from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
@@ -40,9 +40,10 @@ class NonAdditiveDimensionSpec(SerializableDataclass):
         values.extend(sorted(self.window_groupings))
         return hash_items(values)
 
-    @property
-    def linkable_specs(self) -> Sequence[LinkableInstanceSpec]:  # noqa: D102
-        return (TimeDimensionSpec.from_name(self.name),) + tuple(
+    def linkable_specs(  # noqa: D102
+        self, non_additive_dimension_grain: TimeGranularity
+    ) -> Sequence[LinkableInstanceSpec]:
+        return (TimeDimensionSpec.from_name(self.name).with_grain(non_additive_dimension_grain),) + tuple(
             LinklessEntitySpec.from_element_name(entity_name) for entity_name in self.window_groupings
         )
 
