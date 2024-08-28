@@ -565,3 +565,26 @@ def test_min_max_metric_time_week(
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_non_additive_dimension_with_non_default_grain(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    sql_client: SqlClient,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+) -> None:
+    """Tests querying a metric with a non-additive agg_time_dimension that has non-default granularity."""
+    query_spec = MetricFlowQuerySpec(
+        metric_specs=(MetricSpec(element_name="total_account_balance_first_day_of_month"),)
+    )
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
