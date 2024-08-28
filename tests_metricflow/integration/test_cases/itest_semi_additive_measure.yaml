@@ -264,19 +264,19 @@ integration_test:
   name: non_default_grain
   description: Tests selecting a semi-additive measure with an agg_time_dimension that has non-default grain
   model: SIMPLE_MODEL
-  metrics: ["total_account_balance_first_day"]
+  metrics: ["total_account_balance_first_day_of_month"]
   check_query: |
     SELECT
-      SUM(subq_2.total_account_balance_first_day) AS total_account_balance_first_day
+      SUM(subq_2.total_account_balance_first_day_of_month) AS total_account_balance_first_day_of_month
     FROM (
       SELECT
-        {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS ds__day
-        , account_balance AS total_account_balance_first_day
+        {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS ds_month__month
+        , account_balance AS total_account_balance_first_day_of_month
       FROM {{ source_schema }}.fct_accounts
     ) subq_2
     INNER JOIN (
       SELECT
-        MIN({{ render_date_trunc("ds", TimeGranularity.DAY) }}) AS ds__day__complete
+        MIN({{ render_date_trunc("ds", TimeGranularity.MONTH) }}) AS ds_month__month__complete
       FROM {{ source_schema }}.fct_accounts
     ) subq_4
-    ON subq_2.ds__day = subq_4.ds__day__complete
+    ON subq_2.ds_month__month = subq_4.ds_month__month__complete
