@@ -1,6 +1,7 @@
 [
   'account__account_type',
   'account__ds',
+  'account__ds_month',
   'booking__ds',
   'booking__ds_partitioned',
   'booking__is_instant',

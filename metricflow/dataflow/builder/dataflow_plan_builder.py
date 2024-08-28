@@ -1348,8 +1348,13 @@ class DataflowPlanBuilder:
         for filter_spec in filter_specs:
             linkable_spec_sets_to_merge.append(LinkableSpecSet.create_from_specs(filter_spec.linkable_specs))
         if non_additive_dimension_spec:
+            non_additive_dimension_grain = self._semantic_model_lookup.get_defined_time_granularity(
+                TimeDimensionReference(non_additive_dimension_spec.name)
+            )
             linkable_spec_sets_to_merge.append(
-                LinkableSpecSet.create_from_specs(non_additive_dimension_spec.linkable_specs)
+                LinkableSpecSet.create_from_specs(
+                    non_additive_dimension_spec.linkable_specs(non_additive_dimension_grain)
+                )
             )
 
         extraneous_linkable_specs = LinkableSpecSet.merge_iterable(linkable_spec_sets_to_merge).dedupe()
@@ -1543,6 +1548,9 @@ class DataflowPlanBuilder:
         if non_additive_dimension_spec is not None:
             # Apply semi additive join on the node
             agg_time_dimension = measure_properties.agg_time_dimension
+            non_additive_dimension_grain = self._semantic_model_lookup.get_defined_time_granularity(
+                TimeDimensionReference(non_additive_dimension_spec.name)
+            )
             queried_time_dimension_spec: Optional[
                 TimeDimensionSpec
             ] = self._find_non_additive_dimension_in_linkable_specs(
@@ -1550,7 +1558,9 @@ class DataflowPlanBuilder:
                 linkable_specs=queried_linkable_specs.as_tuple,
                 non_additive_dimension_spec=non_additive_dimension_spec,
             )
-            time_dimension_spec = TimeDimensionSpec.from_name(non_additive_dimension_spec.name)
+            time_dimension_spec = TimeDimensionSpec.from_name(non_additive_dimension_spec.name).with_grain(
+                time_granularity=non_additive_dimension_grain
+            )
             window_groupings = tuple(
                 LinklessEntitySpec.from_element_name(name) for name in non_additive_dimension_spec.window_groupings
             )
