@@ -40,7 +40,7 @@ class TimeSpineSource:
     def build_standard_time_spine_sources(
         semantic_manifest: SemanticManifest,
     ) -> Dict[TimeGranularity, TimeSpineSource]:
-        """Creates a time spine source based on what's in the manifest."""
+        """Creates a set of time spine sources with standard granularities based on what's in the manifest."""
         time_spine_sources = {
             time_spine.primary_column.time_granularity: TimeSpineSource(
                 schema_name=time_spine.node_relation.schema_name,
@@ -74,3 +74,12 @@ class TimeSpineSource:
             )
 
         return time_spine_sources
+
+    @staticmethod
+    def build_custom_time_spine_sources(time_spine_sources: Sequence[TimeSpineSource]) -> Dict[str, TimeSpineSource]:
+        """Creates a set of time spine sources with custom granularities based on what's in the manifest."""
+        return {
+            column_name: time_spine_source
+            for time_spine_source in time_spine_sources
+            for column_name in time_spine_source.custom_granularity_columns
+        }
