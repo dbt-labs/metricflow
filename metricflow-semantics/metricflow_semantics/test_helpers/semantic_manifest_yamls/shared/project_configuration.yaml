@@ -1,7 +1,7 @@
 ---
 # Note: This file may be symlinked.
 project_configuration:
-  time_spine_table_configurations:
+  time_spine_table_configurations: # TODO: update DSI json schema so this is not required
     - location: $source_schema.mf_time_spine
       column_name: ds
       grain: day
@@ -43,7 +43,7 @@ project_configuration:
         name: ts
         time_granularity: hour
     - node_relation:
-        alias: mf_time_spine_day
+        alias: mf_time_spine
         schema_name: $source_schema
       primary_column:
         name: ds
