@@ -29,7 +29,7 @@ class TimeSpineSource:
     # The time granularity of the base column.
     base_granularity: TimeGranularity = DEFAULT_TIME_GRANULARITY
     db_name: Optional[str] = None
-    custom_granularity_columns: Sequence[str] = ()
+    custom_granularities: Sequence[str] = ()
 
     @property
     def spine_table(self) -> SqlTable:
@@ -48,7 +48,7 @@ class TimeSpineSource:
                 db_name=time_spine.node_relation.database,
                 base_column=time_spine.primary_column.name,
                 base_granularity=time_spine.primary_column.time_granularity,
-                custom_granularity_columns=[column.name for column in time_spine.custom_granularities],
+                custom_granularities=[column.name for column in time_spine.custom_granularities],
             )
             for time_spine in semantic_manifest.project_configuration.time_spines
         }
