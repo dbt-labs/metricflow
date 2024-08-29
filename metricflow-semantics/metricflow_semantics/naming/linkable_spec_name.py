@@ -104,3 +104,8 @@ class StructuredLinkableSpecName:
         return StructuredLinkableSpecName(
             entity_link_names=self.entity_link_names, element_name=self.element_name
         ).qualified_name
+
+    @property
+    def is_element_name(self) -> bool:
+        """Indicates whether or not this is an unadorned element name, i.e., one without links or time annotations."""
+        return self.qualified_name == self.element_name

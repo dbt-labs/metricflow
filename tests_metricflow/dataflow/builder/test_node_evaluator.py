@@ -576,7 +576,11 @@ def test_node_evaluator_with_multi_hop_scd_target(
     The validity window should have an entity link, the validity window join is mediated by an intervening
     node, and so we need to refer to that column via the link prefix.
     """
-    linkable_specs = [DimensionSpec.from_name("listing__lux_listing__is_confirmed_lux")]
+    linkable_specs = [
+        DimensionSpec(
+            element_name="is_confirmed_lux", entity_links=(EntityReference("listing"), EntityReference("lux_listing"))
+        )
+    ]
     node_evaluator = make_multihop_node_evaluator(
         source_node_set=mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST].source_node_set,
         semantic_manifest_lookup_with_multihop_links=scd_semantic_manifest_lookup,
@@ -641,7 +645,11 @@ def test_node_evaluator_with_multi_hop_through_scd(
     The validity window should NOT have any entity links, as the validity window join is not mediated by an
     intervening node and therefore the column name does not use the link prefix.
     """
-    linkable_specs = [DimensionSpec.from_name("listing__user__home_state_latest")]
+    linkable_specs = [
+        DimensionSpec(
+            element_name="home_state_latest", entity_links=(EntityReference("listing"), EntityReference("user"))
+        )
+    ]
     node_evaluator = make_multihop_node_evaluator(
         source_node_set=mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST].source_node_set,
         semantic_manifest_lookup_with_multihop_links=scd_semantic_manifest_lookup,
@@ -701,7 +709,9 @@ def test_node_evaluator_with_invalid_multi_hop_scd(
 
     This will return an empty result because the linkable spec is not joinable in this model.
     """
-    linkable_specs = [DimensionSpec.from_name("listing__user__account_type")]
+    linkable_specs = [
+        DimensionSpec(element_name="account_type", entity_links=(EntityReference("listing"), EntityReference("user")))
+    ]
     node_evaluator = make_multihop_node_evaluator(
         source_node_set=mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST].source_node_set,
         semantic_manifest_lookup_with_multihop_links=scd_semantic_manifest_lookup,

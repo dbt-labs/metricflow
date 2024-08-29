@@ -1425,7 +1425,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         select_columns: List[SqlSelectColumn] = []
         metadata_instances: List[MetadataInstance] = []
         for agg_type in (AggregationType.MIN, AggregationType.MAX):
-            metadata_spec = MetadataSpec.from_name(name=parent_column_alias, agg_type=agg_type)
+            metadata_spec = MetadataSpec(element_name=parent_column_alias, agg_type=agg_type)
             output_column_association = self._column_association_resolver.resolve_spec(metadata_spec)
             select_columns.append(
                 SqlSelectColumn(
@@ -1461,7 +1461,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         input_data_set: SqlDataSet = node.parent_node.accept(self)
         input_data_set_alias = self._next_unique_table_alias()
 
-        gen_uuid_spec = MetadataSpec.from_name(MetricFlowReservedKeywords.MF_INTERNAL_UUID.value)
+        gen_uuid_spec = MetadataSpec(MetricFlowReservedKeywords.MF_INTERNAL_UUID.value)
         output_column_association = self._column_association_resolver.resolve_spec(gen_uuid_spec)
         output_instance_set = input_data_set.instance_set.transform(
             AddMetadata(

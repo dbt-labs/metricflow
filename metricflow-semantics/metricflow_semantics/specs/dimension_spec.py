@@ -8,7 +8,6 @@ from dbt_semantic_interfaces.references import DimensionReference, EntityReferen
 from typing_extensions import override
 
 from metricflow_semantics.model.semantics.linkable_element import ElementPathKey, LinkableElementType
-from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.specs.instance_spec import InstanceSpecVisitor, LinkableInstanceSpec
 from metricflow_semantics.visitor import VisitorOutputT
 
@@ -30,15 +29,6 @@ class DimensionSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D101
     @staticmethod
     def from_linkable(spec: LinkableInstanceSpec) -> DimensionSpec:  # noqa: D102
         return DimensionSpec(element_name=spec.element_name, entity_links=spec.entity_links)
-
-    @staticmethod
-    def from_name(name: str) -> DimensionSpec:
-        """Construct from a name e.g. listing__ds__month."""
-        parsed_name = StructuredLinkableSpecName.from_name(name)
-        return DimensionSpec(
-            entity_links=tuple([EntityReference(idl) for idl in parsed_name.entity_link_names]),
-            element_name=parsed_name.element_name,
-        )
 
     @property
     def reference(self) -> DimensionReference:  # noqa: D102

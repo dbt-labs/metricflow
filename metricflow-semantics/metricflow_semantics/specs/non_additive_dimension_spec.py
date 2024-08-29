@@ -7,6 +7,7 @@ from typing import Any, Sequence, Tuple
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.type_enums import AggregationType, TimeGranularity
 
+from metricflow_semantics.naming.linkable_spec_name import DUNDER
 from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
@@ -33,6 +34,13 @@ class NonAdditiveDimensionSpec(SerializableDataclass):
     window_choice: AggregationType
     window_groupings: Tuple[str, ...] = ()
 
+    def __post_init__(self) -> None:
+        """Post init validator to ensure names with double-underscores are not allowed."""
+        assert self.name.find(DUNDER) == -1, (
+            f"Non-additive dimension spec references a dimension name `{self.name}`, with added annotations, but it "
+            "should be a simple element name reference. This should have been blocked by model validation!"
+        )
+
     @property
     def bucket_hash(self) -> str:
         """Returns the hash value used for grouping equivalent params."""
@@ -43,9 +51,9 @@ class NonAdditiveDimensionSpec(SerializableDataclass):
     def linkable_specs(  # noqa: D102
         self, non_additive_dimension_grain: TimeGranularity
     ) -> Sequence[LinkableInstanceSpec]:
-        return (TimeDimensionSpec.from_name(self.name).with_grain(non_additive_dimension_grain),) + tuple(
-            LinklessEntitySpec.from_element_name(entity_name) for entity_name in self.window_groupings
-        )
+        return (
+            TimeDimensionSpec(element_name=self.name, entity_links=(), time_granularity=non_additive_dimension_grain),
+        ) + tuple(LinklessEntitySpec.from_element_name(entity_name) for entity_name in self.window_groupings)
 
     def __eq__(self, other: Any) -> bool:  # type: ignore[misc]  # noqa: D105
         if not isinstance(other, NonAdditiveDimensionSpec):

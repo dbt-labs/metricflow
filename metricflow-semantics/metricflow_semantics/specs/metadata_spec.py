@@ -21,9 +21,5 @@ class MetadataSpec(InstanceSpec):
     def qualified_name(self) -> str:  # noqa: D102
         return f"{self.element_name}{DUNDER}{self.agg_type.value}" if self.agg_type else self.element_name
 
-    @staticmethod
-    def from_name(name: str, agg_type: Optional[AggregationType] = None) -> MetadataSpec:  # noqa: D102
-        return MetadataSpec(element_name=name, agg_type=agg_type)
-
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_metadata_spec(self)

@@ -24,6 +24,7 @@ from metricflow_semantics.errors.error_classes import InvalidSemanticModelError
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantics.element_group import ElementGrouper
 from metricflow_semantics.model.spec_converters import MeasureConverter
+from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
@@ -241,17 +242,23 @@ class SemanticModelLookup:
             semantic_models_for_dimension = self._dimension_index.get(dim.reference, []) + [semantic_model]
             self._dimension_index[dim.reference] = semantic_models_for_dimension
 
+            assert StructuredLinkableSpecName.from_name(dim.name).is_element_name, (
+                f"Dimension name `{dim.name}` contains annotations, but this name should be the plain element name "
+                "from the original model. This should have been blocked by validation!"
+            )
+
+            # TODO: Construct these specs correctly. All of the time dimension specs have the default granularity
             self._dimension_ref_to_spec[dim.time_dimension_reference or dim.reference] = (
-                TimeDimensionSpec.from_name(dim.name)
+                TimeDimensionSpec(element_name=dim.name, entity_links=())
                 if dim.type is DimensionType.TIME
-                else DimensionSpec.from_name(dim.name)
+                else DimensionSpec(element_name=dim.name, entity_links=())
             )
 
         for entity in semantic_model.entities:
             semantic_models_for_entity = self._entity_index.get(entity.reference, []) + [semantic_model]
             self._entity_index[entity.reference] = semantic_models_for_entity
 
-            self._entity_ref_to_spec[entity.reference] = EntitySpec.from_name(entity.name)
+            self._entity_ref_to_spec[entity.reference] = EntitySpec(element_name=entity.name, entity_links=())
 
         self._semantic_model_reference_to_semantic_model[semantic_model.reference] = semantic_model
 
