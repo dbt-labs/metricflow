@@ -62,7 +62,7 @@ def check_time_spine_source(
 
     time_spine_snapshot = time_spine_snapshot_candidates[0]
 
-    assert len(time_spine_snapshot.column_definitions) == 1
+    # This assumes the time spine column is the first column in the snapshot.
     time_column = time_spine_snapshot.column_definitions[0]
     assert time_column.name == time_spine_source.base_column
 
