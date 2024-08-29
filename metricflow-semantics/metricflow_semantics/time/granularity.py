@@ -30,3 +30,12 @@ class ExpandedTimeGranularity(SerializableDataclass):
     def from_time_granularity(cls, granularity: TimeGranularity) -> ExpandedTimeGranularity:
         """Factory method for creating an ExpandedTimeGranularity from a standard TimeGranularity enumeration value."""
         return ExpandedTimeGranularity(name=granularity.value, base_granularity=granularity)
+
+    @staticmethod
+    def is_standard_granularity_name(time_granularity_name: str) -> bool:
+        """Helper for checking if a given time granularity name is part of the standard TimeGranularity enumeration."""
+        for granularity in TimeGranularity:
+            if time_granularity_name == granularity.value:
+                return True
+
+        return False
