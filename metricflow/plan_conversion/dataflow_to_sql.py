@@ -195,7 +195,9 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         self._semantic_manifest_lookup = semantic_manifest_lookup
         self._metric_lookup = semantic_manifest_lookup.metric_lookup
         self._semantic_model_lookup = semantic_manifest_lookup.semantic_model_lookup
-        self._time_spine_sources = TimeSpineSource.create_from_manifest(semantic_manifest_lookup.semantic_manifest)
+        self._time_spine_sources = TimeSpineSource.build_standard_time_spine_sources(
+            semantic_manifest_lookup.semantic_manifest
+        )
 
     @property
     def column_association_resolver(self) -> ColumnAssociationResolver:  # noqa: D102

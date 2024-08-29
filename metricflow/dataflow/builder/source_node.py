@@ -60,7 +60,7 @@ class SourceNodeBuilder:
         self._semantic_manifest_lookup = semantic_manifest_lookup
         data_set_converter = SemanticModelToDataSetConverter(column_association_resolver)
         self._time_spine_source_nodes = {}
-        for granularity, time_spine_source in TimeSpineSource.create_from_manifest(
+        for granularity, time_spine_source in TimeSpineSource.build_standard_time_spine_sources(
             semantic_manifest_lookup.semantic_manifest
         ).items():
             data_set = data_set_converter.build_time_spine_source_data_set(time_spine_source)
