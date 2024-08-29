@@ -125,7 +125,7 @@ class ValidLinkableSpecResolver:
         # Sort semantic models by name for consistency in building derived objects.
         self._semantic_models = sorted(self._semantic_manifest.semantic_models, key=lambda x: x.name)
         self._join_evaluator = SemanticModelJoinEvaluator(semantic_model_lookup)
-        self._time_spine_sources = TimeSpineSource.create_from_manifest(self._semantic_manifest)
+        self._time_spine_sources = TimeSpineSource.build_standard_time_spine_sources(self._semantic_manifest)
 
         assert max_entity_links >= 0
         self._max_entity_links = max_entity_links

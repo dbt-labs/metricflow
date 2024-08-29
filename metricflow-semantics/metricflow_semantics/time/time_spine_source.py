@@ -37,7 +37,9 @@ class TimeSpineSource:
         return SqlTable(schema_name=self.schema_name, table_name=self.table_name, db_name=self.db_name)
 
     @staticmethod
-    def create_from_manifest(semantic_manifest: SemanticManifest) -> Dict[TimeGranularity, TimeSpineSource]:
+    def build_standard_time_spine_sources(
+        semantic_manifest: SemanticManifest,
+    ) -> Dict[TimeGranularity, TimeSpineSource]:
         """Creates a time spine source based on what's in the manifest."""
         time_spine_sources = {
             time_spine.primary_column.time_granularity: TimeSpineSource(
