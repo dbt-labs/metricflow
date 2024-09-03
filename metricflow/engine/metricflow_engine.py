@@ -595,9 +595,8 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                                     entity_reference.element_name
                                     for entity_reference in linkable_dimension.entity_links
                                 ),
-                                # TODO: Update StructuredLinkableSpecName to use ExpandedTimeGranularity
-                                time_granularity=(
-                                    linkable_dimension.time_granularity.base_granularity
+                                time_granularity_name=(
+                                    linkable_dimension.time_granularity.name
                                     if linkable_dimension.time_granularity is not None
                                     else None
                                 ),
