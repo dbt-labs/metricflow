@@ -56,6 +56,7 @@ from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.specs.where_filter.where_filter_transform import WhereSpecFactory
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 from tests_metricflow_semantics.specs.conftest import EXAMPLE_FILTER_LOCATION
 
@@ -167,7 +168,7 @@ def test_dimension_in_filter_with_grain(  # noqa: D103
                         element_name="created_at",
                         element_type=LinkableElementType.TIME_DIMENSION,
                         entity_links=(EntityReference("listing"),),
-                        time_granularity=TimeGranularity.WEEK,
+                        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.WEEK),
                         date_part=None,
                     ): (
                         LinkableDimension.create(
@@ -179,7 +180,7 @@ def test_dimension_in_filter_with_grain(  # noqa: D103
                                 left_semantic_model_reference=SemanticModelReference("bookings_source"),
                             ),
                             properties=frozenset(),
-                            time_granularity=TimeGranularity.WEEK,
+                            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.WEEK),
                             date_part=None,
                         ),
                     )
@@ -231,19 +232,19 @@ def test_time_dimension_in_filter(  # noqa: D103
                         element_name="created_at",
                         element_type=LinkableElementType.TIME_DIMENSION,
                         entity_links=(EntityReference("listing"),),
-                        time_granularity=TimeGranularity.MONTH,
+                        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
                         date_part=None,
                     ): (
                         LinkableDimension.create(
                             defined_in_semantic_model=SemanticModelReference("listings_source"),
-                            dimension_type=DimensionType.CATEGORICAL,
+                            dimension_type=DimensionType.TIME,
                             element_name="created_at",
                             entity_links=(EntityReference("listing"),),
                             join_path=SemanticModelJoinPath(
                                 left_semantic_model_reference=SemanticModelReference("bookings_source"),
                             ),
                             properties=frozenset(),
-                            time_granularity=TimeGranularity.MONTH,
+                            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
                             date_part=None,
                         ),
                     )
@@ -295,19 +296,19 @@ def test_time_dimension_with_grain_in_name(  # noqa: D103
                         element_name="created_at",
                         element_type=LinkableElementType.TIME_DIMENSION,
                         entity_links=(EntityReference("listing"),),
-                        time_granularity=TimeGranularity.MONTH,
+                        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
                         date_part=None,
                     ): (
                         LinkableDimension.create(
                             defined_in_semantic_model=SemanticModelReference("listings_source"),
-                            dimension_type=DimensionType.CATEGORICAL,
+                            dimension_type=DimensionType.TIME,
                             element_name="created_at",
                             entity_links=(EntityReference("listing"),),
                             join_path=SemanticModelJoinPath(
                                 left_semantic_model_reference=SemanticModelReference("bookings_source"),
                             ),
                             properties=frozenset(),
-                            time_granularity=TimeGranularity.MONTH,
+                            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
                             date_part=None,
                         ),
                     )
@@ -360,7 +361,7 @@ def test_date_part_in_filter(  # noqa: D103
                         element_name="metric_time",
                         element_type=LinkableElementType.TIME_DIMENSION,
                         entity_links=(),
-                        time_granularity=TimeGranularity.DAY,
+                        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
                         date_part=DatePart.YEAR,
                     ): (
                         LinkableDimension.create(
@@ -372,7 +373,7 @@ def test_date_part_in_filter(  # noqa: D103
                                 left_semantic_model_reference=SemanticModelReference("bookings_source"),
                             ),
                             properties=frozenset(),
-                            time_granularity=TimeGranularity.DAY,
+                            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
                             date_part=DatePart.YEAR,
                         ),
                     )
@@ -428,7 +429,7 @@ def resolved_spec_lookup() -> FilterSpecResolutionLookUp:
                             element_name="metric_time",
                             element_type=LinkableElementType.TIME_DIMENSION,
                             entity_links=(),
-                            time_granularity=TimeGranularity.WEEK,
+                            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.WEEK),
                             date_part=DatePart.YEAR,
                         ): (
                             LinkableDimension.create(
@@ -440,7 +441,7 @@ def resolved_spec_lookup() -> FilterSpecResolutionLookUp:
                                     left_semantic_model_reference=SemanticModelReference("bookings_source"),
                                 ),
                                 properties=frozenset(),
-                                time_granularity=TimeGranularity.WEEK,
+                                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.WEEK),
                                 date_part=DatePart.YEAR,
                             ),
                         )
@@ -550,8 +551,8 @@ def test_entity_in_filter(  # noqa: D103
                         element_name="user",
                         element_type=LinkableElementType.ENTITY,
                         entity_links=(EntityReference("listing"),),
-                        time_granularity=TimeGranularity.DAY,
-                        date_part=DatePart.YEAR,
+                        time_granularity=None,
+                        date_part=None,
                     ): (
                         LinkableEntity.create(
                             defined_in_semantic_model=SemanticModelReference("bookings"),
@@ -659,9 +660,9 @@ def test_dimension_time_dimension_parity(column_association_resolver: ColumnAsso
                             path_key_to_linkable_dimensions={
                                 ElementPathKey(
                                     element_name=METRIC_TIME_ELEMENT_NAME,
-                                    element_type=LinkableElementType.DIMENSION,
+                                    element_type=LinkableElementType.TIME_DIMENSION,
                                     entity_links=(EntityReference("listing"),),
-                                    time_granularity=TimeGranularity.DAY,
+                                    time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
                                     date_part=DatePart.YEAR,
                                 ): (
                                     LinkableDimension.create(
@@ -673,7 +674,9 @@ def test_dimension_time_dimension_parity(column_association_resolver: ColumnAsso
                                             left_semantic_model_reference=SemanticModelReference("bookings_source"),
                                         ),
                                         properties=frozenset(),
-                                        time_granularity=TimeGranularity.WEEK,
+                                        time_granularity=ExpandedTimeGranularity.from_time_granularity(
+                                            TimeGranularity.WEEK
+                                        ),
                                         date_part=DatePart.YEAR,
                                     ),
                                 )

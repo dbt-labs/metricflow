@@ -28,7 +28,10 @@ FilterSpecResolutionLookUp(
           ElementPathKey(
             element_name='metric_time',
             element_type=TIME_DIMENSION,
-            time_granularity=MONTH,
+            time_granularity=ExpandedTimeGranularity(
+              name='month',
+              base_granularity=MONTH,
+            ),
           ): (
             LinkableDimension(
               properties=(
@@ -44,7 +47,10 @@ FilterSpecResolutionLookUp(
                   semantic_model_name='monthly_measures_source',
                 ),
               ),
-              time_granularity=MONTH,
+              time_granularity=ExpandedTimeGranularity(
+                name='month',
+                base_granularity=MONTH,
+              ),
             ),
           ),
         },

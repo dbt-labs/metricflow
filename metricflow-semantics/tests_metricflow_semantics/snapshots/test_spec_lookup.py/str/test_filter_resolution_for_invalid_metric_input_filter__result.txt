@@ -28,7 +28,10 @@ FilterSpecResolutionLookUp(
           ElementPathKey(
             element_name='metric_time',
             element_type=TIME_DIMENSION,
-            time_granularity=YEAR,
+            time_granularity=ExpandedTimeGranularity(
+              name='year',
+              base_granularity=YEAR,
+            ),
           ): (
             LinkableDimension(
               properties=(
@@ -45,7 +48,10 @@ FilterSpecResolutionLookUp(
                   semantic_model_name='monthly_measures_source',
                 ),
               ),
-              time_granularity=YEAR,
+              time_granularity=ExpandedTimeGranularity(
+                name='year',
+                base_granularity=YEAR,
+              ),
             ),
             LinkableDimension(
               properties=(
@@ -61,7 +67,10 @@ FilterSpecResolutionLookUp(
                   semantic_model_name='yearly_measure_source',
                 ),
               ),
-              time_granularity=YEAR,
+              time_granularity=ExpandedTimeGranularity(
+                name='year',
+                base_granularity=YEAR,
+              ),
             ),
           ),
         },

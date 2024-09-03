@@ -595,12 +595,21 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                                     entity_reference.element_name
                                     for entity_reference in linkable_dimension.entity_links
                                 ),
-                                time_granularity=linkable_dimension.time_granularity,
+                                # TODO: Update StructuredLinkableSpecName to use ExpandedTimeGranularity
+                                time_granularity=(
+                                    linkable_dimension.time_granularity.base_granularity
+                                    if linkable_dimension.time_granularity is not None
+                                    else None
+                                ),
                             ).qualified_name,
                             description="Event time for metrics.",
                             metadata=None,
                             type_params=PydanticDimensionTypeParams(
-                                time_granularity=linkable_dimension.time_granularity,
+                                time_granularity=(
+                                    linkable_dimension.time_granularity.base_granularity
+                                    if linkable_dimension.time_granularity is not None
+                                    else None
+                                ),
                                 validity_params=None,
                             ),
                             is_partition=False,

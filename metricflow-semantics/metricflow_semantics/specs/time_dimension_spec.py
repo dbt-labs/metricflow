@@ -14,6 +14,7 @@ from metricflow_semantics.model.semantics.linkable_element import ElementPathKey
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.instance_spec import InstanceSpecVisitor
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.visitor import VisitorOutputT
 
 
@@ -141,7 +142,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
             element_name=self.element_name,
             element_type=LinkableElementType.TIME_DIMENSION,
             entity_links=self.entity_links,
-            time_granularity=self.time_granularity,
+            time_granularity=ExpandedTimeGranularity.from_time_granularity(self.time_granularity),
             date_part=self.date_part,
         )
 

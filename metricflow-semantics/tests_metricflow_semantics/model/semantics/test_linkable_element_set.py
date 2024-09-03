@@ -40,6 +40,7 @@ from metricflow_semantics.specs.patterns.entity_link_pattern import (
     ParameterSetField,
 )
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from more_itertools import bucket
 
 AMBIGUOUS_NAME = "ambiguous"
@@ -105,7 +106,7 @@ _time_dimension = LinkableDimension.create(
     defined_in_semantic_model=_base_semantic_model,
     join_path=SemanticModelJoinPath(left_semantic_model_reference=_measure_semantic_model),
     properties=frozenset([LinkableElementProperty.LOCAL_LINKED]),
-    time_granularity=TimeGranularity.DAY,
+    time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
     date_part=None,
 )
 # Resolves to the same local linked name name as _ambiguous_entity
@@ -598,7 +599,7 @@ def linkable_set() -> LinkableElementSet:  # noqa: D103
                 element_name="time_dimension_element",
                 entity_links=(entity_1,),
                 element_type=LinkableElementType.TIME_DIMENSION,
-                time_granularity=TimeGranularity.DAY,
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
             ): (
                 LinkableDimension.create(
                     defined_in_semantic_model=SemanticModelReference("time_dimension_source"),
@@ -615,7 +616,7 @@ def linkable_set() -> LinkableElementSet:  # noqa: D103
                         ),
                     ),
                     properties=frozenset(),
-                    time_granularity=TimeGranularity.DAY,
+                    time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
                     date_part=None,
                 ),
             ),
