@@ -242,10 +242,12 @@ class SemanticModelLookup:
             semantic_models_for_dimension = self._dimension_index.get(dim.reference, []) + [semantic_model]
             self._dimension_index[dim.reference] = semantic_models_for_dimension
 
-            assert StructuredLinkableSpecName.from_name(dim.name).is_element_name, (
-                f"Dimension name `{dim.name}` contains annotations, but this name should be the plain element name "
-                "from the original model. This should have been blocked by validation!"
-            )
+            if not StructuredLinkableSpecName.from_name(dim.name).is_element_name:
+                # TODO: [custom granularity] change this to an assertion once we're sure there aren't exceptions
+                logger.warning(
+                    f"Dimension name `{dim.name}` contains annotations, but this name should be the plain element name "
+                    "from the original model. This should have been blocked by validation!"
+                )
 
             # TODO: Construct these specs correctly. All of the time dimension specs have the default granularity
             self._dimension_ref_to_spec[dim.time_dimension_reference or dim.reference] = (

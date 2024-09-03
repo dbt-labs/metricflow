@@ -401,10 +401,12 @@ class DataflowPlanBuilder:
             descendent_filter_specs=metric_spec.filter_specs,
             queried_linkable_specs=queried_linkable_specs,
         )
-        assert StructuredLinkableSpecName.from_name(conversion_type_params.entity).is_element_name, (
-            f"Found additional annotations in type param entity name `{conversion_type_params.entity}`, which should "
-            "be a simple element name reference. This should have been blocked by model validation!"
-        )
+        # TODO: [custom granularity] change this to an assertion once we're sure there aren't exceptions
+        if not StructuredLinkableSpecName.from_name(conversion_type_params.entity).is_element_name:
+            logger.warning(
+                f"Found additional annotations in type param entity name `{conversion_type_params.entity}`, which "
+                "should be a simple element name reference. This should have been blocked by model validation!"
+            )
         entity_spec = EntitySpec(element_name=conversion_type_params.entity, entity_links=())
         logger.info(
             f"For conversion metric {metric_spec},\n"

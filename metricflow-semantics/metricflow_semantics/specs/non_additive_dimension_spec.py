@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from hashlib import sha1
 from typing import Any, Sequence, Tuple
@@ -12,6 +13,8 @@ from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.sql.sql_column_type import SqlColumnType
+
+logger = logging.getLogger(__file__)
 
 
 def hash_items(items: Sequence[SqlColumnType]) -> str:
@@ -36,10 +39,12 @@ class NonAdditiveDimensionSpec(SerializableDataclass):
 
     def __post_init__(self) -> None:
         """Post init validator to ensure names with double-underscores are not allowed."""
-        assert self.name.find(DUNDER) == -1, (
-            f"Non-additive dimension spec references a dimension name `{self.name}`, with added annotations, but it "
-            "should be a simple element name reference. This should have been blocked by model validation!"
-        )
+        # TODO: [custom granularity] change this to an assertion once we're sure there aren't exceptions
+        if not self.name.find(DUNDER) == -1:
+            logger.warning(
+                f"Non-additive dimension spec references a dimension name `{self.name}`, with added annotations, but it "
+                "should be a simple element name reference. This should have been blocked by model validation!"
+            )
 
     @property
     def bucket_hash(self) -> str:
