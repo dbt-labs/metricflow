@@ -22,11 +22,6 @@ class MeasureSpec(InstanceSpec):  # noqa: D101
     fill_nulls_with: Optional[int] = None
 
     @staticmethod
-    def from_name(name: str) -> MeasureSpec:
-        """Construct from a name e.g. listing__ds__month."""
-        return MeasureSpec(element_name=name)
-
-    @staticmethod
     def from_reference(reference: MeasureReference) -> MeasureSpec:
         """Initialize from a measure reference instance."""
         return MeasureSpec(element_name=reference.element_name)

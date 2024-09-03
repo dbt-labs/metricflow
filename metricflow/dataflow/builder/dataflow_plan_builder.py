@@ -26,6 +26,7 @@ from metricflow_semantics.mf_logging.formatting import indent
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.mf_logging.runtime import log_runtime
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
     FilterSpecResolutionLookUp,
@@ -352,7 +353,7 @@ class DataflowPlanBuilder:
             conversion_node=unaggregated_conversion_measure_node,
             conversion_measure_spec=conversion_measure_spec.measure_spec,
             conversion_time_dimension_spec=conversion_time_dimension_spec,
-            unique_identifier_keys=(MetadataSpec.from_name(MetricFlowReservedKeywords.MF_INTERNAL_UUID.value),),
+            unique_identifier_keys=(MetadataSpec(MetricFlowReservedKeywords.MF_INTERNAL_UUID.value),),
             entity_spec=entity_spec,
             window=window,
             constant_properties=constant_property_specs,
@@ -400,7 +401,13 @@ class DataflowPlanBuilder:
             descendent_filter_specs=metric_spec.filter_specs,
             queried_linkable_specs=queried_linkable_specs,
         )
-        entity_spec = EntitySpec.from_name(conversion_type_params.entity)
+        # TODO: [custom granularity] change this to an assertion once we're sure there aren't exceptions
+        if not StructuredLinkableSpecName.from_name(conversion_type_params.entity).is_element_name:
+            logger.warning(
+                f"Found additional annotations in type param entity name `{conversion_type_params.entity}`, which "
+                "should be a simple element name reference. This should have been blocked by model validation!"
+            )
+        entity_spec = EntitySpec(element_name=conversion_type_params.entity, entity_links=())
         logger.info(
             f"For conversion metric {metric_spec},\n"
             f"base_measure is:\n{mf_pformat(base_measure)}\n"
@@ -1558,8 +1565,11 @@ class DataflowPlanBuilder:
                 linkable_specs=queried_linkable_specs.as_tuple,
                 non_additive_dimension_spec=non_additive_dimension_spec,
             )
-            time_dimension_spec = TimeDimensionSpec.from_name(non_additive_dimension_spec.name).with_grain(
-                time_granularity=non_additive_dimension_grain
+            time_dimension_spec = TimeDimensionSpec(
+                # The NonAdditiveDimensionSpec name property is a plain element name
+                element_name=non_additive_dimension_spec.name,
+                entity_links=(),
+                time_granularity=non_additive_dimension_grain,
             )
             window_groupings = tuple(
                 LinklessEntitySpec.from_element_name(name) for name in non_additive_dimension_spec.window_groupings

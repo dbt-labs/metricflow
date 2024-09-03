@@ -8,7 +8,6 @@ from dbt_semantic_interfaces.references import EntityReference
 from typing_extensions import override
 
 from metricflow_semantics.model.semantics.linkable_element import ElementPathKey, LinkableElementType
-from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.specs.instance_spec import InstanceSpecVisitor, LinkableInstanceSpec
 from metricflow_semantics.visitor import VisitorOutputT
 
@@ -31,14 +30,6 @@ class EntitySpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D101
         eg as a prefix to a DimensionSpec's entity links to when a join is occurring via this entity
         """
         return (EntityReference(element_name=self.element_name),) + self.entity_links
-
-    @staticmethod
-    def from_name(name: str) -> EntitySpec:  # noqa: D102
-        structured_name = StructuredLinkableSpecName.from_name(name)
-        return EntitySpec(
-            entity_links=tuple(EntityReference(idl) for idl in structured_name.entity_link_names),
-            element_name=structured_name.element_name,
-        )
 
     def __eq__(self, other: Any) -> bool:  # type: ignore[misc]  # noqa: D105
         if not isinstance(other, EntitySpec):

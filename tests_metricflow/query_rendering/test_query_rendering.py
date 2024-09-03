@@ -322,7 +322,11 @@ def test_multi_hop_through_scd_dimension(
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec(element_name="bookings"),),
         time_dimension_specs=(MTD_SPEC_DAY,),
-        dimension_specs=(DimensionSpec.from_name(name="listing__user__home_state_latest"),),
+        dimension_specs=(
+            DimensionSpec(
+                element_name="home_state_latest", entity_links=(EntityReference("listing"), EntityReference("user"))
+            ),
+        ),
     )
 
     render_and_check(
@@ -347,7 +351,12 @@ def test_multi_hop_to_scd_dimension(
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec(element_name="bookings"),),
         time_dimension_specs=(MTD_SPEC_DAY,),
-        dimension_specs=(DimensionSpec.from_name(name="listing__lux_listing__is_confirmed_lux"),),
+        dimension_specs=(
+            DimensionSpec(
+                element_name="is_confirmed_lux",
+                entity_links=(EntityReference("listing"), EntityReference("lux_listing")),
+            ),
+        ),
     )
 
     render_and_check(

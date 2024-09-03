@@ -109,15 +109,6 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
             entity_links=(),
         )
 
-    @staticmethod
-    def from_name(name: str) -> TimeDimensionSpec:  # noqa: D102
-        structured_name = StructuredLinkableSpecName.from_name(name)
-        return TimeDimensionSpec(
-            entity_links=tuple(EntityReference(idl) for idl in structured_name.entity_link_names),
-            element_name=structured_name.element_name,
-            time_granularity=structured_name.time_granularity or DEFAULT_TIME_GRANULARITY,
-        )
-
     @property
     def reference(self) -> TimeDimensionReference:  # noqa: D102
         return TimeDimensionReference(element_name=self.element_name)
