@@ -226,7 +226,7 @@ class GroupByItemResolver:
         )
 
     def resolve_min_metric_time_grain(self) -> TimeGranularity:
-        """Returns the finest time grain of metric_time for querying."""
+        """Returns the finest base time grain of metric_time for querying."""
         metric_time_grain_resolution = self.resolve_matching_item_for_querying(
             spec_pattern=TimeDimensionPattern.from_call_parameter_set(
                 TimeDimensionCallParameterSet(
@@ -247,4 +247,4 @@ class GroupByItemResolver:
                 f"{metric_time_grain_resolution.spec} and issues:\n\n"
                 f"{indent(mf_pformat(metric_time_grain_resolution.issue_set))}"
             )
-        return metric_time_spec_set.time_dimension_specs[0].time_granularity
+        return metric_time_spec_set.time_dimension_specs[0].time_granularity.base_granularity

@@ -11,7 +11,12 @@ ParseQueryResult(
         entity_links=(EntityReference(element_name='user'),),
       ),
     ),
-    time_dimension_specs=(TimeDimensionSpec(element_name='metric_time', time_granularity=DAY),),
+    time_dimension_specs=(
+      TimeDimensionSpec(
+        element_name='metric_time',
+        time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY),
+      ),
+    ),
     filter_intersection=PydanticWhereFilterIntersection(),
     filter_spec_resolution_lookup=FilterSpecResolutionLookUp(),
     min_max_only=False,

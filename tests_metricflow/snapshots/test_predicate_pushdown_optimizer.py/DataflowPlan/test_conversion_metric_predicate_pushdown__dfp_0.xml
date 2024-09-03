@@ -65,7 +65,11 @@
                         <!--     element_name='home_state_latest',                     -->
                         <!--     entity_links=(EntityReference(element_name='user'),), -->
                         <!--   )                                                       -->
-                        <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
+                        <!-- include_spec =                                                                  -->
+                        <!--   TimeDimensionSpec(                                                            -->
+                        <!--     element_name='metric_time',                                                 -->
+                        <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                        <!--   )                                                                             -->
                         <!-- distinct = False -->
                         <WhereConstraintNode>
                             <!-- description = 'Constrain Output with WHERE' -->
@@ -125,7 +129,11 @@
                                 <!--     element_name='referrer_id',                            -->
                                 <!--     entity_links=(EntityReference(element_name='visit'),), -->
                                 <!--   )                                                        -->
-                                <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
+                                <!-- include_spec =                                                                  -->
+                                <!--   TimeDimensionSpec(                                                            -->
+                                <!--     element_name='metric_time',                                                 -->
+                                <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                                <!--   )                                                                             -->
                                 <!-- distinct = False -->
                                 <JoinOnEntitiesNode>
                                     <!-- description = 'Join Standard Outputs' -->
@@ -147,8 +155,14 @@
                                         <!--     element_name='referrer_id',                            -->
                                         <!--     entity_links=(EntityReference(element_name='visit'),), -->
                                         <!--   )                                                        -->
-                                        <!-- include_spec =                                                        -->
-                                        <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
+                                        <!-- include_spec =                                -->
+                                        <!--   TimeDimensionSpec(                          -->
+                                        <!--     element_name='metric_time',               -->
+                                        <!--     time_granularity=ExpandedTimeGranularity( -->
+                                        <!--       name='day',                             -->
+                                        <!--       base_granularity=DAY,                   -->
+                                        <!--     ),                                        -->
+                                        <!--   )                                           -->
                                         <!-- include_spec = LinklessEntitySpec(element_name='user') -->
                                         <!-- distinct = False -->
                                         <MetricTimeDimensionTransformNode>
@@ -191,7 +205,11 @@
                         <!--     element_name='home_state_latest',                     -->
                         <!--     entity_links=(EntityReference(element_name='user'),), -->
                         <!--   )                                                       -->
-                        <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
+                        <!-- include_spec =                                                                  -->
+                        <!--   TimeDimensionSpec(                                                            -->
+                        <!--     element_name='metric_time',                                                 -->
+                        <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                        <!--   )                                                                             -->
                         <!-- distinct = False -->
                         <JoinOnEntitiesNode>
                             <!-- description = 'Join Standard Outputs' -->
@@ -212,16 +230,26 @@
                                 <!--     element_name='referrer_id',                            -->
                                 <!--     entity_links=(EntityReference(element_name='visit'),), -->
                                 <!--   )                                                        -->
-                                <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
+                                <!-- include_spec =                                                                  -->
+                                <!--   TimeDimensionSpec(                                                            -->
+                                <!--     element_name='metric_time',                                                 -->
+                                <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                                <!--   )                                                                             -->
                                 <!-- include_spec = LinklessEntitySpec(element_name='user') -->
                                 <!-- distinct = False -->
                                 <JoinConversionEventsNode>
                                     <!-- description = 'Find conversions for user within the range of 7 day' -->
                                     <!-- node_id = NodeId(id_str='jce_0') -->
-                                    <!-- base_time_dimension_spec =                                   -->
-                                    <!--   TimeDimensionSpec(element_name='ds', time_granularity=DAY) -->
-                                    <!-- conversion_time_dimension_spec =                             -->
-                                    <!--   TimeDimensionSpec(element_name='ds', time_granularity=DAY) -->
+                                    <!-- base_time_dimension_spec =                                                      -->
+                                    <!--   TimeDimensionSpec(                                                            -->
+                                    <!--     element_name='ds',                                                          -->
+                                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                                    <!--   )                                                                             -->
+                                    <!-- conversion_time_dimension_spec =                                                -->
+                                    <!--   TimeDimensionSpec(                                                            -->
+                                    <!--     element_name='ds',                                                          -->
+                                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                                    <!--   )                                                                             -->
                                     <!-- entity_spec = EntitySpec(element_name='user') -->
                                     <!-- window = PydanticMetricTimeWindow(count=7, granularity=DAY) -->
                                     <!-- unique_key_specs = MetadataSpec(element_name='mf_internal_uuid') -->
@@ -241,9 +269,22 @@
                                         <!--     element_name='home_state_latest',                     -->
                                         <!--     entity_links=(EntityReference(element_name='user'),), -->
                                         <!--   )                                                       -->
-                                        <!-- include_spec = TimeDimensionSpec(element_name='ds', time_granularity=DAY) -->
-                                        <!-- include_spec =                                                        -->
-                                        <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
+                                        <!-- include_spec =                                -->
+                                        <!--   TimeDimensionSpec(                          -->
+                                        <!--     element_name='ds',                        -->
+                                        <!--     time_granularity=ExpandedTimeGranularity( -->
+                                        <!--       name='day',                             -->
+                                        <!--       base_granularity=DAY,                   -->
+                                        <!--     ),                                        -->
+                                        <!--   )                                           -->
+                                        <!-- include_spec =                                -->
+                                        <!--   TimeDimensionSpec(                          -->
+                                        <!--     element_name='metric_time',               -->
+                                        <!--     time_granularity=ExpandedTimeGranularity( -->
+                                        <!--       name='day',                             -->
+                                        <!--       base_granularity=DAY,                   -->
+                                        <!--     ),                                        -->
+                                        <!--   )                                           -->
                                         <!-- include_spec = EntitySpec(element_name='user') -->
                                         <!-- distinct = False -->
                                         <JoinOnEntitiesNode>

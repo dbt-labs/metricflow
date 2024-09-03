@@ -8,10 +8,21 @@ ParseQueryResult(
       ),
     ),
     entity_specs=(EntitySpec(element_name='listing'),),
-    time_dimension_specs=(TimeDimensionSpec(element_name='metric_time', time_granularity=DAY),),
+    time_dimension_specs=(
+      TimeDimensionSpec(
+        element_name='metric_time',
+        time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY),
+      ),
+    ),
     order_by_specs=(
       OrderBySpec(
-        instance_spec=TimeDimensionSpec(element_name='metric_time', time_granularity=DAY),
+        instance_spec=TimeDimensionSpec(
+          element_name='metric_time',
+          time_granularity=ExpandedTimeGranularity(
+            name='day',
+            base_granularity=DAY,
+          ),
+        ),
         descending=False,
       ),
       OrderBySpec(instance_spec=MetricSpec(element_name='bookings'), descending=True),

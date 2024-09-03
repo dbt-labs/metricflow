@@ -5,8 +5,13 @@
         <JoinToTimeSpineNode>
             <!-- description = 'Join to Time Spine Dataset' -->
             <!-- node_id = NodeId(id_str='jts_0') -->
-            <!-- requested_agg_time_dimension_specs =                                     -->
-            <!--   (TimeDimensionSpec(element_name='metric_time', time_granularity=DAY),) -->
+            <!-- requested_agg_time_dimension_specs =                                              -->
+            <!--   (                                                                               -->
+            <!--     TimeDimensionSpec(                                                            -->
+            <!--       element_name='metric_time',                                                 -->
+            <!--       time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+            <!--     ),                                                                            -->
+            <!--   )                                                                               -->
             <!-- use_custom_agg_time_dimension = False -->
             <!-- time_range_constraint =                             -->
             <!--   TimeRangeConstraint(                              -->
@@ -27,7 +32,11 @@
                         <!-- description = "Pass Only Elements: ['booking_value', 'metric_time__day', 'listing']" -->
                         <!-- node_id = NodeId(id_str='pfe_0') -->
                         <!-- include_spec = MeasureSpec(element_name='booking_value') -->
-                        <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
+                        <!-- include_spec =                                                                  -->
+                        <!--   TimeDimensionSpec(                                                            -->
+                        <!--     element_name='metric_time',                                                 -->
+                        <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                        <!--   )                                                                             -->
                         <!-- include_spec = LinklessEntitySpec(element_name='listing') -->
                         <!-- distinct = False -->
                         <MetricTimeDimensionTransformNode>

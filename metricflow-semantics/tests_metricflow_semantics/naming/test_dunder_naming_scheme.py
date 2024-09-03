@@ -12,6 +12,7 @@ from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_MONTH, MTD_SPEC_WEEK, MTD_SPEC_YEAR
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 
 @pytest.fixture(scope="session")
@@ -38,7 +39,7 @@ def test_input_str(dunder_naming_scheme: DunderNamingScheme) -> None:  # noqa: D
             TimeDimensionSpec(
                 element_name="creation_time",
                 entity_links=(EntityReference(element_name="booking"), EntityReference(element_name="listing")),
-                time_granularity=TimeGranularity.MONTH,
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
                 date_part=DatePart.DAY,
             )
         )
@@ -53,7 +54,7 @@ def test_input_str(dunder_naming_scheme: DunderNamingScheme) -> None:  # noqa: D
                     EntityReference(element_name="booking"),
                     EntityReference(element_name="listing"),
                 ),
-                time_granularity=TimeGranularity.MONTH,
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
             )
         )
         == "booking__listing__creation_time__month"

@@ -37,7 +37,10 @@
             <!--           time_dimension_specs=(                                      -->
             <!--             TimeDimensionSpec(                                        -->
             <!--               element_name='metric_time',                             -->
-            <!--               time_granularity=DAY,                                   -->
+            <!--               time_granularity=ExpandedTimeGranularity(               -->
+            <!--                 name='day',                                           -->
+            <!--                 base_granularity=DAY,                                 -->
+            <!--               ),                                                      -->
             <!--             ),                                                        -->
             <!--           ),                                                          -->
             <!--         ),                                                            -->
@@ -89,7 +92,10 @@
                         <!--       time_dimension_specs=(                                      -->
                         <!--         TimeDimensionSpec(                                        -->
                         <!--           element_name='metric_time',                             -->
-                        <!--           time_granularity=DAY,                                   -->
+                        <!--           time_granularity=ExpandedTimeGranularity(               -->
+                        <!--             name='day',                                           -->
+                        <!--             base_granularity=DAY,                                 -->
+                        <!--           ),                                                      -->
                         <!--         ),                                                        -->
                         <!--       ),                                                          -->
                         <!--     ),                                                            -->
@@ -104,7 +110,11 @@
                             <!--     element_name='is_instant',                               -->
                             <!--     entity_links=(EntityReference(element_name='booking'),), -->
                             <!--   )                                                          -->
-                            <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
+                            <!-- include_spec =                                                                  -->
+                            <!--   TimeDimensionSpec(                                                            -->
+                            <!--     element_name='metric_time',                                                 -->
+                            <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                            <!--   )                                                                             -->
                             <!-- distinct = False -->
                             <MetricTimeDimensionTransformNode>
                                 <!-- description = "Metric Time Dimension 'ds'" -->

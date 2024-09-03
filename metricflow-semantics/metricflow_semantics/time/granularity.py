@@ -11,16 +11,26 @@ class ExpandedTimeGranularity(SerializableDataclass):
     """Dataclass container for custom granularity extensions to the base TimeGranularity enumeration.
 
     This includes the granularity name, which is either the custom granularity or the TimeGranularity string value,
-    and an associated base time granularity value which we use as a pointer to the base grain used to look up the
-    time spine. This will allow for some level of comparison between custom granularities.
+    and an associated base time granularity value.
 
-    Note: this assumes that any base TimeGranularity value will derive the name from the TimeGranularity. It might be
-    worth adding validation to ensure that is always the case, meaning that no `name` value can be a value in the
-    TimeGranularity enumeration.
+    For custom granularities, we use the base time granularity as a pointer to the base standard grain used to look
+    up the time spine. For standard TimeGranularities the base_granularity is always the same as the TimeGranularity.
+
+    This will allow us to continue to do comparisons for standard TimeGranularity values, and also to do some level of
+    comparison between custom granularities.
     """
 
     name: str
     base_granularity: TimeGranularity
+
+    def __post_init__(self) -> None:
+        """Post init validation to ensure this class is configured correctly for standard time granularity values."""
+        if ExpandedTimeGranularity.is_standard_granularity_name(self.name):
+            assert TimeGranularity(self.name) == self.base_granularity, (
+                f"Invalid configuration of ExpandedTimeGranularity for standard TimeGranularity with name {self.name}."
+                f"This should correspond to a base_granularity of {TimeGranularity(self.name)}, but it has "
+                f"{self.base_granularity}."
+            )
 
     @property
     def is_custom_granularity(self) -> bool:  # noqa: D102

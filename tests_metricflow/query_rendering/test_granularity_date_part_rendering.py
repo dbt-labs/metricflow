@@ -18,6 +18,7 @@ from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataset.dataset_classes import DataSet
@@ -140,7 +141,7 @@ def test_sub_daily_dimension(  # noqa: D103
         time_dimension_specs=(
             TimeDimensionSpec(
                 element_name="bio_added_ts",
-                time_granularity=TimeGranularity.SECOND,
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.SECOND),
                 entity_links=(EntityReference("user"),),
             ),
         ),
@@ -169,7 +170,7 @@ def test_simple_metric_with_sub_daily_dimension(  # noqa: D103
         time_dimension_specs=(
             TimeDimensionSpec(
                 element_name="archived_at",
-                time_granularity=TimeGranularity.HOUR,
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.HOUR),
                 entity_links=(EntityReference("user"),),
             ),
         ),
@@ -198,7 +199,7 @@ def test_simple_metric_with_joined_sub_daily_dimension(  # noqa: D103
         time_dimension_specs=(
             TimeDimensionSpec(
                 element_name="bio_added_ts",
-                time_granularity=TimeGranularity.MINUTE,
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MINUTE),
                 entity_links=(
                     EntityReference("listing"),
                     EntityReference("user"),

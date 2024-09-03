@@ -182,7 +182,11 @@ def test_filter_with_where_constraint_node(
         "bookings_source"
     ]
 
-    ds_spec = TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.DAY)
+    ds_spec = TimeDimensionSpec(
+        element_name="ds",
+        entity_links=(),
+        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
+    )
     filter_node = FilterElementsNode.create(
         parent_node=source_node,
         include_specs=InstanceSpecSet(measure_specs=(measure_spec,), time_dimension_specs=(ds_spec,)),
@@ -198,7 +202,7 @@ def test_filter_with_where_constraint_node(
                         TimeDimensionSpec(
                             element_name="ds",
                             entity_links=(EntityReference(element_name="booking"),),
-                            time_granularity=TimeGranularity.DAY,
+                            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
                         ),
                     ),
                 ),
@@ -574,7 +578,9 @@ def test_join_to_time_spine_node_without_offset(
     entity_spec = LinklessEntitySpec.from_element_name(element_name="listing")
     metric_input_measure_specs = (MetricInputMeasureSpec(measure_spec=measure_spec),)
     metric_time_spec = TimeDimensionSpec(
-        element_name="metric_time", entity_links=(), time_granularity=TimeGranularity.DAY
+        element_name="metric_time",
+        entity_links=(),
+        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
     )
     measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
@@ -647,7 +653,9 @@ def test_join_to_time_spine_node_with_offset_window(
     entity_spec = LinklessEntitySpec.from_element_name(element_name="listing")
     metric_input_measure_specs = (MetricInputMeasureSpec(measure_spec=measure_spec),)
     metric_time_spec = TimeDimensionSpec(
-        element_name="metric_time", entity_links=(), time_granularity=TimeGranularity.DAY
+        element_name="metric_time",
+        entity_links=(),
+        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
     )
     measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
@@ -720,7 +728,9 @@ def test_join_to_time_spine_node_with_offset_to_grain(
     entity_spec = LinklessEntitySpec.from_element_name(element_name="listing")
     metric_input_measure_specs = (MetricInputMeasureSpec(measure_spec=measure_spec),)
     metric_time_spec = TimeDimensionSpec(
-        element_name="metric_time", entity_links=(), time_granularity=TimeGranularity.DAY
+        element_name="metric_time",
+        entity_links=(),
+        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
     )
     measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
@@ -969,7 +979,9 @@ def test_semi_additive_join_node_with_queried_group_by(
     non_additive_dimension_spec = NonAdditiveDimensionSpec(name="ds", window_choice=AggregationType.MIN)
     time_dimension_spec = TimeDimensionSpec(element_name="ds", entity_links=())
     queried_time_dimension_spec = TimeDimensionSpec(
-        element_name="ds", entity_links=(), time_granularity=TimeGranularity.WEEK
+        element_name="ds",
+        entity_links=(),
+        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.WEEK),
     )
 
     measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
@@ -1047,7 +1059,11 @@ def test_constrain_time_range_node(
                 ),
             ),
             time_dimension_specs=(
-                TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.DAY),
+                TimeDimensionSpec(
+                    element_name="ds",
+                    entity_links=(),
+                    time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
+                ),
             ),
         ),
     )

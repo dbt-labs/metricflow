@@ -154,7 +154,7 @@ class _DunderNameTransform(InstanceSpecSetTransform[Sequence[str]]):
             if time_dimension_spec.date_part is not None:
                 items.append(DunderNamingScheme.date_part_suffix(date_part=time_dimension_spec.date_part))
             else:
-                items.append(time_dimension_spec.time_granularity.value)
+                items.append(time_dimension_spec.time_granularity.name)
             names_to_return.append(DUNDER.join(items))
 
         for other_group_by_item_specs in (

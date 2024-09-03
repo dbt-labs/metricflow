@@ -9,6 +9,7 @@ from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
@@ -61,7 +62,9 @@ def test_conversion_rate_with_window(
         entity_links=(EntityReference(element_name="visit"),),
     )
     metric_time_spec = TimeDimensionSpec(
-        element_name="metric_time", entity_links=(), time_granularity=TimeGranularity.DAY
+        element_name="metric_time",
+        entity_links=(),
+        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
     )
     metric_spec = MetricSpec(element_name="visit_buy_conversion_rate_7days")
 
@@ -149,7 +152,9 @@ def test_conversion_rate_with_constant_properties(
         entity_links=(EntityReference(element_name="visit"),),
     )
     metric_time_spec = TimeDimensionSpec(
-        element_name="metric_time", entity_links=(), time_granularity=TimeGranularity.DAY
+        element_name="metric_time",
+        entity_links=(),
+        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
     )
     dataflow_plan = dataflow_plan_builder.build_plan(
         query_spec=MetricFlowQuerySpec(
@@ -179,7 +184,9 @@ def test_conversion_metric_join_to_timespine_and_fill_nulls_with_0(
     """Test conversion metric that joins to time spine and fills nulls with 0."""
     metric_spec = MetricSpec(element_name="visit_buy_conversion_rate_7days_fill_nulls_with_0")
     metric_time_spec = TimeDimensionSpec(
-        element_name="metric_time", entity_links=(), time_granularity=TimeGranularity.DAY
+        element_name="metric_time",
+        entity_links=(),
+        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
     )
     dataflow_plan = dataflow_plan_builder.build_plan(
         query_spec=MetricFlowQuerySpec(

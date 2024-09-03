@@ -1,5 +1,8 @@
 GroupByItemResolution(
-  spec=TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH),
+  spec=TimeDimensionSpec(
+    element_name='metric_time',
+    time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH),
+  ),
   linkable_element_set=LinkableElementSet(
     path_key_to_linkable_dimensions={
       ElementPathKey(

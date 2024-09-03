@@ -713,7 +713,7 @@ def test_filter_by_pattern(linkable_set: LinkableElementSet) -> None:
         TimeDimensionSpec(
             element_name="time_dimension_element",
             entity_links=(EntityReference("entity_1"),),
-            time_granularity=TimeGranularity.DAY,
+            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
             date_part=None,
         ),
     )

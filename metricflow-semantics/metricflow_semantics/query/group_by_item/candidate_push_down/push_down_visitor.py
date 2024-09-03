@@ -67,6 +67,8 @@ class PushDownResult:
     # The issues seen so far while pushing down the result / resolving the ambiguity.
     issue_set: MetricFlowQueryResolutionIssueSet
     # The largest default time granularity of the metrics seen in the DAG so far. Used to resolve metric_time.
+    # TODO: [custom granularity] decide whether or not to support custom granularities as metric_time defaults and
+    # update accordingly
     max_metric_default_time_granularity: Optional[TimeGranularity] = None
 
     def __post_init__(self) -> None:  # noqa: D105

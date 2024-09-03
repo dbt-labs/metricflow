@@ -160,7 +160,7 @@ def test_dimension_in_filter_with_grain(  # noqa: D103
             resolved_spec=TimeDimensionSpec(
                 element_name="created_at",
                 entity_links=(EntityReference("listing"),),
-                time_granularity=TimeGranularity.WEEK,
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.WEEK),
             ),
             resolved_linkable_element_set=LinkableElementSet(
                 path_key_to_linkable_dimensions={
@@ -202,7 +202,7 @@ def test_dimension_in_filter_with_grain(  # noqa: D103
             TimeDimensionSpec(
                 element_name="created_at",
                 entity_links=(EntityReference(element_name="listing"),),
-                time_granularity=TimeGranularity.WEEK,
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.WEEK),
             ),
         ),
         entity_specs=(),
@@ -224,7 +224,7 @@ def test_time_dimension_in_filter(  # noqa: D103
             resolved_spec=TimeDimensionSpec(
                 element_name="created_at",
                 entity_links=(EntityReference("listing"),),
-                time_granularity=TimeGranularity.MONTH,
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
             ),
             resolved_linkable_element_set=LinkableElementSet(
                 path_key_to_linkable_dimensions={
@@ -266,7 +266,7 @@ def test_time_dimension_in_filter(  # noqa: D103
             TimeDimensionSpec(
                 element_name="created_at",
                 entity_links=(EntityReference(element_name="listing"),),
-                time_granularity=TimeGranularity.MONTH,
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
             ),
         ),
         entity_specs=(),
@@ -288,7 +288,7 @@ def test_time_dimension_with_grain_in_name(  # noqa: D103
             resolved_spec=TimeDimensionSpec(
                 element_name="created_at",
                 entity_links=(EntityReference("listing"),),
-                time_granularity=TimeGranularity.MONTH,
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
             ),
             resolved_linkable_element_set=LinkableElementSet(
                 path_key_to_linkable_dimensions={
@@ -330,7 +330,7 @@ def test_time_dimension_with_grain_in_name(  # noqa: D103
             TimeDimensionSpec(
                 element_name="created_at",
                 entity_links=(EntityReference(element_name="listing"),),
-                time_granularity=TimeGranularity.MONTH,
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
             ),
         ),
         entity_specs=(),
@@ -352,7 +352,7 @@ def test_date_part_in_filter(  # noqa: D103
             resolved_spec=TimeDimensionSpec(
                 element_name="metric_time",
                 entity_links=(),
-                time_granularity=TimeGranularity.DAY,
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
                 date_part=DatePart.YEAR,
             ),
             resolved_linkable_element_set=LinkableElementSet(
@@ -395,7 +395,7 @@ def test_date_part_in_filter(  # noqa: D103
             TimeDimensionSpec(
                 element_name="metric_time",
                 entity_links=(),
-                time_granularity=TimeGranularity.DAY,
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
                 date_part=DatePart.YEAR,
             ),
         ),
@@ -483,7 +483,7 @@ def test_date_part_and_grain_in_filter(  # noqa: D103
             TimeDimensionSpec(
                 element_name="metric_time",
                 entity_links=(),
-                time_granularity=TimeGranularity.WEEK,
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.WEEK),
                 date_part=DatePart.YEAR,
             ),
         ),
@@ -520,7 +520,7 @@ def test_date_part_less_than_grain_in_filter(  # noqa: D103
             TimeDimensionSpec(
                 element_name="metric_time",
                 entity_links=(),
-                time_granularity=TimeGranularity.WEEK,
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.WEEK),
                 date_part=DatePart.DAY,
             ),
         ),

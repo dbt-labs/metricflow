@@ -1,10 +1,21 @@
 ParseQueryResult(
   query_spec=MetricFlowQuerySpec(
     metric_specs=(MetricSpec(element_name='bookings'), MetricSpec(element_name='revenue')),
-    time_dimension_specs=(TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH),),
+    time_dimension_specs=(
+      TimeDimensionSpec(
+        element_name='metric_time',
+        time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH),
+      ),
+    ),
     order_by_specs=(
       OrderBySpec(
-        instance_spec=TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH),
+        instance_spec=TimeDimensionSpec(
+          element_name='metric_time',
+          time_granularity=ExpandedTimeGranularity(
+            name='month',
+            base_granularity=MONTH,
+          ),
+        ),
         descending=True,
       ),
     ),

@@ -13,6 +13,7 @@ from metricflow_semantics.specs.entity_spec import EntitySpec, LinklessEntitySpe
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.node_evaluator import (
@@ -427,12 +428,14 @@ def test_node_evaluator_with_multihop_joined_spec(
                 join_on_partition_time_dimensions=(
                     PartitionTimeDimensionJoinDescription(
                         start_node_time_dimension_spec=TimeDimensionSpec(
-                            element_name="ds_partitioned", entity_links=(), time_granularity=TimeGranularity.DAY
+                            element_name="ds_partitioned",
+                            entity_links=(),
+                            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
                         ),
                         node_to_join_time_dimension_spec=TimeDimensionSpec(
                             element_name="ds_partitioned",
                             entity_links=(),
-                            time_granularity=TimeGranularity.DAY,
+                            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
                         ),
                     ),
                 ),

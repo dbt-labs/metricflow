@@ -98,7 +98,16 @@ class PartitionJoinResolver:
     def _get_simplest_time_dimension_spec(time_dimension_specs: Sequence[TimeDimensionSpec]) -> TimeDimensionSpec:
         """Return the time dimension spec with the smallest granularity, then fewest entity links."""
         assert len(time_dimension_specs) > 0
-        sorted_specs = sorted(time_dimension_specs, key=lambda x: (x.time_granularity, len(x.entity_links)))
+        # TODO: [custom granularity] restructure this method to operate on partition collections instead, and
+        # move this enforcement to the PartitionSpecSet
+        assert all(not x.time_granularity.is_custom_granularity for x in time_dimension_specs), (
+            f"Found custom granularity in partition time dimension specs {time_dimension_specs}, but time partitions "
+            "can only use standard granularities as they are based on engine date/time types!"
+        )
+
+        sorted_specs = sorted(
+            time_dimension_specs, key=lambda x: (x.time_granularity.base_granularity, len(x.entity_links))
+        )
         return sorted_specs[0]
 
     def resolve_partition_time_dimension_joins(

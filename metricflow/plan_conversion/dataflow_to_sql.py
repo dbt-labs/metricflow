@@ -245,11 +245,16 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         - Time spines available: SECOND, MINUTE, DAY
         - Agg time dimension granularity needed for request: HOUR, DAY
         --> Selected time spine: MINUTE
+
+        Note time spines are identified by the base granularity from the time dimension instance, not the raw granularity
+        name.
         """
         assert (
             agg_time_dimension_instances
         ), "Building time spine dataset requires agg_time_dimension_instances, but none were found."
-        smallest_agg_time_grain = min(dim.spec.time_granularity for dim in agg_time_dimension_instances)
+        smallest_agg_time_grain = min(
+            dim.spec.time_granularity.base_granularity for dim in agg_time_dimension_instances
+        )
         compatible_time_spine_grains = [
             grain for grain in self._time_spine_sources.keys() if grain.to_int() <= smallest_agg_time_grain.to_int()
         ]
@@ -283,14 +288,17 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             column_alias = self.column_association_resolver.resolve_spec(agg_time_dimension_instance.spec).column_name
             # If the requested granularity is the same as the granularity of the spine, do a direct select.
             # TODO: also handle date part.
-            if agg_time_dimension_instance.spec.time_granularity == time_spine_source.base_granularity:
+            # TODO: [custom granularity] add support for custom granularities to make_time_spine_data_set
+            agg_time_grain = agg_time_dimension_instance.spec.time_granularity
+            assert not agg_time_grain.is_custom_granularity, "Custom time granularities are not yet supported!"
+            if agg_time_grain.base_granularity == time_spine_source.base_granularity:
                 select_columns += (SqlSelectColumn(expr=column_expr, column_alias=column_alias),)
             # If any columns have a different granularity, apply a DATE_TRUNC() and aggregate via group_by.
             else:
                 select_columns += (
                     SqlSelectColumn(
                         expr=SqlDateTruncExpression.create(
-                            time_granularity=agg_time_dimension_instance.spec.time_granularity, arg=column_expr
+                            time_granularity=agg_time_grain.base_granularity, arg=column_expr
                         ),
                         column_alias=column_alias,
                     ),
@@ -331,15 +339,15 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         input_data_set_alias = self._next_unique_table_alias()
 
         # Find requested agg_time_dimensions in parent instance set.
-        # Will use instance with smallest granularity in time spine join.
+        # Will use instance with smallest base granularity in time spine join.
         agg_time_dimension_instance_for_join: Optional[TimeDimensionInstance] = None
         requested_agg_time_dimension_instances: Tuple[TimeDimensionInstance, ...] = ()
         for instance in input_data_set.instance_set.time_dimension_instances:
             if instance.spec in node.queried_agg_time_dimension_specs:
                 requested_agg_time_dimension_instances += (instance,)
                 if not agg_time_dimension_instance_for_join or (
-                    instance.spec.time_granularity.to_int()
-                    < agg_time_dimension_instance_for_join.spec.time_granularity.to_int()
+                    instance.spec.time_granularity.base_granularity.to_int()
+                    < agg_time_dimension_instance_for_join.spec.time_granularity.base_granularity.to_int()
                 ):
                     agg_time_dimension_instance_for_join = instance
         assert (
@@ -996,18 +1004,25 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             ds >= '2020-01-01' AND ds <= '2020-02-01'
 
         instead of this: DATE_TRUNC('month', ds) >= '2020-01-01' AND DATE_TRUNC('month', ds <= '2020-02-01')
+
+        Since time range constraints are always bound by a range of standard date/time values, this conversion
+        cannot use custom granularities.
         """
         from_data_set: SqlDataSet = node.parent_node.accept(self)
         from_data_set_alias = self._next_unique_table_alias()
 
         time_dimension_instances_for_metric_time = sorted(
-            from_data_set.metric_time_dimension_instances,
-            key=lambda x: x.spec.time_granularity.to_int(),
+            [
+                instance
+                for instance in from_data_set.metric_time_dimension_instances
+                if not instance.spec.time_granularity.is_custom_granularity
+            ],
+            key=lambda x: x.spec.time_granularity.base_granularity.to_int(),
         )
 
         assert (
             len(time_dimension_instances_for_metric_time) > 0
-        ), "No metric time dimensions found in the input data set for this node"
+        ), "No metric time dimensions with standard granularities found in the input data set for this node"
 
         time_dimension_instance_for_metric_time = time_dimension_instances_for_metric_time[0]
 
@@ -1064,7 +1079,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 output_measure_instances.append(measure_instance)
 
         # Find time dimension instances that refer to the same dimension as the one specified in the node.
-        matching_time_dimension_instances = []
+        matching_time_dimension_instances: List[TimeDimensionInstance] = []
         for time_dimension_instance in input_data_set.instance_set.time_dimension_instances:
             # The specification for the time dimension to use for aggregation is the local one.
             if (
@@ -1080,7 +1095,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         # For those matching time dimension instances, create the analog metric time dimension instances for the output.
         for matching_time_dimension_instance in matching_time_dimension_instances:
             metric_time_dimension_spec = DataSet.metric_time_dimension_spec(
-                time_granularity=matching_time_dimension_instance.spec.time_granularity,
+                time_granularity=matching_time_dimension_instance.spec.time_granularity.base_granularity,
                 date_part=matching_time_dimension_instance.spec.date_part,
             )
             metric_time_dimension_column_association = self._column_association_resolver.resolve_spec(
@@ -1262,8 +1277,12 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             ):
                 agg_time_dimension_instances.append(instance)
 
-        # Choose the instance with the smallest granularity available.
-        agg_time_dimension_instances.sort(key=lambda instance: instance.spec.time_granularity.to_int())
+        # Choose the instance with the smallest standard granularity available.
+        # TODO: [custom granularity] Update to account for custom granularity instances
+        assert all(
+            [not instance.spec.time_granularity.is_custom_granularity for instance in agg_time_dimension_instances]
+        ), "Custom granularities are not yet supported!"
+        agg_time_dimension_instances.sort(key=lambda instance: instance.spec.time_granularity.base_granularity.to_int())
         assert len(agg_time_dimension_instances) > 0, (
             "Couldn't find requested agg_time_dimension in parent data set. The dataflow plan may have been "
             "configured incorrectly."
@@ -1352,8 +1371,8 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             # TODO: this will break when we start supporting smaller grain than DAY unless the time spine table is
             # updated to use the smallest available grain.
             if (
-                time_dimension_spec.time_granularity.to_int()
-                < original_time_spine_dim_instance.spec.time_granularity.to_int()
+                time_dimension_spec.time_granularity.base_granularity.to_int()
+                < original_time_spine_dim_instance.spec.time_granularity.base_granularity.to_int()
             ):
                 raise RuntimeError(
                     f"Can't join to time spine for a time dimension with a smaller granularity than that of the time "
@@ -1362,11 +1381,16 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 )
 
             # Apply grain to time spine select expression, unless grain already matches original time spine column.
+            should_skip_date_trunc = (
+                time_dimension_spec.time_granularity == original_time_spine_dim_instance.spec.time_granularity
+                or time_dimension_spec.time_granularity.is_custom_granularity
+            )
             select_expr: SqlExpressionNode = (
                 time_spine_column_select_expr
-                if time_dimension_spec.time_granularity == original_time_spine_dim_instance.spec.time_granularity
+                if should_skip_date_trunc
                 else SqlDateTruncExpression.create(
-                    time_granularity=time_dimension_spec.time_granularity, arg=time_spine_column_select_expr
+                    time_granularity=time_dimension_spec.time_granularity.base_granularity,
+                    arg=time_spine_column_select_expr,
                 )
             )
             # Filter down to one row per granularity period requested in the group by. Any other granularities

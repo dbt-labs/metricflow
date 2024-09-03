@@ -7,6 +7,7 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.instances import InstanceSet
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 from metricflow.dataflow.nodes.join_to_base import ValidityWindowJoinDescription
 from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
@@ -36,16 +37,18 @@ def test_validity_window_conversion(
     scd_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Tests converting an instance set with a single validity window into a ValidityWindowJoinDescription."""
-    # The listings semantic model uses a 2-column SCD Type III layout
+    # The listings semantic model uses a 2-column SCD Type II layout
     dataset = mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST].data_set_mapping["listings"]
     expected_join_description = ValidityWindowJoinDescription(
         window_start_dimension=TimeDimensionSpec(
             element_name="window_start",
-            time_granularity=TimeGranularity.DAY,
+            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
             entity_links=(),
         ),
         window_end_dimension=TimeDimensionSpec(
-            element_name="window_end", time_granularity=TimeGranularity.DAY, entity_links=()
+            element_name="window_end",
+            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
+            entity_links=(),
         ),
     )
 

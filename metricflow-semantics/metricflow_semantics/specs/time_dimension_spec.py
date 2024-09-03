@@ -50,7 +50,7 @@ class TimeDimensionSpecComparisonKey:
 
         # This is a list of field values of TimeDimensionSpec that we should use for comparison.
         spec_field_values_for_comparison: List[
-            Union[str, Tuple[EntityReference, ...], TimeGranularity, Optional[DatePart]]
+            Union[str, Tuple[EntityReference, ...], ExpandedTimeGranularity, Optional[DatePart]]
         ] = [self._source_spec.element_name, self._source_spec.entity_links]
 
         if TimeDimensionSpecField.TIME_GRANULARITY not in self._excluded_fields:
@@ -84,7 +84,7 @@ DEFAULT_TIME_GRANULARITY = TimeGranularity.DAY
 
 @dataclass(frozen=True)
 class TimeDimensionSpec(DimensionSpec):  # noqa: D101
-    time_granularity: TimeGranularity = DEFAULT_TIME_GRANULARITY
+    time_granularity: ExpandedTimeGranularity = ExpandedTimeGranularity.from_time_granularity(DEFAULT_TIME_GRANULARITY)
     date_part: Optional[DatePart] = None
 
     # Used for semi-additive joins. Some more thought is needed, but this may be useful in InstanceSpec.
@@ -122,7 +122,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
         return StructuredLinkableSpecName(
             entity_link_names=tuple(x.element_name for x in self.entity_links),
             element_name=self.element_name,
-            time_granularity_name=self.time_granularity.value,
+            time_granularity_name=self.time_granularity.name,
             date_part=self.date_part,
         ).qualified_name
 
@@ -133,7 +133,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
             element_name=self.element_name,
             element_type=LinkableElementType.TIME_DIMENSION,
             entity_links=self.entity_links,
-            time_granularity=ExpandedTimeGranularity.from_time_granularity(self.time_granularity),
+            time_granularity=self.time_granularity,
             date_part=self.date_part,
         )
 
@@ -145,7 +145,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_time_dimension_spec(self)
 
-    def with_grain(self, time_granularity: TimeGranularity) -> TimeDimensionSpec:  # noqa: D102
+    def with_grain(self, time_granularity: ExpandedTimeGranularity) -> TimeDimensionSpec:  # noqa: D102
         return TimeDimensionSpec(
             element_name=self.element_name,
             entity_links=self.entity_links,
@@ -174,14 +174,18 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
     def generate_possible_specs_for_time_dimension(
         time_dimension_reference: TimeDimensionReference, entity_links: Tuple[EntityReference, ...]
     ) -> List[TimeDimensionSpec]:
-        """Generate a list of time dimension specs with all combinations of granularity & date part."""
+        """Generate a list of time dimension specs with all combinations of granularity & date part.
+
+        TODO: [custom calendar] decide whether to add support for custom granularities or rename this to indicate that
+        it only includes standard granularities.
+        """
         time_dimension_specs: List[TimeDimensionSpec] = []
         for time_granularity in TimeGranularity:
             time_dimension_specs.append(
                 TimeDimensionSpec(
                     element_name=time_dimension_reference.element_name,
                     entity_links=entity_links,
-                    time_granularity=time_granularity,
+                    time_granularity=ExpandedTimeGranularity.from_time_granularity(time_granularity),
                     date_part=None,
                 )
             )
@@ -191,7 +195,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
                     TimeDimensionSpec(
                         element_name=time_dimension_reference.element_name,
                         entity_links=entity_links,
-                        time_granularity=time_granularity,
+                        time_granularity=ExpandedTimeGranularity.from_time_granularity(time_granularity),
                         date_part=date_part,
                     )
                 )

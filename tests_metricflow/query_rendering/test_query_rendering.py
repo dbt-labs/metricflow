@@ -24,6 +24,7 @@ from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_WEEK
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataset.dataset_classes import DataSet
@@ -482,7 +483,7 @@ def test_min_max_only_time(
             TimeDimensionSpec(
                 element_name="paid_at",
                 entity_links=(EntityReference("booking"),),
-                time_granularity=TimeGranularity.DAY,
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
             ),
         ),
         min_max_only=True,
@@ -512,7 +513,7 @@ def test_min_max_only_time_quarter(
             TimeDimensionSpec(
                 element_name="paid_at",
                 entity_links=(EntityReference("booking"),),
-                time_granularity=TimeGranularity.QUARTER,
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.QUARTER),
             ),
         ),
         min_max_only=True,

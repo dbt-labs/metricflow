@@ -22,13 +22,22 @@
                         <!-- description = "Pass Only Elements: ['bookers', 'metric_time__day']" -->
                         <!-- node_id = NodeId(id_str='pfe_0') -->
                         <!-- include_spec = MeasureSpec(element_name='bookers') -->
-                        <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
+                        <!-- include_spec =                                                                  -->
+                        <!--   TimeDimensionSpec(                                                            -->
+                        <!--     element_name='metric_time',                                                 -->
+                        <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                        <!--   )                                                                             -->
                         <!-- distinct = False -->
                         <JoinToTimeSpineNode>
                             <!-- description = 'Join to Time Spine Dataset' -->
                             <!-- node_id = NodeId(id_str='jts_0') -->
-                            <!-- requested_agg_time_dimension_specs =                                     -->
-                            <!--   (TimeDimensionSpec(element_name='metric_time', time_granularity=DAY),) -->
+                            <!-- requested_agg_time_dimension_specs =                                              -->
+                            <!--   (                                                                               -->
+                            <!--     TimeDimensionSpec(                                                            -->
+                            <!--       element_name='metric_time',                                                 -->
+                            <!--       time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                            <!--     ),                                                                            -->
+                            <!--   )                                                                               -->
                             <!-- use_custom_agg_time_dimension = False -->
                             <!-- time_range_constraint = None -->
                             <!-- offset_window = PydanticMetricTimeWindow(count=2, granularity=DAY) -->
@@ -37,8 +46,13 @@
                             <JoinOverTimeRangeNode>
                                 <!-- description = 'Join Self Over Time Range' -->
                                 <!-- node_id = NodeId(id_str='jotr_0') -->
-                                <!-- queried_agg_time_dimension_specs =                                       -->
-                                <!--   (TimeDimensionSpec(element_name='metric_time', time_granularity=DAY),) -->
+                                <!-- queried_agg_time_dimension_specs =                                                -->
+                                <!--   (                                                                               -->
+                                <!--     TimeDimensionSpec(                                                            -->
+                                <!--       element_name='metric_time',                                                 -->
+                                <!--       time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                                <!--     ),                                                                            -->
+                                <!--   )                                                                               -->
                                 <!-- window = PydanticMetricTimeWindow(count=2, granularity=DAY) -->
                                 <MetricTimeDimensionTransformNode>
                                     <!-- description = "Metric Time Dimension 'ds'" -->

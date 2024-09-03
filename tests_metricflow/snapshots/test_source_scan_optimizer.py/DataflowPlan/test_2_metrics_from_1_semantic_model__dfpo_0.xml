@@ -22,7 +22,11 @@
                     <!--     element_name='country_latest',                           -->
                     <!--     entity_links=(EntityReference(element_name='listing'),), -->
                     <!--   )                                                          -->
-                    <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
+                    <!-- include_spec =                                                                  -->
+                    <!--   TimeDimensionSpec(                                                            -->
+                    <!--     element_name='metric_time',                                                 -->
+                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                    <!--   )                                                                             -->
                     <!-- distinct = False -->
                     <JoinOnEntitiesNode>
                         <!-- description = 'Join Standard Outputs' -->
@@ -39,7 +43,11 @@
                             <!-- node_id = NodeId(id_str='pfe_12') -->
                             <!-- include_spec = MeasureSpec(element_name='bookings') -->
                             <!-- include_spec = MeasureSpec(element_name='booking_value') -->
-                            <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
+                            <!-- include_spec =                                                                  -->
+                            <!--   TimeDimensionSpec(                                                            -->
+                            <!--     element_name='metric_time',                                                 -->
+                            <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                            <!--   )                                                                             -->
                             <!-- include_spec = LinklessEntitySpec(element_name='listing') -->
                             <!-- distinct = False -->
                             <MetricTimeDimensionTransformNode>
