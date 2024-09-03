@@ -280,6 +280,16 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         )
         return time_spine_source
 
+    def _get_custom_granularity_column_name(self, custom_granularity: str) -> str:
+        time_spine_source = self._get_time_spine_for_custom_granularity(custom_granularity)
+        for custom_granularity in time_spine_source.custom_granularities:
+            if custom_granularity.name == custom_granularity:
+                return custom_granularity.column_name if custom_granularity.column_name else custom_granularity.name
+
+        raise RuntimeError(
+            f"Custom granularity {custom_granularity} not found. This indicates internal misconfiguration."
+        )
+
     def _make_custom_granularity_dataset(self, time_dimension_instance: TimeDimensionInstance) -> SqlDataSet:
         time_spine_instance_set = InstanceSet(time_dimension_instances=(time_dimension_instance,))
         time_spine_table_alias = self._next_unique_table_alias()
@@ -287,8 +297,9 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         # TODO: replace hard-coded column name
         custom_granularity_name = "martian_day"
         time_spine_source = self._get_time_spine_for_custom_granularity(custom_granularity_name)
+        custom_granularity_column_name = self._get_custom_granularity_column_name(custom_granularity_name)
         column_expr = SqlColumnReferenceExpression.from_table_and_column_names(
-            table_alias=time_spine_table_alias, column_name=custom_granularity_name
+            table_alias=time_spine_table_alias, column_name=custom_granularity_column_name
         )
         column_alias = self.column_association_resolver.resolve_spec(time_dimension_instance.spec).column_name
         return SqlDataSet(

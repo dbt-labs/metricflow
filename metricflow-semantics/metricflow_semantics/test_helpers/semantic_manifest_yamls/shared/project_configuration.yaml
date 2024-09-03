@@ -48,5 +48,5 @@ project_configuration:
       primary_column:
         name: ds
         time_granularity: day
-      custom_granularity_columns:
+      custom_granularities:
         - name: martian_day
