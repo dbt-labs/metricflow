@@ -5,7 +5,7 @@ ParseQueryResult(
       TimeDimensionSpec(
         element_name='ds',
         entity_links=(EntityReference(element_name='revenue_instance'),),
-        time_granularity=MONTH,
+        time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH),
       ),
     ),
     filter_intersection=PydanticWhereFilterIntersection(),

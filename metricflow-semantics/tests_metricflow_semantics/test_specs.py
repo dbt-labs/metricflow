@@ -13,6 +13,7 @@ from metricflow_semantics.specs.measure_spec import MeasureSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 
 @pytest.fixture
@@ -31,7 +32,7 @@ def time_dimension_spec() -> TimeDimensionSpec:  # noqa: D103
     return TimeDimensionSpec(
         element_name="signup_ts",
         entity_links=(EntityReference(element_name="user_id"),),
-        time_granularity=TimeGranularity.DAY,
+        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
     )
 
 
@@ -62,7 +63,7 @@ def test_time_dimension_without_first_entity_link(time_dimension_spec: TimeDimen
     assert time_dimension_spec.without_first_entity_link == TimeDimensionSpec(
         element_name="signup_ts",
         entity_links=(),
-        time_granularity=TimeGranularity.DAY,
+        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
     )
 
 
@@ -127,7 +128,7 @@ def spec_set() -> InstanceSpecSet:  # noqa: D103
             TimeDimensionSpec(
                 element_name="ds",
                 entity_links=(),
-                time_granularity=TimeGranularity.DAY,
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
             ),
         ),
         entity_specs=(
@@ -152,7 +153,7 @@ def test_spec_set_linkable_specs(spec_set: InstanceSpecSet) -> None:  # noqa: D1
         TimeDimensionSpec(
             element_name="ds",
             entity_links=(),
-            time_granularity=TimeGranularity.DAY,
+            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
         ),
         EntitySpec(
             element_name="user_id",
@@ -176,7 +177,7 @@ def test_spec_set_all_specs(spec_set: InstanceSpecSet) -> None:  # noqa: D103
         TimeDimensionSpec(
             element_name="ds",
             entity_links=(),
-            time_granularity=TimeGranularity.DAY,
+            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
         ),
         EntitySpec(
             element_name="user_id",

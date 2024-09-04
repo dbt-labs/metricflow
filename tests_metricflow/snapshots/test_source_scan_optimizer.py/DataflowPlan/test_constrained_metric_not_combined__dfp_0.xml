@@ -16,7 +16,11 @@
                         <!-- description = "Pass Only Elements: ['booking_value', 'metric_time__day']" -->
                         <!-- node_id = NodeId(id_str='pfe_0') -->
                         <!-- include_spec = MeasureSpec(element_name='booking_value') -->
-                        <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
+                        <!-- include_spec =                                                                  -->
+                        <!--   TimeDimensionSpec(                                                            -->
+                        <!--     element_name='metric_time',                                                 -->
+                        <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                        <!--   )                                                                             -->
                         <!-- distinct = False -->
                         <MetricTimeDimensionTransformNode>
                             <!-- description = "Metric Time Dimension 'ds'" -->
@@ -42,7 +46,11 @@
                         <!-- description = "Pass Only Elements: ['booking_value', 'metric_time__day']" -->
                         <!-- node_id = NodeId(id_str='pfe_2') -->
                         <!-- include_spec = MeasureSpec(element_name='booking_value') -->
-                        <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
+                        <!-- include_spec =                                                                  -->
+                        <!--   TimeDimensionSpec(                                                            -->
+                        <!--     element_name='metric_time',                                                 -->
+                        <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                        <!--   )                                                                             -->
                         <!-- distinct = False -->
                         <WhereConstraintNode>
                             <!-- description = 'Constrain Output with WHERE' -->
@@ -96,7 +104,11 @@
                                 <!--     element_name='is_instant',                               -->
                                 <!--     entity_links=(EntityReference(element_name='booking'),), -->
                                 <!--   )                                                          -->
-                                <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
+                                <!-- include_spec =                                                                  -->
+                                <!--   TimeDimensionSpec(                                                            -->
+                                <!--     element_name='metric_time',                                                 -->
+                                <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                                <!--   )                                                                             -->
                                 <!-- distinct = False -->
                                 <MetricTimeDimensionTransformNode>
                                     <!-- description = "Metric Time Dimension 'ds'" -->

@@ -20,6 +20,7 @@ from metricflow_semantics.specs.patterns.entity_link_pattern import (
 )
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_MONTH, MTD_SPEC_WEEK, MTD_SPEC_YEAR
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +35,7 @@ def specs() -> Sequence[LinkableInstanceSpec]:  # noqa: D103
         TimeDimensionSpec(
             element_name="creation_time",
             entity_links=(EntityReference("booking"), EntityReference("listing")),
-            time_granularity=TimeGranularity.MONTH,
+            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
             date_part=DatePart.YEAR,
         ),
         # Dimensions
@@ -215,7 +216,7 @@ def test_time_dimension_date_part_match(specs: Sequence[LinkableInstanceSpec]) -
         TimeDimensionSpec(
             element_name="creation_time",
             entity_links=(EntityReference("booking"), EntityReference("listing")),
-            time_granularity=TimeGranularity.MONTH,
+            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
             date_part=DatePart.YEAR,
         ),
     )

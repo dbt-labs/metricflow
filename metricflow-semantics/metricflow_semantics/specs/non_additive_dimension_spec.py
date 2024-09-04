@@ -13,6 +13,7 @@ from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.sql.sql_column_type import SqlColumnType
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 logger = logging.getLogger(__file__)
 
@@ -53,11 +54,19 @@ class NonAdditiveDimensionSpec(SerializableDataclass):
         values.extend(sorted(self.window_groupings))
         return hash_items(values)
 
-    def linkable_specs(  # noqa: D102
-        self, non_additive_dimension_grain: TimeGranularity
-    ) -> Sequence[LinkableInstanceSpec]:
+    def linkable_specs(self, non_additive_dimension_grain: TimeGranularity) -> Sequence[LinkableInstanceSpec]:
+        """Return the set of linkable specs referenced by the NonAdditiveDimensionSpec.
+
+        In practice, the name will always point to a time dimension. This method requires the time granularity
+        provided in the model Dimension definition, which is why the input is typed as an enum value rather than
+        an expanded granularity object - custom granularities are not eligible for consideration here.
+        """
         return (
-            TimeDimensionSpec(element_name=self.name, entity_links=(), time_granularity=non_additive_dimension_grain),
+            TimeDimensionSpec(
+                element_name=self.name,
+                entity_links=(),
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(non_additive_dimension_grain),
+            ),
         ) + tuple(LinklessEntitySpec.from_element_name(entity_name) for entity_name in self.window_groupings)
 
     def __eq__(self, other: Any) -> bool:  # type: ignore[misc]  # noqa: D105

@@ -10,6 +10,7 @@ from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifest
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
@@ -73,7 +74,11 @@ def test_view_sql_generated_at_a_node(
         parent_node=metric_time_node,
         include_specs=InstanceSpecSet(
             time_dimension_specs=(
-                TimeDimensionSpec(element_name="metric_time", entity_links=(), time_granularity=TimeGranularity.DAY),
+                TimeDimensionSpec(
+                    element_name="metric_time",
+                    entity_links=(),
+                    time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
+                ),
             ),
         ),
     )

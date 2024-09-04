@@ -13,13 +13,22 @@
                     <!-- description = "Pass Only Elements: ['txn_revenue', 'metric_time__day']" -->
                     <!-- node_id = NodeId(id_str='pfe_0') -->
                     <!-- include_spec = MeasureSpec(element_name='txn_revenue') -->
-                    <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
+                    <!-- include_spec =                                                                  -->
+                    <!--   TimeDimensionSpec(                                                            -->
+                    <!--     element_name='metric_time',                                                 -->
+                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                    <!--   )                                                                             -->
                     <!-- distinct = False -->
                     <JoinOverTimeRangeNode>
                         <!-- description = 'Join Self Over Time Range' -->
                         <!-- node_id = NodeId(id_str='jotr_0') -->
-                        <!-- queried_agg_time_dimension_specs =                                       -->
-                        <!--   (TimeDimensionSpec(element_name='metric_time', time_granularity=DAY),) -->
+                        <!-- queried_agg_time_dimension_specs =                                                -->
+                        <!--   (                                                                               -->
+                        <!--     TimeDimensionSpec(                                                            -->
+                        <!--       element_name='metric_time',                                                 -->
+                        <!--       time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                        <!--     ),                                                                            -->
+                        <!--   )                                                                               -->
                         <!-- window = PydanticMetricTimeWindow(count=2, granularity=MONTH) -->
                         <MetricTimeDimensionTransformNode>
                             <!-- description = "Metric Time Dimension 'ds'" -->

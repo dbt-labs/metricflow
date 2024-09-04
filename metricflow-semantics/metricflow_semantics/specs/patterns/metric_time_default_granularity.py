@@ -15,6 +15,7 @@ from metricflow_semantics.specs.time_dimension_spec import (
     TimeDimensionSpecComparisonKey,
     TimeDimensionSpecField,
 )
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 
 class MetricTimeDefaultGranularityPattern(SpecPattern):
@@ -53,9 +54,12 @@ class MetricTimeDefaultGranularityPattern(SpecPattern):
             return candidate_specs
 
         # If there are metrics in the query, use max metric default. For no-metric queries, use standard default.
-        default_granularity = self._max_metric_default_time_granularity or DEFAULT_TIME_GRANULARITY
+        # TODO: [custom granularity] allow custom granularities to be used as defaults if appropriate
+        default_granularity = ExpandedTimeGranularity.from_time_granularity(
+            self._max_metric_default_time_granularity or DEFAULT_TIME_GRANULARITY
+        )
 
-        spec_key_to_grains: Dict[TimeDimensionSpecComparisonKey, Set[TimeGranularity]] = defaultdict(set)
+        spec_key_to_grains: Dict[TimeDimensionSpecComparisonKey, Set[ExpandedTimeGranularity]] = defaultdict(set)
         spec_key_to_specs: Dict[TimeDimensionSpecComparisonKey, Tuple[TimeDimensionSpec, ...]] = defaultdict(tuple)
         for metric_time_spec in spec_set.metric_time_specs:
             spec_key = metric_time_spec.comparison_key(exclude_fields=(TimeDimensionSpecField.TIME_GRANULARITY,))

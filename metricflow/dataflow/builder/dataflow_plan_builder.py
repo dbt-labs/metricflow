@@ -54,6 +54,7 @@ from metricflow_semantics.specs.where_filter.where_filter_transform import Where
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.time.dateutil_adjuster import DateutilTimePeriodAdjuster
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.node_evaluator import (
@@ -440,7 +441,10 @@ class DataflowPlanBuilder:
         predicate_pushdown_state: PredicatePushdownState,
         for_group_by_source_node: bool = False,
     ) -> DataflowPlanNode:
-        default_granularity = self._metric_lookup.get_min_queryable_time_granularity(metric_spec.reference)
+        # TODO: [custom granularity] Figure out how to support custom granularities as defaults
+        default_granularity = ExpandedTimeGranularity.from_time_granularity(
+            self._metric_lookup.get_min_queryable_time_granularity(metric_spec.reference)
+        )
 
         queried_agg_time_dimensions = queried_linkable_specs.included_agg_time_dimension_specs_for_metric(
             metric_reference=metric_spec.reference, metric_lookup=self._metric_lookup
@@ -464,7 +468,7 @@ class DataflowPlanBuilder:
         # once as a normal metric, and again using a window function to narrow down to one row per granularity period.
         # In this case, add metric time at the default granularity to the linkable specs. It will be used in the order by
         # clause of the window function and later excluded from the output selections.
-        default_metric_time = DataSet.metric_time_dimension_spec(default_granularity)
+        default_metric_time = DataSet.metric_time_dimension_spec(default_granularity.base_granularity)
         include_linkable_specs = queried_linkable_specs.merge(
             LinkableSpecSet(time_dimension_specs=(default_metric_time,))
         )
@@ -1569,7 +1573,7 @@ class DataflowPlanBuilder:
                 # The NonAdditiveDimensionSpec name property is a plain element name
                 element_name=non_additive_dimension_spec.name,
                 entity_links=(),
-                time_granularity=non_additive_dimension_grain,
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(non_additive_dimension_grain),
             )
             window_groupings = tuple(
                 LinklessEntitySpec.from_element_name(name) for name in non_additive_dimension_spec.window_groupings

@@ -33,6 +33,7 @@ from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY, TimeDimensionSpec
 from metricflow_semantics.sql.sql_table import SqlTable
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.time.time_spine_source import TIME_SPINE_DATA_SET_DESCRIPTION, TimeSpineSource
 
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
@@ -112,7 +113,7 @@ class SemanticModelToDataSetConverter:
         time_dimension_spec = TimeDimensionSpec(
             element_name=element_name,
             entity_links=entity_links,
-            time_granularity=time_granularity,
+            time_granularity=ExpandedTimeGranularity.from_time_granularity(time_granularity),
             date_part=date_part,
         )
 

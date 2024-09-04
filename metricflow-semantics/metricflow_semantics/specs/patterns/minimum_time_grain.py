@@ -14,10 +14,11 @@ from metricflow_semantics.specs.time_dimension_spec import (
     TimeDimensionSpecComparisonKey,
     TimeDimensionSpecField,
 )
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 
 class MinimumTimeGrainPattern(SpecPattern):
-    """A pattern that matches linkable specs, but for time dimension specs, only the one with the finest grain.
+    """A pattern that matches linkable specs, but for time dimension specs, only the one with the finest base grain.
 
     e.g.
 
@@ -35,7 +36,7 @@ class MinimumTimeGrainPattern(SpecPattern):
         ]
 
     The finest grain represents the defined grain of the time dimension in the semantic model when evaluating specs
-    of the source.
+    of the source. For custom granularities, this means the base grain associated with the time dimension spec.
 
     This pattern helps to implement matching of group-by-items for where filters - in those cases, an ambiguously
     specified group-by-item can only match to time dimension spec with the base grain.
@@ -49,12 +50,16 @@ class MinimumTimeGrainPattern(SpecPattern):
         spec_key_to_specs: Dict[TimeDimensionSpecComparisonKey, List[TimeDimensionSpec]] = defaultdict(list)
         for time_dimension_spec in spec_set.time_dimension_specs:
             spec_key = time_dimension_spec.comparison_key(exclude_fields=(TimeDimensionSpecField.TIME_GRANULARITY,))
-            spec_key_to_grains[spec_key].add(time_dimension_spec.time_granularity)
+            spec_key_to_grains[spec_key].add(time_dimension_spec.time_granularity.base_granularity)
             spec_key_to_specs[spec_key].append(time_dimension_spec)
 
         matched_time_dimension_specs: List[TimeDimensionSpec] = []
         for spec_key, time_grains in spec_key_to_grains.items():
-            matched_time_dimension_specs.append(spec_key_to_specs[spec_key][0].with_grain(min(time_grains)))
+            matched_time_dimension_specs.append(
+                spec_key_to_specs[spec_key][0].with_grain(
+                    ExpandedTimeGranularity.from_time_granularity(min(time_grains))
+                )
+            )
 
         matching_specs: Sequence[LinkableInstanceSpec] = (
             spec_set.dimension_specs

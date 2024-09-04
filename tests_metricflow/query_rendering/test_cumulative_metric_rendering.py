@@ -25,6 +25,7 @@ from metricflow_semantics.test_helpers.metric_time_dimension import (
     MTD_SPEC_WEEK,
     MTD_SPEC_YEAR,
 )
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
@@ -49,7 +50,7 @@ def test_cumulative_metric(
             TimeDimensionSpec(
                 element_name="ds",
                 entity_links=(),
-                time_granularity=TimeGranularity.DAY,
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
             ),
         ),
     )
@@ -86,7 +87,7 @@ def test_cumulative_metric_with_time_constraint(
             TimeDimensionSpec(
                 element_name="metric_time",
                 entity_links=(),
-                time_granularity=TimeGranularity.DAY,
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
             ),
         ),
         time_range_constraint=TimeRangeConstraint(
@@ -183,7 +184,7 @@ def test_cumulative_metric_no_window(
             TimeDimensionSpec(
                 element_name="ds",
                 entity_links=(),
-                time_granularity=TimeGranularity.MONTH,
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
             ),
         ),
     )
@@ -242,7 +243,7 @@ def test_cumulative_metric_grain_to_date(
             TimeDimensionSpec(
                 element_name="ds",
                 entity_links=(),
-                time_granularity=TimeGranularity.MONTH,
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
             ),
         ),
     )
@@ -328,12 +329,12 @@ def test_cumulative_metric_with_multiple_agg_time_dimensions(
             TimeDimensionSpec(
                 element_name="ds",
                 entity_links=(EntityReference("revenue_instance"),),
-                time_granularity=TimeGranularity.DAY,
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
             ),
             TimeDimensionSpec(
                 element_name="ds",
                 entity_links=(EntityReference("revenue_instance"),),
-                time_granularity=TimeGranularity.MONTH,
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
             ),
         ),
     )
@@ -390,7 +391,7 @@ def test_cumulative_metric_with_agg_time_and_metric_time(
             TimeDimensionSpec(
                 element_name="ds",
                 entity_links=(EntityReference("revenue_instance"),),
-                time_granularity=TimeGranularity.MONTH,
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
             ),
         ),
     )
@@ -500,7 +501,7 @@ def test_window_metric_with_non_default_grains(
             TimeDimensionSpec(
                 element_name="ds",
                 entity_links=(EntityReference("booking"),),
-                time_granularity=TimeGranularity.MONTH,
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
             ),
         ),
     )
@@ -534,12 +535,12 @@ def test_grain_to_date_metric_with_non_default_grains(
             TimeDimensionSpec(
                 element_name="ds",
                 entity_links=(EntityReference("revenue_instance"),),
-                time_granularity=TimeGranularity.QUARTER,
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.QUARTER),
             ),
             TimeDimensionSpec(
                 element_name="ds",
                 entity_links=(EntityReference("revenue_instance"),),
-                time_granularity=TimeGranularity.YEAR,
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.YEAR),
             ),
         ),
     )

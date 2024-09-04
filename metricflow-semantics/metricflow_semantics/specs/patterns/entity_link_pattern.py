@@ -112,6 +112,22 @@ class EntityLinkPattern(SpecPattern):
         shortest_entity_link_length = min(len(matching_spec.entity_links) for matching_spec in matching_specs)
         return tuple(spec for spec in matching_specs if len(spec.entity_links) == shortest_entity_link_length)
 
+    def _match_time_granularities(
+        self, candidate_specs: Sequence[LinkableInstanceSpec]
+    ) -> Sequence[LinkableInstanceSpec]:
+        """Do a partial match on time granularities.
+
+        TODO: [custom granularity] Support custom granularities properly. This requires us to allow these pattern classes
+        to take in ExpandedTimeGranularity types, which should be viable. Once that is done, this method can be removed.
+        """
+        matching_specs: Sequence[LinkableInstanceSpec] = tuple(
+            candidate_spec
+            for candidate_spec in group_specs_by_type(candidate_specs).time_dimension_specs
+            if candidate_spec.time_granularity.base_granularity == self.parameter_set.time_granularity
+        )
+
+        return matching_specs
+
     @override
     def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[LinkableInstanceSpec]:
         filtered_candidate_specs = group_specs_by_type(candidate_specs).linkable_specs
@@ -120,10 +136,13 @@ class EntityLinkPattern(SpecPattern):
         # Entity links could be a partial match, so it's handled separately.
         if ParameterSetField.ENTITY_LINKS in self.parameter_set.fields_to_compare:
             filtered_candidate_specs = self._match_entity_links(filtered_candidate_specs)
+        # Time granularities are special, so they are also handled separately.
+        if ParameterSetField.TIME_GRANULARITY in self.parameter_set.fields_to_compare:
+            filtered_candidate_specs = self._match_time_granularities(filtered_candidate_specs)
 
         other_keys_to_check = set(
             field_to_compare.value for field_to_compare in self.parameter_set.fields_to_compare
-        ).difference({ParameterSetField.ENTITY_LINKS.value})
+        ).difference({ParameterSetField.ENTITY_LINKS.value, ParameterSetField.TIME_GRANULARITY.value})
 
         matching_specs: List[LinkableInstanceSpec] = []
         parameter_set_values = tuple(getattr(self.parameter_set, key_to_check) for key_to_check in other_keys_to_check)

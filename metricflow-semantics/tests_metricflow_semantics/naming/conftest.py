@@ -12,6 +12,7 @@ from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_MONTH, MTD_SPEC_WEEK, MTD_SPEC_YEAR
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 
 @pytest.fixture(scope="session")
@@ -24,7 +25,7 @@ def specs() -> Sequence[LinkableInstanceSpec]:  # noqa: D103
         TimeDimensionSpec(
             element_name="creation_time",
             entity_links=(EntityReference("booking"), EntityReference("listing")),
-            time_granularity=TimeGranularity.MONTH,
+            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
             date_part=DatePart.DAY,
         ),
         # Dimensions

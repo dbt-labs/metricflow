@@ -1,7 +1,12 @@
 ParseQueryResult(
   query_spec=MetricFlowQuerySpec(
     metric_specs=(MetricSpec(element_name='revenue_growth_2_weeks'),),
-    time_dimension_specs=(TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH),),
+    time_dimension_specs=(
+      TimeDimensionSpec(
+        element_name='metric_time',
+        time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH),
+      ),
+    ),
     filter_intersection=PydanticWhereFilterIntersection(),
     filter_spec_resolution_lookup=FilterSpecResolutionLookUp(),
     min_max_only=False,

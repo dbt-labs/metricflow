@@ -10,8 +10,18 @@
                 <!-- description = 'Re-aggregate Metrics via Window Functions' -->
                 <!-- node_id = NodeId(id_str='wr_0') -->
                 <!-- metric_spec = MetricSpec(element_name='trailing_2_months_revenue', alias='t2mr') -->
-                <!-- order_by_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
-                <!-- partition_by_specs = (TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH),) -->
+                <!-- order_by_spec =                                                                 -->
+                <!--   TimeDimensionSpec(                                                            -->
+                <!--     element_name='metric_time',                                                 -->
+                <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                <!--   )                                                                             -->
+                <!-- partition_by_specs =                                                                  -->
+                <!--   (                                                                                   -->
+                <!--     TimeDimensionSpec(                                                                -->
+                <!--       element_name='metric_time',                                                     -->
+                <!--       time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH), -->
+                <!--     ),                                                                                -->
+                <!--   )                                                                                   -->
                 <ComputeMetricsNode>
                     <!-- description = 'Compute Metrics via Expressions' -->
                     <!-- node_id = NodeId(id_str='cm_0') -->
@@ -24,17 +34,31 @@
                             <!--   "Pass Only Elements: ['txn_revenue', 'metric_time__month', 'metric_time__day']" -->
                             <!-- node_id = NodeId(id_str='pfe_0') -->
                             <!-- include_spec = MeasureSpec(element_name='txn_revenue') -->
-                            <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH) -->
-                            <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
+                            <!-- include_spec =                                                                      -->
+                            <!--   TimeDimensionSpec(                                                                -->
+                            <!--     element_name='metric_time',                                                     -->
+                            <!--     time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH), -->
+                            <!--   )                                                                                 -->
+                            <!-- include_spec =                                                                  -->
+                            <!--   TimeDimensionSpec(                                                            -->
+                            <!--     element_name='metric_time',                                                 -->
+                            <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                            <!--   )                                                                             -->
                             <!-- distinct = False -->
                             <JoinOverTimeRangeNode>
                                 <!-- description = 'Join Self Over Time Range' -->
                                 <!-- node_id = NodeId(id_str='jotr_0') -->
-                                <!-- queried_agg_time_dimension_specs =                                         -->
-                                <!--   (                                                                        -->
-                                <!--     TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH), -->
-                                <!--     TimeDimensionSpec(element_name='metric_time', time_granularity=DAY),   -->
-                                <!--   )                                                                        -->
+                                <!-- queried_agg_time_dimension_specs =                                                    -->
+                                <!--   (                                                                                   -->
+                                <!--     TimeDimensionSpec(                                                                -->
+                                <!--       element_name='metric_time',                                                     -->
+                                <!--       time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH), -->
+                                <!--     ),                                                                                -->
+                                <!--     TimeDimensionSpec(                                                                -->
+                                <!--       element_name='metric_time',                                                     -->
+                                <!--       time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY),     -->
+                                <!--     ),                                                                                -->
+                                <!--   )                                                                                   -->
                                 <!-- window = PydanticMetricTimeWindow(count=2, granularity=MONTH) -->
                                 <MetricTimeDimensionTransformNode>
                                     <!-- description = "Metric Time Dimension 'ds'" -->

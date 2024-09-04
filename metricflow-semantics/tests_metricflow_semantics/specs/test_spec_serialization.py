@@ -61,7 +61,7 @@ def test_where_filter_spec_serialization() -> None:  # noqa: D103
                 TimeDimensionSpec(
                     element_name="element_name",
                     entity_links=(EntityReference(element_name="element_name"),),
-                    time_granularity=TimeGranularity.YEAR,
+                    time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.YEAR),
                 ),
             ),
             entity_specs=(

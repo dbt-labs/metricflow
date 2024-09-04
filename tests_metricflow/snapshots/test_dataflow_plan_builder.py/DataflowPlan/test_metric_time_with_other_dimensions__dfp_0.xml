@@ -11,8 +11,16 @@
             <!--   DimensionSpec(element_name='home_state_latest', entity_links=(EntityReference(element_name='user'),)) -->
             <!-- include_spec =                                                                                         -->
             <!--   DimensionSpec(element_name='is_lux_latest', entity_links=(EntityReference(element_name='listing'),)) -->
-            <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
-            <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH) -->
+            <!-- include_spec =                                                                  -->
+            <!--   TimeDimensionSpec(                                                            -->
+            <!--     element_name='metric_time',                                                 -->
+            <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+            <!--   )                                                                             -->
+            <!-- include_spec =                                                                      -->
+            <!--   TimeDimensionSpec(                                                                -->
+            <!--     element_name='metric_time',                                                     -->
+            <!--     time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH), -->
+            <!--   )                                                                                 -->
             <!-- distinct = True -->
             <JoinOnEntitiesNode>
                 <!-- description = 'Join Standard Outputs' -->
@@ -33,8 +41,16 @@
                 <FilterElementsNode>
                     <!-- description = "Pass Only Elements: ['metric_time__day', 'metric_time__month']" -->
                     <!-- node_id = NodeId(id_str='pfe_2') -->
-                    <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
-                    <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH) -->
+                    <!-- include_spec =                                                                  -->
+                    <!--   TimeDimensionSpec(                                                            -->
+                    <!--     element_name='metric_time',                                                 -->
+                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                    <!--   )                                                                             -->
+                    <!-- include_spec =                                                                      -->
+                    <!--   TimeDimensionSpec(                                                                -->
+                    <!--     element_name='metric_time',                                                     -->
+                    <!--     time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH), -->
+                    <!--   )                                                                                 -->
                     <!-- distinct = False -->
                     <MetricTimeDimensionTransformNode>
                         <!-- description = "Metric Time Dimension 'ds'" -->

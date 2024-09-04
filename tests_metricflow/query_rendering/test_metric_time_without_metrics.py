@@ -12,6 +12,7 @@ from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_DAY
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
@@ -55,7 +56,9 @@ def test_metric_time_quarter_alone(  # noqa: D103
         query_spec=MetricFlowQuerySpec(
             time_dimension_specs=(
                 TimeDimensionSpec(
-                    element_name="metric_time", entity_links=(), time_granularity=TimeGranularity.QUARTER
+                    element_name="metric_time",
+                    entity_links=(),
+                    time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.QUARTER),
                 ),
             ),
         ),

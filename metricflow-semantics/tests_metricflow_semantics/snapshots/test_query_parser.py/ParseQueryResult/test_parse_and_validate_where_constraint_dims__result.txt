@@ -1,7 +1,12 @@
 ParseQueryResult(
   query_spec=MetricFlowQuerySpec(
     metric_specs=(MetricSpec(element_name='bookings'),),
-    time_dimension_specs=(TimeDimensionSpec(element_name='metric_time', time_granularity=DAY),),
+    time_dimension_specs=(
+      TimeDimensionSpec(
+        element_name='metric_time',
+        time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY),
+      ),
+    ),
     time_range_constraint=TimeRangeConstraint(
       start_time=datetime.datetime(2020, 1, 15, 0, 0),
       end_time=datetime.datetime(2020, 2, 15, 0, 0),

@@ -240,13 +240,20 @@ class SqlQueryPlanJoinBuilder:
 
         We use the instance with the smallest granularity and shortest entity link path, since it will be
         used in the ON statement for the join against the validity window.
+
+        Note SCD joins are always evaluated against a standard time granularity. Subsequent conversion to
+        custom granularities should happen after the join.
         """
         if join_description.validity_window is None:
             return tuple()
 
         left_data_set_metric_time_dimension_instances = sorted(
-            left_data_set.data_set.metric_time_dimension_instances,
-            key=lambda x: (x.spec.time_granularity.to_int(), len(x.spec.entity_links)),
+            [
+                instance
+                for instance in left_data_set.data_set.metric_time_dimension_instances
+                if not instance.spec.time_granularity.is_custom_granularity
+            ],
+            key=lambda x: (x.spec.time_granularity.base_granularity.to_int(), len(x.spec.entity_links)),
         )
         assert left_data_set_metric_time_dimension_instances, (
             f"Cannot process join to data set with alias {right_data_set.alias} because it has a validity "

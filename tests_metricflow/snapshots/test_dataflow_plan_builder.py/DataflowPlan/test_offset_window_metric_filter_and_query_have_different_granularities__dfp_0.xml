@@ -37,7 +37,10 @@
             <!--           time_dimension_specs=(                                      -->
             <!--             TimeDimensionSpec(                                        -->
             <!--               element_name='metric_time',                             -->
-            <!--               time_granularity=DAY,                                   -->
+            <!--               time_granularity=ExpandedTimeGranularity(               -->
+            <!--                 name='day',                                           -->
+            <!--                 base_granularity=DAY,                                 -->
+            <!--               ),                                                      -->
             <!--             ),                                                        -->
             <!--           ),                                                          -->
             <!--         ),                                                            -->
@@ -82,7 +85,10 @@
                     <!--           time_dimension_specs=(                                       -->
                     <!--             TimeDimensionSpec(                                         -->
                     <!--               element_name='metric_time',                              -->
-                    <!--               time_granularity=DAY,                                    -->
+                    <!--               time_granularity=ExpandedTimeGranularity(                -->
+                    <!--                 name='day',                                            -->
+                    <!--                 base_granularity=DAY,                                  -->
+                    <!--               ),                                                       -->
                     <!--             ),                                                         -->
                     <!--           ),                                                           -->
                     <!--         ),                                                             -->
@@ -97,7 +103,11 @@
                             <!-- description = "Pass Only Elements: ['booking_value', 'metric_time__month']" -->
                             <!-- node_id = NodeId(id_str='pfe_1') -->
                             <!-- include_spec = MeasureSpec(element_name='booking_value') -->
-                            <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH) -->
+                            <!-- include_spec =                                                                      -->
+                            <!--   TimeDimensionSpec(                                                                -->
+                            <!--     element_name='metric_time',                                                     -->
+                            <!--     time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH), -->
+                            <!--   )                                                                                 -->
                             <!-- distinct = False -->
                             <WhereConstraintNode>
                                 <!-- description = 'Constrain Output with WHERE' -->
@@ -131,7 +141,10 @@
                                 <!--       time_dimension_specs=(                                      -->
                                 <!--         TimeDimensionSpec(                                        -->
                                 <!--           element_name='metric_time',                             -->
-                                <!--           time_granularity=DAY,                                   -->
+                                <!--           time_granularity=ExpandedTimeGranularity(               -->
+                                <!--             name='day',                                           -->
+                                <!--             base_granularity=DAY,                                 -->
+                                <!--           ),                                                      -->
                                 <!--         ),                                                        -->
                                 <!--       ),                                                          -->
                                 <!--     ),                                                            -->
@@ -142,16 +155,33 @@
                                     <!--    "'metric_time__day']")                                         -->
                                     <!-- node_id = NodeId(id_str='pfe_0') -->
                                     <!-- include_spec = MeasureSpec(element_name='booking_value') -->
-                                    <!-- include_spec =                                                          -->
-                                    <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH) -->
-                                    <!-- include_spec =                                                        -->
-                                    <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
+                                    <!-- include_spec =                                -->
+                                    <!--   TimeDimensionSpec(                          -->
+                                    <!--     element_name='metric_time',               -->
+                                    <!--     time_granularity=ExpandedTimeGranularity( -->
+                                    <!--       name='month',                           -->
+                                    <!--       base_granularity=MONTH,                 -->
+                                    <!--     ),                                        -->
+                                    <!--   )                                           -->
+                                    <!-- include_spec =                                                                  -->
+                                    <!--   TimeDimensionSpec(                                                            -->
+                                    <!--     element_name='metric_time',                                                 -->
+                                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                                    <!--   )                                                                             -->
                                     <!-- distinct = False -->
                                     <JoinToTimeSpineNode>
                                         <!-- description = 'Join to Time Spine Dataset' -->
                                         <!-- node_id = NodeId(id_str='jts_0') -->
-                                        <!-- requested_agg_time_dimension_specs =                                       -->
-                                        <!--   (TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH),) -->
+                                        <!-- requested_agg_time_dimension_specs =            -->
+                                        <!--   (                                             -->
+                                        <!--     TimeDimensionSpec(                          -->
+                                        <!--       element_name='metric_time',               -->
+                                        <!--       time_granularity=ExpandedTimeGranularity( -->
+                                        <!--         name='month',                           -->
+                                        <!--         base_granularity=MONTH,                 -->
+                                        <!--       ),                                        -->
+                                        <!--     ),                                          -->
+                                        <!--   )                                             -->
                                         <!-- use_custom_agg_time_dimension = False -->
                                         <!-- time_range_constraint = None -->
                                         <!-- offset_window = PydanticMetricTimeWindow(count=1, granularity=WEEK) -->
@@ -208,7 +238,10 @@
                     <!--           time_dimension_specs=(                                      -->
                     <!--             TimeDimensionSpec(                                        -->
                     <!--               element_name='metric_time',                             -->
-                    <!--               time_granularity=DAY,                                   -->
+                    <!--               time_granularity=ExpandedTimeGranularity(               -->
+                    <!--                 name='day',                                           -->
+                    <!--                 base_granularity=DAY,                                 -->
+                    <!--               ),                                                      -->
                     <!--             ),                                                        -->
                     <!--           ),                                                          -->
                     <!--         ),                                                            -->
@@ -222,7 +255,11 @@
                             <!-- description = "Pass Only Elements: ['bookers', 'metric_time__month']" -->
                             <!-- node_id = NodeId(id_str='pfe_3') -->
                             <!-- include_spec = MeasureSpec(element_name='bookers') -->
-                            <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH) -->
+                            <!-- include_spec =                                                                      -->
+                            <!--   TimeDimensionSpec(                                                                -->
+                            <!--     element_name='metric_time',                                                     -->
+                            <!--     time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH), -->
+                            <!--   )                                                                                 -->
                             <!-- distinct = False -->
                             <WhereConstraintNode>
                                 <!-- description = 'Constrain Output with WHERE' -->
@@ -256,7 +293,10 @@
                                 <!--       time_dimension_specs=(                                      -->
                                 <!--         TimeDimensionSpec(                                        -->
                                 <!--           element_name='metric_time',                             -->
-                                <!--           time_granularity=DAY,                                   -->
+                                <!--           time_granularity=ExpandedTimeGranularity(               -->
+                                <!--             name='day',                                           -->
+                                <!--             base_granularity=DAY,                                 -->
+                                <!--           ),                                                      -->
                                 <!--         ),                                                        -->
                                 <!--       ),                                                          -->
                                 <!--     ),                                                            -->
@@ -266,10 +306,19 @@
                                     <!--   "Pass Only Elements: ['bookers', 'metric_time__month', 'metric_time__day']" -->
                                     <!-- node_id = NodeId(id_str='pfe_2') -->
                                     <!-- include_spec = MeasureSpec(element_name='bookers') -->
-                                    <!-- include_spec =                                                          -->
-                                    <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH) -->
-                                    <!-- include_spec =                                                        -->
-                                    <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
+                                    <!-- include_spec =                                -->
+                                    <!--   TimeDimensionSpec(                          -->
+                                    <!--     element_name='metric_time',               -->
+                                    <!--     time_granularity=ExpandedTimeGranularity( -->
+                                    <!--       name='month',                           -->
+                                    <!--       base_granularity=MONTH,                 -->
+                                    <!--     ),                                        -->
+                                    <!--   )                                           -->
+                                    <!-- include_spec =                                                                  -->
+                                    <!--   TimeDimensionSpec(                                                            -->
+                                    <!--     element_name='metric_time',                                                 -->
+                                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                                    <!--   )                                                                             -->
                                     <!-- distinct = False -->
                                     <MetricTimeDimensionTransformNode>
                                         <!-- description = "Metric Time Dimension 'ds'" -->

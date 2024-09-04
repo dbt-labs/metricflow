@@ -29,6 +29,7 @@ from metricflow_semantics.specs.patterns.typed_patterns import (
     TimeDimensionPattern,
 )
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -40,13 +41,13 @@ def specs() -> Sequence[LinkableInstanceSpec]:  # noqa: D103
         TimeDimensionSpec(
             element_name="common_name",
             entity_links=(EntityReference("booking"), EntityReference("listing")),
-            time_granularity=TimeGranularity.DAY,
+            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
             date_part=None,
         ),
         TimeDimensionSpec(
             element_name="common_name",
             entity_links=(EntityReference("booking"), EntityReference("listing")),
-            time_granularity=TimeGranularity.DAY,
+            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
             date_part=DatePart.MONTH,
         ),
         # Dimensions
@@ -84,13 +85,13 @@ def test_dimension_pattern(specs: Sequence[LinkableInstanceSpec]) -> None:  # no
         TimeDimensionSpec(
             element_name="common_name",
             entity_links=(EntityReference("booking"), EntityReference("listing")),
-            time_granularity=TimeGranularity.DAY,
+            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
             date_part=None,
         ),
         TimeDimensionSpec(
             element_name="common_name",
             entity_links=(EntityReference("booking"), EntityReference("listing")),
-            time_granularity=TimeGranularity.DAY,
+            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
             date_part=DatePart.MONTH,
         ),
     )
@@ -108,7 +109,7 @@ def test_time_dimension_pattern(specs: Sequence[LinkableInstanceSpec]) -> None: 
         TimeDimensionSpec(
             element_name="common_name",
             entity_links=(EntityReference("booking"), EntityReference("listing")),
-            time_granularity=TimeGranularity.DAY,
+            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
             date_part=None,
         ),
     )
@@ -127,7 +128,7 @@ def test_time_dimension_pattern_with_date_part(specs: Sequence[LinkableInstanceS
         TimeDimensionSpec(
             element_name="common_name",
             entity_links=(EntityReference("booking"), EntityReference("listing")),
-            time_granularity=TimeGranularity.DAY,
+            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
             date_part=DatePart.MONTH,
         ),
     )

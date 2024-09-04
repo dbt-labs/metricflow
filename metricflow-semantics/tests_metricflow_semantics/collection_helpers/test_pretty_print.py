@@ -30,7 +30,7 @@ def test_containers() -> None:  # noqa: D103
 
 
 def test_classes() -> None:  # noqa: D103
-    assert "TimeDimensionSpec('metric_time', DAY)" == mf_pformat(
+    assert "TimeDimensionSpec('metric_time', ExpandedTimeGranularity('day', DAY))" == mf_pformat(
         MTD_SPEC_DAY,
         include_object_field_names=False,
         include_none_object_fields=False,
@@ -43,7 +43,7 @@ def test_classes() -> None:  # noqa: D103
             TimeDimensionSpec(
               element_name='metric_time',
               entity_links=(),
-              time_granularity=DAY,
+              time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY),
               date_part=None,
               aggregation_state=None,
             )
@@ -57,7 +57,17 @@ def test_classes() -> None:  # noqa: D103
         )
     )
 
-    assert "TimeDimensionSpec(element_name='metric_time', time_granularity=DAY)" == mf_pformat(MTD_SPEC_DAY)
+    assert (
+        textwrap.dedent(
+            """\
+            TimeDimensionSpec(
+              element_name='metric_time',
+              time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY),
+            )
+            """
+        ).rstrip()
+        == mf_pformat(MTD_SPEC_DAY)
+    )
 
 
 def test_multi_line_key_value_dict() -> None:
