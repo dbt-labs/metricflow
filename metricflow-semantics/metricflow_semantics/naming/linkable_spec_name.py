@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
 from typing import Optional, Tuple
 
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
@@ -14,7 +13,6 @@ DUNDER = "__"
 logger = logging.getLogger(__name__)
 
 
-@dataclass(frozen=True)
 class StructuredLinkableSpecName:
     """Parse a qualified name into different parts.
 
@@ -28,6 +26,18 @@ class StructuredLinkableSpecName:
     element_name: str
     time_granularity_name: Optional[str] = None
     date_part: Optional[DatePart] = None
+
+    def __init__(  # noqa: D107
+        self,
+        entity_link_names: Tuple[str, ...],
+        element_name: str,
+        time_granularity_name: Optional[str] = None,
+        date_part: Optional[DatePart] = None,
+    ) -> None:
+        self.entity_link_names = tuple([entity_link_name.lower() for entity_link_name in entity_link_names])
+        self.element_name = element_name.lower()
+        self.time_granularity_name = time_granularity_name.lower() if time_granularity_name else None
+        self.date_part = date_part
 
     def __post_init__(self) -> None:
         """Post init method to ensure all name values are lower-case.
