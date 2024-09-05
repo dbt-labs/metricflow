@@ -18,6 +18,12 @@ class JoinToCustomGranularityNode(DataflowPlanNode, ABC):
 
     time_dimension_spec: TimeDimensionSpec
 
+    def __post_init__(self) -> None:  # noqa: D105
+        assert (
+            self.time_dimension_spec.time_granularity.is_custom_granularity
+        ), "Time granularity for time dimension spec in JoinToCustomGranularityNode must be qualified as custom granularity."
+        f" Instead, found {self.time_dimension_spec.time_granularity.name}. This indicates internal misconfiguration."
+
     @staticmethod
     def create(  # noqa: D102
         parent_node: DataflowPlanNode, time_dimension_spec: TimeDimensionSpec
