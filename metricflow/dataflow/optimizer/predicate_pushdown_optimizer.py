@@ -462,8 +462,7 @@ class PredicatePushdownOptimizer(
     def visit_join_to_custom_granularity_node(  # noqa: D102
         self, node: JoinToCustomGranularityNode
     ) -> OptimizeBranchResult:
-        self._log_visit_node_type(node)
-        return self._default_handler(node)
+        raise NotImplementedError
 
     def visit_join_on_entities_node(self, node: JoinOnEntitiesNode) -> OptimizeBranchResult:
         """Handles pushdown state propagation for the standard join node type.
