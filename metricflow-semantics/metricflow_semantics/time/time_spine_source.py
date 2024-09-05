@@ -46,7 +46,7 @@ class TimeSpineSource:
                 db_name=time_spine.node_relation.database,
                 base_column=time_spine.primary_column.name,
                 base_granularity=time_spine.primary_column.time_granularity,
-                custom_granularity_columns=[column.name for column in time_spine.custom_granularity_columns],
+                custom_granularity_columns=[column.name for column in time_spine.custom_granularities],
             )
             for time_spine in semantic_manifest.project_configuration.time_spines
         }
