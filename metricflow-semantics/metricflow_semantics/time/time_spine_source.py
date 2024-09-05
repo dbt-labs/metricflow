@@ -4,6 +4,7 @@ import logging
 from dataclasses import dataclass
 from typing import Dict, Optional, Sequence
 
+from dbt_semantic_interfaces.implementations.time_spine import PydanticTimeSpineCustomGranularityColumn
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
@@ -29,7 +30,7 @@ class TimeSpineSource:
     # The time granularity of the base column.
     base_granularity: TimeGranularity = DEFAULT_TIME_GRANULARITY
     db_name: Optional[str] = None
-    custom_granularity_columns: Sequence[str] = ()
+    custom_granularities: Sequence[PydanticTimeSpineCustomGranularityColumn] = ()
 
     @property
     def spine_table(self) -> SqlTable:
@@ -46,7 +47,14 @@ class TimeSpineSource:
                 db_name=time_spine.node_relation.database,
                 base_column=time_spine.primary_column.name,
                 base_granularity=time_spine.primary_column.time_granularity,
-                custom_granularity_columns=[column.name for column in time_spine.custom_granularities],
+                custom_granularities=tuple(
+                    [
+                        PydanticTimeSpineCustomGranularityColumn(
+                            name=custom_granularity.name, column_name=custom_granularity.column_name
+                        )
+                        for custom_granularity in time_spine.custom_granularities
+                    ]
+                ),
             )
             for time_spine in semantic_manifest.project_configuration.time_spines
         }
@@ -72,3 +80,12 @@ class TimeSpineSource:
             )
 
         return time_spine_sources
+
+    @staticmethod
+    def build_custom_time_spine_sources(time_spine_sources: Sequence[TimeSpineSource]) -> Dict[str, TimeSpineSource]:
+        """Creates a set of time spine sources with custom granularities based on what's in the manifest."""
+        return {
+            custom_granularity.name: time_spine_source
+            for time_spine_source in time_spine_sources
+            for custom_granularity in time_spine_source.custom_granularities
+        }
