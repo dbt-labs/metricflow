@@ -21,6 +21,7 @@ from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
 from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
 from metricflow.dataflow.nodes.join_to_base import JoinOnEntitiesNode
+from metricflow.dataflow.nodes.join_to_custom_granularity import JoinToCustomGranularityNode
 from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataflow.nodes.min_max import MinMaxNode
@@ -312,6 +313,12 @@ class SourceScanOptimizer(
         return self._default_base_output_handler(node)
 
     def visit_join_conversion_events_node(self, node: JoinConversionEventsNode) -> OptimizeBranchResult:  # noqa: D102
+        self._log_visit_node_type(node)
+        return self._default_base_output_handler(node)
+
+    def visit_join_to_custom_granularity_node(  # noqa: D102
+        self, node: JoinToCustomGranularityNode
+    ) -> OptimizeBranchResult:
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)
 
