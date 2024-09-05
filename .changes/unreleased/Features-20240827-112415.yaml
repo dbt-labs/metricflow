@@ -1,0 +1,6 @@
+kind: Features
+body: Handle custom granularities in DataflowPlan.
+time: 2024-08-27T11:24:15.909853-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1382"
