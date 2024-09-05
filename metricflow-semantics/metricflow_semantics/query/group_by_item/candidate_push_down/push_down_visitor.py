@@ -394,7 +394,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
             # Note: ignores any granularity set on input metrics.
             metric_default_time_granularity = metric_to_use_for_time_granularity_resolution.time_granularity or max(
                 TimeGranularity.DAY,
-                self._semantic_manifest_lookup.metric_lookup.get_min_queryable_time_granularity(
+                self._semantic_manifest_lookup.metric_lookup.get_min_queryable_base_time_granularity(
                     MetricReference(metric_to_use_for_time_granularity_resolution.name)
                 ),
             )

@@ -443,7 +443,7 @@ class DataflowPlanBuilder:
     ) -> DataflowPlanNode:
         # TODO: [custom granularity] Figure out how to support custom granularities as defaults
         default_granularity = ExpandedTimeGranularity.from_time_granularity(
-            self._metric_lookup.get_min_queryable_time_granularity(metric_spec.reference)
+            self._metric_lookup.get_min_queryable_base_time_granularity(metric_spec.reference)
         )
 
         queried_agg_time_dimensions = queried_linkable_specs.included_agg_time_dimension_specs_for_metric(
@@ -1562,12 +1562,12 @@ class DataflowPlanBuilder:
             non_additive_dimension_grain = self._semantic_model_lookup.get_defined_time_granularity(
                 TimeDimensionReference(non_additive_dimension_spec.name)
             )
-            queried_time_dimension_spec: Optional[
-                TimeDimensionSpec
-            ] = self._find_non_additive_dimension_in_linkable_specs(
-                agg_time_dimension=agg_time_dimension,
-                linkable_specs=queried_linkable_specs.as_tuple,
-                non_additive_dimension_spec=non_additive_dimension_spec,
+            queried_time_dimension_spec: Optional[TimeDimensionSpec] = (
+                self._find_non_additive_dimension_in_linkable_specs(
+                    agg_time_dimension=agg_time_dimension,
+                    linkable_specs=queried_linkable_specs.as_tuple,
+                    non_additive_dimension_spec=non_additive_dimension_spec,
+                )
             )
             time_dimension_spec = TimeDimensionSpec(
                 # The NonAdditiveDimensionSpec name property is a plain element name

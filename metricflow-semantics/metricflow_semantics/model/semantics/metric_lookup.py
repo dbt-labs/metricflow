@@ -188,7 +188,7 @@ class MetricLookup:
         )
         return valid_agg_time_dimension_specs
 
-    def get_min_queryable_time_granularity(self, metric_reference: MetricReference) -> TimeGranularity:
+    def get_min_queryable_base_time_granularity(self, metric_reference: MetricReference) -> TimeGranularity:
         """The minimum grain that can be queried with this metric.
 
         Maps to the largest granularity defined for any of the metric's agg_time_dimensions.

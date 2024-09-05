@@ -9,7 +9,12 @@ from typing import FrozenSet, List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimensionTypeParams
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
-from dbt_semantic_interfaces.references import EntityReference, MeasureReference, MetricReference
+from dbt_semantic_interfaces.references import (
+    EntityReference,
+    MeasureReference,
+    MetricReference,
+    TimeDimensionReference,
+)
 from dbt_semantic_interfaces.type_enums import DimensionType
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
 from metricflow_semantics.errors.error_classes import ExecutionException
@@ -33,6 +38,7 @@ from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.time.time_source import TimeSource
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
@@ -551,6 +557,28 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                     )
                 )
         return list(measures)
+
+    def get_min_queryable_base_granularity_for_metrics(
+        self, metric_references: Sequence[MetricReference]
+    ) -> Optional[TimeGranularity]:
+        """Get the minimum queryable standard granularity that can be queried with all selected metrics."""
+        min_granularity_per_metric = {
+            self._semantic_manifest_lookup.metric_lookup.get_min_queryable_base_time_granularity(metric_reference)
+            for metric_reference in metric_references
+        }
+        # TODO: test that MAX works on enum values
+        return max(min_granularity_per_metric) if min_granularity_per_metric else None
+
+    def get_min_queryable_base_granularity_for_dimensions(
+        self, time_dimension_references: Sequence[TimeDimensionReference]
+    ) -> Optional[TimeGranularity]:
+        """Get the minimum queryable standard granularity that can be queried with all selected time dimensions."""
+        min_granularity_per_dimension = {
+            self._semantic_manifest_lookup.semantic_model_lookup.get_defined_time_granularity(time_dimension_reference)
+            for time_dimension_reference in time_dimension_references
+        }
+        # TODO: test that MAX works on enum values
+        return max(min_granularity_per_metric) if min_granularity_per_metric else None
 
     def simple_dimensions_for_metrics(  # noqa: D102
         self,
