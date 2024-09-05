@@ -155,7 +155,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
         )
 
     def with_grain_and_date_part(  # noqa: D102
-        self, time_granularity: TimeGranularity, date_part: Optional[DatePart]
+        self, time_granularity: ExpandedTimeGranularity, date_part: Optional[DatePart]
     ) -> TimeDimensionSpec:
         return TimeDimensionSpec(
             element_name=self.element_name,
