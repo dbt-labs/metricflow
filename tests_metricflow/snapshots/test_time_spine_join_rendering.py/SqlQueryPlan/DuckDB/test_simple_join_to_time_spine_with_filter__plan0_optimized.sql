@@ -10,7 +10,6 @@ FROM (
   FROM ***************************.mf_time_spine subq_16
   LEFT OUTER JOIN (
     -- Constrain Output with WHERE
-    -- Pass Only Elements: ['bookings', 'booking__is_instant', 'metric_time__day']
     -- Pass Only Elements: ['bookings', 'metric_time__day']
     -- Aggregate Measures
     SELECT
@@ -19,12 +18,13 @@ FROM (
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
+      -- Pass Only Elements: ['bookings', 'booking__is_instant', 'metric_time__day']
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
         , is_instant AS booking__is_instant
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_10
+    ) subq_11
     WHERE booking__is_instant
     GROUP BY
       metric_time__day

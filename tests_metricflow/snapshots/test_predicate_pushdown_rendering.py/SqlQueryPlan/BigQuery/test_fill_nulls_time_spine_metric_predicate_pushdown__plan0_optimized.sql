@@ -24,37 +24,38 @@ FROM (
         , subq_44.bookings AS bookings
       FROM ***************************.mf_time_spine subq_46
       LEFT OUTER JOIN (
-        -- Join Standard Outputs
-        -- Pass Only Elements: ['bookings', 'listing__country_latest', 'booking__is_instant', 'metric_time__day']
+        -- Constrain Output with WHERE
         -- Pass Only Elements: ['bookings', 'listing__country_latest', 'metric_time__day']
         -- Aggregate Measures
         SELECT
-          subq_37.metric_time__day AS metric_time__day
-          , listings_latest_src_28000.country AS listing__country_latest
-          , SUM(subq_37.bookings) AS bookings
+          metric_time__day
+          , listing__country_latest
+          , SUM(bookings) AS bookings
         FROM (
-          -- Constrain Output with WHERE
-          -- Pass Only Elements: ['bookings', 'booking__is_instant', 'metric_time__day', 'listing']
+          -- Join Standard Outputs
+          -- Pass Only Elements: ['bookings', 'listing__country_latest', 'booking__is_instant', 'metric_time__day']
           SELECT
-            metric_time__day
-            , listing
-            , bookings
+            subq_36.metric_time__day AS metric_time__day
+            , subq_36.booking__is_instant AS booking__is_instant
+            , listings_latest_src_28000.country AS listing__country_latest
+            , subq_36.bookings AS bookings
           FROM (
             -- Read Elements From Semantic Model 'bookings_source'
             -- Metric Time Dimension 'ds'
+            -- Pass Only Elements: ['bookings', 'booking__is_instant', 'metric_time__day', 'listing']
             SELECT
               DATETIME_TRUNC(ds, day) AS metric_time__day
               , listing_id AS listing
               , is_instant AS booking__is_instant
               , 1 AS bookings
             FROM ***************************.fct_bookings bookings_source_src_28000
-          ) subq_35
-          WHERE booking__is_instant
-        ) subq_37
-        LEFT OUTER JOIN
-          ***************************.dim_listings_latest listings_latest_src_28000
-        ON
-          subq_37.listing = listings_latest_src_28000.listing_id
+          ) subq_36
+          LEFT OUTER JOIN
+            ***************************.dim_listings_latest listings_latest_src_28000
+          ON
+            subq_36.listing = listings_latest_src_28000.listing_id
+        ) subq_41
+        WHERE booking__is_instant
         GROUP BY
           metric_time__day
           , listing__country_latest
