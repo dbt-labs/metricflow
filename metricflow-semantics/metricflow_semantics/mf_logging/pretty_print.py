@@ -5,7 +5,7 @@ import pprint
 from collections.abc import Mapping
 from dataclasses import fields, is_dataclass
 from enum import Enum
-from typing import Any, Dict, List, Optional, Sized, Union
+from typing import Any, Dict, List, Optional, Sequence, Sized, Union
 
 from dsi_pydantic_shim import BaseModel
 
@@ -459,7 +459,7 @@ def mf_pformat_many(  # type: ignore
             )
 
         lines_in_value_str = len(value_str.split("\n"))
-
+        item_block_lines: Sequence[str]
         if lines_in_value_str > 1:
             item_block_lines = (
                 f"{key}:",

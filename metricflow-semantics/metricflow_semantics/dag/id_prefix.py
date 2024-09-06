@@ -101,6 +101,14 @@ class StaticIdPrefix(IdPrefix, Enum, metaclass=EnumMetaClassHelper):
     SUB_QUERY = "subq"
     NODE_RESOLVER_SUB_QUERY = "nr_subq"
 
+    METRIC_ATTRIBUTE_NODE = "mta"
+    MEASURE_ATTRIBUTE_NODE = "msa"
+    DIMENSION_ATTRIBUTE_NODE = "dma"
+    ENTITY_NODE = "ett"
+    ASSOCIATIVE_ENTITY_NODE = "aet"
+
+    SEMANTIC_GRAPH = "sg"
+
     @property
     @override
     def str_value(self) -> str:

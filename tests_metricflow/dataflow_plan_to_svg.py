@@ -31,5 +31,4 @@ def display_dag_if_requested(
 
     # Create parent directory since it might not exist
     os.makedirs(os.path.dirname(plan_svg_output_path_prefix), exist_ok=True)
-
     render_via_graphviz(dag_graph=dag_graph, file_path_without_svg_suffix=plan_svg_output_path_prefix)

@@ -1,0 +1,23 @@
+.sky>ellipse {
+    fill: deepskyblue;
+}
+
+.ground>ellipse {
+    fill: palegreen;
+}
+
+.p3 {
+  font-family: "Courier New", monospace;
+}
+
+.edge-class text {
+    fill: green;
+    font-weight: bold;
+    /*font-size: 16px;*/
+    font-family: monospace;
+    border-color: #96D4D4;
+}
+
+th, td {
+  border-color: #96D4D4;
+}

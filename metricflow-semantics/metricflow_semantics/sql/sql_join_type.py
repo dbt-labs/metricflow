@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from enum import Enum
 
+from metricflow_semantics.experimental.comparison import ComparisonAnyType
+
 
 class SqlJoinType(Enum):
     """Enumerates the different kinds of SQL joins.
@@ -16,3 +18,8 @@ class SqlJoinType(Enum):
 
     def __repr__(self) -> str:  # noqa: D105
         return f"{self.__class__.__name__}.{self.name}"
+
+    def __lt__(self, other: ComparisonAnyType) -> bool:  # noqa: D105
+        if not isinstance(other, SqlJoinType):
+            return NotImplemented
+        return self.name < other.name

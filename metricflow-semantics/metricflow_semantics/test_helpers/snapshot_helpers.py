@@ -164,8 +164,17 @@ def _exclude_lines_matching_regex(file_contents: str, exclude_line_regex: str) -
     return "\n".join([line for line in file_contents.split("\n") if not compiled_regex.match(line)])
 
 
+DISPLAY_GRAPHS_CLI_FLAG = "--display-graphs"
 DISPLAY_SNAPSHOTS_CLI_FLAG = "--display-snapshots"
 OVERWRITE_SNAPSHOTS_CLI_FLAG = "--overwrite-snapshots"
+
+
+def add_display_graphs_cli_flag(parser: _pytest.config.argparsing.Parser) -> None:  # noqa: D103
+    parser.addoption(
+        DISPLAY_SNAPSHOTS_CLI_FLAG,
+        action="store_true",
+        help="Displays graphs associated with a test in a browser if set",
+    )
 
 
 def add_display_snapshots_cli_flag(parser: _pytest.config.argparsing.Parser) -> None:  # noqa: D103

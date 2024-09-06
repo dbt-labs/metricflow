@@ -21,6 +21,9 @@ from metricflow_semantics.test_helpers.semantic_manifest_yamls.partitioned_multi
     PARTITIONED_MULTI_HOP_JOIN_MANIFEST_ANCHOR,
 )
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.scd_manifest import SCD_MANIFEST_ANCHOR
+from metricflow_semantics.test_helpers.semantic_manifest_yamls.semantic_graph_manifest import (
+    SEMANTIC_GRAPH_MANIFEST_ANCHOR,
+)
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.simple_manifest import SIMPLE_MANIFEST_ANCHOR
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.simple_multi_hop_join_manifest import (
     SIMPLE_MULTI_HOP_JOIN_MANIFEST_ANCHOR,
@@ -129,3 +132,15 @@ def column_association_resolver(  # noqa: D103
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> ColumnAssociationResolver:
     return DunderColumnAssociationResolver(simple_semantic_manifest_lookup)
+
+
+@pytest.fixture(scope="session")
+def semantic_graph_manifest(template_mapping: Dict[str, str]) -> PydanticSemanticManifest:  # noqa: D103
+    return load_semantic_manifest(SEMANTIC_GRAPH_MANIFEST_ANCHOR.directory, template_mapping)
+
+
+@pytest.fixture(scope="session")
+def semantic_graph_manifest_lookup(  # noqa: D103
+    semantic_graph_manifest: PydanticSemanticManifest,
+) -> SemanticManifestLookup:
+    return SemanticManifestLookup(semantic_graph_manifest)

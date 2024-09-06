@@ -13,6 +13,7 @@ from metricflow_semantics.test_helpers.snapshot_helpers import (
     add_overwrite_snapshots_cli_flag,
 )
 
+from tests_metricflow.fixtures.setup_fixtures import DISPLAY_GRAPHS_CLI_FLAG, add_display_graphs_cli_flag
 from tests_metricflow_semantics import TESTS_METRICFLOW_SEMANTICS_DIRECTORY_ANCHOR
 from tests_metricflow_semantics.snapshots import METRICFLOW_SEMANTICS_SNAPSHOT_DIRECTORY_ANCHOR
 
@@ -21,6 +22,7 @@ logger = logging.getLogger(__name__)
 
 def pytest_addoption(parser: _pytest.config.argparsing.Parser) -> None:
     """Add options for running pytest through the CLI."""
+    add_display_graphs_cli_flag(parser)
     add_overwrite_snapshots_cli_flag(parser)
     add_display_snapshots_cli_flag(parser)
 
@@ -35,7 +37,7 @@ def mf_test_configuration(  # noqa: D103
         mf_system_schema="N/A",
         mf_source_schema="N/A",
         display_snapshots=bool(request.config.getoption(DISPLAY_SNAPSHOTS_CLI_FLAG, default=False)),
-        display_graphs=False,
+        display_graphs=bool(request.config.getoption(DISPLAY_GRAPHS_CLI_FLAG, default=False)),
         overwrite_snapshots=bool(request.config.getoption(OVERWRITE_SNAPSHOTS_CLI_FLAG, default=False)),
         use_persistent_source_schema=False,
         snapshot_directory=METRICFLOW_SEMANTICS_SNAPSHOT_DIRECTORY_ANCHOR.directory,
