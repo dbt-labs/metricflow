@@ -381,14 +381,14 @@
                             <!--     expr=SqlColumnReferenceExpression(node_id=cr_28121), -->
                             <!--     column_alias='visit__session',                       -->
                             <!--   )                                                      -->
-                            <!-- from_source = SqlTableFromClauseNode(node_id=tfc_28011) -->
+                            <!-- from_source = SqlTableNode(node_id=tfc_28011) -->
                             <!-- where = None -->
                             <!-- distinct = False -->
-                            <SqlTableFromClauseNode>
+                            <SqlTableNode>
                                 <!-- description = 'Read from ***************************.fct_visits' -->
                                 <!-- node_id = NodeId(id_str='tfc_28011') -->
                                 <!-- table_id = '***************************.fct_visits' -->
-                            </SqlTableFromClauseNode>
+                            </SqlTableNode>
                         </SqlSelectStatementNode>
                     </SqlSelectStatementNode>
                 </SqlSelectStatementNode>
@@ -845,14 +845,14 @@
                                         <!--     expr=SqlColumnReferenceExpression(node_id=cr_28121), -->
                                         <!--     column_alias='visit__session',                       -->
                                         <!--   )                                                      -->
-                                        <!-- from_source = SqlTableFromClauseNode(node_id=tfc_28011) -->
+                                        <!-- from_source = SqlTableNode(node_id=tfc_28011) -->
                                         <!-- where = None -->
                                         <!-- distinct = False -->
-                                        <SqlTableFromClauseNode>
+                                        <SqlTableNode>
                                             <!-- description = 'Read from ***************************.fct_visits' -->
                                             <!-- node_id = NodeId(id_str='tfc_28011') -->
                                             <!-- table_id = '***************************.fct_visits' -->
-                                        </SqlTableFromClauseNode>
+                                        </SqlTableNode>
                                     </SqlSelectStatementNode>
                                 </SqlSelectStatementNode>
                             </SqlSelectStatementNode>
@@ -1406,14 +1406,14 @@
                                         <!--     expr=SqlColumnReferenceExpression(node_id=cr_28043), -->
                                         <!--     column_alias='buy__session_id',                      -->
                                         <!--   )                                                      -->
-                                        <!-- from_source = SqlTableFromClauseNode(node_id=tfc_28002) -->
+                                        <!-- from_source = SqlTableNode(node_id=tfc_28002) -->
                                         <!-- where = None -->
                                         <!-- distinct = False -->
-                                        <SqlTableFromClauseNode>
+                                        <SqlTableNode>
                                             <!-- description = 'Read from ***************************.fct_buys' -->
                                             <!-- node_id = NodeId(id_str='tfc_28002') -->
                                             <!-- table_id = '***************************.fct_buys' -->
-                                        </SqlTableFromClauseNode>
+                                        </SqlTableNode>
                                     </SqlSelectStatementNode>
                                 </SqlSelectStatementNode>
                             </SqlSelectStatementNode>
