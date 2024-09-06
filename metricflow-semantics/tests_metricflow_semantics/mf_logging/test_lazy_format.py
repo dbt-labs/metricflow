@@ -3,8 +3,6 @@ from __future__ import annotations
 import logging
 from typing import override
 
-import pytest
-
 from metricflow_semantics.formatting.formatting_helpers import mf_dedent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from tests_metricflow_semantics.mf_logging.recorded_logging_context import RecordingLogHandler, recorded_logging_context
