@@ -5,7 +5,7 @@ import pprint
 from collections.abc import Mapping
 from dataclasses import fields, is_dataclass
 from enum import Enum
-from typing import Any, Dict, List, Optional, Sized, Union
+from typing import Any, Dict, List, Optional, Sized, Tuple, Union
 
 from dsi_pydantic_shim import BaseModel
 
@@ -458,13 +458,18 @@ def mf_pformat_many(  # type: ignore
                 include_empty_object_fields=include_empty_object_fields,
             )
 
-        item_block_lines = (
-            f"{key}:",
-            indent(
-                value_str,
-                indent_prefix=indent_prefix,
-            ),
-        )
+        lines_in_value_str = len(value_str.split("\n"))
+        item_block_lines: Tuple[str, ...]
+        if lines_in_value_str > 1:
+            item_block_lines = (
+                f"{key}:",
+                indent(
+                    value_str,
+                    indent_prefix=indent_prefix,
+                ),
+            )
+        else:
+            item_block_lines = (f"{key}: {value_str}",)
         item_block = "\n".join(item_block_lines)
         lines.append(indent(item_block))
     return "\n".join(lines)
