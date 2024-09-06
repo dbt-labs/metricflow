@@ -4,11 +4,11 @@ SELECT
   , MAX(metric_time__day) AS metric_time__day__max
 FROM (
   -- Time Spine
-  -- Metric Time Dimension 'ds'
+  -- Metric Time Dimension 'ts'
   -- Pass Only Elements: ['metric_time__day',]
   SELECT
-    DATE_TRUNC('day', ds) AS metric_time__day
-  FROM ***************************.mf_time_spine time_spine_src_28006
+    DATE_TRUNC('day', ts) AS metric_time__day
+  FROM ***************************.mf_time_spine_hour time_spine_src_28005
   GROUP BY
-    DATE_TRUNC('day', ds)
+    DATE_TRUNC('day', ts)
 ) subq_5

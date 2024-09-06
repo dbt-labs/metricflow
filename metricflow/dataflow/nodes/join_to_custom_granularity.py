@@ -17,6 +17,7 @@ class JoinToCustomGranularityNode(DataflowPlanNode, ABC):
     """Join parent dataset to time spine dataset to convert time dimension to a custom granularity."""
 
     time_dimension_spec: TimeDimensionSpec
+    include_base_time_dimension_column: bool
 
     def __post_init__(self) -> None:  # noqa: D105
         assert (
@@ -26,9 +27,13 @@ class JoinToCustomGranularityNode(DataflowPlanNode, ABC):
 
     @staticmethod
     def create(  # noqa: D102
-        parent_node: DataflowPlanNode, time_dimension_spec: TimeDimensionSpec
+        parent_node: DataflowPlanNode, time_dimension_spec: TimeDimensionSpec, include_base_time_dimension_column: bool
     ) -> JoinToCustomGranularityNode:
-        return JoinToCustomGranularityNode(parent_nodes=(parent_node,), time_dimension_spec=time_dimension_spec)
+        return JoinToCustomGranularityNode(
+            parent_nodes=(parent_node,),
+            time_dimension_spec=time_dimension_spec,
+            include_base_time_dimension_column=include_base_time_dimension_column,
+        )
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D102
@@ -45,6 +50,7 @@ class JoinToCustomGranularityNode(DataflowPlanNode, ABC):
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
         return tuple(super().displayed_properties) + (
             DisplayedProperty("time_dimension_spec", self.time_dimension_spec),
+            DisplayedProperty("include_base_time_dimension_column", self.include_base_time_dimension_column),
         )
 
     @property
@@ -52,12 +58,18 @@ class JoinToCustomGranularityNode(DataflowPlanNode, ABC):
         return self.parent_nodes[0]
 
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
-        return isinstance(other_node, self.__class__) and other_node.time_dimension_spec == self.time_dimension_spec
+        return (
+            isinstance(other_node, self.__class__)
+            and other_node.time_dimension_spec == self.time_dimension_spec
+            and other_node.include_base_time_dimension_column == self.include_base_time_dimension_column
+        )
 
     def with_new_parents(  # noqa: D102
         self, new_parent_nodes: Sequence[DataflowPlanNode]
     ) -> JoinToCustomGranularityNode:
         assert len(new_parent_nodes) == 1, "JoinToCustomGranularity accepts exactly one parent node."
         return JoinToCustomGranularityNode.create(
-            parent_node=new_parent_nodes[0], time_dimension_spec=self.time_dimension_spec
+            parent_node=new_parent_nodes[0],
+            time_dimension_spec=self.time_dimension_spec,
+            include_base_time_dimension_column=self.include_base_time_dimension_column,
         )

@@ -190,9 +190,10 @@ class SqlSelectStatementNode(SqlQueryPlanNode):
         return self._description
 
 
+# TODO: rename to SqlTableNode
 @dataclass(frozen=True)
 class SqlTableFromClauseNode(SqlQueryPlanNode):
-    """An SQL table that can go in the FROM clause."""
+    """An SQL table that can go in the FROM clause or the JOIN clause."""
 
     sql_table: SqlTable
 

@@ -39,7 +39,8 @@
                     <!-- data_set = SemanticModelDataSet('listings_latest') -->
                 </ReadSqlSourceNode>
                 <FilterElementsNode>
-                    <!-- description = "Pass Only Elements: ['metric_time__day', 'metric_time__month']" -->
+                    <!-- description =                                                                          -->
+                    <!--   "Pass Only Elements: ['metric_time__day', 'metric_time__month', 'metric_time__day']" -->
                     <!-- node_id = NodeId(id_str='pfe_2') -->
                     <!-- include_spec =                                                                  -->
                     <!--   TimeDimensionSpec(                                                            -->
@@ -51,6 +52,11 @@
                     <!--     element_name='metric_time',                                                     -->
                     <!--     time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH), -->
                     <!--   )                                                                                 -->
+                    <!-- include_spec =                                                                  -->
+                    <!--   TimeDimensionSpec(                                                            -->
+                    <!--     element_name='metric_time',                                                 -->
+                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                    <!--   )                                                                             -->
                     <!-- distinct = False -->
                     <MetricTimeDimensionTransformNode>
                         <!-- description = "Metric Time Dimension 'ds'" -->

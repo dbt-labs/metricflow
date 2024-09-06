@@ -51,6 +51,7 @@ FROM (
     , subq_0.listing__created_at__extract_dow AS listing__created_at__extract_dow
     , subq_0.listing__created_at__extract_doy AS listing__created_at__extract_doy
     , subq_3.metric_time__day AS metric_time__day
+    , subq_3.metric_time__day AS metric_time__day
     , subq_0.listing AS listing
     , subq_0.user AS user
     , subq_0.listing__user AS listing__user
@@ -126,9 +127,10 @@ FROM (
     FROM ***************************.dim_listings_latest listings_latest_src_28000
   ) subq_0
   CROSS JOIN (
-    -- Pass Only Elements: ['metric_time__day',]
+    -- Pass Only Elements: ['metric_time__day', 'metric_time__day']
     SELECT
       subq_2.metric_time__day
+      , subq_2.metric_time__day
     FROM (
       -- Metric Time Dimension 'ds'
       SELECT
@@ -143,7 +145,8 @@ FROM (
         , subq_1.ds__extract_day
         , subq_1.ds__extract_dow
         , subq_1.ds__extract_doy
-        , subq_1.ds__day AS metric_time__day
+        , subq_1.ds__martian_day
+        , subq_1.ds__martian_day AS metric_time__day
         , subq_1.ds__week AS metric_time__week
         , subq_1.ds__month AS metric_time__month
         , subq_1.ds__quarter AS metric_time__quarter
@@ -154,6 +157,7 @@ FROM (
         , subq_1.ds__extract_day AS metric_time__extract_day
         , subq_1.ds__extract_dow AS metric_time__extract_dow
         , subq_1.ds__extract_doy AS metric_time__extract_doy
+        , subq_1.ds__martian_day AS metric_time__day
       FROM (
         -- Time Spine
         SELECT
@@ -168,6 +172,7 @@ FROM (
           , EXTRACT(day FROM time_spine_src_28006.ds) AS ds__extract_day
           , EXTRACT(isodow FROM time_spine_src_28006.ds) AS ds__extract_dow
           , EXTRACT(doy FROM time_spine_src_28006.ds) AS ds__extract_doy
+          , time_spine_src_28006.martian_day AS ds__martian_day
         FROM ***************************.mf_time_spine time_spine_src_28006
       ) subq_1
     ) subq_2

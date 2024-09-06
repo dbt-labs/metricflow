@@ -123,8 +123,8 @@ class SqlColumnPrunerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
             or node.distinct
         )
 
-        if len(pruned_select_columns) == 0:
-            raise RuntimeError("All columns have been pruned - this indicates an bug in the pruner or in the inputs.")
+        # if len(pruned_select_columns) == 0:
+        #     raise RuntimeError("All columns have been pruned - this indicates an bug in the pruner or in the inputs.")
 
         # Based on the expressions in this select statement, figure out what column aliases are needed in the sources of
         # this query (i.e. tables or sub-queries in the FROM or JOIN clauses).

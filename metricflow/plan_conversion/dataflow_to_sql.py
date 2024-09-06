@@ -280,39 +280,48 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         )
         return time_spine_source
 
-    def _get_custom_granularity_column_name(self, custom_granularity: str) -> str:
-        time_spine_source = self._get_time_spine_for_custom_granularity(custom_granularity)
+    def _get_custom_granularity_column_name(self, custom_granularity_name: str) -> str:
+        time_spine_source = self._get_time_spine_for_custom_granularity(custom_granularity_name)
         for custom_granularity in time_spine_source.custom_granularities:
-            if custom_granularity.name == custom_granularity:
+            print(custom_granularity)
+            if custom_granularity.name == custom_granularity_name:
                 return custom_granularity.column_name if custom_granularity.column_name else custom_granularity.name
 
         raise RuntimeError(
             f"Custom granularity {custom_granularity} not found. This indicates internal misconfiguration."
         )
 
-    def _make_custom_granularity_dataset(self, time_dimension_instance: TimeDimensionInstance) -> SqlDataSet:
-        time_spine_instance_set = InstanceSet(time_dimension_instances=(time_dimension_instance,))
-        time_spine_table_alias = self._next_unique_table_alias()
-        assert (
-            time_dimension_instance.spec.time_granularity.is_custom_granularity
-        ), "_make_custom_granularity_dataset() should only be called for custom granularities."
+    # def _make_custom_granularity_dataset(
+    #     self,
+    #     time_dimension_spec: TimeDimensionSpec,
+    #     parent_time_dimension_instance: TimeDimensionInstance,
+    #     time_spine_table_alias: str,
+    # ) -> SqlDataSet:
+    #     assert (
+    #         time_dimension_spec.time_granularity.is_custom_granularity
+    #     ), "_make_custom_granularity_dataset() should only be called for custom granularities."
 
-        custom_granularity_name = time_dimension_instance.spec.time_granularity.name
-        time_spine_source = self._get_time_spine_for_custom_granularity(custom_granularity_name)
-        custom_granularity_column_name = self._get_custom_granularity_column_name(custom_granularity_name)
-        column_expr = SqlColumnReferenceExpression.from_table_and_column_names(
-            table_alias=time_spine_table_alias, column_name=custom_granularity_column_name
-        )
-        column_alias = self.column_association_resolver.resolve_spec(time_dimension_instance.spec).column_name
-        return SqlDataSet(
-            instance_set=time_spine_instance_set,
-            sql_select_node=SqlSelectStatementNode.create(
-                description=TIME_SPINE_DATA_SET_DESCRIPTION,
-                select_columns=(SqlSelectColumn(expr=column_expr, column_alias=column_alias),),
-                from_source=SqlTableFromClauseNode.create(sql_table=time_spine_source.spine_table),
-                from_source_alias=time_spine_table_alias,
-            ),
-        )
+    #     custom_granularity_name = time_dimension_spec.time_granularity.name
+    #     time_spine_source = self._get_time_spine_for_custom_granularity(custom_granularity_name)
+    #     custom_granularity_column_name = self._get_custom_granularity_column_name(custom_granularity_name)
+    #     column_expr = SqlColumnReferenceExpression.from_table_and_column_names(
+    #         table_alias=time_spine_table_alias, column_name=custom_granularity_column_name
+    #     )
+    #     column_alias = self.column_association_resolver.resolve_spec(time_dimension_spec).column_name
+    #     time_spine_instance = TimeDimensionInstance(
+    #         defined_from=parent_time_dimension_instance.defined_from,
+    #         associated_columns=(self._column_association_resolver.resolve_spec(time_dimension_spec),),
+    #         spec=time_dimension_spec,
+    #     )
+    #     return SqlDataSet(
+    #         instance_set=InstanceSet(time_dimension_instances=(time_spine_instance,)),
+    #         sql_select_node=SqlSelectStatementNode.create(
+    #             description=TIME_SPINE_DATA_SET_DESCRIPTION,
+    #             select_columns=(SqlSelectColumn(expr=column_expr, column_alias=column_alias),),
+    #             from_source=SqlTableFromClauseNode.create(sql_table=time_spine_source.spine_table),
+    #             from_source_alias=time_spine_table_alias,
+    #         ),
+    #     )
 
     def _make_time_spine_data_set(
         self,
@@ -1155,9 +1164,9 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                     spec=metric_time_dimension_spec,
                 )
             )
-            output_column_to_input_column[
-                metric_time_dimension_column_association.column_name
-            ] = matching_time_dimension_instance.associated_column.column_name
+            output_column_to_input_column[metric_time_dimension_column_association.column_name] = (
+                matching_time_dimension_instance.associated_column.column_name
+            )
 
         output_instance_set = InstanceSet(
             measure_instances=tuple(output_measure_instances),
@@ -1389,11 +1398,11 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             and len(time_spine_dataset.checked_sql_select_node.select_columns) == 1
         ), "Time spine dataset not configured properly. Expected exactly one column."
         original_time_spine_dim_instance = time_spine_dataset.instance_set.time_dimension_instances[0]
-        time_spine_column_select_expr: Union[
-            SqlColumnReferenceExpression, SqlDateTruncExpression
-        ] = SqlColumnReferenceExpression.create(
-            SqlColumnReference(
-                table_alias=time_spine_alias, column_name=original_time_spine_dim_instance.spec.qualified_name
+        time_spine_column_select_expr: Union[SqlColumnReferenceExpression, SqlDateTruncExpression] = (
+            SqlColumnReferenceExpression.create(
+                SqlColumnReference(
+                    table_alias=time_spine_alias, column_name=original_time_spine_dim_instance.spec.qualified_name
+                )
             )
         )
 
@@ -1481,10 +1490,12 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
     def visit_join_to_custom_granularity_node(self, node: JoinToCustomGranularityNode) -> SqlDataSet:  # noqa: D102
         parent_data_set = node.parent_node.accept(self)
-        parent_alias = self._next_unique_table_alias()
+
+        # Will join without creating a new subquery, so use the same from alias as the parent node.
+        parent_alias = parent_data_set.checked_sql_select_node.from_source_alias
         parent_time_dimension_instance: Optional[TimeDimensionInstance] = None
         for instance in parent_data_set.instance_set.time_dimension_instances:
-            if instance.spec == node.time_dimension_spec:
+            if instance.spec == node.time_dimension_spec.with_base_grain:
                 parent_time_dimension_instance = instance
                 break
         assert parent_time_dimension_instance, (
@@ -1492,28 +1503,25 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             "This indicates internal misconfiguration."
         )
 
-        # Build time spine dataset.
-        time_spine_dataset = self._make_custom_granularity_dataset(parent_time_dimension_instance)
-        assert (
-            time_spine_dataset.instance_set.time_dimension_instances
-        ), "No time dimensions found in time spine dataset. This indicates internal misconfiguration."
-        time_spine_instance = time_spine_dataset.instance_set.time_dimension_instances[0]
-
         # Build join expression.
-        time_spine_source = self._get_time_spine_for_custom_granularity(node.time_dimension_spec.time_granularity.name)
+        time_spine_alias = self._next_unique_table_alias()
+        custom_granularity_name = node.time_dimension_spec.time_granularity.name
+        time_spine_source = self._get_time_spine_for_custom_granularity(custom_granularity_name)
         left_expr_for_join: SqlExpressionNode = SqlColumnReferenceExpression.from_table_and_column_names(
             table_alias=parent_alias, column_name=parent_time_dimension_instance.associated_column.column_name
         )
         left_expr_for_join = (
             left_expr_for_join
-            if parent_time_dimension_instance.spec.time_granularity == time_spine_source.base_granularity
+            if parent_time_dimension_instance.spec.time_granularity.base_granularity
+            == time_spine_source.base_granularity
             else SqlDateTruncExpression.create(
                 time_granularity=time_spine_source.base_granularity, arg=left_expr_for_join
             )
         )
-        time_spine_alias = self._next_unique_table_alias()
         join_description = SqlJoinDescription(
-            right_source=time_spine_dataset.checked_sql_select_node,
+            right_source=SqlTableFromClauseNode.create(
+                sql_table=time_spine_source.spine_table
+            ),  # time_spine_dataset.checked_sql_select_node,
             right_source_alias=time_spine_alias,
             on_condition=SqlComparisonExpression.create(
                 left_expr=left_expr_for_join,
@@ -1525,22 +1533,47 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             join_type=SqlJoinType.LEFT_OUTER,
         )
 
-        # Build output dataset, replacing the custom time dimension from the parent dataset with the one from the time spine.
-        parent_instance_set = parent_data_set.instance_set.transform(
-            FilterElements(exclude_specs=InstanceSpecSet(time_dimension_specs=(parent_time_dimension_instance.spec,)))
+        # Remove base grain from the parent dataset unless that granularity was requested in addition to the custom grain.
+        parent_instance_set = parent_data_set.instance_set
+        parent_select_columns = parent_data_set.checked_sql_select_node.select_columns
+        if not node.include_base_time_dimension_column:
+            parent_instance_set = parent_instance_set.transform(
+                FilterElements(
+                    exclude_specs=InstanceSpecSet(time_dimension_specs=(parent_time_dimension_instance.spec,))
+                )
+            )
+            parent_select_columns = tuple(
+                [
+                    column
+                    for column in parent_select_columns
+                    if column.column_alias != parent_time_dimension_instance.associated_column.column_name
+                ]
+            )
+
+        # Build output time spine instances and columns.
+        time_spine_instance = TimeDimensionInstance(
+            defined_from=parent_time_dimension_instance.defined_from,
+            associated_columns=(self._column_association_resolver.resolve_spec(node.time_dimension_spec),),
+            spec=node.time_dimension_spec,
         )
         time_spine_instance_set = InstanceSet(time_dimension_instances=(time_spine_instance,))
+        time_spine_select_columns = (
+            SqlSelectColumn(
+                expr=SqlColumnReferenceExpression.from_table_and_column_names(
+                    table_alias=time_spine_alias,
+                    column_name=self._get_custom_granularity_column_name(custom_granularity_name),
+                ),
+                column_alias=time_spine_instance.associated_column.column_name,
+            ),
+        )
         return SqlDataSet(
             instance_set=InstanceSet.merge([time_spine_instance_set, parent_instance_set]),
             sql_select_node=SqlSelectStatementNode.create(
-                description=node.description,
-                select_columns=create_select_columns_for_instance_sets(
-                    self._column_association_resolver,
-                    OrderedDict({parent_alias: parent_instance_set, time_spine_alias: time_spine_instance_set}),
-                ),
-                from_source=parent_data_set.checked_sql_select_node,
+                description=node.description + "\n" + parent_data_set.checked_sql_select_node.description,
+                select_columns=parent_select_columns + time_spine_select_columns,
+                from_source=parent_data_set.checked_sql_select_node.from_source,
                 from_source_alias=parent_alias,
-                join_descs=(join_description,),
+                join_descs=parent_data_set.checked_sql_select_node.join_descs + (join_description,),
             ),
         )
 

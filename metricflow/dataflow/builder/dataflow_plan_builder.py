@@ -797,8 +797,13 @@ class DataflowPlanBuilder:
 
         for time_dimension_spec in required_linkable_specs.time_dimension_specs:
             if time_dimension_spec.time_granularity.is_custom_granularity:
+                include_base_time_dimension_column = (
+                    time_dimension_spec.with_base_grain in required_linkable_specs.time_dimension_specs
+                )
                 output_node = JoinToCustomGranularityNode.create(
-                    parent_node=output_node, time_dimension_spec=time_dimension_spec
+                    parent_node=output_node,
+                    time_dimension_spec=time_dimension_spec,
+                    include_base_time_dimension_column=include_base_time_dimension_column,
                 )
 
         if len(query_level_filter_specs) > 0:
@@ -891,11 +896,26 @@ class DataflowPlanBuilder:
         """Find source nodes with requested linkable specs and no measures."""
         # Use a dictionary to dedupe for consistent ordering.
         selected_nodes: Dict[DataflowPlanNode, None] = {}
-        requested_linkable_specs_set = set(linkable_specs.as_tuple)
+
+        # Find the source node that will satisfy the base granularity. Custom granularities will be joined in later.
+        linkable_specs_set_with_base_granularities: Set[LinkableInstanceSpec] = set()
+        for linkable_spec in linkable_specs.as_tuple:
+            if isinstance(linkable_spec, TimeDimensionSpec) and linkable_spec.time_granularity.is_custom_granularity:
+                # TODO: if you can satisfy the spec directly, do that. If not, try base grain.
+                # This would enable querying custom metric_time grains without metrics, without a join.
+                linkable_spec_with_base_grain = linkable_spec.with_grain(
+                    ExpandedTimeGranularity.from_time_granularity(linkable_spec.time_granularity.base_granularity)
+                )
+                linkable_specs_set_with_base_granularities.add(linkable_spec_with_base_grain)
+            else:
+                linkable_specs_set_with_base_granularities.add(linkable_spec)
+
         for source_node in source_nodes:
             output_spec_set = self._node_data_set_resolver.get_output_data_set(source_node).instance_set.spec_set
             all_linkable_specs_in_node = set(output_spec_set.linkable_specs)
-            requested_linkable_specs_in_node = requested_linkable_specs_set.intersection(all_linkable_specs_in_node)
+            requested_linkable_specs_in_node = linkable_specs_set_with_base_granularities.intersection(
+                all_linkable_specs_in_node
+            )
             if requested_linkable_specs_in_node:
                 selected_nodes[source_node] = None
 
@@ -1016,10 +1036,12 @@ class DataflowPlanBuilder:
             metric_time_dimension_reference=self._metric_time_dimension_reference,
             time_spine_nodes=self._source_node_set.time_spine_nodes_tuple,
         )
+
         logger.info(
             f"After removing unnecessary nodes, there are {len(candidate_nodes_for_right_side_of_join)} candidate "
             f"nodes for the right side of the join"
         )
+        # TODO: test multi-hop to ensure we handle custom grains correctly
         if DataflowPlanBuilder._contains_multihop_linkables(linkable_specs):
             candidate_nodes_for_right_side_of_join = list(
                 node_processor.add_multi_hop_joins(
@@ -1080,6 +1102,7 @@ class DataflowPlanBuilder:
             )
 
             start_time = time.time()
+            # Probably happening here
             evaluation = node_evaluator.evaluate_node(
                 left_node=node,
                 required_linkable_specs=list(linkable_specs),
@@ -1542,8 +1565,13 @@ class DataflowPlanBuilder:
 
         for time_dimension_spec in queried_linkable_specs.time_dimension_specs:
             if time_dimension_spec.time_granularity.is_custom_granularity:
+                include_base_time_dimension_column = (
+                    time_dimension_spec.with_base_grain in required_linkable_specs.time_dimension_specs
+                )
                 unaggregated_measure_node = JoinToCustomGranularityNode.create(
-                    parent_node=unaggregated_measure_node, time_dimension_spec=time_dimension_spec
+                    parent_node=unaggregated_measure_node,
+                    time_dimension_spec=time_dimension_spec,
+                    include_base_time_dimension_column=include_base_time_dimension_column,
                 )
 
         # If time constraint was previously adjusted for cumulative window or grain, apply original time constraint

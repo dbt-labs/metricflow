@@ -105,7 +105,7 @@ class SemanticModelToDataSetConverter:
         self,
         element_name: str,
         entity_links: Tuple[EntityReference, ...],
-        time_granularity: TimeGranularity,
+        time_granularity: ExpandedTimeGranularity,
         date_part: Optional[DatePart] = None,
         semantic_model_name: Optional[str] = None,
     ) -> TimeDimensionInstance:
@@ -113,7 +113,7 @@ class SemanticModelToDataSetConverter:
         time_dimension_spec = TimeDimensionSpec(
             element_name=element_name,
             entity_links=entity_links,
-            time_granularity=ExpandedTimeGranularity.from_time_granularity(time_granularity),
+            time_granularity=time_granularity,
             date_part=date_part,
         )
 
@@ -289,7 +289,7 @@ class SemanticModelToDataSetConverter:
             semantic_model_name=semantic_model_name,
             element_name=dimension.reference.element_name,
             entity_links=entity_links,
-            time_granularity=defined_time_granularity,
+            time_granularity=ExpandedTimeGranularity.from_time_granularity(defined_time_granularity),
         )
         time_dimension_instances.append(time_dimension_instance)
 
@@ -305,7 +305,7 @@ class SemanticModelToDataSetConverter:
             )
         else:
             select_columns.append(
-                self._build_column_for_time_granularity(
+                self._build_column_for_standard_time_granularity(
                     time_granularity=defined_time_granularity,
                     expr=dimension_select_expr,
                     column_alias=time_dimension_instance.associated_column.column_name,
@@ -340,12 +340,12 @@ class SemanticModelToDataSetConverter:
                     semantic_model_name=semantic_model_name,
                     element_name=element_name,
                     entity_links=entity_links,
-                    time_granularity=time_granularity,
+                    time_granularity=ExpandedTimeGranularity.from_time_granularity(time_granularity),
                 )
                 time_dimension_instances.append(time_dimension_instance)
 
                 select_columns.append(
-                    self._build_column_for_time_granularity(
+                    self._build_column_for_standard_time_granularity(
                         time_granularity=time_granularity,
                         expr=dimension_select_expr,
                         column_alias=time_dimension_instance.associated_column.column_name,
@@ -359,7 +359,7 @@ class SemanticModelToDataSetConverter:
                     semantic_model_name=semantic_model_name,
                     element_name=element_name,
                     entity_links=entity_links,
-                    time_granularity=defined_time_granularity,
+                    time_granularity=ExpandedTimeGranularity.from_time_granularity(defined_time_granularity),
                     date_part=date_part,
                 )
                 time_dimension_instances.append(time_dimension_instance)
@@ -373,7 +373,7 @@ class SemanticModelToDataSetConverter:
 
         return (time_dimension_instances, select_columns)
 
-    def _build_column_for_time_granularity(
+    def _build_column_for_standard_time_granularity(
         self, time_granularity: TimeGranularity, expr: SqlExpressionNode, column_alias: str
     ) -> SqlSelectColumn:
         return SqlSelectColumn(
@@ -517,35 +517,55 @@ class SemanticModelToDataSetConverter:
     def build_time_spine_source_data_set(self, time_spine_source: TimeSpineSource) -> SqlDataSet:
         """Build data set for time spine."""
         from_source_alias = SequentialIdGenerator.create_next_id(StaticIdPrefix.TIME_SPINE_SOURCE).str_value
-        defined_time_granularity = time_spine_source.base_granularity
+        base_granularity = time_spine_source.base_granularity
         time_column_name = time_spine_source.base_column
 
         time_dimension_instances: List[TimeDimensionInstance] = []
         select_columns: List[SqlSelectColumn] = []
 
-        time_dimension_instance = self._create_time_dimension_instance(
-            element_name=time_column_name, entity_links=(), time_granularity=defined_time_granularity
-        )
-        time_dimension_instances.append(time_dimension_instance)
-
-        dimension_select_expr = SemanticModelToDataSetConverter._make_element_sql_expr(
-            table_alias=from_source_alias, element_name=time_column_name
-        )
-        select_column = self._build_column_for_time_granularity(
-            time_granularity=defined_time_granularity,
-            expr=dimension_select_expr,
-            column_alias=time_dimension_instance.associated_column.column_name,
-        )
-        select_columns.append(select_column)
-
-        new_instances, new_columns = self._build_time_dimension_instances_and_columns(
-            defined_time_granularity=defined_time_granularity,
+        # Build base time dimension instances & columns
+        base_time_dimension_instance = self._create_time_dimension_instance(
             element_name=time_column_name,
             entity_links=(),
-            dimension_select_expr=dimension_select_expr,
+            time_granularity=ExpandedTimeGranularity.from_time_granularity(base_granularity),
         )
-        time_dimension_instances.extend(new_instances)
-        select_columns.extend(new_columns)
+        time_dimension_instances.append(base_time_dimension_instance)
+        base_dimension_select_expr = SemanticModelToDataSetConverter._make_element_sql_expr(
+            table_alias=from_source_alias, element_name=time_column_name
+        )
+        base_select_column = self._build_column_for_standard_time_granularity(
+            time_granularity=base_granularity,
+            expr=base_dimension_select_expr,
+            column_alias=base_time_dimension_instance.associated_column.column_name,
+        )
+        select_columns.append(base_select_column)
+        new_base_instances, new_base_columns = self._build_time_dimension_instances_and_columns(
+            defined_time_granularity=base_granularity,
+            element_name=time_column_name,  # is this right? should it be metric time instead?
+            entity_links=(),
+            dimension_select_expr=base_dimension_select_expr,
+        )
+        time_dimension_instances.extend(new_base_instances)
+        select_columns.extend(new_base_columns)
+
+        # Build custom granularity time dimension instances & columns
+        for custom_granularity in time_spine_source.custom_granularities:
+            custom_time_dimension_instance = self._create_time_dimension_instance(
+                element_name=time_column_name,  # is this right? should it be metric time instead? or gran name instead?
+                entity_links=(),
+                time_granularity=ExpandedTimeGranularity(
+                    name=custom_granularity.name, base_granularity=base_granularity
+                ),
+            )
+            time_dimension_instances.append(custom_time_dimension_instance)
+            custom_select_column = SqlSelectColumn(
+                expr=SemanticModelToDataSetConverter._make_element_sql_expr(
+                    table_alias=from_source_alias,
+                    element_name=custom_granularity.column_name or custom_granularity.name,
+                ),
+                column_alias=custom_time_dimension_instance.associated_column.column_name,
+            )
+            select_columns.append(custom_select_column)
 
         return SqlDataSet(
             instance_set=InstanceSet(time_dimension_instances=tuple(time_dimension_instances)),
