@@ -25,7 +25,7 @@ from metricflow.sql.sql_plan import (
     SqlOrderByDescription,
     SqlSelectColumn,
     SqlSelectStatementNode,
-    SqlTableFromClauseNode,
+    SqlTableNode,
 )
 from tests_metricflow.sql.compare_sql_plan import assert_rendered_sql_equal
 
@@ -49,7 +49,7 @@ def test_component_rendering(
         ),
     ]
 
-    from_source = SqlTableFromClauseNode.create(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings"))
+    from_source = SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings"))
 
     from_source = from_source
     from_source_alias = "a"
@@ -109,7 +109,7 @@ def test_component_rendering(
     # Test single join
     joins_descs.append(
         SqlJoinDescription(
-            right_source=SqlTableFromClauseNode.create(sql_table=SqlTable(schema_name="demo", table_name="dim_users")),
+            right_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="dim_users")),
             right_source_alias="b",
             on_condition=SqlComparisonExpression.create(
                 left_expr=SqlColumnReferenceExpression.create(SqlColumnReference("a", "user_id")),
@@ -140,9 +140,7 @@ def test_component_rendering(
     # Test multiple join
     joins_descs.append(
         SqlJoinDescription(
-            right_source=SqlTableFromClauseNode.create(
-                sql_table=SqlTable(schema_name="demo", table_name="dim_listings")
-            ),
+            right_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="dim_listings")),
             right_source_alias="c",
             on_condition=SqlComparisonExpression.create(
                 left_expr=SqlColumnReferenceExpression.create(SqlColumnReference("a", "user_id")),
@@ -240,9 +238,7 @@ def test_render_where(  # noqa: D103
                     column_alias="booking_value",
                 ),
             ),
-            from_source=SqlTableFromClauseNode.create(
-                sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")
-            ),
+            from_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
             from_source_alias="a",
             where=SqlComparisonExpression.create(
                 left_expr=SqlColumnReferenceExpression.create(
@@ -286,9 +282,7 @@ def test_render_order_by(  # noqa: D103
                     column_alias="bookings",
                 ),
             ),
-            from_source=SqlTableFromClauseNode.create(
-                sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")
-            ),
+            from_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
             from_source_alias="a",
             order_bys=(
                 SqlOrderByDescription(
@@ -329,9 +323,7 @@ def test_render_limit(  # noqa: D103
                     column_alias="bookings",
                 ),
             ),
-            from_source=SqlTableFromClauseNode.create(
-                sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")
-            ),
+            from_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
             from_source_alias="a",
             limit=1,
         ),
@@ -356,7 +348,7 @@ def test_render_create_table_as(  # noqa: D103
                 column_alias="bookings",
             ),
         ),
-        from_source=SqlTableFromClauseNode.create(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
+        from_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
         from_source_alias="a",
         limit=1,
     )

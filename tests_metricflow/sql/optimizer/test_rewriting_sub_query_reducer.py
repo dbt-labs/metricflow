@@ -22,7 +22,7 @@ from metricflow.sql.sql_plan import (
     SqlOrderByDescription,
     SqlSelectColumn,
     SqlSelectStatementNode,
-    SqlTableFromClauseNode,
+    SqlTableNode,
 )
 from tests_metricflow.sql.compare_sql_plan import assert_default_rendered_sql_equal
 
@@ -113,9 +113,7 @@ def base_select_statement() -> SqlSelectStatementNode:
                         column_alias="ds",
                     ),
                 ),
-                from_source=SqlTableFromClauseNode.create(
-                    sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")
-                ),
+                from_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
                 from_source_alias="src0",
                 limit=2,
             ),
@@ -263,9 +261,7 @@ def join_select_statement() -> SqlSelectStatementNode:
                     column_alias="listing",
                 ),
             ),
-            from_source=SqlTableFromClauseNode.create(
-                sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")
-            ),
+            from_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
             from_source_alias="fct_bookings_src",
         ),
         from_source_alias="bookings_src",
@@ -287,9 +283,7 @@ def join_select_statement() -> SqlSelectStatementNode:
                             column_alias="listing",
                         ),
                     ),
-                    from_source=SqlTableFromClauseNode.create(
-                        sql_table=SqlTable(schema_name="demo", table_name="dim_listings")
-                    ),
+                    from_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="dim_listings")),
                     from_source_alias="dim_listings_src",
                 ),
                 right_source_alias="listings_src",
@@ -426,9 +420,7 @@ def colliding_select_statement() -> SqlSelectStatementNode:
                     column_alias="listing",
                 ),
             ),
-            from_source=SqlTableFromClauseNode.create(
-                sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")
-            ),
+            from_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
             from_source_alias="colliding_alias",
         ),
         from_source_alias="bookings_src",
@@ -450,9 +442,7 @@ def colliding_select_statement() -> SqlSelectStatementNode:
                             column_alias="listing",
                         ),
                     ),
-                    from_source=SqlTableFromClauseNode.create(
-                        sql_table=SqlTable(schema_name="demo", table_name="dim_listings")
-                    ),
+                    from_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="dim_listings")),
                     from_source_alias="colliding_alias",
                 ),
                 right_source_alias="listings_src",
@@ -603,9 +593,7 @@ def reduce_all_join_select_statement() -> SqlSelectStatementNode:
                     column_alias="listing",
                 ),
             ),
-            from_source=SqlTableFromClauseNode.create(
-                sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")
-            ),
+            from_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
             from_source_alias="fct_bookings_src",
         ),
         from_source_alias="bookings_src",
@@ -627,9 +615,7 @@ def reduce_all_join_select_statement() -> SqlSelectStatementNode:
                             column_alias="listing",
                         ),
                     ),
-                    from_source=SqlTableFromClauseNode.create(
-                        sql_table=SqlTable(schema_name="demo", table_name="dim_listings")
-                    ),
+                    from_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="dim_listings")),
                     from_source_alias="dim_listings_src1",
                 ),
                 right_source_alias="listings_src1",
@@ -661,9 +647,7 @@ def reduce_all_join_select_statement() -> SqlSelectStatementNode:
                             column_alias="listing",
                         ),
                     ),
-                    from_source=SqlTableFromClauseNode.create(
-                        sql_table=SqlTable(schema_name="demo", table_name="dim_listings")
-                    ),
+                    from_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="dim_listings")),
                     from_source_alias="dim_listings_src2",
                 ),
                 right_source_alias="listings_src2",
@@ -799,9 +783,7 @@ def reducing_join_statement() -> SqlSelectStatementNode:
                         column_alias="bookings",
                     ),
                 ),
-                from_source=SqlTableFromClauseNode.create(
-                    sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")
-                ),
+                from_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
                 from_source_alias="src0",
             ),
             from_source_alias="src1",
@@ -824,9 +806,7 @@ def reducing_join_statement() -> SqlSelectStatementNode:
                             column_alias="listings",
                         ),
                     ),
-                    from_source=SqlTableFromClauseNode.create(
-                        sql_table=SqlTable(schema_name="demo", table_name="fct_listings")
-                    ),
+                    from_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="fct_listings")),
                     from_source_alias="src4",
                 ),
                 right_source_alias="src3",
@@ -917,9 +897,7 @@ def reducing_join_left_node_statement() -> SqlSelectStatementNode:
                     column_alias="listings",
                 ),
             ),
-            from_source=SqlTableFromClauseNode.create(
-                sql_table=SqlTable(schema_name="demo", table_name="fct_listings")
-            ),
+            from_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="fct_listings")),
             from_source_alias="src4",
         ),
         from_source_alias="src2",
@@ -950,7 +928,7 @@ def reducing_join_left_node_statement() -> SqlSelectStatementNode:
                                 column_alias="bookings",
                             ),
                         ),
-                        from_source=SqlTableFromClauseNode.create(
+                        from_source=SqlTableNode.create(
                             sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")
                         ),
                         from_source_alias="src0",
@@ -1019,9 +997,7 @@ def test_rewriting_distinct_select_node_is_not_reduced(
                     column_alias="bookings",
                 ),
             ),
-            from_source=SqlTableFromClauseNode.create(
-                sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")
-            ),
+            from_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
             from_source_alias="a",
             distinct=True,
         ),

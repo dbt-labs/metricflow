@@ -49,7 +49,7 @@ from metricflow.sql.sql_exprs import (
 from metricflow.sql.sql_plan import (
     SqlSelectColumn,
     SqlSelectStatementNode,
-    SqlTableFromClauseNode,
+    SqlTableNode,
 )
 
 logger = logging.getLogger(__name__)
@@ -491,9 +491,7 @@ class SemanticModelToDataSetConverter:
             all_select_columns.extend(select_columns)
 
         # Generate the "from" clause depending on whether it's an SQL query or an SQL table.
-        from_source = SqlTableFromClauseNode.create(
-            sql_table=SqlTable.from_string(semantic_model.node_relation.relation_name)
-        )
+        from_source = SqlTableNode.create(sql_table=SqlTable.from_string(semantic_model.node_relation.relation_name))
 
         select_statement_node = SqlSelectStatementNode.create(
             description=f"Read Elements From Semantic Model '{semantic_model.name}'",
@@ -552,7 +550,7 @@ class SemanticModelToDataSetConverter:
             sql_select_node=SqlSelectStatementNode.create(
                 description=TIME_SPINE_DATA_SET_DESCRIPTION,
                 select_columns=tuple(select_columns),
-                from_source=SqlTableFromClauseNode.create(sql_table=time_spine_source.spine_table),
+                from_source=SqlTableNode.create(sql_table=time_spine_source.spine_table),
                 from_source_alias=from_source_alias,
             ),
         )

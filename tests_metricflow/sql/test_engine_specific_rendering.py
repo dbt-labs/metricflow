@@ -23,7 +23,7 @@ from metricflow.sql.sql_plan import (
     SqlOrderByDescription,
     SqlSelectColumn,
     SqlSelectStatementNode,
-    SqlTableFromClauseNode,
+    SqlTableNode,
 )
 from tests_metricflow.sql.compare_sql_plan import assert_rendered_sql_equal
 
@@ -46,7 +46,7 @@ def test_cast_to_timestamp(
         ),
     ]
 
-    from_source = SqlTableFromClauseNode.create(sql_table=SqlTable(schema_name="foo", table_name="bar"))
+    from_source = SqlTableNode.create(sql_table=SqlTable(schema_name="foo", table_name="bar"))
     from_source_alias = "a"
     joins_descs: List[SqlJoinDescription] = []
     where = None
@@ -84,7 +84,7 @@ def test_generate_uuid(
             column_alias="uuid",
         ),
     ]
-    from_source = SqlTableFromClauseNode.create(sql_table=SqlTable(schema_name="foo", table_name="bar"))
+    from_source = SqlTableNode.create(sql_table=SqlTable(schema_name="foo", table_name="bar"))
     from_source_alias = "a"
 
     assert_rendered_sql_equal(
@@ -125,7 +125,7 @@ def test_continuous_percentile_expr(
         ),
     ]
 
-    from_source = SqlTableFromClauseNode.create(sql_table=SqlTable(schema_name="foo", table_name="bar"))
+    from_source = SqlTableNode.create(sql_table=SqlTable(schema_name="foo", table_name="bar"))
     from_source_alias = "a"
     joins_descs: List[SqlJoinDescription] = []
     where = None
@@ -174,7 +174,7 @@ def test_discrete_percentile_expr(
         ),
     ]
 
-    from_source = SqlTableFromClauseNode.create(sql_table=SqlTable(schema_name="foo", table_name="bar"))
+    from_source = SqlTableNode.create(sql_table=SqlTable(schema_name="foo", table_name="bar"))
     from_source_alias = "a"
     joins_descs: List[SqlJoinDescription] = []
     where = None
@@ -223,7 +223,7 @@ def test_approximate_continuous_percentile_expr(
         ),
     ]
 
-    from_source = SqlTableFromClauseNode.create(sql_table=SqlTable(schema_name="foo", table_name="bar"))
+    from_source = SqlTableNode.create(sql_table=SqlTable(schema_name="foo", table_name="bar"))
     from_source_alias = "a"
     joins_descs: List[SqlJoinDescription] = []
     where = None
@@ -272,7 +272,7 @@ def test_approximate_discrete_percentile_expr(
         ),
     ]
 
-    from_source = SqlTableFromClauseNode.create(sql_table=SqlTable(schema_name="foo", table_name="bar"))
+    from_source = SqlTableNode.create(sql_table=SqlTable(schema_name="foo", table_name="bar"))
     from_source_alias = "a"
     joins_descs: List[SqlJoinDescription] = []
     where = None

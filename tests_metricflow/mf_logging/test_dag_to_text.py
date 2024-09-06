@@ -18,7 +18,7 @@ from metricflow.sql.sql_plan import (
     SqlQueryPlan,
     SqlSelectColumn,
     SqlSelectStatementNode,
-    SqlTableFromClauseNode,
+    SqlTableNode,
 )
 
 logger = logging.getLogger(__name__)
@@ -41,7 +41,7 @@ def test_multithread_dag_to_text() -> None:
                     column_alias="bar",
                 ),
             ),
-            from_source=SqlTableFromClauseNode.create(sql_table=SqlTable(schema_name="schema", table_name="table")),
+            from_source=SqlTableNode.create(sql_table=SqlTable(schema_name="schema", table_name="table")),
             from_source_alias="src",
         ),
     )
@@ -80,13 +80,13 @@ def test_multithread_dag_to_text() -> None:
                 <!--     expr=SqlStringExpression(node_id=str_0 sql_expr='foo'), -->
                 <!--     column_alias='bar',                                     -->
                 <!--   )                                                         -->
-                <!-- from_source =                           -->
-                <!--   SqlTableFromClauseNode(node_id=tfc_0) -->
+                <!-- from_source =                 -->
+                <!--   SqlTableNode(node_id=tfc_0) -->
                 <!-- where =  -->
                 <!--   None -->
                 <!-- distinct =  -->
                 <!--   False -->
-                <SqlTableFromClauseNode>
+                <SqlTableNode>
                     <!-- description =      -->
                     <!--   ('Read '         -->
                     <!--    'from '         -->
@@ -97,7 +97,7 @@ def test_multithread_dag_to_text() -> None:
                     <!--   )                 -->
                     <!-- table_id =       -->
                     <!--   'schema.table' -->
-                </SqlTableFromClauseNode>
+                </SqlTableNode>
             </SqlSelectStatementNode>
         </SqlQueryPlan>
         """

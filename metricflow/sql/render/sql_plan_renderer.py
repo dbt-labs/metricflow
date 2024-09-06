@@ -25,7 +25,7 @@ from metricflow.sql.sql_plan import (
     SqlSelectColumn,
     SqlSelectQueryFromClauseNode,
     SqlSelectStatementNode,
-    SqlTableFromClauseNode,
+    SqlTableNode,
 )
 
 logger = logging.getLogger(__name__)
@@ -301,7 +301,7 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
             bind_parameters=combined_params,
         )
 
-    def visit_table_from_clause_node(self, node: SqlTableFromClauseNode) -> SqlPlanRenderResult:  # noqa: D102
+    def visit_table_node(self, node: SqlTableNode) -> SqlPlanRenderResult:  # noqa: D102
         return SqlPlanRenderResult(
             sql=node.sql_table.sql,
             bind_parameters=SqlBindParameters(),
