@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from dataclasses import dataclass
 from typing import Dict, Optional, Sequence, Set, Tuple
 
 from dbt_semantic_interfaces.type_enums import TimeGranularity
@@ -18,6 +19,7 @@ from metricflow_semantics.specs.time_dimension_spec import (
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 
+@dataclass(frozen=True)
 class MetricTimeDefaultGranularityPattern(SpecPattern):
     """A pattern that matches metric_time specs if they have the default granularity for the requested metrics.
 
@@ -42,13 +44,11 @@ class MetricTimeDefaultGranularityPattern(SpecPattern):
         ]
     """
 
-    def __init__(self, max_metric_default_time_granularity: Optional[TimeGranularity]) -> None:  # noqa: D107
-        self._max_metric_default_time_granularity = max_metric_default_time_granularity
+    max_metric_default_time_granularity: Optional[TimeGranularity]
 
     @override
     def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[InstanceSpec]:
         spec_set = group_specs_by_type(candidate_specs)
-
         # If there are no metric_time specs in the query, skip this filter.
         if not spec_set.metric_time_specs:
             return candidate_specs
@@ -56,7 +56,7 @@ class MetricTimeDefaultGranularityPattern(SpecPattern):
         # If there are metrics in the query, use max metric default. For no-metric queries, use standard default.
         # TODO: [custom granularity] allow custom granularities to be used as defaults if appropriate
         default_granularity = ExpandedTimeGranularity.from_time_granularity(
-            self._max_metric_default_time_granularity or DEFAULT_TIME_GRANULARITY
+            self.max_metric_default_time_granularity or DEFAULT_TIME_GRANULARITY
         )
 
         spec_key_to_grains: Dict[TimeDimensionSpecComparisonKey, Set[ExpandedTimeGranularity]] = defaultdict(set)

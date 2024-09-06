@@ -157,7 +157,7 @@ class MetricFlowQueryResolver:
             input_str=str(group_by_item_input.input_obj),
             candidate_filters=QueryItemSuggestionGenerator.GROUP_BY_ITEM_CANDIDATE_FILTERS
             + (
-                MatchListSpecPattern(
+                MatchListSpecPattern.create(
                     listed_specs=valid_group_by_item_specs_for_querying,
                 ),
             ),
