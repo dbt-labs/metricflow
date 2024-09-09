@@ -31,6 +31,7 @@ from metricflow_semantics.specs.patterns.entity_link_pattern import (
     EntityLinkPatternParameterSet,
     ParameterSetField,
 )
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 
 @dataclass(frozen=True)
@@ -41,7 +42,7 @@ class TimeDimensionParameter(ProtocolHint[TimeDimensionQueryParameter]):
         return self
 
     name: str
-    grain: Optional[TimeGranularity] = None
+    grain: Optional[str] = None
     date_part: Optional[DatePart] = None
 
     def query_resolver_input(  # noqa: D102
@@ -54,9 +55,17 @@ class TimeDimensionParameter(ProtocolHint[TimeDimensionQueryParameter]):
             ParameterSetField.ENTITY_LINKS,
             ParameterSetField.DATE_PART,
         ]
+        time_granularity = None
         if self.grain is not None:
             fields_to_compare.append(ParameterSetField.TIME_GRANULARITY)
+            # TODO: [custom granularity] support custom granularity lookups
+            assert ExpandedTimeGranularity.is_standard_granularity_name(self.grain), (
+                f"We got a non-standard granularity name, `{self.grain}`, but we have not yet "
+                "implemented support for custom granularities!"
+            )
+            time_granularity = ExpandedTimeGranularity.from_time_granularity(TimeGranularity(self.grain))
 
+        # TODO: assert that the name does not include a time granularity marker
         name_structure = StructuredLinkableSpecName.from_name(self.name.lower())
 
         return ResolverInputForGroupByItem(
@@ -67,7 +76,7 @@ class TimeDimensionParameter(ProtocolHint[TimeDimensionQueryParameter]):
                     fields_to_compare=tuple(fields_to_compare),
                     element_name=name_structure.element_name,
                     entity_links=tuple(EntityReference(link_name) for link_name in name_structure.entity_link_names),
-                    time_granularity=self.grain,
+                    time_granularity=time_granularity,
                     date_part=self.date_part,
                 )
             ),

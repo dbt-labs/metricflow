@@ -23,6 +23,7 @@ from metricflow_semantics.specs.patterns.entity_link_pattern import (
 )
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.specs.patterns.typed_patterns import DimensionPattern, TimeDimensionPattern
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -80,14 +81,18 @@ class ObjectBuilderNamingScheme(QueryItemNamingScheme):
                 ParameterSetField.DATE_PART,
             ]
 
+            time_granularity = None
             if time_dimension_call_parameter_set.time_granularity is not None:
                 fields_to_compare.append(ParameterSetField.TIME_GRANULARITY)
+                time_granularity = ExpandedTimeGranularity.from_time_granularity(
+                    time_dimension_call_parameter_set.time_granularity
+                )
 
             return TimeDimensionPattern(
                 EntityLinkPatternParameterSet.from_parameters(
                     element_name=time_dimension_call_parameter_set.time_dimension_reference.element_name,
                     entity_links=time_dimension_call_parameter_set.entity_path,
-                    time_granularity=time_dimension_call_parameter_set.time_granularity,
+                    time_granularity=time_granularity,
                     date_part=time_dimension_call_parameter_set.date_part,
                     fields_to_compare=tuple(fields_to_compare),
                 )

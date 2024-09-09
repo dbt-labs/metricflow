@@ -261,8 +261,6 @@ def test_case(
         if date_part or grain:
             if date_part:
                 kwargs["date_part"] = DatePart(date_part)
-            if grain:
-                kwargs["grain"] = TimeGranularity(grain)
             group_by.append(TimeDimensionParameter(**kwargs))
         else:
             group_by.append(DimensionOrEntityParameter(**kwargs))
