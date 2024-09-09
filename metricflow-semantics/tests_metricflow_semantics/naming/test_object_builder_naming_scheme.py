@@ -6,6 +6,7 @@ import pytest
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
+from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
@@ -80,10 +81,15 @@ def test_input_follows_scheme(object_builder_naming_scheme: ObjectBuilderNamingS
 
 
 def test_spec_pattern(  # noqa: D103
-    object_builder_naming_scheme: ObjectBuilderNamingScheme, specs: Sequence[LinkableInstanceSpec]
+    object_builder_naming_scheme: ObjectBuilderNamingScheme,
+    specs: Sequence[LinkableInstanceSpec],
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     assert tuple(
-        object_builder_naming_scheme.spec_pattern("Dimension('listing__country', entity_path=['booking'])").match(specs)
+        object_builder_naming_scheme.spec_pattern(
+            "Dimension('listing__country', entity_path=['booking'])",
+            semantic_manifest_lookup=simple_semantic_manifest_lookup,
+        ).match(specs)
     ) == (
         DimensionSpec(
             element_name="country",
@@ -97,7 +103,8 @@ def test_spec_pattern(  # noqa: D103
     assert tuple(
         object_builder_naming_scheme.spec_pattern(
             "TimeDimension('listing__creation_time', time_granularity_name='month', date_part_name='day', "
-            "entity_path=['booking'])"
+            "entity_path=['booking'])",
+            semantic_manifest_lookup=simple_semantic_manifest_lookup,
         ).match(specs)
     ) == (
         TimeDimensionSpec(
@@ -108,14 +115,21 @@ def test_spec_pattern(  # noqa: D103
         ),
     )
 
-    assert tuple(object_builder_naming_scheme.spec_pattern("TimeDimension('metric_time')").match(specs)) == (
+    assert tuple(
+        object_builder_naming_scheme.spec_pattern(
+            "TimeDimension('metric_time')", semantic_manifest_lookup=simple_semantic_manifest_lookup
+        ).match(specs)
+    ) == (
         MTD_SPEC_WEEK,
         MTD_SPEC_MONTH,
         MTD_SPEC_YEAR,
     )
 
     assert tuple(
-        object_builder_naming_scheme.spec_pattern("Entity('user', entity_path=['booking', 'listing'])").match(specs)
+        object_builder_naming_scheme.spec_pattern(
+            "Entity('user', entity_path=['booking', 'listing'])",
+            semantic_manifest_lookup=simple_semantic_manifest_lookup,
+        ).match(specs)
     ) == (
         EntitySpec(
             element_name="user",
@@ -124,7 +138,9 @@ def test_spec_pattern(  # noqa: D103
     )
 
     assert tuple(
-        object_builder_naming_scheme.spec_pattern("Metric('bookings', group_by=['listing'])").match(specs)
+        object_builder_naming_scheme.spec_pattern(
+            "Metric('bookings', group_by=['listing'])", semantic_manifest_lookup=simple_semantic_manifest_lookup
+        ).match(specs)
     ) == (
         GroupByMetricSpec(
             element_name="bookings",

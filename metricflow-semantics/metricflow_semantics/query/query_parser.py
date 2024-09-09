@@ -215,7 +215,9 @@ class MetricFlowQueryParser:
                         ResolverInputForGroupByItem(
                             input_obj=order_by_name,
                             input_obj_naming_scheme=group_by_item_naming_scheme,
-                            spec_pattern=group_by_item_naming_scheme.spec_pattern(order_by_name_without_prefix),
+                            spec_pattern=group_by_item_naming_scheme.spec_pattern(
+                                order_by_name_without_prefix, semantic_manifest_lookup=self._manifest_lookup
+                            ),
                         )
                     )
                     break
@@ -226,7 +228,9 @@ class MetricFlowQueryParser:
                         ResolverInputForMetric(
                             input_obj=order_by_name,
                             naming_scheme=metric_naming_scheme,
-                            spec_pattern=metric_naming_scheme.spec_pattern(order_by_name_without_prefix),
+                            spec_pattern=metric_naming_scheme.spec_pattern(
+                                order_by_name_without_prefix, semantic_manifest_lookup=self._manifest_lookup
+                            ),
                         )
                     )
 
@@ -240,11 +244,14 @@ class MetricFlowQueryParser:
 
         return resolver_inputs
 
-    @staticmethod
     def _parse_order_by(
+        self,
         order_by: Sequence[OrderByQueryParameter],
     ) -> Sequence[ResolverInputForOrderByItem]:
-        return tuple(order_by_query_parameter.query_resolver_input for order_by_query_parameter in order_by)
+        return tuple(
+            order_by_query_parameter.query_resolver_input(semantic_manifest_lookup=self._manifest_lookup)
+            for order_by_query_parameter in order_by
+        )
 
     @staticmethod
     def generate_error_message(
@@ -370,7 +377,9 @@ class MetricFlowQueryParser:
                     resolver_input_for_metric = ResolverInputForMetric(
                         input_obj=metric_name,
                         naming_scheme=metric_naming_scheme,
-                        spec_pattern=metric_naming_scheme.spec_pattern(metric_name),
+                        spec_pattern=metric_naming_scheme.spec_pattern(
+                            metric_name, semantic_manifest_lookup=self._manifest_lookup
+                        ),
                     )
                     resolver_inputs_for_metrics.append(resolver_input_for_metric)
                     break
@@ -388,14 +397,18 @@ class MetricFlowQueryParser:
                 )
 
         for metric_query_parameter in metrics:
-            resolver_inputs_for_metrics.append(metric_query_parameter.query_resolver_input)
+            resolver_inputs_for_metrics.append(
+                metric_query_parameter.query_resolver_input(semantic_manifest_lookup=self._manifest_lookup)
+            )
 
         resolver_inputs_for_group_by_items: List[ResolverInputForGroupByItem] = []
         for group_by_name in group_by_names:
             resolver_input_for_group_by_item: Optional[MetricFlowQueryResolverInput] = None
             for group_by_item_naming_scheme in self._group_by_item_naming_schemes:
                 if group_by_item_naming_scheme.input_str_follows_scheme(group_by_name):
-                    spec_pattern = group_by_item_naming_scheme.spec_pattern(group_by_name)
+                    spec_pattern = group_by_item_naming_scheme.spec_pattern(
+                        group_by_name, semantic_manifest_lookup=self._manifest_lookup
+                    )
                     resolver_input_for_group_by_item = ResolverInputForGroupByItem(
                         input_obj=group_by_name,
                         input_obj_naming_scheme=group_by_item_naming_scheme,
@@ -424,7 +437,9 @@ class MetricFlowQueryParser:
             )
 
         for group_by_parameter in group_by:
-            resolver_input_for_group_by_parameter = group_by_parameter.query_resolver_input
+            resolver_input_for_group_by_parameter = group_by_parameter.query_resolver_input(
+                semantic_manifest_lookup=self._manifest_lookup
+            )
             resolver_inputs_for_group_by_items.append(resolver_input_for_group_by_parameter)
             logger.info(
                 "Converted group-by-item input:\n"
@@ -454,7 +469,7 @@ class MetricFlowQueryParser:
                 order_by_names=order_by_names,
             )
         )
-        resolver_inputs_for_order_by.extend(MetricFlowQueryParser._parse_order_by(order_by=order_by))
+        resolver_inputs_for_order_by.extend(self._parse_order_by(order_by=order_by))
 
         resolver_input_for_limit = ResolverInputForLimit(limit=limit)
         resolver_input_for_min_max_only = ResolverInputForMinMaxOnly(min_max_only=min_max_only)

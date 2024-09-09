@@ -6,6 +6,7 @@ import pytest
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
+from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.naming.dunder_scheme import DunderNamingScheme
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
@@ -84,9 +85,15 @@ def test_input_follows_scheme(dunder_naming_scheme: DunderNamingScheme) -> None:
 
 
 def test_spec_pattern(  # noqa: D103
-    dunder_naming_scheme: DunderNamingScheme, specs: Sequence[LinkableInstanceSpec]
+    dunder_naming_scheme: DunderNamingScheme,
+    specs: Sequence[LinkableInstanceSpec],
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:  # noqa: D103
-    assert tuple(dunder_naming_scheme.spec_pattern("listing__user__country").match(specs)) == (
+    assert tuple(
+        dunder_naming_scheme.spec_pattern(
+            "listing__user__country", semantic_manifest_lookup=simple_semantic_manifest_lookup
+        ).match(specs)
+    ) == (
         DimensionSpec(
             element_name="country",
             entity_links=(
@@ -96,13 +103,21 @@ def test_spec_pattern(  # noqa: D103
         ),
     )
 
-    assert tuple(dunder_naming_scheme.spec_pattern("metric_time").match(specs)) == (
+    assert tuple(
+        dunder_naming_scheme.spec_pattern(
+            "metric_time", semantic_manifest_lookup=simple_semantic_manifest_lookup
+        ).match(specs)
+    ) == (
         MTD_SPEC_WEEK,
         MTD_SPEC_MONTH,
         MTD_SPEC_YEAR,
     )
 
-    assert tuple(dunder_naming_scheme.spec_pattern("booking__listing__user").match(specs)) == (
+    assert tuple(
+        dunder_naming_scheme.spec_pattern(
+            "booking__listing__user", semantic_manifest_lookup=simple_semantic_manifest_lookup
+        ).match(specs)
+    ) == (
         EntitySpec(
             element_name="user",
             entity_links=(
@@ -112,4 +127,8 @@ def test_spec_pattern(  # noqa: D103
         ),
     )
 
-    assert tuple(dunder_naming_scheme.spec_pattern("metric_time__month").match(specs)) == (MTD_SPEC_MONTH,)
+    assert tuple(
+        dunder_naming_scheme.spec_pattern(
+            "metric_time__month", semantic_manifest_lookup=simple_semantic_manifest_lookup
+        ).match(specs)
+    ) == (MTD_SPEC_MONTH,)

@@ -9,12 +9,15 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
 
+from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.naming.metric_scheme import MetricNamingScheme
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow_semantics.protocols.query_parameter import (
     DimensionOrEntityQueryParameter,
     InputOrderByParameter,
+    MetricQueryParameter,
+    OrderByQueryParameter,
     TimeDimensionQueryParameter,
 )
 from metricflow_semantics.protocols.query_parameter import SavedQueryParameter as SavedQueryParameterProtocol
@@ -41,8 +44,11 @@ class TimeDimensionParameter(ProtocolHint[TimeDimensionQueryParameter]):
     grain: Optional[TimeGranularity] = None
     date_part: Optional[DatePart] = None
 
-    @property
-    def query_resolver_input(self) -> ResolverInputForGroupByItem:  # noqa: D102
+    def query_resolver_input(  # noqa: D102
+        self,
+        semantic_manifest_lookup: SemanticManifestLookup,
+    ) -> ResolverInputForGroupByItem:
+        # TODO: [custom granularity] use manifest lookup to handle custom granularities
         fields_to_compare = [
             ParameterSetField.ELEMENT_NAME,
             ParameterSetField.ENTITY_LINKS,
@@ -81,8 +87,16 @@ class DimensionOrEntityParameter(ProtocolHint[DimensionOrEntityQueryParameter]):
     def _implements_protocol(self) -> DimensionOrEntityQueryParameter:
         return self
 
-    @property
-    def query_resolver_input(self) -> ResolverInputForGroupByItem:  # noqa: D102
+    def query_resolver_input(self, semantic_manifest_lookup: SemanticManifestLookup) -> ResolverInputForGroupByItem:
+        """Produces resolver input from a query parameter representing a dimension or entity.
+
+        Note these parameters do not currently have a direct need for the semantic_manifest_lookup, but since these
+        can be lumped in with other items that do require it we keep this method signature consistent across
+        the class sets.
+
+        TODO: Refine these query input classes so that this kind of thing is either enforced in self-documenting
+        ways or removed from the codebase
+        """
         name_structure = StructuredLinkableSpecName.from_name(self.name.lower())
 
         return ResolverInputForGroupByItem(
@@ -105,33 +119,43 @@ class DimensionOrEntityParameter(ProtocolHint[DimensionOrEntityQueryParameter]):
 
 
 @dataclass(frozen=True)
-class MetricParameter:
+class MetricParameter(ProtocolHint[MetricQueryParameter]):
     """Metric requested in a query."""
 
     name: str
 
-    @property
-    def query_resolver_input(self) -> ResolverInputForMetric:  # noqa: D102
+    @override
+    def _implements_protocol(self) -> MetricQueryParameter:
+        return self
+
+    def query_resolver_input(  # noqa: D102
+        self, semantic_manifest_lookup: SemanticManifestLookup
+    ) -> ResolverInputForMetric:
         naming_scheme = MetricNamingScheme()
         return ResolverInputForMetric(
             input_obj=self,
             naming_scheme=naming_scheme,
-            spec_pattern=naming_scheme.spec_pattern(self.name),
+            spec_pattern=naming_scheme.spec_pattern(self.name, semantic_manifest_lookup=semantic_manifest_lookup),
         )
 
 
 @dataclass(frozen=True)
-class OrderByParameter:
+class OrderByParameter(ProtocolHint[OrderByQueryParameter]):
     """Order by requested in a query."""
 
     order_by: InputOrderByParameter
     descending: bool = False
 
-    @property
-    def query_resolver_input(self) -> ResolverInputForOrderByItem:  # noqa: D102
+    @override
+    def _implements_protocol(self) -> OrderByQueryParameter:
+        return self
+
+    def query_resolver_input(  # noqa: D102
+        self, semantic_manifest_lookup: SemanticManifestLookup
+    ) -> ResolverInputForOrderByItem:
         return ResolverInputForOrderByItem(
             input_obj=self,
-            possible_inputs=(self.order_by.query_resolver_input,),
+            possible_inputs=(self.order_by.query_resolver_input(semantic_manifest_lookup=semantic_manifest_lookup),),
             descending=self.descending,
         )
 

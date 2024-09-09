@@ -21,7 +21,6 @@ from dbt_semantic_interfaces.references import MetricReference
 from dbt_semantic_interfaces.transformations.transform_rule import SemanticManifestTransformRule
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow_semantics.naming.naming_scheme import QueryItemNamingScheme
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_pattern_factory import (
     DefaultWhereFilterPatternFactory,
 )
@@ -58,7 +57,6 @@ def assert_spec_lookup_snapshot_equal(  # noqa: D103
 def test_filter_spec_resolution(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    naming_scheme: QueryItemNamingScheme,
     ambiguous_resolution_manifest_lookup: SemanticManifestLookup,
     resolution_dags: Dict[AmbiguousResolutionQueryId, GroupByItemResolutionDag],
     dag_case_id: str,

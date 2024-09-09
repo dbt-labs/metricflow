@@ -26,6 +26,7 @@ from dbt_semantic_interfaces.type_enums import DimensionType
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
+from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.linkable_element import (
     ElementPathKey,
     LinkableDimension,
@@ -67,6 +68,7 @@ def create_spec_lookup(
     call_parameter_set: CallParameterSet,
     resolved_spec: LinkableInstanceSpec,
     resolved_linkable_element_set: LinkableElementSet,
+    semantic_manifest_lookup: SemanticManifestLookup,
 ) -> FilterSpecResolutionLookUp:
     """Create a FilterSpecResolutionLookUp where the call_parameter_set maps to resolved_spec."""
     return FilterSpecResolutionLookUp(
@@ -80,7 +82,10 @@ def create_spec_lookup(
                 where_filter_intersection=create_where_filter_intersection("Dimension('dummy__dimension')"),
                 resolved_linkable_element_set=resolved_linkable_element_set,
                 issue_set=MetricFlowQueryResolutionIssueSet.empty_instance(),
-                spec_pattern=ObjectBuilderNamingScheme().spec_pattern("Dimension('dummy__dimension')"),
+                spec_pattern=ObjectBuilderNamingScheme().spec_pattern(
+                    "Dimension('dummy__dimension')",
+                    semantic_manifest_lookup=semantic_manifest_lookup,
+                ),
                 object_builder_str="Dimension('dummy__dimension')",
             ),
         ),
@@ -95,6 +100,7 @@ def create_where_filter_intersection(sql_template: str) -> WhereFilterIntersecti
 
 def test_dimension_in_filter(  # noqa: D103
     column_association_resolver: ColumnAssociationResolver,
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     where_filter_specs = WhereSpecFactory(
         column_association_resolver=column_association_resolver,
@@ -128,6 +134,7 @@ def test_dimension_in_filter(  # noqa: D103
                     )
                 }
             ),
+            semantic_manifest_lookup=simple_semantic_manifest_lookup,
         ),
     ).create_from_where_filter_intersection(
         filter_location=EXAMPLE_FILTER_LOCATION,
@@ -148,6 +155,7 @@ def test_dimension_in_filter(  # noqa: D103
 
 def test_dimension_in_filter_with_grain(  # noqa: D103
     column_association_resolver: ColumnAssociationResolver,
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     where_filter_specs = WhereSpecFactory(
         column_association_resolver=column_association_resolver,
@@ -186,6 +194,7 @@ def test_dimension_in_filter_with_grain(  # noqa: D103
                     )
                 }
             ),
+            semantic_manifest_lookup=simple_semantic_manifest_lookup,
         ),
     ).create_from_where_filter_intersection(
         filter_location=EXAMPLE_FILTER_LOCATION,
@@ -212,6 +221,7 @@ def test_dimension_in_filter_with_grain(  # noqa: D103
 
 def test_time_dimension_in_filter(  # noqa: D103
     column_association_resolver: ColumnAssociationResolver,
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     where_filter_specs = WhereSpecFactory(
         column_association_resolver=column_association_resolver,
@@ -250,6 +260,7 @@ def test_time_dimension_in_filter(  # noqa: D103
                     )
                 }
             ),
+            semantic_manifest_lookup=simple_semantic_manifest_lookup,
         ),
     ).create_from_where_filter_intersection(
         filter_location=EXAMPLE_FILTER_LOCATION,
@@ -276,6 +287,7 @@ def test_time_dimension_in_filter(  # noqa: D103
 
 def test_time_dimension_with_grain_in_name(  # noqa: D103
     column_association_resolver: ColumnAssociationResolver,
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     where_filter_specs = WhereSpecFactory(
         column_association_resolver=column_association_resolver,
@@ -314,6 +326,7 @@ def test_time_dimension_with_grain_in_name(  # noqa: D103
                     )
                 }
             ),
+            semantic_manifest_lookup=simple_semantic_manifest_lookup,
         ),
     ).create_from_where_filter_intersection(
         filter_location=EXAMPLE_FILTER_LOCATION,
@@ -340,6 +353,7 @@ def test_time_dimension_with_grain_in_name(  # noqa: D103
 
 def test_date_part_in_filter(  # noqa: D103
     column_association_resolver: ColumnAssociationResolver,
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     where_filter_specs = WhereSpecFactory(
         column_association_resolver=column_association_resolver,
@@ -379,6 +393,7 @@ def test_date_part_in_filter(  # noqa: D103
                     )
                 }
             ),
+            semantic_manifest_lookup=simple_semantic_manifest_lookup,
         ),
     ).create_from_where_filter_intersection(
         filter_location=EXAMPLE_FILTER_LOCATION,
@@ -405,7 +420,9 @@ def test_date_part_in_filter(  # noqa: D103
 
 
 @pytest.fixture(scope="session")
-def resolved_spec_lookup() -> FilterSpecResolutionLookUp:
+def resolved_spec_lookup(
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
+) -> FilterSpecResolutionLookUp:
     """A spec lookup that maps "TimeDimension('metric_time', 'week', 'year')" to the corresponding spec."""
     return FilterSpecResolutionLookUp(
         spec_resolutions=(
@@ -447,7 +464,9 @@ def resolved_spec_lookup() -> FilterSpecResolutionLookUp:
                         )
                     }
                 ),
-                spec_pattern=ObjectBuilderNamingScheme().spec_pattern("Dimension('dummy__dimension')"),
+                spec_pattern=ObjectBuilderNamingScheme().spec_pattern(
+                    "Dimension('dummy__dimension')", semantic_manifest_lookup=simple_semantic_manifest_lookup
+                ),
                 issue_set=MetricFlowQueryResolutionIssueSet.empty_instance(),
                 object_builder_str="Dimension('dummy__dimension')",
             ),
@@ -531,7 +550,7 @@ def test_date_part_less_than_grain_in_filter(  # noqa: D103
 
 def test_entity_in_filter(  # noqa: D103
     column_association_resolver: ColumnAssociationResolver,
-    resolved_spec_lookup: FilterSpecResolutionLookUp,
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     where_filter = PydanticWhereFilter(
         where_sql_template="{{ Entity('user', entity_path=['listing']) }} == 'example_user_id'"
@@ -566,6 +585,7 @@ def test_entity_in_filter(  # noqa: D103
                     )
                 }
             ),
+            semantic_manifest_lookup=simple_semantic_manifest_lookup,
         ),
     ).create_from_where_filter(filter_location=EXAMPLE_FILTER_LOCATION, where_filter=where_filter)
 
@@ -580,7 +600,7 @@ def test_entity_in_filter(  # noqa: D103
 
 def test_metric_in_filter(  # noqa: D103
     column_association_resolver: ColumnAssociationResolver,
-    resolved_spec_lookup: FilterSpecResolutionLookUp,
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     where_filter = PydanticWhereFilter(where_sql_template="{{ Metric('bookings', group_by=['listing']) }} > 2")
 
@@ -624,6 +644,7 @@ def test_metric_in_filter(  # noqa: D103
                     )
                 }
             ),
+            semantic_manifest_lookup=simple_semantic_manifest_lookup,
         ),
     ).create_from_where_filter(filter_location=EXAMPLE_FILTER_LOCATION, where_filter=where_filter)
 
@@ -636,7 +657,10 @@ def test_metric_in_filter(  # noqa: D103
     )
 
 
-def test_dimension_time_dimension_parity(column_association_resolver: ColumnAssociationResolver) -> None:  # noqa
+def test_dimension_time_dimension_parity(  # noqa: D103
+    column_association_resolver: ColumnAssociationResolver,
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
+) -> None:
     def get_spec(dimension: str) -> WhereFilterSpec:
         where_filter = PydanticWhereFilter(where_sql_template="{{" + dimension + "}} = '2020'")
         filter_location = WhereFilterLocation.for_query((MetricReference("example_metric"),))
@@ -682,7 +706,9 @@ def test_dimension_time_dimension_parity(column_association_resolver: ColumnAsso
                                 )
                             }
                         ),
-                        spec_pattern=ObjectBuilderNamingScheme().spec_pattern("Dimension('dummy__dimension')"),
+                        spec_pattern=ObjectBuilderNamingScheme().spec_pattern(
+                            "Dimension('dummy__dimension')", semantic_manifest_lookup=simple_semantic_manifest_lookup
+                        ),
                         issue_set=MetricFlowQueryResolutionIssueSet.empty_instance(),
                         object_builder_str="Dimension('dummy__dimension')",
                     ),

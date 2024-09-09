@@ -9,6 +9,7 @@ from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from typing_extensions import override
 
+from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.naming.naming_scheme import QueryItemNamingScheme
 from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.patterns.entity_link_pattern import (
@@ -50,7 +51,7 @@ class DunderNamingScheme(QueryItemNamingScheme):
         return names[0]
 
     @override
-    def spec_pattern(self, input_str: str) -> EntityLinkPattern:
+    def spec_pattern(self, input_str: str, semantic_manifest_lookup: SemanticManifestLookup) -> EntityLinkPattern:
         if not self.input_str_follows_scheme(input_str):
             raise ValueError(f"{repr(input_str)} does not follow this scheme.")
 

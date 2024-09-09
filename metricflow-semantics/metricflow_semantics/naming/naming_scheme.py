@@ -3,6 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Optional
 
+from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 
 if TYPE_CHECKING:
@@ -29,11 +30,14 @@ class QueryItemNamingScheme(ABC):
         pass
 
     @abstractmethod
-    def spec_pattern(self, input_str: str) -> SpecPattern:
+    def spec_pattern(self, input_str: str, semantic_manifest_lookup: SemanticManifestLookup) -> SpecPattern:
         """Given an input that follows this scheme, return a spec pattern that matches the described input.
 
-        If the input_str does not follow this scheme, raise a ValueError. In practice, input_str_follows_scheme() should
-        be called on the input_str beforehand.
+        This is used to generate suggestions from available group-by-items if the user specifies a group-by-item that is
+        invalid.
+
+        If this scheme cannot accommodate the spec, return None. This is needed to handle unsupported cases in
+        DunderNamingScheme, such as DatePart, but naming schemes should otherwise be complete.
         """
         pass
 
