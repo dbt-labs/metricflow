@@ -42,3 +42,11 @@ project_configuration:
       primary_column:
         name: ts
         time_granularity: hour
+    - node_relation:
+        alias: mf_time_spine
+        schema_name: $source_schema
+      primary_column:
+        name: ds
+        time_granularity: day
+      custom_granularities:
+        - name: martian_day

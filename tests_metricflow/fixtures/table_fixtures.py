@@ -42,9 +42,9 @@ def check_time_spine_source(
     The time spine table is defined in a table snapshot YAML file and is restored to the source schema based on that
     definition. The definition in the YAML should align with the definition in the time_spine_source fixture.
     """
-    time_spine_source = TimeSpineSource.create_from_manifest(simple_semantic_manifest_lookup.semantic_manifest)[
-        TimeGranularity.DAY
-    ]
+    time_spine_source = TimeSpineSource.build_standard_time_spine_sources(
+        simple_semantic_manifest_lookup.semantic_manifest
+    )[TimeGranularity.DAY]
     assert (
         time_spine_source.schema_name == mf_test_configuration.mf_source_schema
     ), "The time spine source table should be in the source schema"
@@ -62,7 +62,7 @@ def check_time_spine_source(
 
     time_spine_snapshot = time_spine_snapshot_candidates[0]
 
-    assert len(time_spine_snapshot.column_definitions) == 1
+    # This assumes the time spine column is the first column in the snapshot.
     time_column = time_spine_snapshot.column_definitions[0]
     assert time_column.name == time_spine_source.base_column
 
