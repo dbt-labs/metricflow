@@ -13,7 +13,6 @@ FROM (
   FROM ***************************.third_hop_table third_hop_table_src_22000
   LEFT OUTER JOIN (
     -- Constrain Output with WHERE
-    -- Pass Only Elements: ['customers_with_other_data', 'customer_id__country', 'customer_id__customer_third_hop_id']
     -- Pass Only Elements: ['customers_with_other_data', 'customer_id__customer_third_hop_id']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
@@ -24,12 +23,13 @@ FROM (
     FROM (
       -- Read Elements From Semantic Model 'customer_other_data'
       -- Metric Time Dimension 'acquired_ds'
+      -- Pass Only Elements: ['customers_with_other_data', 'customer_id__country', 'customer_id__customer_third_hop_id']
       SELECT
         customer_third_hop_id AS customer_id__customer_third_hop_id
         , country AS customer_id__country
         , 1 AS customers_with_other_data
       FROM ***************************.customer_other_data customer_other_data_src_22000
-    ) subq_20
+    ) subq_21
     WHERE customer_id__country = 'paraguay'
     GROUP BY
       customer_id__customer_third_hop_id

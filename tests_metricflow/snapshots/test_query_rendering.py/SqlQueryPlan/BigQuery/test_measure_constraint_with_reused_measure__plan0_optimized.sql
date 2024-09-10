@@ -10,7 +10,6 @@ FROM (
     , MAX(subq_24.booking_value) AS booking_value
   FROM (
     -- Constrain Output with WHERE
-    -- Pass Only Elements: ['booking_value', 'booking__is_instant', 'metric_time__day']
     -- Pass Only Elements: ['booking_value', 'metric_time__day']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
@@ -20,12 +19,13 @@ FROM (
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
+      -- Pass Only Elements: ['booking_value', 'booking__is_instant', 'metric_time__day']
       SELECT
         DATETIME_TRUNC(ds, day) AS metric_time__day
         , is_instant AS booking__is_instant
         , booking_value
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_14
+    ) subq_15
     WHERE booking__is_instant
     GROUP BY
       metric_time__day

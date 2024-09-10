@@ -11,37 +11,38 @@ FROM (
     , MAX(subq_37.visits) AS visits
     , MAX(subq_54.buys) AS buys
   FROM (
-    -- Join Standard Outputs
-    -- Pass Only Elements: ['visits', 'user__home_state_latest', 'visit__referrer_id', 'metric_time__day']
+    -- Constrain Output with WHERE
     -- Pass Only Elements: ['visits', 'user__home_state_latest', 'metric_time__day']
     -- Aggregate Measures
     SELECT
-      subq_31.metric_time__day AS metric_time__day
-      , users_latest_src_28000.home_state_latest AS user__home_state_latest
-      , SUM(subq_31.visits) AS visits
+      metric_time__day
+      , user__home_state_latest
+      , SUM(visits) AS visits
     FROM (
-      -- Constrain Output with WHERE
-      -- Pass Only Elements: ['visits', 'visit__referrer_id', 'metric_time__day', 'user']
+      -- Join Standard Outputs
+      -- Pass Only Elements: ['visits', 'user__home_state_latest', 'visit__referrer_id', 'metric_time__day']
       SELECT
-        metric_time__day
-        , subq_29.user
-        , visits
+        subq_30.metric_time__day AS metric_time__day
+        , subq_30.visit__referrer_id AS visit__referrer_id
+        , users_latest_src_28000.home_state_latest AS user__home_state_latest
+        , subq_30.visits AS visits
       FROM (
         -- Read Elements From Semantic Model 'visits_source'
         -- Metric Time Dimension 'ds'
+        -- Pass Only Elements: ['visits', 'visit__referrer_id', 'metric_time__day', 'user']
         SELECT
           DATETIME_TRUNC(ds, day) AS metric_time__day
           , user_id AS user
           , referrer_id AS visit__referrer_id
           , 1 AS visits
         FROM ***************************.fct_visits visits_source_src_28000
-      ) subq_29
-      WHERE visit__referrer_id = '123456'
-    ) subq_31
-    LEFT OUTER JOIN
-      ***************************.dim_users_latest users_latest_src_28000
-    ON
-      subq_31.user = users_latest_src_28000.user_id
+      ) subq_30
+      LEFT OUTER JOIN
+        ***************************.dim_users_latest users_latest_src_28000
+      ON
+        subq_30.user = users_latest_src_28000.user_id
+    ) subq_34
+    WHERE visit__referrer_id = '123456'
     GROUP BY
       metric_time__day
       , user__home_state_latest
