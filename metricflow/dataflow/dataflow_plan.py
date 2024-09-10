@@ -26,6 +26,7 @@ if typing.TYPE_CHECKING:
     from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
     from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
     from metricflow.dataflow.nodes.join_to_base import JoinOnEntitiesNode
+    from metricflow.dataflow.nodes.join_to_custom_granularity import JoinToCustomGranularityNode
     from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
     from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
     from metricflow.dataflow.nodes.min_max import MinMaxNode
@@ -185,6 +186,10 @@ class DataflowPlanNodeVisitor(Generic[VisitorOutputT], ABC):
 
     @abstractmethod
     def visit_join_conversion_events_node(self, node: JoinConversionEventsNode) -> VisitorOutputT:  # noqa: D102
+        pass
+
+    @abstractmethod
+    def visit_join_to_custom_granularity_node(self, node: JoinToCustomGranularityNode) -> VisitorOutputT:  # noqa: D102
         pass
 
 

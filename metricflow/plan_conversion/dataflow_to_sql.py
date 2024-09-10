@@ -55,6 +55,7 @@ from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
 from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
 from metricflow.dataflow.nodes.join_to_base import JoinOnEntitiesNode
+from metricflow.dataflow.nodes.join_to_custom_granularity import JoinToCustomGranularityNode
 from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataflow.nodes.min_max import MinMaxNode
@@ -1434,6 +1435,9 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 where=where_filter,
             ),
         )
+
+    def visit_join_to_custom_granularity_node(self, node: JoinToCustomGranularityNode) -> SqlDataSet:  # noqa: D102
+        raise NotImplementedError  # TODO in later commit
 
     def visit_min_max_node(self, node: MinMaxNode) -> SqlDataSet:  # noqa: D102
         parent_data_set = node.parent_node.accept(self)

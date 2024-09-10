@@ -25,6 +25,7 @@ from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
 from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
 from metricflow.dataflow.nodes.join_to_base import JoinOnEntitiesNode
+from metricflow.dataflow.nodes.join_to_custom_granularity import JoinToCustomGranularityNode
 from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataflow.nodes.min_max import MinMaxNode
@@ -457,6 +458,11 @@ class PredicatePushdownOptimizer(
                 new_parent_nodes=tuple(x.optimized_branch for x in optimized_parents)
             )
         )
+
+    def visit_join_to_custom_granularity_node(  # noqa: D102
+        self, node: JoinToCustomGranularityNode
+    ) -> OptimizeBranchResult:
+        raise NotImplementedError
 
     def visit_join_on_entities_node(self, node: JoinOnEntitiesNode) -> OptimizeBranchResult:
         """Handles pushdown state propagation for the standard join node type.
