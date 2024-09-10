@@ -12,7 +12,7 @@ from metricflow.sql.sql_plan import (
     SqlSelectColumn,
     SqlSelectQueryFromClauseNode,
     SqlSelectStatementNode,
-    SqlTableFromClauseNode,
+    SqlTableNode,
 )
 
 logger = logging.getLogger(__name__)
@@ -68,7 +68,7 @@ class SqlTableAliasSimplifierVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
             distinct=node.distinct,
         )
 
-    def visit_table_from_clause_node(self, node: SqlTableFromClauseNode) -> SqlQueryPlanNode:  # noqa: D102
+    def visit_table_node(self, node: SqlTableNode) -> SqlQueryPlanNode:  # noqa: D102
         return node
 
     def visit_query_from_clause_node(self, node: SqlSelectQueryFromClauseNode) -> SqlQueryPlanNode:  # noqa: D102

@@ -16,7 +16,7 @@ from metricflow.sql.sql_plan import (
     SqlSelectColumn,
     SqlSelectQueryFromClauseNode,
     SqlSelectStatementNode,
-    SqlTableFromClauseNode,
+    SqlTableNode,
 )
 
 logger = logging.getLogger(__name__)
@@ -191,8 +191,8 @@ class SqlColumnPrunerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
             distinct=node.distinct,
         )
 
-    def visit_table_from_clause_node(self, node: SqlTableFromClauseNode) -> SqlQueryPlanNode:
-        """This node is effectively a FROM statement inside a SELECT statement node, so pruning cannot apply."""
+    def visit_table_node(self, node: SqlTableNode) -> SqlQueryPlanNode:
+        """There are no SELECT columns in this node, so pruning cannot apply."""
         return node
 
     def visit_query_from_clause_node(self, node: SqlSelectQueryFromClauseNode) -> SqlQueryPlanNode:

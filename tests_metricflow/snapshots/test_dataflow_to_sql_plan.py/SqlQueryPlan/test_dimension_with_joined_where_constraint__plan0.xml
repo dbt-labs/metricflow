@@ -645,14 +645,14 @@
                     <!--     expr=SqlColumnReferenceExpression(node_id=cr_28074), -->
                     <!--     column_alias='listing__user',                        -->
                     <!--   )                                                      -->
-                    <!-- from_source = SqlTableFromClauseNode(node_id=tfc_28005) -->
+                    <!-- from_source = SqlTableNode(node_id=tfc_28005) -->
                     <!-- where = None -->
                     <!-- distinct = False -->
-                    <SqlTableFromClauseNode>
+                    <SqlTableNode>
                         <!-- description = 'Read from ***************************.dim_listings_latest' -->
                         <!-- node_id = NodeId(id_str='tfc_28005') -->
                         <!-- table_id = '***************************.dim_listings_latest' -->
-                    </SqlTableFromClauseNode>
+                    </SqlTableNode>
                 </SqlSelectStatementNode>
                 <SqlSelectStatementNode>
                     <!-- description = "Pass Only Elements: ['home_state_latest', 'user']" -->
@@ -791,14 +791,14 @@
                         <!--   )                                                      -->
                         <!-- col24 =                                                                                     -->
                         <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28104), column_alias='user') -->
-                        <!-- from_source = SqlTableFromClauseNode(node_id=tfc_28009) -->
+                        <!-- from_source = SqlTableNode(node_id=tfc_28009) -->
                         <!-- where = None -->
                         <!-- distinct = False -->
-                        <SqlTableFromClauseNode>
+                        <SqlTableNode>
                             <!-- description = 'Read from ***************************.dim_users_latest' -->
                             <!-- node_id = NodeId(id_str='tfc_28009') -->
                             <!-- table_id = '***************************.dim_users_latest' -->
-                        </SqlTableFromClauseNode>
+                        </SqlTableNode>
                     </SqlSelectStatementNode>
                 </SqlSelectStatementNode>
             </SqlSelectStatementNode>

@@ -68,14 +68,14 @@
                     <!--     expr=SqlColumnReferenceExpression(node_id=cr_45), -->
                     <!--     column_alias='metric_time__day',                  -->
                     <!--   )                                                   -->
-                    <!-- from_source = SqlTableFromClauseNode(node_id=tfc_0) -->
+                    <!-- from_source = SqlTableNode(node_id=tfc_0) -->
                     <!-- where = None -->
                     <!-- distinct = False -->
-                    <SqlTableFromClauseNode>
+                    <SqlTableNode>
                         <!-- description = 'Read from ***************************.mf_time_spine' -->
                         <!-- node_id = NodeId(id_str='tfc_0') -->
                         <!-- table_id = '***************************.mf_time_spine' -->
-                    </SqlTableFromClauseNode>
+                    </SqlTableNode>
                 </SqlSelectStatementNode>
                 <SqlSelectStatementNode>
                     <!-- description = 'Aggregate Measures' -->
@@ -469,14 +469,14 @@
                                 <!--     expr=SqlColumnReferenceExpression(node_id=cr_28121), -->
                                 <!--     column_alias='visit__session',                       -->
                                 <!--   )                                                      -->
-                                <!-- from_source = SqlTableFromClauseNode(node_id=tfc_28011) -->
+                                <!-- from_source = SqlTableNode(node_id=tfc_28011) -->
                                 <!-- where = None -->
                                 <!-- distinct = False -->
-                                <SqlTableFromClauseNode>
+                                <SqlTableNode>
                                     <!-- description = 'Read from ***************************.fct_visits' -->
                                     <!-- node_id = NodeId(id_str='tfc_28011') -->
                                     <!-- table_id = '***************************.fct_visits' -->
-                                </SqlTableFromClauseNode>
+                                </SqlTableNode>
                             </SqlSelectStatementNode>
                         </SqlSelectStatementNode>
                     </SqlSelectStatementNode>
@@ -506,14 +506,14 @@
                     <!--     expr=SqlColumnReferenceExpression(node_id=cr_212), -->
                     <!--     column_alias='metric_time__day',                   -->
                     <!--   )                                                    -->
-                    <!-- from_source = SqlTableFromClauseNode(node_id=tfc_1) -->
+                    <!-- from_source = SqlTableNode(node_id=tfc_1) -->
                     <!-- where = None -->
                     <!-- distinct = False -->
-                    <SqlTableFromClauseNode>
+                    <SqlTableNode>
                         <!-- description = 'Read from ***************************.mf_time_spine' -->
                         <!-- node_id = NodeId(id_str='tfc_1') -->
                         <!-- table_id = '***************************.mf_time_spine' -->
-                    </SqlTableFromClauseNode>
+                    </SqlTableNode>
                 </SqlSelectStatementNode>
                 <SqlSelectStatementNode>
                     <!-- description = 'Aggregate Measures' -->
@@ -1008,14 +1008,14 @@
                                             <!--     expr=SqlColumnReferenceExpression(node_id=cr_28121), -->
                                             <!--     column_alias='visit__session',                       -->
                                             <!--   )                                                      -->
-                                            <!-- from_source = SqlTableFromClauseNode(node_id=tfc_28011) -->
+                                            <!-- from_source = SqlTableNode(node_id=tfc_28011) -->
                                             <!-- where = None -->
                                             <!-- distinct = False -->
-                                            <SqlTableFromClauseNode>
+                                            <SqlTableNode>
                                                 <!-- description = 'Read from ***************************.fct_visits' -->
                                                 <!-- node_id = NodeId(id_str='tfc_28011') -->
                                                 <!-- table_id = '***************************.fct_visits' -->
-                                            </SqlTableFromClauseNode>
+                                            </SqlTableNode>
                                         </SqlSelectStatementNode>
                                     </SqlSelectStatementNode>
                                 </SqlSelectStatementNode>
@@ -1569,14 +1569,14 @@
                                             <!--     expr=SqlColumnReferenceExpression(node_id=cr_28043), -->
                                             <!--     column_alias='buy__session_id',                      -->
                                             <!--   )                                                      -->
-                                            <!-- from_source = SqlTableFromClauseNode(node_id=tfc_28002) -->
+                                            <!-- from_source = SqlTableNode(node_id=tfc_28002) -->
                                             <!-- where = None -->
                                             <!-- distinct = False -->
-                                            <SqlTableFromClauseNode>
+                                            <SqlTableNode>
                                                 <!-- description = 'Read from ***************************.fct_buys' -->
                                                 <!-- node_id = NodeId(id_str='tfc_28002') -->
                                                 <!-- table_id = '***************************.fct_buys' -->
-                                            </SqlTableFromClauseNode>
+                                            </SqlTableNode>
                                         </SqlSelectStatementNode>
                                     </SqlSelectStatementNode>
                                 </SqlSelectStatementNode>

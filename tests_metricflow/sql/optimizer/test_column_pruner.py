@@ -21,7 +21,7 @@ from metricflow.sql.sql_plan import (
     SqlQueryPlanNode,
     SqlSelectColumn,
     SqlSelectStatementNode,
-    SqlTableFromClauseNode,
+    SqlTableNode,
 )
 from tests_metricflow.sql.compare_sql_plan import assert_default_rendered_sql_equal
 
@@ -141,9 +141,7 @@ def base_select_statement() -> SqlSelectStatementNode:
                     column_alias="join_col",
                 ),
             ),
-            from_source=SqlTableFromClauseNode.create(
-                sql_table=SqlTable(schema_name="demo", table_name="from_source_table")
-            ),
+            from_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="from_source_table")),
             from_source_alias="from_source_table",
         ),
         from_source_alias="from_source",
@@ -180,7 +178,7 @@ def base_select_statement() -> SqlSelectStatementNode:
                             column_alias="join_col",
                         ),
                     ),
-                    from_source=SqlTableFromClauseNode.create(
+                    from_source=SqlTableNode.create(
                         sql_table=SqlTable(schema_name="demo", table_name="joined_source_table")
                     ),
                     from_source_alias="joined_source_table",
@@ -529,9 +527,7 @@ def string_select_statement() -> SqlSelectStatementNode:
                     column_alias="join_col",
                 ),
             ),
-            from_source=SqlTableFromClauseNode.create(
-                sql_table=SqlTable(schema_name="demo", table_name="from_source_table")
-            ),
+            from_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="from_source_table")),
             from_source_alias="from_source_table",
         ),
         from_source_alias="from_source",
@@ -568,7 +564,7 @@ def string_select_statement() -> SqlSelectStatementNode:
                             column_alias="join_col",
                         ),
                     ),
-                    from_source=SqlTableFromClauseNode.create(
+                    from_source=SqlTableNode.create(
                         sql_table=SqlTable(schema_name="demo", table_name="joined_source_table")
                     ),
                     from_source_alias="joined_source_table",
@@ -698,7 +694,7 @@ def grandparent_pruning_select_statement() -> SqlSelectStatementNode:
                         column_alias="col2",
                     ),
                 ),
-                from_source=SqlTableFromClauseNode.create(sql_table=SqlTable(schema_name="demo", table_name="src0")),
+                from_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="src0")),
                 from_source_alias="src0",
             ),
             from_source_alias="src1",
@@ -765,9 +761,7 @@ def join_grandparent_pruning_select_statement() -> SqlSelectStatementNode:
                 column_alias="col0",
             ),
         ),
-        from_source=SqlTableFromClauseNode.create(
-            sql_table=SqlTable(schema_name="demo", table_name="from_source_table")
-        ),
+        from_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="from_source_table")),
         from_source_alias="src3",
         join_descs=(
             SqlJoinDescription(
@@ -824,9 +818,7 @@ def join_grandparent_pruning_select_statement() -> SqlSelectStatementNode:
                                 column_alias="join_col",
                             ),
                         ),
-                        from_source=SqlTableFromClauseNode.create(
-                            sql_table=SqlTable(schema_name="demo", table_name="src0")
-                        ),
+                        from_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="src0")),
                         from_source_alias="src0",
                     ),
                     from_source_alias="src1",
@@ -902,9 +894,7 @@ def test_prune_distinct_select(
                     column_alias="bookings",
                 ),
             ),
-            from_source=SqlTableFromClauseNode.create(
-                sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")
-            ),
+            from_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
             from_source_alias="a",
             distinct=True,
         ),

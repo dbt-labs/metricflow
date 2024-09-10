@@ -203,14 +203,14 @@
             <!-- col40 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28010), column_alias='user') -->
             <!-- col41 =                                                                                              -->
             <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28011), column_alias='account__user') -->
-            <!-- from_source = SqlTableFromClauseNode(node_id=tfc_28000) -->
+            <!-- from_source = SqlTableNode(node_id=tfc_28000) -->
             <!-- where = None -->
             <!-- distinct = False -->
-            <SqlTableFromClauseNode>
+            <SqlTableNode>
                 <!-- description = 'Read from ***************************.fct_accounts' -->
                 <!-- node_id = NodeId(id_str='tfc_28000') -->
                 <!-- table_id = '***************************.fct_accounts' -->
-            </SqlTableFromClauseNode>
+            </SqlTableNode>
         </SqlSelectStatementNode>
         <SqlSelectStatementNode>
             <!-- description = 'Filter row on MIN(ds__day)' -->
@@ -363,14 +363,14 @@
                 <!-- col40 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28010), column_alias='user') -->
                 <!-- col41 =                                                                                              -->
                 <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28011), column_alias='account__user') -->
-                <!-- from_source = SqlTableFromClauseNode(node_id=tfc_28000) -->
+                <!-- from_source = SqlTableNode(node_id=tfc_28000) -->
                 <!-- where = None -->
                 <!-- distinct = False -->
-                <SqlTableFromClauseNode>
+                <SqlTableNode>
                     <!-- description = 'Read from ***************************.fct_accounts' -->
                     <!-- node_id = NodeId(id_str='tfc_28000') -->
                     <!-- table_id = '***************************.fct_accounts' -->
-                </SqlTableFromClauseNode>
+                </SqlTableNode>
             </SqlSelectStatementNode>
         </SqlSelectStatementNode>
     </SqlSelectStatementNode>

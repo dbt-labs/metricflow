@@ -87,14 +87,14 @@
                 <!-- col9 = SqlSelectColumn(expr=SqlExtractExpression(node_id=ex_28298), column_alias='ds__extract_dow') -->
                 <!-- col10 =                                                                                        -->
                 <!--   SqlSelectColumn(expr=SqlExtractExpression(node_id=ex_28299), column_alias='ds__extract_doy') -->
-                <!-- from_source = SqlTableFromClauseNode(node_id=tfc_28018) -->
+                <!-- from_source = SqlTableNode(node_id=tfc_28018) -->
                 <!-- where = None -->
                 <!-- distinct = False -->
-                <SqlTableFromClauseNode>
+                <SqlTableNode>
                     <!-- description = 'Read from ***************************.mf_time_spine' -->
                     <!-- node_id = NodeId(id_str='tfc_28018') -->
                     <!-- table_id = '***************************.mf_time_spine' -->
-                </SqlTableFromClauseNode>
+                </SqlTableNode>
             </SqlSelectStatementNode>
         </SqlSelectStatementNode>
     </SqlSelectStatementNode>

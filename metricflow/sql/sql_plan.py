@@ -29,7 +29,7 @@ class SqlQueryPlanNode(DagNode["SqlQueryPlanNode"], ABC):
     * Statements like ALTER TABLE don't fit well, but they could be modeled as just a single sink node.
     * SQL queries in where conditions could be modeled as another SqlQueryPlan.
     * SqlRenderableNode() indicates nodes where plan generation can begin. Generally, this will be all nodes except
-      the SqlTableFromClauseNode() since my_table.my_column wouldn't be a valid SQL query.
+      the SqlTableNode() since my_table.my_column wouldn't be a valid SQL query.
 
     Is there an existing library that can do this?
     """
@@ -63,7 +63,7 @@ class SqlQueryPlanNodeVisitor(Generic[VisitorOutputT], ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def visit_table_from_clause_node(self, node: SqlTableFromClauseNode) -> VisitorOutputT:  # noqa: D102
+    def visit_table_node(self, node: SqlTableNode) -> VisitorOutputT:  # noqa: D102
         raise NotImplementedError
 
     @abstractmethod
@@ -191,14 +191,14 @@ class SqlSelectStatementNode(SqlQueryPlanNode):
 
 
 @dataclass(frozen=True)
-class SqlTableFromClauseNode(SqlQueryPlanNode):
-    """An SQL table that can go in the FROM clause."""
+class SqlTableNode(SqlQueryPlanNode):
+    """An SQL table that can go in the FROM clause or the JOIN clause."""
 
     sql_table: SqlTable
 
     @staticmethod
-    def create(sql_table: SqlTable) -> SqlTableFromClauseNode:  # noqa: D102
-        return SqlTableFromClauseNode(
+    def create(sql_table: SqlTable) -> SqlTableNode:  # noqa: D102
+        return SqlTableNode(
             parent_nodes=(),
             sql_table=sql_table,
         )
@@ -216,7 +216,7 @@ class SqlTableFromClauseNode(SqlQueryPlanNode):
         return tuple(super().displayed_properties) + (DisplayedProperty("table_id", self.sql_table.sql),)
 
     def accept(self, visitor: SqlQueryPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
-        return visitor.visit_table_from_clause_node(self)
+        return visitor.visit_table_node(self)
 
     @property
     def is_table(self) -> bool:  # noqa: D102

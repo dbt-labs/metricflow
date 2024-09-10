@@ -138,7 +138,7 @@ from metricflow.sql.sql_plan import (
     SqlQueryPlanNode,
     SqlSelectColumn,
     SqlSelectStatementNode,
-    SqlTableFromClauseNode,
+    SqlTableNode,
 )
 
 logger = logging.getLogger(__name__)
@@ -312,7 +312,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             sql_select_node=SqlSelectStatementNode.create(
                 description=TIME_SPINE_DATA_SET_DESCRIPTION,
                 select_columns=select_columns,
-                from_source=SqlTableFromClauseNode.create(sql_table=time_spine_source.spine_table),
+                from_source=SqlTableNode.create(sql_table=time_spine_source.spine_table),
                 from_source_alias=time_spine_table_alias,
                 group_bys=select_columns if apply_group_by else (),
                 where=(

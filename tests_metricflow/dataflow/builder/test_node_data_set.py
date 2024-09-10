@@ -30,7 +30,7 @@ from metricflow.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpre
 from metricflow.sql.sql_plan import (
     SqlSelectColumn,
     SqlSelectStatementNode,
-    SqlTableFromClauseNode,
+    SqlTableNode,
 )
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 
@@ -77,9 +77,7 @@ def test_no_parent_node_data_set(
                     column_alias="bookings",
                 ),
             ),
-            from_source=SqlTableFromClauseNode.create(
-                sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")
-            ),
+            from_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
             from_source_alias="src",
         ),
     )

@@ -18,7 +18,7 @@ from metricflow.sql.sql_plan import (
     SqlOrderByDescription,
     SqlSelectColumn,
     SqlSelectStatementNode,
-    SqlTableFromClauseNode,
+    SqlTableNode,
 )
 from tests_metricflow.sql.compare_sql_plan import assert_default_rendered_sql_equal
 
@@ -100,9 +100,7 @@ def base_select_statement() -> SqlSelectStatementNode:
                         column_alias="col1",
                     ),
                 ),
-                from_source=SqlTableFromClauseNode.create(
-                    sql_table=SqlTable(schema_name="demo", table_name="from_source_table")
-                ),
+                from_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="from_source_table")),
                 from_source_alias="src0",
                 limit=2,
             ),
@@ -200,13 +198,11 @@ def rewrite_order_by_statement() -> SqlSelectStatementNode:
                         column_alias="col1",
                     ),
                 ),
-                from_source=SqlTableFromClauseNode.create(sql_table=SqlTable(schema_name="demo", table_name="src0")),
+                from_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="src0")),
                 from_source_alias="src0",
                 join_descs=(
                     SqlJoinDescription(
-                        right_source=SqlTableFromClauseNode.create(
-                            sql_table=SqlTable(schema_name="demo", table_name="src1")
-                        ),
+                        right_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="src1")),
                         right_source_alias="src1",
                         on_condition=SqlComparisonExpression.create(
                             left_expr=SqlColumnReferenceExpression.create(
@@ -291,9 +287,7 @@ def test_distinct_select_node_is_not_reduced(
                     column_alias="bookings",
                 ),
             ),
-            from_source=SqlTableFromClauseNode.create(
-                sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")
-            ),
+            from_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
             from_source_alias="a",
             distinct=True,
         ),

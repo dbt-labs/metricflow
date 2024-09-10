@@ -484,14 +484,14 @@
             <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28035), column_alias='booking__guest') -->
             <!-- col87 =                                                                                              -->
             <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28036), column_alias='booking__host') -->
-            <!-- from_source = SqlTableFromClauseNode(node_id=tfc_28001) -->
+            <!-- from_source = SqlTableNode(node_id=tfc_28001) -->
             <!-- where = None -->
             <!-- distinct = False -->
-            <SqlTableFromClauseNode>
+            <SqlTableNode>
                 <!-- description = 'Read from ***************************.fct_bookings' -->
                 <!-- node_id = NodeId(id_str='tfc_28001') -->
                 <!-- table_id = '***************************.fct_bookings' -->
-            </SqlTableFromClauseNode>
+            </SqlTableNode>
         </SqlSelectStatementNode>
     </SqlSelectStatementNode>
 </SqlQueryPlan>
