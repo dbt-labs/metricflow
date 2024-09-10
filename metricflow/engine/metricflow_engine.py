@@ -111,7 +111,7 @@ class MetricFlowQueryRequest:
     order_by: Optional[Sequence[OrderByQueryParameter]] = None
     min_max_only: bool = False
     sql_optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4
-    dataflow_plan_optimizations: FrozenSet[DataflowPlanOptimization] = DataflowPlanOptimization.enabled_obtimizations()
+    dataflow_plan_optimizations: FrozenSet[DataflowPlanOptimization] = DataflowPlanOptimization.enabled_optimizations()
     query_type: MetricFlowQueryType = MetricFlowQueryType.METRIC
 
     @staticmethod
@@ -130,7 +130,7 @@ class MetricFlowQueryRequest:
         sql_optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4,
         dataflow_plan_optimizations: FrozenSet[
             DataflowPlanOptimization
-        ] = DataflowPlanOptimization.enabled_obtimizations(),
+        ] = DataflowPlanOptimization.enabled_optimizations(),
         query_type: MetricFlowQueryType = MetricFlowQueryType.METRIC,
         min_max_only: bool = False,
     ) -> MetricFlowQueryRequest:

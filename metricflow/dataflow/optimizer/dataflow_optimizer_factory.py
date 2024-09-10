@@ -30,7 +30,7 @@ class DataflowPlanOptimization(Enum):
         return frozenset((DataflowPlanOptimization.SOURCE_SCAN, DataflowPlanOptimization.PREDICATE_PUSHDOWN))
 
     @staticmethod
-    def enabled_obtimizations() -> FrozenSet[DataflowPlanOptimization]:
+    def enabled_optimizations() -> FrozenSet[DataflowPlanOptimization]:
         """Set of DataflowPlanOptimization that are currently enabled.
 
         Predicate pushdown optimizer is currently disabled.
