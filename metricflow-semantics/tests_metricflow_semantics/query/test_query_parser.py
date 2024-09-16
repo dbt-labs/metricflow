@@ -28,7 +28,13 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 from metricflow_semantics.test_helpers.example_project_configuration import (
     EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE,
 )
-from metricflow_semantics.test_helpers.metric_time_dimension import MTD
+from metricflow_semantics.test_helpers.metric_time_dimension import (
+    MTD,
+    MTD_SPEC_MONTH,
+    MTD_SPEC_QUARTER,
+    MTD_SPEC_WEEK,
+    MTD_SPEC_YEAR,
+)
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_snapshot_equal
 
 logger = logging.getLogger(__name__)
@@ -624,3 +630,53 @@ def test_invalid_group_by_metric(bookings_query_parser: MetricFlowQueryParser) -
         bookings_query_parser.parse_and_validate_query(
             metric_names=("bookings",), where_constraint_str="{{ Metric('listings', ['garbage']) }} > 1"
         )
+
+
+def test_where_filter_with_grain(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D103
+    # Can pass granularity into TimeDimension object via time dimension name
+    query_spec = bookings_query_parser.parse_and_validate_query(
+        metric_names=["bookings"],
+        group_by_names=["metric_time"],
+        where_constraint_str="{{ TimeDimension('metric_time__quarter') }} > '2020-01-15'",
+    ).query_spec
+    filter_spec_resolutions = [
+        resolution.resolved_spec for resolution in query_spec.filter_spec_resolution_lookup.spec_resolutions
+    ]
+    assert len(filter_spec_resolutions) == 1
+    assert filter_spec_resolutions[0] == MTD_SPEC_QUARTER
+
+    # Can pass granularity into TimeDimension object via parameter
+    query_spec = bookings_query_parser.parse_and_validate_query(
+        metric_names=["bookings"],
+        group_by_names=["metric_time"],
+        where_constraint_str="{{ TimeDimension('metric_time', time_granularity_name='year') }} > '2020-01-15'",
+    ).query_spec
+    filter_spec_resolutions = [
+        resolution.resolved_spec for resolution in query_spec.filter_spec_resolution_lookup.spec_resolutions
+    ]
+    assert len(filter_spec_resolutions) == 1
+    assert filter_spec_resolutions[0] == MTD_SPEC_YEAR
+
+    # Can pass granularity into Dimension object via time dimension name
+    query_spec = bookings_query_parser.parse_and_validate_query(
+        metric_names=["bookings"],
+        group_by_names=["metric_time"],
+        where_constraint_str="{{ Dimension('metric_time__week') }} > '2020-01-15'",
+    ).query_spec
+    filter_spec_resolutions = [
+        resolution.resolved_spec for resolution in query_spec.filter_spec_resolution_lookup.spec_resolutions
+    ]
+    assert len(filter_spec_resolutions) == 1
+    assert filter_spec_resolutions[0] == MTD_SPEC_WEEK
+
+    # Can pass granularity into Dimension object via parameter
+    query_spec = bookings_query_parser.parse_and_validate_query(
+        metric_names=["bookings"],
+        group_by_names=["metric_time"],
+        where_constraint_str="{{ Dimension('metric_time', time_granularity='month') }} > '2020-01-15'",
+    ).query_spec
+    filter_spec_resolutions = [
+        resolution.resolved_spec for resolution in query_spec.filter_spec_resolution_lookup.spec_resolutions
+    ]
+    assert len(filter_spec_resolutions) == 1
+    assert filter_spec_resolutions[0] == MTD_SPEC_MONTH

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Sequence
+from typing import List, Sequence, Tuple
 
 from dbt_semantic_interfaces.call_parameter_sets import (
     DimensionCallParameterSet,
@@ -39,12 +39,18 @@ class DimensionPattern(EntityLinkPattern):
     def from_call_parameter_set(  # noqa: D102
         dimension_call_parameter_set: DimensionCallParameterSet,
     ) -> DimensionPattern:
+        fields_to_compare: Tuple[ParameterSetField, ...] = (
+            ParameterSetField.ELEMENT_NAME,
+            ParameterSetField.ENTITY_LINKS,
+            ParameterSetField.DATE_PART,
+        )
+
+        if dimension_call_parameter_set.time_granularity is not None:
+            fields_to_compare += (ParameterSetField.TIME_GRANULARITY,)
+
         return DimensionPattern(
             parameter_set=EntityLinkPatternParameterSet.from_parameters(
-                fields_to_compare=(
-                    ParameterSetField.ELEMENT_NAME,
-                    ParameterSetField.ENTITY_LINKS,
-                ),
+                fields_to_compare=fields_to_compare,
                 element_name=dimension_call_parameter_set.dimension_reference.element_name,
                 entity_links=dimension_call_parameter_set.entity_path,
             )
