@@ -29,6 +29,7 @@ from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticM
 from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.spec_set import group_specs_by_type
+from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
@@ -406,6 +407,10 @@ class NodeEvaluatorForLinkableInstances:
         logger.debug(f"Candidate spec set is:\n{mf_pformat(candidate_spec_set)}")
 
         data_set_linkable_specs = candidate_spec_set.linkable_specs
+        # Look for which nodes can satisfy the linkable specs at their base grains. Custom grains will be joined later.
+        required_linkable_specs_with_base_grains = [
+            spec.with_base_grain if isinstance(spec, TimeDimensionSpec) else spec for spec in required_linkable_specs
+        ]
 
         # These are linkable specs in the start node data set. Those are considered "local".
         local_linkable_specs: List[LinkableInstanceSpec] = []
@@ -415,13 +420,20 @@ class NodeEvaluatorForLinkableInstances:
 
         # Group required_linkable_specs into local / un-joinable / or possibly joinable.
         unjoinable_linkable_specs = []
-        for required_linkable_spec in required_linkable_specs:
+        for required_linkable_spec in required_linkable_specs_with_base_grains:
             is_metric_time = required_linkable_spec.element_name == DataSet.metric_time_dimension_name()
             is_local = required_linkable_spec in data_set_linkable_specs
-            is_unjoinable = not is_metric_time and (
-                len(required_linkable_spec.entity_links) == 0
-                or LinklessEntitySpec.from_reference(required_linkable_spec.entity_links[0])
-                not in data_set_linkable_specs
+            is_unjoinable = (
+                # metric_time is never unjoinable. In metric queries, the agg_time_dimension is local to the measure source node.
+                # In no-metric queries, can always CROSS JOIN to a time spine.
+                (not is_metric_time)
+                and (
+                    # metric_time is the only element that can be joined without entity links.
+                    len(required_linkable_spec.entity_links) == 0
+                    # In order be joinable, the first entity link must be in the left node's dataset.
+                    or LinklessEntitySpec.from_reference(required_linkable_spec.entity_links[0])
+                    not in data_set_linkable_specs
+                )
             )
             if is_local:
                 local_linkable_specs.append(required_linkable_spec)
