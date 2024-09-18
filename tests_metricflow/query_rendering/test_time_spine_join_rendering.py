@@ -13,14 +13,13 @@ import datetime
 import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_DAY
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.dataset.dataset_classes import DataSet
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from tests_metricflow.query_rendering.compare_rendered_query import render_and_check
@@ -36,7 +35,7 @@ def test_simple_join_to_time_spine(  # noqa: D103
 ) -> None:
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec(element_name="bookings_join_to_time_spine"),),
-        time_dimension_specs=(DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.DAY),),
+        time_dimension_specs=(MTD_SPEC_DAY,),
     )
 
     render_and_check(

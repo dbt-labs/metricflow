@@ -38,7 +38,10 @@ def test_simple_query_with_date_part(  # noqa: D103
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec(element_name="bookings"),),
         time_dimension_specs=(
-            DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.DAY, date_part=DatePart.DOW),
+            DataSet.metric_time_dimension_spec(
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
+                date_part=DatePart.DOW,
+            ),
         ),
     )
 
@@ -63,12 +66,30 @@ def test_simple_query_with_multiple_date_parts(  # noqa: D103
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec(element_name="bookings"),),
         time_dimension_specs=(
-            DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.DAY, date_part=DatePart.DAY),
-            DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.DAY, date_part=DatePart.DOW),
-            DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.DAY, date_part=DatePart.DOY),
-            DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.DAY, date_part=DatePart.MONTH),
-            DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.DAY, date_part=DatePart.QUARTER),
-            DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.DAY, date_part=DatePart.YEAR),
+            DataSet.metric_time_dimension_spec(
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
+                date_part=DatePart.DAY,
+            ),
+            DataSet.metric_time_dimension_spec(
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
+                date_part=DatePart.DOW,
+            ),
+            DataSet.metric_time_dimension_spec(
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
+                date_part=DatePart.DOY,
+            ),
+            DataSet.metric_time_dimension_spec(
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
+                date_part=DatePart.MONTH,
+            ),
+            DataSet.metric_time_dimension_spec(
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
+                date_part=DatePart.QUARTER,
+            ),
+            DataSet.metric_time_dimension_spec(
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
+                date_part=DatePart.YEAR,
+            ),
         ),
     )
 
@@ -93,7 +114,10 @@ def test_offset_window_with_date_part(  # noqa: D103
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec(element_name="bookings_growth_2_weeks"),),
         time_dimension_specs=(
-            DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.DAY, date_part=DatePart.DOW),
+            DataSet.metric_time_dimension_spec(
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
+                date_part=DatePart.DOW,
+            ),
         ),
     )
 
@@ -116,7 +140,11 @@ def test_sub_daily_metric_time(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        time_dimension_specs=(DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.MILLISECOND),),
+        time_dimension_specs=(
+            DataSet.metric_time_dimension_spec(
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MILLISECOND)
+            ),
+        ),
     )
 
     render_and_check(
@@ -228,7 +256,11 @@ def test_subdaily_cumulative_window_metric(  # noqa: D103
 ) -> None:
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec("subdaily_cumulative_window_metric"),),
-        time_dimension_specs=(DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.HOUR),),
+        time_dimension_specs=(
+            DataSet.metric_time_dimension_spec(
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.HOUR)
+            ),
+        ),
     )
 
     render_and_check(
@@ -251,7 +283,11 @@ def test_subdaily_cumulative_grain_to_date_metric(  # noqa: D103
 ) -> None:
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec("subdaily_cumulative_grain_to_date_metric"),),
-        time_dimension_specs=(DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.HOUR),),
+        time_dimension_specs=(
+            DataSet.metric_time_dimension_spec(
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.HOUR)
+            ),
+        ),
     )
 
     render_and_check(
@@ -274,7 +310,11 @@ def test_subdaily_offset_window_metric(  # noqa: D103
 ) -> None:
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec("subdaily_offset_window_metric"),),
-        time_dimension_specs=(DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.HOUR),),
+        time_dimension_specs=(
+            DataSet.metric_time_dimension_spec(
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.HOUR)
+            ),
+        ),
     )
 
     render_and_check(
@@ -297,7 +337,11 @@ def test_subdaily_offset_to_grain_metric(  # noqa: D103
 ) -> None:
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec("subdaily_offset_grain_to_date_metric"),),
-        time_dimension_specs=(DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.HOUR),),
+        time_dimension_specs=(
+            DataSet.metric_time_dimension_spec(
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.HOUR)
+            ),
+        ),
     )
 
     render_and_check(
@@ -320,7 +364,11 @@ def test_subdaily_join_to_time_spine_metric(  # noqa: D103
 ) -> None:
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec("subdaily_join_to_time_spine_metric"),),
-        time_dimension_specs=(DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.HOUR),),
+        time_dimension_specs=(
+            DataSet.metric_time_dimension_spec(
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.HOUR)
+            ),
+        ),
     )
 
     render_and_check(
@@ -342,7 +390,11 @@ def test_subdaily_time_constraint_without_metrics(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        time_dimension_specs=(DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.SECOND),),
+        time_dimension_specs=(
+            DataSet.metric_time_dimension_spec(
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.SECOND)
+            ),
+        ),
         time_range_constraint=TimeRangeConstraint(
             start_time=dt.datetime(2020, 1, 1, 0, 0, 2), end_time=dt.datetime(2020, 1, 1, 0, 0, 8)
         ),
@@ -368,7 +420,11 @@ def test_subdaily_time_constraint_with_metric(  # noqa: D103
 ) -> None:
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec("subdaily_join_to_time_spine_metric"),),
-        time_dimension_specs=(DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.HOUR),),
+        time_dimension_specs=(
+            DataSet.metric_time_dimension_spec(
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.HOUR)
+            ),
+        ),
         time_range_constraint=TimeRangeConstraint(
             start_time=dt.datetime(2020, 1, 1, 2), end_time=dt.datetime(2020, 1, 1, 5)
         ),
@@ -394,7 +450,11 @@ def test_subdaily_granularity_overrides_metric_default_granularity(  # noqa: D10
 ) -> None:
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec("subdaily_join_to_time_spine_metric"),),
-        time_dimension_specs=(DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.HOUR),),
+        time_dimension_specs=(
+            DataSet.metric_time_dimension_spec(
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.HOUR)
+            ),
+        ),
     )
 
     render_and_check(

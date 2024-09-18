@@ -6,7 +6,6 @@ from typing import Optional, Sequence
 
 from dbt_semantic_interfaces.references import SemanticModelReference, TimeDimensionReference
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 from metricflow_semantics.instances import InstanceSet, TimeDimensionInstance
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
@@ -51,17 +50,13 @@ class DataSet(ABC):
 
     @staticmethod
     def metric_time_dimension_spec(
-        time_granularity: TimeGranularity, date_part: Optional[DatePart] = None
+        time_granularity: ExpandedTimeGranularity, date_part: Optional[DatePart] = None
     ) -> TimeDimensionSpec:
-        """Spec that corresponds to DataSet.metric_time_dimension_reference.
-
-        This is currently used for source time dimension specs derived directly from a semantic model, so
-        custom granularities are not available at the points where this method is invoked.
-        """
+        """Spec that corresponds to DataSet.metric_time_dimension_reference."""
         return TimeDimensionSpec(
             element_name=DataSet.metric_time_dimension_reference().element_name,
             entity_links=(),
-            time_granularity=ExpandedTimeGranularity.from_time_granularity(time_granularity),
+            time_granularity=time_granularity,
             date_part=date_part,
         )
 

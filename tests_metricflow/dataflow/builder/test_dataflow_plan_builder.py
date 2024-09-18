@@ -32,7 +32,6 @@ from metricflow_semantics.test_helpers.snapshot_helpers import assert_plan_snaps
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.dataset.dataset_classes import DataSet
 from tests_metricflow.dataflow_plan_to_svg import display_graph_if_requested
 
 logger = logging.getLogger(__name__)
@@ -671,7 +670,7 @@ def test_common_semantic_model(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings"), MetricSpec(element_name="booking_value")),
             dimension_specs=(
-                DataSet.metric_time_dimension_spec(TimeGranularity.DAY),
+                MTD_SPEC_DAY,
                 DimensionSpec(element_name="country_latest", entity_links=(EntityReference("listing"),)),
             ),
         )
@@ -701,7 +700,7 @@ def test_derived_metric_offset_window(
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings_5_day_lag"),),
-            time_dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
         )
     )
 
@@ -729,7 +728,7 @@ def test_derived_metric_offset_to_grain(
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings_growth_since_start_of_month"),),
-            time_dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
         )
     )
 
@@ -755,8 +754,7 @@ def test_derived_metric_offset_with_granularity(  # noqa: D103
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings_5_day_lag"),),
-            time_dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.MONTH),),
+            metric_specs=(MetricSpec(element_name="bookings_5_day_lag"),), time_dimension_specs=(MTD_SPEC_MONTH,)
         )
     )
 
@@ -783,7 +781,7 @@ def test_derived_offset_cumulative_metric(  # noqa: D103
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="every_2_days_bookers_2_days_ago"),),
-            time_dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
         )
     )
 
@@ -809,7 +807,7 @@ def test_join_to_time_spine_with_metric_time(  # noqa: D103
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings_fill_nulls_with_0"),),
-            time_dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
         )
     )
 
@@ -835,7 +833,7 @@ def test_join_to_time_spine_derived_metric(  # noqa: D103
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings_growth_2_weeks_fill_nulls_with_0"),),
-            time_dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
         )
     )
 
@@ -912,7 +910,7 @@ def test_nested_derived_metric_with_outer_offset(  # noqa: D103
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings_offset_twice"),),
-            time_dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
         )
     )
 

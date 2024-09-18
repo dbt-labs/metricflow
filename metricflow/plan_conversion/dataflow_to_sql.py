@@ -1069,7 +1069,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         # For those matching time dimension instances, create the analog metric time dimension instances for the output.
         for matching_time_dimension_instance in matching_time_dimension_instances:
             metric_time_dimension_spec = DataSet.metric_time_dimension_spec(
-                time_granularity=matching_time_dimension_instance.spec.time_granularity.base_granularity,
+                time_granularity=matching_time_dimension_instance.spec.time_granularity,
                 date_part=matching_time_dimension_instance.spec.date_part,
             )
             metric_time_dimension_column_association = self._column_association_resolver.resolve_spec(
