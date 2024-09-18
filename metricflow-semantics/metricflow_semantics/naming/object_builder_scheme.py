@@ -81,7 +81,7 @@ class ObjectBuilderNamingScheme(QueryItemNamingScheme):
                 ParameterSetField.DATE_PART,
             ]
 
-            time_granularity = None
+            time_granularity: Optional[ExpandedTimeGranularity] = None
             if time_dimension_call_parameter_set.time_granularity is not None:
                 fields_to_compare.append(ParameterSetField.TIME_GRANULARITY)
                 time_granularity = ExpandedTimeGranularity.from_time_granularity(
