@@ -5,6 +5,7 @@ from typing import Optional
 from dbt_semantic_interfaces.references import MetricReference
 from typing_extensions import override
 
+from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.naming.naming_scheme import QueryItemNamingScheme
 from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.patterns.metric_pattern import MetricSpecPattern
@@ -25,7 +26,7 @@ class MetricNamingScheme(QueryItemNamingScheme):
         return names[0]
 
     @override
-    def spec_pattern(self, input_str: str) -> MetricSpecPattern:
+    def spec_pattern(self, input_str: str, semantic_manifest_lookup: SemanticManifestLookup) -> MetricSpecPattern:
         input_str = input_str.lower()
         if not self.input_str_follows_scheme(input_str):
             raise RuntimeError(f"{repr(input_str)} does not follow this scheme.")

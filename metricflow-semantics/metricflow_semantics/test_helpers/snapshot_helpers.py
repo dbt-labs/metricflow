@@ -343,9 +343,11 @@ def assert_spec_set_snapshot_equal(  # noqa: D103
 
 
 def assert_linkable_spec_set_snapshot_equal(  # noqa: D103
-    request: FixtureRequest, mf_test_configuration: SnapshotConfiguration, set_id: str, spec_set: LinkableSpecSet
+    request: FixtureRequest,
+    mf_test_configuration: SnapshotConfiguration,
+    set_id: str,
+    spec_set: LinkableSpecSet,
 ) -> None:
-    # TODO: This will be used in a later PR and this message will be removed.
     naming_scheme = ObjectBuilderNamingScheme()
     assert_snapshot_text_equal(
         request=request,

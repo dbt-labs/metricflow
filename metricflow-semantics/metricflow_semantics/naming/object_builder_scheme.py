@@ -12,6 +12,7 @@ from dbt_semantic_interfaces.parsing.where_filter.where_filter_parser import Whe
 from dbt_semantic_interfaces.references import EntityReference
 from typing_extensions import override
 
+from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.naming.naming_scheme import QueryItemNamingScheme
 from metricflow_semantics.naming.object_builder_str import ObjectBuilderNameConverter
 from metricflow_semantics.specs.instance_spec import InstanceSpec
@@ -36,7 +37,7 @@ class ObjectBuilderNamingScheme(QueryItemNamingScheme):
         return ObjectBuilderNameConverter.input_str_from_spec(instance_spec)
 
     @override
-    def spec_pattern(self, input_str: str) -> SpecPattern:
+    def spec_pattern(self, input_str: str, semantic_manifest_lookup: SemanticManifestLookup) -> SpecPattern:
         if not self.input_str_follows_scheme(input_str):
             raise ValueError(
                 f"The specified input {repr(input_str)} does not match the input described by the object builder "

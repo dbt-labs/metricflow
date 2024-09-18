@@ -38,7 +38,9 @@ def test_ambiguous_metric_time_in_query(  # noqa: D103
         resolution_dag=resolution_dag,
     )
 
-    spec_pattern = ObjectBuilderNamingScheme().spec_pattern(f"TimeDimension('{METRIC_TIME_ELEMENT_NAME}')")
+    spec_pattern = ObjectBuilderNamingScheme().spec_pattern(
+        f"TimeDimension('{METRIC_TIME_ELEMENT_NAME}')", semantic_manifest_lookup=ambiguous_resolution_manifest_lookup
+    )
 
     result = group_by_item_resolver.resolve_matching_item_for_querying(
         spec_pattern=spec_pattern,
@@ -76,7 +78,10 @@ def test_unavailable_group_by_item_in_derived_metric_parent(
         manifest_lookup=ambiguous_resolution_manifest_lookup,
         resolution_dag=resolution_dag,
     )
-    spec_pattern = naming_scheme.spec_pattern("Dimension('monthly_measure_entity__creation_time')")
+    spec_pattern = naming_scheme.spec_pattern(
+        "Dimension('monthly_measure_entity__creation_time')",
+        semantic_manifest_lookup=ambiguous_resolution_manifest_lookup,
+    )
 
     result = group_by_item_resolver.resolve_matching_item_for_querying(
         spec_pattern=spec_pattern,
@@ -106,7 +111,9 @@ def test_invalid_group_by_item(  # noqa: D103
     input_str = "Dimension('monthly_measure_entity__invalid_dimension')"
 
     result = group_by_item_resolver.resolve_matching_item_for_querying(
-        spec_pattern=naming_scheme.spec_pattern(input_str),
+        spec_pattern=naming_scheme.spec_pattern(
+            input_str, semantic_manifest_lookup=ambiguous_resolution_manifest_lookup
+        ),
         suggestion_generator=None,
     )
 

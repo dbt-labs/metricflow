@@ -7,7 +7,6 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow_semantics.naming.naming_scheme import QueryItemNamingScheme
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow_semantics.query.group_by_item.group_by_item_resolver import GroupByItemResolver
@@ -27,7 +26,6 @@ logger = logging.getLogger(__name__)
 def test_ambiguous_metric_time_in_query_filter(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    naming_scheme: QueryItemNamingScheme,
     ambiguous_resolution_manifest_lookup: SemanticManifestLookup,
     resolution_dags: Dict[AmbiguousResolutionQueryId, GroupByItemResolutionDag],
     dag_case_id: str,
@@ -40,7 +38,9 @@ def test_ambiguous_metric_time_in_query_filter(  # noqa: D103
     )
 
     input_str = f"TimeDimension('{METRIC_TIME_ELEMENT_NAME}')"
-    spec_pattern = ObjectBuilderNamingScheme().spec_pattern(input_str)
+    spec_pattern = ObjectBuilderNamingScheme().spec_pattern(
+        input_str, semantic_manifest_lookup=ambiguous_resolution_manifest_lookup
+    )
 
     assert isinstance(resolution_dag.sink_node, QueryGroupByItemResolutionNode)
     result = group_by_item_resolver.resolve_matching_item_for_filters(

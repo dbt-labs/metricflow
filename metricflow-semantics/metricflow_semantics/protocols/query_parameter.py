@@ -6,6 +6,7 @@ from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 
 if TYPE_CHECKING:
+    from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
     from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import (
         ResolverInputForGroupByItem,
         ResolverInputForMetric,
@@ -22,8 +23,9 @@ class MetricQueryParameter(Protocol):
         """The name of the metric."""
         raise NotImplementedError
 
-    @property
-    def query_resolver_input(self) -> ResolverInputForMetric:  # noqa: D102
+    def query_resolver_input(  # noqa: D102
+        self, semantic_manifest_lookup: SemanticManifestLookup
+    ) -> ResolverInputForMetric:
         raise NotImplementedError
 
 
@@ -36,8 +38,9 @@ class DimensionOrEntityQueryParameter(Protocol):
         """The name of the metric."""
         raise NotImplementedError
 
-    @property
-    def query_resolver_input(self) -> ResolverInputForGroupByItem:  # noqa: D102
+    def query_resolver_input(  # noqa: D102
+        self, semantic_manifest_lookup: SemanticManifestLookup
+    ) -> ResolverInputForGroupByItem:
         raise NotImplementedError
 
 
@@ -58,8 +61,9 @@ class TimeDimensionQueryParameter(Protocol):  # noqa: D101
         """Date part to extract from the dimension."""
         raise NotImplementedError
 
-    @property
-    def query_resolver_input(self) -> ResolverInputForGroupByItem:  # noqa: D102
+    def query_resolver_input(  # noqa: D102
+        self, semantic_manifest_lookup: SemanticManifestLookup
+    ) -> ResolverInputForGroupByItem:
         raise NotImplementedError
 
 
@@ -80,8 +84,9 @@ class OrderByQueryParameter(Protocol):
         """Indicates if the order should be ascending or descending."""
         raise NotImplementedError
 
-    @property
-    def query_resolver_input(self) -> ResolverInputForOrderByItem:  # noqa: D102
+    def query_resolver_input(  # noqa: D102
+        self, semantic_manifest_lookup: SemanticManifestLookup
+    ) -> ResolverInputForOrderByItem:
         raise NotImplementedError
 
 
