@@ -237,37 +237,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         """Return the next unique table alias to use in generating queries."""
         return SequentialIdGenerator.create_next_id(StaticIdPrefix.SUB_QUERY).str_value
 
-    def _choose_time_spine_source(
-        self, agg_time_dimension_instances: Tuple[TimeDimensionInstance, ...]
-    ) -> TimeSpineSource:
-        """Determine which time spine source to use when building time spine dataset.
-
-        Will choose the time spine with the largest granularity that can be used to get the smallest granularity requested
-        in the agg time dimension instances. Example:
-        - Time spines available: SECOND, MINUTE, DAY
-        - Agg time dimension granularity needed for request: HOUR, DAY
-        --> Selected time spine: MINUTE
-
-        Note time spines are identified by the base granularity from the time dimension instance, not the raw granularity
-        name.
-        """
-        assert (
-            agg_time_dimension_instances
-        ), "Building time spine dataset requires agg_time_dimension_instances, but none were found."
-        smallest_agg_time_grain = min(
-            dim.spec.time_granularity.base_granularity for dim in agg_time_dimension_instances
-        )
-        compatible_time_spine_grains = [
-            grain for grain in self._time_spine_sources.keys() if grain.to_int() <= smallest_agg_time_grain.to_int()
-        ]
-        if not compatible_time_spine_grains:
-            raise RuntimeError(
-                f"This query requires a time spine with granularity {smallest_agg_time_grain.name} or smaller, which is not configured. "
-                f"The smallest available time spine granularity is {min(self._time_spine_sources.keys()).name}, which is too large."
-                "See documentation for how to configure a new time spine: https://docs.getdbt.com/docs/build/metricflow-time-spine"
-            )
-        return self._time_spine_sources[max(compatible_time_spine_grains)]
-
     def _make_time_spine_data_set(
         self,
         agg_time_dimension_instances: Tuple[TimeDimensionInstance, ...],
@@ -280,7 +249,10 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         time_spine_instance_set = InstanceSet(time_dimension_instances=agg_time_dimension_instances)
         time_spine_table_alias = self._next_unique_table_alias()
 
-        time_spine_source = self._choose_time_spine_source(agg_time_dimension_instances)
+        time_spine_source = TimeSpineSource.choose_time_spine_source(
+            required_time_spine_specs=[instance.spec for instance in agg_time_dimension_instances],
+            time_spine_sources=self._time_spine_sources,
+        )
         column_expr = SqlColumnReferenceExpression.from_table_and_column_names(
             table_alias=time_spine_table_alias, column_name=time_spine_source.base_column
         )

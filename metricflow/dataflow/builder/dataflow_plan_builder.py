@@ -55,6 +55,7 @@ from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.time.dateutil_adjuster import DateutilTimePeriodAdjuster
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
+from metricflow_semantics.time.time_spine_source import TimeSpineSource
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.node_evaluator import (
@@ -973,6 +974,16 @@ class DataflowPlanBuilder:
                     source_nodes=self._source_node_set.source_nodes_for_group_by_item_queries,
                 )
             )
+            # If metric_time is requested without metrics, choose appropriate time spine node to select those values from.
+            if linkable_spec_set.metric_time_specs:
+                time_spine_node = self._source_node_set.time_spine_nodes[
+                    TimeSpineSource.choose_time_spine_source(
+                        required_time_spine_specs=linkable_spec_set.metric_time_specs,
+                        time_spine_sources=self._source_node_builder.time_spine_sources,
+                    ).base_granularity
+                ]
+                candidate_nodes_for_right_side_of_join += [time_spine_node]
+                candidate_nodes_for_left_side_of_join += [time_spine_node]
             default_join_type = SqlJoinType.FULL_OUTER
 
         logger.info(

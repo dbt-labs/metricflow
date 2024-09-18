@@ -8,7 +8,7 @@ from dbt_semantic_interfaces.implementations.time_spine import PydanticTimeSpine
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
-from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY
+from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY, TimeDimensionSpec
 from metricflow_semantics.sql.sql_table import SqlTable
 
 logger = logging.getLogger(__name__)
@@ -91,3 +91,35 @@ class TimeSpineSource:
             for time_spine_source in time_spine_sources
             for custom_granularity in time_spine_source.custom_granularities
         }
+
+    @staticmethod
+    def choose_time_spine_source(
+        required_time_spine_specs: Sequence[TimeDimensionSpec],
+        time_spine_sources: Dict[TimeGranularity, TimeSpineSource],
+    ) -> TimeSpineSource:
+        """Determine which time spine source to use to satisfy the given specs.
+
+        Will choose the time spine with the largest granularity that can be used to get the smallest granularity required to
+        satisfy the time spine specs. Example:
+        - Time spines available: SECOND, MINUTE, DAY
+        - Time granularities needed for request: HOUR, DAY
+        --> Selected time spine: MINUTE
+
+        Note time spines are identified by their base granularity.
+        """
+        assert required_time_spine_specs, (
+            "Choosing time spine source requires time spine specs, but the `required_time_spine_specs` param is empty. "
+            "This indicates internal misconfiguration."
+        )
+        smallest_agg_time_grain = min(spec.time_granularity.base_granularity for spec in required_time_spine_specs)
+        time_spine_grains = time_spine_sources.keys()
+        compatible_time_spine_grains = [
+            grain for grain in time_spine_grains if grain.to_int() <= smallest_agg_time_grain.to_int()
+        ]
+        if not compatible_time_spine_grains:
+            raise RuntimeError(
+                f"This query requires a time spine with granularity {smallest_agg_time_grain.name} or smaller, which is not configured. "
+                f"The smallest available time spine granularity is {min(time_spine_grains).name}, which is too large."
+                "See documentation for how to configure a new time spine: https://docs.getdbt.com/docs/build/metricflow-time-spine"
+            )
+        return time_spine_sources[max(compatible_time_spine_grains)]

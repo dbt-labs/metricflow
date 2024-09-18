@@ -33,8 +33,7 @@ class SourceNodeSet:
     # components.
     source_nodes_for_metric_queries: Tuple[DataflowPlanNode, ...]
 
-    # Semantic models are 1:1 mapped to a ReadSqlSourceNode. The tuple also contains the same `time_spine_node` as
-    # below. See usage in `DataflowPlanBuilder`.
+    # Semantic models are 1:1 mapped to a ReadSqlSourceNode.
     source_nodes_for_group_by_item_queries: Tuple[DataflowPlanNode, ...]
 
     # Provides the time spines.
@@ -42,7 +41,11 @@ class SourceNodeSet:
 
     @property
     def all_nodes(self) -> Sequence[DataflowPlanNode]:  # noqa: D102
-        return self.source_nodes_for_metric_queries + self.source_nodes_for_group_by_item_queries
+        return (
+            self.source_nodes_for_metric_queries
+            + self.source_nodes_for_group_by_item_queries
+            + self.time_spine_nodes_tuple
+        )
 
     @property
     def time_spine_nodes_tuple(self) -> Tuple[MetricTimeDimensionTransformNode, ...]:  # noqa: D102
@@ -59,10 +62,11 @@ class SourceNodeBuilder:
     ) -> None:
         self._semantic_manifest_lookup = semantic_manifest_lookup
         data_set_converter = SemanticModelToDataSetConverter(column_association_resolver)
-        self._time_spine_source_nodes = {}
-        for granularity, time_spine_source in TimeSpineSource.build_standard_time_spine_sources(
+        self.time_spine_sources = TimeSpineSource.build_standard_time_spine_sources(
             semantic_manifest_lookup.semantic_manifest
-        ).items():
+        )
+        self._time_spine_source_nodes = {}
+        for granularity, time_spine_source in self.time_spine_sources.items():
             data_set = data_set_converter.build_time_spine_source_data_set(time_spine_source)
             self._time_spine_source_nodes[granularity] = MetricTimeDimensionTransformNode.create(
                 parent_node=ReadSqlSourceNode.create(data_set),
@@ -100,8 +104,7 @@ class SourceNodeBuilder:
 
         return SourceNodeSet(
             time_spine_nodes=self._time_spine_source_nodes,
-            source_nodes_for_group_by_item_queries=tuple(group_by_item_source_nodes)
-            + tuple(self._time_spine_source_nodes.values()),
+            source_nodes_for_group_by_item_queries=tuple(group_by_item_source_nodes),
             source_nodes_for_metric_queries=tuple(source_nodes_for_metric_queries),
         )
 
