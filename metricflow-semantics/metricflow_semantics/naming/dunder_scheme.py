@@ -18,6 +18,7 @@ from metricflow_semantics.specs.patterns.entity_link_pattern import (
     ParameterSetField,
 )
 from metricflow_semantics.specs.spec_set import InstanceSpecSet, InstanceSpecSetTransform, group_spec_by_type
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 
 class DunderNamingScheme(QueryItemNamingScheme):
@@ -81,7 +82,8 @@ class DunderNamingScheme(QueryItemNamingScheme):
         # At this point, len(input_str_parts) >= 2
         for granularity in TimeGranularity:
             if input_str_parts[-1] == granularity.value:
-                time_grain = granularity
+                # TODO: [custom granularity] add support for custom granularity names here
+                time_grain = ExpandedTimeGranularity.from_time_granularity(granularity)
 
         # Has a time grain specified.
         if time_grain is not None:

@@ -145,7 +145,7 @@ def test_time_dimension_match(specs: Sequence[LinkableInstanceSpec]) -> None:  #
         EntityLinkPatternParameterSet.from_parameters(
             element_name=METRIC_TIME_ELEMENT_NAME,
             entity_links=(),
-            time_granularity=TimeGranularity.WEEK,
+            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.WEEK),
             date_part=None,
             fields_to_compare=(
                 ParameterSetField.ELEMENT_NAME,

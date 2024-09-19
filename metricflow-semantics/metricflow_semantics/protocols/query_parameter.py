@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional, Protocol, Union, runtime_checkable
 
-from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 
 if TYPE_CHECKING:
@@ -52,8 +51,12 @@ class TimeDimensionQueryParameter(Protocol):  # noqa: D101
         raise NotImplementedError
 
     @property
-    def grain(self) -> Optional[TimeGranularity]:
-        """The time granularity."""
+    def grain(self) -> Optional[str]:
+        """The name of the time granularity.
+
+        This may be the name of a custom granularity or the string value of an entry in the standard
+        TimeGranularity enum.
+        """
         raise NotImplementedError
 
     @property
