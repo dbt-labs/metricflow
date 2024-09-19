@@ -13,7 +13,6 @@ from typing_extensions import override
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.specs.spec_set import group_specs_by_type
-from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +49,7 @@ class EntityLinkPatternParameterSet:
     # The entities used for joining semantic models.
     entity_links: Optional[Tuple[EntityReference, ...]] = None
     # Properties of time dimensions to match.
-    time_granularity: Optional[ExpandedTimeGranularity] = None
+    time_granularity: Optional[str] = None
     date_part: Optional[DatePart] = None
     metric_subquery_entity_links: Optional[Tuple[EntityReference, ...]] = None
 
@@ -59,7 +58,7 @@ class EntityLinkPatternParameterSet:
         fields_to_compare: Sequence[ParameterSetField],
         element_name: Optional[str] = None,
         entity_links: Optional[Sequence[EntityReference]] = None,
-        time_granularity: Optional[ExpandedTimeGranularity] = None,
+        time_granularity: Optional[str] = None,
         date_part: Optional[DatePart] = None,
         metric_subquery_entity_links: Optional[Tuple[EntityReference, ...]] = None,
     ) -> EntityLinkPatternParameterSet:
@@ -74,7 +73,7 @@ class EntityLinkPatternParameterSet:
 
     def __post_init__(self) -> None:
         """Check that fields_to_compare is sorted so that patterns that do the same thing can be compared."""
-        assert is_sorted(self.fields_to_compare)
+        assert is_sorted(self.fields_to_compare), "`fields_to_compare` must be sorted."
 
 
 @dataclass(frozen=True)
@@ -112,6 +111,19 @@ class EntityLinkPattern(SpecPattern):
         shortest_entity_link_length = min(len(matching_spec.entity_links) for matching_spec in matching_specs)
         return tuple(spec for spec in matching_specs if len(spec.entity_links) == shortest_entity_link_length)
 
+    def _match_time_granularities(
+        self, candidate_specs: Sequence[LinkableInstanceSpec]
+    ) -> Sequence[LinkableInstanceSpec]:
+        """Do a partial match on time granularities."""
+        matching_specs: Sequence[LinkableInstanceSpec] = tuple(
+            candidate_spec
+            for candidate_spec in group_specs_by_type(candidate_specs).time_dimension_specs
+            if candidate_spec.time_granularity.name
+            == (self.parameter_set.time_granularity.lower() if self.parameter_set.time_granularity else None)
+        )
+
+        return matching_specs
+
     @override
     def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[LinkableInstanceSpec]:
         filtered_candidate_specs = group_specs_by_type(candidate_specs).linkable_specs
@@ -120,10 +132,13 @@ class EntityLinkPattern(SpecPattern):
         # Entity links could be a partial match, so it's handled separately.
         if ParameterSetField.ENTITY_LINKS in self.parameter_set.fields_to_compare:
             filtered_candidate_specs = self._match_entity_links(filtered_candidate_specs)
+        # Time granularity is handled separately because it's comparing a string input to an ExpandedTimeGranularity.
+        if ParameterSetField.TIME_GRANULARITY in self.parameter_set.fields_to_compare:
+            filtered_candidate_specs = self._match_time_granularities(filtered_candidate_specs)
 
         other_keys_to_check = set(
             field_to_compare.value for field_to_compare in self.parameter_set.fields_to_compare
-        ).difference({ParameterSetField.ENTITY_LINKS.value})
+        ).difference({ParameterSetField.ENTITY_LINKS.value, ParameterSetField.TIME_GRANULARITY.value})
 
         matching_specs: List[LinkableInstanceSpec] = []
         parameter_set_values = tuple(getattr(self.parameter_set, key_to_check) for key_to_check in other_keys_to_check)

@@ -560,7 +560,11 @@ def test_date_part_parsing(
         query_parser.parse_and_validate_query(
             metric_names=["revenue"],
             group_by=(
-                TimeDimensionParameter(name="metric_time", grain=TimeGranularity.YEAR.value, date_part=DatePart.MONTH),
+                TimeDimensionParameter(
+                    name="metric_time",
+                    grain=TimeGranularity.YEAR.value,
+                    date_part=DatePart.MONTH,
+                ),
             ),
         )
 

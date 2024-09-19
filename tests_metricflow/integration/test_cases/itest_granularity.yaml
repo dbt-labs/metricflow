@@ -310,3 +310,72 @@ integration_test:
       GROUP BY 2
     ) b
     ON a.listing__ds__day = b.listing__ds__day
+---
+integration_test:
+  name: simple_metric_with_custom_granularity
+  description: A simple metric queried with a custom granularity
+  model: SIMPLE_MODEL
+  metrics: [ "bookings"]
+  group_bys: ["booking__ds__martian_day"]
+  check_query: |
+    SELECT
+      b.martian_day AS booking__ds__martian_day
+      , SUM(a.bookings) AS bookings
+    FROM (
+      SELECT
+        DATE_TRUNC('day', ds) AS booking__ds__day
+        , 1 AS bookings
+      FROM {{ source_schema }}.fct_bookings
+    ) a
+    LEFT OUTER JOIN {{ source_schema }}.mf_time_spine b
+    ON a.booking__ds__day = b.ds
+    GROUP BY b.martian_day
+---
+integration_test:
+  name: simple_metric_with_custom_granularity_and_join
+  description: A simple metric queried with a custom granularity
+  model: SIMPLE_MODEL
+  metrics: [ "bookings"]
+  group_bys: ["listing__ds__martian_day"]
+  check_query: |
+    SELECT
+      c.martian_day AS listing__ds__martian_day
+      , SUM(b.bookings) AS bookings
+    FROM (
+      SELECT
+        DATE_TRUNC('day', l.created_at) AS listing__ds__day
+        , 1 AS bookings
+      FROM {{ source_schema }}.fct_bookings a
+      LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest l
+      ON a.listing_id = l.listing_id
+    ) b
+    LEFT OUTER JOIN {{ source_schema }}.mf_time_spine c
+    ON b.listing__ds__day = c.ds
+    GROUP BY c.martian_day
+---
+integration_test:
+  name: cumulative_metric_with_custom_granularity
+  description: A cumulative metric queried with a custom granularity
+  model: SIMPLE_MODEL
+  metrics: [ "trailing_2_months_revenue"]
+  group_bys: ["metric_time__martian_day"]
+  check_query: |
+    SELECT 1
+---
+integration_test:
+  name: derived_offset_metric_with_custom_granularity
+  description: A derived metric queried with a custom granularity
+  model: SIMPLE_MODEL
+  metrics: [ "booking_fees_last_week_per_booker_this_week"]
+  group_bys: ["metric_time__martian_day"]
+  check_query: |
+    SELECT 1
+---
+integration_test:
+  name: multiple_metrics_with_custom_granularity
+  description: A derived metric queried with a custom granularity
+  model: SIMPLE_MODEL
+  metrics: [ "bookings", "listings"]
+  group_bys: ["metric_time__martian_day", "listing__ds_month"]
+  check_query: |
+    SELECT 1

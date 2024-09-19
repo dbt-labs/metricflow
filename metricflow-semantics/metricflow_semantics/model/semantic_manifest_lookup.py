@@ -6,6 +6,7 @@ from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 
 from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
+from metricflow_semantics.time.time_spine_source import TimeSpineSource
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +18,8 @@ class SemanticManifestLookup:
         self._semantic_manifest = semantic_manifest
         self._semantic_model_lookup = SemanticModelLookup(semantic_manifest)
         self._metric_lookup = MetricLookup(self._semantic_manifest, self._semantic_model_lookup)
+        self._time_spine_sources = TimeSpineSource.build_standard_time_spine_sources(semantic_manifest)
+        self._custom_granularities = TimeSpineSource.build_custom_granularities(list(self._time_spine_sources.values()))
 
     @property
     def semantic_manifest(self) -> SemanticManifest:  # noqa: D102

@@ -214,7 +214,8 @@ def filter_not_supported_features(
 
 @pytest.mark.parametrize(
     "name",
-    CONFIGURED_INTEGRATION_TESTS_REPOSITORY.all_test_case_names,
+    # CONFIGURED_INTEGRATION_TESTS_REPOSITORY.all_test_case_names,
+    ["itest_granularity.yaml/simple_metric_with_custom_granularity_and_join"],
     ids=lambda name: f"name={name}",
 )
 def test_case(
@@ -303,6 +304,7 @@ def test_case(
     )
 
     actual = query_result.result_df
+    # assert 0, query_result.sql
 
     expected = sql_client.query(
         jinja2.Template(

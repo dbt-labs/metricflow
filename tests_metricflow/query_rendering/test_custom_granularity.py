@@ -64,6 +64,35 @@ def test_simple_metric_with_custom_granularity(  # noqa: D103
 
 
 @pytest.mark.sql_engine_snapshot
+def test_simple_metric_with_custom_granularity_and_join(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    query_spec = MetricFlowQuerySpec(
+        metric_specs=(MetricSpec("bookings"),),
+        time_dimension_specs=(
+            TimeDimensionSpec(
+                element_name="ds",
+                time_granularity=ExpandedTimeGranularity(name="martian_day", base_granularity=TimeGranularity.DAY),
+                entity_links=(EntityReference("listing"),),
+            ),
+        ),
+    )
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
 def test_cumulative_metric_with_custom_granularity(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -107,6 +136,9 @@ def test_derived_metric_with_custom_granularity(  # noqa: D103
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
     )
+
+
+# TODO: test with conversion metric
 
 
 # TODO: subqueries in this test should be collapsed. Update optimizer
@@ -162,6 +194,9 @@ def test_metric_custom_granularity_joined_to_non_default_grain(  # noqa: D103
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
     )
+
+
+# No metric queries start here
 
 
 @pytest.mark.sql_engine_snapshot
