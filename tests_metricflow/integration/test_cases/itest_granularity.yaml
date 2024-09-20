@@ -310,3 +310,142 @@ integration_test:
       GROUP BY 2
     ) b
     ON a.listing__ds__day = b.listing__ds__day
+---
+integration_test:
+  name: simple_metric_with_custom_granularity
+  description: A simple metric queried with a custom granularity
+  model: SIMPLE_MODEL
+  metrics: [ "bookings"]
+  group_bys: ["booking__ds__martian_day"]
+  check_query: |
+    SELECT
+      b.martian_day AS booking__ds__martian_day
+      , SUM(1) AS bookings
+    FROM {{ source_schema }}.fct_bookings a
+    LEFT OUTER JOIN {{ source_schema }}.mf_time_spine b
+    ON {{ render_date_trunc("a.ds", TimeGranularity.DAY) }} = b.ds
+    GROUP BY b.martian_day
+---
+integration_test:
+  name: simple_metric_with_custom_granularity_and_join
+  description: A simple metric queried with a custom granularity
+  model: SIMPLE_MODEL
+  metrics: [ "bookings"]
+  group_bys: ["listing__ds__martian_day"]
+  check_query: |
+    SELECT
+      c.martian_day AS listing__ds__martian_day
+      , SUM(1) AS bookings
+    FROM {{ source_schema }}.fct_bookings a
+    LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest l
+      ON a.listing_id = l.listing_id
+    LEFT OUTER JOIN {{ source_schema }}.mf_time_spine c
+      ON {{ render_date_trunc("l.created_at", TimeGranularity.DAY) }} = c.ds
+    GROUP BY c.martian_day
+---
+integration_test:
+  name: cumulative_metric_with_custom_granularity
+  description: A cumulative metric queried with a custom granularity
+  model: SIMPLE_MODEL
+  metrics: [ "trailing_2_months_revenue"]
+  group_bys: ["metric_time__martian_day"]
+  check_query: |
+    SELECT
+      metric_time__martian_day
+      , trailing_2_months_revenue
+    FROM (
+      SELECT
+        metric_time__martian_day
+        , AVG(txn_revenue) OVER (PARTITION BY metric_time__martian_day) AS trailing_2_months_revenue
+      FROM (
+        SELECT
+          ts2.martian_day AS metric_time__martian_day
+          , ts.ds AS metric_time__day
+          , SUM(r.revenue) AS txn_revenue
+        FROM {{ source_schema }}.mf_time_spine ts
+        INNER JOIN {{ source_schema }}.fct_revenue r
+          ON ({{ render_date_trunc("r.created_at", TimeGranularity.DAY) }} <= ts.ds)
+          AND ({{ render_date_trunc("r.created_at", TimeGranularity.DAY) }} > {{ render_date_sub("ts", "ds", 2, TimeGranularity.MONTH) }})
+        LEFT OUTER JOIN {{ source_schema }}.mf_time_spine ts2
+          ON ts.ds = ts2.ds
+        GROUP BY ts2.martian_day, ts.ds
+      ) ts
+    ) subq_9
+    GROUP BY metric_time__martian_day, trailing_2_months_revenue
+---
+integration_test:
+  name: derived_offset_metric_with_custom_granularity
+  description: A derived metric queried with a custom granularity
+  model: SIMPLE_MODEL
+  metrics: [ "booking_fees_last_week_per_booker_this_week"]
+  group_bys: ["metric_time__martian_day"]
+  check_query: |
+    SELECT
+      metric_time__martian_day
+      , booking_value * 0.05 / bookers AS booking_fees_last_week_per_booker_this_week
+    FROM (
+      SELECT
+        COALESCE(subq_8.metric_time__martian_day, subq_14.metric_time__martian_day) AS metric_time__martian_day
+        , MAX(subq_8.booking_value) AS booking_value
+        , MAX(subq_14.bookers) AS bookers
+      FROM (
+        SELECT
+          ts2.martian_day AS metric_time__martian_day
+          , SUM(b.booking_value) AS booking_value
+        FROM {{ source_schema }}.mf_time_spine ts
+        INNER JOIN {{ source_schema }}.fct_bookings b
+          ON {{ render_date_sub("ts", "ds", 1, TimeGranularity.WEEK) }} = {{ render_date_trunc("b.ds", TimeGranularity.DAY) }}
+        LEFT OUTER JOIN {{ source_schema }}.mf_time_spine ts2 ON ts.ds = ts2.ds
+        GROUP BY ts2.martian_day
+      ) subq_8
+      FULL OUTER JOIN (
+        SELECT
+          ts3.martian_day AS metric_time__martian_day
+          , COUNT(DISTINCT b.guest_id) AS bookers
+        FROM {{ source_schema }}.fct_bookings b
+        LEFT OUTER JOIN {{ source_schema }}.mf_time_spine ts3
+          ON {{ render_date_trunc("b.ds", TimeGranularity.DAY) }} = ts3.ds
+        GROUP BY ts3.martian_day
+      ) subq_14
+      ON subq_8.metric_time__martian_day = subq_14.metric_time__martian_day
+      GROUP BY COALESCE(subq_8.metric_time__martian_day, subq_14.metric_time__martian_day)
+    ) subq_15
+---
+integration_test:
+  name: multiple_metrics_with_custom_granularity
+  description: A derived metric queried with a custom granularity
+  model: SIMPLE_MODEL
+  metrics: [ "bookings", "listings"]
+  group_bys: ["metric_time__martian_day", "listing__ds__month"]
+  check_query: |
+    SELECT
+      COALESCE(subq_10.metric_time__martian_day, subq_16.metric_time__martian_day) AS metric_time__martian_day
+      , COALESCE(subq_10.listing__ds__month, subq_16.listing__ds__month) AS listing__ds__month
+      , MAX(subq_10.bookings) AS bookings
+      , MAX(subq_16.listings) AS listings
+    FROM (
+      SELECT
+        ts.martian_day AS metric_time__martian_day
+        , {{ render_date_trunc("l.created_at", TimeGranularity.MONTH) }} AS listing__ds__month
+        , SUM(1) AS bookings
+      FROM {{ source_schema }}.fct_bookings b
+      LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest l ON b.listing_id = l.listing_id
+      LEFT OUTER JOIN {{ source_schema }}.mf_time_spine ts
+        ON {{ render_date_trunc("b.ds", TimeGranularity.DAY) }} = ts.ds
+      GROUP BY ts.martian_day, {{ render_date_trunc("l.created_at", TimeGranularity.MONTH) }}
+    ) subq_10
+    FULL OUTER JOIN (
+      SELECT
+        ts.martian_day AS metric_time__martian_day
+        , {{ render_date_trunc("l.created_at", TimeGranularity.MONTH) }} AS listing__ds__month
+        , SUM(1) AS listings
+      FROM {{ source_schema }}.dim_listings_latest l
+      LEFT OUTER JOIN {{ source_schema }}.mf_time_spine ts
+        ON {{ render_date_trunc("l.created_at", TimeGranularity.DAY) }} = ts.ds
+      GROUP BY ts.martian_day, {{ render_date_trunc("l.created_at", TimeGranularity.MONTH) }}
+    ) subq_16
+    ON (subq_10.metric_time__martian_day = subq_16.metric_time__martian_day)
+      AND (subq_10.listing__ds__month = subq_16.listing__ds__month)
+    GROUP BY
+      COALESCE(subq_10.metric_time__martian_day, subq_16.metric_time__martian_day)
+      , COALESCE(subq_10.listing__ds__month, subq_16.listing__ds__month)
