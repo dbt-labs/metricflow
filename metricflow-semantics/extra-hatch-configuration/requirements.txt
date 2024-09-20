@@ -1,4 +1,4 @@
-dbt-semantic-interfaces==0.7.1
+dbt-semantic-interfaces==0.7.2.dev0
 graphviz>=0.18.2, <0.21
 python-dateutil>=2.9.0, <2.10.0
 rapidfuzz>=3.0, <4.0
