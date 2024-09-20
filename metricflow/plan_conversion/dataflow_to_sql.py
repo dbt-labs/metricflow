@@ -1421,7 +1421,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
     def _get_custom_granularity_column_name(self, custom_granularity_name: str) -> str:
         time_spine_source = self._get_time_spine_for_custom_granularity(custom_granularity_name)
         for custom_granularity in time_spine_source.custom_granularities:
-            print(custom_granularity)
             if custom_granularity.name == custom_granularity_name:
                 return custom_granularity.column_name if custom_granularity.column_name else custom_granularity.name
 
