@@ -1,0 +1,6 @@
+kind: Features
+body: Support custom granularities in query parsing.
+time: 2024-09-20T12:01:14.783921-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1413"
