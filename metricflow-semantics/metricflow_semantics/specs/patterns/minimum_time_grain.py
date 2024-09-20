@@ -4,7 +4,6 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Dict, List, Sequence, Set
 
-from dbt_semantic_interfaces.type_enums import TimeGranularity
 from typing_extensions import override
 
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
@@ -48,20 +47,23 @@ class MinimumTimeGrainPattern(SpecPattern):
     def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[InstanceSpec]:
         spec_set = group_specs_by_type(candidate_specs)
 
-        spec_key_to_grains: Dict[TimeDimensionSpecComparisonKey, Set[TimeGranularity]] = defaultdict(set)
+        spec_key_to_grains: Dict[TimeDimensionSpecComparisonKey, Set[ExpandedTimeGranularity]] = defaultdict(set)
         spec_key_to_specs: Dict[TimeDimensionSpecComparisonKey, List[TimeDimensionSpec]] = defaultdict(list)
         for time_dimension_spec in spec_set.time_dimension_specs:
             spec_key = time_dimension_spec.comparison_key(exclude_fields=(TimeDimensionSpecField.TIME_GRANULARITY,))
-            spec_key_to_grains[spec_key].add(time_dimension_spec.time_granularity.base_granularity)
+            spec_key_to_grains[spec_key].add(time_dimension_spec.time_granularity)
             spec_key_to_specs[spec_key].append(time_dimension_spec)
 
         matched_time_dimension_specs: List[TimeDimensionSpec] = []
         for spec_key, time_grains in spec_key_to_grains.items():
-            matched_time_dimension_specs.append(
-                spec_key_to_specs[spec_key][0].with_grain(
-                    ExpandedTimeGranularity.from_time_granularity(min(time_grains))
-                )
+            sorted_time_grains = sorted(
+                time_grains,
+                # Sort by smallest to largest standard granularity, with custom granularities last (sorted by their
+                # base granularity) since we don't know how large they are.
+                key=lambda grain: (grain.is_custom_granularity, grain.base_granularity.to_int()),
             )
+            assert sorted_time_grains, "Each time dimension spec should have at least one grain."
+            matched_time_dimension_specs.append(spec_key_to_specs[spec_key][0].with_grain(sorted_time_grains[0]))
 
         matching_specs: Sequence[LinkableInstanceSpec] = (
             spec_set.dimension_specs
