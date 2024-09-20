@@ -50,58 +50,6 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-def _generate_linkable_time_dimensions(
-    semantic_model_origin: SemanticModelReference,
-    dimension: Dimension,
-    entity_links: Tuple[EntityReference, ...],
-    join_path: SemanticModelJoinPath,
-    with_properties: FrozenSet[LinkableElementProperty],
-) -> Sequence[LinkableDimension]:
-    """Generates different versions of the given dimension, but at other valid time granularities."""
-    linkable_dimensions = []
-
-    defined_time_granularity = (
-        dimension.type_params.time_granularity if dimension.type_params else DEFAULT_TIME_GRANULARITY
-    )
-    for time_granularity in TimeGranularity:
-        if time_granularity < defined_time_granularity:
-            continue
-        properties = set(with_properties)
-        if time_granularity != defined_time_granularity:
-            properties.add(LinkableElementProperty.DERIVED_TIME_GRANULARITY)
-
-        linkable_dimensions.append(
-            LinkableDimension.create(
-                defined_in_semantic_model=semantic_model_origin,
-                element_name=dimension.reference.element_name,
-                dimension_type=DimensionType.TIME,
-                entity_links=entity_links,
-                join_path=join_path,
-                time_granularity=ExpandedTimeGranularity.from_time_granularity(time_granularity),
-                date_part=None,
-                properties=tuple(sorted(properties)),
-            )
-        )
-
-        # Add the time dimension aggregated to a different date part.
-        for date_part in DatePart:
-            if time_granularity.to_int() <= date_part.to_int():
-                linkable_dimensions.append(
-                    LinkableDimension.create(
-                        defined_in_semantic_model=semantic_model_origin,
-                        element_name=dimension.reference.element_name,
-                        dimension_type=DimensionType.TIME,
-                        entity_links=entity_links,
-                        join_path=join_path,
-                        time_granularity=ExpandedTimeGranularity.from_time_granularity(time_granularity),
-                        date_part=date_part,
-                        properties=frozenset(properties),
-                    )
-                )
-
-    return linkable_dimensions
-
-
 class ValidLinkableSpecResolver:
     """Figures out what linkable specs are valid for a given metric.
 
@@ -127,6 +75,7 @@ class ValidLinkableSpecResolver:
         self._semantic_models = sorted(self._semantic_manifest.semantic_models, key=lambda x: x.name)
         self._join_evaluator = SemanticModelJoinEvaluator(semantic_model_lookup)
         self._time_spine_sources = TimeSpineSource.build_standard_time_spine_sources(self._semantic_manifest)
+        self._custom_granularities = TimeSpineSource.build_custom_granularities(list(self._time_spine_sources.values()))
 
         assert max_entity_links >= 0
         self._max_entity_links = max_entity_links
@@ -238,6 +187,54 @@ class ValidLinkableSpecResolver:
         )
 
         logger.info(f"Building valid group-by-item indexes took: {time.time() - start_time:.2f}s")
+
+    def _generate_linkable_time_dimensions(
+        self,
+        semantic_model_origin: SemanticModelReference,
+        dimension: Dimension,
+        entity_links: Tuple[EntityReference, ...],
+        join_path: SemanticModelJoinPath,
+        with_properties: FrozenSet[LinkableElementProperty],
+    ) -> Sequence[LinkableDimension]:
+        """Generates different versions of the given time dimension with all compatible time granularities & date parts."""
+        defined_time_granularity = (
+            dimension.type_params.time_granularity if dimension.type_params else DEFAULT_TIME_GRANULARITY
+        )
+
+        def create(
+            time_granularity: ExpandedTimeGranularity, date_part: Optional[DatePart] = None
+        ) -> LinkableDimension:
+            properties = set(with_properties)
+            if time_granularity.is_custom_granularity or time_granularity.base_granularity != defined_time_granularity:
+                properties.add(LinkableElementProperty.DERIVED_TIME_GRANULARITY)
+            return LinkableDimension.create(
+                defined_in_semantic_model=semantic_model_origin,
+                element_name=dimension.reference.element_name,
+                dimension_type=DimensionType.TIME,
+                entity_links=entity_links,
+                join_path=join_path,
+                time_granularity=time_granularity,
+                date_part=date_part,
+                properties=tuple(sorted(properties)),
+            )
+
+        # Build linkable dimensions for all compatible standard granularities and date parts.
+        linkable_dimensions = []
+        for time_granularity in TimeGranularity:
+            if time_granularity.to_int() < defined_time_granularity.to_int():
+                continue
+            expanded_granularity = ExpandedTimeGranularity.from_time_granularity(time_granularity)
+            linkable_dimensions.append(create(expanded_granularity))
+            for date_part in DatePart:
+                if time_granularity.to_int() <= date_part.to_int():
+                    linkable_dimensions.append(create(time_granularity=expanded_granularity, date_part=date_part))
+
+        # Build linkable dimensions for all compatible custom granularities.
+        for custom_grain in self._custom_granularities.values():
+            if custom_grain.base_granularity.to_int() >= defined_time_granularity.to_int():
+                linkable_dimensions.append(create(custom_grain))
+
+        return linkable_dimensions
 
     def _metric_requires_metric_time(self, metric: Metric) -> bool:
         """Checks if the metric can only be queried with metric_time. Also checks input metrics.
@@ -378,7 +375,7 @@ class ValidLinkableSpecResolver:
                     )
                 elif dimension_type is DimensionType.TIME:
                     linkable_dimensions.extend(
-                        _generate_linkable_time_dimensions(
+                        self._generate_linkable_time_dimensions(
                             semantic_model_origin=semantic_model.reference,
                             dimension=dimension,
                             entity_links=(entity_link,),
@@ -741,7 +738,7 @@ class ValidLinkableSpecResolver:
                 )
             elif dimension_type == DimensionType.TIME:
                 linkable_dimensions.extend(
-                    _generate_linkable_time_dimensions(
+                    self._generate_linkable_time_dimensions(
                         semantic_model_origin=semantic_model.reference,
                         dimension=dimension,
                         entity_links=join_path.entity_links,
