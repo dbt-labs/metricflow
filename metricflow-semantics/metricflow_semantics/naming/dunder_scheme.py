@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from typing import List, Optional, Sequence, Tuple
+from typing import Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.naming.keywords import DUNDER
 from dbt_semantic_interfaces.references import EntityReference
@@ -77,8 +77,9 @@ class DunderNamingScheme(QueryItemNamingScheme):
             )
 
         # At this point, len(input_str_parts) >= 2
-        custom_granularity_names: List[str] = []  # TODO
-        valid_granularity_names = [granularity.value for granularity in TimeGranularity] + custom_granularity_names
+        valid_granularity_names = [granularity.value for granularity in TimeGranularity] + list(
+            semantic_manifest_lookup._custom_granularities.keys()
+        )
         suffix = input_str_parts[-1]
         time_granularity_name = suffix if suffix in valid_granularity_names else None
         # Has a time grain specified.
