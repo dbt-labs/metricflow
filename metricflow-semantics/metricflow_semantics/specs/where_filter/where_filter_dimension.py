@@ -14,7 +14,6 @@ from dbt_semantic_interfaces.protocols.query_interface import (
     QueryInterfaceDimensionFactory,
 )
 from dbt_semantic_interfaces.references import DimensionReference, EntityReference, TimeDimensionReference
-from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from typing_extensions import override
 
@@ -45,7 +44,7 @@ class WhereFilterDimension(ProtocolHint[QueryInterfaceDimension]):
         rendered_spec_tracker: RenderedSpecTracker,
         element_name: str,
         entity_links: Sequence[EntityReference],
-        time_grain: Optional[TimeGranularity] = None,
+        time_granularity_name: Optional[str] = None,
         date_part: Optional[DatePart] = None,
     ) -> None:
         self._column_association_resolver = column_association_resolver
@@ -54,7 +53,7 @@ class WhereFilterDimension(ProtocolHint[QueryInterfaceDimension]):
         self._rendered_spec_tracker = rendered_spec_tracker
         self._element_name = element_name
         self._entity_links = tuple(entity_links)
-        self._time_grain = time_grain
+        self._time_granularity_name = time_granularity_name
         self._date_part = date_part
 
     def grain(self, time_granularity_name: str) -> QueryInterfaceDimension:
@@ -66,7 +65,7 @@ class WhereFilterDimension(ProtocolHint[QueryInterfaceDimension]):
             rendered_spec_tracker=self._rendered_spec_tracker,
             element_name=self._element_name,
             entity_links=self._entity_links,
-            time_grain=TimeGranularity(time_granularity_name.lower()),
+            time_granularity_name=time_granularity_name.lower(),
             date_part=self._date_part,
         )
 
@@ -79,7 +78,7 @@ class WhereFilterDimension(ProtocolHint[QueryInterfaceDimension]):
             rendered_spec_tracker=self._rendered_spec_tracker,
             element_name=self._element_name,
             entity_links=self._entity_links,
-            time_grain=self._time_grain,
+            time_granularity_name=self._time_granularity_name,
             date_part=DatePart(date_part_name.lower()),
         )
 
@@ -93,11 +92,11 @@ class WhereFilterDimension(ProtocolHint[QueryInterfaceDimension]):
         Important in the Jinja sandbox.
         """
         call_parameter_set: Union[TimeDimensionCallParameterSet, DimensionCallParameterSet]
-        if self._time_grain is not None or self._date_part is not None:
+        if self._time_granularity_name is not None or self._date_part is not None:
             call_parameter_set = TimeDimensionCallParameterSet(
                 entity_path=self._entity_links,
                 time_dimension_reference=TimeDimensionReference(self._element_name),
-                time_granularity=self._time_grain,
+                time_granularity_name=self._time_granularity_name,
                 date_part=self._date_part,
             )
         else:

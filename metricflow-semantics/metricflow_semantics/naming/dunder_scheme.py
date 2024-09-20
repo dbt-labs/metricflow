@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from typing import Optional, Sequence, Tuple
+from typing import List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.naming.keywords import DUNDER
 from dbt_semantic_interfaces.references import EntityReference
@@ -18,7 +18,6 @@ from metricflow_semantics.specs.patterns.entity_link_pattern import (
     ParameterSetField,
 )
 from metricflow_semantics.specs.spec_set import InstanceSpecSet, InstanceSpecSetTransform, group_spec_by_type
-from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 
 class DunderNamingScheme(QueryItemNamingScheme):
@@ -65,28 +64,25 @@ class DunderNamingScheme(QueryItemNamingScheme):
             ParameterSetField.DATE_PART,
         )
 
-        time_grain = None
-
         # No dunder, e.g. "ds"
         if len(input_str_parts) == 1:
             return EntityLinkPattern(
                 parameter_set=EntityLinkPatternParameterSet.from_parameters(
                     element_name=input_str_parts[0],
                     entity_links=(),
-                    time_granularity=time_grain,
+                    time_granularity=None,
                     date_part=None,
                     fields_to_compare=tuple(fields_to_compare),
                 )
             )
 
         # At this point, len(input_str_parts) >= 2
-        for granularity in TimeGranularity:
-            if input_str_parts[-1] == granularity.value:
-                # TODO: [custom granularity] add support for custom granularity names here
-                time_grain = ExpandedTimeGranularity.from_time_granularity(granularity)
-
+        custom_granularity_names: List[str] = []  # TODO
+        valid_granularity_names = [granularity.value for granularity in TimeGranularity] + custom_granularity_names
+        suffix = input_str_parts[-1]
+        time_granularity_name = suffix if suffix in valid_granularity_names else None
         # Has a time grain specified.
-        if time_grain is not None:
+        if time_granularity_name is not None:
             fields_to_compare = fields_to_compare + (ParameterSetField.TIME_GRANULARITY,)
             #  e.g. "ds__month"
             if len(input_str_parts) == 2:
@@ -94,7 +90,7 @@ class DunderNamingScheme(QueryItemNamingScheme):
                     parameter_set=EntityLinkPatternParameterSet.from_parameters(
                         element_name=input_str_parts[0],
                         entity_links=(),
-                        time_granularity=time_grain,
+                        time_granularity=time_granularity_name,
                         date_part=None,
                         fields_to_compare=fields_to_compare,
                     )
@@ -104,7 +100,7 @@ class DunderNamingScheme(QueryItemNamingScheme):
                 parameter_set=EntityLinkPatternParameterSet.from_parameters(
                     element_name=input_str_parts[-2],
                     entity_links=tuple(EntityReference(entity_name) for entity_name in input_str_parts[:-2]),
-                    time_granularity=time_grain,
+                    time_granularity=time_granularity_name,
                     date_part=None,
                     fields_to_compare=fields_to_compare,
                 )
@@ -113,7 +109,7 @@ class DunderNamingScheme(QueryItemNamingScheme):
         # e.g. "messages__ds"
         return EntityLinkPattern(
             parameter_set=EntityLinkPatternParameterSet.from_parameters(
-                element_name=input_str_parts[-1],
+                element_name=suffix,
                 entity_links=tuple(EntityReference(entity_name) for entity_name in input_str_parts[:-1]),
                 time_granularity=None,
                 date_part=None,
@@ -131,6 +127,7 @@ class DunderNamingScheme(QueryItemNamingScheme):
         input_str_parts = input_str.split(DUNDER)
 
         for date_part in DatePart:
+            # TODO: We don't enforce uniqueness against date part names. Could be blocking valid dimension names.
             if input_str_parts[-1] == DunderNamingScheme.date_part_suffix(date_part=date_part):
                 # From existing message in StructuredLinkableSpecName: "Dunder syntax not supported for querying
                 # date_part".
