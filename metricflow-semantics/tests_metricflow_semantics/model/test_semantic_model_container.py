@@ -14,29 +14,38 @@ from metricflow_semantics.test_helpers.snapshot_helpers import (
     assert_linkable_element_set_snapshot_equal,
     assert_object_snapshot_equal,
 )
+from metricflow_semantics.time.time_spine_source import TimeSpineSource
 
 logger = logging.getLogger(__name__)
 
 
+def build_semantic_model_lookup_from_manifest(semantic_manifest: SemanticManifest) -> SemanticModelLookup:  # noqa: D103
+    time_spine_sources = TimeSpineSource.build_standard_time_spine_sources(semantic_manifest)
+    custom_granularities = TimeSpineSource.build_custom_granularities(list(time_spine_sources.values()))
+    return SemanticModelLookup(model=semantic_manifest, custom_granularities=custom_granularities)
+
+
 @pytest.fixture
 def semantic_model_lookup(simple_semantic_manifest: SemanticManifest) -> SemanticModelLookup:  # noqa: D103
-    return SemanticModelLookup(
-        model=simple_semantic_manifest,
-    )
+    return build_semantic_model_lookup_from_manifest(simple_semantic_manifest)
 
 
 @pytest.fixture
 def multi_hop_semantic_model_lookup(  # noqa: D103
     multi_hop_join_manifest: SemanticManifest,
 ) -> SemanticModelLookup:
-    return SemanticModelLookup(model=multi_hop_join_manifest)
+    return build_semantic_model_lookup_from_manifest(multi_hop_join_manifest)
 
 
 @pytest.fixture
 def metric_lookup(  # noqa: D103
     simple_semantic_manifest: SemanticManifest, semantic_model_lookup: SemanticModelLookup
 ) -> MetricLookup:
-    return MetricLookup(semantic_manifest=simple_semantic_manifest, semantic_model_lookup=semantic_model_lookup)
+    return MetricLookup(
+        semantic_manifest=simple_semantic_manifest,
+        semantic_model_lookup=semantic_model_lookup,
+        custom_granularities=semantic_model_lookup._custom_granularities,
+    )
 
 
 @pytest.fixture
@@ -46,6 +55,7 @@ def multi_hop_metric_lookup(  # noqa: D103
     return MetricLookup(
         semantic_manifest=multi_hop_join_manifest,
         semantic_model_lookup=multi_hop_semantic_model_lookup,
+        custom_granularities=multi_hop_semantic_model_lookup._custom_granularities,
     )
 
 
