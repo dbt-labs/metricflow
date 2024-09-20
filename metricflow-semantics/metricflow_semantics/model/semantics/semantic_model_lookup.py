@@ -30,6 +30,7 @@ from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.measure_spec import MeasureSpec
 from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDimensionSpec
 from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY, TimeDimensionSpec
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -37,15 +38,13 @@ logger = logging.getLogger(__name__)
 class SemanticModelLookup:
     """Tracks semantic information for semantic models held in a set of SemanticModelContainers."""
 
-    def __init__(
-        self,
-        model: SemanticManifest,
-    ) -> None:
+    def __init__(self, model: SemanticManifest, custom_granularities: Dict[str, ExpandedTimeGranularity]) -> None:
         """Initializer.
 
         Args:
             model: the semantic manifest used for loading semantic model definitions
         """
+        self._custom_granularities = custom_granularities
         self._measure_index: Dict[MeasureReference, SemanticModel] = {}
         self._measure_aggs: Dict[MeasureReference, AggregationType] = {}
         self._measure_agg_time_dimension: Dict[MeasureReference, TimeDimensionReference] = {}
@@ -371,6 +370,7 @@ class SemanticModelLookup:
         return TimeDimensionSpec.generate_possible_specs_for_time_dimension(
             time_dimension_reference=agg_time_dimension,
             entity_links=(entity_link,),
+            custom_granularities=self._custom_granularities,
         )
 
     def get_defined_time_granularity(self, time_dimension_reference: TimeDimensionReference) -> TimeGranularity:

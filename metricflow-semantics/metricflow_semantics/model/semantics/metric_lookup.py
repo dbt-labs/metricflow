@@ -20,6 +20,7 @@ from metricflow_semantics.model.semantics.linkable_spec_resolver import (
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +28,12 @@ logger = logging.getLogger(__name__)
 class MetricLookup:
     """Tracks semantic information for metrics by linking them to semantic models."""
 
-    def __init__(self, semantic_manifest: SemanticManifest, semantic_model_lookup: SemanticModelLookup) -> None:
+    def __init__(
+        self,
+        semantic_manifest: SemanticManifest,
+        semantic_model_lookup: SemanticModelLookup,
+        custom_granularities: Dict[str, ExpandedTimeGranularity],
+    ) -> None:
         """Initializer.
 
         Args:
@@ -36,6 +42,7 @@ class MetricLookup:
         """
         self._metrics: Dict[MetricReference, Metric] = {}
         self._semantic_model_lookup = semantic_model_lookup
+        self._custom_granularities = custom_granularities
 
         for metric in semantic_manifest.metrics:
             self._add_metric(metric)
@@ -185,6 +192,7 @@ class MetricLookup:
         valid_agg_time_dimension_specs = TimeDimensionSpec.generate_possible_specs_for_time_dimension(
             time_dimension_reference=agg_time_dimension_reference,
             entity_links=agg_time_dimension_entity_links,
+            custom_granularities=self._custom_granularities,
         )
         return valid_agg_time_dimension_specs
 
