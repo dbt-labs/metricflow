@@ -562,6 +562,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         without_any_property: Sequence[LinkableElementProperty] = (
             LinkableElementProperty.ENTITY,
             LinkableElementProperty.DERIVED_TIME_GRANULARITY,
+            LinkableElementProperty.DATE_PART,
             LinkableElementProperty.LOCAL_LINKED,
         ),
     ) -> List[Dimension]:
