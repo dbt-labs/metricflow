@@ -100,18 +100,10 @@ class ValidLinkableSpecResolver:
             self._metric_references_to_metrics[MetricReference(metric.name)] = metric
             linkable_sets_for_measure = []
             for measure in metric.measure_references:
-                # Cumulative metrics currently can't be queried by other time granularities.
                 if metric.type is MetricType.CUMULATIVE:
                     linkable_sets_for_measure.append(
-                        self._get_linkable_element_set_for_measure(measure).filter(
-                            with_any_of=LinkableElementProperty.all_properties(),
-                            # Use filter() here becasue `without_all_of` param is only available on that method.
-                            without_all_of=frozenset(
-                                {
-                                    LinkableElementProperty.METRIC_TIME,
-                                    LinkableElementProperty.DERIVED_TIME_GRANULARITY,
-                                }
-                            ),
+                        self._get_linkable_element_set_for_measure(
+                            measure, without_any_of=frozenset({LinkableElementProperty.DATE_PART})
                         )
                     )
                 elif (
@@ -216,6 +208,8 @@ class ValidLinkableSpecResolver:
             properties = set(with_properties)
             if time_granularity.is_custom_granularity or time_granularity.base_granularity != defined_time_granularity:
                 properties.add(LinkableElementProperty.DERIVED_TIME_GRANULARITY)
+            if date_part:
+                properties.add(LinkableElementProperty.DATE_PART)
             return LinkableDimension.create(
                 defined_in_semantic_model=semantic_model_origin,
                 element_name=dimension.reference.element_name,
@@ -651,6 +645,8 @@ class ValidLinkableSpecResolver:
         """
         return self._no_metric_linkable_element_set.filter(with_any_of=with_any_of, without_any_of=without_any_of)
 
+    # TODO: the results of this method don't actually match what will be allowed for the metric. This method checks
+    # _metric_to_linkable_element_sets, while the actual group by resolution DAG calls _get_linkable_element_set_for_measure.
     def get_linkable_elements_for_metrics(
         self,
         metric_references: Sequence[MetricReference],
