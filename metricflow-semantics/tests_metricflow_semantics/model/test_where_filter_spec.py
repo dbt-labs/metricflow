@@ -163,7 +163,7 @@ def test_dimension_in_filter_with_grain(  # noqa: D103
             call_parameter_set=TimeDimensionCallParameterSet(
                 entity_path=(EntityReference("listing"),),
                 time_dimension_reference=TimeDimensionReference("created_at"),
-                time_granularity=TimeGranularity.WEEK,
+                time_granularity_name=TimeGranularity.WEEK.value,
             ),
             resolved_spec=TimeDimensionSpec(
                 element_name="created_at",
@@ -229,7 +229,7 @@ def test_time_dimension_in_filter(  # noqa: D103
             call_parameter_set=TimeDimensionCallParameterSet(
                 entity_path=(EntityReference("listing"),),
                 time_dimension_reference=TimeDimensionReference("created_at"),
-                time_granularity=TimeGranularity.MONTH,
+                time_granularity_name=TimeGranularity.MONTH.value,
             ),
             resolved_spec=TimeDimensionSpec(
                 element_name="created_at",
@@ -295,7 +295,7 @@ def test_time_dimension_with_grain_in_name(  # noqa: D103
             call_parameter_set=TimeDimensionCallParameterSet(
                 entity_path=(EntityReference("listing"),),
                 time_dimension_reference=TimeDimensionReference("created_at"),
-                time_granularity=TimeGranularity.MONTH,
+                time_granularity_name=TimeGranularity.MONTH.value,
             ),
             resolved_spec=TimeDimensionSpec(
                 element_name="created_at",
@@ -432,7 +432,7 @@ def resolved_spec_lookup(
                     call_parameter_set=TimeDimensionCallParameterSet(
                         time_dimension_reference=TimeDimensionReference(element_name=METRIC_TIME_ELEMENT_NAME),
                         entity_path=(),
-                        time_granularity=TimeGranularity.WEEK,
+                        time_granularity_name=TimeGranularity.WEEK.value,
                         date_part=DatePart.YEAR,
                     ),
                 ),
@@ -674,7 +674,7 @@ def test_dimension_time_dimension_parity(  # noqa: D103
                             call_parameter_set=TimeDimensionCallParameterSet(
                                 entity_path=(),
                                 time_dimension_reference=TimeDimensionReference(METRIC_TIME_ELEMENT_NAME),
-                                time_granularity=TimeGranularity.WEEK,
+                                time_granularity_name=TimeGranularity.WEEK.value,
                                 date_part=DatePart.YEAR,
                             ),
                         ),

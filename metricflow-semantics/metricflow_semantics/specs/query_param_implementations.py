@@ -6,7 +6,6 @@ from typing import Optional
 from dbt_semantic_interfaces.protocols import ProtocolHint
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
 
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
@@ -31,7 +30,6 @@ from metricflow_semantics.specs.patterns.entity_link_pattern import (
     EntityLinkPatternParameterSet,
     ParameterSetField,
 )
-from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 
 @dataclass(frozen=True)
@@ -55,15 +53,8 @@ class TimeDimensionParameter(ProtocolHint[TimeDimensionQueryParameter]):
             ParameterSetField.ENTITY_LINKS,
             ParameterSetField.DATE_PART,
         ]
-        time_granularity = None
         if self.grain is not None:
             fields_to_compare.append(ParameterSetField.TIME_GRANULARITY)
-            # TODO: [custom granularity] support custom granularity lookups
-            assert ExpandedTimeGranularity.is_standard_granularity_name(self.grain), (
-                f"We got a non-standard granularity name, `{self.grain}`, but we have not yet "
-                "implemented support for custom granularities!"
-            )
-            time_granularity = ExpandedTimeGranularity.from_time_granularity(TimeGranularity(self.grain))
 
         # TODO: assert that the name does not include a time granularity marker
         name_structure = StructuredLinkableSpecName.from_name(self.name.lower())
@@ -76,7 +67,7 @@ class TimeDimensionParameter(ProtocolHint[TimeDimensionQueryParameter]):
                     fields_to_compare=tuple(fields_to_compare),
                     element_name=name_structure.element_name,
                     entity_links=tuple(EntityReference(link_name) for link_name in name_structure.entity_link_names),
-                    time_granularity=time_granularity,
+                    time_granularity=self.grain,
                     date_part=self.date_part,
                 )
             ),
