@@ -30,7 +30,6 @@ from metricflow_semantics.model.semantic_model_derivation import SemanticModelDe
 from metricflow_semantics.model.semantics.linkable_element import (
     ElementPathKey,
     LinkableDimension,
-    LinkableElementType,
     LinkableEntity,
     LinkableMetric,
     MetricSubqueryJoinPathElement,
@@ -457,78 +456,68 @@ class ValidLinkableSpecResolver:
         on what aggregation time dimension was used to define the measure.
         """
         measure_semantic_model: Optional[SemanticModel] = None
-        defined_granularity: Optional[TimeGranularity] = None
+        defined_granularity: Optional[ExpandedTimeGranularity] = None
         if measure_reference:
             measure_semantic_model = self._get_semantic_model_for_measure(measure_reference)
             measure_agg_time_dimension_reference = measure_semantic_model.checked_agg_time_dimension_for_measure(
                 measure_reference=measure_reference
             )
-            defined_granularity = self._get_time_granularity_for_dimension(
+            min_granularity = self._get_time_granularity_for_dimension(
                 semantic_model=measure_semantic_model,
                 time_dimension_reference=measure_agg_time_dimension_reference,
             )
-            possible_metric_time_granularities = tuple(
-                time_granularity
-                for time_granularity in TimeGranularity
-                if defined_granularity.is_smaller_than_or_equal(time_granularity)
-            )
+            defined_granularity = ExpandedTimeGranularity.from_time_granularity(min_granularity)
         else:
             # If querying metric_time without metrics, will query from time spines.
             # Defaults to DAY granularity if available in time spines, else smallest available granularity.
-            min_time_spine_granularity = min(self._time_spine_sources.keys())
-            possible_metric_time_granularities = tuple(
-                time_granularity
-                for time_granularity in TimeGranularity
-                if min_time_spine_granularity.is_smaller_than_or_equal(time_granularity)
-            )
+            min_granularity = min(self._time_spine_sources.keys())
+        possible_metric_time_granularities = tuple(
+            ExpandedTimeGranularity.from_time_granularity(time_granularity)
+            for time_granularity in TimeGranularity
+            if min_granularity.is_smaller_than_or_equal(time_granularity)
+        ) + tuple(
+            [
+                custom_granularity
+                for custom_granularity in self._custom_granularities.values()
+                if min_granularity.is_smaller_than_or_equal(custom_granularity.base_granularity)
+            ]
+        )
 
-        # For each of the possible time granularities, create a LinkableDimension.
+        # For each granularity, will create one LinkableDimension with no date part, and one for each compatible date part.
+        # TODO: group by resolution has different logic than source node builder for combining date part w/ grain. Fix.
         path_key_to_linkable_dimensions: Dict[ElementPathKey, List[LinkableDimension]] = defaultdict(list)
         for time_granularity in possible_metric_time_granularities:
-            possible_date_parts: Sequence[Optional[DatePart]] = (
-                # No date part, just the metric time at a different grain.
-                (None,)
-                # date part of a metric time at a different grain.
-                + tuple(date_part for date_part in DatePart if time_granularity.to_int() <= date_part.to_int())
-            )
+            possible_date_parts: Tuple[Optional[DatePart], ...] = (None,)
+            if not time_granularity.is_custom_granularity:
+                possible_date_parts += tuple(
+                    date_part
+                    for date_part in DatePart
+                    if time_granularity.base_granularity.to_int() <= date_part.to_int()
+                )
 
             for date_part in possible_date_parts:
-                path_key = ElementPathKey(
+                properties = {LinkableElementProperty.METRIC_TIME}
+                if time_granularity != defined_granularity:
+                    properties.add(LinkableElementProperty.DERIVED_TIME_GRANULARITY)
+                if date_part:
+                    properties.add(LinkableElementProperty.DATE_PART)
+                linkable_dimension = LinkableDimension.create(
+                    defined_in_semantic_model=measure_semantic_model.reference if measure_semantic_model else None,
                     element_name=MetricFlowReservedKeywords.METRIC_TIME.value,
-                    element_type=LinkableElementType.TIME_DIMENSION,
+                    dimension_type=DimensionType.TIME,
                     entity_links=(),
-                    time_granularity=ExpandedTimeGranularity.from_time_granularity(time_granularity),
+                    join_path=SemanticModelJoinPath(
+                        left_semantic_model_reference=(
+                            measure_semantic_model.reference
+                            if measure_semantic_model
+                            else SemanticModelDerivation.VIRTUAL_SEMANTIC_MODEL_REFERENCE
+                        ),
+                    ),
+                    properties=frozenset(properties),
+                    time_granularity=time_granularity,
                     date_part=date_part,
                 )
-                path_key_to_linkable_dimensions[path_key].append(
-                    LinkableDimension.create(
-                        defined_in_semantic_model=measure_semantic_model.reference if measure_semantic_model else None,
-                        element_name=MetricFlowReservedKeywords.METRIC_TIME.value,
-                        dimension_type=DimensionType.TIME,
-                        entity_links=(),
-                        join_path=SemanticModelJoinPath(
-                            left_semantic_model_reference=(
-                                measure_semantic_model.reference
-                                if measure_semantic_model
-                                else SemanticModelDerivation.VIRTUAL_SEMANTIC_MODEL_REFERENCE
-                            ),
-                        ),
-                        # Anything that's not at the base time granularity of the measure's aggregation time dimension
-                        # should be considered derived.
-                        properties=(
-                            frozenset({LinkableElementProperty.METRIC_TIME})
-                            if time_granularity is defined_granularity and date_part is None
-                            else frozenset(
-                                {
-                                    LinkableElementProperty.METRIC_TIME,
-                                    LinkableElementProperty.DERIVED_TIME_GRANULARITY,
-                                }
-                            )
-                        ),
-                        time_granularity=ExpandedTimeGranularity.from_time_granularity(time_granularity),
-                        date_part=date_part,
-                    )
-                )
+                path_key_to_linkable_dimensions[linkable_dimension.path_key].append(linkable_dimension)
 
         return LinkableElementSet(
             path_key_to_linkable_dimensions={
