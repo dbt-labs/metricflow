@@ -780,7 +780,7 @@ class DataflowPlanBuilder:
                 filter_intersection=query_spec.filter_intersection,
             )
 
-        required_linkable_specs, _ = self.__get_required_and_extraneous_linkable_specs(
+        required_linkable_specs, extraneous_linkable_specs = self.__get_required_and_extraneous_linkable_specs(
             queried_linkable_specs=query_spec.linkable_specs, filter_specs=query_level_filter_specs
         )
         predicate_pushdown_state = PredicatePushdownState(
@@ -796,7 +796,10 @@ class DataflowPlanBuilder:
         if dataflow_recipe.join_targets:
             output_node = JoinOnEntitiesNode.create(left_node=output_node, join_targets=dataflow_recipe.join_targets)
 
-        for time_dimension_spec in required_linkable_specs.time_dimension_specs:
+        time_dimension_specs = set(
+            required_linkable_specs.time_dimension_specs + extraneous_linkable_specs.time_dimension_specs
+        )
+        for time_dimension_spec in time_dimension_specs:
             if time_dimension_spec.time_granularity.is_custom_granularity:
                 output_node = JoinToCustomGranularityNode.create(
                     parent_node=output_node, time_dimension_spec=time_dimension_spec
