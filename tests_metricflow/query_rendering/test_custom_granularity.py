@@ -8,8 +8,10 @@ from __future__ import annotations
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
@@ -258,6 +260,117 @@ def test_simple_metric_with_custom_granularity_and_join(  # noqa: D103
             ),
         ),
     )
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+# TODO: optimizer - could collapse subquery
+@pytest.mark.sql_engine_snapshot
+def test_simple_metric_with_custom_granularity_filter(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    """Simple metric queried with a filter on a custom grain, where that grain is not used in the group by."""
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings",),
+        where_constraint=PydanticWhereFilter(
+            where_sql_template=("{{ TimeDimension('metric_time', 'martian_day') }} = '2020-01-01'")
+        ),
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+# TODO: optimizer - could collapse subquery
+@pytest.mark.sql_engine_snapshot
+def test_simple_metric_with_custom_granularity_in_filter_and_group_by(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    """Simple metric queried with a filter on a custom grain, where that grain is also used in the group by."""
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings",),
+        group_by_names=("metric_time__martian_day",),
+        where_constraint=PydanticWhereFilter(
+            where_sql_template=("{{ TimeDimension('metric_time', 'martian_day') }} = '2020-01-01'")
+        ),
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_no_metrics_with_custom_granularity_filter(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    """Group by items only queried with a filter on a custom grain, where that grain is not used in the group by."""
+    query_spec = query_parser.parse_and_validate_query(
+        group_by_names=("listing__ds__day",),
+        where_constraint=PydanticWhereFilter(
+            where_sql_template=("{{ TimeDimension('listing__ds', 'martian_day') }} = '2020-01-01'")
+        ),
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_no_metrics_with_custom_granularity_in_filter_and_group_by(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    """Group by items only queried with a filter on a custom grain, where that grain is also used in the group by."""
+    query_spec = query_parser.parse_and_validate_query(
+        group_by_names=("listing__ds__martian_day",),
+        where_constraint=PydanticWhereFilter(
+            where_sql_template=("{{ TimeDimension('listing__ds', 'martian_day') }} = '2020-01-01'")
+        ),
+    ).query_spec
 
     render_and_check(
         request=request,

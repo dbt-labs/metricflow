@@ -1440,7 +1440,8 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 break
         assert parent_time_dimension_instance, (
             "JoinToCustomGranularityNode's expected time_dimension_spec not found in parent dataset instances. "
-            "This indicates internal misconfiguration."
+            f"This indicates internal misconfiguration. Expected: {node.time_dimension_spec.with_base_grain}; "
+            f"Got: {[instance.spec for instance in parent_data_set.instance_set.time_dimension_instances]}"
         )
 
         # Build join expression.
