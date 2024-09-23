@@ -14,9 +14,8 @@ from dbt_semantic_interfaces.type_enums import DimensionType
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
 from metricflow_semantics.errors.error_classes import ExecutionException
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
-from metricflow_semantics.mf_logging.formatting import indent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.mf_logging.pretty_print import mf_pformat
+from metricflow_semantics.mf_logging.runtime import log_block_runtime
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.linkable_element import LinkableDimension
@@ -419,7 +418,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def query(self, mf_request: MetricFlowQueryRequest) -> MetricFlowQueryResult:  # noqa: D102
-        logger.debug(LazyFormat(lambda: f"Starting query request:\n{indent(mf_pformat(mf_request))}"))
+        logger.info(LazyFormat("Starting query request", mf_request=mf_request))
         explain_result = self._create_execution_plan(mf_request)
         execution_plan = explain_result.convert_to_execution_plan_result.execution_plan
 
@@ -439,7 +438,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
         assert task_execution_result.sql, "Task execution should have returned SQL that was run"
 
-        logger.debug(LazyFormat(lambda: f"Finished query request: {mf_request.request_id}"))
+        logger.info(LazyFormat("Finished query request", request_id=mf_request.request_id))
         return MetricFlowQueryResult(
             query_spec=explain_result.query_spec,
             dataflow_plan=explain_result.dataflow_plan,
@@ -494,7 +493,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 order_by=mf_query_request.order_by,
                 min_max_only=mf_query_request.min_max_only,
             ).query_spec
-        logger.debug(LazyFormat(lambda: f"Query spec is:\n{mf_pformat(query_spec)}"))
+        logger.info(LazyFormat("Parsed query", query_spec=query_spec))
 
         output_selection_specs: Optional[InstanceSpecSet] = None
         if mf_query_request.query_type == MetricFlowQueryType.DIMENSION_VALUES:
@@ -505,14 +504,25 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 dimension_specs=query_spec.dimension_specs,
                 time_dimension_specs=query_spec.time_dimension_specs,
             )
-
         if query_spec.metric_specs:
+            logger.info(
+                LazyFormat(
+                    "Building dataflow plan", dataflow_plan_optimizations=mf_query_request.dataflow_plan_optimizations
+                )
+            )
             dataflow_plan = self._dataflow_plan_builder.build_plan(
                 query_spec=query_spec,
                 output_selection_specs=output_selection_specs,
                 optimizations=mf_query_request.dataflow_plan_optimizations,
             )
         else:
+            logger.info(
+                LazyFormat(
+                    "Building dataflow plan for distinct values",
+                    dataflow_plan_optimizations=mf_query_request.dataflow_plan_optimizations,
+                )
+            )
+
             dataflow_plan = self._dataflow_plan_builder.build_plan_for_distinct_values(
                 query_spec=query_spec, optimizations=mf_query_request.dataflow_plan_optimizations
             )
@@ -523,8 +533,8 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 f"Got tasks: {dataflow_plan.sink_nodes}"
             )
 
+        logger.info(LazyFormat("Building execution plan"))
         convert_to_execution_plan_result = self._to_execution_plan_converter.convert_to_execution_plan(dataflow_plan)
-
         return MetricFlowExplainResult(
             query_spec=query_spec,
             dataflow_plan=dataflow_plan,
@@ -533,7 +543,8 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def explain(self, mf_request: MetricFlowQueryRequest) -> MetricFlowExplainResult:  # noqa: D102
-        return self._create_execution_plan(mf_request)
+        with log_block_runtime("explain"):
+            return self._create_execution_plan(mf_request)
 
     def get_measures_for_metrics(self, metric_names: List[str]) -> List[Measure]:  # noqa: D102
         metrics = self._semantic_manifest_lookup.metric_lookup.get_metrics(

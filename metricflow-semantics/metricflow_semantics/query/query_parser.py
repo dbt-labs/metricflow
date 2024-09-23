@@ -494,7 +494,7 @@ class MetricFlowQueryParser:
 
         query_resolution = query_resolver.resolve_query(resolver_input_for_query)
 
-        logger.debug(LazyFormat(lambda: "Query resolution is:\n" + indent(mf_pformat(query_resolution))))
+        logger.debug(LazyFormat("Resolved query", query_resolution=query_resolution))
 
         self._raise_exception_if_there_are_errors(
             input_to_issue_set=query_resolution.input_to_issue_set.merge(
