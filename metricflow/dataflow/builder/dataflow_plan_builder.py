@@ -796,10 +796,7 @@ class DataflowPlanBuilder:
         if dataflow_recipe.join_targets:
             output_node = JoinOnEntitiesNode.create(left_node=output_node, join_targets=dataflow_recipe.join_targets)
 
-        time_dimension_specs = set(
-            required_linkable_specs.time_dimension_specs + extraneous_linkable_specs.time_dimension_specs
-        )
-        for time_dimension_spec in time_dimension_specs:
+        for time_dimension_spec in required_linkable_specs.time_dimension_specs:
             if time_dimension_spec.time_granularity.is_custom_granularity:
                 output_node = JoinToCustomGranularityNode.create(
                     parent_node=output_node, time_dimension_spec=time_dimension_spec
