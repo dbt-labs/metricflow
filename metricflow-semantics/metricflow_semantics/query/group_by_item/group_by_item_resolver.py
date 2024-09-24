@@ -92,6 +92,7 @@ class GroupByItemResolver:
         push_down_visitor = _PushDownGroupByItemCandidatesVisitor(
             manifest_lookup=self._manifest_lookup,
             source_spec_patterns=(spec_pattern, NoGroupByMetricPattern()),
+            group_by_item_resolver=self,
             suggestion_generator=suggestion_generator,
         )
 
@@ -163,6 +164,7 @@ class GroupByItemResolver:
         push_down_visitor = _PushDownGroupByItemCandidatesVisitor(
             manifest_lookup=self._manifest_lookup,
             source_spec_patterns=(spec_pattern,),
+            group_by_item_resolver=self,
             suggestion_generator=suggestion_generator,
             filter_location=filter_location,
         )
@@ -206,6 +208,7 @@ class GroupByItemResolver:
     def resolve_available_items(
         self,
         resolution_node: Optional[ResolutionDagSinkNode] = None,
+        source_spec_patterns: Sequence[SpecPattern] = (),
     ) -> AvailableGroupByItemsResolution:
         """Return all available group-by-items at a given node.
 
@@ -217,7 +220,8 @@ class GroupByItemResolver:
 
         push_down_visitor = _PushDownGroupByItemCandidatesVisitor(
             manifest_lookup=self._manifest_lookup,
-            source_spec_patterns=(),
+            source_spec_patterns=source_spec_patterns,
+            group_by_item_resolver=self,
             suggestion_generator=None,
         )
 
