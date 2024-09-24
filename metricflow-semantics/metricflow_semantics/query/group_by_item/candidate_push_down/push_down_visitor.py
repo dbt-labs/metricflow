@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import typing
 from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Dict, FrozenSet, Iterator, List, Optional, Sequence, Set, Tuple
@@ -55,6 +56,10 @@ from metricflow_semantics.query.issues.issues_base import (
 from metricflow_semantics.query.suggestion_generator import QueryItemSuggestionGenerator
 from metricflow_semantics.specs.patterns.none_date_part import NoneDatePartPattern
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
+
+if typing.TYPE_CHECKING:
+    from metricflow_semantics.query.group_by_item.group_by_item_resolver import GroupByItemResolver
+
 
 logger = logging.getLogger(__name__)
 
@@ -140,6 +145,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
         self,
         manifest_lookup: SemanticManifestLookup,
         suggestion_generator: Optional[QueryItemSuggestionGenerator],
+        group_by_item_resolver: GroupByItemResolver,
         source_spec_patterns: Sequence[SpecPattern] = (),
         with_any_property: Optional[FrozenSet[LinkableElementProperty]] = None,
         without_any_property: Optional[FrozenSet[LinkableElementProperty]] = None,
@@ -149,6 +155,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
 
         Args:
             manifest_lookup: The semantic manifest lookup associated with the resolution DAG that this will traverse.
+            group_by_item_resolver: The group-by-item resolver for the query to help generate suggestions.
             suggestion_generator: If there are issues with matching patterns to specs, use this to generate suggestions
             that will go in the issue.
             source_spec_patterns: The patterns to apply to the specs available at the measure nodes.
@@ -164,6 +171,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
         self._without_any_property = without_any_property
         self._suggestion_generator = suggestion_generator
         self._filter_location = filter_location
+        self._group_by_item_resolver_for_query = group_by_item_resolver
 
     @override
     def visit_measure_node(self, node: MeasureGroupByItemSourceNode) -> PushDownResult:
@@ -221,24 +229,21 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
             # The specified patterns don't match to any of the available group-by-items that can be queried for the
             # measure.
             if matching_items.spec_count == 0:
-                items_available_for_measure_given_child_metric = items_available_for_measure.filter_by_spec_patterns(
-                    patterns_to_apply
-                )
+                input_suggestions: Sequence[str] = ()
+
+                if self._suggestion_generator is not None:
+                    candidate_specs = self._group_by_item_resolver_for_query.resolve_available_items(
+                        source_spec_patterns=self._suggestion_generator.candidate_filters
+                    ).specs
+                    input_suggestions = self._suggestion_generator.input_suggestions(tuple(candidate_specs))
+
                 return PushDownResult(
                     candidate_set=GroupByItemCandidateSet.empty_instance(),
                     issue_set=MetricFlowQueryResolutionIssueSet.from_issue(
                         NoMatchingItemsForMeasure.from_parameters(
                             parent_issues=(),
                             query_resolution_path=current_traversal_path,
-                            input_suggestions=(
-                                tuple(
-                                    self._suggestion_generator.input_suggestions(
-                                        items_available_for_measure_given_child_metric.specs
-                                    )
-                                )
-                                if self._suggestion_generator is not None
-                                else ()
-                            ),
+                            input_suggestions=input_suggestions,
                         )
                     ),
                 )

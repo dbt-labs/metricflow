@@ -41,16 +41,22 @@ class QueryItemSuggestionGenerator:
         self._input_str = input_str
         self._candidate_filters = candidate_filters
 
+    @property
+    def candidate_filters(self) -> Sequence[SpecPattern]:
+        """Return the filters that should be applied to the candidate specs when generating suggestions."""
+        return self._candidate_filters
+
     def input_suggestions(
         self,
         candidate_specs: Sequence[InstanceSpec],
         max_suggestions: int = 6,
     ) -> Sequence[str]:
         """Return the best specs that match the given pattern from candidate_specs and match the candidate_filer."""
+        # Use edit distance to figure out the closest matches, so convert the specs to strings.
+
         for candidate_filter in self._candidate_filters:
             candidate_specs = candidate_filter.match(candidate_specs)
 
-        # Use edit distance to figure out the closest matches, so convert the specs to strings.
         candidate_strs = set()
         for candidate_spec in candidate_specs:
             candidate_str = self._input_naming_scheme.input_str(candidate_spec)

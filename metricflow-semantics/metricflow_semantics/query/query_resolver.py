@@ -58,7 +58,6 @@ from metricflow_semantics.query.validation_rules.query_validator import PostReso
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.order_by_spec import OrderBySpec
-from metricflow_semantics.specs.patterns.match_list_pattern import MatchListSpecPattern
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_set import group_specs_by_type
 from metricflow_semantics.workarounds.reference import sorted_semantic_model_references
@@ -151,17 +150,11 @@ class MetricFlowQueryResolver:
     def _resolve_group_by_item_input(
         group_by_item_input: ResolverInputForGroupByItem,
         group_by_item_resolver: GroupByItemResolver,
-        valid_group_by_item_specs_for_querying: Sequence[LinkableInstanceSpec],
     ) -> GroupByItemResolution:
         suggestion_generator = QueryItemSuggestionGenerator(
             input_naming_scheme=group_by_item_input.input_obj_naming_scheme,
             input_str=str(group_by_item_input.input_obj),
-            candidate_filters=QueryItemSuggestionGenerator.GROUP_BY_ITEM_CANDIDATE_FILTERS
-            + (
-                MatchListSpecPattern.create(
-                    listed_specs=valid_group_by_item_specs_for_querying,
-                ),
-            ),
+            candidate_filters=QueryItemSuggestionGenerator.GROUP_BY_ITEM_CANDIDATE_FILTERS,
         )
         return group_by_item_resolver.resolve_matching_item_for_querying(
             spec_pattern=group_by_item_input.spec_pattern,
@@ -230,8 +223,6 @@ class MetricFlowQueryResolver:
             resolution_dag=resolution_dag,
         )
 
-        valid_group_by_item_specs_for_querying = group_by_item_resolver.resolve_available_items().specs
-
         input_to_issue_set_mapping_items: List[InputToIssueSetMappingItem] = []
         group_by_item_specs: List[LinkableInstanceSpec] = []
         linkable_element_sets: List[LinkableElementSet] = []
@@ -239,7 +230,6 @@ class MetricFlowQueryResolver:
             resolution = MetricFlowQueryResolver._resolve_group_by_item_input(
                 group_by_item_resolver=group_by_item_resolver,
                 group_by_item_input=group_by_item_input,
-                valid_group_by_item_specs_for_querying=valid_group_by_item_specs_for_querying,
             )
             if resolution.issue_set.has_issues:
                 input_to_issue_set_mapping_items.append(
@@ -395,7 +385,10 @@ class MetricFlowQueryResolver:
         mappings_to_merge.append(resolve_metrics_or_group_by_result.input_to_issue_set_mapping)
 
         # Resolve metrics.
-        resolve_metrics_result = self._resolve_metric_inputs(metric_inputs, query_resolution_path=query_resolution_path)
+        resolve_metrics_result = self._resolve_metric_inputs(
+            metric_inputs=metric_inputs,
+            query_resolution_path=query_resolution_path,
+        )
         mappings_to_merge.append(resolve_metrics_result.input_to_issue_set_mapping)
         metric_specs = resolve_metrics_result.metric_specs
 
