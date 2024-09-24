@@ -62,7 +62,10 @@ class MinimumTimeGrainPattern(SpecPattern):
                 # base granularity) since we don't know how large they are.
                 key=lambda grain: (grain.is_custom_granularity, grain.base_granularity.to_int()),
             )
-            assert sorted_time_grains, "Each time dimension spec should have at least one grain."
+            assert sorted_time_grains, (
+                f"Each time dimension spec should have at least one grain, but none was found for spec_key {spec_key}. "
+                "This indicates internal misconfiguration."
+            )
             matched_time_dimension_specs.append(spec_key_to_specs[spec_key][0].with_grain(sorted_time_grains[0]))
 
         matching_specs: Sequence[LinkableInstanceSpec] = (
