@@ -67,7 +67,7 @@ class TimeDimensionParameter(ProtocolHint[TimeDimensionQueryParameter]):
                     fields_to_compare=tuple(fields_to_compare),
                     element_name=name_structure.element_name,
                     entity_links=tuple(EntityReference(link_name) for link_name in name_structure.entity_link_names),
-                    time_granularity=self.grain,
+                    time_granularity_name=self.grain,
                     date_part=self.date_part,
                 )
             ),
@@ -111,7 +111,7 @@ class DimensionOrEntityParameter(ProtocolHint[DimensionOrEntityQueryParameter]):
                     ),
                     element_name=name_structure.element_name,
                     entity_links=tuple(EntityReference(link_name) for link_name in name_structure.entity_link_names),
-                    time_granularity=None,
+                    time_granularity_name=None,
                     date_part=None,
                 )
             ),

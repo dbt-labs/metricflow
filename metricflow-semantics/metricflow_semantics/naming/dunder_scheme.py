@@ -70,7 +70,7 @@ class DunderNamingScheme(QueryItemNamingScheme):
                 parameter_set=EntityLinkPatternParameterSet.from_parameters(
                     element_name=input_str_parts[0],
                     entity_links=(),
-                    time_granularity=None,
+                    time_granularity_name=None,
                     date_part=None,
                     fields_to_compare=tuple(fields_to_compare),
                 )
@@ -91,7 +91,7 @@ class DunderNamingScheme(QueryItemNamingScheme):
                     parameter_set=EntityLinkPatternParameterSet.from_parameters(
                         element_name=input_str_parts[0],
                         entity_links=(),
-                        time_granularity=time_granularity_name,
+                        time_granularity_name=time_granularity_name,
                         date_part=None,
                         fields_to_compare=fields_to_compare,
                     )
@@ -101,7 +101,7 @@ class DunderNamingScheme(QueryItemNamingScheme):
                 parameter_set=EntityLinkPatternParameterSet.from_parameters(
                     element_name=input_str_parts[-2],
                     entity_links=tuple(EntityReference(entity_name) for entity_name in input_str_parts[:-2]),
-                    time_granularity=time_granularity_name,
+                    time_granularity_name=time_granularity_name,
                     date_part=None,
                     fields_to_compare=fields_to_compare,
                 )
@@ -112,7 +112,7 @@ class DunderNamingScheme(QueryItemNamingScheme):
             parameter_set=EntityLinkPatternParameterSet.from_parameters(
                 element_name=suffix,
                 entity_links=tuple(EntityReference(entity_name) for entity_name in input_str_parts[:-1]),
-                time_granularity=None,
+                time_granularity_name=None,
                 date_part=None,
                 fields_to_compare=fields_to_compare,
             )

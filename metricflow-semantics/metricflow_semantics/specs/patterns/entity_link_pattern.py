@@ -26,7 +26,7 @@ class ParameterSetField(Enum):
 
     ELEMENT_NAME = "element_name"
     ENTITY_LINKS = "entity_links"
-    TIME_GRANULARITY = "time_granularity"
+    TIME_GRANULARITY = "time_granularity_name"
     DATE_PART = "date_part"
     METRIC_SUBQUERY_ENTITY_LINKS = "metric_subquery_entity_links"
 
@@ -50,7 +50,7 @@ class EntityLinkPatternParameterSet:
     # The entities used for joining semantic models.
     entity_links: Optional[Tuple[EntityReference, ...]] = None
     # Properties of time dimensions to match.
-    time_granularity: Optional[str] = None
+    time_granularity_name: Optional[str] = None
     date_part: Optional[DatePart] = None
     metric_subquery_entity_links: Optional[Tuple[EntityReference, ...]] = None
 
@@ -59,7 +59,7 @@ class EntityLinkPatternParameterSet:
         fields_to_compare: Sequence[ParameterSetField],
         element_name: Optional[str] = None,
         entity_links: Optional[Sequence[EntityReference]] = None,
-        time_granularity: Optional[str] = None,
+        time_granularity_name: Optional[str] = None,
         date_part: Optional[DatePart] = None,
         metric_subquery_entity_links: Optional[Tuple[EntityReference, ...]] = None,
     ) -> EntityLinkPatternParameterSet:
@@ -67,7 +67,7 @@ class EntityLinkPatternParameterSet:
             fields_to_compare=tuple(sorted(fields_to_compare)),
             element_name=element_name,
             entity_links=tuple(entity_links) if entity_links is not None else None,
-            time_granularity=time_granularity,
+            time_granularity_name=time_granularity_name,
             date_part=date_part,
             metric_subquery_entity_links=metric_subquery_entity_links,
         )
@@ -120,7 +120,7 @@ class EntityLinkPattern(SpecPattern):
             candidate_spec
             for candidate_spec in group_specs_by_type(candidate_specs).time_dimension_specs
             if candidate_spec.time_granularity.name
-            == (self.parameter_set.time_granularity.lower() if self.parameter_set.time_granularity else None)
+            == (self.parameter_set.time_granularity_name.lower() if self.parameter_set.time_granularity_name else None)
         )
 
         return matching_specs

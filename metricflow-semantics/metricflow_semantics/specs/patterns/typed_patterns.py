@@ -92,7 +92,7 @@ class TimeDimensionPattern(EntityLinkPattern):
                 fields_to_compare=tuple(fields_to_compare),
                 element_name=time_dimension_call_parameter_set.time_dimension_reference.element_name,
                 entity_links=time_dimension_call_parameter_set.entity_path,
-                time_granularity=time_dimension_call_parameter_set.time_granularity_name,
+                time_granularity_name=time_dimension_call_parameter_set.time_granularity_name,
                 date_part=time_dimension_call_parameter_set.date_part,
             )
         )

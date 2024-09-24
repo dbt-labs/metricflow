@@ -63,8 +63,6 @@ class ObjectBuilderNamingScheme(QueryItemNamingScheme):
                 EntityLinkPatternParameterSet.from_parameters(
                     element_name=dimension_call_parameter_set.dimension_reference.element_name,
                     entity_links=dimension_call_parameter_set.entity_path,
-                    time_granularity=None,
-                    date_part=None,
                     fields_to_compare=(
                         ParameterSetField.ELEMENT_NAME,
                         ParameterSetField.ENTITY_LINKS,
@@ -87,7 +85,7 @@ class ObjectBuilderNamingScheme(QueryItemNamingScheme):
                 EntityLinkPatternParameterSet.from_parameters(
                     element_name=time_dimension_call_parameter_set.time_dimension_reference.element_name,
                     entity_links=time_dimension_call_parameter_set.entity_path,
-                    time_granularity=time_dimension_call_parameter_set.time_granularity_name,
+                    time_granularity_name=time_dimension_call_parameter_set.time_granularity_name,
                     date_part=time_dimension_call_parameter_set.date_part,
                     fields_to_compare=tuple(fields_to_compare),
                 )
@@ -98,8 +96,6 @@ class ObjectBuilderNamingScheme(QueryItemNamingScheme):
                 EntityLinkPatternParameterSet.from_parameters(
                     element_name=entity_call_parameter_set.entity_reference.element_name,
                     entity_links=entity_call_parameter_set.entity_path,
-                    time_granularity=None,
-                    date_part=None,
                     fields_to_compare=(
                         ParameterSetField.ELEMENT_NAME,
                         ParameterSetField.ENTITY_LINKS,
@@ -115,8 +111,6 @@ class ObjectBuilderNamingScheme(QueryItemNamingScheme):
                         EntityReference(element_name=group_by_ref.element_name)
                         for group_by_ref in metric_call_parameter_set.group_by
                     ),
-                    time_granularity=None,
-                    date_part=None,
                     fields_to_compare=(
                         ParameterSetField.ELEMENT_NAME,
                         ParameterSetField.ENTITY_LINKS,
