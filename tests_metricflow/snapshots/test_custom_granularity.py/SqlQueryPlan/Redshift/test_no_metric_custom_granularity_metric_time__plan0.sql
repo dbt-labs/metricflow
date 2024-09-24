@@ -50,7 +50,7 @@ FROM (
   LEFT OUTER JOIN
     ***************************.mf_time_spine subq_1
   ON
-    subq_0.metric_time__day = subq_1.ds
+    subq_0.ds__day = subq_1.ds
 ) subq_2
 GROUP BY
   subq_2.metric_time__martian_day

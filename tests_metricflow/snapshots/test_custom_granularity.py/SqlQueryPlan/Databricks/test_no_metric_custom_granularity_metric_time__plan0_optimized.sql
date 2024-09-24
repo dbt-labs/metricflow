@@ -7,6 +7,6 @@ FROM ***************************.mf_time_spine time_spine_src_28006
 LEFT OUTER JOIN
   ***************************.mf_time_spine subq_4
 ON
-  subq_3.metric_time__day = subq_4.ds
+  DATE_TRUNC('day', time_spine_src_28006.ds) = subq_4.ds
 GROUP BY
   subq_4.martian_day

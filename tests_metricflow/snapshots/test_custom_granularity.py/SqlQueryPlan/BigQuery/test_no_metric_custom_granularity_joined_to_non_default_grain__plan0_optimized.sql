@@ -13,7 +13,7 @@ CROSS JOIN
 LEFT OUTER JOIN
   ***************************.mf_time_spine subq_11
 ON
-  subq_7.metric_time__day = subq_11.ds
+  DATETIME_TRUNC(time_spine_src_28006.ds, day) = subq_11.ds
 LEFT OUTER JOIN
   ***************************.mf_time_spine subq_12
 ON

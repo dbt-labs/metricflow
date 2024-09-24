@@ -7,6 +7,6 @@ FROM ***************************.fct_bookings bookings_source_src_28000
 LEFT OUTER JOIN
   ***************************.mf_time_spine subq_2
 ON
-  bookings_source_src_28000.booking__ds__day = subq_2.ds
+  DATETIME_TRUNC(bookings_source_src_28000.ds, day) = subq_2.ds
 GROUP BY
   booking__ds__martian_day
