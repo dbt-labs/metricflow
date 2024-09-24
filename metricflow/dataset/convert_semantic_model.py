@@ -516,20 +516,20 @@ class SemanticModelToDataSetConverter:
         """Build data set for time spine."""
         from_source_alias = SequentialIdGenerator.create_next_id(StaticIdPrefix.TIME_SPINE_SOURCE).str_value
         base_granularity = time_spine_source.base_granularity
-        time_column_name = time_spine_source.base_column
+        base_column_name = time_spine_source.base_column
 
         time_dimension_instances: List[TimeDimensionInstance] = []
         select_columns: List[SqlSelectColumn] = []
 
         # Build base time dimension instances & columns
         base_time_dimension_instance = self._create_time_dimension_instance(
-            element_name=time_column_name,
+            element_name=base_column_name,
             entity_links=(),
             time_granularity=ExpandedTimeGranularity.from_time_granularity(base_granularity),
         )
         time_dimension_instances.append(base_time_dimension_instance)
         base_dimension_select_expr = SemanticModelToDataSetConverter._make_element_sql_expr(
-            table_alias=from_source_alias, element_name=time_column_name
+            table_alias=from_source_alias, element_name=base_column_name
         )
         base_select_column = self._build_column_for_standard_time_granularity(
             time_granularity=base_granularity,
@@ -539,7 +539,7 @@ class SemanticModelToDataSetConverter:
         select_columns.append(base_select_column)
         new_base_instances, new_base_columns = self._build_time_dimension_instances_and_columns(
             defined_time_granularity=base_granularity,
-            element_name=time_column_name,
+            element_name=base_column_name,
             entity_links=(),
             dimension_select_expr=base_dimension_select_expr,
         )
@@ -549,7 +549,8 @@ class SemanticModelToDataSetConverter:
         # Build custom granularity time dimension instances & columns
         for custom_granularity in time_spine_source.custom_granularities:
             custom_time_dimension_instance = self._create_time_dimension_instance(
-                element_name=time_column_name,
+                # Use base column name here for ease in building metric_time elements in MetricTimeDimensionTransformNode.
+                element_name=base_column_name,
                 entity_links=(),
                 time_granularity=ExpandedTimeGranularity(
                     name=custom_granularity.name, base_granularity=base_granularity
