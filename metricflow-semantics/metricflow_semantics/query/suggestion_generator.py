@@ -32,7 +32,10 @@ class QueryItemSuggestionGenerator:
     )
 
     def __init__(  # noqa: D107
-        self, input_naming_scheme: QueryItemNamingScheme, input_str: str, candidate_filters: Sequence[SpecPattern]
+        self,
+        input_naming_scheme: QueryItemNamingScheme,
+        input_str: str,
+        candidate_filters: Sequence[SpecPattern],
     ) -> None:
         self._input_naming_scheme = input_naming_scheme
         self._input_str = input_str
