@@ -4,6 +4,7 @@ import logging
 import time
 from collections import defaultdict
 from dataclasses import dataclass, field
+from functools import cached_property
 from typing import Dict, FrozenSet, List, Sequence, Set, Tuple
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
@@ -282,7 +283,7 @@ class LinkableElementSet(SemanticModelDerivation):
             path_key_to_linkable_metrics=key_to_linkable_metrics,
         )
 
-    @property
+    @cached_property
     def only_unique_path_keys(self) -> LinkableElementSet:
         """Returns a set that only includes path keys that map to a single distinct element."""
         return LinkableElementSet(
@@ -303,7 +304,7 @@ class LinkableElementSet(SemanticModelDerivation):
             },
         )
 
-    @property
+    @cached_property
     @override
     def derived_from_semantic_models(self) -> Sequence[SemanticModelReference]:
         semantic_model_references: Set[SemanticModelReference] = set()
@@ -319,7 +320,7 @@ class LinkableElementSet(SemanticModelDerivation):
 
         return sorted(semantic_model_references, key=lambda reference: reference.semantic_model_name)
 
-    @property
+    @cached_property
     def spec_count(self) -> int:
         """If this is mapped to spec objects, the number of specs that would be produced."""
         return (
@@ -328,7 +329,7 @@ class LinkableElementSet(SemanticModelDerivation):
             + len(self.path_key_to_linkable_metrics.keys())
         )
 
-    @property
+    @cached_property
     def specs(self) -> Sequence[LinkableInstanceSpec]:
         """Converts the items in a `LinkableElementSet` to their corresponding spec objects."""
         specs: List[LinkableInstanceSpec] = []
