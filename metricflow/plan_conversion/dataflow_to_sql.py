@@ -1464,23 +1464,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             join_type=SqlJoinType.LEFT_OUTER,
         )
 
-        # Remove base grain from parent dataset, unless that grain was also requested (in addition to the custom grain).
-        parent_instance_set = parent_data_set.instance_set
-        parent_select_columns = parent_data_set.checked_sql_select_node.select_columns
-        if not node.include_base_grain:
-            parent_instance_set = parent_instance_set.transform(
-                FilterElements(
-                    exclude_specs=InstanceSpecSet(time_dimension_specs=(parent_time_dimension_instance.spec,))
-                )
-            )
-            parent_select_columns = tuple(
-                [
-                    column
-                    for column in parent_select_columns
-                    if column.column_alias != parent_time_dimension_instance.associated_column.column_name
-                ]
-            )
-
         # Build output time spine instances and columns.
         time_spine_instance = TimeDimensionInstance(
             defined_from=parent_time_dimension_instance.defined_from,
@@ -1498,10 +1481,10 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             ),
         )
         return SqlDataSet(
-            instance_set=InstanceSet.merge([time_spine_instance_set, parent_instance_set]),
+            instance_set=InstanceSet.merge([time_spine_instance_set, parent_data_set.instance_set]),
             sql_select_node=SqlSelectStatementNode.create(
-                description=node.description + "\n" + parent_data_set.checked_sql_select_node.description,
-                select_columns=parent_select_columns + time_spine_select_columns,
+                description=parent_data_set.checked_sql_select_node.description + "\n" + node.description,
+                select_columns=parent_data_set.checked_sql_select_node.select_columns + time_spine_select_columns,
                 from_source=parent_data_set.checked_sql_select_node.from_source,
                 from_source_alias=parent_alias,
                 join_descs=parent_data_set.checked_sql_select_node.join_descs + (join_description,),
