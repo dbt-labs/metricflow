@@ -102,7 +102,7 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
-class DataflowRecipe:
+class SourceNodeRecipe:
     """Get a recipe for how to build a dataflow plan node that outputs measures and linkable instances as needed."""
 
     source_node: DataflowPlanNode
@@ -277,13 +277,13 @@ class DataflowPlanBuilder:
             queried_linkable_specs=queried_linkable_specs,
             filter_specs=base_measure_spec.filter_specs,
         )
-        base_measure_recipe = self._find_dataflow_recipe(
+        base_measure_recipe = self._find_source_node_recipe(
             measure_spec_properties=self._build_measure_spec_properties([base_measure_spec.measure_spec]),
             predicate_pushdown_state=time_range_only_pushdown_state,
             linkable_spec_set=base_required_linkable_specs,
         )
         logger.debug(LazyFormat(lambda: f"Recipe for base measure aggregation:\n{mf_pformat(base_measure_recipe)}"))
-        conversion_measure_recipe = self._find_dataflow_recipe(
+        conversion_measure_recipe = self._find_source_node_recipe(
             measure_spec_properties=self._build_measure_spec_properties([conversion_measure_spec.measure_spec]),
             predicate_pushdown_state=disabled_pushdown_state,
             linkable_spec_set=LinkableSpecSet(),
@@ -368,7 +368,7 @@ class DataflowPlanBuilder:
         )
 
         # Aggregate the conversion events with the JoinConversionEventsNode as the source node
-        recipe_with_join_conversion_source_node = DataflowRecipe(
+        recipe_with_join_conversion_source_node = SourceNodeRecipe(
             source_node=join_conversion_node,
             required_local_linkable_specs=base_measure_recipe.required_local_linkable_specs,
             join_linkable_instances_recipes=base_measure_recipe.join_linkable_instances_recipes,
@@ -800,7 +800,7 @@ class DataflowPlanBuilder:
         predicate_pushdown_state = PredicatePushdownState(
             time_range_constraint=query_spec.time_range_constraint, where_filter_specs=query_level_filter_specs
         )
-        dataflow_recipe = self._find_dataflow_recipe(
+        dataflow_recipe = self._find_source_node_recipe(
             linkable_spec_set=required_linkable_specs, predicate_pushdown_state=predicate_pushdown_state
         )
         if not dataflow_recipe:
@@ -984,12 +984,13 @@ class DataflowPlanBuilder:
             non_additive_dimension_spec=non_additive_dimension_spec,
         )
 
-    def _find_dataflow_recipe(
+    def _find_source_node_recipe(
         self,
         linkable_spec_set: LinkableSpecSet,
         predicate_pushdown_state: PredicatePushdownState,
         measure_spec_properties: Optional[MeasureSpecProperties] = None,
-    ) -> Optional[DataflowRecipe]:
+    ) -> Optional[SourceNodeRecipe]:
+        """Find the most suitable source nodes to satisfy the requested specs, as well as how to join them."""
         linkable_specs = linkable_spec_set.as_tuple
         candidate_nodes_for_left_side_of_join: List[DataflowPlanNode] = []
         candidate_nodes_for_right_side_of_join: List[DataflowPlanNode] = []
@@ -1203,7 +1204,7 @@ class DataflowPlanBuilder:
                 for x in evaluation.join_recipes
                 for y in x.join_on_partition_time_dimensions
             )
-            return DataflowRecipe(
+            return SourceNodeRecipe(
                 source_node=node_with_lowest_cost_plan,
                 required_local_linkable_specs=(
                     evaluation.local_linkable_specs
@@ -1392,7 +1393,7 @@ class DataflowPlanBuilder:
         metric_input_measure_spec: MetricInputMeasureSpec,
         queried_linkable_specs: LinkableSpecSet,
         predicate_pushdown_state: PredicatePushdownState,
-        measure_recipe: Optional[DataflowRecipe] = None,
+        measure_recipe: Optional[SourceNodeRecipe] = None,
     ) -> DataflowPlanNode:
         """Returns a node where the measures are aggregated by the linkable specs and constrained appropriately.
 
@@ -1457,7 +1458,7 @@ class DataflowPlanBuilder:
         metric_input_measure_spec: MetricInputMeasureSpec,
         queried_linkable_specs: LinkableSpecSet,
         predicate_pushdown_state: PredicatePushdownState,
-        measure_recipe: Optional[DataflowRecipe] = None,
+        measure_recipe: Optional[SourceNodeRecipe] = None,
     ) -> DataflowPlanNode:
         measure_spec = metric_input_measure_spec.measure_spec
         cumulative = metric_input_measure_spec.cumulative_description is not None
@@ -1531,7 +1532,7 @@ class DataflowPlanBuilder:
                 )
 
             find_recipe_start_time = time.time()
-            measure_recipe = self._find_dataflow_recipe(
+            measure_recipe = self._find_source_node_recipe(
                 measure_spec_properties=measure_properties,
                 predicate_pushdown_state=measure_pushdown_state,
                 linkable_spec_set=required_linkable_specs,
