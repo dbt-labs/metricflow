@@ -27,7 +27,6 @@ from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_DAY
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.dataset.dataset_classes import DataSet
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from tests_metricflow.query_rendering.compare_rendered_query import render_and_check
@@ -427,7 +426,7 @@ def test_common_semantic_model(  # noqa: D103
 ) -> None:
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec(element_name="bookings"), MetricSpec(element_name="booking_value")),
-        dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
+        dimension_specs=(MTD_SPEC_DAY,),
     )
 
     render_and_check(

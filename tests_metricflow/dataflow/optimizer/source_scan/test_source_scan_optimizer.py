@@ -6,21 +6,17 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.references import EntityReference
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_DAY
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_plan_snapshot_text_equal
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.dataflow.dataflow_plan import (
-    DataflowPlan,
-    DataflowPlanNode,
-    DataflowPlanNodeVisitor,
-)
+from metricflow.dataflow.dataflow_plan import DataflowPlan, DataflowPlanNode, DataflowPlanNodeVisitor
 from metricflow.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
 from metricflow.dataflow.nodes.aggregate_measures import AggregateMeasuresNode
 from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
@@ -42,7 +38,6 @@ from metricflow.dataflow.nodes.window_reaggregation_node import WindowReaggregat
 from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import SourceScanOptimizer
-from metricflow.dataset.dataset_classes import DataSet
 from tests_metricflow.dataflow_plan_to_svg import display_graph_if_requested
 
 logger = logging.getLogger(__name__)
@@ -179,7 +174,7 @@ def test_2_metrics_from_1_semantic_model(
         query_spec=MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings"), MetricSpec(element_name="booking_value")),
             dimension_specs=(
-                DataSet.metric_time_dimension_spec(TimeGranularity.DAY),
+                MTD_SPEC_DAY,
                 DimensionSpec(element_name="country_latest", entity_links=(EntityReference("listing"),)),
             ),
         ),
@@ -201,7 +196,7 @@ def test_2_metrics_from_2_semantic_models(
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings"), MetricSpec(element_name="listings")),
-            dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
+            dimension_specs=(MTD_SPEC_DAY,),
         ),
         expected_num_sources_in_unoptimized=2,
         expected_num_sources_in_optimized=2,
@@ -225,7 +220,7 @@ def test_3_metrics_from_2_semantic_models(
                 MetricSpec(element_name="booking_value"),
                 MetricSpec(element_name="listings"),
             ),
-            dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
+            dimension_specs=(MTD_SPEC_DAY,),
         ),
         expected_num_sources_in_unoptimized=3,
         expected_num_sources_in_optimized=2,
@@ -275,7 +270,7 @@ def test_derived_metric(
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="non_referred_bookings_pct"),),
-            dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
+            dimension_specs=(MTD_SPEC_DAY,),
         ),
         expected_num_sources_in_unoptimized=2,
         expected_num_sources_in_optimized=1,
@@ -299,7 +294,7 @@ def test_nested_derived_metric(
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="instant_plus_non_referred_bookings_pct"),),
-            dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
+            dimension_specs=(MTD_SPEC_DAY,),
         ),
         expected_num_sources_in_unoptimized=4,
         expected_num_sources_in_optimized=2,
@@ -331,7 +326,7 @@ def test_derived_metric_with_non_derived_metric(
                 MetricSpec(element_name="booking_value"),
                 MetricSpec(element_name="non_referred_bookings_pct"),
             ),
-            dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
+            dimension_specs=(MTD_SPEC_DAY,),
         ),
         expected_num_sources_in_unoptimized=3,
         expected_num_sources_in_optimized=2,
@@ -354,7 +349,7 @@ def test_2_ratio_metrics_from_1_semantic_model(
                 MetricSpec(element_name="bookings_per_booker"),
                 MetricSpec(element_name="bookings_per_dollar"),
             ),
-            dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
+            dimension_specs=(MTD_SPEC_DAY,),
         ),
         expected_num_sources_in_unoptimized=4,
         expected_num_sources_in_optimized=1,
@@ -377,7 +372,7 @@ def test_duplicate_measures(
                 MetricSpec(element_name="derived_bookings_0"),
                 MetricSpec(element_name="derived_bookings_1"),
             ),
-            dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
+            dimension_specs=(MTD_SPEC_DAY,),
         ),
         expected_num_sources_in_unoptimized=2,
         expected_num_sources_in_optimized=1,

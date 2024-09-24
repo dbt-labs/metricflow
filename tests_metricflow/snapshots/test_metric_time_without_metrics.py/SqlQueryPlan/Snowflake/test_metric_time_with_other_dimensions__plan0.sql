@@ -143,6 +143,7 @@ FROM (
         , subq_1.ds__extract_day
         , subq_1.ds__extract_dow
         , subq_1.ds__extract_doy
+        , subq_1.ds__martian_day
         , subq_1.ds__day AS metric_time__day
         , subq_1.ds__week AS metric_time__week
         , subq_1.ds__month AS metric_time__month
@@ -154,6 +155,7 @@ FROM (
         , subq_1.ds__extract_day AS metric_time__extract_day
         , subq_1.ds__extract_dow AS metric_time__extract_dow
         , subq_1.ds__extract_doy AS metric_time__extract_doy
+        , subq_1.ds__martian_day AS metric_time__martian_day
       FROM (
         -- Time Spine
         SELECT
@@ -168,6 +170,7 @@ FROM (
           , EXTRACT(day FROM time_spine_src_28006.ds) AS ds__extract_day
           , EXTRACT(dayofweekiso FROM time_spine_src_28006.ds) AS ds__extract_dow
           , EXTRACT(doy FROM time_spine_src_28006.ds) AS ds__extract_doy
+          , time_spine_src_28006.martian_day AS ds__martian_day
         FROM ***************************.mf_time_spine time_spine_src_28006
       ) subq_1
     ) subq_2

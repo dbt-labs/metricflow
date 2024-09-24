@@ -469,7 +469,7 @@ class DataflowPlanBuilder:
         # once as a normal metric, and again using a window function to narrow down to one row per granularity period.
         # In this case, add metric time at the default granularity to the linkable specs. It will be used in the order by
         # clause of the window function and later excluded from the output selections.
-        default_metric_time = DataSet.metric_time_dimension_spec(default_granularity.base_granularity)
+        default_metric_time = DataSet.metric_time_dimension_spec(default_granularity)
         include_linkable_specs = queried_linkable_specs.merge(
             LinkableSpecSet(time_dimension_specs=(default_metric_time,))
         )
