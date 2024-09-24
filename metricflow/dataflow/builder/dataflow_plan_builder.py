@@ -1643,6 +1643,7 @@ class DataflowPlanBuilder:
             # show up in the final result.
             #
             # e.g. for "bookings" by "ds" where "is_instant", "is_instant" should not be in the results.
+            # TODO: filter out base grain here
             pre_aggregate_node = FilterElementsNode.create(
                 parent_node=pre_aggregate_node,
                 include_specs=InstanceSpecSet(measure_specs=(measure_spec,)).merge(
