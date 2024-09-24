@@ -907,18 +907,8 @@ class DataflowPlanBuilder:
         # Use a dictionary to dedupe for consistent ordering.
         selected_nodes: Dict[DataflowPlanNode, None] = {}
 
-        # Find the source node that will satisfy the base granularity. Custom granularities will be joined in later.
-        linkable_specs_set_with_base_granularities: Set[LinkableInstanceSpec] = set()
         # TODO: Add support for no-metrics queries for custom grains without a join (i.e., select directly from time spine).
-        for linkable_spec in linkable_specs.as_tuple:
-            if isinstance(linkable_spec, TimeDimensionSpec) and linkable_spec.time_granularity.is_custom_granularity:
-                linkable_spec_with_base_grain = linkable_spec.with_grain(
-                    ExpandedTimeGranularity.from_time_granularity(linkable_spec.time_granularity.base_granularity)
-                )
-                linkable_specs_set_with_base_granularities.add(linkable_spec_with_base_grain)
-            else:
-                linkable_specs_set_with_base_granularities.add(linkable_spec)
-
+        linkable_specs_set_with_base_granularities = set(linkable_specs.as_tuple)
         for source_node in source_nodes:
             output_spec_set = self._node_data_set_resolver.get_output_data_set(source_node).instance_set.spec_set
             all_linkable_specs_in_node = set(output_spec_set.linkable_specs)
@@ -991,10 +981,14 @@ class DataflowPlanBuilder:
         measure_spec_properties: Optional[MeasureSpecProperties] = None,
     ) -> Optional[SourceNodeRecipe]:
         """Find the most suitable source nodes to satisfy the requested specs, as well as how to join them."""
-        linkable_specs = linkable_spec_set.as_tuple
         candidate_nodes_for_left_side_of_join: List[DataflowPlanNode] = []
         candidate_nodes_for_right_side_of_join: List[DataflowPlanNode] = []
 
+        # Replace any custom granularities with their base granularities. The custom granularity will be joined in
+        # later, since custom granularities cannot be satisfied by source nodes. But we will need the dimension at
+        # base granularity from the source node in order to join to the appropriate time spine later.
+        linkable_specs_to_satisfy = linkable_spec_set.replace_custom_granularity_with_base_granularity()
+        linkable_specs_to_satisfy_tuple = linkable_specs_to_satisfy.as_tuple
         if measure_spec_properties:
             candidate_nodes_for_right_side_of_join += self._source_node_set.source_nodes_for_metric_queries
             candidate_nodes_for_left_side_of_join += self._select_source_nodes_with_measures(
@@ -1006,15 +1000,15 @@ class DataflowPlanBuilder:
             candidate_nodes_for_right_side_of_join += list(self._source_node_set.source_nodes_for_group_by_item_queries)
             candidate_nodes_for_left_side_of_join += list(
                 self._select_source_nodes_with_linkable_specs(
-                    linkable_specs=linkable_spec_set,
+                    linkable_specs=linkable_specs_to_satisfy,
                     source_nodes=self._source_node_set.source_nodes_for_group_by_item_queries,
                 )
             )
             # If metric_time is requested without metrics, choose appropriate time spine node to select those values from.
-            if linkable_spec_set.metric_time_specs:
+            if linkable_specs_to_satisfy.metric_time_specs:
                 time_spine_node = self._source_node_set.time_spine_nodes[
                     TimeSpineSource.choose_time_spine_source(
-                        required_time_spine_specs=linkable_spec_set.metric_time_specs,
+                        required_time_spine_specs=linkable_specs_to_satisfy.metric_time_specs,
                         time_spine_sources=self._source_node_builder.time_spine_sources,
                     ).base_granularity
                 ]
@@ -1053,7 +1047,7 @@ class DataflowPlanBuilder:
             )
 
         candidate_nodes_for_right_side_of_join = node_processor.remove_unnecessary_nodes(
-            desired_linkable_specs=linkable_specs,
+            desired_linkable_specs=linkable_specs_to_satisfy_tuple,
             nodes=candidate_nodes_for_right_side_of_join,
             metric_time_dimension_reference=self._metric_time_dimension_reference,
             time_spine_nodes=self._source_node_set.time_spine_nodes_tuple,
@@ -1065,10 +1059,10 @@ class DataflowPlanBuilder:
             )
         )
         # TODO: test multi-hop with custom grains
-        if DataflowPlanBuilder._contains_multihop_linkables(linkable_specs):
+        if DataflowPlanBuilder._contains_multihop_linkables(linkable_specs_to_satisfy_tuple):
             candidate_nodes_for_right_side_of_join = list(
                 node_processor.add_multi_hop_joins(
-                    desired_linkable_specs=linkable_specs,
+                    desired_linkable_specs=linkable_specs_to_satisfy_tuple,
                     nodes=candidate_nodes_for_right_side_of_join,
                     join_type=default_join_type,
                 )
@@ -1085,14 +1079,16 @@ class DataflowPlanBuilder:
         # We do this at query time instead of during usual source node generation because the number of potential
         # MetricGroupBy source nodes could be extremely large (and potentially slow).
         logger.debug(
-            LazyFormat(lambda: f"Building source nodes for group by metrics: {linkable_spec_set.group_by_metric_specs}")
+            LazyFormat(
+                lambda: f"Building source nodes for group by metrics: {linkable_specs_to_satisfy.group_by_metric_specs}"
+            )
         )
         candidate_nodes_for_right_side_of_join += [
             self._build_query_output_node(
                 query_spec=self._source_node_builder.build_source_node_inputs_for_group_by_metric(group_by_metric_spec),
                 for_group_by_source_node=True,
             )
-            for group_by_metric_spec in linkable_spec_set.group_by_metric_specs
+            for group_by_metric_spec in linkable_specs_to_satisfy.group_by_metric_specs
         ]
 
         logger.debug(LazyFormat(lambda: f"Processing nodes took: {time.time()-start_time:.2f}s"))
@@ -1135,7 +1131,7 @@ class DataflowPlanBuilder:
             start_time = time.time()
             evaluation = node_evaluator.evaluate_node(
                 left_node=node,
-                required_linkable_specs=list(linkable_specs),
+                required_linkable_specs=list(linkable_specs_to_satisfy_tuple),
                 default_join_type=default_join_type,
             )
             logger.debug(LazyFormat(lambda: f"Evaluation of {node} took {time.time() - start_time:.2f}s"))
@@ -1614,10 +1610,7 @@ class DataflowPlanBuilder:
 
             specs_to_keep_after_join = InstanceSpecSet(measure_specs=(measure_spec,)).merge(
                 InstanceSpecSet.create_from_specs(
-                    [
-                        spec.with_base_grain() if isinstance(spec, TimeDimensionSpec) else spec
-                        for spec in required_linkable_specs.as_tuple
-                    ]
+                    required_linkable_specs.replace_custom_granularity_with_base_granularity().as_tuple
                 ),
             )
 
