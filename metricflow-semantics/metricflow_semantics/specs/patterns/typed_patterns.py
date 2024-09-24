@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Sequence
+from typing import FrozenSet, List, Sequence
 
 from dbt_semantic_interfaces.call_parameter_sets import (
     DimensionCallParameterSet,
@@ -12,6 +12,7 @@ from dbt_semantic_interfaces.call_parameter_sets import (
 from dbt_semantic_interfaces.references import EntityReference
 from typing_extensions import override
 
+from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.patterns.entity_link_pattern import (
@@ -50,6 +51,11 @@ class DimensionPattern(EntityLinkPattern):
                 entity_links=dimension_call_parameter_set.entity_path,
             )
         )
+
+    @property
+    @override
+    def without_linkable_element_properties(self) -> FrozenSet[LinkableElementProperty]:
+        return frozenset({LinkableElementProperty.METRIC})
 
 
 @dataclass(frozen=True)
@@ -96,6 +102,11 @@ class TimeDimensionPattern(EntityLinkPattern):
             )
         )
 
+    @property
+    @override
+    def without_linkable_element_properties(self) -> FrozenSet[LinkableElementProperty]:
+        return frozenset({LinkableElementProperty.METRIC})
+
 
 @dataclass(frozen=True)
 class EntityPattern(EntityLinkPattern):
@@ -121,6 +132,11 @@ class EntityPattern(EntityLinkPattern):
                 entity_links=entity_call_parameter_set.entity_path,
             )
         )
+
+    @property
+    @override
+    def without_linkable_element_properties(self) -> FrozenSet[LinkableElementProperty]:
+        return frozenset({LinkableElementProperty.METRIC})
 
 
 @dataclass(frozen=True)

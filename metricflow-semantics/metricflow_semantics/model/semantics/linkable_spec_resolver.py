@@ -605,10 +605,16 @@ class ValidLinkableSpecResolver:
         measure_semantic_model = self._get_semantic_model_for_measure(measure_reference)
 
         elements_in_semantic_model = self._get_elements_in_semantic_model(measure_semantic_model)
-        metrics_linked_to_semantic_model = self.get_joinable_metrics_for_semantic_model(
-            semantic_model=measure_semantic_model,
-            using_join_path=SemanticModelJoinPath(left_semantic_model_reference=measure_semantic_model.reference),
-        )
+
+        # Filter out group-by metrics if not specified by the property as there can be a large number of them.
+        if LinkableElementProperty.METRIC not in without_any_of:
+            metrics_linked_to_semantic_model = self.get_joinable_metrics_for_semantic_model(
+                semantic_model=measure_semantic_model,
+                using_join_path=SemanticModelJoinPath(left_semantic_model_reference=measure_semantic_model.reference),
+            )
+        else:
+            metrics_linked_to_semantic_model = LinkableElementSet()
+
         metric_time_elements = self._get_metric_time_elements(measure_reference)
         joined_elements = self._get_joined_elements(measure_semantic_model)
 

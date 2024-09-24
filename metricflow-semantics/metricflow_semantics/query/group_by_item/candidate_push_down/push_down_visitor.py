@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from contextlib import contextmanager
 from dataclasses import dataclass
-from typing import Dict, FrozenSet, Iterator, List, Optional, Sequence, Tuple
+from typing import Dict, FrozenSet, Iterator, List, Optional, Sequence, Set, Tuple
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.references import MetricReference
@@ -170,10 +170,17 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
         """Push the group-by-item specs that are available to the measure and match the source patterns to the child."""
         with self._path_from_start_node_tracker.track_node_visit(node) as current_traversal_path:
             logger.debug(LazyFormat(lambda: f"Handling {node.ui_description}"))
+
+            without_any_property: Set[LinkableElementProperty] = set()
+            if self._without_any_property is not None:
+                without_any_property.update(self._without_any_property)
+            for spec_pattern in self._source_spec_patterns:
+                without_any_property.update(spec_pattern.without_linkable_element_properties)
+
             items_available_for_measure = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_measure(
                 measure_reference=node.measure_reference,
                 with_any_of=self._with_any_property,
-                without_any_of=self._without_any_property,
+                without_any_of=frozenset(without_any_property),
             )
 
             # The following is needed to handle limitation of cumulative metrics. Filtering could be done at the measure
