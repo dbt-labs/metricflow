@@ -1451,11 +1451,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         left_expr_for_join: SqlExpressionNode = SqlColumnReferenceExpression.from_table_and_column_names(
             table_alias=parent_alias, column_name=parent_time_dimension_instance.associated_column.column_name
         )
-        if parent_time_dimension_instance.spec.time_granularity.base_granularity != time_spine_source.base_granularity:
-            # If needed, apply DATE_TRUNC to parent column match the time spine spine that's column being joined to.
-            left_expr_for_join = SqlDateTruncExpression.create(
-                time_granularity=time_spine_source.base_granularity, arg=left_expr_for_join
-            )
         join_description = SqlJoinDescription(
             right_source=SqlTableNode.create(sql_table=time_spine_source.spine_table),
             right_source_alias=time_spine_alias,
