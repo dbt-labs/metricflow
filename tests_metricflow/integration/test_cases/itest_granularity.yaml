@@ -449,3 +449,70 @@ integration_test:
     GROUP BY
       COALESCE(subq_10.metric_time__martian_day, subq_16.metric_time__martian_day)
       , COALESCE(subq_10.listing__ds__month, subq_16.listing__ds__month)
+---
+integration_test:
+  name: simple_metric_with_custom_granularity_filter
+  description: Simple metric queried with a filter on a custom grain, where that grain is not used in the group by.
+  model: SIMPLE_MODEL
+  metrics: ["bookings"]
+  where_filter: |
+    {{ render_time_dimension_template('listing__ds', 'martian_day') }} >= '2019-12-20'
+  check_query: |
+    SELECT
+      SUM(1) AS bookings
+    FROM {{ source_schema }}.fct_bookings b
+    LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest l ON b.listing_id = l.listing_id
+    LEFT OUTER JOIN {{ source_schema }}.mf_time_spine ts ON {{ render_date_trunc("l.created_at", TimeGranularity.DAY) }} = ts.ds
+    WHERE ts.martian_day >= '2019-12-20'
+---
+integration_test:
+  name: simple_metric_with_custom_granularity_in_filter_and_group_by
+  description: Simple metric queried with a filter on a custom grain, where that grain is also used in the group by.
+  model: SIMPLE_MODEL
+  metrics: ["bookings"]
+  group_bys: ["listing__ds__martian_day"]
+  where_filter: |
+    {{ render_time_dimension_template('listing__ds', 'martian_day') }} >= '2019-12-20'
+  check_query: |
+    SELECT
+      ts.martian_day AS listing__ds__martian_day
+      , SUM(1) AS bookings
+    FROM {{ source_schema }}.fct_bookings b
+    LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest l ON b.listing_id = l.listing_id
+    LEFT OUTER JOIN {{ source_schema }}.mf_time_spine ts
+    ON {{ render_date_trunc("l.created_at", TimeGranularity.DAY) }} = ts.ds
+    WHERE ts.martian_day >= '2019-12-20'
+    GROUP BY listing__ds__martian_day
+---
+integration_test:
+  name: test_no_metrics_with_custom_granularity_filter
+  description: Group by items only queried with a filter on a custom grain, where that grain is not used in the group by.
+  model: SIMPLE_MODEL
+  group_bys: ["metric_time__day"]
+  where_filter: |
+    {{ render_time_dimension_template('listing__ds', 'martian_day') }} >= '2019-12-20'
+  check_query: |
+    SELECT
+      {{ render_date_trunc("ts.ds", TimeGranularity.DAY) }} AS metric_time__day
+    FROM {{ source_schema }}.dim_listings_latest l
+    CROSS JOIN {{ source_schema }}.mf_time_spine ts
+    LEFT OUTER JOIN {{ source_schema }}.mf_time_spine ts2
+    ON {{ render_date_trunc("l.created_at", TimeGranularity.DAY) }} = ts2.ds
+    WHERE ts2.martian_day >= '2019-12-20'
+    GROUP BY metric_time__day
+---
+integration_test:
+  name: test_no_metrics_with_custom_granularity_in_filter_and_group_by
+  description: Group by items only queried with a filter on a custom grain, where that grain is also used in the group by.
+  model: SIMPLE_MODEL
+  group_bys: ["listing__ds__martian_day"]
+  where_filter: |
+    {{ render_time_dimension_template('listing__ds', 'martian_day') }} >= '2019-12-20'
+  check_query: |
+    SELECT
+      ts.martian_day AS listing__ds__martian_day
+    FROM {{ source_schema }}.dim_listings_latest l
+    LEFT OUTER JOIN {{ source_schema }}.mf_time_spine ts
+      ON {{ render_date_trunc("l.created_at", TimeGranularity.DAY) }} = ts.ds
+    WHERE ts.martian_day >= '2019-12-20'
+    GROUP BY listing__ds__martian_day
