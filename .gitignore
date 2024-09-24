@@ -134,3 +134,6 @@ dmypy.json
 # IDE
 .idea/
 .vscode/
+
+# Performance profiler results.
+**/cprofile_output.bin
