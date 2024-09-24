@@ -27,6 +27,8 @@ class LinkableElementProperty(Enum):
     METRIC_TIME = "metric_time"
     # Refers to a metric, not a dimension.
     METRIC = "metric"
+    # A time dimension with a DatePart.
+    DATE_PART = "date_part"
 
     @staticmethod
     def all_properties() -> FrozenSet[LinkableElementProperty]:  # noqa: D102

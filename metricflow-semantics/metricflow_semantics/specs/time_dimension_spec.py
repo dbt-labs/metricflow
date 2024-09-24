@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.references import DimensionReference, EntityReference, TimeDimensionReference
@@ -192,30 +192,31 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
 
     @staticmethod
     def generate_possible_specs_for_time_dimension(
-        time_dimension_reference: TimeDimensionReference, entity_links: Tuple[EntityReference, ...]
+        time_dimension_reference: TimeDimensionReference,
+        entity_links: Tuple[EntityReference, ...],
+        custom_granularities: Dict[str, ExpandedTimeGranularity],
     ) -> List[TimeDimensionSpec]:
-        """Generate a list of time dimension specs with all combinations of granularity & date part.
-
-        TODO: [custom calendar] decide whether to add support for custom granularities or rename this to indicate that
-        it only includes standard granularities.
-        """
+        """Generate a list of time dimension specs with all combinations of granularity & date part."""
         time_dimension_specs: List[TimeDimensionSpec] = []
-        for time_granularity in TimeGranularity:
+        granularities = [
+            ExpandedTimeGranularity.from_time_granularity(time_granularity) for time_granularity in TimeGranularity
+        ] + list(custom_granularities.values())
+        for time_granularity in granularities:
             time_dimension_specs.append(
                 TimeDimensionSpec(
                     element_name=time_dimension_reference.element_name,
                     entity_links=entity_links,
-                    time_granularity=ExpandedTimeGranularity.from_time_granularity(time_granularity),
+                    time_granularity=time_granularity,
                     date_part=None,
                 )
             )
         for date_part in DatePart:
-            for time_granularity in date_part.compatible_granularities:
+            for compatible_granularity in date_part.compatible_granularities:
                 time_dimension_specs.append(
                     TimeDimensionSpec(
                         element_name=time_dimension_reference.element_name,
                         entity_links=entity_links,
-                        time_granularity=ExpandedTimeGranularity.from_time_granularity(time_granularity),
+                        time_granularity=ExpandedTimeGranularity.from_time_granularity(compatible_granularity),
                         date_part=date_part,
                     )
                 )

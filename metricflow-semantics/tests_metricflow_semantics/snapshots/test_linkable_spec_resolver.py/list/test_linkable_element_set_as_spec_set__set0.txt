@@ -152,6 +152,7 @@
   'metric_time__extract_year',
   'metric_time__extract_year',
   'metric_time__extract_year',
+  'metric_time__martian_day',
   'metric_time__month',
   'metric_time__quarter',
   'metric_time__week',

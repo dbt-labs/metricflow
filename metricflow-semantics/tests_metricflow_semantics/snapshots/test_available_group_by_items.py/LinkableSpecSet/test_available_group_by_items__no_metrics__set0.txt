@@ -13,6 +13,7 @@
   "TimeDimension('metric_time', 'hour', date_part_name='month')",
   "TimeDimension('metric_time', 'hour', date_part_name='quarter')",
   "TimeDimension('metric_time', 'hour', date_part_name='year')",
+  "TimeDimension('metric_time', 'martian_day')",
   "TimeDimension('metric_time', 'microsecond')",
   "TimeDimension('metric_time', 'microsecond', date_part_name='day')",
   "TimeDimension('metric_time', 'microsecond', date_part_name='dow')",
