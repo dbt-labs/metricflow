@@ -1439,7 +1439,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         parent_alias = parent_data_set.checked_sql_select_node.from_source_alias
         parent_time_dimension_instance: Optional[TimeDimensionInstance] = None
         for instance in parent_data_set.instance_set.time_dimension_instances:
-            if instance.spec == node.time_dimension_spec.with_base_grain:
+            if instance.spec == node.time_dimension_spec.with_base_grain():
                 parent_time_dimension_instance = instance
                 break
         assert parent_time_dimension_instance, (

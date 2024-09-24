@@ -410,7 +410,7 @@ class NodeEvaluatorForLinkableInstances:
         data_set_linkable_specs = candidate_spec_set.linkable_specs
         # Look for which nodes can satisfy the linkable specs at their base grains. Custom grains will be joined later.
         required_linkable_specs_with_base_grains = [
-            spec.with_base_grain if isinstance(spec, TimeDimensionSpec) else spec for spec in required_linkable_specs
+            spec.with_base_grain() if isinstance(spec, TimeDimensionSpec) else spec for spec in required_linkable_specs
         ]
 
         # These are linkable specs in the start node data set. Those are considered "local".

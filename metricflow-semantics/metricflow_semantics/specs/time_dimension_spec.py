@@ -154,7 +154,6 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
             aggregation_state=self.aggregation_state,
         )
 
-    @property
     def with_base_grain(self) -> TimeDimensionSpec:  # noqa: D102
         return TimeDimensionSpec(
             element_name=self.element_name,
