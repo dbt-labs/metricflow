@@ -10,6 +10,7 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY, TimeDimensionSpec
 from metricflow_semantics.sql.sql_table import SqlTable
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -88,6 +89,17 @@ class TimeSpineSource:
         """Creates a set of time spine sources with custom granularities based on what's in the manifest."""
         return {
             custom_granularity.name: time_spine_source
+            for time_spine_source in time_spine_sources
+            for custom_granularity in time_spine_source.custom_granularities
+        }
+
+    @staticmethod
+    def build_custom_granularities(time_spine_sources: Sequence[TimeSpineSource]) -> Dict[str, ExpandedTimeGranularity]:
+        """Creates a set of supported custom granularities based on what's in the manifest."""
+        return {
+            custom_granularity.name: ExpandedTimeGranularity(
+                name=custom_granularity.name, base_granularity=time_spine_source.base_granularity
+            )
             for time_spine_source in time_spine_sources
             for custom_granularity in time_spine_source.custom_granularities
         }

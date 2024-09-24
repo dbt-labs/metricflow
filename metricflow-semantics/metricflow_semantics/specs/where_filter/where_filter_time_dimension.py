@@ -5,17 +5,16 @@ from typing import Optional, Sequence
 from dbt_semantic_interfaces.call_parameter_sets import (
     TimeDimensionCallParameterSet,
 )
-from dbt_semantic_interfaces.naming.dundered import DunderedNameFormatter
 from dbt_semantic_interfaces.protocols.protocol_hint import ProtocolHint
 from dbt_semantic_interfaces.protocols.query_interface import (
     QueryInterfaceTimeDimensionFactory,
 )
 from dbt_semantic_interfaces.references import EntityReference, TimeDimensionReference
-from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from typing_extensions import override
 
 from metricflow_semantics.errors.error_classes import InvalidQuerySyntax
+from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
     FilterSpecResolutionLookUp,
@@ -37,7 +36,7 @@ class WhereFilterTimeDimension(WhereFilterDimension):
         call_parameter_set = TimeDimensionCallParameterSet(
             entity_path=self._entity_links,
             time_dimension_reference=TimeDimensionReference(self._element_name),
-            time_granularity=self._time_grain,
+            time_granularity_name=self._time_granularity_name,
             date_part=self._date_part,
         )
 
@@ -89,25 +88,30 @@ class WhereFilterTimeDimensionFactory(ProtocolHint[QueryInterfaceTimeDimensionFa
             raise InvalidQuerySyntax(
                 "Can't set descending in the where clause. Try setting descending in the order_by clause instead"
             )
-        structured_name = DunderedNameFormatter.parse_name(time_dimension_name.lower())
 
-        grain_parsed_from_name = structured_name.time_granularity
-        grain_from_param = TimeGranularity(time_granularity_name) if time_granularity_name else None
-        if grain_parsed_from_name and grain_from_param and grain_parsed_from_name != grain_from_param:
+        time_granularity_name = time_granularity_name.lower() if time_granularity_name else None
+        structured_name = StructuredLinkableSpecName.from_name(time_dimension_name.lower())
+
+        if (
+            structured_name.time_granularity_name
+            and time_granularity_name
+            and structured_name.time_granularity_name != time_granularity_name
+        ):
             raise InvalidQuerySyntax(
                 f"Received different granularities in `time_dimension_name` parameter ('{time_dimension_name}') "
                 f"and `time_granularity_name` parameter ('{time_granularity_name}')."
             )
 
-        TimeGranularity(time_granularity_name.lower()) if time_granularity_name else None
         return WhereFilterTimeDimension(
             column_association_resolver=self._column_association_resolver,
             resolved_spec_lookup=self._resolved_spec_lookup,
             where_filter_location=self._where_filter_location,
             rendered_spec_tracker=self._rendered_spec_tracker,
             element_name=structured_name.element_name,
-            entity_links=tuple(EntityReference(entity_link_name.lower()) for entity_link_name in entity_path)
-            + structured_name.entity_links,
-            time_grain=grain_from_param or grain_parsed_from_name,
+            entity_links=tuple(
+                EntityReference(entity_link_name.lower())
+                for entity_link_name in (tuple(entity_path) + structured_name.entity_link_names)
+            ),
+            time_granularity_name=time_granularity_name or structured_name.time_granularity_name,
             date_part=DatePart(date_part_name.lower()) if date_part_name else None,
         )

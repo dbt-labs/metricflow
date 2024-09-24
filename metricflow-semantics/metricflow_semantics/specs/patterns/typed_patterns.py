@@ -21,7 +21,6 @@ from metricflow_semantics.specs.patterns.entity_link_pattern import (
     ParameterSetField,
 )
 from metricflow_semantics.specs.spec_set import group_specs_by_type
-from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 
 @dataclass(frozen=True)
@@ -85,19 +84,15 @@ class TimeDimensionPattern(EntityLinkPattern):
             ParameterSetField.DATE_PART,
         ]
 
-        time_granularity = None
-        if time_dimension_call_parameter_set.time_granularity is not None:
+        if time_dimension_call_parameter_set.time_granularity_name is not None:
             fields_to_compare.append(ParameterSetField.TIME_GRANULARITY)
-            time_granularity = ExpandedTimeGranularity.from_time_granularity(
-                time_dimension_call_parameter_set.time_granularity
-            )
 
         return TimeDimensionPattern(
             parameter_set=EntityLinkPatternParameterSet.from_parameters(
                 fields_to_compare=tuple(fields_to_compare),
                 element_name=time_dimension_call_parameter_set.time_dimension_reference.element_name,
                 entity_links=time_dimension_call_parameter_set.entity_path,
-                time_granularity=time_granularity,
+                time_granularity_name=time_dimension_call_parameter_set.time_granularity_name,
                 date_part=time_dimension_call_parameter_set.date_part,
             )
         )

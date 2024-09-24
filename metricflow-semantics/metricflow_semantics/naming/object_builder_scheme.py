@@ -23,7 +23,6 @@ from metricflow_semantics.specs.patterns.entity_link_pattern import (
 )
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.specs.patterns.typed_patterns import DimensionPattern, TimeDimensionPattern
-from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -64,8 +63,6 @@ class ObjectBuilderNamingScheme(QueryItemNamingScheme):
                 EntityLinkPatternParameterSet.from_parameters(
                     element_name=dimension_call_parameter_set.dimension_reference.element_name,
                     entity_links=dimension_call_parameter_set.entity_path,
-                    time_granularity=None,
-                    date_part=None,
                     fields_to_compare=(
                         ParameterSetField.ELEMENT_NAME,
                         ParameterSetField.ENTITY_LINKS,
@@ -81,18 +78,14 @@ class ObjectBuilderNamingScheme(QueryItemNamingScheme):
                 ParameterSetField.DATE_PART,
             ]
 
-            time_granularity: Optional[ExpandedTimeGranularity] = None
-            if time_dimension_call_parameter_set.time_granularity is not None:
+            if time_dimension_call_parameter_set.time_granularity_name is not None:
                 fields_to_compare.append(ParameterSetField.TIME_GRANULARITY)
-                time_granularity = ExpandedTimeGranularity.from_time_granularity(
-                    time_dimension_call_parameter_set.time_granularity
-                )
 
             return TimeDimensionPattern(
                 EntityLinkPatternParameterSet.from_parameters(
                     element_name=time_dimension_call_parameter_set.time_dimension_reference.element_name,
                     entity_links=time_dimension_call_parameter_set.entity_path,
-                    time_granularity=time_granularity,
+                    time_granularity_name=time_dimension_call_parameter_set.time_granularity_name,
                     date_part=time_dimension_call_parameter_set.date_part,
                     fields_to_compare=tuple(fields_to_compare),
                 )
@@ -103,8 +96,6 @@ class ObjectBuilderNamingScheme(QueryItemNamingScheme):
                 EntityLinkPatternParameterSet.from_parameters(
                     element_name=entity_call_parameter_set.entity_reference.element_name,
                     entity_links=entity_call_parameter_set.entity_path,
-                    time_granularity=None,
-                    date_part=None,
                     fields_to_compare=(
                         ParameterSetField.ELEMENT_NAME,
                         ParameterSetField.ENTITY_LINKS,
@@ -120,8 +111,6 @@ class ObjectBuilderNamingScheme(QueryItemNamingScheme):
                         EntityReference(element_name=group_by_ref.element_name)
                         for group_by_ref in metric_call_parameter_set.group_by
                     ),
-                    time_granularity=None,
-                    date_part=None,
                     fields_to_compare=(
                         ParameterSetField.ELEMENT_NAME,
                         ParameterSetField.ENTITY_LINKS,

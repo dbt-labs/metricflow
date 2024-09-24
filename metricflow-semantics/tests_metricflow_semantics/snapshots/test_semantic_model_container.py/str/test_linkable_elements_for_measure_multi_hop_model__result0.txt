@@ -30,6 +30,7 @@ Model Join-Path                                                Entity Links     
 ('account_month_txns',)                                        ('account_id',)                         ds                      day                 MONTH        ['LOCAL']
 ('account_month_txns',)                                        ('account_id',)                         ds                      day                 QUARTER      ['LOCAL']
 ('account_month_txns',)                                        ('account_id',)                         ds                      day                 YEAR         ['LOCAL']
+('account_month_txns',)                                        ('account_id',)                         ds                      martian_day                      ['DERIVED_TIME_GRANULARITY', 'LOCAL']
 ('account_month_txns',)                                        ('account_id',)                         ds                      month                            ['DERIVED_TIME_GRANULARITY', 'LOCAL']
 ('account_month_txns',)                                        ('account_id',)                         ds                      month               MONTH        ['DERIVED_TIME_GRANULARITY', 'LOCAL']
 ('account_month_txns',)                                        ('account_id',)                         ds                      month               QUARTER      ['DERIVED_TIME_GRANULARITY', 'LOCAL']
