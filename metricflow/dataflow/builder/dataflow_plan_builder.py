@@ -798,7 +798,9 @@ class DataflowPlanBuilder:
 
         for time_dimension_spec in required_linkable_specs.time_dimension_specs:
             if time_dimension_spec.time_granularity.is_custom_granularity:
-                include_base_grain = time_dimension_spec.with_base_grain in required_linkable_specs.time_dimension_specs
+                include_base_grain = (
+                    time_dimension_spec.with_base_grain() in required_linkable_specs.time_dimension_specs
+                )
                 output_node = JoinToCustomGranularityNode.create(
                     parent_node=output_node,
                     time_dimension_spec=time_dimension_spec,
@@ -1572,7 +1574,9 @@ class DataflowPlanBuilder:
 
         for time_dimension_spec in queried_linkable_specs.time_dimension_specs:
             if time_dimension_spec.time_granularity.is_custom_granularity:
-                include_base_grain = time_dimension_spec.with_base_grain in required_linkable_specs.time_dimension_specs
+                include_base_grain = (
+                    time_dimension_spec.with_base_grain() in required_linkable_specs.time_dimension_specs
+                )
                 unaggregated_measure_node = JoinToCustomGranularityNode.create(
                     parent_node=unaggregated_measure_node,
                     time_dimension_spec=time_dimension_spec,
