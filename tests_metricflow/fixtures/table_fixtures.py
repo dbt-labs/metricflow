@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 from dbt_semantic_interfaces.type_enums import TimeGranularity
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
@@ -78,9 +79,11 @@ def create_source_tables(
     If a table with a given name already exists in the source schema, it's assumed to have the expected schema / data.
     """
     if mf_test_configuration.use_persistent_source_schema:
-        logger.info(
-            "This session was configured to use a persistent source schema, so this fixture won't create new tables. "
-            "See populate_source_schema() for more details."
+        logger.debug(
+            LazyFormat(
+                lambda: "This session was configured to use a persistent source schema, so this fixture won't create new tables. "
+                "See populate_source_schema() for more details."
+            )
         )
         return
 

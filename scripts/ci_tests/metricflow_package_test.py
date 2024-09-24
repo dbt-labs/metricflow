@@ -11,6 +11,7 @@ from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from dbt_semantic_interfaces.protocols import SemanticManifest, SemanticModel
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
@@ -167,12 +168,12 @@ def log_dataflow_plan() -> None:  # noqa: D103
         )
     )
 
-    logger.info(f"Dataflow plan is:\n{dataflow_plan.structure_text()}")
+    logger.debug(LazyFormat(lambda: f"Dataflow plan is:\n{dataflow_plan.structure_text()}"))
 
 
 def check_engine_import(metricflow_engine: MetricFlowEngine) -> None:
     """Doesn't need to run, but having this here means that the import is tested."""
-    logger.info(f"Engine is {metricflow_engine}")
+    logger.debug(LazyFormat(lambda: f"Engine is {metricflow_engine}"))
 
 
 logging.basicConfig(format="%(asctime)s - %(levelname)s -  %(message)s", level=logging.INFO)

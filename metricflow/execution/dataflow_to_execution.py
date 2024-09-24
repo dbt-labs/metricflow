@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from typing_extensions import override
 
 from metricflow.dataflow.dataflow_plan import (
@@ -65,12 +66,12 @@ class DataflowToExecutionPlanConverter(DataflowPlanNodeVisitor[ConvertToExecutio
         self._sql_client = sql_client
 
     def _convert_to_sql_plan(self, node: DataflowPlanNode) -> ConvertToSqlPlanResult:
-        logger.info(f"Generating SQL query plan from {node.node_id}")
+        logger.debug(LazyFormat(lambda: f"Generating SQL query plan from {node.node_id}"))
         result = self._sql_plan_converter.convert_to_sql_query_plan(
             sql_engine_type=self._sql_client.sql_engine_type,
             dataflow_plan_node=node,
         )
-        logger.debug(f"Generated SQL query plan is:\n{result.sql_plan.structure_text()}")
+        logger.debug(LazyFormat(lambda: f"Generated SQL query plan is:\n{result.sql_plan.structure_text()}"))
         return result
 
     def _render_sql(self, convert_to_sql_plan_result: ConvertToSqlPlanResult) -> SqlPlanRenderResult:

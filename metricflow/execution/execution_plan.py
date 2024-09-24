@@ -8,6 +8,7 @@ from typing import List, Optional, Sequence, Tuple
 
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId, DagNode, DisplayedProperty, MetricFlowDag, NodeId
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.visitor import Visitable
@@ -186,9 +187,9 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
         sql_query = self.sql_query
         assert sql_query is not None, f"{self.sql_query=} should have been set during creation."
         start_time = time.time()
-        logger.info(f"Dropping table {self.output_table} in case it already exists")
+        logger.debug(LazyFormat(lambda: f"Dropping table {self.output_table} in case it already exists"))
         self.sql_client.execute(f"DROP TABLE IF EXISTS {self.output_table.sql}")
-        logger.info(f"Creating table {self.output_table} using a query")
+        logger.debug(LazyFormat(lambda: f"Creating table {self.output_table} using a query"))
         self.sql_client.execute(
             sql_query.sql_query,
             sql_bind_parameters=sql_query.bind_parameters,

@@ -13,6 +13,7 @@ from dbt.config.project import Project
 from dbt.config.runtime import load_profile, load_project
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from metricflow_semantics.errors.error_classes import ModelCreationException
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.dbt_manifest_parser import parse_manifest_from_dbt_generated_manifest
 from typing_extensions import Self
@@ -40,12 +41,14 @@ class dbtProjectMetadata:
     @classmethod
     def load_from_project_path(cls: Type[Self], project_path: Path) -> Self:
         """Loads all dbt artifacts for the project associated with the given project path."""
-        logger.info(f"Loading dbt project metadata for project located at {project_path}")
+        logger.debug(LazyFormat(lambda: f"Loading dbt project metadata for project located at {project_path}"))
         dbtRunner().invoke(["-q", "debug"], project_dir=str(project_path))
         profile = load_profile(str(project_path), {})
         project = load_project(str(project_path), version_check=False, profile=profile)
         project_path = project_path
-        logger.info(f"Loaded project {project.project_name} with profile details:\n{mf_pformat(profile)}")
+        logger.debug(
+            LazyFormat(lambda: f"Loaded project {project.project_name} with profile details:\n{mf_pformat(profile)}")
+        )
         return cls(profile=profile, project=project, project_path=project_path)
 
     @property

@@ -23,6 +23,7 @@ from typing import List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from metricflow_semantics.instances import InstanceSet
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
@@ -403,7 +404,7 @@ class NodeEvaluatorForLinkableInstances:
         candidate_instance_set: InstanceSet = self._node_data_set_resolver.get_output_data_set(left_node).instance_set
         candidate_spec_set = candidate_instance_set.spec_set
 
-        logger.debug(f"Candidate spec set is:\n{mf_pformat(candidate_spec_set)}")
+        logger.debug(LazyFormat(lambda: f"Candidate spec set is:\n{mf_pformat(candidate_spec_set)}"))
 
         data_set_linkable_specs = candidate_spec_set.linkable_specs
 
@@ -437,27 +438,31 @@ class NodeEvaluatorForLinkableInstances:
         )
         join_candidates: List[JoinLinkableInstancesRecipe] = []
 
-        logger.info("Looping over nodes that can be joined to get the required linkable specs")
+        logger.debug(LazyFormat(lambda: "Looping over nodes that can be joined to get the required linkable specs"))
 
         # Using a greedy approach, try to get the "possibly_joinable_linkable_specs" by iteratively joining nodes with
         # the most matching linkable specs. We try to join nodes with the most matching specs to minimize the number of
         # joins that we have to do to. A knapsack solution is ideal, but punting on that for simplicity.
         while len(possibly_joinable_linkable_specs) > 0:
-            logger.info(f"Looking for linkable specs:\n{mf_pformat(possibly_joinable_linkable_specs)}")
+            logger.debug(
+                LazyFormat(lambda: f"Looking for linkable specs:\n{mf_pformat(possibly_joinable_linkable_specs)}")
+            )
 
             # We've run out of candidate data sets, but there are more linkable specs that we need. That means the
             # rest of the linkable specs can't be joined in, and we're left with unjoinable specs remaining.
             if len(candidates_for_join) == 0:
-                logger.info(
-                    "There are no more candidate nodes that can be joined, but not all linkable specs have "
-                    "been acquired."
+                logger.debug(
+                    LazyFormat(
+                        lambda: "There are no more candidate nodes that can be joined, but not all linkable specs have "
+                        "been acquired."
+                    )
                 )
                 unjoinable_linkable_specs.extend(possibly_joinable_linkable_specs)
                 break
 
             # Join the best candidate to realize the linkable specs
             next_candidate = candidates_for_join.pop(0)
-            logger.info(f"The next candidate node to be joined is:\n{mf_pformat(next_candidate)}")
+            logger.debug(LazyFormat(lambda: f"The next candidate node to be joined is:\n{mf_pformat(next_candidate)}"))
             join_candidates.append(next_candidate)
 
             # Update the candidates. Since we'll be joined/ing the previously selected candidate, we no longer need
@@ -474,7 +479,7 @@ class NodeEvaluatorForLinkableInstances:
                 x for x in possibly_joinable_linkable_specs if x not in next_candidate.satisfiable_linkable_specs
             ]
 
-        logger.info("Done evaluating possible joins")
+        logger.debug(LazyFormat(lambda: "Done evaluating possible joins"))
         return LinkableInstanceSatisfiabilityEvaluation(
             local_linkable_specs=tuple(local_linkable_specs),
             joinable_linkable_specs=tuple(

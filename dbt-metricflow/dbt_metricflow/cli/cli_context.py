@@ -6,6 +6,7 @@ from logging.handlers import TimedRotatingFileHandler
 from typing import Dict, Optional
 
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 
 from dbt_metricflow.cli.dbt_connectors.adapter_backed_client import AdapterBackedSqlClient
@@ -111,7 +112,7 @@ class CLIContext:
             except Exception as e:
                 status = "FAIL"
                 err_string = str(e)
-                logger.error(f"Health Check Item {step}: failed with error {err_string}")
+                logger.error(LazyFormat(lambda: f"Health Check Item {step}: failed with error {err_string}"))
 
             results[f"{self.sql_client.sql_engine_type} - {step}"] = {
                 "status": status,

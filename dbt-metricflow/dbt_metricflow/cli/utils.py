@@ -9,6 +9,7 @@ from typing import Any, Callable, List, Optional
 
 import click
 from dateutil.parser import parse
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 
 import dbt_metricflow.cli.custom_click_types as click_custom
 from dbt_metricflow.cli.cli_context import CLIContext
@@ -122,8 +123,10 @@ def exception_handler(func: Callable[..., Any]) -> Callable[..., Any]:  # type: 
             else:
                 if not isinstance(args[0], CLIContext):
                     logger.error(
-                        f"Missing {CLIContext.__name__} as the first argument to the function "
-                        f"{getattr(func, '__name__', repr(func))}"
+                        LazyFormat(
+                            lambda: f"Missing {CLIContext.__name__} as the first argument to the function "
+                            f"{getattr(func, '__name__', repr(func))}"
+                        )
                     )
                 click.echo(f"\nERROR: {str(e)}")
             if args and hasattr(args[0], "verbose") and args[0].verbose is True:

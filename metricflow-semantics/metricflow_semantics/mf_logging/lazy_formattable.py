@@ -16,7 +16,7 @@ class LazyFormat:
     incur a performance overhead in production.
 
     Example:
-        logger.debug(LazyFormat("Found path", start_point=point_0, end_point=point_1))
+        logger.debug(LazyFormat(lambda: LazyFormat("Found path", start_point=point_0, end_point=point_1)))
 
         ->
 
@@ -28,7 +28,7 @@ class LazyFormat:
     evaluated as well. This style will be deprecated as log statements are updated.
 
     Example:
-        logger.debug(f"Result is: {expensive_function()}")
+        logger.debug(LazyFormat(lambda: f"Result is: {expensive_function()}"))
 
         ->
 

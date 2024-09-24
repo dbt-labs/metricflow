@@ -27,6 +27,7 @@ from metricflow_semantics.instances import (
     TimeDimensionInstance,
 )
 from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.column_assoc import (
     ColumnAssociation,
@@ -221,11 +222,13 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         for optimizer in SqlQueryOptimizerConfiguration.optimizers_for_level(
             optimization_level, use_column_alias_in_group_by=use_column_alias_in_group_by
         ):
-            logger.info(f"Applying optimizer: {optimizer.__class__.__name__}")
+            logger.debug(LazyFormat(lambda: f"Applying optimizer: {optimizer.__class__.__name__}"))
             sql_node = optimizer.optimize(sql_node)
-            logger.info(
-                f"After applying {optimizer.__class__.__name__}, the SQL query plan is:\n"
-                f"{indent(sql_node.structure_text())}"
+            logger.debug(
+                LazyFormat(
+                    lambda: f"After applying {optimizer.__class__.__name__}, the SQL query plan is:\n"
+                    f"{indent(sql_node.structure_text())}"
+                )
             )
 
         return ConvertToSqlPlanResult(

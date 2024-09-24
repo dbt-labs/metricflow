@@ -20,6 +20,7 @@ from dbt_semantic_interfaces.validations.semantic_manifest_validator import Sema
 from dbt_semantic_interfaces.validations.validator_helpers import SemanticManifestValidationResults
 from halo import Halo
 from metricflow_semantics.dag.dag_visualization import display_dag_as_svg
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from update_checker import UpdateChecker
 
 import dbt_metricflow.cli.custom_click_types as click_custom
@@ -92,7 +93,7 @@ def cli(cfg: CLIContext, verbose: bool) -> None:  # noqa: D103
 
         try:
             # Note: we may wish to add support for canceling all queries if zombie queries are a problem
-            logger.info("Closing client connections")
+            logger.debug(LazyFormat(lambda: "Closing client connections"))
             cfg.sql_client.close()
         finally:
             sys.exit(-1)

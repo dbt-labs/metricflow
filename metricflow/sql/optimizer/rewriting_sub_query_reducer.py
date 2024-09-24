@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple
 
 from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 
 from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
 from metricflow.sql.sql_exprs import (
@@ -740,7 +741,11 @@ class SqlGroupByRewritingVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
                     )
                 )
             else:
-                logger.info(f"Did not find matching select for {group_by} in:\n{indent(node.structure_text())}")
+                logger.debug(
+                    LazyFormat(
+                        lambda: f"Did not find matching select for {group_by} in:\n{indent(node.structure_text())}"
+                    )
+                )
                 new_group_bys.append(group_by)
 
         return SqlSelectStatementNode.create(

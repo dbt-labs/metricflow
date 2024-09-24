@@ -5,6 +5,7 @@ import logging
 import time
 from typing import Optional
 
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.sql.sql_table import SqlTable
 
 from dbt_metricflow.cli.dbt_connectors.adapter_backed_client import AdapterBackedSqlClient
@@ -33,7 +34,9 @@ class AdapterBackedDDLSqlClient(AdapterBackedSqlClient):
             df: The Pandas DataTable object containing the column schema and data to load
             chunk_size: The number of rows to insert per transaction
         """
-        logger.info(f"Creating table '{sql_table.sql}' from a DataTable with {df.row_count} row(s)")
+        logger.debug(
+            LazyFormat(lambda: f"Creating table '{sql_table.sql}' from a DataTable with {df.row_count} row(s)")
+        )
         start_time = time.time()
 
         with self._adapter.connection_named("MetricFlow_create_from_dataframe"):
@@ -85,7 +88,11 @@ class AdapterBackedDDLSqlClient(AdapterBackedSqlClient):
             # Commit all insert transaction at once
             self._adapter.commit_if_has_connection()
 
-        logger.info(f"Created SQL table '{sql_table.sql}' from an in-memory table in {time.time() - start_time:.2f}s")
+        logger.debug(
+            LazyFormat(
+                lambda: f"Created SQL table '{sql_table.sql}' from an in-memory table in {time.time() - start_time:.2f}s"
+            )
+        )
 
     def _get_sql_type(self, column_description: ColumnDescription) -> str:
         """Helper method to get the engine-specific type value.

@@ -11,6 +11,7 @@ import pytest
 from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from dbt_semantic_interfaces.protocols import SemanticModel
 from dbt_semantic_interfaces.test_utils import as_datetime
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
@@ -223,7 +224,9 @@ class MetricFlowEngineTestFixture:
         for semantic_model_name, data_set in data_sets.items():
             return_dict[semantic_model_name] = ReadSqlSourceNode.create(data_set)
             logger.debug(
-                f"For semantic model {semantic_model_name}, creating node_id {return_dict[semantic_model_name].node_id}"
+                LazyFormat(
+                    lambda: f"For semantic model {semantic_model_name}, creating node_id {return_dict[semantic_model_name].node_id}"
+                )
             )
 
         return return_dict

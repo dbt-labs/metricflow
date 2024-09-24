@@ -8,6 +8,7 @@ from typing import Any, Sequence, Tuple
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.type_enums import AggregationType, TimeGranularity
 
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.naming.linkable_spec_name import DUNDER
 from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
@@ -43,8 +44,10 @@ class NonAdditiveDimensionSpec(SerializableDataclass):
         # TODO: [custom granularity] change this to an assertion once we're sure there aren't exceptions
         if not self.name.find(DUNDER) == -1:
             logger.warning(
-                f"Non-additive dimension spec references a dimension name `{self.name}`, with added annotations, but it "
-                "should be a simple element name reference. This should have been blocked by model validation!"
+                LazyFormat(
+                    lambda: f"Non-additive dimension spec references a dimension name `{self.name}`, with added annotations, but it "
+                    "should be a simple element name reference. This should have been blocked by model validation!"
+                )
             )
 
     @property

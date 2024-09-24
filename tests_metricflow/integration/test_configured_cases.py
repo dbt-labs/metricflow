@@ -12,6 +12,7 @@ from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.implementations.elements.measure import PydanticMeasureAggregationParameters
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.protocols.query_parameter import DimensionOrEntityQueryParameter
 from metricflow_semantics.specs.query_param_implementations import DimensionOrEntityParameter, TimeDimensionParameter
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
@@ -227,7 +228,7 @@ def test_case(
 ) -> None:
     """Runs all integration tests configured in the test case YAML directory."""
     case = CONFIGURED_INTEGRATION_TESTS_REPOSITORY.get_test_case(name)
-    logger.info(f"Running integration test case: '{case.name}' from file '{case.file_path}'")
+    logger.debug(LazyFormat(lambda: f"Running integration test case: '{case.name}' from file '{case.file_path}'"))
     time_spine_source = time_spine_sources[TimeGranularity.DAY]
 
     missing_required_features = filter_not_supported_features(sql_client, case.required_features)

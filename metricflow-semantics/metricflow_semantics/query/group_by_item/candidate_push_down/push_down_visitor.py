@@ -12,6 +12,7 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
 
 from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat, mf_pformat_many
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
@@ -168,7 +169,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
     def visit_measure_node(self, node: MeasureGroupByItemSourceNode) -> PushDownResult:
         """Push the group-by-item specs that are available to the measure and match the source patterns to the child."""
         with self._path_from_start_node_tracker.track_node_visit(node) as current_traversal_path:
-            logger.info(f"Handling {node.ui_description}")
+            logger.debug(LazyFormat(lambda: f"Handling {node.ui_description}"))
             items_available_for_measure = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_measure(
                 measure_reference=node.measure_reference,
                 with_any_of=self._with_any_property,
@@ -198,13 +199,15 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
 
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(
-                    f"For {node.ui_description}:\n"
-                    + indent(
-                        "After applying patterns:\n"
-                        + indent(mf_pformat(patterns_to_apply + self._source_spec_patterns))
-                        + "\n"
-                        + "to inputs, matches are:\n"
-                        + indent(mf_pformat(matching_items.specs))
+                    LazyFormat(
+                        lambda: f"For {node.ui_description}:\n"
+                        + indent(
+                            "After applying patterns:\n"
+                            + indent(mf_pformat(patterns_to_apply + self._source_spec_patterns))
+                            + "\n"
+                            + "to inputs, matches are:\n"
+                            + indent(mf_pformat(matching_items.specs))
+                        )
                     )
                 )
 
@@ -320,10 +323,13 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
                 },
                 current_traversal_path=current_traversal_path,
             )
-            logger.info(f"Handling {node.ui_description}")
+            logger.debug(LazyFormat(lambda: f"Handling {node.ui_description}"))
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(
-                    "Candidates from parents:\n" + indent(mf_pformat(merged_result_from_parents.candidate_set.specs))
+                    LazyFormat(
+                        lambda: "Candidates from parents:\n"
+                        + indent(mf_pformat(merged_result_from_parents.candidate_set.specs))
+                    )
                 )
             if merged_result_from_parents.candidate_set.is_empty:
                 return merged_result_from_parents
@@ -356,13 +362,15 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
             if logger.isEnabledFor(logging.DEBUG):
                 matched_specs = matched_items.specs
                 logger.debug(
-                    f"For {node.ui_description}:\n"
-                    + indent(
-                        "After applying patterns:\n"
-                        + indent(mf_pformat(patterns_to_apply))
-                        + "\n"
-                        + "to inputs, outputs are:\n"
-                        + indent(mf_pformat(matched_specs))
+                    LazyFormat(
+                        lambda: f"For {node.ui_description}:\n"
+                        + indent(
+                            "After applying patterns:\n"
+                            + indent(mf_pformat(patterns_to_apply))
+                            + "\n"
+                            + "to inputs, outputs are:\n"
+                            + indent(mf_pformat(matched_specs))
+                        )
                     )
                 )
 
@@ -431,7 +439,10 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
             )
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(
-                    "Candidates from parents:\n" + indent(mf_pformat(merged_result_from_parents.candidate_set.specs))
+                    LazyFormat(
+                        lambda: "Candidates from parents:\n"
+                        + indent(mf_pformat(merged_result_from_parents.candidate_set.specs))
+                    )
                 )
 
             return merged_result_from_parents
@@ -440,11 +451,11 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
     def visit_no_metrics_query_node(self, node: NoMetricsGroupByItemSourceNode) -> PushDownResult:
         """Pass the group-by items that can be queried without metrics to the child node."""
         with self._path_from_start_node_tracker.track_node_visit(node) as current_traversal_path:
-            logger.info(f"Handling {node.ui_description}")
+            logger.debug(LazyFormat(lambda: f"Handling {node.ui_description}"))
             # This is a case for distinct dimension values from semantic models.
             candidate_elements = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_no_metrics_query()
             if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f"Candidate elements are:\n{mf_pformat(candidate_elements)}")
+                logger.debug(LazyFormat(lambda: f"Candidate elements are:\n{mf_pformat(candidate_elements)}"))
             candidates_after_filtering = candidate_elements.filter_by_spec_patterns(self._source_spec_patterns)
 
             if candidates_after_filtering.spec_count == 0:
