@@ -122,6 +122,7 @@ class SqlColumnPrunerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
             or select_column in node.group_bys
             or node.distinct
         )
+        # TODO: don't prune column if it's used in join on condition
 
         if len(pruned_select_columns) == 0:
             raise RuntimeError("All columns have been pruned - this indicates an bug in the pruner or in the inputs.")

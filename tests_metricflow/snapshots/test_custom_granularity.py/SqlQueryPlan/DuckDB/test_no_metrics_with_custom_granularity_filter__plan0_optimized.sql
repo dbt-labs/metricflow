@@ -12,7 +12,7 @@ FROM (
   LEFT OUTER JOIN
     ***************************.mf_time_spine subq_3
   ON
-    listings_latest_src_28000.listing__ds__day = subq_3.ds
+    DATE_TRUNC('day', listings_latest_src_28000.created_at) = subq_3.ds
 ) subq_4
 WHERE listing__ds__martian_day = '2020-01-01'
 GROUP BY

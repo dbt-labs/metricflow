@@ -1087,9 +1087,9 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                     spec=metric_time_dimension_spec,
                 )
             )
-            output_column_to_input_column[
-                metric_time_dimension_column_association.column_name
-            ] = matching_time_dimension_instance.associated_column.column_name
+            output_column_to_input_column[metric_time_dimension_column_association.column_name] = (
+                matching_time_dimension_instance.associated_column.column_name
+            )
 
         output_instance_set = InstanceSet(
             measure_instances=tuple(output_measure_instances),
@@ -1324,11 +1324,11 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             and len(time_spine_dataset.checked_sql_select_node.select_columns) == 1
         ), "Time spine dataset not configured properly. Expected exactly one column."
         original_time_spine_dim_instance = time_spine_dataset.instance_set.time_dimension_instances[0]
-        time_spine_column_select_expr: Union[
-            SqlColumnReferenceExpression, SqlDateTruncExpression
-        ] = SqlColumnReferenceExpression.create(
-            SqlColumnReference(
-                table_alias=time_spine_alias, column_name=original_time_spine_dim_instance.spec.qualified_name
+        time_spine_column_select_expr: Union[SqlColumnReferenceExpression, SqlDateTruncExpression] = (
+            SqlColumnReferenceExpression.create(
+                SqlColumnReference(
+                    table_alias=time_spine_alias, column_name=original_time_spine_dim_instance.spec.qualified_name
+                )
             )
         )
 
@@ -1438,24 +1438,32 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             if instance.spec == node.time_dimension_spec.with_base_grain():
                 parent_time_dimension_instance = instance
                 break
+        parent_column: Optional[SqlSelectColumn] = None
         assert parent_time_dimension_instance, (
             "JoinToCustomGranularityNode's expected time_dimension_spec not found in parent dataset instances. "
             f"This indicates internal misconfiguration. Expected: {node.time_dimension_spec.with_base_grain}; "
             f"Got: {[instance.spec for instance in parent_data_set.instance_set.time_dimension_instances]}"
+        )
+        for select_column in parent_data_set.checked_sql_select_node.select_columns:
+            if select_column.column_alias == parent_time_dimension_instance.associated_column.column_name:
+                parent_column = select_column
+                break
+        assert parent_column, (
+            "JoinToCustomGranularityNode's expected time_dimension_spec not found in parent columns. "
+            f"This indicates internal misconfiguration. Expected: "
+            f"{parent_time_dimension_instance.associated_column.column_name}; Got: "
+            f"{[column.column_alias for column in parent_data_set.checked_sql_select_node.select_columns]}"
         )
 
         # Build join expression.
         time_spine_alias = self._next_unique_table_alias()
         custom_granularity_name = node.time_dimension_spec.time_granularity.name
         time_spine_source = self._get_time_spine_for_custom_granularity(custom_granularity_name)
-        left_expr_for_join: SqlExpressionNode = SqlColumnReferenceExpression.from_table_and_column_names(
-            table_alias=parent_alias, column_name=parent_time_dimension_instance.associated_column.column_name
-        )
         join_description = SqlJoinDescription(
             right_source=SqlTableNode.create(sql_table=time_spine_source.spine_table),
             right_source_alias=time_spine_alias,
             on_condition=SqlComparisonExpression.create(
-                left_expr=left_expr_for_join,
+                left_expr=parent_column.expr,
                 comparison=SqlComparison.EQUALS,
                 right_expr=SqlColumnReferenceExpression.from_table_and_column_names(
                     table_alias=time_spine_alias, column_name=time_spine_source.base_column

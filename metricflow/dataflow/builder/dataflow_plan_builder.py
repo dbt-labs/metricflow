@@ -780,7 +780,7 @@ class DataflowPlanBuilder:
                 filter_intersection=query_spec.filter_intersection,
             )
 
-        required_linkable_specs, extraneous_linkable_specs = self.__get_required_and_extraneous_linkable_specs(
+        required_linkable_specs, _ = self.__get_required_and_extraneous_linkable_specs(
             queried_linkable_specs=query_spec.linkable_specs, filter_specs=query_level_filter_specs
         )
         predicate_pushdown_state = PredicatePushdownState(
