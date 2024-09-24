@@ -23,6 +23,7 @@ from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.errors.error_classes import UnableToSatisfyQueryError
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.mf_logging.runtime import log_runtime
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
@@ -234,12 +235,14 @@ class DataflowPlanBuilder:
     def _optimize_plan(self, plan: DataflowPlan, optimizations: FrozenSet[DataflowPlanOptimization]) -> DataflowPlan:
         optimizer_factory = DataflowPlanOptimizerFactory(self._node_data_set_resolver)
         for optimizer in optimizer_factory.get_optimizers(optimizations):
-            logger.info(f"Applying {optimizer.__class__.__name__}")
+            logger.debug(LazyFormat(lambda: f"Applying {optimizer.__class__.__name__}"))
             try:
                 plan = optimizer.optimize(plan)
-                logger.info(
-                    f"After applying {optimizer.__class__.__name__}, the dataflow plan is:\n"
-                    f"{indent(plan.structure_text())}"
+                logger.debug(
+                    LazyFormat(
+                        lambda: f"After applying {optimizer.__class__.__name__}, the dataflow plan is:\n"
+                        f"{indent(plan.structure_text())}"
+                    )
                 )
             except Exception:
                 logger.exception(f"Got an exception applying {optimizer.__class__.__name__}")
@@ -278,13 +281,15 @@ class DataflowPlanBuilder:
             predicate_pushdown_state=time_range_only_pushdown_state,
             linkable_spec_set=base_required_linkable_specs,
         )
-        logger.info(f"Recipe for base measure aggregation:\n{mf_pformat(base_measure_recipe)}")
+        logger.debug(LazyFormat(lambda: f"Recipe for base measure aggregation:\n{mf_pformat(base_measure_recipe)}"))
         conversion_measure_recipe = self._find_dataflow_recipe(
             measure_spec_properties=self._build_measure_spec_properties([conversion_measure_spec.measure_spec]),
             predicate_pushdown_state=disabled_pushdown_state,
             linkable_spec_set=LinkableSpecSet(),
         )
-        logger.info(f"Recipe for conversion measure aggregation:\n{mf_pformat(conversion_measure_recipe)}")
+        logger.debug(
+            LazyFormat(lambda: f"Recipe for conversion measure aggregation:\n{mf_pformat(conversion_measure_recipe)}")
+        )
         if base_measure_recipe is None:
             raise UnableToSatisfyQueryError(
                 f"Unable to join all items in request. Measure: {base_measure_spec.measure_spec}; Specs to join: {base_required_linkable_specs}"
@@ -406,15 +411,19 @@ class DataflowPlanBuilder:
         # TODO: [custom granularity] change this to an assertion once we're sure there aren't exceptions
         if not StructuredLinkableSpecName.from_name(conversion_type_params.entity).is_element_name:
             logger.warning(
-                f"Found additional annotations in type param entity name `{conversion_type_params.entity}`, which "
-                "should be a simple element name reference. This should have been blocked by model validation!"
+                LazyFormat(
+                    lambda: f"Found additional annotations in type param entity name `{conversion_type_params.entity}`, which "
+                    "should be a simple element name reference. This should have been blocked by model validation!"
+                )
             )
         entity_spec = EntitySpec(element_name=conversion_type_params.entity, entity_links=())
-        logger.info(
-            f"For conversion metric {metric_spec},\n"
-            f"base_measure is:\n{mf_pformat(base_measure)}\n"
-            f"conversion_measure is:\n{mf_pformat(conversion_measure)}\n"
-            f"entity is:\n{mf_pformat(entity_spec)}"
+        logger.debug(
+            LazyFormat(
+                lambda: f"For conversion metric {metric_spec},\n"
+                f"base_measure is:\n{mf_pformat(base_measure)}\n"
+                f"conversion_measure is:\n{mf_pformat(conversion_measure)}\n"
+                f"entity is:\n{mf_pformat(entity_spec)}"
+            )
         )
 
         aggregated_measures_node = self._build_aggregated_conversion_node(
@@ -535,10 +544,12 @@ class DataflowPlanBuilder:
             ),
             descendent_filter_specs=metric_spec.filter_specs,
         )
-        logger.info(
-            f"For\n{indent(mf_pformat(metric_spec))}"
-            f"\nneeded measure is:"
-            f"\n{indent(mf_pformat(metric_input_measure_spec))}"
+        logger.debug(
+            LazyFormat(
+                lambda: f"For\n{indent(mf_pformat(metric_spec))}"
+                f"\nneeded measure is:"
+                f"\n{indent(mf_pformat(metric_input_measure_spec))}"
+            )
         )
 
         aggregated_measures_node = self.build_aggregated_measure(
@@ -567,8 +578,11 @@ class DataflowPlanBuilder:
             metric_reference=metric_spec.reference,
             filter_spec_factory=filter_spec_factory,
         )
-        logger.info(
-            f"For {metric.type} metric: {metric_spec}, needed metrics are:\n" f"{mf_pformat(metric_input_specs)}"
+        logger.debug(
+            LazyFormat(
+                lambda: f"For {metric.type} metric: {metric_spec}, needed metrics are:\n"
+                f"{mf_pformat(metric_input_specs)}"
+            )
         )
 
         required_linkable_specs, extraneous_linkable_specs = self.__get_required_and_extraneous_linkable_specs(
@@ -730,7 +744,7 @@ class DataflowPlanBuilder:
         output_nodes: List[DataflowPlanNode] = []
 
         for metric_spec in metric_specs:
-            logger.info(f"Generating compute metrics node for:\n{indent(mf_pformat(metric_spec))}")
+            logger.debug(LazyFormat(lambda: f"Generating compute metrics node for:\n{indent(mf_pformat(metric_spec))}"))
             self._metric_lookup.get_metric(metric_spec.reference)
 
             output_nodes.append(
@@ -986,10 +1000,12 @@ class DataflowPlanBuilder:
                 candidate_nodes_for_left_side_of_join += [time_spine_node]
             default_join_type = SqlJoinType.FULL_OUTER
 
-        logger.info(
-            f"Starting search with {len(candidate_nodes_for_left_side_of_join)} potential source nodes on the left "
-            f"side of the join, and {len(candidate_nodes_for_right_side_of_join)} potential nodes on the right side "
-            f"of the join."
+        logger.debug(
+            LazyFormat(
+                lambda: f"Starting search with {len(candidate_nodes_for_left_side_of_join)} potential source nodes on the left "
+                f"side of the join, and {len(candidate_nodes_for_right_side_of_join)} potential nodes on the right side "
+                f"of the join."
+            )
         )
         start_time = time.time()
 
@@ -1020,9 +1036,11 @@ class DataflowPlanBuilder:
             metric_time_dimension_reference=self._metric_time_dimension_reference,
             time_spine_nodes=self._source_node_set.time_spine_nodes_tuple,
         )
-        logger.info(
-            f"After removing unnecessary nodes, there are {len(candidate_nodes_for_right_side_of_join)} candidate "
-            f"nodes for the right side of the join"
+        logger.debug(
+            LazyFormat(
+                lambda: f"After removing unnecessary nodes, there are {len(candidate_nodes_for_right_side_of_join)} candidate "
+                f"nodes for the right side of the join"
+            )
         )
         if DataflowPlanBuilder._contains_multihop_linkables(linkable_specs):
             candidate_nodes_for_right_side_of_join = list(
@@ -1032,16 +1050,20 @@ class DataflowPlanBuilder:
                     join_type=default_join_type,
                 )
             )
-            logger.info(
-                f"After adding multi-hop nodes, there are {len(candidate_nodes_for_right_side_of_join)} candidate "
-                f"nodes for the right side of the join:\n"
-                f"{mf_pformat(candidate_nodes_for_right_side_of_join)}"
+            logger.debug(
+                LazyFormat(
+                    lambda: f"After adding multi-hop nodes, there are {len(candidate_nodes_for_right_side_of_join)} candidate "
+                    f"nodes for the right side of the join:\n"
+                    f"{mf_pformat(candidate_nodes_for_right_side_of_join)}"
+                )
             )
 
         # If there are MetricGroupBys in the requested linkable specs, build source nodes to satisfy them.
         # We do this at query time instead of during usual source node generation because the number of potential
         # MetricGroupBy source nodes could be extremely large (and potentially slow).
-        logger.info(f"Building source nodes for group by metrics: {linkable_spec_set.group_by_metric_specs}")
+        logger.debug(
+            LazyFormat(lambda: f"Building source nodes for group by metrics: {linkable_spec_set.group_by_metric_specs}")
+        )
         candidate_nodes_for_right_side_of_join += [
             self._build_query_output_node(
                 query_spec=self._source_node_builder.build_source_node_inputs_for_group_by_metric(group_by_metric_spec),
@@ -1050,7 +1072,7 @@ class DataflowPlanBuilder:
             for group_by_metric_spec in linkable_spec_set.group_by_metric_specs
         ]
 
-        logger.info(f"Processing nodes took: {time.time()-start_time:.2f}s")
+        logger.debug(LazyFormat(lambda: f"Processing nodes took: {time.time()-start_time:.2f}s"))
 
         node_evaluator = NodeEvaluatorForLinkableInstances(
             semantic_model_lookup=self._semantic_model_lookup,
@@ -1072,15 +1094,19 @@ class DataflowPlanBuilder:
                 ]
                 if missing_specs:
                     logger.debug(
-                        f"Skipping evaluation for:\n"
-                        f"{indent(node.structure_text())}"
-                        f"since it does not have all of the measure specs:\n"
-                        f"{indent(mf_pformat(missing_specs))}"
+                        LazyFormat(
+                            lambda: f"Skipping evaluation for:\n"
+                            f"{indent(node.structure_text())}"
+                            f"since it does not have all of the measure specs:\n"
+                            f"{indent(mf_pformat(missing_specs))}"
+                        )
                     )
                     continue
 
             logger.debug(
-                f"Evaluating candidate node for the left side of the join:\n{indent(mf_pformat(node.structure_text()))}"
+                LazyFormat(
+                    lambda: f"Evaluating candidate node for the left side of the join:\n{indent(mf_pformat(node.structure_text()))}"
+                )
             )
 
             start_time = time.time()
@@ -1089,33 +1115,43 @@ class DataflowPlanBuilder:
                 required_linkable_specs=list(linkable_specs),
                 default_join_type=default_join_type,
             )
-            logger.info(f"Evaluation of {node} took {time.time() - start_time:.2f}s")
+            logger.debug(LazyFormat(lambda: f"Evaluation of {node} took {time.time() - start_time:.2f}s"))
 
-            logger.info(
-                "Evaluation for source node:"
-                + indent(f"\nnode:\n{indent(node.structure_text())}")
-                + indent(f"\nevaluation:\n{indent(mf_pformat(evaluation))}")
+            logger.debug(
+                LazyFormat(
+                    lambda: "Evaluation for source node:"
+                    + indent(f"\nnode:\n{indent(node.structure_text())}")
+                    + indent(f"\nevaluation:\n{indent(mf_pformat(evaluation))}")
+                )
             )
 
             if len(evaluation.unjoinable_linkable_specs) > 0:
-                logger.info(
-                    f"Skipping {node.node_id} since it contains un-joinable specs: "
-                    f"{evaluation.unjoinable_linkable_specs}"
+                logger.debug(
+                    LazyFormat(
+                        lambda: f"Skipping {node.node_id} since it contains un-joinable specs: "
+                        f"{evaluation.unjoinable_linkable_specs}"
+                    )
                 )
                 continue
 
             num_joins_required = len(evaluation.join_recipes)
-            logger.info(f"Found candidate with node ID '{node.node_id}' with {num_joins_required} joins required.")
+            logger.debug(
+                LazyFormat(
+                    lambda: f"Found candidate with node ID '{node.node_id}' with {num_joins_required} joins required."
+                )
+            )
 
             node_to_evaluation[node] = evaluation
 
             # Since are evaluating nodes with the lowest cost first, if we find one without requiring any joins, then
             # this is going to be the lowest cost solution.
             if len(evaluation.join_recipes) == 0:
-                logger.info("Not evaluating other nodes since we found one that doesn't require joins")
+                logger.debug(
+                    LazyFormat(lambda: "Not evaluating other nodes since we found one that doesn't require joins")
+                )
                 break
 
-        logger.info(f"Found {len(node_to_evaluation)} candidate source nodes.")
+        logger.debug(LazyFormat(lambda: f"Found {len(node_to_evaluation)} candidate source nodes."))
 
         if len(node_to_evaluation) > 0:
             # Find evaluation with lowest number of joins.
@@ -1124,11 +1160,13 @@ class DataflowPlanBuilder:
             )
             evaluation = node_to_evaluation[node_with_lowest_cost_plan]
 
-            logger.info(
-                "Lowest cost plan is:"
-                + indent(f"\nnode:\n{indent(node_with_lowest_cost_plan.structure_text())}")
-                + indent(f"\nevaluation:\n{indent(mf_pformat(evaluation))}")
-                + indent(f"\njoins: {len(node_to_evaluation[node_with_lowest_cost_plan].join_recipes)}")
+            logger.debug(
+                LazyFormat(
+                    lambda: "Lowest cost plan is:"
+                    + indent(f"\nnode:\n{indent(node_with_lowest_cost_plan.structure_text())}")
+                    + indent(f"\nevaluation:\n{indent(mf_pformat(evaluation))}")
+                    + indent(f"\njoins: {len(node_to_evaluation[node_with_lowest_cost_plan].join_recipes)}")
+                )
             )
 
             # Nodes containing the linkable instances will be joined to the source node, so these
@@ -1154,7 +1192,7 @@ class DataflowPlanBuilder:
                 join_linkable_instances_recipes=node_to_evaluation[node_with_lowest_cost_plan].join_recipes,
             )
 
-        logger.error("No recipe could be constructed.")
+        logger.error(LazyFormat(lambda: "No recipe could be constructed."))
         return None
 
     def build_computed_metrics_node(
@@ -1342,10 +1380,12 @@ class DataflowPlanBuilder:
         """
         measure_spec = metric_input_measure_spec.measure_spec
 
-        logger.info(
-            f"Building aggregated measure: {measure_spec} with input measure filters:\n"
-            f"{mf_pformat(metric_input_measure_spec.filter_specs)}\n"
-            f"and  filters:\n{mf_pformat(metric_input_measure_spec.filter_specs)}"
+        logger.debug(
+            LazyFormat(
+                lambda: f"Building aggregated measure: {measure_spec} with input measure filters:\n"
+                f"{mf_pformat(metric_input_measure_spec.filter_specs)}\n"
+                f"and  filters:\n{mf_pformat(metric_input_measure_spec.filter_specs)}"
+            )
         )
 
         return self._build_aggregated_measure_from_measure_source_node(
@@ -1408,7 +1448,11 @@ class DataflowPlanBuilder:
 
         cumulative_metric_adjusted_time_constraint: Optional[TimeRangeConstraint] = None
         if cumulative and predicate_pushdown_state.time_range_constraint is not None:
-            logger.info(f"Time range constraint before adjustment is {predicate_pushdown_state.time_range_constraint}")
+            logger.debug(
+                LazyFormat(
+                    lambda: f"Time range constraint before adjustment is {predicate_pushdown_state.time_range_constraint}"
+                )
+            )
             granularity: Optional[TimeGranularity] = None
             count = 0
             if cumulative_window is not None:
@@ -1423,7 +1467,9 @@ class DataflowPlanBuilder:
                     predicate_pushdown_state.time_range_constraint, granularity, count
                 )
             )
-            logger.info(f"Adjusted time range constraint to: {cumulative_metric_adjusted_time_constraint}")
+            logger.debug(
+                LazyFormat(lambda: f"Adjusted time range constraint to: {cumulative_metric_adjusted_time_constraint}")
+            )
 
         required_linkable_specs, extraneous_linkable_specs = self.__get_required_and_extraneous_linkable_specs(
             queried_linkable_specs=queried_linkable_specs,
@@ -1436,10 +1482,12 @@ class DataflowPlanBuilder:
         )
 
         if measure_recipe is None:
-            logger.info(
-                "Looking for a recipe to get:"
-                + indent(f"\nmeasure_specs:\n{mf_pformat([measure_spec])}")
-                + indent(f"\nevaluation:\n{mf_pformat(required_linkable_specs)}")
+            logger.debug(
+                LazyFormat(
+                    lambda: "Looking for a recipe to get:"
+                    + indent(f"\nmeasure_specs:\n{mf_pformat([measure_spec])}")
+                    + indent(f"\nevaluation:\n{mf_pformat(required_linkable_specs)}")
+                )
             )
             measure_time_constraint = (
                 (cumulative_metric_adjusted_time_constraint or predicate_pushdown_state.time_range_constraint)
@@ -1460,12 +1508,14 @@ class DataflowPlanBuilder:
                 predicate_pushdown_state=measure_pushdown_state,
                 linkable_spec_set=required_linkable_specs,
             )
-            logger.info(
-                f"With {len(self._source_node_set.source_nodes_for_metric_queries)} source nodes, finding a recipe "
-                f"took {time.time() - find_recipe_start_time:.2f}s"
+            logger.debug(
+                LazyFormat(
+                    lambda: f"With {len(self._source_node_set.source_nodes_for_metric_queries)} source nodes, finding a recipe "
+                    f"took {time.time() - find_recipe_start_time:.2f}s"
+                )
             )
 
-        logger.info(f"Using recipe:\n{indent(mf_pformat(measure_recipe))}")
+        logger.debug(LazyFormat(lambda: f"Using recipe:\n{indent(mf_pformat(measure_recipe))}"))
 
         if measure_recipe is None:
             raise UnableToSatisfyQueryError(

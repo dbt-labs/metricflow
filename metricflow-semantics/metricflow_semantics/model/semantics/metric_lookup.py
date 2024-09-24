@@ -12,6 +12,7 @@ from dbt_semantic_interfaces.references import MeasureReference, MetricReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow_semantics.errors.error_classes import DuplicateMetricError, MetricNotFoundError, NonExistentMeasureError
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
 from metricflow_semantics.model.semantics.linkable_spec_resolver import (
@@ -63,8 +64,10 @@ class MetricLookup:
             with_any_of=frozen_with_any_of,
             without_any_of=frozen_without_any_of,
         )
-        logger.info(
-            f"Getting valid linkable elements for measure '{measure_reference.element_name}' took: {time.time() - start_time:.2f}s"
+        logger.debug(
+            LazyFormat(
+                lambda: f"Getting valid linkable elements for measure '{measure_reference.element_name}' took: {time.time() - start_time:.2f}s"
+            )
         )
 
         return linkable_element_set

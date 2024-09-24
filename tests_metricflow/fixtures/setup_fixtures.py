@@ -8,6 +8,7 @@ from pathlib import Path
 import _pytest.config
 import pytest
 from _pytest.fixtures import FixtureRequest
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.random_id import random_id
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import (
@@ -126,11 +127,13 @@ def mf_test_configuration(  # noqa: D103
                 f"schema: {mf_source_schema} default source schema: {default_source_schema}"
             )
 
-        logger.info(
-            f"Since the flag {USE_PERSISTENT_SOURCE_SCHEMA_CLI_FLAG} was specified, this session will use the "
-            f"persistent source schema {mf_source_schema}. If the required source tables do not exist in this "
-            f"schema, they will be created. However, the source schema (and the associated tables) will not "
-            f"be dropped at the end of the testing session."
+        logger.debug(
+            LazyFormat(
+                lambda: f"Since the flag {USE_PERSISTENT_SOURCE_SCHEMA_CLI_FLAG} was specified, this session will use the "
+                f"persistent source schema {mf_source_schema}. If the required source tables do not exist in this "
+                f"schema, they will be created. However, the source schema (and the associated tables) will not "
+                f"be dropped at the end of the testing session."
+            )
         )
     else:
         mf_source_schema = default_source_schema

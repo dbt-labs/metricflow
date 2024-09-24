@@ -7,6 +7,7 @@ from typing import List, Optional, Sequence, Set, Tuple
 
 from dbt_semantic_interfaces.references import MeasureReference, MetricReference, SemanticModelReference
 
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat, mf_pformat_many
 from metricflow_semantics.mf_logging.runtime import log_runtime
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
@@ -222,7 +223,7 @@ class MetricFlowQueryResolver:
             metric_references=metric_references,
             where_filter_intersection=filter_input.where_filter_intersection,
         )
-        logger.info(f"Resolution DAG is:\n{resolution_dag.structure_text()}")
+        logger.debug(LazyFormat(lambda: f"Resolution DAG is:\n{resolution_dag.structure_text()}"))
 
         group_by_item_resolver = GroupByItemResolver(
             manifest_lookup=self._manifest_lookup,
@@ -489,7 +490,9 @@ class MetricFlowQueryResolver:
 
         # No errors.
         linkable_spec_set = group_specs_by_type(group_by_item_specs)
-        logger.info(f"Group-by-items were resolved to:\n{mf_pformat(linkable_spec_set.linkable_specs)}")
+        logger.debug(
+            LazyFormat(lambda: f"Group-by-items were resolved to:\n{mf_pformat(linkable_spec_set.linkable_specs)}")
+        )
 
         # Run post-resolution validation rules to generate issues that are generated at the query-level.
         query_level_issue_set = self._post_resolution_query_validator.validate_query(
@@ -552,10 +555,12 @@ class MetricFlowQueryResolver:
         # a measure alias is used incorrectly.
         if len(models_not_in_manifest) > 0:
             logger.error(
-                mf_pformat_many(
-                    "Semantic references that aren't in the manifest were found in the set used in "
-                    "a query. This is a bug, and to avoid potential issues, they will be filtered out.",
-                    {"models_not_in_manifest": models_not_in_manifest},
+                LazyFormat(
+                    lambda: mf_pformat_many(
+                        "Semantic references that aren't in the manifest were found in the set used in "
+                        "a query. This is a bug, and to avoid potential issues, they will be filtered out.",
+                        {"models_not_in_manifest": models_not_in_manifest},
+                    )
                 )
             )
         queried_semantic_models -= models_not_in_manifest

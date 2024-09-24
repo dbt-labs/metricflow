@@ -14,8 +14,8 @@ from dbt_semantic_interfaces.type_enums import DimensionType
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
 from metricflow_semantics.errors.error_classes import ExecutionException
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
-from metricflow_semantics.mf_logging.formatting import indent
-from metricflow_semantics.mf_logging.pretty_print import mf_pformat
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.mf_logging.runtime import log_block_runtime
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.linkable_element import LinkableDimension
@@ -357,9 +357,11 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         if self._reset_id_enumeration:
             # Some of the objects that are created below use generated IDs. To avoid collision with IDs that are
             # generated for queries, set the ID generation numbering to start at a high enough number.
-            logger.info(
-                f"For creating setup objects, setting numbering of generated IDs to start at: "
-                f"{MetricFlowEngine._ID_ENUMERATION_START_VALUE_FOR_INITIALIZER}"
+            logger.debug(
+                LazyFormat(
+                    lambda: f"For creating setup objects, setting numbering of generated IDs to start at: "
+                    f"{MetricFlowEngine._ID_ENUMERATION_START_VALUE_FOR_INITIALIZER}"
+                )
             )
             SequentialIdGenerator.reset(MetricFlowEngine._ID_ENUMERATION_START_VALUE_FOR_INITIALIZER)
         self._semantic_manifest_lookup = semantic_manifest_lookup
@@ -378,7 +380,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         ):
             data_set = converter.create_sql_source_data_set(semantic_model)
             self._source_data_sets.append(data_set)
-            logger.info(f"Created source dataset from semantic model '{semantic_model.name}'")
+            logger.debug(LazyFormat(lambda: f"Created source dataset from semantic model '{semantic_model.name}'"))
 
         source_node_builder = SourceNodeBuilder(
             column_association_resolver=self._column_association_resolver,
@@ -416,7 +418,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def query(self, mf_request: MetricFlowQueryRequest) -> MetricFlowQueryResult:  # noqa: D102
-        logger.info(f"Starting query request:\n{indent(mf_pformat(mf_request))}")
+        logger.info(LazyFormat("Starting query request", mf_request=mf_request))
         explain_result = self._create_execution_plan(mf_request)
         execution_plan = explain_result.convert_to_execution_plan_result.execution_plan
 
@@ -425,9 +427,9 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
         task = execution_plan.tasks[0]
 
-        logger.info(f"Sequentially running tasks in:\n" f"{execution_plan.structure_text()}")
+        logger.debug(LazyFormat(lambda: f"Sequentially running tasks in:\n" f"{execution_plan.structure_text()}"))
         execution_results = self._executor.execute_plan(execution_plan)
-        logger.info("Finished running tasks in execution plan")
+        logger.debug(LazyFormat(lambda: "Finished running tasks in execution plan"))
 
         if execution_results.contains_task_errors:
             raise ExecutionException(f"Got errors while executing tasks:\n{execution_results.get_result(task.task_id)}")
@@ -436,7 +438,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
         assert task_execution_result.sql, "Task execution should have returned SQL that was run"
 
-        logger.info(f"Finished query request: {mf_request.request_id}")
+        logger.info(LazyFormat("Finished query request", request_id=mf_request.request_id))
         return MetricFlowQueryResult(
             query_spec=explain_result.query_spec,
             dataflow_plan=explain_result.dataflow_plan,
@@ -452,8 +454,10 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
     def _create_execution_plan(self, mf_query_request: MetricFlowQueryRequest) -> MetricFlowExplainResult:
         if self._reset_id_enumeration:
-            logger.info(
-                f"Setting ID generation to start at: {MetricFlowEngine._ID_ENUMERATION_START_VALUE_FOR_QUERIES}"
+            logger.debug(
+                LazyFormat(
+                    lambda: f"Setting ID generation to start at: {MetricFlowEngine._ID_ENUMERATION_START_VALUE_FOR_QUERIES}"
+                )
             )
             SequentialIdGenerator.reset(MetricFlowEngine._ID_ENUMERATION_START_VALUE_FOR_QUERIES)
 
@@ -489,7 +493,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 order_by=mf_query_request.order_by,
                 min_max_only=mf_query_request.min_max_only,
             ).query_spec
-        logger.info(f"Query spec is:\n{mf_pformat(query_spec)}")
+        logger.info(LazyFormat("Parsed query", query_spec=query_spec))
 
         output_selection_specs: Optional[InstanceSpecSet] = None
         if mf_query_request.query_type == MetricFlowQueryType.DIMENSION_VALUES:
@@ -500,14 +504,25 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 dimension_specs=query_spec.dimension_specs,
                 time_dimension_specs=query_spec.time_dimension_specs,
             )
-
         if query_spec.metric_specs:
+            logger.info(
+                LazyFormat(
+                    "Building dataflow plan", dataflow_plan_optimizations=mf_query_request.dataflow_plan_optimizations
+                )
+            )
             dataflow_plan = self._dataflow_plan_builder.build_plan(
                 query_spec=query_spec,
                 output_selection_specs=output_selection_specs,
                 optimizations=mf_query_request.dataflow_plan_optimizations,
             )
         else:
+            logger.info(
+                LazyFormat(
+                    "Building dataflow plan for distinct values",
+                    dataflow_plan_optimizations=mf_query_request.dataflow_plan_optimizations,
+                )
+            )
+
             dataflow_plan = self._dataflow_plan_builder.build_plan_for_distinct_values(
                 query_spec=query_spec, optimizations=mf_query_request.dataflow_plan_optimizations
             )
@@ -518,8 +533,8 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 f"Got tasks: {dataflow_plan.sink_nodes}"
             )
 
+        logger.info(LazyFormat("Building execution plan"))
         convert_to_execution_plan_result = self._to_execution_plan_converter.convert_to_execution_plan(dataflow_plan)
-
         return MetricFlowExplainResult(
             query_spec=query_spec,
             dataflow_plan=dataflow_plan,
@@ -528,7 +543,8 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def explain(self, mf_request: MetricFlowQueryRequest) -> MetricFlowExplainResult:  # noqa: D102
-        return self._create_execution_plan(mf_request)
+        with log_block_runtime("explain"):
+            return self._create_execution_plan(mf_request)
 
     def get_measures_for_metrics(self, metric_names: List[str]) -> List[Measure]:  # noqa: D102
         metrics = self._semantic_manifest_lookup.metric_lookup.get_metrics(

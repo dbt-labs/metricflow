@@ -18,6 +18,7 @@ from metricflow_semantics.assert_one_arg import assert_at_most_one_arg_set
 from metricflow_semantics.filters.merge_where import merge_to_single_where_filter
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.mf_logging.runtime import log_runtime
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
@@ -429,11 +430,13 @@ class MetricFlowQueryParser:
                     )
                 )
 
-            logger.info(
-                "Converted group-by-item input:\n"
-                + indent(f"Input: {repr(group_by_name)}")
-                + "\n"
-                + indent(f"Resolver Input: {mf_pformat(resolver_input_for_group_by_item)}")
+            logger.debug(
+                LazyFormat(
+                    lambda: "Converted group-by-item input:\n"
+                    + indent(f"Input: {repr(group_by_name)}")
+                    + "\n"
+                    + indent(f"Resolver Input: {mf_pformat(resolver_input_for_group_by_item)}")
+                )
             )
 
         for group_by_parameter in group_by:
@@ -441,11 +444,13 @@ class MetricFlowQueryParser:
                 semantic_manifest_lookup=self._manifest_lookup
             )
             resolver_inputs_for_group_by_items.append(resolver_input_for_group_by_parameter)
-            logger.info(
-                "Converted group-by-item input:\n"
-                + indent(f"Input: {repr(group_by_parameter)}")
-                + "\n"
-                + indent(f"Resolver Input: {mf_pformat(resolver_input_for_group_by_parameter)}")
+            logger.debug(
+                LazyFormat(
+                    lambda: "Converted group-by-item input:\n"
+                    + indent(f"Input: {repr(group_by_parameter)}")
+                    + "\n"
+                    + indent(f"Resolver Input: {mf_pformat(resolver_input_for_group_by_parameter)}")
+                )
             )
 
         where_filters: List[PydanticWhereFilter] = []
@@ -483,11 +488,13 @@ class MetricFlowQueryParser:
             min_max_only=resolver_input_for_min_max_only,
         )
 
-        logger.info("Resolver input for query is:\n" + indent(mf_pformat(resolver_input_for_query)))
+        logger.debug(
+            LazyFormat(lambda: "Resolver input for query is:\n" + indent(mf_pformat(resolver_input_for_query)))
+        )
 
         query_resolution = query_resolver.resolve_query(resolver_input_for_query)
 
-        logger.info("Query resolution is:\n" + indent(mf_pformat(query_resolution)))
+        logger.debug(LazyFormat("Resolved query", query_resolution=query_resolution))
 
         self._raise_exception_if_there_are_errors(
             input_to_issue_set=query_resolution.input_to_issue_set.merge(
@@ -500,10 +507,14 @@ class MetricFlowQueryParser:
         if time_constraint_start is not None or time_constraint_end is not None:
             if time_constraint_start is None:
                 time_constraint_start = TimeRangeConstraint.ALL_TIME_BEGIN()
-                logger.info(f"time_constraint_start was None, so it was set to {time_constraint_start}")
+                logger.debug(
+                    LazyFormat(lambda: f"time_constraint_start was None, so it was set to {time_constraint_start}")
+                )
             if time_constraint_end is None:
                 time_constraint_end = TimeRangeConstraint.ALL_TIME_END()
-                logger.info(f"time_constraint_end was None, so it was set to {time_constraint_end}")
+                logger.debug(
+                    LazyFormat(lambda: f"time_constraint_end was None, so it was set to {time_constraint_end}")
+                )
 
             time_constraint = TimeRangeConstraint(
                 start_time=time_constraint_start,
@@ -515,7 +526,7 @@ class MetricFlowQueryParser:
                 time_dimension_specs_in_query=query_spec.time_dimension_specs,
                 time_constraint=time_constraint,
             )
-            logger.info(f"Time constraint after adjustment is: {time_constraint}")
+            logger.debug(LazyFormat(lambda: f"Time constraint after adjustment is: {time_constraint}"))
 
             return ParseQueryResult(
                 query_spec=query_spec.with_time_range_constraint(time_constraint),

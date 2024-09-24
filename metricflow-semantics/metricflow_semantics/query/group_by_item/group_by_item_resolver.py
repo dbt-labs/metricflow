@@ -11,6 +11,7 @@ from dbt_semantic_interfaces.type_enums import TimeGranularity
 from typing_extensions import override
 
 from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
@@ -110,11 +111,13 @@ class GroupByItemResolver:
         ):
             push_down_result = push_down_result.filter_candidates_by_pattern(candidate_filter)
 
-        logger.info(
-            f"Spec pattern:\n"
-            f"{indent(mf_pformat(spec_pattern))}\n"
-            f"was resolved to:\n"
-            f"{indent(mf_pformat(push_down_result.candidate_set.specs))}"
+        logger.debug(
+            LazyFormat(
+                lambda: f"Spec pattern:\n"
+                f"{indent(mf_pformat(spec_pattern))}\n"
+                f"was resolved to:\n"
+                f"{indent(mf_pformat(push_down_result.candidate_set.specs))}"
+            )
         )
         if push_down_result.candidate_set.num_candidates > 1:
             return GroupByItemResolution(

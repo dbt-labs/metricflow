@@ -46,6 +46,7 @@ from typing import Callable, Optional, Sequence
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.implementations.base import FrozenBaseModel
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 
 from metricflow.protocols.sql_client import SqlEngine
 from tests_metricflow.fixtures.setup_fixtures import SQL_ENGINE_SNAPSHOT_MARKER_NAME
@@ -111,7 +112,7 @@ class MetricFlowTestCredentialSetForAllEngines(FrozenBaseModel):  # noqa: D101
 
 
 def run_command(command: str) -> None:  # noqa: D103
-    logger.info(f"Running command {command}")
+    logger.debug(LazyFormat(lambda: f"Running command {command}"))
     return_code = os.system(command)
     if return_code != 0:
         raise RuntimeError(f"Error running command: {command}")
@@ -180,11 +181,15 @@ def run_cli(function_to_run: Callable) -> None:  # noqa: D103
 
     credential_sets = MetricFlowTestCredentialSetForAllEngines.parse_raw(credential_sets_json_str)
 
-    logger.info(f"Running tests in '{TEST_DIRECTORY}' with the marker '{SQL_ENGINE_SNAPSHOT_MARKER_NAME}'")
+    logger.debug(
+        LazyFormat(lambda: f"Running tests in '{TEST_DIRECTORY}' with the marker '{SQL_ENGINE_SNAPSHOT_MARKER_NAME}'")
+    )
 
     for test_configuration in credential_sets.as_configurations:
-        logger.info(
-            f"Running tests for {test_configuration.engine} with URL: {test_configuration.credential_set.engine_url}"
+        logger.debug(
+            LazyFormat(
+                lambda: f"Running tests for {test_configuration.engine} with URL: {test_configuration.credential_set.engine_url}"
+            )
         )
         function_to_run(test_configuration)
 

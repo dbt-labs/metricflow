@@ -14,6 +14,7 @@ import tabulate
 from _pytest.fixtures import FixtureRequest
 
 from metricflow_semantics.dag.mf_dag import MetricFlowDag
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
@@ -85,7 +86,9 @@ def assert_snapshot_text_equal(
 
     if mf_test_configuration.display_snapshots:
         if not mf_test_configuration.overwrite_snapshots:
-            logger.warning(f"Not overwriting snapshots, so displaying existing snapshot at {file_path}")
+            logger.warning(
+                LazyFormat(lambda: f"Not overwriting snapshots, so displaying existing snapshot at {file_path}")
+            )
 
         if len(request.session.items) > 1:
             raise ValueError("Displaying snapshots is only supported when there's a single item in a testing session.")

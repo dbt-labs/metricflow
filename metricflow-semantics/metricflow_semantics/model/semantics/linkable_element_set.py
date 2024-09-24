@@ -10,6 +10,7 @@ from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.references import SemanticModelReference
 from typing_extensions import override
 
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
 from metricflow_semantics.model.semantics.linkable_element import (
@@ -413,5 +414,5 @@ class LinkableElementSet(SemanticModelDerivation):
             path_key_to_linkable_entities=path_key_to_linkable_entities,
             path_key_to_linkable_metrics=path_key_to_linkable_metrics,
         )
-        logger.info(f"Filtering valid linkable elements took: {time.time() - start_time:.2f}s")
+        logger.debug(LazyFormat(lambda: f"Filtering valid linkable elements took: {time.time() - start_time:.2f}s"))
         return filtered_elements

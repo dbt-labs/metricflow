@@ -6,6 +6,7 @@ from collections import OrderedDict
 from typing import Dict
 
 from metricflow_semantics.dag.mf_dag import NodeId
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 
 from metricflow.execution.execution_plan import ExecutionPlan, ExecutionPlanTask, TaskExecutionResult
 
@@ -59,7 +60,7 @@ class SequentialPlanExecutor(ExecutionPlanExecutor):
                 return
 
         result = None
-        logger.info(f"Started task ID: {current_task.node_id}")
+        logger.debug(LazyFormat(lambda: f"Started task ID: {current_task.node_id}"))
         try:
             result = current_task.execute()
             results.add_result(current_task.task_id, result)
@@ -67,11 +68,17 @@ class SequentialPlanExecutor(ExecutionPlanExecutor):
             if result:
                 runtime = f"{result.end_time - result.start_time:.2f}s"
                 if result.errors:
-                    logger.info(f"Finished task ID: {current_task.node_id} with errors: {result.errors} in {runtime}")
+                    logger.debug(
+                        LazyFormat(
+                            lambda: f"Finished task ID: {current_task.node_id} with errors: {result.errors} in {runtime}"
+                        )
+                    )
                 else:
-                    logger.info(f"Finished task ID: {current_task.node_id} successfully in {runtime}")
+                    logger.debug(
+                        LazyFormat(lambda: f"Finished task ID: {current_task.node_id} successfully in {runtime}")
+                    )
             else:
-                logger.info(f"Task ID: {current_task.node_id} exited unexpectedly")
+                logger.debug(LazyFormat(lambda: f"Task ID: {current_task.node_id} exited unexpectedly"))
 
     def execute_plan(self, plan: ExecutionPlan) -> ExecutionResults:  # noqa: D102
         results = ExecutionResults()

@@ -6,6 +6,8 @@ from dataclasses import dataclass
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+
 logger = logging.getLogger(__name__)
 
 
@@ -18,10 +20,18 @@ class TimeRangeConstraint(SerializableDataclass):
 
     def __post_init__(self) -> None:  # noqa: D105
         if self.start_time > self.end_time:
-            logger.warning(f"start_time must not be > end_time. start_time={self.start_time} end_time={self.end_time}")
+            logger.warning(
+                LazyFormat(
+                    lambda: f"start_time must not be > end_time. start_time={self.start_time} end_time={self.end_time}"
+                )
+            )
 
         if self.start_time < TimeRangeConstraint.ALL_TIME_BEGIN():
-            logger.warning(f"start_time={self.start_time} exceeds the limits of {TimeRangeConstraint.ALL_TIME_BEGIN()}")
+            logger.warning(
+                LazyFormat(
+                    lambda: f"start_time={self.start_time} exceeds the limits of {TimeRangeConstraint.ALL_TIME_BEGIN()}"
+                )
+            )
 
         if self.end_time > TimeRangeConstraint.ALL_TIME_END():
             raise RuntimeError(f"end_time={self.end_time} exceeds the limits of {TimeRangeConstraint.ALL_TIME_END()}")

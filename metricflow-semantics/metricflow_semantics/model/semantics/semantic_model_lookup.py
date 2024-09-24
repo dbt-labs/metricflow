@@ -20,6 +20,7 @@ from dbt_semantic_interfaces.references import (
 from dbt_semantic_interfaces.type_enums import AggregationType, DimensionType, EntityType, TimeGranularity
 
 from metricflow_semantics.errors.error_classes import InvalidSemanticModelError
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantics.element_group import ElementGrouper
 from metricflow_semantics.model.spec_converters import MeasureConverter
@@ -242,8 +243,10 @@ class SemanticModelLookup:
             if not StructuredLinkableSpecName.from_name(dim.name).is_element_name:
                 # TODO: [custom granularity] change this to an assertion once we're sure there aren't exceptions
                 logger.warning(
-                    f"Dimension name `{dim.name}` contains annotations, but this name should be the plain element name "
-                    "from the original model. This should have been blocked by validation!"
+                    LazyFormat(
+                        lambda: f"Dimension name `{dim.name}` contains annotations, but this name should be the plain element name "
+                        "from the original model. This should have been blocked by validation!"
+                    )
                 )
 
             # TODO: Construct these specs correctly. All of the time dimension specs have the default granularity

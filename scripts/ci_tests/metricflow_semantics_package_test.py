@@ -8,6 +8,7 @@ from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_val
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
@@ -82,7 +83,7 @@ def log_query_spec() -> None:  # noqa: D103
         metric_names=["bookings"], group_by_names=["booking__is_instant"]
     ).query_spec
 
-    logger.info(f"{query_spec.__class__.__name__}:\n{mf_pformat(query_spec)}")
+    logger.debug(LazyFormat(lambda: f"{query_spec.__class__.__name__}:\n{mf_pformat(query_spec)}"))
 
 
 logging.basicConfig(format="%(asctime)s - %(levelname)s -  %(message)s", level=logging.INFO)

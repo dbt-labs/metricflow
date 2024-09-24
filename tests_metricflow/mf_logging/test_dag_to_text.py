@@ -9,6 +9,7 @@ from typing import List
 from metricflow_semantics.dag.dag_to_text import MetricFlowDagTextFormatter
 from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.sql.sql_table import SqlTable
 
 from metricflow.sql.sql_exprs import (
@@ -48,14 +49,14 @@ def test_multithread_dag_to_text() -> None:
 
     def _run_mf_pformat() -> None:
         current_thread = threading.current_thread()
-        logger.debug(f"In {current_thread} - Starting .dag_to_text()")
+        logger.debug(LazyFormat(lambda: f"In {current_thread} - Starting .dag_to_text()"))
         # Sleep a little bit so that all threads are likely to be running simultaneously.
         time.sleep(0.5)
         try:
             output = dag_to_text_formatter.dag_to_text(dag)
-            logger.debug(f"in {current_thread} - Output is:\n{indent(output)}")
+            logger.debug(LazyFormat(lambda: f"in {current_thread} - Output is:\n{indent(output)}"))
             thread_outputs.append(output)
-            logger.debug(f"In {current_thread} - Successfully finished .dag_to_text()")
+            logger.debug(LazyFormat(lambda: f"In {current_thread} - Successfully finished .dag_to_text()"))
         except Exception:
             logger.exception(f"In {current_thread} - Exiting due to an exception")
 

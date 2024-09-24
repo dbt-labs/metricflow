@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.protocols.sql_client import SqlEngine
@@ -22,7 +23,7 @@ def create_tables_listed_in_table_snapshot_repository(
     """Creates all tables in the table snapshot repository in the given schema."""
     snapshot_loader = SqlTableSnapshotLoader(ddl_sql_client=ddl_sql_client, schema_name=schema_name)
     for table_snapshot in table_snapshot_repository.table_snapshots:
-        logger.info(f"Loading: {table_snapshot.table_name}")
+        logger.debug(LazyFormat(lambda: f"Loading: {table_snapshot.table_name}"))
         snapshot_loader.load(table_snapshot)
 
 
@@ -57,9 +58,9 @@ def populate_source_schema(
 
     schema_name = mf_test_configuration.mf_source_schema
 
-    logger.info(f"Dropping schema {schema_name}")
+    logger.debug(LazyFormat(lambda: f"Dropping schema {schema_name}"))
     ddl_sql_client.drop_schema(schema_name=schema_name, cascade=True)
-    logger.info(f"Creating schema {schema_name}")
+    logger.debug(LazyFormat(lambda: f"Creating schema {schema_name}"))
     ddl_sql_client.create_schema(schema_name=schema_name)
     create_tables_listed_in_table_snapshot_repository(
         ddl_sql_client=ddl_sql_client,

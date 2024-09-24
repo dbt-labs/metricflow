@@ -8,6 +8,7 @@ from typing import Dict, FrozenSet, List, Optional, Sequence, Set
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.references import EntityReference, SemanticModelReference, TimeDimensionReference
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
@@ -475,7 +476,7 @@ class PreJoinNodeProcessor:
             return ()
 
         multi_hop_join_candidates: List[MultiHopJoinCandidate] = []
-        logger.info(f"Creating nodes for {desired_linkable_spec}")
+        logger.debug(LazyFormat(lambda: f"Creating nodes for {desired_linkable_spec}"))
 
         for first_node_that_could_be_joined in nodes:
             data_set_of_first_node_that_could_be_joined = self._node_data_set_resolver.get_output_data_set(
@@ -587,8 +588,10 @@ class PreJoinNodeProcessor:
                 multi_hop_join_candidate.node_with_multi_hop_elements
             )
             logger.debug(
-                f"Node {multi_hop_join_candidate.node_with_multi_hop_elements} has spec set:\n"
-                f"{mf_pformat(output_data_set.instance_set.spec_set)}"
+                LazyFormat(
+                    lambda: f"Node {multi_hop_join_candidate.node_with_multi_hop_elements} has spec set:\n"
+                    f"{mf_pformat(output_data_set.instance_set.spec_set)}"
+                )
             )
 
         return multi_hop_join_candidates
@@ -646,23 +649,27 @@ class PreJoinNodeProcessor:
         ):
             relevant_element_names.remove(metric_time_dimension_reference.element_name)
 
-        logger.info(f"Relevant names are: {relevant_element_names}")
+        logger.debug(LazyFormat(lambda: f"Relevant names are: {relevant_element_names}"))
 
         relevant_nodes = []
 
         for node in nodes:
-            logger.debug(f"Examining {node} for pruning")
+            logger.debug(LazyFormat(lambda: f"Examining {node} for pruning"))
             data_set = self._node_data_set_resolver.get_output_data_set(node)
             element_names_in_data_set = ToElementNameSet().transform(data_set.instance_set.spec_set)
             element_names_intersection = element_names_in_data_set.intersection(relevant_element_names)
             if len(element_names_intersection) > 0:
-                logger.debug(f"Including {node} since `element_names_intersection` is {element_names_intersection}")
+                logger.debug(
+                    LazyFormat(
+                        lambda: f"Including {node} since `element_names_intersection` is {element_names_intersection}"
+                    )
+                )
                 relevant_nodes.append(node)
                 continue
 
             # Used for group-by-item-values queries.
             if node in time_spine_nodes:
-                logger.debug(f"Including {node} since it matches `time_spine_node`")
+                logger.debug(LazyFormat(lambda: f"Including {node} since it matches `time_spine_node`"))
                 relevant_nodes.append(node)
                 continue
 

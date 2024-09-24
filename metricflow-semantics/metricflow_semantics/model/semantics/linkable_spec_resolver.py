@@ -23,6 +23,7 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 
 from metricflow_semantics.errors.error_classes import UnknownMetricLinkingError
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
@@ -203,7 +204,11 @@ class ValidLinkableSpecResolver:
                 for linkable_entity in linkable_entities:
                     # TODO: some users encounter a situation in which the entity reference is in the entity links. Debug why.
                     if linkable_entity.reference in linkable_entity.entity_links:
-                        logger.info(f"Found entity reference in entity links for linkable entity: {linkable_entity}")
+                        logger.debug(
+                            LazyFormat(
+                                lambda: f"Found entity reference in entity links for linkable entity: {linkable_entity}"
+                            )
+                        )
                         continue
                     metric_subquery_join_path_element = MetricSubqueryJoinPathElement(
                         metric_reference=metric_reference,
@@ -227,7 +232,11 @@ class ValidLinkableSpecResolver:
                     semantic_model, SemanticModelJoinPath(left_semantic_model_reference=semantic_model.reference)
                 )
             )
-        logger.info(f"Building valid linkable metrics took: {time.time() - linkable_metrics_start_time:.2f}s")
+        logger.debug(
+            LazyFormat(
+                lambda: f"Building valid linkable metrics took: {time.time() - linkable_metrics_start_time:.2f}s"
+            )
+        )
 
         for semantic_model in semantic_manifest.semantic_models:
             linkable_element_sets_for_no_metrics_queries.append(self._get_elements_in_semantic_model(semantic_model))
@@ -237,7 +246,7 @@ class ValidLinkableSpecResolver:
             linkable_element_sets_for_no_metrics_queries + [metric_time_elements_for_no_metrics]
         )
 
-        logger.info(f"Building valid group-by-item indexes took: {time.time() - start_time:.2f}s")
+        logger.debug(LazyFormat(lambda: f"Building valid group-by-item indexes took: {time.time() - start_time:.2f}s"))
 
     def _metric_requires_metric_time(self, metric: Metric) -> bool:
         """Checks if the metric can only be queried with metric_time. Also checks input metrics.

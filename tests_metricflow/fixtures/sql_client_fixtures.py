@@ -10,6 +10,7 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt.adapters.factory import get_adapter_by_type
 from dbt.cli.main import dbtRunner
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.protocols.sql_client import SqlClient
@@ -191,21 +192,21 @@ def ddl_sql_client(
         password=mf_test_configuration.sql_engine_password,
         schema=mf_test_configuration.mf_source_schema,
     )
-    logger.info(f"Creating schema '{mf_test_configuration.mf_system_schema}'")
+    logger.debug(LazyFormat(lambda: f"Creating schema '{mf_test_configuration.mf_system_schema}'"))
     sql_client.create_schema(mf_test_configuration.mf_system_schema)
     if mf_test_configuration.mf_system_schema != mf_test_configuration.mf_source_schema:
-        logger.info(f"Creating schema '{mf_test_configuration.mf_source_schema}'")
+        logger.debug(LazyFormat(lambda: f"Creating schema '{mf_test_configuration.mf_source_schema}'"))
         sql_client.create_schema(mf_test_configuration.mf_source_schema)
 
     yield sql_client
 
-    logger.info(f"Dropping schema '{mf_test_configuration.mf_system_schema}'")
+    logger.debug(LazyFormat(lambda: f"Dropping schema '{mf_test_configuration.mf_system_schema}'"))
     sql_client.drop_schema(mf_test_configuration.mf_system_schema, cascade=True)
     if (
         mf_test_configuration.mf_system_schema != mf_test_configuration.mf_source_schema
         and not mf_test_configuration.use_persistent_source_schema
     ):
-        logger.info(f"Dropping schema '{mf_test_configuration.mf_source_schema}'")
+        logger.debug(LazyFormat(lambda: f"Dropping schema '{mf_test_configuration.mf_source_schema}'"))
         sql_client.drop_schema(mf_test_configuration.mf_source_schema, cascade=True)
 
     sql_client.close()
