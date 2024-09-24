@@ -39,6 +39,10 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
         """Returns true if this set contains a spec referring to metric time at any grain."""
         return len(self.metric_time_specs) > 0
 
+    @property
+    def time_dimension_specs_with_custom_grain(self) -> Tuple[TimeDimensionSpec, ...]:  # noqa: D102
+        return tuple([spec for spec in self.time_dimension_specs if spec.time_granularity.is_custom_granularity])
+
     def included_agg_time_dimension_specs_for_metric(
         self, metric_reference: MetricReference, metric_lookup: MetricLookup
     ) -> List[TimeDimensionSpec]:
