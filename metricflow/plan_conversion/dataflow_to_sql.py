@@ -1413,10 +1413,10 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             ),
         )
 
-    def _get_time_spine_for_custom_granularity(self, custom_granularity: str) -> TimeSpineSource:
-        time_spine_source = self._custom_granularity_time_spine_sources.get(custom_granularity)
+    def _get_time_spine_for_custom_granularity(self, custom_granularity_name: str) -> TimeSpineSource:
+        time_spine_source = self._custom_granularity_time_spine_sources.get(custom_granularity_name)
         assert time_spine_source, (
-            f"Custom granularity {custom_granularity} does not not exist in time spine sources. "
+            f"Custom granularity {custom_granularity_name} does not not exist in time spine sources. "
             f"Available custom granularities: {list(self._custom_granularity_time_spine_sources.keys())}"
         )
         return time_spine_source

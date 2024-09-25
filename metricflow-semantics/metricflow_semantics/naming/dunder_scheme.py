@@ -78,7 +78,7 @@ class DunderNamingScheme(QueryItemNamingScheme):
 
         # At this point, len(input_str_parts) >= 2
         valid_granularity_names = {granularity.value for granularity in TimeGranularity}.union(
-            set(semantic_manifest_lookup._custom_granularities.keys())
+            set(semantic_manifest_lookup.custom_granularities.keys())
         )
         suffix = input_str_parts[-1]
         time_granularity_name = suffix if suffix in valid_granularity_names else None

@@ -39,7 +39,7 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
             TimeDimensionSpec.generate_possible_specs_for_time_dimension(
                 time_dimension_reference=TimeDimensionReference(element_name=METRIC_TIME_ELEMENT_NAME),
                 entity_links=(),
-                custom_granularities=self._manifest_lookup._custom_granularities,
+                custom_granularities=self._manifest_lookup.custom_granularities,
             )
         )
 
