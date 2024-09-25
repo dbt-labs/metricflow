@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Tuple
+from typing import Optional, Tuple
 
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.references import (
@@ -34,9 +34,19 @@ class SavedQueryDependencyResolver:
 
     def __init__(self, semantic_manifest: SemanticManifest) -> None:  # noqa: D107
         self._semantic_manifest = semantic_manifest
-        self._query_parser = MetricFlowQueryParser(SemanticManifestLookup(semantic_manifest))
+        # TODO: There seems to be issues with an empty manifest, so doing this check for now.
+        self._query_parser: Optional[MetricFlowQueryParser] = None
+        if len(semantic_manifest.semantic_models) > 0:
+            self._query_parser = MetricFlowQueryParser(SemanticManifestLookup(semantic_manifest))
 
     def _resolve_dependencies(self, saved_query_name: str) -> SavedQueryDependencySet:
+        if self._query_parser is None:
+            logger.warning(
+                "Trying to resolve the dependencies of a saved query when the provided semantic manifest does not "
+                "contain semantic models is unexpected. Returning an empty set."
+            )
+            return SavedQueryDependencySet(())
+
         parse_result = self._query_parser.parse_and_validate_saved_query(
             saved_query_parameter=SavedQueryParameter(saved_query_name),
             where_filter=None,
