@@ -16,6 +16,7 @@ from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.protocols.query_parameter import DimensionOrEntityQueryParameter
 from metricflow_semantics.specs.query_param_implementations import DimensionOrEntityParameter, TimeDimensionParameter
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.time.time_constants import ISO8601_PYTHON_FORMAT, ISO8601_PYTHON_TS_FORMAT
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
 
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest
@@ -53,20 +54,26 @@ class CheckQueryHelpers:
     def render_time_constraint(
         self,
         expr: str,
-        start_time: str,
-        stop_time: str,
+        start_time: Optional[str] = None,
+        stop_time: Optional[str] = None,
     ) -> str:
         """Render an expression like "ds >='2020-01-01' AND ds < '2020-01-02'" for start_time = stop_time = '2020-01-01'."""
-        start_expr = self.cast_to_ts(f"{start_time}")
-        time_format = "%Y-%m-%d" if len(start_time) == 10 else "%Y-%m-%d %H:%M:%S"
-        stop_time_dt = datetime.datetime.strptime(stop_time, time_format)
-        if len(start_time) == 10:
-            stop_time = (stop_time_dt + datetime.timedelta(days=1)).strftime(time_format)
-        else:
-            stop_time = (stop_time_dt + datetime.timedelta(seconds=1)).strftime(time_format)
+        time_param = start_time or stop_time  # needed for type checking
+        assert time_param, "At least one of start_time or stop_time must be provided."
+        time_format = ISO8601_PYTHON_FORMAT if len(time_param) == 10 else ISO8601_PYTHON_TS_FORMAT
 
-        stop_expr = self.cast_to_ts(f"{stop_time}")
-        return f"{self.cast_expr_to_ts(expr)} >= {start_expr} AND {self.cast_expr_to_ts(expr)} < {stop_expr}"
+        if start_time:
+            start_expr = f"{self.cast_expr_to_ts(expr)} >= {self.cast_to_ts(f'{start_time}')}"
+
+        if stop_time:
+            stop_time_dt = datetime.datetime.strptime(stop_time, time_format)
+            if time_format == ISO8601_PYTHON_FORMAT:
+                stop_time = (stop_time_dt + datetime.timedelta(days=1)).strftime(time_format)
+            else:
+                stop_time = (stop_time_dt + datetime.timedelta(seconds=1)).strftime(time_format)
+            stop_expr = f"{self.cast_expr_to_ts(expr)} < {self.cast_to_ts(f'{stop_time}')}"
+
+        return f"{start_expr if start_time else ''}{' AND ' if start_time and stop_time else ''}{stop_expr if stop_time else ''}"
 
     def cast_expr_to_ts(self, expr: str) -> str:
         """Returns the expression as a new expression cast to the timestamp type, if applicable for the DB."""
