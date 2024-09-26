@@ -428,7 +428,7 @@ FROM (
   LEFT OUTER JOIN
     ***************************.mf_time_spine subq_4
   ON
-    subq_0.metric_time__day = subq_4.ds
+    subq_3.metric_time__day = subq_4.ds
   LEFT OUTER JOIN
     ***************************.mf_time_spine subq_5
   ON

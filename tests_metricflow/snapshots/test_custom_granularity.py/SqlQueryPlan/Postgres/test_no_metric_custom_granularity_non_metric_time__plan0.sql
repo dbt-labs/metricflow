@@ -98,7 +98,7 @@ FROM (
   LEFT OUTER JOIN
     ***************************.mf_time_spine subq_0
   ON
-    bookings_source_src_28000.booking__ds__day = subq_0.ds
+    DATE_TRUNC('day', bookings_source_src_28000.ds) = subq_0.ds
 ) subq_1
 GROUP BY
   subq_1.booking__ds__martian_day
