@@ -9,6 +9,7 @@ from dbt_semantic_interfaces.references import (
     SemanticModelReference,
 )
 
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.query_param_implementations import SavedQueryParameter
@@ -57,6 +58,24 @@ class SavedQueryDependencyResolver:
             order_by_parameters=None,
         )
 
+        unique_filter_spec_resolutions = set()
+
+        for filter_spec_resolution in parse_result.query_spec.filter_spec_resolution_lookup.spec_resolutions:
+            unique_filter_spec_resolutions.add(
+                (
+                    filter_spec_resolution.lookup_key.filter_location.metric_references,
+                    filter_spec_resolution.spec_pattern,
+                )
+            )
+        logger.info(
+            LazyFormat(
+                "Results",
+                metrics_queried=len(parse_result.query_spec.metric_specs),
+                group_by_items_queried=len(parse_result.query_spec.linkable_specs.as_tuple),
+                group_by_items_in_filters=len(parse_result.query_spec.filter_spec_resolution_lookup.spec_resolutions),
+                unique_filter_spec_resolutions=len(unique_filter_spec_resolutions),
+            )
+        )
         return SavedQueryDependencySet(
             semantic_model_references=tuple(
                 sorted(
