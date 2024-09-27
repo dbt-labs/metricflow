@@ -125,12 +125,14 @@ def test_cumulative_metric_with_non_adjustable_time_filter(
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("every_two_days_bookers",),
         group_by_names=(METRIC_TIME_ELEMENT_NAME,),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template=(
-                "{{ TimeDimension('metric_time', 'day') }} = '2020-01-03' "
-                "or {{ TimeDimension('metric_time', 'day') }} = '2020-01-07'"
+        where_constraints=[
+            PydanticWhereFilter(
+                where_sql_template=(
+                    "{{ TimeDimension('metric_time', 'day') }} = '2020-01-03' "
+                    "or {{ TimeDimension('metric_time', 'day') }} = '2020-01-07'"
+                )
             )
-        ),
+        ],
     ).query_spec
 
     render_and_check(

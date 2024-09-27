@@ -77,9 +77,11 @@ def test_filter_with_where_constraint_on_join_dim(
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("bookings",),
         group_by_names=("booking__is_instant",),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template="{{ Dimension('listing__country_latest') }} = 'us'",
-        ),
+        where_constraints=[
+            PydanticWhereFilter(
+                where_sql_template="{{ Dimension('listing__country_latest') }} = 'us'",
+            )
+        ],
     ).query_spec
 
     render_and_check(
@@ -165,9 +167,11 @@ def test_distinct_values(
     query_spec = query_parser.parse_and_validate_query(
         group_by_names=("listing__country_latest",),
         order_by_names=("-listing__country_latest",),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template="{{ Dimension('listing__country_latest') }} = 'us'",
-        ),
+        where_constraints=[
+            PydanticWhereFilter(
+                where_sql_template="{{ Dimension('listing__country_latest') }} = 'us'",
+            )
+        ],
         limit=100,
     ).query_spec
 
@@ -295,9 +299,11 @@ def test_join_to_scd_dimension(
     query_spec = scd_query_parser.parse_and_validate_query(
         metric_names=("family_bookings",),
         group_by_names=(METRIC_TIME_ELEMENT_NAME,),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template="{{ Dimension('listing__capacity') }} > 2",
-        ),
+        where_constraints=[
+            PydanticWhereFilter(
+                where_sql_template="{{ Dimension('listing__capacity') }} > 2",
+            )
+        ],
     ).query_spec
 
     render_and_check(

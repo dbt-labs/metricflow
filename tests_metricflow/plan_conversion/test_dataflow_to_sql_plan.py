@@ -1224,7 +1224,7 @@ def test_dimension_with_joined_where_constraint(
     """Tests querying 2 dimensions that require a join."""
     query_spec = query_parser.parse_and_validate_query(
         group_by_names=("user__home_state_latest",),
-        where_constraint_str="{{ Dimension('listing__country_latest') }} = 'us'",
+        where_constraint_strs=["{{ Dimension('listing__country_latest') }} = 'us'"],
     ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(query_spec)
 

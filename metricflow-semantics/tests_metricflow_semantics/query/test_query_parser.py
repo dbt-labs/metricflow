@@ -328,7 +328,7 @@ def test_parse_and_validate_where_constraint_dims(
             group_by_names=[MTD],
             time_constraint_start=as_datetime("2020-01-15"),
             time_constraint_end=as_datetime("2020-02-15"),
-            where_constraint_str="{{ Dimension('booking__invalid_dim') }} = '1'",
+            where_constraint_strs=["{{ Dimension('booking__invalid_dim') }} = '1'"],
         )
 
     with pytest.raises(InvalidQueryException, match="Error parsing where filter"):
@@ -337,7 +337,7 @@ def test_parse_and_validate_where_constraint_dims(
             group_by_names=[MTD],
             time_constraint_start=as_datetime("2020-01-15"),
             time_constraint_end=as_datetime("2020-02-15"),
-            where_constraint_str="{{ Dimension('invalid_format') }} = '1'",
+            where_constraint_strs=["{{ Dimension('invalid_format') }} = '1'"],
         )
 
     result = bookings_query_parser.parse_and_validate_query(
@@ -345,7 +345,7 @@ def test_parse_and_validate_where_constraint_dims(
         group_by_names=[MTD],
         time_constraint_start=as_datetime("2020-01-15"),
         time_constraint_end=as_datetime("2020-02-15"),
-        where_constraint_str="{{ Dimension('booking__is_instant') }} = '1'",
+        where_constraint_strs=["{{ Dimension('booking__is_instant') }} = '1'"],
     )
     assert_object_snapshot_equal(request=request, mf_test_configuration=mf_test_configuration, obj=result)
     assert (
@@ -366,7 +366,7 @@ def test_parse_and_validate_where_constraint_metric_time(
         query_parser.parse_and_validate_query(
             metric_names=["revenue"],
             group_by_names=[MTD],
-            where_constraint_str="{{ TimeDimension('metric_time', 'day') }} > '2020-01-15'",
+            where_constraint_strs=["{{ TimeDimension('metric_time', 'day') }} > '2020-01-15'"],
         )
 
 
@@ -622,5 +622,5 @@ def test_invalid_group_by_metric(bookings_query_parser: MetricFlowQueryParser) -
     """Tests that a query for an invalid group by metric gives an appropriate group by metric suggestion."""
     with pytest.raises(InvalidQueryException, match="Metric\\('bookings', group_by=\\['listing'\\]\\)"):
         bookings_query_parser.parse_and_validate_query(
-            metric_names=("bookings",), where_constraint_str="{{ Metric('listings', ['garbage']) }} > 1"
+            metric_names=("bookings",), where_constraint_strs=["{{ Metric('listings', ['garbage']) }} > 1"]
         )

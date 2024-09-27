@@ -28,9 +28,9 @@ def test_conversion_metric(
     parsed_query = query_parser.parse_and_validate_query(
         metric_names=("visit_buy_conversion_rate",),
         group_by_names=("metric_time",),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template=("{{ TimeDimension('metric_time', 'day') }} = '2020-01-01'")
-        ),
+        where_constraints=[
+            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('metric_time', 'day') }} = '2020-01-01'"))
+        ],
     )
 
     render_and_check(
@@ -57,9 +57,9 @@ def test_conversion_metric_with_window(
     parsed_query = query_parser.parse_and_validate_query(
         metric_names=("visit_buy_conversion_rate_7days",),
         group_by_names=("metric_time",),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template=("{{ TimeDimension('metric_time', 'day') }} = '2020-01-01'")
-        ),
+        where_constraints=[
+            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('metric_time', 'day') }} = '2020-01-01'"))
+        ],
     )
 
     render_and_check(
@@ -86,9 +86,9 @@ def test_conversion_metric_with_categorical_filter(
     parsed_query = query_parser.parse_and_validate_query(
         metric_names=("visit_buy_conversion_rate",),
         group_by_names=("metric_time", "visit__referrer_id"),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template=("{{ Dimension('visit__referrer_id') }} = 'ref_id_01'")
-        ),
+        where_constraints=[
+            PydanticWhereFilter(where_sql_template=("{{ Dimension('visit__referrer_id') }} = 'ref_id_01'"))
+        ],
     )
 
     render_and_check(
@@ -115,9 +115,9 @@ def test_conversion_metric_with_time_constraint(
     parsed_query = query_parser.parse_and_validate_query(
         metric_names=("visit_buy_conversion_rate",),
         group_by_names=("visit__referrer_id",),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template=("{{ Dimension('visit__referrer_id') }} = 'ref_id_01'")
-        ),
+        where_constraints=[
+            PydanticWhereFilter(where_sql_template=("{{ Dimension('visit__referrer_id') }} = 'ref_id_01'"))
+        ],
         time_constraint_start=datetime.datetime(2020, 1, 1),
         time_constraint_end=datetime.datetime(2020, 1, 2),
     )
@@ -149,9 +149,9 @@ def test_conversion_metric_with_window_and_time_constraint(
             "metric_time",
             "visit__referrer_id",
         ),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template=("{{ Dimension('visit__referrer_id') }} = 'ref_id_01'")
-        ),
+        where_constraints=[
+            PydanticWhereFilter(where_sql_template=("{{ Dimension('visit__referrer_id') }} = 'ref_id_01'"))
+        ],
         time_constraint_start=datetime.datetime(2020, 1, 1),
         time_constraint_end=datetime.datetime(2020, 1, 2),
     )

@@ -284,9 +284,9 @@ def test_simple_metric_with_custom_granularity_filter(
     """Simple metric queried with a filter on a custom grain, where that grain is not used in the group by."""
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("bookings",),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template=("{{ TimeDimension('metric_time', 'martian_day') }} = '2020-01-01'")
-        ),
+        where_constraints=[
+            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('metric_time', 'martian_day') }} = '2020-01-01'"))
+        ],
     ).query_spec
 
     render_and_check(
@@ -313,9 +313,9 @@ def test_simple_metric_with_custom_granularity_in_filter_and_group_by(
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("bookings",),
         group_by_names=("metric_time__martian_day",),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template=("{{ TimeDimension('metric_time', 'martian_day') }} = '2020-01-01'")
-        ),
+        where_constraints=[
+            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('metric_time', 'martian_day') }} = '2020-01-01'"))
+        ],
     ).query_spec
 
     render_and_check(
@@ -340,9 +340,9 @@ def test_no_metrics_with_custom_granularity_filter(
     """Group by items only queried with a filter on a custom grain, where that grain is not used in the group by."""
     query_spec = query_parser.parse_and_validate_query(
         group_by_names=("listing__ds__day",),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template=("{{ TimeDimension('listing__ds', 'martian_day') }} = '2020-01-01'")
-        ),
+        where_constraints=[
+            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('listing__ds', 'martian_day') }} = '2020-01-01'"))
+        ],
     ).query_spec
 
     render_and_check(
@@ -367,9 +367,9 @@ def test_no_metrics_with_custom_granularity_in_filter_and_group_by(
     """Group by items only queried with a filter on a custom grain, where that grain is also used in the group by."""
     query_spec = query_parser.parse_and_validate_query(
         group_by_names=("listing__ds__martian_day",),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template=("{{ TimeDimension('listing__ds', 'martian_day') }} = '2020-01-01'")
-        ),
+        where_constraints=[
+            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('listing__ds', 'martian_day') }} = '2020-01-01'"))
+        ],
     ).query_spec
 
     render_and_check(
