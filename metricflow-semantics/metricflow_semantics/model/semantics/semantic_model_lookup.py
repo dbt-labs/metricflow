@@ -67,6 +67,9 @@ class SemanticModelLookup:
         # Cache for defined time granularity.
         self._time_dimension_to_defined_time_granularity: Dict[TimeDimensionReference, TimeGranularity] = {}
 
+        # Cache for agg. time dimension for measure.
+        self._measure_reference_to_agg_time_dimension_specs: Dict[MeasureReference, Sequence[TimeDimensionSpec]] = {}
+
     def get_dimension_references(self) -> Sequence[DimensionReference]:
         """Retrieve all dimension references from the collection of semantic models."""
         return tuple(self._dimension_index.keys())
@@ -364,6 +367,17 @@ class SemanticModelLookup:
         self, measure_reference: MeasureReference
     ) -> Sequence[TimeDimensionSpec]:
         """Get the agg time dimension specs that can be used in place of metric time for this measure."""
+        result = self._measure_reference_to_agg_time_dimension_specs.get(measure_reference)
+        if result is not None:
+            return result
+
+        result = self._get_agg_time_dimension_specs_for_measure(measure_reference)
+        self._measure_reference_to_agg_time_dimension_specs[measure_reference] = result
+        return result
+
+    def _get_agg_time_dimension_specs_for_measure(
+        self, measure_reference: MeasureReference
+    ) -> Sequence[TimeDimensionSpec]:
         agg_time_dimension = self.get_agg_time_dimension_for_measure(measure_reference)
         # A measure's agg_time_dimension is required to be in the same semantic model as the measure,
         # so we can assume the same semantic model for both measure and dimension.
