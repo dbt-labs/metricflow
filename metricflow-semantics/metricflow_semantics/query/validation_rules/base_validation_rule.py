@@ -15,8 +15,11 @@ from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import Res
 class PostResolutionQueryValidationRule(ABC):
     """A validation rule that runs after all query inputs have been resolved to specs."""
 
-    def __init__(self, manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D107
+    def __init__(  # noqa: D107
+        self, manifest_lookup: SemanticManifestLookup, resolver_input_for_query: ResolverInputForQuery
+    ) -> None:
         self._manifest_lookup = manifest_lookup
+        self._resolver_input_for_query = resolver_input_for_query
 
     def _get_metric(self, metric_reference: MetricReference) -> Metric:
         return self._manifest_lookup.metric_lookup.get_metric(metric_reference)
@@ -25,7 +28,6 @@ class PostResolutionQueryValidationRule(ABC):
     def validate_metric_in_resolution_dag(
         self,
         metric_reference: MetricReference,
-        resolver_input_for_query: ResolverInputForQuery,
         resolution_path: MetricFlowQueryResolutionPath,
     ) -> MetricFlowQueryResolutionIssueSet:
         """Given a metric that exists in a resolution DAG, check that the query is valid.
@@ -39,7 +41,6 @@ class PostResolutionQueryValidationRule(ABC):
         self,
         metrics_in_query: Sequence[MetricReference],
         where_filter_intersection: WhereFilterIntersection,
-        resolver_input_for_query: ResolverInputForQuery,
         resolution_path: MetricFlowQueryResolutionPath,
     ) -> MetricFlowQueryResolutionIssueSet:
         """Validate the parameters to the query are valid.

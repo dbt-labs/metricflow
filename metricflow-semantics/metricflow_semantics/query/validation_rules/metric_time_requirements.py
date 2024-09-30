@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from functools import cached_property
 from typing import Sequence
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
@@ -32,8 +33,10 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
     * Derived metrics with an offset time.g
     """
 
-    def __init__(self, manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D107
-        super().__init__(manifest_lookup=manifest_lookup)
+    def __init__(  # noqa: D107
+        self, manifest_lookup: SemanticManifestLookup, resolver_input_for_query: ResolverInputForQuery
+    ) -> None:
+        super().__init__(manifest_lookup=manifest_lookup, resolver_input_for_query=resolver_input_for_query)
 
         self._metric_time_specs = tuple(
             TimeDimensionSpec.generate_possible_specs_for_time_dimension(
@@ -43,12 +46,18 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
             )
         )
 
-    def _group_by_items_include_metric_time(self, query_resolver_input: ResolverInputForQuery) -> bool:
-        for group_by_item_input in query_resolver_input.group_by_item_inputs:
+    @cached_property
+    def _group_by_items_include_metric_time(self) -> bool:
+        for group_by_item_input in self._resolver_input_for_query.group_by_item_inputs:
             if group_by_item_input.spec_pattern.matches_any(self._metric_time_specs):
                 return True
 
         return False
+
+    def _query_includes_metric_time_or_agg_time_dimension(self, metric_reference: MetricReference) -> bool:
+        return self._group_by_items_include_metric_time or self._group_by_items_include_agg_time_dimension(
+            query_resolver_input=self._resolver_input_for_query, metric_reference=metric_reference
+        )
 
     def _group_by_items_include_agg_time_dimension(
         self, query_resolver_input: ResolverInputForQuery, metric_reference: MetricReference
@@ -66,15 +75,9 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
     def validate_metric_in_resolution_dag(
         self,
         metric_reference: MetricReference,
-        resolver_input_for_query: ResolverInputForQuery,
         resolution_path: MetricFlowQueryResolutionPath,
     ) -> MetricFlowQueryResolutionIssueSet:
         metric = self._get_metric(metric_reference)
-        query_includes_metric_time_or_agg_time_dimension = self._group_by_items_include_metric_time(
-            resolver_input_for_query
-        ) or self._group_by_items_include_agg_time_dimension(
-            query_resolver_input=resolver_input_for_query, metric_reference=metric_reference
-        )
 
         if metric.type is MetricType.SIMPLE or metric.type is MetricType.CONVERSION:
             return MetricFlowQueryResolutionIssueSet.empty_instance()
@@ -86,7 +89,7 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
                     metric.type_params.cumulative_type_params.window is not None
                     or metric.type_params.cumulative_type_params.grain_to_date is not None
                 )
-                and not query_includes_metric_time_or_agg_time_dimension
+                and not self._query_includes_metric_time_or_agg_time_dimension(metric_reference)
             ):
                 return MetricFlowQueryResolutionIssueSet.from_issue(
                     CumulativeMetricRequiresMetricTimeIssue.from_parameters(
@@ -102,7 +105,7 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
                 for input_metric in metric.input_metrics
             )
 
-            if has_time_offset and not query_includes_metric_time_or_agg_time_dimension:
+            if has_time_offset and not self._query_includes_metric_time_or_agg_time_dimension(metric_reference):
                 return MetricFlowQueryResolutionIssueSet.from_issue(
                     OffsetMetricRequiresMetricTimeIssue.from_parameters(
                         metric_reference=metric_reference,
@@ -119,7 +122,6 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
         self,
         metrics_in_query: Sequence[MetricReference],
         where_filter_intersection: WhereFilterIntersection,
-        resolver_input_for_query: ResolverInputForQuery,
         resolution_path: MetricFlowQueryResolutionPath,
     ) -> MetricFlowQueryResolutionIssueSet:
         return MetricFlowQueryResolutionIssueSet.empty_instance()
