@@ -12,7 +12,7 @@ FROM (
     DATE_TRUNC('day', ds) AS ds__day
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-) subq_7
+) subq_5
 GROUP BY
   ds__day
 LIMIT 1

@@ -8,20 +8,20 @@ FROM (
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
-    subq_10.metric_time__month AS metric_time__month
+    subq_9.metric_time__month AS metric_time__month
     , SUM(bookings_monthly_source_src_16000.bookings_monthly) AS bookings_last_month
   FROM (
     -- Time Spine
     SELECT
       DATE_TRUNC('month', ds) AS metric_time__month
-    FROM ***************************.mf_time_spine subq_11
+    FROM ***************************.mf_time_spine subq_10
     GROUP BY
       DATE_TRUNC('month', ds)
-  ) subq_10
+  ) subq_9
   INNER JOIN
     ***************************.fct_bookings_extended_monthly bookings_monthly_source_src_16000
   ON
-    subq_10.metric_time__month - INTERVAL 1 month = DATE_TRUNC('month', bookings_monthly_source_src_16000.ds)
+    subq_9.metric_time__month - INTERVAL 1 month = DATE_TRUNC('month', bookings_monthly_source_src_16000.ds)
   GROUP BY
-    subq_10.metric_time__month
-) subq_15
+    subq_9.metric_time__month
+) subq_13

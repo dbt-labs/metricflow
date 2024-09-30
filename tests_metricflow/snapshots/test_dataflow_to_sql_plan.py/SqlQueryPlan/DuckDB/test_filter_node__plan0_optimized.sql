@@ -1,4 +1,4 @@
--- Read Elements From Semantic Model 'bookings_source'
+-- Read From SemanticModelDataSet('bookings_source')
 -- Pass Only Elements: ['bookings',]
 SELECT
   1 AS bookings

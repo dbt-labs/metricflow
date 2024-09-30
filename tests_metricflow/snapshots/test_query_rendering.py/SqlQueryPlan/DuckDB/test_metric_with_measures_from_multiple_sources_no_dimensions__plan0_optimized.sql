@@ -1,7 +1,7 @@
 -- Combine Aggregated Outputs
 -- Compute Metrics via Expressions
 SELECT
-  CAST(MAX(subq_15.bookings) AS DOUBLE) / CAST(NULLIF(MAX(subq_20.listings), 0) AS DOUBLE) AS bookings_per_listing
+  CAST(MAX(subq_12.bookings) AS DOUBLE) / CAST(NULLIF(MAX(subq_16.listings), 0) AS DOUBLE) AS bookings_per_listing
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
@@ -11,7 +11,7 @@ FROM (
   SELECT
     SUM(1) AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-) subq_15
+) subq_12
 CROSS JOIN (
   -- Read Elements From Semantic Model 'listings_latest'
   -- Metric Time Dimension 'ds'
@@ -21,4 +21,4 @@ CROSS JOIN (
   SELECT
     SUM(1) AS listings
   FROM ***************************.dim_listings_latest listings_latest_src_28000
-) subq_20
+) subq_16

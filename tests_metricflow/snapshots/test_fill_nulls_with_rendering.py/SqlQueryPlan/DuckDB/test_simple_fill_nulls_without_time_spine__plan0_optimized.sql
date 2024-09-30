@@ -15,7 +15,7 @@ FROM (
       DATE_TRUNC('day', ds) AS metric_time__day
       , 1 AS bookings
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_6
+  ) subq_4
   GROUP BY
     metric_time__day
-) subq_7
+) subq_5

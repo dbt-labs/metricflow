@@ -18,4 +18,4 @@ FROM (
   GROUP BY
     bookings_source_src_28000.listing_id
     , listings_latest_src_28000.country
-) subq_11
+) subq_7

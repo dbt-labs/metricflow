@@ -3,7 +3,7 @@
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  SUM(subq_10.total_account_balance_first_day_of_month) AS total_account_balance_first_day_of_month
+  SUM(subq_7.total_account_balance_first_day_of_month) AS total_account_balance_first_day_of_month
 FROM (
   -- Read Elements From Semantic Model 'accounts_source'
   -- Metric Time Dimension 'ds_month'
@@ -12,7 +12,7 @@ FROM (
     DATE_TRUNC('month', ds_month) AS ds_month__month
     , account_balance AS total_account_balance_first_day_of_month
   FROM ***************************.fct_accounts accounts_source_src_28000
-) subq_10
+) subq_7
 INNER JOIN (
   -- Read Elements From Semantic Model 'accounts_source'
   -- Metric Time Dimension 'ds_month'
@@ -21,6 +21,6 @@ INNER JOIN (
   SELECT
     MIN(DATE_TRUNC('month', ds_month)) AS ds_month__month__complete
   FROM ***************************.fct_accounts accounts_source_src_28000
-) subq_12
+) subq_9
 ON
-  subq_10.ds_month__month = subq_12.ds_month__month__complete
+  subq_7.ds_month__month = subq_9.ds_month__month__complete

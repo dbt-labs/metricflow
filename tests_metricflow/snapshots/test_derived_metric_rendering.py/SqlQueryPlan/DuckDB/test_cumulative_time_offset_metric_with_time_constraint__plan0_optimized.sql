@@ -9,33 +9,33 @@ FROM (
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
-    subq_17.metric_time__day AS metric_time__day
-    , COUNT(DISTINCT subq_16.bookers) AS every_2_days_bookers_2_days_ago
+    subq_16.metric_time__day AS metric_time__day
+    , COUNT(DISTINCT subq_15.bookers) AS every_2_days_bookers_2_days_ago
   FROM (
     -- Time Spine
     SELECT
       ds AS metric_time__day
-    FROM ***************************.mf_time_spine subq_18
+    FROM ***************************.mf_time_spine subq_17
     WHERE ds BETWEEN '2019-12-19' AND '2020-01-02'
-  ) subq_17
+  ) subq_16
   INNER JOIN (
     -- Join Self Over Time Range
     SELECT
-      subq_15.ds AS metric_time__day
+      subq_14.ds AS metric_time__day
       , bookings_source_src_28000.guest_id AS bookers
-    FROM ***************************.mf_time_spine subq_15
+    FROM ***************************.mf_time_spine subq_14
     INNER JOIN
       ***************************.fct_bookings bookings_source_src_28000
     ON
       (
-        DATE_TRUNC('day', bookings_source_src_28000.ds) <= subq_15.ds
+        DATE_TRUNC('day', bookings_source_src_28000.ds) <= subq_14.ds
       ) AND (
-        DATE_TRUNC('day', bookings_source_src_28000.ds) > subq_15.ds - INTERVAL 2 day
+        DATE_TRUNC('day', bookings_source_src_28000.ds) > subq_14.ds - INTERVAL 2 day
       )
-  ) subq_16
+  ) subq_15
   ON
-    subq_17.metric_time__day - INTERVAL 2 day = subq_16.metric_time__day
-  WHERE subq_17.metric_time__day BETWEEN '2019-12-19' AND '2020-01-02'
+    subq_16.metric_time__day - INTERVAL 2 day = subq_15.metric_time__day
+  WHERE subq_16.metric_time__day BETWEEN '2019-12-19' AND '2020-01-02'
   GROUP BY
-    subq_17.metric_time__day
-) subq_23
+    subq_16.metric_time__day
+) subq_21

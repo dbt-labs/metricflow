@@ -8,8 +8,8 @@ FROM (
   -- Join Standard Outputs
   -- Pass Only Elements: ['listings', 'listing__views_times_booking_value']
   SELECT
-    subq_36.listing__views_times_booking_value AS listing__views_times_booking_value
-    , subq_23.listings AS listings
+    subq_26.listing__views_times_booking_value AS listing__views_times_booking_value
+    , subq_16.listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
@@ -18,7 +18,7 @@ FROM (
       listing_id AS listing
       , 1 AS listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_23
+  ) subq_16
   LEFT OUTER JOIN (
     -- Compute Metrics via Expressions
     -- Pass Only Elements: ['listing', 'listing__views_times_booking_value']
@@ -28,9 +28,9 @@ FROM (
     FROM (
       -- Combine Aggregated Outputs
       SELECT
-        COALESCE(subq_28.listing, subq_33.listing) AS listing
-        , MAX(subq_28.booking_value) AS booking_value
-        , MAX(subq_33.views) AS views
+        COALESCE(subq_20.listing, subq_24.listing) AS listing
+        , MAX(subq_20.booking_value) AS booking_value
+        , MAX(subq_24.views) AS views
       FROM (
         -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
@@ -43,7 +43,7 @@ FROM (
         FROM ***************************.fct_bookings bookings_source_src_28000
         GROUP BY
           listing_id
-      ) subq_28
+      ) subq_20
       FULL OUTER JOIN (
         -- Aggregate Measures
         -- Compute Metrics via Expressions
@@ -58,17 +58,17 @@ FROM (
             listing_id AS listing
             , 1 AS views
           FROM ***************************.fct_views views_source_src_28000
-        ) subq_31
+        ) subq_22
         GROUP BY
           listing
-      ) subq_33
+      ) subq_24
       ON
-        subq_28.listing = subq_33.listing
+        subq_20.listing = subq_24.listing
       GROUP BY
-        COALESCE(subq_28.listing, subq_33.listing)
-    ) subq_34
-  ) subq_36
+        COALESCE(subq_20.listing, subq_24.listing)
+    ) subq_25
+  ) subq_26
   ON
-    subq_23.listing = subq_36.listing
-) subq_38
+    subq_16.listing = subq_26.listing
+) subq_27
 WHERE listing__views_times_booking_value > 1

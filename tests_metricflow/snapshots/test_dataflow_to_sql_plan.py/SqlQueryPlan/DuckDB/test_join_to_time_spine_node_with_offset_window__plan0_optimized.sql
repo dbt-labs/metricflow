@@ -1,15 +1,15 @@
 -- Join to Time Spine Dataset
 SELECT
-  subq_12.metric_time__day AS metric_time__day
-  , subq_11.listing AS listing
-  , subq_11.booking_fees AS booking_fees
+  subq_10.metric_time__day AS metric_time__day
+  , subq_9.listing AS listing
+  , subq_9.booking_fees AS booking_fees
 FROM (
   -- Time Spine
   SELECT
     ds AS metric_time__day
-  FROM ***************************.mf_time_spine subq_13
+  FROM ***************************.mf_time_spine subq_11
   WHERE ds BETWEEN '2020-01-01' AND '2021-01-01'
-) subq_12
+) subq_10
 INNER JOIN (
   -- Compute Metrics via Expressions
   SELECT
@@ -29,7 +29,7 @@ INNER JOIN (
     GROUP BY
       DATE_TRUNC('day', ds)
       , listing_id
-  ) subq_10
-) subq_11
+  ) subq_8
+) subq_9
 ON
-  subq_12.metric_time__day - INTERVAL 10 day = subq_11.metric_time__day
+  subq_10.metric_time__day - INTERVAL 10 day = subq_9.metric_time__day

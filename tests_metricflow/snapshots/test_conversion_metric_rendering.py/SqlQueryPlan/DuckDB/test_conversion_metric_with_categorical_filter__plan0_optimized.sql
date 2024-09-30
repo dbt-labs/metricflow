@@ -6,10 +6,10 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_20.metric_time__day, subq_30.metric_time__day) AS metric_time__day
-    , COALESCE(subq_20.visit__referrer_id, subq_30.visit__referrer_id) AS visit__referrer_id
-    , MAX(subq_20.visits) AS visits
-    , MAX(subq_30.buys) AS buys
+    COALESCE(subq_16.metric_time__day, subq_24.metric_time__day) AS metric_time__day
+    , COALESCE(subq_16.visit__referrer_id, subq_24.visit__referrer_id) AS visit__referrer_id
+    , MAX(subq_16.visits) AS visits
+    , MAX(subq_24.buys) AS buys
   FROM (
     -- Constrain Output with WHERE
     -- Aggregate Measures
@@ -26,12 +26,12 @@ FROM (
         , referrer_id AS visit__referrer_id
         , 1 AS visits
       FROM ***************************.fct_visits visits_source_src_28000
-    ) subq_18
+    ) subq_14
     WHERE visit__referrer_id = 'ref_id_01'
     GROUP BY
       metric_time__day
       , visit__referrer_id
-  ) subq_20
+  ) subq_16
   FULL OUTER JOIN (
     -- Find conversions for user within the range of INF
     -- Pass Only Elements: ['buys', 'visit__referrer_id', 'metric_time__day']
@@ -43,48 +43,48 @@ FROM (
     FROM (
       -- Dedupe the fanout with mf_internal_uuid in the conversion data set
       SELECT DISTINCT
-        FIRST_VALUE(subq_23.visits) OVER (
+        FIRST_VALUE(subq_18.visits) OVER (
           PARTITION BY
-            subq_26.user
-            , subq_26.ds__day
-            , subq_26.mf_internal_uuid
-          ORDER BY subq_23.ds__day DESC
+            subq_21.user
+            , subq_21.ds__day
+            , subq_21.mf_internal_uuid
+          ORDER BY subq_18.ds__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS visits
-        , FIRST_VALUE(subq_23.visit__referrer_id) OVER (
+        , FIRST_VALUE(subq_18.visit__referrer_id) OVER (
           PARTITION BY
-            subq_26.user
-            , subq_26.ds__day
-            , subq_26.mf_internal_uuid
-          ORDER BY subq_23.ds__day DESC
+            subq_21.user
+            , subq_21.ds__day
+            , subq_21.mf_internal_uuid
+          ORDER BY subq_18.ds__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS visit__referrer_id
-        , FIRST_VALUE(subq_23.ds__day) OVER (
+        , FIRST_VALUE(subq_18.ds__day) OVER (
           PARTITION BY
-            subq_26.user
-            , subq_26.ds__day
-            , subq_26.mf_internal_uuid
-          ORDER BY subq_23.ds__day DESC
+            subq_21.user
+            , subq_21.ds__day
+            , subq_21.mf_internal_uuid
+          ORDER BY subq_18.ds__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS ds__day
-        , FIRST_VALUE(subq_23.metric_time__day) OVER (
+        , FIRST_VALUE(subq_18.metric_time__day) OVER (
           PARTITION BY
-            subq_26.user
-            , subq_26.ds__day
-            , subq_26.mf_internal_uuid
-          ORDER BY subq_23.ds__day DESC
+            subq_21.user
+            , subq_21.ds__day
+            , subq_21.mf_internal_uuid
+          ORDER BY subq_18.ds__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS metric_time__day
-        , FIRST_VALUE(subq_23.user) OVER (
+        , FIRST_VALUE(subq_18.user) OVER (
           PARTITION BY
-            subq_26.user
-            , subq_26.ds__day
-            , subq_26.mf_internal_uuid
-          ORDER BY subq_23.ds__day DESC
+            subq_21.user
+            , subq_21.ds__day
+            , subq_21.mf_internal_uuid
+          ORDER BY subq_18.ds__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS user
-        , subq_26.mf_internal_uuid AS mf_internal_uuid
-        , subq_26.buys AS buys
+        , subq_21.mf_internal_uuid AS mf_internal_uuid
+        , subq_21.buys AS buys
       FROM (
         -- Read Elements From Semantic Model 'visits_source'
         -- Metric Time Dimension 'ds'
@@ -96,7 +96,7 @@ FROM (
           , referrer_id AS visit__referrer_id
           , 1 AS visits
         FROM ***************************.fct_visits visits_source_src_28000
-      ) subq_23
+      ) subq_18
       INNER JOIN (
         -- Read Elements From Semantic Model 'buys_source'
         -- Metric Time Dimension 'ds'
@@ -107,25 +107,25 @@ FROM (
           , 1 AS buys
           , GEN_RANDOM_UUID() AS mf_internal_uuid
         FROM ***************************.fct_buys buys_source_src_28000
-      ) subq_26
+      ) subq_21
       ON
         (
-          subq_23.user = subq_26.user
+          subq_18.user = subq_21.user
         ) AND (
-          (subq_23.ds__day <= subq_26.ds__day)
+          (subq_18.ds__day <= subq_21.ds__day)
         )
-    ) subq_27
+    ) subq_22
     GROUP BY
       metric_time__day
       , visit__referrer_id
-  ) subq_30
+  ) subq_24
   ON
     (
-      subq_20.visit__referrer_id = subq_30.visit__referrer_id
+      subq_16.visit__referrer_id = subq_24.visit__referrer_id
     ) AND (
-      subq_20.metric_time__day = subq_30.metric_time__day
+      subq_16.metric_time__day = subq_24.metric_time__day
     )
   GROUP BY
-    COALESCE(subq_20.metric_time__day, subq_30.metric_time__day)
-    , COALESCE(subq_20.visit__referrer_id, subq_30.visit__referrer_id)
-) subq_31
+    COALESCE(subq_16.metric_time__day, subq_24.metric_time__day)
+    , COALESCE(subq_16.visit__referrer_id, subq_24.visit__referrer_id)
+) subq_25

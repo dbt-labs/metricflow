@@ -5,15 +5,15 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_24.metric_time__day, subq_30.metric_time__day) AS metric_time__day
-    , MAX(subq_24.booking_fees_start_of_month) AS booking_fees_start_of_month
-    , MAX(subq_30.booking_fees) AS booking_fees
+    COALESCE(subq_21.metric_time__day, subq_26.metric_time__day) AS metric_time__day
+    , MAX(subq_21.booking_fees_start_of_month) AS booking_fees_start_of_month
+    , MAX(subq_26.booking_fees) AS booking_fees
   FROM (
     -- Join to Time Spine Dataset
     SELECT
-      subq_23.ds AS metric_time__day
-      , subq_21.booking_fees_start_of_month AS booking_fees_start_of_month
-    FROM ***************************.mf_time_spine subq_23
+      subq_20.ds AS metric_time__day
+      , subq_18.booking_fees_start_of_month AS booking_fees_start_of_month
+    FROM ***************************.mf_time_spine subq_20
     INNER JOIN (
       -- Compute Metrics via Expressions
       SELECT
@@ -31,11 +31,11 @@ FROM (
         FROM ***************************.fct_bookings bookings_source_src_28000
         GROUP BY
           DATE_TRUNC('day', ds)
-      ) subq_20
-    ) subq_21
+      ) subq_17
+    ) subq_18
     ON
-      DATE_TRUNC('month', subq_23.ds) = subq_21.metric_time__day
-  ) subq_24
+      DATE_TRUNC('month', subq_20.ds) = subq_18.metric_time__day
+  ) subq_21
   FULL OUTER JOIN (
     -- Compute Metrics via Expressions
     SELECT
@@ -53,10 +53,10 @@ FROM (
       FROM ***************************.fct_bookings bookings_source_src_28000
       GROUP BY
         DATE_TRUNC('day', ds)
-    ) subq_29
-  ) subq_30
+    ) subq_25
+  ) subq_26
   ON
-    subq_24.metric_time__day = subq_30.metric_time__day
+    subq_21.metric_time__day = subq_26.metric_time__day
   GROUP BY
-    COALESCE(subq_24.metric_time__day, subq_30.metric_time__day)
-) subq_31
+    COALESCE(subq_21.metric_time__day, subq_26.metric_time__day)
+) subq_27

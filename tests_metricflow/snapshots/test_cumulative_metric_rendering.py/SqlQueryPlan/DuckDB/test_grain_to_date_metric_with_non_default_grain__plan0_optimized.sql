@@ -17,32 +17,32 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      subq_11.metric_time__day AS metric_time__day
-      , subq_11.metric_time__month AS metric_time__month
+      subq_10.metric_time__day AS metric_time__day
+      , subq_10.metric_time__month AS metric_time__month
       , SUM(revenue_src_28000.revenue) AS revenue_mtd
     FROM (
       -- Time Spine
       SELECT
         ds AS metric_time__day
         , DATE_TRUNC('month', ds) AS metric_time__month
-      FROM ***************************.mf_time_spine subq_12
+      FROM ***************************.mf_time_spine subq_11
       GROUP BY
         ds
         , DATE_TRUNC('month', ds)
-    ) subq_11
+    ) subq_10
     INNER JOIN
       ***************************.fct_revenue revenue_src_28000
     ON
       (
-        DATE_TRUNC('day', revenue_src_28000.created_at) <= subq_11.metric_time__day
+        DATE_TRUNC('day', revenue_src_28000.created_at) <= subq_10.metric_time__day
       ) AND (
-        DATE_TRUNC('day', revenue_src_28000.created_at) >= DATE_TRUNC('month', subq_11.metric_time__day)
+        DATE_TRUNC('day', revenue_src_28000.created_at) >= DATE_TRUNC('month', subq_10.metric_time__day)
       )
     GROUP BY
-      subq_11.metric_time__day
-      , subq_11.metric_time__month
-  ) subq_16
-) subq_17
+      subq_10.metric_time__day
+      , subq_10.metric_time__month
+  ) subq_14
+) subq_15
 GROUP BY
   metric_time__month
   , revenue_mtd

@@ -11,4 +11,4 @@ FROM (
   FROM ***************************.mf_time_spine time_spine_src_28006
   GROUP BY
     DATE_TRUNC('day', ds)
-) subq_5
+) subq_3

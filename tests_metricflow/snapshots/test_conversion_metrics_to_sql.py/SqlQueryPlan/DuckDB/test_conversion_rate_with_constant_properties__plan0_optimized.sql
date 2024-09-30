@@ -6,10 +6,10 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_18.metric_time__day, subq_28.metric_time__day) AS metric_time__day
-    , COALESCE(subq_18.visit__referrer_id, subq_28.visit__referrer_id) AS visit__referrer_id
-    , MAX(subq_18.visits) AS visits
-    , MAX(subq_28.buys) AS buys
+    COALESCE(subq_14.metric_time__day, subq_22.metric_time__day) AS metric_time__day
+    , COALESCE(subq_14.visit__referrer_id, subq_22.visit__referrer_id) AS visit__referrer_id
+    , MAX(subq_14.visits) AS visits
+    , MAX(subq_22.buys) AS buys
   FROM (
     -- Aggregate Measures
     SELECT
@@ -25,11 +25,11 @@ FROM (
         , referrer_id AS visit__referrer_id
         , 1 AS visits
       FROM ***************************.fct_visits visits_source_src_28000
-    ) subq_17
+    ) subq_13
     GROUP BY
       metric_time__day
       , visit__referrer_id
-  ) subq_18
+  ) subq_14
   FULL OUTER JOIN (
     -- Find conversions for user within the range of 7 day
     -- Pass Only Elements: ['buys', 'visit__referrer_id', 'metric_time__day']
@@ -41,62 +41,62 @@ FROM (
     FROM (
       -- Dedupe the fanout with mf_internal_uuid in the conversion data set
       SELECT DISTINCT
-        FIRST_VALUE(subq_21.visits) OVER (
+        FIRST_VALUE(subq_16.visits) OVER (
           PARTITION BY
-            subq_24.user
-            , subq_24.ds__day
-            , subq_24.mf_internal_uuid
-            , subq_24.session_id
-          ORDER BY subq_21.ds__day DESC
+            subq_19.user
+            , subq_19.ds__day
+            , subq_19.mf_internal_uuid
+            , subq_19.session_id
+          ORDER BY subq_16.ds__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS visits
-        , FIRST_VALUE(subq_21.visit__referrer_id) OVER (
+        , FIRST_VALUE(subq_16.visit__referrer_id) OVER (
           PARTITION BY
-            subq_24.user
-            , subq_24.ds__day
-            , subq_24.mf_internal_uuid
-            , subq_24.session_id
-          ORDER BY subq_21.ds__day DESC
+            subq_19.user
+            , subq_19.ds__day
+            , subq_19.mf_internal_uuid
+            , subq_19.session_id
+          ORDER BY subq_16.ds__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS visit__referrer_id
-        , FIRST_VALUE(subq_21.ds__day) OVER (
+        , FIRST_VALUE(subq_16.ds__day) OVER (
           PARTITION BY
-            subq_24.user
-            , subq_24.ds__day
-            , subq_24.mf_internal_uuid
-            , subq_24.session_id
-          ORDER BY subq_21.ds__day DESC
+            subq_19.user
+            , subq_19.ds__day
+            , subq_19.mf_internal_uuid
+            , subq_19.session_id
+          ORDER BY subq_16.ds__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS ds__day
-        , FIRST_VALUE(subq_21.metric_time__day) OVER (
+        , FIRST_VALUE(subq_16.metric_time__day) OVER (
           PARTITION BY
-            subq_24.user
-            , subq_24.ds__day
-            , subq_24.mf_internal_uuid
-            , subq_24.session_id
-          ORDER BY subq_21.ds__day DESC
+            subq_19.user
+            , subq_19.ds__day
+            , subq_19.mf_internal_uuid
+            , subq_19.session_id
+          ORDER BY subq_16.ds__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS metric_time__day
-        , FIRST_VALUE(subq_21.user) OVER (
+        , FIRST_VALUE(subq_16.user) OVER (
           PARTITION BY
-            subq_24.user
-            , subq_24.ds__day
-            , subq_24.mf_internal_uuid
-            , subq_24.session_id
-          ORDER BY subq_21.ds__day DESC
+            subq_19.user
+            , subq_19.ds__day
+            , subq_19.mf_internal_uuid
+            , subq_19.session_id
+          ORDER BY subq_16.ds__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS user
-        , FIRST_VALUE(subq_21.session) OVER (
+        , FIRST_VALUE(subq_16.session) OVER (
           PARTITION BY
-            subq_24.user
-            , subq_24.ds__day
-            , subq_24.mf_internal_uuid
-            , subq_24.session_id
-          ORDER BY subq_21.ds__day DESC
+            subq_19.user
+            , subq_19.ds__day
+            , subq_19.mf_internal_uuid
+            , subq_19.session_id
+          ORDER BY subq_16.ds__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS session
-        , subq_24.mf_internal_uuid AS mf_internal_uuid
-        , subq_24.buys AS buys
+        , subq_19.mf_internal_uuid AS mf_internal_uuid
+        , subq_19.buys AS buys
       FROM (
         -- Read Elements From Semantic Model 'visits_source'
         -- Metric Time Dimension 'ds'
@@ -109,7 +109,7 @@ FROM (
           , referrer_id AS visit__referrer_id
           , 1 AS visits
         FROM ***************************.fct_visits visits_source_src_28000
-      ) subq_21
+      ) subq_16
       INNER JOIN (
         -- Read Elements From Semantic Model 'buys_source'
         -- Metric Time Dimension 'ds'
@@ -121,31 +121,31 @@ FROM (
           , 1 AS buys
           , GEN_RANDOM_UUID() AS mf_internal_uuid
         FROM ***************************.fct_buys buys_source_src_28000
-      ) subq_24
+      ) subq_19
       ON
         (
-          subq_21.user = subq_24.user
+          subq_16.user = subq_19.user
         ) AND (
-          subq_21.session = subq_24.session_id
+          subq_16.session = subq_19.session_id
         ) AND (
           (
-            subq_21.ds__day <= subq_24.ds__day
+            subq_16.ds__day <= subq_19.ds__day
           ) AND (
-            subq_21.ds__day > subq_24.ds__day - INTERVAL 7 day
+            subq_16.ds__day > subq_19.ds__day - INTERVAL 7 day
           )
         )
-    ) subq_25
+    ) subq_20
     GROUP BY
       metric_time__day
       , visit__referrer_id
-  ) subq_28
+  ) subq_22
   ON
     (
-      subq_18.visit__referrer_id = subq_28.visit__referrer_id
+      subq_14.visit__referrer_id = subq_22.visit__referrer_id
     ) AND (
-      subq_18.metric_time__day = subq_28.metric_time__day
+      subq_14.metric_time__day = subq_22.metric_time__day
     )
   GROUP BY
-    COALESCE(subq_18.metric_time__day, subq_28.metric_time__day)
-    , COALESCE(subq_18.visit__referrer_id, subq_28.visit__referrer_id)
-) subq_29
+    COALESCE(subq_14.metric_time__day, subq_22.metric_time__day)
+    , COALESCE(subq_14.visit__referrer_id, subq_22.visit__referrer_id)
+) subq_23

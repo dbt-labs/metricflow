@@ -1,4 +1,4 @@
--- Read Elements From Semantic Model 'bookings_source'
+-- Read From SemanticModelDataSet('bookings_source')
 -- Pass Only Elements: ['bookings', 'ds__day']
 -- Metric Time Dimension 'ds'
 -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-02T00:00:00]

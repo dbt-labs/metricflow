@@ -5,11 +5,11 @@
         <!-- sql_query =                                                                                 -->
         <!--   ('-- Combine Aggregated Outputs\n'                                                        -->
         <!--    'SELECT\n'                                                                               -->
-        <!--    '  COALESCE(subq_4.ds__day, subq_9.ds__day, subq_14.ds__day) AS ds__day\n'               -->
-        <!--    '  , COALESCE(subq_4.is_instant, subq_9.is_instant, subq_14.is_instant) AS is_instant\n' -->
-        <!--    '  , MAX(subq_4.bookings) AS bookings\n'                                                 -->
-        <!--    '  , MAX(subq_9.instant_bookings) AS instant_bookings\n'                                 -->
-        <!--    '  , MAX(subq_14.booking_value) AS booking_value\n'                                      -->
+        <!--    '  COALESCE(subq_3.ds__day, subq_7.ds__day, subq_11.ds__day) AS ds__day\n'               -->
+        <!--    '  , COALESCE(subq_3.is_instant, subq_7.is_instant, subq_11.is_instant) AS is_instant\n' -->
+        <!--    '  , MAX(subq_3.bookings) AS bookings\n'                                                 -->
+        <!--    '  , MAX(subq_7.instant_bookings) AS instant_bookings\n'                                 -->
+        <!--    '  , MAX(subq_11.booking_value) AS booking_value\n'                                      -->
         <!--    'FROM (\n'                                                                               -->
         <!--    '  -- Aggregate Measures\n'                                                              -->
         <!--    '  -- Compute Metrics via Expressions\n'                                                 -->
@@ -26,11 +26,11 @@
         <!--    '      , is_instant\n'                                                                   -->
         <!--    '      , 1 AS bookings\n'                                                                -->
         <!--    '    FROM ***************************.fct_bookings bookings_source_src_28000\n'          -->
-        <!--    '  ) subq_2\n'                                                                           -->
+        <!--    '  ) subq_1\n'                                                                           -->
         <!--    '  GROUP BY\n'                                                                           -->
         <!--    '    ds__day\n'                                                                          -->
         <!--    '    , is_instant\n'                                                                     -->
-        <!--    ') subq_4\n'                                                                             -->
+        <!--    ') subq_3\n'                                                                             -->
         <!--    'FULL OUTER JOIN (\n'                                                                    -->
         <!--    '  -- Aggregate Measures\n'                                                              -->
         <!--    '  -- Compute Metrics via Expressions\n'                                                 -->
@@ -47,16 +47,16 @@
         <!--    '      , is_instant\n'                                                                   -->
         <!--    '      , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings\n'                   -->
         <!--    '    FROM ***************************.fct_bookings bookings_source_src_28000\n'          -->
-        <!--    '  ) subq_7\n'                                                                           -->
+        <!--    '  ) subq_5\n'                                                                           -->
         <!--    '  GROUP BY\n'                                                                           -->
         <!--    '    ds__day\n'                                                                          -->
         <!--    '    , is_instant\n'                                                                     -->
-        <!--    ') subq_9\n'                                                                             -->
+        <!--    ') subq_7\n'                                                                             -->
         <!--    'ON\n'                                                                                   -->
         <!--    '  (\n'                                                                                  -->
-        <!--    '    subq_4.is_instant = subq_9.is_instant\n'                                            -->
+        <!--    '    subq_3.is_instant = subq_7.is_instant\n'                                            -->
         <!--    '  ) AND (\n'                                                                            -->
-        <!--    '    subq_4.ds__day = subq_9.ds__day\n'                                                  -->
+        <!--    '    subq_3.ds__day = subq_7.ds__day\n'                                                  -->
         <!--    '  )\n'                                                                                  -->
         <!--    'FULL OUTER JOIN (\n'                                                                    -->
         <!--    "  -- Read Elements From Semantic Model 'bookings_source'\n"                             -->
@@ -72,15 +72,15 @@
         <!--    '  GROUP BY\n'                                                                           -->
         <!--    "    DATE_TRUNC('day', ds)\n"                                                            -->
         <!--    '    , is_instant\n'                                                                     -->
-        <!--    ') subq_14\n'                                                                            -->
+        <!--    ') subq_11\n'                                                                            -->
         <!--    'ON\n'                                                                                   -->
         <!--    '  (\n'                                                                                  -->
-        <!--    '    COALESCE(subq_4.is_instant, subq_9.is_instant) = subq_14.is_instant\n'              -->
+        <!--    '    COALESCE(subq_3.is_instant, subq_7.is_instant) = subq_11.is_instant\n'              -->
         <!--    '  ) AND (\n'                                                                            -->
-        <!--    '    COALESCE(subq_4.ds__day, subq_9.ds__day) = subq_14.ds__day\n'                       -->
+        <!--    '    COALESCE(subq_3.ds__day, subq_7.ds__day) = subq_11.ds__day\n'                       -->
         <!--    '  )\n'                                                                                  -->
         <!--    'GROUP BY\n'                                                                             -->
-        <!--    '  COALESCE(subq_4.ds__day, subq_9.ds__day, subq_14.ds__day)\n'                          -->
-        <!--    '  , COALESCE(subq_4.is_instant, subq_9.is_instant, subq_14.is_instant)')                -->
+        <!--    '  COALESCE(subq_3.ds__day, subq_7.ds__day, subq_11.ds__day)\n'                          -->
+        <!--    '  , COALESCE(subq_3.is_instant, subq_7.is_instant, subq_11.is_instant)')                -->
     </SelectSqlQueryToDataTableTask>
 </ExecutionPlan>

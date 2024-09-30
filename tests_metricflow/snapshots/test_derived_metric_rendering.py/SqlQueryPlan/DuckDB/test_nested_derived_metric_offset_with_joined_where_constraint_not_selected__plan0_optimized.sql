@@ -11,10 +11,10 @@ FROM (
   FROM (
     -- Join to Time Spine Dataset
     SELECT
-      subq_24.ds AS metric_time__day
-      , subq_22.booking__is_instant AS booking__is_instant
-      , subq_22.bookings_offset_once AS bookings_offset_once
-    FROM ***************************.mf_time_spine subq_24
+      subq_21.ds AS metric_time__day
+      , subq_19.booking__is_instant AS booking__is_instant
+      , subq_19.bookings_offset_once AS bookings_offset_once
+    FROM ***************************.mf_time_spine subq_21
     INNER JOIN (
       -- Compute Metrics via Expressions
       SELECT
@@ -27,10 +27,10 @@ FROM (
         -- Aggregate Measures
         -- Compute Metrics via Expressions
         SELECT
-          subq_17.ds AS metric_time__day
-          , subq_15.booking__is_instant AS booking__is_instant
-          , SUM(subq_15.bookings) AS bookings
-        FROM ***************************.mf_time_spine subq_17
+          subq_15.ds AS metric_time__day
+          , subq_13.booking__is_instant AS booking__is_instant
+          , SUM(subq_13.bookings) AS bookings
+        FROM ***************************.mf_time_spine subq_15
         INNER JOIN (
           -- Read Elements From Semantic Model 'bookings_source'
           -- Metric Time Dimension 'ds'
@@ -39,16 +39,16 @@ FROM (
             , is_instant AS booking__is_instant
             , 1 AS bookings
           FROM ***************************.fct_bookings bookings_source_src_28000
-        ) subq_15
+        ) subq_13
         ON
-          subq_17.ds - INTERVAL 5 day = subq_15.metric_time__day
+          subq_15.ds - INTERVAL 5 day = subq_13.metric_time__day
         GROUP BY
-          subq_17.ds
-          , subq_15.booking__is_instant
-      ) subq_21
-    ) subq_22
+          subq_15.ds
+          , subq_13.booking__is_instant
+      ) subq_18
+    ) subq_19
     ON
-      subq_24.ds - INTERVAL 2 day = subq_22.metric_time__day
-  ) subq_25
+      subq_21.ds - INTERVAL 2 day = subq_19.metric_time__day
+  ) subq_22
   WHERE booking__is_instant
-) subq_27
+) subq_23
