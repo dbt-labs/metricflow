@@ -4,7 +4,7 @@ import logging
 import typing
 from contextlib import contextmanager
 from dataclasses import dataclass
-from typing import Dict, FrozenSet, Iterator, List, Optional, Sequence, Set, Tuple
+from typing import Dict, Iterator, List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.references import MetricReference
@@ -15,7 +15,6 @@ from typing_extensions import override
 from metricflow_semantics.mf_logging.formatting import indent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat, mf_pformat_many
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 from metricflow_semantics.query.group_by_item.candidate_push_down.group_by_item_candidate import GroupByItemCandidateSet
@@ -148,8 +147,6 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
         suggestion_generator: Optional[QueryItemSuggestionGenerator],
         group_by_item_resolver: GroupByItemResolver,
         source_spec_patterns: Sequence[SpecPattern] = (),
-        with_any_property: Optional[FrozenSet[LinkableElementProperty]] = None,
-        without_any_property: Optional[FrozenSet[LinkableElementProperty]] = None,
         filter_location: Optional[WhereFilterLocation] = None,
     ) -> None:
         """Initializer.
@@ -168,8 +165,6 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
         self._semantic_manifest_lookup = manifest_lookup
         self._source_spec_patterns = tuple(source_spec_patterns)
         self._path_from_start_node_tracker = DagTraversalPathTracker()
-        self._with_any_property = with_any_property
-        self._without_any_property = without_any_property
         self._suggestion_generator = suggestion_generator
         self._filter_location = filter_location
         self._group_by_item_resolver_for_query = group_by_item_resolver
@@ -180,17 +175,10 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
         with self._path_from_start_node_tracker.track_node_visit(node) as current_traversal_path:
             logger.debug(LazyFormat(lambda: f"Handling {node.ui_description}"))
 
-            without_any_property: Set[LinkableElementProperty] = set()
-            if self._without_any_property is not None:
-                without_any_property.update(self._without_any_property)
-            for spec_pattern in self._source_spec_patterns:
-                without_any_property.update(spec_pattern.without_linkable_element_properties)
-
             items_available_for_measure = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_measure(
                 measure_reference=node.measure_reference,
-                element_filter=LinkableElementFilter(
-                    with_any_of=self._with_any_property or LinkableElementProperty.all_properties(),
-                    without_any_of=frozenset(without_any_property),
+                element_filter=LinkableElementFilter.merge_iterable(
+                    spec_pattern.element_pre_filter for spec_pattern in self._source_spec_patterns
                 ),
             )
 

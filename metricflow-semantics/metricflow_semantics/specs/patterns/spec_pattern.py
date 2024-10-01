@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, FrozenSet, Sequence
+from typing import TYPE_CHECKING, Sequence
 
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
+from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 
 if TYPE_CHECKING:
     from metricflow_semantics.specs.instance_spec import InstanceSpec
@@ -25,6 +25,9 @@ class SpecPattern(ABC):
         return len(self.match(candidate_specs)) > 0
 
     @property
-    def without_linkable_element_properties(self) -> FrozenSet[LinkableElementProperty]:
-        """Returns the set of properties of linkable elements that this won't match."""
-        return frozenset()
+    def element_pre_filter(self) -> LinkableElementFilter:
+        """Returns a filter for a `LinkableElementSet` that can reduce the number of items to match.
+
+        i.e. the filter can produce a superset of the elements that will match.
+        """
+        return LinkableElementFilter()

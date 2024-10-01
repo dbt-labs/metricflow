@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, FrozenSet, List, Optional, Sequence, Tuple
+from typing import Any, List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
@@ -11,6 +11,7 @@ from more_itertools import is_sorted
 from typing_extensions import override
 
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
+from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.specs.spec_set import group_specs_by_type
@@ -152,10 +153,11 @@ class EntityLinkPattern(SpecPattern):
 
     @property
     @override
-    def without_linkable_element_properties(self) -> FrozenSet[LinkableElementProperty]:
+    def element_pre_filter(self) -> LinkableElementFilter:
         if (
             self.parameter_set.metric_subquery_entity_links is None
             or len(self.parameter_set.metric_subquery_entity_links) == 0
         ):
-            return frozenset({LinkableElementProperty.METRIC})
-        return frozenset()
+            return LinkableElementFilter(without_any_of=frozenset({LinkableElementProperty.METRIC}))
+
+        return LinkableElementFilter()
