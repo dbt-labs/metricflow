@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, List, Optional, Sequence, Tuple
+from typing import Any, FrozenSet, List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
@@ -154,10 +154,17 @@ class EntityLinkPattern(SpecPattern):
     @property
     @override
     def element_pre_filter(self) -> LinkableElementFilter:
+        element_names: Optional[FrozenSet[str]] = None
+        if ParameterSetField.ELEMENT_NAME in self.parameter_set.fields_to_compare:
+            element_names = frozenset({self.parameter_set.element_name}) if self.parameter_set.element_name else None
         if (
             self.parameter_set.metric_subquery_entity_links is None
             or len(self.parameter_set.metric_subquery_entity_links) == 0
         ):
-            return LinkableElementFilter(without_any_of=frozenset({LinkableElementProperty.METRIC}))
+            return LinkableElementFilter(
+                element_names=element_names, without_any_of=frozenset({LinkableElementProperty.METRIC})
+            )
 
-        return LinkableElementFilter()
+        return LinkableElementFilter(
+            element_names=element_names,
+        )

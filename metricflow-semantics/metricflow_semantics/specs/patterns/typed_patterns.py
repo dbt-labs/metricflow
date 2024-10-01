@@ -55,7 +55,9 @@ class DimensionPattern(EntityLinkPattern):
     @property
     @override
     def element_pre_filter(self) -> LinkableElementFilter:
-        return LinkableElementFilter(without_any_of=frozenset({LinkableElementProperty.METRIC}))
+        return super().element_pre_filter.merge(
+            LinkableElementFilter(without_any_of=frozenset({LinkableElementProperty.METRIC}))
+        )
 
 
 @dataclass(frozen=True)
@@ -101,7 +103,9 @@ class TimeDimensionPattern(EntityLinkPattern):
     @property
     @override
     def element_pre_filter(self) -> LinkableElementFilter:
-        return LinkableElementFilter(without_any_of=frozenset({LinkableElementProperty.METRIC}))
+        return super().element_pre_filter.merge(
+            LinkableElementFilter(without_any_of=frozenset({LinkableElementProperty.METRIC}))
+        )
 
 
 @dataclass(frozen=True)
