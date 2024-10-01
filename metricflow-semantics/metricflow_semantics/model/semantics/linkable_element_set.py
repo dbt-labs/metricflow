@@ -5,15 +5,15 @@ import time
 from collections import defaultdict
 from dataclasses import dataclass, field
 from functools import cached_property
-from typing import Dict, FrozenSet, List, Sequence, Set, Tuple
+from typing import Dict, List, Sequence, Set, Tuple
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.references import SemanticModelReference
 from typing_extensions import override
 
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
+from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 from metricflow_semantics.model.semantics.linkable_element import (
     ElementPathKey,
     LinkableDimension,
@@ -221,9 +221,7 @@ class LinkableElementSet(SemanticModelDerivation):
 
     def filter(
         self,
-        with_any_of: FrozenSet[LinkableElementProperty],
-        without_any_of: FrozenSet[LinkableElementProperty] = frozenset(),
-        without_all_of: FrozenSet[LinkableElementProperty] = frozenset(),
+        element_filter: LinkableElementFilter,
     ) -> LinkableElementSet:
         """Filter elements in the set.
 
@@ -231,6 +229,10 @@ class LinkableElementSet(SemanticModelDerivation):
         a property in "without_any_of" set are removed. Lastly, any elements with all properties in without_all_of
         are removed.
         """
+        with_any_of = element_filter.with_any_of
+        without_any_of = element_filter.without_any_of
+        without_all_of = element_filter.without_all_of
+
         key_to_linkable_dimensions: Dict[ElementPathKey, Tuple[LinkableDimension, ...]] = {}
         key_to_linkable_entities: Dict[ElementPathKey, Tuple[LinkableEntity, ...]] = {}
         key_to_linkable_metrics: Dict[ElementPathKey, Tuple[LinkableMetric, ...]] = {}

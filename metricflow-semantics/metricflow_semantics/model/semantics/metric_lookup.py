@@ -3,7 +3,7 @@ from __future__ import annotations
 import functools
 import logging
 import time
-from typing import Dict, FrozenSet, Optional, Sequence, Set
+from typing import Dict, Optional, Sequence, Set
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols.metric import Metric, MetricInputMeasure, MetricType
@@ -13,7 +13,7 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow_semantics.errors.error_classes import DuplicateMetricError, MetricNotFoundError, NonExistentMeasureError
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
+from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
 from metricflow_semantics.model.semantics.linkable_spec_resolver import (
     ValidLinkableSpecResolver,
@@ -66,18 +66,13 @@ class MetricLookup:
     def linkable_elements_for_measure(
         self,
         measure_reference: MeasureReference,
-        with_any_of: Optional[FrozenSet[LinkableElementProperty]] = None,
-        without_any_of: Optional[FrozenSet[LinkableElementProperty]] = None,
+        element_filter: LinkableElementFilter = LinkableElementFilter(),
     ) -> LinkableElementSet:
         """Return the set of linkable elements reachable from a given measure."""
-        frozen_with_any_of = LinkableElementProperty.all_properties() if with_any_of is None else with_any_of
-        frozen_without_any_of = frozenset() if without_any_of is None else without_any_of
-
         start_time = time.time()
         linkable_element_set = self._linkable_spec_resolver.get_linkable_element_set_for_measure(
             measure_reference=measure_reference,
-            with_any_of=frozen_with_any_of,
-            without_any_of=frozen_without_any_of,
+            element_filter=element_filter,
         )
         logger.debug(
             LazyFormat(
@@ -89,31 +84,18 @@ class MetricLookup:
 
     @functools.lru_cache
     def linkable_elements_for_no_metrics_query(
-        self,
-        with_any_of: Optional[FrozenSet[LinkableElementProperty]] = None,
-        without_any_of: Optional[FrozenSet[LinkableElementProperty]] = None,
+        self, element_set_filter: LinkableElementFilter = LinkableElementFilter()
     ) -> LinkableElementSet:
         """Return the reachable linkable elements for a dimension values query with no metrics."""
-        frozen_with_any_of = LinkableElementProperty.all_properties() if with_any_of is None else with_any_of
-        frozen_without_any_of = frozenset() if without_any_of is None else without_any_of
-
-        return self._linkable_spec_resolver.get_linkable_elements_for_distinct_values_query(
-            with_any_of=frozen_with_any_of,
-            without_any_of=frozen_without_any_of,
-        )
+        return self._linkable_spec_resolver.get_linkable_elements_for_distinct_values_query(element_set_filter)
 
     @functools.lru_cache
     def linkable_elements_for_metrics(
-        self,
-        metric_references: Sequence[MetricReference],
-        with_any_property: FrozenSet[LinkableElementProperty] = LinkableElementProperty.all_properties(),
-        without_any_property: FrozenSet[LinkableElementProperty] = frozenset(),
+        self, metric_references: Sequence[MetricReference], element_set_filter: LinkableElementFilter
     ) -> LinkableElementSet:
         """Retrieve the matching set of linkable elements common to all metrics requested (intersection)."""
         return self._linkable_spec_resolver.get_linkable_elements_for_metrics(
-            metric_references=metric_references,
-            with_any_of=with_any_property,
-            without_any_of=without_any_property,
+            metric_references=metric_references, element_filter=element_set_filter
         )
 
     def get_metrics(self, metric_references: Sequence[MetricReference]) -> Sequence[Metric]:  # noqa: D102

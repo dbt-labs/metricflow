@@ -22,6 +22,7 @@ from dbt_semantic_interfaces.references import (
 )
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
+from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 from metricflow_semantics.model.semantics.linkable_element import (
     ElementPathKey,
     LinkableDimension,
@@ -265,7 +266,7 @@ def test_filter_with_any_of() -> None:
     filter_properties = frozenset([LinkableElementProperty.JOINED, LinkableElementProperty.ENTITY])
     linkable_set = _linkable_set_with_uniques_and_duplicates()
 
-    filtered_set = linkable_set.filter(with_any_of=filter_properties)
+    filtered_set = linkable_set.filter(LinkableElementFilter(with_any_of=filter_properties))
 
     filtered_dimensions = [
         dim for dim in itertools.chain.from_iterable(filtered_set.path_key_to_linkable_dimensions.values())
@@ -304,7 +305,9 @@ def test_filter_without_any_of() -> None:
     without_any_of_properties = frozenset([LinkableElementProperty.ENTITY, LinkableElementProperty.METRIC])
     linkable_set = _linkable_set_with_uniques_and_duplicates()
 
-    filtered_set = linkable_set.filter(with_any_of=with_any_of_properties, without_any_of=without_any_of_properties)
+    filtered_set = linkable_set.filter(
+        LinkableElementFilter(with_any_of=with_any_of_properties, without_any_of=without_any_of_properties)
+    )
 
     filtered_dimensions = [
         dim for dim in itertools.chain.from_iterable(filtered_set.path_key_to_linkable_dimensions.values())
@@ -340,7 +343,9 @@ def test_filter_without_all_of() -> None:
     without_all_of_properties = frozenset([LinkableElementProperty.JOINED, LinkableElementProperty.ENTITY])
     linkable_set = _linkable_set_with_uniques_and_duplicates()
 
-    filtered_set = linkable_set.filter(with_any_of=with_any_of_properties, without_all_of=without_all_of_properties)
+    filtered_set = linkable_set.filter(
+        LinkableElementFilter(with_any_of=with_any_of_properties, without_all_of=without_all_of_properties)
+    )
 
     filtered_metrics = [
         metric for metric in itertools.chain.from_iterable(filtered_set.path_key_to_linkable_metrics.values())
