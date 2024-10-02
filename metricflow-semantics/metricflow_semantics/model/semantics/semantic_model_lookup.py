@@ -64,6 +64,9 @@ class SemanticModelLookup:
         for semantic_model in sorted(model.semantic_models, key=lambda semantic_model: semantic_model.name):
             self._add_semantic_model(semantic_model)
 
+        # Cache for defined time granularity.
+        self._time_dimension_to_defined_time_granularity: Dict[TimeDimensionReference, TimeGranularity] = {}
+
     def get_dimension_references(self) -> Sequence[DimensionReference]:
         """Retrieve all dimension references from the collection of semantic models."""
         return tuple(self._dimension_index.keys())
@@ -378,6 +381,16 @@ class SemanticModelLookup:
 
     def get_defined_time_granularity(self, time_dimension_reference: TimeDimensionReference) -> TimeGranularity:
         """Time granularity from the time dimension's YAML definition. If not set, defaults to DAY."""
+        result = self._time_dimension_to_defined_time_granularity.get(time_dimension_reference)
+
+        if result is not None:
+            return result
+
+        result = self._get_defined_time_granularity(time_dimension_reference)
+        self._time_dimension_to_defined_time_granularity[time_dimension_reference] = result
+        return result
+
+    def _get_defined_time_granularity(self, time_dimension_reference: TimeDimensionReference) -> TimeGranularity:
         time_dimension = self.get_dimension(time_dimension_reference)
 
         defined_time_granularity = DEFAULT_TIME_GRANULARITY
