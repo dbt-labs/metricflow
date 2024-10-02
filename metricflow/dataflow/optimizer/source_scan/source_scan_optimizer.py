@@ -6,6 +6,7 @@ from typing import List, Optional, Sequence
 
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 
 from metricflow.dataflow.dataflow_plan import (
     DataflowPlan,
@@ -109,11 +110,8 @@ class SourceScanOptimizer(
     parents.
     """
 
-    def __init__(self) -> None:  # noqa: D107
-        self._log_level = logging.DEBUG
-
     def _log_visit_node_type(self, node: DataflowPlanNode) -> None:
-        logger.log(level=self._log_level, msg=f"Visiting {node}")
+        logger.debug(LazyFormat(lambda: "Visiting {node}"))
 
     def _default_base_output_handler(
         self,
@@ -226,7 +224,7 @@ class SourceScanOptimizer(
 
         # Stores the result of running this optimizer on each parent branch separately.
         optimized_parent_branches = []
-        logger.log(level=self._log_level, msg=f"{node} has {len(node.parent_nodes)} parent branches")
+        logger.debug(LazyFormat(lambda: f"{node} has {len(node.parent_nodes)} parent branches"))
 
         # Run the optimizer on the parent branch to handle derived metrics, which are defined recursively in the DAG.
         for parent_branch in node.parent_nodes:
@@ -256,7 +254,7 @@ class SourceScanOptimizer(
                     for branch_combination_result in combination_results
                 ]
 
-        logger.log(level=self._log_level, msg=f"Got {len(combined_parent_branches)} branches after combination")
+        logger.debug(lambda: f"Got {len(combined_parent_branches)} branches after combination")
         assert len(combined_parent_branches) > 0
 
         # If we were able to reduce the parent branches of the CombineAggregatedOutputsNode into a single one, there's no need
@@ -289,12 +287,13 @@ class SourceScanOptimizer(
     def optimize(self, dataflow_plan: DataflowPlan) -> DataflowPlan:  # noqa: D102
         optimized_result: OptimizeBranchResult = dataflow_plan.sink_node.accept(self)
 
-        logger.log(
-            level=self._log_level,
-            msg=f"Optimized:\n\n"
-            f"{dataflow_plan.sink_node.structure_text()}\n\n"
-            f"to:\n\n"
-            f"{optimized_result.optimized_branch.structure_text()}",
+        logger.debug(
+            LazyFormat(
+                lambda: f"Optimized:\n\n"
+                f"{dataflow_plan.sink_node.structure_text()}\n\n"
+                f"to:\n\n"
+                f"{optimized_result.optimized_branch.structure_text()}",
+            ),
         )
 
         return DataflowPlan(

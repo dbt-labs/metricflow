@@ -7,6 +7,7 @@ from typing import Iterator, List, Optional, Sequence, Union
 from dbt_semantic_interfaces.references import SemanticModelReference
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 
@@ -176,12 +177,13 @@ class PredicatePushdownOptimizer(
     def optimize(self, dataflow_plan: DataflowPlan) -> DataflowPlan:  # noqa: D102
         optimized_result: OptimizeBranchResult = dataflow_plan.sink_node.accept(self)
 
-        logger.log(
-            level=self._log_level,
-            msg=f"Optimized:\n\n"
-            f"{dataflow_plan.sink_node.structure_text()}\n\n"
-            f"to:\n\n"
-            f"{optimized_result.optimized_branch.structure_text()}",
+        logger.debug(
+            LazyFormat(
+                lambda: f"Optimized:\n\n"
+                f"{dataflow_plan.sink_node.structure_text()}\n\n"
+                f"to:\n\n"
+                f"{optimized_result.optimized_branch.structure_text()}",
+            ),
         )
 
         return DataflowPlan(
@@ -190,9 +192,11 @@ class PredicatePushdownOptimizer(
         )
 
     def _log_visit_node_type(self, node: DataflowPlanNode) -> None:
-        logger.log(
-            level=self._log_level,
-            msg=f"Visiting {node} with initial pushdown state {self._predicate_pushdown_tracker.last_pushdown_state}",
+        logger.debug(
+            LazyFormat(
+                lambda: f"Visiting {node} with initial pushdown state "
+                f"{self._predicate_pushdown_tracker.last_pushdown_state}",
+            ),
         )
 
     def _default_handler(
@@ -300,7 +304,8 @@ class PredicatePushdownOptimizer(
             else:
                 filters_left_over.append(filter_spec)
 
-        logger.log(level=self._log_level, msg=f"Filter specs to add:\n{filters_to_apply}")
+        logger.debug(LazyFormat(lambda: f"Filter specs to add:\n{filters_to_apply}"))
+
         applied_filters = frozenset.union(
             *[frozenset(current_pushdown_state.applied_where_filter_specs), frozenset(filters_to_apply)]
         )
@@ -377,20 +382,19 @@ class PredicatePushdownOptimizer(
                         pushdown_applied_where_filter_specs=updated_specs,
                     )
                 )
-                logger.log(
-                    level=self._log_level,
-                    msg=(
-                        f"Added applied specs to pushdown state. Added specs:\n\n{node.input_where_specs}\n\n"
+                logger.debug(
+                    LazyFormat(
+                        lambda: f"Added applied specs to pushdown state. Added specs:\n\n{node.input_where_specs}\n\n"
                         + f"Updated pushdown state:\n\n{self._predicate_pushdown_tracker.last_pushdown_state}"
                     ),
                 )
 
             if node.always_apply:
-                logger.log(
-                    level=self._log_level,
-                    msg=(
-                        "Applying original filter spec set based on node-level override directive. Additional specs "
-                        + f"appled:\n{[spec for spec in node.input_where_specs if spec not in filter_specs_to_apply]}"
+                logger.debug(
+                    LazyFormat(
+                        lambda: f"Applying original filter spec set based on node-level override directive. "
+                        f"Additional specs "
+                        f"appled:\n{[spec for spec in node.input_where_specs if spec not in filter_specs_to_apply]}"
                     ),
                 )
                 optimized_node = OptimizeBranchResult(
