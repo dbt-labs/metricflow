@@ -54,6 +54,14 @@ class MetricLookup:
             max_entity_links=MAX_JOIN_HOPS,
         )
 
+        # Cache for `get_min_queryable_time_granularity()`
+        self._metric_reference_to_min_metric_time_grain: Dict[MetricReference, TimeGranularity] = {}
+
+        # Cache for `get_valid_agg_time_dimensions_for_metric()`.
+        self._metric_reference_to_valid_agg_time_dimension_specs: Dict[
+            MetricReference, Sequence[TimeDimensionSpec]
+        ] = {}
+
     @functools.lru_cache
     def linkable_elements_for_measure(
         self,
@@ -183,6 +191,18 @@ class MetricLookup:
         self, metric_reference: MetricReference
     ) -> Sequence[TimeDimensionSpec]:
         """Get the agg time dimension specs that can be used in place of metric time for this metric, if applicable."""
+        result = self._metric_reference_to_valid_agg_time_dimension_specs.get(metric_reference)
+        if result is not None:
+            return result
+
+        result = self._get_valid_agg_time_dimensions_for_metric(metric_reference)
+        self._metric_reference_to_valid_agg_time_dimension_specs[metric_reference] = result
+
+        return result
+
+    def _get_valid_agg_time_dimensions_for_metric(
+        self, metric_reference: MetricReference
+    ) -> Sequence[TimeDimensionSpec]:
         agg_time_dimension_specs = self._get_agg_time_dimension_specs_for_metric(metric_reference)
         distinct_agg_time_dimension_identifiers = set(
             [(spec.reference, spec.entity_links) for spec in agg_time_dimension_specs]
@@ -204,6 +224,15 @@ class MetricLookup:
 
         Maps to the largest granularity defined for any of the metric's agg_time_dimensions.
         """
+        result = self._metric_reference_to_min_metric_time_grain.get(metric_reference)
+        if result is not None:
+            return result
+
+        result = self._get_min_queryable_time_granularity(metric_reference)
+        self._metric_reference_to_min_metric_time_grain[metric_reference] = result
+        return result
+
+    def _get_min_queryable_time_granularity(self, metric_reference: MetricReference) -> TimeGranularity:
         agg_time_dimension_specs = self._get_agg_time_dimension_specs_for_metric(metric_reference)
         assert (
             agg_time_dimension_specs
