@@ -17,6 +17,7 @@ from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat, mf_pformat_many
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 from metricflow_semantics.query.group_by_item.candidate_push_down.group_by_item_candidate import GroupByItemCandidateSet
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import (
     WhereFilterLocation,
@@ -187,8 +188,10 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
 
             items_available_for_measure = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_measure(
                 measure_reference=node.measure_reference,
-                with_any_of=self._with_any_property,
-                without_any_of=frozenset(without_any_property),
+                element_filter=LinkableElementFilter(
+                    with_any_of=self._with_any_property or LinkableElementProperty.all_properties(),
+                    without_any_of=frozenset(without_any_property),
+                ),
             )
 
             # The following is needed to handle limitation of cumulative metrics. Filtering could be done at the measure

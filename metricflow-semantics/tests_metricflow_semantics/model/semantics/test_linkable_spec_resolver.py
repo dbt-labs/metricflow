@@ -12,6 +12,7 @@ from dbt_semantic_interfaces.references import (
 )
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 from metricflow_semantics.model.semantics.linkable_element import SemanticModelJoinPath, SemanticModelJoinPathElement
 from metricflow_semantics.model.semantics.linkable_spec_resolver import ValidLinkableSpecResolver
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
@@ -58,8 +59,9 @@ def test_all_properties(  # noqa: D103
         set_id="result0",
         linkable_element_set=simple_model_spec_resolver.get_linkable_elements_for_metrics(
             metric_references=[MetricReference(element_name="bookings"), MetricReference(element_name="views")],
-            with_any_of=LinkableElementProperty.all_properties(),
-            without_any_of=frozenset({}),
+            element_filter=LinkableElementFilter(
+                with_any_of=LinkableElementProperty.all_properties(), without_any_of=frozenset()
+            ),
         ),
     )
 
@@ -75,8 +77,9 @@ def test_one_property(  # noqa: D103
         set_id="result0",
         linkable_element_set=simple_model_spec_resolver.get_linkable_elements_for_metrics(
             metric_references=[MetricReference(element_name="bookings"), MetricReference(element_name="views")],
-            with_any_of=frozenset({LinkableElementProperty.LOCAL}),
-            without_any_of=frozenset(),
+            element_filter=LinkableElementFilter(
+                with_any_of=frozenset({LinkableElementProperty.LOCAL}), without_any_of=frozenset()
+            ),
         ),
     )
 
@@ -92,8 +95,9 @@ def test_metric_time_property_for_cumulative_metric(  # noqa: D103
         set_id="result0",
         linkable_element_set=simple_model_spec_resolver.get_linkable_elements_for_metrics(
             metric_references=[MetricReference(element_name="trailing_2_months_revenue")],
-            with_any_of=frozenset({LinkableElementProperty.METRIC_TIME}),
-            without_any_of=frozenset(),
+            element_filter=LinkableElementFilter(
+                with_any_of=frozenset({LinkableElementProperty.METRIC_TIME}), without_any_of=frozenset()
+            ),
         ),
     )
 
@@ -109,8 +113,9 @@ def test_metric_time_property_for_derived_metrics(  # noqa: D103
         set_id="result0",
         linkable_element_set=simple_model_spec_resolver.get_linkable_elements_for_metrics(
             metric_references=[MetricReference(element_name="bookings_per_view")],
-            with_any_of=frozenset({LinkableElementProperty.METRIC_TIME}),
-            without_any_of=frozenset(),
+            element_filter=LinkableElementFilter(
+                with_any_of=frozenset({LinkableElementProperty.METRIC_TIME}), without_any_of=frozenset()
+            ),
         ),
     )
 
@@ -126,8 +131,10 @@ def test_cyclic_join_manifest(  # noqa: D103
         set_id="result0",
         linkable_element_set=cyclic_join_manifest_spec_resolver.get_linkable_elements_for_metrics(
             metric_references=[MetricReference(element_name="listings")],
-            with_any_of=LinkableElementProperty.all_properties(),
-            without_any_of=frozenset(),
+            element_filter=LinkableElementFilter(
+                with_any_of=LinkableElementProperty.all_properties(),
+                without_any_of=frozenset(),
+            ),
         ),
     )
 
@@ -192,8 +199,10 @@ def test_linkable_element_set_as_spec_set(
     linkable_spec_set = InstanceSpecSet.create_from_specs(
         simple_model_spec_resolver.get_linkable_element_set_for_measure(
             MeasureReference(element_name="listings"),
-            with_any_of=LinkableElementProperty.all_properties(),
-            without_any_of=frozenset({}),
+            element_filter=LinkableElementFilter(
+                with_any_of=LinkableElementProperty.all_properties(),
+                without_any_of=frozenset(),
+            ),
         ).specs
     )
     assert_spec_set_snapshot_equal(

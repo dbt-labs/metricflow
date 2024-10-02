@@ -27,6 +27,7 @@ from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
+from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 from metricflow_semantics.model.semantics.linkable_element import (
     ElementPathKey,
     LinkableDimension,
@@ -105,7 +106,8 @@ class ValidLinkableSpecResolver:
                 if metric.type is MetricType.CUMULATIVE:
                     linkable_sets_for_measure.append(
                         self._get_linkable_element_set_for_measure(
-                            measure, without_any_of=frozenset({LinkableElementProperty.DATE_PART})
+                            measure,
+                            LinkableElementFilter(without_any_of=frozenset({LinkableElementProperty.DATE_PART})),
                         )
                     )
                 elif (
@@ -593,8 +595,7 @@ class ValidLinkableSpecResolver:
     def _get_linkable_element_set_for_measure(
         self,
         measure_reference: MeasureReference,
-        with_any_of: FrozenSet[LinkableElementProperty] = LinkableElementProperty.all_properties(),
-        without_any_of: FrozenSet[LinkableElementProperty] = frozenset(),
+        element_filter: LinkableElementFilter = LinkableElementFilter(),
     ) -> LinkableElementSet:
         """See get_linkable_element_set_for_measure()."""
         measure_semantic_model = self._get_semantic_model_for_measure(measure_reference)
@@ -602,7 +603,7 @@ class ValidLinkableSpecResolver:
         elements_in_semantic_model = self._get_elements_in_semantic_model(measure_semantic_model)
 
         # Filter out group-by metrics if not specified by the property as there can be a large number of them.
-        if LinkableElementProperty.METRIC not in without_any_of:
+        if LinkableElementProperty.METRIC not in element_filter.without_any_of:
             metrics_linked_to_semantic_model = self.get_joinable_metrics_for_semantic_model(
                 semantic_model=measure_semantic_model,
                 using_join_path=SemanticModelJoinPath(left_semantic_model_reference=measure_semantic_model.reference),
@@ -620,42 +621,35 @@ class ValidLinkableSpecResolver:
                 metric_time_elements,
                 joined_elements,
             )
-        ).filter(
-            with_any_of=with_any_of,
-            without_any_of=without_any_of,
-        )
+        ).filter(element_filter)
 
     def get_linkable_element_set_for_measure(
         self,
         measure_reference: MeasureReference,
-        with_any_of: FrozenSet[LinkableElementProperty],
-        without_any_of: FrozenSet[LinkableElementProperty],
+        element_filter: LinkableElementFilter,
     ) -> LinkableElementSet:
         """Get the valid linkable elements for the given measure."""
         return self._get_linkable_element_set_for_measure(
             measure_reference=measure_reference,
-            with_any_of=with_any_of,
-            without_any_of=without_any_of,
+            element_filter=element_filter,
         )
 
     def get_linkable_elements_for_distinct_values_query(
         self,
-        with_any_of: FrozenSet[LinkableElementProperty],
-        without_any_of: FrozenSet[LinkableElementProperty],
+        element_filter: LinkableElementFilter,
     ) -> LinkableElementSet:
         """Returns queryable items for a distinct group-by-item values query.
 
         A distinct group-by-item values query does not include any metrics.
         """
-        return self._no_metric_linkable_element_set.filter(with_any_of=with_any_of, without_any_of=without_any_of)
+        return self._no_metric_linkable_element_set.filter(element_filter)
 
     # TODO: the results of this method don't actually match what will be allowed for the metric. This method checks
     # _metric_to_linkable_element_sets, while the actual group by resolution DAG calls _get_linkable_element_set_for_measure.
     def get_linkable_elements_for_metrics(
         self,
         metric_references: Sequence[MetricReference],
-        with_any_of: FrozenSet[LinkableElementProperty] = LinkableElementProperty.all_properties(),
-        without_any_of: FrozenSet[LinkableElementProperty] = frozenset(),
+        element_filter: LinkableElementFilter = LinkableElementFilter(),
     ) -> LinkableElementSet:
         """Gets the valid linkable elements that are common to all requested metrics."""
         linkable_element_sets = []
@@ -667,10 +661,7 @@ class ValidLinkableSpecResolver:
             # Using .only_unique_path_keys to exclude ambiguous elements where there are multiple join paths to get
             # a dimension / entity.
             metric_result = LinkableElementSet.intersection_by_path_key(
-                [
-                    element_set.only_unique_path_keys.filter(with_any_of=with_any_of, without_any_of=without_any_of)
-                    for element_set in element_sets
-                ]
+                [element_set.only_unique_path_keys.filter(element_filter) for element_set in element_sets]
             )
             linkable_element_sets.append(metric_result)
 

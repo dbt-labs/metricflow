@@ -18,6 +18,7 @@ from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.runtime import log_block_runtime
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 from metricflow_semantics.model.semantics.linkable_element import LinkableDimension
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
@@ -585,7 +586,9 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         path_key_to_linkable_dimensions = (
             self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_metrics(
                 metric_references=tuple(MetricReference(element_name=mname) for mname in metric_names),
-                without_any_property=frozenset(without_any_property),
+                element_set_filter=LinkableElementFilter(
+                    without_any_of=frozenset(without_any_property),
+                ),
             )
         ).path_key_to_linkable_dimensions
 
@@ -677,10 +680,12 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         path_key_to_linkable_entities = (
             self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_metrics(
                 metric_references=tuple(MetricReference(element_name=mname) for mname in metric_names),
-                with_any_property=frozenset(
-                    {
-                        LinkableElementProperty.ENTITY,
-                    }
+                element_set_filter=LinkableElementFilter(
+                    with_any_of=frozenset(
+                        {
+                            LinkableElementProperty.ENTITY,
+                        }
+                    ),
                 ),
             )
         ).path_key_to_linkable_entities

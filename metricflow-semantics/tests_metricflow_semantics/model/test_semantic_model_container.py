@@ -7,6 +7,7 @@ from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import EntityReference, MeasureReference, MetricReference
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
+from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
@@ -103,8 +104,10 @@ def test_local_linked_elements_for_metric(  # noqa: D103
 ) -> None:
     linkable_elements = metric_lookup.linkable_elements_for_metrics(
         (MetricReference(element_name="listings"),),
-        with_any_property=frozenset({LinkableElementProperty.LOCAL_LINKED}),
-        without_any_property=frozenset({LinkableElementProperty.DERIVED_TIME_GRANULARITY}),
+        LinkableElementFilter(
+            with_any_of=frozenset({LinkableElementProperty.LOCAL_LINKED}),
+            without_any_of=frozenset({LinkableElementProperty.DERIVED_TIME_GRANULARITY}),
+        ),
     )
     sorted_specs = sorted(linkable_elements.specs, key=lambda x: x.qualified_name)
     assert_object_snapshot_equal(
@@ -130,11 +133,13 @@ def test_linkable_elements_for_metrics(  # noqa: D103
         set_id="result0",
         linkable_element_set=metric_lookup.linkable_elements_for_metrics(
             (MetricReference(element_name="views"),),
-            without_any_property=frozenset(
-                {
-                    LinkableElementProperty.DERIVED_TIME_GRANULARITY,
-                    LinkableElementProperty.METRIC_TIME,
-                }
+            LinkableElementFilter(
+                without_any_of=frozenset(
+                    {
+                        LinkableElementProperty.DERIVED_TIME_GRANULARITY,
+                        LinkableElementProperty.METRIC_TIME,
+                    }
+                )
             ),
         ),
     )
@@ -179,7 +184,7 @@ def test_linkable_elements_for_no_metrics_query(
 ) -> None:
     """Tests extracting linkable elements for a dimension values query with no metrics."""
     linkable_elements = metric_lookup.linkable_elements_for_no_metrics_query(
-        without_any_of=frozenset({LinkableElementProperty.DERIVED_TIME_GRANULARITY})
+        LinkableElementFilter(without_any_of=frozenset({LinkableElementProperty.DERIVED_TIME_GRANULARITY}))
     )
     sorted_specs = sorted(linkable_elements.specs, key=lambda x: x.qualified_name)
     assert_object_snapshot_equal(
@@ -203,10 +208,12 @@ def test_linkable_set_for_common_dimensions_in_different_models(
         set_id="result0",
         linkable_element_set=metric_lookup.linkable_elements_for_metrics(
             (MetricReference(element_name="bookings_per_view"),),
-            without_any_property=frozenset(
-                {
-                    LinkableElementProperty.DERIVED_TIME_GRANULARITY,
-                }
+            LinkableElementFilter(
+                without_any_of=frozenset(
+                    {
+                        LinkableElementProperty.DERIVED_TIME_GRANULARITY,
+                    }
+                ),
             ),
         ),
     )
