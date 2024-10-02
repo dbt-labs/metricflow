@@ -54,6 +54,8 @@ from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import (
     ResolverInputForWhereFilterIntersection,
 )
 from metricflow_semantics.query.suggestion_generator import QueryItemSuggestionGenerator
+from metricflow_semantics.query.validation_rules.duplicate_metric import DuplicateMetricValidationRule
+from metricflow_semantics.query.validation_rules.metric_time_requirements import MetricTimeQueryValidationRule
 from metricflow_semantics.query.validation_rules.query_validator import PostResolutionQueryValidator
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
@@ -123,9 +125,7 @@ class MetricFlowQueryResolver:
         where_filter_pattern_factory: WhereFilterPatternFactory,
     ) -> None:
         self._manifest_lookup = manifest_lookup
-        self._post_resolution_query_validator = PostResolutionQueryValidator(
-            manifest_lookup=self._manifest_lookup,
-        )
+        self._post_resolution_query_validator = PostResolutionQueryValidator()
         self._where_filter_pattern_factory = where_filter_pattern_factory
 
     @staticmethod
@@ -491,6 +491,10 @@ class MetricFlowQueryResolver:
         query_level_issue_set = self._post_resolution_query_validator.validate_query(
             resolution_dag=resolution_dag,
             resolver_input_for_query=resolver_input_for_query,
+            validation_rules=(
+                MetricTimeQueryValidationRule(self._manifest_lookup, resolver_input_for_query),
+                DuplicateMetricValidationRule(self._manifest_lookup, resolver_input_for_query),
+            ),
         )
 
         if query_level_issue_set.has_issues:

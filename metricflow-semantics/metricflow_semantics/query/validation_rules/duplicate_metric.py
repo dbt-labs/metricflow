@@ -7,11 +7,9 @@ from dbt_semantic_interfaces.protocols import WhereFilterIntersection
 from dbt_semantic_interfaces.references import MetricReference
 from typing_extensions import override
 
-from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow_semantics.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
 from metricflow_semantics.query.issues.parsing.duplicate_metric import DuplicateMetricIssue
-from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import ResolverInputForQuery
 from metricflow_semantics.query.validation_rules.base_validation_rule import PostResolutionQueryValidationRule
 
 logger = logging.getLogger(__name__)
@@ -20,14 +18,10 @@ logger = logging.getLogger(__name__)
 class DuplicateMetricValidationRule(PostResolutionQueryValidationRule):
     """Validates that a query does not include the same metric multiple times."""
 
-    def __init__(self, manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D107
-        super().__init__(manifest_lookup=manifest_lookup)
-
     @override
     def validate_metric_in_resolution_dag(
         self,
         metric_reference: MetricReference,
-        resolver_input_for_query: ResolverInputForQuery,
         resolution_path: MetricFlowQueryResolutionPath,
     ) -> MetricFlowQueryResolutionIssueSet:
         return MetricFlowQueryResolutionIssueSet.empty_instance()
@@ -37,7 +31,6 @@ class DuplicateMetricValidationRule(PostResolutionQueryValidationRule):
         self,
         metrics_in_query: Sequence[MetricReference],
         where_filter_intersection: WhereFilterIntersection,
-        resolver_input_for_query: ResolverInputForQuery,
         resolution_path: MetricFlowQueryResolutionPath,
     ) -> MetricFlowQueryResolutionIssueSet:
         duplicate_metric_references = tuple(

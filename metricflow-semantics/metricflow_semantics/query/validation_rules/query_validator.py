@@ -4,7 +4,6 @@ from typing import Sequence
 
 from typing_extensions import override
 
-from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.group_by_item.candidate_push_down.push_down_visitor import DagTraversalPathTracker
 from metricflow_semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.base_node import (
@@ -26,27 +25,21 @@ from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.qu
 from metricflow_semantics.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
 from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import ResolverInputForQuery
 from metricflow_semantics.query.validation_rules.base_validation_rule import PostResolutionQueryValidationRule
-from metricflow_semantics.query.validation_rules.duplicate_metric import DuplicateMetricValidationRule
-from metricflow_semantics.query.validation_rules.metric_time_requirements import MetricTimeQueryValidationRule
 
 
 class PostResolutionQueryValidator:
     """Runs query validation rules after query resolution is complete."""
 
-    def __init__(self, manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D107
-        self._manifest_lookup = manifest_lookup
-        self._validation_rules = (
-            MetricTimeQueryValidationRule(self._manifest_lookup),
-            DuplicateMetricValidationRule(self._manifest_lookup),
-        )
-
     def validate_query(
-        self, resolution_dag: GroupByItemResolutionDag, resolver_input_for_query: ResolverInputForQuery
+        self,
+        resolution_dag: GroupByItemResolutionDag,
+        resolver_input_for_query: ResolverInputForQuery,
+        validation_rules: Sequence[PostResolutionQueryValidationRule],
     ) -> MetricFlowQueryResolutionIssueSet:
         """Validate according to the list of configured validation rules and return a set containing issues found."""
         validation_visitor = _PostResolutionQueryValidationVisitor(
             resolver_input_for_query=resolver_input_for_query,
-            validation_rules=self._validation_rules,
+            validation_rules=validation_rules,
         )
 
         return resolution_dag.sink_node.accept(validation_visitor)
@@ -83,7 +76,6 @@ class _PostResolutionQueryValidationVisitor(GroupByItemResolutionNodeVisitor[Met
                 issue_sets_to_merge.append(
                     validation_rule.validate_metric_in_resolution_dag(
                         metric_reference=node.metric_reference,
-                        resolver_input_for_query=self._resolver_input_for_query,
                         resolution_path=current_traversal_path,
                     )
                 )
@@ -100,7 +92,6 @@ class _PostResolutionQueryValidationVisitor(GroupByItemResolutionNodeVisitor[Met
                     validation_rule.validate_query_in_resolution_dag(
                         metrics_in_query=node.metrics_in_query,
                         where_filter_intersection=node.where_filter_intersection,
-                        resolver_input_for_query=self._resolver_input_for_query,
                         resolution_path=current_traversal_path,
                     )
                 )
