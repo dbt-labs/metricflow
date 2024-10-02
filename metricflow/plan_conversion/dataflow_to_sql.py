@@ -1499,6 +1499,11 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 from_source=parent_data_set.checked_sql_select_node.from_source,
                 from_source_alias=parent_alias,
                 join_descs=parent_data_set.checked_sql_select_node.join_descs + (join_description,),
+                where=parent_data_set.checked_sql_select_node.where,
+                group_bys=parent_data_set.checked_sql_select_node.group_bys,
+                order_bys=parent_data_set.checked_sql_select_node.order_bys,
+                limit=parent_data_set.checked_sql_select_node.limit,
+                distinct=parent_data_set.checked_sql_select_node.distinct,
             ),
         )
 
