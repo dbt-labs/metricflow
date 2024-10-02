@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import cached_property, lru_cache
+from typing import FrozenSet
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
@@ -32,20 +34,26 @@ class ExpandedTimeGranularity(SerializableDataclass):
                 f"{self.base_granularity}."
             )
 
-    @property
+    @cached_property
     def is_custom_granularity(self) -> bool:  # noqa: D102
         return self.base_granularity.value != self.name
 
     @classmethod
+    @lru_cache
     def from_time_granularity(cls, granularity: TimeGranularity) -> ExpandedTimeGranularity:
-        """Factory method for creating an ExpandedTimeGranularity from a standard TimeGranularity enumeration value."""
+        """Factory method for creating an ExpandedTimeGranularity from a standard TimeGranularity enumeration value.
+
+        This should be appropriate to use with `@lru_cache` since the number of `TimeGranularity` is small.
+        """
         return ExpandedTimeGranularity(name=granularity.value, base_granularity=granularity)
 
-    @staticmethod
-    def is_standard_granularity_name(time_granularity_name: str) -> bool:
-        """Helper for checking if a given time granularity name is part of the standard TimeGranularity enumeration."""
-        for granularity in TimeGranularity:
-            if time_granularity_name == granularity.value:
-                return True
+    @classmethod
+    @lru_cache
+    def _standard_time_granularity_names(cls) -> FrozenSet:
+        """This should be appropriate to use with `@lru_cache` since the number of `TimeGranularity` is small."""
+        return frozenset(granularity.value for granularity in TimeGranularity)
 
-        return False
+    @classmethod
+    def is_standard_granularity_name(cls, time_granularity_name: str) -> bool:
+        """Helper for checking if a given time granularity name is part of the standard TimeGranularity enumeration."""
+        return time_granularity_name in cls._standard_time_granularity_names()

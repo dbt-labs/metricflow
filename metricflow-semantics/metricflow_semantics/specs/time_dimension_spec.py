@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
+from functools import lru_cache
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
@@ -190,8 +191,18 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
             exclude_fields=exclude_fields,
         )
 
-    @staticmethod
+    @classmethod
+    @lru_cache
+    def _get_compatible_grain_and_date_part(cls) -> Sequence[Tuple[ExpandedTimeGranularity, DatePart]]:
+        items = []
+        for date_part in DatePart:
+            for compatible_granularity in date_part.compatible_granularities:
+                items.append((ExpandedTimeGranularity.from_time_granularity(compatible_granularity), date_part))
+        return items
+
+    @classmethod
     def generate_possible_specs_for_time_dimension(
+        cls,
         time_dimension_reference: TimeDimensionReference,
         entity_links: Tuple[EntityReference, ...],
         custom_granularities: Dict[str, ExpandedTimeGranularity],
@@ -210,16 +221,15 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
                     date_part=None,
                 )
             )
-        for date_part in DatePart:
-            for compatible_granularity in date_part.compatible_granularities:
-                time_dimension_specs.append(
-                    TimeDimensionSpec(
-                        element_name=time_dimension_reference.element_name,
-                        entity_links=entity_links,
-                        time_granularity=ExpandedTimeGranularity.from_time_granularity(compatible_granularity),
-                        date_part=date_part,
-                    )
+        for grain, date_part in cls._get_compatible_grain_and_date_part():
+            time_dimension_specs.append(
+                TimeDimensionSpec(
+                    element_name=time_dimension_reference.element_name,
+                    entity_links=entity_links,
+                    time_granularity=grain,
+                    date_part=date_part,
                 )
+            )
         return time_dimension_specs
 
     @property
