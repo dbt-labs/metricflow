@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Sequence
+from collections.abc import Sequence
 
-from dbt_semantic_interfaces.protocols import Metric, WhereFilterIntersection
+from dbt_semantic_interfaces.protocols import WhereFilterIntersection
 from dbt_semantic_interfaces.references import MetricReference
 
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
@@ -17,9 +17,6 @@ class PostResolutionQueryValidationRule(ABC):
 
     def __init__(self, manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D107
         self._manifest_lookup = manifest_lookup
-
-    def _get_metric(self, metric_reference: MetricReference) -> Metric:
-        return self._manifest_lookup.metric_lookup.get_metric(metric_reference)
 
     @abstractmethod
     def validate_metric_in_resolution_dag(
