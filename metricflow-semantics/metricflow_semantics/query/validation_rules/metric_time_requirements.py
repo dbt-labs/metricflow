@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from functools import cached_property
+from dataclasses import dataclass
+from functools import lru_cache
 from typing import Sequence
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
@@ -22,6 +23,14 @@ from metricflow_semantics.query.issues.parsing.offset_metric_requires_metric_tim
 from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import ResolverInputForQuery
 from metricflow_semantics.query.validation_rules.base_validation_rule import PostResolutionQueryValidationRule
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
+
+
+@dataclass(frozen=True)
+class QueryItemsAnalysis:
+    """Contains data about which items a query contains."""
+
+    has_metric_time: bool
+    has_agg_time_dimension: bool
 
 
 class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
@@ -46,30 +55,27 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
             )
         )
 
-    @cached_property
-    def _group_by_items_include_metric_time(self) -> bool:
-        for group_by_item_input in self._resolver_input_for_query.group_by_item_inputs:
-            if group_by_item_input.spec_pattern.matches_any(self._metric_time_specs):
-                return True
-
-        return False
-
-    def _query_includes_metric_time_or_agg_time_dimension(self, metric_reference: MetricReference) -> bool:
-        return self._group_by_items_include_metric_time or self._group_by_items_include_agg_time_dimension(
-            query_resolver_input=self._resolver_input_for_query, metric_reference=metric_reference
-        )
-
-    def _group_by_items_include_agg_time_dimension(
+    @lru_cache
+    def _get_query_items_analysis(
         self, query_resolver_input: ResolverInputForQuery, metric_reference: MetricReference
-    ) -> bool:
+    ) -> QueryItemsAnalysis:
+        has_agg_time_dimension = False
+        has_metric_time = False
+
         valid_agg_time_dimension_specs = self._manifest_lookup.metric_lookup.get_valid_agg_time_dimensions_for_metric(
             metric_reference
         )
         for group_by_item_input in query_resolver_input.group_by_item_inputs:
-            if group_by_item_input.spec_pattern.matches_any(valid_agg_time_dimension_specs):
-                return True
+            if group_by_item_input.spec_pattern.matches_any(self._metric_time_specs):
+                has_metric_time = True
 
-        return False
+            if group_by_item_input.spec_pattern.matches_any(valid_agg_time_dimension_specs):
+                has_agg_time_dimension = True
+
+        return QueryItemsAnalysis(
+            has_metric_time=has_metric_time,
+            has_agg_time_dimension=has_agg_time_dimension,
+        )
 
     @override
     def validate_metric_in_resolution_dag(
@@ -77,11 +83,13 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
         metric_reference: MetricReference,
         resolution_path: MetricFlowQueryResolutionPath,
     ) -> MetricFlowQueryResolutionIssueSet:
-        metric = self._get_metric(metric_reference)
+        metric = self._manifest_lookup.metric_lookup.get_metric(metric_reference)
 
-        if metric.type is MetricType.SIMPLE or metric.type is MetricType.CONVERSION:
-            return MetricFlowQueryResolutionIssueSet.empty_instance()
-        elif metric.type is MetricType.CUMULATIVE:
+        query_items_analysis = self._get_query_items_analysis(self._resolver_input_for_query, metric_reference)
+
+        issues = MetricFlowQueryResolutionIssueSet.empty_instance()
+
+        if metric.type is MetricType.CUMULATIVE:
             if (
                 metric.type_params is not None
                 and metric.type_params.cumulative_type_params is not None
@@ -89,33 +97,34 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
                     metric.type_params.cumulative_type_params.window is not None
                     or metric.type_params.cumulative_type_params.grain_to_date is not None
                 )
-                and not self._query_includes_metric_time_or_agg_time_dimension(metric_reference)
+                and not (query_items_analysis.has_metric_time or query_items_analysis.has_agg_time_dimension)
             ):
-                return MetricFlowQueryResolutionIssueSet.from_issue(
+                issues = issues.add_issue(
                     CumulativeMetricRequiresMetricTimeIssue.from_parameters(
                         metric_reference=metric_reference,
                         query_resolution_path=resolution_path,
                     )
                 )
-            return MetricFlowQueryResolutionIssueSet.empty_instance()
-
         elif metric.type is MetricType.RATIO or metric.type is MetricType.DERIVED:
             has_time_offset = any(
                 input_metric.offset_window is not None or input_metric.offset_to_grain is not None
                 for input_metric in metric.input_metrics
             )
 
-            if has_time_offset and not self._query_includes_metric_time_or_agg_time_dimension(metric_reference):
-                return MetricFlowQueryResolutionIssueSet.from_issue(
+            if has_time_offset and not (
+                query_items_analysis.has_metric_time or query_items_analysis.has_agg_time_dimension
+            ):
+                issues = issues.add_issue(
                     OffsetMetricRequiresMetricTimeIssue.from_parameters(
                         metric_reference=metric_reference,
                         input_metrics=metric.input_metrics,
                         query_resolution_path=resolution_path,
                     )
                 )
-            return MetricFlowQueryResolutionIssueSet.empty_instance()
-        else:
+        elif metric.type is not MetricType.SIMPLE and metric.type is not MetricType.CONVERSION:
             assert_values_exhausted(metric.type)
+
+        return issues
 
     @override
     def validate_query_in_resolution_dag(
@@ -125,3 +134,6 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
         resolution_path: MetricFlowQueryResolutionPath,
     ) -> MetricFlowQueryResolutionIssueSet:
         return MetricFlowQueryResolutionIssueSet.empty_instance()
+
+
+__all__ = ["MetricTimeQueryValidationRule"]
