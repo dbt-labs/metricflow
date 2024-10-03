@@ -798,7 +798,7 @@ class DataflowPlanBuilder:
             queried_linkable_specs=query_spec.linkable_specs, filter_specs=query_level_filter_specs
         )
         predicate_pushdown_state = PredicatePushdownState(
-            time_range_constraint=query_spec.time_range_constraint, where_filter_specs=query_level_filter_specs
+            time_range_constraint=query_spec.time_range_constraint, where_filter_specs=tuple(query_level_filter_specs)
         )
         dataflow_recipe = self._find_source_node_recipe(
             linkable_spec_set=required_linkable_specs, predicate_pushdown_state=predicate_pushdown_state
