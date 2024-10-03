@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 import time
-from dataclasses import dataclass
 from typing import Dict, FrozenSet, List, Optional, Sequence, Set, Tuple, Union
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
@@ -58,13 +57,14 @@ from metricflow_semantics.time.dateutil_adjuster import DateutilTimePeriodAdjust
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
 
+from metricflow.dataflow.builder.measure_spec_properties import MeasureSpecProperties
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.node_evaluator import (
-    JoinLinkableInstancesRecipe,
     LinkableInstanceSatisfiabilityEvaluation,
     NodeEvaluatorForLinkableInstances,
 )
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder, SourceNodeSet
+from metricflow.dataflow.builder.source_node_recipe import SourceNodeRecipe
 from metricflow.dataflow.dataflow_plan import (
     DataflowPlan,
     DataflowPlanNode,
@@ -77,7 +77,7 @@ from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
 from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
-from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinOnEntitiesNode
+from metricflow.dataflow.nodes.join_to_base import JoinOnEntitiesNode
 from metricflow.dataflow.nodes.join_to_custom_granularity import JoinToCustomGranularityNode
 from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
 from metricflow.dataflow.nodes.min_max import MinMaxNode
@@ -99,30 +99,6 @@ from metricflow.plan_conversion.node_processor import (
 )
 
 logger = logging.getLogger(__name__)
-
-
-@dataclass(frozen=True)
-class SourceNodeRecipe:
-    """Get a recipe for how to build a dataflow plan node that outputs measures and linkable instances as needed."""
-
-    source_node: DataflowPlanNode
-    required_local_linkable_specs: Tuple[LinkableInstanceSpec, ...]
-    join_linkable_instances_recipes: Tuple[JoinLinkableInstancesRecipe, ...]
-
-    @property
-    def join_targets(self) -> List[JoinDescription]:
-        """Joins to be made to source node."""
-        return [join_recipe.join_description for join_recipe in self.join_linkable_instances_recipes]
-
-
-@dataclass(frozen=True)
-class MeasureSpecProperties:
-    """Input dataclass for grouping properties of a sequence of MeasureSpecs."""
-
-    measure_specs: Sequence[MeasureSpec]
-    semantic_model_name: str
-    agg_time_dimension: TimeDimensionReference
-    non_additive_dimension_spec: Optional[NonAdditiveDimensionSpec] = None
 
 
 class DataflowPlanBuilder:
