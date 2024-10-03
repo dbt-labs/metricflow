@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 import logging
-import textwrap
 
-from metricflow_semantics.mf_logging.pretty_print import mf_pformat
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 
 from metricflow.telemetry.handlers.handlers import PayloadType, TelemetryHandler
 
@@ -17,7 +16,4 @@ class PythonLoggerTelemetryHandler(TelemetryHandler):
         self._logger_level = logger_level
 
     def _write_log(self, client_id: str, payload: PayloadType) -> None:
-        logger.log(
-            level=self._logger_level,
-            msg=f"Logging telemetry payload:\n{textwrap.indent(mf_pformat(payload), prefix='    ')}",
-        )
+        logger.log(level=self._logger_level, msg=LazyFormat("Logging telemetry payload", payload=payload))

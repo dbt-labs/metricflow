@@ -4,6 +4,7 @@ import logging
 from dataclasses import dataclass
 from typing import List, Optional, Sequence
 
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.specs.metric_spec import MetricSpec
 
 from metricflow.dataflow.dataflow_plan import (
@@ -129,10 +130,9 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
 
     def __init__(self, left_branch_node: DataflowPlanNode) -> None:  # noqa: D107
         self._current_left_node: DataflowPlanNode = left_branch_node
-        self._log_level = logging.DEBUG
 
     def _log_visit_node_type(self, node: DataflowPlanNode) -> None:
-        logger.log(level=self._log_level, msg=f"Visiting {node}")
+        logger.debug(LazyFormat(lambda: f"Visiting {node}"))
 
     def _log_combine_failure(
         self,
@@ -140,10 +140,11 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         right_node: DataflowPlanNode,
         combine_failure_reason: str,
     ) -> None:
-        logger.log(
-            level=self._log_level,
-            msg=f"Because {combine_failure_reason}, unable to combine nodes "
-            f"left_node={left_node} right_node={right_node}",
+        logger.debug(
+            LazyFormat(
+                lambda: f"Because {combine_failure_reason}, unable to combine nodes "
+                f"left_node={left_node} right_node={right_node}",
+            )
         )
 
     def _log_combine_success(
@@ -152,9 +153,8 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         right_node: DataflowPlanNode,
         combined_node: DataflowPlanNode,
     ) -> None:
-        logger.log(
-            level=self._log_level,
-            msg=f"Combined left_node={left_node} right_node={right_node} combined_node: {combined_node}",
+        logger.debug(
+            LazyFormat(lambda: f"Combined left_node={left_node} right_node={right_node} combined_node: {combined_node}")
         )
 
     def _combine_parent_branches(self, current_right_node: DataflowPlanNode) -> Optional[Sequence[DataflowPlanNode]]:
