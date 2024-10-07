@@ -3,7 +3,7 @@ from __future__ import annotations
 import functools
 import logging
 import time
-from typing import Dict, Optional, Sequence, Set
+from typing import Dict, Optional, Sequence, Set, Tuple
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols.metric import Metric, MetricInputMeasure, MetricType
@@ -13,6 +13,7 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow_semantics.errors.error_classes import DuplicateMetricError, MetricNotFoundError, NonExistentMeasureError
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
 from metricflow_semantics.model.semantics.linkable_spec_resolver import (
@@ -62,7 +63,11 @@ class MetricLookup:
             MetricReference, Sequence[TimeDimensionSpec]
         ] = {}
 
-    @functools.lru_cache
+        # Cache for `linkable_elements_for_measure()`.
+        self._linkable_element_set_for_measure_cache: Dict[
+            Tuple[MeasureReference, LinkableElementFilter], LinkableElementSet
+        ] = {}
+
     def linkable_elements_for_measure(
         self,
         measure_reference: MeasureReference,
@@ -70,17 +75,31 @@ class MetricLookup:
     ) -> LinkableElementSet:
         """Return the set of linkable elements reachable from a given measure."""
         start_time = time.time()
-        linkable_element_set = self._linkable_spec_resolver.get_linkable_element_set_for_measure(
-            measure_reference=measure_reference,
-            element_filter=element_filter,
-        )
+        # Don't cache the result when group-by-metrics are selected as there can be many of them and may significantly
+        # increase memory usage.
+        if (
+            LinkableElementProperty.METRIC in element_filter.with_any_of
+            and LinkableElementProperty.METRIC not in element_filter.without_any_of
+        ):
+            return self._linkable_spec_resolver.get_linkable_element_set_for_measure(measure_reference, element_filter)
+
+        cache_key = (measure_reference, element_filter)
+        result = self._linkable_element_set_for_measure_cache.get(cache_key)
+        if result is not None:
+            return result
+
+        result = self._linkable_spec_resolver.get_linkable_element_set_for_measure(measure_reference, element_filter)
+        self._linkable_element_set_for_measure_cache[cache_key] = result
+
         logger.debug(
             LazyFormat(
-                lambda: f"Getting valid linkable elements for measure '{measure_reference.element_name}' took: {time.time() - start_time:.2f}s"
+                "Finished getting linkable elements",
+                measure_reference=measure_reference,
+                element_filter=element_filter,
+                runtime=time.time() - start_time,
             )
         )
-
-        return linkable_element_set
+        return result
 
     @functools.lru_cache
     def linkable_elements_for_no_metrics_query(
