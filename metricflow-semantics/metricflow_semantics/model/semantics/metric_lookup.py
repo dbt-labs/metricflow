@@ -83,12 +83,17 @@ class MetricLookup:
         ):
             return self._linkable_spec_resolver.get_linkable_element_set_for_measure(measure_reference, element_filter)
 
-        cache_key = (measure_reference, element_filter)
+        # Cache the result without element names in the filter for better hit rates.
+        element_filter_without_element_names = element_filter.without_element_names()
+        cache_key = (measure_reference, element_filter_without_element_names)
+
         result = self._linkable_element_set_for_measure_cache.get(cache_key)
         if result is not None:
-            return result
+            return result.filter(element_filter)
 
-        result = self._linkable_spec_resolver.get_linkable_element_set_for_measure(measure_reference, element_filter)
+        result = self._linkable_spec_resolver.get_linkable_element_set_for_measure(
+            measure_reference, element_filter_without_element_names
+        )
         self._linkable_element_set_for_measure_cache[cache_key] = result
 
         logger.debug(
@@ -99,7 +104,7 @@ class MetricLookup:
                 runtime=time.time() - start_time,
             )
         )
-        return result
+        return result.filter(element_filter)
 
     @functools.lru_cache
     def linkable_elements_for_no_metrics_query(

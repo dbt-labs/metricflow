@@ -157,8 +157,6 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
             suggestion_generator: If there are issues with matching patterns to specs, use this to generate suggestions
             that will go in the issue.
             source_spec_patterns: The patterns to apply to the specs available at the measure nodes.
-            with_any_property: Only consider group-by-items with these properties from the measure nodes.
-            without_any_property:  Only consider group-by-items without any of these properties (see
             LinkableElementProperty).
             filter_location: If resolving a where filter item, where this filter was defined.
         """

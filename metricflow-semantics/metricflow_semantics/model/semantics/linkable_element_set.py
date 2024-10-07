@@ -229,6 +229,7 @@ class LinkableElementSet(SemanticModelDerivation):
         a property in "without_any_of" set are removed. Lastly, any elements with all properties in without_all_of
         are removed.
         """
+        element_names = element_filter.element_names
         with_any_of = element_filter.with_any_of
         without_any_of = element_filter.without_any_of
         without_all_of = element_filter.without_all_of
@@ -238,6 +239,9 @@ class LinkableElementSet(SemanticModelDerivation):
         key_to_linkable_metrics: Dict[ElementPathKey, Tuple[LinkableMetric, ...]] = {}
 
         for path_key, linkable_dimensions in self.path_key_to_linkable_dimensions.items():
+            if element_names is not None and path_key.element_name not in element_names:
+                continue
+
             filtered_linkable_dimensions = tuple(
                 linkable_dimension
                 for linkable_dimension in linkable_dimensions
@@ -252,6 +256,9 @@ class LinkableElementSet(SemanticModelDerivation):
                 key_to_linkable_dimensions[path_key] = filtered_linkable_dimensions
 
         for path_key, linkable_entities in self.path_key_to_linkable_entities.items():
+            if element_names is not None and path_key.element_name not in element_names:
+                continue
+
             filtered_linkable_entities = tuple(
                 linkable_entity
                 for linkable_entity in linkable_entities
@@ -266,6 +273,9 @@ class LinkableElementSet(SemanticModelDerivation):
                 key_to_linkable_entities[path_key] = filtered_linkable_entities
 
         for path_key, linkable_metrics in self.path_key_to_linkable_metrics.items():
+            if element_names is not None and path_key.element_name not in element_names:
+                continue
+
             filtered_linkable_metrics = tuple(
                 linkable_metric
                 for linkable_metric in linkable_metrics
