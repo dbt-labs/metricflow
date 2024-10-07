@@ -1,34 +1,34 @@
 -- Join Standard Outputs
 SELECT
-  subq_7.listing AS listing
-  , subq_9.country_latest AS listing__country_latest
-  , subq_11.country_latest AS listing__country_latest
-  , subq_7.bookings AS bookings
+  subq_3.listing AS listing
+  , subq_4.country_latest AS listing__country_latest
+  , subq_5.country_latest AS listing__country_latest
+  , subq_3.bookings AS bookings
 FROM (
-  -- Read Elements From Semantic Model 'bookings_source'
+  -- Read From SemanticModelDataSet('bookings_source')
   -- Pass Only Elements: ['bookings', 'listing']
   SELECT
-    listing_id AS listing
-    , 1 AS bookings
+    1 AS bookings
+    , listing_id AS listing
   FROM ***************************.fct_bookings bookings_source_src_28000
-) subq_7
+) subq_3
 LEFT OUTER JOIN (
-  -- Read Elements From Semantic Model 'listings_latest'
+  -- Read From SemanticModelDataSet('listings_latest')
   -- Pass Only Elements: ['country_latest', 'listing']
   SELECT
-    listing_id AS listing
-    , country AS country_latest
+    country AS country_latest
+    , listing_id AS listing
   FROM ***************************.dim_listings_latest listings_latest_src_28000
-) subq_9
+) subq_4
 ON
-  subq_7.listing = subq_9.listing
+  subq_3.listing = subq_4.listing
 LEFT OUTER JOIN (
-  -- Read Elements From Semantic Model 'listings_latest'
+  -- Read From SemanticModelDataSet('listings_latest')
   -- Pass Only Elements: ['country_latest', 'listing']
   SELECT
-    listing_id AS listing
-    , country AS country_latest
+    country AS country_latest
+    , listing_id AS listing
   FROM ***************************.dim_listings_latest listings_latest_src_28000
-) subq_11
+) subq_5
 ON
-  subq_7.listing = subq_11.listing
+  subq_3.listing = subq_5.listing

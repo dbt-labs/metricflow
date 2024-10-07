@@ -1,4 +1,4 @@
--- Read Elements From Semantic Model 'bookings_source'
+-- Read From SemanticModelDataSet('bookings_source')
 -- Pass Only Elements: ['bookings', 'instant_bookings', 'average_booking_value', 'bookers']
 -- Aggregate Measures
 SELECT

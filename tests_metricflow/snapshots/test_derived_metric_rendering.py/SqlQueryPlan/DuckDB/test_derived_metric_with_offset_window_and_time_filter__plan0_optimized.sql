@@ -5,9 +5,9 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_21.metric_time__day, subq_30.metric_time__day) AS metric_time__day
-    , MAX(subq_21.bookings) AS bookings
-    , MAX(subq_30.bookings_2_weeks_ago) AS bookings_2_weeks_ago
+    COALESCE(subq_18.metric_time__day, subq_26.metric_time__day) AS metric_time__day
+    , MAX(subq_18.bookings) AS bookings
+    , MAX(subq_26.bookings_2_weeks_ago) AS bookings_2_weeks_ago
   FROM (
     -- Constrain Output with WHERE
     -- Aggregate Measures
@@ -23,11 +23,11 @@ FROM (
         DATE_TRUNC('day', ds) AS metric_time__day
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_18
+    ) subq_15
     WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'
     GROUP BY
       metric_time__day
-  ) subq_21
+  ) subq_18
   FULL OUTER JOIN (
     -- Constrain Output with WHERE
     -- Aggregate Measures
@@ -39,9 +39,9 @@ FROM (
       -- Join to Time Spine Dataset
       -- Pass Only Elements: ['bookings', 'metric_time__day']
       SELECT
-        subq_25.ds AS metric_time__day
-        , subq_23.bookings AS bookings
-      FROM ***************************.mf_time_spine subq_25
+        subq_22.ds AS metric_time__day
+        , subq_20.bookings AS bookings
+      FROM ***************************.mf_time_spine subq_22
       INNER JOIN (
         -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
@@ -49,16 +49,16 @@ FROM (
           DATE_TRUNC('day', ds) AS metric_time__day
           , 1 AS bookings
         FROM ***************************.fct_bookings bookings_source_src_28000
-      ) subq_23
+      ) subq_20
       ON
-        subq_25.ds - INTERVAL 14 day = subq_23.metric_time__day
-    ) subq_27
+        subq_22.ds - INTERVAL 14 day = subq_20.metric_time__day
+    ) subq_23
     WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'
     GROUP BY
       metric_time__day
-  ) subq_30
+  ) subq_26
   ON
-    subq_21.metric_time__day = subq_30.metric_time__day
+    subq_18.metric_time__day = subq_26.metric_time__day
   GROUP BY
-    COALESCE(subq_21.metric_time__day, subq_30.metric_time__day)
-) subq_31
+    COALESCE(subq_18.metric_time__day, subq_26.metric_time__day)
+) subq_27

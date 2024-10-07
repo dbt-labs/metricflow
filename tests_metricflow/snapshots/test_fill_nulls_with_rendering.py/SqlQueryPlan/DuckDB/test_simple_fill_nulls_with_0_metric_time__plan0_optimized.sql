@@ -5,9 +5,9 @@ SELECT
 FROM (
   -- Join to Time Spine Dataset
   SELECT
-    subq_12.ds AS metric_time__day
-    , subq_10.bookings AS bookings
-  FROM ***************************.mf_time_spine subq_12
+    subq_10.ds AS metric_time__day
+    , subq_8.bookings AS bookings
+  FROM ***************************.mf_time_spine subq_10
   LEFT OUTER JOIN (
     -- Aggregate Measures
     SELECT
@@ -21,10 +21,10 @@ FROM (
         DATE_TRUNC('day', ds) AS metric_time__day
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_9
+    ) subq_7
     GROUP BY
       metric_time__day
-  ) subq_10
+  ) subq_8
   ON
-    subq_12.ds = subq_10.metric_time__day
-) subq_13
+    subq_10.ds = subq_8.metric_time__day
+) subq_11

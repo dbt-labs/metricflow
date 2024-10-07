@@ -8,15 +8,15 @@ FROM (
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
-    subq_10.metric_time__day AS metric_time__day
-    , SUM(subq_9.bookings) AS bookings_5_days_ago
+    subq_9.metric_time__day AS metric_time__day
+    , SUM(subq_8.bookings) AS bookings_5_days_ago
   FROM (
     -- Time Spine
     SELECT
       ds AS metric_time__day
-    FROM ***************************.mf_time_spine subq_11
+    FROM ***************************.mf_time_spine subq_10
     WHERE ds BETWEEN '2019-12-19' AND '2020-01-02'
-  ) subq_10
+  ) subq_9
   INNER JOIN (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
@@ -24,9 +24,9 @@ FROM (
       DATE_TRUNC('day', ds) AS metric_time__day
       , 1 AS bookings
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_9
+  ) subq_8
   ON
-    subq_10.metric_time__day - INTERVAL 5 day = subq_9.metric_time__day
+    subq_9.metric_time__day - INTERVAL 5 day = subq_8.metric_time__day
   GROUP BY
-    subq_10.metric_time__day
-) subq_15
+    subq_9.metric_time__day
+) subq_13

@@ -3,11 +3,11 @@ SELECT
   MIN(listing__country_latest) AS listing__country_latest__min
   , MAX(listing__country_latest) AS listing__country_latest__max
 FROM (
-  -- Read Elements From Semantic Model 'listings_latest'
+  -- Read From SemanticModelDataSet('listings_latest')
   -- Pass Only Elements: ['listing__country_latest',]
   SELECT
     country AS listing__country_latest
   FROM ***************************.dim_listings_latest listings_latest_src_28000
   GROUP BY
     country
-) subq_3
+) subq_1

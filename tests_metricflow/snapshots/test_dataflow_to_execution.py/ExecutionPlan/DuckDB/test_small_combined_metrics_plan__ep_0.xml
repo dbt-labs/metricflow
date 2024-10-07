@@ -5,9 +5,9 @@
         <!-- sql_query =                                                                        -->
         <!--   ('-- Combine Aggregated Outputs\n'                                               -->
         <!--    'SELECT\n'                                                                      -->
-        <!--    '  COALESCE(subq_4.is_instant, subq_9.is_instant) AS is_instant\n'              -->
-        <!--    '  , MAX(subq_4.bookings) AS bookings\n'                                        -->
-        <!--    '  , MAX(subq_9.booking_value) AS booking_value\n'                              -->
+        <!--    '  COALESCE(subq_3.is_instant, subq_7.is_instant) AS is_instant\n'              -->
+        <!--    '  , MAX(subq_3.bookings) AS bookings\n'                                        -->
+        <!--    '  , MAX(subq_7.booking_value) AS booking_value\n'                              -->
         <!--    'FROM (\n'                                                                      -->
         <!--    '  -- Aggregate Measures\n'                                                     -->
         <!--    '  -- Compute Metrics via Expressions\n'                                        -->
@@ -22,10 +22,10 @@
         <!--    '      is_instant\n'                                                            -->
         <!--    '      , 1 AS bookings\n'                                                       -->
         <!--    '    FROM ***************************.fct_bookings bookings_source_src_28000\n' -->
-        <!--    '  ) subq_2\n'                                                                  -->
+        <!--    '  ) subq_1\n'                                                                  -->
         <!--    '  GROUP BY\n'                                                                  -->
         <!--    '    is_instant\n'                                                              -->
-        <!--    ') subq_4\n'                                                                    -->
+        <!--    ') subq_3\n'                                                                    -->
         <!--    'FULL OUTER JOIN (\n'                                                           -->
         <!--    "  -- Read Elements From Semantic Model 'bookings_source'\n"                    -->
         <!--    "  -- Metric Time Dimension 'ds'\n"                                             -->
@@ -38,10 +38,10 @@
         <!--    '  FROM ***************************.fct_bookings bookings_source_src_28000\n'   -->
         <!--    '  GROUP BY\n'                                                                  -->
         <!--    '    is_instant\n'                                                              -->
-        <!--    ') subq_9\n'                                                                    -->
+        <!--    ') subq_7\n'                                                                    -->
         <!--    'ON\n'                                                                          -->
-        <!--    '  subq_4.is_instant = subq_9.is_instant\n'                                     -->
+        <!--    '  subq_3.is_instant = subq_7.is_instant\n'                                     -->
         <!--    'GROUP BY\n'                                                                    -->
-        <!--    '  COALESCE(subq_4.is_instant, subq_9.is_instant)')                             -->
+        <!--    '  COALESCE(subq_3.is_instant, subq_7.is_instant)')                             -->
     </SelectSqlQueryToDataTableTask>
 </ExecutionPlan>

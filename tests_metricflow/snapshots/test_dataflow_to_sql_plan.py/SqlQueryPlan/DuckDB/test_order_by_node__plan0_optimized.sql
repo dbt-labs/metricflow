@@ -6,14 +6,14 @@ SELECT
   , is_instant
   , SUM(bookings) AS bookings
 FROM (
-  -- Read Elements From Semantic Model 'bookings_source'
+  -- Read From SemanticModelDataSet('bookings_source')
   -- Pass Only Elements: ['bookings', 'is_instant', 'ds__day']
   SELECT
-    DATE_TRUNC('day', ds) AS ds__day
+    1 AS bookings
     , is_instant
-    , 1 AS bookings
+    , DATE_TRUNC('day', ds) AS ds__day
   FROM ***************************.fct_bookings bookings_source_src_28000
-) subq_5
+) subq_3
 GROUP BY
   ds__day
   , is_instant
