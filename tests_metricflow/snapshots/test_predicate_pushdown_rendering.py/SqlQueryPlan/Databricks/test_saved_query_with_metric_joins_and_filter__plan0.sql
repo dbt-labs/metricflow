@@ -386,7 +386,7 @@ FROM (
               subq_2.listing = subq_5.listing
           ) subq_6
         ) subq_7
-        WHERE ( listing__is_lux_latest ) AND ( metric_time__day >= '2020-01-02' )
+        WHERE (listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')
       ) subq_8
     ) subq_9
     GROUP BY
@@ -698,7 +698,7 @@ FULL OUTER JOIN (
               subq_14.listing = subq_17.listing
           ) subq_18
         ) subq_19
-        WHERE ( listing__is_lux_latest ) AND ( metric_time__day >= '2020-01-02' )
+        WHERE (listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')
       ) subq_20
     ) subq_21
     GROUP BY
@@ -1100,7 +1100,7 @@ FULL OUTER JOIN (
                   subq_26.listing = subq_29.listing
               ) subq_30
             ) subq_31
-            WHERE ( listing__is_lux_latest ) AND ( metric_time__day >= '2020-01-02' )
+            WHERE (listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')
           ) subq_32
         ) subq_33
         GROUP BY
@@ -1412,7 +1412,7 @@ FULL OUTER JOIN (
                   subq_38.listing = subq_41.listing
               ) subq_42
             ) subq_43
-            WHERE ( listing__is_lux_latest ) AND ( metric_time__day >= '2020-01-02' )
+            WHERE (listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')
           ) subq_44
         ) subq_45
         GROUP BY

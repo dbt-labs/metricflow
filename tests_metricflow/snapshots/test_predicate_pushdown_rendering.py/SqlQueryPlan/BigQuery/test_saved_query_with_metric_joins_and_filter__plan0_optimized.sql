@@ -35,7 +35,7 @@ FROM (
     ON
       subq_52.listing = listings_latest_src_28000.listing_id
   ) subq_57
-  WHERE ( listing__is_lux_latest ) AND ( metric_time__day >= '2020-01-02' )
+  WHERE (listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')
   GROUP BY
     listing__capacity_latest
 ) subq_61
@@ -70,7 +70,7 @@ FULL OUTER JOIN (
     ON
       subq_64.listing = listings_latest_src_28000.listing_id
   ) subq_69
-  WHERE ( listing__is_lux_latest ) AND ( metric_time__day >= '2020-01-02' )
+  WHERE (listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')
   GROUP BY
     listing__capacity_latest
 ) subq_73
@@ -113,7 +113,7 @@ FULL OUTER JOIN (
       ON
         subq_76.listing = listings_latest_src_28000.listing_id
     ) subq_81
-    WHERE ( listing__is_lux_latest ) AND ( metric_time__day >= '2020-01-02' )
+    WHERE (listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')
     GROUP BY
       listing__capacity_latest
   ) subq_85
@@ -148,7 +148,7 @@ FULL OUTER JOIN (
       ON
         subq_88.listing = listings_latest_src_28000.listing_id
     ) subq_93
-    WHERE ( listing__is_lux_latest ) AND ( metric_time__day >= '2020-01-02' )
+    WHERE (listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')
     GROUP BY
       listing__capacity_latest
   ) subq_97
