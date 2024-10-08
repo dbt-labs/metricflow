@@ -108,14 +108,12 @@
                         <!--     ),                                                                            -->
                         <!--   )                                                                               -->
                         <!-- use_custom_agg_time_dimension = False -->
+                        <!-- join_type = LEFT_OUTER -->
                         <!-- time_range_constraint =                             -->
                         <!--   TimeRangeConstraint(                              -->
                         <!--     start_time=datetime.datetime(2020, 1, 3, 0, 0), -->
                         <!--     end_time=datetime.datetime(2020, 1, 5, 0, 0),   -->
                         <!--   )                                                 -->
-                        <!-- offset_window = None -->
-                        <!-- offset_to_grain = None -->
-                        <!-- join_type = LEFT_OUTER -->
                         <AggregateMeasuresNode>
                             <!-- description = 'Aggregate Measures' -->
                             <!-- node_id = NodeId(id_str='am_0') -->
