@@ -24,9 +24,6 @@
                         <!--     ),                                                                            -->
                         <!--   )                                                                               -->
                         <!-- use_custom_agg_time_dimension = False -->
-                        <!-- time_range_constraint = None -->
-                        <!-- offset_window = None -->
-                        <!-- offset_to_grain = None -->
                         <!-- join_type = LEFT_OUTER -->
                         <AggregateMeasuresNode>
                             <!-- description = 'Aggregate Measures' -->
@@ -75,9 +72,6 @@
                         <!--     ),                                                                            -->
                         <!--   )                                                                               -->
                         <!-- use_custom_agg_time_dimension = False -->
-                        <!-- time_range_constraint = None -->
-                        <!-- offset_window = None -->
-                        <!-- offset_to_grain = None -->
                         <!-- join_type = LEFT_OUTER -->
                         <AggregateMeasuresNode>
                             <!-- description = 'Aggregate Measures' -->
@@ -103,10 +97,8 @@
                                     <!--     ),                                                                            -->
                                     <!--   )                                                                               -->
                                     <!-- use_custom_agg_time_dimension = False -->
-                                    <!-- time_range_constraint = None -->
-                                    <!-- offset_window = PydanticMetricTimeWindow(count=14, granularity=DAY) -->
-                                    <!-- offset_to_grain = None -->
                                     <!-- join_type = INNER -->
+                                    <!-- offset_window = PydanticMetricTimeWindow(count=14, granularity=DAY) -->
                                     <MetricTimeDimensionTransformNode>
                                         <!-- description = "Metric Time Dimension 'ds'" -->
                                         <!-- node_id = NodeId(id_str='sma_28009') -->

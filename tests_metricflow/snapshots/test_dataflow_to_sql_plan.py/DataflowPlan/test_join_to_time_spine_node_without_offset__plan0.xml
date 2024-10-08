@@ -13,14 +13,12 @@
             <!--     ),                                                                            -->
             <!--   )                                                                               -->
             <!-- use_custom_agg_time_dimension = False -->
+            <!-- join_type = INNER -->
             <!-- time_range_constraint =                             -->
             <!--   TimeRangeConstraint(                              -->
             <!--     start_time=datetime.datetime(2020, 1, 1, 0, 0), -->
             <!--     end_time=datetime.datetime(2021, 1, 1, 0, 0),   -->
             <!--   )                                                 -->
-            <!-- offset_window = None -->
-            <!-- offset_to_grain = None -->
-            <!-- join_type = INNER -->
             <ComputeMetricsNode>
                 <!-- description = 'Compute Metrics via Expressions' -->
                 <!-- node_id = NodeId(id_str='cm_0') -->
