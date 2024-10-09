@@ -263,18 +263,18 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             table_alias=time_spine_table_alias, column_name=time_spine_source.base_column
         )
         select_columns: Tuple[SqlSelectColumn, ...] = ()
-        apply_group_by = False
+        apply_group_by = True
         for agg_time_dimension_instance in agg_time_dimension_instances:
             column_alias = self.column_association_resolver.resolve_spec(agg_time_dimension_instance.spec).column_name
             # If the requested granularity is the same as the granularity of the spine, do a direct select.
-            # TODO: also handle date part.
             agg_time_grain = agg_time_dimension_instance.spec.time_granularity
             assert (
                 not agg_time_grain.is_custom_granularity
             ), "Custom time granularities are not yet supported for all queries."
             if agg_time_grain.base_granularity == time_spine_source.base_granularity:
                 select_columns += (SqlSelectColumn(expr=column_expr, column_alias=column_alias),)
-            # If any columns have a different granularity, apply a DATE_TRUNC() and aggregate via group_by.
+                apply_group_by = False
+            # If any columns have a different granularity, apply a DATE_TRUNC().
             else:
                 select_columns += (
                     SqlSelectColumn(
@@ -284,7 +284,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                         column_alias=column_alias,
                     ),
                 )
-                apply_group_by = True
+            # TODO: also handle date part.
 
         return SqlDataSet(
             instance_set=time_spine_instance_set,
