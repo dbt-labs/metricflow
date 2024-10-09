@@ -125,6 +125,14 @@ class MeasureSpecProperties:
     non_additive_dimension_spec: Optional[NonAdditiveDimensionSpec] = None
 
 
+@dataclass(frozen=True)
+class MetricInputMeasureSpecFilterSet:
+    """Class to encapsulate the filters for MetricInputMeasureSpec."""
+
+    all_filter_specs: Tuple[WhereFilterSpec, ...] = ()
+    after_aggregation_filter_specs: Tuple[WhereFilterSpec, ...] = ()
+
+
 class DataflowPlanBuilder:
     """Builds a dataflow plan to satisfy a given query."""
 
@@ -1278,9 +1286,9 @@ class DataflowPlanBuilder:
         descendent_filter_specs includes all filter specs required to compute the metric in the query. This includes the
         filters in the query and any filter in the definition of metrics in between.
         """
-        filter_specs: Tuple[WhereFilterSpec, ...] = ()
+        filter_spec_set: Optional[MetricInputMeasureSpecFilterSet] = None
         if include_filters:
-            filter_specs = self._build_filter_specs_for_input_measure(
+            filter_spec_set = self._build_filter_specs_for_input_measure(
                 filter_spec_factory=filter_spec_factory,
                 metric=metric,
                 input_measure=input_measure,
@@ -1327,7 +1335,8 @@ class DataflowPlanBuilder:
             offset_window=child_metric_offset_window,
             offset_to_grain=child_metric_offset_to_grain,
             cumulative_description=cumulative_description,
-            filter_specs=filter_specs,
+            after_aggregation_filter_specs=filter_spec_set.after_aggregation_filter_specs if filter_spec_set else (),
+            filter_specs=filter_spec_set.all_filter_specs if filter_spec_set else (),
             alias=input_measure.alias,
             before_aggregation_time_spine_join_description=before_aggregation_time_spine_join_description,
             after_aggregation_time_spine_join_description=after_aggregation_time_spine_join_description,
@@ -1339,18 +1348,30 @@ class DataflowPlanBuilder:
         metric: Metric,
         input_measure: MetricInputMeasure,
         descendent_filter_specs: Sequence[WhereFilterSpec],
-    ) -> Tuple[WhereFilterSpec, ...]:
+    ) -> MetricInputMeasureSpecFilterSet:
         metric_reference = MetricReference(element_name=metric.name)
-        filter_specs: List[WhereFilterSpec] = []
         filter_location = WhereFilterLocation.for_metric(metric_reference)
-        for filter_ in (input_measure.filter, metric.filter):
-            filter_specs.extend(
-                filter_spec_factory.create_from_where_filter_intersection(
-                    filter_location=filter_location, filter_intersection=filter_
-                )
-            )
+
+        filter_specs: List[WhereFilterSpec] = []
+        after_aggregation_filter_specs: List[WhereFilterSpec] = []
+
+        metric_level_filter_specs = filter_spec_factory.create_from_where_filter_intersection(
+            filter_location=filter_location, filter_intersection=metric.filter
+        )
+        measure_level_filter_specs = filter_spec_factory.create_from_where_filter_intersection(
+            filter_location=filter_location, filter_intersection=input_measure.filter
+        )
         filter_specs.extend(descendent_filter_specs)
-        return tuple(filter_specs)
+        filter_specs.extend(metric_level_filter_specs)
+        filter_specs.extend(measure_level_filter_specs)
+
+        after_aggregation_filter_specs.extend(descendent_filter_specs)
+        after_aggregation_filter_specs.extend(metric_level_filter_specs)
+
+        return MetricInputMeasureSpecFilterSet(
+            all_filter_specs=tuple(filter_specs),
+            after_aggregation_filter_specs=tuple(after_aggregation_filter_specs),
+        )
 
     def _build_input_metric_specs_for_derived_metric(
         self,
@@ -1722,7 +1743,7 @@ class DataflowPlanBuilder:
             # time spine join.
             queried_filter_specs = [
                 filter_spec
-                for filter_spec in metric_input_measure_spec.filter_specs
+                for filter_spec in metric_input_measure_spec.after_aggregation_filter_specs
                 if set(filter_spec.linkable_specs).issubset(set(queried_linkable_specs.as_tuple))
             ]
             if len(queried_filter_specs) > 0:
