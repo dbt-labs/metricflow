@@ -1698,7 +1698,7 @@ class DataflowPlanBuilder:
             metric_input_measure_specs=(metric_input_measure_spec,),
         )
 
-        # Joining to time spine after aggregation is for measures that specify `join_to_timespine` in the YAML spec.
+        # Joining to time spine after aggregation is for measures that specify `join_to_timespine: true` in the YAML spec.
         after_aggregation_time_spine_join_description = (
             metric_input_measure_spec.after_aggregation_time_spine_join_description
         )
@@ -1707,6 +1707,13 @@ class DataflowPlanBuilder:
                 f"Expected {SqlJoinType.LEFT_OUTER} for joining to time spine after aggregation. Remove this if "
                 f"there's a new use case."
             )
+            # TODO: should this include agg time dimension filters, too?
+            # TODO: narrow this down to only metric-level and query-level filters after those are separated
+            filters_to_apply_to_time_spine = [
+                filter_spec
+                for filter_spec in metric_input_measure_spec.filter_specs
+                if filter_spec.linkable_spec_set.contains_only_metric_time
+            ]
             output_node: DataflowPlanNode = JoinToTimeSpineNode.create(
                 parent_node=aggregate_measures_node,
                 requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
@@ -1715,15 +1722,17 @@ class DataflowPlanBuilder:
                 time_range_constraint=predicate_pushdown_state.time_range_constraint,
                 offset_window=after_aggregation_time_spine_join_description.offset_window,
                 offset_to_grain=after_aggregation_time_spine_join_description.offset_to_grain,
+                time_spine_filters=filters_to_apply_to_time_spine,
             )
 
             # Since new rows might have been added due to time spine join, re-apply constraints here. Only re-apply filters
-            # for specs that are also in the queried specs, since those are the only ones that might have changed after the
-            # time spine join.
+            # for specs that are also in the queried specs, since those are the only ones that could change after the time
+            # spine join. Exclude filters on metric_time only, since they were already applied to the time spine table.
             queried_filter_specs = [
                 filter_spec
                 for filter_spec in metric_input_measure_spec.filter_specs
                 if set(filter_spec.linkable_specs).issubset(set(queried_linkable_specs.as_tuple))
+                and not filter_spec.linkable_spec_set.contains_only_metric_time
             ]
             if len(queried_filter_specs) > 0:
                 output_node = WhereConstraintNode.create(
