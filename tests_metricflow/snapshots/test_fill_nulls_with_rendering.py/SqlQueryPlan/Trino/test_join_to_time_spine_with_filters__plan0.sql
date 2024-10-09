@@ -16,8 +16,13 @@ FROM (
       -- Time Spine
       SELECT
         subq_8.ds AS metric_time__day
+        , DATE_TRUNC('week', subq_8.ds) AS metric_time__week
       FROM ***************************.mf_time_spine subq_8
-      WHERE subq_8.ds BETWEEN timestamp '2020-01-03' AND timestamp '2020-01-05'
+      WHERE (
+        metric_time__week > '2020-01-01'
+      ) AND (
+        subq_8.ds BETWEEN timestamp '2020-01-03' AND timestamp '2020-01-05'
+      )
     ) subq_7
     LEFT OUTER JOIN (
       -- Aggregate Measures

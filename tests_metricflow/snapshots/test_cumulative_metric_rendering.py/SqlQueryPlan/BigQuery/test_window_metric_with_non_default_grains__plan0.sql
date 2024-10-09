@@ -153,9 +153,9 @@ FROM (
             FROM (
               -- Time Spine
               SELECT
-                DATETIME_TRUNC(subq_3.ds, month) AS booking__ds__month
-                , subq_3.ds AS metric_time__day
+                subq_3.ds AS metric_time__day
                 , DATETIME_TRUNC(subq_3.ds, isoweek) AS metric_time__week
+                , DATETIME_TRUNC(subq_3.ds, month) AS booking__ds__month
               FROM ***************************.mf_time_spine subq_3
             ) subq_2
             INNER JOIN (
