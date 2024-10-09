@@ -57,8 +57,8 @@ FROM (
       FROM (
         -- Time Spine
         SELECT
-          DATE_TRUNC('month', subq_3.ds) AS revenue_instance__ds__month
-          , subq_3.ds AS metric_time__day
+          subq_3.ds AS metric_time__day
+          , DATE_TRUNC('month', subq_3.ds) AS revenue_instance__ds__month
         FROM ***************************.mf_time_spine subq_3
       ) subq_2
       INNER JOIN (

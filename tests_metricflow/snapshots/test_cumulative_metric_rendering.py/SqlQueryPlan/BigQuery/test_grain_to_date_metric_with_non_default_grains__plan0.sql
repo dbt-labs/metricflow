@@ -78,9 +78,9 @@ FROM (
           FROM (
             -- Time Spine
             SELECT
-              DATETIME_TRUNC(subq_3.ds, quarter) AS revenue_instance__ds__quarter
+              subq_3.ds AS metric_time__day
+              , DATETIME_TRUNC(subq_3.ds, quarter) AS revenue_instance__ds__quarter
               , DATETIME_TRUNC(subq_3.ds, year) AS revenue_instance__ds__year
-              , subq_3.ds AS metric_time__day
             FROM ***************************.mf_time_spine subq_3
           ) subq_2
           INNER JOIN (
