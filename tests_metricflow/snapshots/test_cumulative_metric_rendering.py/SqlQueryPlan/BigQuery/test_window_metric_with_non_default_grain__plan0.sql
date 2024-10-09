@@ -70,9 +70,6 @@ FROM (
               subq_3.ds AS metric_time__day
               , DATETIME_TRUNC(subq_3.ds, year) AS metric_time__year
             FROM ***************************.mf_time_spine subq_3
-            GROUP BY
-              metric_time__day
-              , metric_time__year
           ) subq_2
           INNER JOIN (
             -- Metric Time Dimension 'ds'

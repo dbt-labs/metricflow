@@ -75,9 +75,6 @@ FROM (
                 subq_3.ds AS metric_time__day
                 , DATETIME_TRUNC(subq_3.ds, isoweek) AS metric_time__week
               FROM ***************************.mf_time_spine subq_3
-              GROUP BY
-                metric_time__day
-                , metric_time__week
             ) subq_2
             INNER JOIN (
               -- Metric Time Dimension 'ds'

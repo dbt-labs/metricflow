@@ -13,26 +13,17 @@ FROM (
     -- Pass Only Elements: ['txn_revenue', 'metric_time__year', 'metric_time__day']
     -- Aggregate Measures
     SELECT
-      subq_11.metric_time__day AS metric_time__day
-      , subq_11.metric_time__year AS metric_time__year
+      subq_12.ds AS metric_time__day
+      , DATETIME_TRUNC(subq_12.ds, year) AS metric_time__year
       , SUM(revenue_src_28000.revenue) AS txn_revenue
-    FROM (
-      -- Time Spine
-      SELECT
-        ds AS metric_time__day
-        , DATETIME_TRUNC(ds, year) AS metric_time__year
-      FROM ***************************.mf_time_spine subq_12
-      GROUP BY
-        metric_time__day
-        , metric_time__year
-    ) subq_11
+    FROM ***************************.mf_time_spine subq_12
     INNER JOIN
       ***************************.fct_revenue revenue_src_28000
     ON
       (
-        DATETIME_TRUNC(revenue_src_28000.created_at, day) <= subq_11.metric_time__day
+        DATETIME_TRUNC(revenue_src_28000.created_at, day) <= subq_12.ds
       ) AND (
-        DATETIME_TRUNC(revenue_src_28000.created_at, day) > DATE_SUB(CAST(subq_11.metric_time__day AS DATETIME), INTERVAL 2 month)
+        DATETIME_TRUNC(revenue_src_28000.created_at, day) > DATE_SUB(CAST(subq_12.ds AS DATETIME), INTERVAL 2 month)
       )
     GROUP BY
       metric_time__day
