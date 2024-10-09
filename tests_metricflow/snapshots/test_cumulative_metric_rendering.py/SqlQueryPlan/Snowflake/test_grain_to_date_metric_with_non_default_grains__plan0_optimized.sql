@@ -21,34 +21,23 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      subq_11.revenue_instance__ds__quarter AS revenue_instance__ds__quarter
-      , subq_11.revenue_instance__ds__year AS revenue_instance__ds__year
-      , subq_11.metric_time__day AS metric_time__day
+      DATE_TRUNC('quarter', subq_12.ds) AS revenue_instance__ds__quarter
+      , DATE_TRUNC('year', subq_12.ds) AS revenue_instance__ds__year
+      , subq_12.ds AS metric_time__day
       , SUM(revenue_src_28000.revenue) AS revenue_mtd
-    FROM (
-      -- Time Spine
-      SELECT
-        DATE_TRUNC('quarter', ds) AS revenue_instance__ds__quarter
-        , DATE_TRUNC('year', ds) AS revenue_instance__ds__year
-        , ds AS metric_time__day
-      FROM ***************************.mf_time_spine subq_12
-      GROUP BY
-        DATE_TRUNC('quarter', ds)
-        , DATE_TRUNC('year', ds)
-        , ds
-    ) subq_11
+    FROM ***************************.mf_time_spine subq_12
     INNER JOIN
       ***************************.fct_revenue revenue_src_28000
     ON
       (
-        DATE_TRUNC('day', revenue_src_28000.created_at) <= subq_11.metric_time__day
+        DATE_TRUNC('day', revenue_src_28000.created_at) <= subq_12.ds
       ) AND (
-        DATE_TRUNC('day', revenue_src_28000.created_at) >= DATE_TRUNC('month', subq_11.metric_time__day)
+        DATE_TRUNC('day', revenue_src_28000.created_at) >= DATE_TRUNC('month', subq_12.ds)
       )
     GROUP BY
-      subq_11.revenue_instance__ds__quarter
-      , subq_11.revenue_instance__ds__year
-      , subq_11.metric_time__day
+      DATE_TRUNC('quarter', subq_12.ds)
+      , DATE_TRUNC('year', subq_12.ds)
+      , subq_12.ds
   ) subq_16
 ) subq_17
 GROUP BY

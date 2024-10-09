@@ -29,34 +29,23 @@ FROM (
       -- Pass Only Elements: ['bookers', 'metric_time__week', 'booking__ds__month', 'metric_time__day']
       -- Aggregate Measures
       SELECT
-        subq_14.booking__ds__month AS booking__ds__month
-        , subq_14.metric_time__day AS metric_time__day
-        , subq_14.metric_time__week AS metric_time__week
+        DATE_TRUNC('month', subq_15.ds) AS booking__ds__month
+        , subq_15.ds AS metric_time__day
+        , DATE_TRUNC('week', subq_15.ds) AS metric_time__week
         , COUNT(DISTINCT bookings_source_src_28000.guest_id) AS bookers
-      FROM (
-        -- Time Spine
-        SELECT
-          DATE_TRUNC('month', ds) AS booking__ds__month
-          , ds AS metric_time__day
-          , DATE_TRUNC('week', ds) AS metric_time__week
-        FROM ***************************.mf_time_spine subq_15
-        GROUP BY
-          DATE_TRUNC('month', ds)
-          , ds
-          , DATE_TRUNC('week', ds)
-      ) subq_14
+      FROM ***************************.mf_time_spine subq_15
       INNER JOIN
         ***************************.fct_bookings bookings_source_src_28000
       ON
         (
-          DATE_TRUNC('day', bookings_source_src_28000.ds) <= subq_14.metric_time__day
+          DATE_TRUNC('day', bookings_source_src_28000.ds) <= subq_15.ds
         ) AND (
-          DATE_TRUNC('day', bookings_source_src_28000.ds) > DATEADD(day, -2, subq_14.metric_time__day)
+          DATE_TRUNC('day', bookings_source_src_28000.ds) > DATEADD(day, -2, subq_15.ds)
         )
       GROUP BY
-        subq_14.booking__ds__month
-        , subq_14.metric_time__day
-        , subq_14.metric_time__week
+        DATE_TRUNC('month', subq_15.ds)
+        , subq_15.ds
+        , DATE_TRUNC('week', subq_15.ds)
     ) subq_18
     ON
       subq_20.ds = subq_18.metric_time__day

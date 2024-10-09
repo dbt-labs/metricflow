@@ -21,27 +21,16 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      subq_11.metric_time__day AS metric_time__day
-      , subq_11.metric_time__week AS metric_time__week
-      , subq_11.metric_time__quarter AS metric_time__quarter
+      subq_12.ds AS metric_time__day
+      , DATETIME_TRUNC(subq_12.ds, isoweek) AS metric_time__week
+      , DATETIME_TRUNC(subq_12.ds, quarter) AS metric_time__quarter
       , SUM(revenue_src_28000.revenue) AS revenue_all_time
-    FROM (
-      -- Time Spine
-      SELECT
-        ds AS metric_time__day
-        , DATETIME_TRUNC(ds, isoweek) AS metric_time__week
-        , DATETIME_TRUNC(ds, quarter) AS metric_time__quarter
-      FROM ***************************.mf_time_spine subq_12
-      GROUP BY
-        metric_time__day
-        , metric_time__week
-        , metric_time__quarter
-    ) subq_11
+    FROM ***************************.mf_time_spine subq_12
     INNER JOIN
       ***************************.fct_revenue revenue_src_28000
     ON
       (
-        DATETIME_TRUNC(revenue_src_28000.created_at, day) <= subq_11.metric_time__day
+        DATETIME_TRUNC(revenue_src_28000.created_at, day) <= subq_12.ds
       )
     GROUP BY
       metric_time__day

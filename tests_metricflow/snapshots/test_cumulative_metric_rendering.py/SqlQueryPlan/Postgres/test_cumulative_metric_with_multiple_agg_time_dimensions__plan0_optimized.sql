@@ -3,27 +3,18 @@
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  subq_9.revenue_instance__ds__day AS revenue_instance__ds__day
-  , subq_9.revenue_instance__ds__month AS revenue_instance__ds__month
+  subq_10.ds AS revenue_instance__ds__day
+  , DATE_TRUNC('month', subq_10.ds) AS revenue_instance__ds__month
   , SUM(revenue_src_28000.revenue) AS trailing_2_months_revenue
-FROM (
-  -- Time Spine
-  SELECT
-    ds AS revenue_instance__ds__day
-    , DATE_TRUNC('month', ds) AS revenue_instance__ds__month
-  FROM ***************************.mf_time_spine subq_10
-  GROUP BY
-    ds
-    , DATE_TRUNC('month', ds)
-) subq_9
+FROM ***************************.mf_time_spine subq_10
 INNER JOIN
   ***************************.fct_revenue revenue_src_28000
 ON
   (
-    DATE_TRUNC('day', revenue_src_28000.created_at) <= subq_9.revenue_instance__ds__day
+    DATE_TRUNC('day', revenue_src_28000.created_at) <= subq_10.ds
   ) AND (
-    DATE_TRUNC('day', revenue_src_28000.created_at) > subq_9.revenue_instance__ds__day - MAKE_INTERVAL(months => 2)
+    DATE_TRUNC('day', revenue_src_28000.created_at) > subq_10.ds - MAKE_INTERVAL(months => 2)
   )
 GROUP BY
-  subq_9.revenue_instance__ds__day
-  , subq_9.revenue_instance__ds__month
+  subq_10.ds
+  , DATE_TRUNC('month', subq_10.ds)
