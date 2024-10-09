@@ -193,6 +193,10 @@ class ValidLinkableSpecResolver:
 
         logger.debug(LazyFormat(lambda: f"Building valid group-by-item indexes took: {time.time() - start_time:.2f}s"))
 
+    def _is_semantic_model_scd(self, semantic_model: SemanticModel) -> bool:
+        """Whether the semantic model's underlying table is an SCD."""
+        return any(dim.validity_params is not None for dim in semantic_model.dimensions)
+
     def _generate_linkable_time_dimensions(
         self,
         semantic_model_origin: SemanticModelReference,
@@ -294,6 +298,8 @@ class ValidLinkableSpecResolver:
             necessary.
         """
         properties = frozenset({LinkableElementProperty.METRIC, LinkableElementProperty.JOINED})
+        if self._is_semantic_model_scd(semantic_model):
+            properties = properties.union({LinkableElementProperty.SCD_HOP})
 
         join_path_has_path_links = len(using_join_path.path_elements) > 0
         if join_path_has_path_links:
@@ -331,8 +337,15 @@ class ValidLinkableSpecResolver:
         Elements related to metric_time are handled separately in _get_metric_time_elements().
         Linkable metrics are not considered local to the semantic model since they always require a join.
         """
+        semantic_model_is_scd = self._is_semantic_model_scd(semantic_model)
+
         linkable_dimensions = []
         linkable_entities = []
+
+        entity_properties = frozenset({LinkableElementProperty.LOCAL, LinkableElementProperty.ENTITY})
+        if semantic_model_is_scd:
+            entity_properties = entity_properties.union({LinkableElementProperty.SCD_HOP})
+
         for entity in semantic_model.entities:
             linkable_entities.append(
                 LinkableEntity.create(
@@ -342,7 +355,7 @@ class ValidLinkableSpecResolver:
                     join_path=SemanticModelJoinPath(
                         left_semantic_model_reference=semantic_model.reference,
                     ),
-                    properties=frozenset({LinkableElementProperty.LOCAL, LinkableElementProperty.ENTITY}),
+                    properties=entity_properties,
                 )
             )
             for entity_link in self._semantic_model_lookup.entity_links_for_local_elements(semantic_model):
@@ -357,12 +370,15 @@ class ValidLinkableSpecResolver:
                         join_path=SemanticModelJoinPath(
                             left_semantic_model_reference=semantic_model.reference,
                         ),
-                        properties=frozenset({LinkableElementProperty.LOCAL, LinkableElementProperty.ENTITY}),
+                        properties=entity_properties,
                     )
                 )
 
+        dimension_properties = frozenset({LinkableElementProperty.LOCAL})
+        if semantic_model_is_scd:
+            dimension_properties = dimension_properties.union({LinkableElementProperty.SCD_HOP})
+
         for entity_link in self._semantic_model_lookup.entity_links_for_local_elements(semantic_model):
-            dimension_properties = frozenset({LinkableElementProperty.LOCAL})
             for dimension in semantic_model.dimensions:
                 dimension_type = dimension.type
                 if dimension_type is DimensionType.CATEGORICAL:
@@ -464,6 +480,7 @@ class ValidLinkableSpecResolver:
         defined_granularity: Optional[ExpandedTimeGranularity] = None
         if measure_reference:
             measure_semantic_model = self._get_semantic_model_for_measure(measure_reference)
+            semantic_model_is_scd = self._is_semantic_model_scd(measure_semantic_model)
             measure_agg_time_dimension_reference = measure_semantic_model.checked_agg_time_dimension_for_measure(
                 measure_reference=measure_reference
             )
@@ -476,6 +493,7 @@ class ValidLinkableSpecResolver:
             # If querying metric_time without metrics, will query from time spines.
             # Defaults to DAY granularity if available in time spines, else smallest available granularity.
             min_granularity = min(self._time_spine_sources.keys())
+            semantic_model_is_scd = False
         possible_metric_time_granularities = tuple(
             ExpandedTimeGranularity.from_time_granularity(time_granularity)
             for time_granularity in TimeGranularity
@@ -506,6 +524,8 @@ class ValidLinkableSpecResolver:
                     properties.add(LinkableElementProperty.DERIVED_TIME_GRANULARITY)
                 if date_part:
                     properties.add(LinkableElementProperty.DATE_PART)
+                if semantic_model_is_scd:
+                    properties.add(LinkableElementProperty.SCD_HOP)
                 linkable_dimension = LinkableDimension.create(
                     defined_in_semantic_model=measure_semantic_model.reference if measure_semantic_model else None,
                     element_name=MetricFlowReservedKeywords.METRIC_TIME.value,
@@ -717,12 +737,25 @@ class ValidLinkableSpecResolver:
         join_path: SemanticModelJoinPath,
     ) -> LinkableElementSet:
         """Given the current path, generate the respective linkable elements from the last semantic model in the path."""
+        semantic_model = self._semantic_model_lookup.get_by_reference(join_path.last_semantic_model_reference)
+        assert (
+            semantic_model
+        ), f"Semantic model {join_path.last_semantic_model_reference.semantic_model_name} is in join path but does not exist in SemanticModelLookup"
+
         properties = frozenset({LinkableElementProperty.JOINED})
         if len(join_path.path_elements) > 1:
             properties = properties.union({LinkableElementProperty.MULTI_HOP})
 
-        semantic_model = self._semantic_model_lookup.get_by_reference(join_path.last_semantic_model_reference)
-        assert semantic_model
+        # If any of the semantic models in the join path is an SCD, add SCD_HOP
+        for reference_to_derived_model in join_path.derived_from_semantic_models:
+            derived_model = self._semantic_model_lookup.get_by_reference(reference_to_derived_model)
+            assert (
+                derived_model
+            ), f"Semantic model {reference_to_derived_model.semantic_model_name} is in join path but does not exist in SemanticModelLookup"
+
+            if self._is_semantic_model_scd(derived_model):
+                properties = properties.union({LinkableElementProperty.SCD_HOP})
+                break
 
         linkable_dimensions: List[LinkableDimension] = []
         linkable_entities: List[LinkableEntity] = []

@@ -172,7 +172,7 @@ def test_create_linkable_element_set_from_join_path_multi_hop(  # noqa: D103
                 left_semantic_model_reference=SemanticModelReference("views_source"),
                 path_elements=(
                     SemanticModelJoinPathElement(
-                        semantic_model_reference=SemanticModelReference("bookings"),
+                        semantic_model_reference=SemanticModelReference("bookings_source"),
                         join_on_entity=EntityReference("guest"),
                     ),
                     SemanticModelJoinPathElement(

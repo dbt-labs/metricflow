@@ -2,12 +2,15 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from functools import lru_cache
-from typing import Sequence
+from typing import List, Sequence
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.protocols import WhereFilterIntersection
-from dbt_semantic_interfaces.references import MetricReference, TimeDimensionReference
+from dbt_semantic_interfaces.references import (
+    MetricReference,
+    TimeDimensionReference,
+)
 from dbt_semantic_interfaces.type_enums import MetricType
 from typing_extensions import override
 
@@ -20,8 +23,14 @@ from metricflow_semantics.query.issues.parsing.cumulative_metric_requires_metric
 from metricflow_semantics.query.issues.parsing.offset_metric_requires_metric_time import (
     OffsetMetricRequiresMetricTimeIssue,
 )
-from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import ResolverInputForQuery
+from metricflow_semantics.query.issues.parsing.scd_requires_metric_time import (
+    ScdRequiresMetricTimeIssue,
+)
+from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import (
+    ResolverInputForQuery,
+)
 from metricflow_semantics.query.validation_rules.base_validation_rule import PostResolutionQueryValidationRule
+from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 
 
@@ -29,6 +38,7 @@ from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 class QueryItemsAnalysis:
     """Contains data about which items a query contains."""
 
+    scds: Sequence[InstanceSpec]
     has_metric_time: bool
     has_agg_time_dimension: bool
 
@@ -39,7 +49,8 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
     Currently, known cases are:
 
     * Cumulative metrics.
-    * Derived metrics with an offset time.g
+    * Derived metrics with an offset time.
+    * Slowly changing dimensions
     """
 
     def __init__(  # noqa: D107
@@ -61,10 +72,14 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
     ) -> QueryItemsAnalysis:
         has_agg_time_dimension = False
         has_metric_time = False
+        scds: List[InstanceSpec] = []
 
         valid_agg_time_dimension_specs = self._manifest_lookup.metric_lookup.get_valid_agg_time_dimensions_for_metric(
             metric_reference
         )
+
+        scd_specs = self._manifest_lookup.metric_lookup.get_joinable_scd_specs_for_metric(metric_reference)
+
         for group_by_item_input in query_resolver_input.group_by_item_inputs:
             if group_by_item_input.spec_pattern.matches_any(self._metric_time_specs):
                 has_metric_time = True
@@ -72,7 +87,11 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
             if group_by_item_input.spec_pattern.matches_any(valid_agg_time_dimension_specs):
                 has_agg_time_dimension = True
 
+            scd_matches = group_by_item_input.spec_pattern.match(scd_specs)
+            scds.extend(scd_matches)
+
         return QueryItemsAnalysis(
+            scds=scds,
             has_metric_time=has_metric_time,
             has_agg_time_dimension=has_agg_time_dimension,
         )
@@ -88,6 +107,16 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
         query_items_analysis = self._get_query_items_analysis(self._resolver_input_for_query, metric_reference)
 
         issues = MetricFlowQueryResolutionIssueSet.empty_instance()
+
+        # Queries that join to an SCD don't support direct references to agg_time_dimension, so we
+        # only check for metric_time. If we decide to support agg_time_dimension, we should add a check
+        if len(query_items_analysis.scds) > 0 and not query_items_analysis.has_metric_time:
+            issues = issues.add_issue(
+                ScdRequiresMetricTimeIssue.from_parameters(
+                    scds_in_query=query_items_analysis.scds,
+                    query_resolution_path=resolution_path,
+                )
+            )
 
         if metric.type is MetricType.CUMULATIVE:
             if (
@@ -134,6 +163,3 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
         resolution_path: MetricFlowQueryResolutionPath,
     ) -> MetricFlowQueryResolutionIssueSet:
         return MetricFlowQueryResolutionIssueSet.empty_instance()
-
-
-__all__ = ["MetricTimeQueryValidationRule"]
