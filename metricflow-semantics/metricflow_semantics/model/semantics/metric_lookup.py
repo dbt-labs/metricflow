@@ -20,6 +20,7 @@ from metricflow_semantics.model.semantics.linkable_spec_resolver import (
 )
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
+from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
@@ -221,3 +222,12 @@ class MetricLookup:
                     minimum_queryable_granularity = defined_time_granularity
 
         return minimum_queryable_granularity
+
+    def get_joinable_scd_specs_for_metric(self, metric_reference: MetricReference) -> Sequence[LinkableInstanceSpec]:
+        """Get the SCDs that can be joined to a metric."""
+        scd_elems = self.linkable_elements_for_metrics(
+            metric_references=(metric_reference,),
+            with_any_property=frozenset([LinkableElementProperty.SCD_HOP]),
+        )
+
+        return scd_elems.specs

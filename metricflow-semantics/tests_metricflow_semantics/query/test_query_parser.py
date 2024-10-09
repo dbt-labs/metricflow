@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import textwrap
 from typing import List
 
@@ -29,6 +30,9 @@ from metricflow_semantics.test_helpers.example_project_configuration import (
     EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE,
 )
 from metricflow_semantics.test_helpers.metric_time_dimension import MTD
+from metricflow_semantics.test_helpers.semantic_manifest_yamls.scd_manifest import (
+    SCD_MANIFEST_ANCHOR,
+)
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_snapshot_equal
 
 logger = logging.getLogger(__name__)
@@ -189,6 +193,23 @@ def bookings_query_parser() -> MetricFlowQueryParser:  # noqa
 def revenue_query_parser() -> MetricFlowQueryParser:  # noqa
     revenue_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=REVENUE_YAML)
     return query_parser_from_yaml([EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, revenue_yaml_file])
+
+
+@pytest.fixture
+def scd_query_parser() -> MetricFlowQueryParser:  # noqa
+    file_paths = [
+        os.path.join(SCD_MANIFEST_ANCHOR.directory, f)
+        for f in os.listdir(SCD_MANIFEST_ANCHOR.directory)
+        if f.endswith(".yaml")
+    ]
+
+    contents: List[str] = []
+    for fp in file_paths:
+        with open(fp, "r") as f:
+            contents.append(f.read())
+
+    files = [YamlConfigFile(filepath="inline_for_test_1", contents=c) for c in contents]
+    return query_parser_from_yaml(files)
 
 
 def test_query_parser(  # noqa: D103
@@ -459,6 +480,34 @@ def test_cumulative_metric_agg_time_dimension_name_validation(
     assert_object_snapshot_equal(request=request, mf_test_configuration=mf_test_configuration, obj=result)
 
 
+def test_join_to_scd_no_time_dimension_validation(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    scd_query_parser: MetricFlowQueryParser,
+) -> None:
+    """Test that queries that join to SCD semantic models fail if no time dimensions are selected."""
+    with pytest.raises(InvalidQueryException, match="query containing SCDs must also contain the metric_time"):
+        scd_query_parser.parse_and_validate_query(
+            metric_names=["bookings"],
+            group_by_names=["listing__country"],
+        )
+
+
+def test_join_through_scd_no_time_dimension_validation(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    scd_query_parser: MetricFlowQueryParser,
+) -> None:
+    """Test that queries that join through SCDs semantic models fail if no time dimensions are selected."""
+    with pytest.raises(InvalidQueryException, match="query containing SCDs must also contain the metric_time"):
+        # "user__home_state_latest" is not an SCD itself, but since we go through
+        # "listing" and that is an SCD, we should raise an exception here as well
+        scd_query_parser.parse_and_validate_query(
+            metric_names=["bookings"],
+            group_by_names=["listing__user__home_state_latest"],
+        )
+
+
 def test_derived_metric_query_parsing(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -607,12 +656,11 @@ def test_offset_metric_with_diff_agg_time_dims_error() -> None:  # noqa: D103
 
 def query_parser_from_yaml(yaml_contents: List[YamlConfigFile]) -> MetricFlowQueryParser:
     """Given yaml files, return a query parser using default source nodes, resolvers and time spine source."""
-    semantic_manifest_lookup = SemanticManifestLookup(
-        parse_yaml_files_to_validation_ready_semantic_manifest(
-            yaml_contents, apply_transformations=True
-        ).semantic_manifest
-    )
-    SemanticManifestValidator[SemanticManifest]().checked_validations(semantic_manifest_lookup.semantic_manifest)
+    semantic_manifest = parse_yaml_files_to_validation_ready_semantic_manifest(
+        yaml_contents, apply_transformations=True
+    ).semantic_manifest
+    semantic_manifest_lookup = SemanticManifestLookup(semantic_manifest)
+    SemanticManifestValidator[SemanticManifest]().checked_validations(semantic_manifest)
     return MetricFlowQueryParser(
         semantic_manifest_lookup=semantic_manifest_lookup,
     )
