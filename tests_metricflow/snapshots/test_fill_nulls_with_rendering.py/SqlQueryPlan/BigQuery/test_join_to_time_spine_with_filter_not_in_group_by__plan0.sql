@@ -11,7 +11,6 @@ FROM (
     -- Filter Time Spine
     SELECT
       subq_8.metric_time__day
-      , subq_8.metric_time__month
     FROM (
       -- Time Spine
       SELECT

@@ -6,8 +6,7 @@ SELECT
 FROM (
   -- Filter Time Spine
   SELECT
-    metric_time__hour
-    , metric_time__day
+    metric_time__day
   FROM (
     -- Time Spine
     SELECT
@@ -20,6 +19,8 @@ FROM (
   ) AND (
     metric_time__day = '2020-01-01'
   )
+  GROUP BY
+    metric_time__day
 ) subq_16
 LEFT OUTER JOIN (
   -- Constrain Output with WHERE

@@ -7,7 +7,6 @@ FROM (
   -- Filter Time Spine
   SELECT
     metric_time__day
-    , metric_time__month
   FROM (
     -- Time Spine
     SELECT
