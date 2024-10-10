@@ -280,7 +280,7 @@ def test_case(
             limit=case.limit,
             time_constraint_start=parser.parse(case.time_constraint[0]) if case.time_constraint else None,
             time_constraint_end=parser.parse(case.time_constraint[1]) if case.time_constraint else None,
-            where_constraint=(
+            where_constraints=[
                 jinja2.Template(
                     case.where_filter,
                     undefined=jinja2.StrictUndefined,
@@ -302,9 +302,9 @@ def test_case(
                     generate_random_uuid=check_query_helpers.generate_random_uuid,
                     cast_to_ts=check_query_helpers.cast_to_ts,
                 )
-                if case.where_filter
-                else None
-            ),
+            ]
+            if case.where_filter
+            else None,
             order_by_names=case.order_bys,
             min_max_only=case.min_max_only,
         )

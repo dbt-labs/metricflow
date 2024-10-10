@@ -24,9 +24,11 @@ def test_query_with_simple_metric_in_where_filter(
     """Tests a query with a simple metric in the query-level where filter."""
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("listings",),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template="{{ Metric('bookings', ['listing']) }} > 2",
-        ),
+        where_constraints=[
+            PydanticWhereFilter(
+                where_sql_template="{{ Metric('bookings', ['listing']) }} > 2",
+            )
+        ],
     ).query_spec
 
     render_and_check(
@@ -76,9 +78,11 @@ def test_query_with_derived_metric_in_where_filter(
     """Tests a query with a derived metric in the query-level where filter."""
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("listings",),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template="{{ Metric('views_times_booking_value', ['listing']) }} > 1",
-        ),
+        where_constraints=[
+            PydanticWhereFilter(
+                where_sql_template="{{ Metric('views_times_booking_value', ['listing']) }} > 1",
+            )
+        ],
     ).query_spec
 
     render_and_check(
@@ -103,9 +107,11 @@ def test_query_with_ratio_metric_in_where_filter(
     """Tests a query with a ratio metric in the query-level where filter."""
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("listings",),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template="{{ Metric('bookings_per_booker', ['listing']) }} > 1",
-        ),
+        where_constraints=[
+            PydanticWhereFilter(
+                where_sql_template="{{ Metric('bookings_per_booker', ['listing']) }} > 1",
+            )
+        ],
     ).query_spec
 
     render_and_check(
@@ -133,9 +139,11 @@ def test_query_with_cumulative_metric_in_where_filter(
     """
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("listings",),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template="{{ Metric('revenue_all_time', ['user']) }} > 1",
-        ),
+        where_constraints=[
+            PydanticWhereFilter(
+                where_sql_template="{{ Metric('revenue_all_time', ['user']) }} > 1",
+            )
+        ],
     ).query_spec
 
     render_and_check(
@@ -160,9 +168,11 @@ def test_query_with_multiple_metrics_in_filter(
     """Tests a query with 2 simple metrics in the query-level where filter."""
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("listings",),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template="{{ Metric('bookings', ['listing']) }} > 2 AND {{ Metric('bookers', ['listing']) }} > 1",
-        ),
+        where_constraints=[
+            PydanticWhereFilter(
+                where_sql_template="{{ Metric('bookings', ['listing']) }} > 2 AND {{ Metric('bookers', ['listing']) }} > 1",
+            )
+        ],
     ).query_spec
 
     render_and_check(
@@ -187,9 +197,11 @@ def test_filter_by_metric_in_same_semantic_model_as_queried_metric(
     """Tests a query with a simple metric in the query-level where filter."""
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("bookers",),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template="{{ Metric('booking_value', ['guest']) }} > 1.00",
-        ),
+        where_constraints=[
+            PydanticWhereFilter(
+                where_sql_template="{{ Metric('booking_value', ['guest']) }} > 1.00",
+            )
+        ],
     ).query_spec
 
     render_and_check(
@@ -214,9 +226,11 @@ def test_distinct_values_query_with_metric_filter(
     """Tests a distinct values query with a metric in the query-level where filter."""
     query_spec = query_parser.parse_and_validate_query(
         group_by_names=("listing",),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template="{{ Metric('bookings', ['listing']) }} > 2",
-        ),
+        where_constraints=[
+            PydanticWhereFilter(
+                where_sql_template="{{ Metric('bookings', ['listing']) }} > 2",
+            )
+        ],
     ).query_spec
 
     render_and_check(
@@ -241,9 +255,11 @@ def test_metric_filtered_by_itself(
     """Tests a query for a metric that filters by the same metric."""
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("bookers",),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template="{{ Metric('bookers', ['listing']) }} > 1.00",
-        ),
+        where_constraints=[
+            PydanticWhereFilter(
+                where_sql_template="{{ Metric('bookers', ['listing']) }} > 1.00",
+            )
+        ],
     ).query_spec
 
     render_and_check(
@@ -267,9 +283,11 @@ def test_group_by_has_local_entity_prefix(  # noqa: D103
 ) -> None:
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("listings",),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template="{{ Metric('average_booking_value', ['listing__user']) }} > 1",
-        ),
+        where_constraints=[
+            PydanticWhereFilter(
+                where_sql_template="{{ Metric('average_booking_value', ['listing__user']) }} > 1",
+            )
+        ],
     ).query_spec
 
     render_and_check(
@@ -293,9 +311,11 @@ def test_filter_with_conversion_metric(  # noqa: D103
 ) -> None:
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("listings",),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template="{{ Metric('visit_buy_conversion_rate', ['user']) }} > 2",
-        ),
+        where_constraints=[
+            PydanticWhereFilter(
+                where_sql_template="{{ Metric('visit_buy_conversion_rate', ['user']) }} > 2",
+            )
+        ],
     ).query_spec
 
     render_and_check(
@@ -320,9 +340,11 @@ def test_inner_query_single_hop(
     """Tests rendering for a metric filter using a one-hop join in the inner query."""
     query_spec = multihop_query_parser.parse_and_validate_query(
         metric_names=("third_hop_count",),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template="{{ Metric('paraguayan_customers', ['customer_id__customer_third_hop_id']) }} > 0",
-        ),
+        where_constraints=[
+            PydanticWhereFilter(
+                where_sql_template="{{ Metric('paraguayan_customers', ['customer_id__customer_third_hop_id']) }} > 0",
+            )
+        ],
     ).query_spec
 
     render_and_check(
@@ -347,9 +369,11 @@ def test_inner_query_multi_hop(
     """Tests rendering for a metric filter using a two-hop join in the inner query."""
     query_spec = multihop_query_parser.parse_and_validate_query(
         metric_names=("third_hop_count",),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template="{{ Metric('txn_count', ['account_id__customer_id__customer_third_hop_id']) }} > 2",
-        ),
+        where_constraints=[
+            PydanticWhereFilter(
+                where_sql_template="{{ Metric('txn_count', ['account_id__customer_id__customer_third_hop_id']) }} > 2",
+            )
+        ],
     ).query_spec
 
     render_and_check(

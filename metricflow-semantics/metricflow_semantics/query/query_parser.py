@@ -15,7 +15,6 @@ from dbt_semantic_interfaces.references import SemanticModelReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 
 from metricflow_semantics.assert_one_arg import assert_at_most_one_arg_set
-from metricflow_semantics.filters.merge_where import merge_to_single_where_filter
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.mf_logging.formatting import indent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
@@ -93,7 +92,7 @@ class MetricFlowQueryParser:
     def parse_and_validate_saved_query(
         self,
         saved_query_parameter: SavedQueryParameter,
-        where_filter: Optional[WhereFilter],
+        where_filters: Optional[Sequence[WhereFilter]],
         limit: Optional[int],
         time_constraint_start: Optional[datetime.datetime],
         time_constraint_end: Optional[datetime.datetime],
@@ -107,19 +106,19 @@ class MetricFlowQueryParser:
         saved_query = self._get_saved_query(saved_query_parameter)
 
         # Merge interface could streamline this.
-        where_filters: List[WhereFilter] = []
+        parsed_where_filters: List[WhereFilter] = []
         if saved_query.query_params.where is not None:
-            where_filters.extend(saved_query.query_params.where.where_filters)
-        if where_filter is not None:
-            where_filters.append(where_filter)
+            parsed_where_filters.extend(saved_query.query_params.where.where_filters)
+        if where_filters is not None:
+            parsed_where_filters.extend(where_filters)
 
         return self._parse_and_validate_query(
             metric_names=saved_query.query_params.metrics,
             metrics=None,
             group_by_names=saved_query.query_params.group_by,
             group_by=None,
-            where_constraint=merge_to_single_where_filter(PydanticWhereFilterIntersection(where_filters=where_filters)),
-            where_constraint_str=None,
+            where_constraints=parsed_where_filters,
+            where_constraint_strs=None,
             time_constraint_start=time_constraint_start,
             time_constraint_end=time_constraint_end,
             limit=limit,
@@ -309,8 +308,8 @@ class MetricFlowQueryParser:
         limit: Optional[int] = None,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
-        where_constraint: Optional[WhereFilter] = None,
-        where_constraint_str: Optional[str] = None,
+        where_constraints: Optional[Sequence[WhereFilter]] = None,
+        where_constraint_strs: Optional[Sequence[str]] = None,
         order_by_names: Optional[Sequence[str]] = None,
         order_by: Optional[Sequence[OrderByQueryParameter]] = None,
         min_max_only: bool = False,
@@ -329,8 +328,8 @@ class MetricFlowQueryParser:
             limit=limit,
             time_constraint_start=time_constraint_start,
             time_constraint_end=time_constraint_end,
-            where_constraint=where_constraint,
-            where_constraint_str=where_constraint_str,
+            where_constraints=where_constraints,
+            where_constraint_strs=where_constraint_strs,
             order_by_names=order_by_names,
             order_by=order_by,
             min_max_only=min_max_only,
@@ -346,8 +345,8 @@ class MetricFlowQueryParser:
         limit: Optional[int],
         time_constraint_start: Optional[datetime.datetime],
         time_constraint_end: Optional[datetime.datetime],
-        where_constraint: Optional[WhereFilter],
-        where_constraint_str: Optional[str],
+        where_constraints: Optional[Sequence[WhereFilter]],
+        where_constraint_strs: Optional[Sequence[str]],
         order_by_names: Optional[Sequence[str]],
         order_by: Optional[Sequence[OrderByQueryParameter]],
         min_max_only: bool,
@@ -357,7 +356,7 @@ class MetricFlowQueryParser:
         assert_at_most_one_arg_set(metric_names=metric_names, metrics=metrics)
         assert_at_most_one_arg_set(group_by_names=group_by_names, group_by=group_by)
         assert_at_most_one_arg_set(order_by_names=order_by_names, order_by=order_by)
-        assert_at_most_one_arg_set(where_constraint=where_constraint, where_constraint_str=where_constraint_str)
+        assert_at_most_one_arg_set(where_constraints=where_constraints, where_constraint_strs=where_constraint_strs)
 
         metric_names = metric_names or ()
         metrics = metrics or ()
@@ -455,10 +454,20 @@ class MetricFlowQueryParser:
 
         where_filters: List[PydanticWhereFilter] = []
 
-        if where_constraint is not None:
-            where_filters.append(PydanticWhereFilter(where_sql_template=where_constraint.where_sql_template))
-        if where_constraint_str is not None:
-            where_filters.append(PydanticWhereFilter(where_sql_template=where_constraint_str))
+        if where_constraints is not None:
+            where_filters.extend(
+                [
+                    PydanticWhereFilter(where_sql_template=constraint.where_sql_template)
+                    for constraint in where_constraints
+                ]
+            )
+        if where_constraint_strs is not None:
+            where_filters.extend(
+                [
+                    PydanticWhereFilter(where_sql_template=where_constraint_str)
+                    for where_constraint_str in where_constraint_strs
+                ]
+            )
 
         resolver_input_for_filter = ResolverInputForQueryLevelWhereFilterIntersection(
             where_filter_intersection=PydanticWhereFilterIntersection(where_filters=where_filters)

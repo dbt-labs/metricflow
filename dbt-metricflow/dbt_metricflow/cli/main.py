@@ -281,7 +281,7 @@ def query(
         limit=limit,
         time_constraint_start=start_time,
         time_constraint_end=end_time,
-        where_constraint=where,
+        where_constraints=[where] if where else None,
         order_by_names=order,
     )
 

@@ -55,9 +55,11 @@ def test_dimension_values_with_a_join_and_a_filter(
     """Tests querying 2 dimensions that require a join and a filter."""
     query_spec = query_parser.parse_and_validate_query(
         group_by_names=("user__home_state_latest", "listing__is_lux_latest"),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template="{{ Dimension('user__home_state_latest') }} = 'us'",
-        ),
+        where_constraints=[
+            PydanticWhereFilter(
+                where_sql_template="{{ Dimension('user__home_state_latest') }} = 'us'",
+            )
+        ],
     ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(query_spec)
 

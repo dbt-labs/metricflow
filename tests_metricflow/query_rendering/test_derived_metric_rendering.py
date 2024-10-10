@@ -111,12 +111,14 @@ def test_derived_metric_with_offset_window_and_time_filter(  # noqa: D103
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("bookings_growth_2_weeks",),
         group_by_names=(METRIC_TIME_ELEMENT_NAME,),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template=(
-                "{{ TimeDimension('metric_time', 'day') }} = '2020-01-01' "
-                "or {{ TimeDimension('metric_time', 'day') }} = '2020-01-14'"
+        where_constraints=[
+            PydanticWhereFilter(
+                where_sql_template=(
+                    "{{ TimeDimension('metric_time', 'day') }} = '2020-01-01' "
+                    "or {{ TimeDimension('metric_time', 'day') }} = '2020-01-14'"
+                )
             )
-        ),
+        ],
     ).query_spec
 
     render_and_check(
@@ -375,12 +377,14 @@ def test_nested_offsets_with_where_constraint(  # noqa: D103
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("bookings_offset_twice",),
         group_by_names=(METRIC_TIME_ELEMENT_NAME,),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template=(
-                "{{ TimeDimension('metric_time', 'day') }} = '2020-01-12' "
-                "or {{ TimeDimension('metric_time', 'day') }} = '2020-01-13'"
+        where_constraints=[
+            PydanticWhereFilter(
+                where_sql_template=(
+                    "{{ TimeDimension('metric_time', 'day') }} = '2020-01-12' "
+                    "or {{ TimeDimension('metric_time', 'day') }} = '2020-01-13'"
+                )
             )
-        ),
+        ],
     ).query_spec
 
     render_and_check(
@@ -514,7 +518,7 @@ def test_nested_derived_metric_offset_with_joined_where_constraint_not_selected(
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("bookings_offset_twice",),
         group_by_names=(group_by_name,),
-        where_constraint_str="{{ Dimension('booking__is_instant') }}",
+        where_constraint_strs=["{{ Dimension('booking__is_instant') }}"],
     ).query_spec
 
     render_and_check(
@@ -749,9 +753,9 @@ def test_offset_window_metric_filter_and_query_have_different_granularities(
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("booking_fees_last_week_per_booker_this_week",),
         group_by_names=("metric_time__month",),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template=("{{ TimeDimension('metric_time', 'day') }} = '2020-01-01'")
-        ),
+        where_constraints=[
+            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('metric_time', 'day') }} = '2020-01-01'"))
+        ],
     ).query_spec
 
     render_and_check(
@@ -778,9 +782,9 @@ def test_offset_to_grain_metric_filter_and_query_have_different_granularities(
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("bookings_at_start_of_month",),
         group_by_names=("metric_time__month",),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template=("{{ TimeDimension('metric_time', 'day') }} = '2020-01-01'")
-        ),
+        where_constraints=[
+            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('metric_time', 'day') }} = '2020-01-01'"))
+        ],
     ).query_spec
 
     render_and_check(

@@ -26,9 +26,11 @@ def test_single_categorical_dimension_pushdown(
     parsed_query = query_parser.parse_and_validate_query(
         metric_names=("bookings",),
         group_by_names=("listing__country_latest",),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template="{{ Dimension('booking__is_instant') }}",
-        ),
+        where_constraints=[
+            PydanticWhereFilter(
+                where_sql_template="{{ Dimension('booking__is_instant') }}",
+            )
+        ],
     )
 
     render_and_check(
@@ -54,9 +56,11 @@ def test_multiple_categorical_dimension_pushdown(
     parsed_query = query_parser.parse_and_validate_query(
         metric_names=("listings",),
         group_by_names=("user__home_state_latest",),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template="{{ Dimension('listing__is_lux_latest') }} OR {{ Dimension('listing__capacity_latest') }} > 4",
-        ),
+        where_constraints=[
+            PydanticWhereFilter(
+                where_sql_template="{{ Dimension('listing__is_lux_latest') }} OR {{ Dimension('listing__capacity_latest') }} > 4",
+            )
+        ],
     )
 
     render_and_check(
@@ -122,9 +126,11 @@ def test_skipped_pushdown(
     parsed_query = query_parser.parse_and_validate_query(
         metric_names=("bookings",),
         group_by_names=("listing__country_latest",),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template="{{ Dimension('booking__is_instant') }} OR {{ Dimension('listing__is_lux_latest') }}",
-        ),
+        where_constraints=[
+            PydanticWhereFilter(
+                where_sql_template="{{ Dimension('booking__is_instant') }} OR {{ Dimension('listing__is_lux_latest') }}",
+            )
+        ],
     )
 
     render_and_check(
@@ -155,7 +161,7 @@ def test_metric_time_filter_with_two_targets(
     parsed_query = query_parser.parse_and_validate_query(
         metric_names=("bookings",),
         group_by_names=("listing__country_latest",),
-        where_constraint=PydanticWhereFilter(where_sql_template="{{ TimeDimension('metric_time') }} = '2024-01-01'"),
+        where_constraints=[PydanticWhereFilter(where_sql_template="{{ TimeDimension('metric_time') }} = '2024-01-01'")],
     )
 
     render_and_check(
@@ -181,7 +187,7 @@ def test_conversion_metric_query_filters(
     parsed_query = query_parser.parse_and_validate_query(
         metric_names=("visit_buy_conversion_rate_7days",),
         group_by_names=("metric_time", "user__home_state_latest"),
-        where_constraint=PydanticWhereFilter(where_sql_template="{{ Dimension('visit__referrer_id') }} = '123456'"),
+        where_constraints=[PydanticWhereFilter(where_sql_template="{{ Dimension('visit__referrer_id') }} = '123456'")],
     )
 
     render_and_check(
@@ -210,7 +216,7 @@ def test_cumulative_metric_with_query_time_filters(
     parsed_query = query_parser.parse_and_validate_query(
         metric_names=("every_two_days_bookers",),
         group_by_names=("listing__country_latest", "metric_time"),
-        where_constraint=PydanticWhereFilter(where_sql_template="{{ Dimension('booking__is_instant') }}"),
+        where_constraints=[PydanticWhereFilter(where_sql_template="{{ Dimension('booking__is_instant') }}")],
     )
 
     render_and_check(
@@ -239,7 +245,7 @@ def test_offset_metric_with_query_time_filters(
     parsed_query = query_parser.parse_and_validate_query(
         metric_names=("bookings_growth_2_weeks",),
         group_by_names=("listing__country_latest", "metric_time"),
-        where_constraint=PydanticWhereFilter(where_sql_template="{{ Dimension('booking__is_instant') }}"),
+        where_constraints=[PydanticWhereFilter(where_sql_template="{{ Dimension('booking__is_instant') }}")],
     )
 
     render_and_check(
@@ -268,7 +274,7 @@ def test_fill_nulls_time_spine_metric_predicate_pushdown(
     parsed_query = query_parser.parse_and_validate_query(
         metric_names=("bookings_growth_2_weeks_fill_nulls_with_0",),
         group_by_names=("listing__country_latest", "metric_time"),
-        where_constraint=PydanticWhereFilter(where_sql_template="{{ Dimension('booking__is_instant') }}"),
+        where_constraints=[PydanticWhereFilter(where_sql_template="{{ Dimension('booking__is_instant') }}")],
     )
 
     render_and_check(
@@ -297,9 +303,11 @@ def test_simple_join_to_time_spine_pushdown_filter_application(
     parsed_query = query_parser.parse_and_validate_query(
         metric_names=("bookings_join_to_time_spine",),
         group_by_names=("booking__is_instant", "metric_time"),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template="{{ Dimension('booking__is_instant') }}",
-        ),
+        where_constraints=[
+            PydanticWhereFilter(
+                where_sql_template="{{ Dimension('booking__is_instant') }}",
+            )
+        ],
     )
 
     render_and_check(
@@ -327,7 +335,7 @@ def test_saved_query_with_metric_joins_and_filter(
     """
     parsed_query = query_parser.parse_and_validate_saved_query(
         saved_query_parameter=SavedQueryParameter("saved_query_with_metric_joins_and_filter"),
-        where_filter=None,
+        where_filters=None,
         limit=None,
         time_constraint_start=None,
         time_constraint_end=None,

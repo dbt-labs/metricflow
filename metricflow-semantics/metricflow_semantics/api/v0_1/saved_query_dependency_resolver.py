@@ -49,7 +49,7 @@ class SavedQueryDependencyResolver:
 
         parse_result = self._query_parser.parse_and_validate_saved_query(
             saved_query_parameter=SavedQueryParameter(saved_query_name),
-            where_filter=None,
+            where_filters=None,
             limit=None,
             time_constraint_start=None,
             time_constraint_end=None,

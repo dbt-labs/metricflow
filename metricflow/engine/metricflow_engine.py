@@ -90,7 +90,7 @@ class MetricFlowQueryRequest:
     limit: Limit the result to this many rows.
     time_constraint_start: Get data for the start of this time range.
     time_constraint_end: Get data for the end of this time range.
-    where_constraint: A SQL string using group by names that can be used like a where clause on the output data.
+    where_constraints: A sequence of SQL strings that can be used like a where clause on the output data.
     order_by_names: metric and group by names to order by. A "-" can be used to specify reverse order e.g. "-ds".
     order_by: metric, dimension, or entity objects to order by.
     output_table: If specified, output the result data to this table instead of a result data_table.
@@ -107,7 +107,7 @@ class MetricFlowQueryRequest:
     limit: Optional[int] = None
     time_constraint_start: Optional[datetime.datetime] = None
     time_constraint_end: Optional[datetime.datetime] = None
-    where_constraint: Optional[str] = None
+    where_constraints: Optional[Sequence[str]] = None
     order_by_names: Optional[Sequence[str]] = None
     order_by: Optional[Sequence[OrderByQueryParameter]] = None
     min_max_only: bool = False
@@ -125,7 +125,7 @@ class MetricFlowQueryRequest:
         limit: Optional[int] = None,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
-        where_constraint: Optional[str] = None,
+        where_constraints: Optional[Sequence[str]] = None,
         order_by_names: Optional[Sequence[str]] = None,
         order_by: Optional[Sequence[OrderByQueryParameter]] = None,
         sql_optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4,
@@ -145,7 +145,7 @@ class MetricFlowQueryRequest:
             limit=limit,
             time_constraint_start=time_constraint_start,
             time_constraint_end=time_constraint_end,
-            where_constraint=where_constraint,
+            where_constraints=where_constraints,
             order_by_names=order_by_names,
             order_by=order_by,
             sql_optimization_level=sql_optimization_level,
@@ -469,11 +469,12 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 raise InvalidQueryException("Group by items can't be specified with a saved query.")
             query_spec = self._query_parser.parse_and_validate_saved_query(
                 saved_query_parameter=SavedQueryParameter(mf_query_request.saved_query_name),
-                where_filter=(
-                    PydanticWhereFilter(where_sql_template=mf_query_request.where_constraint)
-                    if mf_query_request.where_constraint is not None
-                    else None
-                ),
+                where_filters=[
+                    PydanticWhereFilter(where_sql_template=where_constraint)
+                    for where_constraint in mf_query_request.where_constraints
+                ]
+                if mf_query_request.where_constraints is not None
+                else None,
                 limit=mf_query_request.limit,
                 time_constraint_start=mf_query_request.time_constraint_start,
                 time_constraint_end=mf_query_request.time_constraint_end,
@@ -489,7 +490,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 limit=mf_query_request.limit,
                 time_constraint_start=mf_query_request.time_constraint_start,
                 time_constraint_end=mf_query_request.time_constraint_end,
-                where_constraint_str=mf_query_request.where_constraint,
+                where_constraint_strs=mf_query_request.where_constraints,
                 order_by_names=mf_query_request.order_by_names,
                 order_by=mf_query_request.order_by,
                 min_max_only=mf_query_request.min_max_only,

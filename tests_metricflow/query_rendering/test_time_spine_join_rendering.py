@@ -61,7 +61,7 @@ def test_simple_join_to_time_spine_with_filter(
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("bookings_fill_nulls_with_0",),
         group_by_names=("metric_time__day",),
-        where_constraint=PydanticWhereFilter(where_sql_template="{{ Dimension('booking__is_instant') }}"),
+        where_constraints=[PydanticWhereFilter(where_sql_template="{{ Dimension('booking__is_instant') }}")],
     ).query_spec
 
     render_and_check(
@@ -87,7 +87,7 @@ def test_simple_join_to_time_spine_with_queried_filter(
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("bookings_fill_nulls_with_0",),
         group_by_names=("metric_time__day", "booking__is_instant"),
-        where_constraint=PydanticWhereFilter(where_sql_template="{{ Dimension('booking__is_instant') }}"),
+        where_constraints=[PydanticWhereFilter(where_sql_template="{{ Dimension('booking__is_instant') }}")],
     ).query_spec
 
     render_and_check(

@@ -357,7 +357,7 @@ def test_where_constrained_plan(
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("bookings",),
         group_by_names=("booking__is_instant",),
-        where_constraint_str="{{ Dimension('listing__country_latest') }} = 'us'",
+        where_constraint_strs=["{{ Dimension('listing__country_latest') }} = 'us'"],
     ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
@@ -386,7 +386,7 @@ def test_where_constrained_plan_time_dimension(
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("bookings",),
         group_by_names=("booking__is_instant",),
-        where_constraint_str="{{ TimeDimension('metric_time', 'day') }} >= '2020-01-01'",
+        where_constraint_strs=["{{ TimeDimension('metric_time', 'day') }} >= '2020-01-01'"],
     ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
@@ -416,7 +416,7 @@ def test_where_constrained_with_common_linkable_plan(
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("bookings",),
         group_by_names=("listing__country_latest",),
-        where_constraint_str="{{ Dimension('listing__country_latest') }} = 'us'",
+        where_constraint_strs=["{{ Dimension('listing__country_latest') }} = 'us'"],
     ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
@@ -553,7 +553,7 @@ def test_distinct_values_plan(
     query_spec = query_parser.parse_and_validate_query(
         metric_names=(),
         group_by_names=("listing__country_latest",),
-        where_constraint_str="{{ Dimension('listing__country_latest') }} = 'us'",
+        where_constraint_strs=["{{ Dimension('listing__country_latest') }} = 'us'"],
         order_by_names=("-listing__country_latest",),
         limit=100,
     ).query_spec
@@ -583,7 +583,7 @@ def test_distinct_values_plan_with_join(
     """Tests a plan to get distinct values of 2 dimensions, where a join is required."""
     query_spec = query_parser.parse_and_validate_query(
         group_by_names=("user__home_state_latest", "listing__is_lux_latest"),
-        where_constraint_str="{{ Dimension('listing__country_latest') }} = 'us'",
+        where_constraint_strs=["{{ Dimension('listing__country_latest') }} = 'us'"],
         order_by_names=("-listing__is_lux_latest",),
         limit=100,
     ).query_spec
@@ -1188,9 +1188,9 @@ def test_join_to_time_spine_with_filters(
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("bookings_fill_nulls_with_0",),
         group_by_names=("metric_time__day",),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template=("{{ TimeDimension('metric_time', 'day') }} = '2020-01-01'")
-        ),
+        where_constraints=[
+            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('metric_time', 'day') }} = '2020-01-01'"))
+        ],
         time_constraint_start=datetime.datetime(2020, 1, 3),
         time_constraint_end=datetime.datetime(2020, 1, 5),
     ).query_spec
@@ -1221,9 +1221,9 @@ def test_offset_window_metric_filter_and_query_have_different_granularities(
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("booking_fees_last_week_per_booker_this_week",),
         group_by_names=("metric_time__month",),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template=("{{ TimeDimension('metric_time', 'day') }} = '2020-01-01'")
-        ),
+        where_constraints=[
+            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('metric_time', 'day') }} = '2020-01-01'"))
+        ],
     ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
@@ -1252,9 +1252,9 @@ def test_offset_to_grain_metric_filter_and_query_have_different_granularities(
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("bookings_at_start_of_month",),
         group_by_names=("metric_time__month",),
-        where_constraint=PydanticWhereFilter(
-            where_sql_template=("{{ TimeDimension('metric_time', 'day') }} = '2020-01-01'")
-        ),
+        where_constraints=[
+            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('metric_time', 'day') }} = '2020-01-01'"))
+        ],
     ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
@@ -1281,7 +1281,7 @@ def test_metric_in_query_where_filter(
 ) -> None:
     """Test querying a metric that has a metric in its where filter."""
     query_spec = query_parser.parse_and_validate_query(
-        metric_names=("listings",), where_constraint_str="{{ Metric('bookings', ['listing'])}} > 2"
+        metric_names=("listings",), where_constraint_strs=["{{ Metric('bookings', ['listing'])}} > 2"]
     ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
@@ -1340,11 +1340,13 @@ def test_all_available_metric_filters(
             entity_spec = group_by_metric_spec.metric_subquery_entity_spec
             query_spec = query_parser.parse_and_validate_query(
                 metric_names=("bookings",),
-                where_constraint=PydanticWhereFilter(
-                    where_sql_template=string.Template("{{ Metric('$metric_name', ['$entity_name']) }} > 2").substitute(
-                        metric_name=linkable_metric.element_name, entity_name=entity_spec.qualified_name
-                    ),
-                ),
+                where_constraints=[
+                    PydanticWhereFilter(
+                        where_sql_template=string.Template(
+                            "{{ Metric('$metric_name', ['$entity_name']) }} > 2"
+                        ).substitute(metric_name=linkable_metric.element_name, entity_name=entity_spec.qualified_name),
+                    )
+                ],
             ).query_spec
             dataflow_plan_builder.build_plan(query_spec)
 

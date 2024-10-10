@@ -22,7 +22,7 @@ def test_query_with_simple_metric_in_where_filter(  # noqa: D103
             metric_names=["listings", "bookings"],
             group_by_names=["listing"],
             order_by_names=["listing"],
-            where_constraint="{{ Metric('bookings', ['listing']) }} > 3",
+            where_constraints=["{{ Metric('bookings', ['listing']) }} > 3"],
         )
     )
     assert query_result.result_df is not None, "Unexpected empty result."
@@ -48,7 +48,7 @@ def test_metric_with_metric_in_where_filter(  # noqa: D103
             metric_names=["active_listings", "bookings"],
             group_by_names=["listing"],
             order_by_names=["listing"],
-            where_constraint="{{ Metric('bookings', ['listing']) }} > 1",
+            where_constraints=["{{ Metric('bookings', ['listing']) }} > 1"],
         )
     )
     assert query_result.result_df is not None, "Unexpected empty result."
