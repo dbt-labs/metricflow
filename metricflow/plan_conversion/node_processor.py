@@ -3,7 +3,7 @@ from __future__ import annotations
 import dataclasses
 import logging
 from enum import Enum
-from typing import Dict, FrozenSet, List, Optional, Sequence, Set
+from typing import Dict, FrozenSet, List, Optional, Sequence, Set, Tuple
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.references import EntityReference, SemanticModelReference, TimeDimensionReference
@@ -103,7 +103,7 @@ class PredicatePushdownState:
 
     time_range_constraint: Optional[TimeRangeConstraint]
     # TODO: Deduplicate where_filter_specs
-    where_filter_specs: Sequence[WhereFilterSpec]
+    where_filter_specs: Tuple[WhereFilterSpec, ...]
     applied_where_filter_specs: FrozenSet[WhereFilterSpec] = frozenset()
     pushdown_enabled_types: FrozenSet[PredicateInputType] = frozenset(
         [PredicateInputType.TIME_RANGE_CONSTRAINT, PredicateInputType.CATEGORICAL_DIMENSION]
@@ -271,7 +271,7 @@ class PredicatePushdownState:
         """
         return PredicatePushdownState(
             time_range_constraint=original_pushdown_state.time_range_constraint,
-            where_filter_specs=where_filter_specs,
+            where_filter_specs=tuple(where_filter_specs),
             pushdown_enabled_types=original_pushdown_state.pushdown_enabled_types,
             applied_where_filter_specs=original_pushdown_state.applied_where_filter_specs,
         )

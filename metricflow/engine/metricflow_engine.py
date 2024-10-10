@@ -36,6 +36,7 @@ from metricflow_semantics.time.time_source import TimeSource
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
 
 from metricflow.data_table.mf_table import MetricFlowDataTable
+from metricflow.dataflow.builder.builder_cache import DataflowPlanBuilderCache
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
@@ -395,12 +396,14 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         )
         node_output_resolver.cache_output_data_sets(source_node_set.all_nodes)
 
+        self._dataflow_plan_builder_cache = DataflowPlanBuilderCache()
         self._dataflow_plan_builder = DataflowPlanBuilder(
             source_node_set=source_node_set,
             semantic_manifest_lookup=self._semantic_manifest_lookup,
             column_association_resolver=self._column_association_resolver,
             node_output_resolver=node_output_resolver,
             source_node_builder=source_node_builder,
+            dataflow_plan_builder_cache=self._dataflow_plan_builder_cache,
         )
         self._to_sql_query_plan_converter = DataflowToSqlQueryPlanConverter(
             column_association_resolver=self._column_association_resolver,
