@@ -17,10 +17,8 @@
                 <!--     ),                                                                            -->
                 <!--   )                                                                               -->
                 <!-- use_custom_agg_time_dimension = False -->
-                <!-- time_range_constraint = None -->
-                <!-- offset_window = PydanticMetricTimeWindow(count=2, granularity=DAY) -->
-                <!-- offset_to_grain = None -->
                 <!-- join_type = INNER -->
+                <!-- offset_window = PydanticMetricTimeWindow(count=2, granularity=DAY) -->
                 <ComputeMetricsNode>
                     <!-- description = 'Compute Metrics via Expressions' -->
                     <!-- node_id = NodeId(id_str='cm_1') -->
@@ -61,10 +59,8 @@
                                     <!--     ),                                                                            -->
                                     <!--   )                                                                               -->
                                     <!-- use_custom_agg_time_dimension = False -->
-                                    <!-- time_range_constraint = None -->
-                                    <!-- offset_window = PydanticMetricTimeWindow(count=5, granularity=DAY) -->
-                                    <!-- offset_to_grain = None -->
                                     <!-- join_type = INNER -->
+                                    <!-- offset_window = PydanticMetricTimeWindow(count=5, granularity=DAY) -->
                                     <MetricTimeDimensionTransformNode>
                                         <!-- description = "Metric Time Dimension 'ds'" -->
                                         <!-- node_id = NodeId(id_str='sma_28009') -->

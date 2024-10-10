@@ -39,9 +39,9 @@ FROM (
         FROM (
           -- Join Self Over Time Range
           SELECT
-            subq_2.revenue_instance__ds__quarter AS revenue_instance__ds__quarter
+            subq_2.metric_time__day AS metric_time__day
+            , subq_2.revenue_instance__ds__quarter AS revenue_instance__ds__quarter
             , subq_2.revenue_instance__ds__year AS revenue_instance__ds__year
-            , subq_2.metric_time__day AS metric_time__day
             , subq_1.ds__day AS ds__day
             , subq_1.ds__week AS ds__week
             , subq_1.ds__month AS ds__month
@@ -78,9 +78,9 @@ FROM (
           FROM (
             -- Time Spine
             SELECT
-              DATETIME_TRUNC(subq_3.ds, quarter) AS revenue_instance__ds__quarter
+              subq_3.ds AS metric_time__day
+              , DATETIME_TRUNC(subq_3.ds, quarter) AS revenue_instance__ds__quarter
               , DATETIME_TRUNC(subq_3.ds, year) AS revenue_instance__ds__year
-              , subq_3.ds AS metric_time__day
             FROM ***************************.mf_time_spine subq_3
           ) subq_2
           INNER JOIN (

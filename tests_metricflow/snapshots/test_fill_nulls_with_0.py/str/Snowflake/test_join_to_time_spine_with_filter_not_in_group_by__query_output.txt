@@ -1,0 +1,3 @@
+METRIC_TIME__DAY       BOOKINGS_JOIN_TO_TIME_SPINE_WITH_TIERED_FILTERS
+-------------------  -------------------------------------------------
+2020-01-02T00:00:00                                                  9

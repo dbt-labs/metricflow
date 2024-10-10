@@ -1,23 +1,30 @@
 -- Compute Metrics via Expressions
 SELECT
-  subq_10.metric_time__day
-  , COALESCE(subq_10.bookings, 0) AS bookings_fill_nulls_with_0
+  subq_11.metric_time__day
+  , COALESCE(subq_11.bookings, 0) AS bookings_fill_nulls_with_0
 FROM (
   -- Constrain Time Range to [2020-01-03T00:00:00, 2020-01-05T00:00:00]
   SELECT
-    subq_9.metric_time__day
-    , subq_9.bookings
+    subq_10.metric_time__day
+    , subq_10.bookings
   FROM (
     -- Join to Time Spine Dataset
     SELECT
       subq_7.metric_time__day AS metric_time__day
       , subq_6.bookings AS bookings
     FROM (
-      -- Time Spine
+      -- Filter Time Spine
       SELECT
-        subq_8.ds AS metric_time__day
-      FROM ***************************.mf_time_spine subq_8
-      WHERE subq_8.ds BETWEEN timestamp '2020-01-03' AND timestamp '2020-01-05'
+        subq_9.metric_time__day
+      FROM (
+        -- Time Spine
+        SELECT
+          subq_8.ds AS metric_time__day
+          , DATE_TRUNC('week', subq_8.ds) AS metric_time__week
+        FROM ***************************.mf_time_spine subq_8
+        WHERE subq_8.ds BETWEEN timestamp '2020-01-03' AND timestamp '2020-01-05'
+      ) subq_9
+      WHERE metric_time__week > '2020-01-01'
     ) subq_7
     LEFT OUTER JOIN (
       -- Aggregate Measures
@@ -348,6 +355,6 @@ FROM (
     ) subq_6
     ON
       subq_7.metric_time__day = subq_6.metric_time__day
-  ) subq_9
-  WHERE subq_9.metric_time__day BETWEEN timestamp '2020-01-03' AND timestamp '2020-01-05'
-) subq_10
+  ) subq_10
+  WHERE subq_10.metric_time__day BETWEEN timestamp '2020-01-03' AND timestamp '2020-01-05'
+) subq_11

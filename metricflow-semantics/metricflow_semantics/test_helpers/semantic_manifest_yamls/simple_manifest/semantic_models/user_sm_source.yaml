@@ -123,3 +123,12 @@ metric:
     measure:
       name: archived_users
   time_granularity: hour
+---
+metric:
+  name: archived_users_join_to_time_spine
+  description: subdaily metric joining to time spine
+  type: simple
+  type_params:
+    measure:
+      name: archived_users
+      join_to_timespine: true

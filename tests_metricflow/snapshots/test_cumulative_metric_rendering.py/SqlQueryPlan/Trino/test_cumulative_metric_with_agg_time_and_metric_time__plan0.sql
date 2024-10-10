@@ -18,8 +18,8 @@ FROM (
     FROM (
       -- Join Self Over Time Range
       SELECT
-        subq_2.revenue_instance__ds__month AS revenue_instance__ds__month
-        , subq_2.metric_time__day AS metric_time__day
+        subq_2.metric_time__day AS metric_time__day
+        , subq_2.revenue_instance__ds__month AS revenue_instance__ds__month
         , subq_1.ds__day AS ds__day
         , subq_1.ds__week AS ds__week
         , subq_1.ds__month AS ds__month
@@ -57,8 +57,8 @@ FROM (
       FROM (
         -- Time Spine
         SELECT
-          DATE_TRUNC('month', subq_3.ds) AS revenue_instance__ds__month
-          , subq_3.ds AS metric_time__day
+          subq_3.ds AS metric_time__day
+          , DATE_TRUNC('month', subq_3.ds) AS revenue_instance__ds__month
         FROM ***************************.mf_time_spine subq_3
       ) subq_2
       INNER JOIN (
