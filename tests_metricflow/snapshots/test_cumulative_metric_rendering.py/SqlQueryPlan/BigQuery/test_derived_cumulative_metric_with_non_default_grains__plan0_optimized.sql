@@ -18,26 +18,17 @@ FROM (
       -- Pass Only Elements: ['txn_revenue', 'metric_time__week', 'metric_time__day']
       -- Aggregate Measures
       SELECT
-        subq_12.metric_time__day AS metric_time__day
-        , subq_12.metric_time__week AS metric_time__week
+        subq_13.ds AS metric_time__day
+        , DATETIME_TRUNC(subq_13.ds, isoweek) AS metric_time__week
         , SUM(revenue_src_28000.revenue) AS txn_revenue
-      FROM (
-        -- Time Spine
-        SELECT
-          ds AS metric_time__day
-          , DATETIME_TRUNC(ds, isoweek) AS metric_time__week
-        FROM ***************************.mf_time_spine subq_13
-        GROUP BY
-          metric_time__day
-          , metric_time__week
-      ) subq_12
+      FROM ***************************.mf_time_spine subq_13
       INNER JOIN
         ***************************.fct_revenue revenue_src_28000
       ON
         (
-          DATETIME_TRUNC(revenue_src_28000.created_at, day) <= subq_12.metric_time__day
+          DATETIME_TRUNC(revenue_src_28000.created_at, day) <= subq_13.ds
         ) AND (
-          DATETIME_TRUNC(revenue_src_28000.created_at, day) > DATE_SUB(CAST(subq_12.metric_time__day AS DATETIME), INTERVAL 2 month)
+          DATETIME_TRUNC(revenue_src_28000.created_at, day) > DATE_SUB(CAST(subq_13.ds AS DATETIME), INTERVAL 2 month)
         )
       GROUP BY
         metric_time__day

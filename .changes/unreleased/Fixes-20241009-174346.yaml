@@ -1,0 +1,6 @@
+kind: Fixes
+body: Remove unnecessary group bys that make queries less efficient.
+time: 2024-10-09T17:43:46.011252-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1453"

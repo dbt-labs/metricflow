@@ -60,9 +60,6 @@ FROM (
           DATE_TRUNC('month', subq_3.ds) AS revenue_instance__ds__month
           , subq_3.ds AS metric_time__day
         FROM ***************************.mf_time_spine subq_3
-        GROUP BY
-          DATE_TRUNC('month', subq_3.ds)
-          , subq_3.ds
       ) subq_2
       INNER JOIN (
         -- Metric Time Dimension 'ds'
