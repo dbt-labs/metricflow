@@ -111,7 +111,7 @@ class SourceScanOptimizer(
     """
 
     def _log_visit_node_type(self, node: DataflowPlanNode) -> None:
-        logger.debug(LazyFormat(lambda: "Visiting {node}"))
+        logger.debug(LazyFormat(lambda: f"Visiting {node}"))
 
     def _default_base_output_handler(
         self,

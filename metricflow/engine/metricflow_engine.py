@@ -495,7 +495,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 order_by=mf_query_request.order_by,
                 min_max_only=mf_query_request.min_max_only,
             ).query_spec
-        logger.info(LazyFormat("Parsed query", query_spec=query_spec))
+        logger.debug(LazyFormat("Parsed query", query_spec=query_spec))
 
         output_selection_specs: Optional[InstanceSpecSet] = None
         if mf_query_request.query_type == MetricFlowQueryType.DIMENSION_VALUES:

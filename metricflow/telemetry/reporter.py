@@ -62,7 +62,7 @@ class TelemetryReporter:
         return sha256(id_str.encode("utf-8")).hexdigest()
 
     def add_python_log_handler(self) -> None:  # noqa: D102
-        self._handlers.append(PythonLoggerTelemetryHandler(logger_level=logging.INFO))
+        self._handlers.append(PythonLoggerTelemetryHandler(logger_level=logging.DEBUG))
 
     def add_test_handler(self) -> None:
         """See test_handler."""
