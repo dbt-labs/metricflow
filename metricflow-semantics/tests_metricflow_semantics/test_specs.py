@@ -272,7 +272,7 @@ def test_where_filter_spec_set_all_specs(where_filter_spec_set: WhereFilterSpecS
 
 
 def test_where_filter_spec_set_post_aggregation_specs(where_filter_spec_set: WhereFilterSpecSet) -> None:  # noqa: D103
-    assert set(where_filter_spec_set.post_aggregation_filter_specs) == {
+    assert set(where_filter_spec_set.after_measure_aggregation_filter_specs) == {
         WhereFilterSpec(
             where_sql="metric is true",
             bind_parameters=SqlBindParameters(),

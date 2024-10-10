@@ -12,10 +12,12 @@ from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilte
 class WhereFilterSpecSet(SerializableDataclass):
     """Class to encapsulate filters needed at a certain point of the queried metric.
 
-    This class splits up the filters based on where it was defined at, meaning
-    measure-level filters are defined at the input_measure config, metric-level filter
-    are defined at the metric config, etc... This can then be used to determine where
-    each filter should be applied during each step of the metric process.
+    This class splits up the filters based on where it was defined at, which can then be used to
+    determine where each filter should be applied during each step of the metric building process.
+
+    measure-level: filters defined on the input_measure
+    metric-level: filters defined on the input_metric or metric:filter
+    query-level: filters defined at query time
     """
 
     measure_level_filter_specs: Tuple[WhereFilterSpec, ...] = ()
@@ -23,13 +25,16 @@ class WhereFilterSpecSet(SerializableDataclass):
     query_level_filter_specs: Tuple[WhereFilterSpec, ...] = ()
 
     @property
-    def post_aggregation_filter_specs(self) -> Tuple[WhereFilterSpec, ...]:
+    def after_measure_aggregation_filter_specs(self) -> Tuple[WhereFilterSpec, ...]:
         """Returns filters relevant to post-measure aggregation."""
         return self.metric_level_filter_specs + self.query_level_filter_specs
 
     @property
     def all_filter_specs(self) -> Tuple[WhereFilterSpec, ...]:
-        """Returns all the filters in this class."""
+        """Returns all the filters in this class.
+
+        Generally, before measure aggregation, all filters should be applied.
+        """
         return self.measure_level_filter_specs + self.metric_level_filter_specs + self.query_level_filter_specs
 
     def merge(self, other: WhereFilterSpecSet) -> WhereFilterSpecSet:
