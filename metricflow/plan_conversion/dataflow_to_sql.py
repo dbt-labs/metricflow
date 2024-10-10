@@ -8,7 +8,7 @@ from typing import List, Optional, Sequence, Set, Tuple, Union
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.protocols.metric import MetricInputMeasure, MetricType
-from dbt_semantic_interfaces.references import EntityReference, MetricModelReference
+from dbt_semantic_interfaces.references import EntityReference, MetricModelReference, SemanticModelElementReference
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.conversion_calculation_type import ConversionCalculationType
 from dbt_semantic_interfaces.type_enums.period_agg import PeriodAggregation
@@ -254,7 +254,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
         Column alias will use 'metric_time' or the agg_time_dimension name depending on which the user requested.
         """
-        time_spine_instance_set = InstanceSet(time_dimension_instances=agg_time_dimension_instances)
         time_spine_table_alias = self._next_unique_table_alias()
 
         agg_time_dimension_specs = {instance.spec for instance in agg_time_dimension_instances}
@@ -319,8 +318,24 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         elif time_constraint_expr:
             complete_where_filter = time_constraint_expr
 
+        output_instance_set = InstanceSet(
+            time_dimension_instances=tuple(
+                [
+                    TimeDimensionInstance(
+                        defined_from=(
+                            SemanticModelElementReference(
+                                semantic_model_name=time_spine_source.table_name, element_name=spec.element_name
+                            ),
+                        ),
+                        associated_columns=(self._column_association_resolver.resolve_spec(spec),),
+                        spec=spec,
+                    )
+                    for spec in required_time_spine_specs
+                ]
+            )
+        )
         return SqlDataSet(
-            instance_set=time_spine_instance_set,
+            instance_set=output_instance_set,
             sql_select_node=SqlSelectStatementNode.create(
                 description=TIME_SPINE_DATA_SET_DESCRIPTION,
                 select_columns=select_columns,
@@ -1308,7 +1323,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         )
 
         # Build join expression.
-
         join_description = SqlQueryPlanJoinBuilder.make_join_to_time_spine_join_description(
             node=node,
             time_spine_alias=time_spine_alias,
@@ -1350,12 +1364,20 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             self._column_association_resolver, OrderedDict({parent_alias: parent_instance_set})
         )
 
-        # Select agg_time_dimension instance from time spine data set.
+        # Select instance from time spine data set that matches the join instance in the parent dataset.
+        # Also check to see if the time spine dataset contains any grains smaller than the join instance grain.
+        # This might have been included to satisfy a where filter for a spec that isn't in the group by.
+        # If so, we'll need to apply a group by on all select columns after the join to remove duplicate rows.
+        apply_group_by = False
         original_time_spine_dim_instance: Optional[TimeDimensionInstance] = None
         for time_dimension_instance in time_spine_dataset.instance_set.time_dimension_instances:
             if time_dimension_instance.spec == agg_time_dimension_instance_for_join.spec:
                 original_time_spine_dim_instance = time_dimension_instance
-                break
+            if (
+                time_dimension_instance.spec.time_granularity.base_granularity.to_int()
+                < agg_time_dimension_instance_for_join.spec.time_granularity.base_granularity.to_int()
+            ):
+                apply_group_by = True
         assert original_time_spine_dim_instance, (
             "Couldn't find requested agg_time_dimension_instance_for_join in time spine data set, which "
             f"indicates it may have been configured incorrectly. Expected: {agg_time_dimension_instance_for_join.spec};"
@@ -1435,15 +1457,17 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             )
         time_spine_instance_set = InstanceSet(time_dimension_instances=tuple(time_spine_dim_instances))
 
+        select_columns = tuple(time_spine_select_columns) + parent_select_columns
         return SqlDataSet(
             instance_set=InstanceSet.merge([time_spine_instance_set, parent_instance_set]),
             sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
-                select_columns=tuple(time_spine_select_columns) + parent_select_columns,
+                select_columns=select_columns,
                 from_source=time_spine_dataset.checked_sql_select_node,
                 from_source_alias=time_spine_alias,
                 join_descs=(join_description,),
                 where=where_filter,
+                group_bys=select_columns if apply_group_by else (),
             ),
         )
 
