@@ -1,18 +1,24 @@
 -- Compute Metrics via Expressions
 SELECT
-  subq_8.metric_time__day
-  , subq_8.archived_users AS archived_users_join_to_time_spine
+  subq_9.metric_time__day
+  , subq_9.archived_users AS archived_users_join_to_time_spine
 FROM (
   -- Join to Time Spine Dataset
   SELECT
     subq_6.metric_time__day AS metric_time__day
     , subq_5.archived_users AS archived_users
   FROM (
-    -- Time Spine
+    -- Filter Time Spine
     SELECT
-      subq_7.ts AS metric_time__hour
-      , DATE_TRUNC('day', subq_7.ts) AS metric_time__day
-    FROM ***************************.mf_time_spine_hour subq_7
+      subq_8.metric_time__hour
+      , subq_8.metric_time__day
+    FROM (
+      -- Time Spine
+      SELECT
+        subq_7.ts AS metric_time__hour
+        , DATE_TRUNC('day', subq_7.ts) AS metric_time__day
+      FROM ***************************.mf_time_spine_hour subq_7
+    ) subq_8
     WHERE (
       metric_time__hour > '2020-01-01 00:09:00'
     ) AND (
@@ -428,7 +434,4 @@ FROM (
   ) subq_5
   ON
     subq_6.metric_time__day = subq_5.metric_time__day
-  GROUP BY
-    subq_6.metric_time__day
-    , subq_5.archived_users
-) subq_8
+) subq_9
