@@ -332,6 +332,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         if not time_spine_where_constraints:
             return SqlDataSet(instance_set=output_instance_set, sql_select_node=inner_sql_select_node)
 
+        # Build outer query to apply where constraints.
         inner_query_alias = self._next_unique_table_alias()
         where_constraint_exprs = [
             self._render_where_constraint_expr(constraint) for constraint in time_spine_where_constraints
@@ -343,17 +344,33 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             )
         elif len(where_constraint_exprs) == 1:
             complete_outer_where_filter = where_constraint_exprs[0]
+
+        outer_query_output_instance_set = InstanceSet(time_dimension_instances=agg_time_dimension_instances)
+        outer_query_select_columns = create_select_columns_for_instance_sets(
+            column_resolver=self._column_association_resolver,
+            table_alias_to_instance_set=OrderedDict({inner_query_alias: outer_query_output_instance_set}),
+        )
+        # After removing unneeded instances from the inner query, a group by will be needed to ensure unique rows if the
+        # smallest grain from the inner query was removed.
+        smallest_grain_in_inner_query = sorted(
+            output_instance_set.time_dimension_instances,
+            key=lambda instance: instance.spec.time_granularity.base_granularity.to_int(),
+        )[0].spec.time_granularity.base_granularity
+        apply_group_by = True
+        for instance in outer_query_output_instance_set.time_dimension_instances:
+            if instance.spec.time_granularity.base_granularity == smallest_grain_in_inner_query:
+                apply_group_by = False
+                break
+
         return SqlDataSet(
             instance_set=output_instance_set,
             sql_select_node=SqlSelectStatementNode.create(
                 description="Filter Time Spine",
-                select_columns=create_select_columns_for_instance_sets(
-                    column_resolver=self._column_association_resolver,
-                    table_alias_to_instance_set=OrderedDict({inner_query_alias: output_instance_set}),
-                ),
+                select_columns=outer_query_select_columns,
                 from_source=inner_sql_select_node,
                 from_source_alias=inner_query_alias,
                 where=complete_outer_where_filter,
+                group_bys=outer_query_select_columns if apply_group_by else (),
             ),
         )
 
