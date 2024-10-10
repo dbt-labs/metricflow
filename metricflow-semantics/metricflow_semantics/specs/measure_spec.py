@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional, Tuple
+from typing import Optional
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.protocols import MetricTimeWindow
@@ -10,7 +10,7 @@ from dbt_semantic_interfaces.type_enums import TimeGranularity
 
 from metricflow_semantics.specs.instance_spec import InstanceSpec, InstanceSpecVisitor
 from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDimensionSpec
-from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
+from metricflow_semantics.specs.where_filter.where_filter_spec_set import WhereFilterSpecSet
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.visitor import VisitorOutputT
 
@@ -62,7 +62,7 @@ class MetricInputMeasureSpec(SerializableDataclass):
     offset_window: Optional[MetricTimeWindow] = None
     offset_to_grain: Optional[TimeGranularity] = None
     cumulative_description: Optional[CumulativeMeasureDescription] = None
-    filter_specs: Tuple[WhereFilterSpec, ...] = ()
+    filter_spec_set: WhereFilterSpecSet = WhereFilterSpecSet()
     alias: Optional[str] = None
     before_aggregation_time_spine_join_description: Optional[JoinToTimeSpineDescription] = None
     after_aggregation_time_spine_join_description: Optional[JoinToTimeSpineDescription] = None
