@@ -258,9 +258,9 @@ def test_join_to_time_spine_with_filter_smaller_than_group_by(  # noqa: D103
         group_by_names=("metric_time__day",),
         where_constraints=[
             PydanticWhereFilter(
-                where_sql_template="{{ TimeDimension('metric_time', 'hour') }} > '2020-01-01 00:00:00'"
+                where_sql_template="{{ TimeDimension('metric_time', 'hour') }} > '2020-01-01 00:09:00'"
             ),
-            PydanticWhereFilter(where_sql_template="{{ TimeDimension('metric_time', 'year') }} < '2021-01-01'"),
+            PydanticWhereFilter(where_sql_template="{{ TimeDimension('metric_time', 'day') }} = '2020-01-01'"),
         ],
     ).query_spec
 
