@@ -14,7 +14,7 @@ from metricflow_semantics.query.resolver_inputs.base_resolver_inputs import Metr
 
 
 @dataclass(frozen=True)
-class SCDRequiresMetricTimeIssue(MetricFlowQueryResolutionIssue):
+class ScdRequiresMetricTimeIssue(MetricFlowQueryResolutionIssue):
     """Describes an issue with a query that includes a SCD group by but does not include metric_time."""
 
     scd_qualified_names: Sequence[str]
@@ -31,8 +31,8 @@ class SCDRequiresMetricTimeIssue(MetricFlowQueryResolutionIssue):
         )
 
     @override
-    def with_path_prefix(self, path_prefix: MetricFlowQueryResolutionPath) -> SCDRequiresMetricTimeIssue:
-        return SCDRequiresMetricTimeIssue(
+    def with_path_prefix(self, path_prefix: MetricFlowQueryResolutionPath) -> ScdRequiresMetricTimeIssue:
+        return ScdRequiresMetricTimeIssue(
             issue_type=self.issue_type,
             parent_issues=self.parent_issues,
             query_resolution_path=self.query_resolution_path.with_path_prefix(path_prefix),
@@ -42,8 +42,8 @@ class SCDRequiresMetricTimeIssue(MetricFlowQueryResolutionIssue):
     @staticmethod
     def from_parameters(  # noqa: D102
         scd_qualified_names: Sequence[str], query_resolution_path: MetricFlowQueryResolutionPath
-    ) -> SCDRequiresMetricTimeIssue:
-        return SCDRequiresMetricTimeIssue(
+    ) -> ScdRequiresMetricTimeIssue:
+        return ScdRequiresMetricTimeIssue(
             issue_type=MetricFlowQueryIssueType.ERROR,
             parent_issues=(),
             query_resolution_path=query_resolution_path,

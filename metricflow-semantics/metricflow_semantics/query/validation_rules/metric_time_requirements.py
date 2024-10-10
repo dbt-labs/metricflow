@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import List
+from typing import List, Sequence
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
@@ -24,7 +23,7 @@ from metricflow_semantics.query.issues.parsing.offset_metric_requires_metric_tim
     OffsetMetricRequiresMetricTimeIssue,
 )
 from metricflow_semantics.query.issues.parsing.scd_requires_metric_time import (
-    SCDRequiresMetricTimeIssue,
+    ScdRequiresMetricTimeIssue,
 )
 from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import (
     ResolverInputForQuery,
@@ -48,7 +47,7 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
     Currently, known cases are:
 
     * Cumulative metrics.
-    * Derived metrics with an offset time.g
+    * Derived metrics with an offset time.
     * Slowly changing dimensions
     """
 
@@ -83,8 +82,8 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
             if group_by_item_input.spec_pattern.matches_any(valid_agg_time_dimension_specs):
                 has_agg_time_dimension = True
 
-            matches = group_by_item_input.spec_pattern.match(scd_specs)
-            scds.extend(match.qualified_name for match in matches)
+            scd_matches = group_by_item_input.spec_pattern.match(scd_specs)
+            scds.extend(match.qualified_name for match in scd_matches)
 
         return QueryItemsAnalysis(
             scds=scds,
@@ -109,7 +108,7 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
         # only check for metric_time. If we decide to support agg_time_dimension, we should add a check
         if len(query_items_analysis.scds) > 0 and not query_items_analysis.has_metric_time:
             issues = issues.add_issue(
-                SCDRequiresMetricTimeIssue.from_parameters(
+                ScdRequiresMetricTimeIssue.from_parameters(
                     scd_qualified_names=query_items_analysis.scds,
                     query_resolution_path=resolution_path,
                 )
@@ -161,6 +160,3 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
         resolution_path: MetricFlowQueryResolutionPath,
     ) -> MetricFlowQueryResolutionIssueSet:
         return MetricFlowQueryResolutionIssueSet.empty_instance()
-
-
-__all__ = ["MetricTimeQueryValidationRule"]

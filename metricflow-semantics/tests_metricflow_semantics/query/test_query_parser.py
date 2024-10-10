@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import logging
-import os
 import textwrap
 from typing import List
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_validation_ready_semantic_manifest
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from dbt_semantic_interfaces.protocols import SemanticManifest
@@ -30,9 +30,6 @@ from metricflow_semantics.test_helpers.example_project_configuration import (
     EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE,
 )
 from metricflow_semantics.test_helpers.metric_time_dimension import MTD
-from metricflow_semantics.test_helpers.semantic_manifest_yamls.scd_manifest import (
-    SCD_MANIFEST_ANCHOR,
-)
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_snapshot_equal
 
 logger = logging.getLogger(__name__)
@@ -196,20 +193,9 @@ def revenue_query_parser() -> MetricFlowQueryParser:  # noqa
 
 
 @pytest.fixture
-def scd_query_parser() -> MetricFlowQueryParser:  # noqa
-    file_paths = [
-        os.path.join(SCD_MANIFEST_ANCHOR.directory, f)
-        for f in os.listdir(SCD_MANIFEST_ANCHOR.directory)
-        if f.endswith(".yaml")
-    ]
-
-    contents: List[str] = []
-    for fp in file_paths:
-        with open(fp, "r") as f:
-            contents.append(f.read())
-
-    files = [YamlConfigFile(filepath="inline_for_test_1", contents=c) for c in contents]
-    return query_parser_from_yaml(files)
+def scd_query_parser(scd_semantic_manifest: PydanticSemanticManifest) -> MetricFlowQueryParser:  # noqa
+    semantic_manifest_lookup = SemanticManifestLookup(scd_semantic_manifest)
+    return MetricFlowQueryParser(semantic_manifest_lookup)
 
 
 def test_query_parser(  # noqa: D103
