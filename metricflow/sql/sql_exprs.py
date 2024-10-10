@@ -6,7 +6,7 @@ import itertools
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, Generic, List, Mapping, Optional, Sequence, Tuple
+from typing import Dict, Generic, List, Mapping, Optional, Sequence, Set, Tuple
 
 import more_itertools
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
@@ -96,6 +96,12 @@ class SqlExpressionNode(DagNode["SqlExpressionNode"], Visitable, ABC):
     @abstractmethod
     def matches(self, other: SqlExpressionNode) -> bool:
         """Similar to equals - returns true if these expressions are equivalent."""
+        pass
+
+    @property
+    @abstractmethod
+    def used_column_aliases(self) -> Set[str]:
+        """All column aliases used in the expression."""
         pass
 
 
@@ -313,6 +319,10 @@ class SqlStringExpression(SqlExpressionNode):
         """If this is a string expression, return self."""
         return self
 
+    @property
+    def used_column_aliases(self) -> Set[str]:  # noqa: D102
+        return set(self.used_columns) if self.used_columns else set()
+
 
 @dataclass(frozen=True)
 class SqlStringLiteralExpression(SqlExpressionNode):
@@ -365,6 +375,10 @@ class SqlStringLiteralExpression(SqlExpressionNode):
         if not isinstance(other, SqlStringLiteralExpression):
             return False
         return self.literal_value == other.literal_value
+
+    @property
+    def used_column_aliases(self) -> Set[str]:  # noqa: D102
+        return set()
 
 
 @dataclass(frozen=True)
@@ -474,6 +488,14 @@ class SqlColumnReferenceExpression(SqlExpressionNode):
     def from_table_and_column_names(table_alias: str, column_name: str) -> SqlColumnReferenceExpression:  # noqa: D102
         return SqlColumnReferenceExpression.create(SqlColumnReference(table_alias=table_alias, column_name=column_name))
 
+    @property
+    def used_column_aliases(self) -> Set[str]:  # noqa: D102
+        return {
+            f"{self.col_ref.table_alias}.{self.col_ref.column_name}"
+            if self.should_render_table_alias
+            else self.col_ref.column_name
+        }
+
 
 @dataclass(frozen=True)
 class SqlColumnAliasReferenceExpression(SqlExpressionNode):
@@ -534,6 +556,10 @@ class SqlColumnAliasReferenceExpression(SqlExpressionNode):
         if not isinstance(other, SqlColumnAliasReferenceExpression):
             return False
         return self.column_alias == other.column_alias
+
+    @property
+    def used_column_aliases(self) -> Set[str]:  # noqa: D102
+        return {self.column_alias}
 
 
 class SqlComparison(Enum):  # noqa: D101
@@ -612,6 +638,10 @@ class SqlComparisonExpression(SqlExpressionNode):
         if not isinstance(other, SqlComparisonExpression):
             return False
         return self.comparison == other.comparison and self._parents_match(other)
+
+    @property
+    def used_column_aliases(self) -> Set[str]:  # noqa: D102
+        return self.left_expr.used_column_aliases.union(self.right_expr.used_column_aliases)
 
 
 class SqlFunction(Enum):
@@ -811,6 +841,10 @@ class SqlAggregateFunctionExpression(SqlFunctionExpression):
             return False
         return self.sql_function == other.sql_function and self._parents_match(other)
 
+    @property
+    def used_column_aliases(self) -> Set[str]:  # noqa: D102
+        return {column_alias for arg in self.sql_function_args for column_alias in arg.used_column_aliases}
+
 
 class SqlPercentileFunctionType(Enum):
     """Type of percentile function used."""
@@ -930,6 +964,10 @@ class SqlPercentileExpression(SqlFunctionExpression):
         if not isinstance(other, SqlPercentileExpression):
             return False
         return self.percentile_args == other.percentile_args and self._parents_match(other)
+
+    @property
+    def used_column_aliases(self) -> Set[str]:  # noqa: D102
+        return self.order_by_arg.used_column_aliases
 
 
 class SqlWindowFunction(Enum):
@@ -1100,6 +1138,15 @@ class SqlWindowFunctionExpression(SqlFunctionExpression):
             and self._parents_match(other)
         )
 
+    @property
+    def used_column_aliases(self) -> Set[str]:  # noqa: D102
+        args = (
+            list(self.sql_function_args)
+            + list(self.partition_by_args)
+            + [order_by_arg.expr for order_by_arg in self.order_by_args]
+        )
+        return {column_alias for arg in args for column_alias in arg.used_column_aliases}
+
 
 @dataclass(frozen=True)
 class SqlNullExpression(SqlExpressionNode):
@@ -1139,6 +1186,10 @@ class SqlNullExpression(SqlExpressionNode):
 
     def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D102
         return isinstance(other, SqlNullExpression)
+
+    @property
+    def used_column_aliases(self) -> Set[str]:  # noqa: D102
+        return set()
 
 
 class SqlLogicalOperator(Enum):
@@ -1202,6 +1253,10 @@ class SqlLogicalExpression(SqlExpressionNode):
             return False
         return self.operator == other.operator and self._parents_match(other)
 
+    @property
+    def used_column_aliases(self) -> Set[str]:  # noqa: D102
+        return {column_alias for arg in self.args for column_alias in arg.used_column_aliases}
+
 
 @dataclass(frozen=True)
 class SqlIsNullExpression(SqlExpressionNode):
@@ -1246,6 +1301,10 @@ class SqlIsNullExpression(SqlExpressionNode):
         if not isinstance(other, SqlIsNullExpression):
             return False
         return self._parents_match(other)
+
+    @property
+    def used_column_aliases(self) -> Set[str]:  # noqa: D102
+        return self.arg.used_column_aliases
 
 
 @dataclass(frozen=True)
@@ -1312,6 +1371,10 @@ class SqlSubtractTimeIntervalExpression(SqlExpressionNode):
             return False
         return self.count == other.count and self.granularity == other.granularity and self._parents_match(other)
 
+    @property
+    def used_column_aliases(self) -> Set[str]:  # noqa: D102
+        return self.arg.used_column_aliases
+
 
 @dataclass(frozen=True)
 class SqlCastToTimestampExpression(SqlExpressionNode):
@@ -1358,6 +1421,10 @@ class SqlCastToTimestampExpression(SqlExpressionNode):
         if not isinstance(other, SqlCastToTimestampExpression):
             return False
         return self._parents_match(other)
+
+    @property
+    def used_column_aliases(self) -> Set[str]:  # noqa: D102
+        return self.arg.used_column_aliases
 
 
 @dataclass(frozen=True)
@@ -1409,6 +1476,10 @@ class SqlDateTruncExpression(SqlExpressionNode):
         if not isinstance(other, SqlDateTruncExpression):
             return False
         return self.time_granularity == other.time_granularity and self._parents_match(other)
+
+    @property
+    def used_column_aliases(self) -> Set[str]:  # noqa: D102
+        return self.arg.used_column_aliases
 
 
 @dataclass(frozen=True)
@@ -1468,6 +1539,10 @@ class SqlExtractExpression(SqlExpressionNode):
         if not isinstance(other, SqlExtractExpression):
             return False
         return self.date_part == other.date_part and self._parents_match(other)
+
+    @property
+    def used_column_aliases(self) -> Set[str]:  # noqa: D102
+        return self.arg.used_column_aliases
 
 
 @dataclass(frozen=True)
@@ -1534,6 +1609,10 @@ class SqlRatioComputationExpression(SqlExpressionNode):
             return False
         return self._parents_match(other)
 
+    @property
+    def used_column_aliases(self) -> Set[str]:  # noqa: D102
+        return self.numerator.used_column_aliases.union(self.denominator.used_column_aliases)
+
 
 @dataclass(frozen=True)
 class SqlBetweenExpression(SqlExpressionNode):
@@ -1599,6 +1678,14 @@ class SqlBetweenExpression(SqlExpressionNode):
             return False
         return self._parents_match(other)
 
+    @property
+    def used_column_aliases(self) -> Set[str]:  # noqa: D102
+        return {
+            column_alias
+            for arg in (self.column_arg, self.start_expr, self.end_expr)
+            for column_alias in arg.used_column_aliases
+        }
+
 
 @dataclass(frozen=True)
 class SqlGenerateUuidExpression(SqlExpressionNode):
@@ -1649,3 +1736,7 @@ class SqlGenerateUuidExpression(SqlExpressionNode):
 
     def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D102
         return False
+
+    @property
+    def used_column_aliases(self) -> Set[str]:  # noqa: D102
+        return set()

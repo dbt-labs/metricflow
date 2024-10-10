@@ -119,11 +119,16 @@ class SqlColumnPrunerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
             select_column
             for select_column in node.select_columns
             if select_column.column_alias in self._required_column_aliases
+            or select_column.column_alias in (node.where.used_column_aliases if node.where else ())
+            or select_column.column_alias
+            in {
+                column_alias
+                for join_desc in node.join_descs
+                for column_alias in (join_desc.on_condition.used_column_aliases if join_desc.on_condition else ())
+            }
             or select_column in node.group_bys
             or node.distinct
         )
-        # TODO: don't prune columns used in join condition! Tricky to derive since the join condition can be any
-        # SqlExpressionNode.
 
         if len(pruned_select_columns) == 0:
             raise RuntimeError("All columns have been pruned - this indicates an bug in the pruner or in the inputs.")
