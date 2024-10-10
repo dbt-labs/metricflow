@@ -12,7 +12,6 @@ FROM (
     -- Filter Time Spine
     SELECT
       metric_time__day
-      , metric_time__week
     FROM (
       -- Time Spine
       SELECT
