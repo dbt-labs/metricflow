@@ -29,6 +29,7 @@ from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import (
     ResolverInputForQuery,
 )
 from metricflow_semantics.query.validation_rules.base_validation_rule import PostResolutionQueryValidationRule
+from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 
 
@@ -36,7 +37,7 @@ from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 class QueryItemsAnalysis:
     """Contains data about which items a query contains."""
 
-    scds: Sequence[str]
+    scds: Sequence[InstanceSpec]
     has_metric_time: bool
     has_agg_time_dimension: bool
 
@@ -67,7 +68,7 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
     ) -> QueryItemsAnalysis:
         has_agg_time_dimension = False
         has_metric_time = False
-        scds: List[str] = []
+        scds: List[InstanceSpec] = []
 
         valid_agg_time_dimension_specs = self._manifest_lookup.metric_lookup.get_valid_agg_time_dimensions_for_metric(
             metric_reference
@@ -83,7 +84,7 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
                 has_agg_time_dimension = True
 
             scd_matches = group_by_item_input.spec_pattern.match(scd_specs)
-            scds.extend(match.qualified_name for match in scd_matches)
+            scds.extend(scd_matches)
 
         return QueryItemsAnalysis(
             scds=scds,
@@ -109,7 +110,7 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
         if len(query_items_analysis.scds) > 0 and not query_items_analysis.has_metric_time:
             issues = issues.add_issue(
                 ScdRequiresMetricTimeIssue.from_parameters(
-                    scd_qualified_names=query_items_analysis.scds,
+                    scds_in_query=query_items_analysis.scds,
                     query_resolution_path=resolution_path,
                 )
             )
