@@ -630,6 +630,17 @@ metric:
   time_granularity: week
 ---
 metric:
+  name: instant_bookings_with_measure_filter
+  description: simple metric joining to time spine with measure filter
+  type: simple
+  type_params:
+    measure:
+      name: bookings
+      join_to_timespine: true
+      filter: "{{ Dimension('booking__is_instant') }}"
+  filter: "{{ Entity('listing') }} IS NOT NULL"
+---
+metric:
   name: every_two_days_bookers_fill_nulls_with_0
   description: cumulative metric filling 0
   type: cumulative
