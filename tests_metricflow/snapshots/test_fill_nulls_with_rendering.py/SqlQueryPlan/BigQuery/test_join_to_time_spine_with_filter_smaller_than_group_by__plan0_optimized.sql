@@ -1,20 +1,26 @@
 -- Join to Time Spine Dataset
 -- Compute Metrics via Expressions
 SELECT
-  subq_15.metric_time__day AS metric_time__day
-  , subq_14.archived_users AS archived_users_join_to_time_spine
+  subq_16.metric_time__day AS metric_time__day
+  , subq_15.archived_users AS archived_users_join_to_time_spine
 FROM (
-  -- Time Spine
+  -- Filter Time Spine
   SELECT
-    ts AS metric_time__hour
-    , DATETIME_TRUNC(ts, day) AS metric_time__day
-  FROM ***************************.mf_time_spine_hour subq_16
+    metric_time__hour
+    , metric_time__day
+  FROM (
+    -- Time Spine
+    SELECT
+      ts AS metric_time__hour
+      , DATETIME_TRUNC(ts, day) AS metric_time__day
+    FROM ***************************.mf_time_spine_hour subq_17
+  ) subq_18
   WHERE (
     metric_time__hour > '2020-01-01 00:09:00'
   ) AND (
     metric_time__day = '2020-01-01'
   )
-) subq_15
+) subq_16
 LEFT OUTER JOIN (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['archived_users', 'metric_time__day']
@@ -31,13 +37,10 @@ LEFT OUTER JOIN (
       , DATETIME_TRUNC(archived_at, day) AS metric_time__day
       , 1 AS archived_users
     FROM ***************************.dim_users users_ds_source_src_28000
-  ) subq_11
+  ) subq_12
   WHERE (metric_time__hour > '2020-01-01 00:09:00') AND (metric_time__day = '2020-01-01')
   GROUP BY
     metric_time__day
-) subq_14
+) subq_15
 ON
-  subq_15.metric_time__day = subq_14.metric_time__day
-GROUP BY
-  metric_time__day
-  , archived_users_join_to_time_spine
+  subq_16.metric_time__day = subq_15.metric_time__day

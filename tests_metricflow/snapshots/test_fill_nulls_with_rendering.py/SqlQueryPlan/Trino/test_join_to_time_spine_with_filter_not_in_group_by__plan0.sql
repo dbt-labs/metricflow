@@ -1,18 +1,24 @@
 -- Compute Metrics via Expressions
 SELECT
-  subq_8.metric_time__day
-  , subq_8.bookings AS bookings_join_to_time_spine_with_tiered_filters
+  subq_9.metric_time__day
+  , subq_9.bookings AS bookings_join_to_time_spine_with_tiered_filters
 FROM (
   -- Join to Time Spine Dataset
   SELECT
     subq_6.metric_time__day AS metric_time__day
     , subq_5.bookings AS bookings
   FROM (
-    -- Time Spine
+    -- Filter Time Spine
     SELECT
-      subq_7.ds AS metric_time__day
-      , DATE_TRUNC('month', subq_7.ds) AS metric_time__month
-    FROM ***************************.mf_time_spine subq_7
+      subq_8.metric_time__day
+      , subq_8.metric_time__month
+    FROM (
+      -- Time Spine
+      SELECT
+        subq_7.ds AS metric_time__day
+        , DATE_TRUNC('month', subq_7.ds) AS metric_time__month
+      FROM ***************************.mf_time_spine subq_7
+    ) subq_8
     WHERE (
       metric_time__day >= '2020-01-02'
     ) AND (
@@ -247,4 +253,4 @@ FROM (
   ) subq_5
   ON
     subq_6.metric_time__day = subq_5.metric_time__day
-) subq_8
+) subq_9
