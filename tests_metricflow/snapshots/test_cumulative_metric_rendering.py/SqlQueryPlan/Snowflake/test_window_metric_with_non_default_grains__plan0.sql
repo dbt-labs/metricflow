@@ -52,9 +52,9 @@ FROM (
           FROM (
             -- Join Self Over Time Range
             SELECT
-              subq_2.booking__ds__month AS booking__ds__month
-              , subq_2.metric_time__day AS metric_time__day
+              subq_2.metric_time__day AS metric_time__day
               , subq_2.metric_time__week AS metric_time__week
+              , subq_2.booking__ds__month AS booking__ds__month
               , subq_1.ds__day AS ds__day
               , subq_1.ds__week AS ds__week
               , subq_1.ds__month AS ds__month
