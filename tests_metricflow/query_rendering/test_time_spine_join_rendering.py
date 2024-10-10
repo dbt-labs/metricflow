@@ -152,3 +152,34 @@ def test_join_to_time_spine_with_queried_time_constraint(
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_join_to_time_spine_with_input_measure_constraint(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    """Check filter hierarchy.
+
+    Ensure that the measure filter 'booking__is_instant' doesn't get applied again post-aggregation.
+    """
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("instant_bookings_with_measure_filter",),
+        group_by_names=("metric_time__day", "booking__is_instant"),
+        where_constraints=[
+            PydanticWhereFilter(where_sql_template="{{ TimeDimension('metric_time', 'day') }} > '2020-01-01'")
+        ],
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )

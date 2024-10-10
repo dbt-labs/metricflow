@@ -62,6 +62,7 @@ class MetricInputMeasureSpec(SerializableDataclass):
     offset_window: Optional[MetricTimeWindow] = None
     offset_to_grain: Optional[TimeGranularity] = None
     cumulative_description: Optional[CumulativeMeasureDescription] = None
+    after_aggregation_filter_specs: Tuple[WhereFilterSpec, ...] = ()
     filter_specs: Tuple[WhereFilterSpec, ...] = ()
     alias: Optional[str] = None
     before_aggregation_time_spine_join_description: Optional[JoinToTimeSpineDescription] = None

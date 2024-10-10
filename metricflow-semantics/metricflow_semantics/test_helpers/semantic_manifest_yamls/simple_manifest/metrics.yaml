@@ -11,7 +11,10 @@ metric:
   description: "average booking value metric"
   type: simple
   type_params:
-    measure: average_booking_value
+    measure:
+      name: average_booking_value
+      filter: "average_booking_value > 10"
+
 ---
 metric:
   name: "instant_bookings"
@@ -628,6 +631,16 @@ metric:
       join_to_timespine: true
       fill_nulls_with: 0
   time_granularity: week
+---
+metric:
+  name: instant_bookings_with_measure_filter
+  description: simple metric joining to time spine with measure filter
+  type: simple
+  type_params:
+    measure:
+      name: bookings
+      join_to_timespine: true
+      filter: "{{ Dimension('booking__is_instant') }}"
 ---
 metric:
   name: every_two_days_bookers_fill_nulls_with_0
