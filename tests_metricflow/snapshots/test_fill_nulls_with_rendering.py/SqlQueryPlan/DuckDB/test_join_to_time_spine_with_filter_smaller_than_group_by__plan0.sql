@@ -10,8 +10,7 @@ FROM (
   FROM (
     -- Filter Time Spine
     SELECT
-      subq_8.metric_time__hour
-      , subq_8.metric_time__day
+      subq_8.metric_time__day
     FROM (
       -- Time Spine
       SELECT
@@ -24,6 +23,8 @@ FROM (
     ) AND (
       metric_time__day = '2020-01-01'
     )
+    GROUP BY
+      subq_8.metric_time__day
   ) subq_6
   LEFT OUTER JOIN (
     -- Aggregate Measures
