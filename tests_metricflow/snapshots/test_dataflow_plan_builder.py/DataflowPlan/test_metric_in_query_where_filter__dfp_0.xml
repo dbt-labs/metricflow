@@ -5,33 +5,35 @@
         <ComputeMetricsNode>
             <!-- description = 'Compute Metrics via Expressions' -->
             <!-- node_id = NodeId(id_str='cm_1') -->
-            <!-- metric_spec =                                -->
-            <!--   MetricSpec(                                -->
-            <!--     element_name='listings',                 -->
-            <!--     filter_specs=(                           -->
-            <!--       WhereFilterSpec(                       -->
-            <!--         where_sql='listing__bookings > 2',   -->
-            <!--         bind_parameters=SqlBindParameters(), -->
-            <!--         linkable_spec_set=LinkableSpecSet(   -->
-            <!--           group_by_metric_specs=(            -->
-            <!--             GroupByMetricSpec(               -->
-            <!--               element_name='bookings',       -->
-            <!--               entity_links=(                 -->
-            <!--                 EntityReference(             -->
-            <!--                   element_name='listing',    -->
-            <!--                 ),                           -->
-            <!--               ),                             -->
-            <!--               metric_subquery_entity_links=( -->
-            <!--                 EntityReference(             -->
-            <!--                   element_name='listing',    -->
-            <!--                 ),                           -->
-            <!--               ),                             -->
-            <!--             ),                               -->
-            <!--           ),                                 -->
-            <!--         ),                                   -->
-            <!--       ),                                     -->
-            <!--     ),                                       -->
-            <!--   )                                          -->
+            <!-- metric_spec =                                  -->
+            <!--   MetricSpec(                                  -->
+            <!--     element_name='listings',                   -->
+            <!--     filter_spec_set=WhereFilterSpecSet(        -->
+            <!--       query_level_filter_specs=(               -->
+            <!--         WhereFilterSpec(                       -->
+            <!--           where_sql='listing__bookings > 2',   -->
+            <!--           bind_parameters=SqlBindParameters(), -->
+            <!--           linkable_spec_set=LinkableSpecSet(   -->
+            <!--             group_by_metric_specs=(            -->
+            <!--               GroupByMetricSpec(               -->
+            <!--                 element_name='bookings',       -->
+            <!--                 entity_links=(                 -->
+            <!--                   EntityReference(             -->
+            <!--                     element_name='listing',    -->
+            <!--                   ),                           -->
+            <!--                 ),                             -->
+            <!--                 metric_subquery_entity_links=( -->
+            <!--                   EntityReference(             -->
+            <!--                     element_name='listing',    -->
+            <!--                   ),                           -->
+            <!--                 ),                             -->
+            <!--               ),                               -->
+            <!--             ),                                 -->
+            <!--           ),                                   -->
+            <!--         ),                                     -->
+            <!--       ),                                       -->
+            <!--     ),                                         -->
+            <!--   )                                            -->
             <AggregateMeasuresNode>
                 <!-- description = 'Aggregate Measures' -->
                 <!-- node_id = NodeId(id_str='am_1') -->
@@ -115,7 +117,8 @@
                                     <ComputeMetricsNode>
                                         <!-- description = 'Compute Metrics via Expressions' -->
                                         <!-- node_id = NodeId(id_str='cm_0') -->
-                                        <!-- metric_spec = MetricSpec(element_name='bookings') -->
+                                        <!-- metric_spec =                                                               -->
+                                        <!--   MetricSpec(element_name='bookings', filter_spec_set=WhereFilterSpecSet()) -->
                                         <!-- for_group_by_source_node = True -->
                                         <AggregateMeasuresNode>
                                             <!-- description = 'Aggregate Measures' -->

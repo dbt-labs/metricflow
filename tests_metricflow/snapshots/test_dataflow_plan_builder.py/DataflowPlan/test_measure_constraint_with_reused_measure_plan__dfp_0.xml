@@ -5,58 +5,63 @@
         <ComputeMetricsNode>
             <!-- description = 'Compute Metrics via Expressions' -->
             <!-- node_id = NodeId(id_str='cm_2') -->
-            <!-- metric_spec = MetricSpec(element_name='instant_booking_value_ratio') -->
+            <!-- metric_spec =                                                                                  -->
+            <!--   MetricSpec(element_name='instant_booking_value_ratio', filter_spec_set=WhereFilterSpecSet()) -->
             <CombineAggregatedOutputsNode>
                 <!-- description = 'Combine Aggregated Outputs' -->
                 <!-- node_id = NodeId(id_str='cao_0') -->
                 <ComputeMetricsNode>
                     <!-- description = 'Compute Metrics via Expressions' -->
                     <!-- node_id = NodeId(id_str='cm_0') -->
-                    <!-- metric_spec =                                                         -->
-                    <!--   MetricSpec(                                                         -->
-                    <!--     element_name='booking_value',                                     -->
-                    <!--     filter_specs=(                                                    -->
-                    <!--       WhereFilterSpec(                                                -->
-                    <!--         where_sql='booking__is_instant',                              -->
-                    <!--         bind_parameters=SqlBindParameters(),                          -->
-                    <!--         linkable_element_unions=(                                     -->
-                    <!--           LinkableElementUnion(                                       -->
-                    <!--             linkable_dimension=LinkableDimension(                     -->
-                    <!--               properties=(LOCAL,),                                    -->
-                    <!--               defined_in_semantic_model=SemanticModelReference(       -->
-                    <!--                 semantic_model_name='bookings_source',                -->
-                    <!--               ),                                                      -->
-                    <!--               element_name='is_instant',                              -->
-                    <!--               dimension_type=CATEGORICAL,                             -->
-                    <!--               entity_links=(                                          -->
-                    <!--                 EntityReference(                                      -->
-                    <!--                   element_name='booking',                             -->
-                    <!--                 ),                                                    -->
-                    <!--               ),                                                      -->
-                    <!--               join_path=SemanticModelJoinPath(                        -->
-                    <!--                 left_semantic_model_reference=SemanticModelReference( -->
-                    <!--                   semantic_model_name='bookings_source',              -->
-                    <!--                 ),                                                    -->
-                    <!--               ),                                                      -->
-                    <!--             ),                                                        -->
-                    <!--           ),                                                          -->
-                    <!--         ),                                                            -->
-                    <!--         linkable_spec_set=LinkableSpecSet(                            -->
-                    <!--           dimension_specs=(                                           -->
-                    <!--             DimensionSpec(                                            -->
-                    <!--               element_name='is_instant',                              -->
-                    <!--               entity_links=(                                          -->
-                    <!--                 EntityReference(                                      -->
-                    <!--                   element_name='booking',                             -->
-                    <!--                 ),                                                    -->
-                    <!--               ),                                                      -->
-                    <!--             ),                                                        -->
-                    <!--           ),                                                          -->
-                    <!--         ),                                                            -->
-                    <!--       ),                                                              -->
-                    <!--     ),                                                                -->
-                    <!--     alias='booking_value_with_is_instant_constraint',                 -->
-                    <!--   )                                                                   -->
+                    <!-- metric_spec =                                                           -->
+                    <!--   MetricSpec(                                                           -->
+                    <!--     element_name='booking_value',                                       -->
+                    <!--     filter_spec_set=WhereFilterSpecSet(                                 -->
+                    <!--       metric_level_filter_specs=(                                       -->
+                    <!--         WhereFilterSpec(                                                -->
+                    <!--           where_sql='booking__is_instant',                              -->
+                    <!--           bind_parameters=SqlBindParameters(),                          -->
+                    <!--           linkable_element_unions=(                                     -->
+                    <!--             LinkableElementUnion(                                       -->
+                    <!--               linkable_dimension=LinkableDimension(                     -->
+                    <!--                 properties=(                                            -->
+                    <!--                   LOCAL,                                                -->
+                    <!--                 ),                                                      -->
+                    <!--                 defined_in_semantic_model=SemanticModelReference(       -->
+                    <!--                   semantic_model_name='bookings_source',                -->
+                    <!--                 ),                                                      -->
+                    <!--                 element_name='is_instant',                              -->
+                    <!--                 dimension_type=CATEGORICAL,                             -->
+                    <!--                 entity_links=(                                          -->
+                    <!--                   EntityReference(                                      -->
+                    <!--                     element_name='booking',                             -->
+                    <!--                   ),                                                    -->
+                    <!--                 ),                                                      -->
+                    <!--                 join_path=SemanticModelJoinPath(                        -->
+                    <!--                   left_semantic_model_reference=SemanticModelReference( -->
+                    <!--                     semantic_model_name='bookings_source',              -->
+                    <!--                   ),                                                    -->
+                    <!--                 ),                                                      -->
+                    <!--               ),                                                        -->
+                    <!--             ),                                                          -->
+                    <!--           ),                                                            -->
+                    <!--           linkable_spec_set=LinkableSpecSet(                            -->
+                    <!--             dimension_specs=(                                           -->
+                    <!--               DimensionSpec(                                            -->
+                    <!--                 element_name='is_instant',                              -->
+                    <!--                 entity_links=(                                          -->
+                    <!--                   EntityReference(                                      -->
+                    <!--                     element_name='booking',                             -->
+                    <!--                   ),                                                    -->
+                    <!--                 ),                                                      -->
+                    <!--               ),                                                        -->
+                    <!--             ),                                                          -->
+                    <!--           ),                                                            -->
+                    <!--         ),                                                              -->
+                    <!--       ),                                                                -->
+                    <!--     ),                                                                  -->
+                    <!--     alias='booking_value_with_is_instant_constraint',                   -->
+                    <!--   )                                                                     -->
                     <AggregateMeasuresNode>
                         <!-- description = 'Aggregate Measures' -->
                         <!-- node_id = NodeId(id_str='am_0') -->
@@ -147,7 +152,7 @@
                 <ComputeMetricsNode>
                     <!-- description = 'Compute Metrics via Expressions' -->
                     <!-- node_id = NodeId(id_str='cm_1') -->
-                    <!-- metric_spec = MetricSpec(element_name='booking_value') -->
+                    <!-- metric_spec = MetricSpec(element_name='booking_value', filter_spec_set=WhereFilterSpecSet()) -->
                     <AggregateMeasuresNode>
                         <!-- description = 'Aggregate Measures' -->
                         <!-- node_id = NodeId(id_str='am_1') -->

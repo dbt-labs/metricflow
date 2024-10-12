@@ -5,7 +5,8 @@
         <ComputeMetricsNode>
             <!-- description = 'Compute Metrics via Expressions' -->
             <!-- node_id = NodeId(id_str='cm_0') -->
-            <!-- metric_spec = MetricSpec(element_name='bookings_fill_nulls_with_0') -->
+            <!-- metric_spec =                                                                                 -->
+            <!--   MetricSpec(element_name='bookings_fill_nulls_with_0', filter_spec_set=WhereFilterSpecSet()) -->
             <JoinToTimeSpineNode>
                 <!-- description = 'Join to Time Spine Dataset' -->
                 <!-- node_id = NodeId(id_str='jts_0') -->

@@ -5,7 +5,7 @@
         <ComputeMetricsNode>
             <!-- description = 'Compute Metrics via Expressions' -->
             <!-- node_id = NodeId(id_str='cm_0') -->
-            <!-- metric_spec = MetricSpec(element_name='txn_count') -->
+            <!-- metric_spec = MetricSpec(element_name='txn_count', filter_spec_set=WhereFilterSpecSet()) -->
             <AggregateMeasuresNode>
                 <!-- description = 'Aggregate Measures' -->
                 <!-- node_id = NodeId(id_str='am_0') -->

@@ -5,13 +5,15 @@
         <ComputeMetricsNode>
             <!-- description = 'Compute Metrics via Expressions' -->
             <!-- node_id = NodeId(id_str='cm_1') -->
-            <!-- metric_spec = MetricSpec(element_name='every_2_days_bookers_2_days_ago') -->
+            <!-- metric_spec =                                                                                      -->
+            <!--   MetricSpec(element_name='every_2_days_bookers_2_days_ago', filter_spec_set=WhereFilterSpecSet()) -->
             <ComputeMetricsNode>
                 <!-- description = 'Compute Metrics via Expressions' -->
                 <!-- node_id = NodeId(id_str='cm_0') -->
                 <!-- metric_spec =                                                         -->
                 <!--   MetricSpec(                                                         -->
                 <!--     element_name='every_two_days_bookers',                            -->
+                <!--     filter_spec_set=WhereFilterSpecSet(),                             -->
                 <!--     alias='every_2_days_bookers_2_days_ago',                          -->
                 <!--     offset_window=PydanticMetricTimeWindow(count=2, granularity=DAY), -->
                 <!--   )                                                                   -->
