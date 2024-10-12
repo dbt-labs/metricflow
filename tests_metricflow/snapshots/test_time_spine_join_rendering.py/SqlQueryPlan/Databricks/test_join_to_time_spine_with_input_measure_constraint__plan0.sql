@@ -253,5 +253,5 @@ FROM (
     ON
       subq_6.metric_time__day = subq_5.metric_time__day
   ) subq_8
-  WHERE (booking__is_instant) AND (metric_time__day > '2020-01-01')
+  WHERE metric_time__day > '2020-01-01'
 ) subq_9

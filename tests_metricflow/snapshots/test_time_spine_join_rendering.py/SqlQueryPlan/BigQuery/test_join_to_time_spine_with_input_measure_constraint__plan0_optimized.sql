@@ -38,4 +38,4 @@ FROM (
   ON
     subq_17.ds = subq_15.metric_time__day
 ) subq_18
-WHERE (booking__is_instant) AND (metric_time__day > '2020-01-01')
+WHERE metric_time__day > '2020-01-01'
