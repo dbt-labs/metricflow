@@ -78,6 +78,7 @@ class StaticIdPrefix(IdPrefix, Enum, metaclass=EnumMetaClassHelper):
     SQL_PLAN_TABLE_FROM_CLAUSE_ID_PREFIX = "tfc"
     SQL_PLAN_QUERY_FROM_CLAUSE_ID_PREFIX = "qfc"
     SQL_PLAN_CREATE_TABLE_AS_ID_PREFIX = "cta"
+    SQL_PLAN_COMMON_TABLE_EXPRESSION_ID_PREFIX = "cta"
 
     EXEC_NODE_READ_SQL_QUERY = "rsq"
     EXEC_NODE_NOOP = "noop"

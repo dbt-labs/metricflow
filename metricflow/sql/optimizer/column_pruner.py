@@ -4,12 +4,15 @@ import logging
 from collections import defaultdict
 from typing import Dict, List, Set, Tuple
 
+from typing_extensions import override
+
 from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
 from metricflow.sql.sql_exprs import (
     SqlExpressionTreeLineage,
 )
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
+    SqlCteNode,
     SqlJoinDescription,
     SqlQueryPlanNode,
     SqlQueryPlanNodeVisitor,
@@ -110,6 +113,10 @@ class SqlColumnPrunerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
             limit=node.limit,
             distinct=node.distinct,
         )
+
+    @override
+    def visit_cte_node(self, node: SqlCteNode) -> SqlQueryPlanNode:
+        raise NotImplementedError
 
     def visit_select_statement_node(self, node: SqlSelectStatementNode) -> SqlQueryPlanNode:  # noqa: D102
         # Remove columns that are not needed from this SELECT statement because the parent SELECT statement doesn't
