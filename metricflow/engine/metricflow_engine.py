@@ -204,7 +204,7 @@ class MetricFlowExplainResult:
                     sql_query.sql_query.split("\n"),
                 )
             ),
-            bind_parameters=sql_query.bind_parameters,
+            bind_parameter_set=sql_query.bind_parameter_set,
         )
 
     @property

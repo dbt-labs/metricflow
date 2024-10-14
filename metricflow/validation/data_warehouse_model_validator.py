@@ -34,7 +34,7 @@ from metricflow_semantics.specs.dunder_column_association_resolver import Dunder
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.measure_spec import MeasureSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
-from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
+from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
@@ -85,7 +85,7 @@ class QueryRenderingTools:
 class DataWarehouseValidationTask:
     """Dataclass for defining a task to be used in the DataWarehouseModelValidator."""
 
-    query_and_params_callable: Callable[[], Tuple[str, SqlBindParameters]]
+    query_and_params_callable: Callable[[], Tuple[str, SqlBindParameterSet]]
     error_message: str
     description: str
     context: Optional[ValidationContext] = None
@@ -123,8 +123,8 @@ class DataWarehouseTaskBuilder:
     @staticmethod
     def renderize(
         sql_client: SqlClient, plan_converter: DataflowToSqlQueryPlanConverter, plan_id: str, nodes: FilterElementsNode
-    ) -> Tuple[str, SqlBindParameters]:
-        """Generates a sql query plan and returns the rendered sql and bind_parameters."""
+    ) -> Tuple[str, SqlBindParameterSet]:
+        """Generates a sql query plan and returns the rendered sql and bind_parameter_set."""
         conversion_result = plan_converter.convert_to_sql_query_plan(
             sql_engine_type=sql_client.sql_engine_type,
             dataflow_plan_node=nodes,
@@ -132,7 +132,7 @@ class DataWarehouseTaskBuilder:
         sql_plan = conversion_result.sql_plan
 
         rendered_plan = sql_client.sql_query_plan_renderer.render_sql_query_plan(sql_plan)
-        return (rendered_plan.sql, rendered_plan.bind_parameters)
+        return (rendered_plan.sql, rendered_plan.bind_parameter_set)
 
     @classmethod
     def gen_semantic_model_tasks(
@@ -148,7 +148,7 @@ class DataWarehouseTaskBuilder:
                     query_and_params_callable=partial(
                         lambda name=semantic_model.node_relation.relation_name: (
                             f"SELECT * FROM {name}",
-                            SqlBindParameters(),
+                            SqlBindParameterSet(),
                         )
                     ),
                     context=SemanticModelContext(
@@ -450,11 +450,11 @@ class DataWarehouseTaskBuilder:
     @staticmethod
     def _gen_explain_query_task_query_and_params(
         mf_engine: MetricFlowEngine, mf_request: MetricFlowQueryRequest
-    ) -> Tuple[str, SqlBindParameters]:
+    ) -> Tuple[str, SqlBindParameterSet]:
         explain_result: MetricFlowExplainResult = mf_engine.explain(mf_request=mf_request)
         return (
             explain_result.rendered_sql_without_descriptions.sql_query,
-            explain_result.rendered_sql_without_descriptions.bind_parameters,
+            explain_result.rendered_sql_without_descriptions.bind_parameter_set,
         )
 
     @classmethod
@@ -569,7 +569,7 @@ class DataWarehouseModelValidator:
                 break
             try:
                 (query_string, query_params) = task.query_and_params_callable()
-                self._sql_client.dry_run(stmt=query_string, sql_bind_parameters=query_params)
+                self._sql_client.dry_run(stmt=query_string, sql_bind_parameter_set=query_params)
             except Exception as e:
                 issues.append(
                     ValidationError(

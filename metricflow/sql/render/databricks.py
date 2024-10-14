@@ -38,7 +38,7 @@ class DatabricksSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
         """Render a percentile expression for Databricks."""
         arg_rendered = self.render_sql_expr(node.order_by_arg)
-        params = arg_rendered.bind_parameters
+        params = arg_rendered.bind_parameter_set
         percentile = node.percentile_args.percentile
 
         if node.percentile_args.function_type is SqlPercentileFunctionType.CONTINUOUS:
@@ -57,14 +57,14 @@ class DatabricksSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         elif node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_DISCRETE:
             return SqlExpressionRenderResult(
                 sql=f"APPROX_PERCENTILE({arg_rendered.sql}, {percentile})",
-                bind_parameters=params,
+                bind_parameter_set=params,
             )
         else:
             assert_values_exhausted(node.percentile_args.function_type)
 
         return SqlExpressionRenderResult(
             sql=f"{function_str}({percentile}) WITHIN GROUP (ORDER BY ({arg_rendered.sql}))",
-            bind_parameters=params,
+            bind_parameter_set=params,
         )
 
 

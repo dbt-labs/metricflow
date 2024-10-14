@@ -10,7 +10,7 @@ from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from metricflow_semantics.errors.error_classes import SqlBindParametersNotSupportedError
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.random_id import random_id
-from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
+from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 
 from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.protocols.sql_client import SqlEngine
@@ -127,23 +127,25 @@ class AdapterBackedSqlClient:
     def query(
         self,
         stmt: str,
-        sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
+        sql_bind_parameter_set: SqlBindParameterSet = SqlBindParameterSet(),
     ) -> MetricFlowDataTable:
         """Query statement; result expected to be data which will be returned as a DataTable.
 
         Args:
             stmt: The SQL query statement to run. This should produce output via a SELECT
-            sql_bind_parameters: The parameter replacement mapping for filling in concrete values for SQL query
+            sql_bind_parameter_set: The parameter replacement mapping for filling in concrete values for SQL query
             parameters.
         """
         start = time.time()
         request_id = SqlRequestId(f"mf_rid__{random_id()}")
-        if sql_bind_parameters.param_dict:
+        if sql_bind_parameter_set.param_dict:
             raise SqlBindParametersNotSupportedError(
                 f"Invalid query statement - we do not support queries with bind parameters through dbt adapters! "
-                f"Bind params: {sql_bind_parameters.param_dict}"
+                f"Bind params: {sql_bind_parameter_set.param_dict}"
             )
-        logger.info(LazyFormat("Running query() statement", statement=stmt, param_dict=sql_bind_parameters.param_dict))
+        logger.info(
+            LazyFormat("Running query() statement", statement=stmt, param_dict=sql_bind_parameter_set.param_dict)
+        )
         with self._adapter.connection_named(f"MetricFlow_request_{request_id}"):
             # returns a Tuple[AdapterResponse, agate.Table] but the decorator converts it to Any
             result = self._adapter.execute(sql=stmt, auto_begin=True, fetch=True)
@@ -167,24 +169,24 @@ class AdapterBackedSqlClient:
     def execute(
         self,
         stmt: str,
-        sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
+        sql_bind_parameter_set: SqlBindParameterSet = SqlBindParameterSet(),
     ) -> None:
         """Execute a SQL statement. No result will be returned.
 
         Args:
             stmt: The SQL query statement to run. This should not produce output.
-            sql_bind_parameters: The parameter replacement mapping for filling in
+            sql_bind_parameter_set: The parameter replacement mapping for filling in
                 concrete values for SQL query parameters.
         """
-        if sql_bind_parameters.param_dict:
+        if sql_bind_parameter_set.param_dict:
             raise SqlBindParametersNotSupportedError(
                 f"Invalid execute statement - we do not support execute commands with bind parameters through dbt "
-                f"adapters! Bind params: {SqlBindParameters.param_dict}"
+                f"adapters! Bind params: {SqlBindParameterSet.param_dict}"
             )
         start = time.time()
         request_id = SqlRequestId(f"mf_rid__{random_id()}")
         logger.info(
-            LazyFormat("Running execute() statement", statement=stmt, param_dict=sql_bind_parameters.param_dict)
+            LazyFormat("Running execute() statement", statement=stmt, param_dict=sql_bind_parameter_set.param_dict)
         )
         with self._adapter.connection_named(f"MetricFlow_request_{request_id}"):
             result = self._adapter.execute(stmt, auto_begin=True, fetch=False)
@@ -199,7 +201,7 @@ class AdapterBackedSqlClient:
     def dry_run(
         self,
         stmt: str,
-        sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
+        sql_bind_parameter_set: SqlBindParameterSet = SqlBindParameterSet(),
     ) -> None:
         """Dry run statement; checks that the 'stmt' is queryable. Returns None on success.
 
@@ -207,11 +209,11 @@ class AdapterBackedSqlClient:
 
         Args:
             stmt: The SQL query statement to dry run.
-            sql_bind_parameters: The parameter replacement mapping for filling in
+            sql_bind_parameter_set: The parameter replacement mapping for filling in
                 concrete values for SQL query parameters.
         """
         start = time.time()
-        logger.info(LazyFormat("Running dry run", statement=stmt, param_dict=sql_bind_parameters.param_dict))
+        logger.info(LazyFormat("Running dry run", statement=stmt, param_dict=sql_bind_parameter_set.param_dict))
         request_id = SqlRequestId(f"mf_rid__{random_id()}")
         connection_name = f"MetricFlow_dry_run_request_{request_id}"
         # TODO - consolidate to self._adapter.validate_sql() when all implementations will work from within MetricFlow

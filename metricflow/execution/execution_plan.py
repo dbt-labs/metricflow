@@ -9,7 +9,7 @@ from typing import List, Optional, Sequence, Tuple
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId, DagNode, DisplayedProperty, MetricFlowDag, NodeId
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
+from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.visitor import Visitable
 
@@ -49,7 +49,7 @@ class SqlQuery:
 
     # This field will be renamed as it is confusing given the class name.
     sql_query: str
-    bind_parameters: SqlBindParameters
+    bind_parameter_set: SqlBindParameterSet
 
 
 @dataclass(frozen=True)
@@ -69,7 +69,7 @@ class TaskExecutionResult:
 
     # If the task was an SQL query, it's stored here
     sql: Optional[str] = None
-    bind_params: Optional[SqlBindParameters] = None
+    bind_params: Optional[SqlBindParameterSet] = None
     # If the task produces a data_table as a result, it's stored here.
     df: Optional[MetricFlowDataTable] = None
 
@@ -120,7 +120,7 @@ class SelectSqlQueryToDataTableTask(ExecutionPlanTask):
 
         df = self.sql_client.query(
             sql_query.sql_query,
-            sql_bind_parameters=sql_query.bind_parameters,
+            sql_bind_parameter_set=sql_query.bind_parameter_set,
         )
 
         end_time = time.time()
@@ -128,7 +128,7 @@ class SelectSqlQueryToDataTableTask(ExecutionPlanTask):
             start_time=start_time,
             end_time=end_time,
             sql=sql_query.sql_query,
-            bind_params=sql_query.bind_parameters,
+            bind_params=sql_query.bind_parameter_set,
             df=df,
         )
 
@@ -180,7 +180,7 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
         return tuple(super().displayed_properties) + (
             DisplayedProperty(key="sql_query", value=sql_query.sql_query),
             DisplayedProperty(key="output_table", value=self.output_table),
-            DisplayedProperty(key="bind_parameters", value=sql_query.bind_parameters),
+            DisplayedProperty(key="bind_parameter_set", value=sql_query.bind_parameter_set),
         )
 
     def execute(self) -> TaskExecutionResult:  # noqa: D102
@@ -192,7 +192,7 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
         logger.debug(LazyFormat(lambda: f"Creating table {self.output_table} using a query"))
         self.sql_client.execute(
             sql_query.sql_query,
-            sql_bind_parameters=sql_query.bind_parameters,
+            sql_bind_parameter_set=sql_query.bind_parameter_set,
         )
 
         end_time = time.time()

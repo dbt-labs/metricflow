@@ -6,7 +6,7 @@ from typing import Protocol, Set
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
+from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 
 from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
@@ -79,7 +79,7 @@ class SqlClient(Protocol):
     def query(
         self,
         stmt: str,
-        sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
+        sql_bind_parameter_set: SqlBindParameterSet = SqlBindParameterSet(),
     ) -> MetricFlowDataTable:
         """Base query method, upon execution will run a query that returns a pandas DataTable."""
         raise NotImplementedError
@@ -88,7 +88,7 @@ class SqlClient(Protocol):
     def execute(
         self,
         stmt: str,
-        sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
+        sql_bind_parameter_set: SqlBindParameterSet = SqlBindParameterSet(),
     ) -> None:
         """Base execute method."""
         raise NotImplementedError
@@ -97,7 +97,7 @@ class SqlClient(Protocol):
     def dry_run(
         self,
         stmt: str,
-        sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
+        sql_bind_parameter_set: SqlBindParameterSet = SqlBindParameterSet(),
     ) -> None:
         """Base dry_run method."""
         raise NotImplementedError

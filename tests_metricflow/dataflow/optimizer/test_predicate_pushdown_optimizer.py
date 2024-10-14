@@ -10,7 +10,7 @@ from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
-from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
+from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_plan_snapshot_text_equal
 
@@ -78,7 +78,7 @@ def test_branch_state_propagation(branch_state_tracker: PredicatePushdownBranchS
         where_filter_specs=(
             WhereFilterSpec(
                 where_sql="x is true",
-                bind_parameters=SqlBindParameters(),
+                bind_parameters=SqlBindParameterSet(),
                 linkable_element_unions=(),
                 linkable_spec_set=LinkableSpecSet(),
             ),
@@ -115,13 +115,13 @@ def test_applied_filter_back_propagation(branch_state_tracker: PredicatePushdown
     base_state = branch_state_tracker.last_pushdown_state
     where_spec_x_is_true = WhereFilterSpec(
         where_sql="x is true",
-        bind_parameters=SqlBindParameters(),
+        bind_parameters=SqlBindParameterSet(),
         linkable_element_unions=(),
         linkable_spec_set=LinkableSpecSet(),
     )
     where_spec_y_is_null = WhereFilterSpec(
         where_sql="y is null",
-        bind_parameters=SqlBindParameters(),
+        bind_parameters=SqlBindParameterSet(),
         linkable_element_unions=(),
         linkable_spec_set=LinkableSpecSet(),
     )

@@ -26,7 +26,7 @@ from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
-from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
+from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_DAY
@@ -196,7 +196,7 @@ def test_filter_with_where_constraint_node(
         where_specs=(
             WhereFilterSpec(
                 where_sql="booking__ds__day = '2020-01-01'",
-                bind_parameters=SqlBindParameters(),
+                bind_parameters=SqlBindParameterSet(),
                 linkable_spec_set=LinkableSpecSet(
                     time_dimension_specs=(
                         TimeDimensionSpec(
