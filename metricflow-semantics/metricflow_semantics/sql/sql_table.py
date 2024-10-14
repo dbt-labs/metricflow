@@ -2,22 +2,27 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional, Tuple, Union
+from typing import Optional
 
 
 class SqlTableType(Enum):  # noqa: D101
     TABLE = "table"
     VIEW = "view"
+    # CTE type may be added later.
 
 
 @dataclass(frozen=True, order=True)
 class SqlTable:
     """Represents a reference to a SQL table."""
 
-    schema_name: str
+    schema_name: Optional[str]
     table_name: str
     db_name: Optional[str] = None
     table_type: SqlTableType = SqlTableType.TABLE
+
+    def __post_init__(self) -> None:  # noqa: D105
+        if self.db_name is not None and self.schema_name is None:
+            raise ValueError(f"{self.db_name=} when it should be specified with {self.schema_name=}")
 
     @staticmethod
     def from_string(sql_str: str) -> SqlTable:  # noqa: D102
@@ -34,14 +39,11 @@ class SqlTable:
     @property
     def sql(self) -> str:
         """Return the snippet that can be used for use in SQL queries."""
-        if self.db_name:
-            return f"{self.db_name}.{self.schema_name}.{self.table_name}"
-        return f"{self.schema_name}.{self.table_name}"
+        items = []
+        if self.db_name is not None:
+            items.append(self.db_name)
+        if self.schema_name is not None:
+            items.append(self.schema_name)
+        items.append(self.table_name)
 
-    @property
-    def parts_tuple(self) -> Union[Tuple[str, str], Tuple[str, str, str]]:
-        """Return a tuple of the sql table parts."""
-        if self.db_name:
-            return (self.db_name, self.schema_name, self.table_name)
-        else:
-            return (self.schema_name, self.table_name)
+        return ".".join(items)

@@ -24,7 +24,7 @@ class TimeSpineSource:
     Dates should be contiguous. May also contain custom granularity columns.
     """
 
-    schema_name: str
+    schema_name: Optional[str]
     table_name: str = "mf_time_spine"
     # Name of the column in the table that contains date/time values that map to a standard granularity.
     base_column: str = "ds"
