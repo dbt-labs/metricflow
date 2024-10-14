@@ -11,7 +11,7 @@
             <!--     filter_specs=(                                                    -->
             <!--       WhereFilterSpec(                                                -->
             <!--         where_sql='booking__is_instant',                              -->
-            <!--         bind_parameters=SqlBindParameters(),                          -->
+            <!--         bind_parameters=SqlBindParameterSet(),                        -->
             <!--         linkable_element_unions=(                                     -->
             <!--           LinkableElementUnion(                                       -->
             <!--             linkable_dimension=LinkableDimension(                     -->
@@ -61,7 +61,7 @@
                     <!--     filter_specs=(                                                    -->
                     <!--       WhereFilterSpec(                                                -->
                     <!--         where_sql='booking__is_instant',                              -->
-                    <!--         bind_parameters=SqlBindParameters(),                          -->
+                    <!--         bind_parameters=SqlBindParameterSet(),                        -->
                     <!--         linkable_element_unions=(                                     -->
                     <!--           LinkableElementUnion(                                       -->
                     <!--             linkable_dimension=LinkableDimension(                     -->
@@ -176,7 +176,7 @@
                                             <!-- where_condition =                                                 -->
                                             <!--   WhereFilterSpec(                                                -->
                                             <!--     where_sql='booking__is_instant',                              -->
-                                            <!--     bind_parameters=SqlBindParameters(),                          -->
+                                            <!--     bind_parameters=SqlBindParameterSet(),                        -->
                                             <!--     linkable_element_unions=(                                     -->
                                             <!--       LinkableElementUnion(                                       -->
                                             <!--         linkable_dimension=LinkableDimension(                     -->
@@ -256,7 +256,7 @@
                     <!--     filter_specs=(                                                     -->
                     <!--       WhereFilterSpec(                                                 -->
                     <!--         where_sql='booking__is_instant',                               -->
-                    <!--         bind_parameters=SqlBindParameters(),                           -->
+                    <!--         bind_parameters=SqlBindParameterSet(),                         -->
                     <!--         linkable_element_unions=(                                      -->
                     <!--           LinkableElementUnion(                                        -->
                     <!--             linkable_dimension=LinkableDimension(                      -->
@@ -321,7 +321,7 @@
                                 <!-- where_condition =                                                 -->
                                 <!--   WhereFilterSpec(                                                -->
                                 <!--     where_sql='booking__is_instant',                              -->
-                                <!--     bind_parameters=SqlBindParameters(),                          -->
+                                <!--     bind_parameters=SqlBindParameterSet(),                        -->
                                 <!--     linkable_element_unions=(                                     -->
                                 <!--       LinkableElementUnion(                                       -->
                                 <!--         linkable_dimension=LinkableDimension(                     -->

@@ -11,7 +11,7 @@
             <!--     filter_specs=(                                                    -->
             <!--       WhereFilterSpec(                                                -->
             <!--         where_sql="metric_time__day = '2020-01-01'",                  -->
-            <!--         bind_parameters=SqlBindParameters(),                          -->
+            <!--         bind_parameters=SqlBindParameterSet(),                        -->
             <!--         linkable_element_unions=(                                     -->
             <!--           LinkableElementUnion(                                       -->
             <!--             linkable_dimension=LinkableDimension(                     -->
@@ -56,7 +56,7 @@
                 <!--     filter_specs=(                                                    -->
                 <!--       WhereFilterSpec(                                                -->
                 <!--         where_sql="metric_time__day = '2020-01-01'",                  -->
-                <!--         bind_parameters=SqlBindParameters(),                          -->
+                <!--         bind_parameters=SqlBindParameterSet(),                        -->
                 <!--         linkable_element_unions=(                                     -->
                 <!--           LinkableElementUnion(                                       -->
                 <!--             linkable_dimension=LinkableDimension(                     -->
@@ -113,7 +113,7 @@
                             <!-- where_condition =                                                 -->
                             <!--   WhereFilterSpec(                                                -->
                             <!--     where_sql="metric_time__day = '2020-01-01'",                  -->
-                            <!--     bind_parameters=SqlBindParameters(),                          -->
+                            <!--     bind_parameters=SqlBindParameterSet(),                        -->
                             <!--     linkable_element_unions=(                                     -->
                             <!--       LinkableElementUnion(                                       -->
                             <!--         linkable_dimension=LinkableDimension(                     -->
