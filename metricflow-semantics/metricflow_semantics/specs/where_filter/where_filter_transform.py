@@ -20,7 +20,7 @@ from metricflow_semantics.specs.where_filter.where_filter_entity import WhereFil
 from metricflow_semantics.specs.where_filter.where_filter_metric import WhereFilterMetricFactory
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.specs.where_filter.where_filter_time_dimension import WhereFilterTimeDimensionFactory
-from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
+from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 
 logger = logging.getLogger(__name__)
 
@@ -108,7 +108,7 @@ class WhereSpecFactory:
             filter_specs.append(
                 WhereFilterSpec(
                     where_sql=where_sql,
-                    bind_parameters=SqlBindParameters(),
+                    bind_parameters=SqlBindParameterSet(),
                     linkable_spec_set=LinkableSpecSet.create_from_specs(rendered_specs),
                     linkable_element_unions=tuple(linkable_element.as_union for linkable_element in linkable_elements),
                 )

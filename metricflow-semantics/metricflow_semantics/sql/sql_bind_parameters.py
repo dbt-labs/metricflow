@@ -74,7 +74,7 @@ class SqlBindParameter(SerializableDataclass):  # noqa: D101
 
 
 @dataclass(frozen=True)
-class SqlBindParameters(SerializableDataclass):
+class SqlBindParameterSet(SerializableDataclass):
     """Helps to build execution parameters during SQL query rendering.
 
     These can be used as per https://docs.sqlalchemy.org/en/14/core/tutorial.html#using-textual-sql
@@ -83,7 +83,7 @@ class SqlBindParameters(SerializableDataclass):
     # Using tuples for immutability as dicts are not.
     param_items: Tuple[SqlBindParameter, ...] = ()
 
-    def combine(self, additional_params: SqlBindParameters) -> SqlBindParameters:
+    def combine(self, additional_params: SqlBindParameterSet) -> SqlBindParameterSet:
         """Create a new set of bind parameters that includes parameters from this and additional_params."""
         if len(self.param_items) == 0:
             return additional_params
@@ -108,7 +108,7 @@ class SqlBindParameters(SerializableDataclass):
             new_items.append(item)
             included_keys.add(item.key)
 
-        return SqlBindParameters(param_items=tuple(new_items))
+        return SqlBindParameterSet(param_items=tuple(new_items))
 
     @property
     def param_dict(self) -> OrderedDict[str, SqlColumnType]:
@@ -119,8 +119,8 @@ class SqlBindParameters(SerializableDataclass):
         return param_dict
 
     @staticmethod
-    def create_from_dict(param_dict: Mapping[str, SqlColumnType]) -> SqlBindParameters:  # noqa: D102
-        return SqlBindParameters(
+    def create_from_dict(param_dict: Mapping[str, SqlColumnType]) -> SqlBindParameterSet:  # noqa: D102
+        return SqlBindParameterSet(
             tuple(
                 SqlBindParameter(key=key, value=SqlBindParameterValue.create_from_sql_column_type(value))
                 for key, value in param_dict.items()
@@ -128,4 +128,4 @@ class SqlBindParameters(SerializableDataclass):
         )
 
     def __eq__(self, other: Any) -> bool:  # type: ignore  # noqa: D105
-        return isinstance(other, SqlBindParameters) and self.param_dict == other.param_dict
+        return isinstance(other, SqlBindParameterSet) and self.param_dict == other.param_dict

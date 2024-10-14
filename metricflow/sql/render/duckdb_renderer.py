@@ -4,7 +4,7 @@ from typing import Collection
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
+from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from typing_extensions import override
 
 from metricflow.protocols.sql_client import SqlEngine
@@ -49,21 +49,21 @@ class DuckDbSqlExpressionRenderer(DefaultSqlExpressionRenderer):
 
         return SqlExpressionRenderResult(
             sql=f"{arg_rendered.sql} - INTERVAL {count} {granularity.value}",
-            bind_parameters=arg_rendered.bind_parameters,
+            bind_parameter_set=arg_rendered.bind_parameter_set,
         )
 
     @override
     def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> SqlExpressionRenderResult:
         return SqlExpressionRenderResult(
             sql="GEN_RANDOM_UUID()",
-            bind_parameters=SqlBindParameters(),
+            bind_parameter_set=SqlBindParameterSet(),
         )
 
     @override
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
         """Render a percentile expression for DuckDB."""
         arg_rendered = self.render_sql_expr(node.order_by_arg)
-        params = arg_rendered.bind_parameters
+        params = arg_rendered.bind_parameter_set
         percentile = node.percentile_args.percentile
 
         if node.percentile_args.function_type is SqlPercentileFunctionType.CONTINUOUS:
@@ -73,7 +73,7 @@ class DuckDbSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         elif node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS:
             return SqlExpressionRenderResult(
                 sql=f"approx_quantile({arg_rendered.sql}, {percentile})",
-                bind_parameters=params,
+                bind_parameter_set=params,
             )
         elif node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_DISCRETE:
             raise RuntimeError(
@@ -85,7 +85,7 @@ class DuckDbSqlExpressionRenderer(DefaultSqlExpressionRenderer):
 
         return SqlExpressionRenderResult(
             sql=f"{function_str}({percentile}) WITHIN GROUP (ORDER BY ({arg_rendered.sql}))",
-            bind_parameters=params,
+            bind_parameter_set=params,
         )
 
 

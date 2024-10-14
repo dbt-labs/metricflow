@@ -6,7 +6,7 @@ from typing import Optional, Set, Union
 import pytest
 from dbt_semantic_interfaces.test_utils import as_datetime
 from metricflow_semantics.random_id import random_id
-from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
+from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
@@ -122,15 +122,15 @@ def test_dry_run_of_bad_query_raises_exception(sql_client: SqlClient) -> None:  
 
 
 def test_update_params_with_same_item() -> None:  # noqa: D103
-    bind_params0 = SqlBindParameters.create_from_dict({"key": "value"})
-    bind_params1 = SqlBindParameters.create_from_dict({"key": "value"})
+    bind_params0 = SqlBindParameterSet.create_from_dict({"key": "value"})
+    bind_params1 = SqlBindParameterSet.create_from_dict({"key": "value"})
 
     bind_params0.combine(bind_params1)
 
 
 def test_update_params_with_same_key_different_values() -> None:  # noqa: D103
-    bind_params0 = SqlBindParameters.create_from_dict(({"key": "value0"}))
-    bind_params1 = SqlBindParameters.create_from_dict(({"key": "value1"}))
+    bind_params0 = SqlBindParameterSet.create_from_dict(({"key": "value0"}))
+    bind_params1 = SqlBindParameterSet.create_from_dict(({"key": "value1"}))
 
     with pytest.raises(RuntimeError):
         bind_params0.combine(bind_params1)

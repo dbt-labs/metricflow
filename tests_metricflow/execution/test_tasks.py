@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.random_id import random_id
-from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
+from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
@@ -19,7 +19,7 @@ from tests_metricflow.sql.compare_data_table import assert_data_tables_equal
 
 
 def test_read_sql_task(sql_client: SqlClient) -> None:  # noqa: D103
-    task = SelectSqlQueryToDataTableTask.create(sql_client, SqlQuery("SELECT 1 AS foo", SqlBindParameters()))
+    task = SelectSqlQueryToDataTableTask.create(sql_client, SqlQuery("SELECT 1 AS foo", SqlBindParameterSet()))
     execution_plan = ExecutionPlan(leaf_tasks=[task], dag_id=DagId.from_str("plan0"))
 
     results = SequentialPlanExecutor().execute_plan(execution_plan)
@@ -46,7 +46,7 @@ def test_write_table_task(  # noqa: D103
         sql_client=sql_client,
         sql_query=SqlQuery(
             sql_query=f"CREATE TABLE {output_table.sql} AS SELECT 1 AS foo",
-            bind_parameters=SqlBindParameters(),
+            bind_parameter_set=SqlBindParameterSet(),
         ),
         output_table=output_table,
     )

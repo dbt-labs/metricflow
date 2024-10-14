@@ -17,7 +17,7 @@ from dbt_semantic_interfaces.type_enums.period_agg import PeriodAggregation
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagNode, DisplayedProperty
-from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
+from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.visitor import Visitable, VisitorOutputT
 from typing_extensions import override
 
@@ -47,13 +47,13 @@ class SqlExpressionNode(DagNode["SqlExpressionNode"], Visitable, ABC):
         pass
 
     @property
-    def bind_parameters(self) -> SqlBindParameters:
+    def bind_parameter_set(self) -> SqlBindParameterSet:
         """Execution parameters when running a query containing this expression.
 
         * See: https://docs.sqlalchemy.org/en/14/core/tutorial.html#using-textual-sql
         * Generally only defined for string expressions.
         """
-        return SqlBindParameters()
+        return SqlBindParameterSet()
 
     @property
     def as_column_reference_expression(self) -> Optional[SqlColumnReferenceExpression]:
@@ -239,7 +239,7 @@ class SqlStringExpression(SqlExpressionNode):
 
     Attributes:
         sql_expr: The SQL in string form.
-        bind_parameters: See SqlExpressionNode.bind_parameters
+        bind_parameter_set: See SqlExpressionNode.bind_parameter_set
         requires_parenthesis: Whether this should be rendered with () if nested in another expression.
         used_columns: If set, indicates that the expression represented by the string only uses those columns. e.g.
         sql_expr="a + b", used_columns=["a", "b"]. This may be used by optimizers, and if specified, it must be
@@ -247,21 +247,21 @@ class SqlStringExpression(SqlExpressionNode):
     """
 
     sql_expr: str
-    bind_parameters: SqlBindParameters = SqlBindParameters()
+    bind_parameter_set: SqlBindParameterSet = SqlBindParameterSet()
     requires_parenthesis: bool = True
     used_columns: Optional[Tuple[str, ...]] = None
 
     @staticmethod
     def create(  # noqa: D102
         sql_expr: str,
-        bind_parameters: SqlBindParameters = SqlBindParameters(),
+        bind_parameter_set: SqlBindParameterSet = SqlBindParameterSet(),
         requires_parenthesis: bool = True,
         used_columns: Optional[Tuple[str, ...]] = None,
     ) -> SqlStringExpression:
         return SqlStringExpression(
             parent_nodes=(),
             sql_expr=sql_expr,
-            bind_parameters=bind_parameters,
+            bind_parameter_set=bind_parameter_set,
             requires_parenthesis=requires_parenthesis,
             used_columns=used_columns,
         )
@@ -305,7 +305,7 @@ class SqlStringExpression(SqlExpressionNode):
         return (
             self.sql_expr == other.sql_expr
             and self.used_columns == other.used_columns
-            and self.bind_parameters == other.bind_parameters
+            and self.bind_parameter_set == other.bind_parameter_set
         )
 
     @property
@@ -344,8 +344,8 @@ class SqlStringLiteralExpression(SqlExpressionNode):
         return False
 
     @property
-    def bind_parameters(self) -> SqlBindParameters:  # noqa: D102
-        return SqlBindParameters()
+    def bind_parameter_set(self) -> SqlBindParameterSet:  # noqa: D102
+        return SqlBindParameterSet()
 
     def __repr__(self) -> str:  # noqa: D105
         return f"{self.__class__.__name__}(node_id={self.node_id}, literal_value={self.literal_value})"
@@ -1630,8 +1630,8 @@ class SqlGenerateUuidExpression(SqlExpressionNode):
         return False
 
     @property
-    def bind_parameters(self) -> SqlBindParameters:  # noqa: D102
-        return SqlBindParameters()
+    def bind_parameter_set(self) -> SqlBindParameterSet:  # noqa: D102
+        return SqlBindParameterSet()
 
     def __repr__(self) -> str:  # noqa: D105
         return f"{self.__class__.__name__}(node_id={self.node_id})"

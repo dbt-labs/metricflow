@@ -5,7 +5,7 @@ from typing import Collection
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from metricflow_semantics.errors.error_classes import UnsupportedEngineFeatureError
-from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
+from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from typing_extensions import override
 
 from metricflow.protocols.sql_client import SqlEngine
@@ -43,7 +43,7 @@ class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
         """Render a percentile expression for Redshift."""
         arg_rendered = self.render_sql_expr(node.order_by_arg)
-        params = arg_rendered.bind_parameters
+        params = arg_rendered.bind_parameter_set
         percentile = node.percentile_args.percentile
 
         if node.percentile_args.function_type is SqlPercentileFunctionType.CONTINUOUS:
@@ -65,7 +65,7 @@ class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
 
         return SqlExpressionRenderResult(
             sql=f"{function_str}({percentile}) WITHIN GROUP (ORDER BY ({arg_rendered.sql}))",
-            bind_parameters=params,
+            bind_parameter_set=params,
         )
 
     @override
@@ -90,7 +90,7 @@ class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
 
         return SqlExpressionRenderResult(
             sql=case_expr,
-            bind_parameters=extract_rendering_result.bind_parameters,
+            bind_parameter_set=extract_rendering_result.bind_parameter_set,
         )
 
     @override
@@ -104,7 +104,7 @@ class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         """
         return SqlExpressionRenderResult(
             sql="CONCAT(CAST(RANDOM()*100000000 AS INT)::VARCHAR,CAST(RANDOM()*100000000 AS INT)::VARCHAR)",
-            bind_parameters=SqlBindParameters(),
+            bind_parameter_set=SqlBindParameterSet(),
         )
 
 
