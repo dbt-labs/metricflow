@@ -91,9 +91,9 @@ class TrinoSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         rendered_end_expr = self.render_sql_expr(node.end_expr)
 
         bind_parameter_set = SqlBindParameterSet()
-        bind_parameter_set = bind_parameter_set.combine(rendered_column_arg.bind_parameter_set)
-        bind_parameter_set = bind_parameter_set.combine(rendered_start_expr.bind_parameter_set)
-        bind_parameter_set = bind_parameter_set.combine(rendered_end_expr.bind_parameter_set)
+        bind_parameter_set = bind_parameter_set.merge(rendered_column_arg.bind_parameter_set)
+        bind_parameter_set = bind_parameter_set.merge(rendered_start_expr.bind_parameter_set)
+        bind_parameter_set = bind_parameter_set.merge(rendered_end_expr.bind_parameter_set)
 
         # Handle timestamp literals differently.
         if parse(rendered_start_expr.sql):

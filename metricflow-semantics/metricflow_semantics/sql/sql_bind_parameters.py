@@ -6,8 +6,10 @@ from dataclasses import dataclass
 from typing import Any, Mapping, Optional, Tuple
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
+from typing_extensions import override
 
 from metricflow_semantics.assert_one_arg import assert_exactly_one_arg_set
+from metricflow_semantics.collection_helpers.merger import Mergeable
 from metricflow_semantics.sql.sql_column_type import SqlColumnType
 
 
@@ -74,7 +76,7 @@ class SqlBindParameter(SerializableDataclass):  # noqa: D101
 
 
 @dataclass(frozen=True)
-class SqlBindParameterSet(SerializableDataclass):
+class SqlBindParameterSet(SerializableDataclass, Mergeable):
     """Helps to build execution parameters during SQL query rendering.
 
     These can be used as per https://docs.sqlalchemy.org/en/14/core/tutorial.html#using-textual-sql
@@ -83,16 +85,22 @@ class SqlBindParameterSet(SerializableDataclass):
     # Using tuples for immutability as dicts are not.
     param_items: Tuple[SqlBindParameter, ...] = ()
 
-    def combine(self, additional_params: SqlBindParameterSet) -> SqlBindParameterSet:
-        """Create a new set of bind parameters that includes parameters from this and additional_params."""
-        if len(self.param_items) == 0:
-            return additional_params
+    @classmethod
+    @override
+    def empty_instance(cls) -> SqlBindParameterSet:
+        return SqlBindParameterSet()
 
-        if len(additional_params.param_items) == 0:
+    @override
+    def merge(self, other: SqlBindParameterSet) -> SqlBindParameterSet:
+        """Create a new set of bind parameters that includes parameters from this and other."""
+        if len(self.param_items) == 0:
+            return other
+
+        if len(other.param_items) == 0:
             return self
 
         self_dict = {item.key: item.value for item in self.param_items}
-        other_dict = {item.key: item.value for item in additional_params.param_items}
+        other_dict = {item.key: item.value for item in other.param_items}
 
         for key, value in other_dict.items():
             if key in self_dict and self_dict[key] != value:
@@ -102,7 +110,7 @@ class SqlBindParameterSet(SerializableDataclass):
                 )
         new_items = list(self.param_items)
         included_keys = set(item.key for item in new_items)
-        for item in additional_params.param_items:
+        for item in other.param_items:
             if item.key in included_keys:
                 continue
             new_items.append(item)

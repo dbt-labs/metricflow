@@ -143,10 +143,10 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         combined_params = SqlBindParameterSet()
 
         left_expr_rendered = self.render_sql_expr(node.left_expr)
-        combined_params = combined_params.combine(left_expr_rendered.bind_parameter_set)
+        combined_params = combined_params.merge(left_expr_rendered.bind_parameter_set)
 
         right_expr_rendered = self.render_sql_expr(node.right_expr)
-        combined_params = combined_params.combine(right_expr_rendered.bind_parameter_set)
+        combined_params = combined_params.merge(right_expr_rendered.bind_parameter_set)
 
         # To avoid issues with operator precedence, use parenthesis to group the left / right expressions if they
         # contain operators.
@@ -165,7 +165,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         args_rendered = [self.render_sql_expr(x) for x in node.sql_function_args]
         combined_params = SqlBindParameterSet()
         for arg_rendered in args_rendered:
-            combined_params = combined_params.combine(arg_rendered.bind_parameter_set)
+            combined_params = combined_params.merge(arg_rendered.bind_parameter_set)
 
         distinct_prefix = "DISTINCT " if SqlFunction.is_distinct_aggregation(node.sql_function) else ""
         args_string = ", ".join([x.sql for x in args_rendered])
@@ -202,7 +202,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         can_be_rendered_in_one_line = sum(len(x.expr.sql) for x in args_rendered) < 60
 
         for arg_rendered in args_rendered:
-            combined_parameters.combine(arg_rendered.expr.bind_parameter_set)
+            combined_parameters.merge(arg_rendered.expr.bind_parameter_set)
             arg_sql = self._render_logical_arg(
                 arg_rendered.expr, arg_rendered.requires_parenthesis, render_in_one_line=can_be_rendered_in_one_line
             )
@@ -329,8 +329,8 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         denominator_sql = f"CAST(NULLIF({rendered_denominator.sql}, 0) AS {self.double_data_type})"
 
         bind_parameter_set = SqlBindParameterSet()
-        bind_parameter_set = bind_parameter_set.combine(rendered_numerator.bind_parameter_set)
-        bind_parameter_set = bind_parameter_set.combine(rendered_denominator.bind_parameter_set)
+        bind_parameter_set = bind_parameter_set.merge(rendered_numerator.bind_parameter_set)
+        bind_parameter_set = bind_parameter_set.merge(rendered_denominator.bind_parameter_set)
 
         return SqlExpressionRenderResult(
             sql=f"{numerator_sql} / {denominator_sql}",
@@ -343,9 +343,9 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         rendered_end_expr = self.render_sql_expr(node.end_expr)
 
         bind_parameter_set = SqlBindParameterSet()
-        bind_parameter_set = bind_parameter_set.combine(rendered_column_arg.bind_parameter_set)
-        bind_parameter_set = bind_parameter_set.combine(rendered_start_expr.bind_parameter_set)
-        bind_parameter_set = bind_parameter_set.combine(rendered_end_expr.bind_parameter_set)
+        bind_parameter_set = bind_parameter_set.merge(rendered_column_arg.bind_parameter_set)
+        bind_parameter_set = bind_parameter_set.merge(rendered_start_expr.bind_parameter_set)
+        bind_parameter_set = bind_parameter_set.merge(rendered_end_expr.bind_parameter_set)
 
         return SqlExpressionRenderResult(
             sql=f"{rendered_column_arg.sql} BETWEEN {rendered_start_expr.sql} AND {rendered_end_expr.sql}",
@@ -366,7 +366,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         if order_by_args_rendered:
             args_rendered.extend(list(order_by_args_rendered.keys()))
         for arg_rendered in args_rendered:
-            combined_params = combined_params.combine(arg_rendered.bind_parameter_set)
+            combined_params = combined_params.merge(arg_rendered.bind_parameter_set)
 
         sql_function_args_string = ", ".join([x.sql for x in sql_function_args_rendered])
         window_string_lines: List[str] = []
