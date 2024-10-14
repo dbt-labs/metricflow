@@ -1,0 +1,17 @@
+Got errors while resolving the query.
+
+Error #1:
+  Message:
+
+    Your query contains the following group bys, which are SCDs or contain SCDs in the join path: ['listing__country'].
+
+    A query containing SCDs must also contain the metric_time dimension in order to join the SCD table to the valid time range. Please add metric_time to the query and try again. If you're using agg_time_dimension, use metric_time instead.
+
+  Query Input:
+
+    Query(['bookings'], ['listing__country']
+
+  Issue Location:
+
+    [Resolve Query(['bookings'])]
+      -> [Resolve Metric('bookings')]
