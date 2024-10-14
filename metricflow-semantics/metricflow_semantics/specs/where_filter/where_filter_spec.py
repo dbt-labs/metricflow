@@ -69,7 +69,7 @@ class WhereFilterSpec(Mergeable, SerializableDataclass):
 
         return WhereFilterSpec(
             where_sql=f"({self.where_sql}) AND ({other.where_sql})",
-            bind_parameters=self.bind_parameters.combine(other.bind_parameters),
+            bind_parameters=self.bind_parameters.merge(other.bind_parameters),
             linkable_spec_set=self.linkable_spec_set.merge(other.linkable_spec_set).dedupe(),
             linkable_element_unions=ordered_dedupe(self.linkable_element_unions, other.linkable_element_unions),
         )
