@@ -686,8 +686,9 @@ class DataflowPlanBuilder:
         """Builds a node to compute a metric of any type."""
         result = self._cache.get_build_any_metric_output_node_result(parameter_set)
         if result is not None:
+            logger.info(LazyFormat("Got cache hit", parameter_set=parameter_set))
             return result
-
+        logger.info(LazyFormat("Got cache miss", parameter_set=parameter_set))
         result = self._build_any_metric_output_node_non_cached(parameter_set)
         self._cache.set_build_any_metric_output_node_result(parameter_set, result)
         return result
