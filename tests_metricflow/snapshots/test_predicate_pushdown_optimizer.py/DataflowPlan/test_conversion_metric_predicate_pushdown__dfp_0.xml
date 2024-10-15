@@ -5,50 +5,54 @@
         <ComputeMetricsNode>
             <!-- description = 'Compute Metrics via Expressions' -->
             <!-- node_id = NodeId(id_str='cm_0') -->
-            <!-- metric_spec =                                                         -->
-            <!--   MetricSpec(                                                         -->
-            <!--     element_name='visit_buy_conversion_rate_7days',                   -->
-            <!--     filter_specs=(                                                    -->
-            <!--       WhereFilterSpec(                                                -->
-            <!--         where_sql="visit__referrer_id = '123456'",                    -->
-            <!--         bind_parameters=SqlBindParameters(),                          -->
-            <!--         linkable_element_unions=(                                     -->
-            <!--           LinkableElementUnion(                                       -->
-            <!--             linkable_dimension=LinkableDimension(                     -->
-            <!--               properties=(LOCAL,),                                    -->
-            <!--               defined_in_semantic_model=SemanticModelReference(       -->
-            <!--                 semantic_model_name='visits_source',                  -->
-            <!--               ),                                                      -->
-            <!--               element_name='referrer_id',                             -->
-            <!--               dimension_type=CATEGORICAL,                             -->
-            <!--               entity_links=(                                          -->
-            <!--                 EntityReference(                                      -->
-            <!--                   element_name='visit',                               -->
-            <!--                 ),                                                    -->
-            <!--               ),                                                      -->
-            <!--               join_path=SemanticModelJoinPath(                        -->
-            <!--                 left_semantic_model_reference=SemanticModelReference( -->
-            <!--                   semantic_model_name='visits_source',                -->
-            <!--                 ),                                                    -->
-            <!--               ),                                                      -->
-            <!--             ),                                                        -->
-            <!--           ),                                                          -->
-            <!--         ),                                                            -->
-            <!--         linkable_spec_set=LinkableSpecSet(                            -->
-            <!--           dimension_specs=(                                           -->
-            <!--             DimensionSpec(                                            -->
-            <!--               element_name='referrer_id',                             -->
-            <!--               entity_links=(                                          -->
-            <!--                 EntityReference(                                      -->
-            <!--                   element_name='visit',                               -->
-            <!--                 ),                                                    -->
-            <!--               ),                                                      -->
-            <!--             ),                                                        -->
-            <!--           ),                                                          -->
-            <!--         ),                                                            -->
-            <!--       ),                                                              -->
-            <!--     ),                                                                -->
-            <!--   )                                                                   -->
+            <!-- metric_spec =                                                           -->
+            <!--   MetricSpec(                                                           -->
+            <!--     element_name='visit_buy_conversion_rate_7days',                     -->
+            <!--     filter_spec_set=WhereFilterSpecSet(                                 -->
+            <!--       query_level_filter_specs=(                                        -->
+            <!--         WhereFilterSpec(                                                -->
+            <!--           where_sql="visit__referrer_id = '123456'",                    -->
+            <!--           bind_parameters=SqlBindParameters(),                          -->
+            <!--           linkable_element_unions=(                                     -->
+            <!--             LinkableElementUnion(                                       -->
+            <!--               linkable_dimension=LinkableDimension(                     -->
+            <!--                 properties=(                                            -->
+            <!--                   LOCAL,                                                -->
+            <!--                 ),                                                      -->
+            <!--                 defined_in_semantic_model=SemanticModelReference(       -->
+            <!--                   semantic_model_name='visits_source',                  -->
+            <!--                 ),                                                      -->
+            <!--                 element_name='referrer_id',                             -->
+            <!--                 dimension_type=CATEGORICAL,                             -->
+            <!--                 entity_links=(                                          -->
+            <!--                   EntityReference(                                      -->
+            <!--                     element_name='visit',                               -->
+            <!--                   ),                                                    -->
+            <!--                 ),                                                      -->
+            <!--                 join_path=SemanticModelJoinPath(                        -->
+            <!--                   left_semantic_model_reference=SemanticModelReference( -->
+            <!--                     semantic_model_name='visits_source',                -->
+            <!--                   ),                                                    -->
+            <!--                 ),                                                      -->
+            <!--               ),                                                        -->
+            <!--             ),                                                          -->
+            <!--           ),                                                            -->
+            <!--           linkable_spec_set=LinkableSpecSet(                            -->
+            <!--             dimension_specs=(                                           -->
+            <!--               DimensionSpec(                                            -->
+            <!--                 element_name='referrer_id',                             -->
+            <!--                 entity_links=(                                          -->
+            <!--                   EntityReference(                                      -->
+            <!--                     element_name='visit',                               -->
+            <!--                   ),                                                    -->
+            <!--                 ),                                                      -->
+            <!--               ),                                                        -->
+            <!--             ),                                                          -->
+            <!--           ),                                                            -->
+            <!--         ),                                                              -->
+            <!--       ),                                                                -->
+            <!--     ),                                                                  -->
+            <!--   )                                                                     -->
             <CombineAggregatedOutputsNode>
                 <!-- description = 'Combine Aggregated Outputs' -->
                 <!-- node_id = NodeId(id_str='cao_0') -->

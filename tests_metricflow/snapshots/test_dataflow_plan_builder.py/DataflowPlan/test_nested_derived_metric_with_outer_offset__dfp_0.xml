@@ -5,7 +5,7 @@
         <ComputeMetricsNode>
             <!-- description = 'Compute Metrics via Expressions' -->
             <!-- node_id = NodeId(id_str='cm_2') -->
-            <!-- metric_spec = MetricSpec(element_name='bookings_offset_twice') -->
+            <!-- metric_spec = MetricSpec(element_name='bookings_offset_twice', filter_spec_set=WhereFilterSpecSet()) -->
             <JoinToTimeSpineNode>
                 <!-- description = 'Join to Time Spine Dataset' -->
                 <!-- node_id = NodeId(id_str='jts_1') -->
@@ -27,6 +27,7 @@
                     <!-- metric_spec =                                                         -->
                     <!--   MetricSpec(                                                         -->
                     <!--     element_name='bookings_offset_once',                              -->
+                    <!--     filter_spec_set=WhereFilterSpecSet(),                             -->
                     <!--     offset_window=PydanticMetricTimeWindow(count=2, granularity=DAY), -->
                     <!--   )                                                                   -->
                     <ComputeMetricsNode>
@@ -35,6 +36,7 @@
                         <!-- metric_spec =                                                         -->
                         <!--   MetricSpec(                                                         -->
                         <!--     element_name='bookings',                                          -->
+                        <!--     filter_spec_set=WhereFilterSpecSet(),                             -->
                         <!--     offset_window=PydanticMetricTimeWindow(count=5, granularity=DAY), -->
                         <!--   )                                                                   -->
                         <AggregateMeasuresNode>

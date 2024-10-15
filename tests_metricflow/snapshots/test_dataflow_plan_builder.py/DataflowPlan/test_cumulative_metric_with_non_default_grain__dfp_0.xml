@@ -5,7 +5,8 @@
         <WindowReaggregationNode>
             <!-- description = 'Re-aggregate Metrics via Window Functions' -->
             <!-- node_id = NodeId(id_str='wr_0') -->
-            <!-- metric_spec = MetricSpec(element_name='trailing_2_months_revenue') -->
+            <!-- metric_spec =                                                                                -->
+            <!--   MetricSpec(element_name='trailing_2_months_revenue', filter_spec_set=WhereFilterSpecSet()) -->
             <!-- order_by_spec =                                                                 -->
             <!--   TimeDimensionSpec(                                                            -->
             <!--     element_name='metric_time',                                                 -->
@@ -21,7 +22,8 @@
             <ComputeMetricsNode>
                 <!-- description = 'Compute Metrics via Expressions' -->
                 <!-- node_id = NodeId(id_str='cm_0') -->
-                <!-- metric_spec = MetricSpec(element_name='trailing_2_months_revenue') -->
+                <!-- metric_spec =                                                                                -->
+                <!--   MetricSpec(element_name='trailing_2_months_revenue', filter_spec_set=WhereFilterSpecSet()) -->
                 <AggregateMeasuresNode>
                     <!-- description = 'Aggregate Measures' -->
                     <!-- node_id = NodeId(id_str='am_0') -->

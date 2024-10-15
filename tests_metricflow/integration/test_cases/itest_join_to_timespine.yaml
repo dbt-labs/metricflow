@@ -1,0 +1,41 @@
+integration_test:
+  name: test_constraint_on_measure_selected_in_group_by
+  description: Tests that the filter on measure is not re-applied even if selected in group by
+  model: SIMPLE_MODEL
+  metrics: ["instant_bookings_with_measure_filter"]
+  group_bys: ["metric_time__day", "booking__is_instant"]
+  where_filter: |
+    {{ render_time_constraint(render_time_dimension_template('metric_time', 'day'), start_time="2020-01-01") }}
+  check_query: |
+    SELECT
+      metric_time__day
+      , booking__is_instant
+      , bookings AS instant_bookings_with_measure_filter
+    FROM (
+      SELECT
+        t.ds AS metric_time__day
+        , b.booking__is_instant AS booking__is_instant
+        , b.bookings AS bookings
+      FROM {{ source_schema }}.mf_time_spine t
+      LEFT OUTER JOIN (
+        SELECT
+          metric_time__day
+          , booking__is_instant
+          , SUM(bookings) AS bookings
+        FROM (
+          SELECT
+            {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
+            , listing_id AS listing
+            , is_instant AS booking__is_instant
+            , 1 AS bookings
+          FROM {{ source_schema }}.fct_bookings b
+        ) d
+        WHERE booking__is_instant AND listing IS NOT NULL AND {{ render_time_constraint("metric_time__day", start_time="2020-01-01") }}
+        GROUP BY
+          metric_time__day
+          , booking__is_instant
+      ) b
+      ON
+        t.ds = b.metric_time__day
+    ) c
+    WHERE {{ render_time_constraint("metric_time__day", start_time="2020-01-01") }}

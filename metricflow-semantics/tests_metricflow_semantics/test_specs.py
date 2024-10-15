@@ -9,10 +9,14 @@ from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec, LinklessEntitySpec
 from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
+from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.measure_spec import MeasureSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
+from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
+from metricflow_semantics.specs.where_filter.where_filter_spec_set import WhereFilterSpecSet
+from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 
@@ -212,3 +216,115 @@ def test_linkless_entity() -> None:
 
     set_with_entity_spec.add(linkless_entity_spec)
     assert len(set_with_entity_spec) == 1
+
+
+@pytest.fixture
+def where_filter_spec_set() -> WhereFilterSpecSet:  # noqa: D103
+    return WhereFilterSpecSet(
+        measure_level_filter_specs=(
+            WhereFilterSpec(
+                where_sql="measure is true",
+                bind_parameters=SqlBindParameters(),
+                linkable_element_unions=(),
+                linkable_spec_set=LinkableSpecSet(),
+            ),
+        ),
+        metric_level_filter_specs=(
+            WhereFilterSpec(
+                where_sql="metric is true",
+                bind_parameters=SqlBindParameters(),
+                linkable_element_unions=(),
+                linkable_spec_set=LinkableSpecSet(),
+            ),
+        ),
+        query_level_filter_specs=(
+            WhereFilterSpec(
+                where_sql="query is true",
+                bind_parameters=SqlBindParameters(),
+                linkable_element_unions=(),
+                linkable_spec_set=LinkableSpecSet(),
+            ),
+        ),
+    )
+
+
+def test_where_filter_spec_set_all_specs(where_filter_spec_set: WhereFilterSpecSet) -> None:  # noqa: D103
+    assert set(where_filter_spec_set.all_filter_specs) == {
+        WhereFilterSpec(
+            where_sql="measure is true",
+            bind_parameters=SqlBindParameters(),
+            linkable_element_unions=(),
+            linkable_spec_set=LinkableSpecSet(),
+        ),
+        WhereFilterSpec(
+            where_sql="metric is true",
+            bind_parameters=SqlBindParameters(),
+            linkable_element_unions=(),
+            linkable_spec_set=LinkableSpecSet(),
+        ),
+        WhereFilterSpec(
+            where_sql="query is true",
+            bind_parameters=SqlBindParameters(),
+            linkable_element_unions=(),
+            linkable_spec_set=LinkableSpecSet(),
+        ),
+    }
+
+
+def test_where_filter_spec_set_post_aggregation_specs(where_filter_spec_set: WhereFilterSpecSet) -> None:  # noqa: D103
+    assert set(where_filter_spec_set.after_measure_aggregation_filter_specs) == {
+        WhereFilterSpec(
+            where_sql="metric is true",
+            bind_parameters=SqlBindParameters(),
+            linkable_element_unions=(),
+            linkable_spec_set=LinkableSpecSet(),
+        ),
+        WhereFilterSpec(
+            where_sql="query is true",
+            bind_parameters=SqlBindParameters(),
+            linkable_element_unions=(),
+            linkable_spec_set=LinkableSpecSet(),
+        ),
+    }
+
+
+def test_where_filter_spec_set_merge(where_filter_spec_set: WhereFilterSpecSet) -> None:  # noqa: D103
+    spec_set1 = WhereFilterSpecSet(
+        measure_level_filter_specs=(
+            WhereFilterSpec(
+                where_sql="measure is true",
+                bind_parameters=SqlBindParameters(),
+                linkable_element_unions=(),
+                linkable_spec_set=LinkableSpecSet(),
+            ),
+        ),
+    )
+    spec_set2 = WhereFilterSpecSet(
+        metric_level_filter_specs=(
+            WhereFilterSpec(
+                where_sql="metric is true",
+                bind_parameters=SqlBindParameters(),
+                linkable_element_unions=(),
+                linkable_spec_set=LinkableSpecSet(),
+            ),
+        ),
+    )
+
+    assert spec_set1.merge(spec_set2) == WhereFilterSpecSet(
+        measure_level_filter_specs=(
+            WhereFilterSpec(
+                where_sql="measure is true",
+                bind_parameters=SqlBindParameters(),
+                linkable_element_unions=(),
+                linkable_spec_set=LinkableSpecSet(),
+            ),
+        ),
+        metric_level_filter_specs=(
+            WhereFilterSpec(
+                where_sql="metric is true",
+                bind_parameters=SqlBindParameters(),
+                linkable_element_unions=(),
+                linkable_spec_set=LinkableSpecSet(),
+            ),
+        ),
+    )

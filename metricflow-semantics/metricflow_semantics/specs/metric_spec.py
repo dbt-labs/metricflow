@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional, Tuple
+from typing import Optional
 
 from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
 from dbt_semantic_interfaces.references import MetricReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 
 from metricflow_semantics.specs.instance_spec import InstanceSpec, InstanceSpecVisitor
-from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
+from metricflow_semantics.specs.where_filter.where_filter_spec_set import WhereFilterSpecSet
 from metricflow_semantics.visitor import VisitorOutputT
 
 
@@ -16,7 +16,7 @@ from metricflow_semantics.visitor import VisitorOutputT
 class MetricSpec(InstanceSpec):  # noqa: D101
     # Time-over-time could go here
     element_name: str
-    filter_specs: Tuple[WhereFilterSpec, ...] = ()
+    filter_spec_set: WhereFilterSpecSet = WhereFilterSpecSet()
     alias: Optional[str] = None
     offset_window: Optional[PydanticMetricTimeWindow] = None
     offset_to_grain: Optional[TimeGranularity] = None
@@ -48,4 +48,4 @@ class MetricSpec(InstanceSpec):  # noqa: D101
 
     def without_offset(self) -> MetricSpec:
         """Represents the metric spec with any time offsets removed."""
-        return MetricSpec(element_name=self.element_name, filter_specs=self.filter_specs, alias=self.alias)
+        return MetricSpec(element_name=self.element_name, filter_spec_set=self.filter_spec_set, alias=self.alias)

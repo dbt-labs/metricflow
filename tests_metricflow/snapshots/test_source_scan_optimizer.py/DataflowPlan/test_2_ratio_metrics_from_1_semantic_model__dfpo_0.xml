@@ -5,14 +5,14 @@
         <ComputeMetricsNode>
             <!-- description = 'Compute Metrics via Expressions' -->
             <!-- node_id = NodeId(id_str='cm_14') -->
-            <!-- metric_spec = MetricSpec(element_name='bookings_per_booker') -->
-            <!-- metric_spec = MetricSpec(element_name='bookings_per_dollar') -->
+            <!-- metric_spec = MetricSpec(element_name='bookings_per_booker', filter_spec_set=WhereFilterSpecSet()) -->
+            <!-- metric_spec = MetricSpec(element_name='bookings_per_dollar', filter_spec_set=WhereFilterSpecSet()) -->
             <ComputeMetricsNode>
                 <!-- description = 'Compute Metrics via Expressions' -->
                 <!-- node_id = NodeId(id_str='cm_13') -->
-                <!-- metric_spec = MetricSpec(element_name='bookings') -->
-                <!-- metric_spec = MetricSpec(element_name='bookers') -->
-                <!-- metric_spec = MetricSpec(element_name='booking_value') -->
+                <!-- metric_spec = MetricSpec(element_name='bookings', filter_spec_set=WhereFilterSpecSet()) -->
+                <!-- metric_spec = MetricSpec(element_name='bookers', filter_spec_set=WhereFilterSpecSet()) -->
+                <!-- metric_spec = MetricSpec(element_name='booking_value', filter_spec_set=WhereFilterSpecSet()) -->
                 <AggregateMeasuresNode>
                     <!-- description = 'Aggregate Measures' -->
                     <!-- node_id = NodeId(id_str='am_9') -->
