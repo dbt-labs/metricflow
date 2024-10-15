@@ -641,6 +641,17 @@ metric:
   filter: "{{ Entity('listing') }} IS NOT NULL"
 ---
 metric:
+  name: bookings_join_to_time_spine_with_tiered_filters
+  description: simple metric that joins to timespine and has metric_time filters at both the measure and metric level
+  type: simple
+  type_params:
+    measure:
+      name: bookings
+      join_to_timespine: true
+      filter: "{{ TimeDimension('metric_time', 'day') }} >= '2020-01-02'"
+  filter: "{{ TimeDimension('metric_time', 'day') }} <= '2020-01-02'"
+---
+metric:
   name: every_two_days_bookers_fill_nulls_with_0
   description: cumulative metric filling 0
   type: cumulative
