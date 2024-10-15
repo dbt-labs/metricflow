@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from functools import lru_cache
-from typing import List, Sequence
+from typing import List, Sequence, Tuple
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
@@ -14,6 +13,7 @@ from dbt_semantic_interfaces.references import (
 from dbt_semantic_interfaces.type_enums import MetricType
 from typing_extensions import override
 
+from metricflow_semantics.collection_helpers.lru_cache import LruCache
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow_semantics.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
@@ -65,9 +65,22 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
                 custom_granularities=self._manifest_lookup.custom_granularities,
             )
         )
+        self._query_items_analysis_cache: LruCache[
+            Tuple[ResolverInputForQuery, MetricReference], QueryItemsAnalysis
+        ] = LruCache(128)
 
-    @lru_cache
     def _get_query_items_analysis(
+        self, query_resolver_input: ResolverInputForQuery, metric_reference: MetricReference
+    ) -> QueryItemsAnalysis:
+        cache_key = (query_resolver_input, metric_reference)
+        result = self._query_items_analysis_cache.get(cache_key)
+        if result is not None:
+            return result
+        result = self._uncached_query_items_analysis(query_resolver_input, metric_reference)
+        self._query_items_analysis_cache.set(cache_key, result)
+        return result
+
+    def _uncached_query_items_analysis(
         self, query_resolver_input: ResolverInputForQuery, metric_reference: MetricReference
     ) -> QueryItemsAnalysis:
         has_agg_time_dimension = False
