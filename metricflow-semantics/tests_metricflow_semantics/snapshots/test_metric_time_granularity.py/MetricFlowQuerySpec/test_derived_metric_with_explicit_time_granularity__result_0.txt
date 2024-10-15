@@ -1,5 +1,5 @@
 MetricFlowQuerySpec(
-  metric_specs=(MetricSpec(element_name='derived_metric_with_time_granularity'),),
+  metric_specs=(MetricSpec(element_name='derived_metric_with_time_granularity', filter_spec_set=WhereFilterSpecSet()),),
   time_dimension_specs=(
     TimeDimensionSpec(
       element_name='metric_time',

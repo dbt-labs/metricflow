@@ -55,6 +55,7 @@ logger = logging.getLogger(__name__)
 
 
 TEST_DIRECTORY = "tests_metricflow"
+MF_SEMANTICS_TEST_DIRECTORY = "metricflow-semantics/tests_metricflow_semantics"
 
 
 class MetricFlowTestCredentialSet(FrozenBaseModel):  # noqa: D101
@@ -142,6 +143,10 @@ def run_tests(test_configuration: MetricFlowTestConfiguration) -> None:  # noqa:
     if test_configuration.engine is SqlEngine.DUCKDB:
         # DuckDB is fast, so generate all snapshots, including the engine-agnostic ones
         run_command(f"pytest -x -vv -n 4 --overwrite-snapshots -k 'not itest' {TEST_DIRECTORY}")
+
+        # Run snapshots changes for metricflow-semantics
+        # these are not dialect specific, so only need to run once
+        run_command(f"pytest -x -vv -n 4 --overwrite-snapshots {MF_SEMANTICS_TEST_DIRECTORY}")
     elif (
         test_configuration.engine is SqlEngine.REDSHIFT
         or test_configuration.engine is SqlEngine.SNOWFLAKE
