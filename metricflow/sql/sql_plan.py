@@ -74,6 +74,10 @@ class SqlQueryPlanNodeVisitor(Generic[VisitorOutputT], ABC):
     def visit_create_table_as_node(self, node: SqlCreateTableAsNode) -> VisitorOutputT:  # noqa: D102
         raise NotImplementedError
 
+    @abstractmethod
+    def visit_cte_node(self, node: SqlCteNode) -> VisitorOutputT:  # noqa: D102
+        raise NotImplementedError
+
 
 @dataclass(frozen=True)
 class SqlSelectColumn:
@@ -121,6 +125,7 @@ class SqlSelectStatementNode(SqlQueryPlanNode):
     select_columns: Tuple[SqlSelectColumn, ...]
     from_source: SqlQueryPlanNode
     from_source_alias: str
+    cte_sources: Tuple[SqlCteNode, ...]
     join_descs: Tuple[SqlJoinDescription, ...]
     group_bys: Tuple[SqlSelectColumn, ...]
     order_bys: Tuple[SqlOrderByDescription, ...]
@@ -134,6 +139,7 @@ class SqlSelectStatementNode(SqlQueryPlanNode):
         select_columns: Tuple[SqlSelectColumn, ...],
         from_source: SqlQueryPlanNode,
         from_source_alias: str,
+        cte_sources: Tuple[SqlCteNode, ...] = (),
         join_descs: Tuple[SqlJoinDescription, ...] = (),
         group_bys: Tuple[SqlSelectColumn, ...] = (),
         order_bys: Tuple[SqlOrderByDescription, ...] = (),
@@ -141,13 +147,14 @@ class SqlSelectStatementNode(SqlQueryPlanNode):
         limit: Optional[int] = None,
         distinct: bool = False,
     ) -> SqlSelectStatementNode:
-        parent_nodes = [from_source] + [x.right_source for x in join_descs]
+        parent_nodes = (from_source,) + tuple(x.right_source for x in join_descs) + cte_sources
         return SqlSelectStatementNode(
-            parent_nodes=tuple(parent_nodes),
+            parent_nodes=parent_nodes,
             _description=description,
             select_columns=select_columns,
             from_source=from_source,
             from_source_alias=from_source_alias,
+            cte_sources=cte_sources,
             join_descs=join_descs,
             group_bys=group_bys,
             order_bys=order_bys,
@@ -334,3 +341,43 @@ class SqlQueryPlan(MetricFlowDag[SqlQueryPlanNode]):
     @property
     def render_node(self) -> SqlQueryPlanNode:  # noqa: D102
         return self._render_node
+
+
+@dataclass(frozen=True)
+class SqlCteNode(SqlQueryPlanNode):
+    """Represents a single common table expression."""
+
+    select_statement: SqlSelectStatementNode
+    cte_alias: str
+
+    @staticmethod
+    def create(select_statement: SqlSelectStatementNode, cte_alias: str) -> SqlCteNode:  # noqa: D102
+        return SqlCteNode(
+            parent_nodes=(select_statement,),
+            select_statement=select_statement,
+            cte_alias=cte_alias,
+        )
+
+    @override
+    def accept(self, visitor: SqlQueryPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:
+        return visitor.visit_cte_node(self)
+
+    @property
+    @override
+    def is_table(self) -> bool:
+        return False
+
+    @property
+    @override
+    def as_select_node(self) -> Optional[SqlSelectStatementNode]:
+        return None
+
+    @property
+    @override
+    def description(self) -> str:
+        return "CTE"
+
+    @classmethod
+    @override
+    def id_prefix(cls) -> IdPrefix:
+        return StaticIdPrefix.SQL_PLAN_COMMON_TABLE_EXPRESSION_ID_PREFIX

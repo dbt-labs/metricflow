@@ -9,6 +9,7 @@ from typing import List, Optional, Sequence
 
 from metricflow_semantics.mf_logging.formatting import indent
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
+from typing_extensions import override
 
 from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
@@ -19,6 +20,7 @@ from metricflow.sql.render.rendering_constants import SqlRenderingConstants
 from metricflow.sql.sql_exprs import SqlExpressionNode
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
+    SqlCteNode,
     SqlJoinDescription,
     SqlOrderByDescription,
     SqlQueryPlan,
@@ -84,6 +86,44 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
             return None
         description_lines = [f"-- {x}" for x in description.split("\n") if x]
         return SqlPlanRenderResult("\n".join(description_lines), SqlBindParameterSet())
+
+    @override
+    def visit_cte_node(self, node: SqlCteNode) -> SqlPlanRenderResult:
+        lines = []
+        collected_bind_parameters = []
+        lines.append(f"{node.cte_alias} AS (")
+        select_statement_render_result = node.select_statement.accept(self)
+        lines.append(indent(select_statement_render_result.sql, indent_prefix=SqlRenderingConstants.INDENT))
+        collected_bind_parameters.append(select_statement_render_result.bind_parameter_set)
+        lines.append(")")
+
+        return SqlPlanRenderResult(
+            sql="\n".join(lines), bind_parameter_set=SqlBindParameterSet.merge_iterable(collected_bind_parameters)
+        )
+
+    def _render_cte_sections(self, cte_nodes: Sequence[SqlCteNode]) -> Optional[SqlPlanRenderResult]:
+        """Convert the CTEs into a series of `WITH` clauses.
+
+        e.g.
+            WITH cte_alias_0 AS (
+                ...
+            )
+            cte_alias_1 AS (
+                ...
+            )
+            ...
+        """
+        if len(cte_nodes) == 0:
+            return None
+
+        cte_render_results = tuple(self.visit_cte_node(cte_node) for cte_node in cte_nodes)
+
+        return SqlPlanRenderResult(
+            sql="WITH " + "\n, ".join(cte_render_result.sql + "\n" for cte_render_result in cte_render_results),
+            bind_parameter_set=SqlBindParameterSet.merge_iterable(
+                [cte_render_result.bind_parameter_set for cte_render_result in cte_render_results]
+            ),
+        )
 
     def _render_select_columns_section(
         self,
@@ -285,6 +325,7 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
     def visit_select_statement_node(self, node: SqlSelectStatementNode) -> SqlPlanRenderResult:  # noqa: D102
         render_results = [
             self._render_description_section(node.description),
+            self._render_cte_sections(node.cte_sources),
             self._render_select_columns_section(node.select_columns, len(node.parent_nodes), node.distinct),
             self._render_from_section(node.from_source, node.from_source_alias),
             self._render_joins_section(node.join_descs),

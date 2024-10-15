@@ -3,10 +3,13 @@ from __future__ import annotations
 import logging
 from typing import List, Optional
 
+from typing_extensions import override
+
 from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
 from metricflow.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
+    SqlCteNode,
     SqlJoinDescription,
     SqlOrderByDescription,
     SqlQueryPlanNode,
@@ -120,6 +123,10 @@ class SqlSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
                 if column_reference_expr:
                     return column_reference_expr.col_ref.table_alias
         return None
+
+    @override
+    def visit_cte_node(self, node: SqlCteNode) -> SqlQueryPlanNode:
+        raise NotImplementedError
 
     def visit_select_statement_node(self, node: SqlSelectStatementNode) -> SqlQueryPlanNode:  # noqa: D102
         node_with_reduced_parents = self._reduce_parents(node)
