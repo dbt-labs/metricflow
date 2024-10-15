@@ -1,5 +1,5 @@
 MetricFlowQuerySpec(
-  metric_specs=(MetricSpec(element_name='entity_1_metric'),),
+  metric_specs=(MetricSpec(element_name='entity_1_metric', filter_spec_set=WhereFilterSpecSet()),),
   dimension_specs=(
     DimensionSpec(
       element_name='country',

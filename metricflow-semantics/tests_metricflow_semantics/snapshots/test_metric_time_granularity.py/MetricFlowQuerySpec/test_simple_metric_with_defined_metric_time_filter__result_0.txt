@@ -1,5 +1,10 @@
 MetricFlowQuerySpec(
-  metric_specs=(MetricSpec(element_name='simple_metric_with_default_time_granularity_and_metric_time_filter'),),
+  metric_specs=(
+    MetricSpec(
+      element_name='simple_metric_with_default_time_granularity_and_metric_time_filter',
+      filter_spec_set=WhereFilterSpecSet(),
+    ),
+  ),
   filter_intersection=PydanticWhereFilterIntersection(),
   filter_spec_resolution_lookup=FilterSpecResolutionLookUp(
     spec_resolutions=(

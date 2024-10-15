@@ -1,5 +1,5 @@
 MetricFlowQuerySpec(
-  metric_specs=(MetricSpec(element_name='monthly_metric_0'),),
+  metric_specs=(MetricSpec(element_name='monthly_metric_0', filter_spec_set=WhereFilterSpecSet()),),
   time_dimension_specs=(
     TimeDimensionSpec(
       element_name='metric_time',

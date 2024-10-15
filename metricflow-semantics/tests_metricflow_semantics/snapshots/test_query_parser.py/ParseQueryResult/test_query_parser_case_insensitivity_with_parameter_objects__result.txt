@@ -1,6 +1,6 @@
 ParseQueryResult(
   query_spec=MetricFlowQuerySpec(
-    metric_specs=(MetricSpec(element_name='bookings'),),
+    metric_specs=(MetricSpec(element_name='bookings', filter_spec_set=WhereFilterSpecSet()),),
     dimension_specs=(
       DimensionSpec(
         element_name='is_instant',
@@ -25,7 +25,13 @@ ParseQueryResult(
         ),
         descending=False,
       ),
-      OrderBySpec(instance_spec=MetricSpec(element_name='bookings'), descending=True),
+      OrderBySpec(
+        instance_spec=MetricSpec(
+          element_name='bookings',
+          filter_spec_set=WhereFilterSpecSet(),
+        ),
+        descending=True,
+      ),
     ),
     filter_intersection=PydanticWhereFilterIntersection(),
     filter_spec_resolution_lookup=FilterSpecResolutionLookUp(),
