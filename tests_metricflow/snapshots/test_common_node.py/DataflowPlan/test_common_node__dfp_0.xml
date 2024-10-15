@@ -1,0 +1,257 @@
+<DataflowPlan>
+    <WriteToResultDataTableNode>
+        <!-- description = 'Write to DataTable' -->
+        <!-- node_id = NodeId(id_str='wrd_0') -->
+        <ComputeMetricsNode>
+            <!-- description = 'Compute Metrics via Expressions' -->
+            <!-- node_id = NodeId(id_str='cm_2') -->
+            <!-- metric_spec = MetricSpec(element_name='instant_booking_value_ratio') -->
+            <CombineAggregatedOutputsNode>
+                <!-- description = 'Combine Aggregated Outputs' -->
+                <!-- node_id = NodeId(id_str='cao_0') -->
+                <ComputeMetricsNode>
+                    <!-- description = 'Compute Metrics via Expressions' -->
+                    <!-- node_id = NodeId(id_str='cm_0') -->
+                    <!-- metric_spec =                                                         -->
+                    <!--   MetricSpec(                                                         -->
+                    <!--     element_name='booking_value',                                     -->
+                    <!--     filter_specs=(                                                    -->
+                    <!--       WhereFilterSpec(                                                -->
+                    <!--         where_sql='booking__is_instant',                              -->
+                    <!--         bind_parameters=SqlBindParameterSet(),                        -->
+                    <!--         linkable_element_unions=(                                     -->
+                    <!--           LinkableElementUnion(                                       -->
+                    <!--             linkable_dimension=LinkableDimension(                     -->
+                    <!--               properties=(LOCAL,),                                    -->
+                    <!--               defined_in_semantic_model=SemanticModelReference(       -->
+                    <!--                 semantic_model_name='bookings_source',                -->
+                    <!--               ),                                                      -->
+                    <!--               element_name='is_instant',                              -->
+                    <!--               dimension_type=CATEGORICAL,                             -->
+                    <!--               entity_links=(                                          -->
+                    <!--                 EntityReference(                                      -->
+                    <!--                   element_name='booking',                             -->
+                    <!--                 ),                                                    -->
+                    <!--               ),                                                      -->
+                    <!--               join_path=SemanticModelJoinPath(                        -->
+                    <!--                 left_semantic_model_reference=SemanticModelReference( -->
+                    <!--                   semantic_model_name='bookings_source',              -->
+                    <!--                 ),                                                    -->
+                    <!--               ),                                                      -->
+                    <!--             ),                                                        -->
+                    <!--           ),                                                          -->
+                    <!--         ),                                                            -->
+                    <!--         linkable_spec_set=LinkableSpecSet(                            -->
+                    <!--           dimension_specs=(                                           -->
+                    <!--             DimensionSpec(                                            -->
+                    <!--               element_name='is_instant',                              -->
+                    <!--               entity_links=(                                          -->
+                    <!--                 EntityReference(                                      -->
+                    <!--                   element_name='booking',                             -->
+                    <!--                 ),                                                    -->
+                    <!--               ),                                                      -->
+                    <!--             ),                                                        -->
+                    <!--           ),                                                          -->
+                    <!--         ),                                                            -->
+                    <!--       ),                                                              -->
+                    <!--     ),                                                                -->
+                    <!--     alias='booking_value_with_is_instant_constraint',                 -->
+                    <!--   )                                                                   -->
+                    <AggregateMeasuresNode>
+                        <!-- description = 'Aggregate Measures' -->
+                        <!-- node_id = NodeId(id_str='am_0') -->
+                        <FilterElementsNode>
+                            <!-- description = "Pass Only Elements: ['booking_value', 'listing__country_latest']" -->
+                            <!-- node_id = NodeId(id_str='pfe_3') -->
+                            <!-- include_spec = MeasureSpec(element_name='booking_value') -->
+                            <!-- include_spec =                                               -->
+                            <!--   DimensionSpec(                                             -->
+                            <!--     element_name='country_latest',                           -->
+                            <!--     entity_links=(EntityReference(element_name='listing'),), -->
+                            <!--   )                                                          -->
+                            <!-- distinct = False -->
+                            <WhereConstraintNode>
+                                <!-- description = 'Constrain Output with WHERE' -->
+                                <!-- node_id = NodeId(id_str='wcc_0') -->
+                                <!-- where_condition =                                                 -->
+                                <!--   WhereFilterSpec(                                                -->
+                                <!--     where_sql='booking__is_instant',                              -->
+                                <!--     bind_parameters=SqlBindParameterSet(),                        -->
+                                <!--     linkable_element_unions=(                                     -->
+                                <!--       LinkableElementUnion(                                       -->
+                                <!--         linkable_dimension=LinkableDimension(                     -->
+                                <!--           properties=(LOCAL,),                                    -->
+                                <!--           defined_in_semantic_model=SemanticModelReference(       -->
+                                <!--             semantic_model_name='bookings_source',                -->
+                                <!--           ),                                                      -->
+                                <!--           element_name='is_instant',                              -->
+                                <!--           dimension_type=CATEGORICAL,                             -->
+                                <!--           entity_links=(                                          -->
+                                <!--             EntityReference(                                      -->
+                                <!--               element_name='booking',                             -->
+                                <!--             ),                                                    -->
+                                <!--           ),                                                      -->
+                                <!--           join_path=SemanticModelJoinPath(                        -->
+                                <!--             left_semantic_model_reference=SemanticModelReference( -->
+                                <!--               semantic_model_name='bookings_source',              -->
+                                <!--             ),                                                    -->
+                                <!--           ),                                                      -->
+                                <!--         ),                                                        -->
+                                <!--       ),                                                          -->
+                                <!--     ),                                                            -->
+                                <!--     linkable_spec_set=LinkableSpecSet(                            -->
+                                <!--       dimension_specs=(                                           -->
+                                <!--         DimensionSpec(                                            -->
+                                <!--           element_name='is_instant',                              -->
+                                <!--           entity_links=(                                          -->
+                                <!--             EntityReference(                                      -->
+                                <!--               element_name='booking',                             -->
+                                <!--             ),                                                    -->
+                                <!--           ),                                                      -->
+                                <!--         ),                                                        -->
+                                <!--       ),                                                          -->
+                                <!--     ),                                                            -->
+                                <!--   )                                                               -->
+                                <FilterElementsNode>
+                                    <!-- description =                                                          -->
+                                    <!--   ("Pass Only Elements: ['booking_value', 'listing__country_latest', " -->
+                                    <!--    "'booking__is_instant']")                                           -->
+                                    <!-- node_id = NodeId(id_str='pfe_2') -->
+                                    <!-- include_spec = MeasureSpec(element_name='booking_value') -->
+                                    <!-- include_spec =                                               -->
+                                    <!--   DimensionSpec(                                             -->
+                                    <!--     element_name='country_latest',                           -->
+                                    <!--     entity_links=(EntityReference(element_name='listing'),), -->
+                                    <!--   )                                                          -->
+                                    <!-- include_spec =                                               -->
+                                    <!--   DimensionSpec(                                             -->
+                                    <!--     element_name='is_instant',                               -->
+                                    <!--     entity_links=(EntityReference(element_name='booking'),), -->
+                                    <!--   )                                                          -->
+                                    <!-- distinct = False -->
+                                    <JoinOnEntitiesNode>
+                                        <!-- description = 'Join Standard Outputs' -->
+                                        <!-- node_id = NodeId(id_str='jso_0') -->
+                                        <!-- join0_for_node_id_pfe_1 =                                      -->
+                                        <!--   JoinDescription(                                             -->
+                                        <!--     join_node=FilterElementsNode(node_id=pfe_1),               -->
+                                        <!--     join_on_entity=LinklessEntitySpec(element_name='listing'), -->
+                                        <!--     join_type=LEFT_OUTER,                                      -->
+                                        <!--   )                                                            -->
+                                        <FilterElementsNode>
+                                            <!-- description =                                                      -->
+                                            <!--   ("Pass Only Elements: ['booking_value', 'booking__is_instant', " -->
+                                            <!--    "'listing']")                                                   -->
+                                            <!-- node_id = NodeId(id_str='pfe_0') -->
+                                            <!-- include_spec = MeasureSpec(element_name='booking_value') -->
+                                            <!-- include_spec =                                               -->
+                                            <!--   DimensionSpec(                                             -->
+                                            <!--     element_name='is_instant',                               -->
+                                            <!--     entity_links=(EntityReference(element_name='booking'),), -->
+                                            <!--   )                                                          -->
+                                            <!-- include_spec = LinklessEntitySpec(element_name='listing') -->
+                                            <!-- distinct = False -->
+                                            <MetricTimeDimensionTransformNode>
+                                                <!-- description = "Metric Time Dimension 'ds'" -->
+                                                <!-- node_id = NodeId(id_str='sma_28009') -->
+                                                <!-- aggregation_time_dimension = 'ds' -->
+                                                <ReadSqlSourceNode>
+                                                    <!-- description =                                         -->
+                                                    <!--   "Read From SemanticModelDataSet('bookings_source')" -->
+                                                    <!-- node_id = NodeId(id_str='rss_28020') -->
+                                                    <!-- data_set = SemanticModelDataSet('bookings_source') -->
+                                                </ReadSqlSourceNode>
+                                            </MetricTimeDimensionTransformNode>
+                                        </FilterElementsNode>
+                                        <FilterElementsNode>
+                                            <!-- description = "Pass Only Elements: ['country_latest', 'listing']" -->
+                                            <!-- node_id = NodeId(id_str='pfe_1') -->
+                                            <!-- include_spec = DimensionSpec(element_name='country_latest') -->
+                                            <!-- include_spec = LinklessEntitySpec(element_name='listing') -->
+                                            <!-- distinct = False -->
+                                            <MetricTimeDimensionTransformNode>
+                                                <!-- description = "Metric Time Dimension 'ds'" -->
+                                                <!-- node_id = NodeId(id_str='sma_28013') -->
+                                                <!-- aggregation_time_dimension = 'ds' -->
+                                                <ReadSqlSourceNode>
+                                                    <!-- description =                                         -->
+                                                    <!--   "Read From SemanticModelDataSet('listings_latest')" -->
+                                                    <!-- node_id = NodeId(id_str='rss_28024') -->
+                                                    <!-- data_set = SemanticModelDataSet('listings_latest') -->
+                                                </ReadSqlSourceNode>
+                                            </MetricTimeDimensionTransformNode>
+                                        </FilterElementsNode>
+                                    </JoinOnEntitiesNode>
+                                </FilterElementsNode>
+                            </WhereConstraintNode>
+                        </FilterElementsNode>
+                    </AggregateMeasuresNode>
+                </ComputeMetricsNode>
+                <ComputeMetricsNode>
+                    <!-- description = 'Compute Metrics via Expressions' -->
+                    <!-- node_id = NodeId(id_str='cm_1') -->
+                    <!-- metric_spec = MetricSpec(element_name='booking_value') -->
+                    <AggregateMeasuresNode>
+                        <!-- description = 'Aggregate Measures' -->
+                        <!-- node_id = NodeId(id_str='am_1') -->
+                        <FilterElementsNode>
+                            <!-- description = "Pass Only Elements: ['booking_value', 'listing__country_latest']" -->
+                            <!-- node_id = NodeId(id_str='pfe_6') -->
+                            <!-- include_spec = MeasureSpec(element_name='booking_value') -->
+                            <!-- include_spec =                                               -->
+                            <!--   DimensionSpec(                                             -->
+                            <!--     element_name='country_latest',                           -->
+                            <!--     entity_links=(EntityReference(element_name='listing'),), -->
+                            <!--   )                                                          -->
+                            <!-- distinct = False -->
+                            <JoinOnEntitiesNode>
+                                <!-- description = 'Join Standard Outputs' -->
+                                <!-- node_id = NodeId(id_str='jso_1') -->
+                                <!-- join0_for_node_id_pfe_5 =                                      -->
+                                <!--   JoinDescription(                                             -->
+                                <!--     join_node=FilterElementsNode(node_id=pfe_5),               -->
+                                <!--     join_on_entity=LinklessEntitySpec(element_name='listing'), -->
+                                <!--     join_type=LEFT_OUTER,                                      -->
+                                <!--   )                                                            -->
+                                <FilterElementsNode>
+                                    <!-- description = "Pass Only Elements: ['booking_value', 'listing']" -->
+                                    <!-- node_id = NodeId(id_str='pfe_4') -->
+                                    <!-- include_spec = MeasureSpec(element_name='booking_value') -->
+                                    <!-- include_spec = LinklessEntitySpec(element_name='listing') -->
+                                    <!-- distinct = False -->
+                                    <MetricTimeDimensionTransformNode>
+                                        <!-- description = "Metric Time Dimension 'ds'" -->
+                                        <!-- node_id = NodeId(id_str='sma_28009') -->
+                                        <!-- aggregation_time_dimension = 'ds' -->
+                                        <ReadSqlSourceNode>
+                                            <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
+                                            <!-- node_id = NodeId(id_str='rss_28020') -->
+                                            <!-- data_set = SemanticModelDataSet('bookings_source') -->
+                                        </ReadSqlSourceNode>
+                                    </MetricTimeDimensionTransformNode>
+                                </FilterElementsNode>
+                                <FilterElementsNode>
+                                    <!-- description = "Pass Only Elements: ['country_latest', 'listing']" -->
+                                    <!-- node_id = NodeId(id_str='pfe_5') -->
+                                    <!-- include_spec = DimensionSpec(element_name='country_latest') -->
+                                    <!-- include_spec = LinklessEntitySpec(element_name='listing') -->
+                                    <!-- distinct = False -->
+                                    <MetricTimeDimensionTransformNode>
+                                        <!-- description = "Metric Time Dimension 'ds'" -->
+                                        <!-- node_id = NodeId(id_str='sma_28013') -->
+                                        <!-- aggregation_time_dimension = 'ds' -->
+                                        <ReadSqlSourceNode>
+                                            <!-- description = "Read From SemanticModelDataSet('listings_latest')" -->
+                                            <!-- node_id = NodeId(id_str='rss_28024') -->
+                                            <!-- data_set = SemanticModelDataSet('listings_latest') -->
+                                        </ReadSqlSourceNode>
+                                    </MetricTimeDimensionTransformNode>
+                                </FilterElementsNode>
+                            </JoinOnEntitiesNode>
+                        </FilterElementsNode>
+                    </AggregateMeasuresNode>
+                </ComputeMetricsNode>
+            </CombineAggregatedOutputsNode>
+        </ComputeMetricsNode>
+    </WriteToResultDataTableNode>
+</DataflowPlan>
