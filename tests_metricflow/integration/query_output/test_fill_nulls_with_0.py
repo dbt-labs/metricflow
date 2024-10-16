@@ -143,3 +143,36 @@ def test_fill_nulls_with_0_multi_metric_query_with_categorical_dimension(  # noq
         snapshot_str=query_result.result_df.text_format(),
         sql_engine=sql_client.sql_engine_type,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_join_to_time_spine_metric_with_unqueried_metric_time_filter(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+    it_helpers: IntegrationTestHelpers,
+) -> None:
+    """Test for a specific join to time spine filter scenario.
+
+    A query for a metric whose measure joins to time spine, queried with a metric_time filter that differs from the
+    metric_time used in the group by.
+    """
+    query_result = it_helpers.mf_engine.query(
+        MetricFlowQueryRequest.create_with_random_request_id(
+            metric_names=["bookings_join_to_time_spine"],
+            group_by_names=["metric_time__day"],
+            order_by_names=["metric_time__day"],
+            where_constraint="{{ TimeDimension('metric_time', 'month') }} >= '2020-01-01' AND {{ TimeDimension('metric_time', 'month') }} < '2020-03-01'",
+        )
+    )
+    assert query_result.result_df is not None, "Unexpected empty result."
+
+    assert_str_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.text_format(),
+        sql_engine=sql_client.sql_engine_type,
+    )
+
+# TODO: test if it's categorical (shouldn't be re-applied)
