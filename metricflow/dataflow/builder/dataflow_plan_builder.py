@@ -1738,7 +1738,7 @@ class DataflowPlanBuilder:
             metric_input_measure_specs=(metric_input_measure_spec,),
         )
 
-        # Joining to time spine after aggregation is for measures that specify `join_to_timespine` in the YAML spec.
+        # Joining to time spine after aggregation is for measures that specify `join_to_timespine: true` in the YAML spec.
         after_aggregation_time_spine_join_description = (
             metric_input_measure_spec.after_aggregation_time_spine_join_description
         )
@@ -1747,6 +1747,20 @@ class DataflowPlanBuilder:
                 f"Expected {SqlJoinType.LEFT_OUTER} for joining to time spine after aggregation. Remove this if "
                 f"there's a new use case."
             )
+            # Find filters that contain only metric_time or agg_time_dimension. They will be applied to the time spine table.
+            agg_time_only_filters: List[WhereFilterSpec] = []
+            non_agg_time_filters: List[WhereFilterSpec] = []
+            for filter_spec in metric_input_measure_spec.filter_spec_set.after_measure_aggregation_filter_specs:
+                included_agg_time_specs = filter_spec.linkable_spec_set.included_agg_time_dimension_specs_for_measure(
+                    measure_reference=measure_spec.reference, semantic_model_lookup=self._semantic_model_lookup
+                )
+                if set(included_agg_time_specs) == set(filter_spec.linkable_spec_set.as_tuple):
+                    agg_time_only_filters.append(filter_spec)
+                else:
+                    non_agg_time_filters.append(filter_spec)
+
+            # TODO: split this node into TimeSpineSourceNode and JoinToTimeSpineNode - then can use standard nodes here
+            # like JoinToCustomGranularityNode, WhereConstraintNode, etc.
             output_node: DataflowPlanNode = JoinToTimeSpineNode.create(
                 parent_node=aggregate_measures_node,
                 requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
@@ -1755,19 +1769,21 @@ class DataflowPlanBuilder:
                 time_range_constraint=predicate_pushdown_state.time_range_constraint,
                 offset_window=after_aggregation_time_spine_join_description.offset_window,
                 offset_to_grain=after_aggregation_time_spine_join_description.offset_to_grain,
+                time_spine_filters=agg_time_only_filters,
             )
 
             # Since new rows might have been added due to time spine join, re-apply constraints here. Only re-apply filters
-            # for specs that are also in the queried specs, since those are the only ones that might have changed after the
-            # time spine join.
-            queried_filter_specs = [
+            # for specs that are also in the queried specs, since those are the only ones that could change after the time
+            # spine join. Exclude filters that contain only metric_time or an agg time dimension, since were already applied
+            # to the time spine table.
+            queried_non_agg_time_filter_specs = [
                 filter_spec
-                for filter_spec in metric_input_measure_spec.filter_spec_set.after_measure_aggregation_filter_specs
+                for filter_spec in non_agg_time_filters
                 if set(filter_spec.linkable_specs).issubset(set(queried_linkable_specs.as_tuple))
             ]
-            if len(queried_filter_specs) > 0:
+            if len(queried_non_agg_time_filter_specs) > 0:
                 output_node = WhereConstraintNode.create(
-                    parent_node=output_node, where_specs=queried_filter_specs, always_apply=True
+                    parent_node=output_node, where_specs=queried_non_agg_time_filter_specs, always_apply=True
                 )
 
             # TODO: this will break if you query by agg_time_dimension but apply a time constraint on metric_time.
