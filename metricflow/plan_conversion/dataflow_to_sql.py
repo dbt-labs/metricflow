@@ -328,7 +328,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
         # Where constraints must be applied in an outer query since they are using an alias (e.g., 'metric_time__day'),
         # and some engines do not support using an alias in the WHERE clause.
-        if not time_spine_where_constraints:
+        if len(time_spine_where_constraints) == 0:
             return SqlDataSet(instance_set=output_instance_set, sql_select_node=inner_sql_select_node)
 
         # Build outer query to apply where constraints.
