@@ -214,3 +214,114 @@ def test_join_to_time_spine_with_filters(  # noqa: D103
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_join_to_time_spine_with_filter_not_in_group_by(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings_join_to_time_spine_with_tiered_filters",),
+        group_by_names=("metric_time__day",),
+        where_constraints=[
+            PydanticWhereFilter(where_sql_template="{{ TimeDimension('metric_time', 'month') }} > '2020-01-01'")
+        ],
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_join_to_time_spine_with_filter_smaller_than_group_by(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("archived_users_join_to_time_spine",),
+        group_by_names=("metric_time__day",),
+        where_constraints=[
+            PydanticWhereFilter(
+                where_sql_template="{{ TimeDimension('metric_time', 'hour') }} > '2020-01-01 00:09:00'"
+            ),
+            PydanticWhereFilter(where_sql_template="{{ TimeDimension('metric_time', 'day') }} = '2020-01-01'"),
+        ],
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_join_to_time_spine_with_filter_not_in_group_by_using_agg_time(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings_join_to_time_spine_with_tiered_filters",),
+        group_by_names=("booking__ds__day",),
+        where_constraints=[
+            PydanticWhereFilter(where_sql_template="{{ TimeDimension('booking__ds', 'month') }} > '2020-01-01'")
+        ],
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_join_to_time_spine_with_filter_not_in_group_by_using_agg_time_and_metric_time(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings_join_to_time_spine_with_tiered_filters",),
+        group_by_names=("metric_time__day",),
+        where_constraints=[
+            PydanticWhereFilter(where_sql_template="{{ TimeDimension('booking__ds', 'month') }} > '2020-01-01'")
+        ],
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )

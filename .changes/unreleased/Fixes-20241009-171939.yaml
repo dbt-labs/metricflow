@@ -1,0 +1,7 @@
+kind: Fixes
+body: 'Bug fix: when querying a join_to_timespine metric with a metric_time filter
+  that is not included in the group by, unexpected output rows were included.'
+time: 2024-10-09T17:19:39.244779-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1450"

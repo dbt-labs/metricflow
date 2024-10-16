@@ -41,10 +41,8 @@
                             <!--     ),                                                                            -->
                             <!--   )                                                                               -->
                             <!-- use_custom_agg_time_dimension = False -->
-                            <!-- time_range_constraint = None -->
-                            <!-- offset_window = PydanticMetricTimeWindow(count=2, granularity=DAY) -->
-                            <!-- offset_to_grain = None -->
                             <!-- join_type = INNER -->
+                            <!-- offset_window = PydanticMetricTimeWindow(count=2, granularity=DAY) -->
                             <JoinOverTimeRangeNode>
                                 <!-- description = 'Join Self Over Time Range' -->
                                 <!-- node_id = NodeId(id_str='jotr_0') -->
