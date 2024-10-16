@@ -16,14 +16,14 @@ from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
-from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameter, SqlBindParameters, SqlBindParameterValue
+from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameter, SqlBindParameterSet, SqlBindParameterValue
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 
 def test_where_filter_spec_serialization() -> None:  # noqa: D103
     where_filter_spec = WhereFilterSpec(
         where_sql="where_sql",
-        bind_parameters=SqlBindParameters(
+        bind_parameters=SqlBindParameterSet(
             param_items=(SqlBindParameter(key="key", value=SqlBindParameterValue(str_value="str_value")),)
         ),
         linkable_element_unions=(

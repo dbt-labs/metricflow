@@ -17,28 +17,28 @@
                     <WhereConstraintNode>
                         <!-- description = 'Constrain Output with WHERE' -->
                         <!-- node_id = NodeId(id_str='wcc_0') -->
-                        <!-- where_condition =                        -->
-                        <!--   WhereFilterSpec(                       -->
-                        <!--     where_sql='listing__bookings > 2',   -->
-                        <!--     bind_parameters=SqlBindParameters(), -->
-                        <!--     linkable_spec_set=LinkableSpecSet(   -->
-                        <!--       group_by_metric_specs=(            -->
-                        <!--         GroupByMetricSpec(               -->
-                        <!--           element_name='bookings',       -->
-                        <!--           entity_links=(                 -->
-                        <!--             EntityReference(             -->
-                        <!--               element_name='listing',    -->
-                        <!--             ),                           -->
-                        <!--           ),                             -->
-                        <!--           metric_subquery_entity_links=( -->
-                        <!--             EntityReference(             -->
-                        <!--               element_name='listing',    -->
-                        <!--             ),                           -->
-                        <!--           ),                             -->
-                        <!--         ),                               -->
-                        <!--       ),                                 -->
-                        <!--     ),                                   -->
-                        <!--   )                                      -->
+                        <!-- where_condition =                          -->
+                        <!--   WhereFilterSpec(                         -->
+                        <!--     where_sql='listing__bookings > 2',     -->
+                        <!--     bind_parameters=SqlBindParameterSet(), -->
+                        <!--     linkable_spec_set=LinkableSpecSet(     -->
+                        <!--       group_by_metric_specs=(              -->
+                        <!--         GroupByMetricSpec(                 -->
+                        <!--           element_name='bookings',         -->
+                        <!--           entity_links=(                   -->
+                        <!--             EntityReference(               -->
+                        <!--               element_name='listing',      -->
+                        <!--             ),                             -->
+                        <!--           ),                               -->
+                        <!--           metric_subquery_entity_links=(   -->
+                        <!--             EntityReference(               -->
+                        <!--               element_name='listing',      -->
+                        <!--             ),                             -->
+                        <!--           ),                               -->
+                        <!--         ),                                 -->
+                        <!--       ),                                   -->
+                        <!--     ),                                     -->
+                        <!--   )                                        -->
                         <FilterElementsNode>
                             <!-- description = "Pass Only Elements: ['listings', 'listing__bookings']" -->
                             <!-- node_id = NodeId(id_str='pfe_3') -->

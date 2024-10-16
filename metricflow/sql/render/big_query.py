@@ -7,7 +7,7 @@ from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.errors.error_classes import UnsupportedEngineFeatureError
-from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
+from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from typing_extensions import override
 
 from metricflow.protocols.sql_client import SqlEngine
@@ -71,7 +71,7 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
         """
         return SqlExpressionRenderResult(
             sql=group_by_column.column_alias,
-            bind_parameters=group_by_column.expr.bind_parameters,
+            bind_parameter_set=group_by_column.expr.bind_parameter_set,
         )
 
     @override
@@ -84,14 +84,14 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
         """
         if node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS:
             arg_rendered = self.render_sql_expr(node.order_by_arg)
-            params = arg_rendered.bind_parameters
+            params = arg_rendered.bind_parameter_set
             percentile = node.percentile_args.percentile
 
             fraction = Fraction(percentile).limit_denominator()
 
             return SqlExpressionRenderResult(
                 sql=f"APPROX_QUANTILES({arg_rendered.sql}, {fraction.denominator})[OFFSET({fraction.numerator})]",
-                bind_parameters=params,
+                bind_parameter_set=params,
             )
         elif (
             node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_DISCRETE
@@ -117,7 +117,7 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
         arg_rendered = self.render_sql_expr(node.arg)
         return SqlExpressionRenderResult(
             sql=f"CAST({arg_rendered.sql} AS {self.timestamp_data_type})",
-            bind_parameters=arg_rendered.bind_parameters,
+            bind_parameter_set=arg_rendered.bind_parameter_set,
         )
 
     @override
@@ -133,7 +133,7 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
 
         return SqlExpressionRenderResult(
             sql=f"DATETIME_TRUNC({arg_rendered.sql}, {prefix}{node.time_granularity.value})",
-            bind_parameters=arg_rendered.bind_parameters,
+            bind_parameter_set=arg_rendered.bind_parameter_set,
         )
 
     @override
@@ -163,7 +163,7 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
 
         return SqlExpressionRenderResult(
             sql=case_expr,
-            bind_parameters=extract_rendering_result.bind_parameters,
+            bind_parameter_set=extract_rendering_result.bind_parameter_set,
         )
 
     @override
@@ -173,14 +173,14 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
 
         return SqlExpressionRenderResult(
             sql=f"DATE_SUB(CAST({column.sql} AS {self.timestamp_data_type}), INTERVAL {node.count} {node.granularity.value})",
-            bind_parameters=column.bind_parameters,
+            bind_parameter_set=column.bind_parameter_set,
         )
 
     @override
     def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> SqlExpressionRenderResult:
         return SqlExpressionRenderResult(
             sql="GENERATE_UUID()",
-            bind_parameters=SqlBindParameters(),
+            bind_parameter_set=SqlBindParameterSet(),
         )
 
 

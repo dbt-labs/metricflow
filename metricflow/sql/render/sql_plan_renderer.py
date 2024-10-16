@@ -8,7 +8,7 @@ from string import Template
 from typing import List, Optional, Sequence, Tuple
 
 from metricflow_semantics.mf_logging.formatting import indent
-from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
+from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 
 from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
@@ -36,7 +36,7 @@ class SqlPlanRenderResult:  # noqa: D101
     # The SQL string that could be run.
     sql: str
     # The execution parameters that should be specified along with the SQL str to execute()
-    bind_parameters: SqlBindParameters
+    bind_parameter_set: SqlBindParameterSet
 
 
 class SqlQueryPlanRenderer(SqlQueryPlanNodeVisitor[SqlPlanRenderResult], ABC):
@@ -76,7 +76,7 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
         select_columns: Sequence[SqlSelectColumn],
         num_parents: int,
         distinct: bool,
-    ) -> Tuple[str, SqlBindParameters]:
+    ) -> Tuple[str, SqlBindParameterSet]:
         """Convert the select columns into a "SELECT" section.
 
         e.g.
@@ -87,13 +87,13 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
 
         Returns a tuple of the "SELECT" section as a string and the associated execution parameters.
         """
-        params = SqlBindParameters()
+        params = SqlBindParameterSet()
         select_section_lines = ["SELECT DISTINCT" if distinct else "SELECT"]
         first_column = True
         for select_column in select_columns:
             expr_rendered = self.EXPR_RENDERER.render_sql_expr(select_column.expr)
             # Merge all execution parameters together. Similar pattern follows below.
-            params = params.combine(expr_rendered.bind_parameters)
+            params = params.combine(expr_rendered.bind_parameter_set)
 
             column_select_str = f"{expr_rendered.sql} AS {select_column.column_alias}"
 
@@ -123,7 +123,7 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
 
     def _render_from_section(
         self, from_source: SqlQueryPlanNode, from_source_alias: str
-    ) -> Tuple[str, SqlBindParameters]:
+    ) -> Tuple[str, SqlBindParameterSet]:
         """Convert the node into a "FROM" section.
 
         e.g.
@@ -146,9 +146,9 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
             from_section_lines.append(f") {from_source_alias}")
         from_section = "\n".join(from_section_lines)
 
-        return from_section, from_render_result.bind_parameters
+        return from_section, from_render_result.bind_parameter_set
 
-    def _render_joins_section(self, join_descriptions: Sequence[SqlJoinDescription]) -> Tuple[str, SqlBindParameters]:
+    def _render_joins_section(self, join_descriptions: Sequence[SqlJoinDescription]) -> Tuple[str, SqlBindParameterSet]:
         """Convert the join descriptions into a "JOIN" section.
 
         e.g.
@@ -160,18 +160,18 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
 
         Returns a tuple of the "JOIN" section as a string and the associated execution parameters.
         """
-        params = SqlBindParameters()
+        params = SqlBindParameterSet()
         join_section_lines = []
         for join_description in join_descriptions:
             # Render the source for the join
             right_source_rendered = self._render_node(join_description.right_source)
-            params = params.combine(right_source_rendered.bind_parameters)
+            params = params.combine(right_source_rendered.bind_parameter_set)
 
             # Render the on condition for the join
             on_condition_rendered: Optional[SqlExpressionRenderResult] = None
             if join_description.on_condition:
                 on_condition_rendered = self.EXPR_RENDERER.render_sql_expr(join_description.on_condition)
-                params = params.combine(on_condition_rendered.bind_parameters)
+                params = params.combine(on_condition_rendered.bind_parameter_set)
 
             if join_description.right_source.is_table:
                 join_section_lines.append(join_description.join_type.value)
@@ -196,7 +196,7 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
 
         return "\n".join(join_section_lines), params
 
-    def _render_group_by_section(self, group_by_columns: Sequence[SqlSelectColumn]) -> Tuple[str, SqlBindParameters]:
+    def _render_group_by_section(self, group_by_columns: Sequence[SqlSelectColumn]) -> Tuple[str, SqlBindParameterSet]:
         """Convert the group by columns into a "GROUP BY" section.
 
         e.g.
@@ -206,11 +206,11 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
         Returns a tuple of the "GROUP BY" section as a string and the associated execution parameters.
         """
         group_by_section_lines: List[str] = []
-        params = SqlBindParameters()
+        params = SqlBindParameterSet()
         first = True
         for group_by_column in group_by_columns:
             group_by_expr_rendered = self.EXPR_RENDERER.render_group_by_expr(group_by_column)
-            params = params.combine(group_by_expr_rendered.bind_parameters)
+            params = params.combine(group_by_expr_rendered.bind_parameter_set)
             if first:
                 first = False
                 group_by_section_lines.append("GROUP BY")
@@ -226,7 +226,7 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
 
     def visit_select_statement_node(self, node: SqlSelectStatementNode) -> SqlPlanRenderResult:  # noqa: D102
         # Keep track of all execution parameters for all expressions
-        combined_params = SqlBindParameters()
+        combined_params = SqlBindParameterSet()
 
         # Render description section
         description_section = "\n".join([f"-- {x}" for x in node.description.split("\n") if x])
@@ -253,7 +253,7 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
         where_section = None
         if node.where:
             where_render_result = self.EXPR_RENDERER.render_sql_expr(node.where)
-            combined_params = combined_params.combine(where_render_result.bind_parameters)
+            combined_params = combined_params.combine(where_render_result.bind_parameter_set)
             where_section = f"WHERE {where_render_result.sql}"
 
         # Render "ORDER BY" section
@@ -263,7 +263,7 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
             for order_by in node.order_bys:
                 order_by_render_result = self.EXPR_RENDERER.render_sql_expr(order_by.expr)
                 order_by_items.append(order_by_render_result.sql + (" DESC" if order_by.desc else ""))
-                combined_params = combined_params.combine(order_by_render_result.bind_parameters)
+                combined_params = combined_params.combine(order_by_render_result.bind_parameter_set)
 
             order_by_section = "ORDER BY " + ", ".join(order_by_items)
 
@@ -298,19 +298,19 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
 
         return SqlPlanRenderResult(
             sql="\n".join(sections_to_render),
-            bind_parameters=combined_params,
+            bind_parameter_set=combined_params,
         )
 
     def visit_table_node(self, node: SqlTableNode) -> SqlPlanRenderResult:  # noqa: D102
         return SqlPlanRenderResult(
             sql=node.sql_table.sql,
-            bind_parameters=SqlBindParameters(),
+            bind_parameter_set=SqlBindParameterSet(),
         )
 
     def visit_query_from_clause_node(self, node: SqlSelectQueryFromClauseNode) -> SqlPlanRenderResult:  # noqa: D102
         return SqlPlanRenderResult(
             sql=node.select_query.rstrip(),
-            bind_parameters=SqlBindParameters(),
+            bind_parameter_set=SqlBindParameterSet(),
         )
 
     def visit_create_table_as_node(self, node: SqlCreateTableAsNode) -> SqlPlanRenderResult:  # noqa: D102
@@ -330,7 +330,7 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
 
         return SqlPlanRenderResult(
             sql=sql,
-            bind_parameters=inner_sql_render_result.bind_parameters,
+            bind_parameter_set=inner_sql_render_result.bind_parameter_set,
         )
 
     @property

@@ -14,7 +14,7 @@ from dbt_semantic_interfaces.protocols.entity import EntityType
 from dbt_semantic_interfaces.test_utils import semantic_model_with_guaranteed_meta
 from dbt_semantic_interfaces.transformations.semantic_manifest_transformer import PydanticSemanticManifestTransformer
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
-from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
+from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.protocols.sql_client import SqlClient
@@ -59,8 +59,8 @@ def test_build_semantic_model_tasks(  # noqa: D103
 def test_task_runner(sql_client: SqlClient, mf_test_configuration: MetricFlowTestConfiguration) -> None:  # noqa: D103
     dw_validator = DataWarehouseModelValidator(sql_client=sql_client)
 
-    def good_query() -> Tuple[str, SqlBindParameters]:
-        return ("SELECT 'foo' AS foo", SqlBindParameters())
+    def good_query() -> Tuple[str, SqlBindParameterSet]:
+        return ("SELECT 'foo' AS foo", SqlBindParameterSet())
 
     tasks = [
         DataWarehouseValidationTask(
@@ -71,8 +71,8 @@ def test_task_runner(sql_client: SqlClient, mf_test_configuration: MetricFlowTes
     issues = dw_validator.run_tasks(tasks=tasks)
     assert len(issues.all_issues) == 0
 
-    def bad_query() -> Tuple[str, SqlBindParameters]:
-        return ("SELECT (true) AS col1 FROM doesnt_exist", SqlBindParameters())
+    def bad_query() -> Tuple[str, SqlBindParameterSet]:
+        return ("SELECT (true) AS col1 FROM doesnt_exist", SqlBindParameterSet())
 
     err_msg_bad = "Could not access table 'doesnt_exist' in data warehouse"
     bad_task = DataWarehouseValidationTask(

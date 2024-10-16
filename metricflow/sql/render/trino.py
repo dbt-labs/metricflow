@@ -6,7 +6,7 @@ from dateutil.parser import parse
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
+from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from typing_extensions import override
 
 from metricflow.protocols.sql_client import SqlEngine
@@ -41,7 +41,7 @@ class TrinoSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> SqlExpressionRenderResult:
         return SqlExpressionRenderResult(
             sql="uuid()",
-            bind_parameters=SqlBindParameters(),
+            bind_parameter_set=SqlBindParameterSet(),
         )
 
     @override
@@ -56,20 +56,20 @@ class TrinoSqlExpressionRenderer(DefaultSqlExpressionRenderer):
             count *= 3
         return SqlExpressionRenderResult(
             sql=f"DATE_ADD('{granularity.value}', -{count}, {arg_rendered.sql})",
-            bind_parameters=arg_rendered.bind_parameters,
+            bind_parameter_set=arg_rendered.bind_parameter_set,
         )
 
     @override
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
         """Render a percentile expression for Trino."""
         arg_rendered = self.render_sql_expr(node.order_by_arg)
-        params = arg_rendered.bind_parameters
+        params = arg_rendered.bind_parameter_set
         percentile = node.percentile_args.percentile
 
         if node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS:
             return SqlExpressionRenderResult(
                 sql=f"approx_percentile({arg_rendered.sql}, {percentile})",
-                bind_parameters=params,
+                bind_parameter_set=params,
             )
         elif (
             node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_DISCRETE
@@ -90,10 +90,10 @@ class TrinoSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         rendered_start_expr = self.render_sql_expr(node.start_expr)
         rendered_end_expr = self.render_sql_expr(node.end_expr)
 
-        bind_parameters = SqlBindParameters()
-        bind_parameters = bind_parameters.combine(rendered_column_arg.bind_parameters)
-        bind_parameters = bind_parameters.combine(rendered_start_expr.bind_parameters)
-        bind_parameters = bind_parameters.combine(rendered_end_expr.bind_parameters)
+        bind_parameter_set = SqlBindParameterSet()
+        bind_parameter_set = bind_parameter_set.combine(rendered_column_arg.bind_parameter_set)
+        bind_parameter_set = bind_parameter_set.combine(rendered_start_expr.bind_parameter_set)
+        bind_parameter_set = bind_parameter_set.combine(rendered_end_expr.bind_parameter_set)
 
         # Handle timestamp literals differently.
         if parse(rendered_start_expr.sql):
@@ -103,7 +103,7 @@ class TrinoSqlExpressionRenderer(DefaultSqlExpressionRenderer):
 
         return SqlExpressionRenderResult(
             sql=sql,
-            bind_parameters=bind_parameters,
+            bind_parameter_set=bind_parameter_set,
         )
 
     @override

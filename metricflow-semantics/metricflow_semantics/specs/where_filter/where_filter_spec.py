@@ -11,7 +11,7 @@ from metricflow_semantics.collection_helpers.merger import Mergeable
 from metricflow_semantics.model.semantics.linkable_element import LinkableElement, LinkableElementUnion
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
-from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
+from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 
 
 @dataclass(frozen=True)
@@ -26,7 +26,7 @@ class WhereFilterSpec(Mergeable, SerializableDataclass):
 
     WhereFilterSpec(
         where_sql="listing__country == 'US'",
-        bind_parameters: SqlBindParameters(),
+        bind_parameter_set: SqlBindParameters(),
         linkable_specs: (
             DimensionSpec(
                 element_name='country',
@@ -42,10 +42,10 @@ class WhereFilterSpec(Mergeable, SerializableDataclass):
     )
     """
 
-    # Debating whether where_sql / bind_parameters belongs here. where_sql may become dialect specific if we introduce
+    # Debating whether where_sql / bind_parameter_set belongs here. where_sql may become dialect specific if we introduce
     # quoted identifiers later.
     where_sql: str
-    bind_parameters: SqlBindParameters
+    bind_parameters: SqlBindParameterSet
     linkable_element_unions: Tuple[LinkableElementUnion, ...]
     linkable_spec_set: LinkableSpecSet
 
@@ -83,7 +83,7 @@ class WhereFilterSpec(Mergeable, SerializableDataclass):
         # line with other cases of Mergeable.
         return WhereFilterSpec(
             where_sql="TRUE",
-            bind_parameters=SqlBindParameters(),
+            bind_parameters=SqlBindParameterSet(),
             linkable_spec_set=LinkableSpecSet(),
             linkable_element_unions=(),
         )

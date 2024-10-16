@@ -855,7 +855,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                     used_columns=tuple(
                         column_association.column_name for column_association in column_associations_in_where_sql
                     ),
-                    bind_parameters=node.where.bind_parameters,
+                    bind_parameter_set=node.where.bind_parameters,
                 ),
             ),
         )
