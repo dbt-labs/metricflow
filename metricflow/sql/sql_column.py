@@ -35,7 +35,7 @@ class SqlColumn:
         return self.table.db_name
 
     @property
-    def schema_name(self) -> str:  # noqa: D102
+    def schema_name(self) -> Optional[str]:  # noqa: D102
         return self.table.schema_name
 
     @property
