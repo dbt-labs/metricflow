@@ -1,0 +1,6 @@
+visit__referrer_id    visit_buy_conversion_rate
+--------------------  ---------------------------
+fb_ad_1               1.00
+fb_ad_3               None
+homepage_1            None
+user_2                None
