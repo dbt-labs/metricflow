@@ -125,7 +125,7 @@ def test_update_params_with_same_item() -> None:  # noqa: D103
     bind_params0 = SqlBindParameterSet.create_from_dict({"key": "value"})
     bind_params1 = SqlBindParameterSet.create_from_dict({"key": "value"})
 
-    bind_params0.combine(bind_params1)
+    bind_params0.merge(bind_params1)
 
 
 def test_update_params_with_same_key_different_values() -> None:  # noqa: D103
@@ -133,4 +133,4 @@ def test_update_params_with_same_key_different_values() -> None:  # noqa: D103
     bind_params1 = SqlBindParameterSet.create_from_dict(({"key": "value1"}))
 
     with pytest.raises(RuntimeError):
-        bind_params0.combine(bind_params1)
+        bind_params0.merge(bind_params1)
