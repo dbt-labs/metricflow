@@ -534,3 +534,21 @@ integration_test:
       AND {{ render_date_trunc("b.ds_partitioned", TimeGranularity.DAY) }} = {{ render_date_trunc("u.ds_partitioned", TimeGranularity.DAY) }}
     LEFT OUTER JOIN {{ source_schema }}.mf_time_spine ts ON {{ render_date_trunc("u.ds", TimeGranularity.DAY) }} = ts.ds
     GROUP BY ts.martian_day
+---
+integration_test:
+  name: test_offset_metric_with_custom_granularity_filter_not_in_group_by
+  description: Test querying a simple metric with a custom grain on a multi-hop dimension
+  model: SIMPLE_MODEL
+  metrics: ["bookings_5_day_lag"]
+  group_bys: ["metric_time__day"]
+  where_filter: |
+    {{ render_time_constraint(render_time_dimension_template('metric_time', 'martian_day'), start_time="2020-01-01") }}
+  check_query: |
+    SELECT
+      ts.ds AS metric_time__day
+      , SUM(1) AS bookings_5_day_lag
+    FROM {{ source_schema }}.mf_time_spine ts
+    INNER JOIN {{ source_schema }}.fct_bookings b ON {{ render_date_sub("ts", "ds", 5, TimeGranularity.DAY) }} = {{ render_date_trunc("b.ds", TimeGranularity.DAY) }}
+    LEFT OUTER JOIN {{ source_schema }}.mf_time_spine ts1 ON ts.ds = ts1.ds
+    WHERE {{ render_time_constraint("ts1.martian_day", "2020-01-01") }}
+    GROUP BY ts.ds
