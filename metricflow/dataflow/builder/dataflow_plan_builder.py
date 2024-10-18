@@ -333,10 +333,12 @@ class DataflowPlanBuilder:
             unaggregated_base_measure_node = JoinOnEntitiesNode.create(
                 left_node=unaggregated_base_measure_node, join_targets=base_measure_recipe.join_targets
             )
+        # TODO: write explanatory comment; or maybe refactor so this doesn't need to live here
+        filter_to_specs = base_required_linkable_specs.replace_custom_granularity_with_base_granularity()
         filtered_unaggregated_base_node = FilterElementsNode.create(
             parent_node=unaggregated_base_measure_node,
             include_specs=group_specs_by_type(required_local_specs)
-            .merge(InstanceSpecSet.create_from_specs(base_required_linkable_specs.as_tuple))
+            .merge(InstanceSpecSet.create_from_specs(filter_to_specs.as_tuple))
             .dedupe(),
         )
 
@@ -1696,12 +1698,12 @@ class DataflowPlanBuilder:
             non_additive_dimension_grain = self._semantic_model_lookup.get_defined_time_granularity(
                 TimeDimensionReference(non_additive_dimension_spec.name)
             )
-            queried_time_dimension_spec: Optional[
-                TimeDimensionSpec
-            ] = self._find_non_additive_dimension_in_linkable_specs(
-                agg_time_dimension=agg_time_dimension,
-                linkable_specs=queried_linkable_specs.as_tuple,
-                non_additive_dimension_spec=non_additive_dimension_spec,
+            queried_time_dimension_spec: Optional[TimeDimensionSpec] = (
+                self._find_non_additive_dimension_in_linkable_specs(
+                    agg_time_dimension=agg_time_dimension,
+                    linkable_specs=queried_linkable_specs.as_tuple,
+                    non_additive_dimension_spec=non_additive_dimension_spec,
+                )
             )
             time_dimension_spec = TimeDimensionSpec(
                 # The NonAdditiveDimensionSpec name property is a plain element name
