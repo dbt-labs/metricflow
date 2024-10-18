@@ -516,3 +516,21 @@ integration_test:
       ON {{ render_date_trunc("l.created_at", TimeGranularity.DAY) }} = ts.ds
     WHERE {{ render_time_constraint("ts.martian_day", start_time="2019-12-20") }}
     GROUP BY ts.martian_day
+---
+integration_test:
+  name: test_simple_metric_with_multi_hop_custom_granularity
+  description: Test querying a simple metric with a custom grain on a multi-hop dimension
+  model: SIMPLE_MODEL
+  metrics: ["bookings"]
+  group_bys: ["listing__user__ds__martian_day"]
+  check_query: |
+    SELECT
+      ts.martian_day AS listing__user__ds__martian_day
+      , SUM(1) AS bookings
+    FROM {{ source_schema }}.fct_bookings b
+    LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest l
+    LEFT OUTER JOIN {{ source_schema }}.dim_users u ON l.user_id = u.user_id
+      ON b.listing_id = l.listing_id
+      AND {{ render_date_trunc("b.ds_partitioned", TimeGranularity.DAY) }} = {{ render_date_trunc("u.ds_partitioned", TimeGranularity.DAY) }}
+    LEFT OUTER JOIN {{ source_schema }}.mf_time_spine ts ON {{ render_date_trunc("u.ds", TimeGranularity.DAY) }} = ts.ds
+    GROUP BY ts.martian_day

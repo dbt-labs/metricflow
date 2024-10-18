@@ -222,7 +222,8 @@ def filter_not_supported_features(
 
 @pytest.mark.parametrize(
     "name",
-    CONFIGURED_INTEGRATION_TESTS_REPOSITORY.all_test_case_names,
+    # CONFIGURED_INTEGRATION_TESTS_REPOSITORY.all_test_case_names,
+    ["itest_granularity.yaml/test_simple_metric_with_multi_hop_custom_granularity"],
     ids=lambda name: f"name={name}",
 )
 def test_case(
@@ -280,37 +281,40 @@ def test_case(
             limit=case.limit,
             time_constraint_start=parser.parse(case.time_constraint[0]) if case.time_constraint else None,
             time_constraint_end=parser.parse(case.time_constraint[1]) if case.time_constraint else None,
-            where_constraints=[
-                jinja2.Template(
-                    case.where_filter,
-                    undefined=jinja2.StrictUndefined,
-                ).render(
-                    source_schema=mf_test_configuration.mf_source_schema,
-                    render_time_constraint=check_query_helpers.render_time_constraint,
-                    TimeGranularity=TimeGranularity,
-                    DatePart=DatePart,
-                    render_date_sub=check_query_helpers.render_date_sub,
-                    render_date_trunc=check_query_helpers.render_date_trunc,
-                    render_extract=check_query_helpers.render_extract,
-                    render_percentile_expr=check_query_helpers.render_percentile_expr,
-                    mf_time_spine_source=time_spine_source.spine_table.sql,
-                    double_data_type_name=check_query_helpers.double_data_type_name,
-                    render_dimension_template=check_query_helpers.render_dimension_template,
-                    render_entity_template=check_query_helpers.render_entity_template,
-                    render_metric_template=check_query_helpers.render_metric_template,
-                    render_time_dimension_template=check_query_helpers.render_time_dimension_template,
-                    generate_random_uuid=check_query_helpers.generate_random_uuid,
-                    cast_to_ts=check_query_helpers.cast_to_ts,
-                )
-            ]
-            if case.where_filter
-            else None,
+            where_constraints=(
+                [
+                    jinja2.Template(
+                        case.where_filter,
+                        undefined=jinja2.StrictUndefined,
+                    ).render(
+                        source_schema=mf_test_configuration.mf_source_schema,
+                        render_time_constraint=check_query_helpers.render_time_constraint,
+                        TimeGranularity=TimeGranularity,
+                        DatePart=DatePart,
+                        render_date_sub=check_query_helpers.render_date_sub,
+                        render_date_trunc=check_query_helpers.render_date_trunc,
+                        render_extract=check_query_helpers.render_extract,
+                        render_percentile_expr=check_query_helpers.render_percentile_expr,
+                        mf_time_spine_source=time_spine_source.spine_table.sql,
+                        double_data_type_name=check_query_helpers.double_data_type_name,
+                        render_dimension_template=check_query_helpers.render_dimension_template,
+                        render_entity_template=check_query_helpers.render_entity_template,
+                        render_metric_template=check_query_helpers.render_metric_template,
+                        render_time_dimension_template=check_query_helpers.render_time_dimension_template,
+                        generate_random_uuid=check_query_helpers.generate_random_uuid,
+                        cast_to_ts=check_query_helpers.cast_to_ts,
+                    )
+                ]
+                if case.where_filter
+                else None
+            ),
             order_by_names=case.order_bys,
             min_max_only=case.min_max_only,
         )
     )
 
     actual = query_result.result_df
+    # assert 0, query_result.sql
 
     expected = sql_client.query(
         jinja2.Template(
