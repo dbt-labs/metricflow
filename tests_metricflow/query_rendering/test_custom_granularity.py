@@ -380,3 +380,28 @@ def test_no_metrics_with_custom_granularity_in_filter_and_group_by(
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_simple_metric_with_multi_hop_custom_granularity(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    """Test simple metric with a multi hop dimension and custom grain."""
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings",),
+        group_by_names=("listing__user__ds__martian_day",),
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
