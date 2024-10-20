@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from typing import Generator
 from unittest.mock import patch
 
+import pytest
+
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
 
 
@@ -25,6 +27,17 @@ def patch_id_generators_helper(start_value: int) -> Generator[None, None, None]:
         for patch_context_manager in patch_context_managers:
             stack.enter_context(patch_context_manager)  # type: ignore
         # This will un-patch when done with the test.
+        yield None
+
+
+@pytest.fixture(autouse=True, scope="function")
+def patch_id_generators() -> Generator[None, None, None]:
+    """Patch ID generators with a new one to get repeatability in plan outputs before every test.
+
+    Plan outputs contain IDs, so if the IDs are not consistent from run to run, there will be diffs in the actual vs.
+    expected outputs during a test.
+    """
+    with patch_id_generators_helper(start_value=IdNumberSpace.for_test_start().start_value):
         yield None
 
 
