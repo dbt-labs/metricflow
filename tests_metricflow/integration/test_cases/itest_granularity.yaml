@@ -529,8 +529,8 @@ integration_test:
       , SUM(1) AS bookings
     FROM {{ source_schema }}.fct_bookings b
     LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest l
-    LEFT OUTER JOIN {{ source_schema }}.dim_users u ON l.user_id = u.user_id
       ON b.listing_id = l.listing_id
+    LEFT OUTER JOIN {{ source_schema }}.dim_users u ON l.user_id = u.user_id
       AND {{ render_date_trunc("b.ds_partitioned", TimeGranularity.DAY) }} = {{ render_date_trunc("u.ds_partitioned", TimeGranularity.DAY) }}
     LEFT OUTER JOIN {{ source_schema }}.mf_time_spine ts ON {{ render_date_trunc("u.ds", TimeGranularity.DAY) }} = ts.ds
     GROUP BY ts.martian_day
