@@ -11,13 +11,14 @@ import pytest
 from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from dbt_semantic_interfaces.protocols import SemanticModel
 from dbt_semantic_interfaces.test_utils import as_datetime
+from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
-from metricflow_semantics.test_helpers.id_helpers import IdNumberSpace, patch_id_generators_helper
+from metricflow_semantics.test_helpers.id_helpers import IdNumberSpace
 from metricflow_semantics.test_helpers.manifest_helpers import load_semantic_manifest
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.ambiguous_resolution_manifest import (
     AMBIGUOUS_RESOLUTION_MANIFEST_ANCHOR,
@@ -264,7 +265,7 @@ def mf_engine_test_fixture_mapping(
     """Returns a mapping for all semantic manifests used in testing to the associated test fixture."""
     fixture_mapping: Dict[SemanticManifestSetup, MetricFlowEngineTestFixture] = {}
     for semantic_manifest_setup in SemanticManifestSetup:
-        with patch_id_generators_helper(semantic_manifest_setup.id_number_space.start_value):
+        with SequentialIdGenerator.patch_id_generators_helper(semantic_manifest_setup.id_number_space.start_value):
             fixture_mapping[semantic_manifest_setup] = MetricFlowEngineTestFixture.from_parameters(
                 sql_client, load_semantic_manifest(semantic_manifest_setup.yaml_file_dir, template_mapping)
             )

@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import threading
+from contextlib import ExitStack, contextmanager
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, Generator
+from unittest.mock import patch
 
 from typing_extensions import override
 
@@ -48,3 +50,23 @@ class SequentialIdGenerator:
         with cls._state_lock:
             cls._prefix_to_next_value = {}
             cls._default_start_value = default_start_value
+
+    @classmethod
+    @contextmanager
+    def patch_id_generators_helper(cls, start_value: int) -> Generator[None, None, None]:
+        """Replace ID generators in IdGeneratorRegistry with one that has the given start value.
+
+        TODO: This method will be modified in a later PR.
+        """
+        # Create patch context managers for all ID generators in the registry with introspection magic.
+        patch_context_managers = [
+            patch.object(SequentialIdGenerator, "_prefix_to_next_value", {}),
+            patch.object(SequentialIdGenerator, "_default_start_value", start_value),
+        ]
+
+        # Enter the patch context for the patches above.
+        with ExitStack() as stack:
+            for patch_context_manager in patch_context_managers:
+                stack.enter_context(patch_context_manager)  # type: ignore
+            # This will un-patch when done with the test.
+            yield None
