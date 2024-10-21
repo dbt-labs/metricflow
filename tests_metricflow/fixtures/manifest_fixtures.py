@@ -265,7 +265,7 @@ def mf_engine_test_fixture_mapping(
     """Returns a mapping for all semantic manifests used in testing to the associated test fixture."""
     fixture_mapping: Dict[SemanticManifestSetup, MetricFlowEngineTestFixture] = {}
     for semantic_manifest_setup in SemanticManifestSetup:
-        with SequentialIdGenerator.patch_id_generators_helper(semantic_manifest_setup.id_number_space.start_value):
+        with SequentialIdGenerator.id_number_space(semantic_manifest_setup.id_number_space.start_value):
             fixture_mapping[semantic_manifest_setup] = MetricFlowEngineTestFixture.from_parameters(
                 sql_client, load_semantic_manifest(semantic_manifest_setup.yaml_file_dir, template_mapping)
             )

@@ -9,13 +9,15 @@ from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
 
 
 @pytest.fixture(autouse=True, scope="function")
-def patch_id_generators() -> Generator[None, None, None]:
-    """Patch ID generators with a new one to get repeatability in plan outputs before every test.
+def setup_id_generators() -> Generator[None, None, None]:
+    """Setup ID generation to start numbering at a specific value to get repeatability in generated IDs.
 
     Plan outputs contain IDs, so if the IDs are not consistent from run to run, there will be diffs in the actual vs.
     expected outputs during a test.
+
+    Fixtures may generate IDs, so this needs to be done before every test.
     """
-    with SequentialIdGenerator.patch_id_generators_helper(start_value=IdNumberSpace.for_test_start().start_value):
+    with SequentialIdGenerator.id_number_space(start_value=IdNumberSpace.for_test_start().start_value):
         yield None
 
 
