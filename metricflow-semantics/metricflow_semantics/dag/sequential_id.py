@@ -96,7 +96,7 @@ class SequentialIdGenerator:
 
     @classmethod
     @contextmanager
-    def patch_id_generators_helper(cls, start_value: int) -> Generator[None, None, None]:
+    def id_number_space(cls, start_value: int) -> Generator[None, None, None]:
         """Open a context where ID generation starts with the given start value.
 
         On exit, resume ID numbering from prior to entering the context.

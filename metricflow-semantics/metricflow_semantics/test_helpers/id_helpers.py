@@ -15,7 +15,7 @@ def patch_id_generators() -> Generator[None, None, None]:
     Plan outputs contain IDs, so if the IDs are not consistent from run to run, there will be diffs in the actual vs.
     expected outputs during a test.
     """
-    with SequentialIdGenerator.patch_id_generators_helper(start_value=IdNumberSpace.for_test_start().start_value):
+    with SequentialIdGenerator.id_number_space(start_value=IdNumberSpace.for_test_start().start_value):
         yield None
 
 
