@@ -39,7 +39,9 @@ logger = logging.getLogger(__name__)
 class SemanticModelLookup:
     """Tracks semantic information for semantic models held in a set of SemanticModelContainers."""
 
-    def __init__(self, model: SemanticManifest, custom_granularities: Dict[str, ExpandedTimeGranularity]) -> None:
+    def __init__(
+        self, semantic_manifest: SemanticManifest, custom_granularities: Dict[str, ExpandedTimeGranularity]
+    ) -> None:
         """Initializer.
 
         Args:
@@ -61,7 +63,7 @@ class SemanticModelLookup:
         ] = {}
 
         self._semantic_model_reference_to_semantic_model: Dict[SemanticModelReference, SemanticModel] = {}
-        for semantic_model in sorted(model.semantic_models, key=lambda semantic_model: semantic_model.name):
+        for semantic_model in sorted(semantic_manifest.semantic_models, key=lambda semantic_model: semantic_model.name):
             self._add_semantic_model(semantic_model)
 
         # Cache for defined time granularity.

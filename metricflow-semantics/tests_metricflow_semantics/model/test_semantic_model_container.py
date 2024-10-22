@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 def build_semantic_model_lookup_from_manifest(semantic_manifest: SemanticManifest) -> SemanticModelLookup:  # noqa: D103
     time_spine_sources = TimeSpineSource.build_standard_time_spine_sources(semantic_manifest)
     custom_granularities = TimeSpineSource.build_custom_granularities(list(time_spine_sources.values()))
-    return SemanticModelLookup(model=semantic_manifest, custom_granularities=custom_granularities)
+    return SemanticModelLookup(semantic_manifest=semantic_manifest, custom_granularities=custom_granularities)
 
 
 @pytest.fixture
