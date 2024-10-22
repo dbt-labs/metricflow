@@ -138,6 +138,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
             date_part=self.date_part,
         )
 
+    # TODO: remove this method
     @staticmethod
     def from_reference(reference: TimeDimensionReference) -> TimeDimensionSpec:
         """Initialize from a time dimension reference instance."""

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Dict, List, Optional, Sequence, Set
+from typing import Dict, List, Optional, Sequence, Set, Tuple
 
 from dbt_semantic_interfaces.protocols.dimension import Dimension
 from dbt_semantic_interfaces.protocols.entity import Entity
@@ -67,10 +67,10 @@ class SemanticModelLookup:
             self._add_semantic_model(semantic_model)
 
         # Cache for defined time granularity.
-        self._time_dimension_to_defined_time_granularity: Dict[TimeDimensionReference, TimeGranularity] = {}
+        self._time_dimension_to_defined_time_granularity: Dict[SemanticModelElementReference, TimeGranularity] = {}
 
         # Cache for agg. time dimension for measure.
-        self._measure_reference_to_agg_time_dimension_specs: Dict[MeasureReference, Sequence[TimeDimensionSpec]] = {}
+        self._measure_reference_to_agg_time_dimension_specs: Dict[MeasureReference, Set[TimeDimensionSpec]] = {}
 
     def get_dimension_references(self) -> Sequence[DimensionReference]:
         """Retrieve all dimension references from the collection of semantic models."""
@@ -78,16 +78,18 @@ class SemanticModelLookup:
 
     @staticmethod
     def get_dimension_from_semantic_model(
-        semantic_model: SemanticModel, dimension_reference: LinkableElementReference
+        semantic_model: SemanticModel, dimension_reference: DimensionReference
     ) -> Dimension:
         """Get dimension from semantic model."""
         for dim in semantic_model.dimensions:
-            if dim.reference == dimension_reference:
+            # Check element_name instead of direct reference in case the input is a TimeDimensionReference
+            if dim.reference.element_name == dimension_reference.element_name:
                 return dim
         raise ValueError(
-            f"No dimension with name ({dimension_reference}) in semantic_model with name ({semantic_model.name})"
+            f"No dimension with name '{dimension_reference.element_name}' in semantic_model '{semantic_model.name}'."
         )
 
+    # TODO: remove this method
     def get_dimension(self, dimension_reference: DimensionReference) -> Dimension:
         """Retrieves a full dimension object by name."""
         # If the reference passed is a TimeDimensionReference, convert to DimensionReference.
@@ -105,6 +107,7 @@ class SemanticModelLookup:
             dimension_reference=dimension_reference,
         )
 
+    # TODO: remove this method
     def get_time_dimension(self, time_dimension_reference: TimeDimensionReference) -> Dimension:
         """Retrieves a full dimension object by name."""
         return self.get_dimension(dimension_reference=time_dimension_reference.dimension_reference)
@@ -154,13 +157,31 @@ class SemanticModelLookup:
         )
         return semantic_model
 
-    def get_agg_time_dimension_for_measure(self, measure_reference: MeasureReference) -> TimeDimensionReference:
+    def get_semantic_model(self, semantic_model_reference: SemanticModelReference) -> SemanticModel:
+        """Retrieve the semantic model object matching the input semantic model reference."""
+        semantic_model = self._semantic_model_reference_to_semantic_model.get(semantic_model_reference)
+        assert semantic_model, f"Semantic model {semantic_model_reference} not found in manifest."
+        return semantic_model
+
+    def get_agg_time_dimension_for_measure(self, measure_reference: MeasureReference) -> SemanticModelElementReference:
         """Retrieves the aggregate time dimension that is associated with the measure reference.
 
         This is the time dimension along which the measure will be aggregated when a metric built on this measure
         is queried with metric_time.
         """
-        return self._measure_agg_time_dimension[measure_reference]
+        agg_time_dimension = self._measure_agg_time_dimension.get(measure_reference)
+        if not agg_time_dimension:
+            raise ValueError(
+                f"No agg_time_dimension found for measure {measure_reference}. This indicates internal misconfiguration"
+                " since validations should ensure an agg_time_dimension for every measure."
+            )
+
+        # A measure's agg_time_dimension is required to be in the same semantic model as the measure,
+        # so we can assume the same semantic model for both measure and dimension.
+        semantic_model = self.get_semantic_model_for_measure(measure_reference)
+        return SemanticModelElementReference.create_from_references(
+            element_reference=agg_time_dimension, semantic_model_reference=semantic_model.reference
+        )
 
     def get_entity_in_semantic_model(self, ref: SemanticModelElementReference) -> Optional[Entity]:
         """Retrieve the entity matching the element -> semantic model mapping, if any."""
@@ -365,49 +386,63 @@ class SemanticModelLookup:
         else:
             raise ValueError(f"Unable to find linkable element {element_name} in manifest")
 
-    def get_agg_time_dimension_specs_for_measure(
-        self, measure_reference: MeasureReference
-    ) -> Sequence[TimeDimensionSpec]:
+    def local_entity_links_for_time_dimension(
+        self, time_dimension_element_reference: SemanticModelElementReference
+    ) -> Tuple[EntityReference]:
+        """Return the primary entity as entity links that should be used for the time dimension when no joins are involved."""
+        semantic_model = self.get_semantic_model(time_dimension_element_reference.semantic_model_reference)
+        return (self.get_primary_entity_else_error(semantic_model),)
+
+    def generate_possible_time_dimension_specs_from_element_reference(
+        self,
+        time_dimension_element_reference: SemanticModelElementReference,
+    ) -> Set[TimeDimensionSpec]:
+        """Generate all possible time dimension specs that use the given time dimension.
+
+        This means a spec for every possible granularity and date part.
+        """
+        return set(
+            TimeDimensionSpec.generate_possible_specs_for_time_dimension(
+                time_dimension_reference=TimeDimensionReference(time_dimension_element_reference.element_name),
+                entity_links=self.local_entity_links_for_time_dimension(time_dimension_element_reference),
+                custom_granularities=self._custom_granularities,
+            )
+        )
+
+    def get_agg_time_dimension_specs_for_measure(self, measure_reference: MeasureReference) -> Set[TimeDimensionSpec]:
         """Get the agg time dimension specs that can be used in place of metric time for this measure."""
         result = self._measure_reference_to_agg_time_dimension_specs.get(measure_reference)
         if result is not None:
             return result
 
-        result = self._get_agg_time_dimension_specs_for_measure(measure_reference)
-        self._measure_reference_to_agg_time_dimension_specs[measure_reference] = result
-        return result
-
-    def _get_agg_time_dimension_specs_for_measure(
-        self, measure_reference: MeasureReference
-    ) -> Sequence[TimeDimensionSpec]:
-        agg_time_dimension = self.get_agg_time_dimension_for_measure(measure_reference)
-        # A measure's agg_time_dimension is required to be in the same semantic model as the measure,
-        # so we can assume the same semantic model for both measure and dimension.
-        semantic_model = self.get_semantic_model_for_measure(measure_reference)
-        entity_link = self.resolved_primary_entity(semantic_model)
-        assert entity_link is not None, (
-            f"Expected semantic model {semantic_model} to have a primary entity since it has a "
-            "measure requiring an agg_time_dimension, but found none.",
+        agg_time_element_reference = self.get_agg_time_dimension_for_measure(measure_reference)
+        agg_time_dimension_specs = self.generate_possible_time_dimension_specs_from_element_reference(
+            agg_time_element_reference
         )
-        return TimeDimensionSpec.generate_possible_specs_for_time_dimension(
-            time_dimension_reference=agg_time_dimension,
-            entity_links=(entity_link,),
-            custom_granularities=self._custom_granularities,
-        )
+        self._measure_reference_to_agg_time_dimension_specs[measure_reference] = agg_time_dimension_specs
+        return agg_time_dimension_specs
 
-    def get_defined_time_granularity(self, time_dimension_reference: TimeDimensionReference) -> TimeGranularity:
+    def get_defined_time_granularity(
+        self, time_dimension_element_reference: SemanticModelElementReference
+    ) -> TimeGranularity:
         """Time granularity from the time dimension's YAML definition. If not set, defaults to DAY."""
-        result = self._time_dimension_to_defined_time_granularity.get(time_dimension_reference)
+        result = self._time_dimension_to_defined_time_granularity.get(time_dimension_element_reference)
 
         if result is not None:
             return result
 
-        result = self._get_defined_time_granularity(time_dimension_reference)
-        self._time_dimension_to_defined_time_granularity[time_dimension_reference] = result
+        result = self._get_defined_time_granularity(time_dimension_element_reference)
+        self._time_dimension_to_defined_time_granularity[time_dimension_element_reference] = result
         return result
 
-    def _get_defined_time_granularity(self, time_dimension_reference: TimeDimensionReference) -> TimeGranularity:
-        time_dimension = self.get_dimension(time_dimension_reference)
+    def _get_defined_time_granularity(
+        self, time_dimension_element_reference: SemanticModelElementReference
+    ) -> TimeGranularity:
+        semantic_model = self.get_semantic_model(time_dimension_element_reference.semantic_model_reference)
+        time_dimension = self.get_dimension_from_semantic_model(
+            dimension_reference=TimeDimensionReference(time_dimension_element_reference.element_name),
+            semantic_model=semantic_model,
+        )
 
         defined_time_granularity = DEFAULT_TIME_GRANULARITY
         if time_dimension.type_params and time_dimension.type_params.time_granularity:

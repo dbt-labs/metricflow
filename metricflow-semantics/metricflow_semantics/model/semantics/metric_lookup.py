@@ -7,7 +7,11 @@ from typing import Dict, Optional, Sequence, Set, Tuple
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols.metric import Metric, MetricInputMeasure, MetricType
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.references import MeasureReference, MetricReference
+from dbt_semantic_interfaces.references import (
+    MeasureReference,
+    MetricReference,
+    SemanticModelElementReference,
+)
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow_semantics.collection_helpers.lru_cache import LruCache
@@ -211,18 +215,17 @@ class MetricLookup:
                         return True
         return False
 
-    def _get_agg_time_dimension_specs_for_metric(
+    def get_agg_time_dimensions_for_metric(
         self, metric_reference: MetricReference
-    ) -> Sequence[TimeDimensionSpec]:
+    ) -> Set[SemanticModelElementReference]:
         """Retrieves the aggregate time dimensions associated with the metric's measures."""
         metric = self.get_metric(metric_reference)
-        specs: Set[TimeDimensionSpec] = set()
+        agg_time_dimensions: Set[SemanticModelElementReference] = set()
         for input_measure in metric.input_measures:
-            time_dimension_specs = self._semantic_model_lookup.get_agg_time_dimension_specs_for_measure(
-                measure_reference=input_measure.measure_reference
+            agg_time_dimensions.add(
+                self._semantic_model_lookup.get_agg_time_dimension_for_measure(input_measure.measure_reference)
             )
-            specs.update(time_dimension_specs)
-        return list(specs)
+        return agg_time_dimensions
 
     def get_valid_agg_time_dimensions_for_metric(
         self, metric_reference: MetricReference
@@ -240,21 +243,16 @@ class MetricLookup:
     def _get_valid_agg_time_dimensions_for_metric(
         self, metric_reference: MetricReference
     ) -> Sequence[TimeDimensionSpec]:
-        agg_time_dimension_specs = self._get_agg_time_dimension_specs_for_metric(metric_reference)
-        distinct_agg_time_dimension_identifiers = set(
-            [(spec.reference, spec.entity_links) for spec in agg_time_dimension_specs]
-        )
-        if len(distinct_agg_time_dimension_identifiers) != 1:
+        agg_time_dimensions = self.get_agg_time_dimensions_for_metric(metric_reference)
+        if len(agg_time_dimensions) != 1:
             # If the metric's input measures have different agg_time_dimensions, user must use metric_time.
             return []
 
-        agg_time_dimension_reference, agg_time_dimension_entity_links = distinct_agg_time_dimension_identifiers.pop()
-        valid_agg_time_dimension_specs = TimeDimensionSpec.generate_possible_specs_for_time_dimension(
-            time_dimension_reference=agg_time_dimension_reference,
-            entity_links=agg_time_dimension_entity_links,
-            custom_granularities=self._custom_granularities,
+        return tuple(
+            self._semantic_model_lookup.generate_possible_time_dimension_specs_from_element_reference(
+                agg_time_dimensions.pop()
+            )
         )
-        return valid_agg_time_dimension_specs
 
     def get_min_queryable_time_granularity(self, metric_reference: MetricReference) -> TimeGranularity:
         """The minimum grain that can be queried with this metric.
@@ -270,21 +268,21 @@ class MetricLookup:
         return result
 
     def _get_min_queryable_time_granularity(self, metric_reference: MetricReference) -> TimeGranularity:
-        agg_time_dimension_specs = self._get_agg_time_dimension_specs_for_metric(metric_reference)
-        assert (
-            agg_time_dimension_specs
-        ), f"No agg_time_dimension found for metric {metric_reference}. Something has been misconfigured."
+        agg_time_dimensions = self.get_agg_time_dimensions_for_metric(metric_reference)
 
-        minimum_queryable_granularity = self._semantic_model_lookup.get_defined_time_granularity(
-            agg_time_dimension_specs[0].reference
-        )
-        if len(agg_time_dimension_specs) > 1:
-            for agg_time_dimension_spec in agg_time_dimension_specs[1:]:
-                defined_time_granularity = self._semantic_model_lookup.get_defined_time_granularity(
-                    agg_time_dimension_spec.reference
-                )
-                if defined_time_granularity.to_int() > minimum_queryable_granularity.to_int():
-                    minimum_queryable_granularity = defined_time_granularity
+        minimum_queryable_granularity: Optional[TimeGranularity] = None
+        for agg_time_dimension in agg_time_dimensions:
+            defined_time_granularity = self._semantic_model_lookup.get_defined_time_granularity(agg_time_dimension)
+            if (
+                not minimum_queryable_granularity
+                or defined_time_granularity.to_int() > minimum_queryable_granularity.to_int()
+            ):
+                minimum_queryable_granularity = defined_time_granularity
+
+        if not minimum_queryable_granularity:
+            raise ValueError(
+                f"No agg_time_dimension found for metric '{metric_reference.element_name}'. Something has been misconfigured."
+            )
 
         return minimum_queryable_granularity
 

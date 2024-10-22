@@ -234,7 +234,7 @@ def test_get_valid_agg_time_dimensions_for_metric(  # noqa: D103
         )
         if len(measure_agg_time_dims) == 1:
             for metric_agg_time_dim in metric_agg_time_dims:
-                assert metric_agg_time_dim.reference == measure_agg_time_dims[0]
+                assert metric_agg_time_dim.reference.element_name == measure_agg_time_dims[0].element_name
         else:
             assert len(metric_agg_time_dims) == 0
 
@@ -243,6 +243,6 @@ def test_get_agg_time_dimension_specs_for_measure(semantic_model_lookup: Semanti
     for measure_name in ["bookings", "views", "listings"]:
         measure_reference = MeasureReference(measure_name)
         agg_time_dim_specs = semantic_model_lookup.get_agg_time_dimension_specs_for_measure(measure_reference)
-        agg_time_dim_reference = semantic_model_lookup.get_agg_time_dimension_for_measure(measure_reference)
+        agg_time_dim_element_reference = semantic_model_lookup.get_agg_time_dimension_for_measure(measure_reference)
         for spec in agg_time_dim_specs:
-            assert spec.reference == agg_time_dim_reference
+            assert spec.reference.element_name == agg_time_dim_element_reference.element_name
