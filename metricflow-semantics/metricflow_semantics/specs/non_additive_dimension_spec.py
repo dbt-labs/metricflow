@@ -6,6 +6,7 @@ from hashlib import sha1
 from typing import Any, Sequence, Tuple
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
+from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums import AggregationType, TimeGranularity
 
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
@@ -41,6 +42,7 @@ class NonAdditiveDimensionSpec(SerializableDataclass):
 
     def __post_init__(self) -> None:
         """Post init validator to ensure names with double-underscores are not allowed."""
+        # TODO?
         # TODO: [custom granularity] change this to an assertion once we're sure there aren't exceptions
         if not self.name.find(DUNDER) == -1:
             logger.warning(
@@ -57,7 +59,9 @@ class NonAdditiveDimensionSpec(SerializableDataclass):
         values.extend(sorted(self.window_groupings))
         return hash_items(values)
 
-    def linkable_specs(self, non_additive_dimension_grain: TimeGranularity) -> Sequence[LinkableInstanceSpec]:
+    def linkable_specs(
+        self, non_additive_dimension_grain: TimeGranularity, primary_entity: EntityReference
+    ) -> Sequence[LinkableInstanceSpec]:
         """Return the set of linkable specs referenced by the NonAdditiveDimensionSpec.
 
         In practice, the name will always point to a time dimension. This method requires the time granularity
@@ -67,7 +71,7 @@ class NonAdditiveDimensionSpec(SerializableDataclass):
         return (
             TimeDimensionSpec(
                 element_name=self.name,
-                entity_links=(),
+                entity_links=(primary_entity,),
                 time_granularity=ExpandedTimeGranularity.from_time_granularity(non_additive_dimension_grain),
             ),
         ) + tuple(LinklessEntitySpec.from_element_name(entity_name) for entity_name in self.window_groupings)

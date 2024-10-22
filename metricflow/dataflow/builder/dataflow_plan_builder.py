@@ -34,7 +34,7 @@ from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.constant_property_spec import ConstantPropertySpec
 from metricflow_semantics.specs.entity_spec import EntitySpec, LinklessEntitySpec
-from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
+from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.measure_spec import (
     CumulativeMeasureDescription,
@@ -262,29 +262,33 @@ class DataflowPlanBuilder:
             queried_linkable_specs=queried_linkable_specs,
             filter_specs=base_measure_spec.filter_spec_set.all_filter_specs,
         )
-        base_measure_recipe = self._find_source_node_recipe(
+        base_source_node_recipe = self._find_source_node_recipe(
             FindSourceNodeRecipeParameterSet(
-                measure_spec_properties=self._build_measure_spec_properties([base_measure_spec.measure_spec]),
+                measure_spec_properties=self._build_measure_spec_properties(base_measure_spec.measure_spec),
                 predicate_pushdown_state=time_range_only_pushdown_state,
                 linkable_spec_set=base_required_linkable_specs,
             )
         )
-        logger.debug(LazyFormat(lambda: f"Recipe for base measure aggregation:\n{mf_pformat(base_measure_recipe)}"))
-        conversion_measure_recipe = self._find_source_node_recipe(
+        logger.debug(
+            LazyFormat(lambda: f"Recipe for base measure source nodes:\n{mf_pformat(base_source_node_recipe)}")
+        )
+        conversion_source_node_recipe = self._find_source_node_recipe(
             FindSourceNodeRecipeParameterSet(
-                measure_spec_properties=self._build_measure_spec_properties([conversion_measure_spec.measure_spec]),
+                measure_spec_properties=self._build_measure_spec_properties(conversion_measure_spec.measure_spec),
                 predicate_pushdown_state=disabled_pushdown_state,
                 linkable_spec_set=LinkableSpecSet(),
             )
         )
         logger.debug(
-            LazyFormat(lambda: f"Recipe for conversion measure aggregation:\n{mf_pformat(conversion_measure_recipe)}")
+            LazyFormat(
+                lambda: f"Recipe for conversion measure source nodes:\n{mf_pformat(conversion_source_node_recipe)}"
+            )
         )
-        if base_measure_recipe is None:
+        if base_source_node_recipe is None:
             raise UnableToSatisfyQueryError(
                 f"Unable to join all items in request. Measure: {base_measure_spec.measure_spec}; Specs to join: {base_required_linkable_specs}"
             )
-        if conversion_measure_recipe is None:
+        if conversion_source_node_recipe is None:
             raise UnableToSatisfyQueryError(
                 f"Unable to build dataflow plan for conversion measure: {conversion_measure_spec.measure_spec}"
             )
@@ -299,28 +303,58 @@ class DataflowPlanBuilder:
         # Build unaggregated conversions source node
         # Generate UUID column for conversion source to uniquely identify each row
         unaggregated_conversion_measure_node = AddGeneratedUuidColumnNode.create(
-            parent_node=conversion_measure_recipe.source_node
+            parent_node=conversion_source_node_recipe.source_node
         )
 
         # Get the agg time dimension for each measure used for matching conversion time windows
-        base_time_dimension_spec = TimeDimensionSpec.from_reference(
-            self._semantic_model_lookup.get_agg_time_dimension_for_measure(base_measure_spec.measure_spec.reference)
+        base_semantic_model = self._semantic_model_lookup.get_semantic_model_for_measure(
+            base_measure_spec.measure_spec.reference
         )
-        conversion_time_dimension_spec = TimeDimensionSpec.from_reference(
-            self._semantic_model_lookup.get_agg_time_dimension_for_measure(
-                conversion_measure_spec.measure_spec.reference
-            )
+        base_time_dim_ref = self._semantic_model_lookup.get_agg_time_dimension_for_measure(
+            base_measure_spec.measure_spec.reference
+        )
+        base_time_dim_entity_links = (self._semantic_model_lookup.get_primary_entity_else_error(base_semantic_model),)
+        base_time_dimension_spec = TimeDimensionSpec(
+            element_name=base_time_dim_ref.element_name,
+            entity_links=base_time_dim_entity_links,
+            time_granularity=ExpandedTimeGranularity.from_time_granularity(
+                self._semantic_model_lookup.get_defined_time_granularity(
+                    time_dimension_reference=base_time_dim_ref, entity_links=base_time_dim_entity_links
+                )
+            ),
+        )
+        conversion_semantic_model = self._semantic_model_lookup.get_semantic_model_for_measure(
+            conversion_measure_spec.measure_spec.reference
+        )
+        conversion_time_dim_ref = self._semantic_model_lookup.get_agg_time_dimension_for_measure(
+            conversion_measure_spec.measure_spec.reference
+        )
+        conversion_time_dim_entity_links = (
+            self._semantic_model_lookup.get_primary_entity_else_error(conversion_semantic_model),
+        )
+        conversion_time_dimension_spec = TimeDimensionSpec(
+            element_name=conversion_time_dim_ref.element_name,
+            entity_links=conversion_time_dim_entity_links,
+            time_granularity=ExpandedTimeGranularity.from_time_granularity(
+                self._semantic_model_lookup.get_defined_time_granularity(
+                    time_dimension_reference=conversion_time_dim_ref, entity_links=conversion_time_dim_entity_links
+                )
+            ),
         )
 
         # Filter the source nodes with only the required specs needed for the calculation
         constant_property_specs = []
-        required_local_specs = [base_measure_spec.measure_spec, entity_spec, base_time_dimension_spec] + list(
-            base_measure_recipe.required_local_linkable_specs
-        )
+        required_local_specs: List[InstanceSpec] = [
+            base_measure_spec.measure_spec,
+            entity_spec,
+            base_time_dimension_spec,
+        ] + list(base_source_node_recipe.required_local_linkable_specs.as_tuple)
         for constant_property in constant_properties or []:
-            base_property_spec = self._semantic_model_lookup.get_element_spec_for_name(constant_property.base_property)
-            conversion_property_spec = self._semantic_model_lookup.get_element_spec_for_name(
-                constant_property.conversion_property
+            base_property_spec = self._semantic_model_lookup.get_linkable_element_spec_from_semantic_model(
+                element_name=constant_property.base_property, semantic_model=base_semantic_model
+            )
+            conversion_property_spec = self._semantic_model_lookup.get_linkable_element_spec_from_semantic_model(
+                element_name=constant_property.conversion_property, semantic_model=conversion_semantic_model
             )
             required_local_specs.append(base_property_spec)
             constant_property_specs.append(
@@ -328,17 +362,15 @@ class DataflowPlanBuilder:
             )
 
         # Build the unaggregated base measure node for computing conversions
-        unaggregated_base_measure_node = base_measure_recipe.source_node
-        if base_measure_recipe.join_targets:
+        unaggregated_base_measure_node = base_source_node_recipe.source_node
+        if base_source_node_recipe.join_targets:
             unaggregated_base_measure_node = JoinOnEntitiesNode.create(
-                left_node=unaggregated_base_measure_node, join_targets=base_measure_recipe.join_targets
+                left_node=unaggregated_base_measure_node, join_targets=base_source_node_recipe.join_targets
             )
-        # TODO: write explanatory comment; or maybe refactor so this doesn't need to live here
-        filter_to_specs = base_required_linkable_specs.replace_custom_granularity_with_base_granularity()
         filtered_unaggregated_base_node = FilterElementsNode.create(
             parent_node=unaggregated_base_measure_node,
             include_specs=group_specs_by_type(required_local_specs)
-            .merge(InstanceSpecSet.create_from_specs(filter_to_specs.as_tuple))
+            .merge(base_source_node_recipe.linkable_specs_required_for_source_nodes.as_instance_spec_set)
             .dedupe(),
         )
 
@@ -361,18 +393,17 @@ class DataflowPlanBuilder:
         # Aggregate the conversion events with the JoinConversionEventsNode as the source node
         recipe_with_join_conversion_source_node = SourceNodeRecipe(
             source_node=join_conversion_node,
-            required_local_linkable_specs=base_measure_recipe.required_local_linkable_specs,
-            join_linkable_instances_recipes=base_measure_recipe.join_linkable_instances_recipes,
+            required_local_linkable_specs=base_source_node_recipe.required_local_linkable_specs,
+            join_linkable_instances_recipes=base_source_node_recipe.join_linkable_instances_recipes,
+            linkable_specs_required_for_source_nodes=base_source_node_recipe.linkable_specs_required_for_source_nodes,
         )
-        # TODO: Refine conversion metric configuration to fit into the standard dataflow plan building model
-        # In this case we override the measure recipe, which currently results in us bypassing predicate pushdown
-        # Rather than relying on happenstance in the way the code is laid out we also explicitly disable
-        # predicate pushdwon until we are ready to fully support it for conversion metrics
+        # TODO: Refine conversion metric configuration to fit into the standard dataflow plan building model.
+        # This special logic results in a lot of duplicated code and missed edge cases.
         aggregated_conversions_node = self.build_aggregated_measure(
             metric_input_measure_spec=conversion_measure_spec,
             queried_linkable_specs=queried_linkable_specs,
             predicate_pushdown_state=disabled_pushdown_state,
-            measure_recipe=recipe_with_join_conversion_source_node,
+            source_node_recipe=recipe_with_join_conversion_source_node,
         )
 
         # Combine the aggregated opportunities and conversion data sets
@@ -917,19 +948,15 @@ class DataflowPlanBuilder:
     def _select_source_nodes_with_linkable_specs(
         self, linkable_specs: LinkableSpecSet, source_nodes: Sequence[DataflowPlanNode]
     ) -> Sequence[DataflowPlanNode]:
-        """Find source nodes with requested linkable specs and no measures."""
+        """Find source nodes that contain any of the requested linkable specs."""
         # Use a dictionary to dedupe for consistent ordering.
         selected_nodes: Dict[DataflowPlanNode, None] = {}
 
         # TODO: Add support for no-metrics queries for custom grains without a join (i.e., select directly from time spine).
-        linkable_specs_set_with_base_granularities = set(linkable_specs.as_tuple)
+        needed_linkable_specs = set(linkable_specs.as_tuple)
         for source_node in source_nodes:
             output_spec_set = self._node_data_set_resolver.get_output_data_set(source_node).instance_set.spec_set
-            all_linkable_specs_in_node = set(output_spec_set.linkable_specs)
-            requested_linkable_specs_in_node = linkable_specs_set_with_base_granularities.intersection(
-                all_linkable_specs_in_node
-            )
-            if requested_linkable_specs_in_node:
+            if needed_linkable_specs.intersection(set(output_spec_set.linkable_specs)):
                 selected_nodes[source_node] = None
 
         return tuple(selected_nodes.keys())
@@ -956,36 +983,15 @@ class DataflowPlanBuilder:
         ), "Non-additive dimension can only be a time dimension, if specified."
         return queried_time_dimension_spec
 
-    def _build_measure_spec_properties(self, measure_specs: Sequence[MeasureSpec]) -> MeasureSpecProperties:
+    def _build_measure_spec_properties(self, measure_spec: MeasureSpec) -> MeasureSpecProperties:
         """Ensures that the group of MeasureSpecs has the same non_additive_dimension_spec and agg_time_dimension."""
-        if len(measure_specs) == 0:
-            raise ValueError("Cannot build MeasureParametersForRecipe when given an empty sequence of measure_specs.")
-        semantic_model_names = {
-            self._semantic_model_lookup.get_semantic_model_for_measure(measure.reference).name
-            for measure in measure_specs
-        }
-        if len(semantic_model_names) > 1:
-            raise ValueError(
-                f"Cannot find common properties for measures {measure_specs} coming from multiple "
-                f"semantic models: {semantic_model_names}. This suggests the measure_specs were not correctly filtered."
-            )
-        semantic_model_name = semantic_model_names.pop()
-
-        agg_time_dimension = self._semantic_model_lookup.get_agg_time_dimension_for_measure(measure_specs[0].reference)
-        non_additive_dimension_spec = measure_specs[0].non_additive_dimension_spec
-        for measure_spec in measure_specs:
-            if non_additive_dimension_spec != measure_spec.non_additive_dimension_spec:
-                raise ValueError(f"measure_specs {measure_specs} do not have the same non_additive_dimension_spec.")
-            measure_agg_time_dimension = self._semantic_model_lookup.get_agg_time_dimension_for_measure(
-                measure_spec.reference
-            )
-            if measure_agg_time_dimension != agg_time_dimension:
-                raise ValueError(f"measure_specs {measure_specs} do not have the same agg_time_dimension.")
+        semantic_model_name = self._semantic_model_lookup.get_semantic_model_for_measure(measure_spec.reference).name
+        agg_time_dimension = self._semantic_model_lookup.get_agg_time_dimension_for_measure(measure_spec.reference)
         return MeasureSpecProperties(
-            measure_specs=tuple(measure_specs),
+            measure_spec=measure_spec,
             semantic_model_name=semantic_model_name,
             agg_time_dimension=agg_time_dimension,
-            non_additive_dimension_spec=non_additive_dimension_spec,
+            non_additive_dimension_spec=measure_spec.non_additive_dimension_spec,
         )
 
     def _find_source_node_recipe(self, parameter_set: FindSourceNodeRecipeParameterSet) -> Optional[SourceNodeRecipe]:
@@ -995,13 +1001,7 @@ class DataflowPlanBuilder:
             return result.source_node_recipe
         source_node_recipe = self._find_source_node_recipe_non_cached(parameter_set)
         self._cache.set_find_source_node_recipe_result(parameter_set, FindSourceNodeRecipeResult(source_node_recipe))
-        if source_node_recipe is not None:
-            return SourceNodeRecipe(
-                source_node=source_node_recipe.source_node,
-                required_local_linkable_specs=source_node_recipe.required_local_linkable_specs,
-                join_linkable_instances_recipes=source_node_recipe.join_linkable_instances_recipes,
-            )
-        return None
+        return source_node_recipe
 
     def _find_source_node_recipe_non_cached(
         self, parameter_set: FindSourceNodeRecipeParameterSet
@@ -1021,7 +1021,7 @@ class DataflowPlanBuilder:
         if measure_spec_properties:
             candidate_nodes_for_right_side_of_join += self._source_node_set.source_nodes_for_metric_queries
             candidate_nodes_for_left_side_of_join += self._select_source_nodes_with_measures(
-                measure_specs=set(measure_spec_properties.measure_specs),
+                measure_specs={measure_spec_properties.measure_spec},
                 source_nodes=self._source_node_set.source_nodes_for_metric_queries,
             )
             default_join_type = SqlJoinType.LEFT_OUTER
@@ -1136,17 +1136,13 @@ class DataflowPlanBuilder:
             data_set = self._node_data_set_resolver.get_output_data_set(node)
 
             if measure_spec_properties:
-                measure_specs = measure_spec_properties.measure_specs
-                missing_specs = [
-                    spec for spec in measure_specs if spec not in data_set.instance_set.spec_set.measure_specs
-                ]
-                if missing_specs:
+                if measure_spec_properties.measure_spec not in data_set.instance_set.spec_set.measure_specs:
                     logger.debug(
                         LazyFormat(
                             lambda: f"Skipping evaluation for:\n"
                             f"{indent(node.structure_text())}"
-                            f"since it does not have all of the measure specs:\n"
-                            f"{indent(mf_pformat(missing_specs))}"
+                            f"since it does not have the needed measure spec:\n"
+                            f"{indent(mf_pformat(measure_spec_properties.measure_spec))}"
                         )
                     )
                     continue
@@ -1231,13 +1227,14 @@ class DataflowPlanBuilder:
             )
             return SourceNodeRecipe(
                 source_node=node_with_lowest_cost_plan,
-                required_local_linkable_specs=(
+                required_local_linkable_specs=LinkableSpecSet.create_from_specs(
                     evaluation.local_linkable_specs
                     + required_local_entity_specs
                     + required_local_dimension_specs
                     + required_local_time_dimension_specs
                 ),
                 join_linkable_instances_recipes=node_to_evaluation[node_with_lowest_cost_plan].join_recipes,
+                linkable_specs_required_for_source_nodes=linkable_specs_to_satisfy,
             )
 
         logger.error(LazyFormat(lambda: "No recipe could be constructed."))
@@ -1429,7 +1426,7 @@ class DataflowPlanBuilder:
         metric_input_measure_spec: MetricInputMeasureSpec,
         queried_linkable_specs: LinkableSpecSet,
         predicate_pushdown_state: PredicatePushdownState,
-        measure_recipe: Optional[SourceNodeRecipe] = None,
+        source_node_recipe: Optional[SourceNodeRecipe] = None,
     ) -> DataflowPlanNode:
         """Returns a node where the measures are aggregated by the linkable specs and constrained appropriately.
 
@@ -1451,14 +1448,14 @@ class DataflowPlanBuilder:
             metric_input_measure_spec=metric_input_measure_spec,
             queried_linkable_specs=queried_linkable_specs,
             predicate_pushdown_state=predicate_pushdown_state,
-            measure_recipe=measure_recipe,
+            source_node_recipe=source_node_recipe,
         )
 
     def __get_required_and_extraneous_linkable_specs(
         self,
         queried_linkable_specs: LinkableSpecSet,
         filter_specs: Sequence[WhereFilterSpec],
-        non_additive_dimension_spec: Optional[NonAdditiveDimensionSpec] = None,
+        measure_spec_properties: Optional[MeasureSpecProperties] = None,
     ) -> Tuple[LinkableSpecSet, LinkableSpecSet]:
         """Get the required and extraneous linkable specs for this query.
 
@@ -1468,13 +1465,20 @@ class DataflowPlanBuilder:
         linkable_spec_sets_to_merge: List[LinkableSpecSet] = []
         for filter_spec in filter_specs:
             linkable_spec_sets_to_merge.append(LinkableSpecSet.create_from_specs(filter_spec.linkable_specs))
-        if non_additive_dimension_spec:
-            non_additive_dimension_grain = self._semantic_model_lookup.get_defined_time_granularity(
-                TimeDimensionReference(non_additive_dimension_spec.name)
+        if measure_spec_properties and measure_spec_properties.non_additive_dimension_spec:
+            semantic_model = self._semantic_model_lookup.get_semantic_model_for_measure(
+                measure_spec_properties.measure_spec.reference
+            )
+            primary_entity = self._semantic_model_lookup.get_primary_entity_else_error(semantic_model)
+            non_additive_dimension_grain = self._non_additive_dimension_spec_grain(
+                non_additive_dimension_spec=measure_spec_properties.non_additive_dimension_spec,
+                measure_spec=measure_spec_properties.measure_spec,
             )
             linkable_spec_sets_to_merge.append(
                 LinkableSpecSet.create_from_specs(
-                    non_additive_dimension_spec.linkable_specs(non_additive_dimension_grain)
+                    measure_spec_properties.non_additive_dimension_spec.linkable_specs(
+                        non_additive_dimension_grain=non_additive_dimension_grain, primary_entity=primary_entity
+                    )
                 )
             )
 
@@ -1482,19 +1486,30 @@ class DataflowPlanBuilder:
         required_linkable_specs = queried_linkable_specs.merge(extraneous_linkable_specs).dedupe()
 
         # Custom grains require joining to their base grain, so add base grain to extraneous specs.
-        base_grain_set = LinkableSpecSet.create_from_specs(
-            [spec.with_base_grain() for spec in required_linkable_specs.time_dimension_specs_with_custom_grain]
-        )
-        extraneous_linkable_specs = extraneous_linkable_specs.merge(base_grain_set).dedupe()
+        if required_linkable_specs.time_dimension_specs_with_custom_grain:
+            base_grain_set = LinkableSpecSet.create_from_specs(
+                [spec.with_base_grain() for spec in required_linkable_specs.time_dimension_specs_with_custom_grain]
+            )
+            extraneous_linkable_specs = extraneous_linkable_specs.merge(base_grain_set).dedupe()
 
         return required_linkable_specs, extraneous_linkable_specs
+
+    def _non_additive_dimension_spec_grain(
+        self, non_additive_dimension_spec: NonAdditiveDimensionSpec, measure_spec: MeasureSpec
+    ) -> TimeGranularity:
+        semantic_model = self._semantic_model_lookup.get_semantic_model_for_measure(measure_spec.reference)
+        primary_entity = self._semantic_model_lookup.get_primary_entity_else_error(semantic_model)
+        return self._semantic_model_lookup.get_defined_time_granularity(
+            time_dimension_reference=TimeDimensionReference(non_additive_dimension_spec.name),
+            entity_links=(primary_entity,),
+        )
 
     def _build_aggregated_measure_from_measure_source_node(
         self,
         metric_input_measure_spec: MetricInputMeasureSpec,
         queried_linkable_specs: LinkableSpecSet,
         predicate_pushdown_state: PredicatePushdownState,
-        measure_recipe: Optional[SourceNodeRecipe] = None,
+        source_node_recipe: Optional[SourceNodeRecipe] = None,
     ) -> DataflowPlanNode:
         measure_spec = metric_input_measure_spec.measure_spec
         cumulative = metric_input_measure_spec.cumulative_description is not None
@@ -1508,7 +1523,7 @@ class DataflowPlanBuilder:
             if metric_input_measure_spec.cumulative_description
             else None
         )
-        measure_properties = self._build_measure_spec_properties([measure_spec])
+        measure_properties = self._build_measure_spec_properties(measure_spec)
         non_additive_dimension_spec = measure_properties.non_additive_dimension_spec
 
         cumulative_metric_adjusted_time_constraint: Optional[TimeRangeConstraint] = None
@@ -1539,14 +1554,14 @@ class DataflowPlanBuilder:
         required_linkable_specs, extraneous_linkable_specs = self.__get_required_and_extraneous_linkable_specs(
             queried_linkable_specs=queried_linkable_specs,
             filter_specs=metric_input_measure_spec.filter_spec_set.all_filter_specs,
-            non_additive_dimension_spec=non_additive_dimension_spec,
+            measure_spec_properties=measure_properties,
         )
 
         before_aggregation_time_spine_join_description = (
             metric_input_measure_spec.before_aggregation_time_spine_join_description
         )
 
-        if measure_recipe is None:
+        if source_node_recipe is None:
             logger.debug(
                 LazyFormat(
                     lambda: "Looking for a recipe to get:"
@@ -1568,7 +1583,7 @@ class DataflowPlanBuilder:
                 )
 
             find_recipe_start_time = time.time()
-            measure_recipe = self._find_source_node_recipe(
+            source_node_recipe = self._find_source_node_recipe(
                 FindSourceNodeRecipeParameterSet(
                     measure_spec_properties=measure_properties,
                     predicate_pushdown_state=measure_pushdown_state,
@@ -1582,9 +1597,9 @@ class DataflowPlanBuilder:
                 )
             )
 
-        logger.debug(LazyFormat(lambda: f"Using recipe:\n{indent(mf_pformat(measure_recipe))}"))
+        logger.debug(LazyFormat(lambda: f"Using recipe:\n{indent(mf_pformat(source_node_recipe))}"))
 
-        if measure_recipe is None:
+        if source_node_recipe is None:
             raise UnableToSatisfyQueryError(
                 f"Unable to join all items in request. Measure: {measure_spec.element_name}; Specs to join: {required_linkable_specs}"
             )
@@ -1595,10 +1610,10 @@ class DataflowPlanBuilder:
 
         # If a cumulative metric is queried with metric_time / agg_time_dimension, join over time range.
         # Otherwise, the measure will be aggregated over all time.
-        time_range_node: Optional[JoinOverTimeRangeNode] = None
+        output_node = source_node_recipe.source_node
         if cumulative and queried_agg_time_dimension_specs:
-            time_range_node = JoinOverTimeRangeNode.create(
-                parent_node=measure_recipe.source_node,
+            output_node = JoinOverTimeRangeNode.create(
+                parent_node=output_node,
                 queried_agg_time_dimension_specs=tuple(queried_agg_time_dimension_specs),
                 window=cumulative_window,
                 grain_to_date=cumulative_grain_to_date,
@@ -1612,7 +1627,6 @@ class DataflowPlanBuilder:
             )
 
         # If querying an offset metric, join to time spine before aggregation.
-        join_to_time_spine_node: Optional[JoinToTimeSpineNode] = None
         if before_aggregation_time_spine_join_description is not None:
             assert queried_agg_time_dimension_specs, (
                 "Joining to time spine requires querying with metric time or the appropriate agg_time_dimension."
@@ -1624,8 +1638,8 @@ class DataflowPlanBuilder:
             )
             # This also uses the original time range constraint due to the application of the time window intervals
             # in join rendering
-            join_to_time_spine_node = JoinToTimeSpineNode.create(
-                parent_node=time_range_node or measure_recipe.source_node,
+            output_node = JoinToTimeSpineNode.create(
+                parent_node=output_node,
                 requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
                 use_custom_agg_time_dimension=not queried_linkable_specs.contains_metric_time,
                 time_range_constraint=predicate_pushdown_state.time_range_constraint,
@@ -1635,43 +1649,29 @@ class DataflowPlanBuilder:
             )
 
         # Only get the required measure and the local linkable instances so that aggregations work correctly.
-        filtered_measure_source_node = FilterElementsNode.create(
-            parent_node=join_to_time_spine_node or time_range_node or measure_recipe.source_node,
+        output_node = FilterElementsNode.create(
+            parent_node=output_node,
             include_specs=InstanceSpecSet(measure_specs=(measure_spec,)).merge(
-                group_specs_by_type(measure_recipe.required_local_linkable_specs),
+                source_node_recipe.required_local_linkable_specs.as_instance_spec_set,
             ),
         )
 
-        join_targets = measure_recipe.join_targets
-        unaggregated_measure_node: DataflowPlanNode
+        join_targets = source_node_recipe.join_targets
         if len(join_targets) > 0:
-            filtered_measures_with_joined_elements = JoinOnEntitiesNode.create(
-                left_node=filtered_measure_source_node,
-                join_targets=join_targets,
+            output_node = JoinOnEntitiesNode.create(left_node=output_node, join_targets=join_targets)
+            specs_to_keep_after_joins = InstanceSpecSet(measure_specs=(measure_spec,)).merge(
+                source_node_recipe.linkable_specs_required_for_source_nodes.as_instance_spec_set
             )
-
-            specs_to_keep_after_join = InstanceSpecSet(measure_specs=(measure_spec,)).merge(
-                InstanceSpecSet.create_from_specs(
-                    required_linkable_specs.replace_custom_granularity_with_base_granularity().as_tuple
-                ),
-            )
-
-            after_join_filtered_node = FilterElementsNode.create(
-                parent_node=filtered_measures_with_joined_elements, include_specs=specs_to_keep_after_join
-            )
-            unaggregated_measure_node = after_join_filtered_node
-        else:
-            unaggregated_measure_node = filtered_measure_source_node
+            output_node = FilterElementsNode.create(parent_node=output_node, include_specs=specs_to_keep_after_joins)
 
         for time_dimension_spec in required_linkable_specs.time_dimension_specs:
             if time_dimension_spec.time_granularity.is_custom_granularity:
-                unaggregated_measure_node = JoinToCustomGranularityNode.create(
-                    parent_node=unaggregated_measure_node, time_dimension_spec=time_dimension_spec
+                output_node = JoinToCustomGranularityNode.create(
+                    parent_node=output_node, time_dimension_spec=time_dimension_spec
                 )
 
         # If time constraint was previously adjusted for cumulative window or grain, apply original time constraint
         # here. Can skip if metric is being aggregated over all time.
-        cumulative_metric_constrained_node: Optional[ConstrainTimeRangeNode] = None
         # TODO - Pushdown: Encapsulate all of this window sliding bookkeeping in the pushdown params object
         if (
             cumulative_metric_adjusted_time_constraint is not None
@@ -1680,42 +1680,41 @@ class DataflowPlanBuilder:
             assert (
                 queried_linkable_specs.contains_metric_time
             ), "Using time constraints currently requires querying with metric_time."
-            cumulative_metric_constrained_node = ConstrainTimeRangeNode.create(
-                unaggregated_measure_node, predicate_pushdown_state.time_range_constraint
+            output_node = ConstrainTimeRangeNode.create(
+                parent_node=output_node, time_range_constraint=predicate_pushdown_state.time_range_constraint
             )
 
-        pre_aggregate_node: DataflowPlanNode = cumulative_metric_constrained_node or unaggregated_measure_node
         if len(metric_input_measure_spec.filter_spec_set.all_filter_specs) > 0:
             # Apply where constraint on the node
-            pre_aggregate_node = WhereConstraintNode.create(
-                parent_node=pre_aggregate_node,
-                where_specs=metric_input_measure_spec.filter_spec_set.all_filter_specs,
+            output_node = WhereConstraintNode.create(
+                parent_node=output_node, where_specs=metric_input_measure_spec.filter_spec_set.all_filter_specs
             )
 
         if non_additive_dimension_spec is not None:
             # Apply semi additive join on the node
-            agg_time_dimension = measure_properties.agg_time_dimension
-            non_additive_dimension_grain = self._semantic_model_lookup.get_defined_time_granularity(
-                TimeDimensionReference(non_additive_dimension_spec.name)
+            non_additive_dimension_grain = self._non_additive_dimension_spec_grain(
+                non_additive_dimension_spec=non_additive_dimension_spec, measure_spec=measure_spec
             )
             queried_time_dimension_spec: Optional[
                 TimeDimensionSpec
             ] = self._find_non_additive_dimension_in_linkable_specs(
-                agg_time_dimension=agg_time_dimension,
+                agg_time_dimension=measure_properties.agg_time_dimension,
                 linkable_specs=queried_linkable_specs.as_tuple,
                 non_additive_dimension_spec=non_additive_dimension_spec,
             )
+            semantic_model = self._semantic_model_lookup.get_semantic_model_for_measure(measure_spec.reference)
+            primary_entity = self._semantic_model_lookup.get_primary_entity_else_error(semantic_model)
             time_dimension_spec = TimeDimensionSpec(
                 # The NonAdditiveDimensionSpec name property is a plain element name
                 element_name=non_additive_dimension_spec.name,
-                entity_links=(),
+                entity_links=(primary_entity,),
                 time_granularity=ExpandedTimeGranularity.from_time_granularity(non_additive_dimension_grain),
             )
             window_groupings = tuple(
                 LinklessEntitySpec.from_element_name(name) for name in non_additive_dimension_spec.window_groupings
             )
-            pre_aggregate_node = SemiAdditiveJoinNode.create(
-                parent_node=pre_aggregate_node,
+            output_node = SemiAdditiveJoinNode.create(
+                parent_node=output_node,
                 entity_specs=window_groupings,
                 time_dimension_spec=time_dimension_spec,
                 agg_by_function=non_additive_dimension_spec.window_choice,
@@ -1726,18 +1725,16 @@ class DataflowPlanBuilder:
             # At this point, it's the case that there are extraneous specs are not a subset of the queried
             # linkable specs. A filter is needed after, say, a where clause so that the linkable specs in the where clause don't
             # show up in the final result.
-            #
             # e.g. for "bookings" by "ds" where "is_instant", "is_instant" should not be in the results.
-            pre_aggregate_node = FilterElementsNode.create(
-                parent_node=pre_aggregate_node,
+            output_node = FilterElementsNode.create(
+                parent_node=output_node,
                 include_specs=InstanceSpecSet(measure_specs=(measure_spec,)).merge(
                     InstanceSpecSet.create_from_specs(queried_linkable_specs.as_tuple)
                 ),
             )
 
-        aggregate_measures_node = AggregateMeasuresNode.create(
-            parent_node=pre_aggregate_node,
-            metric_input_measure_specs=(metric_input_measure_spec,),
+        output_node = AggregateMeasuresNode.create(
+            parent_node=output_node, metric_input_measure_specs=(metric_input_measure_spec,)
         )
 
         # Joining to time spine after aggregation is for measures that specify `join_to_timespine: true` in the YAML spec.
@@ -1763,8 +1760,8 @@ class DataflowPlanBuilder:
 
             # TODO: split this node into TimeSpineSourceNode and JoinToTimeSpineNode - then can use standard nodes here
             # like JoinToCustomGranularityNode, WhereConstraintNode, etc.
-            output_node: DataflowPlanNode = JoinToTimeSpineNode.create(
-                parent_node=aggregate_measures_node,
+            output_node = JoinToTimeSpineNode.create(
+                parent_node=output_node,
                 requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
                 use_custom_agg_time_dimension=not queried_linkable_specs.contains_metric_time,
                 join_type=after_aggregation_time_spine_join_description.join_type,
@@ -1796,4 +1793,4 @@ class DataflowPlanBuilder:
                 )
             return output_node
 
-        return aggregate_measures_node
+        return output_node

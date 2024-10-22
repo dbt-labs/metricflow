@@ -10,6 +10,7 @@ from dbt_semantic_interfaces.references import EntityReference, LinkableElementR
 
 from metricflow_semantics.model.semantics.linkable_element import ElementPathKey
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
+from metricflow_semantics.visitor import VisitorOutputT
 
 if typing.TYPE_CHECKING:
     from metricflow_semantics.specs.dimension_spec import DimensionSpec
@@ -19,7 +20,6 @@ if typing.TYPE_CHECKING:
     from metricflow_semantics.specs.metadata_spec import MetadataSpec
     from metricflow_semantics.specs.metric_spec import MetricSpec
     from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
-from metricflow_semantics.visitor import VisitorOutputT
 
 
 @dataclass(frozen=True)

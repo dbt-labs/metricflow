@@ -138,10 +138,10 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
             date_part=self.date_part,
         )
 
-    @staticmethod
-    def from_reference(reference: TimeDimensionReference) -> TimeDimensionSpec:
-        """Initialize from a time dimension reference instance."""
-        return TimeDimensionSpec(entity_links=(), element_name=reference.element_name)
+    # @staticmethod
+    # def from_reference(reference: TimeDimensionReference) -> TimeDimensionSpec:
+    #     """Initialize from a time dimension reference instance."""
+    #     return TimeDimensionSpec(entity_links=(), element_name=reference.element_name)
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_time_dimension_spec(self)

@@ -271,20 +271,22 @@ class MetricLookup:
 
     def _get_min_queryable_time_granularity(self, metric_reference: MetricReference) -> TimeGranularity:
         agg_time_dimension_specs = self._get_agg_time_dimension_specs_for_metric(metric_reference)
-        assert (
-            agg_time_dimension_specs
-        ), f"No agg_time_dimension found for metric {metric_reference}. Something has been misconfigured."
 
-        minimum_queryable_granularity = self._semantic_model_lookup.get_defined_time_granularity(
-            agg_time_dimension_specs[0].reference
-        )
-        if len(agg_time_dimension_specs) > 1:
-            for agg_time_dimension_spec in agg_time_dimension_specs[1:]:
-                defined_time_granularity = self._semantic_model_lookup.get_defined_time_granularity(
-                    agg_time_dimension_spec.reference
-                )
-                if defined_time_granularity.to_int() > minimum_queryable_granularity.to_int():
-                    minimum_queryable_granularity = defined_time_granularity
+        minimum_queryable_granularity: Optional[TimeGranularity] = None
+        for agg_time_dimension_spec in agg_time_dimension_specs:
+            defined_time_granularity = self._semantic_model_lookup.get_defined_time_granularity(
+                agg_time_dimension_spec.reference, entity_links=agg_time_dimension_spec.entity_links
+            )
+            if (
+                not minimum_queryable_granularity
+                or defined_time_granularity.to_int() > minimum_queryable_granularity.to_int()
+            ):
+                minimum_queryable_granularity = defined_time_granularity
+
+        if not minimum_queryable_granularity:
+            raise ValueError(
+                f"No agg_time_dimension found for metric '{metric_reference.element_name}'. Something has been misconfigured."
+            )
 
         return minimum_queryable_granularity
 
