@@ -552,3 +552,385 @@ integration_test:
     LEFT OUTER JOIN {{ source_schema }}.mf_time_spine ts1 ON ts.ds = ts1.ds
     WHERE {{ render_time_constraint("ts1.martian_day", "2020-01-01") }}
     GROUP BY ts.ds
+---
+integration_test:
+  name: test_conversion_metric_with_custom_granularity
+  description: Test querying a conversion metric with a custom grain
+  model: SIMPLE_MODEL
+  metrics: ["visit_buy_conversion_rate"]
+  group_bys: ["metric_time__martian_day"]
+  check_query: |
+    SELECT
+      metric_time__martian_day
+      , CAST(buys AS {{ double_data_type_name }}) / CAST(NULLIF(visits, 0) AS {{ double_data_type_name }}) AS visit_buy_conversion_rate
+    FROM (
+      SELECT
+        COALESCE(subq_5.metric_time__martian_day, subq_17.metric_time__martian_day) AS metric_time__martian_day
+        , MAX(subq_5.visits) AS visits
+        , MAX(subq_17.buys) AS buys
+      FROM (
+        SELECT
+          ts.martian_day AS metric_time__martian_day
+          , SUM(1) AS visits
+        FROM {{ source_schema }}.fct_visits v
+        LEFT OUTER JOIN {{ source_schema }}.mf_time_spine ts ON {{ render_date_trunc("V.ds", TimeGranularity.DAY) }} = ts.ds
+        GROUP BY ts.martian_day
+      ) subq_5
+      FULL OUTER JOIN (
+        SELECT
+          ts2.martian_day AS metric_time__martian_day
+          , SUM(subq_12.buys) AS buys
+        FROM (
+          SELECT DISTINCT
+            FIRST_VALUE(subq_8.visits) OVER (
+              PARTITION BY subq_11.user, subq_11.ds__day, subq_11.mf_internal_uuid
+              ORDER BY subq_8.ds__day DESC
+              ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+            ) AS visits
+            , FIRST_VALUE(subq_8.ds__day) OVER (
+              PARTITION BY subq_11.user, subq_11.ds__day, subq_11.mf_internal_uuid
+              ORDER BY subq_8.ds__day DESC
+              ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+            ) AS ds__day
+            , FIRST_VALUE(subq_8.metric_time__day) OVER (
+              PARTITION BY subq_11.user, subq_11.ds__day, subq_11.mf_internal_uuid
+              ORDER BY subq_8.ds__day DESC
+              ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+            ) AS metric_time__day
+            , FIRST_VALUE(subq_8.user) OVER (
+              PARTITION BY subq_11.user, subq_11.ds__day, subq_11.mf_internal_uuid
+              ORDER BY subq_8.ds__day DESC
+              ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+            ) AS user
+            , subq_11.mf_internal_uuid AS mf_internal_uuid
+            , subq_11.buys AS buys
+          FROM (
+            SELECT
+              {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS ds__day
+              , {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
+              , user_id AS user
+              , 1 AS visits
+            FROM {{ source_schema }}.fct_visits v
+          ) subq_8
+          INNER JOIN (
+            SELECT
+              {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS ds__day
+              , user_id AS user
+              , 1 AS buys
+              , GEN_RANDOM_UUID() AS mf_internal_uuid
+            FROM {{ source_schema }}.fct_buys b
+          ) subq_11
+          ON subq_8.user = subq_11.user AND subq_8.ds__day <= subq_11.ds__day
+        ) subq_12
+        LEFT OUTER JOIN {{ source_schema }}.mf_time_spine ts2 ON subq_12.metric_time__day = ts2.ds
+        GROUP BY ts2.martian_day
+      ) subq_17
+      ON subq_5.metric_time__martian_day = subq_17.metric_time__martian_day
+      GROUP BY COALESCE(subq_5.metric_time__martian_day, subq_17.metric_time__martian_day)
+    ) subq_18
+---
+integration_test:
+  name: test_windowed_conversion_metric_with_custom_granularity
+  description: Test querying a windowed conversion metric with a custom grain
+  model: SIMPLE_MODEL
+  metrics: ["visit_buy_conversion_rate_7days"]
+  group_bys: ["metric_time__martian_day"]
+  check_query: |
+    SELECT
+      metric_time__martian_day
+      , CAST(buys AS {{ double_data_type_name }}) / CAST(NULLIF(visits, 0) AS {{ double_data_type_name }}) AS visit_buy_conversion_rate_7days
+    FROM (
+      SELECT
+        COALESCE(subq_5.metric_time__martian_day, subq_17.metric_time__martian_day) AS metric_time__martian_day
+        , MAX(subq_5.visits) AS visits
+        , MAX(subq_17.buys) AS buys
+      FROM (
+        SELECT
+          ts.martian_day AS metric_time__martian_day
+          , SUM(1) AS visits
+        FROM {{ source_schema }}.fct_visits v
+        LEFT OUTER JOIN {{ source_schema }}.mf_time_spine ts ON {{ render_date_trunc("V.ds", TimeGranularity.DAY) }} = ts.ds
+        GROUP BY ts.martian_day
+      ) subq_5
+      FULL OUTER JOIN (
+        SELECT
+          ts2.martian_day AS metric_time__martian_day
+          , SUM(subq_12.buys) AS buys
+        FROM (
+          SELECT DISTINCT
+            FIRST_VALUE(subq_8.visits) OVER (
+              PARTITION BY subq_11.user, subq_11.ds__day, subq_11.mf_internal_uuid
+              ORDER BY subq_8.ds__day DESC
+              ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+            ) AS visits
+            , FIRST_VALUE(subq_8.ds__day) OVER (
+              PARTITION BY
+                subq_11.user, subq_11.ds__day, subq_11.mf_internal_uuid
+              ORDER BY subq_8.ds__day DESC
+              ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+            ) AS ds__day
+            , FIRST_VALUE(subq_8.metric_time__day) OVER (
+              PARTITION BY subq_11.user, subq_11.ds__day, subq_11.mf_internal_uuid
+              ORDER BY subq_8.ds__day DESC
+              ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+            ) AS metric_time__day
+            , FIRST_VALUE(subq_8.user) OVER (
+              PARTITION BY subq_11.user, subq_11.ds__day, subq_11.mf_internal_uuid
+              ORDER BY subq_8.ds__day DESC
+              ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+            ) AS user
+            , subq_11.mf_internal_uuid AS mf_internal_uuid
+            , subq_11.buys AS buys
+          FROM (
+            SELECT
+              {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS ds__day
+              , {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
+              , user_id AS user
+              , 1 AS visits
+            FROM {{ source_schema }}.fct_visits v
+          ) subq_8
+          INNER JOIN (
+            SELECT
+              {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS ds__day
+              , user_id AS user
+              , 1 AS buys
+              , GEN_RANDOM_UUID() AS mf_internal_uuid
+            FROM {{ source_schema }}.fct_buys b
+          ) subq_11
+          ON subq_8.user = subq_11.user AND subq_8.ds__day <= subq_11.ds__day
+            AND subq_8.ds__day > {{ render_date_sub("subq_11", "ds__day", 7, TimeGranularity.DAY) }}
+        ) subq_12
+        LEFT OUTER JOIN {{ source_schema }}.mf_time_spine ts2
+        ON subq_12.metric_time__day = ts2.ds
+        GROUP BY ts2.martian_day
+      ) subq_17
+      ON subq_5.metric_time__martian_day = subq_17.metric_time__martian_day
+      GROUP BY COALESCE(subq_5.metric_time__martian_day, subq_17.metric_time__martian_day)
+    ) subq_18
+---
+integration_test:
+  name: test_conversion_metric_with_custom_granularity_filter
+  description: Test querying a conversion metric with a custom grain in the filter (also in group by)
+  model: SIMPLE_MODEL
+  metrics: ["visit_buy_conversion_rate"]
+  group_bys: ["metric_time__martian_day"]
+  where_filter: |
+    {{ render_time_constraint(render_time_dimension_template('metric_time', 'martian_day'), start_time="2019-12-20") }}
+  check_query: |
+    SELECT
+      metric_time__martian_day
+      , CAST(buys AS {{ double_data_type_name }}) / CAST(NULLIF(visits, 0) AS {{ double_data_type_name }}) AS visit_buy_conversion_rate
+    FROM (
+      SELECT
+        COALESCE(subq_6.metric_time__martian_day, subq_19.metric_time__martian_day) AS metric_time__martian_day
+        , MAX(subq_6.visits) AS visits
+        , MAX(subq_19.buys) AS buys
+      FROM (
+        SELECT
+          metric_time__martian_day
+          , SUM(visits) AS visits
+        FROM (
+          SELECT
+            subq_1.visits AS visits
+            , subq_2.martian_day AS metric_time__martian_day
+          FROM (
+            SELECT
+              {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
+              , 1 AS visits
+            FROM {{ source_schema }}.fct_visits v
+          ) subq_1
+          LEFT OUTER JOIN
+            {{ source_schema }}.mf_time_spine subq_2
+          ON
+            subq_1.metric_time__day = subq_2.ds
+        ) subq_3
+        WHERE CAST(metric_time__martian_day AS TIMESTAMP) >= CAST('2019-12-20' AS TIMESTAMP)
+        GROUP BY
+          metric_time__martian_day
+      ) subq_6
+      FULL OUTER JOIN (
+        SELECT
+          metric_time__martian_day
+          , SUM(buys) AS buys
+        FROM (
+          SELECT DISTINCT
+            FIRST_VALUE(subq_11.visits) OVER (
+              PARTITION BY
+                subq_14.user
+                , subq_14.ds__day
+                , subq_14.mf_internal_uuid
+              ORDER BY subq_11.ds__day DESC
+              ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+            ) AS visits
+            , FIRST_VALUE(subq_11.metric_time__martian_day) OVER (
+              PARTITION BY
+                subq_14.user
+                , subq_14.ds__day
+                , subq_14.mf_internal_uuid
+              ORDER BY subq_11.ds__day DESC
+              ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+            ) AS metric_time__martian_day
+            , FIRST_VALUE(subq_11.ds__day) OVER (
+              PARTITION BY
+                subq_14.user
+                , subq_14.ds__day
+                , subq_14.mf_internal_uuid
+              ORDER BY subq_11.ds__day DESC
+              ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+            ) AS ds__day
+            , FIRST_VALUE(subq_11.metric_time__day) OVER (
+              PARTITION BY
+                subq_14.user
+                , subq_14.ds__day
+                , subq_14.mf_internal_uuid
+              ORDER BY subq_11.ds__day DESC
+              ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+            ) AS metric_time__day
+            , FIRST_VALUE(subq_11.user) OVER (
+              PARTITION BY
+                subq_14.user
+                , subq_14.ds__day
+                , subq_14.mf_internal_uuid
+              ORDER BY subq_11.ds__day DESC
+              ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+            ) AS user
+            , subq_14.mf_internal_uuid AS mf_internal_uuid
+            , subq_14.buys AS buys
+          FROM (
+            SELECT
+              metric_time__martian_day
+              , ds__day
+              , metric_time__day
+              , subq_9.user
+              , visits
+            FROM (
+              SELECT
+                subq_7.ds__day AS ds__day
+                , subq_7.ds__day AS metric_time__day
+                , subq_7.user AS user
+                , subq_7.visits AS visits
+                , subq_8.martian_day AS metric_time__martian_day
+              FROM (
+                SELECT
+                  1 AS visits
+                  , {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS ds__day
+                  , user_id AS user
+                FROM {{ source_schema }}.fct_visits v
+              ) subq_7
+              LEFT OUTER JOIN
+                {{ source_schema }}.mf_time_spine subq_8
+              ON
+                subq_7.ds__day = subq_8.ds
+            ) subq_9
+            WHERE CAST(metric_time__martian_day AS TIMESTAMP) >= CAST('2019-12-20' AS TIMESTAMP)
+          ) subq_11
+          INNER JOIN (
+            SELECT
+              {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS ds__day
+              , user_id AS user
+              , 1 AS buys
+              , GEN_RANDOM_UUID() AS mf_internal_uuid
+            FROM {{ source_schema }}.fct_buys b
+          ) subq_14
+          ON
+            (
+              subq_11.user = subq_14.user
+            ) AND (
+              (subq_11.ds__day <= subq_14.ds__day)
+            )
+        ) subq_15
+        GROUP BY
+          metric_time__martian_day
+      ) subq_19
+      ON
+        subq_6.metric_time__martian_day = subq_19.metric_time__martian_day
+      GROUP BY
+        COALESCE(subq_6.metric_time__martian_day, subq_19.metric_time__martian_day)
+    ) subq_20
+---
+integration_test:
+  name: test_conversion_metric_with_custom_granularity_filter_not_in_group_by
+  description: Test querying a conversion metric with a custom grain in the filter that's not in the group by
+  model: SIMPLE_MODEL
+  metrics: ["visit_buy_conversion_rate"]
+  where_filter: |
+    {{ render_time_constraint(render_time_dimension_template('metric_time', 'martian_day'), start_time="2019-12-20") }}
+  check_query: |
+    SELECT
+      CAST(MAX(subq_18.buys) AS {{ double_data_type_name }}) / CAST(NULLIF(MAX(subq_6.visits), 0) AS {{ double_data_type_name }}) AS visit_buy_conversion_rate
+    FROM (
+      SELECT
+        SUM(1) AS visits
+      FROM {{ source_schema }}.fct_visits v1
+      LEFT OUTER JOIN {{ source_schema }}.mf_time_spine ts ON {{ render_date_trunc("v1.ds", TimeGranularity.DAY) }} = ts.ds
+      WHERE CAST(ts.martian_day AS TIMESTAMP) >= CAST('2019-12-20' AS TIMESTAMP)
+    ) subq_6
+    CROSS JOIN (
+      SELECT
+        SUM(buys) AS buys
+      FROM (
+        SELECT DISTINCT
+          FIRST_VALUE(subq_11.visits) OVER (
+            PARTITION BY
+              subq_14.user
+              , subq_14.ds__day
+              , subq_14.mf_internal_uuid
+            ORDER BY subq_11.ds__day DESC
+            ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+          ) AS visits
+          , FIRST_VALUE(subq_11.metric_time__martian_day) OVER (
+            PARTITION BY
+              subq_14.user
+              , subq_14.ds__day
+              , subq_14.mf_internal_uuid
+            ORDER BY subq_11.ds__day DESC
+            ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+          ) AS metric_time__martian_day
+          , FIRST_VALUE(subq_11.ds__day) OVER (
+            PARTITION BY
+              subq_14.user
+              , subq_14.ds__day
+              , subq_14.mf_internal_uuid
+            ORDER BY subq_11.ds__day DESC
+            ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+          ) AS ds__day
+          , FIRST_VALUE(subq_11.metric_time__day) OVER (
+            PARTITION BY
+              subq_14.user
+              , subq_14.ds__day
+              , subq_14.mf_internal_uuid
+            ORDER BY subq_11.ds__day DESC
+            ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+          ) AS metric_time__day
+          , FIRST_VALUE(subq_11.user) OVER (
+            PARTITION BY
+              subq_14.user
+              , subq_14.ds__day
+              , subq_14.mf_internal_uuid
+            ORDER BY subq_11.ds__day DESC
+            ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+          ) AS user
+          , subq_14.mf_internal_uuid AS mf_internal_uuid
+          , subq_14.buys AS buys
+        FROM (
+          SELECT
+            {{ render_date_trunc("v2.ds", TimeGranularity.DAY) }} AS ds__day
+            , {{ render_date_trunc("v2.ds", TimeGranularity.DAY) }} AS metric_time__day
+            , v2.user_id AS user
+            , 1 AS visits
+            , subq_8.martian_day AS metric_time__martian_day
+          FROM {{ source_schema }}.fct_visits v2
+          LEFT OUTER JOIN {{ source_schema }}.mf_time_spine subq_8 ON {{ render_date_trunc("v2.ds", TimeGranularity.DAY) }} = subq_8.ds
+          WHERE CAST(subq_8.martian_day AS TIMESTAMP) >= CAST('2019-12-20' AS TIMESTAMP)
+        ) subq_11
+        INNER JOIN (
+          SELECT
+            {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS ds__day
+            , user_id AS user
+            , 1 AS buys
+            , GEN_RANDOM_UUID() AS mf_internal_uuid
+          FROM {{ source_schema }}.fct_buys b
+        ) subq_14
+        ON subq_11.user = subq_14.user AND subq_11.ds__day <= subq_14.ds__day
+      ) subq_15
+    ) subq_18
