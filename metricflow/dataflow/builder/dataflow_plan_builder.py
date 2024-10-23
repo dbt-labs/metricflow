@@ -315,7 +315,7 @@ class DataflowPlanBuilder:
         # Filter the source nodes with only the required specs needed for the calculation
         constant_property_specs = []
         required_local_specs = [base_measure_spec.measure_spec, entity_spec, base_time_dimension_spec] + list(
-            base_measure_recipe.required_local_linkable_specs
+            base_measure_recipe.required_local_linkable_specs.as_tuple
         )
         for constant_property in constant_properties or []:
             base_property_spec = self._semantic_model_lookup.get_element_spec_for_name(constant_property.base_property)
@@ -361,11 +361,12 @@ class DataflowPlanBuilder:
             constant_properties=constant_property_specs,
         )
 
-        # Aggregate the conversion events with the JoinConversionEventsNode as the source node
+        # Aggregate the conversion events with the JoinConversionEventsNode as the source node.
         recipe_with_join_conversion_source_node = SourceNodeRecipe(
             source_node=join_conversion_node,
-            required_local_linkable_specs=queried_linkable_specs.as_tuple,
+            required_local_linkable_specs=queried_linkable_specs,
             join_linkable_instances_recipes=(),
+            all_linkable_specs_required_for_source_nodes=queried_linkable_specs,
         )
         # TODO: Refine conversion metric configuration to fit into the standard dataflow plan building model
         # In this case we override the measure recipe, which currently results in us bypassing predicate pushdown
@@ -1226,13 +1227,14 @@ class DataflowPlanBuilder:
             )
             return SourceNodeRecipe(
                 source_node=node_with_lowest_cost_plan,
-                required_local_linkable_specs=(
+                required_local_linkable_specs=LinkableSpecSet.create_from_specs(
                     evaluation.local_linkable_specs
                     + required_local_entity_specs
                     + required_local_dimension_specs
                     + required_local_time_dimension_specs
                 ),
                 join_linkable_instances_recipes=node_to_evaluation[node_with_lowest_cost_plan].join_recipes,
+                all_linkable_specs_required_for_source_nodes=linkable_specs_to_satisfy,
             )
 
         logger.error(LazyFormat(lambda: "No recipe could be constructed."))
@@ -1633,7 +1635,7 @@ class DataflowPlanBuilder:
         filtered_measure_source_node = FilterElementsNode.create(
             parent_node=join_to_time_spine_node or time_range_node or measure_recipe.source_node,
             include_specs=InstanceSpecSet(measure_specs=(measure_spec,)).merge(
-                group_specs_by_type(measure_recipe.required_local_linkable_specs),
+                measure_recipe.required_local_linkable_specs.as_instance_spec_set,
             ),
         )
 
@@ -1646,9 +1648,7 @@ class DataflowPlanBuilder:
             )
 
             specs_to_keep_after_join = InstanceSpecSet(measure_specs=(measure_spec,)).merge(
-                InstanceSpecSet.create_from_specs(
-                    required_linkable_specs.replace_custom_granularity_with_base_granularity().as_tuple
-                ),
+                InstanceSpecSet.create_from_specs(measure_recipe.all_linkable_specs_required_for_source_nodes.as_tuple),
             )
 
             after_join_filtered_node = FilterElementsNode.create(
