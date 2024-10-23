@@ -341,7 +341,7 @@ class DataflowPlanBuilder:
         filtered_unaggregated_base_node = FilterElementsNode.create(
             parent_node=unaggregated_base_measure_node,
             include_specs=group_specs_by_type(required_local_specs)
-            .merge(InstanceSpecSet.create_from_specs(base_required_linkable_specs.as_tuple))
+            .merge(base_measure_recipe.all_linkable_specs_required_for_source_nodes.as_instance_spec_set)
             .dedupe(),
         )
 
