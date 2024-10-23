@@ -78,11 +78,6 @@ def test_get_names(  # noqa: D103
 
 
 def test_get_elements(semantic_model_lookup: SemanticModelLookup) -> None:  # noqa: D103
-    for dimension_reference in semantic_model_lookup.get_dimension_references():
-        assert (
-            semantic_model_lookup.get_dimension(dimension_reference=dimension_reference).reference
-            == dimension_reference
-        )
     for measure_reference in semantic_model_lookup.measure_references:
         measure_reference = MeasureReference(element_name=measure_reference.element_name)
         assert semantic_model_lookup.get_measure(measure_reference=measure_reference).reference == measure_reference

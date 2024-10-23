@@ -14,7 +14,12 @@ from dbt_semantic_interfaces.protocols.metric import (
     MetricTimeWindow,
     MetricType,
 )
-from dbt_semantic_interfaces.references import MetricReference, SemanticModelElementReference, TimeDimensionReference
+from dbt_semantic_interfaces.references import (
+    MetricReference,
+    SemanticModelElementReference,
+    SemanticModelReference,
+    TimeDimensionReference,
+)
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
@@ -48,7 +53,7 @@ from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDi
 from metricflow_semantics.specs.order_by_spec import OrderBySpec
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet, group_specs_by_type
-from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
+from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY, TimeDimensionSpec
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.specs.where_filter.where_filter_spec_set import WhereFilterSpecSet
 from metricflow_semantics.specs.where_filter.where_filter_transform import WhereSpecFactory
@@ -303,19 +308,23 @@ class DataflowPlanBuilder:
         )
 
         # Get the agg time dimension for each measure used for matching conversion time windows
-        base_time_dimension_spec = TimeDimensionSpec.from_reference(
-            TimeDimensionReference(
-                self._semantic_model_lookup.get_agg_time_dimension_for_measure(
-                    base_measure_spec.measure_spec.reference
-                ).element_name
-            )
+        base_time_dimension_spec = TimeDimensionSpec(
+            element_name=self._semantic_model_lookup.get_agg_time_dimension_for_measure(
+                base_measure_spec.measure_spec.reference
+            ).element_name,
+            entity_links=(),  # TODO: is this acceptable?
+            time_granularity=ExpandedTimeGranularity.from_time_granularity(
+                DEFAULT_TIME_GRANULARITY
+            ),  # TODO: need actual granularity here
         )
-        conversion_time_dimension_spec = TimeDimensionSpec.from_reference(
-            TimeDimensionReference(
-                self._semantic_model_lookup.get_agg_time_dimension_for_measure(
-                    conversion_measure_spec.measure_spec.reference
-                ).element_name
-            )
+        conversion_time_dimension_spec = TimeDimensionSpec(
+            element_name=self._semantic_model_lookup.get_agg_time_dimension_for_measure(
+                conversion_measure_spec.measure_spec.reference
+            ).element_name,
+            entity_links=(),  # TODO: is this acceptable?
+            time_granularity=ExpandedTimeGranularity.from_time_granularity(
+                DEFAULT_TIME_GRANULARITY
+            ),  # TODO: need actual granularity here
         )
 
         # Filter the source nodes with only the required specs needed for the calculation
@@ -1467,6 +1476,7 @@ class DataflowPlanBuilder:
         linkable_spec_sets_to_merge: List[LinkableSpecSet] = []
         for filter_spec in filter_specs:
             linkable_spec_sets_to_merge.append(LinkableSpecSet.create_from_specs(filter_spec.linkable_specs))
+
         if measure_spec_properties and measure_spec_properties.non_additive_dimension_spec:
             non_additive_dimension_grain = self._semantic_model_lookup.get_defined_time_granularity(
                 SemanticModelElementReference(
@@ -1474,9 +1484,15 @@ class DataflowPlanBuilder:
                     semantic_model_name=measure_spec_properties.agg_time_dimension.semantic_model_name,
                 )
             )
+            semantic_model = self._semantic_model_lookup.get_semantic_model(
+                SemanticModelReference(measure_spec_properties.agg_time_dimension.semantic_model_name)
+            )
+            primary_entity = self._semantic_model_lookup.get_primary_entity_else_error(semantic_model)
             linkable_spec_sets_to_merge.append(
                 LinkableSpecSet.create_from_specs(
-                    measure_spec_properties.non_additive_dimension_spec.linkable_specs(non_additive_dimension_grain)
+                    measure_spec_properties.non_additive_dimension_spec.linkable_specs(
+                        non_additive_dimension_grain=non_additive_dimension_grain, primary_entity=primary_entity
+                    )
                 )
             )
 
@@ -1713,7 +1729,7 @@ class DataflowPlanBuilder:
             time_dimension_spec = TimeDimensionSpec(
                 # The NonAdditiveDimensionSpec name property is a plain element name
                 element_name=non_additive_dimension_spec.name,
-                entity_links=(),
+                entity_links=(),  # TODO
                 time_granularity=ExpandedTimeGranularity.from_time_granularity(non_additive_dimension_grain),
             )
             window_groupings = tuple(

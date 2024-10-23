@@ -39,7 +39,10 @@ def test_view_sql_generated_at_a_node(
     column_association_resolver = DunderColumnAssociationResolver(
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
     )
-    to_data_set_converter = SemanticModelToDataSetConverter(column_association_resolver)
+    to_data_set_converter = SemanticModelToDataSetConverter(
+        column_association_resolver=column_association_resolver,
+        semantic_model_lookup=simple_semantic_manifest_lookup.semantic_model_lookup,
+    )
 
     to_sql_plan_converter = DataflowToSqlQueryPlanConverter(
         column_association_resolver=DunderColumnAssociationResolver(simple_semantic_manifest_lookup),

@@ -61,7 +61,10 @@ class SourceNodeBuilder:
         semantic_manifest_lookup: SemanticManifestLookup,
     ) -> None:
         self._semantic_manifest_lookup = semantic_manifest_lookup
-        data_set_converter = SemanticModelToDataSetConverter(column_association_resolver)
+        data_set_converter = SemanticModelToDataSetConverter(
+            column_association_resolver=column_association_resolver,
+            semantic_model_lookup=semantic_manifest_lookup.semantic_model_lookup,
+        )
         self.time_spine_sources = TimeSpineSource.build_standard_time_spine_sources(
             semantic_manifest_lookup.semantic_manifest
         )

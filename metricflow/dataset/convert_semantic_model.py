@@ -76,8 +76,11 @@ class SemanticModelToDataSetConverter:
     # Regex for inferring whether an expression for an element is a column reference.
     _SQL_IDENTIFIER_REGEX = re.compile("^[a-zA-Z_][a-zA-Z_0-9]*$")
 
-    def __init__(self, column_association_resolver: ColumnAssociationResolver) -> None:  # noqa: D107
+    def __init__(  # noqa: D107
+        self, column_association_resolver: ColumnAssociationResolver, semantic_model_lookup: SemanticModelLookup
+    ) -> None:
         self._column_association_resolver = column_association_resolver
+        self._semantic_model_lookup = semantic_model_lookup
 
     def _create_dimension_instance(
         self,
@@ -437,49 +440,37 @@ class SemanticModelToDataSetConverter:
             all_select_columns.extend(select_columns)
 
         # Group by items in the semantic model can be accessed though a subset of the entities defined in the model.
-        possible_entity_links: List[Tuple[EntityReference, ...]] = [
-            (),
-        ]
+        # Is this actually right? Shouldn't it only be the primary entity since you can't use fan-out joins?
+        # possible_entity_links: List[Tuple[EntityReference, ...]] = [
+        #     (),  # TODO: is this where we lose entity links?
+        # ]
+        primary_entity = self._semantic_model_lookup.resolved_primary_entity(semantic_model)
+        # for entity_link in SemanticModelLookup.entity_links_for_local_elements(semantic_model):
+        #     possible_entity_links.append((entity_link,))
 
-        for entity_link in SemanticModelLookup.entity_links_for_local_elements(semantic_model):
-            possible_entity_links.append((entity_link,))
-
-        # Handle dimensions
-        conversion_results = [
-            self._convert_dimensions(
+        # Handle dimensions. Semantic models with dimensions always have a primary entity.
+        if primary_entity:
+            conversion_result = self._convert_dimensions(
                 semantic_model_name=semantic_model.name,
                 dimensions=semantic_model.dimensions,
-                entity_links=entity_links,
+                entity_links=(primary_entity,),
                 table_alias=from_source_alias,
             )
-            for entity_links in possible_entity_links
-        ]
 
-        all_dimension_instances.extend(
-            [
-                dimension_instance
-                for conversion_result in conversion_results
-                for dimension_instance in conversion_result.dimension_instances
-            ]
-        )
+            all_dimension_instances.extend(
+                [dimension_instance for dimension_instance in conversion_result.dimension_instances]
+            )
 
-        all_time_dimension_instances.extend(
-            [
-                time_dimension_instance
-                for conversion_result in conversion_results
-                for time_dimension_instance in conversion_result.time_dimension_instances
-            ]
-        )
+            all_time_dimension_instances.extend(
+                [time_dimension_instance for time_dimension_instance in conversion_result.time_dimension_instances]
+            )
 
-        all_select_columns.extend(
-            [
-                select_column
-                for conversion_result in conversion_results
-                for select_column in conversion_result.select_columns
-            ]
-        )
+            all_select_columns.extend([select_column for select_column in conversion_result.select_columns])
 
         # Handle entities
+        possible_entity_links: List[Tuple[EntityReference, ...]] = [()]
+        if primary_entity:
+            possible_entity_links.append((primary_entity,))
         for entity_links in possible_entity_links:
             entity_instances, select_columns = self._create_entity_instances(
                 semantic_model_name=semantic_model.name,

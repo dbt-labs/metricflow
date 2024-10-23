@@ -101,6 +101,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
             date_part=self.date_part,
         )
 
+    # TODO - can we remove this method?
     @property
     def without_entity_links(self) -> TimeDimensionSpec:  # noqa: D102
         return TimeDimensionSpec(
@@ -137,12 +138,6 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
             time_granularity=self.time_granularity,
             date_part=self.date_part,
         )
-
-    # TODO: remove this method
-    @staticmethod
-    def from_reference(reference: TimeDimensionReference) -> TimeDimensionSpec:
-        """Initialize from a time dimension reference instance."""
-        return TimeDimensionSpec(entity_links=(), element_name=reference.element_name)
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_time_dimension_spec(self)

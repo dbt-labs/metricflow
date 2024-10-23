@@ -54,8 +54,11 @@ class SemanticModelLookup:
         self._measure_non_additive_dimension_specs: Dict[MeasureReference, NonAdditiveDimensionSpec] = {}
         self._dimension_index: Dict[DimensionReference, List[SemanticModel]] = {}
         self._entity_index: Dict[EntityReference, List[SemanticModel]] = {}
+        self._primary_entity_index: Dict[EntityReference, List[SemanticModel]] = {}
 
+        # TODO: remove this dict
         self._dimension_ref_to_spec: Dict[DimensionReference, DimensionSpec] = {}
+
         self._entity_ref_to_spec: Dict[EntityReference, EntitySpec] = {}
 
         self._semantic_model_to_aggregation_time_dimensions: Dict[
@@ -88,29 +91,6 @@ class SemanticModelLookup:
         raise ValueError(
             f"No dimension with name '{dimension_reference.element_name}' in semantic_model '{semantic_model.name}'."
         )
-
-    # TODO: remove this method
-    def get_dimension(self, dimension_reference: DimensionReference) -> Dimension:
-        """Retrieves a full dimension object by name."""
-        # If the reference passed is a TimeDimensionReference, convert to DimensionReference.
-        dimension_reference = DimensionReference(dimension_reference.element_name)
-
-        semantic_models = self._dimension_index.get(dimension_reference)
-        if not semantic_models:
-            raise ValueError(
-                f"Could not find dimension with name '{dimension_reference.element_name}' in configured semantic models"
-            )
-
-        return SemanticModelLookup.get_dimension_from_semantic_model(
-            # Dimension object should match across semantic models, so just use the first semantic model.
-            semantic_model=semantic_models[0],
-            dimension_reference=dimension_reference,
-        )
-
-    # TODO: remove this method
-    def get_time_dimension(self, time_dimension_reference: TimeDimensionReference) -> Dimension:
-        """Retrieves a full dimension object by name."""
-        return self.get_dimension(dimension_reference=time_dimension_reference.dimension_reference)
 
     @property
     def measure_references(self) -> Sequence[MeasureReference]:
@@ -277,18 +257,17 @@ class SemanticModelLookup:
                     )
                 )
 
-            # TODO: Construct these specs correctly. All of the time dimension specs have the default granularity
-            self._dimension_ref_to_spec[dim.time_dimension_reference or dim.reference] = (
-                TimeDimensionSpec(element_name=dim.name, entity_links=())
-                if dim.type is DimensionType.TIME
-                else DimensionSpec(element_name=dim.name, entity_links=())
-            )
-
         for entity in semantic_model.entities:
             semantic_models_for_entity = self._entity_index.get(entity.reference, []) + [semantic_model]
             self._entity_index[entity.reference] = semantic_models_for_entity
 
             self._entity_ref_to_spec[entity.reference] = EntitySpec(element_name=entity.name, entity_links=())
+
+        primary_entity = self.resolved_primary_entity(semantic_model)
+        if primary_entity:
+            self._primary_entity_index[primary_entity] = self._primary_entity_index.get(primary_entity, []) + [
+                semantic_model
+            ]
 
         self._semantic_model_reference_to_semantic_model[semantic_model.reference] = semantic_model
 
@@ -375,6 +354,7 @@ class SemanticModelLookup:
 
         return sorted(possible_entity_links, key=lambda entity_reference: entity_reference.element_name)
 
+    # TODO: remove this method
     def get_element_spec_for_name(self, element_name: str) -> LinkableInstanceSpec:
         """Returns the spec for the given name of a linkable element (dimension or entity)."""
         if TimeDimensionReference(element_name=element_name) in self._dimension_ref_to_spec:
@@ -449,3 +429,38 @@ class SemanticModelLookup:
             defined_time_granularity = time_dimension.type_params.time_granularity
 
         return defined_time_granularity
+
+    def get_semantic_models_for_primary_entity(self, entity_reference: EntityReference) -> List[SemanticModel]:
+        """Return all semantic models associated with the primary entity reference."""
+        return self._primary_entity_index.get(entity_reference, [])
+
+    def get_semantic_model_for_dimension(
+        self, dimension_reference: DimensionReference, entity_links: Sequence[EntityReference]
+    ) -> SemanticModel:
+        """Use the entity links proveded to deterine the semantic model where this dimension is defined."""
+        if not entity_links:
+            raise ValueError(
+                f"No entity links received for dimension {dimension_reference}. "
+                "Entity links are required to determine semantic model for dimension."
+            )
+        primary_entity = entity_links[-1]
+        semantic_models = self.get_semantic_models_for_entity(primary_entity)
+        for semantic_model in semantic_models:
+            try:
+                self.get_dimension_from_semantic_model(
+                    semantic_model=semantic_model, dimension_reference=dimension_reference
+                )
+                return semantic_model
+            except ValueError:
+                continue
+        raise ValueError(
+            f"Could not find dimension {dimension_reference} in any semantic model associated with primary entity {primary_entity}."
+        )
+
+    def dimension_is_partition(self, dimension_spec: DimensionSpec) -> bool:  # noqa: D102
+        semantic_model = self.get_semantic_model_for_dimension(
+            dimension_reference=dimension_spec.reference, entity_links=dimension_spec.entity_links
+        )
+        return self.get_dimension_from_semantic_model(
+            dimension_reference=dimension_spec.reference, semantic_model=semantic_model
+        ).is_partition
