@@ -258,7 +258,7 @@ class DataflowPlanBuilder:
         )
 
         # Build measure recipes
-        base_required_linkable_specs, _ = self.__get_required_and_extraneous_linkable_specs(
+        base_required_linkable_specs, extraneous_linkable_specs = self.__get_required_and_extraneous_linkable_specs(
             queried_linkable_specs=queried_linkable_specs,
             filter_specs=base_measure_spec.filter_spec_set.all_filter_specs,
         )
@@ -333,6 +333,11 @@ class DataflowPlanBuilder:
             unaggregated_base_measure_node = JoinOnEntitiesNode.create(
                 left_node=unaggregated_base_measure_node, join_targets=base_measure_recipe.join_targets
             )
+        if len(base_measure_spec.filter_spec_set.all_filter_specs) > 0:
+            unaggregated_base_measure_node = WhereConstraintNode.create(
+                parent_node=unaggregated_base_measure_node,
+                where_specs=base_measure_spec.filter_spec_set.all_filter_specs,
+            )
         filtered_unaggregated_base_node = FilterElementsNode.create(
             parent_node=unaggregated_base_measure_node,
             include_specs=group_specs_by_type(required_local_specs)
@@ -372,6 +377,16 @@ class DataflowPlanBuilder:
             predicate_pushdown_state=disabled_pushdown_state,
             measure_recipe=recipe_with_join_conversion_source_node,
         )
+        if not extraneous_linkable_specs.is_subset_of(queried_linkable_specs):
+            # At this point, it's the case that there are extraneous specs are not a subset of the queried
+            # linkable specs. A filter is needed after, say, a where clause so that the linkable specs in the where clause don't
+            # show up in the final result.
+            aggregated_conversions_node = FilterElementsNode.create(
+                parent_node=aggregated_conversions_node,
+                include_specs=InstanceSpecSet(measure_specs=(conversion_measure_spec.post_aggregation_spec,)).merge(
+                    InstanceSpecSet.create_from_specs(queried_linkable_specs.as_tuple)
+                ),
+            )
 
         # Combine the aggregated opportunities and conversion data sets
         return CombineAggregatedOutputsNode.create(
