@@ -935,13 +935,11 @@ class DataflowPlanBuilder:
         selected_nodes: Dict[DataflowPlanNode, None] = {}
 
         # TODO: Add support for no-metrics queries for custom grains without a join (i.e., select directly from time spine).
-        linkable_specs_set_with_base_granularities = set(linkable_specs.as_tuple)
+        linkable_specs_set = set(linkable_specs.as_tuple)
         for source_node in source_nodes:
             output_spec_set = self._node_data_set_resolver.get_output_data_set(source_node).instance_set.spec_set
             all_linkable_specs_in_node = set(output_spec_set.linkable_specs)
-            requested_linkable_specs_in_node = linkable_specs_set_with_base_granularities.intersection(
-                all_linkable_specs_in_node
-            )
+            requested_linkable_specs_in_node = linkable_specs_set.intersection(all_linkable_specs_in_node)
             if requested_linkable_specs_in_node:
                 selected_nodes[source_node] = None
 
@@ -1008,13 +1006,7 @@ class DataflowPlanBuilder:
             return result.source_node_recipe
         source_node_recipe = self._find_source_node_recipe_non_cached(parameter_set)
         self._cache.set_find_source_node_recipe_result(parameter_set, FindSourceNodeRecipeResult(source_node_recipe))
-        if source_node_recipe is not None:
-            return SourceNodeRecipe(
-                source_node=source_node_recipe.source_node,
-                required_local_linkable_specs=source_node_recipe.required_local_linkable_specs,
-                join_linkable_instances_recipes=source_node_recipe.join_linkable_instances_recipes,
-            )
-        return None
+        return source_node_recipe
 
     def _find_source_node_recipe_non_cached(
         self, parameter_set: FindSourceNodeRecipeParameterSet
@@ -1711,12 +1703,12 @@ class DataflowPlanBuilder:
             non_additive_dimension_grain = self._semantic_model_lookup.get_defined_time_granularity(
                 TimeDimensionReference(non_additive_dimension_spec.name)
             )
-            queried_time_dimension_spec: Optional[
-                TimeDimensionSpec
-            ] = self._find_non_additive_dimension_in_linkable_specs(
-                agg_time_dimension=agg_time_dimension,
-                linkable_specs=queried_linkable_specs.as_tuple,
-                non_additive_dimension_spec=non_additive_dimension_spec,
+            queried_time_dimension_spec: Optional[TimeDimensionSpec] = (
+                self._find_non_additive_dimension_in_linkable_specs(
+                    agg_time_dimension=agg_time_dimension,
+                    linkable_specs=queried_linkable_specs.as_tuple,
+                    non_additive_dimension_spec=non_additive_dimension_spec,
+                )
             )
             time_dimension_spec = TimeDimensionSpec(
                 # The NonAdditiveDimensionSpec name property is a plain element name
