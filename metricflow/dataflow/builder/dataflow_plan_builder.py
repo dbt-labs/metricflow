@@ -333,6 +333,11 @@ class DataflowPlanBuilder:
             unaggregated_base_measure_node = JoinOnEntitiesNode.create(
                 left_node=unaggregated_base_measure_node, join_targets=base_measure_recipe.join_targets
             )
+        for time_dimension_spec in base_required_linkable_specs.time_dimension_specs:
+            if time_dimension_spec.time_granularity.is_custom_granularity:
+                unaggregated_base_measure_node = JoinToCustomGranularityNode.create(
+                    parent_node=unaggregated_base_measure_node, time_dimension_spec=time_dimension_spec
+                )
         if len(base_measure_spec.filter_spec_set.all_filter_specs) > 0:
             unaggregated_base_measure_node = WhereConstraintNode.create(
                 parent_node=unaggregated_base_measure_node,
@@ -341,7 +346,7 @@ class DataflowPlanBuilder:
         filtered_unaggregated_base_node = FilterElementsNode.create(
             parent_node=unaggregated_base_measure_node,
             include_specs=group_specs_by_type(required_local_specs)
-            .merge(InstanceSpecSet.create_from_specs(base_required_linkable_specs.as_tuple))
+            .merge(base_required_linkable_specs.as_instance_spec_set)
             .dedupe(),
         )
 
@@ -1659,7 +1664,11 @@ class DataflowPlanBuilder:
             unaggregated_measure_node = filtered_measure_source_node
 
         for time_dimension_spec in required_linkable_specs.time_dimension_specs:
-            if time_dimension_spec.time_granularity.is_custom_granularity:
+            if (
+                time_dimension_spec.time_granularity.is_custom_granularity
+                # If this is the second layer of aggregation for a conversion metric, we have already joined the custom granularity.
+                and time_dimension_spec not in measure_recipe.all_linkable_specs_required_for_source_nodes.as_tuple
+            ):
                 unaggregated_measure_node = JoinToCustomGranularityNode.create(
                     parent_node=unaggregated_measure_node, time_dimension_spec=time_dimension_spec
                 )
