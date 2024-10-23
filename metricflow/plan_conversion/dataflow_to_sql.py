@@ -1517,7 +1517,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         parent_column: Optional[SqlSelectColumn] = None
         assert parent_time_dimension_instance, (
             "JoinToCustomGranularityNode's expected time_dimension_spec not found in parent dataset instances. "
-            f"This indicates internal misconfiguration. Expected: {node.time_dimension_spec.with_base_grain}; "
+            f"This indicates internal misconfiguration. Expected: {node.time_dimension_spec.with_base_grain()}; "
             f"Got: {[instance.spec for instance in parent_data_set.instance_set.time_dimension_instances]}"
         )
         for select_column in parent_data_set.checked_sql_select_node.select_columns:
