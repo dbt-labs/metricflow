@@ -275,11 +275,8 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         apply_group_by = True
         for agg_time_dimension_spec in required_time_spine_specs:
             column_alias = self.column_association_resolver.resolve_spec(agg_time_dimension_spec).column_name
-            # If the requested granularity is the same as the granularity of the spine, do a direct select.
+            # If the requested base granularity is the same as the granularity of the spine, do a direct select.
             agg_time_grain = agg_time_dimension_spec.time_granularity
-            assert (
-                not agg_time_grain.is_custom_granularity
-            ), "Custom time granularities are not yet supported for all queries."
             if agg_time_grain.base_granularity == time_spine_source.base_granularity:
                 select_columns += (SqlSelectColumn(expr=column_expr, column_alias=column_alias),)
                 apply_group_by = False
@@ -1161,9 +1158,9 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                     spec=metric_time_dimension_spec,
                 )
             )
-            output_column_to_input_column[
-                metric_time_dimension_column_association.column_name
-            ] = matching_time_dimension_instance.associated_column.column_name
+            output_column_to_input_column[metric_time_dimension_column_association.column_name] = (
+                matching_time_dimension_instance.associated_column.column_name
+            )
 
         output_instance_set = InstanceSet(
             measure_instances=tuple(output_measure_instances),
@@ -1400,11 +1397,11 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             f"indicates it may have been configured incorrectly. Expected: {agg_time_dim_for_join_with_base_grain};"
             f" Got: {[instance.spec for instance in time_spine_dataset.instance_set.time_dimension_instances]}"
         )
-        time_spine_column_select_expr: Union[
-            SqlColumnReferenceExpression, SqlDateTruncExpression
-        ] = SqlColumnReferenceExpression.create(
-            SqlColumnReference(
-                table_alias=time_spine_alias, column_name=original_time_spine_dim_instance.spec.qualified_name
+        time_spine_column_select_expr: Union[SqlColumnReferenceExpression, SqlDateTruncExpression] = (
+            SqlColumnReferenceExpression.create(
+                SqlColumnReference(
+                    table_alias=time_spine_alias, column_name=original_time_spine_dim_instance.spec.qualified_name
+                )
             )
         )
 
