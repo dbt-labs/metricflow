@@ -1696,12 +1696,12 @@ class DataflowPlanBuilder:
             non_additive_dimension_grain = self._semantic_model_lookup.get_defined_time_granularity(
                 TimeDimensionReference(non_additive_dimension_spec.name)
             )
-            queried_time_dimension_spec: Optional[
-                TimeDimensionSpec
-            ] = self._find_non_additive_dimension_in_linkable_specs(
-                agg_time_dimension=agg_time_dimension,
-                linkable_specs=queried_linkable_specs.as_tuple,
-                non_additive_dimension_spec=non_additive_dimension_spec,
+            queried_time_dimension_spec: Optional[TimeDimensionSpec] = (
+                self._find_non_additive_dimension_in_linkable_specs(
+                    agg_time_dimension=agg_time_dimension,
+                    linkable_specs=queried_linkable_specs.as_tuple,
+                    non_additive_dimension_spec=non_additive_dimension_spec,
+                )
             )
             time_dimension_spec = TimeDimensionSpec(
                 # The NonAdditiveDimensionSpec name property is a plain element name
