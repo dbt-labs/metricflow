@@ -258,7 +258,7 @@ class DataflowPlanBuilder:
         )
 
         # Build measure recipes
-        base_required_linkable_specs, _ = self.__get_required_and_extraneous_linkable_specs(
+        base_required_linkable_specs, extraneous_linkable_specs = self.__get_required_and_extraneous_linkable_specs(
             queried_linkable_specs=queried_linkable_specs,
             filter_specs=base_measure_spec.filter_spec_set.all_filter_specs,
         )
@@ -333,6 +333,11 @@ class DataflowPlanBuilder:
             unaggregated_base_measure_node = JoinOnEntitiesNode.create(
                 left_node=unaggregated_base_measure_node, join_targets=base_measure_recipe.join_targets
             )
+        if len(base_measure_spec.filter_spec_set.all_filter_specs) > 0:
+            unaggregated_base_measure_node = WhereConstraintNode.create(
+                parent_node=unaggregated_base_measure_node,
+                where_specs=base_measure_spec.filter_spec_set.all_filter_specs,
+            )
         filtered_unaggregated_base_node = FilterElementsNode.create(
             parent_node=unaggregated_base_measure_node,
             include_specs=group_specs_by_type(required_local_specs)
@@ -359,8 +364,8 @@ class DataflowPlanBuilder:
         # Aggregate the conversion events with the JoinConversionEventsNode as the source node
         recipe_with_join_conversion_source_node = SourceNodeRecipe(
             source_node=join_conversion_node,
-            required_local_linkable_specs=base_measure_recipe.required_local_linkable_specs,
-            join_linkable_instances_recipes=base_measure_recipe.join_linkable_instances_recipes,
+            required_local_linkable_specs=queried_linkable_specs.as_tuple,
+            join_linkable_instances_recipes=(),
         )
         # TODO: Refine conversion metric configuration to fit into the standard dataflow plan building model
         # In this case we override the measure recipe, which currently results in us bypassing predicate pushdown
