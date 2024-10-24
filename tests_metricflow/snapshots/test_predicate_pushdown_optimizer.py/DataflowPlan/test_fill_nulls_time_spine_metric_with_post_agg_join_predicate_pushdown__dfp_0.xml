@@ -160,7 +160,6 @@
                             <!--       time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                             <!--     ),                                                                            -->
                             <!--   )                                                                               -->
-                            <!-- use_custom_agg_time_dimension = False -->
                             <!-- join_type = LEFT_OUTER -->
                             <AggregateMeasuresNode>
                                 <!-- description = 'Aggregate Measures' -->
@@ -405,7 +404,6 @@
                             <!--       time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                             <!--     ),                                                                            -->
                             <!--   )                                                                               -->
-                            <!-- use_custom_agg_time_dimension = False -->
                             <!-- join_type = LEFT_OUTER -->
                             <AggregateMeasuresNode>
                                 <!-- description = 'Aggregate Measures' -->
@@ -520,7 +518,6 @@
                                                     <!--       ),                                        -->
                                                     <!--     ),                                          -->
                                                     <!--   )                                             -->
-                                                    <!-- use_custom_agg_time_dimension = False -->
                                                     <!-- join_type = INNER -->
                                                     <!-- offset_window =                                       -->
                                                     <!--   PydanticMetricTimeWindow(count=14, granularity=DAY) -->

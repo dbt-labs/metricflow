@@ -17,7 +17,6 @@
                 <!--       time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                 <!--     ),                                                                            -->
                 <!--   )                                                                               -->
-                <!-- use_custom_agg_time_dimension = False -->
                 <!-- join_type = LEFT_OUTER -->
                 <AggregateMeasuresNode>
                     <!-- description = 'Aggregate Measures' -->

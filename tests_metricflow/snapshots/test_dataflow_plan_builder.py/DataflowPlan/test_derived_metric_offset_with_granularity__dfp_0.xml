@@ -39,7 +39,6 @@
                             <!--       time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH), -->
                             <!--     ),                                                                                -->
                             <!--   )                                                                                   -->
-                            <!-- use_custom_agg_time_dimension = False -->
                             <!-- join_type = INNER -->
                             <!-- offset_window = PydanticMetricTimeWindow(count=5, granularity=DAY) -->
                             <MetricTimeDimensionTransformNode>
