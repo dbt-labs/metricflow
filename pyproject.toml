@@ -7,7 +7,7 @@ name = "metricflow"
 version = "0.207.0.dev2"
 description = "Translates a simple metric definition into reusable SQL and executes it against the SQL engine of your choice."
 readme = "README.md"
-requires-python = ">=3.8,<3.13"
+requires-python = ">=3.9,<3.13"
 license = "BUSL-1.1"
 keywords = []
 authors = [
@@ -17,7 +17,6 @@ authors = [
 classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python",
-  "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
