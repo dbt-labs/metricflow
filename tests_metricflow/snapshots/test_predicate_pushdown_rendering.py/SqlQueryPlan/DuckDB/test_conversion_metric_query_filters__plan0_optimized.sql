@@ -6,10 +6,10 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_39.metric_time__day, subq_58.metric_time__day) AS metric_time__day
-    , COALESCE(subq_39.user__home_state_latest, subq_58.user__home_state_latest) AS user__home_state_latest
+    COALESCE(subq_39.metric_time__day, subq_57.metric_time__day) AS metric_time__day
+    , COALESCE(subq_39.user__home_state_latest, subq_57.user__home_state_latest) AS user__home_state_latest
     , MAX(subq_39.visits) AS visits
-    , MAX(subq_58.buys) AS buys
+    , MAX(subq_57.buys) AS buys
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['visits', 'user__home_state_latest', 'metric_time__day']
@@ -49,11 +49,11 @@ FROM (
   ) subq_39
   FULL OUTER JOIN (
     -- Join Standard Outputs
-    -- Pass Only Elements: ['buys', 'user__home_state_latest', 'metric_time__day']
+    -- Pass Only Elements: ['buys', 'user__home_state_latest', 'visit__referrer_id', 'metric_time__day']
     -- Aggregate Measures
-    -- Pass Only Elements: ['buys', 'user__home_state_latest', 'metric_time__day']
     SELECT
       subq_50.metric_time__day AS metric_time__day
+      , subq_50.visit__referrer_id AS visit__referrer_id
       , users_latest_src_28000.home_state_latest AS user__home_state_latest
       , SUM(subq_50.buys) AS buys
     FROM (
@@ -174,15 +174,16 @@ FROM (
       subq_50.user = users_latest_src_28000.user_id
     GROUP BY
       subq_50.metric_time__day
+      , subq_50.visit__referrer_id
       , users_latest_src_28000.home_state_latest
-  ) subq_58
+  ) subq_57
   ON
     (
-      subq_39.user__home_state_latest = subq_58.user__home_state_latest
+      subq_39.user__home_state_latest = subq_57.user__home_state_latest
     ) AND (
-      subq_39.metric_time__day = subq_58.metric_time__day
+      subq_39.metric_time__day = subq_57.metric_time__day
     )
   GROUP BY
-    COALESCE(subq_39.metric_time__day, subq_58.metric_time__day)
-    , COALESCE(subq_39.user__home_state_latest, subq_58.user__home_state_latest)
+    COALESCE(subq_39.metric_time__day, subq_57.metric_time__day)
+    , COALESCE(subq_39.user__home_state_latest, subq_57.user__home_state_latest)
 ) subq_59
