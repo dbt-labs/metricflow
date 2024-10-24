@@ -2,9 +2,12 @@ from __future__ import annotations
 
 import logging
 
+from typing_extensions import override
+
 from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
+    SqlCteNode,
     SqlJoinDescription,
     SqlOrderByDescription,
     SqlQueryPlanNode,
@@ -20,6 +23,10 @@ logger = logging.getLogger(__name__)
 
 class SqlTableAliasSimplifierVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
     """Visits the SQL query plan to see if table aliases can be omitted when rendering column references."""
+
+    @override
+    def visit_cte_node(self, node: SqlCteNode) -> SqlQueryPlanNode:
+        raise NotImplementedError
 
     def visit_select_statement_node(self, node: SqlSelectStatementNode) -> SqlQueryPlanNode:  # noqa: D102
         # If there is only a single parent, no table aliases are required since there's no ambiguity.
