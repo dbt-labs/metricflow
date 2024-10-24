@@ -24,6 +24,7 @@ class DimensionSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D101
 
     @property
     def without_entity_links(self) -> DimensionSpec:  # noqa: D102
+        # TODO - check if this is acceptable?
         return DimensionSpec(element_name=self.element_name, entity_links=())
 
     @staticmethod

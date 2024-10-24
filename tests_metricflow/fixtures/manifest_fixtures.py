@@ -248,7 +248,8 @@ class MetricFlowEngineTestFixture:
         semantic_models = sorted(semantic_models, key=lambda x: x.name)
 
         converter = SemanticModelToDataSetConverter(
-            column_association_resolver=DunderColumnAssociationResolver(multihop_semantic_manifest_lookup)
+            column_association_resolver=DunderColumnAssociationResolver(multihop_semantic_manifest_lookup),
+            semantic_model_lookup=multihop_semantic_manifest_lookup.semantic_model_lookup,
         )
 
         for semantic_model in semantic_models:

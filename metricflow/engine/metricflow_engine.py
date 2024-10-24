@@ -376,7 +376,10 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             semantic_manifest_lookup.semantic_manifest
         )
         self._source_data_sets: List[SemanticModelDataSet] = []
-        converter = SemanticModelToDataSetConverter(column_association_resolver=self._column_association_resolver)
+        converter = SemanticModelToDataSetConverter(
+            column_association_resolver=self._column_association_resolver,
+            semantic_model_lookup=self._semantic_manifest_lookup.semantic_model_lookup,
+        )
         for semantic_model in sorted(
             self._semantic_manifest_lookup.semantic_manifest.semantic_models, key=lambda model: model.name
         ):
@@ -472,12 +475,14 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 raise InvalidQueryException("Group by items can't be specified with a saved query.")
             query_spec = self._query_parser.parse_and_validate_saved_query(
                 saved_query_parameter=SavedQueryParameter(mf_query_request.saved_query_name),
-                where_filters=[
-                    PydanticWhereFilter(where_sql_template=where_constraint)
-                    for where_constraint in mf_query_request.where_constraints
-                ]
-                if mf_query_request.where_constraints is not None
-                else None,
+                where_filters=(
+                    [
+                        PydanticWhereFilter(where_sql_template=where_constraint)
+                        for where_constraint in mf_query_request.where_constraints
+                    ]
+                    if mf_query_request.where_constraints is not None
+                    else None
+                ),
                 limit=mf_query_request.limit,
                 time_constraint_start=mf_query_request.time_constraint_start,
                 time_constraint_end=mf_query_request.time_constraint_end,
