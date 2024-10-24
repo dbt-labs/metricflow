@@ -189,12 +189,14 @@ FROM (
       -- Aggregate Measures
       SELECT
         subq_26.metric_time__day
+        , subq_26.visit__referrer_id
         , subq_26.user__home_state_latest
         , SUM(subq_26.buys) AS buys
       FROM (
-        -- Pass Only Elements: ['buys', 'user__home_state_latest', 'metric_time__day']
+        -- Pass Only Elements: ['buys', 'user__home_state_latest', 'visit__referrer_id', 'metric_time__day']
         SELECT
           subq_25.metric_time__day
+          , subq_25.visit__referrer_id
           , subq_25.user__home_state_latest
           , subq_25.buys
         FROM (
@@ -671,6 +673,7 @@ FROM (
       ) subq_26
       GROUP BY
         subq_26.metric_time__day
+        , subq_26.visit__referrer_id
         , subq_26.user__home_state_latest
     ) subq_27
   ) subq_28
