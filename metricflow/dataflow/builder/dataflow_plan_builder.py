@@ -364,8 +364,8 @@ class DataflowPlanBuilder:
         # Aggregate the conversion events with the JoinConversionEventsNode as the source node
         recipe_with_join_conversion_source_node = SourceNodeRecipe(
             source_node=join_conversion_node,
-            required_local_linkable_specs=base_measure_recipe.required_local_linkable_specs,
-            join_linkable_instances_recipes=base_measure_recipe.join_linkable_instances_recipes,
+            required_local_linkable_specs=queried_linkable_specs.as_tuple,
+            join_linkable_instances_recipes=(),
         )
         # TODO: Refine conversion metric configuration to fit into the standard dataflow plan building model
         # In this case we override the measure recipe, which currently results in us bypassing predicate pushdown
@@ -377,16 +377,6 @@ class DataflowPlanBuilder:
             predicate_pushdown_state=disabled_pushdown_state,
             measure_recipe=recipe_with_join_conversion_source_node,
         )
-        if not extraneous_linkable_specs.is_subset_of(queried_linkable_specs):
-            # At this point, it's the case that there are extraneous specs are not a subset of the queried
-            # linkable specs. A filter is needed after, say, a where clause so that the linkable specs in the where clause don't
-            # show up in the final result.
-            aggregated_conversions_node = FilterElementsNode.create(
-                parent_node=aggregated_conversions_node,
-                include_specs=InstanceSpecSet(measure_specs=(conversion_measure_spec.post_aggregation_spec,)).merge(
-                    InstanceSpecSet.create_from_specs(queried_linkable_specs.as_tuple)
-                ),
-            )
 
         # Combine the aggregated opportunities and conversion data sets
         return CombineAggregatedOutputsNode.create(
