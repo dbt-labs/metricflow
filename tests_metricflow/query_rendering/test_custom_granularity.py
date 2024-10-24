@@ -455,3 +455,27 @@ def test_offset_metric_with_custom_granularity_filter_not_in_group_by(  # noqa: 
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_conversion_metric_with_custom_granularity(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("visit_buy_conversion_rate_7days",),
+        group_by_names=("metric_time__martian_day",),
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )

@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 def build_semantic_model_lookup_from_manifest(semantic_manifest: SemanticManifest) -> SemanticModelLookup:  # noqa: D103
     time_spine_sources = TimeSpineSource.build_standard_time_spine_sources(semantic_manifest)
     custom_granularities = TimeSpineSource.build_custom_granularities(list(time_spine_sources.values()))
-    return SemanticModelLookup(model=semantic_manifest, custom_granularities=custom_granularities)
+    return SemanticModelLookup(semantic_manifest=semantic_manifest, custom_granularities=custom_granularities)
 
 
 @pytest.fixture
@@ -77,12 +77,18 @@ def test_get_names(  # noqa: D103
     )
 
 
-def test_get_elements(semantic_model_lookup: SemanticModelLookup) -> None:  # noqa: D103
-    for dimension_reference in semantic_model_lookup.get_dimension_references():
-        assert (
-            semantic_model_lookup.get_dimension(dimension_reference=dimension_reference).reference
-            == dimension_reference
-        )
+def test_get_elements(  # noqa: D103
+    semantic_model_lookup: SemanticModelLookup, simple_semantic_manifest: SemanticManifest
+) -> None:
+    for semantic_model in simple_semantic_manifest.semantic_models:
+        for dimension in semantic_model.dimensions:
+            assert (
+                semantic_model_lookup.get_dimension(
+                    dimension_reference=dimension.reference,
+                    entity_links=(semantic_model_lookup.get_primary_entity_else_error(semantic_model),),
+                ).reference
+                == dimension.reference
+            )
     for measure_reference in semantic_model_lookup.measure_references:
         measure_reference = MeasureReference(element_name=measure_reference.element_name)
         assert semantic_model_lookup.get_measure(measure_reference=measure_reference).reference == measure_reference

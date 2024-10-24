@@ -40,13 +40,17 @@ class PartitionJoinResolver:
         partition_dimension_specs = tuple(
             x
             for x in spec_set.dimension_specs
-            if self._semantic_model_lookup.get_dimension(dimension_reference=x.reference).is_partition
+            if self._semantic_model_lookup.get_dimension(
+                dimension_reference=x.reference, entity_links=x.entity_links
+            ).is_partition
         )
         partition_time_dimension_specs = tuple(
             x
             for x in spec_set.time_dimension_specs
             if x.reference != DataSet.metric_time_dimension_reference()
-            and self._semantic_model_lookup.get_time_dimension(time_dimension_reference=x.reference).is_partition
+            and self._semantic_model_lookup.get_dimension(
+                dimension_reference=x.reference, entity_links=x.entity_links
+            ).is_partition
         )
 
         return PartitionSpecSet(

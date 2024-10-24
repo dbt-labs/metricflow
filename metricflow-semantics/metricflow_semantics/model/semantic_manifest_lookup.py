@@ -19,7 +19,7 @@ class SemanticManifestLookup:
         self._time_spine_sources = TimeSpineSource.build_standard_time_spine_sources(semantic_manifest)
         self.custom_granularities = TimeSpineSource.build_custom_granularities(list(self._time_spine_sources.values()))
         self._semantic_model_lookup = SemanticModelLookup(
-            model=semantic_manifest, custom_granularities=self.custom_granularities
+            semantic_manifest=semantic_manifest, custom_granularities=self.custom_granularities
         )
         self._metric_lookup = MetricLookup(
             semantic_manifest=self._semantic_manifest,

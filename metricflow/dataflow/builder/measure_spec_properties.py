@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional, Sequence
+from typing import Optional
 
 from dbt_semantic_interfaces.references import TimeDimensionReference
 from metricflow_semantics.specs.measure_spec import MeasureSpec
@@ -12,7 +12,7 @@ from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDi
 class MeasureSpecProperties:
     """Input dataclass for grouping properties of a sequence of MeasureSpecs."""
 
-    measure_specs: Sequence[MeasureSpec]
+    measure_spec: MeasureSpec
     semantic_model_name: str
     agg_time_dimension: TimeDimensionReference
     non_additive_dimension_spec: Optional[NonAdditiveDimensionSpec] = None
