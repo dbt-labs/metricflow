@@ -1,0 +1,4 @@
+METRIC_TIME__DAY     VISIT__REFERRER_ID      VISIT_BUY_CONVERSION_RATE_7DAYS
+-------------------  --------------------  ---------------------------------
+2020-01-01T00:00:00  fb_ad_1                                               2
+2020-01-02T00:00:00  fb_ad_1                                               1

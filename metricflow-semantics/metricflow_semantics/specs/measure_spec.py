@@ -77,7 +77,11 @@ class MetricInputMeasureSpec(SerializableDataclass):
                 fill_nulls_with=self.fill_nulls_with,
             )
         else:
-            return self.measure_spec
+            return MeasureSpec(
+                element_name=self.measure_spec.element_name,
+                non_additive_dimension_spec=self.measure_spec.non_additive_dimension_spec,
+                fill_nulls_with=self.fill_nulls_with,
+            )
 
 
 @dataclass(frozen=True)
