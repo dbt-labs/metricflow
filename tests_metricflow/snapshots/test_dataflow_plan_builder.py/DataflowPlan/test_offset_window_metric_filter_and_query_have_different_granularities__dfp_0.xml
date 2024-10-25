@@ -180,7 +180,7 @@
                                     <JoinToTimeSpineNode>
                                         <!-- description = 'Join to Time Spine Dataset' -->
                                         <!-- node_id = NodeId(id_str='jts_0') -->
-                                        <!-- requested_agg_time_dimension_specs =            -->
+                                        <!-- replace_time_dimension_specs =                  -->
                                         <!--   (                                             -->
                                         <!--     TimeDimensionSpec(                          -->
                                         <!--       element_name='metric_time',               -->
@@ -190,7 +190,6 @@
                                         <!--       ),                                        -->
                                         <!--     ),                                          -->
                                         <!--   )                                             -->
-                                        <!-- use_custom_agg_time_dimension = False -->
                                         <!-- join_type = INNER -->
                                         <!-- offset_window = PydanticMetricTimeWindow(count=1, granularity=WEEK) -->
                                         <MetricTimeDimensionTransformNode>

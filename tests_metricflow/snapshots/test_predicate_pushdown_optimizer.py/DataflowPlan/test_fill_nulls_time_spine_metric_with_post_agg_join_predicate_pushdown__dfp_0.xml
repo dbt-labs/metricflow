@@ -153,14 +153,13 @@
                         <JoinToTimeSpineNode>
                             <!-- description = 'Join to Time Spine Dataset' -->
                             <!-- node_id = NodeId(id_str='jts_0') -->
-                            <!-- requested_agg_time_dimension_specs =                                              -->
+                            <!-- replace_time_dimension_specs =                                                    -->
                             <!--   (                                                                               -->
                             <!--     TimeDimensionSpec(                                                            -->
                             <!--       element_name='metric_time',                                                 -->
                             <!--       time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                             <!--     ),                                                                            -->
                             <!--   )                                                                               -->
-                            <!-- use_custom_agg_time_dimension = False -->
                             <!-- join_type = LEFT_OUTER -->
                             <AggregateMeasuresNode>
                                 <!-- description = 'Aggregate Measures' -->
@@ -398,14 +397,13 @@
                         <JoinToTimeSpineNode>
                             <!-- description = 'Join to Time Spine Dataset' -->
                             <!-- node_id = NodeId(id_str='jts_2') -->
-                            <!-- requested_agg_time_dimension_specs =                                              -->
+                            <!-- replace_time_dimension_specs =                                                    -->
                             <!--   (                                                                               -->
                             <!--     TimeDimensionSpec(                                                            -->
                             <!--       element_name='metric_time',                                                 -->
                             <!--       time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                             <!--     ),                                                                            -->
                             <!--   )                                                                               -->
-                            <!-- use_custom_agg_time_dimension = False -->
                             <!-- join_type = LEFT_OUTER -->
                             <AggregateMeasuresNode>
                                 <!-- description = 'Aggregate Measures' -->
@@ -510,7 +508,7 @@
                                                 <JoinToTimeSpineNode>
                                                     <!-- description = 'Join to Time Spine Dataset' -->
                                                     <!-- node_id = NodeId(id_str='jts_1') -->
-                                                    <!-- requested_agg_time_dimension_specs =            -->
+                                                    <!-- replace_time_dimension_specs =                  -->
                                                     <!--   (                                             -->
                                                     <!--     TimeDimensionSpec(                          -->
                                                     <!--       element_name='metric_time',               -->
@@ -520,7 +518,6 @@
                                                     <!--       ),                                        -->
                                                     <!--     ),                                          -->
                                                     <!--   )                                             -->
-                                                    <!-- use_custom_agg_time_dimension = False -->
                                                     <!-- join_type = INNER -->
                                                     <!-- offset_window =                                       -->
                                                     <!--   PydanticMetricTimeWindow(count=14, granularity=DAY) -->

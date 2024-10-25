@@ -569,7 +569,7 @@ class SemanticModelToDataSetConverter:
         return SqlDataSet(
             instance_set=InstanceSet(time_dimension_instances=tuple(time_dimension_instances)),
             sql_select_node=SqlSelectStatementNode.create(
-                description=TIME_SPINE_DATA_SET_DESCRIPTION,
+                description=f"Read From {TIME_SPINE_DATA_SET_DESCRIPTION} '{time_spine_source.table_name}'",
                 select_columns=tuple(select_columns),
                 from_source=SqlTableNode.create(sql_table=time_spine_source.spine_table),
                 from_source_alias=from_source_alias,

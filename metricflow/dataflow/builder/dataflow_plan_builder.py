@@ -650,8 +650,7 @@ class DataflowPlanBuilder:
             ), "Joining to time spine requires querying with metric_time or the appropriate agg_time_dimension."
             output_node = JoinToTimeSpineNode.create(
                 parent_node=output_node,
-                requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
-                use_custom_agg_time_dimension=not queried_linkable_specs.contains_metric_time,
+                replace_time_dimension_specs=queried_agg_time_dimension_specs,
                 time_range_constraint=predicate_pushdown_state.time_range_constraint,
                 offset_window=metric_spec.offset_window,
                 offset_to_grain=metric_spec.offset_to_grain,
@@ -1033,7 +1032,7 @@ class DataflowPlanBuilder:
             )
             # If metric_time is requested without metrics, choose appropriate time spine node to select those values from.
             if linkable_specs_to_satisfy.metric_time_specs:
-                time_spine_node = self._source_node_set.time_spine_nodes[
+                time_spine_node = self._source_node_set.time_spine_metric_time_nodes[
                     TimeSpineSource.choose_time_spine_source(
                         required_time_spine_specs=linkable_specs_to_satisfy.metric_time_specs,
                         time_spine_sources=self._source_node_builder.time_spine_sources,
@@ -1077,7 +1076,7 @@ class DataflowPlanBuilder:
             desired_linkable_specs=linkable_specs_to_satisfy_tuple,
             nodes=candidate_nodes_for_right_side_of_join,
             metric_time_dimension_reference=self._metric_time_dimension_reference,
-            time_spine_nodes=self._source_node_set.time_spine_nodes_tuple,
+            time_spine_metric_time_nodes=self._source_node_set.time_spine_metric_time_nodes_tuple,
         )
         logger.debug(
             LazyFormat(
@@ -1124,7 +1123,7 @@ class DataflowPlanBuilder:
             semantic_model_lookup=self._semantic_model_lookup,
             nodes_available_for_joins=self._sort_by_suitability(candidate_nodes_for_right_side_of_join),
             node_data_set_resolver=self._node_data_set_resolver,
-            time_spine_nodes=self._source_node_set.time_spine_nodes_tuple,
+            time_spine_metric_time_nodes=self._source_node_set.time_spine_metric_time_nodes_tuple,
         )
 
         # Dict from the node that contains the source node to the evaluation results.
@@ -1624,8 +1623,7 @@ class DataflowPlanBuilder:
             # in join rendering
             join_to_time_spine_node = JoinToTimeSpineNode.create(
                 parent_node=time_range_node or measure_recipe.source_node,
-                requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
-                use_custom_agg_time_dimension=not queried_linkable_specs.contains_metric_time,
+                replace_time_dimension_specs=queried_agg_time_dimension_specs,
                 time_range_constraint=predicate_pushdown_state.time_range_constraint,
                 offset_window=before_aggregation_time_spine_join_description.offset_window,
                 offset_to_grain=before_aggregation_time_spine_join_description.offset_to_grain,
@@ -1763,8 +1761,7 @@ class DataflowPlanBuilder:
             # like JoinToCustomGranularityNode, WhereConstraintNode, etc.
             output_node: DataflowPlanNode = JoinToTimeSpineNode.create(
                 parent_node=aggregate_measures_node,
-                requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
-                use_custom_agg_time_dimension=not queried_linkable_specs.contains_metric_time,
+                replace_time_dimension_specs=queried_agg_time_dimension_specs,
                 join_type=after_aggregation_time_spine_join_description.join_type,
                 time_range_constraint=predicate_pushdown_state.time_range_constraint,
                 offset_window=after_aggregation_time_spine_join_description.offset_window,

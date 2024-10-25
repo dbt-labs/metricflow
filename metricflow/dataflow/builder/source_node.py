@@ -36,20 +36,23 @@ class SourceNodeSet:
     # Semantic models are 1:1 mapped to a ReadSqlSourceNode.
     source_nodes_for_group_by_item_queries: Tuple[DataflowPlanNode, ...]
 
-    # Provides the time spines.
-    time_spine_nodes: Mapping[TimeGranularity, MetricTimeDimensionTransformNode]
+    # Provides time spines that can be used to satisfy time spine joins, organized by granularity name.
+    time_spine_read_nodes: Mapping[str, ReadSqlSourceNode]
+
+    # Provides time spines that can be used to satisfy metric_time without metrics, organized by base granularity.
+    time_spine_metric_time_nodes: Mapping[TimeGranularity, MetricTimeDimensionTransformNode]
 
     @property
     def all_nodes(self) -> Sequence[DataflowPlanNode]:  # noqa: D102
         return (
             self.source_nodes_for_metric_queries
             + self.source_nodes_for_group_by_item_queries
-            + self.time_spine_nodes_tuple
+            + self.time_spine_metric_time_nodes_tuple
         )
 
     @property
-    def time_spine_nodes_tuple(self) -> Tuple[MetricTimeDimensionTransformNode, ...]:  # noqa: D102
-        return tuple(self.time_spine_nodes.values())
+    def time_spine_metric_time_nodes_tuple(self) -> Tuple[MetricTimeDimensionTransformNode, ...]:  # noqa: D102
+        return tuple(self.time_spine_metric_time_nodes.values())
 
 
 class SourceNodeBuilder:
@@ -65,11 +68,17 @@ class SourceNodeBuilder:
         self.time_spine_sources = TimeSpineSource.build_standard_time_spine_sources(
             semantic_manifest_lookup.semantic_manifest
         )
-        self._time_spine_source_nodes = {}
-        for granularity, time_spine_source in self.time_spine_sources.items():
+
+        self._time_spine_read_nodes = {}
+        self._time_spine_metric_time_nodes = {}
+        for base_granularity, time_spine_source in self.time_spine_sources.items():
             data_set = data_set_converter.build_time_spine_source_data_set(time_spine_source)
-            self._time_spine_source_nodes[granularity] = MetricTimeDimensionTransformNode.create(
-                parent_node=ReadSqlSourceNode.create(data_set),
+            read_node = ReadSqlSourceNode.create(data_set)
+            self._time_spine_read_nodes[base_granularity.value] = read_node
+            for custom_granularity in time_spine_source.custom_granularities:
+                self._time_spine_read_nodes[custom_granularity.name] = read_node
+            self._time_spine_metric_time_nodes[base_granularity] = MetricTimeDimensionTransformNode.create(
+                parent_node=read_node,
                 aggregation_time_dimension_reference=TimeDimensionReference(time_spine_source.base_column),
             )
 
@@ -103,7 +112,8 @@ class SourceNodeBuilder:
                     source_nodes_for_metric_queries.append(metric_time_transform_node)
 
         return SourceNodeSet(
-            time_spine_nodes=self._time_spine_source_nodes,
+            time_spine_metric_time_nodes=self._time_spine_metric_time_nodes,
+            time_spine_read_nodes=self._time_spine_read_nodes,
             source_nodes_for_group_by_item_queries=tuple(group_by_item_source_nodes),
             source_nodes_for_metric_queries=tuple(source_nodes_for_metric_queries),
         )

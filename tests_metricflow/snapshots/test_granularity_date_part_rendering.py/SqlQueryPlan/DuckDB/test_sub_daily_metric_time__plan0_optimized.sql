@@ -1,4 +1,4 @@
--- Time Spine
+-- Read From Time Spine 'mf_time_spine_millisecond'
 -- Metric Time Dimension 'ts'
 -- Pass Only Elements: ['metric_time__millisecond',]
 SELECT

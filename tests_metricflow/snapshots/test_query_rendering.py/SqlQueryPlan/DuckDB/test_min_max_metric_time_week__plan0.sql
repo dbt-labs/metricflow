@@ -34,7 +34,7 @@ FROM (
       , subq_0.ds__extract_doy AS metric_time__extract_doy
       , subq_0.ds__martian_day AS metric_time__martian_day
     FROM (
-      -- Time Spine
+      -- Read From Time Spine 'mf_time_spine'
       SELECT
         DATE_TRUNC('day', time_spine_src_28006.ds) AS ds__day
         , DATE_TRUNC('week', time_spine_src_28006.ds) AS ds__week

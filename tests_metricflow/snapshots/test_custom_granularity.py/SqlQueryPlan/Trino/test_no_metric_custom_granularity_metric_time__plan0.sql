@@ -33,6 +33,8 @@ FROM (
   FROM (
     -- Time Spine
     SELECT
+    -- don't need to apply this date trunc
+    -- But otherwise, we can use this as one source node
       DATE_TRUNC('day', time_spine_src_28006.ds) AS ds__day
       , DATE_TRUNC('week', time_spine_src_28006.ds) AS ds__week
       , DATE_TRUNC('month', time_spine_src_28006.ds) AS ds__month
