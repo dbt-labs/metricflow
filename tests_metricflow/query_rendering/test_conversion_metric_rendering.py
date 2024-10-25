@@ -192,3 +192,31 @@ def test_conversion_metric_with_filter(
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=parsed_query.query_spec,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_conversion_metric_with_filter_not_in_group_by(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+    query_parser: MetricFlowQueryParser,
+    create_source_tables: bool,
+) -> None:
+    """Test rendering a query against a conversion metric."""
+    parsed_query = query_parser.parse_and_validate_query(
+        metric_names=("visit_buy_conversions",),
+        where_constraints=(
+            PydanticWhereFilter(where_sql_template=("{{ Dimension('visit__referrer_id') }} = 'ref_id_01'")),
+        ),
+    )
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=parsed_query.query_spec,
+    )
