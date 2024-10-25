@@ -1032,7 +1032,7 @@ class DataflowPlanBuilder:
             )
             # If metric_time is requested without metrics, choose appropriate time spine node to select those values from.
             if linkable_specs_to_satisfy.metric_time_specs:
-                time_spine_node = self._source_node_set.time_spine_nodes[
+                time_spine_node = self._source_node_set.time_spine_metric_time_nodes[
                     TimeSpineSource.choose_time_spine_source(
                         required_time_spine_specs=linkable_specs_to_satisfy.metric_time_specs,
                         time_spine_sources=self._source_node_builder.time_spine_sources,
@@ -1076,7 +1076,7 @@ class DataflowPlanBuilder:
             desired_linkable_specs=linkable_specs_to_satisfy_tuple,
             nodes=candidate_nodes_for_right_side_of_join,
             metric_time_dimension_reference=self._metric_time_dimension_reference,
-            time_spine_nodes=self._source_node_set.time_spine_nodes_tuple,
+            time_spine_metric_time_nodes=self._source_node_set.time_spine_metric_time_nodes_tuple,
         )
         logger.debug(
             LazyFormat(
@@ -1123,7 +1123,7 @@ class DataflowPlanBuilder:
             semantic_model_lookup=self._semantic_model_lookup,
             nodes_available_for_joins=self._sort_by_suitability(candidate_nodes_for_right_side_of_join),
             node_data_set_resolver=self._node_data_set_resolver,
-            time_spine_nodes=self._source_node_set.time_spine_nodes_tuple,
+            time_spine_metric_time_nodes=self._source_node_set.time_spine_metric_time_nodes_tuple,
         )
 
         # Dict from the node that contains the source node to the evaluation results.

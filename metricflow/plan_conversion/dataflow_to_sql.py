@@ -1315,11 +1315,11 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
         if LinkableSpecSet.create_from_specs(node.requested_agg_time_dimension_specs).contains_metric_time:
             agg_time_element_name = METRIC_TIME_ELEMENT_NAME
-            agg_time_entity_links = ()
+            agg_time_entity_links: Tuple[EntityReference, ...] = ()
         else:
             agg_time_dimension = node.requested_agg_time_dimension_specs[0]
             agg_time_element_name = agg_time_dimension.element_name
-            agg_time_entity_links: Tuple[EntityReference, ...] = agg_time_dimension.entity_links
+            agg_time_entity_links = agg_time_dimension.entity_links
 
         # Find the time dimension instances in the parent data set that match the one we want to join with.
         agg_time_dimension_instances: List[TimeDimensionInstance] = []
