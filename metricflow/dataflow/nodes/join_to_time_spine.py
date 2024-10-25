@@ -23,7 +23,6 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
 
     Attributes:
         requested_agg_time_dimension_specs: Time dimensions requested in the query.
-        use_custom_agg_time_dimension: Indicates if agg_time_dimension should be used in join. If false, uses metric_time.
         join_type: Join type to use when joining to time spine.
         time_range_constraint: Time range to constrain the time spine to.
         offset_window: Time window to offset the parent dataset by when joining to time spine.
@@ -31,7 +30,6 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
     """
 
     requested_agg_time_dimension_specs: Sequence[TimeDimensionSpec]
-    use_custom_agg_time_dimension: bool
     join_type: SqlJoinType
     time_range_constraint: Optional[TimeRangeConstraint]
     offset_window: Optional[MetricTimeWindow]
@@ -53,7 +51,6 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
     def create(  # noqa: D102
         parent_node: DataflowPlanNode,
         requested_agg_time_dimension_specs: Sequence[TimeDimensionSpec],
-        use_custom_agg_time_dimension: bool,
         join_type: SqlJoinType,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         offset_window: Optional[MetricTimeWindow] = None,
@@ -63,7 +60,6 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
         return JoinToTimeSpineNode(
             parent_nodes=(parent_node,),
             requested_agg_time_dimension_specs=tuple(requested_agg_time_dimension_specs),
-            use_custom_agg_time_dimension=use_custom_agg_time_dimension,
             join_type=join_type,
             time_range_constraint=time_range_constraint,
             offset_window=offset_window,
@@ -86,7 +82,6 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
         props = tuple(super().displayed_properties) + (
             DisplayedProperty("requested_agg_time_dimension_specs", self.requested_agg_time_dimension_specs),
-            DisplayedProperty("use_custom_agg_time_dimension", self.use_custom_agg_time_dimension),
             DisplayedProperty("join_type", self.join_type),
         )
         if self.offset_window:
@@ -114,7 +109,6 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
             and other_node.offset_window == self.offset_window
             and other_node.offset_to_grain == self.offset_to_grain
             and other_node.requested_agg_time_dimension_specs == self.requested_agg_time_dimension_specs
-            and other_node.use_custom_agg_time_dimension == self.use_custom_agg_time_dimension
             and other_node.join_type == self.join_type
             and other_node.time_spine_filters == self.time_spine_filters
         )
@@ -124,7 +118,6 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
         return JoinToTimeSpineNode.create(
             parent_node=new_parent_nodes[0],
             requested_agg_time_dimension_specs=self.requested_agg_time_dimension_specs,
-            use_custom_agg_time_dimension=self.use_custom_agg_time_dimension,
             time_range_constraint=self.time_range_constraint,
             offset_window=self.offset_window,
             offset_to_grain=self.offset_to_grain,
