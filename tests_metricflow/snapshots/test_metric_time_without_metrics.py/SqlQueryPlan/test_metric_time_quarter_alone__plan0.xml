@@ -78,7 +78,7 @@
             <!-- where = None -->
             <!-- distinct = False -->
             <SqlSelectStatementNode>
-                <!-- description = 'Time Spine' -->
+                <!-- description = "Read From Time Spine 'mf_time_spine'" -->
                 <!-- node_id = NodeId(id_str='ss_28018') -->
                 <!-- col0 = SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28287), column_alias='ds__day') -->
                 <!-- col1 = SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28288), column_alias='ds__week') -->
