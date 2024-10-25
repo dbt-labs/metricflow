@@ -21,7 +21,7 @@
                     <JoinToTimeSpineNode>
                         <!-- description = 'Join to Time Spine Dataset' -->
                         <!-- node_id = NodeId(id_str='jts_0') -->
-                        <!-- requested_agg_time_dimension_specs =                                              -->
+                        <!-- replace_time_dimension_specs =                                                    -->
                         <!--   (                                                                               -->
                         <!--     TimeDimensionSpec(                                                            -->
                         <!--       element_name='metric_time',                                                 -->
@@ -69,7 +69,7 @@
                     <JoinToTimeSpineNode>
                         <!-- description = 'Join to Time Spine Dataset' -->
                         <!-- node_id = NodeId(id_str='jts_2') -->
-                        <!-- requested_agg_time_dimension_specs =                                              -->
+                        <!-- replace_time_dimension_specs =                                                    -->
                         <!--   (                                                                               -->
                         <!--     TimeDimensionSpec(                                                            -->
                         <!--       element_name='metric_time',                                                 -->
@@ -93,7 +93,7 @@
                                 <JoinToTimeSpineNode>
                                     <!-- description = 'Join to Time Spine Dataset' -->
                                     <!-- node_id = NodeId(id_str='jts_1') -->
-                                    <!-- requested_agg_time_dimension_specs =                                              -->
+                                    <!-- replace_time_dimension_specs =                                                    -->
                                     <!--   (                                                                               -->
                                     <!--     TimeDimensionSpec(                                                            -->
                                     <!--       element_name='metric_time',                                                 -->

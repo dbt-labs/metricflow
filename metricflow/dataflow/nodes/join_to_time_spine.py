@@ -22,14 +22,16 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
     """Join parent dataset to time spine dataset.
 
     Attributes:
-        requested_agg_time_dimension_specs: Time dimensions requested in the query.
+        replace_time_dimension_specs: Time dimensions that should be replaced with columns from the time spine.
         join_type: Join type to use when joining to time spine.
         time_range_constraint: Time range to constrain the time spine to.
         offset_window: Time window to offset the parent dataset by when joining to time spine.
         offset_to_grain: Granularity period to offset the parent dataset to when joining to time spine.
     """
 
-    requested_agg_time_dimension_specs: Sequence[TimeDimensionSpec]
+    # TODO: filter params; will apply where filters & time constraints separately using standard nodes
+    # TODO: add time_spine_source_node as a param
+    replace_time_dimension_specs: Sequence[TimeDimensionSpec]
     join_type: SqlJoinType
     time_range_constraint: Optional[TimeRangeConstraint]
     offset_window: Optional[MetricTimeWindow]
@@ -44,13 +46,13 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
             self.offset_window and self.offset_to_grain
         ), "Can't set both offset_window and offset_to_grain when joining to time spine. Choose one or the other."
         assert (
-            len(self.requested_agg_time_dimension_specs) > 0
-        ), "Must have at least one value in requested_agg_time_dimension_specs for JoinToTimeSpineNode."
+            len(self.replace_time_dimension_specs) > 0
+        ), "Must have at least one value in replace_time_dimension_specs for JoinToTimeSpineNode."
 
     @staticmethod
     def create(  # noqa: D102
         parent_node: DataflowPlanNode,
-        requested_agg_time_dimension_specs: Sequence[TimeDimensionSpec],
+        replace_time_dimension_specs: Sequence[TimeDimensionSpec],
         join_type: SqlJoinType,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         offset_window: Optional[MetricTimeWindow] = None,
@@ -59,7 +61,7 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
     ) -> JoinToTimeSpineNode:
         return JoinToTimeSpineNode(
             parent_nodes=(parent_node,),
-            requested_agg_time_dimension_specs=tuple(requested_agg_time_dimension_specs),
+            replace_time_dimension_specs=tuple(replace_time_dimension_specs),
             join_type=join_type,
             time_range_constraint=time_range_constraint,
             offset_window=offset_window,
@@ -81,7 +83,7 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
     @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
         props = tuple(super().displayed_properties) + (
-            DisplayedProperty("requested_agg_time_dimension_specs", self.requested_agg_time_dimension_specs),
+            DisplayedProperty("replace_time_dimension_specs", self.replace_time_dimension_specs),
             DisplayedProperty("join_type", self.join_type),
         )
         if self.offset_window:
@@ -108,7 +110,7 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
             and other_node.time_range_constraint == self.time_range_constraint
             and other_node.offset_window == self.offset_window
             and other_node.offset_to_grain == self.offset_to_grain
-            and other_node.requested_agg_time_dimension_specs == self.requested_agg_time_dimension_specs
+            and other_node.replace_time_dimension_specs == self.replace_time_dimension_specs
             and other_node.join_type == self.join_type
             and other_node.time_spine_filters == self.time_spine_filters
         )
@@ -117,7 +119,7 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
         assert len(new_parent_nodes) == 1
         return JoinToTimeSpineNode.create(
             parent_node=new_parent_nodes[0],
-            requested_agg_time_dimension_specs=self.requested_agg_time_dimension_specs,
+            replace_time_dimension_specs=self.replace_time_dimension_specs,
             time_range_constraint=self.time_range_constraint,
             offset_window=self.offset_window,
             offset_to_grain=self.offset_to_grain,

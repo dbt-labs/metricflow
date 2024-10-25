@@ -1313,11 +1313,11 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         parent_data_set = node.parent_node.accept(self)
         parent_alias = self._next_unique_table_alias()
 
-        if LinkableSpecSet.create_from_specs(node.requested_agg_time_dimension_specs).contains_metric_time:
+        if LinkableSpecSet.create_from_specs(node.replace_time_dimension_specs).contains_metric_time:
             agg_time_element_name = METRIC_TIME_ELEMENT_NAME
             agg_time_entity_links: Tuple[EntityReference, ...] = ()
         else:
-            agg_time_dimension = node.requested_agg_time_dimension_specs[0]
+            agg_time_dimension = node.replace_time_dimension_specs[0]
             agg_time_element_name = agg_time_dimension.element_name
             agg_time_entity_links = agg_time_dimension.entity_links
 
@@ -1416,8 +1416,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         # If offset_to_grain is used, will need to filter down to rows that match selected granularities.
         # Does not apply if one of the granularities selected matches the time spine column granularity.
         need_where_filter = (
-            node.offset_to_grain
-            and original_time_spine_dim_instance.spec not in node.requested_agg_time_dimension_specs
+            node.offset_to_grain and original_time_spine_dim_instance.spec not in node.replace_time_dimension_specs
         )
 
         # Add requested granularities (if different from time_spine) and date_parts to time spine column.
@@ -1448,7 +1447,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             )
             # Filter down to one row per granularity period requested in the group by. Any other granularities
             # included here will be filtered out in later nodes so should not be included in where filter.
-            if need_where_filter and time_dimension_spec in node.requested_agg_time_dimension_specs:
+            if need_where_filter and time_dimension_spec in node.replace_time_dimension_specs:
                 new_where_filter = SqlComparisonExpression.create(
                     left_expr=select_expr, comparison=SqlComparison.EQUALS, right_expr=time_spine_column_select_expr
                 )
