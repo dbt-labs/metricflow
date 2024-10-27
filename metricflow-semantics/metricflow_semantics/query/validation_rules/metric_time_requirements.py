@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import typing
 from dataclasses import dataclass
 from typing import List, Sequence, Tuple
 
@@ -29,12 +30,13 @@ from metricflow_semantics.query.issues.parsing.offset_metric_requires_metric_tim
 from metricflow_semantics.query.issues.parsing.scd_requires_metric_time import (
     ScdRequiresMetricTimeIssue,
 )
-from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import (
-    ResolverInputForQuery,
-)
+from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import ResolverInputForQuery
 from metricflow_semantics.query.validation_rules.base_validation_rule import PostResolutionQueryValidationRule
 from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
+
+if typing.TYPE_CHECKING:
+    from metricflow_semantics.query.query_resolver import ResolveGroupByItemsResult
 
 
 @dataclass(frozen=True)
@@ -57,9 +59,16 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
     """
 
     def __init__(  # noqa: D107
-        self, manifest_lookup: SemanticManifestLookup, resolver_input_for_query: ResolverInputForQuery
+        self,
+        manifest_lookup: SemanticManifestLookup,
+        resolver_input_for_query: ResolverInputForQuery,
+        resolve_group_by_item_result: ResolveGroupByItemsResult,
     ) -> None:
-        super().__init__(manifest_lookup=manifest_lookup, resolver_input_for_query=resolver_input_for_query)
+        super().__init__(
+            manifest_lookup=manifest_lookup,
+            resolver_input_for_query=resolver_input_for_query,
+            resolve_group_by_item_result=resolve_group_by_item_result,
+        )
 
         self._metric_time_specs = tuple(
             TimeDimensionSpec.generate_possible_specs_for_time_dimension(

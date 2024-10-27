@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import typing
 from abc import ABC, abstractmethod
 from typing import Sequence
 
@@ -11,15 +12,22 @@ from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQ
 from metricflow_semantics.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
 from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import ResolverInputForQuery
 
+if typing.TYPE_CHECKING:
+    from metricflow_semantics.query.query_resolver import ResolveGroupByItemsResult
+
 
 class PostResolutionQueryValidationRule(ABC):
     """A validation rule that runs after all query inputs have been resolved to specs."""
 
     def __init__(  # noqa: D107
-        self, manifest_lookup: SemanticManifestLookup, resolver_input_for_query: ResolverInputForQuery
+        self,
+        manifest_lookup: SemanticManifestLookup,
+        resolver_input_for_query: ResolverInputForQuery,
+        resolve_group_by_item_result: ResolveGroupByItemsResult,
     ) -> None:
         self._manifest_lookup = manifest_lookup
         self._resolver_input_for_query = resolver_input_for_query
+        self._resolve_group_by_item_result = resolve_group_by_item_result
 
     @abstractmethod
     def validate_metric_in_resolution_dag(

@@ -492,8 +492,12 @@ class MetricFlowQueryResolver:
             resolution_dag=resolution_dag,
             resolver_input_for_query=resolver_input_for_query,
             validation_rules=(
-                MetricTimeQueryValidationRule(self._manifest_lookup, resolver_input_for_query),
-                DuplicateMetricValidationRule(self._manifest_lookup, resolver_input_for_query),
+                MetricTimeQueryValidationRule(
+                    self._manifest_lookup, resolver_input_for_query, resolve_group_by_item_result
+                ),
+                DuplicateMetricValidationRule(
+                    self._manifest_lookup, resolver_input_for_query, resolve_group_by_item_result
+                ),
             ),
         )
 
