@@ -4,7 +4,7 @@ import logging
 from typing import Sequence
 
 from dbt_semantic_interfaces.protocols import WhereFilterIntersection
-from dbt_semantic_interfaces.references import MetricReference
+from dbt_semantic_interfaces.references import MeasureReference, MetricReference
 from typing_extensions import override
 
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
@@ -48,4 +48,12 @@ class DuplicateMetricValidationRule(PostResolutionQueryValidationRule):
                 )
             )
 
+        return MetricFlowQueryResolutionIssueSet.empty_instance()
+
+    @override
+    def validate_measure_in_resolution_dag(
+        self,
+        measure_reference: MeasureReference,
+        resolution_path: MetricFlowQueryResolutionPath,
+    ) -> MetricFlowQueryResolutionIssueSet:
         return MetricFlowQueryResolutionIssueSet.empty_instance()
