@@ -427,3 +427,39 @@ class LinkableElementSet(SemanticModelDerivation):
         )
         logger.debug(LazyFormat(lambda: f"Filtering valid linkable elements took: {time.time() - start_time:.2f}s"))
         return filtered_elements
+
+    def filter_by_left_semantic_model(
+        self, left_semantic_model_reference: SemanticModelReference
+    ) -> LinkableElementSet:
+        """Return a `LinkableElementSet` with only elements that have the given left semantic model in the join path."""
+        path_key_to_linkable_dimensions: Dict[ElementPathKey, Tuple[LinkableDimension, ...]] = {}
+        path_key_to_linkable_entities: Dict[ElementPathKey, Tuple[LinkableEntity, ...]] = {}
+        path_key_to_linkable_metrics: Dict[ElementPathKey, Tuple[LinkableMetric, ...]] = {}
+
+        for path_key, linkable_dimensions in self.path_key_to_linkable_dimensions.items():
+            path_key_to_linkable_dimensions[path_key] = tuple(
+                linkable_dimension
+                for linkable_dimension in linkable_dimensions
+                if linkable_dimension.join_path.left_semantic_model_reference == left_semantic_model_reference
+            )
+
+        for path_key, linkable_entities in self.path_key_to_linkable_entities.items():
+            path_key_to_linkable_entities[path_key] = tuple(
+                linkable_entity
+                for linkable_entity in linkable_entities
+                if linkable_entity.join_path.left_semantic_model_reference == left_semantic_model_reference
+            )
+
+        for path_key, linkable_metrics in self.path_key_to_linkable_metrics.items():
+            path_key_to_linkable_metrics[path_key] = tuple(
+                linkable_metric
+                for linkable_metric in linkable_metrics
+                if linkable_metric.join_path.semantic_model_join_path.left_semantic_model_reference
+                == left_semantic_model_reference
+            )
+
+        return LinkableElementSet(
+            path_key_to_linkable_dimensions=path_key_to_linkable_dimensions,
+            path_key_to_linkable_entities=path_key_to_linkable_entities,
+            path_key_to_linkable_metrics=path_key_to_linkable_metrics,
+        )
