@@ -1,0 +1,10 @@
+---
+metric:
+  name: monthly_bookings_to_daily_bookings
+  description: Ratio of daily bookings that are included in the monthly bookings total as a derived metric.
+  type: ratio
+  type_params:
+    numerator:
+      name: bookings
+    denominator:
+      name: bookings_monthly
