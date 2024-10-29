@@ -11,18 +11,18 @@ from dbt_semantic_interfaces.protocols.semantic_model import SemanticModel
 from dbt_semantic_interfaces.references import (
     DimensionReference,
     EntityReference,
-    LinkableElementReference,
     MeasureReference,
     SemanticModelElementReference,
     SemanticModelReference,
     TimeDimensionReference,
 )
-from dbt_semantic_interfaces.type_enums import AggregationType, DimensionType, EntityType, TimeGranularity
+from dbt_semantic_interfaces.type_enums import AggregationType, DimensionType, TimeGranularity
 
 from metricflow_semantics.errors.error_classes import InvalidSemanticModelError
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantics.element_group import ElementGrouper
+from metricflow_semantics.model.semantics.semantic_model_helper import SemanticModelHelper
 from metricflow_semantics.model.spec_converters import MeasureConverter
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
@@ -74,18 +74,6 @@ class SemanticModelLookup:
         """Retrieve all dimension references from the collection of semantic models."""
         return tuple(self._dimension_index.keys())
 
-    @staticmethod
-    def get_dimension_from_semantic_model(
-        semantic_model: SemanticModel, dimension_reference: LinkableElementReference
-    ) -> Dimension:
-        """Get dimension from semantic model."""
-        for dim in semantic_model.dimensions:
-            if dim.reference == dimension_reference:
-                return dim
-        raise ValueError(
-            f"No dimension with name ({dimension_reference}) in semantic_model with name ({semantic_model.name})"
-        )
-
     def get_dimension(self, dimension_reference: DimensionReference) -> Dimension:
         """Retrieves a full dimension object by name."""
         # If the reference passed is a TimeDimensionReference, convert to DimensionReference.
@@ -97,7 +85,7 @@ class SemanticModelLookup:
                 f"Could not find dimension with name '{dimension_reference.element_name}' in configured semantic models"
             )
 
-        return SemanticModelLookup.get_dimension_from_semantic_model(
+        return SemanticModelHelper.get_dimension_from_semantic_model(
             # Dimension object should match across semantic models, so just use the first semantic model.
             semantic_model=semantic_models[0],
             dimension_reference=dimension_reference,
@@ -120,23 +108,12 @@ class SemanticModelLookup:
         """
         return self._measure_non_additive_dimension_specs
 
-    @staticmethod
-    def get_measure_from_semantic_model(semantic_model: SemanticModel, measure_reference: MeasureReference) -> Measure:
-        """Get measure from semantic model."""
-        for measure in semantic_model.measures:
-            if measure.reference == measure_reference:
-                return measure
-
-        raise ValueError(
-            f"No dimension with name ({measure_reference.element_name}) in semantic_model with name ({semantic_model.name})"
-        )
-
     def get_measure(self, measure_reference: MeasureReference) -> Measure:
         """Retrieve the measure model object associated with the measure reference."""
         if measure_reference not in self._measure_index:
             raise ValueError(f"Could not find measure with name ({measure_reference}) in configured semantic models")
 
-        return SemanticModelLookup.get_measure_from_semantic_model(
+        return SemanticModelHelper.get_measure_from_semantic_model(
             semantic_model=self.get_semantic_model_for_measure(measure_reference), measure_reference=measure_reference
         )
 
@@ -276,7 +253,8 @@ class SemanticModelLookup:
         also assume there must be a primary entity because measures are required to have an `agg_time_dimension`
         defined in the same semantic model.
         """
-        primary_entity = SemanticModelLookup.resolved_primary_entity(semantic_model)
+        # TODO: Move me.
+        primary_entity = SemanticModelHelper.resolved_primary_entity(semantic_model)
         if primary_entity is None:
             raise RuntimeError(
                 f"The semantic model should have a primary entity since there are dimensions, but it does not. "
@@ -300,57 +278,6 @@ class SemanticModelLookup:
     def get_semantic_models_for_dimension(self, dimension_reference: DimensionReference) -> Set[SemanticModel]:
         """Return all semantic models associated with a dimension reference."""
         return set(self._dimension_index.get(dimension_reference, []))
-
-    @staticmethod
-    def get_entity_from_semantic_model(
-        semantic_model: SemanticModel, entity_reference: LinkableElementReference
-    ) -> Entity:
-        """Get entity from semantic model."""
-        for entity in semantic_model.entities:
-            if entity.reference == entity_reference:
-                return entity
-
-        raise ValueError(
-            f"No entity with name ({entity_reference}) in semantic_model with name ({semantic_model.name})"
-        )
-
-    @staticmethod
-    def resolved_primary_entity(semantic_model: SemanticModel) -> Optional[EntityReference]:
-        """Return the primary entity for dimensions in the model."""
-        primary_entity_reference = semantic_model.primary_entity_reference
-
-        entities_with_type_primary = tuple(
-            entity for entity in semantic_model.entities if entity.type == EntityType.PRIMARY
-        )
-
-        # This should be caught by the validation, but adding a sanity check.
-        assert len(entities_with_type_primary) <= 1, f"Found > 1 primary entity in {semantic_model}"
-        if primary_entity_reference is not None:
-            assert len(entities_with_type_primary) == 0, (
-                f"The primary_entity field was set to {primary_entity_reference}, but there are non-zero entities with "
-                f"type {EntityType.PRIMARY} in {semantic_model}"
-            )
-            return primary_entity_reference
-
-        if len(entities_with_type_primary) > 0:
-            return entities_with_type_primary[0].reference
-
-        return None
-
-    @staticmethod
-    def entity_links_for_local_elements(semantic_model: SemanticModel) -> Sequence[EntityReference]:
-        """Return the entity prefix that can be used to access dimensions defined in the semantic model."""
-        primary_entity_reference = semantic_model.primary_entity_reference
-
-        possible_entity_links = set()
-        if primary_entity_reference is not None:
-            possible_entity_links.add(primary_entity_reference)
-
-        for entity in semantic_model.entities:
-            if entity.is_linkable_entity_type:
-                possible_entity_links.add(entity.reference)
-
-        return sorted(possible_entity_links, key=lambda entity_reference: entity_reference.element_name)
 
     def get_element_spec_for_name(self, element_name: str) -> LinkableInstanceSpec:
         """Returns the spec for the given name of a linkable element (dimension or entity)."""
@@ -382,7 +309,7 @@ class SemanticModelLookup:
         # A measure's agg_time_dimension is required to be in the same semantic model as the measure,
         # so we can assume the same semantic model for both measure and dimension.
         semantic_model = self.get_semantic_model_for_measure(measure_reference)
-        entity_link = self.resolved_primary_entity(semantic_model)
+        entity_link = SemanticModelHelper.resolved_primary_entity(semantic_model)
         assert entity_link is not None, (
             f"Expected semantic model {semantic_model} to have a primary entity since it has a "
             "measure requiring an agg_time_dimension, but found none.",
