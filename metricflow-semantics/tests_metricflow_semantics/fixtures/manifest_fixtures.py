@@ -14,6 +14,9 @@ from metricflow_semantics.test_helpers.semantic_manifest_yamls.ambiguous_resolut
     AMBIGUOUS_RESOLUTION_MANIFEST_ANCHOR,
 )
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.cyclic_join_manifest import CYCLIC_JOIN_MANIFEST_ANCHOR
+from metricflow_semantics.test_helpers.semantic_manifest_yamls.extended_date_manifest import (
+    EXTENDED_DATE_MANIFEST_ANCHOR,
+)
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.multi_hop_join_manifest import (
     MULTI_HOP_JOIN_MANIFEST_ANCHOR,
 )
@@ -65,6 +68,12 @@ def multi_hop_join_manifest_lookup(  # noqa: D103
 def simple_multi_hop_join_manifest(template_mapping: Dict[str, str]) -> PydanticSemanticManifest:
     """Manifest used for many tests."""
     return load_semantic_manifest(SIMPLE_MULTI_HOP_JOIN_MANIFEST_ANCHOR.directory, template_mapping)
+
+
+@pytest.fixture(scope="session")
+def extended_date_manifest(template_mapping: Dict[str, str]) -> PydanticSemanticManifest:
+    """Manifest used for many tests."""
+    return load_semantic_manifest(EXTENDED_DATE_MANIFEST_ANCHOR.directory, template_mapping)
 
 
 @pytest.fixture(scope="session")
@@ -129,3 +138,10 @@ def column_association_resolver(  # noqa: D103
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> ColumnAssociationResolver:
     return DunderColumnAssociationResolver(simple_semantic_manifest_lookup)
+
+
+@pytest.fixture(scope="session")
+def extended_date_semantic_manifest_lookup(  # noqa: D103
+    extended_date_manifest: PydanticSemanticManifest,
+) -> SemanticManifestLookup:
+    return SemanticManifestLookup(extended_date_manifest)
