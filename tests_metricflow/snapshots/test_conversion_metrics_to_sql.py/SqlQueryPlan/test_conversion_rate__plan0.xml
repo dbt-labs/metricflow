@@ -454,8 +454,11 @@
                     <SqlSelectStatementNode>
                         <!-- description = 'Find conversions for user within the range of INF' -->
                         <!-- node_id = NodeId(id_str='ss_8') -->
-                        <!-- col0 =                                                                                       -->
-                        <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_201), column_alias='ds__day') -->
+                        <!-- col0 =                                                 -->
+                        <!--   SqlSelectColumn(                                     -->
+                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_201), -->
+                        <!--     column_alias='metric_time__day',                   -->
+                        <!--   )                                                    -->
                         <!-- col1 =                                                                                    -->
                         <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_202), column_alias='user') -->
                         <!-- col2 =                                                 -->
@@ -486,7 +489,7 @@
                             <!-- col2 =                                                                          -->
                             <!--   SqlSelectColumn(                                                              -->
                             <!--     expr=SqlWindowFunctionExpression(node_id=wfnc_2, sql_function=FIRST_VALUE), -->
-                            <!--     column_alias='ds__day',                                                     -->
+                            <!--     column_alias='metric_time__day',                                            -->
                             <!--   )                                                                             -->
                             <!-- col3 =                                                                          -->
                             <!--   SqlSelectColumn(                                                              -->
@@ -511,13 +514,13 @@
                             <!-- where = None -->
                             <!-- distinct = True -->
                             <SqlSelectStatementNode>
-                                <!-- description =                                                               -->
-                                <!--   "Pass Only Elements: ['visits', 'visit__referrer_id', 'ds__day', 'user']" -->
+                                <!-- description =                                                                        -->
+                                <!--   "Pass Only Elements: ['visits', 'visit__referrer_id', 'metric_time__day', 'user']" -->
                                 <!-- node_id = NodeId(id_str='ss_4') -->
                                 <!-- col0 =                                                -->
                                 <!--   SqlSelectColumn(                                    -->
                                 <!--     expr=SqlColumnReferenceExpression(node_id=cr_88), -->
-                                <!--     column_alias='ds__day',                           -->
+                                <!--     column_alias='metric_time__day',                  -->
                                 <!--   )                                                   -->
                                 <!-- col1 =                                                -->
                                 <!--   SqlSelectColumn(                                    -->

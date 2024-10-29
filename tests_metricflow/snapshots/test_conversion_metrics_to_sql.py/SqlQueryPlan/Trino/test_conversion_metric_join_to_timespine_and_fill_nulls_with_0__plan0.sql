@@ -140,8 +140,7 @@ FROM (
         FROM (
           -- Find conversions for user within the range of 7 day
           SELECT
-            subq_13.ds__day
-            , subq_13.metric_time__day
+            subq_13.metric_time__day
             , subq_13.user
             , subq_13.buys
             , subq_13.visits
@@ -151,42 +150,33 @@ FROM (
               FIRST_VALUE(subq_9.visits) OVER (
                 PARTITION BY
                   subq_12.user
-                  , subq_12.ds__day
+                  , subq_12.metric_time__day
                   , subq_12.mf_internal_uuid
-                ORDER BY subq_9.ds__day DESC
+                ORDER BY subq_9.metric_time__day DESC
                 ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
               ) AS visits
-              , FIRST_VALUE(subq_9.ds__day) OVER (
-                PARTITION BY
-                  subq_12.user
-                  , subq_12.ds__day
-                  , subq_12.mf_internal_uuid
-                ORDER BY subq_9.ds__day DESC
-                ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-              ) AS ds__day
               , FIRST_VALUE(subq_9.metric_time__day) OVER (
                 PARTITION BY
                   subq_12.user
-                  , subq_12.ds__day
+                  , subq_12.metric_time__day
                   , subq_12.mf_internal_uuid
-                ORDER BY subq_9.ds__day DESC
+                ORDER BY subq_9.metric_time__day DESC
                 ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
               ) AS metric_time__day
               , FIRST_VALUE(subq_9.user) OVER (
                 PARTITION BY
                   subq_12.user
-                  , subq_12.ds__day
+                  , subq_12.metric_time__day
                   , subq_12.mf_internal_uuid
-                ORDER BY subq_9.ds__day DESC
+                ORDER BY subq_9.metric_time__day DESC
                 ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
               ) AS user
               , subq_12.mf_internal_uuid AS mf_internal_uuid
               , subq_12.buys AS buys
             FROM (
-              -- Pass Only Elements: ['visits', 'ds__day', 'metric_time__day', 'user']
+              -- Pass Only Elements: ['visits', 'metric_time__day', 'user']
               SELECT
-                subq_8.ds__day
-                , subq_8.metric_time__day
+                subq_8.metric_time__day
                 , subq_8.user
                 , subq_8.visits
               FROM (
@@ -395,9 +385,9 @@ FROM (
                 subq_9.user = subq_12.user
               ) AND (
                 (
-                  subq_9.ds__day <= subq_12.ds__day
+                  subq_9.metric_time__day <= subq_12.metric_time__day
                 ) AND (
-                  subq_9.ds__day > DATE_ADD('day', -7, subq_12.ds__day)
+                  subq_9.metric_time__day > DATE_ADD('day', -7, subq_12.metric_time__day)
                 )
               )
           ) subq_13

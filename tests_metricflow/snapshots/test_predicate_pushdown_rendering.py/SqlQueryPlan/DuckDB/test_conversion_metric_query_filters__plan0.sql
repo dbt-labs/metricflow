@@ -194,8 +194,7 @@ FROM (
       FROM (
         -- Find conversions for user within the range of 7 day
         SELECT
-          subq_20.ds__day
-          , subq_20.metric_time__day
+          subq_20.metric_time__day
           , subq_20.user
           , subq_20.visit__referrer_id
           , subq_20.user__home_state_latest
@@ -207,58 +206,49 @@ FROM (
             FIRST_VALUE(subq_16.visits) OVER (
               PARTITION BY
                 subq_19.user
-                , subq_19.ds__day
+                , subq_19.metric_time__day
                 , subq_19.mf_internal_uuid
-              ORDER BY subq_16.ds__day DESC
+              ORDER BY subq_16.metric_time__day DESC
               ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
             ) AS visits
             , FIRST_VALUE(subq_16.visit__referrer_id) OVER (
               PARTITION BY
                 subq_19.user
-                , subq_19.ds__day
+                , subq_19.metric_time__day
                 , subq_19.mf_internal_uuid
-              ORDER BY subq_16.ds__day DESC
+              ORDER BY subq_16.metric_time__day DESC
               ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
             ) AS visit__referrer_id
             , FIRST_VALUE(subq_16.user__home_state_latest) OVER (
               PARTITION BY
                 subq_19.user
-                , subq_19.ds__day
+                , subq_19.metric_time__day
                 , subq_19.mf_internal_uuid
-              ORDER BY subq_16.ds__day DESC
+              ORDER BY subq_16.metric_time__day DESC
               ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
             ) AS user__home_state_latest
-            , FIRST_VALUE(subq_16.ds__day) OVER (
-              PARTITION BY
-                subq_19.user
-                , subq_19.ds__day
-                , subq_19.mf_internal_uuid
-              ORDER BY subq_16.ds__day DESC
-              ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-            ) AS ds__day
             , FIRST_VALUE(subq_16.metric_time__day) OVER (
               PARTITION BY
                 subq_19.user
-                , subq_19.ds__day
+                , subq_19.metric_time__day
                 , subq_19.mf_internal_uuid
-              ORDER BY subq_16.ds__day DESC
+              ORDER BY subq_16.metric_time__day DESC
               ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
             ) AS metric_time__day
             , FIRST_VALUE(subq_16.user) OVER (
               PARTITION BY
                 subq_19.user
-                , subq_19.ds__day
+                , subq_19.metric_time__day
                 , subq_19.mf_internal_uuid
-              ORDER BY subq_16.ds__day DESC
+              ORDER BY subq_16.metric_time__day DESC
               ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
             ) AS user
             , subq_19.mf_internal_uuid AS mf_internal_uuid
             , subq_19.buys AS buys
           FROM (
-            -- Pass Only Elements: ['visits', 'visit__referrer_id', 'user__home_state_latest', 'ds__day', 'metric_time__day', 'user']
+            -- Pass Only Elements: ['visits', 'visit__referrer_id', 'user__home_state_latest', 'metric_time__day', 'user']
             SELECT
-              subq_15.ds__day
-              , subq_15.metric_time__day
+              subq_15.metric_time__day
               , subq_15.user
               , subq_15.visit__referrer_id
               , subq_15.user__home_state_latest
@@ -600,9 +590,9 @@ FROM (
               subq_16.user = subq_19.user
             ) AND (
               (
-                subq_16.ds__day <= subq_19.ds__day
+                subq_16.metric_time__day <= subq_19.metric_time__day
               ) AND (
-                subq_16.ds__day > subq_19.ds__day - INTERVAL 7 day
+                subq_16.metric_time__day > subq_19.metric_time__day - INTERVAL 7 day
               )
             )
         ) subq_20

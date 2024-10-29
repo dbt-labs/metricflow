@@ -44,41 +44,33 @@ FROM (
         FIRST_VALUE(subq_21.visits) OVER (
           PARTITION BY
             subq_24.user
-            , subq_24.ds__day
+            , subq_24.metric_time__day
             , subq_24.mf_internal_uuid
-          ORDER BY subq_21.ds__day DESC
+          ORDER BY subq_21.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS visits
         , FIRST_VALUE(subq_21.visit__referrer_id) OVER (
           PARTITION BY
             subq_24.user
-            , subq_24.ds__day
+            , subq_24.metric_time__day
             , subq_24.mf_internal_uuid
-          ORDER BY subq_21.ds__day DESC
+          ORDER BY subq_21.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS visit__referrer_id
-        , FIRST_VALUE(subq_21.ds__day) OVER (
-          PARTITION BY
-            subq_24.user
-            , subq_24.ds__day
-            , subq_24.mf_internal_uuid
-          ORDER BY subq_21.ds__day DESC
-          ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-        ) AS ds__day
         , FIRST_VALUE(subq_21.metric_time__day) OVER (
           PARTITION BY
             subq_24.user
-            , subq_24.ds__day
+            , subq_24.metric_time__day
             , subq_24.mf_internal_uuid
-          ORDER BY subq_21.ds__day DESC
+          ORDER BY subq_21.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS metric_time__day
         , FIRST_VALUE(subq_21.user) OVER (
           PARTITION BY
             subq_24.user
-            , subq_24.ds__day
+            , subq_24.metric_time__day
             , subq_24.mf_internal_uuid
-          ORDER BY subq_21.ds__day DESC
+          ORDER BY subq_21.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS user
         , subq_24.mf_internal_uuid AS mf_internal_uuid
@@ -86,10 +78,9 @@ FROM (
       FROM (
         -- Read Elements From Semantic Model 'visits_source'
         -- Metric Time Dimension 'ds'
-        -- Pass Only Elements: ['visits', 'visit__referrer_id', 'ds__day', 'metric_time__day', 'user']
+        -- Pass Only Elements: ['visits', 'visit__referrer_id', 'metric_time__day', 'user']
         SELECT
-          DATE_TRUNC('day', ds) AS ds__day
-          , DATE_TRUNC('day', ds) AS metric_time__day
+          DATE_TRUNC('day', ds) AS metric_time__day
           , user_id AS user
           , referrer_id AS visit__referrer_id
           , 1 AS visits
@@ -100,7 +91,7 @@ FROM (
         -- Metric Time Dimension 'ds'
         -- Add column with generated UUID
         SELECT
-          DATE_TRUNC('day', ds) AS ds__day
+          DATE_TRUNC('day', ds) AS metric_time__day
           , user_id AS user
           , 1 AS buys
           , GEN_RANDOM_UUID() AS mf_internal_uuid
@@ -111,9 +102,9 @@ FROM (
           subq_21.user = subq_24.user
         ) AND (
           (
-            subq_21.ds__day <= subq_24.ds__day
+            subq_21.metric_time__day <= subq_24.metric_time__day
           ) AND (
-            subq_21.ds__day > subq_24.ds__day - MAKE_INTERVAL(days => 7)
+            subq_21.metric_time__day > subq_24.metric_time__day - MAKE_INTERVAL(days => 7)
           )
         )
     ) subq_25

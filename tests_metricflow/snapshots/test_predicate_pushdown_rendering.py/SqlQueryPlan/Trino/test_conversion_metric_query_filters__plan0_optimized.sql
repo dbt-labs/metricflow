@@ -61,59 +61,50 @@ FROM (
         FIRST_VALUE(subq_41.visits) OVER (
           PARTITION BY
             subq_44.user
-            , subq_44.ds__day
+            , subq_44.metric_time__day
             , subq_44.mf_internal_uuid
-          ORDER BY subq_41.ds__day DESC
+          ORDER BY subq_41.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS visits
         , FIRST_VALUE(subq_41.visit__referrer_id) OVER (
           PARTITION BY
             subq_44.user
-            , subq_44.ds__day
+            , subq_44.metric_time__day
             , subq_44.mf_internal_uuid
-          ORDER BY subq_41.ds__day DESC
+          ORDER BY subq_41.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS visit__referrer_id
         , FIRST_VALUE(subq_41.user__home_state_latest) OVER (
           PARTITION BY
             subq_44.user
-            , subq_44.ds__day
+            , subq_44.metric_time__day
             , subq_44.mf_internal_uuid
-          ORDER BY subq_41.ds__day DESC
+          ORDER BY subq_41.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS user__home_state_latest
-        , FIRST_VALUE(subq_41.ds__day) OVER (
-          PARTITION BY
-            subq_44.user
-            , subq_44.ds__day
-            , subq_44.mf_internal_uuid
-          ORDER BY subq_41.ds__day DESC
-          ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-        ) AS ds__day
         , FIRST_VALUE(subq_41.metric_time__day) OVER (
           PARTITION BY
             subq_44.user
-            , subq_44.ds__day
+            , subq_44.metric_time__day
             , subq_44.mf_internal_uuid
-          ORDER BY subq_41.ds__day DESC
+          ORDER BY subq_41.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS metric_time__day
         , FIRST_VALUE(subq_41.user) OVER (
           PARTITION BY
             subq_44.user
-            , subq_44.ds__day
+            , subq_44.metric_time__day
             , subq_44.mf_internal_uuid
-          ORDER BY subq_41.ds__day DESC
+          ORDER BY subq_41.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS user
         , subq_44.mf_internal_uuid AS mf_internal_uuid
         , subq_44.buys AS buys
       FROM (
         -- Constrain Output with WHERE
-        -- Pass Only Elements: ['visits', 'visit__referrer_id', 'user__home_state_latest', 'ds__day', 'metric_time__day', 'user']
+        -- Pass Only Elements: ['visits', 'visit__referrer_id', 'user__home_state_latest', 'metric_time__day', 'user']
         SELECT
-          ds__day
-          , metric_time__day
+          metric_time__day
           , subq_39.user
           , visit__referrer_id
           , user__home_state_latest
@@ -121,8 +112,7 @@ FROM (
         FROM (
           -- Join Standard Outputs
           SELECT
-            subq_36.ds__day AS ds__day
-            , subq_36.metric_time__day AS metric_time__day
+            subq_36.metric_time__day AS metric_time__day
             , subq_36.user AS user
             , subq_36.visit__referrer_id AS visit__referrer_id
             , users_latest_src_28000.home_state_latest AS user__home_state_latest
@@ -131,8 +121,7 @@ FROM (
             -- Read Elements From Semantic Model 'visits_source'
             -- Metric Time Dimension 'ds'
             SELECT
-              DATE_TRUNC('day', ds) AS ds__day
-              , DATE_TRUNC('day', ds) AS metric_time__day
+              DATE_TRUNC('day', ds) AS metric_time__day
               , user_id AS user
               , referrer_id AS visit__referrer_id
               , 1 AS visits
@@ -150,7 +139,7 @@ FROM (
         -- Metric Time Dimension 'ds'
         -- Add column with generated UUID
         SELECT
-          DATE_TRUNC('day', ds) AS ds__day
+          DATE_TRUNC('day', ds) AS metric_time__day
           , user_id AS user
           , 1 AS buys
           , uuid() AS mf_internal_uuid
@@ -161,9 +150,9 @@ FROM (
           subq_41.user = subq_44.user
         ) AND (
           (
-            subq_41.ds__day <= subq_44.ds__day
+            subq_41.metric_time__day <= subq_44.metric_time__day
           ) AND (
-            subq_41.ds__day > DATE_ADD('day', -7, subq_44.ds__day)
+            subq_41.metric_time__day > DATE_ADD('day', -7, subq_44.metric_time__day)
           )
         )
     ) subq_45
