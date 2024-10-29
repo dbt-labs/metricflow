@@ -8,6 +8,7 @@ from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.protocols import Metric, WhereFilterIntersection
 from dbt_semantic_interfaces.references import (
+    MeasureReference,
     MetricReference,
     TimeDimensionReference,
 )
@@ -224,6 +225,14 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
         self,
         metrics_in_query: Sequence[MetricReference],
         where_filter_intersection: WhereFilterIntersection,
+        resolution_path: MetricFlowQueryResolutionPath,
+    ) -> MetricFlowQueryResolutionIssueSet:
+        return MetricFlowQueryResolutionIssueSet.empty_instance()
+
+    @override
+    def validate_measure_in_resolution_dag(
+        self,
+        measure_reference: MeasureReference,
         resolution_path: MetricFlowQueryResolutionPath,
     ) -> MetricFlowQueryResolutionIssueSet:
         return MetricFlowQueryResolutionIssueSet.empty_instance()

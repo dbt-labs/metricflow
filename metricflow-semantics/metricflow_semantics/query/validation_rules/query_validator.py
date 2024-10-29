@@ -65,7 +65,18 @@ class _PostResolutionQueryValidationVisitor(GroupByItemResolutionNodeVisitor[Met
 
     @override
     def visit_measure_node(self, node: MeasureGroupByItemSourceNode) -> MetricFlowQueryResolutionIssueSet:
-        return self._default_handler(node)
+        with self._path_from_start_node_tracker.track_node_visit(node) as current_traversal_path:
+            issue_sets_to_merge = [parent_node.accept(self) for parent_node in node.parent_nodes]
+
+            for validation_rule in self._validation_rules:
+                issue_sets_to_merge.append(
+                    validation_rule.validate_measure_in_resolution_dag(
+                        measure_reference=node.measure_reference,
+                        resolution_path=current_traversal_path,
+                    )
+                )
+
+            return MetricFlowQueryResolutionIssueSet.merge_iterable(issue_sets_to_merge)
 
     @override
     def visit_metric_node(self, node: MetricGroupByItemResolutionNode) -> MetricFlowQueryResolutionIssueSet:
