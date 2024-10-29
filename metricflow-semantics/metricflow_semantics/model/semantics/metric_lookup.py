@@ -278,7 +278,7 @@ class MetricLookup:
             )
             agg_time_dimension_grains.add(measure_properties.agg_time_granularity)
 
-        return min(agg_time_dimension_grains, key=lambda time_granularity: time_granularity.to_int())
+        return max(agg_time_dimension_grains, key=lambda time_granularity: time_granularity.to_int())
 
     def get_joinable_scd_specs_for_metric(self, metric_reference: MetricReference) -> Sequence[LinkableInstanceSpec]:
         """Get the SCDs that can be joined to a metric."""

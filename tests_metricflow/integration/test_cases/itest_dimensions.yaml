@@ -157,18 +157,17 @@ integration_test:
     GROUP BY
       v.ds
 ---
-# TODO: Test is currently broken.
-#integration_test:
-#  name: query_non_default_time_dimension_without_granularity
-#  description: Query just a time dimension, no granularity specified. Should assume default granularity for dimension.
-#  model: EXTENDED_DATE_MODEL
-#  group_bys: [ "booking__monthly_ds"]
-#  check_query: |
-#    SELECT
-#      ds AS booking__monthly_ds__month
-#    FROM {{ source_schema }}.fct_bookings_extended_monthly
-#    GROUP BY
-#      ds
+integration_test:
+  name: query_non_default_time_dimension_without_granularity
+  description: Query just a time dimension, no granularity specified. Should assume default granularity for dimension.
+  model: EXTENDED_DATE_MODEL
+  group_bys: [ "booking_monthly__ds"]
+  check_query: |
+    SELECT
+      ds AS booking_monthly__ds__month
+    FROM {{ source_schema }}.fct_bookings_extended_monthly
+    GROUP BY
+      ds
 ---
 integration_test:
   name: query_dimension_with_constraint_from_diff_source
