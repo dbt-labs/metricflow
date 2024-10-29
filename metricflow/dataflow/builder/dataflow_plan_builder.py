@@ -237,6 +237,7 @@ class DataflowPlanBuilder:
 
     def _build_aggregated_conversion_node(
         self,
+        metric_spec: MetricSpec,
         base_measure_spec: MetricInputMeasureSpec,
         conversion_measure_spec: MetricInputMeasureSpec,
         entity_spec: EntitySpec,
@@ -250,6 +251,9 @@ class DataflowPlanBuilder:
         # Due to other outstanding issues with conversion metric filters, we disable predicate
         # pushdown for any filter parameter set that is not part of the original time range constraint
         # implementation.
+        default_granularity = ExpandedTimeGranularity.from_time_granularity(
+            self._metric_lookup.get_min_queryable_time_granularity(metric_spec.reference)
+        )
         disabled_pushdown_state = PredicatePushdownState.with_pushdown_disabled()
         time_range_only_pushdown_state = PredicatePushdownState(
             time_range_constraint=predicate_pushdown_state.time_range_constraint,
@@ -302,19 +306,14 @@ class DataflowPlanBuilder:
             parent_node=conversion_measure_recipe.source_node
         )
 
-        # Get the agg time dimension for each measure used for matching conversion time windows
-        base_time_dimension_spec = TimeDimensionSpec.from_reference(
-            self._semantic_model_lookup.get_agg_time_dimension_for_measure(base_measure_spec.measure_spec.reference)
-        )
-        conversion_time_dimension_spec = TimeDimensionSpec.from_reference(
-            self._semantic_model_lookup.get_agg_time_dimension_for_measure(
-                conversion_measure_spec.measure_spec.reference
-            )
-        )
+        # Get the time dimension used to calculate the conversion window
+        # Currently, both the base/conversion measure uses metric_time as it's the default agg time dimension.
+        # However, eventually, there can be user-specified time dimensions used for this calculation.
+        metric_time_dimension_spec = DataSet.metric_time_dimension_spec(default_granularity)
 
         # Filter the source nodes with only the required specs needed for the calculation
         constant_property_specs = []
-        required_local_specs = [base_measure_spec.measure_spec, entity_spec, base_time_dimension_spec] + list(
+        required_local_specs = [base_measure_spec.measure_spec, entity_spec, metric_time_dimension_spec] + list(
             base_measure_recipe.required_local_linkable_specs.as_tuple
         )
         for constant_property in constant_properties or []:
@@ -356,10 +355,10 @@ class DataflowPlanBuilder:
         # adjusted in the opposite direction.
         join_conversion_node = JoinConversionEventsNode.create(
             base_node=filtered_unaggregated_base_node,
-            base_time_dimension_spec=base_time_dimension_spec,
+            base_time_dimension_spec=metric_time_dimension_spec,
             conversion_node=unaggregated_conversion_measure_node,
             conversion_measure_spec=conversion_measure_spec.measure_spec,
-            conversion_time_dimension_spec=conversion_time_dimension_spec,
+            conversion_time_dimension_spec=metric_time_dimension_spec,
             unique_identifier_keys=(MetadataSpec(MetricFlowReservedKeywords.MF_INTERNAL_UUID.value),),
             entity_spec=entity_spec,
             window=window,
@@ -428,6 +427,7 @@ class DataflowPlanBuilder:
         )
 
         aggregated_measures_node = self._build_aggregated_conversion_node(
+            metric_spec=metric_spec,
             base_measure_spec=base_measure,
             conversion_measure_spec=conversion_measure,
             queried_linkable_specs=queried_linkable_specs,
