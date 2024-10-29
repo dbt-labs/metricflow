@@ -270,23 +270,15 @@ class MetricLookup:
         return result
 
     def _get_min_queryable_time_granularity(self, metric_reference: MetricReference) -> TimeGranularity:
-        agg_time_dimension_specs = self._get_agg_time_dimension_specs_for_metric(metric_reference)
-        assert (
-            agg_time_dimension_specs
-        ), f"No agg_time_dimension found for metric {metric_reference}. Something has been misconfigured."
+        metric = self.get_metric(metric_reference)
+        agg_time_dimension_grains = set()
+        for input_measure in metric.input_measures:
+            measure_properties = self._semantic_model_lookup.measure_lookup.get_properties(
+                input_measure.measure_reference
+            )
+            agg_time_dimension_grains.add(measure_properties.agg_time_granularity)
 
-        minimum_queryable_granularity = self._semantic_model_lookup.get_defined_time_granularity(
-            agg_time_dimension_specs[0].reference
-        )
-        if len(agg_time_dimension_specs) > 1:
-            for agg_time_dimension_spec in agg_time_dimension_specs[1:]:
-                defined_time_granularity = self._semantic_model_lookup.get_defined_time_granularity(
-                    agg_time_dimension_spec.reference
-                )
-                if defined_time_granularity.to_int() > minimum_queryable_granularity.to_int():
-                    minimum_queryable_granularity = defined_time_granularity
-
-        return minimum_queryable_granularity
+        return min(agg_time_dimension_grains, key=lambda time_granularity: time_granularity.to_int())
 
     def get_joinable_scd_specs_for_metric(self, metric_reference: MetricReference) -> Sequence[LinkableInstanceSpec]:
         """Get the SCDs that can be joined to a metric."""
