@@ -38,15 +38,15 @@ class PartitionJoinResolver:
     def _get_partitions(self, spec_set: InstanceSpecSet) -> PartitionSpecSet:
         """Returns the specs from the instance set that correspond to partition specs."""
         partition_dimension_specs = tuple(
-            x
-            for x in spec_set.dimension_specs
-            if self._semantic_model_lookup.get_dimension(dimension_reference=x.reference).is_partition
+            dimension_spec
+            for dimension_spec in spec_set.dimension_specs
+            if self._semantic_model_lookup.dimension_lookup.get_invariant(dimension_spec.reference).is_partition
         )
         partition_time_dimension_specs = tuple(
-            x
-            for x in spec_set.time_dimension_specs
-            if x.reference != DataSet.metric_time_dimension_reference()
-            and self._semantic_model_lookup.get_time_dimension(time_dimension_reference=x.reference).is_partition
+            time_dimension_spec
+            for time_dimension_spec in spec_set.time_dimension_specs
+            if time_dimension_spec.reference != DataSet.metric_time_dimension_reference()
+            and self._semantic_model_lookup.dimension_lookup.get_invariant(time_dimension_spec.reference).is_partition
         )
 
         return PartitionSpecSet(
