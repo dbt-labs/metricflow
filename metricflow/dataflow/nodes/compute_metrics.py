@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Sequence, Set, Tuple
+from dataclasses import dataclass, field
+from typing import Dict, Sequence, Set, Tuple
 
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
@@ -28,9 +28,11 @@ class ComputeMetricsNode(DataflowPlanNode):
     metric_specs: Tuple[MetricSpec, ...]
     for_group_by_source_node: bool
     _aggregated_to_elements: Tuple[LinkableInstanceSpec, ...]
+    _alias_to_metric_spec: Dict[str, MetricSpec] = field(hash=False)
 
     def __post_init__(self) -> None:  # noqa: D105
         super().__post_init__()
+
         assert len(self.parent_nodes) == 1
 
     @staticmethod
@@ -44,6 +46,7 @@ class ComputeMetricsNode(DataflowPlanNode):
             parent_nodes=(parent_node,),
             metric_specs=tuple(metric_specs),
             _aggregated_to_elements=tuple(aggregated_to_elements),
+            _alias_to_metric_spec={spec.alias: spec for spec in metric_specs if spec.alias is not None},
             for_group_by_source_node=for_group_by_source_node,
         )
 
@@ -96,6 +99,17 @@ class ComputeMetricsNode(DataflowPlanNode):
 
         if other_node.for_group_by_source_node != self.for_group_by_source_node:
             return False, "one node is a group by metric source node"
+
+        for spec in other_node.metric_specs:
+            if (
+                spec.alias is not None
+                and spec.alias in self._alias_to_metric_spec
+                and self._alias_to_metric_spec[spec.alias] != spec
+            ):
+                return (
+                    False,
+                    f"'{spec.alias}' is defined in both nodes but it refers to different things in each of them",
+                )
 
         return True, ""
 
