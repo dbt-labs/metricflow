@@ -1,0 +1,6 @@
+kind: Fixes
+body: Fix `SourceScanOptimizer` generated duplicated columns when querying for 2 derived metrics which define the same alias
+time: 2024-10-30T20:12:14.516814+01:00
+custom:
+    Author: serramatutu
+    Issue: "1494"
