@@ -617,7 +617,7 @@ integration_test:
               {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS ds__day
               , user_id AS user
               , 1 AS buys
-              , GEN_RANDOM_UUID() AS mf_internal_uuid
+              , {{ generate_random_uuid() }} AS mf_internal_uuid
             FROM {{ source_schema }}.fct_buys b
           ) subq_11
           ON subq_8.user = subq_11.user AND subq_8.ds__day <= subq_11.ds__day
@@ -694,7 +694,7 @@ integration_test:
               {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS ds__day
               , user_id AS user
               , 1 AS buys
-              , GEN_RANDOM_UUID() AS mf_internal_uuid
+              , {{ generate_random_uuid() }} AS mf_internal_uuid
             FROM {{ source_schema }}.fct_buys b
           ) subq_11
           ON subq_8.user = subq_11.user AND subq_8.ds__day <= subq_11.ds__day
@@ -829,7 +829,7 @@ integration_test:
               {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS ds__day
               , user_id AS user
               , 1 AS buys
-              , GEN_RANDOM_UUID() AS mf_internal_uuid
+              , {{ generate_random_uuid() }} AS mf_internal_uuid
             FROM {{ source_schema }}.fct_buys b
           ) subq_14
           ON
@@ -928,7 +928,7 @@ integration_test:
             {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS ds__day
             , user_id AS user
             , 1 AS buys
-            , GEN_RANDOM_UUID() AS mf_internal_uuid
+            , {{ generate_random_uuid() }} AS mf_internal_uuid
           FROM {{ source_schema }}.fct_buys b
         ) subq_14
         ON subq_11.user = subq_14.user AND subq_11.ds__day <= subq_14.ds__day
