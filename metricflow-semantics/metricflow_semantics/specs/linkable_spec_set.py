@@ -15,6 +15,7 @@ from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.instance_spec import InstanceSpecVisitor, LinkableInstanceSpec
+from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 
 if typing.TYPE_CHECKING:
@@ -153,6 +154,15 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
     @staticmethod
     def create_from_specs(specs: Sequence[LinkableInstanceSpec]) -> LinkableSpecSet:  # noqa: D102
         return _group_specs_by_type(specs)
+
+    @property
+    def as_instance_spec_set(self) -> InstanceSpecSet:  # noqa: D102
+        return InstanceSpecSet(
+            dimension_specs=self.dimension_specs,
+            entity_specs=self.entity_specs,
+            time_dimension_specs=self.time_dimension_specs,
+            group_by_metric_specs=self.group_by_metric_specs,
+        )
 
 
 @dataclass

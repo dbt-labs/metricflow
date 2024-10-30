@@ -4,20 +4,22 @@ import dataclasses
 import itertools
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Generic, List, Sequence, Tuple, TypeVar
+from typing import TYPE_CHECKING, Generic, List, Sequence, Tuple, TypeVar
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.merger import Mergeable
-from metricflow_semantics.specs.dimension_spec import DimensionSpec
-from metricflow_semantics.specs.entity_spec import EntitySpec
-from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.instance_spec import InstanceSpec, InstanceSpecVisitor, LinkableInstanceSpec
-from metricflow_semantics.specs.measure_spec import MeasureSpec
-from metricflow_semantics.specs.metadata_spec import MetadataSpec
-from metricflow_semantics.specs.metric_spec import MetricSpec
-from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
+
+if TYPE_CHECKING:
+    from metricflow_semantics.specs.dimension_spec import DimensionSpec
+    from metricflow_semantics.specs.entity_spec import EntitySpec
+    from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
+    from metricflow_semantics.specs.measure_spec import MeasureSpec
+    from metricflow_semantics.specs.metadata_spec import MetadataSpec
+    from metricflow_semantics.specs.metric_spec import MetricSpec
+    from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 
 
 @dataclass(frozen=True)
