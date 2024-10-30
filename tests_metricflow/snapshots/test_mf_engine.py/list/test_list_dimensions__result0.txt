@@ -7,6 +7,7 @@
   'booking__is_instant',
   'booking__paid_at',
   'buy__ds',
+  'buy__ds_month',
   'company__company_name',
   'listing__capacity_latest',
   'listing__country_latest',

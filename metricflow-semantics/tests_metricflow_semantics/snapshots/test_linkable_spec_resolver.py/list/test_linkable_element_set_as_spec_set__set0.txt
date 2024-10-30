@@ -488,10 +488,12 @@
   'user__visit__user__visit_buy_conversion_rate_7days',
   'user__visit__user__visit_buy_conversion_rate_7days_fill_nulls_with_0',
   'user__visit__user__visit_buy_conversion_rate_by_session',
+  'user__visit__user__visit_buy_conversion_rate_with_monthly_conversion',
   'user__visit__user__visit_buy_conversions',
   'user__visit_buy_conversion_rate',
   'user__visit_buy_conversion_rate_7days',
   'user__visit_buy_conversion_rate_7days_fill_nulls_with_0',
   'user__visit_buy_conversion_rate_by_session',
+  'user__visit_buy_conversion_rate_with_monthly_conversion',
   'user__visit_buy_conversions',
 ]

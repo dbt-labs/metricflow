@@ -34,6 +34,7 @@
     'bookings',
     'buyers',
     'buys',
+    'buys_month',
     'current_account_balance_by_user',
     'discrete_booking_value_p99',
     'identity_verifications',

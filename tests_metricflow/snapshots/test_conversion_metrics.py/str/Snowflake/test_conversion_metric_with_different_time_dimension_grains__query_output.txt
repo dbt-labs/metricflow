@@ -1,0 +1,3 @@
+  VISIT_BUY_CONVERSION_RATE_WITH_MONTHLY_CONVERSION
+---------------------------------------------------
+                                                0.5

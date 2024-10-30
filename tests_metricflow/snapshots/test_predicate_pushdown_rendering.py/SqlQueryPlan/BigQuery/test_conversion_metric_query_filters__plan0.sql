@@ -479,6 +479,12 @@ FROM (
               , subq_18.ds__extract_day
               , subq_18.ds__extract_dow
               , subq_18.ds__extract_doy
+              , subq_18.ds_month__month
+              , subq_18.ds_month__quarter
+              , subq_18.ds_month__year
+              , subq_18.ds_month__extract_year
+              , subq_18.ds_month__extract_quarter
+              , subq_18.ds_month__extract_month
               , subq_18.buy__ds__day
               , subq_18.buy__ds__week
               , subq_18.buy__ds__month
@@ -490,6 +496,12 @@ FROM (
               , subq_18.buy__ds__extract_day
               , subq_18.buy__ds__extract_dow
               , subq_18.buy__ds__extract_doy
+              , subq_18.buy__ds_month__month
+              , subq_18.buy__ds_month__quarter
+              , subq_18.buy__ds_month__year
+              , subq_18.buy__ds_month__extract_year
+              , subq_18.buy__ds_month__extract_quarter
+              , subq_18.buy__ds_month__extract_month
               , subq_18.metric_time__day
               , subq_18.metric_time__week
               , subq_18.metric_time__month
@@ -522,6 +534,12 @@ FROM (
                 , subq_17.ds__extract_day
                 , subq_17.ds__extract_dow
                 , subq_17.ds__extract_doy
+                , subq_17.ds_month__month
+                , subq_17.ds_month__quarter
+                , subq_17.ds_month__year
+                , subq_17.ds_month__extract_year
+                , subq_17.ds_month__extract_quarter
+                , subq_17.ds_month__extract_month
                 , subq_17.buy__ds__day
                 , subq_17.buy__ds__week
                 , subq_17.buy__ds__month
@@ -533,6 +551,12 @@ FROM (
                 , subq_17.buy__ds__extract_day
                 , subq_17.buy__ds__extract_dow
                 , subq_17.buy__ds__extract_doy
+                , subq_17.buy__ds_month__month
+                , subq_17.buy__ds_month__quarter
+                , subq_17.buy__ds_month__year
+                , subq_17.buy__ds_month__extract_year
+                , subq_17.buy__ds_month__extract_quarter
+                , subq_17.buy__ds_month__extract_month
                 , subq_17.ds__day AS metric_time__day
                 , subq_17.ds__week AS metric_time__week
                 , subq_17.ds__month AS metric_time__month
@@ -554,6 +578,7 @@ FROM (
                 -- Read Elements From Semantic Model 'buys_source'
                 SELECT
                   1 AS buys
+                  , 1 AS buys_month
                   , buys_source_src_28000.user_id AS buyers
                   , DATETIME_TRUNC(buys_source_src_28000.ds, day) AS ds__day
                   , DATETIME_TRUNC(buys_source_src_28000.ds, isoweek) AS ds__week
@@ -566,6 +591,12 @@ FROM (
                   , EXTRACT(day FROM buys_source_src_28000.ds) AS ds__extract_day
                   , IF(EXTRACT(dayofweek FROM buys_source_src_28000.ds) = 1, 7, EXTRACT(dayofweek FROM buys_source_src_28000.ds) - 1) AS ds__extract_dow
                   , EXTRACT(dayofyear FROM buys_source_src_28000.ds) AS ds__extract_doy
+                  , DATETIME_TRUNC(buys_source_src_28000.ds_month, month) AS ds_month__month
+                  , DATETIME_TRUNC(buys_source_src_28000.ds_month, quarter) AS ds_month__quarter
+                  , DATETIME_TRUNC(buys_source_src_28000.ds_month, year) AS ds_month__year
+                  , EXTRACT(year FROM buys_source_src_28000.ds_month) AS ds_month__extract_year
+                  , EXTRACT(quarter FROM buys_source_src_28000.ds_month) AS ds_month__extract_quarter
+                  , EXTRACT(month FROM buys_source_src_28000.ds_month) AS ds_month__extract_month
                   , DATETIME_TRUNC(buys_source_src_28000.ds, day) AS buy__ds__day
                   , DATETIME_TRUNC(buys_source_src_28000.ds, isoweek) AS buy__ds__week
                   , DATETIME_TRUNC(buys_source_src_28000.ds, month) AS buy__ds__month
@@ -577,6 +608,12 @@ FROM (
                   , EXTRACT(day FROM buys_source_src_28000.ds) AS buy__ds__extract_day
                   , IF(EXTRACT(dayofweek FROM buys_source_src_28000.ds) = 1, 7, EXTRACT(dayofweek FROM buys_source_src_28000.ds) - 1) AS buy__ds__extract_dow
                   , EXTRACT(dayofyear FROM buys_source_src_28000.ds) AS buy__ds__extract_doy
+                  , DATETIME_TRUNC(buys_source_src_28000.ds_month, month) AS buy__ds_month__month
+                  , DATETIME_TRUNC(buys_source_src_28000.ds_month, quarter) AS buy__ds_month__quarter
+                  , DATETIME_TRUNC(buys_source_src_28000.ds_month, year) AS buy__ds_month__year
+                  , EXTRACT(year FROM buys_source_src_28000.ds_month) AS buy__ds_month__extract_year
+                  , EXTRACT(quarter FROM buys_source_src_28000.ds_month) AS buy__ds_month__extract_quarter
+                  , EXTRACT(month FROM buys_source_src_28000.ds_month) AS buy__ds_month__extract_month
                   , buys_source_src_28000.user_id AS user
                   , buys_source_src_28000.session_id
                   , buys_source_src_28000.user_id AS buy__user
