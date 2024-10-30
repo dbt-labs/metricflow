@@ -805,3 +805,36 @@ metric:
       name: listings
   filter: "{{ Metric('views', ['listing']) }} > 10"
   time_granularity: week
+---
+# note that in both 1a and 1b "shared_alias" refer to "bookinks", whereas
+# in 2 it refers to "instant_bookings", hence the naming difference
+metric:
+  name: derived_sharedalias_1a
+  description: "Minimal repro case for derived metrics which give the same alias for different underlying metrics"
+  type: derived
+  type_params:
+    expr: shared_alias - 10
+    metrics:
+      - name: bookings
+        alias: shared_alias
+---
+metric:
+  name: derived_sharedalias_1b
+  description: "Minimal repro case for derived metrics which give the same alias for different underlying metrics"
+  type: derived
+  type_params:
+    expr: shared_alias - 100
+    metrics:
+      - name: bookings
+        alias: shared_alias
+---
+metric:
+  name: derived_sharedalias_2
+  description: "Minimal repro case for derived metrics which give the same alias for different underlying metrics"
+  type: derived
+  type_params:
+    expr: shared_alias + 10
+    metrics:
+      - name: instant_bookings
+        alias: shared_alias
+---
