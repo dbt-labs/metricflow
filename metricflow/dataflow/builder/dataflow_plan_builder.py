@@ -251,9 +251,6 @@ class DataflowPlanBuilder:
         # Due to other outstanding issues with conversion metric filters, we disable predicate
         # pushdown for any filter parameter set that is not part of the original time range constraint
         # implementation.
-        default_granularity = ExpandedTimeGranularity.from_time_granularity(
-            self._metric_lookup.get_min_queryable_time_granularity(metric_spec.reference)
-        )
         disabled_pushdown_state = PredicatePushdownState.with_pushdown_disabled()
         time_range_only_pushdown_state = PredicatePushdownState(
             time_range_constraint=predicate_pushdown_state.time_range_constraint,
@@ -309,6 +306,9 @@ class DataflowPlanBuilder:
         # Get the time dimension used to calculate the conversion window
         # Currently, both the base/conversion measure uses metric_time as it's the default agg time dimension.
         # However, eventually, there can be user-specified time dimensions used for this calculation.
+        default_granularity = ExpandedTimeGranularity.from_time_granularity(
+            self._metric_lookup.get_min_queryable_time_granularity(metric_spec.reference)
+        )
         metric_time_dimension_spec = DataSet.metric_time_dimension_spec(default_granularity)
 
         # Filter the source nodes with only the required specs needed for the calculation
