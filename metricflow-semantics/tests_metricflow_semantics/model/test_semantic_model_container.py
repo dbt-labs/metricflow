@@ -77,28 +77,6 @@ def test_get_names(  # noqa: D103
     )
 
 
-def test_get_elements(semantic_model_lookup: SemanticModelLookup) -> None:  # noqa: D103
-    for dimension_reference in semantic_model_lookup.get_dimension_references():
-        assert (
-            semantic_model_lookup.get_dimension(dimension_reference=dimension_reference).reference
-            == dimension_reference
-        )
-    for measure_reference in semantic_model_lookup.measure_references:
-        measure_reference = MeasureReference(element_name=measure_reference.element_name)
-        assert semantic_model_lookup.get_measure(measure_reference=measure_reference).reference == measure_reference
-
-
-def test_get_semantic_model_for_measure(semantic_model_lookup: SemanticModelLookup) -> None:  # noqa: D103
-    bookings_source = semantic_model_lookup.get_semantic_model_for_measure(MeasureReference(element_name="bookings"))
-    assert bookings_source.name == "bookings_source"
-
-    views_source = semantic_model_lookup.get_semantic_model_for_measure(MeasureReference(element_name="views"))
-    assert views_source.name == "views_source"
-
-    listings_source = semantic_model_lookup.get_semantic_model_for_measure(MeasureReference(element_name="listings"))
-    assert listings_source.name == "listings_latest"
-
-
 def test_local_linked_elements_for_metric(  # noqa: D103
     request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, metric_lookup: MetricLookup
 ) -> None:
@@ -239,12 +217,3 @@ def test_get_valid_agg_time_dimensions_for_metric(  # noqa: D103
                 assert metric_agg_time_dim.reference == measure_agg_time_dims[0]
         else:
             assert len(metric_agg_time_dims) == 0
-
-
-def test_get_agg_time_dimension_specs_for_measure(semantic_model_lookup: SemanticModelLookup) -> None:  # noqa: D103
-    for measure_name in ["bookings", "views", "listings"]:
-        measure_reference = MeasureReference(measure_name)
-        agg_time_dim_specs = semantic_model_lookup.get_agg_time_dimension_specs_for_measure(measure_reference)
-        agg_time_dim_reference = semantic_model_lookup.get_agg_time_dimension_for_measure(measure_reference)
-        for spec in agg_time_dim_specs:
-            assert spec.reference == agg_time_dim_reference
