@@ -45,41 +45,33 @@ FROM (
         FIRST_VALUE(subq_28.visits) OVER (
           PARTITION BY
             subq_31.user
-            , subq_31.ds__day
+            , subq_31.metric_time__day
             , subq_31.mf_internal_uuid
-          ORDER BY subq_28.ds__day DESC
+          ORDER BY subq_28.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS visits
         , FIRST_VALUE(subq_28.metric_time__martian_day) OVER (
           PARTITION BY
             subq_31.user
-            , subq_31.ds__day
+            , subq_31.metric_time__day
             , subq_31.mf_internal_uuid
-          ORDER BY subq_28.ds__day DESC
+          ORDER BY subq_28.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS metric_time__martian_day
-        , FIRST_VALUE(subq_28.ds__day) OVER (
-          PARTITION BY
-            subq_31.user
-            , subq_31.ds__day
-            , subq_31.mf_internal_uuid
-          ORDER BY subq_28.ds__day DESC
-          ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-        ) AS ds__day
         , FIRST_VALUE(subq_28.metric_time__day) OVER (
           PARTITION BY
             subq_31.user
-            , subq_31.ds__day
+            , subq_31.metric_time__day
             , subq_31.mf_internal_uuid
-          ORDER BY subq_28.ds__day DESC
+          ORDER BY subq_28.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS metric_time__day
         , FIRST_VALUE(subq_28.user) OVER (
           PARTITION BY
             subq_31.user
-            , subq_31.ds__day
+            , subq_31.metric_time__day
             , subq_31.mf_internal_uuid
-          ORDER BY subq_28.ds__day DESC
+          ORDER BY subq_28.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS user
         , subq_31.mf_internal_uuid AS mf_internal_uuid
@@ -87,10 +79,9 @@ FROM (
       FROM (
         -- Metric Time Dimension 'ds'
         -- Join to Custom Granularity Dataset
-        -- Pass Only Elements: ['visits', 'ds__day', 'metric_time__day', 'metric_time__martian_day', 'user']
+        -- Pass Only Elements: ['visits', 'metric_time__day', 'metric_time__martian_day', 'user']
         SELECT
           subq_26.martian_day AS metric_time__martian_day
-          , subq_25.ds__day AS ds__day
           , subq_25.ds__day AS metric_time__day
           , subq_25.user AS user
           , subq_25.visits AS visits
@@ -112,7 +103,7 @@ FROM (
         -- Metric Time Dimension 'ds'
         -- Add column with generated UUID
         SELECT
-          DATETIME_TRUNC(ds, day) AS ds__day
+          DATETIME_TRUNC(ds, day) AS metric_time__day
           , user_id AS user
           , 1 AS buys
           , GENERATE_UUID() AS mf_internal_uuid
@@ -123,9 +114,9 @@ FROM (
           subq_28.user = subq_31.user
         ) AND (
           (
-            subq_28.ds__day <= subq_31.ds__day
+            subq_28.metric_time__day <= subq_31.metric_time__day
           ) AND (
-            subq_28.ds__day > DATE_SUB(CAST(subq_31.ds__day AS DATETIME), INTERVAL 7 day)
+            subq_28.metric_time__day > DATE_SUB(CAST(subq_31.metric_time__day AS DATETIME), INTERVAL 7 day)
           )
         )
     ) subq_32
