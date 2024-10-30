@@ -607,9 +607,9 @@ class MetricFlowQueryResolver:
 
         model_references: Set[SemanticModelReference] = set()
         for measure_reference in measure_references:
-            measure_semantic_model = self._manifest_lookup.semantic_model_lookup.get_semantic_model_for_measure(
+            measure_semantic_model = self._manifest_lookup.semantic_model_lookup.measure_lookup.get_properties(
                 measure_reference
-            )
-            model_references.add(measure_semantic_model.reference)
+            ).model_reference
+            model_references.add(measure_semantic_model)
 
         return model_references

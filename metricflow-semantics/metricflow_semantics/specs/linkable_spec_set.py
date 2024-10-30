@@ -75,7 +75,9 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
         """Get the time dims included that are valid agg time dimensions for the specified measure."""
         queried_metric_time_specs = list(self.metric_time_specs)
 
-        valid_agg_time_dimensions = semantic_model_lookup.get_agg_time_dimension_specs_for_measure(measure_reference)
+        valid_agg_time_dimensions = semantic_model_lookup.measure_lookup.get_properties(
+            measure_reference
+        ).agg_time_dimension_specs
         queried_agg_time_dimension_specs = (
             list(set(self.time_dimension_specs).intersection(set(valid_agg_time_dimensions)))
             + queried_metric_time_specs

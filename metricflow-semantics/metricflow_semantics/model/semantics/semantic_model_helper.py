@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from typing import Sequence
+from typing import Dict, Mapping, Sequence
 
+from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols import Dimension
 from dbt_semantic_interfaces.protocols.entity import Entity
 from dbt_semantic_interfaces.protocols.measure import Measure
@@ -10,8 +11,9 @@ from dbt_semantic_interfaces.references import (
     EntityReference,
     LinkableElementReference,
     MeasureReference,
+    TimeDimensionReference,
 )
-from dbt_semantic_interfaces.type_enums import EntityType
+from dbt_semantic_interfaces.type_enums import DimensionType, EntityType, TimeGranularity
 
 
 class SemanticModelHelper:
@@ -94,3 +96,25 @@ class SemanticModelHelper:
         raise ValueError(
             f"No dimension with name ({dimension_reference}) in semantic_model with name ({semantic_model.name})"
         )
+
+    @staticmethod
+    def get_time_dimension_grains(semantic_model: SemanticModel) -> Mapping[TimeDimensionReference, TimeGranularity]:
+        """Return a mapping of the defined time granularity of the time dimensions in the semantic mode."""
+        time_dimension_reference_to_grain: Dict[TimeDimensionReference, TimeGranularity] = {}
+
+        for dimension in semantic_model.dimensions:
+            if dimension.type is DimensionType.TIME:
+                if dimension.type_params is None:
+                    raise ValueError(
+                        f"A dimension is specified as a time dimension but does not specify a gain. This should have "
+                        f"been caught in semantic-manifest validation {dimension=} {semantic_model=}"
+                    )
+                time_dimension_reference_to_grain[
+                    dimension.reference.time_dimension_reference
+                ] = dimension.type_params.time_granularity
+            elif dimension.type is DimensionType.CATEGORICAL:
+                pass
+            else:
+                assert_values_exhausted(dimension.type)
+
+        return time_dimension_reference_to_grain

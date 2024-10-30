@@ -218,10 +218,10 @@ class MetricLookup:
         metric = self.get_metric(metric_reference)
         specs: Set[TimeDimensionSpec] = set()
         for input_measure in metric.input_measures:
-            time_dimension_specs = self._semantic_model_lookup.get_agg_time_dimension_specs_for_measure(
+            measure_properties = self._semantic_model_lookup.measure_lookup.get_properties(
                 measure_reference=input_measure.measure_reference
             )
-            specs.update(time_dimension_specs)
+            specs.update(measure_properties.agg_time_dimension_specs)
         return list(specs)
 
     def get_valid_agg_time_dimensions_for_metric(

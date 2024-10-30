@@ -562,14 +562,14 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             for input_measure in metric.input_measures:
                 measure_reference = MeasureReference(element_name=input_measure.name)
                 # populate new obj
-                measure = semantic_model_lookup.get_measure(measure_reference=measure_reference)
+                measure = semantic_model_lookup.measure_lookup.get_measure(measure_reference=measure_reference)
                 measures.add(
                     Measure(
                         name=measure.name,
                         agg=measure.agg,
-                        agg_time_dimension=semantic_model_lookup.get_agg_time_dimension_for_measure(
+                        agg_time_dimension=semantic_model_lookup.measure_lookup.get_properties(
                             measure_reference=measure_reference
-                        ).element_name,
+                        ).agg_time_dimension_reference.element_name,
                         description=measure.description,
                         expr=measure.expr,
                         agg_params=measure.agg_params,
