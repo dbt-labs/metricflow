@@ -75,6 +75,11 @@ class SemanticModelLookup:
         self._measure_lookup = MeasureLookup(sorted_semantic_models, custom_granularities)
         self._dimension_lookup = DimensionLookup(sorted_semantic_models)
 
+    @property
+    def custom_granularity_names(self) -> Sequence[str]:
+        """Returns all the custom_granularity names."""
+        return list(self._custom_granularities.keys())
+
     def get_dimension_references(self) -> Sequence[DimensionReference]:
         """Retrieve all dimension references from the collection of semantic models."""
         return tuple(self._dimension_index.keys())
