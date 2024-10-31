@@ -136,6 +136,7 @@ def test_dimension_in_filter(  # noqa: D103
             ),
             semantic_manifest_lookup=simple_semantic_manifest_lookup,
         ),
+        semantic_model_lookup=simple_semantic_manifest_lookup.semantic_model_lookup,
     ).create_from_where_filter_intersection(
         filter_location=EXAMPLE_FILTER_LOCATION,
         filter_intersection=create_where_filter_intersection("{{ Dimension('listing__country_latest') }} = 'US'"),
@@ -196,6 +197,7 @@ def test_dimension_in_filter_with_grain(  # noqa: D103
             ),
             semantic_manifest_lookup=simple_semantic_manifest_lookup,
         ),
+        semantic_model_lookup=simple_semantic_manifest_lookup.semantic_model_lookup,
     ).create_from_where_filter_intersection(
         filter_location=EXAMPLE_FILTER_LOCATION,
         filter_intersection=create_where_filter_intersection(
@@ -262,6 +264,7 @@ def test_time_dimension_in_filter(  # noqa: D103
             ),
             semantic_manifest_lookup=simple_semantic_manifest_lookup,
         ),
+        semantic_model_lookup=simple_semantic_manifest_lookup.semantic_model_lookup,
     ).create_from_where_filter_intersection(
         filter_location=EXAMPLE_FILTER_LOCATION,
         filter_intersection=create_where_filter_intersection(
@@ -328,6 +331,7 @@ def test_time_dimension_with_grain_in_name(  # noqa: D103
             ),
             semantic_manifest_lookup=simple_semantic_manifest_lookup,
         ),
+        semantic_model_lookup=simple_semantic_manifest_lookup.semantic_model_lookup,
     ).create_from_where_filter_intersection(
         filter_location=EXAMPLE_FILTER_LOCATION,
         filter_intersection=create_where_filter_intersection(
@@ -395,6 +399,7 @@ def test_date_part_in_filter(  # noqa: D103
             ),
             semantic_manifest_lookup=simple_semantic_manifest_lookup,
         ),
+        semantic_model_lookup=simple_semantic_manifest_lookup.semantic_model_lookup,
     ).create_from_where_filter_intersection(
         filter_location=EXAMPLE_FILTER_LOCATION,
         filter_intersection=create_where_filter_intersection(
@@ -486,6 +491,7 @@ def resolved_spec_lookup(
 def test_date_part_and_grain_in_filter(  # noqa: D103
     column_association_resolver: ColumnAssociationResolver,
     resolved_spec_lookup: FilterSpecResolutionLookUp,
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
     where_sql: str,
 ) -> None:
     where_filter = PydanticWhereFilter(where_sql_template=where_sql)
@@ -493,6 +499,7 @@ def test_date_part_and_grain_in_filter(  # noqa: D103
     where_filter_spec = WhereSpecFactory(
         column_association_resolver=column_association_resolver,
         spec_resolution_lookup=resolved_spec_lookup,
+        semantic_model_lookup=simple_semantic_manifest_lookup.semantic_model_lookup,
     ).create_from_where_filter(EXAMPLE_FILTER_LOCATION, where_filter)
 
     assert where_filter_spec.where_sql == "metric_time__extract_year = '2020'"
@@ -523,6 +530,7 @@ def test_date_part_and_grain_in_filter(  # noqa: D103
 def test_date_part_less_than_grain_in_filter(  # noqa: D103
     column_association_resolver: ColumnAssociationResolver,
     resolved_spec_lookup: FilterSpecResolutionLookUp,
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
     where_sql: str,
 ) -> None:
     where_filter = PydanticWhereFilter(where_sql_template=where_sql)
@@ -530,6 +538,7 @@ def test_date_part_less_than_grain_in_filter(  # noqa: D103
     where_filter_spec = WhereSpecFactory(
         column_association_resolver=column_association_resolver,
         spec_resolution_lookup=resolved_spec_lookup,
+        semantic_model_lookup=simple_semantic_manifest_lookup.semantic_model_lookup,
     ).create_from_where_filter(EXAMPLE_FILTER_LOCATION, where_filter)
 
     assert where_filter_spec.where_sql == "metric_time__extract_day = '2020'"
@@ -587,6 +596,7 @@ def test_entity_in_filter(  # noqa: D103
             ),
             semantic_manifest_lookup=simple_semantic_manifest_lookup,
         ),
+        semantic_model_lookup=simple_semantic_manifest_lookup.semantic_model_lookup,
     ).create_from_where_filter(filter_location=EXAMPLE_FILTER_LOCATION, where_filter=where_filter)
 
     assert where_filter_spec.where_sql == "listing__user == 'example_user_id'"
@@ -646,6 +656,7 @@ def test_metric_in_filter(  # noqa: D103
             ),
             semantic_manifest_lookup=simple_semantic_manifest_lookup,
         ),
+        semantic_model_lookup=simple_semantic_manifest_lookup.semantic_model_lookup,
     ).create_from_where_filter(filter_location=EXAMPLE_FILTER_LOCATION, where_filter=where_filter)
 
     assert where_filter_spec.where_sql == "listing__bookings > 2"
@@ -715,6 +726,7 @@ def test_dimension_time_dimension_parity(  # noqa: D103
                 ),
                 non_parsable_resolutions=(),
             ),
+            semantic_model_lookup=simple_semantic_manifest_lookup.semantic_model_lookup,
         ).create_from_where_filter(filter_location, where_filter)
 
     time_dimension_spec = get_spec("TimeDimension('metric_time', 'week', date_part_name='year')")
