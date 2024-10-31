@@ -56,8 +56,10 @@ class TimeDimensionParameter(ProtocolHint[TimeDimensionQueryParameter]):
         if self.grain is not None:
             fields_to_compare.append(ParameterSetField.TIME_GRANULARITY)
 
-        # TODO: assert that the name does not include a time granularity marker
-        name_structure = StructuredLinkableSpecName.from_name(self.name.lower())
+        name_structure = StructuredLinkableSpecName.from_name(
+            qualified_name=self.name.lower(),
+            custom_granularity_names=semantic_manifest_lookup.semantic_model_lookup.custom_granularity_names,
+        )
 
         return ResolverInputForGroupByItem(
             input_obj=self,
@@ -97,7 +99,10 @@ class DimensionOrEntityParameter(ProtocolHint[DimensionOrEntityQueryParameter]):
         TODO: Refine these query input classes so that this kind of thing is either enforced in self-documenting
         ways or removed from the codebase
         """
-        name_structure = StructuredLinkableSpecName.from_name(self.name.lower())
+        name_structure = StructuredLinkableSpecName.from_name(
+            qualified_name=self.name.lower(),
+            custom_granularity_names=semantic_manifest_lookup.semantic_model_lookup.custom_granularity_names,
+        )
 
         return ResolverInputForGroupByItem(
             input_obj=self,

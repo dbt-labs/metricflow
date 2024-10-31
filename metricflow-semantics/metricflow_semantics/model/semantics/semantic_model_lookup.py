@@ -229,7 +229,9 @@ class SemanticModelLookup:
             semantic_models_for_dimension = self._dimension_index.get(dim.reference, []) + [semantic_model]
             self._dimension_index[dim.reference] = semantic_models_for_dimension
 
-            if not StructuredLinkableSpecName.from_name(dim.name).is_element_name:
+            if not StructuredLinkableSpecName.from_name(
+                qualified_name=dim.name, custom_granularity_names=self.custom_granularity_names
+            ).is_element_name:
                 # TODO: [custom granularity] change this to an assertion once we're sure there aren't exceptions
                 logger.warning(
                     LazyFormat(

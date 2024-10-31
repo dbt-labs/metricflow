@@ -658,6 +658,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                                 dimension_reference=linkable_dimension.reference,
                             ),
                             entity_links=path_key.entity_links,
+                            custom_granularity_names=self._semantic_manifest_lookup.semantic_model_lookup.custom_granularity_names,
                         )
                     )
         return sorted(dimensions, key=lambda dimension: dimension.qualified_name)
@@ -675,6 +676,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                             semantic_model=semantic_model, dimension_reference=dimension_reference
                         ),
                         entity_links=(SemanticModelHelper.resolved_primary_entity(semantic_model),),
+                        custom_granularity_names=self._semantic_manifest_lookup.semantic_model_lookup.custom_granularity_names,
                     )
                 )
 
