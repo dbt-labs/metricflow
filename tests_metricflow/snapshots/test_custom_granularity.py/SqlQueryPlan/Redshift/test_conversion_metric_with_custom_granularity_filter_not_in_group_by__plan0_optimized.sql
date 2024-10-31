@@ -41,51 +41,42 @@ CROSS JOIN (
       FIRST_VALUE(subq_31.visits) OVER (
         PARTITION BY
           subq_34.user
-          , subq_34.ds__day
+          , subq_34.metric_time__day
           , subq_34.mf_internal_uuid
-        ORDER BY subq_31.ds__day DESC
+        ORDER BY subq_31.metric_time__day DESC
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
       ) AS visits
       , FIRST_VALUE(subq_31.metric_time__martian_day) OVER (
         PARTITION BY
           subq_34.user
-          , subq_34.ds__day
+          , subq_34.metric_time__day
           , subq_34.mf_internal_uuid
-        ORDER BY subq_31.ds__day DESC
+        ORDER BY subq_31.metric_time__day DESC
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
       ) AS metric_time__martian_day
-      , FIRST_VALUE(subq_31.ds__day) OVER (
-        PARTITION BY
-          subq_34.user
-          , subq_34.ds__day
-          , subq_34.mf_internal_uuid
-        ORDER BY subq_31.ds__day DESC
-        ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-      ) AS ds__day
       , FIRST_VALUE(subq_31.metric_time__day) OVER (
         PARTITION BY
           subq_34.user
-          , subq_34.ds__day
+          , subq_34.metric_time__day
           , subq_34.mf_internal_uuid
-        ORDER BY subq_31.ds__day DESC
+        ORDER BY subq_31.metric_time__day DESC
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
       ) AS metric_time__day
       , FIRST_VALUE(subq_31.user) OVER (
         PARTITION BY
           subq_34.user
-          , subq_34.ds__day
+          , subq_34.metric_time__day
           , subq_34.mf_internal_uuid
-        ORDER BY subq_31.ds__day DESC
+        ORDER BY subq_31.metric_time__day DESC
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
       ) AS user
       , subq_34.mf_internal_uuid AS mf_internal_uuid
       , subq_34.buys AS buys
     FROM (
       -- Constrain Output with WHERE
-      -- Pass Only Elements: ['visits', 'ds__day', 'metric_time__day', 'metric_time__martian_day', 'user']
+      -- Pass Only Elements: ['visits', 'metric_time__day', 'metric_time__martian_day', 'user']
       SELECT
         metric_time__martian_day
-        , ds__day
         , metric_time__day
         , subq_29.user
         , visits
@@ -93,8 +84,7 @@ CROSS JOIN (
         -- Metric Time Dimension 'ds'
         -- Join to Custom Granularity Dataset
         SELECT
-          subq_27.ds__day AS ds__day
-          , subq_27.ds__day AS metric_time__day
+          subq_27.ds__day AS metric_time__day
           , subq_27.user AS user
           , subq_27.visits AS visits
           , subq_28.martian_day AS metric_time__martian_day
@@ -118,7 +108,7 @@ CROSS JOIN (
       -- Metric Time Dimension 'ds'
       -- Add column with generated UUID
       SELECT
-        DATE_TRUNC('day', ds) AS ds__day
+        DATE_TRUNC('day', ds) AS metric_time__day
         , user_id AS user
         , 1 AS buys
         , CONCAT(CAST(RANDOM()*100000000 AS INT)::VARCHAR,CAST(RANDOM()*100000000 AS INT)::VARCHAR) AS mf_internal_uuid
@@ -129,9 +119,9 @@ CROSS JOIN (
         subq_31.user = subq_34.user
       ) AND (
         (
-          subq_31.ds__day <= subq_34.ds__day
+          subq_31.metric_time__day <= subq_34.metric_time__day
         ) AND (
-          subq_31.ds__day > DATEADD(day, -7, subq_34.ds__day)
+          subq_31.metric_time__day > DATEADD(day, -7, subq_34.metric_time__day)
         )
       )
   ) subq_35

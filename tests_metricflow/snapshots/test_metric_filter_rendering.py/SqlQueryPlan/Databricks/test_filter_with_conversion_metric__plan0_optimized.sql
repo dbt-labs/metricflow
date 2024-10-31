@@ -55,25 +55,25 @@ FROM (
           FIRST_VALUE(subq_34.visits) OVER (
             PARTITION BY
               subq_37.user
-              , subq_37.ds__day
+              , subq_37.metric_time__day
               , subq_37.mf_internal_uuid
-            ORDER BY subq_34.ds__day DESC
+            ORDER BY subq_34.metric_time__day DESC
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
           ) AS visits
-          , FIRST_VALUE(subq_34.ds__day) OVER (
+          , FIRST_VALUE(subq_34.metric_time__day) OVER (
             PARTITION BY
               subq_37.user
-              , subq_37.ds__day
+              , subq_37.metric_time__day
               , subq_37.mf_internal_uuid
-            ORDER BY subq_34.ds__day DESC
+            ORDER BY subq_34.metric_time__day DESC
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-          ) AS ds__day
+          ) AS metric_time__day
           , FIRST_VALUE(subq_34.user) OVER (
             PARTITION BY
               subq_37.user
-              , subq_37.ds__day
+              , subq_37.metric_time__day
               , subq_37.mf_internal_uuid
-            ORDER BY subq_34.ds__day DESC
+            ORDER BY subq_34.metric_time__day DESC
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
           ) AS user
           , subq_37.mf_internal_uuid AS mf_internal_uuid
@@ -81,9 +81,9 @@ FROM (
         FROM (
           -- Read Elements From Semantic Model 'visits_source'
           -- Metric Time Dimension 'ds'
-          -- Pass Only Elements: ['visits', 'ds__day', 'user']
+          -- Pass Only Elements: ['visits', 'metric_time__day', 'user']
           SELECT
-            DATE_TRUNC('day', ds) AS ds__day
+            DATE_TRUNC('day', ds) AS metric_time__day
             , user_id AS user
             , 1 AS visits
           FROM ***************************.fct_visits visits_source_src_28000
@@ -93,7 +93,7 @@ FROM (
           -- Metric Time Dimension 'ds'
           -- Add column with generated UUID
           SELECT
-            DATE_TRUNC('day', ds) AS ds__day
+            DATE_TRUNC('day', ds) AS metric_time__day
             , user_id AS user
             , 1 AS buys
             , UUID() AS mf_internal_uuid
@@ -103,7 +103,7 @@ FROM (
           (
             subq_34.user = subq_37.user
           ) AND (
-            (subq_34.ds__day <= subq_37.ds__day)
+            (subq_34.metric_time__day <= subq_37.metric_time__day)
           )
       ) subq_38
       GROUP BY

@@ -14,6 +14,10 @@ semantic_model:
     - name: buys
       expr: 1
       agg: count
+    - name: buys_month
+      expr: 1
+      agg: count
+      agg_time_dimension: ds_month
     - name: buyers
       expr: user_id
       agg: count_distinct
@@ -23,6 +27,10 @@ semantic_model:
       type: time
       type_params:
         time_granularity: day
+    - name: ds_month
+      type: time
+      type_params:
+        time_granularity: month
 
   primary_entity: buy
 

@@ -220,3 +220,28 @@ def test_conversion_metric_with_filter_not_in_group_by(
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=parsed_query.query_spec,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_conversion_metric_with_different_time_dimension_grains(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+    query_parser: MetricFlowQueryParser,
+    create_source_tables: bool,
+) -> None:
+    """Test rendering a query against a conversion metric."""
+    parsed_query = query_parser.parse_and_validate_query(
+        metric_names=("visit_buy_conversion_rate_with_monthly_conversion",),
+    )
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=parsed_query.query_spec,
+    )

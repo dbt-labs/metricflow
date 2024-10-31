@@ -23,25 +23,25 @@ CROSS JOIN (
       FIRST_VALUE(subq_21.visits) OVER (
         PARTITION BY
           subq_24.user
-          , subq_24.ds__day
+          , subq_24.metric_time__day
           , subq_24.mf_internal_uuid
-        ORDER BY subq_21.ds__day DESC
+        ORDER BY subq_21.metric_time__day DESC
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
       ) AS visits
-      , FIRST_VALUE(subq_21.ds__day) OVER (
+      , FIRST_VALUE(subq_21.metric_time__day) OVER (
         PARTITION BY
           subq_24.user
-          , subq_24.ds__day
+          , subq_24.metric_time__day
           , subq_24.mf_internal_uuid
-        ORDER BY subq_21.ds__day DESC
+        ORDER BY subq_21.metric_time__day DESC
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-      ) AS ds__day
+      ) AS metric_time__day
       , FIRST_VALUE(subq_21.user) OVER (
         PARTITION BY
           subq_24.user
-          , subq_24.ds__day
+          , subq_24.metric_time__day
           , subq_24.mf_internal_uuid
-        ORDER BY subq_21.ds__day DESC
+        ORDER BY subq_21.metric_time__day DESC
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
       ) AS user
       , subq_24.mf_internal_uuid AS mf_internal_uuid
@@ -49,9 +49,9 @@ CROSS JOIN (
     FROM (
       -- Read Elements From Semantic Model 'visits_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements: ['visits', 'ds__day', 'user']
+      -- Pass Only Elements: ['visits', 'metric_time__day', 'user']
       SELECT
-        DATE_TRUNC('day', ds) AS ds__day
+        DATE_TRUNC('day', ds) AS metric_time__day
         , user_id AS user
         , 1 AS visits
       FROM ***************************.fct_visits visits_source_src_28000
@@ -61,7 +61,7 @@ CROSS JOIN (
       -- Metric Time Dimension 'ds'
       -- Add column with generated UUID
       SELECT
-        DATE_TRUNC('day', ds) AS ds__day
+        DATE_TRUNC('day', ds) AS metric_time__day
         , user_id AS user
         , 1 AS buys
         , uuid() AS mf_internal_uuid
@@ -72,9 +72,9 @@ CROSS JOIN (
         subq_21.user = subq_24.user
       ) AND (
         (
-          subq_21.ds__day <= subq_24.ds__day
+          subq_21.metric_time__day <= subq_24.metric_time__day
         ) AND (
-          subq_21.ds__day > DATE_ADD('day', -7, subq_24.ds__day)
+          subq_21.metric_time__day > DATE_ADD('day', -7, subq_24.metric_time__day)
         )
       )
   ) subq_25

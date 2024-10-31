@@ -595,6 +595,18 @@ metric:
       calculation: conversions
 ---
 metric:
+  name: visit_buy_conversion_rate_with_monthly_conversion
+  description: conversion rate on visits-buys_month
+  type: conversion
+  type_params:
+    conversion_type_params:
+      base_measure: visits
+      conversion_measure: buys_month
+      entity: user
+      calculation: conversion_rate
+      window: 1 month
+---
+metric:
   name: visit_buy_conversion_rate_by_session
   description: conversion rate on visits-buys on a 7 day window held by a constant session_id
   type: conversion

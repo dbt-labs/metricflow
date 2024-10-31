@@ -171,7 +171,7 @@
                                         <!-- distinct = False -->
                                         <MetricTimeDimensionTransformNode>
                                             <!-- description = "Metric Time Dimension 'ds'" -->
-                                            <!-- node_id = NodeId(id_str='sma_28018') -->
+                                            <!-- node_id = NodeId(id_str='sma_28019') -->
                                             <!-- aggregation_time_dimension = 'ds' -->
                                             <ReadSqlSourceNode>
                                                 <!-- description = "Read From SemanticModelDataSet('visits_source')" -->
@@ -220,12 +220,12 @@
                             <!-- node_id = NodeId(id_str='jce_0') -->
                             <!-- base_time_dimension_spec =                                                      -->
                             <!--   TimeDimensionSpec(                                                            -->
-                            <!--     element_name='ds',                                                          -->
+                            <!--     element_name='metric_time',                                                 -->
                             <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                             <!--   )                                                                             -->
                             <!-- conversion_time_dimension_spec =                                                -->
                             <!--   TimeDimensionSpec(                                                            -->
-                            <!--     element_name='ds',                                                          -->
+                            <!--     element_name='metric_time',                                                 -->
                             <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                             <!--   )                                                                             -->
                             <!-- entity_spec = EntitySpec(element_name='user') -->
@@ -234,7 +234,7 @@
                             <FilterElementsNode>
                                 <!-- description =                                                                         -->
                                 <!--   ("Pass Only Elements: ['visits', 'visit__referrer_id', 'user__home_state_latest', " -->
-                                <!--    "'ds__day', 'metric_time__day', 'user']")                                          -->
+                                <!--    "'metric_time__day', 'user']")                                                     -->
                                 <!-- node_id = NodeId(id_str='pfe_6') -->
                                 <!-- include_spec = MeasureSpec(element_name='visits') -->
                                 <!-- include_spec =                                             -->
@@ -247,11 +247,6 @@
                                 <!--     element_name='home_state_latest',                     -->
                                 <!--     entity_links=(EntityReference(element_name='user'),), -->
                                 <!--   )                                                       -->
-                                <!-- include_spec =                                                                  -->
-                                <!--   TimeDimensionSpec(                                                            -->
-                                <!--     element_name='ds',                                                          -->
-                                <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
-                                <!--   )                                                                             -->
                                 <!-- include_spec =                                                                  -->
                                 <!--   TimeDimensionSpec(                                                            -->
                                 <!--     element_name='metric_time',                                                 -->
@@ -312,7 +307,7 @@
                                         <!--   )                                                         -->
                                         <MetricTimeDimensionTransformNode>
                                             <!-- description = "Metric Time Dimension 'ds'" -->
-                                            <!-- node_id = NodeId(id_str='sma_28018') -->
+                                            <!-- node_id = NodeId(id_str='sma_28019') -->
                                             <!-- aggregation_time_dimension = 'ds' -->
                                             <ReadSqlSourceNode>
                                                 <!-- description = "Read From SemanticModelDataSet('visits_source')" -->

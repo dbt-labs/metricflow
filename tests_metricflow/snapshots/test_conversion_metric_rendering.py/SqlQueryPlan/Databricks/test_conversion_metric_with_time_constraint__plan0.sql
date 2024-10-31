@@ -168,7 +168,7 @@ FROM (
       FROM (
         -- Find conversions for user within the range of INF
         SELECT
-          subq_14.ds__day
+          subq_14.metric_time__day
           , subq_14.user
           , subq_14.visit__referrer_id
           , subq_14.buys
@@ -179,41 +179,41 @@ FROM (
             FIRST_VALUE(subq_10.visits) OVER (
               PARTITION BY
                 subq_13.user
-                , subq_13.ds__day
+                , subq_13.metric_time__day
                 , subq_13.mf_internal_uuid
-              ORDER BY subq_10.ds__day DESC
+              ORDER BY subq_10.metric_time__day DESC
               ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
             ) AS visits
             , FIRST_VALUE(subq_10.visit__referrer_id) OVER (
               PARTITION BY
                 subq_13.user
-                , subq_13.ds__day
+                , subq_13.metric_time__day
                 , subq_13.mf_internal_uuid
-              ORDER BY subq_10.ds__day DESC
+              ORDER BY subq_10.metric_time__day DESC
               ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
             ) AS visit__referrer_id
-            , FIRST_VALUE(subq_10.ds__day) OVER (
+            , FIRST_VALUE(subq_10.metric_time__day) OVER (
               PARTITION BY
                 subq_13.user
-                , subq_13.ds__day
+                , subq_13.metric_time__day
                 , subq_13.mf_internal_uuid
-              ORDER BY subq_10.ds__day DESC
+              ORDER BY subq_10.metric_time__day DESC
               ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-            ) AS ds__day
+            ) AS metric_time__day
             , FIRST_VALUE(subq_10.user) OVER (
               PARTITION BY
                 subq_13.user
-                , subq_13.ds__day
+                , subq_13.metric_time__day
                 , subq_13.mf_internal_uuid
-              ORDER BY subq_10.ds__day DESC
+              ORDER BY subq_10.metric_time__day DESC
               ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
             ) AS user
             , subq_13.mf_internal_uuid AS mf_internal_uuid
             , subq_13.buys AS buys
           FROM (
-            -- Pass Only Elements: ['visits', 'visit__referrer_id', 'ds__day', 'user']
+            -- Pass Only Elements: ['visits', 'visit__referrer_id', 'metric_time__day', 'user']
             SELECT
-              subq_9.ds__day
+              subq_9.metric_time__day
               , subq_9.user
               , subq_9.visit__referrer_id
               , subq_9.visits
@@ -404,6 +404,12 @@ FROM (
               , subq_12.ds__extract_day
               , subq_12.ds__extract_dow
               , subq_12.ds__extract_doy
+              , subq_12.ds_month__month
+              , subq_12.ds_month__quarter
+              , subq_12.ds_month__year
+              , subq_12.ds_month__extract_year
+              , subq_12.ds_month__extract_quarter
+              , subq_12.ds_month__extract_month
               , subq_12.buy__ds__day
               , subq_12.buy__ds__week
               , subq_12.buy__ds__month
@@ -415,6 +421,12 @@ FROM (
               , subq_12.buy__ds__extract_day
               , subq_12.buy__ds__extract_dow
               , subq_12.buy__ds__extract_doy
+              , subq_12.buy__ds_month__month
+              , subq_12.buy__ds_month__quarter
+              , subq_12.buy__ds_month__year
+              , subq_12.buy__ds_month__extract_year
+              , subq_12.buy__ds_month__extract_quarter
+              , subq_12.buy__ds_month__extract_month
               , subq_12.metric_time__day
               , subq_12.metric_time__week
               , subq_12.metric_time__month
@@ -447,6 +459,12 @@ FROM (
                 , subq_11.ds__extract_day
                 , subq_11.ds__extract_dow
                 , subq_11.ds__extract_doy
+                , subq_11.ds_month__month
+                , subq_11.ds_month__quarter
+                , subq_11.ds_month__year
+                , subq_11.ds_month__extract_year
+                , subq_11.ds_month__extract_quarter
+                , subq_11.ds_month__extract_month
                 , subq_11.buy__ds__day
                 , subq_11.buy__ds__week
                 , subq_11.buy__ds__month
@@ -458,6 +476,12 @@ FROM (
                 , subq_11.buy__ds__extract_day
                 , subq_11.buy__ds__extract_dow
                 , subq_11.buy__ds__extract_doy
+                , subq_11.buy__ds_month__month
+                , subq_11.buy__ds_month__quarter
+                , subq_11.buy__ds_month__year
+                , subq_11.buy__ds_month__extract_year
+                , subq_11.buy__ds_month__extract_quarter
+                , subq_11.buy__ds_month__extract_month
                 , subq_11.ds__day AS metric_time__day
                 , subq_11.ds__week AS metric_time__week
                 , subq_11.ds__month AS metric_time__month
@@ -479,6 +503,7 @@ FROM (
                 -- Read Elements From Semantic Model 'buys_source'
                 SELECT
                   1 AS buys
+                  , 1 AS buys_month
                   , buys_source_src_28000.user_id AS buyers
                   , DATE_TRUNC('day', buys_source_src_28000.ds) AS ds__day
                   , DATE_TRUNC('week', buys_source_src_28000.ds) AS ds__week
@@ -491,6 +516,12 @@ FROM (
                   , EXTRACT(day FROM buys_source_src_28000.ds) AS ds__extract_day
                   , EXTRACT(DAYOFWEEK_ISO FROM buys_source_src_28000.ds) AS ds__extract_dow
                   , EXTRACT(doy FROM buys_source_src_28000.ds) AS ds__extract_doy
+                  , DATE_TRUNC('month', buys_source_src_28000.ds_month) AS ds_month__month
+                  , DATE_TRUNC('quarter', buys_source_src_28000.ds_month) AS ds_month__quarter
+                  , DATE_TRUNC('year', buys_source_src_28000.ds_month) AS ds_month__year
+                  , EXTRACT(year FROM buys_source_src_28000.ds_month) AS ds_month__extract_year
+                  , EXTRACT(quarter FROM buys_source_src_28000.ds_month) AS ds_month__extract_quarter
+                  , EXTRACT(month FROM buys_source_src_28000.ds_month) AS ds_month__extract_month
                   , DATE_TRUNC('day', buys_source_src_28000.ds) AS buy__ds__day
                   , DATE_TRUNC('week', buys_source_src_28000.ds) AS buy__ds__week
                   , DATE_TRUNC('month', buys_source_src_28000.ds) AS buy__ds__month
@@ -502,6 +533,12 @@ FROM (
                   , EXTRACT(day FROM buys_source_src_28000.ds) AS buy__ds__extract_day
                   , EXTRACT(DAYOFWEEK_ISO FROM buys_source_src_28000.ds) AS buy__ds__extract_dow
                   , EXTRACT(doy FROM buys_source_src_28000.ds) AS buy__ds__extract_doy
+                  , DATE_TRUNC('month', buys_source_src_28000.ds_month) AS buy__ds_month__month
+                  , DATE_TRUNC('quarter', buys_source_src_28000.ds_month) AS buy__ds_month__quarter
+                  , DATE_TRUNC('year', buys_source_src_28000.ds_month) AS buy__ds_month__year
+                  , EXTRACT(year FROM buys_source_src_28000.ds_month) AS buy__ds_month__extract_year
+                  , EXTRACT(quarter FROM buys_source_src_28000.ds_month) AS buy__ds_month__extract_quarter
+                  , EXTRACT(month FROM buys_source_src_28000.ds_month) AS buy__ds_month__extract_month
                   , buys_source_src_28000.user_id AS user
                   , buys_source_src_28000.session_id
                   , buys_source_src_28000.user_id AS buy__user
@@ -514,7 +551,7 @@ FROM (
             (
               subq_10.user = subq_13.user
             ) AND (
-              (subq_10.ds__day <= subq_13.ds__day)
+              (subq_10.metric_time__day <= subq_13.metric_time__day)
             )
         ) subq_14
       ) subq_15
