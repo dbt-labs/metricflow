@@ -26,7 +26,7 @@ from metricflow_semantics.instances import (
     MeasureInstance,
     TimeDimensionInstance,
 )
-from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
+from metricflow_semantics.model.semantics.semantic_model_helper import SemanticModelHelper
 from metricflow_semantics.model.spec_converters import MeasureConverter
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
@@ -441,7 +441,7 @@ class SemanticModelToDataSetConverter:
             (),
         ]
 
-        for entity_link in SemanticModelLookup.entity_links_for_local_elements(semantic_model):
+        for entity_link in SemanticModelHelper.entity_links_for_local_elements(semantic_model):
             possible_entity_links.append((entity_link,))
 
         # Handle dimensions

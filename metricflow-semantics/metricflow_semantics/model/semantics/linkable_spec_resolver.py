@@ -39,6 +39,7 @@ from metricflow_semantics.model.semantics.linkable_element import (
     SemanticModelToMetricSubqueryJoinPath,
 )
 from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
+from metricflow_semantics.model.semantics.semantic_model_helper import SemanticModelHelper
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
 from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
@@ -358,7 +359,7 @@ class ValidLinkableSpecResolver:
                     properties=entity_properties,
                 )
             )
-            for entity_link in self._semantic_model_lookup.entity_links_for_local_elements(semantic_model):
+            for entity_link in SemanticModelHelper.entity_links_for_local_elements(semantic_model):
                 # Avoid creating "booking_id__booking_id"
                 if entity_link == entity.reference:
                     continue
@@ -378,7 +379,7 @@ class ValidLinkableSpecResolver:
         if semantic_model_is_scd:
             dimension_properties = dimension_properties.union({LinkableElementProperty.SCD_HOP})
 
-        for entity_link in self._semantic_model_lookup.entity_links_for_local_elements(semantic_model):
+        for entity_link in SemanticModelHelper.entity_links_for_local_elements(semantic_model):
             for dimension in semantic_model.dimensions:
                 dimension_type = dimension.type
                 if dimension_type is DimensionType.CATEGORICAL:

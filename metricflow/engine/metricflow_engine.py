@@ -20,7 +20,7 @@ from metricflow_semantics.model.linkable_element_property import LinkableElement
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 from metricflow_semantics.model.semantics.linkable_element import LinkableDimension
-from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
+from metricflow_semantics.model.semantics.semantic_model_helper import SemanticModelHelper
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.protocols.query_parameter import GroupByParameter, MetricQueryParameter, OrderByQueryParameter
 from metricflow_semantics.query.query_exceptions import InvalidQueryException
@@ -653,7 +653,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                     assert semantic_model
                     dimensions.append(
                         Dimension.from_pydantic(
-                            pydantic_dimension=SemanticModelLookup.get_dimension_from_semantic_model(
+                            pydantic_dimension=SemanticModelHelper.get_dimension_from_semantic_model(
                                 semantic_model=semantic_model,
                                 dimension_reference=linkable_dimension.reference,
                             ),
@@ -671,7 +671,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             for semantic_model in semantic_model_lookup.get_semantic_models_for_dimension(dimension_reference):
                 dimensions.append(
                     Dimension.from_pydantic(
-                        pydantic_dimension=semantic_model_lookup.get_dimension_from_semantic_model(
+                        pydantic_dimension=SemanticModelHelper.get_dimension_from_semantic_model(
                             semantic_model=semantic_model, dimension_reference=dimension_reference
                         ),
                         entity_links=(semantic_model_lookup.get_primary_entity_else_error(semantic_model),),
@@ -706,7 +706,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 assert semantic_model
                 entities.append(
                     Entity.from_pydantic(
-                        pydantic_entity=SemanticModelLookup.get_entity_from_semantic_model(
+                        pydantic_entity=SemanticModelHelper.get_entity_from_semantic_model(
                             semantic_model=semantic_model,
                             entity_reference=EntityReference(element_name=linkable_entity.element_name),
                         )
