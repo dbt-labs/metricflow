@@ -674,7 +674,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                         pydantic_dimension=SemanticModelHelper.get_dimension_from_semantic_model(
                             semantic_model=semantic_model, dimension_reference=dimension_reference
                         ),
-                        entity_links=(semantic_model_lookup.get_primary_entity_else_error(semantic_model),),
+                        entity_links=(SemanticModelHelper.resolved_primary_entity(semantic_model),),
                     )
                 )
 

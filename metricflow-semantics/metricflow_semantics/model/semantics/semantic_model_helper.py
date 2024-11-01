@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional, Sequence
+from typing import Sequence
 
 from dbt_semantic_interfaces.protocols import Dimension
 from dbt_semantic_interfaces.protocols.entity import Entity
@@ -31,8 +31,12 @@ class SemanticModelHelper:
         )
 
     @staticmethod
-    def resolved_primary_entity(semantic_model: SemanticModel) -> Optional[EntityReference]:
-        """Return the primary entity for dimensions in the model."""
+    def resolved_primary_entity(semantic_model: SemanticModel) -> EntityReference:
+        """Return the primary entity for dimensions in the model.
+
+        Semantic models with measures or dimensions should have a primary entity as enforced by semantic manifest
+        validation.
+        """
         primary_entity_reference = semantic_model.primary_entity_reference
 
         entities_with_type_primary = tuple(
@@ -51,7 +55,7 @@ class SemanticModelHelper:
         if len(entities_with_type_primary) > 0:
             return entities_with_type_primary[0].reference
 
-        return None
+        raise ValueError(f"No primary entity found in {semantic_model.reference=}")
 
     @staticmethod
     def entity_links_for_local_elements(semantic_model: SemanticModel) -> Sequence[EntityReference]:
