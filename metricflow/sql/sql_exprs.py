@@ -22,7 +22,7 @@ from metricflow_semantics.visitor import Visitable, VisitorOutputT
 from typing_extensions import override
 
 
-@dataclass(frozen=True, order=True)
+@dataclass(frozen=True, eq=False)
 class SqlExpressionNode(DagNode["SqlExpressionNode"], Visitable, ABC):
     """An SQL expression like my_table.my_column, CONCAT(a, b) or 1 + 1 that evaluates to a value."""
 
@@ -230,7 +230,7 @@ class SqlExpressionNodeVisitor(Generic[VisitorOutputT], ABC):
         pass
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class SqlStringExpression(SqlExpressionNode):
     """An SQL expression in a string format, so it lacks information about the structure.
 
@@ -314,7 +314,7 @@ class SqlStringExpression(SqlExpressionNode):
         return self
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class SqlStringLiteralExpression(SqlExpressionNode):
     """A string literal like 'foo'. It shouldn't include delimiters as it should be added during rendering."""
 
@@ -375,7 +375,7 @@ class SqlColumnReference:
     column_name: str
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class SqlColumnReferenceExpression(SqlExpressionNode):
     """An expression that evaluates to the value of a column in one of the sources in the select query.
 
@@ -475,7 +475,7 @@ class SqlColumnReferenceExpression(SqlExpressionNode):
         return SqlColumnReferenceExpression.create(SqlColumnReference(table_alias=table_alias, column_name=column_name))
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class SqlColumnAliasReferenceExpression(SqlExpressionNode):
     """An expression that evaluates to the alias of a column, but is not qualified with a table alias.
 
@@ -544,7 +544,7 @@ class SqlComparison(Enum):  # noqa: D101
     EQUALS = "="
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class SqlComparisonExpression(SqlExpressionNode):
     """A comparison using >, <, <=, >=, =.
 
@@ -698,6 +698,7 @@ class SqlFunction(Enum):
             assert_values_exhausted(aggregation_type)
 
 
+@dataclass(frozen=True, eq=False)
 class SqlFunctionExpression(SqlExpressionNode):
     """Denotes a function expression in SQL."""
 
@@ -723,7 +724,7 @@ class SqlFunctionExpression(SqlExpressionNode):
             return SqlAggregateFunctionExpression.from_aggregation_type(aggregation_type, sql_column_expression)
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class SqlAggregateFunctionExpression(SqlFunctionExpression):
     """An aggregate function expression like SUM(1).
 
@@ -857,7 +858,7 @@ class SqlPercentileExpressionArgument:
         )
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class SqlPercentileExpression(SqlFunctionExpression):
     """A percentile aggregation expression.
 
@@ -984,7 +985,7 @@ class SqlWindowOrderByArgument:
         return " ".join(result)
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class SqlWindowFunctionExpression(SqlFunctionExpression):
     """A window function expression like SUM(foo) OVER bar.
 
@@ -1101,7 +1102,7 @@ class SqlWindowFunctionExpression(SqlFunctionExpression):
         )
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class SqlNullExpression(SqlExpressionNode):
     """Represents NULL."""
 
@@ -1151,7 +1152,7 @@ class SqlLogicalOperator(Enum):
     OR = "OR"
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class SqlLogicalExpression(SqlExpressionNode):
     """A logical expression like "a AND b AND c"."""
 
@@ -1203,7 +1204,7 @@ class SqlLogicalExpression(SqlExpressionNode):
         return self.operator == other.operator and self._parents_match(other)
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class SqlIsNullExpression(SqlExpressionNode):
     """An IS NULL expression like "foo IS NULL"."""
 
@@ -1248,7 +1249,7 @@ class SqlIsNullExpression(SqlExpressionNode):
         return self._parents_match(other)
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class SqlSubtractTimeIntervalExpression(SqlExpressionNode):
     """Represents an interval subtraction from a given timestamp.
 
@@ -1313,7 +1314,7 @@ class SqlSubtractTimeIntervalExpression(SqlExpressionNode):
         return self.count == other.count and self.granularity == other.granularity and self._parents_match(other)
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class SqlCastToTimestampExpression(SqlExpressionNode):
     """Cast to the timestamp type like CAST('2020-01-01' AS TIMESTAMP)."""
 
@@ -1360,7 +1361,7 @@ class SqlCastToTimestampExpression(SqlExpressionNode):
         return self._parents_match(other)
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class SqlDateTruncExpression(SqlExpressionNode):
     """Apply a date trunc to a column like CAST('2020-01-01' AS TIMESTAMP)."""
 
@@ -1411,7 +1412,7 @@ class SqlDateTruncExpression(SqlExpressionNode):
         return self.time_granularity == other.time_granularity and self._parents_match(other)
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class SqlExtractExpression(SqlExpressionNode):
     """Extract a date part from a time expression.
 
@@ -1470,7 +1471,7 @@ class SqlExtractExpression(SqlExpressionNode):
         return self.date_part == other.date_part and self._parents_match(other)
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class SqlRatioComputationExpression(SqlExpressionNode):
     """Node for expressing Ratio metrics to allow for appropriate casting to float/double in each engine.
 
@@ -1535,7 +1536,7 @@ class SqlRatioComputationExpression(SqlExpressionNode):
         return self._parents_match(other)
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class SqlBetweenExpression(SqlExpressionNode):
     """A BETWEEN clause like `column BETWEEN val1 AND val2`.
 
@@ -1600,7 +1601,7 @@ class SqlBetweenExpression(SqlExpressionNode):
         return self._parents_match(other)
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class SqlGenerateUuidExpression(SqlExpressionNode):
     """Renders a SQL to generate a random UUID, which is non-deterministic."""
 

@@ -57,9 +57,14 @@ class DagNodeVisitor(Generic[VisitorOutputT], ABC):
 DagNodeT = TypeVar("DagNodeT", bound="DagNode")
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class DagNode(MetricFlowPrettyFormattable, Generic[DagNodeT], ABC):
-    """A node in a DAG. These should be immutable."""
+    """A node in a DAG. These should be immutable.
+
+    Since there should only be a single instance of a node with a given ID, `eq` can be set to false so that equality
+    operations can be done without comparing the fields. Comparing the fields can be a slow process since the
+    `parent_nodes` field is recursive.
+    """
 
     parent_nodes: Tuple[DagNodeT, ...]
 

@@ -44,7 +44,7 @@ logger = logging.getLogger(__name__)
 NodeSelfT = TypeVar("NodeSelfT", bound="DataflowPlanNode")
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class DataflowPlanNode(DagNode["DataflowPlanNode"], Visitable, ABC):
     """A node in the graph representation of the dataflow.
 

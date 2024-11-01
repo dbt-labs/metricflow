@@ -16,7 +16,7 @@ from metricflow.dataflow.dataflow_plan import (
 )
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class ComputeMetricsNode(DataflowPlanNode):
     """A node that computes metrics from input measures. Dimensions / entities are passed through.
 

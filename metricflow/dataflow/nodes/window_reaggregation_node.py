@@ -17,7 +17,7 @@ from metricflow.dataflow.dataflow_plan import (
 from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class WindowReaggregationNode(DataflowPlanNode):
     """A node that re-aggregates metrics using window functions.
 

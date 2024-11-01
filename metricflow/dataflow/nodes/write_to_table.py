@@ -13,7 +13,7 @@ from metricflow.dataflow.dataflow_plan import (
 )
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class WriteToResultTableNode(DataflowPlanNode):
     """A node where incoming data gets written to a table.
 

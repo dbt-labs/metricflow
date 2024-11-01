@@ -19,7 +19,7 @@ from metricflow.sql.sql_exprs import SqlExpressionNode
 logger = logging.getLogger(__name__)
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class SqlQueryPlanNode(DagNode["SqlQueryPlanNode"], ABC):
     """Modeling a SQL query plan like a data flow plan as well.
 
@@ -105,7 +105,7 @@ class SqlOrderByDescription:  # noqa: D101
     desc: bool
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class SqlSelectStatementNode(SqlQueryPlanNode):
     """Represents an SQL Select statement.
 
@@ -197,7 +197,7 @@ class SqlSelectStatementNode(SqlQueryPlanNode):
         return self._description
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class SqlTableNode(SqlQueryPlanNode):
     """An SQL table that can go in the FROM clause or the JOIN clause."""
 
@@ -234,7 +234,7 @@ class SqlTableNode(SqlQueryPlanNode):
         return None
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class SqlSelectQueryFromClauseNode(SqlQueryPlanNode):
     """An SQL select query that can go in the FROM clause.
 
@@ -271,7 +271,7 @@ class SqlSelectQueryFromClauseNode(SqlQueryPlanNode):
         return None
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class SqlCreateTableAsNode(SqlQueryPlanNode):
     """An SQL node representing a CREATE TABLE AS statement.
 
@@ -343,7 +343,7 @@ class SqlQueryPlan(MetricFlowDag[SqlQueryPlanNode]):
         return self._render_node
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class SqlCteNode(SqlQueryPlanNode):
     """Represents a single common table expression."""
 

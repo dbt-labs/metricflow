@@ -17,7 +17,7 @@ from metricflow_semantics.visitor import VisitorOutputT
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNodeVisitor
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class JoinToTimeSpineNode(DataflowPlanNode, ABC):
     """Join parent dataset to time spine dataset.
 

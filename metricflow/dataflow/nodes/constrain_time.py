@@ -12,7 +12,7 @@ from metricflow.dataflow.dataflow_plan import DataflowPlanNodeVisitor
 from metricflow.dataflow.nodes.aggregate_measures import DataflowPlanNode
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class ConstrainTimeRangeNode(DataflowPlanNode):
     """Constrains the time range of the input data set.
 

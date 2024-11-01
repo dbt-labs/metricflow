@@ -12,7 +12,7 @@ from metricflow_semantics.visitor import VisitorOutputT
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNodeVisitor
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class FilterElementsNode(DataflowPlanNode):
     """Only passes the listed elements.
 
