@@ -20,6 +20,7 @@ from dbt_semantic_interfaces.type_enums import AggregationType, DimensionType, T
 
 from metricflow_semantics.errors.error_classes import InvalidSemanticModelError
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.model.semantics.dimension_lookup import DimensionLookup
 from metricflow_semantics.model.semantics.element_group import ElementGrouper
 from metricflow_semantics.model.semantics.measure_lookup import MeasureLookup
 from metricflow_semantics.model.semantics.semantic_model_helper import SemanticModelHelper
@@ -72,6 +73,7 @@ class SemanticModelLookup:
         self._measure_reference_to_agg_time_dimension_specs: Dict[MeasureReference, Sequence[TimeDimensionSpec]] = {}
 
         self._measure_lookup = MeasureLookup(sorted_semantic_models, custom_granularities)
+        self._dimension_lookup = DimensionLookup(sorted_semantic_models)
 
     def get_dimension_references(self) -> Sequence[DimensionReference]:
         """Retrieve all dimension references from the collection of semantic models."""
@@ -323,3 +325,7 @@ class SemanticModelLookup:
     @property
     def measure_lookup(self) -> MeasureLookup:  # noqa: D102
         return self._measure_lookup
+
+    @property
+    def dimension_lookup(self) -> DimensionLookup:  # noqa: D102
+        return self._dimension_lookup

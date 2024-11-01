@@ -1,0 +1,12 @@
+{
+  'account_month': DimensionInvariant(dimension_type=CATEGORICAL, is_partition=False),
+  'acquired_ds': DimensionInvariant(dimension_type=TIME, is_partition=False),
+  'country': DimensionInvariant(dimension_type=CATEGORICAL, is_partition=False),
+  'customer_atomic_weight': DimensionInvariant(dimension_type=CATEGORICAL, is_partition=False),
+  'customer_name': DimensionInvariant(dimension_type=CATEGORICAL, is_partition=False),
+  'ds': DimensionInvariant(dimension_type=TIME, is_partition=False),
+  'ds_partitioned': DimensionInvariant(dimension_type=TIME, is_partition=True),
+  'extra_dim': DimensionInvariant(dimension_type=CATEGORICAL, is_partition=False),
+  'third_hop_ds': DimensionInvariant(dimension_type=TIME, is_partition=False),
+  'value': DimensionInvariant(dimension_type=CATEGORICAL, is_partition=False),
+}
