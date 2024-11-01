@@ -980,9 +980,11 @@ class DataflowPlanBuilder:
             )
         semantic_model_name = semantic_model_names.pop()
 
-        agg_time_dimension = self._semantic_model_lookup.measure_lookup.get_properties(
-            measure_specs[0].reference
-        ).agg_time_dimension_reference
+        measure_reference = measure_specs[0].reference
+        measure_properties = self._semantic_model_lookup.measure_lookup.get_properties(measure_reference)
+        agg_time_dimension = measure_properties.agg_time_dimension_reference
+        agg_time_dimension_grain = measure_properties.agg_time_granularity
+
         non_additive_dimension_spec = measure_specs[0].non_additive_dimension_spec
         for measure_spec in measure_specs:
             if non_additive_dimension_spec != measure_spec.non_additive_dimension_spec:
@@ -996,6 +998,7 @@ class DataflowPlanBuilder:
             measure_specs=tuple(measure_specs),
             semantic_model_name=semantic_model_name,
             agg_time_dimension=agg_time_dimension,
+            agg_time_dimension_grain=agg_time_dimension_grain,
             non_additive_dimension_spec=non_additive_dimension_spec,
         )
 
@@ -1464,7 +1467,7 @@ class DataflowPlanBuilder:
         self,
         queried_linkable_specs: LinkableSpecSet,
         filter_specs: Sequence[WhereFilterSpec],
-        non_additive_dimension_spec: Optional[NonAdditiveDimensionSpec] = None,
+        measure_spec_properties: Optional[MeasureSpecProperties] = None,
     ) -> Tuple[LinkableSpecSet, LinkableSpecSet]:
         """Get the required and extraneous linkable specs for this query.
 
@@ -1474,15 +1477,18 @@ class DataflowPlanBuilder:
         linkable_spec_sets_to_merge: List[LinkableSpecSet] = []
         for filter_spec in filter_specs:
             linkable_spec_sets_to_merge.append(LinkableSpecSet.create_from_specs(filter_spec.linkable_specs))
-        if non_additive_dimension_spec:
-            non_additive_dimension_grain = self._semantic_model_lookup.get_defined_time_granularity(
-                TimeDimensionReference(non_additive_dimension_spec.name)
+
+        if measure_spec_properties is not None:
+            non_additive_dimension_spec = (
+                measure_spec_properties.non_additive_dimension_spec if measure_spec_properties else None
             )
-            linkable_spec_sets_to_merge.append(
-                LinkableSpecSet.create_from_specs(
-                    non_additive_dimension_spec.linkable_specs(non_additive_dimension_grain)
+            if non_additive_dimension_spec is not None:
+                agg_time_dimension_grain = measure_spec_properties.agg_time_dimension_grain
+                linkable_spec_sets_to_merge.append(
+                    LinkableSpecSet.create_from_specs(
+                        non_additive_dimension_spec.linkable_specs(agg_time_dimension_grain)
+                    )
                 )
-            )
 
         extraneous_linkable_specs = LinkableSpecSet.merge_iterable(linkable_spec_sets_to_merge).dedupe()
         required_linkable_specs = queried_linkable_specs.merge(extraneous_linkable_specs).dedupe()
@@ -1515,8 +1521,6 @@ class DataflowPlanBuilder:
             else None
         )
         measure_properties = self._build_measure_spec_properties([measure_spec])
-        non_additive_dimension_spec = measure_properties.non_additive_dimension_spec
-
         cumulative_metric_adjusted_time_constraint: Optional[TimeRangeConstraint] = None
         if cumulative and predicate_pushdown_state.time_range_constraint is not None:
             logger.debug(
@@ -1545,7 +1549,7 @@ class DataflowPlanBuilder:
         required_linkable_specs, extraneous_linkable_specs = self.__get_required_and_extraneous_linkable_specs(
             queried_linkable_specs=queried_linkable_specs,
             filter_specs=metric_input_measure_spec.filter_spec_set.all_filter_specs,
-            non_additive_dimension_spec=non_additive_dimension_spec,
+            measure_spec_properties=measure_properties,
         )
 
         before_aggregation_time_spine_join_description = (
@@ -1700,12 +1704,11 @@ class DataflowPlanBuilder:
                 where_specs=metric_input_measure_spec.filter_spec_set.all_filter_specs,
             )
 
+        non_additive_dimension_spec = measure_properties.non_additive_dimension_spec
         if non_additive_dimension_spec is not None:
             # Apply semi additive join on the node
             agg_time_dimension = measure_properties.agg_time_dimension
-            non_additive_dimension_grain = self._semantic_model_lookup.get_defined_time_granularity(
-                TimeDimensionReference(non_additive_dimension_spec.name)
-            )
+            non_additive_dimension_grain = measure_properties.agg_time_dimension_grain
             queried_time_dimension_spec: Optional[
                 TimeDimensionSpec
             ] = self._find_non_additive_dimension_in_linkable_specs(
