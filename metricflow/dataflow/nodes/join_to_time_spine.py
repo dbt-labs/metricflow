@@ -22,6 +22,7 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
     """Join parent dataset to time spine dataset.
 
     Attributes:
+        time_spine_source_node: The source node that should be joined to the parent node.
         replace_time_dimension_specs: Time dimensions that should be replaced with columns from the time spine.
         join_type: Join type to use when joining to time spine.
         time_range_constraint: Time range to constrain the time spine to.
@@ -30,7 +31,7 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
     """
 
     # TODO: filter params; will apply where filters & time constraints separately using standard nodes
-    # TODO: add time_spine_source_node as a param
+    time_spine_source_node: DataflowPlanNode
     replace_time_dimension_specs: Sequence[TimeDimensionSpec]
     join_type: SqlJoinType
     time_range_constraint: Optional[TimeRangeConstraint]
@@ -52,6 +53,7 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
     @staticmethod
     def create(  # noqa: D102
         parent_node: DataflowPlanNode,
+        time_spine_source_node: DataflowPlanNode,
         replace_time_dimension_specs: Sequence[TimeDimensionSpec],
         join_type: SqlJoinType,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
@@ -61,6 +63,7 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
     ) -> JoinToTimeSpineNode:
         return JoinToTimeSpineNode(
             parent_nodes=(parent_node,),
+            time_spine_source_node=time_spine_source_node,
             replace_time_dimension_specs=tuple(replace_time_dimension_specs),
             join_type=join_type,
             time_range_constraint=time_range_constraint,
@@ -100,6 +103,8 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
             )
         return props
 
+    # TODO: should the time spine be considered a parent node? There must be downstream implications.
+    # e.g., if this node is used in an export, the time spine source should show up in the DAG, right?
     @property
     def parent_node(self) -> DataflowPlanNode:  # noqa: D102
         return self.parent_nodes[0]
@@ -107,6 +112,7 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
         return (
             isinstance(other_node, self.__class__)
+            and self.time_spine_source_node == other_node.time_spine_source_node
             and other_node.time_range_constraint == self.time_range_constraint
             and other_node.offset_window == self.offset_window
             and other_node.offset_to_grain == self.offset_to_grain
@@ -119,6 +125,7 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
         assert len(new_parent_nodes) == 1
         return JoinToTimeSpineNode.create(
             parent_node=new_parent_nodes[0],
+            time_spine_source_node=self.time_spine_source_node,
             replace_time_dimension_specs=self.replace_time_dimension_specs,
             time_range_constraint=self.time_range_constraint,
             offset_window=self.offset_window,

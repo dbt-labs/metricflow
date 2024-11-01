@@ -31,6 +31,7 @@ from metricflow_semantics.model.spec_converters import MeasureConverter
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
+from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY, TimeDimensionSpec
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
@@ -107,7 +108,7 @@ class SemanticModelToDataSetConverter:
         entity_links: Tuple[EntityReference, ...],
         time_granularity: ExpandedTimeGranularity,
         date_part: Optional[DatePart] = None,
-        semantic_model_name: Optional[str] = None,
+        semantic_model_name: Optional[str] = None,  # TODO: make required
     ) -> TimeDimensionInstance:
         """Create a time dimension instance from the dimension object from a semantic model in the model."""
         time_dimension_spec = TimeDimensionSpec(
@@ -363,15 +364,22 @@ class SemanticModelToDataSetConverter:
                     date_part=date_part,
                 )
                 time_dimension_instances.append(time_dimension_instance)
-
                 select_columns.append(
-                    SqlSelectColumn(
-                        expr=SqlExtractExpression.create(date_part=date_part, arg=dimension_select_expr),
+                    self._build_column_for_date_part(
+                        date_part=date_part,
+                        base_expr=dimension_select_expr,
                         column_alias=time_dimension_instance.associated_column.column_name,
                     )
                 )
 
         return (time_dimension_instances, select_columns)
+
+    def _build_column_for_date_part(
+        self, date_part: DatePart, base_expr: SqlExpressionNode, column_alias: str
+    ) -> SqlSelectColumn:
+        return SqlSelectColumn(
+            expr=SqlExtractExpression.create(date_part=date_part, arg=base_expr), column_alias=column_alias
+        )
 
     def _build_column_for_standard_time_granularity(
         self, time_granularity: TimeGranularity, expr: SqlExpressionNode, column_alias: str
@@ -524,6 +532,7 @@ class SemanticModelToDataSetConverter:
         # Build base time dimension instances & columns
         base_time_dimension_instance = self._create_time_dimension_instance(
             element_name=base_column_name,
+            semantic_model_name=time_spine_source.table_name,
             entity_links=(),
             time_granularity=ExpandedTimeGranularity.from_time_granularity(base_granularity),
         )
@@ -531,10 +540,8 @@ class SemanticModelToDataSetConverter:
         base_dimension_select_expr = SemanticModelToDataSetConverter._make_element_sql_expr(
             table_alias=from_source_alias, element_name=base_column_name
         )
-        base_select_column = self._build_column_for_standard_time_granularity(
-            time_granularity=base_granularity,
-            expr=base_dimension_select_expr,
-            column_alias=base_time_dimension_instance.associated_column.column_name,
+        base_select_column = SqlSelectColumn(
+            expr=base_dimension_select_expr, column_alias=base_time_dimension_instance.associated_column.column_name
         )
         select_columns.append(base_select_column)
         new_base_instances, new_base_columns = self._build_time_dimension_instances_and_columns(
@@ -551,6 +558,7 @@ class SemanticModelToDataSetConverter:
             custom_time_dimension_instance = self._create_time_dimension_instance(
                 # Use base column name here for ease in building metric_time elements in MetricTimeDimensionTransformNode.
                 element_name=base_column_name,
+                semantic_model_name=time_spine_source.table_name,
                 entity_links=(),
                 time_granularity=ExpandedTimeGranularity(
                     name=custom_granularity.name, base_granularity=base_granularity
@@ -572,6 +580,58 @@ class SemanticModelToDataSetConverter:
                 description=f"Read From {TIME_SPINE_DATA_SET_DESCRIPTION} '{time_spine_source.table_name}'",
                 select_columns=tuple(select_columns),
                 from_source=SqlTableNode.create(sql_table=time_spine_source.spine_table),
+                from_source_alias=from_source_alias,
+            ),
+        )
+
+    # TODO: dedupe with logic above
+    def build_time_spine_source_data_set_to_satisfy_linkable_specs(
+        self, time_spine_source: TimeSpineSource, linkable_spec_set: LinkableSpecSet
+    ) -> SqlDataSet:
+        """Build data set for time spine."""
+        from_source_alias = SequentialIdGenerator.create_next_id(StaticIdPrefix.TIME_SPINE_SOURCE).str_value
+        base_granularity = ExpandedTimeGranularity.from_time_granularity(time_spine_source.base_granularity)
+        base_column_name = time_spine_source.base_column
+
+        base_expr = SemanticModelToDataSetConverter._make_element_sql_expr(
+            table_alias=from_source_alias, element_name=base_column_name
+        )
+
+        time_dimension_instances: Tuple[TimeDimensionInstance] = ()
+        select_columns: Tuple[SqlSelectColumn] = ()
+        for linkable_spec in linkable_spec_set.time_dimension_specs:
+            time_dimension_instance = self._create_time_dimension_instance(
+                element_name=linkable_spec.element_name,
+                semantic_model_name=time_spine_source.table_name,
+                entity_links=linkable_spec.entity_links,
+                time_granularity=linkable_spec.time_granularity,
+                date_part=linkable_spec.date_part,
+            )
+            column_alias = time_dimension_instance.associated_column.column_name
+            if linkable_spec.date_part:
+                select_column = self._build_column_for_date_part(
+                    date_part=linkable_spec.date_part, base_expr=base_expr, column_alias=column_alias
+                )
+            elif linkable_spec.time_granularity != base_granularity:
+                select_column = self._build_column_for_standard_time_granularity(
+                    # TODO: make sure this is what's expected for custom grains
+                    # Use base grain here. Custom granularities will be joined separately.
+                    time_granularity=linkable_spec.time_granularity.base_granularity,
+                    expr=base_expr,
+                    column_alias=time_dimension_instance.associated_column.column_name,
+                )
+            else:
+                select_column = SqlSelectColumn(expr=base_expr, column_alias=column_alias)
+
+            time_dimension_instances += (time_dimension_instance,)
+            select_columns += (select_column,)
+
+        return SqlDataSet(
+            instance_set=InstanceSet(time_dimension_instances=time_dimension_instances),
+            sql_select_node=SqlSelectStatementNode.create(
+                description=f"Read From {TIME_SPINE_DATA_SET_DESCRIPTION} '{time_spine_source.table_name}'",
+                select_columns=select_columns,
+                from_source=SqlTableNode.create(time_spine_source.spine_table),
                 from_source_alias=from_source_alias,
             ),
         )

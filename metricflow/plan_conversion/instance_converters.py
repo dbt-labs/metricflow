@@ -565,9 +565,11 @@ class FilterElements(InstanceSetTransform[InstanceSet]):
                 if include_spec not in instance_set.spec_set.all_specs:
                     include_specs_not_found.append(include_spec)
             if include_specs_not_found:
+                readable_spec_set = "\n".join([f" - {spec}" for spec in instance_set.spec_set.all_specs])
                 raise RuntimeError(
-                    f"Include specs {include_specs_not_found} are not in the spec set {instance_set.spec_set} - "
-                    f"check if this node was constructed correctly."
+                    "Some include specs are not in the spec set - check if this node was constructed correctly.\n"
+                    f"Missing specs:\n - {include_specs_not_found}\n"
+                    f"Specs in spec set:{readable_spec_set}\n"
                 )
         elif self._exclude_specs:
             exclude_specs_not_found = []

@@ -562,8 +562,8 @@ class SqlQueryPlanJoinBuilder:
             on_condition=SqlComparisonExpression.create(
                 left_expr=left_expr,
                 comparison=SqlComparison.EQUALS,
-                right_expr=SqlColumnReferenceExpression.create(
-                    col_ref=SqlColumnReference(table_alias=parent_alias, column_name=agg_time_dimension_column_name)
+                right_expr=SqlColumnReferenceExpression.from_table_and_column_names(
+                    table_alias=parent_alias, column_name=agg_time_dimension_column_name
                 ),
             ),
             join_type=node.join_type,

@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime as dt
 import logging
 from collections import OrderedDict
-from typing import List, Optional, Sequence, Set, Tuple, Union
+from typing import List, Optional, Sequence, Set, Tuple, Dict
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
@@ -119,7 +119,6 @@ from metricflow.sql.sql_exprs import (
     SqlComparisonExpression,
     SqlDateTruncExpression,
     SqlExpressionNode,
-    SqlExtractExpression,
     SqlFunction,
     SqlFunctionExpression,
     SqlGenerateUuidExpression,
@@ -244,6 +243,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         """Return the next unique table alias to use in generating queries."""
         return SequentialIdGenerator.create_next_id(StaticIdPrefix.SUB_QUERY).str_value
 
+    # TODO: use source node instead of this for JoinOverTimeRangeNode, too
     def _make_time_spine_data_set(
         self,
         agg_time_dimension_instances: Tuple[TimeDimensionInstance, ...],
@@ -255,7 +255,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         Column alias will use 'metric_time' or the agg_time_dimension name depending on which the user requested.
         """
         time_spine_table_alias = self._next_unique_table_alias()
-
         agg_time_dimension_specs = {instance.spec for instance in agg_time_dimension_instances}
         specs_required_for_where_constraints = {
             spec
@@ -267,7 +266,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             key=lambda spec: (spec.element_name, spec.time_granularity.base_granularity.to_int()),
         )
         time_spine_source = TimeSpineSource.choose_time_spine_source(
-            required_time_spine_specs=list(required_time_spine_specs), time_spine_sources=self._time_spine_sources
+            required_time_spine_specs=required_time_spine_specs, time_spine_sources=self._time_spine_sources
         )
         column_expr = SqlColumnReferenceExpression.from_table_and_column_names(
             table_alias=time_spine_table_alias, column_name=time_spine_source.base_column
@@ -278,9 +277,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             column_alias = self.column_association_resolver.resolve_spec(agg_time_dimension_spec).column_name
             # If the requested granularity is the same as the granularity of the spine, do a direct select.
             agg_time_grain = agg_time_dimension_spec.time_granularity
-            assert (
-                not agg_time_grain.is_custom_granularity
-            ), "Custom time granularities are not yet supported for all queries."
             if agg_time_grain.base_granularity == time_spine_source.base_granularity:
                 select_columns += (SqlSelectColumn(expr=column_expr, column_alias=column_alias),)
                 apply_group_by = False
@@ -294,7 +290,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                         column_alias=column_alias,
                     ),
                 )
-            # TODO: also handle date part.
+            # TODO: also handle date part. - check if this is handled in the source nodes - I think it is
 
         output_instance_set = InstanceSet(
             time_dimension_instances=tuple(
@@ -386,23 +382,23 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
     def visit_join_over_time_range_node(self, node: JoinOverTimeRangeNode) -> SqlDataSet:
         """Generate time range join SQL."""
         table_alias_to_instance_set: OrderedDict[str, InstanceSet] = OrderedDict()
-        input_data_set = node.parent_node.accept(self)
-        input_data_set_alias = self._next_unique_table_alias()
+        parent_data_set = node.parent_node.accept(self)
+        parent_data_set_alias = self._next_unique_table_alias()
 
         # Find requested agg_time_dimensions in parent instance set.
         # Will use instance with smallest base granularity in time spine join.
-        agg_time_dimension_instance_for_join: Optional[TimeDimensionInstance] = None
+        agg_time_dimension_spec_for_join: Optional[TimeDimensionInstance] = None
         requested_agg_time_dimension_instances: Tuple[TimeDimensionInstance, ...] = ()
-        for instance in input_data_set.instance_set.time_dimension_instances:
+        for instance in parent_data_set.instance_set.time_dimension_instances:
             if instance.spec in node.queried_agg_time_dimension_specs:
                 requested_agg_time_dimension_instances += (instance,)
-                if not agg_time_dimension_instance_for_join or (
+                if not agg_time_dimension_spec_for_join or (
                     instance.spec.time_granularity.base_granularity.to_int()
-                    < agg_time_dimension_instance_for_join.spec.time_granularity.base_granularity.to_int()
+                    < agg_time_dimension_spec_for_join.spec.time_granularity.base_granularity.to_int()
                 ):
-                    agg_time_dimension_instance_for_join = instance
+                    agg_time_dimension_spec_for_join = instance
         assert (
-            agg_time_dimension_instance_for_join
+            agg_time_dimension_spec_for_join
         ), "Specified metric time spec not found in parent data set. This should have been caught by validations."
 
         time_spine_data_set_alias = self._next_unique_table_alias()
@@ -417,31 +413,31 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         join_desc = SqlQueryPlanJoinBuilder.make_cumulative_metric_time_range_join_description(
             node=node,
             metric_data_set=AnnotatedSqlDataSet(
-                data_set=input_data_set,
-                alias=input_data_set_alias,
-                _metric_time_column_name=input_data_set.column_association_for_time_dimension(
-                    agg_time_dimension_instance_for_join.spec
+                data_set=parent_data_set,
+                alias=parent_data_set_alias,
+                _metric_time_column_name=parent_data_set.column_association_for_time_dimension(
+                    agg_time_dimension_spec_for_join.spec
                 ).column_name,
             ),
             time_spine_data_set=AnnotatedSqlDataSet(
                 data_set=time_spine_data_set,
                 alias=time_spine_data_set_alias,
                 _metric_time_column_name=time_spine_data_set.column_association_for_time_dimension(
-                    agg_time_dimension_instance_for_join.spec
+                    agg_time_dimension_spec_for_join.spec
                 ).column_name,
             ),
         )
 
         # Remove instances of agg_time_dimension from input data set. They'll be replaced with time spine instances.
         agg_time_dimension_specs = tuple(dim.spec for dim in requested_agg_time_dimension_instances)
-        modified_input_instance_set = input_data_set.instance_set.transform(
+        modified_input_instance_set = parent_data_set.instance_set.transform(
             FilterElements(exclude_specs=InstanceSpecSet(time_dimension_specs=agg_time_dimension_specs))
         )
-        table_alias_to_instance_set[input_data_set_alias] = modified_input_instance_set
+        table_alias_to_instance_set[parent_data_set_alias] = modified_input_instance_set
 
         # The output instances are the same as the input instances.
         output_instance_set = ChangeAssociatedColumns(self._column_association_resolver).transform(
-            input_data_set.instance_set
+            parent_data_set.instance_set
         )
         return SqlDataSet(
             instance_set=output_instance_set,
@@ -1162,9 +1158,9 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                     spec=metric_time_dimension_spec,
                 )
             )
-            output_column_to_input_column[
-                metric_time_dimension_column_association.column_name
-            ] = matching_time_dimension_instance.associated_column.column_name
+            output_column_to_input_column[metric_time_dimension_column_association.column_name] = (
+                matching_time_dimension_instance.associated_column.column_name
+            )
 
         output_instance_set = InstanceSet(
             measure_instances=tuple(output_measure_instances),
@@ -1312,6 +1308,15 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
     def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode) -> SqlDataSet:  # noqa: D102
         parent_data_set = node.parent_node.accept(self)
         parent_alias = self._next_unique_table_alias()
+        time_spine_dataset = node.time_spine_source_node.accept(self)
+        time_spine_alias = self._next_unique_table_alias()
+
+        def build_time_spine_column_expr(
+            time_spine_instance: TimeDimensionInstance,
+        ) -> SqlColumnReferenceExpression:
+            return SqlColumnReferenceExpression.from_table_and_column_names(
+                table_alias=time_spine_alias, column_name=time_spine_instance.associated_column.column_name
+            )
 
         if LinkableSpecSet.create_from_specs(node.replace_time_dimension_specs).contains_metric_time:
             agg_time_element_name = METRIC_TIME_ELEMENT_NAME
@@ -1323,6 +1328,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
         # Find the time dimension instances in the parent data set that match the one we want to join with.
         agg_time_dimension_instances: List[TimeDimensionInstance] = []
+        # TODO: can we dedupe this loop with the other loop thru parent instances?
         for instance in parent_data_set.instance_set.time_dimension_instances:
             if (
                 instance.spec.date_part is None  # Ensure we don't join using an instance with date part
@@ -1333,42 +1339,49 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
         # Choose the instance with the smallest base granularity available.
         agg_time_dimension_instances.sort(key=lambda instance: instance.spec.time_granularity.base_granularity.to_int())
+        # Why is this error getting triggered? Why would the parent dataset be impacted at all?
         assert len(agg_time_dimension_instances) > 0, (
             "Couldn't find requested agg_time_dimension in parent data set. The dataflow plan may have been "
             "configured incorrectly."
         )
         agg_time_dimension_instance_for_join = agg_time_dimension_instances[0]
-        agg_time_dim_for_join_with_base_grain = agg_time_dimension_instance_for_join.spec.with_base_grain()
-
-        # Build time spine data set using the requested agg_time_dimension name.
-        time_spine_alias = self._next_unique_table_alias()
-        time_spine_dataset = self._make_time_spine_data_set(
-            agg_time_dimension_instances=(agg_time_dimension_instance_for_join,),
-            time_range_constraint=node.time_range_constraint,
-            time_spine_where_constraints=node.time_spine_filters or (),
-        )
+        time_dimension_spec_for_join = agg_time_dimension_instance_for_join.spec.with_base_grain()
 
         # Build join expression.
         join_description = SqlQueryPlanJoinBuilder.make_join_to_time_spine_join_description(
             node=node,
             time_spine_alias=time_spine_alias,
             agg_time_dimension_column_name=self.column_association_resolver.resolve_spec(
-                agg_time_dim_for_join_with_base_grain
+                time_dimension_spec_for_join
             ).column_name,
             parent_sql_select_node=parent_data_set.checked_sql_select_node,
             parent_alias=parent_alias,
         )
 
-        # Select all instances from the parent data set, EXCEPT agg_time_dimensions.
-        # The agg_time_dimensions will be selected from the time spine data set.
+        time_spine_instances_by_grain_and_date_part = {
+            (instance.spec.time_granularity, instance.spec.date_part): instance
+            for instance in time_spine_dataset.instance_set.time_dimension_instances
+        }
+
+        # Select all instances from the parent data set, EXCEPT requested agg_time_dimensions.
+        # Those will be selected from the time spine data set.
         time_dimensions_to_select_from_parent: Tuple[TimeDimensionInstance, ...] = ()
         time_dimensions_to_select_from_time_spine: Tuple[TimeDimensionInstance, ...] = ()
+        parent_instances_to_matching_time_spine_instances: Dict[TimeDimensionInstance, TimeDimensionInstance] = {}
         for time_dimension_instance in parent_data_set.instance_set.time_dimension_instances:
+            # If there is no matching time spine instance, this wasn't selected in the query and will get filtered out later.
+            matching_time_spine_instance = time_spine_instances_by_grain_and_date_part.get(
+                (time_dimension_instance.spec.time_granularity, time_dimension_instance.spec.date_part)
+            )
             if (
                 time_dimension_instance.spec.element_name == agg_time_element_name
                 and time_dimension_instance.spec.entity_links == agg_time_entity_links
+                and matching_time_spine_instance
             ):
                 time_dimensions_to_select_from_time_spine += (time_dimension_instance,)
+                parent_instances_to_matching_time_spine_instances[time_dimension_instance] = (
+                    matching_time_spine_instance
+                )
             else:
                 time_dimensions_to_select_from_parent += (time_dimension_instance,)
         parent_instance_set = InstanceSet(
@@ -1391,65 +1404,66 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         )
 
         # Select matching instance from time spine data set (using base grain - custom grain will be joined in a later node).
-        original_time_spine_dim_instance: Optional[TimeDimensionInstance] = None
+        smallest_time_spine_instance: Optional[TimeDimensionInstance] = None
         for time_dimension_instance in time_spine_dataset.instance_set.time_dimension_instances:
-            if time_dimension_instance.spec == agg_time_dim_for_join_with_base_grain:
-                original_time_spine_dim_instance = time_dimension_instance
+            if (
+                time_dimension_instance.spec.time_granularity == time_dimension_spec_for_join.time_granularity
+                and time_dimension_instance.spec.date_part == time_dimension_spec_for_join.date_part
+            ):
+                smallest_time_spine_instance = time_dimension_instance
                 break
-        assert original_time_spine_dim_instance, (
-            "Couldn't find requested agg_time_dimension_instance_for_join in time spine data set, which "
-            f"indicates it may have been configured incorrectly. Expected: {agg_time_dim_for_join_with_base_grain};"
+        assert smallest_time_spine_instance, (
+            "Couldn't find requested time_dimension_spec_for_join in time spine data set, which "
+            f"indicates it may have been configured incorrectly. Expected: {time_dimension_spec_for_join};"
             f" Got: {[instance.spec for instance in time_spine_dataset.instance_set.time_dimension_instances]}"
         )
-        time_spine_column_select_expr: Union[
-            SqlColumnReferenceExpression, SqlDateTruncExpression
-        ] = SqlColumnReferenceExpression.create(
-            SqlColumnReference(
-                table_alias=time_spine_alias, column_name=original_time_spine_dim_instance.spec.qualified_name
-            )
-        )
-
-        time_spine_select_columns = []
-        time_spine_dim_instances = []
-        where_filter: Optional[SqlExpressionNode] = None
 
         # If offset_to_grain is used, will need to filter down to rows that match selected granularities.
-        # Does not apply if one of the granularities selected matches the time spine column granularity.
+        # Does not apply if one of the granularities selected matches the time spine's smallest column granularity.
         need_where_filter = (
-            node.offset_to_grain and original_time_spine_dim_instance.spec not in node.replace_time_dimension_specs
+            node.offset_to_grain and smallest_time_spine_instance.spec not in node.replace_time_dimension_specs
         )
 
-        # Add requested granularities (if different from time_spine) and date_parts to time spine column.
-        for time_dimension_instance in time_dimensions_to_select_from_time_spine:
-            time_dimension_spec = time_dimension_instance.spec
-            if (
-                time_dimension_spec.time_granularity.base_granularity.to_int()
-                < original_time_spine_dim_instance.spec.time_granularity.base_granularity.to_int()
-            ):
-                raise RuntimeError(
-                    f"Can't join to time spine for a time dimension with a smaller granularity than that of the time "
-                    f"spine column. Got {time_dimension_spec.time_granularity} for time dimension, "
-                    f"{original_time_spine_dim_instance.spec.time_granularity} for time spine."
-                )
+        # Build new select columns & where filters
+        new_select_columns = []
+        new_instances = []
+        where_filter: Optional[SqlExpressionNode] = None
+        for parent_time_dimension_instance in time_dimensions_to_select_from_time_spine:
+            parent_time_dimension_spec = parent_time_dimension_instance.spec
+            # TODO: confirm that this is validated elsewhere before removing error
+            # if (
+            #     parent_time_dimension_spec.time_granularity.base_granularity.to_int()
+            #     < smallest_time_spine_instance.spec.time_granularity.base_granularity.to_int()
+            # ):
+            #     raise RuntimeError(
+            #         f"Can't join to time spine for a time dimension with a smaller granularity than that of the time "
+            #         f"spine base column. Got {parent_time_dimension_spec.time_granularity} for time dimension, "
+            #         f"{smallest_time_spine_instance.spec.time_granularity} for time spine."
+            #     )
 
-            # Apply grain to time spine select expression, unless grain already matches original time spine column.
-            should_skip_date_trunc = (
-                time_dimension_spec.time_granularity == original_time_spine_dim_instance.spec.time_granularity
-                or time_dimension_spec.time_granularity.is_custom_granularity
+            matching_time_spine_instance = parent_instances_to_matching_time_spine_instances[
+                parent_time_dimension_instance
+            ]
+
+            # Apply parent alias to time spine column.
+            new_instance = TimeDimensionInstance(
+                defined_from=matching_time_spine_instance.defined_from,
+                associated_columns=parent_time_dimension_instance.associated_columns,
+                spec=parent_time_dimension_spec,
             )
-            select_expr: SqlExpressionNode = (
-                time_spine_column_select_expr
-                if should_skip_date_trunc
-                else SqlDateTruncExpression.create(
-                    time_granularity=time_dimension_spec.time_granularity.base_granularity,
-                    arg=time_spine_column_select_expr,
-                )
+            new_select_column = SqlSelectColumn(
+                expr=build_time_spine_column_expr(matching_time_spine_instance),
+                column_alias=parent_time_dimension_instance.associated_column.column_name,
             )
-            # Filter down to one row per granularity period requested in the group by. Any other granularities
-            # included here will be filtered out in later nodes so should not be included in where filter.
-            if need_where_filter and time_dimension_spec in node.replace_time_dimension_specs:
+            new_instances.append(new_instance)
+            new_select_columns.append(new_select_column)
+
+            # Build where filter if needed
+            if need_where_filter and parent_time_dimension_spec in node.replace_time_dimension_specs:
                 new_where_filter = SqlComparisonExpression.create(
-                    left_expr=select_expr, comparison=SqlComparison.EQUALS, right_expr=time_spine_column_select_expr
+                    left_expr=new_select_column.expr,
+                    comparison=SqlComparison.EQUALS,
+                    right_expr=build_time_spine_column_expr(smallest_time_spine_instance),
                 )
                 where_filter = (
                     SqlLogicalExpression.create(operator=SqlLogicalOperator.OR, args=(where_filter, new_where_filter))
@@ -1457,28 +1471,13 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                     else new_where_filter
                 )
 
-            # Apply date_part to time spine column select expression.
-            if time_dimension_spec.date_part:
-                select_expr = SqlExtractExpression.create(date_part=time_dimension_spec.date_part, arg=select_expr)
-            time_dim_spec = original_time_spine_dim_instance.spec.with_grain_and_date_part(
-                time_granularity=time_dimension_spec.time_granularity, date_part=time_dimension_spec.date_part
-            )
-            time_spine_dim_instance = TimeDimensionInstance(
-                defined_from=original_time_spine_dim_instance.defined_from,
-                associated_columns=(self._column_association_resolver.resolve_spec(time_dim_spec),),
-                spec=time_dim_spec,
-            )
-            time_spine_dim_instances.append(time_spine_dim_instance)
-            time_spine_select_columns.append(
-                SqlSelectColumn(expr=select_expr, column_alias=time_spine_dim_instance.associated_column.column_name)
-            )
-        time_spine_instance_set = InstanceSet(time_dimension_instances=tuple(time_spine_dim_instances))
-
         return SqlDataSet(
-            instance_set=InstanceSet.merge([time_spine_instance_set, parent_instance_set]),
+            instance_set=InstanceSet.merge(
+                [InstanceSet(time_dimension_instances=tuple(new_instances)), parent_instance_set]
+            ),
             sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
-                select_columns=tuple(time_spine_select_columns) + parent_select_columns,
+                select_columns=tuple(new_select_columns) + parent_select_columns,
                 from_source=time_spine_dataset.checked_sql_select_node,
                 from_source_alias=time_spine_alias,
                 join_descs=(join_description,),
