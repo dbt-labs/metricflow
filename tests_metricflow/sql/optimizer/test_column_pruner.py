@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import logging
+
 import pytest
 from _pytest.fixtures import FixtureRequest
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
@@ -24,6 +27,8 @@ from metricflow.sql.sql_plan import (
     SqlTableNode,
 )
 from tests_metricflow.sql.compare_sql_plan import assert_default_rendered_sql_equal
+
+logger = logging.getLogger(__name__)
 
 
 @pytest.fixture
@@ -206,6 +211,8 @@ def test_no_pruning(
     base_select_statement: SqlSelectStatementNode,
 ) -> None:
     """Tests a case where no pruning should occur."""
+    logger.debug(LazyFormat("Pruning select statement", base_select_statement=base_select_statement.structure_text()))
+
     assert_default_rendered_sql_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
@@ -900,6 +907,9 @@ def test_prune_distinct_select(
         ),
         from_source_alias="b",
     )
+
+    logger.debug(LazyFormat("Pruning select statement", select_statement=select_node.structure_text()))
+
     assert_default_rendered_sql_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,

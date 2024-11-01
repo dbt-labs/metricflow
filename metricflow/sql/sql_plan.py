@@ -98,6 +98,15 @@ class SqlJoinDescription:
     join_type: SqlJoinType
     on_condition: Optional[SqlExpressionNode] = None
 
+    def with_right_source(self, new_right_source: SqlQueryPlanNode) -> SqlJoinDescription:
+        """Return a copy of this but with the right source replaced."""
+        return SqlJoinDescription(
+            right_source=new_right_source,
+            right_source_alias=self.right_source_alias,
+            join_type=self.join_type,
+            on_condition=self.on_condition,
+        )
+
 
 @dataclass(frozen=True)
 class SqlOrderByDescription:  # noqa: D101
