@@ -228,7 +228,9 @@ def test_get_valid_agg_time_dimensions_for_metric(  # noqa: D103
         metric_agg_time_dims = metric_lookup.get_valid_agg_time_dimensions_for_metric(metric_reference)
         measure_agg_time_dims = list(
             {
-                semantic_model_lookup.get_agg_time_dimension_for_measure(measure.measure_reference)
+                semantic_model_lookup.measure_lookup.get_properties(
+                    measure.measure_reference
+                ).agg_time_dimension_reference
                 for measure in metric.input_measures
             }
         )

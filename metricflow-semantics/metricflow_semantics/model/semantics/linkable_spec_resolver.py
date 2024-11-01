@@ -142,10 +142,14 @@ class ValidLinkableSpecResolver:
                 continue
             metric_reference = MetricReference(metric.name)
             linkable_element_set_for_metric = self.get_linkable_elements_for_metrics([metric_reference])
+
             defined_from_semantic_models = tuple(
-                self._semantic_model_lookup.get_semantic_model_for_measure(input_measure.measure_reference).reference
+                self._semantic_model_lookup.measure_lookup.get_properties(
+                    input_measure.measure_reference
+                ).model_reference
                 for input_measure in metric.input_measures
             )
+
             for linkable_entities in linkable_element_set_for_metric.path_key_to_linkable_entities.values():
                 for linkable_entity in linkable_entities:
                     # TODO: some users encounter a situation in which the entity reference is in the entity links. Debug why.

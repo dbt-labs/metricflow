@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
 from functools import lru_cache
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, List, Mapping, Optional, Sequence, Tuple, Union
 
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.references import DimensionReference, EntityReference, TimeDimensionReference
@@ -205,7 +205,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
         cls,
         time_dimension_reference: TimeDimensionReference,
         entity_links: Tuple[EntityReference, ...],
-        custom_granularities: Dict[str, ExpandedTimeGranularity],
+        custom_granularities: Mapping[str, ExpandedTimeGranularity],
     ) -> List[TimeDimensionSpec]:
         """Generate a list of time dimension specs with all combinations of granularity & date part."""
         time_dimension_specs: List[TimeDimensionSpec] = []

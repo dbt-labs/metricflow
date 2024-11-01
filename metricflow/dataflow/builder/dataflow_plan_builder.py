@@ -968,7 +968,9 @@ class DataflowPlanBuilder:
         if len(measure_specs) == 0:
             raise ValueError("Cannot build MeasureParametersForRecipe when given an empty sequence of measure_specs.")
         semantic_model_names = {
-            self._semantic_model_lookup.get_semantic_model_for_measure(measure.reference).name
+            self._semantic_model_lookup.measure_lookup.get_properties(
+                measure.reference
+            ).model_reference.semantic_model_name
             for measure in measure_specs
         }
         if len(semantic_model_names) > 1:
@@ -978,14 +980,16 @@ class DataflowPlanBuilder:
             )
         semantic_model_name = semantic_model_names.pop()
 
-        agg_time_dimension = self._semantic_model_lookup.get_agg_time_dimension_for_measure(measure_specs[0].reference)
+        agg_time_dimension = self._semantic_model_lookup.measure_lookup.get_properties(
+            measure_specs[0].reference
+        ).agg_time_dimension_reference
         non_additive_dimension_spec = measure_specs[0].non_additive_dimension_spec
         for measure_spec in measure_specs:
             if non_additive_dimension_spec != measure_spec.non_additive_dimension_spec:
                 raise ValueError(f"measure_specs {measure_specs} do not have the same non_additive_dimension_spec.")
-            measure_agg_time_dimension = self._semantic_model_lookup.get_agg_time_dimension_for_measure(
+            measure_agg_time_dimension = self._semantic_model_lookup.measure_lookup.get_properties(
                 measure_spec.reference
-            )
+            ).agg_time_dimension_reference
             if measure_agg_time_dimension != agg_time_dimension:
                 raise ValueError(f"measure_specs {measure_specs} do not have the same agg_time_dimension.")
         return MeasureSpecProperties(
