@@ -935,7 +935,7 @@ class ConvertToMetadata(InstanceSetTransform[InstanceSet]):
         )
 
 
-def create_select_columns_for_instance_sets(
+def create_simple_select_columns_for_instance_sets(
     column_resolver: ColumnAssociationResolver,
     table_alias_to_instance_set: OrderedDict[str, InstanceSet],
 ) -> Tuple[SqlSelectColumn, ...]:

@@ -87,7 +87,7 @@ from metricflow.plan_conversion.instance_converters import (
     RemoveMeasures,
     RemoveMetrics,
     UpdateMeasureFillNullsWith,
-    create_select_columns_for_instance_sets,
+    create_simple_select_columns_for_instance_sets,
 )
 from metricflow.plan_conversion.select_column_gen import (
     SelectColumnSet,
@@ -345,7 +345,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             complete_outer_where_filter = where_constraint_exprs[0]
 
         outer_query_output_instance_set = InstanceSet(time_dimension_instances=agg_time_dimension_instances)
-        outer_query_select_columns = create_select_columns_for_instance_sets(
+        outer_query_select_columns = create_simple_select_columns_for_instance_sets(
             column_resolver=self._column_association_resolver,
             table_alias_to_instance_set=OrderedDict({inner_query_alias: outer_query_output_instance_set}),
         )
@@ -444,7 +444,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             instance_set=output_instance_set,
             sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
-                select_columns=create_select_columns_for_instance_sets(
+                select_columns=create_simple_select_columns_for_instance_sets(
                     self._column_association_resolver, table_alias_to_instance_set
                 ),
                 from_source=time_spine_data_set.checked_sql_select_node,
@@ -529,7 +529,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
             output_instance_set = InstanceSet.merge([output_instance_set, right_instance_set_after_join])
 
-        select_columns += create_select_columns_for_instance_sets(
+        select_columns += create_simple_select_columns_for_instance_sets(
             column_resolver=self._column_association_resolver,
             table_alias_to_instance_set=instances_to_build_simple_select_columns_for,
         )
@@ -1384,7 +1384,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             metric_instances=parent_data_set.instance_set.metric_instances,
             metadata_instances=parent_data_set.instance_set.metadata_instances,
         )
-        parent_select_columns = create_select_columns_for_instance_sets(
+        parent_select_columns = create_simple_select_columns_for_instance_sets(
             self._column_association_resolver, OrderedDict({parent_alias: parent_instance_set})
         )
 
