@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from itertools import chain
 from typing import Dict, List, Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.references import EntityReference, MetricReference, SemanticModelReference
+from dbt_semantic_interfaces.references import MetricReference, SemanticModelReference
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
@@ -29,13 +29,10 @@ from metricflow_semantics.instances import (
 from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
-from metricflow_semantics.specs.dimension_spec import DimensionSpec
-from metricflow_semantics.specs.entity_spec import EntitySpec, LinklessEntitySpec
-from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
+from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.measure_spec import MeasureSpec, MetricInputMeasureSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
-from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from more_itertools import bucket
 
 from metricflow.dataflow.nodes.join_to_base import ValidityWindowJoinDescription
@@ -387,118 +384,14 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
         return None
 
 
-class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
-    """Return a new instance set where the all linkable elements in the set have a new link added.
-
-    e.g. "country" -> "user_id__country" after a data set has been joined by entity.
-    """
-
-    def __init__(self, join_on_entity: LinklessEntitySpec) -> None:  # noqa: D107
-        self._join_on_entity = join_on_entity
-
-    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D102
-        assert len(instance_set.metric_instances) == 0, "Can't add links to instance sets with metrics"
-        assert len(instance_set.measure_instances) == 0, "Can't add links to instance sets with measures"
-
-        # Handle dimension instances
-        dimension_instances_with_additional_link = []
-        for dimension_instance in instance_set.dimension_instances:
-            # The new dimension spec should include the join on entity.
-            transformed_dimension_spec_from_right = DimensionSpec(
-                element_name=dimension_instance.spec.element_name,
-                entity_links=self._join_on_entity.as_linkless_prefix + dimension_instance.spec.entity_links,
-            )
-            dimension_instances_with_additional_link.append(
-                DimensionInstance(
-                    associated_columns=dimension_instance.associated_columns,
-                    defined_from=dimension_instance.defined_from,
-                    spec=transformed_dimension_spec_from_right,
-                )
-            )
-
-        # Handle time dimension instances
-        time_dimension_instances_with_additional_link = []
-        for time_dimension_instance in instance_set.time_dimension_instances:
-            # The new dimension spec should include the join on entity.
-            transformed_time_dimension_spec_from_right = TimeDimensionSpec(
-                element_name=time_dimension_instance.spec.element_name,
-                entity_links=(
-                    (EntityReference(element_name=self._join_on_entity.element_name),)
-                    + time_dimension_instance.spec.entity_links
-                ),
-                time_granularity=time_dimension_instance.spec.time_granularity,
-                date_part=time_dimension_instance.spec.date_part,
-            )
-            time_dimension_instances_with_additional_link.append(
-                TimeDimensionInstance(
-                    associated_columns=time_dimension_instance.associated_columns,
-                    defined_from=time_dimension_instance.defined_from,
-                    spec=transformed_time_dimension_spec_from_right,
-                )
-            )
-
-        # Handle entity instances
-        entity_instances_with_additional_link = []
-        for entity_instance in instance_set.entity_instances:
-            # Don't include adding the entity link to the same entity.
-            # Otherwise, you would create "user_id__user_id", which is confusing.
-            if entity_instance.spec == self._join_on_entity:
-                continue
-            # The new entity spec should include the join on entity.
-            transformed_entity_spec_from_right = EntitySpec(
-                element_name=entity_instance.spec.element_name,
-                entity_links=self._join_on_entity.as_linkless_prefix + entity_instance.spec.entity_links,
-            )
-            entity_instances_with_additional_link.append(
-                EntityInstance(
-                    associated_columns=entity_instance.associated_columns,
-                    defined_from=entity_instance.defined_from,
-                    spec=transformed_entity_spec_from_right,
-                )
-            )
-
-        # Handle group by metric instances
-        group_by_metric_instances_with_additional_link = []
-        for group_by_metric_instance in instance_set.group_by_metric_instances:
-            transformed_group_by_metric_spec_from_right = GroupByMetricSpec(
-                element_name=group_by_metric_instance.spec.element_name,
-                entity_links=self._join_on_entity.as_linkless_prefix + group_by_metric_instance.spec.entity_links,
-                metric_subquery_entity_links=group_by_metric_instance.spec.metric_subquery_entity_links,
-            )
-            group_by_metric_instances_with_additional_link.append(
-                GroupByMetricInstance(
-                    associated_columns=group_by_metric_instance.associated_columns,
-                    defined_from=group_by_metric_instance.defined_from,
-                    spec=transformed_group_by_metric_spec_from_right,
-                )
-            )
-
-        return InstanceSet(
-            measure_instances=(),
-            dimension_instances=tuple(dimension_instances_with_additional_link),
-            time_dimension_instances=tuple(time_dimension_instances_with_additional_link),
-            entity_instances=tuple(entity_instances_with_additional_link),
-            group_by_metric_instances=tuple(group_by_metric_instances_with_additional_link),
-            metric_instances=(),
-            metadata_instances=(),
-        )
-
-
 class FilterLinkableInstancesWithLeadingLink(InstanceSetTransform[InstanceSet]):
     """Return an instance set with the elements that have a specified leading link removed.
 
     e.g. Remove "listing__country" if the specified link is "listing".
     """
 
-    def __init__(
-        self,
-        entity_link: LinklessEntitySpec,
-    ) -> None:
-        """Constructor.
-
-        Args:
-            entity_link: Remove elements with this link as the first element in "entity_links"
-        """
+    def __init__(self, entity_link: LinklessEntitySpec) -> None:
+        """Remove elements with this link as the first element in "entity_links"."""
         self._entity_link = entity_link
 
     def _should_pass(self, linkable_spec: LinkableInstanceSpec) -> bool:
