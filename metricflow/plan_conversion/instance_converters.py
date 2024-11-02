@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from itertools import chain
 from typing import Dict, List, Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.references import MetricReference, SemanticModelReference
+from dbt_semantic_interfaces.references import EntityReference, MetricReference, SemanticModelReference
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
@@ -29,7 +29,6 @@ from metricflow_semantics.instances import (
 from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
-from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.measure_spec import MeasureSpec, MetricInputMeasureSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
@@ -390,15 +389,14 @@ class FilterLinkableInstancesWithLeadingLink(InstanceSetTransform[InstanceSet]):
     e.g. Remove "listing__country" if the specified link is "listing".
     """
 
-    def __init__(self, entity_link: LinklessEntitySpec) -> None:
+    def __init__(self, entity_link: EntityReference) -> None:
         """Remove elements with this link as the first element in "entity_links"."""
         self._entity_link = entity_link
 
     def _should_pass(self, linkable_spec: LinkableInstanceSpec) -> bool:
-        return (
-            len(linkable_spec.entity_links) == 0
-            or LinklessEntitySpec.from_reference(linkable_spec.entity_links[0]) != self._entity_link
-        )
+        if len(linkable_spec.entity_links) == 0:
+            return not linkable_spec.reference == self._entity_link
+        return linkable_spec.entity_links[0] != self._entity_link
 
     def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D102
         # Normal to not filter anything if the instance set has no instances with links.

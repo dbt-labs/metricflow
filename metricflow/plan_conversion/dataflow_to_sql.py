@@ -498,17 +498,15 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             if join_on_entity:
                 # Remove any instances that already have the join_on_entity as the leading link. This will prevent a duplicate
                 # entity link when we add it in the next step.
-                right_instance_set_filtered = FilterLinkableInstancesWithLeadingLink(join_on_entity).transform(
-                    right_data_set.instance_set
-                )
+                right_instance_set_filtered = FilterLinkableInstancesWithLeadingLink(
+                    join_on_entity.reference
+                ).transform(right_data_set.instance_set)
 
                 # After the right data set is joined, update the entity links to indicate that joining on the entity was
                 # required to reach the spec. If the "country" dimension was joined and "user_id" is the join_on_entity,
                 # then the joined data set should have the "user__country" dimension.
                 new_instances: Tuple[MdoInstance, ...] = ()
                 for original_instance in right_instance_set_filtered.linkable_instances:
-                    if original_instance.spec == join_on_entity:
-                        continue
                     new_instance = original_instance.with_entity_prefix(
                         join_on_entity.reference, column_association_resolver=self._column_association_resolver
                     )
