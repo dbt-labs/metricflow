@@ -22,8 +22,8 @@ FROM (
         FROM (
           -- Join Standard Outputs
           SELECT
-            subq_2.user AS user
-            , subq_19.user__visit_buy_conversion_rate AS user__visit_buy_conversion_rate
+            subq_19.user__visit_buy_conversion_rate AS user__visit_buy_conversion_rate
+            , subq_2.user AS user
             , subq_2.listings AS listings
           FROM (
             -- Pass Only Elements: ['listings', 'user']

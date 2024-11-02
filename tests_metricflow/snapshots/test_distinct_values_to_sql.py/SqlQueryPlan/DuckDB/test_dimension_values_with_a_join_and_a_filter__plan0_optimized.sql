@@ -6,8 +6,8 @@ SELECT
 FROM (
   -- Join Standard Outputs
   SELECT
-    listings_latest_src_28000.is_lux AS listing__is_lux_latest
-    , users_latest_src_28000.home_state_latest AS user__home_state_latest
+    users_latest_src_28000.home_state_latest AS user__home_state_latest
+    , listings_latest_src_28000.is_lux AS listing__is_lux_latest
   FROM ***************************.dim_listings_latest listings_latest_src_28000
   FULL OUTER JOIN
     ***************************.dim_users_latest users_latest_src_28000

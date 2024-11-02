@@ -39,14 +39,14 @@
             <SqlSelectStatementNode>
                 <!-- description = 'Join Standard Outputs' -->
                 <!-- node_id = NodeId(id_str='ss_2') -->
-                <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_7), column_alias='listing') -->
-                <!-- col1 =                                               -->
+                <!-- col0 =                                               -->
                 <!--   SqlSelectColumn(                                   -->
-                <!--     expr=SqlColumnReferenceExpression(node_id=cr_8), -->
+                <!--     expr=SqlColumnReferenceExpression(node_id=cr_6), -->
                 <!--     column_alias='listing__country_latest',          -->
                 <!--   )                                                  -->
+                <!-- col1 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_8), column_alias='listing') -->
                 <!-- col2 =                                                                                           -->
-                <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_6), column_alias='booking_value') -->
+                <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_7), column_alias='booking_value') -->
                 <!-- from_source = SqlSelectStatementNode(node_id=ss_0) -->
                 <!-- join_0 =                                                 -->
                 <!--   SqlJoinDescription(                                    -->
