@@ -111,3 +111,10 @@ class GroupByMetricSpec(LinkableInstanceSpec, SerializableDataclass):
         return ElementPathKey(
             element_name=self.element_name, element_type=LinkableElementType.METRIC, entity_links=self.entity_links
         )
+
+    def with_entity_prefix(self, entity_prefix: EntityReference) -> GroupByMetricSpec:  # noqa: D102
+        return GroupByMetricSpec(
+            element_name=self.element_name,
+            entity_links=(entity_prefix,) + self.entity_links,
+            metric_subquery_entity_links=self.metric_subquery_entity_links,
+        )

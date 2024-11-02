@@ -235,3 +235,12 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
     @property
     def is_metric_time(self) -> bool:  # noqa: D102
         return self.element_name == METRIC_TIME_ELEMENT_NAME
+
+    def with_entity_prefix(self, entity_prefix: EntityReference) -> TimeDimensionSpec:  # noqa: D102
+        return TimeDimensionSpec(
+            element_name=self.element_name,
+            entity_links=(entity_prefix,) + self.entity_links,
+            time_granularity=self.time_granularity,
+            date_part=self.date_part,
+            aggregation_state=self.aggregation_state,
+        )

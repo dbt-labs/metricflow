@@ -136,5 +136,10 @@ class LinkableInstanceSpec(InstanceSpec, ABC):
         """Return the ElementPathKey representation of the LinkableInstanceSpec subtype."""
         raise NotImplementedError()
 
+    @abstractmethod
+    def with_entity_prefix(self, entity_prefix: EntityReference) -> LinkableInstanceSpec:
+        """Add the selected entity prefix to the start of the entity links."""
+        raise NotImplementedError()
+
 
 SelfTypeT = TypeVar("SelfTypeT", bound="LinkableInstanceSpec")
