@@ -7,11 +7,11 @@ from dataclasses import dataclass, field
 from typing import Generic, List, Sequence, Tuple, TypeVar
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
-from dbt_semantic_interfaces.references import MetricModelReference, SemanticModelElementReference
+from dbt_semantic_interfaces.references import EntityReference, MetricModelReference, SemanticModelElementReference
 from typing_extensions import override
 
 from metricflow_semantics.aggregation_properties import AggregationState
-from metricflow_semantics.specs.column_assoc import ColumnAssociation
+from metricflow_semantics.specs.column_assoc import ColumnAssociation, ColumnAssociationResolver
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
@@ -57,6 +57,16 @@ class MdoInstance(ABC, Generic[SpecT]):
         raise NotImplementedError()
 
 
+class LinkableInstance(MdoInstance, Generic[SpecT]):
+    """An MdoInstance whose spec is linkable (i.e., it can have entity links)."""
+
+    def with_entity_prefix(
+        self, entity_prefix: EntityReference, column_association_resolver: ColumnAssociationResolver
+    ) -> MdoInstance:
+        """Add entity link to the underlying spec and associated column."""
+        raise NotImplementedError()
+
+
 # Instances for the major metric object types
 
 
@@ -95,40 +105,84 @@ class MeasureInstance(MdoInstance[MeasureSpec], SemanticModelElementInstance):  
 
 
 @dataclass(frozen=True)
-class DimensionInstance(MdoInstance[DimensionSpec], SemanticModelElementInstance):  # noqa: D101
+class DimensionInstance(LinkableInstance[DimensionSpec], SemanticModelElementInstance):  # noqa: D101
     associated_columns: Tuple[ColumnAssociation, ...]
     spec: DimensionSpec
 
     def accept(self, visitor: InstanceVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_dimension_instance(self)
 
+    def with_entity_prefix(
+        self, entity_prefix: EntityReference, column_association_resolver: ColumnAssociationResolver
+    ) -> DimensionInstance:
+        """Returns a new instance with the entity prefix added to the entity links."""
+        transformed_spec = self.spec.with_entity_prefix(entity_prefix)
+        return DimensionInstance(
+            associated_columns=(column_association_resolver.resolve_spec(transformed_spec),),
+            defined_from=self.defined_from,
+            spec=transformed_spec,
+        )
+
 
 @dataclass(frozen=True)
-class TimeDimensionInstance(MdoInstance[TimeDimensionSpec], SemanticModelElementInstance):  # noqa: D101
+class TimeDimensionInstance(LinkableInstance[TimeDimensionSpec], SemanticModelElementInstance):  # noqa: D101
     associated_columns: Tuple[ColumnAssociation, ...]
     spec: TimeDimensionSpec
 
     def accept(self, visitor: InstanceVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_time_dimension_instance(self)
 
+    def with_entity_prefix(
+        self, entity_prefix: EntityReference, column_association_resolver: ColumnAssociationResolver
+    ) -> TimeDimensionInstance:
+        """Returns a new instance with the entity prefix added to the entity links."""
+        transformed_spec = self.spec.with_entity_prefix(entity_prefix)
+        return TimeDimensionInstance(
+            associated_columns=(column_association_resolver.resolve_spec(transformed_spec),),
+            defined_from=self.defined_from,
+            spec=transformed_spec,
+        )
+
 
 @dataclass(frozen=True)
-class EntityInstance(MdoInstance[EntitySpec], SemanticModelElementInstance):  # noqa: D101
+class EntityInstance(LinkableInstance[EntitySpec], SemanticModelElementInstance):  # noqa: D101
     associated_columns: Tuple[ColumnAssociation, ...]
     spec: EntitySpec
 
     def accept(self, visitor: InstanceVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_entity_instance(self)
 
+    def with_entity_prefix(
+        self, entity_prefix: EntityReference, column_association_resolver: ColumnAssociationResolver
+    ) -> EntityInstance:
+        """Returns a new instance with the entity prefix added to the entity links."""
+        transformed_spec = self.spec.with_entity_prefix(entity_prefix)
+        return EntityInstance(
+            associated_columns=(column_association_resolver.resolve_spec(transformed_spec),),
+            defined_from=self.defined_from,
+            spec=transformed_spec,
+        )
+
 
 @dataclass(frozen=True)
-class GroupByMetricInstance(MdoInstance[GroupByMetricSpec], SerializableDataclass):  # noqa: D101
+class GroupByMetricInstance(LinkableInstance[GroupByMetricSpec], SerializableDataclass):  # noqa: D101
     associated_columns: Tuple[ColumnAssociation, ...]
     spec: GroupByMetricSpec
     defined_from: MetricModelReference
 
     def accept(self, visitor: InstanceVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_group_by_metric_instance(self)
+
+    def with_entity_prefix(
+        self, entity_prefix: EntityReference, column_association_resolver: ColumnAssociationResolver
+    ) -> GroupByMetricInstance:
+        """Returns a new instance with the entity prefix added to the entity links."""
+        transformed_spec = self.spec.with_entity_prefix(entity_prefix)
+        return GroupByMetricInstance(
+            associated_columns=(column_association_resolver.resolve_spec(transformed_spec),),
+            defined_from=self.defined_from,
+            spec=transformed_spec,
+        )
 
 
 @dataclass(frozen=True)
@@ -254,6 +308,15 @@ class InstanceSet(SerializableDataclass):
             + self.group_by_metric_instances
             + self.metric_instances
             + self.metadata_instances
+        )
+
+    @property
+    def linkable_instances(self) -> Tuple[LinkableInstance, ...]:  # noqa: D102
+        return (
+            self.dimension_instances
+            + self.time_dimension_instances
+            + self.entity_instances
+            + self.group_by_metric_instances
         )
 
 
