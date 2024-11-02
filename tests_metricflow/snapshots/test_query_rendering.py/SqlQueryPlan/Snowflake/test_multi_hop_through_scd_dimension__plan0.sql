@@ -18,11 +18,11 @@ FROM (
     FROM (
       -- Join Standard Outputs
       SELECT
-        subq_2.metric_time__day AS metric_time__day
+        subq_7.user__home_state_latest AS listing__user__home_state_latest
         , subq_7.window_start__day AS listing__window_start__day
         , subq_7.window_end__day AS listing__window_end__day
+        , subq_2.metric_time__day AS metric_time__day
         , subq_2.listing AS listing
-        , subq_7.user__home_state_latest AS listing__user__home_state_latest
         , subq_2.bookings AS bookings
       FROM (
         -- Pass Only Elements: ['bookings', 'metric_time__day', 'listing']
@@ -224,7 +224,19 @@ FROM (
         FROM (
           -- Join Standard Outputs
           SELECT
-            subq_3.window_start__day AS window_start__day
+            subq_5.home_state_latest AS user__home_state_latest
+            , subq_5.ds__day AS user__ds__day
+            , subq_5.ds__week AS user__ds__week
+            , subq_5.ds__month AS user__ds__month
+            , subq_5.ds__quarter AS user__ds__quarter
+            , subq_5.ds__year AS user__ds__year
+            , subq_5.ds__extract_year AS user__ds__extract_year
+            , subq_5.ds__extract_quarter AS user__ds__extract_quarter
+            , subq_5.ds__extract_month AS user__ds__extract_month
+            , subq_5.ds__extract_day AS user__ds__extract_day
+            , subq_5.ds__extract_dow AS user__ds__extract_dow
+            , subq_5.ds__extract_doy AS user__ds__extract_doy
+            , subq_3.window_start__day AS window_start__day
             , subq_3.window_start__week AS window_start__week
             , subq_3.window_start__month AS window_start__month
             , subq_3.window_start__quarter AS window_start__quarter
@@ -268,17 +280,6 @@ FROM (
             , subq_3.listing__window_end__extract_day AS listing__window_end__extract_day
             , subq_3.listing__window_end__extract_dow AS listing__window_end__extract_dow
             , subq_3.listing__window_end__extract_doy AS listing__window_end__extract_doy
-            , subq_5.ds__day AS user__ds__day
-            , subq_5.ds__week AS user__ds__week
-            , subq_5.ds__month AS user__ds__month
-            , subq_5.ds__quarter AS user__ds__quarter
-            , subq_5.ds__year AS user__ds__year
-            , subq_5.ds__extract_year AS user__ds__extract_year
-            , subq_5.ds__extract_quarter AS user__ds__extract_quarter
-            , subq_5.ds__extract_month AS user__ds__extract_month
-            , subq_5.ds__extract_day AS user__ds__extract_day
-            , subq_5.ds__extract_dow AS user__ds__extract_dow
-            , subq_5.ds__extract_doy AS user__ds__extract_doy
             , subq_3.listing AS listing
             , subq_3.user AS user
             , subq_3.listing__user AS listing__user
@@ -288,7 +289,6 @@ FROM (
             , subq_3.listing__country AS listing__country
             , subq_3.listing__is_lux AS listing__is_lux
             , subq_3.listing__capacity AS listing__capacity
-            , subq_5.home_state_latest AS user__home_state_latest
           FROM (
             -- Read Elements From Semantic Model 'listings'
             SELECT

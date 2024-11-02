@@ -22,8 +22,8 @@ FROM (
         FROM (
           -- Join Standard Outputs
           SELECT
-            subq_2.listing AS listing
-            , subq_15.listing__bookings_per_booker AS listing__bookings_per_booker
+            subq_15.listing__bookings_per_booker AS listing__bookings_per_booker
+            , subq_2.listing AS listing
             , subq_2.listings AS listings
           FROM (
             -- Pass Only Elements: ['listings', 'listing']

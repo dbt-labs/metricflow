@@ -39,10 +39,10 @@ FROM (
           FROM (
             -- Join Standard Outputs
             SELECT
-              subq_2.metric_time__day AS metric_time__day
+              subq_4.home_state_latest AS user__home_state_latest
+              , subq_2.metric_time__day AS metric_time__day
               , subq_2.user AS user
               , subq_2.visit__referrer_id AS visit__referrer_id
-              , subq_4.home_state_latest AS user__home_state_latest
               , subq_2.visits AS visits
             FROM (
               -- Pass Only Elements: ['visits', 'visit__referrer_id', 'metric_time__day', 'user']
@@ -301,7 +301,8 @@ FROM (
               FROM (
                 -- Join Standard Outputs
                 SELECT
-                  subq_11.ds__day AS ds__day
+                  subq_13.home_state_latest AS user__home_state_latest
+                  , subq_11.ds__day AS ds__day
                   , subq_11.ds__week AS ds__week
                   , subq_11.ds__month AS ds__month
                   , subq_11.ds__quarter AS ds__quarter
@@ -340,7 +341,6 @@ FROM (
                   , subq_11.visit__session AS visit__session
                   , subq_11.referrer_id AS referrer_id
                   , subq_11.visit__referrer_id AS visit__referrer_id
-                  , subq_13.home_state_latest AS user__home_state_latest
                   , subq_11.visits AS visits
                   , subq_11.visitors AS visitors
                 FROM (

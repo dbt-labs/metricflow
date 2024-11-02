@@ -5,8 +5,8 @@ SELECT
 FROM (
   -- Join Standard Outputs
   SELECT
-    lux_listing_mapping_src_28000.listing_id AS listing
-    , subq_15.listing__bookings AS listing__bookings
+    subq_15.listing__bookings AS listing__bookings
+    , lux_listing_mapping_src_28000.listing_id AS listing
   FROM ***************************.dim_lux_listing_id_mapping lux_listing_mapping_src_28000
   FULL OUTER JOIN (
     -- Aggregate Measures

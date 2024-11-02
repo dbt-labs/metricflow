@@ -57,10 +57,10 @@ FROM (
               FROM (
                 -- Join Standard Outputs
                 SELECT
-                  subq_2.metric_time__day AS metric_time__day
+                  subq_5.country_latest AS listing__country_latest
+                  , subq_2.metric_time__day AS metric_time__day
                   , subq_2.listing AS listing
                   , subq_2.booking__is_instant AS booking__is_instant
-                  , subq_5.country_latest AS listing__country_latest
                   , subq_2.bookings AS bookings
                 FROM (
                   -- Pass Only Elements: ['bookings', 'booking__is_instant', 'metric_time__day', 'listing']
@@ -465,10 +465,10 @@ FROM (
               FROM (
                 -- Join Standard Outputs
                 SELECT
-                  subq_20.metric_time__day AS metric_time__day
+                  subq_23.country_latest AS listing__country_latest
+                  , subq_20.metric_time__day AS metric_time__day
                   , subq_20.listing AS listing
                   , subq_20.booking__is_instant AS booking__is_instant
-                  , subq_23.country_latest AS listing__country_latest
                   , subq_20.bookings AS bookings
                 FROM (
                   -- Pass Only Elements: ['bookings', 'booking__is_instant', 'metric_time__day', 'listing']

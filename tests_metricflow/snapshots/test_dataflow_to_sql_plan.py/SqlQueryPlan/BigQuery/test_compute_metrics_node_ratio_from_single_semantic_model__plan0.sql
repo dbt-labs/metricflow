@@ -13,8 +13,8 @@ FROM (
   FROM (
     -- Join Standard Outputs
     SELECT
-      subq_1.listing AS listing
-      , subq_3.country_latest AS listing__country_latest
+      subq_3.country_latest AS listing__country_latest
+      , subq_1.listing AS listing
       , subq_1.bookings AS bookings
       , subq_1.bookers AS bookers
     FROM (

@@ -27,11 +27,11 @@ FROM (
         FROM (
           -- Join Standard Outputs
           SELECT
-            subq_2.metric_time__day AS metric_time__day
+            subq_4.capacity AS listing__capacity
             , subq_4.window_start__day AS listing__window_start__day
             , subq_4.window_end__day AS listing__window_end__day
+            , subq_2.metric_time__day AS metric_time__day
             , subq_2.listing AS listing
-            , subq_4.capacity AS listing__capacity
             , subq_2.bookings AS bookings
           FROM (
             -- Pass Only Elements: ['bookings', 'metric_time__day', 'listing']

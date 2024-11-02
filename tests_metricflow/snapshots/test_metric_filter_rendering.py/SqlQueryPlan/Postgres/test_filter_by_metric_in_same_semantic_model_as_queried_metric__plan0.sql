@@ -22,8 +22,8 @@ FROM (
         FROM (
           -- Join Standard Outputs
           SELECT
-            subq_2.guest AS guest
-            , subq_8.guest__booking_value AS guest__booking_value
+            subq_8.guest__booking_value AS guest__booking_value
+            , subq_2.guest AS guest
             , subq_2.bookers AS bookers
           FROM (
             -- Pass Only Elements: ['bookers', 'guest']

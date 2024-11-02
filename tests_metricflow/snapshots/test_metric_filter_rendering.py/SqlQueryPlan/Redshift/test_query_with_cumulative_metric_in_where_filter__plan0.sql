@@ -22,8 +22,8 @@ FROM (
         FROM (
           -- Join Standard Outputs
           SELECT
-            subq_2.user AS user
-            , subq_8.user__revenue_all_time AS user__revenue_all_time
+            subq_8.user__revenue_all_time AS user__revenue_all_time
+            , subq_2.user AS user
             , subq_2.listings AS listings
           FROM (
             -- Pass Only Elements: ['listings', 'user']

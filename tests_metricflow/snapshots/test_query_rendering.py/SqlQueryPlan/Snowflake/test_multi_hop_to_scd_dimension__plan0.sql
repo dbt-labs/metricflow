@@ -18,11 +18,11 @@ FROM (
     FROM (
       -- Join Standard Outputs
       SELECT
-        subq_2.metric_time__day AS metric_time__day
+        subq_7.lux_listing__is_confirmed_lux AS listing__lux_listing__is_confirmed_lux
         , subq_7.lux_listing__window_start__day AS listing__lux_listing__window_start__day
         , subq_7.lux_listing__window_end__day AS listing__lux_listing__window_end__day
+        , subq_2.metric_time__day AS metric_time__day
         , subq_2.listing AS listing
-        , subq_7.lux_listing__is_confirmed_lux AS listing__lux_listing__is_confirmed_lux
         , subq_2.bookings AS bookings
       FROM (
         -- Pass Only Elements: ['bookings', 'metric_time__day', 'listing']
@@ -224,7 +224,8 @@ FROM (
         FROM (
           -- Join Standard Outputs
           SELECT
-            subq_5.window_start__day AS lux_listing__window_start__day
+            subq_5.is_confirmed_lux AS lux_listing__is_confirmed_lux
+            , subq_5.window_start__day AS lux_listing__window_start__day
             , subq_5.window_start__week AS lux_listing__window_start__week
             , subq_5.window_start__month AS lux_listing__window_start__month
             , subq_5.window_start__quarter AS lux_listing__window_start__quarter
@@ -249,7 +250,6 @@ FROM (
             , subq_3.listing AS listing
             , subq_3.lux_listing AS lux_listing
             , subq_3.listing__lux_listing AS listing__lux_listing
-            , subq_5.is_confirmed_lux AS lux_listing__is_confirmed_lux
           FROM (
             -- Read Elements From Semantic Model 'lux_listing_mapping'
             SELECT
