@@ -133,7 +133,13 @@ class SqlColumnPrunerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
         # SqlExpressionNode.
 
         if len(pruned_select_columns) == 0:
-            raise RuntimeError("All columns have been pruned - this indicates an bug in the pruner or in the inputs.")
+            raise RuntimeError(
+                "All columns have been removed - this indicates an bug in the pruner or in the inputs.\n"
+                f"Original column aliases: {[col.column_alias for col in node.select_columns]}\n"
+                f"Required column aliases: {self._required_column_aliases}\n"
+                f"Group bys: {node.group_bys}\n"
+                f"Distinct: {node.distinct}"
+            )
 
         # Based on the expressions in this select statement, figure out what column aliases are needed in the sources of
         # this query (i.e. tables or sub-queries in the FROM or JOIN clauses).
