@@ -12,13 +12,15 @@ from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
 )
 from metricflow.dataset.sql_dataset import SqlDataSet
-from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
+from metricflow.plan_conversion.dataflow_to_sql import (
+    DataflowNodeToSqlSubqueryVisitor,
+)
 
 if TYPE_CHECKING:
     from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 
 
-class DataflowPlanNodeOutputDataSetResolver(DataflowToSqlQueryPlanConverter):
+class DataflowPlanNodeOutputDataSetResolver:
     """Given a node in a dataflow plan, figure out what is the data set output by that node.
 
     Recall that in the dataflow plan, the nodes represent computation, and the inputs and outputs of the nodes are
@@ -68,9 +70,11 @@ class DataflowPlanNodeOutputDataSetResolver(DataflowToSqlQueryPlanConverter):
         _node_to_output_data_set: Optional[Dict[DataflowPlanNode, SqlDataSet]] = None,
     ) -> None:
         self._node_to_output_data_set: Dict[DataflowPlanNode, SqlDataSet] = _node_to_output_data_set or {}
-        super().__init__(
-            column_association_resolver=column_association_resolver,
-            semantic_manifest_lookup=semantic_manifest_lookup,
+        self._column_association_resolver = column_association_resolver
+        self._semantic_manifest_lookup = semantic_manifest_lookup
+        self._to_data_set_visitor = _NodeDataSetVisitor(
+            column_association_resolver=self._column_association_resolver,
+            semantic_manifest_lookup=self._semantic_manifest_lookup,
         )
 
     def get_output_data_set(self, node: DataflowPlanNode) -> SqlDataSet:
@@ -79,7 +83,7 @@ class DataflowPlanNodeOutputDataSetResolver(DataflowToSqlQueryPlanConverter):
         # TODO: The cache needs to be pruned, but has not yet been an issue.
         """
         if node not in self._node_to_output_data_set:
-            self._node_to_output_data_set[node] = node.accept(self)
+            self._node_to_output_data_set[node] = node.accept(self._to_data_set_visitor)
 
         return self._node_to_output_data_set[node]
 
@@ -92,11 +96,13 @@ class DataflowPlanNodeOutputDataSetResolver(DataflowToSqlQueryPlanConverter):
     def copy(self) -> DataflowPlanNodeOutputDataSetResolver:
         """Return a copy of this with the same nodes cached."""
         return DataflowPlanNodeOutputDataSetResolver(
-            column_association_resolver=self.column_association_resolver,
+            column_association_resolver=self._column_association_resolver,
             semantic_manifest_lookup=self._semantic_manifest_lookup,
             _node_to_output_data_set=dict(self._node_to_output_data_set),
         )
 
+
+class _NodeDataSetVisitor(DataflowNodeToSqlSubqueryVisitor):
     @override
     def _next_unique_table_alias(self) -> str:
         """Return the next unique table alias to use in generating queries.
