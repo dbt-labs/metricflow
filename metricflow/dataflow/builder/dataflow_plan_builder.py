@@ -1043,12 +1043,15 @@ class DataflowPlanBuilder:
             )
             # If metric_time is requested without metrics, choose appropriate time spine node to select those values from.
             if linkable_specs_to_satisfy.metric_time_specs:
-                time_spine_node = self._source_node_set.time_spine_nodes[
-                    TimeSpineSource.choose_time_spine_source(
-                        required_time_spine_specs=linkable_specs_to_satisfy.metric_time_specs,
-                        time_spine_sources=self._source_node_builder.time_spine_sources,
-                    ).base_granularity
-                ]
+                time_spine_sources = TimeSpineSource.choose_time_spine_sources(
+                    required_time_spine_specs=linkable_specs_to_satisfy.metric_time_specs,
+                    time_spine_sources=self._source_node_builder.time_spine_sources,
+                )
+                assert len(time_spine_sources) == 1, (
+                    "Exactly one time spine source should have been selected for base grains."
+                    "This indicates internal misconfiguration."
+                )
+                time_spine_node = self._source_node_set.time_spine_nodes[time_spine_sources[0].base_granularity]
                 candidate_nodes_for_right_side_of_join += [time_spine_node]
                 candidate_nodes_for_left_side_of_join += [time_spine_node]
             default_join_type = SqlJoinType.FULL_OUTER
@@ -1769,6 +1772,11 @@ class DataflowPlanBuilder:
                 )
                 if set(included_agg_time_specs) == set(filter_spec.linkable_spec_set.as_tuple):
                     agg_time_only_filters.append(filter_spec)
+                    if filter_spec.linkable_spec_set.time_dimension_specs_with_custom_grain:
+                        raise ValueError(
+                            "Using custom granularity in filters for `join_to_timespine` metrics is not yet fully supported. "
+                            "This feature is coming soon!"
+                        )
                 else:
                     non_agg_time_filters.append(filter_spec)
 

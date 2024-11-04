@@ -265,10 +265,17 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             agg_time_dimension_specs.union(specs_required_for_where_constraints),
             key=lambda spec: (spec.element_name, spec.time_granularity.base_granularity.to_int()),
         )
-        time_spine_source = TimeSpineSource.choose_time_spine_source(
+        time_spine_sources = TimeSpineSource.choose_time_spine_sources(
             required_time_spine_specs=list(required_time_spine_specs), time_spine_sources=self._time_spine_sources
         )
-        column_expr = SqlColumnReferenceExpression.from_table_and_column_names(
+        # TODO: handle multiple time spine joins
+        assert len(time_spine_sources) == 1, (
+            "Join to time spine with custom granularity currently only supports one custom granularity per query. "
+            "Full feature coming soon."
+        )
+        time_spine_source = time_spine_sources[0]
+
+        base_column_expr = SqlColumnReferenceExpression.from_table_and_column_names(
             table_alias=time_spine_table_alias, column_name=time_spine_source.base_column
         )
         select_columns: Tuple[SqlSelectColumn, ...] = ()
@@ -277,22 +284,24 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             column_alias = self.column_association_resolver.resolve_spec(agg_time_dimension_spec).column_name
             # If the requested granularity is the same as the granularity of the spine, do a direct select.
             agg_time_grain = agg_time_dimension_spec.time_granularity
-            assert (
-                not agg_time_grain.is_custom_granularity
-            ), "Custom time granularities are not yet supported for all queries."
-            if agg_time_grain.base_granularity == time_spine_source.base_granularity:
-                select_columns += (SqlSelectColumn(expr=column_expr, column_alias=column_alias),)
+            if (
+                agg_time_grain.base_granularity == time_spine_source.base_granularity
+                and not agg_time_grain.is_custom_granularity
+            ):
+                expr: SqlExpressionNode = base_column_expr
                 apply_group_by = False
-            # If any columns have a different granularity, apply a DATE_TRUNC().
+            elif agg_time_grain.is_custom_granularity:
+                # If any dimensions require a custom granularity, select the appropriate column.
+                for custom_granularity in time_spine_source.custom_granularities:
+                    expr = SqlColumnReferenceExpression.from_table_and_column_names(
+                        table_alias=time_spine_table_alias, column_name=custom_granularity.parsed_column_name
+                    )
             else:
-                select_columns += (
-                    SqlSelectColumn(
-                        expr=SqlDateTruncExpression.create(
-                            time_granularity=agg_time_grain.base_granularity, arg=column_expr
-                        ),
-                        column_alias=column_alias,
-                    ),
+                # If any dimensions require a different standard granularity, apply a DATE_TRUNC() to the base column.
+                expr = SqlDateTruncExpression.create(
+                    time_granularity=agg_time_grain.base_granularity, arg=base_column_expr
                 )
+            select_columns += (SqlSelectColumn(expr=expr, column_alias=column_alias),)
             # TODO: also handle date part.
 
         output_instance_set = InstanceSet(
@@ -1337,7 +1346,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             "configured incorrectly."
         )
         agg_time_dimension_instance_for_join = agg_time_dimension_instances[0]
-        agg_time_dim_for_join_with_base_grain = agg_time_dimension_instance_for_join.spec.with_base_grain()
 
         # Build time spine data set using the requested agg_time_dimension name.
         time_spine_alias = self._next_unique_table_alias()
@@ -1352,7 +1360,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             node=node,
             time_spine_alias=time_spine_alias,
             agg_time_dimension_column_name=self.column_association_resolver.resolve_spec(
-                agg_time_dim_for_join_with_base_grain
+                agg_time_dimension_instance_for_join.spec
             ).column_name,
             parent_sql_select_node=parent_data_set.checked_sql_select_node,
             parent_alias=parent_alias,
@@ -1392,12 +1400,12 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         # Select matching instance from time spine data set (using base grain - custom grain will be joined in a later node).
         original_time_spine_dim_instance: Optional[TimeDimensionInstance] = None
         for time_dimension_instance in time_spine_dataset.instance_set.time_dimension_instances:
-            if time_dimension_instance.spec == agg_time_dim_for_join_with_base_grain:
+            if time_dimension_instance.spec == agg_time_dimension_instance_for_join.spec:
                 original_time_spine_dim_instance = time_dimension_instance
                 break
         assert original_time_spine_dim_instance, (
             "Couldn't find requested agg_time_dimension_instance_for_join in time spine data set, which "
-            f"indicates it may have been configured incorrectly. Expected: {agg_time_dim_for_join_with_base_grain};"
+            f"indicates it may have been configured incorrectly. Expected: {agg_time_dimension_instance_for_join.spec};"
             f" Got: {[instance.spec for instance in time_spine_dataset.instance_set.time_dimension_instances]}"
         )
         time_spine_column_select_expr: Union[
@@ -1498,7 +1506,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         time_spine_source = self._get_time_spine_for_custom_granularity(custom_granularity_name)
         for custom_granularity in time_spine_source.custom_granularities:
             if custom_granularity.name == custom_granularity_name:
-                return custom_granularity.column_name if custom_granularity.column_name else custom_granularity.name
+                return custom_granularity.parsed_column_name
 
         raise RuntimeError(
             f"Custom granularity {custom_granularity} not found. This indicates internal misconfiguration."

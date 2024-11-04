@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
+from functools import lru_cache
 from typing import Dict, Optional, Sequence
 
 from dbt_semantic_interfaces.implementations.time_spine import PydanticTimeSpineCustomGranularityColumn
@@ -79,6 +80,7 @@ class TimeSpineSource:
         return time_spine_sources
 
     @staticmethod
+    @lru_cache
     def build_custom_time_spine_sources(time_spine_sources: Sequence[TimeSpineSource]) -> Dict[str, TimeSpineSource]:
         """Creates a set of time spine sources with custom granularities based on what's in the manifest."""
         return {
@@ -99,33 +101,50 @@ class TimeSpineSource:
         }
 
     @staticmethod
-    def choose_time_spine_source(
+    def choose_time_spine_sources(
         required_time_spine_specs: Sequence[TimeDimensionSpec],
         time_spine_sources: Dict[TimeGranularity, TimeSpineSource],
-    ) -> TimeSpineSource:
-        """Determine which time spine source to use to satisfy the given specs.
+    ) -> Sequence[TimeSpineSource]:
+        """Determine which time spine sources to use to satisfy the given specs.
 
-        Will choose the time spine with the largest granularity that can be used to get the smallest granularity required to
-        satisfy the time spine specs. Example:
+        Custom grains can only use the time spine where they are defined. For standard grains, this will choose the time
+        spine with the largest granularity that is compatible with all required standard grains. This ensures max efficiency
+        for the query by minimizing the number of time spine joins and the amount of aggregation required. Example:
         - Time spines available: SECOND, MINUTE, DAY
         - Time granularities needed for request: HOUR, DAY
         --> Selected time spine: MINUTE
-
-        Note time spines are identified by their base granularity.
         """
         assert required_time_spine_specs, (
             "Choosing time spine source requires time spine specs, but the `required_time_spine_specs` param is empty. "
             "This indicates internal misconfiguration."
         )
-        smallest_agg_time_grain = min(spec.time_granularity.base_granularity for spec in required_time_spine_specs)
-        time_spine_grains = time_spine_sources.keys()
-        compatible_time_spine_grains = [
-            grain for grain in time_spine_grains if grain.to_int() <= smallest_agg_time_grain.to_int()
-        ]
-        if not compatible_time_spine_grains:
+
+        # Each custom grain can only be satisfied by one time spine.
+        custom_time_spines = TimeSpineSource.build_custom_time_spine_sources(tuple(time_spine_sources.values()))
+        required_time_spines = {
+            custom_time_spines[spec.time_granularity.name]
+            for spec in required_time_spine_specs
+            if spec.time_granularity.is_custom_granularity
+        }
+
+        # Standard grains can be satisfied by any time spine with a base grain that's <= the standard grain.
+        smallest_required_standard_grain = min(
+            spec.time_granularity.base_granularity for spec in required_time_spine_specs
+        )
+        compatible_time_spines_for_standard_grains = {
+            grain: time_spine_source
+            for grain, time_spine_source in time_spine_sources.items()
+            if grain.to_int() <= smallest_required_standard_grain.to_int()
+        }
+        if not compatible_time_spines_for_standard_grains:
             raise RuntimeError(
-                f"This query requires a time spine with granularity {smallest_agg_time_grain.name} or smaller, which is not configured. "
-                f"The smallest available time spine granularity is {min(time_spine_grains).name}, which is too large."
+                f"This query requires a time spine with granularity {smallest_required_standard_grain.name} or smaller, which is not configured. "
+                f"The smallest available time spine granularity is {min(time_spine_sources.keys()).name}, which is too large."
                 "See documentation for how to configure a new time spine: https://docs.getdbt.com/docs/build/metricflow-time-spine"
             )
-        return time_spine_sources[max(compatible_time_spine_grains)]
+
+        # If the standard grains can't be satisfied by the same time spines as the custom grains, add the largest compatible one.
+        if not required_time_spines.intersection(set(compatible_time_spines_for_standard_grains.values())):
+            required_time_spines.add(time_spine_sources[max(compatible_time_spines_for_standard_grains.keys())])
+
+        return tuple(required_time_spines)
