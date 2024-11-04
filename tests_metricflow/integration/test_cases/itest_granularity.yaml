@@ -934,3 +934,30 @@ integration_test:
         ON subq_11.user = subq_14.user AND subq_11.ds__day <= subq_14.ds__day
       ) subq_15
     ) subq_18
+---
+integration_test:
+  name: test_join_to_time_spine_metric_grouped_by_custom_grain
+  description: Test a join to time spine metric with custom grain in group by
+  model: SIMPLE_MODEL
+  metrics: ["bookings_join_to_time_spine"]
+  group_bys: ["metric_time__martian_day"]
+  check_query: |
+    SELECT
+      subq_6.metric_time__martian_day
+      , subq_5.bookings AS bookings_join_to_time_spine
+    FROM (
+      SELECT
+        martian_day AS metric_time__martian_day
+      FROM {{ source_schema }}.mf_time_spine subq_7
+      GROUP BY martian_day
+    ) subq_6
+    LEFT OUTER JOIN (
+      SELECT
+        subq_2.martian_day AS metric_time__martian_day
+        , SUM(1) AS bookings
+      FROM {{ source_schema }}.fct_bookings b
+      LEFT OUTER JOIN {{ source_schema }}.mf_time_spine subq_2
+      ON {{ render_date_trunc("b.ds", TimeGranularity.DAY) }} = subq_2.ds
+      GROUP BY subq_2.martian_day
+    ) subq_5
+    ON subq_6.metric_time__martian_day = subq_5.metric_time__martian_day
