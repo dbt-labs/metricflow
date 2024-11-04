@@ -2,13 +2,13 @@
 -- Order By [] Limit 1
 SELECT
   COALESCE(subq_18.booking__is_instant, subq_24.booking__is_instant) AS booking__is_instant
-  , MAX(subq_18.derived_sharedalias_1a) AS derived_sharedalias_1a
-  , MAX(subq_24.derived_sharedalias_2) AS derived_sharedalias_2
+  , MAX(subq_18.derived_shared_alias_1a) AS derived_shared_alias_1a
+  , MAX(subq_24.derived_shared_alias_2) AS derived_shared_alias_2
 FROM (
   -- Compute Metrics via Expressions
   SELECT
     booking__is_instant
-    , shared_alias - 10 AS derived_sharedalias_1a
+    , shared_alias - 10 AS derived_shared_alias_1a
   FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
@@ -32,7 +32,7 @@ FULL OUTER JOIN (
   -- Compute Metrics via Expressions
   SELECT
     booking__is_instant
-    , shared_alias + 10 AS derived_sharedalias_2
+    , shared_alias + 10 AS derived_shared_alias_2
   FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions

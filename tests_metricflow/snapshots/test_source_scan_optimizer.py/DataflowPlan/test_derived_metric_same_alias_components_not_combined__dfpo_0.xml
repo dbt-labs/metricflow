@@ -8,8 +8,8 @@
             <ComputeMetricsNode>
                 <!-- description = 'Compute Metrics via Expressions' -->
                 <!-- node_id = NodeId(id_str='cm_5') -->
-                <!-- metric_spec =                                                                             -->
-                <!--   MetricSpec(element_name='derived_sharedalias_1a', filter_spec_set=WhereFilterSpecSet()) -->
+                <!-- metric_spec =                                                                              -->
+                <!--   MetricSpec(element_name='derived_shared_alias_1a', filter_spec_set=WhereFilterSpecSet()) -->
                 <ComputeMetricsNode>
                     <!-- description = 'Compute Metrics via Expressions' -->
                     <!-- node_id = NodeId(id_str='cm_4') -->
@@ -45,8 +45,8 @@
             <ComputeMetricsNode>
                 <!-- description = 'Compute Metrics via Expressions' -->
                 <!-- node_id = NodeId(id_str='cm_7') -->
-                <!-- metric_spec =                                                                            -->
-                <!--   MetricSpec(element_name='derived_sharedalias_2', filter_spec_set=WhereFilterSpecSet()) -->
+                <!-- metric_spec =                                                                             -->
+                <!--   MetricSpec(element_name='derived_shared_alias_2', filter_spec_set=WhereFilterSpecSet()) -->
                 <ComputeMetricsNode>
                     <!-- description = 'Compute Metrics via Expressions' -->
                     <!-- node_id = NodeId(id_str='cm_6') -->

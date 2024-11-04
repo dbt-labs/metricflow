@@ -1,19 +1,19 @@
 -- Order By [] Limit 1
 SELECT
   subq_12.booking__is_instant
-  , subq_12.derived_sharedalias_1a
-  , subq_12.derived_sharedalias_2
+  , subq_12.derived_shared_alias_1a
+  , subq_12.derived_shared_alias_2
 FROM (
   -- Combine Aggregated Outputs
   SELECT
     COALESCE(subq_5.booking__is_instant, subq_11.booking__is_instant) AS booking__is_instant
-    , MAX(subq_5.derived_sharedalias_1a) AS derived_sharedalias_1a
-    , MAX(subq_11.derived_sharedalias_2) AS derived_sharedalias_2
+    , MAX(subq_5.derived_shared_alias_1a) AS derived_shared_alias_1a
+    , MAX(subq_11.derived_shared_alias_2) AS derived_shared_alias_2
   FROM (
     -- Compute Metrics via Expressions
     SELECT
       subq_4.booking__is_instant
-      , shared_alias - 10 AS derived_sharedalias_1a
+      , shared_alias - 10 AS derived_shared_alias_1a
     FROM (
       -- Compute Metrics via Expressions
       SELECT
@@ -234,7 +234,7 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       subq_10.booking__is_instant
-      , shared_alias + 10 AS derived_sharedalias_2
+      , shared_alias + 10 AS derived_shared_alias_2
     FROM (
       -- Compute Metrics via Expressions
       SELECT

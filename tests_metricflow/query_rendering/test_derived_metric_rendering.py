@@ -806,9 +806,9 @@ def test_derived_metric_that_defines_the_same_alias_in_different_components(
     sql_client: SqlClient,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
 ) -> None:
-    """Tests querying a cumulative metric which give the same alias to its components."""
+    """Tests querying a derived metric which give the same alias to its components."""
     query_spec = query_parser.parse_and_validate_query(
-        metric_names=("derived_sharedalias_1a", "derived_sharedalias_2"),
+        metric_names=("derived_shared_alias_1a", "derived_shared_alias_2"),
         group_by_names=("booking__is_instant",),
         limit=1,
     ).query_spec

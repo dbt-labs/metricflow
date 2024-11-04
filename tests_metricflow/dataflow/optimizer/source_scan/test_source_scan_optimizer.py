@@ -350,8 +350,8 @@ def test_derived_metric_same_alias_components_combined(
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
             metric_specs=(
-                MetricSpec(element_name="derived_sharedalias_1a"),
-                MetricSpec(element_name="derived_sharedalias_1b"),
+                MetricSpec(element_name="derived_shared_alias_1a"),
+                MetricSpec(element_name="derived_shared_alias_1b"),
             ),
             dimension_specs=(DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),),
         ),
@@ -377,8 +377,8 @@ def test_derived_metric_same_alias_components_not_combined(
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
             metric_specs=(
-                MetricSpec(element_name="derived_sharedalias_1a"),
-                MetricSpec(element_name="derived_sharedalias_2"),
+                MetricSpec(element_name="derived_shared_alias_1a"),
+                MetricSpec(element_name="derived_shared_alias_2"),
             ),
             dimension_specs=(DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),),
         ),
