@@ -1,5 +1,5 @@
 kind: Fixes
-body: Fix `SourceScanOptimizer` generated duplicated columns when querying for 2 derived metrics which define the same alias
+body: Prevent SourceScanOptimizer from combining nodes that use the same input metric alias in different derived metrics
 time: 2024-10-30T20:12:14.516814+01:00
 custom:
     Author: serramatutu
