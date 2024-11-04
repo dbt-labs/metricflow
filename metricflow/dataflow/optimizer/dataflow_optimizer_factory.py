@@ -8,7 +8,6 @@ from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOptimizer
 from metricflow.dataflow.optimizer.predicate_pushdown_optimizer import PredicatePushdownOptimizer
-from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import SourceScanOptimizer
 
 
 class DataflowPlanOptimization(Enum):
@@ -21,13 +20,12 @@ class DataflowPlanOptimization(Enum):
     configurations).
     """
 
-    SOURCE_SCAN = 0
     PREDICATE_PUSHDOWN = 1
 
     @staticmethod
     def all_optimizations() -> FrozenSet[DataflowPlanOptimization]:
         """Convenience method for getting a set of all available optimizations."""
-        return frozenset((DataflowPlanOptimization.SOURCE_SCAN, DataflowPlanOptimization.PREDICATE_PUSHDOWN))
+        return frozenset((DataflowPlanOptimization.PREDICATE_PUSHDOWN,))
 
     @staticmethod
     def enabled_optimizations() -> FrozenSet[DataflowPlanOptimization]:
@@ -35,7 +33,7 @@ class DataflowPlanOptimization(Enum):
 
         Predicate pushdown optimizer is currently disabled.
         """
-        return frozenset((DataflowPlanOptimization.SOURCE_SCAN,))
+        return frozenset()
 
 
 class DataflowPlanOptimizerFactory:
@@ -48,17 +46,15 @@ class DataflowPlanOptimizerFactory:
     def __init__(self, node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver) -> None:
         """Initializer.
 
-        This collects all of the initialization requirements for the optimizers it manages.
+        This collects all initialization requirements for the optimizers that this manages.
         """
         self._node_data_set_resolver = node_data_set_resolver
 
     def get_optimizers(self, optimizations: FrozenSet[DataflowPlanOptimization]) -> Sequence[DataflowPlanOptimizer]:
-        """Initializes and returns a sequence of optimizers matching the input optimization requests."""
+        """Initializes and returns a sequence of optimizers matching the input optimization request."""
         optimizers: List[DataflowPlanOptimizer] = []
         for optimization in sorted(list(optimizations), key=lambda x: x.value):
-            if optimization is DataflowPlanOptimization.SOURCE_SCAN:
-                optimizers.append(SourceScanOptimizer())
-            elif optimization is DataflowPlanOptimization.PREDICATE_PUSHDOWN:
+            if optimization is DataflowPlanOptimization.PREDICATE_PUSHDOWN:
                 optimizers.append(PredicatePushdownOptimizer(self._node_data_set_resolver))
             else:
                 assert_values_exhausted(optimization)
