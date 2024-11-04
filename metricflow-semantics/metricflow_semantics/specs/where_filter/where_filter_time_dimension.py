@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional, Sequence
+from typing import Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.call_parameter_sets import (
     TimeDimensionCallParameterSet,
@@ -69,7 +69,7 @@ class WhereFilterTimeDimensionFactory(ProtocolHint[QueryInterfaceTimeDimensionFa
         spec_resolution_lookup: FilterSpecResolutionLookUp,
         where_filter_location: WhereFilterLocation,
         rendered_spec_tracker: RenderedSpecTracker,
-        custom_granularity_names: Sequence[str],
+        custom_granularity_names: Tuple[str, ...],
     ):
         self._column_association_resolver = column_association_resolver
         self._resolved_spec_lookup = spec_resolution_lookup

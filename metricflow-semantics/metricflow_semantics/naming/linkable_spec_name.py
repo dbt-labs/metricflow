@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from functools import lru_cache
 from typing import Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
@@ -34,6 +35,7 @@ class StructuredLinkableSpecName:
         self.date_part = date_part
 
     @staticmethod
+    @lru_cache
     def from_name(qualified_name: str, custom_granularity_names: Sequence[str]) -> StructuredLinkableSpecName:
         """Construct from a name e.g. listing__ds__month."""
         name_parts = qualified_name.split(DUNDER)
@@ -52,10 +54,13 @@ class StructuredLinkableSpecName:
         for granularity in TimeGranularity:
             if name_parts[-1] == granularity.value:
                 associated_granularity = granularity.value
+                break
 
-        for custom_grain in custom_granularity_names:
-            if name_parts[-1] == custom_grain:
-                associated_granularity = custom_grain
+        if associated_granularity is None:
+            for custom_grain in custom_granularity_names:
+                if name_parts[-1] == custom_grain:
+                    associated_granularity = custom_grain
+                    break
 
         # Has a time granularity
         if associated_granularity:

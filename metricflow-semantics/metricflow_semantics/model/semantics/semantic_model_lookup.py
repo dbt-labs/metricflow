@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import logging
-from typing import Dict, List, Optional, Sequence, Set
+from functools import cached_property
+from typing import Dict, List, Optional, Sequence, Set, Tuple
 
 from dbt_semantic_interfaces.protocols.dimension import Dimension
 from dbt_semantic_interfaces.protocols.entity import Entity
@@ -75,10 +76,10 @@ class SemanticModelLookup:
         self._measure_lookup = MeasureLookup(sorted_semantic_models, custom_granularities)
         self._dimension_lookup = DimensionLookup(sorted_semantic_models)
 
-    @property
-    def custom_granularity_names(self) -> Sequence[str]:
+    @cached_property
+    def custom_granularity_names(self) -> Tuple[str, ...]:
         """Returns all the custom_granularity names."""
-        return list(self._custom_granularities.keys())
+        return tuple(self._custom_granularities.keys())
 
     def get_dimension_references(self) -> Sequence[DimensionReference]:
         """Retrieve all dimension references from the collection of semantic models."""
