@@ -822,7 +822,7 @@ def test_reducing_join_statement(
     mf_test_configuration: MetricFlowTestConfiguration,
     reducing_join_statement: SqlSelectStatementNode,
 ) -> None:
-    """Tests a case where a join query should not reduced an aggregate."""
+    """Tests a case where a join query should not reduce an aggregate."""
     assert_default_rendered_sql_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
