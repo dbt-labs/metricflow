@@ -38,7 +38,7 @@ from metricflow.dataflow.nodes.window_reaggregation_node import WindowReaggregat
 from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOptimizer
-from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import OptimizeBranchResult
+from metricflow.dataflow.optimizer.optimize_branch_result import OptimizeBranchResult
 from metricflow.plan_conversion.node_processor import PredicateInputType, PredicatePushdownState
 
 logger = logging.getLogger(__name__)
