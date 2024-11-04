@@ -190,7 +190,7 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
         from_render_result = self._render_node(from_source)
 
         from_section_lines = []
-        if from_source.is_table:
+        if from_source.as_sql_table_node is not None:
             from_section_lines.append(f"FROM {from_render_result.sql} {from_source_alias}")
         else:
             from_section_lines.append("FROM (")
@@ -228,7 +228,7 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
                 on_condition_rendered = self.EXPR_RENDERER.render_sql_expr(join_description.on_condition)
                 params = params.merge(on_condition_rendered.bind_parameter_set)
 
-            if join_description.right_source.is_table:
+            if join_description.right_source.as_sql_table_node is not None:
                 join_section_lines.append(join_description.join_type.value)
                 join_section_lines.append(
                     textwrap.indent(
