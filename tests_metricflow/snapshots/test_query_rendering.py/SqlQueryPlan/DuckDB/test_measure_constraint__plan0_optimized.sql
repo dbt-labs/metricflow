@@ -5,47 +5,71 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_41.metric_time__day, subq_46.metric_time__day) AS metric_time__day
+    COALESCE(subq_41.metric_time__day, subq_53.metric_time__day, subq_58.metric_time__day) AS metric_time__day
     , MAX(subq_41.average_booking_value) AS average_booking_value
-    , MAX(subq_41.bookings) AS bookings
-    , MAX(subq_46.booking_value) AS booking_value
+    , MAX(subq_53.bookings) AS bookings
+    , MAX(subq_58.booking_value) AS booking_value
   FROM (
     -- Constrain Output with WHERE
-    -- Pass Only Elements: ['average_booking_value', 'bookings', 'metric_time__day']
+    -- Pass Only Elements: ['average_booking_value', 'metric_time__day']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
       metric_time__day
       , AVG(average_booking_value) AS average_booking_value
-      , SUM(bookings) AS bookings
     FROM (
       -- Join Standard Outputs
-      -- Pass Only Elements: ['average_booking_value', 'bookings', 'listing__is_lux_latest', 'metric_time__day']
+      -- Pass Only Elements: ['average_booking_value', 'listing__is_lux_latest', 'metric_time__day']
       SELECT
-        subq_32.metric_time__day AS metric_time__day
+        DATE_TRUNC('day', bookings_source_src_28000.ds) AS metric_time__day
         , listings_latest_src_28000.is_lux AS listing__is_lux_latest
-        , subq_32.bookings AS bookings
-        , subq_32.average_booking_value AS average_booking_value
-      FROM (
-        -- Read Elements From Semantic Model 'bookings_source'
-        -- Metric Time Dimension 'ds'
-        -- Pass Only Elements: ['average_booking_value', 'bookings', 'metric_time__day', 'listing']
-        SELECT
-          DATE_TRUNC('day', ds) AS metric_time__day
-          , listing_id AS listing
-          , 1 AS bookings
-          , booking_value AS average_booking_value
-        FROM ***************************.fct_bookings bookings_source_src_28000
-      ) subq_32
+        , bookings_source_src_28000.booking_value AS average_booking_value
+      FROM ***************************.fct_bookings bookings_source_src_28000
       LEFT OUTER JOIN
         ***************************.dim_listings_latest listings_latest_src_28000
       ON
-        subq_32.listing = listings_latest_src_28000.listing_id
+        bookings_source_src_28000.listing_id = listings_latest_src_28000.listing_id
     ) subq_37
     WHERE listing__is_lux_latest
     GROUP BY
       metric_time__day
   ) subq_41
+  FULL OUTER JOIN (
+    -- Constrain Output with WHERE
+    -- Pass Only Elements: ['bookings', 'metric_time__day']
+    -- Aggregate Measures
+    -- Compute Metrics via Expressions
+    SELECT
+      metric_time__day
+      , SUM(bookings) AS bookings
+    FROM (
+      -- Join Standard Outputs
+      -- Pass Only Elements: ['bookings', 'listing__is_lux_latest', 'metric_time__day']
+      SELECT
+        subq_44.metric_time__day AS metric_time__day
+        , listings_latest_src_28000.is_lux AS listing__is_lux_latest
+        , subq_44.bookings AS bookings
+      FROM (
+        -- Read Elements From Semantic Model 'bookings_source'
+        -- Metric Time Dimension 'ds'
+        -- Pass Only Elements: ['bookings', 'metric_time__day', 'listing']
+        SELECT
+          DATE_TRUNC('day', ds) AS metric_time__day
+          , listing_id AS listing
+          , 1 AS bookings
+        FROM ***************************.fct_bookings bookings_source_src_28000
+      ) subq_44
+      LEFT OUTER JOIN
+        ***************************.dim_listings_latest listings_latest_src_28000
+      ON
+        subq_44.listing = listings_latest_src_28000.listing_id
+    ) subq_49
+    WHERE listing__is_lux_latest
+    GROUP BY
+      metric_time__day
+  ) subq_53
+  ON
+    subq_41.metric_time__day = subq_53.metric_time__day
   FULL OUTER JOIN (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
@@ -58,9 +82,9 @@ FROM (
     FROM ***************************.fct_bookings bookings_source_src_28000
     GROUP BY
       DATE_TRUNC('day', ds)
-  ) subq_46
+  ) subq_58
   ON
-    subq_41.metric_time__day = subq_46.metric_time__day
+    COALESCE(subq_41.metric_time__day, subq_53.metric_time__day) = subq_58.metric_time__day
   GROUP BY
-    COALESCE(subq_41.metric_time__day, subq_46.metric_time__day)
-) subq_47
+    COALESCE(subq_41.metric_time__day, subq_53.metric_time__day, subq_58.metric_time__day)
+) subq_59
