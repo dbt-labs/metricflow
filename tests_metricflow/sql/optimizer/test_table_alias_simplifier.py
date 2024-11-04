@@ -145,7 +145,7 @@ def test_table_alias_simplification(
     mf_test_configuration: MetricFlowTestConfiguration,
     base_select_statement: SqlSelectStatementNode,
 ) -> None:
-    """Tests a case where no pruning should occur."""
+    """Tests that table aliases are removed when not needed."""
     assert_default_rendered_sql_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
