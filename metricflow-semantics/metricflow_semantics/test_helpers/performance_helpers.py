@@ -61,12 +61,113 @@ class ContextReport(FrozenBaseModel):
             wall_ns_max=int(max(c.total_wall_ns for c in calls)),
         )
 
+    def compare(self, other: ContextReport) -> ContextReportComparison:
+        """Compare this report with other."""
+        assert self.context_id == other.context_id, "Cannot compare unrelated contexts."
+
+        calculated_keys = (
+            "cpu_ns_average",
+            "cpu_ns_median",
+            "cpu_ns_max",
+            "wall_ns_average",
+            "wall_ns_median",
+            "wall_ns_max",
+        )
+
+        kwargs = {}
+        max_pct_change = float("-inf")
+        for key in calculated_keys:
+            self_val = getattr(self, key)
+            other_val = getattr(other, key)
+
+            diff = self_val - other_val
+            kwargs[f"{key}_abs"] = diff
+
+            pct = diff / self_val
+            kwargs[f"{key}_pct"] = pct
+            if pct > max_pct_change:
+                max_pct_change = pct
+
+        return ContextReportComparison(
+            context_id=self.context_id,
+            a=self,
+            b=other,
+            max_pct_change=max_pct_change,
+            **kwargs,
+        )
+
+
+class ContextReportComparison(FrozenBaseModel):
+    """A comparison between two context reports."""
+
+    context_id: str
+
+    a: ContextReport
+    b: ContextReport
+
+    max_pct_change: float
+
+    cpu_ns_average_abs: int
+    cpu_ns_average_pct: float
+    cpu_ns_median_abs: int
+    cpu_ns_median_pct: float
+    cpu_ns_max_abs: int
+    cpu_ns_max_pct: float
+
+    wall_ns_average_abs: int
+    wall_ns_average_pct: float
+    wall_ns_median_abs: int
+    wall_ns_median_pct: float
+    wall_ns_max_abs: int
+    wall_ns_max_pct: float
+
 
 class SessionReport(FrozenBaseModel):
     """A performance report containing aggregated runtime statistics from a session."""
 
     session_id: str
     contexts: Dict[str, ContextReport]
+
+    def compare(self, other: SessionReport) -> SessionReportComparison:
+        """Compare this report with other."""
+        assert self.session_id == other.session_id, "Cannot compare unrelated sessions."
+
+        self_contexts = set(self.contexts.keys())
+        other_contexts = set(other.contexts.keys())
+        all_contexts = self_contexts.union(other_contexts)
+
+        comparisons: Dict[str, Optional[ContextReportComparison]] = {}
+        max_pct_change = float("-inf")
+        for context in all_contexts:
+            if context not in self.contexts or context not in other.contexts:
+                comparisons[context] = None
+            else:
+                comp = self.contexts[context].compare(other.contexts[context])
+                comparisons[context] = comp
+                if comp.max_pct_change > max_pct_change:
+                    max_pct_change = comp.max_pct_change
+
+        return SessionReportComparison(
+            session_id=self.session_id,
+            a=self.contexts,
+            b=other.contexts,
+            contexts=comparisons,
+            max_pct_change=max_pct_change,
+        )
+
+
+class SessionReportComparison(FrozenBaseModel):
+    """A comparison between two session reports.
+
+    If a context is not present in A or B, the absolute and pct values will be None for
+    that entry.
+    """
+
+    session_id: str
+    a: Dict[str, ContextReport]
+    b: Dict[str, ContextReport]
+    contexts: Dict[str, Optional[ContextReportComparison]]
+    max_pct_change: float
 
 
 class SessionReportSet(FrozenBaseModel):
@@ -77,6 +178,43 @@ class SessionReportSet(FrozenBaseModel):
     def add_report(self, report: SessionReport) -> None:
         """Add a report and associate it with the session ID."""
         self.sessions[report.session_id] = report
+
+    def compare(self, other: SessionReportSet) -> SessionReportSetComparison:
+        """Compare this report set with other."""
+        self_sessions = set(self.sessions.keys())
+        other_sessions = set(other.sessions.keys())
+        all_sessions = self_sessions.union(other_sessions)
+
+        comparison: Dict[str, Optional[SessionReportComparison]] = {}
+        max_pct_change = float("-inf")
+        max_pct_change_session = ""
+        for session in all_sessions:
+            if session not in self.sessions or session not in other.sessions:
+                comparison[session] = None
+            else:
+                comp = self.sessions[session].compare(other.sessions[session])
+                comparison[session] = comp
+                if comp.max_pct_change > max_pct_change:
+                    max_pct_change = comp.max_pct_change
+                    max_pct_change_session = session
+
+        return SessionReportSetComparison(
+            sessions=comparison,
+            max_pct_change=max_pct_change,
+            max_pct_change_session=max_pct_change_session,
+        )
+
+
+class SessionReportSetComparison(FrozenBaseModel):
+    """A comparison between two session report sets.
+
+    If a session ID is not present in A or B, the comparison is None
+    """
+
+    sessions: Dict[str, Optional[SessionReportComparison]]
+
+    max_pct_change: float
+    max_pct_change_session: str
 
 
 class PerformanceTracker:

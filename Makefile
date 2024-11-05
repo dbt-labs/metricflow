@@ -7,10 +7,13 @@ PARALLELISM = auto
 # Additional command line options to pass to pytest.
 ADDITIONAL_PYTEST_OPTIONS =
 
+PERFORMANCE_OUTPUT_FILE = performance-report.json
+PERFORMANCE_COMPARISON_OUTPUT_FILE = performance-comparison.md
+TESTS_PERFORMANCE = tests_metricflow/performance
+
 # Pytest that can populate the persistent source schema
 USE_PERSISTENT_SOURCE_SCHEMA = --use-persistent-source-schema
 TESTS_METRICFLOW = tests_metricflow
-TESTS_PERFORMANCE = tests_metricflow/performance
 TESTS_METRICFLOW_SEMANTICS = tests_metricflow_semantics
 POPULATE_PERSISTENT_SOURCE_SCHEMA = $(TESTS_METRICFLOW)/source_schema_tools.py::populate_source_schema
 
@@ -21,7 +24,11 @@ install-hatch:
 
 .PHONY: perf
 perf:
-	hatch -v run dev-env:pytest -vv -n 1 $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_PERFORMANCE)/
+	hatch -v run dev-env:pytest -vv -n 1 $(ADDITIONAL_PYTEST_OPTIONS) --output-json $(PERFORMANCE_OUTPUT_FILE) $(TESTS_PERFORMANCE)/
+
+.PHONY: perf-compare
+perf-compare:
+	hatch -v run dev-env:python $(TESTS_PERFORMANCE)/compare_reports.py $A $B $(PERFORMANCE_COMPARISON_OUTPUT_FILE)
 
 # Testing and linting
 .PHONY: test

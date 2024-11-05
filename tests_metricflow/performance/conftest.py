@@ -25,6 +25,22 @@ ANCHOR = DirectoryPathAnchor()
 GLOBAL_TRACKING_CONTEXT = "global"
 
 
+def pytest_addoption(parser: pytest.Parser) -> None:
+    """Add option for performance report file."""
+    parser.addoption(
+        "--output-json",
+        action="store",
+        default="performance-report.json",
+        help="where to store performance results as JSON",
+    )
+
+
+@pytest.fixture(scope="session")
+def perf_output_json(request: pytest.FixtureRequest) -> str:
+    """The output json for the performance test."""
+    return request.config.getoption("--output-json")  # type: ignore
+
+
 @pytest.fixture(scope="session")
 def perf_tracker() -> PerformanceTracker:
     """Instrument MetricFlow with performance tracking utilities."""
@@ -44,7 +60,10 @@ class MeasureFixture(Protocol):  # noqa: D101
 
 
 @pytest.fixture(scope="session")
-def measure_compilation_performance(perf_tracker: PerformanceTracker) -> Iterator[MeasureFixture]:
+def measure_compilation_performance(
+    perf_tracker: PerformanceTracker,
+    perf_output_json: str,
+) -> Iterator[MeasureFixture]:
     """Fixture that returns a function which measures compilation performance for a given query."""
 
     def _measure(
@@ -83,4 +102,5 @@ def measure_compilation_performance(perf_tracker: PerformanceTracker) -> Iterato
 
     report_set = perf_tracker.get_report_set()
 
-    print(report_set.to_pretty_json())
+    with open(perf_output_json, "w") as f:
+        f.write(report_set.to_pretty_json())

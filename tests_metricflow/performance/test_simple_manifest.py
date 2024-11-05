@@ -36,7 +36,6 @@ def test_simple_query(
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
     )
-    assert False
 
 
 def test_simple_query_2(
@@ -63,4 +62,3 @@ def test_simple_query_2(
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
     )
-    assert False
