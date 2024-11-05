@@ -79,6 +79,7 @@ class Dimension:
     qualified_name: str
     description: Optional[str]
     type: DimensionType
+    entity_links: Tuple[EntityReference, ...]
     type_params: Optional[DimensionTypeParams]
     metadata: Optional[Metadata]
     is_partition: bool = False
@@ -87,7 +88,9 @@ class Dimension:
 
     @classmethod
     def from_pydantic(
-        cls, pydantic_dimension: SemanticManifestDimension, entity_links: Tuple[EntityReference, ...]
+        cls,
+        pydantic_dimension: SemanticManifestDimension,
+        entity_links: Tuple[EntityReference, ...],
     ) -> Dimension:
         """Build from pydantic Dimension and entity_key."""
         qualified_name = DimensionSpec(element_name=pydantic_dimension.name, entity_links=entity_links).qualified_name
@@ -107,6 +110,7 @@ class Dimension:
             is_partition=pydantic_dimension.is_partition,
             expr=pydantic_dimension.expr,
             label=pydantic_dimension.label,
+            entity_links=entity_links,
         )
 
     @property
@@ -120,7 +124,9 @@ class Dimension:
         Dimension set has de-duplicated TimeDimensions such that you never have more than one granularity
         in your set for each TimeDimension.
         """
-        return StructuredLinkableSpecName.from_name(qualified_name=self.qualified_name).granularity_free_qualified_name
+        return StructuredLinkableSpecName(
+            entity_link_names=tuple(e.element_name for e in self.entity_links), element_name=self.name
+        ).qualified_name
 
 
 @dataclass(frozen=True)

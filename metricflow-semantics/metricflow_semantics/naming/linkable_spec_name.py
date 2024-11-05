@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional, Tuple
+from functools import lru_cache
+from typing import Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
@@ -34,7 +35,8 @@ class StructuredLinkableSpecName:
         self.date_part = date_part
 
     @staticmethod
-    def from_name(qualified_name: str) -> StructuredLinkableSpecName:
+    @lru_cache
+    def from_name(qualified_name: str, custom_granularity_names: Sequence[str]) -> StructuredLinkableSpecName:
         """Construct from a name e.g. listing__ds__month."""
         name_parts = qualified_name.split(DUNDER)
 
@@ -48,24 +50,30 @@ class StructuredLinkableSpecName:
                     "Dunder syntax not supported for querying date_part. Use `group_by` object syntax instead."
                 )
 
-        associated_granularity = None
-        # TODO: [custom granularity] Update parsing to account for custom granularities
+        associated_granularity: Optional[str] = None
         for granularity in TimeGranularity:
             if name_parts[-1] == granularity.value:
-                associated_granularity = granularity
+                associated_granularity = granularity.value
+                break
+
+        if associated_granularity is None:
+            for custom_grain in custom_granularity_names:
+                if name_parts[-1] == custom_grain:
+                    associated_granularity = custom_grain
+                    break
 
         # Has a time granularity
         if associated_granularity:
             #  e.g. "ds__month"
             if len(name_parts) == 2:
                 return StructuredLinkableSpecName(
-                    entity_link_names=(), element_name=name_parts[0], time_granularity_name=associated_granularity.value
+                    entity_link_names=(), element_name=name_parts[0], time_granularity_name=associated_granularity
                 )
             # e.g. "messages__ds__month"
             return StructuredLinkableSpecName(
                 entity_link_names=tuple(name_parts[:-2]),
                 element_name=name_parts[-2],
-                time_granularity_name=associated_granularity.value,
+                time_granularity_name=associated_granularity,
             )
 
         # e.g. "messages__ds"

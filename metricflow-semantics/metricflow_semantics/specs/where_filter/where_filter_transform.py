@@ -8,6 +8,7 @@ import jinja2
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
 from dbt_semantic_interfaces.protocols import WhereFilter, WhereFilterIntersection
 
+from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
     FilterSpecResolutionLookUp,
@@ -36,9 +37,11 @@ class WhereSpecFactory:
         self,
         column_association_resolver: ColumnAssociationResolver,
         spec_resolution_lookup: FilterSpecResolutionLookUp,
+        semantic_model_lookup: SemanticModelLookup,
     ) -> None:
         self._column_association_resolver = column_association_resolver
         self._spec_resolution_lookup = spec_resolution_lookup
+        self._semantic_model_lookup = semantic_model_lookup
 
     def create_from_where_filter(  # noqa: D102
         self,
@@ -73,6 +76,7 @@ class WhereSpecFactory:
                 spec_resolution_lookup=self._spec_resolution_lookup,
                 where_filter_location=filter_location,
                 rendered_spec_tracker=rendered_spec_tracker,
+                custom_granularity_names=self._semantic_model_lookup.custom_granularity_names,
             )
             entity_factory = WhereFilterEntityFactory(
                 column_association_resolver=self._column_association_resolver,

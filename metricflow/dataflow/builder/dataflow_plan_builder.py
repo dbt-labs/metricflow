@@ -165,6 +165,7 @@ class DataflowPlanBuilder:
         filter_spec_factory = WhereSpecFactory(
             column_association_resolver=self._column_association_resolver,
             spec_resolution_lookup=query_spec.filter_spec_resolution_lookup,
+            semantic_model_lookup=self._semantic_model_lookup,
         )
 
         query_level_filter_specs = tuple(
@@ -409,7 +410,9 @@ class DataflowPlanBuilder:
             queried_linkable_specs=queried_linkable_specs,
         )
         # TODO: [custom granularity] change this to an assertion once we're sure there aren't exceptions
-        if not StructuredLinkableSpecName.from_name(conversion_type_params.entity).is_element_name:
+        if not StructuredLinkableSpecName.from_name(
+            qualified_name=conversion_type_params.entity, custom_granularity_names=()
+        ).is_element_name:
             logger.warning(
                 LazyFormat(
                     lambda: f"Found additional annotations in type param entity name `{conversion_type_params.entity}`, which "
@@ -806,6 +809,7 @@ class DataflowPlanBuilder:
                 column_association_resolver=self._column_association_resolver,
                 spec_resolution_lookup=query_spec.filter_spec_resolution_lookup
                 or FilterSpecResolutionLookUp.empty_instance(),
+                semantic_model_lookup=self._semantic_model_lookup,
             )
 
             query_level_filter_specs = filter_spec_factory.create_from_where_filter_intersection(

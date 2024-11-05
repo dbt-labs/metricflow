@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import logging
-from typing import Dict, List, Optional, Sequence, Set
+from functools import cached_property
+from typing import Dict, List, Optional, Sequence, Set, Tuple
 
 from dbt_semantic_interfaces.protocols.dimension import Dimension
 from dbt_semantic_interfaces.protocols.entity import Entity
@@ -74,6 +75,11 @@ class SemanticModelLookup:
 
         self._measure_lookup = MeasureLookup(sorted_semantic_models, custom_granularities)
         self._dimension_lookup = DimensionLookup(sorted_semantic_models)
+
+    @cached_property
+    def custom_granularity_names(self) -> Tuple[str, ...]:
+        """Returns all the custom_granularity names."""
+        return tuple(self._custom_granularities.keys())
 
     def get_dimension_references(self) -> Sequence[DimensionReference]:
         """Retrieve all dimension references from the collection of semantic models."""
@@ -224,7 +230,9 @@ class SemanticModelLookup:
             semantic_models_for_dimension = self._dimension_index.get(dim.reference, []) + [semantic_model]
             self._dimension_index[dim.reference] = semantic_models_for_dimension
 
-            if not StructuredLinkableSpecName.from_name(dim.name).is_element_name:
+            if not StructuredLinkableSpecName.from_name(
+                qualified_name=dim.name, custom_granularity_names=self.custom_granularity_names
+            ).is_element_name:
                 # TODO: [custom granularity] change this to an assertion once we're sure there aren't exceptions
                 logger.warning(
                     LazyFormat(

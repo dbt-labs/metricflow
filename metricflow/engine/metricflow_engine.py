@@ -629,6 +629,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                                     else None
                                 ),
                             ).qualified_name,
+                            entity_links=(),
                             description="Event time for metrics.",
                             metadata=None,
                             type_params=PydanticDimensionTypeParams(

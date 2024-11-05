@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional, Sequence
+from typing import Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.call_parameter_sets import (
     TimeDimensionCallParameterSet,
@@ -69,11 +69,13 @@ class WhereFilterTimeDimensionFactory(ProtocolHint[QueryInterfaceTimeDimensionFa
         spec_resolution_lookup: FilterSpecResolutionLookUp,
         where_filter_location: WhereFilterLocation,
         rendered_spec_tracker: RenderedSpecTracker,
+        custom_granularity_names: Tuple[str, ...],
     ):
         self._column_association_resolver = column_association_resolver
         self._resolved_spec_lookup = spec_resolution_lookup
         self._where_filter_location = where_filter_location
         self._rendered_spec_tracker = rendered_spec_tracker
+        self._custom_granularity_names = custom_granularity_names
 
     def create(
         self,
@@ -90,7 +92,9 @@ class WhereFilterTimeDimensionFactory(ProtocolHint[QueryInterfaceTimeDimensionFa
             )
 
         time_granularity_name = time_granularity_name.lower() if time_granularity_name else None
-        structured_name = StructuredLinkableSpecName.from_name(time_dimension_name.lower())
+        structured_name = StructuredLinkableSpecName.from_name(
+            qualified_name=time_dimension_name.lower(), custom_granularity_names=self._custom_granularity_names
+        )
 
         if (
             structured_name.time_granularity_name

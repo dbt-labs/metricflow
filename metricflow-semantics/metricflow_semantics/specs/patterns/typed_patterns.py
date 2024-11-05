@@ -160,7 +160,10 @@ class GroupByMetricPattern(EntityLinkPattern):
                 "This should have been caught by validations."
             )
         group_by = metric_call_parameter_set.group_by[0]
-        structured_name = StructuredLinkableSpecName.from_name(group_by.element_name)
+        # custom_granularity_names is empty because we are not parsing any dimensions here with grain
+        structured_name = StructuredLinkableSpecName.from_name(
+            qualified_name=group_by.element_name, custom_granularity_names=()
+        )
         metric_subquery_entity_links = tuple(
             EntityReference(entity_name)
             for entity_name in (structured_name.entity_link_names + (structured_name.element_name,))
