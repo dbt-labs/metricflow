@@ -136,15 +136,15 @@ class TimeSpineSource:
             for grain, time_spine_source in time_spine_sources.items()
             if grain.to_int() <= smallest_required_standard_grain.to_int()
         }
-        if not compatible_time_spines_for_standard_grains:
+        if len(compatible_time_spines_for_standard_grains) == 0:
             raise RuntimeError(
                 f"This query requires a time spine with granularity {smallest_required_standard_grain.name} or smaller, which is not configured. "
-                f"The smallest available time spine granularity is {min(time_spine_sources.keys()).name}, which is too large."
+                f"The smallest available time spine granularity is {min(time_spine_sources).name}, which is too large."
                 "See documentation for how to configure a new time spine: https://docs.getdbt.com/docs/build/metricflow-time-spine"
             )
 
         # If the standard grains can't be satisfied by the same time spines as the custom grains, add the largest compatible one.
         if not required_time_spines.intersection(set(compatible_time_spines_for_standard_grains.values())):
-            required_time_spines.add(time_spine_sources[max(compatible_time_spines_for_standard_grains.keys())])
+            required_time_spines.add(time_spine_sources[max(compatible_time_spines_for_standard_grains)])
 
         return tuple(required_time_spines)
