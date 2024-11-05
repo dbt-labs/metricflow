@@ -559,8 +559,7 @@ class SemanticModelToDataSetConverter:
             time_dimension_instances.append(custom_time_dimension_instance)
             custom_select_column = SqlSelectColumn(
                 expr=SemanticModelToDataSetConverter._make_element_sql_expr(
-                    table_alias=from_source_alias,
-                    element_name=custom_granularity.column_name or custom_granularity.name,
+                    table_alias=from_source_alias, element_name=custom_granularity.parsed_column_name
                 ),
                 column_alias=custom_time_dimension_instance.associated_column.column_name,
             )

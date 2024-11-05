@@ -1,0 +1,6 @@
+kind: Features
+body: Basic support for join_to_timespine metrics with custom grain in the group by.
+time: 2024-11-04T19:35:31.185372-08:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1505"
