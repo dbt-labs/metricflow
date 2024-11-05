@@ -10,6 +10,7 @@ ADDITIONAL_PYTEST_OPTIONS =
 # Pytest that can populate the persistent source schema
 USE_PERSISTENT_SOURCE_SCHEMA = --use-persistent-source-schema
 TESTS_METRICFLOW = tests_metricflow
+TESTS_PERFORMANCE = tests_metricflow/performance
 TESTS_METRICFLOW_SEMANTICS = tests_metricflow_semantics
 POPULATE_PERSISTENT_SOURCE_SCHEMA = $(TESTS_METRICFLOW)/source_schema_tools.py::populate_source_schema
 
@@ -17,6 +18,10 @@ POPULATE_PERSISTENT_SOURCE_SCHEMA = $(TESTS_METRICFLOW)/source_schema_tools.py::
 .PHONY: install-hatch
 install-hatch:
 	pip3 install hatch
+
+.PHONY: perf
+perf:
+	hatch -v run dev-env:pytest -vv -n 1 $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_PERFORMANCE)/
 
 # Testing and linting
 .PHONY: test
