@@ -12,8 +12,8 @@ FROM (
   FROM (
     -- Join Standard Outputs
     SELECT
-      subq_1.listing AS listing
-      , subq_3.country_latest AS listing__country_latest
+      subq_3.country_latest AS listing__country_latest
+      , subq_1.listing AS listing
       , subq_1.booking_value AS booking_value
     FROM (
       -- Pass Only Elements: ['booking_value', 'listing']

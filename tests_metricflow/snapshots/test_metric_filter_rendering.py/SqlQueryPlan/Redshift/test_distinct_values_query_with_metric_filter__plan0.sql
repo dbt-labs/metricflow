@@ -11,10 +11,10 @@ FROM (
   FROM (
     -- Join Standard Outputs
     SELECT
-      subq_0.listing AS listing
+      subq_6.listing__bookings AS listing__bookings
+      , subq_0.listing AS listing
       , subq_0.lux_listing AS lux_listing
       , subq_0.listing__lux_listing AS listing__lux_listing
-      , subq_6.listing__bookings AS listing__bookings
     FROM (
       -- Read Elements From Semantic Model 'lux_listing_mapping'
       SELECT

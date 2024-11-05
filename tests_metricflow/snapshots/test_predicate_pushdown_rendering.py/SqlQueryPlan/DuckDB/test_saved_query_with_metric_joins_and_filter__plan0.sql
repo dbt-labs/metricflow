@@ -36,10 +36,10 @@ FROM (
           FROM (
             -- Join Standard Outputs
             SELECT
-              subq_2.metric_time__day AS metric_time__day
-              , subq_2.listing AS listing
-              , subq_5.is_lux_latest AS listing__is_lux_latest
+              subq_5.is_lux_latest AS listing__is_lux_latest
               , subq_5.capacity_latest AS listing__capacity_latest
+              , subq_2.metric_time__day AS metric_time__day
+              , subq_2.listing AS listing
               , subq_2.bookings AS bookings
             FROM (
               -- Pass Only Elements: ['bookings', 'metric_time__day', 'listing']
@@ -425,10 +425,10 @@ FULL OUTER JOIN (
           FROM (
             -- Join Standard Outputs
             SELECT
-              subq_14.metric_time__day AS metric_time__day
-              , subq_14.listing AS listing
-              , subq_17.is_lux_latest AS listing__is_lux_latest
+              subq_17.is_lux_latest AS listing__is_lux_latest
               , subq_17.capacity_latest AS listing__capacity_latest
+              , subq_14.metric_time__day AS metric_time__day
+              , subq_14.listing AS listing
               , subq_14.views AS views
             FROM (
               -- Pass Only Elements: ['views', 'metric_time__day', 'listing']
@@ -750,10 +750,10 @@ FULL OUTER JOIN (
               FROM (
                 -- Join Standard Outputs
                 SELECT
-                  subq_26.metric_time__day AS metric_time__day
-                  , subq_26.listing AS listing
-                  , subq_29.is_lux_latest AS listing__is_lux_latest
+                  subq_29.is_lux_latest AS listing__is_lux_latest
                   , subq_29.capacity_latest AS listing__capacity_latest
+                  , subq_26.metric_time__day AS metric_time__day
+                  , subq_26.listing AS listing
                   , subq_26.bookings AS bookings
                 FROM (
                   -- Pass Only Elements: ['bookings', 'metric_time__day', 'listing']
@@ -1139,10 +1139,10 @@ FULL OUTER JOIN (
               FROM (
                 -- Join Standard Outputs
                 SELECT
-                  subq_38.metric_time__day AS metric_time__day
-                  , subq_38.listing AS listing
-                  , subq_41.is_lux_latest AS listing__is_lux_latest
+                  subq_41.is_lux_latest AS listing__is_lux_latest
                   , subq_41.capacity_latest AS listing__capacity_latest
+                  , subq_38.metric_time__day AS metric_time__day
+                  , subq_38.listing AS listing
                   , subq_38.views AS views
                 FROM (
                   -- Pass Only Elements: ['views', 'metric_time__day', 'listing']

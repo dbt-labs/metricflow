@@ -22,9 +22,9 @@ FROM (
         FROM (
           -- Join Standard Outputs
           SELECT
-            subq_2.customer_third_hop_id AS customer_third_hop_id
-            , subq_17.account_id__customer_id__customer_third_hop_id AS customer_third_hop_id__account_id__customer_id__customer_third_hop_id
+            subq_17.account_id__customer_id__customer_third_hop_id AS customer_third_hop_id__account_id__customer_id__customer_third_hop_id
             , subq_17.account_id__customer_id__customer_third_hop_id__txn_count AS customer_third_hop_id__account_id__customer_id__customer_third_hop_id__txn_count
+            , subq_2.customer_third_hop_id AS customer_third_hop_id
             , subq_2.third_hop_count AS third_hop_count
           FROM (
             -- Pass Only Elements: ['third_hop_count', 'customer_third_hop_id']
@@ -127,10 +127,10 @@ FROM (
                   FROM (
                     -- Join Standard Outputs
                     SELECT
-                      subq_5.ds_partitioned__day AS ds_partitioned__day
-                      , subq_12.ds_partitioned__day AS account_id__ds_partitioned__day
-                      , subq_5.account_id AS account_id
+                      subq_12.ds_partitioned__day AS account_id__ds_partitioned__day
                       , subq_12.customer_id__customer_third_hop_id AS account_id__customer_id__customer_third_hop_id
+                      , subq_5.ds_partitioned__day AS ds_partitioned__day
+                      , subq_5.account_id AS account_id
                       , subq_5.txn_count AS txn_count
                     FROM (
                       -- Pass Only Elements: ['txn_count', 'ds_partitioned__day', 'account_id']
@@ -264,7 +264,44 @@ FROM (
                       FROM (
                         -- Join Standard Outputs
                         SELECT
-                          subq_7.ds_partitioned__day AS ds_partitioned__day
+                          subq_10.country AS customer_id__country
+                          , subq_10.customer_third_hop_id__country AS customer_id__customer_third_hop_id__country
+                          , subq_10.acquired_ds__day AS customer_id__acquired_ds__day
+                          , subq_10.acquired_ds__week AS customer_id__acquired_ds__week
+                          , subq_10.acquired_ds__month AS customer_id__acquired_ds__month
+                          , subq_10.acquired_ds__quarter AS customer_id__acquired_ds__quarter
+                          , subq_10.acquired_ds__year AS customer_id__acquired_ds__year
+                          , subq_10.acquired_ds__extract_year AS customer_id__acquired_ds__extract_year
+                          , subq_10.acquired_ds__extract_quarter AS customer_id__acquired_ds__extract_quarter
+                          , subq_10.acquired_ds__extract_month AS customer_id__acquired_ds__extract_month
+                          , subq_10.acquired_ds__extract_day AS customer_id__acquired_ds__extract_day
+                          , subq_10.acquired_ds__extract_dow AS customer_id__acquired_ds__extract_dow
+                          , subq_10.acquired_ds__extract_doy AS customer_id__acquired_ds__extract_doy
+                          , subq_10.customer_third_hop_id__acquired_ds__day AS customer_id__customer_third_hop_id__acquired_ds__day
+                          , subq_10.customer_third_hop_id__acquired_ds__week AS customer_id__customer_third_hop_id__acquired_ds__week
+                          , subq_10.customer_third_hop_id__acquired_ds__month AS customer_id__customer_third_hop_id__acquired_ds__month
+                          , subq_10.customer_third_hop_id__acquired_ds__quarter AS customer_id__customer_third_hop_id__acquired_ds__quarter
+                          , subq_10.customer_third_hop_id__acquired_ds__year AS customer_id__customer_third_hop_id__acquired_ds__year
+                          , subq_10.customer_third_hop_id__acquired_ds__extract_year AS customer_id__customer_third_hop_id__acquired_ds__extract_year
+                          , subq_10.customer_third_hop_id__acquired_ds__extract_quarter AS customer_id__customer_third_hop_id__acquired_ds__extract_quarter
+                          , subq_10.customer_third_hop_id__acquired_ds__extract_month AS customer_id__customer_third_hop_id__acquired_ds__extract_month
+                          , subq_10.customer_third_hop_id__acquired_ds__extract_day AS customer_id__customer_third_hop_id__acquired_ds__extract_day
+                          , subq_10.customer_third_hop_id__acquired_ds__extract_dow AS customer_id__customer_third_hop_id__acquired_ds__extract_dow
+                          , subq_10.customer_third_hop_id__acquired_ds__extract_doy AS customer_id__customer_third_hop_id__acquired_ds__extract_doy
+                          , subq_10.metric_time__day AS customer_id__metric_time__day
+                          , subq_10.metric_time__week AS customer_id__metric_time__week
+                          , subq_10.metric_time__month AS customer_id__metric_time__month
+                          , subq_10.metric_time__quarter AS customer_id__metric_time__quarter
+                          , subq_10.metric_time__year AS customer_id__metric_time__year
+                          , subq_10.metric_time__extract_year AS customer_id__metric_time__extract_year
+                          , subq_10.metric_time__extract_quarter AS customer_id__metric_time__extract_quarter
+                          , subq_10.metric_time__extract_month AS customer_id__metric_time__extract_month
+                          , subq_10.metric_time__extract_day AS customer_id__metric_time__extract_day
+                          , subq_10.metric_time__extract_dow AS customer_id__metric_time__extract_dow
+                          , subq_10.metric_time__extract_doy AS customer_id__metric_time__extract_doy
+                          , subq_10.customer_third_hop_id AS customer_id__customer_third_hop_id
+                          , subq_10.customer_third_hop_id__customer_id AS customer_id__customer_third_hop_id__customer_id
+                          , subq_7.ds_partitioned__day AS ds_partitioned__day
                           , subq_7.ds_partitioned__week AS ds_partitioned__week
                           , subq_7.ds_partitioned__month AS ds_partitioned__month
                           , subq_7.ds_partitioned__quarter AS ds_partitioned__quarter
@@ -308,51 +345,14 @@ FROM (
                           , subq_7.metric_time__extract_day AS metric_time__extract_day
                           , subq_7.metric_time__extract_dow AS metric_time__extract_dow
                           , subq_7.metric_time__extract_doy AS metric_time__extract_doy
-                          , subq_10.acquired_ds__day AS customer_id__acquired_ds__day
-                          , subq_10.acquired_ds__week AS customer_id__acquired_ds__week
-                          , subq_10.acquired_ds__month AS customer_id__acquired_ds__month
-                          , subq_10.acquired_ds__quarter AS customer_id__acquired_ds__quarter
-                          , subq_10.acquired_ds__year AS customer_id__acquired_ds__year
-                          , subq_10.acquired_ds__extract_year AS customer_id__acquired_ds__extract_year
-                          , subq_10.acquired_ds__extract_quarter AS customer_id__acquired_ds__extract_quarter
-                          , subq_10.acquired_ds__extract_month AS customer_id__acquired_ds__extract_month
-                          , subq_10.acquired_ds__extract_day AS customer_id__acquired_ds__extract_day
-                          , subq_10.acquired_ds__extract_dow AS customer_id__acquired_ds__extract_dow
-                          , subq_10.acquired_ds__extract_doy AS customer_id__acquired_ds__extract_doy
-                          , subq_10.customer_third_hop_id__acquired_ds__day AS customer_id__customer_third_hop_id__acquired_ds__day
-                          , subq_10.customer_third_hop_id__acquired_ds__week AS customer_id__customer_third_hop_id__acquired_ds__week
-                          , subq_10.customer_third_hop_id__acquired_ds__month AS customer_id__customer_third_hop_id__acquired_ds__month
-                          , subq_10.customer_third_hop_id__acquired_ds__quarter AS customer_id__customer_third_hop_id__acquired_ds__quarter
-                          , subq_10.customer_third_hop_id__acquired_ds__year AS customer_id__customer_third_hop_id__acquired_ds__year
-                          , subq_10.customer_third_hop_id__acquired_ds__extract_year AS customer_id__customer_third_hop_id__acquired_ds__extract_year
-                          , subq_10.customer_third_hop_id__acquired_ds__extract_quarter AS customer_id__customer_third_hop_id__acquired_ds__extract_quarter
-                          , subq_10.customer_third_hop_id__acquired_ds__extract_month AS customer_id__customer_third_hop_id__acquired_ds__extract_month
-                          , subq_10.customer_third_hop_id__acquired_ds__extract_day AS customer_id__customer_third_hop_id__acquired_ds__extract_day
-                          , subq_10.customer_third_hop_id__acquired_ds__extract_dow AS customer_id__customer_third_hop_id__acquired_ds__extract_dow
-                          , subq_10.customer_third_hop_id__acquired_ds__extract_doy AS customer_id__customer_third_hop_id__acquired_ds__extract_doy
-                          , subq_10.metric_time__day AS customer_id__metric_time__day
-                          , subq_10.metric_time__week AS customer_id__metric_time__week
-                          , subq_10.metric_time__month AS customer_id__metric_time__month
-                          , subq_10.metric_time__quarter AS customer_id__metric_time__quarter
-                          , subq_10.metric_time__year AS customer_id__metric_time__year
-                          , subq_10.metric_time__extract_year AS customer_id__metric_time__extract_year
-                          , subq_10.metric_time__extract_quarter AS customer_id__metric_time__extract_quarter
-                          , subq_10.metric_time__extract_month AS customer_id__metric_time__extract_month
-                          , subq_10.metric_time__extract_day AS customer_id__metric_time__extract_day
-                          , subq_10.metric_time__extract_dow AS customer_id__metric_time__extract_dow
-                          , subq_10.metric_time__extract_doy AS customer_id__metric_time__extract_doy
                           , subq_7.account_id AS account_id
                           , subq_7.customer_id AS customer_id
                           , subq_7.account_id__customer_id AS account_id__customer_id
                           , subq_7.bridge_account__account_id AS bridge_account__account_id
                           , subq_7.bridge_account__customer_id AS bridge_account__customer_id
-                          , subq_10.customer_third_hop_id AS customer_id__customer_third_hop_id
-                          , subq_10.customer_third_hop_id__customer_id AS customer_id__customer_third_hop_id__customer_id
                           , subq_7.extra_dim AS extra_dim
                           , subq_7.account_id__extra_dim AS account_id__extra_dim
                           , subq_7.bridge_account__extra_dim AS bridge_account__extra_dim
-                          , subq_10.country AS customer_id__country
-                          , subq_10.customer_third_hop_id__country AS customer_id__customer_third_hop_id__country
                           , subq_7.account_customer_combos AS account_customer_combos
                         FROM (
                           -- Metric Time Dimension 'ds_partitioned'

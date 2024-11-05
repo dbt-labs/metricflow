@@ -32,10 +32,10 @@ FROM (
         FROM (
           -- Join Standard Outputs
           SELECT
-            subq_5.metric_time__day AS metric_time__day
+            subq_8.country_latest AS listing__country_latest
+            , subq_5.metric_time__day AS metric_time__day
             , subq_5.listing AS listing
             , subq_5.booking__is_instant AS booking__is_instant
-            , subq_8.country_latest AS listing__country_latest
             , subq_5.bookers AS bookers
           FROM (
             -- Pass Only Elements: ['bookers', 'booking__is_instant', 'metric_time__day', 'listing']

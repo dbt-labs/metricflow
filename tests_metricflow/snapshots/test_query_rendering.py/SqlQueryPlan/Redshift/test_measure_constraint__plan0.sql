@@ -39,9 +39,9 @@ FROM (
             FROM (
               -- Join Standard Outputs
               SELECT
-                subq_2.metric_time__day AS metric_time__day
+                subq_5.is_lux_latest AS listing__is_lux_latest
+                , subq_2.metric_time__day AS metric_time__day
                 , subq_2.listing AS listing
-                , subq_5.is_lux_latest AS listing__is_lux_latest
                 , subq_2.average_booking_value AS average_booking_value
               FROM (
                 -- Pass Only Elements: ['average_booking_value', 'metric_time__day', 'listing']
@@ -424,9 +424,9 @@ FROM (
             FROM (
               -- Join Standard Outputs
               SELECT
-                subq_14.metric_time__day AS metric_time__day
+                subq_17.is_lux_latest AS listing__is_lux_latest
+                , subq_14.metric_time__day AS metric_time__day
                 , subq_14.listing AS listing
-                , subq_17.is_lux_latest AS listing__is_lux_latest
                 , subq_14.bookings AS bookings
               FROM (
                 -- Pass Only Elements: ['bookings', 'metric_time__day', 'listing']

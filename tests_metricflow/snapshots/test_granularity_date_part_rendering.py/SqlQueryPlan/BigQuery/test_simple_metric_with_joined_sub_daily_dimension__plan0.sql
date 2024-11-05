@@ -15,9 +15,9 @@ FROM (
     FROM (
       -- Join Standard Outputs
       SELECT
-        subq_2.ds_partitioned__day AS ds_partitioned__day
-        , subq_9.user__ds_partitioned__day AS listing__user__ds_partitioned__day
+        subq_9.user__ds_partitioned__day AS listing__user__ds_partitioned__day
         , subq_9.user__bio_added_ts__minute AS listing__user__bio_added_ts__minute
+        , subq_2.ds_partitioned__day AS ds_partitioned__day
         , subq_2.listing AS listing
         , subq_2.bookings AS bookings
       FROM (
@@ -231,61 +231,7 @@ FROM (
         FROM (
           -- Join Standard Outputs
           SELECT
-            subq_4.ds__day AS ds__day
-            , subq_4.ds__week AS ds__week
-            , subq_4.ds__month AS ds__month
-            , subq_4.ds__quarter AS ds__quarter
-            , subq_4.ds__year AS ds__year
-            , subq_4.ds__extract_year AS ds__extract_year
-            , subq_4.ds__extract_quarter AS ds__extract_quarter
-            , subq_4.ds__extract_month AS ds__extract_month
-            , subq_4.ds__extract_day AS ds__extract_day
-            , subq_4.ds__extract_dow AS ds__extract_dow
-            , subq_4.ds__extract_doy AS ds__extract_doy
-            , subq_4.created_at__day AS created_at__day
-            , subq_4.created_at__week AS created_at__week
-            , subq_4.created_at__month AS created_at__month
-            , subq_4.created_at__quarter AS created_at__quarter
-            , subq_4.created_at__year AS created_at__year
-            , subq_4.created_at__extract_year AS created_at__extract_year
-            , subq_4.created_at__extract_quarter AS created_at__extract_quarter
-            , subq_4.created_at__extract_month AS created_at__extract_month
-            , subq_4.created_at__extract_day AS created_at__extract_day
-            , subq_4.created_at__extract_dow AS created_at__extract_dow
-            , subq_4.created_at__extract_doy AS created_at__extract_doy
-            , subq_4.listing__ds__day AS listing__ds__day
-            , subq_4.listing__ds__week AS listing__ds__week
-            , subq_4.listing__ds__month AS listing__ds__month
-            , subq_4.listing__ds__quarter AS listing__ds__quarter
-            , subq_4.listing__ds__year AS listing__ds__year
-            , subq_4.listing__ds__extract_year AS listing__ds__extract_year
-            , subq_4.listing__ds__extract_quarter AS listing__ds__extract_quarter
-            , subq_4.listing__ds__extract_month AS listing__ds__extract_month
-            , subq_4.listing__ds__extract_day AS listing__ds__extract_day
-            , subq_4.listing__ds__extract_dow AS listing__ds__extract_dow
-            , subq_4.listing__ds__extract_doy AS listing__ds__extract_doy
-            , subq_4.listing__created_at__day AS listing__created_at__day
-            , subq_4.listing__created_at__week AS listing__created_at__week
-            , subq_4.listing__created_at__month AS listing__created_at__month
-            , subq_4.listing__created_at__quarter AS listing__created_at__quarter
-            , subq_4.listing__created_at__year AS listing__created_at__year
-            , subq_4.listing__created_at__extract_year AS listing__created_at__extract_year
-            , subq_4.listing__created_at__extract_quarter AS listing__created_at__extract_quarter
-            , subq_4.listing__created_at__extract_month AS listing__created_at__extract_month
-            , subq_4.listing__created_at__extract_day AS listing__created_at__extract_day
-            , subq_4.listing__created_at__extract_dow AS listing__created_at__extract_dow
-            , subq_4.listing__created_at__extract_doy AS listing__created_at__extract_doy
-            , subq_4.metric_time__day AS metric_time__day
-            , subq_4.metric_time__week AS metric_time__week
-            , subq_4.metric_time__month AS metric_time__month
-            , subq_4.metric_time__quarter AS metric_time__quarter
-            , subq_4.metric_time__year AS metric_time__year
-            , subq_4.metric_time__extract_year AS metric_time__extract_year
-            , subq_4.metric_time__extract_quarter AS metric_time__extract_quarter
-            , subq_4.metric_time__extract_month AS metric_time__extract_month
-            , subq_4.metric_time__extract_day AS metric_time__extract_day
-            , subq_4.metric_time__extract_dow AS metric_time__extract_dow
-            , subq_4.metric_time__extract_doy AS metric_time__extract_doy
+            subq_7.home_state AS user__home_state
             , subq_7.ds__day AS user__ds__day
             , subq_7.ds__week AS user__ds__week
             , subq_7.ds__month AS user__ds__month
@@ -384,6 +330,61 @@ FROM (
             , subq_7.metric_time__extract_day AS user__metric_time__extract_day
             , subq_7.metric_time__extract_dow AS user__metric_time__extract_dow
             , subq_7.metric_time__extract_doy AS user__metric_time__extract_doy
+            , subq_4.ds__day AS ds__day
+            , subq_4.ds__week AS ds__week
+            , subq_4.ds__month AS ds__month
+            , subq_4.ds__quarter AS ds__quarter
+            , subq_4.ds__year AS ds__year
+            , subq_4.ds__extract_year AS ds__extract_year
+            , subq_4.ds__extract_quarter AS ds__extract_quarter
+            , subq_4.ds__extract_month AS ds__extract_month
+            , subq_4.ds__extract_day AS ds__extract_day
+            , subq_4.ds__extract_dow AS ds__extract_dow
+            , subq_4.ds__extract_doy AS ds__extract_doy
+            , subq_4.created_at__day AS created_at__day
+            , subq_4.created_at__week AS created_at__week
+            , subq_4.created_at__month AS created_at__month
+            , subq_4.created_at__quarter AS created_at__quarter
+            , subq_4.created_at__year AS created_at__year
+            , subq_4.created_at__extract_year AS created_at__extract_year
+            , subq_4.created_at__extract_quarter AS created_at__extract_quarter
+            , subq_4.created_at__extract_month AS created_at__extract_month
+            , subq_4.created_at__extract_day AS created_at__extract_day
+            , subq_4.created_at__extract_dow AS created_at__extract_dow
+            , subq_4.created_at__extract_doy AS created_at__extract_doy
+            , subq_4.listing__ds__day AS listing__ds__day
+            , subq_4.listing__ds__week AS listing__ds__week
+            , subq_4.listing__ds__month AS listing__ds__month
+            , subq_4.listing__ds__quarter AS listing__ds__quarter
+            , subq_4.listing__ds__year AS listing__ds__year
+            , subq_4.listing__ds__extract_year AS listing__ds__extract_year
+            , subq_4.listing__ds__extract_quarter AS listing__ds__extract_quarter
+            , subq_4.listing__ds__extract_month AS listing__ds__extract_month
+            , subq_4.listing__ds__extract_day AS listing__ds__extract_day
+            , subq_4.listing__ds__extract_dow AS listing__ds__extract_dow
+            , subq_4.listing__ds__extract_doy AS listing__ds__extract_doy
+            , subq_4.listing__created_at__day AS listing__created_at__day
+            , subq_4.listing__created_at__week AS listing__created_at__week
+            , subq_4.listing__created_at__month AS listing__created_at__month
+            , subq_4.listing__created_at__quarter AS listing__created_at__quarter
+            , subq_4.listing__created_at__year AS listing__created_at__year
+            , subq_4.listing__created_at__extract_year AS listing__created_at__extract_year
+            , subq_4.listing__created_at__extract_quarter AS listing__created_at__extract_quarter
+            , subq_4.listing__created_at__extract_month AS listing__created_at__extract_month
+            , subq_4.listing__created_at__extract_day AS listing__created_at__extract_day
+            , subq_4.listing__created_at__extract_dow AS listing__created_at__extract_dow
+            , subq_4.listing__created_at__extract_doy AS listing__created_at__extract_doy
+            , subq_4.metric_time__day AS metric_time__day
+            , subq_4.metric_time__week AS metric_time__week
+            , subq_4.metric_time__month AS metric_time__month
+            , subq_4.metric_time__quarter AS metric_time__quarter
+            , subq_4.metric_time__year AS metric_time__year
+            , subq_4.metric_time__extract_year AS metric_time__extract_year
+            , subq_4.metric_time__extract_quarter AS metric_time__extract_quarter
+            , subq_4.metric_time__extract_month AS metric_time__extract_month
+            , subq_4.metric_time__extract_day AS metric_time__extract_day
+            , subq_4.metric_time__extract_dow AS metric_time__extract_dow
+            , subq_4.metric_time__extract_doy AS metric_time__extract_doy
             , subq_4.listing AS listing
             , subq_4.user AS user
             , subq_4.listing__user AS listing__user
@@ -393,7 +394,6 @@ FROM (
             , subq_4.listing__country_latest AS listing__country_latest
             , subq_4.listing__is_lux_latest AS listing__is_lux_latest
             , subq_4.listing__capacity_latest AS listing__capacity_latest
-            , subq_7.home_state AS user__home_state
             , subq_4.listings AS listings
             , subq_4.largest_listing AS largest_listing
             , subq_4.smallest_listing AS smallest_listing

@@ -22,9 +22,9 @@ FROM (
         FROM (
           -- Join Standard Outputs
           SELECT
-            subq_2.user AS user
-            , subq_13.listing__user AS user__listing__user
+            subq_13.listing__user AS user__listing__user
             , subq_13.listing__user__average_booking_value AS user__listing__user__average_booking_value
+            , subq_2.user AS user
             , subq_2.listings AS listings
           FROM (
             -- Pass Only Elements: ['listings', 'user']
@@ -187,8 +187,8 @@ FROM (
                   FROM (
                     -- Join Standard Outputs
                     SELECT
-                      subq_5.listing AS listing
-                      , subq_8.user AS listing__user
+                      subq_8.user AS listing__user
+                      , subq_5.listing AS listing
                       , subq_5.average_booking_value AS average_booking_value
                     FROM (
                       -- Pass Only Elements: ['average_booking_value', 'listing']

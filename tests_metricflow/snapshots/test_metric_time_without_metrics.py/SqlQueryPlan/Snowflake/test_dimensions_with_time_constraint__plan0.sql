@@ -67,7 +67,8 @@ FROM (
   FROM (
     -- Join Standard Outputs
     SELECT
-      subq_0.ds__day AS ds__day
+      subq_5.home_state_latest AS user__home_state_latest
+      , subq_0.ds__day AS ds__day
       , subq_0.ds__week AS ds__week
       , subq_0.ds__month AS ds__month
       , subq_0.ds__quarter AS ds__quarter
@@ -121,7 +122,6 @@ FROM (
       , subq_0.listing__country_latest AS listing__country_latest
       , subq_0.listing__is_lux_latest AS listing__is_lux_latest
       , subq_0.listing__capacity_latest AS listing__capacity_latest
-      , subq_5.home_state_latest AS user__home_state_latest
       , subq_0.listings AS listings
       , subq_0.largest_listing AS largest_listing
       , subq_0.smallest_listing AS smallest_listing

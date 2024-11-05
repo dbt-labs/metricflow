@@ -98,3 +98,11 @@ populate-persistent-source-schemas:
 .PHONY: test-snap
 test-snap:
 	make test ADDITIONAL_PYTEST_OPTIONS=--overwrite-snapshots
+
+.PHONY: testx
+testx:
+	make test ADDITIONAL_PYTEST_OPTIONS=-x
+
+.PHONY: testx-snap
+testx-snap:
+	make test ADDITIONAL_PYTEST_OPTIONS='-x --overwrite-snapshots'

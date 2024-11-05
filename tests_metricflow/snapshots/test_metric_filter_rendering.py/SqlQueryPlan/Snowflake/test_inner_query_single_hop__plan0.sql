@@ -22,9 +22,9 @@ FROM (
         FROM (
           -- Join Standard Outputs
           SELECT
-            subq_2.customer_third_hop_id AS customer_third_hop_id
-            , subq_10.customer_id__customer_third_hop_id AS customer_third_hop_id__customer_id__customer_third_hop_id
+            subq_10.customer_id__customer_third_hop_id AS customer_third_hop_id__customer_id__customer_third_hop_id
             , subq_10.customer_id__customer_third_hop_id__paraguayan_customers AS customer_third_hop_id__customer_id__customer_third_hop_id__paraguayan_customers
+            , subq_2.customer_third_hop_id AS customer_third_hop_id
             , subq_2.third_hop_count AS third_hop_count
           FROM (
             -- Pass Only Elements: ['third_hop_count', 'customer_third_hop_id']

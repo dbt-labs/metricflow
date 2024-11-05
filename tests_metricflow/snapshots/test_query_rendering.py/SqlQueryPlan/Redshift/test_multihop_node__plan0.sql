@@ -15,10 +15,10 @@ FROM (
     FROM (
       -- Join Standard Outputs
       SELECT
-        subq_2.ds_partitioned__day AS ds_partitioned__day
+        subq_9.customer_id__customer_name AS account_id__customer_id__customer_name
         , subq_9.ds_partitioned__day AS account_id__ds_partitioned__day
+        , subq_2.ds_partitioned__day AS ds_partitioned__day
         , subq_2.account_id AS account_id
-        , subq_9.customer_id__customer_name AS account_id__customer_id__customer_name
         , subq_2.txn_count AS txn_count
       FROM (
         -- Pass Only Elements: ['txn_count', 'ds_partitioned__day', 'account_id']
@@ -152,7 +152,31 @@ FROM (
         FROM (
           -- Join Standard Outputs
           SELECT
-            subq_4.ds_partitioned__day AS ds_partitioned__day
+            subq_7.customer_name AS customer_id__customer_name
+            , subq_7.customer_atomic_weight AS customer_id__customer_atomic_weight
+            , subq_7.ds_partitioned__day AS customer_id__ds_partitioned__day
+            , subq_7.ds_partitioned__week AS customer_id__ds_partitioned__week
+            , subq_7.ds_partitioned__month AS customer_id__ds_partitioned__month
+            , subq_7.ds_partitioned__quarter AS customer_id__ds_partitioned__quarter
+            , subq_7.ds_partitioned__year AS customer_id__ds_partitioned__year
+            , subq_7.ds_partitioned__extract_year AS customer_id__ds_partitioned__extract_year
+            , subq_7.ds_partitioned__extract_quarter AS customer_id__ds_partitioned__extract_quarter
+            , subq_7.ds_partitioned__extract_month AS customer_id__ds_partitioned__extract_month
+            , subq_7.ds_partitioned__extract_day AS customer_id__ds_partitioned__extract_day
+            , subq_7.ds_partitioned__extract_dow AS customer_id__ds_partitioned__extract_dow
+            , subq_7.ds_partitioned__extract_doy AS customer_id__ds_partitioned__extract_doy
+            , subq_7.metric_time__day AS customer_id__metric_time__day
+            , subq_7.metric_time__week AS customer_id__metric_time__week
+            , subq_7.metric_time__month AS customer_id__metric_time__month
+            , subq_7.metric_time__quarter AS customer_id__metric_time__quarter
+            , subq_7.metric_time__year AS customer_id__metric_time__year
+            , subq_7.metric_time__extract_year AS customer_id__metric_time__extract_year
+            , subq_7.metric_time__extract_quarter AS customer_id__metric_time__extract_quarter
+            , subq_7.metric_time__extract_month AS customer_id__metric_time__extract_month
+            , subq_7.metric_time__extract_day AS customer_id__metric_time__extract_day
+            , subq_7.metric_time__extract_dow AS customer_id__metric_time__extract_dow
+            , subq_7.metric_time__extract_doy AS customer_id__metric_time__extract_doy
+            , subq_4.ds_partitioned__day AS ds_partitioned__day
             , subq_4.ds_partitioned__week AS ds_partitioned__week
             , subq_4.ds_partitioned__month AS ds_partitioned__month
             , subq_4.ds_partitioned__quarter AS ds_partitioned__quarter
@@ -196,28 +220,6 @@ FROM (
             , subq_4.metric_time__extract_day AS metric_time__extract_day
             , subq_4.metric_time__extract_dow AS metric_time__extract_dow
             , subq_4.metric_time__extract_doy AS metric_time__extract_doy
-            , subq_7.ds_partitioned__day AS customer_id__ds_partitioned__day
-            , subq_7.ds_partitioned__week AS customer_id__ds_partitioned__week
-            , subq_7.ds_partitioned__month AS customer_id__ds_partitioned__month
-            , subq_7.ds_partitioned__quarter AS customer_id__ds_partitioned__quarter
-            , subq_7.ds_partitioned__year AS customer_id__ds_partitioned__year
-            , subq_7.ds_partitioned__extract_year AS customer_id__ds_partitioned__extract_year
-            , subq_7.ds_partitioned__extract_quarter AS customer_id__ds_partitioned__extract_quarter
-            , subq_7.ds_partitioned__extract_month AS customer_id__ds_partitioned__extract_month
-            , subq_7.ds_partitioned__extract_day AS customer_id__ds_partitioned__extract_day
-            , subq_7.ds_partitioned__extract_dow AS customer_id__ds_partitioned__extract_dow
-            , subq_7.ds_partitioned__extract_doy AS customer_id__ds_partitioned__extract_doy
-            , subq_7.metric_time__day AS customer_id__metric_time__day
-            , subq_7.metric_time__week AS customer_id__metric_time__week
-            , subq_7.metric_time__month AS customer_id__metric_time__month
-            , subq_7.metric_time__quarter AS customer_id__metric_time__quarter
-            , subq_7.metric_time__year AS customer_id__metric_time__year
-            , subq_7.metric_time__extract_year AS customer_id__metric_time__extract_year
-            , subq_7.metric_time__extract_quarter AS customer_id__metric_time__extract_quarter
-            , subq_7.metric_time__extract_month AS customer_id__metric_time__extract_month
-            , subq_7.metric_time__extract_day AS customer_id__metric_time__extract_day
-            , subq_7.metric_time__extract_dow AS customer_id__metric_time__extract_dow
-            , subq_7.metric_time__extract_doy AS customer_id__metric_time__extract_doy
             , subq_4.account_id AS account_id
             , subq_4.customer_id AS customer_id
             , subq_4.account_id__customer_id AS account_id__customer_id
@@ -226,8 +228,6 @@ FROM (
             , subq_4.extra_dim AS extra_dim
             , subq_4.account_id__extra_dim AS account_id__extra_dim
             , subq_4.bridge_account__extra_dim AS bridge_account__extra_dim
-            , subq_7.customer_name AS customer_id__customer_name
-            , subq_7.customer_atomic_weight AS customer_id__customer_atomic_weight
             , subq_4.account_customer_combos AS account_customer_combos
           FROM (
             -- Metric Time Dimension 'ds_partitioned'

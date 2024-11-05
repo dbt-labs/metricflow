@@ -25,13 +25,12 @@ from metricflow_semantics.instances import (
     MetadataInstance,
     MetricInstance,
     TimeDimensionInstance,
+    group_instances_by_type,
 )
 from metricflow_semantics.mf_logging.formatting import indent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow_semantics.specs.column_assoc import (
-    ColumnAssociationResolver,
-)
+from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.measure_spec import MeasureSpec
@@ -72,7 +71,6 @@ from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.convert_to_sql_plan import ConvertToSqlPlanResult
 from metricflow.plan_conversion.instance_converters import (
     AddGroupByMetric,
-    AddLinkToLinkableElements,
     AddMetadata,
     AddMetrics,
     AliasAggregatedMeasures,
@@ -89,7 +87,7 @@ from metricflow.plan_conversion.instance_converters import (
     RemoveMeasures,
     RemoveMetrics,
     UpdateMeasureFillNullsWith,
-    create_select_columns_for_instance_sets,
+    create_simple_select_columns_for_instance_sets,
 )
 from metricflow.plan_conversion.select_column_gen import (
     SelectColumnSet,
@@ -229,7 +227,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             sql_node = optimizer.optimize(sql_node)
             logger.debug(
                 LazyFormat(
-                    lambda: f"After applying {optimizer.__class__.__name__}, the SQL query plan is:\n"
+                    lambda: f"After applying optimizer {optimizer.__class__.__name__}, the SQL query plan is:\n"
                     f"{indent(sql_node.structure_text())}"
                 )
             )
@@ -347,7 +345,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             complete_outer_where_filter = where_constraint_exprs[0]
 
         outer_query_output_instance_set = InstanceSet(time_dimension_instances=agg_time_dimension_instances)
-        outer_query_select_columns = create_select_columns_for_instance_sets(
+        outer_query_select_columns = create_simple_select_columns_for_instance_sets(
             column_resolver=self._column_association_resolver,
             table_alias_to_instance_set=OrderedDict({inner_query_alias: outer_query_output_instance_set}),
         )
@@ -446,7 +444,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             instance_set=output_instance_set,
             sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
-                select_columns=create_select_columns_for_instance_sets(
+                select_columns=create_simple_select_columns_for_instance_sets(
                     self._column_association_resolver, table_alias_to_instance_set
                 ),
                 from_source=time_spine_data_set.checked_sql_select_node,
@@ -456,69 +454,17 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         )
 
     def visit_join_on_entities_node(self, node: JoinOnEntitiesNode) -> SqlDataSet:
-        """Generates the query that realizes the behavior of the JoinToStandardOutputNode."""
-        # Keep a mapping between the table aliases that would be used in the query and the MDO instances in that source.
-        # e.g. when building "FROM from_table a JOIN right_table b", the value for key "a" would be the instances in
-        # "from_table"
-        table_alias_to_instance_set: OrderedDict[str, InstanceSet] = OrderedDict()
-
-        # Convert the dataflow from the left node to a DataSet and add context for it to table_alias_to_instance_set
-        # A DataSet is a bundle of the SQL query (in object form) and the MDO instances that the SQL query contains.
+        """Generates the query that realizes the behavior of the JoinOnEntitiesNode."""
         from_data_set = node.left_node.accept(self)
         from_data_set_alias = self._next_unique_table_alias()
-        table_alias_to_instance_set[from_data_set_alias] = from_data_set.instance_set
-
-        # Build the join descriptions for the SqlQueryPlan - different from node.join_descriptions which are the join
-        # descriptions from the dataflow plan.
-        sql_join_descs: List[SqlJoinDescription] = []
-
-        # The dataflow plan describes how the data sets coming from the parent nodes should be joined together. Use
-        # those descriptions to convert them to join descriptions for the SQL query plan.
-        for join_description in node.join_targets:
-            join_on_entity = join_description.join_on_entity
-
-            right_node_to_join: DataflowPlanNode = join_description.join_node
-            right_data_set: SqlDataSet = right_node_to_join.accept(self)
-            right_data_set_alias = self._next_unique_table_alias()
-
-            sql_join_desc = SqlQueryPlanJoinBuilder.make_base_output_join_description(
-                left_data_set=AnnotatedSqlDataSet(data_set=from_data_set, alias=from_data_set_alias),
-                right_data_set=AnnotatedSqlDataSet(data_set=right_data_set, alias=right_data_set_alias),
-                join_description=join_description,
-            )
-            sql_join_descs.append(sql_join_desc)
-
-            if join_on_entity:
-                # Remove the linkable instances with the join_on_entity as the leading link as the next step adds the
-                # link. This is to avoid cases where there is a primary entity and a dimension in the data set, and we
-                # create an instance in the next step that has the same entity link.
-                # e.g. a data set has the dimension "listing__country_latest" and "listing" is a primary entity in the
-                # data set. The next step would create an instance like "listing__listing__country_latest" without this
-                # filter.
-                right_data_set_instance_set_filtered = FilterLinkableInstancesWithLeadingLink(
-                    entity_link=join_on_entity,
-                ).transform(right_data_set.instance_set)
-
-                # After the right data set is joined to the "from" data set, we need to change the links for some of the
-                # instances that represent the right data set. For example, if the "from" data set contains the "bookings"
-                # measure instance and the right dataset contains the "country" dimension instance, then after the join,
-                # the output data set should have the "country" dimension instance with the "user_id" entity link
-                # (if "user_id" equality was the join condition). "country" -> "user_id__country"
-                right_data_set_instance_set_after_join = right_data_set_instance_set_filtered.transform(
-                    AddLinkToLinkableElements(join_on_entity=join_on_entity)
-                )
-            else:
-                right_data_set_instance_set_after_join = right_data_set.instance_set
-            table_alias_to_instance_set[right_data_set_alias] = right_data_set_instance_set_after_join
-
-        from_data_set_output_instance_set = from_data_set.instance_set.transform(
-            FilterElements(include_specs=from_data_set.instance_set.spec_set)
-        )
 
         # Change the aggregation state for the measures to be partially aggregated if it was previously aggregated
         # since we removed the entities and added the dimensions. The dimensions could have the same value for
         # multiple rows, so we'll need to re-aggregate.
-        from_data_set_output_instance_set = from_data_set_output_instance_set.transform(
+        from_data_set_output_instance_set = from_data_set.instance_set.transform(
+            # TODO: is this filter doing anything? seems like no?
+            FilterElements(include_specs=from_data_set.instance_set.spec_set)
+        ).transform(
             ChangeMeasureAggregationState(
                 {
                     AggregationState.NON_AGGREGATED: AggregationState.NON_AGGREGATED,
@@ -527,18 +473,69 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 }
             )
         )
+        instances_to_build_simple_select_columns_for = OrderedDict(
+            {from_data_set_alias: from_data_set_output_instance_set}
+        )
 
-        table_alias_to_instance_set[from_data_set_alias] = from_data_set_output_instance_set
+        # Build SQL join description, instance set, and select columns for each join target.
+        output_instance_set = from_data_set_output_instance_set
+        select_columns: Tuple[SqlSelectColumn, ...] = ()
+        sql_join_descs: List[SqlJoinDescription] = []
+        for join_description in node.join_targets:
+            join_on_entity = join_description.join_on_entity
+            right_node_to_join = join_description.join_node
+            right_data_set: SqlDataSet = right_node_to_join.accept(self)
+            right_data_set_alias = self._next_unique_table_alias()
 
-        # Construct the data set that contains the updated instances and the SQL nodes that should go in the various
-        # clauses.
+            # Build join description.
+            sql_join_desc = SqlQueryPlanJoinBuilder.make_base_output_join_description(
+                left_data_set=AnnotatedSqlDataSet(data_set=from_data_set, alias=from_data_set_alias),
+                right_data_set=AnnotatedSqlDataSet(data_set=right_data_set, alias=right_data_set_alias),
+                join_description=join_description,
+            )
+            sql_join_descs.append(sql_join_desc)
+
+            if join_on_entity:
+                # Remove any instances that already have the join_on_entity as the leading link. This will prevent a duplicate
+                # entity link when we add it in the next step.
+                right_instance_set_filtered = FilterLinkableInstancesWithLeadingLink(
+                    join_on_entity.reference
+                ).transform(right_data_set.instance_set)
+
+                # After the right data set is joined, update the entity links to indicate that joining on the entity was
+                # required to reach the spec. If the "country" dimension was joined and "user_id" is the join_on_entity,
+                # then the joined data set should have the "user__country" dimension.
+                new_instances: Tuple[MdoInstance, ...] = ()
+                for original_instance in right_instance_set_filtered.linkable_instances:
+                    new_instance = original_instance.with_entity_prefix(
+                        join_on_entity.reference, column_association_resolver=self._column_association_resolver
+                    )
+                    # Build new select column using the old column name as the expr and the new column name as the alias.
+                    select_column = SqlSelectColumn(
+                        expr=SqlColumnReferenceExpression.from_table_and_column_names(
+                            table_alias=right_data_set_alias,
+                            column_name=original_instance.associated_column.column_name,
+                        ),
+                        column_alias=new_instance.associated_column.column_name,
+                    )
+                    new_instances += (new_instance,)
+                    select_columns += (select_column,)
+                right_instance_set_after_join = group_instances_by_type(new_instances)
+            else:
+                right_instance_set_after_join = right_data_set.instance_set
+                instances_to_build_simple_select_columns_for[right_data_set_alias] = right_instance_set_after_join
+
+            output_instance_set = InstanceSet.merge([output_instance_set, right_instance_set_after_join])
+
+        select_columns += create_simple_select_columns_for_instance_sets(
+            column_resolver=self._column_association_resolver,
+            table_alias_to_instance_set=instances_to_build_simple_select_columns_for,
+        )
         return SqlDataSet(
-            instance_set=InstanceSet.merge(list(table_alias_to_instance_set.values())),
+            instance_set=output_instance_set,
             sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
-                select_columns=create_select_columns_for_instance_sets(
-                    self._column_association_resolver, table_alias_to_instance_set
-                ),
+                select_columns=select_columns,
                 from_source=from_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
                 join_descs=tuple(sql_join_descs),
@@ -1385,7 +1382,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             metric_instances=parent_data_set.instance_set.metric_instances,
             metadata_instances=parent_data_set.instance_set.metadata_instances,
         )
-        parent_select_columns = create_select_columns_for_instance_sets(
+        parent_select_columns = create_simple_select_columns_for_instance_sets(
             self._column_association_resolver, OrderedDict({parent_alias: parent_instance_set})
         )
 

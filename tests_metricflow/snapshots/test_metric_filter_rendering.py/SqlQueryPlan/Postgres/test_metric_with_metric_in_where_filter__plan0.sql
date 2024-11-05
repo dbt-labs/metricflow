@@ -27,9 +27,9 @@ FROM (
         FROM (
           -- Join Standard Outputs
           SELECT
-            subq_2.metric_time__day AS metric_time__day
+            subq_8.listing__bookings AS listing__bookings
+            , subq_2.metric_time__day AS metric_time__day
             , subq_2.listing AS listing
-            , subq_8.listing__bookings AS listing__bookings
             , subq_2.listings AS listings
           FROM (
             -- Pass Only Elements: ['listings', 'metric_time__day', 'listing']

@@ -29,10 +29,10 @@ FROM (
         FROM (
           -- Join Standard Outputs
           SELECT
-            subq_2.user AS user
+            subq_4.home_state_latest AS user__home_state_latest
+            , subq_2.user AS user
             , subq_2.listing__is_lux_latest AS listing__is_lux_latest
             , subq_2.listing__capacity_latest AS listing__capacity_latest
-            , subq_4.home_state_latest AS user__home_state_latest
             , subq_2.listings AS listings
           FROM (
             -- Pass Only Elements: ['listings', 'listing__is_lux_latest', 'listing__capacity_latest', 'user']

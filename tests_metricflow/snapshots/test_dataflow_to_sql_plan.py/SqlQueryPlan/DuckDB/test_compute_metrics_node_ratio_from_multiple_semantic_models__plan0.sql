@@ -31,9 +31,9 @@ FROM (
         FROM (
           -- Join Standard Outputs
           SELECT
-            subq_2.ds__day AS ds__day
+            subq_5.country_latest AS listing__country_latest
+            , subq_2.ds__day AS ds__day
             , subq_2.listing AS listing
-            , subq_5.country_latest AS listing__country_latest
             , subq_2.bookings AS bookings
           FROM (
             -- Pass Only Elements: ['bookings', 'ds__day', 'listing']
@@ -405,9 +405,9 @@ FROM (
         FROM (
           -- Join Standard Outputs
           SELECT
-            subq_12.ds__day AS ds__day
+            subq_15.country_latest AS listing__country_latest
+            , subq_12.ds__day AS ds__day
             , subq_12.listing AS listing
-            , subq_15.country_latest AS listing__country_latest
             , subq_12.views AS views
           FROM (
             -- Pass Only Elements: ['views', 'ds__day', 'listing']

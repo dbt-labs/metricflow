@@ -110,22 +110,22 @@
                             <!-- node_id = NodeId(id_str='ss_4') -->
                             <!-- col0 =                                                 -->
                             <!--   SqlSelectColumn(                                     -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_173), -->
-                            <!--     column_alias='ds__day',                            -->
+                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_172), -->
+                            <!--     column_alias='listing__country_latest',            -->
                             <!--   )                                                    -->
                             <!-- col1 =                                                 -->
                             <!--   SqlSelectColumn(                                     -->
                             <!--     expr=SqlColumnReferenceExpression(node_id=cr_174), -->
-                            <!--     column_alias='listing',                            -->
+                            <!--     column_alias='ds__day',                            -->
                             <!--   )                                                    -->
                             <!-- col2 =                                                 -->
                             <!--   SqlSelectColumn(                                     -->
                             <!--     expr=SqlColumnReferenceExpression(node_id=cr_175), -->
-                            <!--     column_alias='listing__country_latest',            -->
+                            <!--     column_alias='listing',                            -->
                             <!--   )                                                    -->
                             <!-- col3 =                                                 -->
                             <!--   SqlSelectColumn(                                     -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_172), -->
+                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_173), -->
                             <!--     column_alias='bookings',                           -->
                             <!--   )                                                    -->
                             <!-- from_source = SqlSelectStatementNode(node_id=ss_1) -->
@@ -1823,22 +1823,22 @@
                             <!-- node_id = NodeId(id_str='ss_12') -->
                             <!-- col0 =                                                 -->
                             <!--   SqlSelectColumn(                                     -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_320), -->
-                            <!--     column_alias='ds__day',                            -->
+                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_319), -->
+                            <!--     column_alias='listing__country_latest',            -->
                             <!--   )                                                    -->
                             <!-- col1 =                                                 -->
                             <!--   SqlSelectColumn(                                     -->
                             <!--     expr=SqlColumnReferenceExpression(node_id=cr_321), -->
-                            <!--     column_alias='listing',                            -->
+                            <!--     column_alias='ds__day',                            -->
                             <!--   )                                                    -->
                             <!-- col2 =                                                 -->
                             <!--   SqlSelectColumn(                                     -->
                             <!--     expr=SqlColumnReferenceExpression(node_id=cr_322), -->
-                            <!--     column_alias='listing__country_latest',            -->
+                            <!--     column_alias='listing',                            -->
                             <!--   )                                                    -->
                             <!-- col3 =                                                 -->
                             <!--   SqlSelectColumn(                                     -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_319), -->
+                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_320), -->
                             <!--     column_alias='views',                              -->
                             <!--   )                                                    -->
                             <!-- from_source = SqlSelectStatementNode(node_id=ss_9) -->

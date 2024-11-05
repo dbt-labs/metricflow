@@ -15,10 +15,10 @@ FROM (
     FROM (
       -- Join Standard Outputs
       SELECT
-        subq_2.ds_partitioned__day AS ds_partitioned__day
+        subq_5.home_state AS user__home_state
         , subq_5.ds_partitioned__day AS user__ds_partitioned__day
+        , subq_2.ds_partitioned__day AS ds_partitioned__day
         , subq_2.user AS user
-        , subq_5.home_state AS user__home_state
         , subq_2.identity_verifications AS identity_verifications
       FROM (
         -- Pass Only Elements: ['identity_verifications', 'ds_partitioned__day', 'user']

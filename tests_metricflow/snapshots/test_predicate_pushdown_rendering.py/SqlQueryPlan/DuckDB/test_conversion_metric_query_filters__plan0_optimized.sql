@@ -112,10 +112,10 @@ FROM (
         FROM (
           -- Join Standard Outputs
           SELECT
-            subq_36.metric_time__day AS metric_time__day
+            users_latest_src_28000.home_state_latest AS user__home_state_latest
+            , subq_36.metric_time__day AS metric_time__day
             , subq_36.user AS user
             , subq_36.visit__referrer_id AS visit__referrer_id
-            , users_latest_src_28000.home_state_latest AS user__home_state_latest
             , subq_36.visits AS visits
           FROM (
             -- Read Elements From Semantic Model 'visits_source'

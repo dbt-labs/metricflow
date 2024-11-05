@@ -221,12 +221,12 @@ class DataflowPlanBuilder:
     def _optimize_plan(self, plan: DataflowPlan, optimizations: FrozenSet[DataflowPlanOptimization]) -> DataflowPlan:
         optimizer_factory = DataflowPlanOptimizerFactory(self._node_data_set_resolver)
         for optimizer in optimizer_factory.get_optimizers(optimizations):
-            logger.debug(LazyFormat(lambda: f"Applying {optimizer.__class__.__name__}"))
+            logger.debug(LazyFormat(lambda: f"Applying optimizer: {optimizer.__class__.__name__}"))
             try:
                 plan = optimizer.optimize(plan)
                 logger.debug(
                     LazyFormat(
-                        lambda: f"After applying {optimizer.__class__.__name__}, the dataflow plan is:\n"
+                        lambda: f"After applying optimizer {optimizer.__class__.__name__}, the dataflow plan is:\n"
                         f"{indent(plan.structure_text())}"
                     )
                 )

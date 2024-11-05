@@ -38,9 +38,9 @@ FROM (
               FROM (
                 -- Join Standard Outputs
                 SELECT
-                  subq_2.listing AS listing
+                  subq_5.is_lux_latest AS listing__is_lux_latest
+                  , subq_2.listing AS listing
                   , subq_2.booking__is_instant AS booking__is_instant
-                  , subq_5.is_lux_latest AS listing__is_lux_latest
                   , subq_2.average_booking_value AS average_booking_value
                 FROM (
                   -- Pass Only Elements: ['average_booking_value', 'booking__is_instant', 'listing']
@@ -418,9 +418,9 @@ FROM (
               FROM (
                 -- Join Standard Outputs
                 SELECT
-                  subq_14.listing AS listing
+                  subq_17.is_lux_latest AS listing__is_lux_latest
+                  , subq_14.listing AS listing
                   , subq_14.booking__is_instant AS booking__is_instant
-                  , subq_17.is_lux_latest AS listing__is_lux_latest
                   , subq_14.bookings AS bookings
                 FROM (
                   -- Pass Only Elements: ['bookings', 'booking__is_instant', 'listing']

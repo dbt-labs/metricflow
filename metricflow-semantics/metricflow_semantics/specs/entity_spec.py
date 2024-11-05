@@ -53,6 +53,9 @@ class EntitySpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D101
             element_name=self.element_name, element_type=LinkableElementType.ENTITY, entity_links=self.entity_links
         )
 
+    def with_entity_prefix(self, entity_prefix: EntityReference) -> EntitySpec:  # noqa: D102
+        return EntitySpec(element_name=self.element_name, entity_links=(entity_prefix,) + self.entity_links)
+
 
 @dataclass(frozen=True)
 class LinklessEntitySpec(EntitySpec, SerializableDataclass):
