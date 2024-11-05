@@ -33,6 +33,7 @@ def assert_execution_plan_text_equal(  # noqa: D103
     mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
     execution_plan: ExecutionPlan,
+    expectation_description: Optional[str] = None,
 ) -> None:
     assert_plan_snapshot_text_equal(
         request=request,
@@ -44,6 +45,7 @@ def assert_execution_plan_text_equal(  # noqa: D103
             source_schema=mf_test_configuration.mf_source_schema,
         ),
         additional_sub_directories_for_snapshots=(sql_client.sql_engine_type.value,),
+        expectation_description=expectation_description,
     )
 
 
@@ -52,6 +54,7 @@ def assert_dataflow_plan_text_equal(  # noqa: D103
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan: DataflowPlan,
     sql_client: SqlClient,
+    expectation_description: Optional[str] = None,
 ) -> None:
     assert_plan_snapshot_text_equal(
         request=request,
@@ -60,6 +63,7 @@ def assert_dataflow_plan_text_equal(  # noqa: D103
         plan_snapshot_text=dataflow_plan.structure_text(),
         incomparable_strings_replacement_function=replace_dataset_id_hash,
         additional_sub_directories_for_snapshots=(sql_client.sql_engine_type.value,),
+        expectation_description=expectation_description,
     )
 
 
@@ -69,6 +73,7 @@ def assert_object_snapshot_equal(  # type: ignore[misc]
     obj_id: str,
     obj: Any,
     sql_client: Optional[SqlClient] = None,
+    expectation_description: Optional[str] = None,
 ) -> None:
     """For tests to compare large objects, this can be used to snapshot a text representation of the object."""
     if sql_client is not None:
@@ -82,6 +87,7 @@ def assert_object_snapshot_equal(  # type: ignore[misc]
         snapshot_text=mf_pformat(obj),
         snapshot_file_extension=".txt",
         additional_sub_directories_for_snapshots=(sql_client.sql_engine_type.value,) if sql_client else (),
+        expectation_description=expectation_description,
     )
 
 
@@ -91,6 +97,7 @@ def assert_sql_snapshot_equal(
     snapshot_id: str,
     sql: str,
     sql_engine: Optional[SqlEngine] = None,
+    expectation_description: Optional[str] = None,
 ) -> None:
     """For tests that generate SQL, use this to write / check snapshots."""
     if sql_engine is not None:
@@ -109,6 +116,7 @@ def assert_sql_snapshot_equal(
         exclude_line_regex=_EXCLUDE_TABLE_ALIAS_REGEX,
         additional_sub_directories_for_snapshots=(sql_engine.value,) if sql_engine is not None else (),
         additional_header_fields={SQL_ENGINE_HEADER_NAME: sql_engine.value} if sql_engine is not None else None,
+        expectation_description=expectation_description,
     )
 
 
@@ -118,6 +126,7 @@ def assert_str_snapshot_equal(  # type: ignore[misc]
     snapshot_id: str,
     snapshot_str: str,
     sql_engine: Optional[SqlEngine] = None,
+    expectation_description: Optional[str] = None,
 ) -> None:
     """Write / compare a string snapshot."""
     if sql_engine is not None:
@@ -131,4 +140,5 @@ def assert_str_snapshot_equal(  # type: ignore[misc]
         snapshot_text=snapshot_str,
         snapshot_file_extension=".txt",
         additional_sub_directories_for_snapshots=(sql_engine.value,) if sql_engine is not None else (),
+        expectation_description=expectation_description,
     )

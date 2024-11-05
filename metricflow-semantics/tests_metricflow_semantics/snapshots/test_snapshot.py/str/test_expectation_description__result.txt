@@ -1,0 +1,8 @@
+test_name: test_expectation_description
+test_filename: test_snapshot.py
+docstring:
+  Tests having a description of the expectation in a snapshot.
+expectation_description:
+  The snapshot should show the 2 as the result.
+---
+1 + 1 = 2
