@@ -10,6 +10,7 @@ FROM (
     , MAX(subq_30.bookings_2_weeks_ago) AS bookings_2_weeks_ago
   FROM (
     -- Constrain Output with WHERE
+    -- Pass Only Elements: ['bookings', 'metric_time__day']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
@@ -18,18 +19,18 @@ FROM (
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements: ['bookings', 'metric_time__day']
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_18
+    ) subq_17
     WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'
     GROUP BY
       metric_time__day
   ) subq_21
   FULL OUTER JOIN (
     -- Constrain Output with WHERE
+    -- Pass Only Elements: ['bookings', 'metric_time__day']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
@@ -37,7 +38,6 @@ FROM (
       , SUM(bookings) AS bookings_2_weeks_ago
     FROM (
       -- Join to Time Spine Dataset
-      -- Pass Only Elements: ['bookings', 'metric_time__day']
       SELECT
         subq_25.ds AS metric_time__day
         , subq_23.bookings AS bookings
@@ -52,7 +52,7 @@ FROM (
       ) subq_23
       ON
         subq_25.ds - INTERVAL 14 day = subq_23.metric_time__day
-    ) subq_27
+    ) subq_26
     WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'
     GROUP BY
       metric_time__day
