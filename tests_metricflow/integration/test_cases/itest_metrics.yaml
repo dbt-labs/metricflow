@@ -552,6 +552,34 @@ integration_test:
     ) a
 ---
 integration_test:
+  name: shared_alias_derived_metric_same
+  description: Tests derived metrics which use the same alias for the same thing
+  model: SIMPLE_MODEL
+  metrics: ["derived_shared_alias_1a", "derived_shared_alias_1b"]
+  group_bys: ["booking__is_instant"]
+  check_query: |
+    SELECT
+      is_instant AS booking__is_instant
+      , COUNT(*) - 10 AS derived_shared_alias_1a
+      , COUNT(*) - 100 AS derived_shared_alias_1b
+    FROM {{ source_schema }}.fct_bookings
+    GROUP BY 1
+---
+integration_test:
+  name: shared_alias_derived_metric_different
+  description: Tests derived metrics which use the same alias for different things
+  model: SIMPLE_MODEL
+  metrics: ["derived_shared_alias_1a", "derived_shared_alias_2"]
+  group_bys: ["booking__is_instant"]
+  check_query: |
+    SELECT
+      is_instant AS booking__is_instant
+      , COUNT(*) - 10 AS derived_shared_alias_1a
+      , SUM(CASE WHEN is_instant THEN 1 ELSE 0 END) + 10 AS derived_shared_alias_2
+    FROM {{ source_schema }}.fct_bookings
+    GROUP BY 1
+---
+integration_test:
   name: two_metrics_with_null_dimension_values
   description: Tests querying two metrics with a dimension having a NULL values
   model: SIMPLE_MODEL

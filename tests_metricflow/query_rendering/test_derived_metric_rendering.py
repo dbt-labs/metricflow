@@ -795,3 +795,29 @@ def test_offset_to_grain_metric_filter_and_query_have_different_granularities(
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_derived_metric_that_defines_the_same_alias_in_different_components(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    query_parser: MetricFlowQueryParser,
+    sql_client: SqlClient,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+) -> None:
+    """Tests querying a derived metric which give the same alias to its components."""
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("derived_shared_alias_1a", "derived_shared_alias_2"),
+        group_by_names=("booking__is_instant",),
+        limit=1,
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )

@@ -334,6 +334,60 @@ def test_derived_metric_with_non_derived_metric(
 
 
 @pytest.mark.sql_engine_snapshot
+def test_derived_metric_same_alias_components_combined(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+) -> None:
+    """Tests optimization of querying 2 metrics which give the same alias to the same thing in their components.
+
+    In this case we DO combine source nodes, since the components are the same exact thing so we don't need to
+    scan over it twice
+    """
+    check_optimization(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=MetricFlowQuerySpec(
+            metric_specs=(
+                MetricSpec(element_name="derived_shared_alias_1a"),
+                MetricSpec(element_name="derived_shared_alias_1b"),
+            ),
+            dimension_specs=(DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),),
+        ),
+        expected_num_sources_in_unoptimized=2,
+        expected_num_sources_in_optimized=1,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_derived_metric_same_alias_components_not_combined(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+) -> None:
+    """Tests optimization of querying 2 metrics which give the same alias different things in their components.
+
+    In this case we should NOT combine source nodes, since this would generate two columns with
+    the same alias.
+    """
+    check_optimization(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=MetricFlowQuerySpec(
+            metric_specs=(
+                MetricSpec(element_name="derived_shared_alias_1a"),
+                MetricSpec(element_name="derived_shared_alias_2"),
+            ),
+            dimension_specs=(DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),),
+        ),
+        expected_num_sources_in_unoptimized=2,
+        expected_num_sources_in_optimized=2,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
 def test_2_ratio_metrics_from_1_semantic_model(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,

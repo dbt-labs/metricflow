@@ -31,6 +31,7 @@ class ComputeMetricsNode(DataflowPlanNode):
 
     def __post_init__(self) -> None:  # noqa: D105
         super().__post_init__()
+
         assert len(self.parent_nodes) == 1
 
     @staticmethod
@@ -96,6 +97,19 @@ class ComputeMetricsNode(DataflowPlanNode):
 
         if other_node.for_group_by_source_node != self.for_group_by_source_node:
             return False, "one node is a group by metric source node"
+
+        alias_to_metric_spec = {spec.alias: spec for spec in self.metric_specs if spec.alias is not None}
+
+        for spec in other_node.metric_specs:
+            if (
+                spec.alias is not None
+                and spec.alias in alias_to_metric_spec
+                and alias_to_metric_spec[spec.alias] != spec
+            ):
+                return (
+                    False,
+                    f"Alias '{spec.alias}' is defined in both nodes but it refers to different things in each of them",
+                )
 
         return True, ""
 
