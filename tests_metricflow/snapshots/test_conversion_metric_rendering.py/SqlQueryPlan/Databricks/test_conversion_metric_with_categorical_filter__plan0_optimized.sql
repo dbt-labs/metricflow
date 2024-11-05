@@ -12,6 +12,7 @@ FROM (
     , MAX(subq_32.buys) AS buys
   FROM (
     -- Constrain Output with WHERE
+    -- Pass Only Elements: ['visits', 'visit__referrer_id', 'metric_time__day']
     -- Aggregate Measures
     SELECT
       metric_time__day
@@ -20,13 +21,12 @@ FROM (
     FROM (
       -- Read Elements From Semantic Model 'visits_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements: ['visits', 'visit__referrer_id', 'metric_time__day']
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
         , referrer_id AS visit__referrer_id
         , 1 AS visits
       FROM ***************************.fct_visits visits_source_src_28000
-    ) subq_19
+    ) subq_18
     WHERE visit__referrer_id = 'ref_id_01'
     GROUP BY
       metric_time__day

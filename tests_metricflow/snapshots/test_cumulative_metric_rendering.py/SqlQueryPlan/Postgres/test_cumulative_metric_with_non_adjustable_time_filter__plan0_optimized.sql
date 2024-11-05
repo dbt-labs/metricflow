@@ -1,4 +1,5 @@
 -- Constrain Output with WHERE
+-- Pass Only Elements: ['bookers', 'metric_time__day']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
@@ -6,7 +7,6 @@ SELECT
   , COUNT(DISTINCT bookers) AS every_two_days_bookers
 FROM (
   -- Join Self Over Time Range
-  -- Pass Only Elements: ['bookers', 'metric_time__day']
   SELECT
     subq_11.ds AS metric_time__day
     , bookings_source_src_28000.guest_id AS bookers
@@ -19,7 +19,7 @@ FROM (
     ) AND (
       DATE_TRUNC('day', bookings_source_src_28000.ds) > subq_11.ds - MAKE_INTERVAL(days => 2)
     )
-) subq_13
+) subq_12
 WHERE metric_time__day = '2020-01-03' or metric_time__day = '2020-01-07'
 GROUP BY
   metric_time__day

@@ -20,14 +20,14 @@ FROM (
         , subq_6.metric_time__day
         , SUM(subq_6.txn_revenue) AS txn_revenue
       FROM (
-        -- Pass Only Elements: ['txn_revenue', 'metric_time__day', 'metric_time__day']
-        -- Join to Custom Granularity Dataset
+        -- Pass Only Elements: ['txn_revenue', 'metric_time__martian_day', 'metric_time__day']
         SELECT
-          subq_4.metric_time__day AS metric_time__day
-          , subq_4.txn_revenue AS txn_revenue
-          , subq_5.martian_day AS metric_time__martian_day
+          subq_5.metric_time__martian_day
+          , subq_5.metric_time__day
+          , subq_5.txn_revenue
         FROM (
           -- Join Self Over Time Range
+          -- Join to Custom Granularity Dataset
           SELECT
             subq_2.metric_time__day AS metric_time__day
             , subq_1.ds__day AS ds__day
@@ -65,6 +65,7 @@ FROM (
             , subq_1.user AS user
             , subq_1.revenue_instance__user AS revenue_instance__user
             , subq_1.txn_revenue AS txn_revenue
+            , subq_4.martian_day AS metric_time__martian_day
           FROM (
             -- Time Spine
             SELECT
@@ -147,11 +148,11 @@ FROM (
             ) AND (
               subq_1.metric_time__day > DATE_ADD('month', -2, subq_2.metric_time__day)
             )
-        ) subq_4
-        LEFT OUTER JOIN
-          ***************************.mf_time_spine subq_5
-        ON
-          subq_4.metric_time__day = subq_5.ds
+          LEFT OUTER JOIN
+            ***************************.mf_time_spine subq_4
+          ON
+            subq_2.metric_time__day = subq_4.ds
+        ) subq_5
       ) subq_6
       GROUP BY
         subq_6.metric_time__martian_day

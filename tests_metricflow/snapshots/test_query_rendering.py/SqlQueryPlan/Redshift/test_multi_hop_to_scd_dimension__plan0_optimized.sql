@@ -3,19 +3,18 @@
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  subq_13.metric_time__day AS metric_time__day
-  , subq_18.lux_listing__is_confirmed_lux AS listing__lux_listing__is_confirmed_lux
-  , SUM(subq_13.bookings) AS bookings
+  subq_11.metric_time__day AS metric_time__day
+  , subq_16.lux_listing__is_confirmed_lux AS listing__lux_listing__is_confirmed_lux
+  , SUM(subq_11.bookings) AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
-  -- Pass Only Elements: ['bookings', 'metric_time__day', 'listing']
   SELECT
     DATE_TRUNC('day', ds) AS metric_time__day
     , listing_id AS listing
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_26000
-) subq_13
+) subq_11
 LEFT OUTER JOIN (
   -- Join Standard Outputs
   -- Pass Only Elements: ['lux_listing__is_confirmed_lux', 'lux_listing__window_start__day', 'lux_listing__window_end__day', 'listing']
@@ -29,21 +28,21 @@ LEFT OUTER JOIN (
     ***************************.dim_lux_listings lux_listings_src_26000
   ON
     lux_listing_mapping_src_26000.lux_listing_id = lux_listings_src_26000.lux_listing_id
-) subq_18
+) subq_16
 ON
   (
-    subq_13.listing = subq_18.listing
+    subq_11.listing = subq_16.listing
   ) AND (
     (
-      subq_13.metric_time__day >= subq_18.lux_listing__window_start__day
+      subq_11.metric_time__day >= subq_16.lux_listing__window_start__day
     ) AND (
       (
-        subq_13.metric_time__day < subq_18.lux_listing__window_end__day
+        subq_11.metric_time__day < subq_16.lux_listing__window_end__day
       ) OR (
-        subq_18.lux_listing__window_end__day IS NULL
+        subq_16.lux_listing__window_end__day IS NULL
       )
     )
   )
 GROUP BY
-  subq_13.metric_time__day
-  , subq_18.lux_listing__is_confirmed_lux
+  subq_11.metric_time__day
+  , subq_16.lux_listing__is_confirmed_lux

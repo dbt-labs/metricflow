@@ -6,19 +6,17 @@ SELECT
   SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['listings', 'user__revenue_all_time']
   SELECT
-    subq_22.user__revenue_all_time AS user__revenue_all_time
-    , subq_16.listings AS listings
+    subq_19.user__revenue_all_time AS user__revenue_all_time
+    , subq_13.listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
-    -- Pass Only Elements: ['listings', 'user']
     SELECT
       user_id AS user
       , 1 AS listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_16
+  ) subq_13
   LEFT OUTER JOIN (
     -- Read Elements From Semantic Model 'revenue'
     -- Metric Time Dimension 'ds'
@@ -32,8 +30,8 @@ FROM (
     FROM ***************************.fct_revenue revenue_src_28000
     GROUP BY
       user
-  ) subq_22
+  ) subq_19
   ON
-    subq_16.user = subq_22.user
-) subq_24
+    subq_13.user = subq_19.user
+) subq_20
 WHERE user__revenue_all_time > 1

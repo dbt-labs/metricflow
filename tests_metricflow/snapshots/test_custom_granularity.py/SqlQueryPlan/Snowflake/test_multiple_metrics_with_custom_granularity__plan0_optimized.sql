@@ -1,57 +1,55 @@
 -- Combine Aggregated Outputs
 SELECT
-  COALESCE(subq_20.metric_time__martian_day, subq_27.metric_time__martian_day) AS metric_time__martian_day
-  , MAX(subq_20.bookings) AS bookings
-  , MAX(subq_27.listings) AS listings
+  COALESCE(subq_17.metric_time__martian_day, subq_23.metric_time__martian_day) AS metric_time__martian_day
+  , MAX(subq_17.bookings) AS bookings
+  , MAX(subq_23.listings) AS listings
 FROM (
-  -- Pass Only Elements: ['bookings', 'metric_time__day']
+  -- Metric Time Dimension 'ds'
   -- Join to Custom Granularity Dataset
   -- Pass Only Elements: ['bookings', 'metric_time__martian_day']
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
-    subq_16.martian_day AS metric_time__martian_day
-    , SUM(subq_15.bookings) AS bookings
+    subq_13.martian_day AS metric_time__martian_day
+    , SUM(subq_12.bookings) AS bookings
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
-    -- Metric Time Dimension 'ds'
     SELECT
-      DATE_TRUNC('day', ds) AS metric_time__day
-      , 1 AS bookings
+      1 AS bookings
+      , DATE_TRUNC('day', ds) AS ds__day
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_15
+  ) subq_12
   LEFT OUTER JOIN
-    ***************************.mf_time_spine subq_16
+    ***************************.mf_time_spine subq_13
   ON
-    subq_15.metric_time__day = subq_16.ds
+    subq_12.ds__day = subq_13.ds
   GROUP BY
-    subq_16.martian_day
-) subq_20
+    subq_13.martian_day
+) subq_17
 FULL OUTER JOIN (
-  -- Pass Only Elements: ['listings', 'metric_time__day']
+  -- Metric Time Dimension 'ds'
   -- Join to Custom Granularity Dataset
   -- Pass Only Elements: ['listings', 'metric_time__martian_day']
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
-    subq_23.martian_day AS metric_time__martian_day
-    , SUM(subq_22.listings) AS listings
+    subq_19.martian_day AS metric_time__martian_day
+    , SUM(subq_18.listings) AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
-    -- Metric Time Dimension 'ds'
     SELECT
-      DATE_TRUNC('day', created_at) AS metric_time__day
-      , 1 AS listings
+      1 AS listings
+      , DATE_TRUNC('day', created_at) AS ds__day
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_22
+  ) subq_18
   LEFT OUTER JOIN
-    ***************************.mf_time_spine subq_23
+    ***************************.mf_time_spine subq_19
   ON
-    subq_22.metric_time__day = subq_23.ds
+    subq_18.ds__day = subq_19.ds
   GROUP BY
-    subq_23.martian_day
-) subq_27
+    subq_19.martian_day
+) subq_23
 ON
-  subq_20.metric_time__martian_day = subq_27.metric_time__martian_day
+  subq_17.metric_time__martian_day = subq_23.metric_time__martian_day
 GROUP BY
-  COALESCE(subq_20.metric_time__martian_day, subq_27.metric_time__martian_day)
+  COALESCE(subq_17.metric_time__martian_day, subq_23.metric_time__martian_day)
