@@ -563,8 +563,7 @@ integration_test:
       , COUNT(*) - 10 AS derived_shared_alias_1a
       , COUNT(*) - 100 AS derived_shared_alias_1b
     FROM {{ source_schema }}.fct_bookings
-    GROUP BY
-      booking__is_instant
+    GROUP BY 1
 ---
 integration_test:
   name: shared_alias_derived_metric_different
@@ -578,8 +577,7 @@ integration_test:
       , COUNT(*) - 10 AS derived_shared_alias_1a
       , SUM(CASE WHEN is_instant THEN 1 ELSE 0 END) + 10 AS derived_shared_alias_2
     FROM {{ source_schema }}.fct_bookings
-    GROUP BY
-      booking__is_instant
+    GROUP BY 1
 ---
 integration_test:
   name: two_metrics_with_null_dimension_values
