@@ -84,7 +84,7 @@ from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
 from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
-from metricflow.dataflow.nodes.join_to_base import JoinOnEntitiesNode
+from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinOnEntitiesNode
 from metricflow.dataflow.nodes.join_to_custom_granularity import JoinToCustomGranularityNode
 from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
 from metricflow.dataflow.nodes.min_max import MinMaxNode
@@ -328,26 +328,15 @@ class DataflowPlanBuilder:
             )
 
         # Build the unaggregated base measure node for computing conversions
-        unaggregated_base_measure_node = base_measure_recipe.source_node
-        if base_measure_recipe.join_targets:
-            unaggregated_base_measure_node = JoinOnEntitiesNode.create(
-                left_node=unaggregated_base_measure_node, join_targets=base_measure_recipe.join_targets
-            )
-        for time_dimension_spec in base_required_linkable_specs.time_dimension_specs:
-            if time_dimension_spec.time_granularity.is_custom_granularity:
-                unaggregated_base_measure_node = JoinToCustomGranularityNode.create(
-                    parent_node=unaggregated_base_measure_node, time_dimension_spec=time_dimension_spec
-                )
-        if len(base_measure_spec.filter_spec_set.all_filter_specs) > 0:
-            unaggregated_base_measure_node = WhereConstraintNode.create(
-                parent_node=unaggregated_base_measure_node,
-                where_specs=base_measure_spec.filter_spec_set.all_filter_specs,
-            )
-        filtered_unaggregated_base_node = FilterElementsNode.create(
-            parent_node=unaggregated_base_measure_node,
-            include_specs=group_specs_by_type(required_local_specs)
+        unaggregated_base_measure_node = self._build_pre_aggregation_plan(
+            source_node=base_measure_recipe.source_node,
+            join_targets=base_measure_recipe.join_targets,
+            filter_to_specs=group_specs_by_type(required_local_specs)
             .merge(base_required_linkable_specs.as_instance_spec_set)
             .dedupe(),
+            custom_granularity_specs=base_required_linkable_specs.time_dimension_specs_with_custom_grain,
+            time_range_constraint=None,
+            where_filter_specs=base_measure_spec.filter_spec_set.all_filter_specs,
         )
 
         # Gets the successful conversions using JoinConversionEventsNode
@@ -355,7 +344,7 @@ class DataflowPlanBuilder:
         # be still be constrained, where we adjust the time range to the window size similar to cumulative, but
         # adjusted in the opposite direction.
         join_conversion_node = JoinConversionEventsNode.create(
-            base_node=filtered_unaggregated_base_node,
+            base_node=unaggregated_base_measure_node,
             base_time_dimension_spec=metric_time_dimension_spec,
             conversion_node=unaggregated_conversion_measure_node,
             conversion_measure_spec=conversion_measure_spec.measure_spec,
@@ -833,26 +822,13 @@ class DataflowPlanBuilder:
         if not dataflow_recipe:
             raise UnableToSatisfyQueryError(f"Unable to join all items in request: {required_linkable_specs}")
 
-        output_node = dataflow_recipe.source_node
-        if dataflow_recipe.join_targets:
-            output_node = JoinOnEntitiesNode.create(left_node=output_node, join_targets=dataflow_recipe.join_targets)
-
-        for time_dimension_spec in required_linkable_specs.time_dimension_specs:
-            if time_dimension_spec.time_granularity.is_custom_granularity:
-                output_node = JoinToCustomGranularityNode.create(
-                    parent_node=output_node, time_dimension_spec=time_dimension_spec
-                )
-
-        if len(query_level_filter_specs) > 0:
-            output_node = WhereConstraintNode.create(parent_node=output_node, where_specs=query_level_filter_specs)
-        if query_spec.time_range_constraint:
-            output_node = ConstrainTimeRangeNode.create(
-                parent_node=output_node, time_range_constraint=query_spec.time_range_constraint
-            )
-
-        output_node = FilterElementsNode.create(
-            parent_node=output_node,
-            include_specs=InstanceSpecSet.create_from_specs(query_spec.linkable_specs.as_tuple),
+        output_node = self._build_pre_aggregation_plan(
+            source_node=dataflow_recipe.source_node,
+            join_targets=dataflow_recipe.join_targets,
+            filter_to_specs=InstanceSpecSet.create_from_specs(query_spec.linkable_specs.as_tuple),
+            custom_granularity_specs=required_linkable_specs.time_dimension_specs_with_custom_grain,
+            where_filter_specs=query_level_filter_specs,
+            time_range_constraint=query_spec.time_range_constraint,
             distinct=True,
         )
 
@@ -1650,79 +1626,34 @@ class DataflowPlanBuilder:
                 join_type=before_aggregation_time_spine_join_description.join_type,
             )
 
-        join_targets = measure_recipe.join_targets
-        if len(join_targets) > 0:
-            unaggregated_measure_node = JoinOnEntitiesNode.create(
-                left_node=unaggregated_measure_node, join_targets=join_targets
-            )
-
-        for time_dimension_spec in required_linkable_specs.time_dimension_specs:
-            if (
-                time_dimension_spec.time_granularity.is_custom_granularity
-                # If this is the second layer of aggregation for a conversion metric, we have already joined the custom granularity.
-                and time_dimension_spec not in measure_recipe.all_linkable_specs_required_for_source_nodes.as_tuple
-            ):
-                unaggregated_measure_node = JoinToCustomGranularityNode.create(
-                    parent_node=unaggregated_measure_node, time_dimension_spec=time_dimension_spec
-                )
-
+        custom_granularity_specs_to_join = [
+            spec
+            for spec in required_linkable_specs.time_dimension_specs_with_custom_grain
+            # If this is the second layer of aggregation for a conversion metric, we have already joined the custom granularity.
+            if spec not in measure_recipe.all_linkable_specs_required_for_source_nodes.as_tuple
+        ]
         # If time constraint was previously adjusted for cumulative window or grain, apply original time constraint
         # here. Can skip if metric is being aggregated over all time.
         # TODO - Pushdown: Encapsulate all of this window sliding bookkeeping in the pushdown params object
-        if (
-            cumulative_metric_adjusted_time_constraint is not None
-            and predicate_pushdown_state.time_range_constraint is not None
-        ):
-            assert (
-                queried_linkable_specs.contains_metric_time
-            ), "Using time constraints currently requires querying with metric_time."
-            unaggregated_measure_node = ConstrainTimeRangeNode.create(
-                parent_node=unaggregated_measure_node,
-                time_range_constraint=predicate_pushdown_state.time_range_constraint,
+        time_range_constraint_to_apply = (
+            predicate_pushdown_state.time_range_constraint
+            if (
+                cumulative_metric_adjusted_time_constraint is not None
+                and predicate_pushdown_state.time_range_constraint is not None
             )
-
-        if len(metric_input_measure_spec.filter_spec_set.all_filter_specs) > 0:
-            # Apply where constraint on the node
-            unaggregated_measure_node = WhereConstraintNode.create(
-                parent_node=unaggregated_measure_node,
-                where_specs=metric_input_measure_spec.filter_spec_set.all_filter_specs,
-            )
-
-        non_additive_dimension_spec = measure_properties.non_additive_dimension_spec
-        if non_additive_dimension_spec is not None:
-            # Apply semi additive join on the node
-            agg_time_dimension = measure_properties.agg_time_dimension
-            non_additive_dimension_grain = measure_properties.agg_time_dimension_grain
-            queried_time_dimension_spec: Optional[
-                TimeDimensionSpec
-            ] = self._find_non_additive_dimension_in_linkable_specs(
-                agg_time_dimension=agg_time_dimension,
-                linkable_specs=queried_linkable_specs.as_tuple,
-                non_additive_dimension_spec=non_additive_dimension_spec,
-            )
-            time_dimension_spec = TimeDimensionSpec(
-                # The NonAdditiveDimensionSpec name property is a plain element name
-                element_name=non_additive_dimension_spec.name,
-                entity_links=(),
-                time_granularity=ExpandedTimeGranularity.from_time_granularity(non_additive_dimension_grain),
-            )
-            window_groupings = tuple(
-                LinklessEntitySpec.from_element_name(name) for name in non_additive_dimension_spec.window_groupings
-            )
-            unaggregated_measure_node = SemiAdditiveJoinNode.create(
-                parent_node=unaggregated_measure_node,
-                entity_specs=window_groupings,
-                time_dimension_spec=time_dimension_spec,
-                agg_by_function=non_additive_dimension_spec.window_choice,
-                queried_time_dimension_spec=queried_time_dimension_spec,
-            )
-
-        # Filter to just the required measure and the requested group bys so that aggregations work correctly.
-        unaggregated_measure_node = FilterElementsNode.create(
-            parent_node=unaggregated_measure_node,
-            include_specs=InstanceSpecSet(measure_specs=(measure_spec,)).merge(
+            else None
+        )
+        unaggregated_measure_node = self._build_pre_aggregation_plan(
+            source_node=unaggregated_measure_node,
+            join_targets=measure_recipe.join_targets,
+            custom_granularity_specs=custom_granularity_specs_to_join,
+            where_filter_specs=metric_input_measure_spec.filter_spec_set.all_filter_specs,
+            time_range_constraint=time_range_constraint_to_apply,
+            filter_to_specs=InstanceSpecSet(measure_specs=(measure_spec,)).merge(
                 InstanceSpecSet.create_from_specs(queried_linkable_specs.as_tuple)
             ),
+            measure_properties=measure_properties,
+            queried_linkable_specs=queried_linkable_specs,
         )
 
         aggregate_measures_node = AggregateMeasuresNode.create(
@@ -1791,3 +1722,86 @@ class DataflowPlanBuilder:
             return output_node
 
         return aggregate_measures_node
+
+    def _build_pre_aggregation_plan(
+        self,
+        source_node: DataflowPlanNode,
+        join_targets: List[JoinDescription],
+        custom_granularity_specs: Sequence[TimeDimensionSpec],
+        where_filter_specs: Sequence[WhereFilterSpec],
+        time_range_constraint: Optional[TimeRangeConstraint],
+        filter_to_specs: InstanceSpecSet,
+        measure_properties: Optional[MeasureSpecProperties] = None,
+        queried_linkable_specs: Optional[LinkableSpecSet] = None,
+        distinct: bool = False,
+    ) -> DataflowPlanNode:
+        """Adds standard pre-aggegation steps after building source node and before aggregation."""
+        output_node = source_node
+        if join_targets:
+            output_node = JoinOnEntitiesNode.create(left_node=output_node, join_targets=join_targets)
+
+        for custom_granularity_spec in custom_granularity_specs:
+            output_node = JoinToCustomGranularityNode.create(
+                parent_node=output_node, time_dimension_spec=custom_granularity_spec
+            )
+
+        if len(where_filter_specs) > 0:
+            output_node = WhereConstraintNode.create(parent_node=output_node, where_specs=where_filter_specs)
+
+        if time_range_constraint:
+            output_node = ConstrainTimeRangeNode.create(
+                parent_node=output_node, time_range_constraint=time_range_constraint
+            )
+
+        if measure_properties and measure_properties.non_additive_dimension_spec:
+            if queried_linkable_specs is None:
+                raise ValueError(
+                    "`queried_linkable_specs` must be provided in _build_pre_aggregation_plan() if "
+                    "`non_additive_dimension_spec` is present."
+                )
+            output_node = self._build_semi_additive_join_node(
+                measure_properties=measure_properties,
+                queried_linkable_specs=queried_linkable_specs,
+                parent_node=output_node,
+            )
+
+        output_node = FilterElementsNode.create(
+            parent_node=output_node, include_specs=filter_to_specs, distinct=distinct
+        )
+
+        return output_node
+
+    def _build_semi_additive_join_node(
+        self,
+        measure_properties: MeasureSpecProperties,
+        queried_linkable_specs: LinkableSpecSet,
+        parent_node: DataflowPlanNode,
+    ) -> SemiAdditiveJoinNode:
+        non_additive_dimension_spec = measure_properties.non_additive_dimension_spec
+        assert (
+            non_additive_dimension_spec
+        ), "_build_semi_additive_join_node() should only be called if there is a non_additive_dimension_spec."
+        # Apply semi additive join on the node
+        agg_time_dimension = measure_properties.agg_time_dimension
+        non_additive_dimension_grain = measure_properties.agg_time_dimension_grain
+        queried_time_dimension_spec: Optional[TimeDimensionSpec] = self._find_non_additive_dimension_in_linkable_specs(
+            agg_time_dimension=agg_time_dimension,
+            linkable_specs=queried_linkable_specs.as_tuple,
+            non_additive_dimension_spec=non_additive_dimension_spec,
+        )
+        time_dimension_spec = TimeDimensionSpec(
+            # The NonAdditiveDimensionSpec name property is a plain element name
+            element_name=non_additive_dimension_spec.name,
+            entity_links=(),
+            time_granularity=ExpandedTimeGranularity.from_time_granularity(non_additive_dimension_grain),
+        )
+        window_groupings = tuple(
+            LinklessEntitySpec.from_element_name(name) for name in non_additive_dimension_spec.window_groupings
+        )
+        return SemiAdditiveJoinNode.create(
+            parent_node=parent_node,
+            entity_specs=window_groupings,
+            time_dimension_spec=time_dimension_spec,
+            agg_by_function=non_additive_dimension_spec.window_choice,
+            queried_time_dimension_spec=queried_time_dimension_spec,
+        )
