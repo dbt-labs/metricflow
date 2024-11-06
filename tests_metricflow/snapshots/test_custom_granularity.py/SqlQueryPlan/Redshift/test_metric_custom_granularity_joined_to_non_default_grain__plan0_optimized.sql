@@ -1,25 +1,24 @@
--- Pass Only Elements: ['listings', 'metric_time__day', 'listing__ds__month']
+-- Metric Time Dimension 'ds'
 -- Join to Custom Granularity Dataset
 -- Pass Only Elements: ['listings', 'metric_time__martian_day', 'listing__ds__month']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  subq_8.martian_day AS metric_time__martian_day
-  , subq_7.listing__ds__month AS listing__ds__month
-  , SUM(subq_7.listings) AS listings
+  subq_6.martian_day AS metric_time__martian_day
+  , subq_5.listing__ds__month AS listing__ds__month
+  , SUM(subq_5.listings) AS listings
 FROM (
   -- Read Elements From Semantic Model 'listings_latest'
-  -- Metric Time Dimension 'ds'
   SELECT
-    DATE_TRUNC('month', created_at) AS listing__ds__month
-    , DATE_TRUNC('day', created_at) AS metric_time__day
-    , 1 AS listings
+    1 AS listings
+    , DATE_TRUNC('day', created_at) AS ds__day
+    , DATE_TRUNC('month', created_at) AS listing__ds__month
   FROM ***************************.dim_listings_latest listings_latest_src_28000
-) subq_7
+) subq_5
 LEFT OUTER JOIN
-  ***************************.mf_time_spine subq_8
+  ***************************.mf_time_spine subq_6
 ON
-  subq_7.metric_time__day = subq_8.ds
+  subq_5.ds__day = subq_6.ds
 GROUP BY
-  subq_8.martian_day
-  , subq_7.listing__ds__month
+  subq_6.martian_day
+  , subq_5.listing__ds__month

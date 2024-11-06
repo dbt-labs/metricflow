@@ -6,19 +6,17 @@ SELECT
   SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['listings', 'listing__bookings_per_booker']
   SELECT
-    CAST(subq_28.bookings AS DOUBLE) / CAST(NULLIF(subq_28.bookers, 0) AS DOUBLE) AS listing__bookings_per_booker
-    , subq_23.listings AS listings
+    CAST(subq_25.bookings AS DOUBLE) / CAST(NULLIF(subq_25.bookers, 0) AS DOUBLE) AS listing__bookings_per_booker
+    , subq_20.listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
-    -- Pass Only Elements: ['listings', 'listing']
     SELECT
       listing_id AS listing
       , 1 AS listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_23
+  ) subq_20
   LEFT OUTER JOIN (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
@@ -35,11 +33,11 @@ FROM (
         , 1 AS bookings
         , guest_id AS bookers
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_26
+    ) subq_23
     GROUP BY
       listing
-  ) subq_28
+  ) subq_25
   ON
-    subq_23.listing = subq_28.listing
-) subq_32
+    subq_20.listing = subq_25.listing
+) subq_28
 WHERE listing__bookings_per_booker > 1

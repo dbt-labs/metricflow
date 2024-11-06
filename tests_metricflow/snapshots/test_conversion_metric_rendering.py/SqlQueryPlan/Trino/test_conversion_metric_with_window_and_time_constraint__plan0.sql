@@ -17,17 +17,55 @@ FROM (
       , subq_4.visit__referrer_id
       , SUM(subq_4.visits) AS visits
     FROM (
-      -- Constrain Output with WHERE
+      -- Pass Only Elements: ['visits', 'visit__referrer_id', 'metric_time__day']
       SELECT
         subq_3.metric_time__day
         , subq_3.visit__referrer_id
         , subq_3.visits
       FROM (
-        -- Pass Only Elements: ['visits', 'visit__referrer_id', 'metric_time__day']
+        -- Constrain Output with WHERE
         SELECT
-          subq_2.metric_time__day
+          subq_2.ds__day
+          , subq_2.ds__week
+          , subq_2.ds__month
+          , subq_2.ds__quarter
+          , subq_2.ds__year
+          , subq_2.ds__extract_year
+          , subq_2.ds__extract_quarter
+          , subq_2.ds__extract_month
+          , subq_2.ds__extract_day
+          , subq_2.ds__extract_dow
+          , subq_2.ds__extract_doy
+          , subq_2.visit__ds__day
+          , subq_2.visit__ds__week
+          , subq_2.visit__ds__month
+          , subq_2.visit__ds__quarter
+          , subq_2.visit__ds__year
+          , subq_2.visit__ds__extract_year
+          , subq_2.visit__ds__extract_quarter
+          , subq_2.visit__ds__extract_month
+          , subq_2.visit__ds__extract_day
+          , subq_2.visit__ds__extract_dow
+          , subq_2.visit__ds__extract_doy
+          , subq_2.metric_time__day
+          , subq_2.metric_time__week
+          , subq_2.metric_time__month
+          , subq_2.metric_time__quarter
+          , subq_2.metric_time__year
+          , subq_2.metric_time__extract_year
+          , subq_2.metric_time__extract_quarter
+          , subq_2.metric_time__extract_month
+          , subq_2.metric_time__extract_day
+          , subq_2.metric_time__extract_dow
+          , subq_2.metric_time__extract_doy
+          , subq_2.user
+          , subq_2.session
+          , subq_2.visit__user
+          , subq_2.visit__session
+          , subq_2.referrer_id
           , subq_2.visit__referrer_id
           , subq_2.visits
+          , subq_2.visitors
         FROM (
           -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-02T00:00:00]
           SELECT
@@ -154,8 +192,8 @@ FROM (
           ) subq_1
           WHERE subq_1.metric_time__day BETWEEN timestamp '2020-01-01' AND timestamp '2020-01-02'
         ) subq_2
+        WHERE visit__referrer_id = 'ref_id_01'
       ) subq_3
-      WHERE visit__referrer_id = 'ref_id_01'
     ) subq_4
     GROUP BY
       subq_4.metric_time__day

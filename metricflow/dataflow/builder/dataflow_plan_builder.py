@@ -1612,10 +1612,10 @@ class DataflowPlanBuilder:
 
         # If a cumulative metric is queried with metric_time / agg_time_dimension, join over time range.
         # Otherwise, the measure will be aggregated over all time.
-        time_range_node: Optional[JoinOverTimeRangeNode] = None
+        unaggregated_measure_node: DataflowPlanNode = measure_recipe.source_node
         if cumulative and queried_agg_time_dimension_specs:
-            time_range_node = JoinOverTimeRangeNode.create(
-                parent_node=measure_recipe.source_node,
+            unaggregated_measure_node = JoinOverTimeRangeNode.create(
+                parent_node=unaggregated_measure_node,
                 queried_agg_time_dimension_specs=tuple(queried_agg_time_dimension_specs),
                 window=cumulative_window,
                 grain_to_date=cumulative_grain_to_date,
@@ -1629,7 +1629,6 @@ class DataflowPlanBuilder:
             )
 
         # If querying an offset metric, join to time spine before aggregation.
-        join_to_time_spine_node: Optional[JoinToTimeSpineNode] = None
         if before_aggregation_time_spine_join_description is not None:
             assert queried_agg_time_dimension_specs, (
                 "Joining to time spine requires querying with metric time or the appropriate agg_time_dimension."
@@ -1641,8 +1640,8 @@ class DataflowPlanBuilder:
             )
             # This also uses the original time range constraint due to the application of the time window intervals
             # in join rendering
-            join_to_time_spine_node = JoinToTimeSpineNode.create(
-                parent_node=time_range_node or measure_recipe.source_node,
+            unaggregated_measure_node = JoinToTimeSpineNode.create(
+                parent_node=unaggregated_measure_node,
                 requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
                 use_custom_agg_time_dimension=not queried_linkable_specs.contains_metric_time,
                 time_range_constraint=predicate_pushdown_state.time_range_constraint,
@@ -1651,32 +1650,11 @@ class DataflowPlanBuilder:
                 join_type=before_aggregation_time_spine_join_description.join_type,
             )
 
-        # Only get the required measure and the local linkable instances so that aggregations work correctly.
-        filtered_measure_source_node = FilterElementsNode.create(
-            parent_node=join_to_time_spine_node or time_range_node or measure_recipe.source_node,
-            include_specs=InstanceSpecSet(measure_specs=(measure_spec,)).merge(
-                measure_recipe.required_local_linkable_specs.as_instance_spec_set,
-            ),
-        )
-
         join_targets = measure_recipe.join_targets
-        unaggregated_measure_node: DataflowPlanNode
         if len(join_targets) > 0:
-            filtered_measures_with_joined_elements = JoinOnEntitiesNode.create(
-                left_node=filtered_measure_source_node,
-                join_targets=join_targets,
+            unaggregated_measure_node = JoinOnEntitiesNode.create(
+                left_node=unaggregated_measure_node, join_targets=join_targets
             )
-
-            specs_to_keep_after_join = InstanceSpecSet(measure_specs=(measure_spec,)).merge(
-                InstanceSpecSet.create_from_specs(measure_recipe.all_linkable_specs_required_for_source_nodes.as_tuple),
-            )
-
-            after_join_filtered_node = FilterElementsNode.create(
-                parent_node=filtered_measures_with_joined_elements, include_specs=specs_to_keep_after_join
-            )
-            unaggregated_measure_node = after_join_filtered_node
-        else:
-            unaggregated_measure_node = filtered_measure_source_node
 
         for time_dimension_spec in required_linkable_specs.time_dimension_specs:
             if (
@@ -1690,7 +1668,6 @@ class DataflowPlanBuilder:
 
         # If time constraint was previously adjusted for cumulative window or grain, apply original time constraint
         # here. Can skip if metric is being aggregated over all time.
-        cumulative_metric_constrained_node: Optional[ConstrainTimeRangeNode] = None
         # TODO - Pushdown: Encapsulate all of this window sliding bookkeeping in the pushdown params object
         if (
             cumulative_metric_adjusted_time_constraint is not None
@@ -1699,15 +1676,15 @@ class DataflowPlanBuilder:
             assert (
                 queried_linkable_specs.contains_metric_time
             ), "Using time constraints currently requires querying with metric_time."
-            cumulative_metric_constrained_node = ConstrainTimeRangeNode.create(
-                unaggregated_measure_node, predicate_pushdown_state.time_range_constraint
+            unaggregated_measure_node = ConstrainTimeRangeNode.create(
+                parent_node=unaggregated_measure_node,
+                time_range_constraint=predicate_pushdown_state.time_range_constraint,
             )
 
-        pre_aggregate_node: DataflowPlanNode = cumulative_metric_constrained_node or unaggregated_measure_node
         if len(metric_input_measure_spec.filter_spec_set.all_filter_specs) > 0:
             # Apply where constraint on the node
-            pre_aggregate_node = WhereConstraintNode.create(
-                parent_node=pre_aggregate_node,
+            unaggregated_measure_node = WhereConstraintNode.create(
+                parent_node=unaggregated_measure_node,
                 where_specs=metric_input_measure_spec.filter_spec_set.all_filter_specs,
             )
 
@@ -1732,30 +1709,24 @@ class DataflowPlanBuilder:
             window_groupings = tuple(
                 LinklessEntitySpec.from_element_name(name) for name in non_additive_dimension_spec.window_groupings
             )
-            pre_aggregate_node = SemiAdditiveJoinNode.create(
-                parent_node=pre_aggregate_node,
+            unaggregated_measure_node = SemiAdditiveJoinNode.create(
+                parent_node=unaggregated_measure_node,
                 entity_specs=window_groupings,
                 time_dimension_spec=time_dimension_spec,
                 agg_by_function=non_additive_dimension_spec.window_choice,
                 queried_time_dimension_spec=queried_time_dimension_spec,
             )
 
-        if not extraneous_linkable_specs.is_subset_of(queried_linkable_specs):
-            # At this point, it's the case that there are extraneous specs are not a subset of the queried
-            # linkable specs. A filter is needed after, say, a where clause so that the linkable specs in the where clause don't
-            # show up in the final result.
-            #
-            # e.g. for "bookings" by "ds" where "is_instant", "is_instant" should not be in the results.
-            pre_aggregate_node = FilterElementsNode.create(
-                parent_node=pre_aggregate_node,
-                include_specs=InstanceSpecSet(measure_specs=(measure_spec,)).merge(
-                    InstanceSpecSet.create_from_specs(queried_linkable_specs.as_tuple)
-                ),
-            )
+        # Filter to just the required measure and the requested group bys so that aggregations work correctly.
+        unaggregated_measure_node = FilterElementsNode.create(
+            parent_node=unaggregated_measure_node,
+            include_specs=InstanceSpecSet(measure_specs=(measure_spec,)).merge(
+                InstanceSpecSet.create_from_specs(queried_linkable_specs.as_tuple)
+            ),
+        )
 
         aggregate_measures_node = AggregateMeasuresNode.create(
-            parent_node=pre_aggregate_node,
-            metric_input_measure_specs=(metric_input_measure_spec,),
+            parent_node=unaggregated_measure_node, metric_input_measure_specs=(metric_input_measure_spec,)
         )
 
         # Joining to time spine after aggregation is for measures that specify `join_to_timespine: true` in the YAML spec.

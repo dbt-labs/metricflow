@@ -8,14 +8,48 @@ FROM (
     subq_7.metric_time__day
     , SUM(subq_7.txn_revenue) AS txn_revenue
   FROM (
-    -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-01T00:00:00]
+    -- Pass Only Elements: ['txn_revenue', 'metric_time__day']
     SELECT
       subq_6.metric_time__day
       , subq_6.txn_revenue
     FROM (
-      -- Pass Only Elements: ['txn_revenue', 'metric_time__day']
+      -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-01T00:00:00]
       SELECT
-        subq_5.metric_time__day
+        subq_5.ds__day
+        , subq_5.ds__week
+        , subq_5.ds__month
+        , subq_5.ds__quarter
+        , subq_5.ds__year
+        , subq_5.ds__extract_year
+        , subq_5.ds__extract_quarter
+        , subq_5.ds__extract_month
+        , subq_5.ds__extract_day
+        , subq_5.ds__extract_dow
+        , subq_5.ds__extract_doy
+        , subq_5.revenue_instance__ds__day
+        , subq_5.revenue_instance__ds__week
+        , subq_5.revenue_instance__ds__month
+        , subq_5.revenue_instance__ds__quarter
+        , subq_5.revenue_instance__ds__year
+        , subq_5.revenue_instance__ds__extract_year
+        , subq_5.revenue_instance__ds__extract_quarter
+        , subq_5.revenue_instance__ds__extract_month
+        , subq_5.revenue_instance__ds__extract_day
+        , subq_5.revenue_instance__ds__extract_dow
+        , subq_5.revenue_instance__ds__extract_doy
+        , subq_5.metric_time__day
+        , subq_5.metric_time__week
+        , subq_5.metric_time__month
+        , subq_5.metric_time__quarter
+        , subq_5.metric_time__year
+        , subq_5.metric_time__extract_year
+        , subq_5.metric_time__extract_quarter
+        , subq_5.metric_time__extract_month
+        , subq_5.metric_time__extract_day
+        , subq_5.metric_time__extract_dow
+        , subq_5.metric_time__extract_doy
+        , subq_5.user
+        , subq_5.revenue_instance__user
         , subq_5.txn_revenue
       FROM (
         -- Join Self Over Time Range
@@ -181,8 +215,8 @@ FROM (
             subq_2.metric_time__day > subq_3.metric_time__day - INTERVAL 2 month
           )
       ) subq_5
+      WHERE subq_5.metric_time__day BETWEEN '2020-01-01' AND '2020-01-01'
     ) subq_6
-    WHERE subq_6.metric_time__day BETWEEN '2020-01-01' AND '2020-01-01'
   ) subq_7
   GROUP BY
     subq_7.metric_time__day

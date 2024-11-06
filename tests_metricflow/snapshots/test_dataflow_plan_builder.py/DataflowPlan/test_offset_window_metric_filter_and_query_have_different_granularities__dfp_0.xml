@@ -109,7 +109,7 @@
                         <!-- node_id = NodeId(id_str='am_0') -->
                         <FilterElementsNode>
                             <!-- description = "Pass Only Elements: ['booking_value', 'metric_time__month']" -->
-                            <!-- node_id = NodeId(id_str='pfe_1') -->
+                            <!-- node_id = NodeId(id_str='pfe_0') -->
                             <!-- include_spec = MeasureSpec(element_name='booking_value') -->
                             <!-- include_spec =                                                                      -->
                             <!--   TimeDimensionSpec(                                                                -->
@@ -157,54 +157,33 @@
                                 <!--       ),                                                          -->
                                 <!--     ),                                                            -->
                                 <!--   )                                                               -->
-                                <FilterElementsNode>
-                                    <!-- description =                                                     -->
-                                    <!--   ("Pass Only Elements: ['booking_value', 'metric_time__month', " -->
-                                    <!--    "'metric_time__day']")                                         -->
-                                    <!-- node_id = NodeId(id_str='pfe_0') -->
-                                    <!-- include_spec = MeasureSpec(element_name='booking_value') -->
-                                    <!-- include_spec =                                -->
-                                    <!--   TimeDimensionSpec(                          -->
-                                    <!--     element_name='metric_time',               -->
-                                    <!--     time_granularity=ExpandedTimeGranularity( -->
-                                    <!--       name='month',                           -->
-                                    <!--       base_granularity=MONTH,                 -->
-                                    <!--     ),                                        -->
-                                    <!--   )                                           -->
-                                    <!-- include_spec =                                                                  -->
-                                    <!--   TimeDimensionSpec(                                                            -->
-                                    <!--     element_name='metric_time',                                                 -->
-                                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
-                                    <!--   )                                                                             -->
-                                    <!-- distinct = False -->
-                                    <JoinToTimeSpineNode>
-                                        <!-- description = 'Join to Time Spine Dataset' -->
-                                        <!-- node_id = NodeId(id_str='jts_0') -->
-                                        <!-- requested_agg_time_dimension_specs =            -->
-                                        <!--   (                                             -->
-                                        <!--     TimeDimensionSpec(                          -->
-                                        <!--       element_name='metric_time',               -->
-                                        <!--       time_granularity=ExpandedTimeGranularity( -->
-                                        <!--         name='month',                           -->
-                                        <!--         base_granularity=MONTH,                 -->
-                                        <!--       ),                                        -->
-                                        <!--     ),                                          -->
-                                        <!--   )                                             -->
-                                        <!-- use_custom_agg_time_dimension = False -->
-                                        <!-- join_type = INNER -->
-                                        <!-- offset_window = PydanticMetricTimeWindow(count=1, granularity=WEEK) -->
-                                        <MetricTimeDimensionTransformNode>
-                                            <!-- description = "Metric Time Dimension 'ds'" -->
-                                            <!-- node_id = NodeId(id_str='sma_28009') -->
-                                            <!-- aggregation_time_dimension = 'ds' -->
-                                            <ReadSqlSourceNode>
-                                                <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
-                                                <!-- node_id = NodeId(id_str='rss_28020') -->
-                                                <!-- data_set = SemanticModelDataSet('bookings_source') -->
-                                            </ReadSqlSourceNode>
-                                        </MetricTimeDimensionTransformNode>
-                                    </JoinToTimeSpineNode>
-                                </FilterElementsNode>
+                                <JoinToTimeSpineNode>
+                                    <!-- description = 'Join to Time Spine Dataset' -->
+                                    <!-- node_id = NodeId(id_str='jts_0') -->
+                                    <!-- requested_agg_time_dimension_specs =            -->
+                                    <!--   (                                             -->
+                                    <!--     TimeDimensionSpec(                          -->
+                                    <!--       element_name='metric_time',               -->
+                                    <!--       time_granularity=ExpandedTimeGranularity( -->
+                                    <!--         name='month',                           -->
+                                    <!--         base_granularity=MONTH,                 -->
+                                    <!--       ),                                        -->
+                                    <!--     ),                                          -->
+                                    <!--   )                                             -->
+                                    <!-- use_custom_agg_time_dimension = False -->
+                                    <!-- join_type = INNER -->
+                                    <!-- offset_window = PydanticMetricTimeWindow(count=1, granularity=WEEK) -->
+                                    <MetricTimeDimensionTransformNode>
+                                        <!-- description = "Metric Time Dimension 'ds'" -->
+                                        <!-- node_id = NodeId(id_str='sma_28009') -->
+                                        <!-- aggregation_time_dimension = 'ds' -->
+                                        <ReadSqlSourceNode>
+                                            <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
+                                            <!-- node_id = NodeId(id_str='rss_28020') -->
+                                            <!-- data_set = SemanticModelDataSet('bookings_source') -->
+                                        </ReadSqlSourceNode>
+                                    </MetricTimeDimensionTransformNode>
+                                </JoinToTimeSpineNode>
                             </WhereConstraintNode>
                         </FilterElementsNode>
                     </AggregateMeasuresNode>
@@ -263,7 +242,7 @@
                         <!-- node_id = NodeId(id_str='am_1') -->
                         <FilterElementsNode>
                             <!-- description = "Pass Only Elements: ['bookers', 'metric_time__month']" -->
-                            <!-- node_id = NodeId(id_str='pfe_3') -->
+                            <!-- node_id = NodeId(id_str='pfe_1') -->
                             <!-- include_spec = MeasureSpec(element_name='bookers') -->
                             <!-- include_spec =                                                                      -->
                             <!--   TimeDimensionSpec(                                                                -->
@@ -311,36 +290,16 @@
                                 <!--       ),                                                          -->
                                 <!--     ),                                                            -->
                                 <!--   )                                                               -->
-                                <FilterElementsNode>
-                                    <!-- description =                                                                 -->
-                                    <!--   "Pass Only Elements: ['bookers', 'metric_time__month', 'metric_time__day']" -->
-                                    <!-- node_id = NodeId(id_str='pfe_2') -->
-                                    <!-- include_spec = MeasureSpec(element_name='bookers') -->
-                                    <!-- include_spec =                                -->
-                                    <!--   TimeDimensionSpec(                          -->
-                                    <!--     element_name='metric_time',               -->
-                                    <!--     time_granularity=ExpandedTimeGranularity( -->
-                                    <!--       name='month',                           -->
-                                    <!--       base_granularity=MONTH,                 -->
-                                    <!--     ),                                        -->
-                                    <!--   )                                           -->
-                                    <!-- include_spec =                                                                  -->
-                                    <!--   TimeDimensionSpec(                                                            -->
-                                    <!--     element_name='metric_time',                                                 -->
-                                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
-                                    <!--   )                                                                             -->
-                                    <!-- distinct = False -->
-                                    <MetricTimeDimensionTransformNode>
-                                        <!-- description = "Metric Time Dimension 'ds'" -->
-                                        <!-- node_id = NodeId(id_str='sma_28009') -->
-                                        <!-- aggregation_time_dimension = 'ds' -->
-                                        <ReadSqlSourceNode>
-                                            <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
-                                            <!-- node_id = NodeId(id_str='rss_28020') -->
-                                            <!-- data_set = SemanticModelDataSet('bookings_source') -->
-                                        </ReadSqlSourceNode>
-                                    </MetricTimeDimensionTransformNode>
-                                </FilterElementsNode>
+                                <MetricTimeDimensionTransformNode>
+                                    <!-- description = "Metric Time Dimension 'ds'" -->
+                                    <!-- node_id = NodeId(id_str='sma_28009') -->
+                                    <!-- aggregation_time_dimension = 'ds' -->
+                                    <ReadSqlSourceNode>
+                                        <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
+                                        <!-- node_id = NodeId(id_str='rss_28020') -->
+                                        <!-- data_set = SemanticModelDataSet('bookings_source') -->
+                                    </ReadSqlSourceNode>
+                                </MetricTimeDimensionTransformNode>
                             </WhereConstraintNode>
                         </FilterElementsNode>
                     </AggregateMeasuresNode>

@@ -1,9 +1,9 @@
 -- Combine Aggregated Outputs
 SELECT
-  COALESCE(subq_61.listing__capacity_latest, subq_73.listing__capacity_latest, subq_98.listing__capacity_latest) AS listing__capacity_latest
-  , MAX(subq_61.bookings) AS bookings
-  , MAX(subq_73.views) AS views
-  , MAX(CAST(subq_98.bookings AS FLOAT64) / CAST(NULLIF(subq_98.views, 0) AS FLOAT64)) AS bookings_per_view
+  COALESCE(subq_51.listing__capacity_latest, subq_61.listing__capacity_latest, subq_82.listing__capacity_latest) AS listing__capacity_latest
+  , MAX(subq_51.bookings) AS bookings
+  , MAX(subq_61.views) AS views
+  , MAX(CAST(subq_82.bookings AS FLOAT64) / CAST(NULLIF(subq_82.views, 0) AS FLOAT64)) AS bookings_per_view
 FROM (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['bookings', 'listing__capacity_latest']
@@ -14,31 +14,29 @@ FROM (
     , SUM(bookings) AS bookings
   FROM (
     -- Join Standard Outputs
-    -- Pass Only Elements: ['bookings', 'listing__capacity_latest', 'listing__is_lux_latest', 'metric_time__day']
     SELECT
-      subq_52.metric_time__day AS metric_time__day
-      , listings_latest_src_28000.is_lux AS listing__is_lux_latest
+      listings_latest_src_28000.is_lux AS listing__is_lux_latest
       , listings_latest_src_28000.capacity AS listing__capacity_latest
-      , subq_52.bookings AS bookings
+      , subq_43.metric_time__day AS metric_time__day
+      , subq_43.bookings AS bookings
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements: ['bookings', 'metric_time__day', 'listing']
       SELECT
         DATETIME_TRUNC(ds, day) AS metric_time__day
         , listing_id AS listing
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_52
+    ) subq_43
     LEFT OUTER JOIN
       ***************************.dim_listings_latest listings_latest_src_28000
     ON
-      subq_52.listing = listings_latest_src_28000.listing_id
-  ) subq_57
+      subq_43.listing = listings_latest_src_28000.listing_id
+  ) subq_47
   WHERE (listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')
   GROUP BY
     listing__capacity_latest
-) subq_61
+) subq_51
 FULL OUTER JOIN (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['views', 'listing__capacity_latest']
@@ -49,39 +47,37 @@ FULL OUTER JOIN (
     , SUM(views) AS views
   FROM (
     -- Join Standard Outputs
-    -- Pass Only Elements: ['views', 'listing__capacity_latest', 'listing__is_lux_latest', 'metric_time__day']
     SELECT
-      subq_64.metric_time__day AS metric_time__day
-      , listings_latest_src_28000.is_lux AS listing__is_lux_latest
+      listings_latest_src_28000.is_lux AS listing__is_lux_latest
       , listings_latest_src_28000.capacity AS listing__capacity_latest
-      , subq_64.views AS views
+      , subq_53.metric_time__day AS metric_time__day
+      , subq_53.views AS views
     FROM (
       -- Read Elements From Semantic Model 'views_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements: ['views', 'metric_time__day', 'listing']
       SELECT
         DATETIME_TRUNC(ds, day) AS metric_time__day
         , listing_id AS listing
         , 1 AS views
       FROM ***************************.fct_views views_source_src_28000
-    ) subq_64
+    ) subq_53
     LEFT OUTER JOIN
       ***************************.dim_listings_latest listings_latest_src_28000
     ON
-      subq_64.listing = listings_latest_src_28000.listing_id
-  ) subq_69
+      subq_53.listing = listings_latest_src_28000.listing_id
+  ) subq_57
   WHERE (listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')
   GROUP BY
     listing__capacity_latest
-) subq_73
+) subq_61
 ON
-  subq_61.listing__capacity_latest = subq_73.listing__capacity_latest
+  subq_51.listing__capacity_latest = subq_61.listing__capacity_latest
 FULL OUTER JOIN (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_85.listing__capacity_latest, subq_97.listing__capacity_latest) AS listing__capacity_latest
-    , MAX(subq_85.bookings) AS bookings
-    , MAX(subq_97.views) AS views
+    COALESCE(subq_71.listing__capacity_latest, subq_81.listing__capacity_latest) AS listing__capacity_latest
+    , MAX(subq_71.bookings) AS bookings
+    , MAX(subq_81.views) AS views
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['bookings', 'listing__capacity_latest']
@@ -92,31 +88,29 @@ FULL OUTER JOIN (
       , SUM(bookings) AS bookings
     FROM (
       -- Join Standard Outputs
-      -- Pass Only Elements: ['bookings', 'listing__capacity_latest', 'listing__is_lux_latest', 'metric_time__day']
       SELECT
-        subq_76.metric_time__day AS metric_time__day
-        , listings_latest_src_28000.is_lux AS listing__is_lux_latest
+        listings_latest_src_28000.is_lux AS listing__is_lux_latest
         , listings_latest_src_28000.capacity AS listing__capacity_latest
-        , subq_76.bookings AS bookings
+        , subq_63.metric_time__day AS metric_time__day
+        , subq_63.bookings AS bookings
       FROM (
         -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
-        -- Pass Only Elements: ['bookings', 'metric_time__day', 'listing']
         SELECT
           DATETIME_TRUNC(ds, day) AS metric_time__day
           , listing_id AS listing
           , 1 AS bookings
         FROM ***************************.fct_bookings bookings_source_src_28000
-      ) subq_76
+      ) subq_63
       LEFT OUTER JOIN
         ***************************.dim_listings_latest listings_latest_src_28000
       ON
-        subq_76.listing = listings_latest_src_28000.listing_id
-    ) subq_81
+        subq_63.listing = listings_latest_src_28000.listing_id
+    ) subq_67
     WHERE (listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')
     GROUP BY
       listing__capacity_latest
-  ) subq_85
+  ) subq_71
   FULL OUTER JOIN (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['views', 'listing__capacity_latest']
@@ -127,37 +121,35 @@ FULL OUTER JOIN (
       , SUM(views) AS views
     FROM (
       -- Join Standard Outputs
-      -- Pass Only Elements: ['views', 'listing__capacity_latest', 'listing__is_lux_latest', 'metric_time__day']
       SELECT
-        subq_88.metric_time__day AS metric_time__day
-        , listings_latest_src_28000.is_lux AS listing__is_lux_latest
+        listings_latest_src_28000.is_lux AS listing__is_lux_latest
         , listings_latest_src_28000.capacity AS listing__capacity_latest
-        , subq_88.views AS views
+        , subq_73.metric_time__day AS metric_time__day
+        , subq_73.views AS views
       FROM (
         -- Read Elements From Semantic Model 'views_source'
         -- Metric Time Dimension 'ds'
-        -- Pass Only Elements: ['views', 'metric_time__day', 'listing']
         SELECT
           DATETIME_TRUNC(ds, day) AS metric_time__day
           , listing_id AS listing
           , 1 AS views
         FROM ***************************.fct_views views_source_src_28000
-      ) subq_88
+      ) subq_73
       LEFT OUTER JOIN
         ***************************.dim_listings_latest listings_latest_src_28000
       ON
-        subq_88.listing = listings_latest_src_28000.listing_id
-    ) subq_93
+        subq_73.listing = listings_latest_src_28000.listing_id
+    ) subq_77
     WHERE (listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')
     GROUP BY
       listing__capacity_latest
-  ) subq_97
+  ) subq_81
   ON
-    subq_85.listing__capacity_latest = subq_97.listing__capacity_latest
+    subq_71.listing__capacity_latest = subq_81.listing__capacity_latest
   GROUP BY
     listing__capacity_latest
-) subq_98
+) subq_82
 ON
-  COALESCE(subq_61.listing__capacity_latest, subq_73.listing__capacity_latest) = subq_98.listing__capacity_latest
+  COALESCE(subq_51.listing__capacity_latest, subq_61.listing__capacity_latest) = subq_82.listing__capacity_latest
 GROUP BY
   listing__capacity_latest

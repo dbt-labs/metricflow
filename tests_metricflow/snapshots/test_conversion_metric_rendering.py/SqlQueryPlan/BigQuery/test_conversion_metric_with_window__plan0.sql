@@ -14,15 +14,54 @@ FROM (
       subq_3.metric_time__day
       , SUM(subq_3.visits) AS visits
     FROM (
-      -- Constrain Output with WHERE
+      -- Pass Only Elements: ['visits', 'metric_time__day']
       SELECT
         subq_2.metric_time__day
         , subq_2.visits
       FROM (
-        -- Pass Only Elements: ['visits', 'metric_time__day']
+        -- Constrain Output with WHERE
         SELECT
-          subq_1.metric_time__day
+          subq_1.ds__day
+          , subq_1.ds__week
+          , subq_1.ds__month
+          , subq_1.ds__quarter
+          , subq_1.ds__year
+          , subq_1.ds__extract_year
+          , subq_1.ds__extract_quarter
+          , subq_1.ds__extract_month
+          , subq_1.ds__extract_day
+          , subq_1.ds__extract_dow
+          , subq_1.ds__extract_doy
+          , subq_1.visit__ds__day
+          , subq_1.visit__ds__week
+          , subq_1.visit__ds__month
+          , subq_1.visit__ds__quarter
+          , subq_1.visit__ds__year
+          , subq_1.visit__ds__extract_year
+          , subq_1.visit__ds__extract_quarter
+          , subq_1.visit__ds__extract_month
+          , subq_1.visit__ds__extract_day
+          , subq_1.visit__ds__extract_dow
+          , subq_1.visit__ds__extract_doy
+          , subq_1.metric_time__day
+          , subq_1.metric_time__week
+          , subq_1.metric_time__month
+          , subq_1.metric_time__quarter
+          , subq_1.metric_time__year
+          , subq_1.metric_time__extract_year
+          , subq_1.metric_time__extract_quarter
+          , subq_1.metric_time__extract_month
+          , subq_1.metric_time__extract_day
+          , subq_1.metric_time__extract_dow
+          , subq_1.metric_time__extract_doy
+          , subq_1.user
+          , subq_1.session
+          , subq_1.visit__user
+          , subq_1.visit__session
+          , subq_1.referrer_id
+          , subq_1.visit__referrer_id
           , subq_1.visits
+          , subq_1.visitors
         FROM (
           -- Metric Time Dimension 'ds'
           SELECT
@@ -103,8 +142,8 @@ FROM (
             FROM ***************************.fct_visits visits_source_src_28000
           ) subq_0
         ) subq_1
+        WHERE metric_time__day = '2020-01-01'
       ) subq_2
-      WHERE metric_time__day = '2020-01-01'
     ) subq_3
     GROUP BY
       metric_time__day

@@ -10,6 +10,7 @@ FROM (
     , MAX(subq_32.buys) AS buys
   FROM (
     -- Constrain Output with WHERE
+    -- Pass Only Elements: ['visits', 'metric_time__day']
     -- Aggregate Measures
     SELECT
       metric_time__day
@@ -17,12 +18,11 @@ FROM (
     FROM (
       -- Read Elements From Semantic Model 'visits_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements: ['visits', 'metric_time__day']
       SELECT
         DATETIME_TRUNC(ds, day) AS metric_time__day
         , 1 AS visits
       FROM ***************************.fct_visits visits_source_src_28000
-    ) subq_19
+    ) subq_18
     WHERE metric_time__day = '2020-01-01'
     GROUP BY
       metric_time__day

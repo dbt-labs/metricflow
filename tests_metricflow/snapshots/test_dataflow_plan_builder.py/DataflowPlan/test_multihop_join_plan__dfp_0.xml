@@ -11,7 +11,7 @@
                 <!-- node_id = NodeId(id_str='am_0') -->
                 <FilterElementsNode>
                     <!-- description = "Pass Only Elements: ['txn_count', 'account_id__customer_id__customer_name']" -->
-                    <!-- node_id = NodeId(id_str='pfe_3') -->
+                    <!-- node_id = NodeId(id_str='pfe_2') -->
                     <!-- include_spec = MeasureSpec(element_name='txn_count') -->
                     <!-- include_spec =                                     -->
                     <!--   DimensionSpec(                                   -->
@@ -25,9 +25,9 @@
                     <JoinOnEntitiesNode>
                         <!-- description = 'Join Standard Outputs' -->
                         <!-- node_id = NodeId(id_str='jso_1') -->
-                        <!-- join0_for_node_id_pfe_2 =                                         -->
+                        <!-- join0_for_node_id_pfe_1 =                                         -->
                         <!--   JoinDescription(                                                -->
-                        <!--     join_node=FilterElementsNode(node_id=pfe_2),                  -->
+                        <!--     join_node=FilterElementsNode(node_id=pfe_1),                  -->
                         <!--     join_on_entity=LinklessEntitySpec(element_name='account_id'), -->
                         <!--     join_type=LEFT_OUTER,                                         -->
                         <!--     join_on_partition_time_dimensions=(                           -->
@@ -49,33 +49,21 @@
                         <!--       ),                                                          -->
                         <!--     ),                                                            -->
                         <!--   )                                                               -->
-                        <FilterElementsNode>
-                            <!-- description = "Pass Only Elements: ['txn_count', 'ds_partitioned__day', 'account_id']" -->
-                            <!-- node_id = NodeId(id_str='pfe_1') -->
-                            <!-- include_spec = MeasureSpec(element_name='txn_count') -->
-                            <!-- include_spec =                                                                  -->
-                            <!--   TimeDimensionSpec(                                                            -->
-                            <!--     element_name='ds_partitioned',                                              -->
-                            <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
-                            <!--   )                                                                             -->
-                            <!-- include_spec = LinklessEntitySpec(element_name='account_id') -->
-                            <!-- distinct = False -->
-                            <MetricTimeDimensionTransformNode>
-                                <!-- description = "Metric Time Dimension 'ds'" -->
-                                <!-- node_id = NodeId(id_str='sma_22007') -->
-                                <!-- aggregation_time_dimension = 'ds' -->
-                                <ReadSqlSourceNode>
-                                    <!-- description = "Read From SemanticModelDataSet('account_month_txns')" -->
-                                    <!-- node_id = NodeId(id_str='rss_22012') -->
-                                    <!-- data_set = SemanticModelDataSet('account_month_txns') -->
-                                </ReadSqlSourceNode>
-                            </MetricTimeDimensionTransformNode>
-                        </FilterElementsNode>
+                        <MetricTimeDimensionTransformNode>
+                            <!-- description = "Metric Time Dimension 'ds'" -->
+                            <!-- node_id = NodeId(id_str='sma_22007') -->
+                            <!-- aggregation_time_dimension = 'ds' -->
+                            <ReadSqlSourceNode>
+                                <!-- description = "Read From SemanticModelDataSet('account_month_txns')" -->
+                                <!-- node_id = NodeId(id_str='rss_22012') -->
+                                <!-- data_set = SemanticModelDataSet('account_month_txns') -->
+                            </ReadSqlSourceNode>
+                        </MetricTimeDimensionTransformNode>
                         <FilterElementsNode>
                             <!-- description =                                                                   -->
                             <!--   ("Pass Only Elements: ['customer_id__customer_name', 'ds_partitioned__day', " -->
                             <!--    "'account_id']")                                                             -->
-                            <!-- node_id = NodeId(id_str='pfe_2') -->
+                            <!-- node_id = NodeId(id_str='pfe_1') -->
                             <!-- include_spec =                                                   -->
                             <!--   DimensionSpec(                                                 -->
                             <!--     element_name='customer_name',                                -->

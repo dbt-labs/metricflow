@@ -1,592 +1,711 @@
 -- Compute Metrics via Expressions
 SELECT
-  subq_24.listings
+  subq_22.listings
 FROM (
   -- Aggregate Measures
   SELECT
-    SUM(subq_23.listings) AS listings
+    SUM(subq_21.listings) AS listings
   FROM (
     -- Pass Only Elements: ['listings',]
     SELECT
-      subq_22.listings
+      subq_20.listings
     FROM (
       -- Constrain Output with WHERE
       SELECT
-        subq_21.user__visit_buy_conversion_rate
-        , subq_21.listings
+        subq_19.ds__day
+        , subq_19.ds__week
+        , subq_19.ds__month
+        , subq_19.ds__quarter
+        , subq_19.ds__year
+        , subq_19.ds__extract_year
+        , subq_19.ds__extract_quarter
+        , subq_19.ds__extract_month
+        , subq_19.ds__extract_day
+        , subq_19.ds__extract_dow
+        , subq_19.ds__extract_doy
+        , subq_19.created_at__day
+        , subq_19.created_at__week
+        , subq_19.created_at__month
+        , subq_19.created_at__quarter
+        , subq_19.created_at__year
+        , subq_19.created_at__extract_year
+        , subq_19.created_at__extract_quarter
+        , subq_19.created_at__extract_month
+        , subq_19.created_at__extract_day
+        , subq_19.created_at__extract_dow
+        , subq_19.created_at__extract_doy
+        , subq_19.listing__ds__day
+        , subq_19.listing__ds__week
+        , subq_19.listing__ds__month
+        , subq_19.listing__ds__quarter
+        , subq_19.listing__ds__year
+        , subq_19.listing__ds__extract_year
+        , subq_19.listing__ds__extract_quarter
+        , subq_19.listing__ds__extract_month
+        , subq_19.listing__ds__extract_day
+        , subq_19.listing__ds__extract_dow
+        , subq_19.listing__ds__extract_doy
+        , subq_19.listing__created_at__day
+        , subq_19.listing__created_at__week
+        , subq_19.listing__created_at__month
+        , subq_19.listing__created_at__quarter
+        , subq_19.listing__created_at__year
+        , subq_19.listing__created_at__extract_year
+        , subq_19.listing__created_at__extract_quarter
+        , subq_19.listing__created_at__extract_month
+        , subq_19.listing__created_at__extract_day
+        , subq_19.listing__created_at__extract_dow
+        , subq_19.listing__created_at__extract_doy
+        , subq_19.metric_time__day
+        , subq_19.metric_time__week
+        , subq_19.metric_time__month
+        , subq_19.metric_time__quarter
+        , subq_19.metric_time__year
+        , subq_19.metric_time__extract_year
+        , subq_19.metric_time__extract_quarter
+        , subq_19.metric_time__extract_month
+        , subq_19.metric_time__extract_day
+        , subq_19.metric_time__extract_dow
+        , subq_19.metric_time__extract_doy
+        , subq_19.listing
+        , subq_19.user
+        , subq_19.listing__user
+        , subq_19.country_latest
+        , subq_19.is_lux_latest
+        , subq_19.capacity_latest
+        , subq_19.listing__country_latest
+        , subq_19.listing__is_lux_latest
+        , subq_19.listing__capacity_latest
+        , subq_19.user__visit_buy_conversion_rate
+        , subq_19.listings
+        , subq_19.largest_listing
+        , subq_19.smallest_listing
       FROM (
-        -- Pass Only Elements: ['listings', 'user__visit_buy_conversion_rate']
+        -- Join Standard Outputs
         SELECT
-          subq_20.user__visit_buy_conversion_rate
-          , subq_20.listings
+          subq_18.user__visit_buy_conversion_rate AS user__visit_buy_conversion_rate
+          , subq_1.ds__day AS ds__day
+          , subq_1.ds__week AS ds__week
+          , subq_1.ds__month AS ds__month
+          , subq_1.ds__quarter AS ds__quarter
+          , subq_1.ds__year AS ds__year
+          , subq_1.ds__extract_year AS ds__extract_year
+          , subq_1.ds__extract_quarter AS ds__extract_quarter
+          , subq_1.ds__extract_month AS ds__extract_month
+          , subq_1.ds__extract_day AS ds__extract_day
+          , subq_1.ds__extract_dow AS ds__extract_dow
+          , subq_1.ds__extract_doy AS ds__extract_doy
+          , subq_1.created_at__day AS created_at__day
+          , subq_1.created_at__week AS created_at__week
+          , subq_1.created_at__month AS created_at__month
+          , subq_1.created_at__quarter AS created_at__quarter
+          , subq_1.created_at__year AS created_at__year
+          , subq_1.created_at__extract_year AS created_at__extract_year
+          , subq_1.created_at__extract_quarter AS created_at__extract_quarter
+          , subq_1.created_at__extract_month AS created_at__extract_month
+          , subq_1.created_at__extract_day AS created_at__extract_day
+          , subq_1.created_at__extract_dow AS created_at__extract_dow
+          , subq_1.created_at__extract_doy AS created_at__extract_doy
+          , subq_1.listing__ds__day AS listing__ds__day
+          , subq_1.listing__ds__week AS listing__ds__week
+          , subq_1.listing__ds__month AS listing__ds__month
+          , subq_1.listing__ds__quarter AS listing__ds__quarter
+          , subq_1.listing__ds__year AS listing__ds__year
+          , subq_1.listing__ds__extract_year AS listing__ds__extract_year
+          , subq_1.listing__ds__extract_quarter AS listing__ds__extract_quarter
+          , subq_1.listing__ds__extract_month AS listing__ds__extract_month
+          , subq_1.listing__ds__extract_day AS listing__ds__extract_day
+          , subq_1.listing__ds__extract_dow AS listing__ds__extract_dow
+          , subq_1.listing__ds__extract_doy AS listing__ds__extract_doy
+          , subq_1.listing__created_at__day AS listing__created_at__day
+          , subq_1.listing__created_at__week AS listing__created_at__week
+          , subq_1.listing__created_at__month AS listing__created_at__month
+          , subq_1.listing__created_at__quarter AS listing__created_at__quarter
+          , subq_1.listing__created_at__year AS listing__created_at__year
+          , subq_1.listing__created_at__extract_year AS listing__created_at__extract_year
+          , subq_1.listing__created_at__extract_quarter AS listing__created_at__extract_quarter
+          , subq_1.listing__created_at__extract_month AS listing__created_at__extract_month
+          , subq_1.listing__created_at__extract_day AS listing__created_at__extract_day
+          , subq_1.listing__created_at__extract_dow AS listing__created_at__extract_dow
+          , subq_1.listing__created_at__extract_doy AS listing__created_at__extract_doy
+          , subq_1.metric_time__day AS metric_time__day
+          , subq_1.metric_time__week AS metric_time__week
+          , subq_1.metric_time__month AS metric_time__month
+          , subq_1.metric_time__quarter AS metric_time__quarter
+          , subq_1.metric_time__year AS metric_time__year
+          , subq_1.metric_time__extract_year AS metric_time__extract_year
+          , subq_1.metric_time__extract_quarter AS metric_time__extract_quarter
+          , subq_1.metric_time__extract_month AS metric_time__extract_month
+          , subq_1.metric_time__extract_day AS metric_time__extract_day
+          , subq_1.metric_time__extract_dow AS metric_time__extract_dow
+          , subq_1.metric_time__extract_doy AS metric_time__extract_doy
+          , subq_1.listing AS listing
+          , subq_1.user AS user
+          , subq_1.listing__user AS listing__user
+          , subq_1.country_latest AS country_latest
+          , subq_1.is_lux_latest AS is_lux_latest
+          , subq_1.capacity_latest AS capacity_latest
+          , subq_1.listing__country_latest AS listing__country_latest
+          , subq_1.listing__is_lux_latest AS listing__is_lux_latest
+          , subq_1.listing__capacity_latest AS listing__capacity_latest
+          , subq_1.listings AS listings
+          , subq_1.largest_listing AS largest_listing
+          , subq_1.smallest_listing AS smallest_listing
         FROM (
-          -- Join Standard Outputs
+          -- Metric Time Dimension 'ds'
           SELECT
-            subq_19.user__visit_buy_conversion_rate AS user__visit_buy_conversion_rate
-            , subq_2.user AS user
-            , subq_2.listings AS listings
+            subq_0.ds__day
+            , subq_0.ds__week
+            , subq_0.ds__month
+            , subq_0.ds__quarter
+            , subq_0.ds__year
+            , subq_0.ds__extract_year
+            , subq_0.ds__extract_quarter
+            , subq_0.ds__extract_month
+            , subq_0.ds__extract_day
+            , subq_0.ds__extract_dow
+            , subq_0.ds__extract_doy
+            , subq_0.created_at__day
+            , subq_0.created_at__week
+            , subq_0.created_at__month
+            , subq_0.created_at__quarter
+            , subq_0.created_at__year
+            , subq_0.created_at__extract_year
+            , subq_0.created_at__extract_quarter
+            , subq_0.created_at__extract_month
+            , subq_0.created_at__extract_day
+            , subq_0.created_at__extract_dow
+            , subq_0.created_at__extract_doy
+            , subq_0.listing__ds__day
+            , subq_0.listing__ds__week
+            , subq_0.listing__ds__month
+            , subq_0.listing__ds__quarter
+            , subq_0.listing__ds__year
+            , subq_0.listing__ds__extract_year
+            , subq_0.listing__ds__extract_quarter
+            , subq_0.listing__ds__extract_month
+            , subq_0.listing__ds__extract_day
+            , subq_0.listing__ds__extract_dow
+            , subq_0.listing__ds__extract_doy
+            , subq_0.listing__created_at__day
+            , subq_0.listing__created_at__week
+            , subq_0.listing__created_at__month
+            , subq_0.listing__created_at__quarter
+            , subq_0.listing__created_at__year
+            , subq_0.listing__created_at__extract_year
+            , subq_0.listing__created_at__extract_quarter
+            , subq_0.listing__created_at__extract_month
+            , subq_0.listing__created_at__extract_day
+            , subq_0.listing__created_at__extract_dow
+            , subq_0.listing__created_at__extract_doy
+            , subq_0.ds__day AS metric_time__day
+            , subq_0.ds__week AS metric_time__week
+            , subq_0.ds__month AS metric_time__month
+            , subq_0.ds__quarter AS metric_time__quarter
+            , subq_0.ds__year AS metric_time__year
+            , subq_0.ds__extract_year AS metric_time__extract_year
+            , subq_0.ds__extract_quarter AS metric_time__extract_quarter
+            , subq_0.ds__extract_month AS metric_time__extract_month
+            , subq_0.ds__extract_day AS metric_time__extract_day
+            , subq_0.ds__extract_dow AS metric_time__extract_dow
+            , subq_0.ds__extract_doy AS metric_time__extract_doy
+            , subq_0.listing
+            , subq_0.user
+            , subq_0.listing__user
+            , subq_0.country_latest
+            , subq_0.is_lux_latest
+            , subq_0.capacity_latest
+            , subq_0.listing__country_latest
+            , subq_0.listing__is_lux_latest
+            , subq_0.listing__capacity_latest
+            , subq_0.listings
+            , subq_0.largest_listing
+            , subq_0.smallest_listing
           FROM (
-            -- Pass Only Elements: ['listings', 'user']
+            -- Read Elements From Semantic Model 'listings_latest'
             SELECT
-              subq_1.user
-              , subq_1.listings
-            FROM (
-              -- Metric Time Dimension 'ds'
-              SELECT
-                subq_0.ds__day
-                , subq_0.ds__week
-                , subq_0.ds__month
-                , subq_0.ds__quarter
-                , subq_0.ds__year
-                , subq_0.ds__extract_year
-                , subq_0.ds__extract_quarter
-                , subq_0.ds__extract_month
-                , subq_0.ds__extract_day
-                , subq_0.ds__extract_dow
-                , subq_0.ds__extract_doy
-                , subq_0.created_at__day
-                , subq_0.created_at__week
-                , subq_0.created_at__month
-                , subq_0.created_at__quarter
-                , subq_0.created_at__year
-                , subq_0.created_at__extract_year
-                , subq_0.created_at__extract_quarter
-                , subq_0.created_at__extract_month
-                , subq_0.created_at__extract_day
-                , subq_0.created_at__extract_dow
-                , subq_0.created_at__extract_doy
-                , subq_0.listing__ds__day
-                , subq_0.listing__ds__week
-                , subq_0.listing__ds__month
-                , subq_0.listing__ds__quarter
-                , subq_0.listing__ds__year
-                , subq_0.listing__ds__extract_year
-                , subq_0.listing__ds__extract_quarter
-                , subq_0.listing__ds__extract_month
-                , subq_0.listing__ds__extract_day
-                , subq_0.listing__ds__extract_dow
-                , subq_0.listing__ds__extract_doy
-                , subq_0.listing__created_at__day
-                , subq_0.listing__created_at__week
-                , subq_0.listing__created_at__month
-                , subq_0.listing__created_at__quarter
-                , subq_0.listing__created_at__year
-                , subq_0.listing__created_at__extract_year
-                , subq_0.listing__created_at__extract_quarter
-                , subq_0.listing__created_at__extract_month
-                , subq_0.listing__created_at__extract_day
-                , subq_0.listing__created_at__extract_dow
-                , subq_0.listing__created_at__extract_doy
-                , subq_0.ds__day AS metric_time__day
-                , subq_0.ds__week AS metric_time__week
-                , subq_0.ds__month AS metric_time__month
-                , subq_0.ds__quarter AS metric_time__quarter
-                , subq_0.ds__year AS metric_time__year
-                , subq_0.ds__extract_year AS metric_time__extract_year
-                , subq_0.ds__extract_quarter AS metric_time__extract_quarter
-                , subq_0.ds__extract_month AS metric_time__extract_month
-                , subq_0.ds__extract_day AS metric_time__extract_day
-                , subq_0.ds__extract_dow AS metric_time__extract_dow
-                , subq_0.ds__extract_doy AS metric_time__extract_doy
-                , subq_0.listing
-                , subq_0.user
-                , subq_0.listing__user
-                , subq_0.country_latest
-                , subq_0.is_lux_latest
-                , subq_0.capacity_latest
-                , subq_0.listing__country_latest
-                , subq_0.listing__is_lux_latest
-                , subq_0.listing__capacity_latest
-                , subq_0.listings
-                , subq_0.largest_listing
-                , subq_0.smallest_listing
-              FROM (
-                -- Read Elements From Semantic Model 'listings_latest'
-                SELECT
-                  1 AS listings
-                  , listings_latest_src_28000.capacity AS largest_listing
-                  , listings_latest_src_28000.capacity AS smallest_listing
-                  , DATETIME_TRUNC(listings_latest_src_28000.created_at, day) AS ds__day
-                  , DATETIME_TRUNC(listings_latest_src_28000.created_at, isoweek) AS ds__week
-                  , DATETIME_TRUNC(listings_latest_src_28000.created_at, month) AS ds__month
-                  , DATETIME_TRUNC(listings_latest_src_28000.created_at, quarter) AS ds__quarter
-                  , DATETIME_TRUNC(listings_latest_src_28000.created_at, year) AS ds__year
-                  , EXTRACT(year FROM listings_latest_src_28000.created_at) AS ds__extract_year
-                  , EXTRACT(quarter FROM listings_latest_src_28000.created_at) AS ds__extract_quarter
-                  , EXTRACT(month FROM listings_latest_src_28000.created_at) AS ds__extract_month
-                  , EXTRACT(day FROM listings_latest_src_28000.created_at) AS ds__extract_day
-                  , IF(EXTRACT(dayofweek FROM listings_latest_src_28000.created_at) = 1, 7, EXTRACT(dayofweek FROM listings_latest_src_28000.created_at) - 1) AS ds__extract_dow
-                  , EXTRACT(dayofyear FROM listings_latest_src_28000.created_at) AS ds__extract_doy
-                  , DATETIME_TRUNC(listings_latest_src_28000.created_at, day) AS created_at__day
-                  , DATETIME_TRUNC(listings_latest_src_28000.created_at, isoweek) AS created_at__week
-                  , DATETIME_TRUNC(listings_latest_src_28000.created_at, month) AS created_at__month
-                  , DATETIME_TRUNC(listings_latest_src_28000.created_at, quarter) AS created_at__quarter
-                  , DATETIME_TRUNC(listings_latest_src_28000.created_at, year) AS created_at__year
-                  , EXTRACT(year FROM listings_latest_src_28000.created_at) AS created_at__extract_year
-                  , EXTRACT(quarter FROM listings_latest_src_28000.created_at) AS created_at__extract_quarter
-                  , EXTRACT(month FROM listings_latest_src_28000.created_at) AS created_at__extract_month
-                  , EXTRACT(day FROM listings_latest_src_28000.created_at) AS created_at__extract_day
-                  , IF(EXTRACT(dayofweek FROM listings_latest_src_28000.created_at) = 1, 7, EXTRACT(dayofweek FROM listings_latest_src_28000.created_at) - 1) AS created_at__extract_dow
-                  , EXTRACT(dayofyear FROM listings_latest_src_28000.created_at) AS created_at__extract_doy
-                  , listings_latest_src_28000.country AS country_latest
-                  , listings_latest_src_28000.is_lux AS is_lux_latest
-                  , listings_latest_src_28000.capacity AS capacity_latest
-                  , DATETIME_TRUNC(listings_latest_src_28000.created_at, day) AS listing__ds__day
-                  , DATETIME_TRUNC(listings_latest_src_28000.created_at, isoweek) AS listing__ds__week
-                  , DATETIME_TRUNC(listings_latest_src_28000.created_at, month) AS listing__ds__month
-                  , DATETIME_TRUNC(listings_latest_src_28000.created_at, quarter) AS listing__ds__quarter
-                  , DATETIME_TRUNC(listings_latest_src_28000.created_at, year) AS listing__ds__year
-                  , EXTRACT(year FROM listings_latest_src_28000.created_at) AS listing__ds__extract_year
-                  , EXTRACT(quarter FROM listings_latest_src_28000.created_at) AS listing__ds__extract_quarter
-                  , EXTRACT(month FROM listings_latest_src_28000.created_at) AS listing__ds__extract_month
-                  , EXTRACT(day FROM listings_latest_src_28000.created_at) AS listing__ds__extract_day
-                  , IF(EXTRACT(dayofweek FROM listings_latest_src_28000.created_at) = 1, 7, EXTRACT(dayofweek FROM listings_latest_src_28000.created_at) - 1) AS listing__ds__extract_dow
-                  , EXTRACT(dayofyear FROM listings_latest_src_28000.created_at) AS listing__ds__extract_doy
-                  , DATETIME_TRUNC(listings_latest_src_28000.created_at, day) AS listing__created_at__day
-                  , DATETIME_TRUNC(listings_latest_src_28000.created_at, isoweek) AS listing__created_at__week
-                  , DATETIME_TRUNC(listings_latest_src_28000.created_at, month) AS listing__created_at__month
-                  , DATETIME_TRUNC(listings_latest_src_28000.created_at, quarter) AS listing__created_at__quarter
-                  , DATETIME_TRUNC(listings_latest_src_28000.created_at, year) AS listing__created_at__year
-                  , EXTRACT(year FROM listings_latest_src_28000.created_at) AS listing__created_at__extract_year
-                  , EXTRACT(quarter FROM listings_latest_src_28000.created_at) AS listing__created_at__extract_quarter
-                  , EXTRACT(month FROM listings_latest_src_28000.created_at) AS listing__created_at__extract_month
-                  , EXTRACT(day FROM listings_latest_src_28000.created_at) AS listing__created_at__extract_day
-                  , IF(EXTRACT(dayofweek FROM listings_latest_src_28000.created_at) = 1, 7, EXTRACT(dayofweek FROM listings_latest_src_28000.created_at) - 1) AS listing__created_at__extract_dow
-                  , EXTRACT(dayofyear FROM listings_latest_src_28000.created_at) AS listing__created_at__extract_doy
-                  , listings_latest_src_28000.country AS listing__country_latest
-                  , listings_latest_src_28000.is_lux AS listing__is_lux_latest
-                  , listings_latest_src_28000.capacity AS listing__capacity_latest
-                  , listings_latest_src_28000.listing_id AS listing
-                  , listings_latest_src_28000.user_id AS user
-                  , listings_latest_src_28000.user_id AS listing__user
-                FROM ***************************.dim_listings_latest listings_latest_src_28000
-              ) subq_0
-            ) subq_1
-          ) subq_2
-          LEFT OUTER JOIN (
-            -- Pass Only Elements: ['user', 'user__visit_buy_conversion_rate']
+              1 AS listings
+              , listings_latest_src_28000.capacity AS largest_listing
+              , listings_latest_src_28000.capacity AS smallest_listing
+              , DATETIME_TRUNC(listings_latest_src_28000.created_at, day) AS ds__day
+              , DATETIME_TRUNC(listings_latest_src_28000.created_at, isoweek) AS ds__week
+              , DATETIME_TRUNC(listings_latest_src_28000.created_at, month) AS ds__month
+              , DATETIME_TRUNC(listings_latest_src_28000.created_at, quarter) AS ds__quarter
+              , DATETIME_TRUNC(listings_latest_src_28000.created_at, year) AS ds__year
+              , EXTRACT(year FROM listings_latest_src_28000.created_at) AS ds__extract_year
+              , EXTRACT(quarter FROM listings_latest_src_28000.created_at) AS ds__extract_quarter
+              , EXTRACT(month FROM listings_latest_src_28000.created_at) AS ds__extract_month
+              , EXTRACT(day FROM listings_latest_src_28000.created_at) AS ds__extract_day
+              , IF(EXTRACT(dayofweek FROM listings_latest_src_28000.created_at) = 1, 7, EXTRACT(dayofweek FROM listings_latest_src_28000.created_at) - 1) AS ds__extract_dow
+              , EXTRACT(dayofyear FROM listings_latest_src_28000.created_at) AS ds__extract_doy
+              , DATETIME_TRUNC(listings_latest_src_28000.created_at, day) AS created_at__day
+              , DATETIME_TRUNC(listings_latest_src_28000.created_at, isoweek) AS created_at__week
+              , DATETIME_TRUNC(listings_latest_src_28000.created_at, month) AS created_at__month
+              , DATETIME_TRUNC(listings_latest_src_28000.created_at, quarter) AS created_at__quarter
+              , DATETIME_TRUNC(listings_latest_src_28000.created_at, year) AS created_at__year
+              , EXTRACT(year FROM listings_latest_src_28000.created_at) AS created_at__extract_year
+              , EXTRACT(quarter FROM listings_latest_src_28000.created_at) AS created_at__extract_quarter
+              , EXTRACT(month FROM listings_latest_src_28000.created_at) AS created_at__extract_month
+              , EXTRACT(day FROM listings_latest_src_28000.created_at) AS created_at__extract_day
+              , IF(EXTRACT(dayofweek FROM listings_latest_src_28000.created_at) = 1, 7, EXTRACT(dayofweek FROM listings_latest_src_28000.created_at) - 1) AS created_at__extract_dow
+              , EXTRACT(dayofyear FROM listings_latest_src_28000.created_at) AS created_at__extract_doy
+              , listings_latest_src_28000.country AS country_latest
+              , listings_latest_src_28000.is_lux AS is_lux_latest
+              , listings_latest_src_28000.capacity AS capacity_latest
+              , DATETIME_TRUNC(listings_latest_src_28000.created_at, day) AS listing__ds__day
+              , DATETIME_TRUNC(listings_latest_src_28000.created_at, isoweek) AS listing__ds__week
+              , DATETIME_TRUNC(listings_latest_src_28000.created_at, month) AS listing__ds__month
+              , DATETIME_TRUNC(listings_latest_src_28000.created_at, quarter) AS listing__ds__quarter
+              , DATETIME_TRUNC(listings_latest_src_28000.created_at, year) AS listing__ds__year
+              , EXTRACT(year FROM listings_latest_src_28000.created_at) AS listing__ds__extract_year
+              , EXTRACT(quarter FROM listings_latest_src_28000.created_at) AS listing__ds__extract_quarter
+              , EXTRACT(month FROM listings_latest_src_28000.created_at) AS listing__ds__extract_month
+              , EXTRACT(day FROM listings_latest_src_28000.created_at) AS listing__ds__extract_day
+              , IF(EXTRACT(dayofweek FROM listings_latest_src_28000.created_at) = 1, 7, EXTRACT(dayofweek FROM listings_latest_src_28000.created_at) - 1) AS listing__ds__extract_dow
+              , EXTRACT(dayofyear FROM listings_latest_src_28000.created_at) AS listing__ds__extract_doy
+              , DATETIME_TRUNC(listings_latest_src_28000.created_at, day) AS listing__created_at__day
+              , DATETIME_TRUNC(listings_latest_src_28000.created_at, isoweek) AS listing__created_at__week
+              , DATETIME_TRUNC(listings_latest_src_28000.created_at, month) AS listing__created_at__month
+              , DATETIME_TRUNC(listings_latest_src_28000.created_at, quarter) AS listing__created_at__quarter
+              , DATETIME_TRUNC(listings_latest_src_28000.created_at, year) AS listing__created_at__year
+              , EXTRACT(year FROM listings_latest_src_28000.created_at) AS listing__created_at__extract_year
+              , EXTRACT(quarter FROM listings_latest_src_28000.created_at) AS listing__created_at__extract_quarter
+              , EXTRACT(month FROM listings_latest_src_28000.created_at) AS listing__created_at__extract_month
+              , EXTRACT(day FROM listings_latest_src_28000.created_at) AS listing__created_at__extract_day
+              , IF(EXTRACT(dayofweek FROM listings_latest_src_28000.created_at) = 1, 7, EXTRACT(dayofweek FROM listings_latest_src_28000.created_at) - 1) AS listing__created_at__extract_dow
+              , EXTRACT(dayofyear FROM listings_latest_src_28000.created_at) AS listing__created_at__extract_doy
+              , listings_latest_src_28000.country AS listing__country_latest
+              , listings_latest_src_28000.is_lux AS listing__is_lux_latest
+              , listings_latest_src_28000.capacity AS listing__capacity_latest
+              , listings_latest_src_28000.listing_id AS listing
+              , listings_latest_src_28000.user_id AS user
+              , listings_latest_src_28000.user_id AS listing__user
+            FROM ***************************.dim_listings_latest listings_latest_src_28000
+          ) subq_0
+        ) subq_1
+        LEFT OUTER JOIN (
+          -- Pass Only Elements: ['user', 'user__visit_buy_conversion_rate']
+          SELECT
+            subq_17.user
+            , subq_17.user__visit_buy_conversion_rate
+          FROM (
+            -- Compute Metrics via Expressions
             SELECT
-              subq_18.user
-              , subq_18.user__visit_buy_conversion_rate
+              subq_16.user
+              , CAST(subq_16.buys AS FLOAT64) / CAST(NULLIF(subq_16.visits, 0) AS FLOAT64) AS user__visit_buy_conversion_rate
             FROM (
-              -- Compute Metrics via Expressions
+              -- Combine Aggregated Outputs
               SELECT
-                subq_17.user
-                , CAST(subq_17.buys AS FLOAT64) / CAST(NULLIF(subq_17.visits, 0) AS FLOAT64) AS user__visit_buy_conversion_rate
+                COALESCE(subq_5.user, subq_15.user) AS user
+                , MAX(subq_5.visits) AS visits
+                , MAX(subq_15.buys) AS buys
               FROM (
-                -- Combine Aggregated Outputs
+                -- Aggregate Measures
                 SELECT
-                  COALESCE(subq_6.user, subq_16.user) AS user
-                  , MAX(subq_6.visits) AS visits
-                  , MAX(subq_16.buys) AS buys
+                  subq_4.user
+                  , SUM(subq_4.visits) AS visits
                 FROM (
-                  -- Aggregate Measures
+                  -- Pass Only Elements: ['visits', 'user']
                   SELECT
-                    subq_5.user
-                    , SUM(subq_5.visits) AS visits
+                    subq_3.user
+                    , subq_3.visits
                   FROM (
-                    -- Pass Only Elements: ['visits', 'user']
+                    -- Metric Time Dimension 'ds'
                     SELECT
-                      subq_4.user
-                      , subq_4.visits
+                      subq_2.ds__day
+                      , subq_2.ds__week
+                      , subq_2.ds__month
+                      , subq_2.ds__quarter
+                      , subq_2.ds__year
+                      , subq_2.ds__extract_year
+                      , subq_2.ds__extract_quarter
+                      , subq_2.ds__extract_month
+                      , subq_2.ds__extract_day
+                      , subq_2.ds__extract_dow
+                      , subq_2.ds__extract_doy
+                      , subq_2.visit__ds__day
+                      , subq_2.visit__ds__week
+                      , subq_2.visit__ds__month
+                      , subq_2.visit__ds__quarter
+                      , subq_2.visit__ds__year
+                      , subq_2.visit__ds__extract_year
+                      , subq_2.visit__ds__extract_quarter
+                      , subq_2.visit__ds__extract_month
+                      , subq_2.visit__ds__extract_day
+                      , subq_2.visit__ds__extract_dow
+                      , subq_2.visit__ds__extract_doy
+                      , subq_2.ds__day AS metric_time__day
+                      , subq_2.ds__week AS metric_time__week
+                      , subq_2.ds__month AS metric_time__month
+                      , subq_2.ds__quarter AS metric_time__quarter
+                      , subq_2.ds__year AS metric_time__year
+                      , subq_2.ds__extract_year AS metric_time__extract_year
+                      , subq_2.ds__extract_quarter AS metric_time__extract_quarter
+                      , subq_2.ds__extract_month AS metric_time__extract_month
+                      , subq_2.ds__extract_day AS metric_time__extract_day
+                      , subq_2.ds__extract_dow AS metric_time__extract_dow
+                      , subq_2.ds__extract_doy AS metric_time__extract_doy
+                      , subq_2.user
+                      , subq_2.session
+                      , subq_2.visit__user
+                      , subq_2.visit__session
+                      , subq_2.referrer_id
+                      , subq_2.visit__referrer_id
+                      , subq_2.visits
+                      , subq_2.visitors
                     FROM (
-                      -- Metric Time Dimension 'ds'
+                      -- Read Elements From Semantic Model 'visits_source'
                       SELECT
-                        subq_3.ds__day
-                        , subq_3.ds__week
-                        , subq_3.ds__month
-                        , subq_3.ds__quarter
-                        , subq_3.ds__year
-                        , subq_3.ds__extract_year
-                        , subq_3.ds__extract_quarter
-                        , subq_3.ds__extract_month
-                        , subq_3.ds__extract_day
-                        , subq_3.ds__extract_dow
-                        , subq_3.ds__extract_doy
-                        , subq_3.visit__ds__day
-                        , subq_3.visit__ds__week
-                        , subq_3.visit__ds__month
-                        , subq_3.visit__ds__quarter
-                        , subq_3.visit__ds__year
-                        , subq_3.visit__ds__extract_year
-                        , subq_3.visit__ds__extract_quarter
-                        , subq_3.visit__ds__extract_month
-                        , subq_3.visit__ds__extract_day
-                        , subq_3.visit__ds__extract_dow
-                        , subq_3.visit__ds__extract_doy
-                        , subq_3.ds__day AS metric_time__day
-                        , subq_3.ds__week AS metric_time__week
-                        , subq_3.ds__month AS metric_time__month
-                        , subq_3.ds__quarter AS metric_time__quarter
-                        , subq_3.ds__year AS metric_time__year
-                        , subq_3.ds__extract_year AS metric_time__extract_year
-                        , subq_3.ds__extract_quarter AS metric_time__extract_quarter
-                        , subq_3.ds__extract_month AS metric_time__extract_month
-                        , subq_3.ds__extract_day AS metric_time__extract_day
-                        , subq_3.ds__extract_dow AS metric_time__extract_dow
-                        , subq_3.ds__extract_doy AS metric_time__extract_doy
-                        , subq_3.user
-                        , subq_3.session
-                        , subq_3.visit__user
-                        , subq_3.visit__session
-                        , subq_3.referrer_id
-                        , subq_3.visit__referrer_id
-                        , subq_3.visits
-                        , subq_3.visitors
-                      FROM (
-                        -- Read Elements From Semantic Model 'visits_source'
-                        SELECT
-                          1 AS visits
-                          , visits_source_src_28000.user_id AS visitors
-                          , DATETIME_TRUNC(visits_source_src_28000.ds, day) AS ds__day
-                          , DATETIME_TRUNC(visits_source_src_28000.ds, isoweek) AS ds__week
-                          , DATETIME_TRUNC(visits_source_src_28000.ds, month) AS ds__month
-                          , DATETIME_TRUNC(visits_source_src_28000.ds, quarter) AS ds__quarter
-                          , DATETIME_TRUNC(visits_source_src_28000.ds, year) AS ds__year
-                          , EXTRACT(year FROM visits_source_src_28000.ds) AS ds__extract_year
-                          , EXTRACT(quarter FROM visits_source_src_28000.ds) AS ds__extract_quarter
-                          , EXTRACT(month FROM visits_source_src_28000.ds) AS ds__extract_month
-                          , EXTRACT(day FROM visits_source_src_28000.ds) AS ds__extract_day
-                          , IF(EXTRACT(dayofweek FROM visits_source_src_28000.ds) = 1, 7, EXTRACT(dayofweek FROM visits_source_src_28000.ds) - 1) AS ds__extract_dow
-                          , EXTRACT(dayofyear FROM visits_source_src_28000.ds) AS ds__extract_doy
-                          , visits_source_src_28000.referrer_id
-                          , DATETIME_TRUNC(visits_source_src_28000.ds, day) AS visit__ds__day
-                          , DATETIME_TRUNC(visits_source_src_28000.ds, isoweek) AS visit__ds__week
-                          , DATETIME_TRUNC(visits_source_src_28000.ds, month) AS visit__ds__month
-                          , DATETIME_TRUNC(visits_source_src_28000.ds, quarter) AS visit__ds__quarter
-                          , DATETIME_TRUNC(visits_source_src_28000.ds, year) AS visit__ds__year
-                          , EXTRACT(year FROM visits_source_src_28000.ds) AS visit__ds__extract_year
-                          , EXTRACT(quarter FROM visits_source_src_28000.ds) AS visit__ds__extract_quarter
-                          , EXTRACT(month FROM visits_source_src_28000.ds) AS visit__ds__extract_month
-                          , EXTRACT(day FROM visits_source_src_28000.ds) AS visit__ds__extract_day
-                          , IF(EXTRACT(dayofweek FROM visits_source_src_28000.ds) = 1, 7, EXTRACT(dayofweek FROM visits_source_src_28000.ds) - 1) AS visit__ds__extract_dow
-                          , EXTRACT(dayofyear FROM visits_source_src_28000.ds) AS visit__ds__extract_doy
-                          , visits_source_src_28000.referrer_id AS visit__referrer_id
-                          , visits_source_src_28000.user_id AS user
-                          , visits_source_src_28000.session_id AS session
-                          , visits_source_src_28000.user_id AS visit__user
-                          , visits_source_src_28000.session_id AS visit__session
-                        FROM ***************************.fct_visits visits_source_src_28000
-                      ) subq_3
-                    ) subq_4
-                  ) subq_5
-                  GROUP BY
-                    user
-                ) subq_6
-                FULL OUTER JOIN (
-                  -- Aggregate Measures
-                  SELECT
-                    subq_15.user
-                    , SUM(subq_15.buys) AS buys
-                  FROM (
-                    -- Pass Only Elements: ['buys', 'user']
-                    SELECT
-                      subq_14.user
-                      , subq_14.buys
-                    FROM (
-                      -- Find conversions for user within the range of INF
-                      SELECT
-                        subq_13.metric_time__day
-                        , subq_13.user
-                        , subq_13.buys
-                        , subq_13.visits
-                      FROM (
-                        -- Dedupe the fanout with mf_internal_uuid in the conversion data set
-                        SELECT DISTINCT
-                          FIRST_VALUE(subq_9.visits) OVER (
-                            PARTITION BY
-                              subq_12.user
-                              , subq_12.metric_time__day
-                              , subq_12.mf_internal_uuid
-                            ORDER BY subq_9.metric_time__day DESC
-                            ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-                          ) AS visits
-                          , FIRST_VALUE(subq_9.metric_time__day) OVER (
-                            PARTITION BY
-                              subq_12.user
-                              , subq_12.metric_time__day
-                              , subq_12.mf_internal_uuid
-                            ORDER BY subq_9.metric_time__day DESC
-                            ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-                          ) AS metric_time__day
-                          , FIRST_VALUE(subq_9.user) OVER (
-                            PARTITION BY
-                              subq_12.user
-                              , subq_12.metric_time__day
-                              , subq_12.mf_internal_uuid
-                            ORDER BY subq_9.metric_time__day DESC
-                            ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-                          ) AS user
-                          , subq_12.mf_internal_uuid AS mf_internal_uuid
-                          , subq_12.buys AS buys
-                        FROM (
-                          -- Pass Only Elements: ['visits', 'metric_time__day', 'user']
-                          SELECT
-                            subq_8.metric_time__day
-                            , subq_8.user
-                            , subq_8.visits
-                          FROM (
-                            -- Metric Time Dimension 'ds'
-                            SELECT
-                              subq_7.ds__day
-                              , subq_7.ds__week
-                              , subq_7.ds__month
-                              , subq_7.ds__quarter
-                              , subq_7.ds__year
-                              , subq_7.ds__extract_year
-                              , subq_7.ds__extract_quarter
-                              , subq_7.ds__extract_month
-                              , subq_7.ds__extract_day
-                              , subq_7.ds__extract_dow
-                              , subq_7.ds__extract_doy
-                              , subq_7.visit__ds__day
-                              , subq_7.visit__ds__week
-                              , subq_7.visit__ds__month
-                              , subq_7.visit__ds__quarter
-                              , subq_7.visit__ds__year
-                              , subq_7.visit__ds__extract_year
-                              , subq_7.visit__ds__extract_quarter
-                              , subq_7.visit__ds__extract_month
-                              , subq_7.visit__ds__extract_day
-                              , subq_7.visit__ds__extract_dow
-                              , subq_7.visit__ds__extract_doy
-                              , subq_7.ds__day AS metric_time__day
-                              , subq_7.ds__week AS metric_time__week
-                              , subq_7.ds__month AS metric_time__month
-                              , subq_7.ds__quarter AS metric_time__quarter
-                              , subq_7.ds__year AS metric_time__year
-                              , subq_7.ds__extract_year AS metric_time__extract_year
-                              , subq_7.ds__extract_quarter AS metric_time__extract_quarter
-                              , subq_7.ds__extract_month AS metric_time__extract_month
-                              , subq_7.ds__extract_day AS metric_time__extract_day
-                              , subq_7.ds__extract_dow AS metric_time__extract_dow
-                              , subq_7.ds__extract_doy AS metric_time__extract_doy
-                              , subq_7.user
-                              , subq_7.session
-                              , subq_7.visit__user
-                              , subq_7.visit__session
-                              , subq_7.referrer_id
-                              , subq_7.visit__referrer_id
-                              , subq_7.visits
-                              , subq_7.visitors
-                            FROM (
-                              -- Read Elements From Semantic Model 'visits_source'
-                              SELECT
-                                1 AS visits
-                                , visits_source_src_28000.user_id AS visitors
-                                , DATETIME_TRUNC(visits_source_src_28000.ds, day) AS ds__day
-                                , DATETIME_TRUNC(visits_source_src_28000.ds, isoweek) AS ds__week
-                                , DATETIME_TRUNC(visits_source_src_28000.ds, month) AS ds__month
-                                , DATETIME_TRUNC(visits_source_src_28000.ds, quarter) AS ds__quarter
-                                , DATETIME_TRUNC(visits_source_src_28000.ds, year) AS ds__year
-                                , EXTRACT(year FROM visits_source_src_28000.ds) AS ds__extract_year
-                                , EXTRACT(quarter FROM visits_source_src_28000.ds) AS ds__extract_quarter
-                                , EXTRACT(month FROM visits_source_src_28000.ds) AS ds__extract_month
-                                , EXTRACT(day FROM visits_source_src_28000.ds) AS ds__extract_day
-                                , IF(EXTRACT(dayofweek FROM visits_source_src_28000.ds) = 1, 7, EXTRACT(dayofweek FROM visits_source_src_28000.ds) - 1) AS ds__extract_dow
-                                , EXTRACT(dayofyear FROM visits_source_src_28000.ds) AS ds__extract_doy
-                                , visits_source_src_28000.referrer_id
-                                , DATETIME_TRUNC(visits_source_src_28000.ds, day) AS visit__ds__day
-                                , DATETIME_TRUNC(visits_source_src_28000.ds, isoweek) AS visit__ds__week
-                                , DATETIME_TRUNC(visits_source_src_28000.ds, month) AS visit__ds__month
-                                , DATETIME_TRUNC(visits_source_src_28000.ds, quarter) AS visit__ds__quarter
-                                , DATETIME_TRUNC(visits_source_src_28000.ds, year) AS visit__ds__year
-                                , EXTRACT(year FROM visits_source_src_28000.ds) AS visit__ds__extract_year
-                                , EXTRACT(quarter FROM visits_source_src_28000.ds) AS visit__ds__extract_quarter
-                                , EXTRACT(month FROM visits_source_src_28000.ds) AS visit__ds__extract_month
-                                , EXTRACT(day FROM visits_source_src_28000.ds) AS visit__ds__extract_day
-                                , IF(EXTRACT(dayofweek FROM visits_source_src_28000.ds) = 1, 7, EXTRACT(dayofweek FROM visits_source_src_28000.ds) - 1) AS visit__ds__extract_dow
-                                , EXTRACT(dayofyear FROM visits_source_src_28000.ds) AS visit__ds__extract_doy
-                                , visits_source_src_28000.referrer_id AS visit__referrer_id
-                                , visits_source_src_28000.user_id AS user
-                                , visits_source_src_28000.session_id AS session
-                                , visits_source_src_28000.user_id AS visit__user
-                                , visits_source_src_28000.session_id AS visit__session
-                              FROM ***************************.fct_visits visits_source_src_28000
-                            ) subq_7
-                          ) subq_8
-                        ) subq_9
-                        INNER JOIN (
-                          -- Add column with generated UUID
-                          SELECT
-                            subq_11.ds__day
-                            , subq_11.ds__week
-                            , subq_11.ds__month
-                            , subq_11.ds__quarter
-                            , subq_11.ds__year
-                            , subq_11.ds__extract_year
-                            , subq_11.ds__extract_quarter
-                            , subq_11.ds__extract_month
-                            , subq_11.ds__extract_day
-                            , subq_11.ds__extract_dow
-                            , subq_11.ds__extract_doy
-                            , subq_11.ds_month__month
-                            , subq_11.ds_month__quarter
-                            , subq_11.ds_month__year
-                            , subq_11.ds_month__extract_year
-                            , subq_11.ds_month__extract_quarter
-                            , subq_11.ds_month__extract_month
-                            , subq_11.buy__ds__day
-                            , subq_11.buy__ds__week
-                            , subq_11.buy__ds__month
-                            , subq_11.buy__ds__quarter
-                            , subq_11.buy__ds__year
-                            , subq_11.buy__ds__extract_year
-                            , subq_11.buy__ds__extract_quarter
-                            , subq_11.buy__ds__extract_month
-                            , subq_11.buy__ds__extract_day
-                            , subq_11.buy__ds__extract_dow
-                            , subq_11.buy__ds__extract_doy
-                            , subq_11.buy__ds_month__month
-                            , subq_11.buy__ds_month__quarter
-                            , subq_11.buy__ds_month__year
-                            , subq_11.buy__ds_month__extract_year
-                            , subq_11.buy__ds_month__extract_quarter
-                            , subq_11.buy__ds_month__extract_month
-                            , subq_11.metric_time__day
-                            , subq_11.metric_time__week
-                            , subq_11.metric_time__month
-                            , subq_11.metric_time__quarter
-                            , subq_11.metric_time__year
-                            , subq_11.metric_time__extract_year
-                            , subq_11.metric_time__extract_quarter
-                            , subq_11.metric_time__extract_month
-                            , subq_11.metric_time__extract_day
-                            , subq_11.metric_time__extract_dow
-                            , subq_11.metric_time__extract_doy
-                            , subq_11.user
-                            , subq_11.session_id
-                            , subq_11.buy__user
-                            , subq_11.buy__session_id
-                            , subq_11.buys
-                            , subq_11.buyers
-                            , GENERATE_UUID() AS mf_internal_uuid
-                          FROM (
-                            -- Metric Time Dimension 'ds'
-                            SELECT
-                              subq_10.ds__day
-                              , subq_10.ds__week
-                              , subq_10.ds__month
-                              , subq_10.ds__quarter
-                              , subq_10.ds__year
-                              , subq_10.ds__extract_year
-                              , subq_10.ds__extract_quarter
-                              , subq_10.ds__extract_month
-                              , subq_10.ds__extract_day
-                              , subq_10.ds__extract_dow
-                              , subq_10.ds__extract_doy
-                              , subq_10.ds_month__month
-                              , subq_10.ds_month__quarter
-                              , subq_10.ds_month__year
-                              , subq_10.ds_month__extract_year
-                              , subq_10.ds_month__extract_quarter
-                              , subq_10.ds_month__extract_month
-                              , subq_10.buy__ds__day
-                              , subq_10.buy__ds__week
-                              , subq_10.buy__ds__month
-                              , subq_10.buy__ds__quarter
-                              , subq_10.buy__ds__year
-                              , subq_10.buy__ds__extract_year
-                              , subq_10.buy__ds__extract_quarter
-                              , subq_10.buy__ds__extract_month
-                              , subq_10.buy__ds__extract_day
-                              , subq_10.buy__ds__extract_dow
-                              , subq_10.buy__ds__extract_doy
-                              , subq_10.buy__ds_month__month
-                              , subq_10.buy__ds_month__quarter
-                              , subq_10.buy__ds_month__year
-                              , subq_10.buy__ds_month__extract_year
-                              , subq_10.buy__ds_month__extract_quarter
-                              , subq_10.buy__ds_month__extract_month
-                              , subq_10.ds__day AS metric_time__day
-                              , subq_10.ds__week AS metric_time__week
-                              , subq_10.ds__month AS metric_time__month
-                              , subq_10.ds__quarter AS metric_time__quarter
-                              , subq_10.ds__year AS metric_time__year
-                              , subq_10.ds__extract_year AS metric_time__extract_year
-                              , subq_10.ds__extract_quarter AS metric_time__extract_quarter
-                              , subq_10.ds__extract_month AS metric_time__extract_month
-                              , subq_10.ds__extract_day AS metric_time__extract_day
-                              , subq_10.ds__extract_dow AS metric_time__extract_dow
-                              , subq_10.ds__extract_doy AS metric_time__extract_doy
-                              , subq_10.user
-                              , subq_10.session_id
-                              , subq_10.buy__user
-                              , subq_10.buy__session_id
-                              , subq_10.buys
-                              , subq_10.buyers
-                            FROM (
-                              -- Read Elements From Semantic Model 'buys_source'
-                              SELECT
-                                1 AS buys
-                                , 1 AS buys_month
-                                , buys_source_src_28000.user_id AS buyers
-                                , DATETIME_TRUNC(buys_source_src_28000.ds, day) AS ds__day
-                                , DATETIME_TRUNC(buys_source_src_28000.ds, isoweek) AS ds__week
-                                , DATETIME_TRUNC(buys_source_src_28000.ds, month) AS ds__month
-                                , DATETIME_TRUNC(buys_source_src_28000.ds, quarter) AS ds__quarter
-                                , DATETIME_TRUNC(buys_source_src_28000.ds, year) AS ds__year
-                                , EXTRACT(year FROM buys_source_src_28000.ds) AS ds__extract_year
-                                , EXTRACT(quarter FROM buys_source_src_28000.ds) AS ds__extract_quarter
-                                , EXTRACT(month FROM buys_source_src_28000.ds) AS ds__extract_month
-                                , EXTRACT(day FROM buys_source_src_28000.ds) AS ds__extract_day
-                                , IF(EXTRACT(dayofweek FROM buys_source_src_28000.ds) = 1, 7, EXTRACT(dayofweek FROM buys_source_src_28000.ds) - 1) AS ds__extract_dow
-                                , EXTRACT(dayofyear FROM buys_source_src_28000.ds) AS ds__extract_doy
-                                , DATETIME_TRUNC(buys_source_src_28000.ds_month, month) AS ds_month__month
-                                , DATETIME_TRUNC(buys_source_src_28000.ds_month, quarter) AS ds_month__quarter
-                                , DATETIME_TRUNC(buys_source_src_28000.ds_month, year) AS ds_month__year
-                                , EXTRACT(year FROM buys_source_src_28000.ds_month) AS ds_month__extract_year
-                                , EXTRACT(quarter FROM buys_source_src_28000.ds_month) AS ds_month__extract_quarter
-                                , EXTRACT(month FROM buys_source_src_28000.ds_month) AS ds_month__extract_month
-                                , DATETIME_TRUNC(buys_source_src_28000.ds, day) AS buy__ds__day
-                                , DATETIME_TRUNC(buys_source_src_28000.ds, isoweek) AS buy__ds__week
-                                , DATETIME_TRUNC(buys_source_src_28000.ds, month) AS buy__ds__month
-                                , DATETIME_TRUNC(buys_source_src_28000.ds, quarter) AS buy__ds__quarter
-                                , DATETIME_TRUNC(buys_source_src_28000.ds, year) AS buy__ds__year
-                                , EXTRACT(year FROM buys_source_src_28000.ds) AS buy__ds__extract_year
-                                , EXTRACT(quarter FROM buys_source_src_28000.ds) AS buy__ds__extract_quarter
-                                , EXTRACT(month FROM buys_source_src_28000.ds) AS buy__ds__extract_month
-                                , EXTRACT(day FROM buys_source_src_28000.ds) AS buy__ds__extract_day
-                                , IF(EXTRACT(dayofweek FROM buys_source_src_28000.ds) = 1, 7, EXTRACT(dayofweek FROM buys_source_src_28000.ds) - 1) AS buy__ds__extract_dow
-                                , EXTRACT(dayofyear FROM buys_source_src_28000.ds) AS buy__ds__extract_doy
-                                , DATETIME_TRUNC(buys_source_src_28000.ds_month, month) AS buy__ds_month__month
-                                , DATETIME_TRUNC(buys_source_src_28000.ds_month, quarter) AS buy__ds_month__quarter
-                                , DATETIME_TRUNC(buys_source_src_28000.ds_month, year) AS buy__ds_month__year
-                                , EXTRACT(year FROM buys_source_src_28000.ds_month) AS buy__ds_month__extract_year
-                                , EXTRACT(quarter FROM buys_source_src_28000.ds_month) AS buy__ds_month__extract_quarter
-                                , EXTRACT(month FROM buys_source_src_28000.ds_month) AS buy__ds_month__extract_month
-                                , buys_source_src_28000.user_id AS user
-                                , buys_source_src_28000.session_id
-                                , buys_source_src_28000.user_id AS buy__user
-                                , buys_source_src_28000.session_id AS buy__session_id
-                              FROM ***************************.fct_buys buys_source_src_28000
-                            ) subq_10
-                          ) subq_11
-                        ) subq_12
-                        ON
-                          (
-                            subq_9.user = subq_12.user
-                          ) AND (
-                            (subq_9.metric_time__day <= subq_12.metric_time__day)
-                          )
-                      ) subq_13
-                    ) subq_14
-                  ) subq_15
-                  GROUP BY
-                    user
-                ) subq_16
-                ON
-                  subq_6.user = subq_16.user
+                        1 AS visits
+                        , visits_source_src_28000.user_id AS visitors
+                        , DATETIME_TRUNC(visits_source_src_28000.ds, day) AS ds__day
+                        , DATETIME_TRUNC(visits_source_src_28000.ds, isoweek) AS ds__week
+                        , DATETIME_TRUNC(visits_source_src_28000.ds, month) AS ds__month
+                        , DATETIME_TRUNC(visits_source_src_28000.ds, quarter) AS ds__quarter
+                        , DATETIME_TRUNC(visits_source_src_28000.ds, year) AS ds__year
+                        , EXTRACT(year FROM visits_source_src_28000.ds) AS ds__extract_year
+                        , EXTRACT(quarter FROM visits_source_src_28000.ds) AS ds__extract_quarter
+                        , EXTRACT(month FROM visits_source_src_28000.ds) AS ds__extract_month
+                        , EXTRACT(day FROM visits_source_src_28000.ds) AS ds__extract_day
+                        , IF(EXTRACT(dayofweek FROM visits_source_src_28000.ds) = 1, 7, EXTRACT(dayofweek FROM visits_source_src_28000.ds) - 1) AS ds__extract_dow
+                        , EXTRACT(dayofyear FROM visits_source_src_28000.ds) AS ds__extract_doy
+                        , visits_source_src_28000.referrer_id
+                        , DATETIME_TRUNC(visits_source_src_28000.ds, day) AS visit__ds__day
+                        , DATETIME_TRUNC(visits_source_src_28000.ds, isoweek) AS visit__ds__week
+                        , DATETIME_TRUNC(visits_source_src_28000.ds, month) AS visit__ds__month
+                        , DATETIME_TRUNC(visits_source_src_28000.ds, quarter) AS visit__ds__quarter
+                        , DATETIME_TRUNC(visits_source_src_28000.ds, year) AS visit__ds__year
+                        , EXTRACT(year FROM visits_source_src_28000.ds) AS visit__ds__extract_year
+                        , EXTRACT(quarter FROM visits_source_src_28000.ds) AS visit__ds__extract_quarter
+                        , EXTRACT(month FROM visits_source_src_28000.ds) AS visit__ds__extract_month
+                        , EXTRACT(day FROM visits_source_src_28000.ds) AS visit__ds__extract_day
+                        , IF(EXTRACT(dayofweek FROM visits_source_src_28000.ds) = 1, 7, EXTRACT(dayofweek FROM visits_source_src_28000.ds) - 1) AS visit__ds__extract_dow
+                        , EXTRACT(dayofyear FROM visits_source_src_28000.ds) AS visit__ds__extract_doy
+                        , visits_source_src_28000.referrer_id AS visit__referrer_id
+                        , visits_source_src_28000.user_id AS user
+                        , visits_source_src_28000.session_id AS session
+                        , visits_source_src_28000.user_id AS visit__user
+                        , visits_source_src_28000.session_id AS visit__session
+                      FROM ***************************.fct_visits visits_source_src_28000
+                    ) subq_2
+                  ) subq_3
+                ) subq_4
                 GROUP BY
                   user
-              ) subq_17
-            ) subq_18
-          ) subq_19
-          ON
-            subq_2.user = subq_19.user
-        ) subq_20
-      ) subq_21
+              ) subq_5
+              FULL OUTER JOIN (
+                -- Aggregate Measures
+                SELECT
+                  subq_14.user
+                  , SUM(subq_14.buys) AS buys
+                FROM (
+                  -- Pass Only Elements: ['buys', 'user']
+                  SELECT
+                    subq_13.user
+                    , subq_13.buys
+                  FROM (
+                    -- Find conversions for user within the range of INF
+                    SELECT
+                      subq_12.metric_time__day
+                      , subq_12.user
+                      , subq_12.buys
+                      , subq_12.visits
+                    FROM (
+                      -- Dedupe the fanout with mf_internal_uuid in the conversion data set
+                      SELECT DISTINCT
+                        FIRST_VALUE(subq_8.visits) OVER (
+                          PARTITION BY
+                            subq_11.user
+                            , subq_11.metric_time__day
+                            , subq_11.mf_internal_uuid
+                          ORDER BY subq_8.metric_time__day DESC
+                          ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+                        ) AS visits
+                        , FIRST_VALUE(subq_8.metric_time__day) OVER (
+                          PARTITION BY
+                            subq_11.user
+                            , subq_11.metric_time__day
+                            , subq_11.mf_internal_uuid
+                          ORDER BY subq_8.metric_time__day DESC
+                          ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+                        ) AS metric_time__day
+                        , FIRST_VALUE(subq_8.user) OVER (
+                          PARTITION BY
+                            subq_11.user
+                            , subq_11.metric_time__day
+                            , subq_11.mf_internal_uuid
+                          ORDER BY subq_8.metric_time__day DESC
+                          ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+                        ) AS user
+                        , subq_11.mf_internal_uuid AS mf_internal_uuid
+                        , subq_11.buys AS buys
+                      FROM (
+                        -- Pass Only Elements: ['visits', 'metric_time__day', 'user']
+                        SELECT
+                          subq_7.metric_time__day
+                          , subq_7.user
+                          , subq_7.visits
+                        FROM (
+                          -- Metric Time Dimension 'ds'
+                          SELECT
+                            subq_6.ds__day
+                            , subq_6.ds__week
+                            , subq_6.ds__month
+                            , subq_6.ds__quarter
+                            , subq_6.ds__year
+                            , subq_6.ds__extract_year
+                            , subq_6.ds__extract_quarter
+                            , subq_6.ds__extract_month
+                            , subq_6.ds__extract_day
+                            , subq_6.ds__extract_dow
+                            , subq_6.ds__extract_doy
+                            , subq_6.visit__ds__day
+                            , subq_6.visit__ds__week
+                            , subq_6.visit__ds__month
+                            , subq_6.visit__ds__quarter
+                            , subq_6.visit__ds__year
+                            , subq_6.visit__ds__extract_year
+                            , subq_6.visit__ds__extract_quarter
+                            , subq_6.visit__ds__extract_month
+                            , subq_6.visit__ds__extract_day
+                            , subq_6.visit__ds__extract_dow
+                            , subq_6.visit__ds__extract_doy
+                            , subq_6.ds__day AS metric_time__day
+                            , subq_6.ds__week AS metric_time__week
+                            , subq_6.ds__month AS metric_time__month
+                            , subq_6.ds__quarter AS metric_time__quarter
+                            , subq_6.ds__year AS metric_time__year
+                            , subq_6.ds__extract_year AS metric_time__extract_year
+                            , subq_6.ds__extract_quarter AS metric_time__extract_quarter
+                            , subq_6.ds__extract_month AS metric_time__extract_month
+                            , subq_6.ds__extract_day AS metric_time__extract_day
+                            , subq_6.ds__extract_dow AS metric_time__extract_dow
+                            , subq_6.ds__extract_doy AS metric_time__extract_doy
+                            , subq_6.user
+                            , subq_6.session
+                            , subq_6.visit__user
+                            , subq_6.visit__session
+                            , subq_6.referrer_id
+                            , subq_6.visit__referrer_id
+                            , subq_6.visits
+                            , subq_6.visitors
+                          FROM (
+                            -- Read Elements From Semantic Model 'visits_source'
+                            SELECT
+                              1 AS visits
+                              , visits_source_src_28000.user_id AS visitors
+                              , DATETIME_TRUNC(visits_source_src_28000.ds, day) AS ds__day
+                              , DATETIME_TRUNC(visits_source_src_28000.ds, isoweek) AS ds__week
+                              , DATETIME_TRUNC(visits_source_src_28000.ds, month) AS ds__month
+                              , DATETIME_TRUNC(visits_source_src_28000.ds, quarter) AS ds__quarter
+                              , DATETIME_TRUNC(visits_source_src_28000.ds, year) AS ds__year
+                              , EXTRACT(year FROM visits_source_src_28000.ds) AS ds__extract_year
+                              , EXTRACT(quarter FROM visits_source_src_28000.ds) AS ds__extract_quarter
+                              , EXTRACT(month FROM visits_source_src_28000.ds) AS ds__extract_month
+                              , EXTRACT(day FROM visits_source_src_28000.ds) AS ds__extract_day
+                              , IF(EXTRACT(dayofweek FROM visits_source_src_28000.ds) = 1, 7, EXTRACT(dayofweek FROM visits_source_src_28000.ds) - 1) AS ds__extract_dow
+                              , EXTRACT(dayofyear FROM visits_source_src_28000.ds) AS ds__extract_doy
+                              , visits_source_src_28000.referrer_id
+                              , DATETIME_TRUNC(visits_source_src_28000.ds, day) AS visit__ds__day
+                              , DATETIME_TRUNC(visits_source_src_28000.ds, isoweek) AS visit__ds__week
+                              , DATETIME_TRUNC(visits_source_src_28000.ds, month) AS visit__ds__month
+                              , DATETIME_TRUNC(visits_source_src_28000.ds, quarter) AS visit__ds__quarter
+                              , DATETIME_TRUNC(visits_source_src_28000.ds, year) AS visit__ds__year
+                              , EXTRACT(year FROM visits_source_src_28000.ds) AS visit__ds__extract_year
+                              , EXTRACT(quarter FROM visits_source_src_28000.ds) AS visit__ds__extract_quarter
+                              , EXTRACT(month FROM visits_source_src_28000.ds) AS visit__ds__extract_month
+                              , EXTRACT(day FROM visits_source_src_28000.ds) AS visit__ds__extract_day
+                              , IF(EXTRACT(dayofweek FROM visits_source_src_28000.ds) = 1, 7, EXTRACT(dayofweek FROM visits_source_src_28000.ds) - 1) AS visit__ds__extract_dow
+                              , EXTRACT(dayofyear FROM visits_source_src_28000.ds) AS visit__ds__extract_doy
+                              , visits_source_src_28000.referrer_id AS visit__referrer_id
+                              , visits_source_src_28000.user_id AS user
+                              , visits_source_src_28000.session_id AS session
+                              , visits_source_src_28000.user_id AS visit__user
+                              , visits_source_src_28000.session_id AS visit__session
+                            FROM ***************************.fct_visits visits_source_src_28000
+                          ) subq_6
+                        ) subq_7
+                      ) subq_8
+                      INNER JOIN (
+                        -- Add column with generated UUID
+                        SELECT
+                          subq_10.ds__day
+                          , subq_10.ds__week
+                          , subq_10.ds__month
+                          , subq_10.ds__quarter
+                          , subq_10.ds__year
+                          , subq_10.ds__extract_year
+                          , subq_10.ds__extract_quarter
+                          , subq_10.ds__extract_month
+                          , subq_10.ds__extract_day
+                          , subq_10.ds__extract_dow
+                          , subq_10.ds__extract_doy
+                          , subq_10.ds_month__month
+                          , subq_10.ds_month__quarter
+                          , subq_10.ds_month__year
+                          , subq_10.ds_month__extract_year
+                          , subq_10.ds_month__extract_quarter
+                          , subq_10.ds_month__extract_month
+                          , subq_10.buy__ds__day
+                          , subq_10.buy__ds__week
+                          , subq_10.buy__ds__month
+                          , subq_10.buy__ds__quarter
+                          , subq_10.buy__ds__year
+                          , subq_10.buy__ds__extract_year
+                          , subq_10.buy__ds__extract_quarter
+                          , subq_10.buy__ds__extract_month
+                          , subq_10.buy__ds__extract_day
+                          , subq_10.buy__ds__extract_dow
+                          , subq_10.buy__ds__extract_doy
+                          , subq_10.buy__ds_month__month
+                          , subq_10.buy__ds_month__quarter
+                          , subq_10.buy__ds_month__year
+                          , subq_10.buy__ds_month__extract_year
+                          , subq_10.buy__ds_month__extract_quarter
+                          , subq_10.buy__ds_month__extract_month
+                          , subq_10.metric_time__day
+                          , subq_10.metric_time__week
+                          , subq_10.metric_time__month
+                          , subq_10.metric_time__quarter
+                          , subq_10.metric_time__year
+                          , subq_10.metric_time__extract_year
+                          , subq_10.metric_time__extract_quarter
+                          , subq_10.metric_time__extract_month
+                          , subq_10.metric_time__extract_day
+                          , subq_10.metric_time__extract_dow
+                          , subq_10.metric_time__extract_doy
+                          , subq_10.user
+                          , subq_10.session_id
+                          , subq_10.buy__user
+                          , subq_10.buy__session_id
+                          , subq_10.buys
+                          , subq_10.buyers
+                          , GENERATE_UUID() AS mf_internal_uuid
+                        FROM (
+                          -- Metric Time Dimension 'ds'
+                          SELECT
+                            subq_9.ds__day
+                            , subq_9.ds__week
+                            , subq_9.ds__month
+                            , subq_9.ds__quarter
+                            , subq_9.ds__year
+                            , subq_9.ds__extract_year
+                            , subq_9.ds__extract_quarter
+                            , subq_9.ds__extract_month
+                            , subq_9.ds__extract_day
+                            , subq_9.ds__extract_dow
+                            , subq_9.ds__extract_doy
+                            , subq_9.ds_month__month
+                            , subq_9.ds_month__quarter
+                            , subq_9.ds_month__year
+                            , subq_9.ds_month__extract_year
+                            , subq_9.ds_month__extract_quarter
+                            , subq_9.ds_month__extract_month
+                            , subq_9.buy__ds__day
+                            , subq_9.buy__ds__week
+                            , subq_9.buy__ds__month
+                            , subq_9.buy__ds__quarter
+                            , subq_9.buy__ds__year
+                            , subq_9.buy__ds__extract_year
+                            , subq_9.buy__ds__extract_quarter
+                            , subq_9.buy__ds__extract_month
+                            , subq_9.buy__ds__extract_day
+                            , subq_9.buy__ds__extract_dow
+                            , subq_9.buy__ds__extract_doy
+                            , subq_9.buy__ds_month__month
+                            , subq_9.buy__ds_month__quarter
+                            , subq_9.buy__ds_month__year
+                            , subq_9.buy__ds_month__extract_year
+                            , subq_9.buy__ds_month__extract_quarter
+                            , subq_9.buy__ds_month__extract_month
+                            , subq_9.ds__day AS metric_time__day
+                            , subq_9.ds__week AS metric_time__week
+                            , subq_9.ds__month AS metric_time__month
+                            , subq_9.ds__quarter AS metric_time__quarter
+                            , subq_9.ds__year AS metric_time__year
+                            , subq_9.ds__extract_year AS metric_time__extract_year
+                            , subq_9.ds__extract_quarter AS metric_time__extract_quarter
+                            , subq_9.ds__extract_month AS metric_time__extract_month
+                            , subq_9.ds__extract_day AS metric_time__extract_day
+                            , subq_9.ds__extract_dow AS metric_time__extract_dow
+                            , subq_9.ds__extract_doy AS metric_time__extract_doy
+                            , subq_9.user
+                            , subq_9.session_id
+                            , subq_9.buy__user
+                            , subq_9.buy__session_id
+                            , subq_9.buys
+                            , subq_9.buyers
+                          FROM (
+                            -- Read Elements From Semantic Model 'buys_source'
+                            SELECT
+                              1 AS buys
+                              , 1 AS buys_month
+                              , buys_source_src_28000.user_id AS buyers
+                              , DATETIME_TRUNC(buys_source_src_28000.ds, day) AS ds__day
+                              , DATETIME_TRUNC(buys_source_src_28000.ds, isoweek) AS ds__week
+                              , DATETIME_TRUNC(buys_source_src_28000.ds, month) AS ds__month
+                              , DATETIME_TRUNC(buys_source_src_28000.ds, quarter) AS ds__quarter
+                              , DATETIME_TRUNC(buys_source_src_28000.ds, year) AS ds__year
+                              , EXTRACT(year FROM buys_source_src_28000.ds) AS ds__extract_year
+                              , EXTRACT(quarter FROM buys_source_src_28000.ds) AS ds__extract_quarter
+                              , EXTRACT(month FROM buys_source_src_28000.ds) AS ds__extract_month
+                              , EXTRACT(day FROM buys_source_src_28000.ds) AS ds__extract_day
+                              , IF(EXTRACT(dayofweek FROM buys_source_src_28000.ds) = 1, 7, EXTRACT(dayofweek FROM buys_source_src_28000.ds) - 1) AS ds__extract_dow
+                              , EXTRACT(dayofyear FROM buys_source_src_28000.ds) AS ds__extract_doy
+                              , DATETIME_TRUNC(buys_source_src_28000.ds_month, month) AS ds_month__month
+                              , DATETIME_TRUNC(buys_source_src_28000.ds_month, quarter) AS ds_month__quarter
+                              , DATETIME_TRUNC(buys_source_src_28000.ds_month, year) AS ds_month__year
+                              , EXTRACT(year FROM buys_source_src_28000.ds_month) AS ds_month__extract_year
+                              , EXTRACT(quarter FROM buys_source_src_28000.ds_month) AS ds_month__extract_quarter
+                              , EXTRACT(month FROM buys_source_src_28000.ds_month) AS ds_month__extract_month
+                              , DATETIME_TRUNC(buys_source_src_28000.ds, day) AS buy__ds__day
+                              , DATETIME_TRUNC(buys_source_src_28000.ds, isoweek) AS buy__ds__week
+                              , DATETIME_TRUNC(buys_source_src_28000.ds, month) AS buy__ds__month
+                              , DATETIME_TRUNC(buys_source_src_28000.ds, quarter) AS buy__ds__quarter
+                              , DATETIME_TRUNC(buys_source_src_28000.ds, year) AS buy__ds__year
+                              , EXTRACT(year FROM buys_source_src_28000.ds) AS buy__ds__extract_year
+                              , EXTRACT(quarter FROM buys_source_src_28000.ds) AS buy__ds__extract_quarter
+                              , EXTRACT(month FROM buys_source_src_28000.ds) AS buy__ds__extract_month
+                              , EXTRACT(day FROM buys_source_src_28000.ds) AS buy__ds__extract_day
+                              , IF(EXTRACT(dayofweek FROM buys_source_src_28000.ds) = 1, 7, EXTRACT(dayofweek FROM buys_source_src_28000.ds) - 1) AS buy__ds__extract_dow
+                              , EXTRACT(dayofyear FROM buys_source_src_28000.ds) AS buy__ds__extract_doy
+                              , DATETIME_TRUNC(buys_source_src_28000.ds_month, month) AS buy__ds_month__month
+                              , DATETIME_TRUNC(buys_source_src_28000.ds_month, quarter) AS buy__ds_month__quarter
+                              , DATETIME_TRUNC(buys_source_src_28000.ds_month, year) AS buy__ds_month__year
+                              , EXTRACT(year FROM buys_source_src_28000.ds_month) AS buy__ds_month__extract_year
+                              , EXTRACT(quarter FROM buys_source_src_28000.ds_month) AS buy__ds_month__extract_quarter
+                              , EXTRACT(month FROM buys_source_src_28000.ds_month) AS buy__ds_month__extract_month
+                              , buys_source_src_28000.user_id AS user
+                              , buys_source_src_28000.session_id
+                              , buys_source_src_28000.user_id AS buy__user
+                              , buys_source_src_28000.session_id AS buy__session_id
+                            FROM ***************************.fct_buys buys_source_src_28000
+                          ) subq_9
+                        ) subq_10
+                      ) subq_11
+                      ON
+                        (
+                          subq_8.user = subq_11.user
+                        ) AND (
+                          (subq_8.metric_time__day <= subq_11.metric_time__day)
+                        )
+                    ) subq_12
+                  ) subq_13
+                ) subq_14
+                GROUP BY
+                  user
+              ) subq_15
+              ON
+                subq_5.user = subq_15.user
+              GROUP BY
+                user
+            ) subq_16
+          ) subq_17
+        ) subq_18
+        ON
+          subq_1.user = subq_18.user
+      ) subq_19
       WHERE user__visit_buy_conversion_rate > 2
-    ) subq_22
-  ) subq_23
-) subq_24
+    ) subq_20
+  ) subq_21
+) subq_22

@@ -6,19 +6,17 @@ SELECT
   COUNT(DISTINCT bookers) AS bookers
 FROM (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['bookers', 'listing__bookers']
   SELECT
-    subq_22.listing__bookers AS listing__bookers
-    , subq_16.bookers AS bookers
+    subq_19.listing__bookers AS listing__bookers
+    , subq_13.bookers AS bookers
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
-    -- Pass Only Elements: ['bookers', 'listing']
     SELECT
       listing_id AS listing
       , guest_id AS bookers
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_16
+  ) subq_13
   LEFT OUTER JOIN (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
@@ -32,8 +30,8 @@ FROM (
     FROM ***************************.fct_bookings bookings_source_src_28000
     GROUP BY
       listing
-  ) subq_22
+  ) subq_19
   ON
-    subq_16.listing = subq_22.listing
-) subq_24
+    subq_13.listing = subq_19.listing
+) subq_20
 WHERE listing__bookers > 1.00
