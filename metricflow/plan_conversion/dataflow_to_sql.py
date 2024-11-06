@@ -212,39 +212,6 @@ class DataflowToSqlQueryPlanConverter:
         )
 
 
-def _make_time_range_comparison_expr(
-    table_alias: str, column_alias: str, time_range_constraint: TimeRangeConstraint
-) -> SqlExpressionNode:
-    """Build an expression like "ds BETWEEN CAST('2020-01-01' AS TIMESTAMP) AND CAST('2020-01-02' AS TIMESTAMP).
-
-    If the constraint uses day or larger grain, only render to the date level. Otherwise, render to the timestamp level.
-    """
-
-    def strip_time_from_dt(ts: dt.datetime) -> dt.datetime:
-        date_obj = ts.date()
-        return dt.datetime(date_obj.year, date_obj.month, date_obj.day)
-
-    constraint_uses_day_or_larger_grain = True
-    for constraint_input in (time_range_constraint.start_time, time_range_constraint.end_time):
-        if strip_time_from_dt(constraint_input) != constraint_input:
-            constraint_uses_day_or_larger_grain = False
-            break
-
-    time_format_to_render = ISO8601_PYTHON_FORMAT if constraint_uses_day_or_larger_grain else ISO8601_PYTHON_TS_FORMAT
-
-    return SqlBetweenExpression.create(
-        column_arg=SqlColumnReferenceExpression.create(
-            SqlColumnReference(table_alias=table_alias, column_name=column_alias)
-        ),
-        start_expr=SqlStringLiteralExpression.create(
-            literal_value=time_range_constraint.start_time.strftime(time_format_to_render),
-        ),
-        end_expr=SqlStringLiteralExpression.create(
-            literal_value=time_range_constraint.end_time.strftime(time_format_to_render),
-        ),
-    )
-
-
 class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
     """Generates a SQL query plan by converting parent nodes to a sub-query and the given node to a query."""
 
@@ -350,7 +317,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             from_source_alias=time_spine_table_alias,
             group_bys=select_columns if apply_group_by else (),
             where=(
-                _make_time_range_comparison_expr(
+                DataflowNodeToSqlSubQueryVisitor._make_time_range_comparison_expr(
                     table_alias=time_spine_table_alias,
                     column_alias=time_spine_source.base_column,
                     time_range_constraint=time_range_constraint,
@@ -1112,7 +1079,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         time_dimension_instance_for_metric_time = time_dimension_instances_for_metric_time[0]
 
         # Build an expression like "ds >= CAST('2020-01-01' AS TIMESTAMP) AND ds <= CAST('2020-01-02' AS TIMESTAMP)"
-        constrain_metric_time_column_condition = _make_time_range_comparison_expr(
+        constrain_metric_time_column_condition = DataflowNodeToSqlSubQueryVisitor._make_time_range_comparison_expr(
             table_alias=from_data_set_alias,
             column_alias=time_dimension_instance_for_metric_time.associated_column.column_name,
             time_range_constraint=node.time_range_constraint,
@@ -1942,5 +1909,40 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                 from_source=subquery,
                 from_source_alias=subquery_alias,
                 group_bys=outer_query_select_columns,
+            ),
+        )
+
+    @staticmethod
+    def _make_time_range_comparison_expr(
+        table_alias: str, column_alias: str, time_range_constraint: TimeRangeConstraint
+    ) -> SqlExpressionNode:
+        """Build an expression like "ds BETWEEN CAST('2020-01-01' AS TIMESTAMP) AND CAST('2020-01-02' AS TIMESTAMP).
+
+        If the constraint uses day or larger grain, only render to the date level. Otherwise, render to the timestamp level.
+        """
+
+        def strip_time_from_dt(ts: dt.datetime) -> dt.datetime:
+            date_obj = ts.date()
+            return dt.datetime(date_obj.year, date_obj.month, date_obj.day)
+
+        constraint_uses_day_or_larger_grain = True
+        for constraint_input in (time_range_constraint.start_time, time_range_constraint.end_time):
+            if strip_time_from_dt(constraint_input) != constraint_input:
+                constraint_uses_day_or_larger_grain = False
+                break
+
+        time_format_to_render = (
+            ISO8601_PYTHON_FORMAT if constraint_uses_day_or_larger_grain else ISO8601_PYTHON_TS_FORMAT
+        )
+
+        return SqlBetweenExpression.create(
+            column_arg=SqlColumnReferenceExpression.create(
+                SqlColumnReference(table_alias=table_alias, column_name=column_alias)
+            ),
+            start_expr=SqlStringLiteralExpression.create(
+                literal_value=time_range_constraint.start_time.strftime(time_format_to_render),
+            ),
+            end_expr=SqlStringLiteralExpression.create(
+                literal_value=time_range_constraint.end_time.strftime(time_format_to_render),
             ),
         )
