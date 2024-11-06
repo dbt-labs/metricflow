@@ -12,9 +12,7 @@ from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
 )
 from metricflow.dataset.sql_dataset import SqlDataSet
-from metricflow.plan_conversion.dataflow_to_sql import (
-    DataflowNodeToSqlSubqueryVisitor,
-)
+from metricflow.plan_conversion.dataflow_to_sql_subquery import DataflowNodeToSqlSubqueryVisitor
 
 if TYPE_CHECKING:
     from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
