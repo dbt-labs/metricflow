@@ -14,7 +14,7 @@ from typing_extensions import override
 
 from metricflow_semantics.mf_logging.formatting import indent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.mf_logging.pretty_print import mf_pformat, mf_pformat_many
+from metricflow_semantics.mf_logging.pretty_print import mf_pformat, mf_pformat_dict
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 from metricflow_semantics.query.group_by_item.candidate_push_down.group_by_item_candidate import GroupByItemCandidateSet
@@ -82,7 +82,7 @@ class PushDownResult:
         # If there are errors, there shouldn't be any candidate sets.
         assert (not self.issue_set.has_errors and not self.candidate_set.is_empty) or (
             self.issue_set.has_errors and self.candidate_set.is_empty
-        ), mf_pformat_many(
+        ), mf_pformat_dict(
             "candidate_set / issue_set mismatch:", {"candidate_set": self.candidate_set, "issue_set": self.issue_set}
         )
 

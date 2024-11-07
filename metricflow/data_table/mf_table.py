@@ -9,7 +9,7 @@ from typing import Iterable, Iterator, List, Optional, Sequence, Tuple, Type
 
 import tabulate
 from metricflow_semantics.mf_logging.formatting import indent
-from metricflow_semantics.mf_logging.pretty_print import mf_pformat, mf_pformat_many
+from metricflow_semantics.mf_logging.pretty_print import mf_pformat, mf_pformat_dict
 from typing_extensions import Self
 
 from metricflow.data_table.column_types import CellValue, InputCellValue, row_cell_types
@@ -47,7 +47,7 @@ class MetricFlowDataTable:
             # Check that the type of the object in the rows match.
             for column_index, cell_value in enumerate(row):
                 expected_cell_value_type = self.column_descriptions[column_index].column_type
-                assert cell_value is None or isinstance(cell_value, expected_cell_value_type), mf_pformat_many(
+                assert cell_value is None or isinstance(cell_value, expected_cell_value_type), mf_pformat_dict(
                     "Cell value type mismatch.",
                     {
                         "row_index": row_index,
@@ -59,7 +59,7 @@ class MetricFlowDataTable:
                 )
                 # Check that datetimes don't have a timezone set.
                 if isinstance(cell_value, datetime.datetime):
-                    assert cell_value.tzinfo is None, mf_pformat_many(
+                    assert cell_value.tzinfo is None, mf_pformat_dict(
                         "Time zone provided for datetime.",
                         {
                             "row_index": row_index,

@@ -9,7 +9,7 @@ from dbt_semantic_interfaces.implementations.elements.dimension import PydanticD
 from dbt_semantic_interfaces.type_enums import DimensionType
 from metricflow_semantics.mf_logging.formatting import indent
 from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
-from metricflow_semantics.mf_logging.pretty_print import mf_pformat, mf_pformat_many
+from metricflow_semantics.mf_logging.pretty_print import mf_pformat, mf_pformat_dict
 from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_DAY
 from typing_extensions import override
 
@@ -145,7 +145,7 @@ def test_pydantic_model() -> None:  # noqa: D103
 
 
 def test_pformat_many() -> None:  # noqa: D103
-    result = mf_pformat_many("Example description:", obj_dict={"object_0": (1, 2, 3), "object_1": {4: 5}})
+    result = mf_pformat_dict("Example description:", obj_dict={"object_0": (1, 2, 3), "object_1": {4: 5}})
 
     assert (
         textwrap.dedent(
@@ -160,7 +160,7 @@ def test_pformat_many() -> None:  # noqa: D103
 
 
 def test_pformat_many_with_raw_strings() -> None:  # noqa: D103
-    result = mf_pformat_many("Example description:", obj_dict={"object_0": "foo\nbar"}, preserve_raw_strings=True)
+    result = mf_pformat_dict("Example description:", obj_dict={"object_0": "foo\nbar"}, preserve_raw_strings=True)
 
     assert (
         textwrap.dedent(
@@ -176,7 +176,7 @@ def test_pformat_many_with_raw_strings() -> None:  # noqa: D103
 
 
 def test_pformat_many_with_strings() -> None:  # noqa: D103
-    result = mf_pformat_many("Example description:", obj_dict={"object_0": "foo\nbar"})
+    result = mf_pformat_dict("Example description:", obj_dict={"object_0": "foo\nbar"})
     assert (
         textwrap.dedent(
             """\
