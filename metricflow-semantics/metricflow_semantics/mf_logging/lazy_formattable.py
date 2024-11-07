@@ -5,7 +5,7 @@ from typing import Callable, Union
 
 from typing_extensions import override
 
-from metricflow_semantics.mf_logging.pretty_print import mf_pformat_many
+from metricflow_semantics.mf_logging.pretty_print import mf_pformat_dict
 
 
 class LazyFormat:
@@ -52,7 +52,7 @@ class LazyFormat:
             message = self._message()
         else:
             message = self._message
-        return mf_pformat_many(message, self._kwargs, preserve_raw_strings=True)
+        return mf_pformat_dict(message, self._kwargs, preserve_raw_strings=True)
 
     @override
     def __str__(self) -> str:

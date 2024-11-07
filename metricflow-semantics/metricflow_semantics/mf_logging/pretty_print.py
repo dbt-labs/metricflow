@@ -428,7 +428,7 @@ def mf_pformat(  # type: ignore
         return str(obj)
 
 
-def mf_pformat_many(  # type: ignore
+def mf_pformat_dict(  # type: ignore
     description: str,
     obj_dict: Dict[str, Any],
     max_line_length: int = 120,
