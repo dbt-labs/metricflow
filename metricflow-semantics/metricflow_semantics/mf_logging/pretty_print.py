@@ -5,7 +5,7 @@ import pprint
 from collections.abc import Mapping
 from dataclasses import fields, is_dataclass
 from enum import Enum
-from typing import Any, Dict, List, Optional, Sized, Tuple, Union
+from typing import Any, List, Optional, Sized, Tuple, Union
 
 from dsi_pydantic_shim import BaseModel
 
@@ -429,8 +429,8 @@ def mf_pformat(  # type: ignore
 
 
 def mf_pformat_dict(  # type: ignore
-    description: str,
-    obj_dict: Dict[str, Any],
+    description: Optional[str] = None,
+    obj_dict: Optional[Mapping[str, Any]] = None,
     max_line_length: int = 120,
     indent_prefix: str = "  ",
     include_object_field_names: bool = True,
@@ -444,7 +444,8 @@ def mf_pformat_dict(  # type: ignore
     representation of the string. e.g. if value="foo", then "foo" instead of "'foo'". Useful for values that contain
     newlines.
     """
-    lines: List[str] = [description]
+    lines: List[str] = [description] if description is not None else []
+    obj_dict = obj_dict or {}
     for key, value in obj_dict.items():
         if preserve_raw_strings and isinstance(value, str):
             value_str = value
@@ -471,5 +472,9 @@ def mf_pformat_dict(  # type: ignore
         else:
             item_block_lines = (f"{key}: {value_str}",)
         item_block = "\n".join(item_block_lines)
-        lines.append(indent(item_block))
+
+        if description is None:
+            lines.append(item_block)
+        else:
+            lines.append(indent(item_block))
     return "\n".join(lines)

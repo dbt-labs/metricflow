@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from functools import cached_property
-from typing import Callable, Union
+from typing import Callable, Optional, Union
 
 from typing_extensions import override
 
@@ -35,7 +35,7 @@ class LazyFormat:
         logger.debug(LazyFormat(lambda: f"Result is: {expensive_function()}")
     """
 
-    def __init__(self, message: Union[str, Callable[[], str]], **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def __init__(self, message: Optional[Union[str, Callable[[], str]]] = None, **kwargs) -> None:  # type: ignore[no-untyped-def]
         """Initializer.
 
         Args:
@@ -47,12 +47,13 @@ class LazyFormat:
 
     @cached_property
     def _str_value(self) -> str:
+        message: Optional[str]
         """Cache the result as `__str__` can be called multiple times for multiple log handlers."""
-        if callable(self._message):
+        if self._message is not None and callable(self._message):
             message = self._message()
         else:
             message = self._message
-        return mf_pformat_dict(message, self._kwargs, preserve_raw_strings=True)
+        return mf_pformat_dict(description=message, obj_dict=self._kwargs, preserve_raw_strings=True)
 
     @override
     def __str__(self) -> str:
