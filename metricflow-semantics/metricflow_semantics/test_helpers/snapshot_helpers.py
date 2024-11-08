@@ -50,6 +50,7 @@ def assert_snapshot_text_equal(
     additional_sub_directories_for_snapshots: Tuple[str, ...] = (),
 ) -> None:
     """Similar to assert_plan_snapshot_text_equal(), but with more controls on how the snapshot paths are generated."""
+    logger.debug(LazyFormat("Checking the generated snapshot with what's stored", generated_snapshot=snapshot_text))
     file_path = (
         str(
             snapshot_path_prefix(

@@ -5,6 +5,7 @@ from typing import List, Optional, Sequence
 from dbt_semantic_interfaces.references import SemanticModelReference
 from metricflow_semantics.assert_one_arg import assert_exactly_one_arg_set
 from metricflow_semantics.instances import EntityInstance, InstanceSet
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.specs.column_assoc import ColumnAssociation
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
@@ -52,7 +53,14 @@ class SqlDataSet(DataSet):
         Otherwise, an exception is thrown.
         """
         if self._sql_select_node is None:
-            raise RuntimeError(f"{self} was created with a SQL node that is not a {SqlSelectStatementNode}")
+            raise RuntimeError(
+                str(
+                    LazyFormat(
+                        f"{self} was created with a SQL node that is not a {SqlSelectStatementNode}",
+                        sql_node=self.sql_node.structure_text(),
+                    )
+                )
+            )
         return self._sql_select_node
 
     def column_associations_for_entity(
