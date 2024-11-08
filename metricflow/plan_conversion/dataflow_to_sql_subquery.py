@@ -11,6 +11,8 @@ from dbt_semantic_interfaces.protocols import MetricInputMeasure
 from dbt_semantic_interfaces.references import EntityReference, MetricModelReference, SemanticModelElementReference
 from dbt_semantic_interfaces.type_enums import AggregationType, ConversionCalculationType, MetricType, PeriodAggregation
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
+
+from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
 from metricflow_semantics.aggregation_properties import AggregationState
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
@@ -37,7 +39,7 @@ from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.time.time_constants import ISO8601_PYTHON_FORMAT, ISO8601_PYTHON_TS_FORMAT
 from metricflow_semantics.time.time_spine_source import TIME_SPINE_DATA_SET_DESCRIPTION, TimeSpineSource
 
-from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNodeVisitor
+from metricflow.dataflow.dataflow_plan import DataflowPlanNode
 from metricflow.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
 from metricflow.dataflow.nodes.aggregate_measures import AggregateMeasuresNode
 from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
@@ -800,7 +802,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
                 select_columns=select_columns,
-                from_source=from_data_set.checked_sql_select_node,
+                from_source=from_data_set.sql_node,
                 from_source_alias=from_data_set_alias,
                 group_bys=group_bys,
             ),
