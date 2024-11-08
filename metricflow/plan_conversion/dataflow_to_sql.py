@@ -19,8 +19,8 @@ from metricflow.plan_conversion.convert_to_sql_plan import ConvertToSqlPlanResul
 from metricflow.plan_conversion.dataflow_to_sql_subquery import DataflowNodeToSqlSubqueryVisitor
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.sql.optimizer.optimization_levels import (
+    SqlQueryGenerationOptionLookup,
     SqlQueryOptimizationLevel,
-    SqlQueryOptimizerConfiguration,
 )
 from metricflow.sql.sql_plan import (
     SqlQueryPlan,
@@ -68,20 +68,23 @@ class DataflowToSqlQueryPlanConverter:
         sql_query_plan_id: Optional[DagId] = None,
     ) -> ConvertToSqlPlanResult:
         """Create an SQL query plan that represents the computation up to the given dataflow plan node."""
-        to_sql_visitor = DataflowNodeToSqlSubqueryVisitor(
+        # TODO: Handle generation with CTE.
+        to_sql_subquery_visitor = DataflowNodeToSqlSubqueryVisitor(
             column_association_resolver=self.column_association_resolver,
             semantic_manifest_lookup=self._semantic_manifest_lookup,
         )
-        data_set = dataflow_plan_node.accept(to_sql_visitor)
+        data_set = dataflow_plan_node.accept(to_sql_subquery_visitor)
 
         sql_node: SqlQueryPlanNode = data_set.sql_node
         # TODO: Make this a more generally accessible attribute instead of checking against the
         # BigQuery-ness of the engine
         use_column_alias_in_group_by = sql_engine_type is SqlEngine.BIGQUERY
 
-        for optimizer in SqlQueryOptimizerConfiguration.optimizers_for_level(
+        option_set = SqlQueryGenerationOptionLookup.options_for_level(
             optimization_level, use_column_alias_in_group_by=use_column_alias_in_group_by
-        ):
+        )
+
+        for optimizer in option_set.optimizers:
             logger.debug(LazyFormat(lambda: f"Applying optimizer: {optimizer.__class__.__name__}"))
             sql_node = optimizer.optimize(sql_node)
             logger.debug(

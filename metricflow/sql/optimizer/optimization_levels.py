@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from enum import Enum
-from typing import Sequence
+from typing import Tuple
+
+from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 
 from metricflow.sql.optimizer.column_pruner import SqlColumnPrunerOptimizer
 from metricflow.sql.optimizer.rewriting_sub_query_reducer import SqlRewritingSubQueryReducer
@@ -18,27 +21,53 @@ class SqlQueryOptimizationLevel(Enum):
     O2 = "O2"
     O3 = "O3"
     O4 = "O4"
+    O5 = "O5"
 
 
-class SqlQueryOptimizerConfiguration:
-    """Defines the different optimizers that should be used at each level."""
+@dataclass(frozen=True)
+class SqlQueryGenerationOptionSet:
+    """Describe the options for generate SQL from the dataflow plan."""
+
+    optimizers: Tuple[SqlQueryPlanOptimizer, ...]
+
+    # Specifies whether CTEs can be used to simplify generated SQL.
+    allow_cte: bool
+
+
+class SqlQueryGenerationOptionLookup:
+    """Defines the different SQL generation optimizers / options that should be used at each level."""
 
     @staticmethod
-    def optimizers_for_level(
+    def options_for_level(  # noqa: D102
         level: SqlQueryOptimizationLevel, use_column_alias_in_group_by: bool
-    ) -> Sequence[SqlQueryPlanOptimizer]:
-        """Return the optimizers that should be applied (in order) for each level."""
+    ) -> SqlQueryGenerationOptionSet:
+        optimizers: Tuple[SqlQueryPlanOptimizer, ...] = ()
+        allow_cte = False
         if level is SqlQueryOptimizationLevel.O0:
-            return ()
+            pass
         elif level is SqlQueryOptimizationLevel.O1:
-            return (SqlTableAliasSimplifier(),)
+            optimizers = (SqlTableAliasSimplifier(),)
         elif level is SqlQueryOptimizationLevel.O2:
-            return (SqlColumnPrunerOptimizer(), SqlTableAliasSimplifier())
+            optimizers = (SqlColumnPrunerOptimizer(), SqlTableAliasSimplifier())
         elif level is SqlQueryOptimizationLevel.O3:
-            return (SqlColumnPrunerOptimizer(), SqlSubQueryReducer(), SqlTableAliasSimplifier())
+            optimizers = (SqlColumnPrunerOptimizer(), SqlSubQueryReducer(), SqlTableAliasSimplifier())
         elif level is SqlQueryOptimizationLevel.O4:
-            return (
+            optimizers = (
                 SqlColumnPrunerOptimizer(),
                 SqlRewritingSubQueryReducer(use_column_alias_in_group_bys=use_column_alias_in_group_by),
                 SqlTableAliasSimplifier(),
             )
+        elif level is SqlQueryOptimizationLevel.O5:
+            optimizers = (
+                SqlColumnPrunerOptimizer(),
+                SqlRewritingSubQueryReducer(use_column_alias_in_group_bys=use_column_alias_in_group_by),
+                SqlTableAliasSimplifier(),
+            )
+            allow_cte = True
+        else:
+            assert_values_exhausted(level)
+
+        return SqlQueryGenerationOptionSet(
+            optimizers=optimizers,
+            allow_cte=allow_cte,
+        )
