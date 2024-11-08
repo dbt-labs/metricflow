@@ -293,6 +293,7 @@ class SemanticModelToDataSetConverter:
         )
         time_dimension_instances.append(time_dimension_instance)
 
+        # TODO: figure out how to repro this bug https://dbt-labs.slack.com/archives/C06UEFM66P5/p1730317825261629
         # Until we support minimal granularities, we cannot truncate for
         # any time dimension used as part of a validity window, since a validity window might
         # be stored in seconds while we would truncate to daily.
