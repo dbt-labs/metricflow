@@ -14,7 +14,8 @@ from metricflow.dataflow.builder.partitions import (
     PartitionDimensionJoinDescription,
     PartitionTimeDimensionJoinDescription,
 )
-from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNodeVisitor
+from metricflow.dataflow.dataflow_plan import DataflowPlanNode
+from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
 
 
 @dataclass(frozen=True)

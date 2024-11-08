@@ -7,7 +7,8 @@ from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.visitor import VisitorOutputT
 
-from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNodeVisitor
+from metricflow.dataflow.dataflow_plan import DataflowPlanNode
+from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
 
 
 @dataclass(frozen=True, eq=False)
