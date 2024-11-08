@@ -11,8 +11,8 @@ from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow.dataflow.dataflow_plan import (
     DataflowPlan,
     DataflowPlanNode,
-    DataflowPlanNodeVisitor,
 )
+from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
 from metricflow.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
 from metricflow.dataflow.nodes.aggregate_measures import AggregateMeasuresNode
 from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode

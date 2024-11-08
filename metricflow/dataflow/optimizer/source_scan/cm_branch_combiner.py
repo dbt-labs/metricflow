@@ -9,8 +9,8 @@ from metricflow_semantics.specs.metric_spec import MetricSpec
 
 from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
-    DataflowPlanNodeVisitor,
 )
+from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
 from metricflow.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
 from metricflow.dataflow.nodes.aggregate_measures import AggregateMeasuresNode
 from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode

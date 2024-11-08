@@ -12,8 +12,8 @@ from typing_extensions import override
 
 from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
-    DataflowPlanNodeVisitor,
 )
+from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
 
 
 @dataclass(frozen=True, eq=False)
