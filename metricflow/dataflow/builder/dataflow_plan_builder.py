@@ -653,7 +653,9 @@ class DataflowPlanBuilder:
             ), "Joining to time spine requires querying with metric_time or the appropriate agg_time_dimension."
             output_node = JoinToTimeSpineNode.create(
                 parent_node=output_node,
-                requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
+                requested_agg_time_dimension_specs=[
+                    spec.with_base_grain() for spec in queried_agg_time_dimension_specs
+                ],
                 use_custom_agg_time_dimension=not queried_linkable_specs.contains_metric_time,
                 time_range_constraint=predicate_pushdown_state.time_range_constraint,
                 offset_window=metric_spec.offset_window,
@@ -1618,7 +1620,9 @@ class DataflowPlanBuilder:
             # in join rendering
             unaggregated_measure_node = JoinToTimeSpineNode.create(
                 parent_node=unaggregated_measure_node,
-                requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
+                requested_agg_time_dimension_specs=[
+                    spec.with_base_grain() for spec in queried_agg_time_dimension_specs
+                ],
                 use_custom_agg_time_dimension=not queried_linkable_specs.contains_metric_time,
                 time_range_constraint=predicate_pushdown_state.time_range_constraint,
                 offset_window=before_aggregation_time_spine_join_description.offset_window,
@@ -1688,6 +1692,7 @@ class DataflowPlanBuilder:
 
             # TODO: split this node into TimeSpineSourceNode and JoinToTimeSpineNode - then can use standard nodes here
             # like JoinToCustomGranularityNode, WhereConstraintNode, etc.
+            print("queried_agg_time_dimension_specs:", queried_agg_time_dimension_specs)
             output_node: DataflowPlanNode = JoinToTimeSpineNode.create(
                 parent_node=aggregate_measures_node,
                 requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
