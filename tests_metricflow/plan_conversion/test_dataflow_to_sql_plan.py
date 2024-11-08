@@ -98,7 +98,6 @@ def convert_and_check(
         sql_engine_type=sql_client.sql_engine_type,
         sql_query_plan_id=DagId.from_str("plan0_optimized"),
         dataflow_plan_node=node,
-        optimization_level=SqlQueryOptimizationLevel.O4,
     )
     sql_query_plan = conversion_result.sql_plan
     display_graph_if_requested(

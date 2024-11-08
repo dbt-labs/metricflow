@@ -31,7 +31,7 @@ def make_execution_plan_converter(  # noqa: D103
         ),
         sql_plan_renderer=DefaultSqlQueryPlanRenderer(),
         sql_client=sql_client,
-        sql_optimization_level=SqlQueryOptimizationLevel.O4,
+        sql_optimization_level=SqlQueryOptimizationLevel.default_level(),
     )
 
 

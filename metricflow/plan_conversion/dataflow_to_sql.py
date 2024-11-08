@@ -182,7 +182,7 @@ class DataflowToSqlQueryPlanConverter:
         self,
         sql_engine_type: SqlEngine,
         dataflow_plan_node: DataflowPlanNode,
-        optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4,
+        optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.default_level(),
         sql_query_plan_id: Optional[DagId] = None,
     ) -> ConvertToSqlPlanResult:
         """Create an SQL query plan that represents the computation up to the given dataflow plan node."""

@@ -100,21 +100,21 @@ class MetricFlowQueryRequest:
     """
 
     request_id: MetricFlowRequestId
-    saved_query_name: Optional[str] = None
-    metric_names: Optional[Sequence[str]] = None
-    metrics: Optional[Sequence[MetricQueryParameter]] = None
-    group_by_names: Optional[Sequence[str]] = None
-    group_by: Optional[Tuple[GroupByParameter, ...]] = None
-    limit: Optional[int] = None
-    time_constraint_start: Optional[datetime.datetime] = None
-    time_constraint_end: Optional[datetime.datetime] = None
-    where_constraints: Optional[Sequence[str]] = None
-    order_by_names: Optional[Sequence[str]] = None
-    order_by: Optional[Sequence[OrderByQueryParameter]] = None
-    min_max_only: bool = False
-    sql_optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4
-    dataflow_plan_optimizations: FrozenSet[DataflowPlanOptimization] = DataflowPlanOptimization.enabled_optimizations()
-    query_type: MetricFlowQueryType = MetricFlowQueryType.METRIC
+    saved_query_name: Optional[str]
+    metric_names: Optional[Sequence[str]]
+    metrics: Optional[Sequence[MetricQueryParameter]]
+    group_by_names: Optional[Sequence[str]]
+    group_by: Optional[Tuple[GroupByParameter, ...]]
+    limit: Optional[int]
+    time_constraint_start: Optional[datetime.datetime]
+    time_constraint_end: Optional[datetime.datetime]
+    where_constraints: Optional[Sequence[str]]
+    order_by_names: Optional[Sequence[str]]
+    order_by: Optional[Sequence[OrderByQueryParameter]]
+    min_max_only: bool
+    sql_optimization_level: SqlQueryOptimizationLevel
+    dataflow_plan_optimizations: FrozenSet[DataflowPlanOptimization]
+    query_type: MetricFlowQueryType
 
     @staticmethod
     def create_with_random_request_id(  # noqa: D102
@@ -129,7 +129,7 @@ class MetricFlowQueryRequest:
         where_constraints: Optional[Sequence[str]] = None,
         order_by_names: Optional[Sequence[str]] = None,
         order_by: Optional[Sequence[OrderByQueryParameter]] = None,
-        sql_optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4,
+        sql_optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.default_level(),
         dataflow_plan_optimizations: FrozenSet[
             DataflowPlanOptimization
         ] = DataflowPlanOptimization.enabled_optimizations(),
