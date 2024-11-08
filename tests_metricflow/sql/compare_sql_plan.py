@@ -31,6 +31,9 @@ def assert_default_rendered_sql_equal(
         plan=sql_query_plan,
         plan_snapshot_text=rendered_sql,
         plan_snapshot_file_extension=".sql",
+        incomparable_strings_replacement_function=make_schema_replacement_function(
+            system_schema=mf_test_configuration.mf_system_schema, source_schema=mf_test_configuration.mf_source_schema
+        ),
     )
 
 
