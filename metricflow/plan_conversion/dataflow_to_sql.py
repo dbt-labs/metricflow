@@ -69,7 +69,7 @@ class DataflowToSqlQueryPlanConverter:
         self,
         sql_engine_type: SqlEngine,
         dataflow_plan_node: DataflowPlanNode,
-        optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4,
+        optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O5,
         sql_query_plan_id: Optional[DagId] = None,
         override_nodes_to_convert_to_cte: Optional[FrozenSet[DataflowPlanNode]] = None,
     ) -> ConvertToSqlPlanResult:
