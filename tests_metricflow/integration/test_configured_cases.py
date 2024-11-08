@@ -21,6 +21,7 @@ from metricflow_semantics.time.time_spine_source import TimeSpineSource
 
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql.sql_exprs import (
     SqlCastToTimestampExpression,
     SqlColumnReference,
@@ -307,6 +308,7 @@ def test_case(
             else None,
             order_by_names=case.order_bys,
             min_max_only=case.min_max_only,
+            sql_optimization_level=SqlQueryOptimizationLevel.O5,
         )
     )
 

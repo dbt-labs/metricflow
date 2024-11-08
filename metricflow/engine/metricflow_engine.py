@@ -129,6 +129,7 @@ class MetricFlowQueryRequest:
         where_constraints: Optional[Sequence[str]] = None,
         order_by_names: Optional[Sequence[str]] = None,
         order_by: Optional[Sequence[OrderByQueryParameter]] = None,
+        # Leaving default to O4 in the external API for now to simplify incremental deployment.
         sql_optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4,
         dataflow_plan_optimizations: FrozenSet[
             DataflowPlanOptimization

@@ -57,7 +57,7 @@ def test_view_sql_generated_at_a_node(
     conversion_result = to_sql_plan_converter.convert_to_sql_query_plan(
         sql_engine_type=sql_client.sql_engine_type,
         dataflow_plan_node=read_source_node,
-        optimization_level=SqlQueryOptimizationLevel.O4,
+        optimization_level=SqlQueryOptimizationLevel.O5,
     )
     sql_plan_at_read_node = conversion_result.sql_plan
     sql_at_read_node = sql_renderer.render_sql_query_plan(sql_plan_at_read_node).sql
@@ -86,7 +86,6 @@ def test_view_sql_generated_at_a_node(
     conversion_result = to_sql_plan_converter.convert_to_sql_query_plan(
         sql_engine_type=sql_client.sql_engine_type,
         dataflow_plan_node=filter_elements_node,
-        optimization_level=SqlQueryOptimizationLevel.O4,
     )
     sql_plan_at_filter_elements_node = conversion_result.sql_plan
     sql_at_filter_elements_node = sql_renderer.render_sql_query_plan(sql_plan_at_filter_elements_node).sql

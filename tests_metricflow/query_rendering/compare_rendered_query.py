@@ -63,7 +63,6 @@ def render_and_check(
     conversion_result = dataflow_to_sql_converter.convert_to_sql_query_plan(
         sql_engine_type=sql_client.sql_engine_type,
         dataflow_plan_node=optimized_plan.sink_node,
-        optimization_level=SqlQueryOptimizationLevel.O4,
         sql_query_plan_id=DagId.from_str("plan0_optimized"),
     )
     sql_query_plan = conversion_result.sql_plan
