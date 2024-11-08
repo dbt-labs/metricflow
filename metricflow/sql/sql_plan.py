@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Generic, Optional, Sequence, Tuple
+from typing import Generic, Mapping, Optional, Sequence, Tuple
 
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId, DagNode, DisplayedProperty, MetricFlowDag
@@ -49,6 +49,22 @@ class SqlQueryPlanNode(DagNode["SqlQueryPlanNode"], ABC):
     @abstractmethod
     def as_select_node(self) -> Optional[SqlSelectStatementNode]:
         """If possible, return this as a select statement node."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def nearest_select_columns(
+        self, cte_source_mapping: Mapping[str, SqlCteNode]
+    ) -> Optional[Sequence[SqlSelectColumn]]:
+        """Return the SELECT columns that are in this node or the closest `SqlSelectStatementNode` of its ancestors.
+
+        * For a SELECT statement node, this is just the columns in the node.
+        * For a node that has a SELECT statement node as its only parent (e.g. CREATE TABLE ... AS SELECT ...), this
+          would be the SELECT columns in the parent.
+        * If not known (e.g. an arbitrary SQL statement as a string), return None.
+        * This is used to figure out which columns are needed at a leaf node of the DAG for column pruning.
+        * A SQL table could refer to a CTE, so a mapping from the name of the CTE to the CTE node should be provided to
+          get the associated SELECT columns.
+        """
         raise NotImplementedError
 
 
@@ -205,6 +221,12 @@ class SqlSelectStatementNode(SqlQueryPlanNode):
     def description(self) -> str:
         return self._description
 
+    @override
+    def nearest_select_columns(
+        self, cte_source_mapping: Mapping[str, SqlCteNode]
+    ) -> Optional[Sequence[SqlSelectColumn]]:
+        return self.select_columns
+
 
 @dataclass(frozen=True, eq=False)
 class SqlTableNode(SqlQueryPlanNode):
@@ -242,6 +264,16 @@ class SqlTableNode(SqlQueryPlanNode):
     def as_select_node(self) -> Optional[SqlSelectStatementNode]:  # noqa: D102
         return None
 
+    @override
+    def nearest_select_columns(
+        self, cte_source_mapping: Mapping[str, SqlCteNode]
+    ) -> Optional[Sequence[SqlSelectColumn]]:
+        if self.sql_table.schema_name is None:
+            cte_node = cte_source_mapping.get(self.sql_table.table_name)
+            if cte_node is not None:
+                return cte_node.nearest_select_columns(cte_source_mapping)
+        return None
+
 
 @dataclass(frozen=True, eq=False)
 class SqlSelectQueryFromClauseNode(SqlQueryPlanNode):
@@ -277,6 +309,12 @@ class SqlSelectQueryFromClauseNode(SqlQueryPlanNode):
 
     @property
     def as_select_node(self) -> Optional[SqlSelectStatementNode]:  # noqa: D102
+        return None
+
+    @override
+    def nearest_select_columns(
+        self, cte_source_mapping: Mapping[str, SqlCteNode]
+    ) -> Optional[Sequence[SqlSelectColumn]]:
         return None
 
 
@@ -330,6 +368,12 @@ class SqlCreateTableAsNode(SqlQueryPlanNode):
     def id_prefix(cls) -> IdPrefix:
         return StaticIdPrefix.SQL_PLAN_CREATE_TABLE_AS_ID_PREFIX
 
+    @override
+    def nearest_select_columns(
+        self, cte_source_mapping: Mapping[str, SqlCteNode]
+    ) -> Optional[Sequence[SqlSelectColumn]]:
+        return self.parent_node.nearest_select_columns(cte_source_mapping)
+
 
 class SqlQueryPlan(MetricFlowDag[SqlQueryPlanNode]):
     """Model for an SQL Query as a DAG."""
@@ -358,6 +402,10 @@ class SqlCteNode(SqlQueryPlanNode):
 
     select_statement: SqlSelectStatementNode
     cte_alias: str
+
+    def __post_init__(self) -> None:  # noqa: D105
+        super().__post_init__()
+        assert len(self.parent_nodes) == 1
 
     @staticmethod
     def create(select_statement: SqlSelectStatementNode, cte_alias: str) -> SqlCteNode:  # noqa: D102
@@ -390,3 +438,9 @@ class SqlCteNode(SqlQueryPlanNode):
     @override
     def id_prefix(cls) -> IdPrefix:
         return StaticIdPrefix.SQL_PLAN_COMMON_TABLE_EXPRESSION_ID_PREFIX
+
+    @override
+    def nearest_select_columns(
+        self, cte_source_mapping: Mapping[str, SqlCteNode]
+    ) -> Optional[Sequence[SqlSelectColumn]]:
+        return self.select_statement.nearest_select_columns(cte_source_mapping)

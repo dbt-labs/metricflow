@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import logging
 from collections import defaultdict
-from typing import Dict, List, Set, Tuple
+from typing import Dict, FrozenSet, List, Set, Tuple
 
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from typing_extensions import override
 
-from metricflow.sql.optimizer.tag_column_aliases import TaggedColumnAliasSet
+from metricflow.sql.optimizer.tag_column_aliases import NodeToColumnAliasMapping
 from metricflow.sql.sql_exprs import SqlExpressionTreeLineage
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
@@ -23,21 +23,29 @@ from metricflow.sql.sql_plan import (
 logger = logging.getLogger(__name__)
 
 
-class SqlTagRequiredColumnAliasesVisitor(SqlQueryPlanNodeVisitor[None]):
-    """To aid column pruning, traverse the SQL-query representation DAG and tag all column aliases that are required.
+class SqlMapRequiredColumnAliasesVisitor(SqlQueryPlanNodeVisitor[None]):
+    """To aid column pruning, traverse the SQL-query representation DAG and map the SELECT columns needed at each node.
 
-    For example, for the query:
+    For example, the query:
 
+        -- SELECT node_id="select_0"
         SELECT source_0.col_0 AS col_0_renamed
         FROM (
+            -- SELECT node_id="select_1
             SELECT
                 example_table.col_0
                 example_table.col_1
             FROM example_table_0
         ) source_0
 
-    The top-level SQL node would have the column alias `col_0_renamed` tagged, and the SQL node associated with
-    `source_0` would have `col_0` tagged. Once tagged, the information can be used to prune the columns in the SELECT:
+    would generate the mapping:
+
+        {
+            "select_0": {"col_0"},
+            "select_1": {"col_0"),
+        }
+
+    The mapping can be later used to rewrite the query to:
 
         SELECT source_0.col_0 AS col_0_renamed
         FROM (
@@ -47,14 +55,26 @@ class SqlTagRequiredColumnAliasesVisitor(SqlQueryPlanNodeVisitor[None]):
         ) source_0
     """
 
-    def __init__(self, tagged_column_alias_set: TaggedColumnAliasSet) -> None:
+    def __init__(self, start_node: SqlQueryPlanNode, required_column_aliases_in_start_node: FrozenSet[str]) -> None:
         """Initializer.
 
         Args:
-            tagged_column_alias_set: Stores the set of columns that are tagged. This will be updated as the visitor
-            traverses the SQL-query representation DAG.
+            start_node: The node where the traversal by this visitor will start.
+            required_column_aliases_in_start_node: The column aliases at the `start_node` that are required.
         """
-        self._column_alias_tagger = tagged_column_alias_set
+        # Stores the mapping of the SQL node to the required column aliases. This will be updated as the visitor
+        # traverses the SQL-query representation DAG.
+        self._current_required_column_alias_mapping = NodeToColumnAliasMapping()
+        self._current_required_column_alias_mapping.add_aliases(start_node, required_column_aliases_in_start_node)
+
+        # Helps lookup the CTE node associated with a given CTE alias. A member variable is needed as any node in the
+        # SQL DAG can reference a CTE.
+        start_node_as_select_node = start_node.as_select_node
+        self._cte_alias_to_cte_node: Dict[str, SqlCteNode] = (
+            {cte_source.cte_alias: cte_source for cte_source in start_node_as_select_node.cte_sources}
+            if start_node_as_select_node is not None
+            else {}
+        )
 
     def _search_for_expressions(
         self, select_node: SqlSelectStatementNode, pruned_select_columns: Tuple[SqlSelectColumn, ...]
@@ -94,11 +114,9 @@ class SqlTagRequiredColumnAliasesVisitor(SqlQueryPlanNodeVisitor[None]):
             parent_node.accept(self)
         return
 
-    def visit_select_statement_node(self, node: SqlSelectStatementNode) -> None:  # noqa: D102
-        # Based on column aliases that are tagged in this SELECT statement, tag corresponding column aliases in
-        # parent nodes.
-
-        initial_required_column_aliases_in_this_node = self._column_alias_tagger.get_tagged_aliases(node)
+    def visit_select_statement_node(self, node: SqlSelectStatementNode) -> None:
+        """Based on required column aliases for this SELECT, figure out required column aliases in parents."""
+        initial_required_column_aliases_in_this_node = self._current_required_column_alias_mapping.get_aliases(node)
 
         # If this SELECT statement uses DISTINCT, all columns are required as removing them would change the meaning of
         # the query.
@@ -121,7 +139,7 @@ class SqlTagRequiredColumnAliasesVisitor(SqlQueryPlanNodeVisitor[None]):
             )
         )
         # Since additional select columns could have been selected due to DISTINCT or GROUP BY, re-tag.
-        self._column_alias_tagger.tag_aliases(node, updated_required_column_aliases_in_this_node)
+        self._current_required_column_alias_mapping.add_aliases(node, updated_required_column_aliases_in_this_node)
 
         required_select_columns_in_this_node = tuple(
             select_column
@@ -129,12 +147,9 @@ class SqlTagRequiredColumnAliasesVisitor(SqlQueryPlanNodeVisitor[None]):
             if select_column.column_alias in updated_required_column_aliases_in_this_node
         )
 
-        # TODO: don't prune columns used in join condition! Tricky to derive since the join condition can be any
-        # SqlExpressionNode.
-
         if len(required_select_columns_in_this_node) == 0:
             raise RuntimeError(
-                "No columns are required in this node - this indicates a bug in this collector or in the inputs."
+                "No columns are required in this node - this indicates a bug in this visitor or in the inputs."
             )
 
         # Based on the expressions in this select statement, figure out what column aliases are needed in the sources of
@@ -144,25 +159,43 @@ class SqlTagRequiredColumnAliasesVisitor(SqlQueryPlanNodeVisitor[None]):
         # If any of the string expressions don't have context on what columns are used in the expression, then it's
         # impossible to know what columns can be pruned from the parent sources. Tag all columns in parents as required.
         if any([string_expr.used_columns is None for string_expr in exprs_used_in_this_node.string_exprs]):
-            for parent_node in node.parent_nodes:
-                self._column_alias_tagger.tag_all_aliases_in_node(parent_node)
+            nodes_to_retain_all_columns = [node.from_source]
+            for join_desc in node.join_descs:
+                nodes_to_retain_all_columns.append(join_desc.right_source)
+
+            for node_to_retain_all_columns in nodes_to_retain_all_columns:
+                nearest_select_columns = node_to_retain_all_columns.nearest_select_columns({})
+                for select_column in nearest_select_columns or ():
+                    self._current_required_column_alias_mapping.add_alias(
+                        node=node_to_retain_all_columns, column_alias=select_column.column_alias
+                    )
+
             self._visit_parents(node)
             return
 
         # Create a mapping from the source alias to the column aliases needed from the corresponding source.
-        source_alias_to_required_column_alias: Dict[str, Set[str]] = defaultdict(set)
+        source_alias_to_required_column_aliases: Dict[str, Set[str]] = defaultdict(set)
         for column_reference_expr in exprs_used_in_this_node.column_reference_exprs:
             column_reference = column_reference_expr.col_ref
-            source_alias_to_required_column_alias[column_reference.table_alias].add(column_reference.column_name)
+            source_alias_to_required_column_aliases[column_reference.table_alias].add(column_reference.column_name)
 
+        logger.debug(
+            LazyFormat(
+                "Collected required column names from sources",
+                source_alias_to_required_column_aliases=source_alias_to_required_column_aliases,
+            )
+        )
         # Appropriately tag the columns required in the parent nodes.
-        if node.from_source_alias in source_alias_to_required_column_alias:
-            aliases_required_in_parent = source_alias_to_required_column_alias[node.from_source_alias]
-            self._column_alias_tagger.tag_aliases(node=node.from_source, column_aliases=aliases_required_in_parent)
+        if node.from_source_alias in source_alias_to_required_column_aliases:
+            aliases_required_in_parent = source_alias_to_required_column_aliases[node.from_source_alias]
+            self._current_required_column_alias_mapping.add_aliases(
+                node=node.from_source, column_aliases=aliases_required_in_parent
+            )
+
         for join_desc in node.join_descs:
-            if join_desc.right_source_alias in source_alias_to_required_column_alias:
-                aliases_required_in_parent = source_alias_to_required_column_alias[join_desc.right_source_alias]
-                self._column_alias_tagger.tag_aliases(
+            if join_desc.right_source_alias in source_alias_to_required_column_aliases:
+                aliases_required_in_parent = source_alias_to_required_column_aliases[join_desc.right_source_alias]
+                self._current_required_column_alias_mapping.add_aliases(
                     node=join_desc.right_source, column_aliases=aliases_required_in_parent
                 )
         # TODO: Handle CTEs parent nodes.
@@ -172,8 +205,10 @@ class SqlTagRequiredColumnAliasesVisitor(SqlQueryPlanNodeVisitor[None]):
         for string_expr in exprs_used_in_this_node.string_exprs:
             if string_expr.used_columns:
                 for column_alias in string_expr.used_columns:
-                    for parent_node in node.parent_nodes:
-                        self._column_alias_tagger.tag_alias(parent_node, column_alias)
+                    for node_to_retain_all_columns in (node.from_source,) + tuple(
+                        join_desc.right_source for join_desc in node.join_descs
+                    ):
+                        self._current_required_column_alias_mapping.add_alias(node_to_retain_all_columns, column_alias)
 
         # Same with unqualified column references - it's hard to tell which source it came from, so it's safest to say
         # it's required from all parents.
@@ -181,8 +216,10 @@ class SqlTagRequiredColumnAliasesVisitor(SqlQueryPlanNodeVisitor[None]):
         # expression is like `SELECT table_0.col_0`.
         for unqualified_column_reference_expr in exprs_used_in_this_node.column_alias_reference_exprs:
             column_alias = unqualified_column_reference_expr.column_alias
-            for parent_node in node.parent_nodes:
-                self._column_alias_tagger.tag_alias(parent_node, column_alias)
+            for node_to_retain_all_columns in (node.from_source,) + tuple(
+                join_desc.right_source for join_desc in node.join_descs
+            ):
+                self._current_required_column_alias_mapping.add_alias(node_to_retain_all_columns, column_alias)
 
         # Visit recursively.
         self._visit_parents(node)
@@ -198,3 +235,8 @@ class SqlTagRequiredColumnAliasesVisitor(SqlQueryPlanNodeVisitor[None]):
 
     def visit_create_table_as_node(self, node: SqlCreateTableAsNode) -> None:  # noqa: D102
         return self._visit_parents(node)
+
+    @property
+    def required_column_alias_mapping(self) -> NodeToColumnAliasMapping:
+        """Return the column aliases required at each node as determined after traversal."""
+        return self._current_required_column_alias_mapping

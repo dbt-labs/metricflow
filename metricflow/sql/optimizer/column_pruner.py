@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import logging
-from typing import FrozenSet, Mapping
 
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from typing_extensions import override
 
 from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
-from metricflow.sql.optimizer.tag_column_aliases import TaggedColumnAliasSet
-from metricflow.sql.optimizer.tag_required_column_aliases import SqlTagRequiredColumnAliasesVisitor
+from metricflow.sql.optimizer.tag_column_aliases import NodeToColumnAliasMapping
+from metricflow.sql.optimizer.tag_required_column_aliases import SqlMapRequiredColumnAliasesVisitor
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlCteNode,
@@ -29,7 +29,7 @@ class SqlColumnPrunerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
 
     def __init__(
         self,
-        required_alias_mapping: Mapping[SqlQueryPlanNode, FrozenSet[str]],
+        required_alias_mapping: NodeToColumnAliasMapping,
     ) -> None:
         """Constructor.
 
@@ -42,7 +42,7 @@ class SqlColumnPrunerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
         # Remove columns that are not needed from this SELECT statement because the parent SELECT statement doesn't
         # need them. However, keep columns that are in group bys because that changes the meaning of the query.
         # Similarly, if this node is a distinct select node, keep all columns as it may return a different result set.
-        required_column_aliases = self._required_alias_mapping.get(node)
+        required_column_aliases = self._required_alias_mapping.get_aliases(node)
         if required_column_aliases is None:
             logger.error(
                 f"Did not find {node.node_id=} in the required alias mapping. Returning the non-pruned version "
@@ -100,23 +100,31 @@ class SqlColumnPrunerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
 
 
 class SqlColumnPrunerOptimizer(SqlQueryPlanOptimizer):
-    """Removes unnecessary columns in the SELECT clauses."""
+    """Removes unnecessary columns in the SELECT statements."""
 
     def optimize(self, node: SqlQueryPlanNode) -> SqlQueryPlanNode:  # noqa: D102
-        # Can't prune columns without knowing the structure of the query.
-        if not node.as_select_node:
+        # ALl columns in the nearest SELECT node need to be kept as otherwise, the meaning of the query changes.
+        required_select_columns = node.nearest_select_columns({})
+
+        # Can't prune without knowing the structure of the query.
+        if required_select_columns is None:
+            logger.debug(
+                LazyFormat(
+                    "The columns required at this node can't be determined, so skipping column pruning",
+                    node=node.structure_text(),
+                    required_select_columns=required_select_columns,
+                )
+            )
             return node
 
-        # Figure out which columns in which nodes are required.
-        tagged_column_alias_set = TaggedColumnAliasSet()
-        tagged_column_alias_set.tag_all_aliases_in_node(node.as_select_node)
-        tag_required_column_alias_visitor = SqlTagRequiredColumnAliasesVisitor(
-            tagged_column_alias_set=tagged_column_alias_set,
+        map_required_column_aliases_visitor = SqlMapRequiredColumnAliasesVisitor(
+            start_node=node,
+            required_column_aliases_in_start_node=frozenset(
+                [select_column.column_alias for select_column in required_select_columns]
+            ),
         )
-        node.accept(tag_required_column_alias_visitor)
+        node.accept(map_required_column_aliases_visitor)
 
-        # Re-write the query, pruning columns in the SELECT that are not needed.
-        pruning_visitor = SqlColumnPrunerVisitor(
-            required_alias_mapping=tagged_column_alias_set.get_mapping(),
-        )
+        # Re-write the query, removing unnecessary columns in the SELECT statements.
+        pruning_visitor = SqlColumnPrunerVisitor(map_required_column_aliases_visitor.required_column_alias_mapping)
         return node.accept(pruning_visitor)
