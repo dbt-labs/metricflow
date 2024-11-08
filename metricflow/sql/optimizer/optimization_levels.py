@@ -25,7 +25,7 @@ class SqlQueryOptimizationLevel(Enum):
 
 
 @dataclass(frozen=True)
-class SqlQueryGenerationOptionSet:
+class SqlGenerationOptionSet:
     """Defines the different SQL generation optimizers / options that should be used at each level."""
 
     optimizers: Tuple[SqlQueryPlanOptimizer, ...]
@@ -36,7 +36,7 @@ class SqlQueryGenerationOptionSet:
     @staticmethod
     def options_for_level(  # noqa: D102
         level: SqlQueryOptimizationLevel, use_column_alias_in_group_by: bool
-    ) -> SqlQueryGenerationOptionSet:
+    ) -> SqlGenerationOptionSet:
         optimizers: Tuple[SqlQueryPlanOptimizer, ...] = ()
         allow_cte = False
         if level is SqlQueryOptimizationLevel.O0:
@@ -63,7 +63,7 @@ class SqlQueryGenerationOptionSet:
         else:
             assert_values_exhausted(level)
 
-        return SqlQueryGenerationOptionSet(
+        return SqlGenerationOptionSet(
             optimizers=optimizers,
             allow_cte=allow_cte,
         )
