@@ -1,0 +1,14 @@
+initial_sql:
+  SELECT
+    1 AS bookings
+  FROM mf_test_2024_11_08_b0ar5w4d.fct_bookings bookings_source_src_28000
+sql_with_cte:
+  WITH rss_28001_cte AS (
+    SELECT
+      1 AS bookings
+    FROM mf_test_2024_11_08_b0ar5w4d.fct_bookings bookings_source_src_28000
+  )
+
+  SELECT
+    rss_28001_cte.bookings AS bookings
+  FROM rss_28001_cte rss_28001_cte
