@@ -108,7 +108,7 @@ class SqlColumnPrunerOptimizer(SqlQueryPlanOptimizer):
 
         # Can't prune without knowing the structure of the query.
         if required_select_columns is None:
-            logger.debug(
+            logger.error(
                 LazyFormat(
                     "The columns required at this node can't be determined, so skipping column pruning",
                     node=node.structure_text(),
