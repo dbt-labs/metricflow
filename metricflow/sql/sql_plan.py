@@ -227,6 +227,21 @@ class SqlSelectStatementNode(SqlQueryPlanNode):
     ) -> Optional[Sequence[SqlSelectColumn]]:
         return self.select_columns
 
+    def create_copy(self) -> SqlSelectStatementNode:  # noqa: D102
+        return SqlSelectStatementNode.create(
+            description=self.description,
+            select_columns=self.select_columns,
+            from_source=self.from_source,
+            from_source_alias=self.from_source_alias,
+            cte_sources=self.cte_sources,
+            join_descs=self.join_descs,
+            group_bys=self.group_bys,
+            order_bys=self.order_bys,
+            where=self.where,
+            limit=self.limit,
+            distinct=self.distinct,
+        )
+
 
 @dataclass(frozen=True, eq=False)
 class SqlTableNode(SqlQueryPlanNode):
