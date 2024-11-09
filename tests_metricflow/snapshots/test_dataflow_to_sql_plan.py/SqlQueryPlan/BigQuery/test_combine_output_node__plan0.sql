@@ -1,3 +1,8 @@
+test_name: test_combine_output_node
+test_filename: test_dataflow_to_sql_plan.py
+docstring:
+  Tests combining AggregateMeasuresNode.
+---
 -- Combine Aggregated Outputs
 SELECT
   COALESCE(subq_2.is_instant, subq_5.is_instant) AS is_instant

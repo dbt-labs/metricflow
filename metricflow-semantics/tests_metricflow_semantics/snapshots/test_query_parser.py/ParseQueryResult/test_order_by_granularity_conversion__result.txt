@@ -1,3 +1,11 @@
+test_name: test_order_by_granularity_conversion
+test_filename: test_query_parser.py
+docstring:
+  Test that the granularity of the primary time dimension in the order by is returned appropriately.
+
+      In the case where the primary time dimension is specified in the order by without a granularity suffix, the order
+      by spec returned by the parser should have a granularity appropriate for the queried metrics.
+---
 ParseQueryResult(
   query_spec=MetricFlowQuerySpec(
     metric_specs=(

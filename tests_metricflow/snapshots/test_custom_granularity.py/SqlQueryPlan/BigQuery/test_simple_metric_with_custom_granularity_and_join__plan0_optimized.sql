@@ -1,3 +1,6 @@
+test_name: test_simple_metric_with_custom_granularity_and_join
+test_filename: test_custom_granularity.py
+---
 -- Join Standard Outputs
 -- Join to Custom Granularity Dataset
 -- Pass Only Elements: ['bookings', 'listing__ds__martian_day']

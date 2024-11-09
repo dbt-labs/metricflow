@@ -14,6 +14,7 @@ import tabulate
 from _pytest.fixtures import FixtureRequest
 
 from metricflow_semantics.dag.mf_dag import MetricFlowDag
+from metricflow_semantics.mf_logging.formatting import indent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
@@ -66,11 +67,25 @@ def assert_snapshot_text_equal(
     if incomparable_strings_replacement_function is not None:
         snapshot_text = incomparable_strings_replacement_function(snapshot_text)
 
+    # Add a header with context about the snapshot.
+    path_to_test_file = pathlib.Path(request.node.fspath)
+    test_doc_string = request.function.__doc__
+    header_lines = [
+        f"test_name: {request.node.name}",
+        f"test_filename: {path_to_test_file.name}",
+    ]
+    if test_doc_string is not None:
+        header_lines.append("docstring:")
+        header_lines.append(indent(test_doc_string.rstrip()))
+    header_lines.append("---")
+
+    snapshot_text = "\n".join(header_lines) + "\n" + snapshot_text
+
     # Add a new line at the end of the file so that PRs don't show the "no newline" symbol on Github.
     if len(snapshot_text) > 1 and snapshot_text[-1] != "\n":
         snapshot_text = snapshot_text + "\n"
 
-    # If we are in overwrite mode, make a new plan:
+    # If we are in overwrite mode, create / overwrite the snapshot file.:
     if mf_test_configuration.overwrite_snapshots:
         # Create parent directory for the plan text files.
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
@@ -81,7 +96,7 @@ def assert_snapshot_text_equal(
     if not os.path.exists(file_path):
         raise FileNotFoundError(
             f"Could not find snapshot file at path {file_path}. Re-run with --overwrite-snapshots and check git status "
-            "to see what's new."
+            f"to see what's new."
         )
 
     if mf_test_configuration.display_snapshots:

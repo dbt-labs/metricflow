@@ -1,3 +1,6 @@
+test_name: test_joined_plan
+test_filename: test_dataflow_to_execution.py
+---
 <ExecutionPlan>
     <SelectSqlQueryToDataTableTask>
         <!-- description = 'Run a query and write the results to a data frame' -->

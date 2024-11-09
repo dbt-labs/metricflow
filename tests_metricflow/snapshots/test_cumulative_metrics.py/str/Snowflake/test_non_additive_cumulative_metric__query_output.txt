@@ -1,3 +1,8 @@
+test_name: test_non_additive_cumulative_metric
+test_filename: test_cumulative_metrics.py
+docstring:
+  Tests a query with a non-additive cumulative metric to ensure the non-additive constraint is applied.
+---
 METRIC_TIME__DAY       EVERY_TWO_DAYS_BOOKERS
 -------------------  ------------------------
 2020-01-01T00:00:00                         3

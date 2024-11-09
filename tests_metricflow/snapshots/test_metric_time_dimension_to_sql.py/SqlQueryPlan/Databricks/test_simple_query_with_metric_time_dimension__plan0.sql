@@ -1,3 +1,8 @@
+test_name: test_simple_query_with_metric_time_dimension
+test_filename: test_metric_time_dimension_to_sql.py
+docstring:
+  Tests building a query that uses measures defined from 2 different time dimensions.
+---
 -- Combine Aggregated Outputs
 SELECT
   COALESCE(subq_4.metric_time__day, subq_9.metric_time__day) AS metric_time__day

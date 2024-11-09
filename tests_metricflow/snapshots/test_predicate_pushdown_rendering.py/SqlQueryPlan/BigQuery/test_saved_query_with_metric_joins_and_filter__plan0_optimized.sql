@@ -1,3 +1,10 @@
+test_name: test_saved_query_with_metric_joins_and_filter
+test_filename: test_predicate_pushdown_rendering.py
+docstring:
+  Tests rendering a query where we join to a time spine and query the filter input.
+
+      This should produce a SQL query that applies the filter outside of the time spine join.
+---
 -- Combine Aggregated Outputs
 SELECT
   COALESCE(subq_51.listing__capacity_latest, subq_61.listing__capacity_latest, subq_82.listing__capacity_latest) AS listing__capacity_latest

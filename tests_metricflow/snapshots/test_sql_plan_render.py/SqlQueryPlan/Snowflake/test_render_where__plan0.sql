@@ -1,3 +1,6 @@
+test_name: test_render_where
+test_filename: test_sql_plan_render.py
+---
 -- test0
 SELECT
   a.booking_value

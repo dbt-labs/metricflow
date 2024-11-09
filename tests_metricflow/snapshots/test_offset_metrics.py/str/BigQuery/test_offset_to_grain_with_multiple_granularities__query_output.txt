@@ -1,3 +1,6 @@
+test_name: test_offset_to_grain_with_multiple_granularities
+test_filename: test_offset_metrics.py
+---
 metric_time__day     metric_time__month    metric_time__year      bookings_at_start_of_month
 -------------------  --------------------  -------------------  ----------------------------
 2019-12-01T00:00:00  2019-12-01T00:00:00   2019-01-01T00:00:00                             1

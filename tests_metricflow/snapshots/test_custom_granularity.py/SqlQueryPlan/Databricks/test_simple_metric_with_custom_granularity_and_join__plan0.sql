@@ -1,3 +1,6 @@
+test_name: test_simple_metric_with_custom_granularity_and_join
+test_filename: test_custom_granularity.py
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_8.listing__ds__martian_day

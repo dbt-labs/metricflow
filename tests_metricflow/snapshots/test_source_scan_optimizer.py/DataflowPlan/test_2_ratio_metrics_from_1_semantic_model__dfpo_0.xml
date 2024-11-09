@@ -1,3 +1,8 @@
+test_name: test_2_ratio_metrics_from_1_semantic_model
+test_filename: test_source_scan_optimizer.py
+docstring:
+  Tests that 2 ratio metrics with measures from a 1 semantic model result in 1 scan.
+---
 <DataflowPlan>
     <WriteToResultDataTableNode>
         <!-- description = 'Write to DataTable' -->

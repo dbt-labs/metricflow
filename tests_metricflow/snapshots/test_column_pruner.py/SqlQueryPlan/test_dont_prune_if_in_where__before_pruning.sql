@@ -1,3 +1,8 @@
+test_name: test_dont_prune_if_in_where
+test_filename: test_column_pruner.py
+docstring:
+  Tests that columns aren't pruned from parent sources if columns are used in a where.
+---
 -- test0
 SELECT
   from_source.col0 AS from_source_col0

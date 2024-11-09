@@ -1,3 +1,11 @@
+test_name: test_constrained_metric_not_combined
+test_filename: test_source_scan_optimizer.py
+docstring:
+  Tests that 2 metrics from the same semantic model but where 1 is constrained results in 2 scans.
+
+      If there is a constraint for a metric, it needs to be handled in a separate query because the constraint applies to
+      all rows.
+---
 <DataflowPlan>
     <WriteToResultDataTableNode>
         <!-- description = 'Write to DataTable' -->

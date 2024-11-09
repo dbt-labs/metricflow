@@ -1,3 +1,8 @@
+test_name: test_compute_metrics_node_simple_expr
+test_filename: test_dataflow_to_sql_plan.py
+docstring:
+  Tests the compute metrics node for expr type metrics sourced from a single measure.
+---
 -- Compute Metrics via Expressions
 SELECT
   listing

@@ -1,3 +1,6 @@
+test_name: test_cumulative_metric_with_custom_granularity
+test_filename: test_custom_granularity.py
+---
 -- Re-aggregate Metric via Group By
 SELECT
   subq_9.metric_time__martian_day

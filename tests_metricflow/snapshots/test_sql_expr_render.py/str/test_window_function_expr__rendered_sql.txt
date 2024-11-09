@@ -1,3 +1,6 @@
+test_name: test_window_function_expr
+test_filename: test_sql_expr_render.py
+---
 -- Window function with 0 PARTITION BY items(s)
 FIRST_VALUE(a.col0) OVER ()
 

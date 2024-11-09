@@ -1,3 +1,6 @@
+test_name: test_available_group_by_items[accumulate_last_2_months_metric]
+test_filename: test_available_group_by_items.py
+---
 [
   "TimeDimension('metric_time', 'month')",
   "TimeDimension('metric_time', 'quarter')",

@@ -1,3 +1,8 @@
+test_name: test_cumulative_metric_grain_to_date
+test_filename: test_cumulative_metric_rendering.py
+docstring:
+  Tests rendering a query against a grain_to_date cumulative metric.
+---
 -- Read Elements From Semantic Model 'revenue'
 -- Metric Time Dimension 'ds'
 -- Pass Only Elements: ['txn_revenue', 'ds__month']

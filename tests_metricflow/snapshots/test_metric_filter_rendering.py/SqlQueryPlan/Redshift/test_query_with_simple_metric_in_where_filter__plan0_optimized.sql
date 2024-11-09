@@ -1,3 +1,8 @@
+test_name: test_query_with_simple_metric_in_where_filter
+test_filename: test_metric_filter_rendering.py
+docstring:
+  Tests a query with a simple metric in the query-level where filter.
+---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['listings',]
 -- Aggregate Measures

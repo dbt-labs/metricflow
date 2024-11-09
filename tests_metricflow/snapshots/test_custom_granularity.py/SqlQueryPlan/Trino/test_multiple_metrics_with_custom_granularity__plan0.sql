@@ -1,3 +1,6 @@
+test_name: test_multiple_metrics_with_custom_granularity
+test_filename: test_custom_granularity.py
+---
 -- Combine Aggregated Outputs
 SELECT
   COALESCE(subq_5.metric_time__martian_day, subq_11.metric_time__martian_day) AS metric_time__martian_day

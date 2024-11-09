@@ -1,3 +1,8 @@
+test_name: test_distinct_values
+test_filename: test_query_rendering.py
+docstring:
+  Tests a plan to get distinct values for a dimension.
+---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['listing__country_latest',]
 -- Order By ['listing__country_latest'] Limit 100

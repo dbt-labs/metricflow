@@ -1,3 +1,8 @@
+test_name: test_prune_from_source
+test_filename: test_column_pruner.py
+docstring:
+  Tests a case where columns should be pruned from the FROM clause.
+---
 -- test0
 SELECT
   from_source.col0 AS from_source_col0

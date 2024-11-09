@@ -1,3 +1,8 @@
+test_name: test_cumulative_metric_agg_time_dimension_name_validation
+test_filename: test_query_parser.py
+docstring:
+  Test that queries for cumulative metrics succeed if the agg_time_dimension is selected by name.
+---
 ParseQueryResult(
   query_spec=MetricFlowQuerySpec(
     metric_specs=(MetricSpec(element_name='revenue_cumulative', filter_spec_set=WhereFilterSpecSet()),),

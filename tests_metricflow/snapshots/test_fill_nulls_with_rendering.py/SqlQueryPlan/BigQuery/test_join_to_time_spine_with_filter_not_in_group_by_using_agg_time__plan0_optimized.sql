@@ -1,3 +1,6 @@
+test_name: test_join_to_time_spine_with_filter_not_in_group_by_using_agg_time
+test_filename: test_fill_nulls_with_rendering.py
+---
 -- Join to Time Spine Dataset
 -- Compute Metrics via Expressions
 SELECT

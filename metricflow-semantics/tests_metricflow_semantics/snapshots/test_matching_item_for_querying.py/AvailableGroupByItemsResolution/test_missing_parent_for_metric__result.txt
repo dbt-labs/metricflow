@@ -1,3 +1,13 @@
+test_name: test_missing_parent_for_metric
+test_filename: test_matching_item_for_querying.py
+docstring:
+  Tests a search for a group by item with a metric stub with no parents.
+
+      We operate under the logical assumption that metric and query items have parent nodes - for a query,
+      these are the inputs (group by items, metrics, etc.). For metrics, these are the metric inputs (metrics
+      or measures). However, in the event of a validation gap upstream, we sometimes encounter inscrutable errors
+      caused by missing parent nodes for these input types, so we add a more informative error and test for it here.
+---
 AvailableGroupByItemsResolution(
   issue_set=MetricFlowQueryResolutionIssueSet(
     issues=(

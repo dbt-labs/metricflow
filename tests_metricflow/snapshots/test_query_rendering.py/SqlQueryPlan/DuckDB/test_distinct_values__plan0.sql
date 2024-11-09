@@ -1,3 +1,8 @@
+test_name: test_distinct_values
+test_filename: test_query_rendering.py
+docstring:
+  Tests a plan to get distinct values for a dimension.
+---
 -- Order By ['listing__country_latest'] Limit 100
 SELECT
   subq_2.listing__country_latest

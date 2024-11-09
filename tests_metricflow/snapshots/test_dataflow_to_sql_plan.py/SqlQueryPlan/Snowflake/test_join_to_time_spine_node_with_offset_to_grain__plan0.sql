@@ -1,3 +1,8 @@
+test_name: test_join_to_time_spine_node_with_offset_to_grain
+test_filename: test_dataflow_to_sql_plan.py
+docstring:
+  Tests JoinToTimeSpineNode for a single metric with offset_to_grain.
+---
 -- Join to Time Spine Dataset
 SELECT
   subq_5.metric_time__day AS metric_time__day

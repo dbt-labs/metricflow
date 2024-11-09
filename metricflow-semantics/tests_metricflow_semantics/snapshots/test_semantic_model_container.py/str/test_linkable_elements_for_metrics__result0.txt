@@ -1,3 +1,6 @@
+test_name: test_linkable_elements_for_metrics
+test_filename: test_semantic_model_container.py
+---
 Model Join-Path                                         Entity Links         Name                  Time Granularity    Date Part    Properties
 ------------------------------------------------------  -------------------  --------------------  ------------------  -----------  ------------------------------------
 ('views_source',)                                       ()                   listing                                                ['ENTITY', 'LOCAL']

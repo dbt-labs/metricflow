@@ -1,3 +1,8 @@
+test_name: test_conversion_metric_join_to_timespine_and_fill_nulls_with_0
+test_filename: test_conversion_metrics_to_sql.py
+docstring:
+  Test conversion metric that joins to time spine and fills nulls with 0.
+---
 -- Compute Metrics via Expressions
 SELECT
   metric_time__day

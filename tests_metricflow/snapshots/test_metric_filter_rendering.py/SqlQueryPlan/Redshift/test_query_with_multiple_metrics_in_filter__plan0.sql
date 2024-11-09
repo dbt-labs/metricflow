@@ -1,3 +1,8 @@
+test_name: test_query_with_multiple_metrics_in_filter
+test_filename: test_metric_filter_rendering.py
+docstring:
+  Tests a query with 2 simple metrics in the query-level where filter.
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_17.listings

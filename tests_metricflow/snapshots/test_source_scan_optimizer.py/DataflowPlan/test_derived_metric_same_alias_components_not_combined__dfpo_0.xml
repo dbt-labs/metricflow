@@ -1,3 +1,11 @@
+test_name: test_derived_metric_same_alias_components_not_combined
+test_filename: test_source_scan_optimizer.py
+docstring:
+  Tests optimization of querying 2 metrics which give the same alias different things in their components.
+
+      In this case we should NOT combine source nodes, since this would generate two columns with
+      the same alias.
+---
 <DataflowPlan>
     <WriteToResultDataTableNode>
         <!-- description = 'Write to DataTable' -->

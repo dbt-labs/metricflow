@@ -1,3 +1,8 @@
+test_name: test_metric_time_only
+test_filename: test_metric_time_without_metrics.py
+docstring:
+  Tests querying only metric time.
+---
 -- Pass Only Elements: ['metric_time__day',]
 SELECT
   subq_1.metric_time__day

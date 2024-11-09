@@ -1,3 +1,8 @@
+test_name: test_cumulative_metric_grain_to_date
+test_filename: test_cumulative_metric_rendering.py
+docstring:
+  Tests rendering a query against a grain_to_date cumulative metric.
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_3.ds__month

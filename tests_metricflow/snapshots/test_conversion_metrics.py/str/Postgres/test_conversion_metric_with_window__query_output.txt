@@ -1,3 +1,8 @@
+test_name: test_conversion_metric_with_window
+test_filename: test_conversion_metrics.py
+docstring:
+  Test query against a conversion metric with a window.
+---
 metric_time__day     visit_buy_conversion_rate_7days
 -------------------  ---------------------------------
 2020-01-01T00:00:00  0.50

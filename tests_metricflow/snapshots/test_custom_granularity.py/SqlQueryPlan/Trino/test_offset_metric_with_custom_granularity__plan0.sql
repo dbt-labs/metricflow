@@ -1,3 +1,6 @@
+test_name: test_offset_metric_with_custom_granularity
+test_filename: test_custom_granularity.py
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_8.booking__ds__martian_day

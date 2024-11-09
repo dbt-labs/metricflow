@@ -1,3 +1,8 @@
+test_name: test_compute_metrics_node_ratio_from_multiple_semantic_models
+test_filename: test_dataflow_to_sql_plan.py
+docstring:
+  Tests the combine metrics node for ratio type metrics.
+---
 -- Compute Metrics via Expressions
 SELECT
   ds__day

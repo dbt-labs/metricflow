@@ -1,3 +1,8 @@
+test_name: test_dimensions_requiring_join
+test_filename: test_dataflow_to_sql_plan.py
+docstring:
+  Tests querying 2 dimensions that require a join.
+---
 -- Join Standard Outputs
 -- Pass Only Elements: ['user__home_state_latest', 'listing__is_lux_latest']
 SELECT

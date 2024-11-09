@@ -1,3 +1,6 @@
+test_name: test_subdaily_offset_window_metric
+test_filename: test_granularity_date_part_rendering.py
+---
 -- Compute Metrics via Expressions
 SELECT
   metric_time__hour

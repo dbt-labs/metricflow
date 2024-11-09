@@ -1,3 +1,6 @@
+test_name: test_build_saved_query_tasks
+test_filename: test_data_warehouse_tasks.py
+---
 SELECT
   metric_time__day
   , listing__capacity_latest

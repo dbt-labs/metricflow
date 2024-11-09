@@ -1,3 +1,8 @@
+test_name: test_window_metric_with_non_default_grain
+test_filename: test_cumulative_metric_rendering.py
+docstring:
+  Tests rendering a query for a cumulative window metric queried with non-default grain.
+---
 -- Re-aggregate Metric via Group By
 SELECT
   subq_8.metric_time__year

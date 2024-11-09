@@ -1,3 +1,6 @@
+test_name: test_resolvable_ambiguous_entity_path
+test_filename: test_ambiguous_entity_path.py
+---
 MetricFlowQuerySpec(
   metric_specs=(MetricSpec(element_name='entity_1_metric', filter_spec_set=WhereFilterSpecSet()),),
   dimension_specs=(

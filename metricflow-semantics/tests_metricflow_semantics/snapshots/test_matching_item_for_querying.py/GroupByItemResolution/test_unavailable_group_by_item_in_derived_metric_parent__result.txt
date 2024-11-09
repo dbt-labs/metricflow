@@ -1,3 +1,8 @@
+test_name: test_unavailable_group_by_item_in_derived_metric_parent
+test_filename: test_matching_item_for_querying.py
+docstring:
+  Tests a group-by-item that's only available in one of the parent metrics of a derived metric.
+---
 GroupByItemResolution(
   linkable_element_set=LinkableElementSet(),
   issue_set=MetricFlowQueryResolutionIssueSet(

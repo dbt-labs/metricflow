@@ -1,3 +1,10 @@
+test_name: test_query_with_cumulative_metric_in_where_filter
+test_filename: test_metric_filter_rendering.py
+docstring:
+  Tests a query with a cumulative metric in the query-level where filter.
+
+      Note this cumulative metric has no window / grain to date.
+---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['listings',]
 -- Aggregate Measures

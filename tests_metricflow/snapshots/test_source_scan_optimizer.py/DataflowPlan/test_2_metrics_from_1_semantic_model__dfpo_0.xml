@@ -1,3 +1,10 @@
+test_name: test_2_metrics_from_1_semantic_model
+test_filename: test_source_scan_optimizer.py
+docstring:
+  Tests that optimizing the plan for 2 metrics from 2 measure semantic models results in half the number of scans.
+
+      Each metric is computed from the same measure semantic model and the dimension semantic model.
+---
 <DataflowPlan>
     <WriteToResultDataTableNode>
         <!-- description = 'Write to DataTable' -->

@@ -1,3 +1,8 @@
+test_name: test_multiple_cumulative_metrics
+test_filename: test_cumulative_metrics.py
+docstring:
+  Tests a query with multiple cumulative metrics to ensure date selections align.
+---
 metric_time__day       revenue_all_time    trailing_2_months_revenue
 -------------------  ------------------  ---------------------------
 2020-03-31T00:00:00                8000                         7000

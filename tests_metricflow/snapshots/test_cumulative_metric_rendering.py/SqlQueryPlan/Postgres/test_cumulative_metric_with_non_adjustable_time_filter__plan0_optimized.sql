@@ -1,3 +1,12 @@
+test_name: test_cumulative_metric_with_non_adjustable_time_filter
+test_filename: test_cumulative_metric_rendering.py
+docstring:
+  Tests rendering a cumulative metric query with a time filter that cannot be automatically adjusted.
+
+      Not all query inputs with time constraint filters allow us to adjust the time constraint to include the full
+      span of input data for a cumulative metric. When we do not have an adjustable time filter we must include all
+      input data in order to ensure the cumulative metric is correct.
+---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['bookers', 'metric_time__day']
 -- Aggregate Measures

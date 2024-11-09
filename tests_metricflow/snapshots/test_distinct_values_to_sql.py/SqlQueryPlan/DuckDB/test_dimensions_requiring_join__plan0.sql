@@ -1,3 +1,8 @@
+test_name: test_dimensions_requiring_join
+test_filename: test_distinct_values_to_sql.py
+docstring:
+  Tests querying 2 dimensions that require a join.
+---
 -- Pass Only Elements: ['user__home_state_latest', 'listing__is_lux_latest']
 SELECT
   subq_3.listing__is_lux_latest

@@ -1,3 +1,6 @@
+test_name: test_nested_derived_metric_with_outer_offset
+test_filename: test_dataflow_plan_builder.py
+---
 <DataflowPlan>
     <WriteToResultDataTableNode>
         <!-- description = 'Write to DataTable' -->

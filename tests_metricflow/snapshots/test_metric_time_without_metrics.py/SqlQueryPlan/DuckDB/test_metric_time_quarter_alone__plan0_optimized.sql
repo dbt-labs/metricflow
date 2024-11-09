@@ -1,3 +1,6 @@
+test_name: test_metric_time_quarter_alone
+test_filename: test_metric_time_without_metrics.py
+---
 -- Time Spine
 -- Metric Time Dimension 'ds'
 -- Pass Only Elements: ['metric_time__quarter',]

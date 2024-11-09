@@ -1,3 +1,8 @@
+test_name: test_cumulative_metric_no_ds
+test_filename: test_cumulative_metric_rendering.py
+docstring:
+  Tests rendering a cumulative metric with no time dimension specified.
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_3.txn_revenue AS trailing_2_months_revenue

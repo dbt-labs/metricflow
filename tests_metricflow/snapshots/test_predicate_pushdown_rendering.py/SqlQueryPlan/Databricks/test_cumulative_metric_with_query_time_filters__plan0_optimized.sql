@@ -1,3 +1,10 @@
+test_name: test_cumulative_metric_with_query_time_filters
+test_filename: test_predicate_pushdown_rendering.py
+docstring:
+  Tests pushdown optimizer behavior for a query against a cumulative metric.
+
+      TODO: support metric time filters
+---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['bookers', 'listing__country_latest', 'metric_time__day']
 -- Aggregate Measures

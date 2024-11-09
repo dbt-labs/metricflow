@@ -1,3 +1,12 @@
+test_name: test_cumulative_metric_with_time_constraint
+test_filename: test_cumulative_metric_rendering.py
+docstring:
+  Tests rendering a cumulative metric query with an adjustable time constraint.
+
+      Not all query inputs with time constraint filters allow us to adjust the time constraint to include the full
+      span of input data for a cumulative metric, but when we receive a time constraint filter expression we can
+      automatically adjust it should render a query similar to this one.
+---
 -- Join Self Over Time Range
 -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-01T00:00:00]
 -- Pass Only Elements: ['txn_revenue', 'metric_time__day']

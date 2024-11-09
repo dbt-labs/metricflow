@@ -1,3 +1,8 @@
+test_name: test_reduce_all_join_sources
+test_filename: test_rewriting_sub_query_reducer.py
+docstring:
+  Tests a case where reducing occurs all all sources on a JOIN.
+---
 -- query
 SELECT
   SUM(fct_bookings_src.booking) AS bookings

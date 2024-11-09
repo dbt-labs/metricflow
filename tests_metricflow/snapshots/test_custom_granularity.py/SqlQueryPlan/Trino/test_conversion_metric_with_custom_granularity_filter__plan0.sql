@@ -1,3 +1,6 @@
+test_name: test_conversion_metric_with_custom_granularity_filter
+test_filename: test_custom_granularity.py
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_18.metric_time__martian_day

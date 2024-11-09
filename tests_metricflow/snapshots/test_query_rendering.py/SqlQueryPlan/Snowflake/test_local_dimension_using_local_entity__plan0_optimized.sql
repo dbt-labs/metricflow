@@ -1,3 +1,6 @@
+test_name: test_local_dimension_using_local_entity
+test_filename: test_query_rendering.py
+---
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT

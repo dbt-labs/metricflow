@@ -1,3 +1,8 @@
+test_name: test_simple_cumulative_metric
+test_filename: test_cumulative_metrics.py
+docstring:
+  Tests a query of a cumulative metric with a monthly window and a time constraint adjustment.
+---
 METRIC_TIME__DAY       TRAILING_2_MONTHS_REVENUE
 -------------------  ---------------------------
 2020-02-01T00:00:00                         5000

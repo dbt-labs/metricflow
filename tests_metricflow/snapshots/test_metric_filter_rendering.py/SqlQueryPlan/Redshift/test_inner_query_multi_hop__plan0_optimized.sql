@@ -1,3 +1,8 @@
+test_name: test_inner_query_multi_hop
+test_filename: test_metric_filter_rendering.py
+docstring:
+  Tests rendering for a metric filter using a two-hop join in the inner query.
+---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['third_hop_count',]
 -- Aggregate Measures

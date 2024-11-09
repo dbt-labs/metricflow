@@ -1,3 +1,16 @@
+test_name: test_cumulative_metric_predicate_pushdown
+test_filename: test_predicate_pushdown_optimizer.py
+docstring:
+  Tests pushdown optimizer behavior for a query against a cumulative metric.
+
+      At this time categorical dimension predicates should be pushed down, but metric_time predicates should not be,
+      since supporting time filter pushdown for cumulative metrics requires filter expansion to ensure we capture the
+      full set of inputs for the initial cumulative window.
+
+      For the query listed here the entire constraint will be moved past the dimension join.
+
+      TODO: Add metric time filters
+---
 <DataflowPlan>
     <WriteToResultDataTableNode>
         <!-- description = 'Write to DataTable' -->

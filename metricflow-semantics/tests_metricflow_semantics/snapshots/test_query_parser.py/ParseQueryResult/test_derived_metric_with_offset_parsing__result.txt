@@ -1,3 +1,8 @@
+test_name: test_derived_metric_with_offset_parsing
+test_filename: test_query_parser.py
+docstring:
+  Test that querying derived metrics with a time offset requires a time dimension.
+---
 ParseQueryResult(
   query_spec=MetricFlowQuerySpec(
     metric_specs=(MetricSpec(element_name='revenue_growth_2_weeks', filter_spec_set=WhereFilterSpecSet()),),

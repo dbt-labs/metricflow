@@ -1,3 +1,8 @@
+test_name: test_prune_str_expr
+test_filename: test_column_pruner.py
+docstring:
+  Tests a case where a string expr in a node results in the parent being pruned properly.
+---
 -- test0
 SELECT
   col0 AS from_source_col0

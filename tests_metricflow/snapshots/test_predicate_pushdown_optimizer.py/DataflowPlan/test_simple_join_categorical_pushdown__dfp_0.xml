@@ -1,3 +1,10 @@
+test_name: test_simple_join_categorical_pushdown
+test_filename: test_predicate_pushdown_optimizer.py
+docstring:
+  Tests pushdown optimization for a simple predicate through a single join.
+
+      In this case the entire constraint should be moved inside of the join.
+---
 <DataflowPlan>
     <WriteToResultDataTableNode>
         <!-- description = 'Write to DataTable' -->

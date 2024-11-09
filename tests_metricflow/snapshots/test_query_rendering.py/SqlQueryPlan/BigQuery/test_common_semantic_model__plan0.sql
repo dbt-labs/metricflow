@@ -1,3 +1,6 @@
+test_name: test_common_semantic_model
+test_filename: test_query_rendering.py
+---
 -- Combine Aggregated Outputs
 SELECT
   COALESCE(subq_4.metric_time__day, subq_9.metric_time__day) AS metric_time__day

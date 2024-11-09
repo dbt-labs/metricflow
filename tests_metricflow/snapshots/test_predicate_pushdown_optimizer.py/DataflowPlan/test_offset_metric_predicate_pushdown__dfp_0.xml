@@ -1,3 +1,15 @@
+test_name: test_offset_metric_predicate_pushdown
+test_filename: test_predicate_pushdown_optimizer.py
+docstring:
+  Tests pushdown optimizer behavior for a query against a derived offset metric.
+
+      As with cumulative metrics, at this time categorical dimension predicates may be pushed down, but metric_time
+      predicates should not be, since we need to capture the union of the filter window and the offset span.
+
+      For the query listed here the entire constraint will be moved past the dimension join.
+
+      TODO: Add metric time filters
+---
 <DataflowPlan>
     <WriteToResultDataTableNode>
         <!-- description = 'Write to DataTable' -->

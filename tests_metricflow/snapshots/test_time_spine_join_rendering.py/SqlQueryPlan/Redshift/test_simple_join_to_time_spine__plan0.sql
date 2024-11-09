@@ -1,3 +1,6 @@
+test_name: test_simple_join_to_time_spine
+test_filename: test_time_spine_join_rendering.py
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_6.metric_time__day

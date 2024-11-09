@@ -1,3 +1,10 @@
+test_name: test_linkable_set_for_common_dimensions_in_different_models
+test_filename: test_semantic_model_container.py
+docstring:
+  Tests case where a metric has dimensions with the same path.
+
+      In this example, "ds" is defined in both "bookings_source" and "views_source".
+---
 Model Join-Path                                            Entity Links         Name                  Time Granularity    Date Part    Properties
 ---------------------------------------------------------  -------------------  --------------------  ------------------  -----------  ------------------------------------
 ('bookings_source',)                                       ()                   listing                                                ['ENTITY', 'LOCAL']

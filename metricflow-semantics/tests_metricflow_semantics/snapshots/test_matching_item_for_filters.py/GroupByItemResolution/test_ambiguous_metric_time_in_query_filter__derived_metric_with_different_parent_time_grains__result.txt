@@ -1,3 +1,6 @@
+test_name: test_ambiguous_metric_time_in_query_filter[derived_metric_with_different_parent_time_grains]
+test_filename: test_matching_item_for_filters.py
+---
 GroupByItemResolution(
   spec=TimeDimensionSpec(
     element_name='metric_time',

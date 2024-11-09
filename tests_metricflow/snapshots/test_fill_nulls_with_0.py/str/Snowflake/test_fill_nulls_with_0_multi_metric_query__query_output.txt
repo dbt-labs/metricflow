@@ -1,3 +1,6 @@
+test_name: test_fill_nulls_with_0_multi_metric_query
+test_filename: test_fill_nulls_with_0.py
+---
 METRIC_TIME__WEEK      BOOKINGS_FILL_NULLS_WITH_0  VIEWS
 -------------------  ----------------------------  -------
 2019-11-25T00:00:00                             1  None

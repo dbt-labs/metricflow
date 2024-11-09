@@ -1,3 +1,6 @@
+test_name: test_nested_fill_nulls_without_time_spine
+test_filename: test_derived_metric_rendering.py
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_5.metric_time__day

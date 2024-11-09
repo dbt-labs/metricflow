@@ -1,3 +1,6 @@
+test_name: test_offset_metric_with_custom_granularity_filter_not_in_group_by
+test_filename: test_custom_granularity.py
+---
 -- Compute Metrics via Expressions
 SELECT
   metric_time__day

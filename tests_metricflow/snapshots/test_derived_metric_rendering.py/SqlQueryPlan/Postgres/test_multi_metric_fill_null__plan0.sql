@@ -1,3 +1,6 @@
+test_name: test_multi_metric_fill_null
+test_filename: test_derived_metric_rendering.py
+---
 -- Combine Aggregated Outputs
 SELECT
   COALESCE(subq_5.metric_time__day, subq_10.metric_time__day) AS metric_time__day

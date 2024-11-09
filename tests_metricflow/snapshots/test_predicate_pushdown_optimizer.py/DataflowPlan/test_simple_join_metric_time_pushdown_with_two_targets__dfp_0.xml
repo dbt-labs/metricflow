@@ -1,3 +1,13 @@
+test_name: test_simple_join_metric_time_pushdown_with_two_targets
+test_filename: test_predicate_pushdown_optimizer.py
+docstring:
+  Tests pushdown optimization for a simple metric time predicate through a single join.
+
+      This includes a scenario where the dimension source is also a metric time node, but we do NOT want the metric_time
+      filter applied to it since it is a _current style dimension table at its core.
+
+      Note this optimizer will not push the predicate down until metric_time pushdown is supported.
+---
 <DataflowPlan>
     <WriteToResultDataTableNode>
         <!-- description = 'Write to DataTable' -->

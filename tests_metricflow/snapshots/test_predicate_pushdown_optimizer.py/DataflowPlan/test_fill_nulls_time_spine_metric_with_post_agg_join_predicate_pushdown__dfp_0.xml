@@ -1,3 +1,20 @@
+test_name: test_fill_nulls_time_spine_metric_with_post_agg_join_predicate_pushdown
+test_filename: test_predicate_pushdown_optimizer.py
+docstring:
+  Tests pushdown optimizer behavior for a metric with a time spine and fill_nulls_with and a post-agg join.
+
+      When querying a metric like this with a group by on all filter specs we do a post-aggregation outer join
+      against the time spine, which should preclude predicate pushdown for query-time filters at that state, but
+      will allow for pushdown within the JoinToTimeSpine operation. This will still do predicate pushdown as before,
+      but only exactly as before - the added constraint outside of the JoinToTimeSpine operation must still be
+      applied in its entirety, and so we expect 0 additional constraint nodes. If we failed to account for the
+      repeated constraint outside of the JoinToTimeSpine in our pushdown handling this would remove one of the
+      WhereConstraintNodes from the original query altogether.
+
+      Until time dimension pushdown is supported we will only see the categorical dimension entry pushed down here.
+
+      TODO: Add metric time filters
+---
 <DataflowPlan>
     <WriteToResultDataTableNode>
         <!-- description = 'Write to DataTable' -->

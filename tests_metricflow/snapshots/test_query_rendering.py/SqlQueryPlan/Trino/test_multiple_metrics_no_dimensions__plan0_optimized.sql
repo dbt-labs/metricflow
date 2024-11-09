@@ -1,3 +1,6 @@
+test_name: test_multiple_metrics_no_dimensions
+test_filename: test_query_rendering.py
+---
 -- Combine Aggregated Outputs
 SELECT
   MAX(subq_17.bookings) AS bookings

@@ -1,3 +1,8 @@
+test_name: test_compute_metrics_node_ratio_from_single_semantic_model
+test_filename: test_dataflow_to_sql_plan.py
+docstring:
+  Tests the compute metrics node for ratio type metrics sourced from a single semantic model.
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_5.listing

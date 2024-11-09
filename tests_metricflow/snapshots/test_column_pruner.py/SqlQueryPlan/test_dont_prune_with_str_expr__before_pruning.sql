@@ -1,3 +1,8 @@
+test_name: test_dont_prune_with_str_expr
+test_filename: test_column_pruner.py
+docstring:
+  Tests that columns aren't pruned from parent sources if there's a string expression in the select.
+---
 -- test0
 SELECT
   from_source.col0 AS some_string_expr

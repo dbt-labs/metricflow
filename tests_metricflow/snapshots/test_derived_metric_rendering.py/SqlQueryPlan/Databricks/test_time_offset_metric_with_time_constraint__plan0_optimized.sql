@@ -1,3 +1,6 @@
+test_name: test_time_offset_metric_with_time_constraint
+test_filename: test_derived_metric_rendering.py
+---
 -- Compute Metrics via Expressions
 SELECT
   metric_time__day

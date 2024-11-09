@@ -1,3 +1,6 @@
+test_name: test_simple_query_with_date_part
+test_filename: test_granularity_date_part_rendering.py
+---
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT

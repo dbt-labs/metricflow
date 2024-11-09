@@ -1,3 +1,6 @@
+test_name: test_suggestions_for_metric
+test_filename: test_suggestions.py
+---
 Got errors while resolving the query.
 
 Error #1:

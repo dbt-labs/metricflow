@@ -1,3 +1,8 @@
+test_name: test_no_metrics_with_custom_granularity_filter
+test_filename: test_custom_granularity.py
+docstring:
+  Group by items only queried with a filter on a custom grain, where that grain is not used in the group by.
+---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['listing__ds__day',]
 SELECT

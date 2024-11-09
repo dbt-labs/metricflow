@@ -1,3 +1,6 @@
+test_name: test_simple_metric_with_custom_granularity
+test_filename: test_custom_granularity.py
+---
 -- Metric Time Dimension 'ds'
 -- Join to Custom Granularity Dataset
 -- Pass Only Elements: ['bookings', 'booking__ds__martian_day']

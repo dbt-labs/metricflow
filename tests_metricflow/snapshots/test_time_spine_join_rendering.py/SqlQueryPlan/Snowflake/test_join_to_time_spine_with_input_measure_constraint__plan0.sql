@@ -1,3 +1,10 @@
+test_name: test_join_to_time_spine_with_input_measure_constraint
+test_filename: test_time_spine_join_rendering.py
+docstring:
+  Check filter hierarchy.
+
+      Ensure that the measure filter 'booking__is_instant' doesn't get applied again post-aggregation.
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_8.metric_time__day

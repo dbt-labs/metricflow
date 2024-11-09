@@ -1,3 +1,6 @@
+test_name: test_derived_metric_with_offset_window
+test_filename: test_derived_metric_rendering.py
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_13.metric_time__day

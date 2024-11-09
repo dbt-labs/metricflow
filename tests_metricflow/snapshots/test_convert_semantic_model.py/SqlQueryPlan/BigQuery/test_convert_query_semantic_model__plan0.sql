@@ -1,3 +1,6 @@
+test_name: test_convert_query_semantic_model
+test_filename: test_convert_semantic_model.py
+---
 -- Read Elements From Semantic Model 'revenue'
 SELECT
   revenue_src_28000.revenue AS txn_revenue

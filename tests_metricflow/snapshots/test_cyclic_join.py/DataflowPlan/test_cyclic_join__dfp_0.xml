@@ -1,3 +1,8 @@
+test_name: test_cyclic_join
+test_filename: test_cyclic_join.py
+docstring:
+  Tests that sources with the same joinable keys don't cause cycle issues.
+---
 <DataflowPlan>
     <WriteToResultDataTableNode>
         <!-- description = 'Write to DataTable' -->

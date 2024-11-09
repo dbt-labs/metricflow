@@ -1,3 +1,11 @@
+test_name: test_metric_time_filter_with_two_targets
+test_filename: test_predicate_pushdown_rendering.py
+docstring:
+  Tests pushdown optimization for a simple metric time predicate through a single join.
+
+      This is currently a no-op for the pushdown optimizer.
+      TODO: support metric time pushdown
+---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['bookings', 'listing__country_latest']
 -- Aggregate Measures

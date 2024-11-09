@@ -1,3 +1,6 @@
+test_name: test_filter_with_conversion_metric
+test_filename: test_metric_filter_rendering.py
+---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['listings',]
 -- Aggregate Measures

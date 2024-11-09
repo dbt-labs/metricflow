@@ -1,3 +1,8 @@
+test_name: test_simple_metric_without_explicit_time_granularity
+test_filename: test_metric_time_granularity.py
+docstring:
+  Tests that a metric without default granularity uses the min granualrity for its agg_time_dim.
+---
 MetricFlowQuerySpec(
   metric_specs=(MetricSpec(element_name='monthly_metric_0', filter_spec_set=WhereFilterSpecSet()),),
   time_dimension_specs=(

@@ -1,1 +1,4 @@
+test_name: test_available_group_by_items[metrics_with_different_time_grains]
+test_filename: test_available_group_by_items.py
+---
 ["TimeDimension('metric_time', 'year')", "TimeDimension('metric_time', 'year', date_part_name='year')"]

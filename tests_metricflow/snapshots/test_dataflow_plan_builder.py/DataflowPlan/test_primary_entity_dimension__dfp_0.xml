@@ -1,3 +1,8 @@
+test_name: test_primary_entity_dimension
+test_filename: test_dataflow_plan_builder.py
+docstring:
+  Tests a simple plan getting a metric and a local dimension.
+---
 <DataflowPlan>
     <WriteToResultDataTableNode>
         <!-- description = 'Write to DataTable' -->

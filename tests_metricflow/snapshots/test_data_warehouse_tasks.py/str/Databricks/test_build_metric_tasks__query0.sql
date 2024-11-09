@@ -1,3 +1,6 @@
+test_name: test_build_metric_tasks
+test_filename: test_data_warehouse_tasks.py
+---
 SELECT
   metric_time__day
   , SUM(count_dogs) AS count_dogs

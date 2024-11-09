@@ -1,3 +1,6 @@
+test_name: test_saved_query_with_where
+test_filename: test_cli.py
+---
 METRIC_TIME__DAY       LISTING__CAPACITY_LATEST    BOOKINGS    INSTANT_BOOKINGS
 -------------------  --------------------------  ----------  ------------------
 2019-12-01T00:00:00                           5           1                   0

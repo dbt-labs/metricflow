@@ -1,3 +1,6 @@
+test_name: test_no_metric_custom_granularity_non_metric_time
+test_filename: test_custom_granularity.py
+---
 -- Read Elements From Semantic Model 'bookings_source'
 -- Join to Custom Granularity Dataset
 -- Pass Only Elements: ['booking__ds__martian_day',]

@@ -1,3 +1,8 @@
+test_name: test_simple_metric_with_multi_hop_custom_granularity
+test_filename: test_custom_granularity.py
+docstring:
+  Test simple metric with a multi hop dimension and custom grain.
+---
 -- Join Standard Outputs
 -- Join to Custom Granularity Dataset
 -- Pass Only Elements: ['bookings', 'listing__user__ds__martian_day']

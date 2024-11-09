@@ -1,3 +1,8 @@
+test_name: test_simple_metric_with_custom_granularity_in_filter_and_group_by
+test_filename: test_custom_granularity.py
+docstring:
+  Simple metric queried with a filter on a custom grain, where that grain is also used in the group by.
+---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['bookings', 'metric_time__martian_day']
 -- Aggregate Measures
