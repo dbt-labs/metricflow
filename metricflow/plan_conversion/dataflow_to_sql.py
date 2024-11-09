@@ -273,7 +273,10 @@ class DataflowToSqlQueryPlanConverter:
         """Handles logic for selecting which nodes to convert to CTEs based on the request."""
         dataflow_plan = dataflow_plan_node.as_plan()
         nodes_to_convert_to_cte: Set[DataflowPlanNode] = set(DataflowPlanAnalyzer.find_common_branches(dataflow_plan))
-        # Additional nodes will be added later.
+
+        compute_metric_nodes = DataflowPlanAnalyzer.group_nodes_by_type(dataflow_plan).compute_metric_nodes
+        if len(compute_metric_nodes) > 1:
+            nodes_to_convert_to_cte.update(compute_metric_nodes)
 
         return frozenset(nodes_to_convert_to_cte)
 

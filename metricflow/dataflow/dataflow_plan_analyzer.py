@@ -41,7 +41,7 @@ class DataflowPlanAnalyzer:
 
     @staticmethod
     def group_nodes_by_type(dataflow_plan: DataflowPlan) -> DataflowPlanNodeSet:
-        """Grouops dataflow plan nodes by type."""
+        """Groups dataflow plan nodes by type."""
         grouping_visitor = _GroupNodesByTypeVisitor()
         return dataflow_plan.sink_node.accept(grouping_visitor)
 
@@ -98,12 +98,14 @@ class DataflowPlanNodeSet(Mergeable):
 
     compute_metric_nodes: FrozenSet[ComputeMetricsNode]
 
+    @override
     def merge(self, other: DataflowPlanNodeSet) -> DataflowPlanNodeSet:
         return DataflowPlanNodeSet(
             compute_metric_nodes=self.compute_metric_nodes.union(other.compute_metric_nodes),
         )
 
     @classmethod
+    @override
     def empty_instance(cls) -> DataflowPlanNodeSet:
         return DataflowPlanNodeSet(
             compute_metric_nodes=frozenset(),
