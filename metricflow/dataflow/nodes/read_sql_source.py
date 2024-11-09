@@ -15,7 +15,7 @@ from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNode
 from metricflow.dataset.sql_dataset import SqlDataSet
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class ReadSqlSourceNode(DataflowPlanNode):
     """A source node where data from an SQL table or SQL query is read and output.
 

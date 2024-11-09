@@ -16,7 +16,7 @@ from metricflow_semantics.visitor import VisitorOutputT
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNodeVisitor
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class JoinConversionEventsNode(DataflowPlanNode):
     """Builds a data set containing successful conversion events.
 

@@ -43,7 +43,7 @@ class JoinDescription:
             raise RuntimeError("`join_on_entity` is required unless using CROSS JOIN.")
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class JoinOnEntitiesNode(DataflowPlanNode):
     """A node that joins data from other nodes via the entities in the inputs.
 

@@ -14,7 +14,7 @@ from metricflow_semantics.visitor import VisitorOutputT
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNodeVisitor
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class JoinOverTimeRangeNode(DataflowPlanNode):
     """A node that allows for cumulative metric computation by doing a self join across a cumulative date range.
 

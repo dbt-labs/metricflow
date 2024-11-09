@@ -12,7 +12,7 @@ from metricflow.dataflow.dataflow_plan import (
 )
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class CombineAggregatedOutputsNode(DataflowPlanNode):
     """Combines metrics from different nodes into a single output."""
 

@@ -14,7 +14,7 @@ from metricflow.dataflow.dataflow_plan import (
 )
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class OrderByLimitNode(DataflowPlanNode):
     """A node that re-orders the input data with a limit.
 
