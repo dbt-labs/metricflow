@@ -1,3 +1,8 @@
+test_name: test_conversion_metric_with_window
+test_filename: test_conversion_metric_rendering.py
+docstring:
+  Test rendering a query against a conversion metric with a window.
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_16.metric_time__day

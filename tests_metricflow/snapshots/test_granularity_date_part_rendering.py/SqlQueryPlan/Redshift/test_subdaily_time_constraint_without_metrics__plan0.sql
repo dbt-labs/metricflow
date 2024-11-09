@@ -1,3 +1,6 @@
+test_name: test_subdaily_time_constraint_without_metrics
+test_filename: test_granularity_date_part_rendering.py
+---
 -- Pass Only Elements: ['metric_time__second',]
 SELECT
   subq_2.metric_time__second

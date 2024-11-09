@@ -1,3 +1,6 @@
+test_name: test_common_semantic_model
+test_filename: test_query_rendering.py
+---
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT

@@ -1,3 +1,8 @@
+test_name: test_snapshot[metrics_with_different_time_grains]
+test_filename: test_resolution_dags.py
+docstring:
+  Checks that the resolution DAGs have been built correctly via checks against a snapshot.
+---
 <GroupByItemResolutionDag>
     <QueryGroupByItemResolutionNode>
         <!-- description = 'Output the group-by items for query.' -->

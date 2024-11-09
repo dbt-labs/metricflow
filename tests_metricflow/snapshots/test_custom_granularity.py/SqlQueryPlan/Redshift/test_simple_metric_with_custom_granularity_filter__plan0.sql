@@ -1,3 +1,8 @@
+test_name: test_simple_metric_with_custom_granularity_filter
+test_filename: test_custom_granularity.py
+docstring:
+  Simple metric queried with a filter on a custom grain, where that grain is not used in the group by.
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_5.bookings

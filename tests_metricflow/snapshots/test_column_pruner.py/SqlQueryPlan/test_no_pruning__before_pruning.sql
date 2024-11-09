@@ -1,3 +1,8 @@
+test_name: test_no_pruning
+test_filename: test_column_pruner.py
+docstring:
+  Tests a case where no pruning should occur.
+---
 -- test0
 SELECT
   from_source.col0 AS from_source_col0

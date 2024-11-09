@@ -1,3 +1,8 @@
+test_name: test_derived_metric_with_explicit_time_granularity
+test_filename: test_metric_time_granularity.py
+docstring:
+  Tests that a derived metric with default granularity ignores the default granularities set on its input metrics.
+---
 MetricFlowQuerySpec(
   metric_specs=(MetricSpec(element_name='derived_metric_with_time_granularity', filter_spec_set=WhereFilterSpecSet()),),
   time_dimension_specs=(

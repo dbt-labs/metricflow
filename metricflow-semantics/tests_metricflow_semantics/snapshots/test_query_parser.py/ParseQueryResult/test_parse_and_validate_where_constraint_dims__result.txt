@@ -1,3 +1,8 @@
+test_name: test_parse_and_validate_where_constraint_dims
+test_filename: test_query_parser.py
+docstring:
+  Test that the returned time constraint in the query spec is adjusted to match the granularity of the query.
+---
 ParseQueryResult(
   query_spec=MetricFlowQuerySpec(
     metric_specs=(MetricSpec(element_name='bookings', filter_spec_set=WhereFilterSpecSet()),),

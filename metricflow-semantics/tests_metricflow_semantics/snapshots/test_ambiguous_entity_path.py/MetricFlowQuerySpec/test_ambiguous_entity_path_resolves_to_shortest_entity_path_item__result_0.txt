@@ -1,3 +1,8 @@
+test_name: test_ambiguous_entity_path_resolves_to_shortest_entity_path_item
+test_filename: test_ambiguous_entity_path.py
+docstring:
+  Tests that 'entity_1__country' resolves to 'entity_1__country' not 'entity_1__entity_0__country'.
+---
 MetricFlowQuerySpec(
   metric_specs=(MetricSpec(element_name='all_entity_metric', filter_spec_set=WhereFilterSpecSet()),),
   dimension_specs=(DimensionSpec(element_name='country', entity_links=(EntityReference(element_name='entity_1'),)),),

@@ -1,3 +1,8 @@
+test_name: test_simple_join_to_time_spine_with_queried_filter
+test_filename: test_time_spine_join_rendering.py
+docstring:
+  Test case where metric fills nulls and filter is in group by. Should apply constraint twice.
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_8.metric_time__day

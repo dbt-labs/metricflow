@@ -1,3 +1,6 @@
+test_name: test_cyclic_join_manifest
+test_filename: test_linkable_spec_resolver.py
+---
 Model Join-Path                                Entity Links        Name             Time Granularity    Date Part    Properties
 ---------------------------------------------  ------------------  ---------------  ------------------  -----------  --------------------------------------------------------
 ('listings_latest',)                           ()                  cyclic_entity                                     ['ENTITY', 'LOCAL']

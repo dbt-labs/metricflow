@@ -1,3 +1,8 @@
+test_name: test_metric_with_metric_in_where_filter
+test_filename: test_metric_filter_rendering.py
+docstring:
+  Tests a query with a metric in the metric-level where filter.
+---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['listings', 'metric_time__day']
 -- Aggregate Measures

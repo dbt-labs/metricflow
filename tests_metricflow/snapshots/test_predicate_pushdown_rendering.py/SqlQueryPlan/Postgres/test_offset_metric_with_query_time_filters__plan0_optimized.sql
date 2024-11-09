@@ -1,3 +1,10 @@
+test_name: test_offset_metric_with_query_time_filters
+test_filename: test_predicate_pushdown_rendering.py
+docstring:
+  Tests pushdown optimizer behavior for a query against a derived offset metric.
+
+      TODO: support metric time filters
+---
 -- Compute Metrics via Expressions
 SELECT
   metric_time__day

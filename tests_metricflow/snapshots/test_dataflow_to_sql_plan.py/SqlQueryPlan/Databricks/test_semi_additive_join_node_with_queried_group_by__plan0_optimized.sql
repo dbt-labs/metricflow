@@ -1,3 +1,8 @@
+test_name: test_semi_additive_join_node_with_queried_group_by
+test_filename: test_dataflow_to_sql_plan.py
+docstring:
+  Tests converting a dataflow plan to a SQL query plan using a SemiAdditiveJoinNode.
+---
 -- Join on MIN(ds) and [] grouping by ds
 SELECT
   subq_3.ds__day AS ds__day

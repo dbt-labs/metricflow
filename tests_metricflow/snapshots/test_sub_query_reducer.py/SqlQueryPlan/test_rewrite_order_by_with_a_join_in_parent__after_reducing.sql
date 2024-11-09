@@ -1,3 +1,8 @@
+test_name: test_rewrite_order_by_with_a_join_in_parent
+test_filename: test_sub_query_reducer.py
+docstring:
+  Tests rewriting an order by when the parent has a join.
+---
 -- src2
 -- src3
 SELECT

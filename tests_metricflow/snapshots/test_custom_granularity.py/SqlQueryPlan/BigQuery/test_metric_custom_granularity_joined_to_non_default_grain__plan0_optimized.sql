@@ -1,3 +1,6 @@
+test_name: test_metric_custom_granularity_joined_to_non_default_grain
+test_filename: test_custom_granularity.py
+---
 -- Metric Time Dimension 'ds'
 -- Join to Custom Granularity Dataset
 -- Pass Only Elements: ['listings', 'metric_time__martian_day', 'listing__ds__month']

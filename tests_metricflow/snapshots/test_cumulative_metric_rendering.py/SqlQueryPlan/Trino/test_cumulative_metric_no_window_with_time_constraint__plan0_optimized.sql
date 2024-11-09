@@ -1,3 +1,8 @@
+test_name: test_cumulative_metric_no_window_with_time_constraint
+test_filename: test_cumulative_metric_rendering.py
+docstring:
+  Tests rendering a query for a windowless cumulative metric query with an adjustable time constraint.
+---
 -- Join Self Over Time Range
 -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-01T00:00:00]
 -- Pass Only Elements: ['txn_revenue', 'metric_time__day']

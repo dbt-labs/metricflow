@@ -1,3 +1,8 @@
+test_name: test_prune_grandparents_in_join_query
+test_filename: test_column_pruner.py
+docstring:
+  Tests pruning grandparents of a join query.
+---
 -- 4
 SELECT
   col0 AS col0

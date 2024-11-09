@@ -1,3 +1,6 @@
+test_name: test_query_parser_with_object_params
+test_filename: test_query_parser.py
+---
 ParseQueryResult(
   query_spec=MetricFlowQuerySpec(
     metric_specs=(MetricSpec(element_name='bookings', filter_spec_set=WhereFilterSpecSet()),),

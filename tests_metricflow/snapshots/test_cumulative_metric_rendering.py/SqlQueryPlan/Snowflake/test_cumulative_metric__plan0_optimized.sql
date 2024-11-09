@@ -1,3 +1,8 @@
+test_name: test_cumulative_metric
+test_filename: test_cumulative_metric_rendering.py
+docstring:
+  Tests rendering a basic cumulative metric query.
+---
 -- Read Elements From Semantic Model 'revenue'
 -- Metric Time Dimension 'ds'
 -- Pass Only Elements: ['txn_revenue', 'ds__day']

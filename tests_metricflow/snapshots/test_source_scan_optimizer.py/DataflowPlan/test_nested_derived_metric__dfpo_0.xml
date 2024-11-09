@@ -1,3 +1,11 @@
+test_name: test_nested_derived_metric
+test_filename: test_source_scan_optimizer.py
+docstring:
+  Tests optimization of a query that use a nested derived metric from a single semantic model.
+
+      The optimal solution would reduce this to 1 source scan, but there are challenges with derived metrics e.g. aliases,
+      so that is left as a future improvement.
+---
 <DataflowPlan>
     <WriteToResultDataTableNode>
         <!-- description = 'Write to DataTable' -->

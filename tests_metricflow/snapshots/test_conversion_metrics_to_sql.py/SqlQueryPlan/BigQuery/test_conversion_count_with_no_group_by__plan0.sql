@@ -1,3 +1,8 @@
+test_name: test_conversion_count_with_no_group_by
+test_filename: test_conversion_metrics_to_sql.py
+docstring:
+  Test conversion metric with no group by data flow plan rendering.
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_14.buys AS visit_buy_conversions

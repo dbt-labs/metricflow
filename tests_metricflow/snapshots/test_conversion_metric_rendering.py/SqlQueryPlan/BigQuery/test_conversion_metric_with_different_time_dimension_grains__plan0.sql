@@ -1,3 +1,8 @@
+test_name: test_conversion_metric_with_different_time_dimension_grains
+test_filename: test_conversion_metric_rendering.py
+docstring:
+  Test rendering a query against a conversion metric.
+---
 -- Compute Metrics via Expressions
 SELECT
   CAST(subq_14.buys_month AS FLOAT64) / CAST(NULLIF(subq_14.visits, 0) AS FLOAT64) AS visit_buy_conversion_rate_with_monthly_conversion

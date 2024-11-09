@@ -1,3 +1,6 @@
+test_name: test_derived_metric_with_custom_granularity
+test_filename: test_custom_granularity.py
+---
 -- Compute Metrics via Expressions
 SELECT
   booking__ds__martian_day

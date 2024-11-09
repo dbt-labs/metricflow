@@ -1,3 +1,8 @@
+test_name: test_cumulative_metric
+test_filename: test_cumulative_metric_rendering.py
+docstring:
+  Tests rendering a basic cumulative metric query.
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_3.ds__day

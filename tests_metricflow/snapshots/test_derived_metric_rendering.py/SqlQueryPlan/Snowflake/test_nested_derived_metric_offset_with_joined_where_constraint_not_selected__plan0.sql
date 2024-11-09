@@ -1,3 +1,6 @@
+test_name: test_nested_derived_metric_offset_with_joined_where_constraint_not_selected
+test_filename: test_derived_metric_rendering.py
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_13.metric_time__day

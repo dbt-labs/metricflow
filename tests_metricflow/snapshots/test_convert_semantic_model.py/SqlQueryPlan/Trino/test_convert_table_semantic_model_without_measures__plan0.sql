@@ -1,3 +1,8 @@
+test_name: test_convert_table_semantic_model_without_measures
+test_filename: test_convert_semantic_model.py
+docstring:
+  Simple test for converting a table semantic model. Since there are no measures, primary time is not checked.
+---
 -- Read Elements From Semantic Model 'users_latest'
 SELECT
   DATE_TRUNC('day', users_latest_src_28000.ds) AS ds_latest__day

@@ -1,3 +1,8 @@
+test_name: test_measure_properties
+test_filename: test_measure_lookup.py
+docstring:
+  Test a couple of measures for correct properties.
+---
 {
   'bookings': MeasureRelationshipPropertySet(
     model_reference=SemanticModelReference(semantic_model_name='extended_bookings_source'),

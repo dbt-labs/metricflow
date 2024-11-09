@@ -1,3 +1,6 @@
+test_name: test_nested_fill_nulls_without_time_spine_multi_metric
+test_filename: test_derived_metric_rendering.py
+---
 -- Combine Aggregated Outputs
 SELECT
   COALESCE(subq_18.metric_time__day, subq_23.metric_time__day) AS metric_time__day

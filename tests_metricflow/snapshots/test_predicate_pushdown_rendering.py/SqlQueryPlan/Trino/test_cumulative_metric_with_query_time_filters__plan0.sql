@@ -1,3 +1,10 @@
+test_name: test_cumulative_metric_with_query_time_filters
+test_filename: test_predicate_pushdown_rendering.py
+docstring:
+  Tests pushdown optimizer behavior for a query against a cumulative metric.
+
+      TODO: support metric time filters
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_11.metric_time__day

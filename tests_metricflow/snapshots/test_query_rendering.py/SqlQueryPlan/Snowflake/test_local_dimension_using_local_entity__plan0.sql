@@ -1,3 +1,6 @@
+test_name: test_local_dimension_using_local_entity
+test_filename: test_query_rendering.py
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_3.listing__country_latest

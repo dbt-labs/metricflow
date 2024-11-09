@@ -1,3 +1,6 @@
+test_name: test_conversion_metric_with_custom_granularity_filter_not_in_group_by
+test_filename: test_custom_granularity.py
+---
 -- Compute Metrics via Expressions
 SELECT
   CAST(subq_18.buys AS FLOAT64) / CAST(NULLIF(subq_18.visits, 0) AS FLOAT64) AS visit_buy_conversion_rate_7days

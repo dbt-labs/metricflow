@@ -1,3 +1,8 @@
+test_name: test_conversion_rate
+test_filename: test_conversion_metrics_to_sql.py
+docstring:
+  Test conversion metric data flow plan rendering.
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_14.visit__referrer_id

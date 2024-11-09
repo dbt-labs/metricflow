@@ -1,3 +1,8 @@
+test_name: test_cumulative_metric_with_window
+test_filename: test_dataflow_plan_builder.py
+docstring:
+  Tests a plan to compute a cumulative metric.
+---
 <DataflowPlan>
     <WriteToResultDataTableNode>
         <!-- description = 'Write to DataTable' -->

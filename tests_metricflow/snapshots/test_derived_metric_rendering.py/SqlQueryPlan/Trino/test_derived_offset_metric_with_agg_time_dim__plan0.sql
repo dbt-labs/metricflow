@@ -1,3 +1,6 @@
+test_name: test_derived_offset_metric_with_agg_time_dim
+test_filename: test_derived_metric_rendering.py
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_13.booking__ds__day

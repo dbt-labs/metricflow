@@ -1,3 +1,6 @@
+test_name: test_cumulative_fill_nulls
+test_filename: test_fill_nulls_with_rendering.py
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_9.metric_time__day

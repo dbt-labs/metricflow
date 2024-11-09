@@ -1,3 +1,6 @@
+test_name: test_render_query
+test_filename: test_rendered_query.py
+---
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT

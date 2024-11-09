@@ -1,3 +1,6 @@
+test_name: test_metric_time_property_for_derived_metrics
+test_filename: test_linkable_spec_resolver.py
+---
 Model Join-Path       Entity Links    Name         Time Granularity    Date Part    Properties
 --------------------  --------------  -----------  ------------------  -----------  --------------------------------------------------------
 ('bookings_source',)  ()              metric_time  day                              ['METRIC_TIME']

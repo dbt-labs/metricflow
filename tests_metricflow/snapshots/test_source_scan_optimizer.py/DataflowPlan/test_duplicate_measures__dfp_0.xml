@@ -1,3 +1,8 @@
+test_name: test_duplicate_measures
+test_filename: test_source_scan_optimizer.py
+docstring:
+  Tests a case where derived metrics in a query use the same measure (in the same form e.g. filters).
+---
 <DataflowPlan>
     <WriteToResultDataTableNode>
         <!-- description = 'Write to DataTable' -->

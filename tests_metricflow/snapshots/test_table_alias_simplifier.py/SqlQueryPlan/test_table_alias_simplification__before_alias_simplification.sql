@@ -1,3 +1,8 @@
+test_name: test_table_alias_simplification
+test_filename: test_table_alias_simplifier.py
+docstring:
+  Tests a case where no pruning should occur.
+---
 -- test0
 SELECT
   from_source.col0 AS from_source_col0

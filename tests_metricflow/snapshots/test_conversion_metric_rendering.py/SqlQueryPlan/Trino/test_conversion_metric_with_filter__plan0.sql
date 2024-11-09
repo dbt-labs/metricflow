@@ -1,3 +1,8 @@
+test_name: test_conversion_metric_with_filter
+test_filename: test_conversion_metric_rendering.py
+docstring:
+  Test rendering a query against a conversion metric.
+---
 -- Compute Metrics via Expressions
 SELECT
   CAST(subq_16.buys AS DOUBLE) / CAST(NULLIF(subq_16.visits, 0) AS DOUBLE) AS visit_buy_conversion_rate

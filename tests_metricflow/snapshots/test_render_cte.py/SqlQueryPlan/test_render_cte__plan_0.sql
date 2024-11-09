@@ -1,3 +1,6 @@
+test_name: test_render_cte
+test_filename: test_render_cte.py
+---
 -- cte_test
 WITH cte_0 AS (
   -- cte_select_0

@@ -1,3 +1,8 @@
+test_name: test_min_max_metric_time_week
+test_filename: test_query_rendering.py
+docstring:
+  Tests a plan to get the min & max distinct values of metric_time with non-default granularity.
+---
 -- Calculate min and max
 SELECT
   MIN(metric_time__week) AS metric_time__week__min

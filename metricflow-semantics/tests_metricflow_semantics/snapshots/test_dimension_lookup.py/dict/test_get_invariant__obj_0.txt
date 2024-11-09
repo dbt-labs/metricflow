@@ -1,3 +1,10 @@
+test_name: test_get_invariant
+test_filename: test_dimension_lookup.py
+docstring:
+  Test invariants for all dimensions.
+
+      Uses `partitioned_multi_hop_join_semantic_manifest` to show an example of different `is_partition` values.
+---
 {
   'account_month': DimensionInvariant(dimension_type=CATEGORICAL, is_partition=False),
   'acquired_ds': DimensionInvariant(dimension_type=TIME, is_partition=False),

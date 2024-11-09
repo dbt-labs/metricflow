@@ -1,3 +1,8 @@
+test_name: test_partitioned_join
+test_filename: test_query_rendering.py
+docstring:
+  Tests converting a dataflow plan where there's a join on a partitioned dimension.
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_7.user__home_state

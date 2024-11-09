@@ -1,3 +1,8 @@
+test_name: test_filter_with_where_constraint_on_join_dim
+test_filename: test_query_rendering.py
+docstring:
+  Tests converting a dataflow plan to a SQL query plan where there is a join between 1 measure and 2 dimensions.
+---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['bookings', 'booking__is_instant']
 -- Aggregate Measures

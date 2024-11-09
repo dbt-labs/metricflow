@@ -1,3 +1,6 @@
+test_name: test_join_to_time_spine_with_filter_smaller_than_group_by
+test_filename: test_fill_nulls_with_rendering.py
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_8.metric_time__day

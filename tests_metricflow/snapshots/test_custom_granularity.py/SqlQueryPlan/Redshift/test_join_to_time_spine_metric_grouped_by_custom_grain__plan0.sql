@@ -1,3 +1,6 @@
+test_name: test_join_to_time_spine_metric_grouped_by_custom_grain
+test_filename: test_custom_granularity.py
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_7.metric_time__martian_day

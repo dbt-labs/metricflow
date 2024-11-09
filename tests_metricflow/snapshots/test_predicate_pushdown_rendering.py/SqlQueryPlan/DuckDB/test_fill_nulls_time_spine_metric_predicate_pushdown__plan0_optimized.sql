@@ -1,3 +1,10 @@
+test_name: test_fill_nulls_time_spine_metric_predicate_pushdown
+test_filename: test_predicate_pushdown_rendering.py
+docstring:
+  Tests pushdown optimizer behavior for a metric with a time spine and fill_nulls_with enabled.
+
+      TODO: support metric time filters
+---
 -- Compute Metrics via Expressions
 SELECT
   metric_time__day

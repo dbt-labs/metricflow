@@ -1,3 +1,8 @@
+test_name: test_cumulative_metric_with_multiple_agg_time_dimensions
+test_filename: test_cumulative_metric_rendering.py
+docstring:
+  Tests rendering a query for a cumulative metric queried with multiple agg time dimensions.
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_6.revenue_instance__ds__day

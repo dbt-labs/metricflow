@@ -1,3 +1,8 @@
+test_name: test_reduce_sub_query
+test_filename: test_rewriting_sub_query_reducer.py
+docstring:
+  Tests a case where an outer query should be reduced into its inner query with merged LIMIT expressions.
+---
 -- src3
 SELECT
   SUM(src2.bookings) AS bookings

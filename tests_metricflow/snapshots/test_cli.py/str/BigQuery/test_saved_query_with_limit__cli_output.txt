@@ -1,3 +1,6 @@
+test_name: test_saved_query_with_limit
+test_filename: test_cli.py
+---
 metric_time__day       listing__capacity_latest    bookings    instant_bookings
 -------------------  --------------------------  ----------  ------------------
 2019-12-01T00:00:00                           5           1                   0

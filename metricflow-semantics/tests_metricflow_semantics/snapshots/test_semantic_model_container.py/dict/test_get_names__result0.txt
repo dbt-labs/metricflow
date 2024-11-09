@@ -1,3 +1,6 @@
+test_name: test_get_names
+test_filename: test_semantic_model_container.py
+---
 {
   'dimension_references': [
     'account_type',

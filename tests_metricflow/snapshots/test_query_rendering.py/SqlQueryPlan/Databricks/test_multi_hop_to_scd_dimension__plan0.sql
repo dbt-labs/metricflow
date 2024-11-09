@@ -1,3 +1,8 @@
+test_name: test_multi_hop_to_scd_dimension
+test_filename: test_query_rendering.py
+docstring:
+  Tests conversion of a plan using an SCD dimension that is reached through another table.
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_9.metric_time__day

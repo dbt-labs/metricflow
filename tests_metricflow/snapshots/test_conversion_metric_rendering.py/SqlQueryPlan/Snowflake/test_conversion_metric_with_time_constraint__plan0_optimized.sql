@@ -1,3 +1,8 @@
+test_name: test_conversion_metric_with_time_constraint
+test_filename: test_conversion_metric_rendering.py
+docstring:
+  Test rendering a query against a conversion metric with a time constraint and categorical filter.
+---
 -- Compute Metrics via Expressions
 SELECT
   visit__referrer_id

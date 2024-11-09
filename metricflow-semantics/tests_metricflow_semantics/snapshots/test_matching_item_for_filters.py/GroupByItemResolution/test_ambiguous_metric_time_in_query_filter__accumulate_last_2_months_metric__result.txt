@@ -1,3 +1,6 @@
+test_name: test_ambiguous_metric_time_in_query_filter[accumulate_last_2_months_metric]
+test_filename: test_matching_item_for_filters.py
+---
 GroupByItemResolution(
   spec=TimeDimensionSpec(
     element_name='metric_time',

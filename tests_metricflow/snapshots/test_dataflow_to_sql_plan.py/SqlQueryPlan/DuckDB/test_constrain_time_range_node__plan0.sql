@@ -1,3 +1,8 @@
+test_name: test_constrain_time_range_node
+test_filename: test_dataflow_to_sql_plan.py
+docstring:
+  Tests converting the ConstrainTimeRangeNode to SQL.
+---
 -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-02T00:00:00]
 SELECT
   subq_2.ds__day

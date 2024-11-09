@@ -1,3 +1,6 @@
+test_name: test_derived_fill_nulls_for_one_input_metric
+test_filename: test_fill_nulls_with_rendering.py
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_16.metric_time__day

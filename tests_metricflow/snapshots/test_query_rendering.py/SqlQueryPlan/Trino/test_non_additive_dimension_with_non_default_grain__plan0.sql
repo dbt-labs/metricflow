@@ -1,3 +1,8 @@
+test_name: test_non_additive_dimension_with_non_default_grain
+test_filename: test_query_rendering.py
+docstring:
+  Tests querying a metric with a non-additive agg_time_dimension that has non-default granularity.
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_6.total_account_balance_first_day_of_month

@@ -1,3 +1,8 @@
+test_name: test_distinct_select_node_is_not_reduced
+test_filename: test_sub_query_reducer.py
+docstring:
+  Tests to ensure distinct select node doesn't get overwritten.
+---
 -- test0
 SELECT
   a.booking_value

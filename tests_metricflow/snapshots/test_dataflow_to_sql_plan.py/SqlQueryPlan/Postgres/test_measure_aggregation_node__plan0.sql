@@ -1,3 +1,10 @@
+test_name: test_measure_aggregation_node
+test_filename: test_dataflow_to_sql_plan.py
+docstring:
+  Tests converting a dataflow plan to a SQL query plan where there is a leaf measure aggregation node.
+
+      Covers SUM, AVERAGE, SUM_BOOLEAN (transformed to SUM upstream), and COUNT_DISTINCT agg types
+---
 -- Aggregate Measures
 SELECT
   SUM(subq_1.bookings) AS bookings

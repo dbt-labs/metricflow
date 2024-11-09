@@ -1,3 +1,8 @@
+test_name: test_where_constrained_with_common_linkable_plan
+test_filename: test_dataflow_plan_builder.py
+docstring:
+  Tests a dataflow plan where the where clause has a common linkable with the query.
+---
 <DataflowPlan>
     <WriteToResultDataTableNode>
         <!-- description = 'Write to DataTable' -->

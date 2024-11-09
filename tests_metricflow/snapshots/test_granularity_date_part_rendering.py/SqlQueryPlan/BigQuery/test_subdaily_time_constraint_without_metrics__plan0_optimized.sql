@@ -1,3 +1,6 @@
+test_name: test_subdaily_time_constraint_without_metrics
+test_filename: test_granularity_date_part_rendering.py
+---
 -- Time Spine
 -- Metric Time Dimension 'ts'
 -- Constrain Time Range to [2020-01-01T00:00:02, 2020-01-01T00:00:08]

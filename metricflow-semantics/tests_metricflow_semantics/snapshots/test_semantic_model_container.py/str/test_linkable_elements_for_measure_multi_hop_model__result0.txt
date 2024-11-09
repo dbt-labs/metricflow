@@ -1,3 +1,8 @@
+test_name: test_linkable_elements_for_measure_multi_hop_model
+test_filename: test_semantic_model_container.py
+docstring:
+  Tests extracting linkable elements for a given measure input.
+---
 Model Join-Path                                                Entity Links                            Name                    Time Granularity    Date Part    Properties
 -------------------------------------------------------------  --------------------------------------  ----------------------  ------------------  -----------  --------------------------------------------------------
 ('account_month_txns',)                                        ()                                      account_id                                               ['ENTITY', 'LOCAL']

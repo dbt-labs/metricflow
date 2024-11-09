@@ -1,3 +1,6 @@
+test_name: test_derived_offset_cumulative_metric
+test_filename: test_derived_metric_rendering.py
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_10.metric_time__day

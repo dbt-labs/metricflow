@@ -1,3 +1,6 @@
+test_name: test_id_enumeration
+test_filename: test_rendered_query.py
+---
 -- Combine Aggregated Outputs
 SELECT
   COALESCE(subq_4.metric_time__day, subq_9.metric_time__day) AS metric_time__day

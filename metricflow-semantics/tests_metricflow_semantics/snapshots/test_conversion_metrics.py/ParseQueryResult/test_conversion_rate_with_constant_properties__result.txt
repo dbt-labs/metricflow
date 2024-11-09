@@ -1,3 +1,6 @@
+test_name: test_conversion_rate_with_constant_properties
+test_filename: test_conversion_metrics.py
+---
 ParseQueryResult(
   query_spec=MetricFlowQuerySpec(
     metric_specs=(

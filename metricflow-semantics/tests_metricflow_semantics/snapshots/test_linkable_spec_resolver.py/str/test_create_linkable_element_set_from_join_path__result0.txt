@@ -1,3 +1,6 @@
+test_name: test_create_linkable_element_set_from_join_path
+test_filename: test_linkable_spec_resolver.py
+---
 Model Join-Path                         Entity Links    Name             Time Granularity    Date Part    Properties
 --------------------------------------  --------------  ---------------  ------------------  -----------  ---------------------------------------------------
 ('bookings_source', 'listings_latest')  ('listing',)    capacity_latest                                   ['JOINED']

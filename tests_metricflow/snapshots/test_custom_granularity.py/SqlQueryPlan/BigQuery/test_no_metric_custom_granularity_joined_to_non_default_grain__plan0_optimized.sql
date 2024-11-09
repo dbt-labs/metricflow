@@ -1,3 +1,6 @@
+test_name: test_no_metric_custom_granularity_joined_to_non_default_grain
+test_filename: test_custom_granularity.py
+---
 -- Join Standard Outputs
 -- Join to Custom Granularity Dataset
 -- Join to Custom Granularity Dataset

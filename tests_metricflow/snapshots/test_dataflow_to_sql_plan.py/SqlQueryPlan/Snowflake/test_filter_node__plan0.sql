@@ -1,3 +1,8 @@
+test_name: test_filter_node
+test_filename: test_dataflow_to_sql_plan.py
+docstring:
+  Tests converting a dataflow plan to a SQL query plan where there is a leaf pass filter node.
+---
 -- Pass Only Elements: ['bookings',]
 SELECT
   subq_0.bookings

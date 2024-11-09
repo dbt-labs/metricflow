@@ -1,3 +1,8 @@
+test_name: test_derived_metric_that_defines_the_same_alias_in_different_components
+test_filename: test_derived_metric_rendering.py
+docstring:
+  Tests querying a derived metric which give the same alias to its components.
+---
 -- Order By [] Limit 1
 SELECT
   subq_12.booking__is_instant

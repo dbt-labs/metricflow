@@ -1,3 +1,8 @@
+test_name: test_offset_window_metric_filter_and_query_have_different_granularities
+test_filename: test_dataflow_plan_builder.py
+docstring:
+  Test a query where an offset window metric is queried with one granularity and filtered by a different one.
+---
 <DataflowPlan>
     <WriteToResultDataTableNode>
         <!-- description = 'Write to DataTable' -->

@@ -1,3 +1,10 @@
+test_name: test_simple_join_to_time_spine_pushdown_filter_application
+test_filename: test_predicate_pushdown_rendering.py
+docstring:
+  Tests rendering a query where we join to a time spine and query the filter input.
+
+      This should produce a SQL query that applies the filter outside of the time spine join.
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_8.metric_time__day

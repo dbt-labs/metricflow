@@ -1,3 +1,6 @@
+test_name: test_offset_window_with_date_part
+test_filename: test_granularity_date_part_rendering.py
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_13.metric_time__extract_dow

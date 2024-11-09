@@ -1,3 +1,8 @@
+test_name: test_measure_constraint_with_reused_measure_plan
+test_filename: test_dataflow_plan_builder.py
+docstring:
+  Tests a plan for querying a metric with a constraint on one or more of its input measures.
+---
 <DataflowPlan>
     <WriteToResultDataTableNode>
         <!-- description = 'Write to DataTable' -->

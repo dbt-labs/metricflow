@@ -1,3 +1,8 @@
+test_name: test_single_categorical_dimension_pushdown
+test_filename: test_predicate_pushdown_rendering.py
+docstring:
+  Tests rendering a query where we expect predicate pushdown for a single categorical dimension.
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_8.listing__country_latest

@@ -1,3 +1,6 @@
+test_name: test_measure_constraint
+test_filename: test_query_rendering.py
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_25.metric_time__day

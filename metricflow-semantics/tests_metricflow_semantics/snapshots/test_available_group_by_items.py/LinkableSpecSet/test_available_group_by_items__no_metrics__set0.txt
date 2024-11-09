@@ -1,3 +1,6 @@
+test_name: test_available_group_by_items[no_metrics]
+test_filename: test_available_group_by_items.py
+---
 [
   "TimeDimension('metric_time', 'day')",
   "TimeDimension('metric_time', 'day', date_part_name='day')",

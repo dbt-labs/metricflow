@@ -1,3 +1,8 @@
+test_name: test_dimension_values_with_a_join_and_a_filter
+test_filename: test_distinct_values_to_sql.py
+docstring:
+  Tests querying 2 dimensions that require a join and a filter.
+---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['user__home_state_latest', 'listing__is_lux_latest']
 SELECT

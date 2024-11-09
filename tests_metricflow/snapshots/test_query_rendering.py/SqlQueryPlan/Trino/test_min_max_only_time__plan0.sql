@@ -1,3 +1,8 @@
+test_name: test_min_max_only_time
+test_filename: test_query_rendering.py
+docstring:
+  Tests a min max only query with a time dimension.
+---
 -- Calculate min and max
 SELECT
   MIN(subq_1.booking__paid_at__day) AS booking__paid_at__day__min

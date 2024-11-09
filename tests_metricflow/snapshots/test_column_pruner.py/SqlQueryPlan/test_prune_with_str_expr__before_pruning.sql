@@ -1,3 +1,8 @@
+test_name: test_prune_with_str_expr
+test_filename: test_column_pruner.py
+docstring:
+  Tests that columns are from parent sources if there's a string expression in the select with known cols.
+---
 -- test0
 SELECT
   from_source.col0 AS some_string_expr

@@ -1,3 +1,8 @@
+test_name: test_cumulative_metric_with_non_adjustable_filter
+test_filename: test_cumulative_metrics.py
+docstring:
+  Tests a cumulative metric with a filter that cannot be adjusted to ensure all data is included.
+---
 METRIC_TIME__DAY       TRAILING_2_MONTHS_REVENUE
 -------------------  ---------------------------
 2020-03-15T00:00:00                         7000

@@ -1,3 +1,6 @@
+test_name: test_saved_query_with_cumulative_metric
+test_filename: test_cli.py
+---
 METRIC_TIME__DAY       TRAILING_2_MONTHS_REVENUE
 -------------------  ---------------------------
 2020-01-01T00:00:00                         1000

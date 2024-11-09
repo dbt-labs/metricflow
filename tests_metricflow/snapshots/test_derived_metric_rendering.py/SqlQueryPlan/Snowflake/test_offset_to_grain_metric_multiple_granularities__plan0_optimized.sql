@@ -1,3 +1,8 @@
+test_name: test_offset_to_grain_metric_multiple_granularities
+test_filename: test_derived_metric_rendering.py
+docstring:
+  Test a query where an offset to grain metric is queried with multiple granularities.
+---
 -- Compute Metrics via Expressions
 SELECT
   metric_time__day

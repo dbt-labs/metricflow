@@ -1,3 +1,8 @@
+test_name: test_offset_window_metric_filter_and_query_have_different_granularities
+test_filename: test_derived_metric_rendering.py
+docstring:
+  Test a query where an offset window metric is queried with one granularity and filtered by a different one.
+---
 -- Compute Metrics via Expressions
 SELECT
   metric_time__month

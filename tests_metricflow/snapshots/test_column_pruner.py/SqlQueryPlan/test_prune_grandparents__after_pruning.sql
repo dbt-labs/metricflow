@@ -1,3 +1,8 @@
+test_name: test_prune_grandparents
+test_filename: test_column_pruner.py
+docstring:
+  Tests a case where a string expr in a node prevents the parent from being pruned, but prunes grandparents.
+---
 -- src2
 SELECT
   col0 AS col0

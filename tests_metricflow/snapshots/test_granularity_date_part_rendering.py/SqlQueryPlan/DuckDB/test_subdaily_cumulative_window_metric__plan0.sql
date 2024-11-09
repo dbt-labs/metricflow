@@ -1,3 +1,6 @@
+test_name: test_subdaily_cumulative_window_metric
+test_filename: test_granularity_date_part_rendering.py
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_6.metric_time__hour

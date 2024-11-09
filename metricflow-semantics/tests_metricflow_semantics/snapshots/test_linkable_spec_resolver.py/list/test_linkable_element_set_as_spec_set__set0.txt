@@ -1,3 +1,12 @@
+test_name: test_linkable_element_set_as_spec_set
+test_filename: test_linkable_spec_resolver.py
+docstring:
+  Tests extracting linkable elements for a given measure input and converting them into a spec set.
+
+      Note assert_spec_set_snapshot_equal relies on an InstanceSpecSet, not a LinkableSpecSet, so we have to
+      double up on the .as_spec_set calls here. Yes, this is lazy. No, I don't care to make another helper to
+      do snapshot comparisons on LinkableSpecSets.
+---
 [
   'listing',
   'listing__active_listings',

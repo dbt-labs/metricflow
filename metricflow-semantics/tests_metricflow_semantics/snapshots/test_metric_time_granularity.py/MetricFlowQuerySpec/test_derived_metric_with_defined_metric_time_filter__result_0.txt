@@ -1,3 +1,8 @@
+test_name: test_derived_metric_with_defined_metric_time_filter
+test_filename: test_metric_time_granularity.py
+docstring:
+  Tests that a derived metric's metric_time filter defined in its YAML uses outer metric's default granularity.
+---
 MetricFlowQuerySpec(
   metric_specs=(
     MetricSpec(

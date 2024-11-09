@@ -1,3 +1,8 @@
+test_name: test_nested_filters
+test_filename: test_derived_metric_rendering.py
+docstring:
+  Tests derived metric rendering for a nested derived metric with filters on the outer metric spec.
+---
 -- Compute Metrics via Expressions
 SELECT
   instant_lux_booking_value_rate AS instant_lux_booking_value_rate

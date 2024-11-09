@@ -1,3 +1,8 @@
+test_name: test_min_max_only_categorical
+test_filename: test_query_rendering.py
+docstring:
+  Tests a min max only query with a categorical dimension.
+---
 -- Calculate min and max
 SELECT
   MIN(listing__country_latest) AS listing__country_latest__min

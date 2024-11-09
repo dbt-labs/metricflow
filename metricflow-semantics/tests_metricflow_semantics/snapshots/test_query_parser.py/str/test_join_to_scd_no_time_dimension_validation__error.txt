@@ -1,3 +1,8 @@
+test_name: test_join_to_scd_no_time_dimension_validation
+test_filename: test_query_parser.py
+docstring:
+  Test that queries that join to SCD semantic models fail if no time dimensions are selected.
+---
 Got errors while resolving the query.
 
 Error #1:

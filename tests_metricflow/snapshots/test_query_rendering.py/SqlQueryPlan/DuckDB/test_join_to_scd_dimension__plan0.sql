@@ -1,3 +1,8 @@
+test_name: test_join_to_scd_dimension
+test_filename: test_query_rendering.py
+docstring:
+  Tests conversion of a plan using a dimension with a validity window inside a measure constraint.
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_7.metric_time__day

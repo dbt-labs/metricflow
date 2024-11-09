@@ -1,3 +1,8 @@
+test_name: test_conversion_metric_with_window_and_time_constraint
+test_filename: test_conversion_metrics.py
+docstring:
+  Test query against a conversion metric with a window, time constraint, and categorical filter.
+---
 METRIC_TIME__DAY     VISIT__REFERRER_ID      VISIT_BUY_CONVERSION_RATE_7DAYS
 -------------------  --------------------  ---------------------------------
 2020-01-01T00:00:00  fb_ad_1                                               2

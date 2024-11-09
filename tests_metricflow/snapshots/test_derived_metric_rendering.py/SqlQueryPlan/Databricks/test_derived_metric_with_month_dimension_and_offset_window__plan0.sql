@@ -1,3 +1,6 @@
+test_name: test_derived_metric_with_month_dimension_and_offset_window
+test_filename: test_derived_metric_rendering.py
+---
 -- Compute Metrics via Expressions
 SELECT
   subq_7.metric_time__month
