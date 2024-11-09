@@ -2,6 +2,7 @@ test_name: test_conversion_metric_with_window_and_time_constraint
 test_filename: test_conversion_metric_rendering.py
 docstring:
   Test rendering a query against a conversion metric with a window, time constraint, and categorical filter.
+sql_engine: BigQuery
 ---
 -- Compute Metrics via Expressions
 SELECT

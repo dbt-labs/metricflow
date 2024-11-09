@@ -4,6 +4,7 @@ docstring:
   Tests rendering a query for a cumulative all-time metric queried with non-default grains.
 
       Uses only metric_time. Excludes default grain.
+sql_engine: DuckDB
 ---
 -- Re-aggregate Metric via Group By
 SELECT

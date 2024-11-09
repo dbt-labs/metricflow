@@ -2,6 +2,7 @@ test_name: test_inner_query_single_hop
 test_filename: test_metric_filter_rendering.py
 docstring:
   Tests rendering for a metric filter using a one-hop join in the inner query.
+sql_engine: DuckDB
 ---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['third_hop_count',]

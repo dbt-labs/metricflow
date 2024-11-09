@@ -1,5 +1,6 @@
 test_name: test_nested_derived_metric_with_offset_multiple_input_metrics
 test_filename: test_derived_metric_rendering.py
+sql_engine: Databricks
 ---
 -- Compute Metrics via Expressions
 SELECT

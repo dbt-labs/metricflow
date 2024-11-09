@@ -1,5 +1,6 @@
 test_name: test_sub_daily_metric_time
 test_filename: test_granularity_date_part_rendering.py
+sql_engine: DuckDB
 ---
 -- Time Spine
 -- Metric Time Dimension 'ts'

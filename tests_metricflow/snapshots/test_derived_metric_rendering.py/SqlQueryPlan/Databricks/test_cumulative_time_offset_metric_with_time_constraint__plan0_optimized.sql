@@ -1,5 +1,6 @@
 test_name: test_cumulative_time_offset_metric_with_time_constraint
 test_filename: test_derived_metric_rendering.py
+sql_engine: Databricks
 ---
 -- Compute Metrics via Expressions
 SELECT

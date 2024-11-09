@@ -1,5 +1,6 @@
 test_name: test_derived_offset_cumulative_metric
 test_filename: test_derived_metric_rendering.py
+sql_engine: Trino
 ---
 -- Compute Metrics via Expressions
 SELECT

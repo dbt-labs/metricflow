@@ -2,6 +2,7 @@ test_name: test_query_with_ratio_metric_in_where_filter
 test_filename: test_metric_filter_rendering.py
 docstring:
   Tests a query with a ratio metric in the query-level where filter.
+sql_engine: DuckDB
 ---
 -- Compute Metrics via Expressions
 SELECT

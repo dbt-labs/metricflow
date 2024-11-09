@@ -2,6 +2,7 @@ test_name: test_conversion_rate_with_window
 test_filename: test_conversion_metrics_to_sql.py
 docstring:
   Test conversion metric with a window data flow plan rendering.
+sql_engine: Postgres
 ---
 -- Compute Metrics via Expressions
 SELECT

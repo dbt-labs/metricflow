@@ -2,6 +2,7 @@ test_name: test_conversion_metric_query_filters
 test_filename: test_predicate_pushdown_rendering.py
 docstring:
   Tests pushdown optimizer behavior for a simple predicate on a conversion metric.
+sql_engine: Postgres
 ---
 -- Compute Metrics via Expressions
 SELECT

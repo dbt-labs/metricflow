@@ -5,6 +5,7 @@ docstring:
 
       Measures trigger a primary time dimension validation. Additionally, this includes both categorical and time
       dimension types, which should cover most, if not all, of the table source branches in the target class.
+sql_engine: Databricks
 ---
 -- Read Elements From Semantic Model 'id_verifications'
 SELECT

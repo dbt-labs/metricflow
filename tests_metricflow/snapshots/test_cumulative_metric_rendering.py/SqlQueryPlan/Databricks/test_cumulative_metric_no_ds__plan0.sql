@@ -2,6 +2,7 @@ test_name: test_cumulative_metric_no_ds
 test_filename: test_cumulative_metric_rendering.py
 docstring:
   Tests rendering a cumulative metric with no time dimension specified.
+sql_engine: Databricks
 ---
 -- Compute Metrics via Expressions
 SELECT

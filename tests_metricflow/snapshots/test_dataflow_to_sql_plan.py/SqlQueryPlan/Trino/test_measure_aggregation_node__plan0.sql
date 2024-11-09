@@ -4,6 +4,7 @@ docstring:
   Tests converting a dataflow plan to a SQL query plan where there is a leaf measure aggregation node.
 
       Covers SUM, AVERAGE, SUM_BOOLEAN (transformed to SUM upstream), and COUNT_DISTINCT agg types
+sql_engine: Trino
 ---
 -- Aggregate Measures
 SELECT

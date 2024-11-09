@@ -2,6 +2,7 @@ test_name: test_simple_join_to_time_spine_with_filter
 test_filename: test_time_spine_join_rendering.py
 docstring:
   Test case where metric fills nulls and filter is not in group by. Should apply constraint once.
+sql_engine: Trino
 ---
 -- Compute Metrics via Expressions
 SELECT

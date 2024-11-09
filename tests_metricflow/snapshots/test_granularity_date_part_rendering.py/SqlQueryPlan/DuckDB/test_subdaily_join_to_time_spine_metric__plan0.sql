@@ -1,5 +1,6 @@
 test_name: test_subdaily_join_to_time_spine_metric
 test_filename: test_granularity_date_part_rendering.py
+sql_engine: DuckDB
 ---
 -- Compute Metrics via Expressions
 SELECT

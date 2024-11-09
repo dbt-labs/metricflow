@@ -1,5 +1,6 @@
 test_name: test_offset_metric_with_custom_granularity
 test_filename: test_custom_granularity.py
+sql_engine: Databricks
 ---
 -- Compute Metrics via Expressions
 SELECT

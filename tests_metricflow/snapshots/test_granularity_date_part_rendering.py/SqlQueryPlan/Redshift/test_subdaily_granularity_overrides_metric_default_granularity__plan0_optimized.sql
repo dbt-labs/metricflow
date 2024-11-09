@@ -1,5 +1,6 @@
 test_name: test_subdaily_granularity_overrides_metric_default_granularity
 test_filename: test_granularity_date_part_rendering.py
+sql_engine: Redshift
 ---
 -- Join to Time Spine Dataset
 -- Compute Metrics via Expressions

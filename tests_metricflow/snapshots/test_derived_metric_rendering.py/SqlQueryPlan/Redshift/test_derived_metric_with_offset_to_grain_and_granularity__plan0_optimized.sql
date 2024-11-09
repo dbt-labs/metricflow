@@ -1,5 +1,6 @@
 test_name: test_derived_metric_with_offset_to_grain_and_granularity
 test_filename: test_derived_metric_rendering.py
+sql_engine: Redshift
 ---
 -- Compute Metrics via Expressions
 SELECT

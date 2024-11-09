@@ -4,6 +4,7 @@ docstring:
   Tests pushdown optimizer behavior for a query against a cumulative metric.
 
       TODO: support metric time filters
+sql_engine: BigQuery
 ---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['bookers', 'listing__country_latest', 'metric_time__day']

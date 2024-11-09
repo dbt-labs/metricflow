@@ -2,6 +2,7 @@ test_name: test_limit_rows
 test_filename: test_query_rendering.py
 docstring:
   Tests a plan with a limit to the number of rows returned.
+sql_engine: Databricks
 ---
 -- Order By [] Limit 1
 SELECT

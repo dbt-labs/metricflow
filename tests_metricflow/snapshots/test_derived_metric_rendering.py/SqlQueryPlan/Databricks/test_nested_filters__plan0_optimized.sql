@@ -2,6 +2,7 @@ test_name: test_nested_filters
 test_filename: test_derived_metric_rendering.py
 docstring:
   Tests derived metric rendering for a nested derived metric with filters on the outer metric spec.
+sql_engine: Databricks
 ---
 -- Compute Metrics via Expressions
 SELECT

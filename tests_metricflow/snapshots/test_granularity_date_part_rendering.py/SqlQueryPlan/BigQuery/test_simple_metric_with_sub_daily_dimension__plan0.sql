@@ -1,5 +1,6 @@
 test_name: test_simple_metric_with_sub_daily_dimension
 test_filename: test_granularity_date_part_rendering.py
+sql_engine: BigQuery
 ---
 -- Compute Metrics via Expressions
 SELECT

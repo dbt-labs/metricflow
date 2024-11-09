@@ -1,5 +1,6 @@
 test_name: test_simple_metric_with_joined_sub_daily_dimension
 test_filename: test_granularity_date_part_rendering.py
+sql_engine: Snowflake
 ---
 -- Join Standard Outputs
 -- Pass Only Elements: ['bookings', 'listing__user__bio_added_ts__minute']

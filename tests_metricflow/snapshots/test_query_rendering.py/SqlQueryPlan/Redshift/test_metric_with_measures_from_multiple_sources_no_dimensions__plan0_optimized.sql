@@ -1,5 +1,6 @@
 test_name: test_metric_with_measures_from_multiple_sources_no_dimensions
 test_filename: test_query_rendering.py
+sql_engine: Redshift
 ---
 -- Combine Aggregated Outputs
 -- Compute Metrics via Expressions

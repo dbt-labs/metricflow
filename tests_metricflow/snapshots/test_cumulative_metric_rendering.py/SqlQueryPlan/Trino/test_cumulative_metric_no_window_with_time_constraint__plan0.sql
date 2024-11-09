@@ -2,6 +2,7 @@ test_name: test_cumulative_metric_no_window_with_time_constraint
 test_filename: test_cumulative_metric_rendering.py
 docstring:
   Tests rendering a query for a windowless cumulative metric query with an adjustable time constraint.
+sql_engine: Trino
 ---
 -- Compute Metrics via Expressions
 SELECT

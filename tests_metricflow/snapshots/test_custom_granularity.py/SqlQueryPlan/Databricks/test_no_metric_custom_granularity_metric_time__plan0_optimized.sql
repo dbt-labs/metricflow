@@ -1,5 +1,6 @@
 test_name: test_no_metric_custom_granularity_metric_time
 test_filename: test_custom_granularity.py
+sql_engine: Databricks
 ---
 -- Metric Time Dimension 'ds'
 -- Join to Custom Granularity Dataset

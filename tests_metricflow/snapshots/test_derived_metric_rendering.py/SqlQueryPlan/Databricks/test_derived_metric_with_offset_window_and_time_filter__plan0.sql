@@ -1,5 +1,6 @@
 test_name: test_derived_metric_with_offset_window_and_time_filter
 test_filename: test_derived_metric_rendering.py
+sql_engine: Databricks
 ---
 -- Compute Metrics via Expressions
 SELECT

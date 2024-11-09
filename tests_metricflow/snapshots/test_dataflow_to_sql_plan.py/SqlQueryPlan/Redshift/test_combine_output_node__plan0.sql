@@ -2,6 +2,7 @@ test_name: test_combine_output_node
 test_filename: test_dataflow_to_sql_plan.py
 docstring:
   Tests combining AggregateMeasuresNode.
+sql_engine: Redshift
 ---
 -- Combine Aggregated Outputs
 SELECT

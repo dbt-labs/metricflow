@@ -1,5 +1,6 @@
 test_name: test_convert_query_semantic_model
 test_filename: test_convert_semantic_model.py
+sql_engine: Trino
 ---
 -- Read Elements From Semantic Model 'revenue'
 SELECT

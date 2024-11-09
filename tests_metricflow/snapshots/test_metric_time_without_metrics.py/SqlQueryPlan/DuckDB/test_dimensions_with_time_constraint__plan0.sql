@@ -1,5 +1,6 @@
 test_name: test_dimensions_with_time_constraint
 test_filename: test_metric_time_without_metrics.py
+sql_engine: DuckDB
 ---
 -- Pass Only Elements: ['user__home_state_latest', 'listing__is_lux_latest', 'metric_time__day']
 SELECT

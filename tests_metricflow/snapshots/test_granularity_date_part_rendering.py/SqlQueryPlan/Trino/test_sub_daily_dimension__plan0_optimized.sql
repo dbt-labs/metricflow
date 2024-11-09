@@ -1,5 +1,6 @@
 test_name: test_sub_daily_dimension
 test_filename: test_granularity_date_part_rendering.py
+sql_engine: Trino
 ---
 -- Read Elements From Semantic Model 'users_ds_source'
 -- Pass Only Elements: ['user__bio_added_ts__second',]

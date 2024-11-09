@@ -6,6 +6,7 @@ docstring:
       Not all query inputs with time constraint filters allow us to adjust the time constraint to include the full
       span of input data for a cumulative metric, but when we receive a time constraint filter expression we can
       automatically adjust it should render a query similar to this one.
+sql_engine: DuckDB
 ---
 -- Compute Metrics via Expressions
 SELECT

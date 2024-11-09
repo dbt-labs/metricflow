@@ -1,5 +1,6 @@
 test_name: test_no_metric_custom_granularity_joined_to_non_default_grain
 test_filename: test_custom_granularity.py
+sql_engine: DuckDB
 ---
 -- Pass Only Elements: ['metric_time__day', 'metric_time__martian_day', 'user__bio_added_ts__martian_day', 'user__bio_added_ts__month']
 SELECT

@@ -2,6 +2,7 @@ test_name: test_single_categorical_dimension_pushdown
 test_filename: test_predicate_pushdown_rendering.py
 docstring:
   Tests rendering a query where we expect predicate pushdown for a single categorical dimension.
+sql_engine: BigQuery
 ---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['bookings', 'listing__country_latest']

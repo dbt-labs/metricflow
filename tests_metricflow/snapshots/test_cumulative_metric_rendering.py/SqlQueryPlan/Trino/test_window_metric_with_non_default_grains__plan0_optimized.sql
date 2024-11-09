@@ -4,6 +4,7 @@ docstring:
   Tests rendering a query for a cumulative window metric queried with non-default grains.
 
       Uses both metric_time and agg_time_dimension. Excludes default grain.
+sql_engine: Trino
 ---
 -- Re-aggregate Metric via Group By
 SELECT

@@ -1,5 +1,6 @@
 test_name: test_render_order_by
 test_filename: test_sql_plan_render.py
+sql_engine: Trino
 ---
 -- test0
 SELECT

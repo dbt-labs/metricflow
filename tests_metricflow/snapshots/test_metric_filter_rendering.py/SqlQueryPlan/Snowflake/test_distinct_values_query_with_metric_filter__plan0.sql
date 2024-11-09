@@ -2,6 +2,7 @@ test_name: test_distinct_values_query_with_metric_filter
 test_filename: test_metric_filter_rendering.py
 docstring:
   Tests a distinct values query with a metric in the query-level where filter.
+sql_engine: Snowflake
 ---
 -- Pass Only Elements: ['listing',]
 SELECT

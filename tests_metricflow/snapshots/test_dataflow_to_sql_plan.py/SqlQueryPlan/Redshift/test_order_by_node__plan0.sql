@@ -2,6 +2,7 @@ test_name: test_order_by_node
 test_filename: test_dataflow_to_sql_plan.py
 docstring:
   Tests converting a dataflow plan to a SQL query plan where there is a leaf compute metrics node.
+sql_engine: Redshift
 ---
 -- Order By ['ds__day', 'bookings']
 SELECT

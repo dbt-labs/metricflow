@@ -1,5 +1,6 @@
 test_name: test_simple_fill_nulls_with_0_with_non_metric_time
 test_filename: test_fill_nulls_with_rendering.py
+sql_engine: DuckDB
 ---
 -- Compute Metrics via Expressions
 SELECT

@@ -1,5 +1,6 @@
 test_name: test_cumulative_fill_nulls
 test_filename: test_fill_nulls_with_rendering.py
+sql_engine: DuckDB
 ---
 -- Compute Metrics via Expressions
 SELECT

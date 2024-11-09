@@ -2,6 +2,7 @@ test_name: test_conversion_rate_with_constant_properties
 test_filename: test_conversion_metrics_to_sql.py
 docstring:
   Test conversion metric with constant properties by data flow plan rendering.
+sql_engine: Trino
 ---
 -- Compute Metrics via Expressions
 SELECT

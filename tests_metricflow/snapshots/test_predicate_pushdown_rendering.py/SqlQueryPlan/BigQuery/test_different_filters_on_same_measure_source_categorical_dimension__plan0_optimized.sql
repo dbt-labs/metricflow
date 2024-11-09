@@ -10,6 +10,7 @@ docstring:
 
       The metric listed here has one input that filters on bookings__is_instant and another that does not, which means
       the source input for the latter input must NOT have the filter applied to it.
+sql_engine: BigQuery
 ---
 -- Compute Metrics via Expressions
 SELECT

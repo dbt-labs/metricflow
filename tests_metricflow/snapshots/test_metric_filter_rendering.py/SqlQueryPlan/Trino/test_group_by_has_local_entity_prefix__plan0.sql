@@ -1,5 +1,6 @@
 test_name: test_group_by_has_local_entity_prefix
 test_filename: test_metric_filter_rendering.py
+sql_engine: Trino
 ---
 -- Compute Metrics via Expressions
 SELECT

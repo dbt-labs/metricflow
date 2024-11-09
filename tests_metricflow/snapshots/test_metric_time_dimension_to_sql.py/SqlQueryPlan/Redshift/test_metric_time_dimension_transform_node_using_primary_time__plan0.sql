@@ -2,6 +2,7 @@ test_name: test_metric_time_dimension_transform_node_using_primary_time
 test_filename: test_metric_time_dimension_to_sql.py
 docstring:
   Tests converting a PlotTimeDimensionTransform node using the primary time dimension to SQL.
+sql_engine: Redshift
 ---
 -- Metric Time Dimension 'ds'
 SELECT

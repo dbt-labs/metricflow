@@ -2,6 +2,7 @@ test_name: test_min_max_metric_time
 test_filename: test_query_rendering.py
 docstring:
   Tests a plan to get the min & max distinct values of metric_time.
+sql_engine: BigQuery
 ---
 -- Calculate min and max
 SELECT

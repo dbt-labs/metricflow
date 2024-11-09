@@ -4,6 +4,7 @@ docstring:
   Tests pushdown optimizer behavior for a metric with a time spine and fill_nulls_with enabled.
 
       TODO: support metric time filters
+sql_engine: DuckDB
 ---
 -- Compute Metrics via Expressions
 SELECT

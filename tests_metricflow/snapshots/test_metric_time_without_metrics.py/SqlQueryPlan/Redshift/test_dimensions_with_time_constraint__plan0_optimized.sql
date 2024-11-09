@@ -1,5 +1,6 @@
 test_name: test_dimensions_with_time_constraint
 test_filename: test_metric_time_without_metrics.py
+sql_engine: Redshift
 ---
 -- Join Standard Outputs
 -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-03T00:00:00]

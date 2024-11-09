@@ -2,6 +2,7 @@ test_name: test_metric_time_only
 test_filename: test_metric_time_without_metrics.py
 docstring:
   Tests querying only metric time.
+sql_engine: Redshift
 ---
 -- Time Spine
 -- Metric Time Dimension 'ds'

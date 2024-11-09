@@ -1,5 +1,6 @@
 test_name: test_measure_constraint_with_reused_measure
 test_filename: test_query_rendering.py
+sql_engine: Redshift
 ---
 -- Compute Metrics via Expressions
 SELECT

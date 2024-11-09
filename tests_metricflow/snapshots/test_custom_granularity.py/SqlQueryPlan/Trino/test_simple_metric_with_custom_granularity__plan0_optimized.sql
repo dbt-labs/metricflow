@@ -1,5 +1,6 @@
 test_name: test_simple_metric_with_custom_granularity
 test_filename: test_custom_granularity.py
+sql_engine: Trino
 ---
 -- Metric Time Dimension 'ds'
 -- Join to Custom Granularity Dataset
