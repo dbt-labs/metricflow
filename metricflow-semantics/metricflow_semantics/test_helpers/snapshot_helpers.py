@@ -24,6 +24,9 @@ from metricflow_semantics.specs.spec_set import InstanceSpecSet
 
 logger = logging.getLogger(__name__)
 
+# In the snapshot file, include a header that describe what should be observed in the snapshot.
+SNAPSHOT_EXPECTATION_DESCRIPTION = "expectation_description"
+
 
 @dataclass(frozen=True)
 class SnapshotConfiguration:
@@ -50,6 +53,7 @@ def assert_snapshot_text_equal(
     incomparable_strings_replacement_function: Optional[Callable[[str], str]] = None,
     additional_sub_directories_for_snapshots: Tuple[str, ...] = (),
     additional_header_fields: Optional[Mapping[str, str]] = None,
+    expectation_description: Optional[str] = None,
 ) -> None:
     """Similar to assert_plan_snapshot_text_equal(), but with more controls on how the snapshot paths are generated."""
     file_path = (
@@ -81,6 +85,9 @@ def assert_snapshot_text_equal(
     if additional_header_fields is not None:
         for header_field_name, header_field_value in additional_header_fields.items():
             header_lines.append(f"{header_field_name}: {header_field_value}")
+    if expectation_description is not None:
+        header_lines.append(f"{SNAPSHOT_EXPECTATION_DESCRIPTION}:")
+        header_lines.append(indent(expectation_description))
     header_lines.append("---")
 
     snapshot_text = "\n".join(header_lines) + "\n" + snapshot_text
@@ -250,6 +257,7 @@ def assert_plan_snapshot_text_equal(
     exclude_line_regex: Optional[str] = None,
     incomparable_strings_replacement_function: Optional[Callable[[str], str]] = None,
     additional_sub_directories_for_snapshots: Tuple[str, ...] = (),
+    expectation_description: Optional[str] = None,
 ) -> None:
     """Checks if the given plan text is equal to the one that's saved for comparison.
 
@@ -272,6 +280,7 @@ def assert_plan_snapshot_text_equal(
         exclude_line_regex=exclude_line_regex,
         incomparable_strings_replacement_function=incomparable_strings_replacement_function,
         additional_sub_directories_for_snapshots=additional_sub_directories_for_snapshots,
+        expectation_description=expectation_description,
     )
 
 
@@ -280,6 +289,7 @@ def assert_linkable_element_set_snapshot_equal(  # noqa: D103
     mf_test_configuration: SnapshotConfiguration,
     set_id: str,
     linkable_element_set: LinkableElementSet,
+    expectation_description: Optional[str] = None,
 ) -> None:
     headers = ("Model Join-Path", "Entity Links", "Name", "Time Granularity", "Date Part", "Properties")
     rows = []
@@ -350,17 +360,23 @@ def assert_linkable_element_set_snapshot_equal(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         snapshot_id=set_id,
         snapshot_str=tabulate.tabulate(headers=headers, tabular_data=sorted(rows)),
+        expectation_description=expectation_description,
     )
 
 
 def assert_spec_set_snapshot_equal(  # noqa: D103
-    request: FixtureRequest, mf_test_configuration: SnapshotConfiguration, set_id: str, spec_set: InstanceSpecSet
+    request: FixtureRequest,
+    mf_test_configuration: SnapshotConfiguration,
+    set_id: str,
+    spec_set: InstanceSpecSet,
+    expectation_description: Optional[str] = None,
 ) -> None:
     assert_object_snapshot_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
         obj_id=set_id,
         obj=sorted(spec.qualified_name for spec in spec_set.all_specs),
+        expectation_description=expectation_description,
     )
 
 
@@ -369,6 +385,7 @@ def assert_linkable_spec_set_snapshot_equal(  # noqa: D103
     mf_test_configuration: SnapshotConfiguration,
     set_id: str,
     spec_set: LinkableSpecSet,
+    expectation_description: Optional[str] = None,
 ) -> None:
     naming_scheme = ObjectBuilderNamingScheme()
     assert_snapshot_text_equal(
@@ -379,6 +396,7 @@ def assert_linkable_spec_set_snapshot_equal(  # noqa: D103
         snapshot_text=mf_pformat(sorted(naming_scheme.input_str(spec) for spec in spec_set.as_tuple)),
         snapshot_file_extension=".txt",
         additional_sub_directories_for_snapshots=(),
+        expectation_description=expectation_description,
     )
 
 
@@ -387,6 +405,7 @@ def assert_object_snapshot_equal(  # type: ignore[misc]
     mf_test_configuration: SnapshotConfiguration,
     obj: Any,
     obj_id: str = "result",
+    expectation_description: Optional[str] = None,
 ) -> None:
     """For tests to compare large objects, this can be used to snapshot a text representation of the object."""
     assert_snapshot_text_equal(
@@ -396,6 +415,7 @@ def assert_object_snapshot_equal(  # type: ignore[misc]
         snapshot_id=obj_id,
         snapshot_text=mf_pformat(obj),
         snapshot_file_extension=".txt",
+        expectation_description=expectation_description,
     )
 
 
@@ -404,6 +424,7 @@ def assert_str_snapshot_equal(  # noqa: D103
     mf_test_configuration: SnapshotConfiguration,
     snapshot_id: str,
     snapshot_str: str,
+    expectation_description: Optional[str] = None,
 ) -> None:
     """Write / compare a string snapshot."""
     assert_snapshot_text_equal(
@@ -413,4 +434,5 @@ def assert_str_snapshot_equal(  # noqa: D103
         snapshot_id=snapshot_id,
         snapshot_text=snapshot_str,
         snapshot_file_extension=".txt",
+        expectation_description=expectation_description,
     )
