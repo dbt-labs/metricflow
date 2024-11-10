@@ -6,16 +6,16 @@ docstring:
 <SqlQueryPlan>
     <SqlSelectStatementNode>
         <!-- description = "Pass Only Elements: ['metric_time__day',]" -->
-        <!-- node_id = NodeId(id_str='ss_1') -->
+        <!-- node_id = NodeId(id_str='ss_2') -->
         <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_24), column_alias='metric_time__day') -->
-        <!-- from_source = SqlSelectStatementNode(node_id=ss_0) -->
+        <!-- from_source = SqlSelectStatementNode(node_id=ss_1) -->
         <!-- group_by0 =                                                                                          -->
         <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_24), column_alias='metric_time__day') -->
         <!-- where = None -->
         <!-- distinct = False -->
         <SqlSelectStatementNode>
             <!-- description = "Metric Time Dimension 'ds'" -->
-            <!-- node_id = NodeId(id_str='ss_0') -->
+            <!-- node_id = NodeId(id_str='ss_1') -->
             <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_0), column_alias='ds__day') -->
             <!-- col1 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_1), column_alias='ds__week') -->
             <!-- col2 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_2), column_alias='ds__month') -->
@@ -78,12 +78,12 @@ docstring:
             <!--     expr=SqlColumnReferenceExpression(node_id=cr_23), -->
             <!--     column_alias='metric_time__martian_day',          -->
             <!--   )                                                   -->
-            <!-- from_source = SqlSelectStatementNode(node_id=ss_28018) -->
+            <!-- from_source = SqlSelectStatementNode(node_id=ss_0) -->
             <!-- where = None -->
             <!-- distinct = False -->
             <SqlSelectStatementNode>
                 <!-- description = 'Time Spine' -->
-                <!-- node_id = NodeId(id_str='ss_28018') -->
+                <!-- node_id = NodeId(id_str='ss_0') -->
                 <!-- col0 = SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28293), column_alias='ds__day') -->
                 <!-- col1 = SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28294), column_alias='ds__week') -->
                 <!-- col2 = SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28295), column_alias='ds__month') -->

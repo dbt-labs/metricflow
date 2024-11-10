@@ -6,14 +6,14 @@ docstring:
 <SqlQueryPlan>
     <SqlSelectStatementNode>
         <!-- description = 'Join to Time Spine Dataset' -->
-        <!-- node_id = NodeId(id_str='ss_5') -->
+        <!-- node_id = NodeId(id_str='ss_6') -->
         <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_112), column_alias='metric_time__day') -->
         <!-- col1 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_111), column_alias='listing') -->
         <!-- col2 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_110), column_alias='booking_fees') -->
-        <!-- from_source = SqlSelectStatementNode(node_id=ss_4) -->
+        <!-- from_source = SqlSelectStatementNode(node_id=ss_5) -->
         <!-- join_0 =                                                 -->
         <!--   SqlJoinDescription(                                    -->
-        <!--     right_source=SqlSelectStatementNode(node_id=ss_3),   -->
+        <!--     right_source=SqlSelectStatementNode(node_id=ss_4),   -->
         <!--     right_source_alias='subq_4',                         -->
         <!--     join_type=INNER,                                     -->
         <!--     on_condition=SqlComparisonExpression(node_id=cmp_0), -->
@@ -22,7 +22,7 @@ docstring:
         <!-- distinct = False -->
         <SqlSelectStatementNode>
             <!-- description = 'Time Spine' -->
-            <!-- node_id = NodeId(id_str='ss_4') -->
+            <!-- node_id = NodeId(id_str='ss_5') -->
             <!-- col0 =                                                                                                -->
             <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_106), column_alias='metric_time__day') -->
             <!-- from_source = SqlTableNode(node_id=tfc_0) -->
@@ -36,7 +36,7 @@ docstring:
         </SqlSelectStatementNode>
         <SqlSelectStatementNode>
             <!-- description = 'Compute Metrics via Expressions' -->
-            <!-- node_id = NodeId(id_str='ss_3') -->
+            <!-- node_id = NodeId(id_str='ss_4') -->
             <!-- col0 =                                                                                                -->
             <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_104), column_alias='metric_time__day') -->
             <!-- col1 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_105), column_alias='listing') -->
@@ -45,12 +45,12 @@ docstring:
             <!--     expr=SqlStringExpression(node_id=str_0 sql_expr=booking_value * 0.05), -->
             <!--     column_alias='booking_fees',                                           -->
             <!--   )                                                                        -->
-            <!-- from_source = SqlSelectStatementNode(node_id=ss_2) -->
+            <!-- from_source = SqlSelectStatementNode(node_id=ss_3) -->
             <!-- where = None -->
             <!-- distinct = False -->
             <SqlSelectStatementNode>
                 <!-- description = 'Aggregate Measures' -->
-                <!-- node_id = NodeId(id_str='ss_2') -->
+                <!-- node_id = NodeId(id_str='ss_3') -->
                 <!-- col0 =                                                                                                -->
                 <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_102), column_alias='metric_time__day') -->
                 <!-- col1 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_103), column_alias='listing') -->
@@ -59,7 +59,7 @@ docstring:
                 <!--     expr=SqlAggregateFunctionExpression(node_id=fnc_0, sql_function=SUM), -->
                 <!--     column_alias='booking_value',                                         -->
                 <!--   )                                                                       -->
-                <!-- from_source = SqlSelectStatementNode(node_id=ss_1) -->
+                <!-- from_source = SqlSelectStatementNode(node_id=ss_2) -->
                 <!-- group_by0 =                                                                                           -->
                 <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_102), column_alias='metric_time__day') -->
                 <!-- group_by1 =                                                                                  -->
@@ -68,7 +68,7 @@ docstring:
                 <!-- distinct = False -->
                 <SqlSelectStatementNode>
                     <!-- description = "Pass Only Elements: ['booking_value', 'metric_time__day', 'listing']" -->
-                    <!-- node_id = NodeId(id_str='ss_1') -->
+                    <!-- node_id = NodeId(id_str='ss_2') -->
                     <!-- col0 =                                                -->
                     <!--   SqlSelectColumn(                                    -->
                     <!--     expr=SqlColumnReferenceExpression(node_id=cr_99), -->
@@ -78,12 +78,12 @@ docstring:
                     <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_100), column_alias='listing') -->
                     <!-- col2 =                                                                                            -->
                     <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_98), column_alias='booking_value') -->
-                    <!-- from_source = SqlSelectStatementNode(node_id=ss_0) -->
+                    <!-- from_source = SqlSelectStatementNode(node_id=ss_1) -->
                     <!-- where = None -->
                     <!-- distinct = False -->
                     <SqlSelectStatementNode>
                         <!-- description = "Metric Time Dimension 'ds'" -->
-                        <!-- node_id = NodeId(id_str='ss_0') -->
+                        <!-- node_id = NodeId(id_str='ss_1') -->
                         <!-- col0 =                                                                                      -->
                         <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_15), column_alias='ds__day') -->
                         <!-- col1 =                                                                                       -->
@@ -547,12 +547,12 @@ docstring:
                         <!--     expr=SqlColumnReferenceExpression(node_id=cr_12),      -->
                         <!--     column_alias='approximate_discrete_booking_value_p99', -->
                         <!--   )                                                        -->
-                        <!-- from_source = SqlSelectStatementNode(node_id=ss_28001) -->
+                        <!-- from_source = SqlSelectStatementNode(node_id=ss_0) -->
                         <!-- where = None -->
                         <!-- distinct = False -->
                         <SqlSelectStatementNode>
                             <!-- description = "Read Elements From Semantic Model 'bookings_source'" -->
-                            <!-- node_id = NodeId(id_str='ss_28001') -->
+                            <!-- node_id = NodeId(id_str='ss_0') -->
                             <!-- col0 =                                                      -->
                             <!--   SqlSelectColumn(                                          -->
                             <!--     expr=SqlStringExpression(node_id=str_28000 sql_expr=1), -->

@@ -385,7 +385,9 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
     def visit_source_node(self, node: ReadSqlSourceNode) -> SqlDataSet:
         """Generate the SQL to read from the source."""
         return SqlDataSet(
-            sql_select_node=node.data_set.checked_sql_select_node,
+            # This visitor is assumed to create a unique SELECT node for each dataflow node, so create a copy.
+            # The column pruner relies on this assumption to keep track of what columns are required at each node.
+            sql_select_node=node.data_set.checked_sql_select_node.create_copy(),
             instance_set=node.data_set.instance_set,
         )
 

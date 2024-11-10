@@ -6,13 +6,13 @@ docstring:
 <SqlQueryPlan>
     <SqlSelectStatementNode>
         <!-- description = 'Join Standard Outputs' -->
-        <!-- node_id = NodeId(id_str='ss_2') -->
+        <!-- node_id = NodeId(id_str='ss_4') -->
         <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_7), column_alias='listing') -->
         <!-- col1 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_6), column_alias='bookings') -->
-        <!-- from_source = SqlSelectStatementNode(node_id=ss_0) -->
+        <!-- from_source = SqlSelectStatementNode(node_id=ss_1) -->
         <!-- join_0 =                                                 -->
         <!--   SqlJoinDescription(                                    -->
-        <!--     right_source=SqlSelectStatementNode(node_id=ss_1),   -->
+        <!--     right_source=SqlSelectStatementNode(node_id=ss_3),   -->
         <!--     right_source_alias='subq_3',                         -->
         <!--     join_type=LEFT_OUTER,                                -->
         <!--     on_condition=SqlComparisonExpression(node_id=cmp_0), -->
@@ -21,15 +21,15 @@ docstring:
         <!-- distinct = False -->
         <SqlSelectStatementNode>
             <!-- description = "Pass Only Elements: ['bookings', 'listing']" -->
-            <!-- node_id = NodeId(id_str='ss_0') -->
+            <!-- node_id = NodeId(id_str='ss_1') -->
             <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_1), column_alias='listing') -->
             <!-- col1 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_0), column_alias='bookings') -->
-            <!-- from_source = SqlSelectStatementNode(node_id=ss_28001) -->
+            <!-- from_source = SqlSelectStatementNode(node_id=ss_0) -->
             <!-- where = None -->
             <!-- distinct = False -->
             <SqlSelectStatementNode>
                 <!-- description = "Read Elements From Semantic Model 'bookings_source'" -->
-                <!-- node_id = NodeId(id_str='ss_28001') -->
+                <!-- node_id = NodeId(id_str='ss_0') -->
                 <!-- col0 =                                                                                             -->
                 <!--   SqlSelectColumn(expr=SqlStringExpression(node_id=str_28000 sql_expr=1), column_alias='bookings') -->
                 <!-- col1 =                                                                                           -->
@@ -359,19 +359,19 @@ docstring:
         </SqlSelectStatementNode>
         <SqlSelectStatementNode>
             <!-- description = "Pass Only Elements: ['listing__country_latest', 'listing']" -->
-            <!-- node_id = NodeId(id_str='ss_1') -->
+            <!-- node_id = NodeId(id_str='ss_3') -->
             <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_3), column_alias='listing') -->
             <!-- col1 =                                               -->
             <!--   SqlSelectColumn(                                   -->
             <!--     expr=SqlColumnReferenceExpression(node_id=cr_2), -->
             <!--     column_alias='listing__country_latest',          -->
             <!--   )                                                  -->
-            <!-- from_source = SqlSelectStatementNode(node_id=ss_28005) -->
+            <!-- from_source = SqlSelectStatementNode(node_id=ss_2) -->
             <!-- where = None -->
             <!-- distinct = False -->
             <SqlSelectStatementNode>
                 <!-- description = "Read Elements From Semantic Model 'listings_latest'" -->
-                <!-- node_id = NodeId(id_str='ss_28005') -->
+                <!-- node_id = NodeId(id_str='ss_2') -->
                 <!-- col0 =                                                                                             -->
                 <!--   SqlSelectColumn(expr=SqlStringExpression(node_id=str_28006 sql_expr=1), column_alias='listings') -->
                 <!-- col1 =                                                   -->

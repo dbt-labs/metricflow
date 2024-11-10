@@ -8,7 +8,7 @@ docstring:
 <SqlQueryPlan>
     <SqlSelectStatementNode>
         <!-- description = 'Aggregate Measures' -->
-        <!-- node_id = NodeId(id_str='ss_1') -->
+        <!-- node_id = NodeId(id_str='ss_2') -->
         <!-- col0 =                                                                    -->
         <!--   SqlSelectColumn(                                                        -->
         <!--     expr=SqlAggregateFunctionExpression(node_id=fnc_0, sql_function=SUM), -->
@@ -29,25 +29,25 @@ docstring:
         <!--     expr=SqlAggregateFunctionExpression(node_id=fnc_3, sql_function=AVERAGE), -->
         <!--     column_alias='average_booking_value',                                     -->
         <!--   )                                                                           -->
-        <!-- from_source = SqlSelectStatementNode(node_id=ss_0) -->
+        <!-- from_source = SqlSelectStatementNode(node_id=ss_1) -->
         <!-- where = None -->
         <!-- distinct = False -->
         <SqlSelectStatementNode>
             <!-- description =                                                                                -->
             <!--   "Pass Only Elements: ['bookings', 'instant_bookings', 'average_booking_value', 'bookers']" -->
-            <!-- node_id = NodeId(id_str='ss_0') -->
+            <!-- node_id = NodeId(id_str='ss_1') -->
             <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_0), column_alias='bookings') -->
             <!-- col1 =                                                                                              -->
             <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_1), column_alias='instant_bookings') -->
             <!-- col2 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_2), column_alias='bookers') -->
             <!-- col3 =                                                                                                   -->
             <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_3), column_alias='average_booking_value') -->
-            <!-- from_source = SqlSelectStatementNode(node_id=ss_28001) -->
+            <!-- from_source = SqlSelectStatementNode(node_id=ss_0) -->
             <!-- where = None -->
             <!-- distinct = False -->
             <SqlSelectStatementNode>
                 <!-- description = "Read Elements From Semantic Model 'bookings_source'" -->
-                <!-- node_id = NodeId(id_str='ss_28001') -->
+                <!-- node_id = NodeId(id_str='ss_0') -->
                 <!-- col0 =                                                                                             -->
                 <!--   SqlSelectColumn(expr=SqlStringExpression(node_id=str_28000 sql_expr=1), column_alias='bookings') -->
                 <!-- col1 =                                                                                           -->
