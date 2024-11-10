@@ -426,6 +426,7 @@ def assert_str_snapshot_equal(  # noqa: D103
     snapshot_id: str,
     snapshot_str: str,
     expectation_description: Optional[str] = None,
+    incomparable_strings_replacement_function: Optional[Callable[[str], str]] = None,
 ) -> None:
     """Write / compare a string snapshot."""
     assert_snapshot_text_equal(
@@ -436,4 +437,5 @@ def assert_str_snapshot_equal(  # noqa: D103
         snapshot_text=snapshot_str,
         snapshot_file_extension=".txt",
         expectation_description=expectation_description,
+        incomparable_strings_replacement_function=incomparable_strings_replacement_function,
     )
