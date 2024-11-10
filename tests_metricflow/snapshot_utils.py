@@ -24,6 +24,9 @@ logger = logging.getLogger(__name__)
 # Needed as the table alias can vary from run to run.
 _EXCLUDE_TABLE_ALIAS_REGEX = "^.*_src.*$"
 
+# In the snapshot file, include a header with the name of the SQL engine when appropriate.
+SQL_ENGINE_HEADER_NAME = "sql_engine"
+
 
 def assert_execution_plan_text_equal(  # noqa: D103
     request: FixtureRequest,
@@ -105,6 +108,7 @@ def assert_sql_snapshot_equal(
         ),
         exclude_line_regex=_EXCLUDE_TABLE_ALIAS_REGEX,
         additional_sub_directories_for_snapshots=(sql_engine.value,) if sql_engine is not None else (),
+        additional_header_fields={SQL_ENGINE_HEADER_NAME: sql_engine.value} if sql_engine is not None else None,
     )
 
 

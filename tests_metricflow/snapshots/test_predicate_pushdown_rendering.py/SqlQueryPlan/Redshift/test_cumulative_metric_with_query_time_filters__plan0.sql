@@ -4,6 +4,7 @@ docstring:
   Tests pushdown optimizer behavior for a query against a cumulative metric.
 
       TODO: support metric time filters
+sql_engine: Redshift
 ---
 -- Compute Metrics via Expressions
 SELECT

@@ -1,5 +1,6 @@
 test_name: test_subdaily_offset_to_grain_metric
 test_filename: test_granularity_date_part_rendering.py
+sql_engine: Databricks
 ---
 -- Compute Metrics via Expressions
 SELECT

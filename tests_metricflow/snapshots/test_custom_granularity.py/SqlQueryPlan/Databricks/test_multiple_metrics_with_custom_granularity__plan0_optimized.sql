@@ -1,5 +1,6 @@
 test_name: test_multiple_metrics_with_custom_granularity
 test_filename: test_custom_granularity.py
+sql_engine: Databricks
 ---
 -- Combine Aggregated Outputs
 SELECT

@@ -1,5 +1,6 @@
 test_name: test_multi_metric_fill_null
 test_filename: test_derived_metric_rendering.py
+sql_engine: DuckDB
 ---
 -- Combine Aggregated Outputs
 SELECT

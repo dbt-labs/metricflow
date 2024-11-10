@@ -2,6 +2,7 @@ test_name: test_multi_hop_through_scd_dimension
 test_filename: test_query_rendering.py
 docstring:
   Tests conversion of a plan using a dimension that is reached through an SCD table.
+sql_engine: Trino
 ---
 -- Join Standard Outputs
 -- Pass Only Elements: ['bookings', 'listing__user__home_state_latest', 'metric_time__day']

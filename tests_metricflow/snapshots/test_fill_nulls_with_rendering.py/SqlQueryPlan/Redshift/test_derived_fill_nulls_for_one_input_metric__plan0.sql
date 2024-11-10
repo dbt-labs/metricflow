@@ -1,5 +1,6 @@
 test_name: test_derived_fill_nulls_for_one_input_metric
 test_filename: test_fill_nulls_with_rendering.py
+sql_engine: Redshift
 ---
 -- Compute Metrics via Expressions
 SELECT

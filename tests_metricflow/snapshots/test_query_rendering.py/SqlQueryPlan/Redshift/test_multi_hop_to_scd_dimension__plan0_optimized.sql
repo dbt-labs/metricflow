@@ -2,6 +2,7 @@ test_name: test_multi_hop_to_scd_dimension
 test_filename: test_query_rendering.py
 docstring:
   Tests conversion of a plan using an SCD dimension that is reached through another table.
+sql_engine: Redshift
 ---
 -- Join Standard Outputs
 -- Pass Only Elements: ['bookings', 'listing__lux_listing__is_confirmed_lux', 'metric_time__day']

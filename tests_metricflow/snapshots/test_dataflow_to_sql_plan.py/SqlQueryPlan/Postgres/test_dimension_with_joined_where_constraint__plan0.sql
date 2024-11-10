@@ -2,6 +2,7 @@ test_name: test_dimension_with_joined_where_constraint
 test_filename: test_dataflow_to_sql_plan.py
 docstring:
   Tests querying 2 dimensions that require a join.
+sql_engine: Postgres
 ---
 -- Pass Only Elements: ['user__home_state_latest',]
 SELECT

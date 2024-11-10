@@ -2,6 +2,7 @@ test_name: test_source_node
 test_filename: test_dataflow_to_sql_plan.py
 docstring:
   Tests converting a dataflow plan to a SQL query plan where there is a single source node.
+sql_engine: Databricks
 ---
 -- Read Elements From Semantic Model 'bookings_source'
 SELECT

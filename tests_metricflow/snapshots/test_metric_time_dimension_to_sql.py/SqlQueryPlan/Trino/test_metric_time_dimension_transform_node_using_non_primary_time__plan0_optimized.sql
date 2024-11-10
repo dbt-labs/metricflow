@@ -2,6 +2,7 @@ test_name: test_metric_time_dimension_transform_node_using_non_primary_time
 test_filename: test_metric_time_dimension_to_sql.py
 docstring:
   Tests converting a PlotTimeDimensionTransform node using a non-primary time dimension to SQL.
+sql_engine: Trino
 ---
 -- Read Elements From Semantic Model 'bookings_source'
 -- Metric Time Dimension 'paid_at'

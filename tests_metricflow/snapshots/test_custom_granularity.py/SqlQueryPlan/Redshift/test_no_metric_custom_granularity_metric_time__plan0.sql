@@ -1,5 +1,6 @@
 test_name: test_no_metric_custom_granularity_metric_time
 test_filename: test_custom_granularity.py
+sql_engine: Redshift
 ---
 -- Pass Only Elements: ['metric_time__martian_day',]
 SELECT

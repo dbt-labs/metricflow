@@ -2,6 +2,7 @@ test_name: test_distinct_values
 test_filename: test_query_rendering.py
 docstring:
   Tests a plan to get distinct values for a dimension.
+sql_engine: BigQuery
 ---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['listing__country_latest',]

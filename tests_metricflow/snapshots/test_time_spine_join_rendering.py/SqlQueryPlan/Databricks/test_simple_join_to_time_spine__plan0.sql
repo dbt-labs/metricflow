@@ -1,5 +1,6 @@
 test_name: test_simple_join_to_time_spine
 test_filename: test_time_spine_join_rendering.py
+sql_engine: Databricks
 ---
 -- Compute Metrics via Expressions
 SELECT

@@ -2,6 +2,7 @@ test_name: test_metric_filtered_by_itself
 test_filename: test_metric_filter_rendering.py
 docstring:
   Tests a query for a metric that filters by the same metric.
+sql_engine: Redshift
 ---
 -- Compute Metrics via Expressions
 SELECT

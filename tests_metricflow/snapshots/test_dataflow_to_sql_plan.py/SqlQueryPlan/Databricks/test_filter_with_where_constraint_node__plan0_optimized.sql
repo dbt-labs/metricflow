@@ -2,6 +2,7 @@ test_name: test_filter_with_where_constraint_node
 test_filename: test_dataflow_to_sql_plan.py
 docstring:
   Tests converting a dataflow plan to a SQL query plan where there is a leaf pass filter node.
+sql_engine: Databricks
 ---
 -- Constrain Output with WHERE
 SELECT

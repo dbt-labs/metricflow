@@ -1,5 +1,6 @@
 test_name: test_multiple_metrics_no_dimensions
 test_filename: test_query_rendering.py
+sql_engine: BigQuery
 ---
 -- Combine Aggregated Outputs
 SELECT

@@ -1,5 +1,6 @@
 test_name: test_cumulative_metric_with_custom_granularity
 test_filename: test_custom_granularity.py
+sql_engine: Databricks
 ---
 -- Re-aggregate Metric via Group By
 SELECT

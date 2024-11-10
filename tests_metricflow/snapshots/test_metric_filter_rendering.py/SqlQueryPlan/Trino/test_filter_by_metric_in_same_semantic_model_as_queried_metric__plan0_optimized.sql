@@ -2,6 +2,7 @@ test_name: test_filter_by_metric_in_same_semantic_model_as_queried_metric
 test_filename: test_metric_filter_rendering.py
 docstring:
   Tests a query with a simple metric in the query-level where filter.
+sql_engine: Trino
 ---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['bookers',]

@@ -2,6 +2,7 @@ test_name: test_cumulative_metric_no_window
 test_filename: test_cumulative_metric_rendering.py
 docstring:
   Tests rendering a query where there is a windowless cumulative metric to compute.
+sql_engine: BigQuery
 ---
 -- Compute Metrics via Expressions
 SELECT

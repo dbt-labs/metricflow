@@ -2,6 +2,7 @@ test_name: test_cumulative_metric
 test_filename: test_cumulative_metric_rendering.py
 docstring:
   Tests rendering a basic cumulative metric query.
+sql_engine: Databricks
 ---
 -- Read Elements From Semantic Model 'revenue'
 -- Metric Time Dimension 'ds'

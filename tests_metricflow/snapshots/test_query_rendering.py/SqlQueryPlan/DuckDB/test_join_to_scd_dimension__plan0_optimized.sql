@@ -2,6 +2,7 @@ test_name: test_join_to_scd_dimension
 test_filename: test_query_rendering.py
 docstring:
   Tests conversion of a plan using a dimension with a validity window inside a measure constraint.
+sql_engine: DuckDB
 ---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['bookings', 'metric_time__day']

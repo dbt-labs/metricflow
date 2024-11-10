@@ -1,5 +1,6 @@
 test_name: test_subdaily_time_constraint_with_metric
 test_filename: test_granularity_date_part_rendering.py
+sql_engine: Redshift
 ---
 -- Join to Time Spine Dataset
 -- Constrain Time Range to [2020-01-01T02:00:00, 2020-01-01T05:00:00]

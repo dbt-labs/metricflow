@@ -2,6 +2,7 @@ test_name: test_multi_hop_to_scd_dimension
 test_filename: test_query_rendering.py
 docstring:
   Tests conversion of a plan using an SCD dimension that is reached through another table.
+sql_engine: Redshift
 ---
 -- Compute Metrics via Expressions
 SELECT

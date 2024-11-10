@@ -2,6 +2,7 @@ test_name: test_semi_additive_join_node_with_grouping
 test_filename: test_dataflow_to_sql_plan.py
 docstring:
   Tests converting a dataflow plan to a SQL query plan using a SemiAdditiveJoinNode with a window_grouping.
+sql_engine: Databricks
 ---
 -- Join on MAX(ds) and ['user'] grouping by None
 SELECT

@@ -1,5 +1,6 @@
 test_name: test_id_enumeration
 test_filename: test_rendered_query.py
+sql_engine: Databricks
 ---
 -- Combine Aggregated Outputs
 SELECT

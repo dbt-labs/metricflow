@@ -1,5 +1,6 @@
 test_name: test_nested_fill_nulls_without_time_spine
 test_filename: test_derived_metric_rendering.py
+sql_engine: Trino
 ---
 -- Compute Metrics via Expressions
 SELECT

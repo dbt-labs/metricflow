@@ -2,6 +2,7 @@ test_name: test_no_metrics_with_custom_granularity_in_filter_and_group_by
 test_filename: test_custom_granularity.py
 docstring:
   Group by items only queried with a filter on a custom grain, where that grain is also used in the group by.
+sql_engine: Postgres
 ---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['listing__ds__martian_day',]

@@ -1,5 +1,6 @@
 test_name: test_build_metric_tasks
 test_filename: test_data_warehouse_tasks.py
+sql_engine: Snowflake
 ---
 SELECT
   metric_time__day

@@ -1,5 +1,6 @@
 test_name: test_join_to_time_spine_metric_grouped_by_custom_grain
 test_filename: test_custom_granularity.py
+sql_engine: DuckDB
 ---
 -- Compute Metrics via Expressions
 SELECT

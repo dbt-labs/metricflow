@@ -1,5 +1,6 @@
 test_name: test_measure_constraint
 test_filename: test_query_rendering.py
+sql_engine: DuckDB
 ---
 -- Compute Metrics via Expressions
 SELECT

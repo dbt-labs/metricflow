@@ -4,6 +4,7 @@ docstring:
   Check filter hierarchy.
 
       Ensure that the measure filter 'booking__is_instant' doesn't get applied again post-aggregation.
+sql_engine: Snowflake
 ---
 -- Join to Time Spine Dataset
 -- Compute Metrics via Expressions

@@ -1,5 +1,6 @@
 test_name: test_metric_time_with_other_dimensions
 test_filename: test_metric_time_without_metrics.py
+sql_engine: Redshift
 ---
 -- Pass Only Elements: ['user__home_state_latest', 'listing__is_lux_latest', 'metric_time__day']
 SELECT

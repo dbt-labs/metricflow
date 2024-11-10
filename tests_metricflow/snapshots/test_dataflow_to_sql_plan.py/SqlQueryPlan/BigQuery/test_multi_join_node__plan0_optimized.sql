@@ -2,6 +2,7 @@ test_name: test_multi_join_node
 test_filename: test_dataflow_to_sql_plan.py
 docstring:
   Tests converting a dataflow plan to a SQL query plan where there is a join between 1 measure and 2 dimensions.
+sql_engine: BigQuery
 ---
 -- Join Standard Outputs
 SELECT

@@ -1,5 +1,6 @@
 test_name: test_derived_metric_with_custom_granularity
 test_filename: test_custom_granularity.py
+sql_engine: Trino
 ---
 -- Compute Metrics via Expressions
 SELECT

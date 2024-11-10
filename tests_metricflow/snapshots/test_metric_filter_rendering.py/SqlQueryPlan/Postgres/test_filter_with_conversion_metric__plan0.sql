@@ -1,5 +1,6 @@
 test_name: test_filter_with_conversion_metric
 test_filename: test_metric_filter_rendering.py
+sql_engine: Postgres
 ---
 -- Compute Metrics via Expressions
 SELECT

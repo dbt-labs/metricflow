@@ -1,5 +1,6 @@
 test_name: test_simple_query_with_date_part
 test_filename: test_granularity_date_part_rendering.py
+sql_engine: Databricks
 ---
 -- Aggregate Measures
 -- Compute Metrics via Expressions

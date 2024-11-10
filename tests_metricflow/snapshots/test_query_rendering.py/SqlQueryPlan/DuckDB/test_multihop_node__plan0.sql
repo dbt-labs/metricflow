@@ -2,6 +2,7 @@ test_name: test_multihop_node
 test_filename: test_query_rendering.py
 docstring:
   Tests converting a dataflow plan to a SQL query plan where there is a join between 1 measure and 2 dimensions.
+sql_engine: DuckDB
 ---
 -- Compute Metrics via Expressions
 SELECT

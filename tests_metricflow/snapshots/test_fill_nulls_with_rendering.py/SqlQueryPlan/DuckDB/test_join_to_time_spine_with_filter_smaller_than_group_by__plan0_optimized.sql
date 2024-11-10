@@ -1,5 +1,6 @@
 test_name: test_join_to_time_spine_with_filter_smaller_than_group_by
 test_filename: test_fill_nulls_with_rendering.py
+sql_engine: DuckDB
 ---
 -- Join to Time Spine Dataset
 -- Compute Metrics via Expressions

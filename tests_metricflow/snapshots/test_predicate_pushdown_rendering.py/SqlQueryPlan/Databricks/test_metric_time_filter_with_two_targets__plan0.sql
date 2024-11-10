@@ -5,6 +5,7 @@ docstring:
 
       This is currently a no-op for the pushdown optimizer.
       TODO: support metric time pushdown
+sql_engine: Databricks
 ---
 -- Compute Metrics via Expressions
 SELECT

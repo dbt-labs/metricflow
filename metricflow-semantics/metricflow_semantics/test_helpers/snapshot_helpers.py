@@ -7,7 +7,7 @@ import pathlib
 import re
 import webbrowser
 from dataclasses import dataclass
-from typing import Any, Callable, Optional, Tuple, TypeVar
+from typing import Any, Callable, Mapping, Optional, Tuple, TypeVar
 
 import _pytest.fixtures
 import tabulate
@@ -49,6 +49,7 @@ def assert_snapshot_text_equal(
     exclude_line_regex: Optional[str] = None,
     incomparable_strings_replacement_function: Optional[Callable[[str], str]] = None,
     additional_sub_directories_for_snapshots: Tuple[str, ...] = (),
+    additional_header_fields: Optional[Mapping[str, str]] = None,
 ) -> None:
     """Similar to assert_plan_snapshot_text_equal(), but with more controls on how the snapshot paths are generated."""
     file_path = (
@@ -77,6 +78,9 @@ def assert_snapshot_text_equal(
     if test_doc_string is not None:
         header_lines.append("docstring:")
         header_lines.append(indent(test_doc_string.rstrip()))
+    if additional_header_fields is not None:
+        for header_field_name, header_field_value in additional_header_fields.items():
+            header_lines.append(f"{header_field_name}: {header_field_value}")
     header_lines.append("---")
 
     snapshot_text = "\n".join(header_lines) + "\n" + snapshot_text

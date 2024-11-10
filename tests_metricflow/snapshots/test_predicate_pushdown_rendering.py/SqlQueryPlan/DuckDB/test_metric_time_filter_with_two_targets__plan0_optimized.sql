@@ -5,6 +5,7 @@ docstring:
 
       This is currently a no-op for the pushdown optimizer.
       TODO: support metric time pushdown
+sql_engine: DuckDB
 ---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['bookings', 'listing__country_latest']

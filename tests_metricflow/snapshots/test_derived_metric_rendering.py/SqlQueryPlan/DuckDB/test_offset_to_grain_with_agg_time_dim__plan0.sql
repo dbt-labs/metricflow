@@ -1,5 +1,6 @@
 test_name: test_offset_to_grain_with_agg_time_dim
 test_filename: test_derived_metric_rendering.py
+sql_engine: DuckDB
 ---
 -- Compute Metrics via Expressions
 SELECT

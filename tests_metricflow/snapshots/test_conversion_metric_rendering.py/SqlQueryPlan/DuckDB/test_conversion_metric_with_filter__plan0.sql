@@ -2,6 +2,7 @@ test_name: test_conversion_metric_with_filter
 test_filename: test_conversion_metric_rendering.py
 docstring:
   Test rendering a query against a conversion metric.
+sql_engine: DuckDB
 ---
 -- Compute Metrics via Expressions
 SELECT

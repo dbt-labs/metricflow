@@ -4,6 +4,7 @@ docstring:
   Tests rendering a query for a cumulative grain to date metric queried with non-default grains.
 
       Uses agg time dimension instead of metric_time. Excludes default grain.
+sql_engine: Redshift
 ---
 -- Re-aggregate Metric via Group By
 SELECT

@@ -6,6 +6,7 @@ docstring:
       Not all query inputs with time constraint filters allow us to adjust the time constraint to include the full
       span of input data for a cumulative metric. When we do not have an adjustable time filter we must include all
       input data in order to ensure the cumulative metric is correct.
+sql_engine: Postgres
 ---
 -- Compute Metrics via Expressions
 SELECT

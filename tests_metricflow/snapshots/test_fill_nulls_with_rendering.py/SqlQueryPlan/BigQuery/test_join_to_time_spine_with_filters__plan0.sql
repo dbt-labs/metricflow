@@ -1,5 +1,6 @@
 test_name: test_join_to_time_spine_with_filters
 test_filename: test_fill_nulls_with_rendering.py
+sql_engine: BigQuery
 ---
 -- Compute Metrics via Expressions
 SELECT

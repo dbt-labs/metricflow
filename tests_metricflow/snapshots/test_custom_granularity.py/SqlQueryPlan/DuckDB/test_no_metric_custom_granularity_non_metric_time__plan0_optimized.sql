@@ -1,5 +1,6 @@
 test_name: test_no_metric_custom_granularity_non_metric_time
 test_filename: test_custom_granularity.py
+sql_engine: DuckDB
 ---
 -- Read Elements From Semantic Model 'bookings_source'
 -- Join to Custom Granularity Dataset

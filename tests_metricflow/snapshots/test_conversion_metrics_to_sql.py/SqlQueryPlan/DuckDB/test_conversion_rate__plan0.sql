@@ -2,6 +2,7 @@ test_name: test_conversion_rate
 test_filename: test_conversion_metrics_to_sql.py
 docstring:
   Test conversion metric data flow plan rendering.
+sql_engine: DuckDB
 ---
 -- Compute Metrics via Expressions
 SELECT

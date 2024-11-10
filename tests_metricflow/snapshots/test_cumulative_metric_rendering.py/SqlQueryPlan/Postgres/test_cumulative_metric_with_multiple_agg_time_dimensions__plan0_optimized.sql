@@ -2,6 +2,7 @@ test_name: test_cumulative_metric_with_multiple_agg_time_dimensions
 test_filename: test_cumulative_metric_rendering.py
 docstring:
   Tests rendering a query for a cumulative metric queried with multiple agg time dimensions.
+sql_engine: Postgres
 ---
 -- Join Self Over Time Range
 -- Pass Only Elements: ['txn_revenue', 'revenue_instance__ds__day', 'revenue_instance__ds__month']

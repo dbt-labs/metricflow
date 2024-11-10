@@ -1,5 +1,6 @@
 test_name: test_join_to_time_spine_with_filter_not_in_group_by_using_agg_time_and_metric_time
 test_filename: test_fill_nulls_with_rendering.py
+sql_engine: Postgres
 ---
 -- Compute Metrics via Expressions
 SELECT

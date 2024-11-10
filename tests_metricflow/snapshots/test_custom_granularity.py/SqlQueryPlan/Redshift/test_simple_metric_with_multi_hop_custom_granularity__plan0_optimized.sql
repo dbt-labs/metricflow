@@ -2,6 +2,7 @@ test_name: test_simple_metric_with_multi_hop_custom_granularity
 test_filename: test_custom_granularity.py
 docstring:
   Test simple metric with a multi hop dimension and custom grain.
+sql_engine: Redshift
 ---
 -- Join Standard Outputs
 -- Join to Custom Granularity Dataset

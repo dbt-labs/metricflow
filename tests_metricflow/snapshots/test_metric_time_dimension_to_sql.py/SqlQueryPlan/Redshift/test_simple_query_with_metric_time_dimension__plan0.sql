@@ -2,6 +2,7 @@ test_name: test_simple_query_with_metric_time_dimension
 test_filename: test_metric_time_dimension_to_sql.py
 docstring:
   Tests building a query that uses measures defined from 2 different time dimensions.
+sql_engine: Redshift
 ---
 -- Combine Aggregated Outputs
 SELECT

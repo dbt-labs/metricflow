@@ -7,6 +7,7 @@ docstring:
       skip pushdown, typically due to a lack of certainty over whether or not the query will return the same results.
 
       The specific scenario is less important here than that it match one that should not be pushed down.
+sql_engine: Databricks
 ---
 -- Compute Metrics via Expressions
 SELECT

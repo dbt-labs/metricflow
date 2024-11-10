@@ -2,6 +2,7 @@ test_name: test_multiple_categorical_dimension_pushdown
 test_filename: test_predicate_pushdown_rendering.py
 docstring:
   Tests rendering a query where we expect predicate pushdown for more than one categorical dimension.
+sql_engine: Postgres
 ---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['listings', 'user__home_state_latest']

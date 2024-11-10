@@ -1,5 +1,6 @@
 test_name: test_nested_derived_metric_offset_with_joined_where_constraint_not_selected
 test_filename: test_derived_metric_rendering.py
+sql_engine: Snowflake
 ---
 -- Compute Metrics via Expressions
 SELECT

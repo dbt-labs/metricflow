@@ -4,6 +4,7 @@ docstring:
   Tests a query with a cumulative metric in the query-level where filter.
 
       Note this cumulative metric has no window / grain to date.
+sql_engine: Databricks
 ---
 -- Compute Metrics via Expressions
 SELECT

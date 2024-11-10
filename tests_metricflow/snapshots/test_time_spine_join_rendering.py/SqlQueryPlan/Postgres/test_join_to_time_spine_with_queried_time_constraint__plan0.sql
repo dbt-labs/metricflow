@@ -2,6 +2,7 @@ test_name: test_join_to_time_spine_with_queried_time_constraint
 test_filename: test_time_spine_join_rendering.py
 docstring:
   Test case where metric that fills nulls is queried with metric time and a time constraint. Should apply constraint twice.
+sql_engine: Postgres
 ---
 -- Compute Metrics via Expressions
 SELECT

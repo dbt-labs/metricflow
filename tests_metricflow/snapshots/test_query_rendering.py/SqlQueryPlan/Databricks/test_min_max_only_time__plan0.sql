@@ -2,6 +2,7 @@ test_name: test_min_max_only_time
 test_filename: test_query_rendering.py
 docstring:
   Tests a min max only query with a time dimension.
+sql_engine: Databricks
 ---
 -- Calculate min and max
 SELECT

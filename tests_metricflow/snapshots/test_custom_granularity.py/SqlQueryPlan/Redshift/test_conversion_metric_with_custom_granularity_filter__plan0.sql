@@ -1,5 +1,6 @@
 test_name: test_conversion_metric_with_custom_granularity_filter
 test_filename: test_custom_granularity.py
+sql_engine: Redshift
 ---
 -- Compute Metrics via Expressions
 SELECT

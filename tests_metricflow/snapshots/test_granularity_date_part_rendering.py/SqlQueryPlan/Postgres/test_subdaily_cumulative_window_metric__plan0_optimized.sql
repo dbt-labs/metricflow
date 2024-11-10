@@ -1,5 +1,6 @@
 test_name: test_subdaily_cumulative_window_metric
 test_filename: test_granularity_date_part_rendering.py
+sql_engine: Postgres
 ---
 -- Join Self Over Time Range
 -- Pass Only Elements: ['archived_users', 'metric_time__hour']
