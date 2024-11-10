@@ -1,0 +1,55 @@
+test_name: test_multi_child_pruning
+test_filename: test_cte_column_pruner.py
+docstring:
+  Tests the case of pruning a CTE where difference sources depend on the same CTE.
+---
+optimizer:
+  SqlColumnPrunerOptimizer
+
+sql_before_optimizing:
+  -- Top-level SELECT
+  WITH cte_source_0 AS (
+    -- CTE source 0
+    SELECT
+      test_table_alias.col_0 AS cte_source_0__col_0
+      , test_table_alias.col_1 AS cte_source_0__col_1
+      , test_table_alias.col_1 AS cte_source_0__col_2
+    FROM test_schema.test_table test_table_alias
+  )
+
+  SELECT
+    cte_source_0_alias.cte_source_0__col_0 AS top_level__col_0
+    , right_source_alias.right_source__col_1 AS top_level__col_1
+  FROM cte_source_0 cte_source_0_alias
+  INNER JOIN (
+    -- Joined sub-query
+    SELECT
+      cte_source_0_alias_in_right_source.cte_source_0__col_0 AS right_source__col_0
+      , cte_source_0_alias_in_right_source.cte_source_0__col_1 AS right_source__col_1
+    FROM cte_source_0 cte_source_0_alias_in_right_source
+  ) right_source_alias
+  ON
+    cte_source_0_alias.cte_source_0__col_1 = right_source_alias.right_source__col_1
+
+sql_after_optimizing:
+  -- Top-level SELECT
+  WITH cte_source_0 AS (
+    -- CTE source 0
+    SELECT
+      test_table_alias.col_0 AS cte_source_0__col_0
+      , test_table_alias.col_1 AS cte_source_0__col_1
+    FROM test_schema.test_table test_table_alias
+  )
+
+  SELECT
+    cte_source_0_alias.cte_source_0__col_0 AS top_level__col_0
+    , right_source_alias.right_source__col_1 AS top_level__col_1
+  FROM cte_source_0 cte_source_0_alias
+  INNER JOIN (
+    -- Joined sub-query
+    SELECT
+      cte_source_0_alias_in_right_source.cte_source_0__col_1 AS right_source__col_1
+    FROM cte_source_0 cte_source_0_alias_in_right_source
+  ) right_source_alias
+  ON
+    cte_source_0_alias.cte_source_0__col_1 = right_source_alias.right_source__col_1
