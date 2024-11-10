@@ -1,7 +1,7 @@
 test_name: test_table_alias_simplification
 test_filename: test_table_alias_simplifier.py
 docstring:
-  Tests a case where no pruning should occur.
+  Tests that table aliases are removed when not needed.
 ---
 -- test0
 SELECT
