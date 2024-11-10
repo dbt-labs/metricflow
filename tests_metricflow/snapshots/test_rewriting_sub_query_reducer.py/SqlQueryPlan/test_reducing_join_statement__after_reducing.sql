@@ -1,7 +1,7 @@
 test_name: test_reducing_join_statement
 test_filename: test_rewriting_sub_query_reducer.py
 docstring:
-  Tests a case where a join query should not reduced an aggregate.
+  Tests a case where a join query should not reduce an aggregate.
 ---
 -- query
 SELECT

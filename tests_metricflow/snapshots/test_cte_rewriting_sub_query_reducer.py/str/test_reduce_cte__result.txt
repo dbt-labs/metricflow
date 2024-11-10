@@ -1,0 +1,81 @@
+test_name: test_reduce_cte
+test_filename: test_cte_rewriting_sub_query_reducer.py
+docstring:
+  Tests that the SELECT statements in CTEs are reduced.
+---
+optimizer:
+  SqlRewritingSubQueryReducer
+
+sql_before_optimizing:
+  -- Top-level SELECT
+  WITH cte_source_0 AS (
+    -- CTE source 0
+    SELECT
+      test_table_alias.col_0 AS cte_source_0__col_0
+      , test_table_alias.col_1 AS cte_source_0__col_1
+    FROM (
+      -- CTE source 0 sub-query
+      SELECT
+        test_table_alias.col_0 AS cte_source_0_subquery__col_0
+        , test_table_alias.col_0 AS cte_source_0_subquery__col_1
+      FROM test_schema.test_table test_table_alias
+    ) cte_source_0_subquery
+  )
+
+  , cte_source_1 AS (
+    -- CTE source 1
+    SELECT
+      test_table_alias.col_0 AS cte_source_1__col_0
+      , test_table_alias.col_1 AS cte_source_1__col_1
+    FROM (
+      -- CTE source 1 sub-query
+      SELECT
+        cte_source_0_alias.cte_source_0__col_0 AS cte_source_1_subquery__col_0
+        , cte_source_0_alias.cte_source_0__col_0 AS cte_source_1_subquery__col_1
+      FROM cte_source_0 cte_source_0_alias
+    ) cte_source_1_subquery
+  )
+
+  SELECT
+    cte_source_0_alias.cte_source_0__col_0 AS top_level__col_0
+    , right_source_alias.right_source__col_1 AS top_level__col_1
+  FROM cte_source_0 cte_source_0_alias
+  INNER JOIN
+    cte_source_1 right_source_alias
+  ON
+    cte_source_0_alias.cte_source_0__col_1 = right_source_alias.right_source__col_1
+  GROUP BY
+    cte_source_0_alias.cte_source_0__col_0
+    , right_source_alias.right_source__col_1
+
+sql_after_optimizing:
+  -- Top-level SELECT
+  WITH cte_source_0 AS (
+    -- CTE source 0 sub-query
+    -- CTE source 0
+    SELECT
+      test_table_alias.col_0 AS cte_source_0__col_0
+      , test_table_alias.col_1 AS cte_source_0__col_1
+    FROM test_schema.test_table test_table_alias
+  )
+
+  , cte_source_1 AS (
+    -- CTE source 1 sub-query
+    -- CTE source 1
+    SELECT
+      test_table_alias.col_0 AS cte_source_1__col_0
+      , test_table_alias.col_1 AS cte_source_1__col_1
+    FROM cte_source_0 cte_source_0_alias
+  )
+
+  SELECT
+    cte_source_0_alias.cte_source_0__col_0 AS top_level__col_0
+    , right_source_alias.right_source__col_1 AS top_level__col_1
+  FROM cte_source_0 cte_source_0_alias
+  INNER JOIN
+    cte_source_1 right_source_alias
+  ON
+    cte_source_0_alias.cte_source_0__col_1 = right_source_alias.right_source__col_1
+  GROUP BY
+    cte_source_0_alias.cte_source_0__col_0
+    , right_source_alias.right_source__col_1
