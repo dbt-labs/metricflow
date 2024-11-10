@@ -40,6 +40,7 @@ from metricflow.execution.execution_plan import (
 from metricflow.plan_conversion.convert_to_sql_plan import ConvertToSqlPlanResult
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderResult, SqlQueryPlanRenderer
 
 logger = logging.getLogger(__name__)
@@ -53,6 +54,7 @@ class DataflowToExecutionPlanConverter(DataflowPlanNodeVisitor[ConvertToExecutio
         sql_plan_converter: DataflowToSqlQueryPlanConverter,
         sql_plan_renderer: SqlQueryPlanRenderer,
         sql_client: SqlClient,
+        sql_optimization_level: SqlQueryOptimizationLevel,
     ) -> None:
         """Constructor.
 
@@ -60,15 +62,18 @@ class DataflowToExecutionPlanConverter(DataflowPlanNodeVisitor[ConvertToExecutio
             sql_plan_converter: Converts a dataflow plan node to a SQL query plan
             sql_plan_renderer: Converts a SQL query plan to SQL text
             sql_client: The client to use for running queries.
+            sql_optimization_level: The optimization level to use for generating the SQL.
         """
         self._sql_plan_converter = sql_plan_converter
         self._sql_plan_renderer = sql_plan_renderer
         self._sql_client = sql_client
+        self._optimization_level = sql_optimization_level
 
     def _convert_to_sql_plan(self, node: DataflowPlanNode) -> ConvertToSqlPlanResult:
         logger.debug(LazyFormat(lambda: f"Generating SQL query plan from {node.node_id}"))
         result = self._sql_plan_converter.convert_to_sql_query_plan(
             sql_engine_type=self._sql_client.sql_engine_type,
+            optimization_level=self._optimization_level,
             dataflow_plan_node=node,
         )
         logger.debug(LazyFormat(lambda: f"Generated SQL query plan is:\n{result.sql_plan.structure_text()}"))

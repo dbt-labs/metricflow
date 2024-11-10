@@ -409,11 +409,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             column_association_resolver=self._column_association_resolver,
             semantic_manifest_lookup=self._semantic_manifest_lookup,
         )
-        self._to_execution_plan_converter = DataflowToExecutionPlanConverter(
-            sql_plan_converter=self._to_sql_query_plan_converter,
-            sql_plan_renderer=self._sql_client.sql_query_plan_renderer,
-            sql_client=sql_client,
-        )
         self._executor = SequentialPlanExecutor()
 
         self._query_parser = query_parser or MetricFlowQueryParser(
@@ -539,7 +534,13 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             )
 
         logger.info(LazyFormat("Building execution plan"))
-        convert_to_execution_plan_result = self._to_execution_plan_converter.convert_to_execution_plan(dataflow_plan)
+        _to_execution_plan_converter = DataflowToExecutionPlanConverter(
+            sql_plan_converter=self._to_sql_query_plan_converter,
+            sql_plan_renderer=self._sql_client.sql_query_plan_renderer,
+            sql_client=self._sql_client,
+            sql_optimization_level=mf_query_request.sql_optimization_level,
+        )
+        convert_to_execution_plan_result = _to_execution_plan_converter.convert_to_execution_plan(dataflow_plan)
         return MetricFlowExplainResult(
             query_spec=query_spec,
             dataflow_plan=dataflow_plan,
