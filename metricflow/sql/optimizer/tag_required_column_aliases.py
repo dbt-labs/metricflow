@@ -165,6 +165,8 @@ class SqlMapRequiredColumnAliasesVisitor(SqlQueryPlanNodeVisitor[None]):
             raise RuntimeError(
                 "No columns are required in this node - this indicates a bug in this visitor or in the inputs."
             )
+        # It's possible for `required_select_columns_in_this_node` to be empty because we traverse through the ancestors
+        # of a CTE node whenever a CTE node is updated. See `test_multi_child_pruning`.
 
         # Based on the expressions in this select statement, figure out what column aliases are needed in the sources of
         # this query (i.e. tables or sub-queries in the FROM or JOIN clauses).
@@ -178,7 +180,7 @@ class SqlMapRequiredColumnAliasesVisitor(SqlQueryPlanNodeVisitor[None]):
                 nodes_to_retain_all_columns.append(join_desc.right_source)
 
             for node_to_retain_all_columns in nodes_to_retain_all_columns:
-                nearest_select_columns = node_to_retain_all_columns.nearest_select_columns({})
+                nearest_select_columns = node_to_retain_all_columns.nearest_select_columns(self._cte_alias_to_cte_node)
                 for select_column in nearest_select_columns or ():
                     self._current_required_column_alias_mapping.add_alias(
                         node=node_to_retain_all_columns, column_alias=select_column.column_alias
