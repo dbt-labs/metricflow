@@ -38,14 +38,16 @@ class ObjectBuilderNamingScheme(QueryItemNamingScheme):
 
     @override
     def spec_pattern(self, input_str: str, semantic_manifest_lookup: SemanticManifestLookup) -> SpecPattern:
-        if not self.input_str_follows_scheme(input_str):
+        if not self.input_str_follows_scheme(input_str, semantic_manifest_lookup=semantic_manifest_lookup):
             raise ValueError(
                 f"The specified input {repr(input_str)} does not match the input described by the object builder "
                 f"pattern."
             )
         try:
             # TODO: Update when more appropriate parsing libraries are available.
-            call_parameter_sets = PydanticWhereFilter(where_sql_template="{{ " + input_str + " }}").call_parameter_sets
+            call_parameter_sets = PydanticWhereFilter(where_sql_template="{{ " + input_str + " }}").call_parameter_sets(
+                custom_granularity_names=semantic_manifest_lookup.semantic_model_lookup.custom_granularity_names
+            )
         except ParseWhereFilterException as e:
             raise ValueError(f"A spec pattern can't be generated from the input string {repr(input_str)}") from e
 
@@ -121,11 +123,14 @@ class ObjectBuilderNamingScheme(QueryItemNamingScheme):
         raise RuntimeError("There should have been a return associated with one of the CallParameterSets.")
 
     @override
-    def input_str_follows_scheme(self, input_str: str) -> bool:
+    def input_str_follows_scheme(self, input_str: str, semantic_manifest_lookup: SemanticManifestLookup) -> bool:
         if ObjectBuilderNamingScheme._NAME_REGEX.match(input_str) is None:
             return False
         try:
-            call_parameter_sets = WhereFilterParser.parse_call_parameter_sets("{{ " + input_str + " }}")
+            call_parameter_sets = WhereFilterParser.parse_call_parameter_sets(
+                where_sql_template="{{ " + input_str + " }}",
+                custom_granularity_names=semantic_manifest_lookup.semantic_model_lookup.custom_granularity_names,
+            )
             return_value = (
                 len(call_parameter_sets.dimension_call_parameter_sets)
                 + len(call_parameter_sets.time_dimension_call_parameter_sets)

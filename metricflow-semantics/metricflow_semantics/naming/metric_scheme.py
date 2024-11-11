@@ -28,12 +28,12 @@ class MetricNamingScheme(QueryItemNamingScheme):
     @override
     def spec_pattern(self, input_str: str, semantic_manifest_lookup: SemanticManifestLookup) -> MetricSpecPattern:
         input_str = input_str.lower()
-        if not self.input_str_follows_scheme(input_str):
+        if not self.input_str_follows_scheme(input_str, semantic_manifest_lookup=semantic_manifest_lookup):
             raise RuntimeError(f"{repr(input_str)} does not follow this scheme.")
         return MetricSpecPattern(metric_reference=MetricReference(element_name=input_str))
 
     @override
-    def input_str_follows_scheme(self, input_str: str) -> bool:
+    def input_str_follows_scheme(self, input_str: str, semantic_manifest_lookup: SemanticManifestLookup) -> bool:
         # TODO: Use regex.
         return True
 

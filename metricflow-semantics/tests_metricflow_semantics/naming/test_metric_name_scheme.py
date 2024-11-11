@@ -19,8 +19,12 @@ def test_input_str(metric_naming_scheme: MetricNamingScheme) -> None:  # noqa: D
     assert metric_naming_scheme.input_str(MetricSpec(element_name="bookings")) == "bookings"
 
 
-def test_input_follows_scheme(metric_naming_scheme: MetricNamingScheme) -> None:  # noqa: D103
-    assert metric_naming_scheme.input_str_follows_scheme("listings")
+def test_input_follows_scheme(  # noqa: D103
+    metric_naming_scheme: MetricNamingScheme, simple_semantic_manifest_lookup: SemanticManifestLookup
+) -> None:
+    assert metric_naming_scheme.input_str_follows_scheme(
+        "listings", semantic_manifest_lookup=simple_semantic_manifest_lookup
+    )
 
 
 def test_spec_pattern(  # noqa: D103
