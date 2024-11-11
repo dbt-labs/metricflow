@@ -6,6 +6,7 @@ from typing import List, Optional, Sequence, Tuple
 from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.assert_one_arg import assert_exactly_one_arg_set
+from metricflow_semantics.errors.custom_grain_not_supported import error_if_not_standard_grain
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 
 from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
@@ -466,7 +467,9 @@ class SqlQueryPlanJoinBuilder:
                 right_expr=SqlSubtractTimeIntervalExpression.create(
                     arg=time_comparison_column_expr,
                     count=window.count,
-                    granularity=window.granularity,
+                    granularity=error_if_not_standard_grain(
+                        input_granularity=window.granularity,
+                    ),
                 ),
             )
             comparison_expressions.append(start_of_range_comparison_expr)
@@ -551,7 +554,9 @@ class SqlQueryPlanJoinBuilder:
         )
         if node.offset_window:
             left_expr = SqlSubtractTimeIntervalExpression.create(
-                arg=left_expr, count=node.offset_window.count, granularity=node.offset_window.granularity
+                arg=left_expr,
+                count=node.offset_window.count,
+                granularity=error_if_not_standard_grain(input_granularity=node.offset_window.granularity),
             )
         elif node.offset_to_grain:
             left_expr = SqlDateTruncExpression.create(time_granularity=node.offset_to_grain, arg=left_expr)

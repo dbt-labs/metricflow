@@ -19,6 +19,7 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId
+from metricflow_semantics.errors.custom_grain_not_supported import error_if_not_standard_grain
 from metricflow_semantics.errors.error_classes import UnableToSatisfyQueryError
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.mf_logging.formatting import indent
@@ -512,6 +513,16 @@ class DataflowPlanBuilder:
             len(metric.input_measures) == 1
         ), f"A base metric should not have multiple measures. Got {metric.input_measures}"
 
+        cumulative_grain_to_date: Optional[TimeGranularity] = None
+        if (
+            metric.type_params.cumulative_type_params
+            and metric.type_params.cumulative_type_params.grain_to_date is not None
+        ):
+            cumulative_grain_to_date = error_if_not_standard_grain(
+                context=f"CumulativeMetric({metric_spec.element_name}).grain_to_date",
+                input_granularity=metric.type_params.cumulative_type_params.grain_to_date,
+            )
+
         metric_input_measure_spec = self._build_input_measure_spec(
             filter_spec_factory=filter_spec_factory,
             metric=metric,
@@ -526,11 +537,7 @@ class DataflowPlanBuilder:
                         if metric.type_params.cumulative_type_params
                         else None
                     ),
-                    cumulative_grain_to_date=(
-                        metric.type_params.cumulative_type_params.grain_to_date
-                        if metric.type_params.cumulative_type_params
-                        else None
-                    ),
+                    cumulative_grain_to_date=cumulative_grain_to_date,
                 )
                 if metric.type is MetricType.CUMULATIVE
                 else None
@@ -1404,6 +1411,13 @@ class DataflowPlanBuilder:
                 ),
             )
 
+            input_metric_offset_to_grain: Optional[TimeGranularity] = None
+            if input_metric.offset_to_grain is not None:
+                input_metric_offset_to_grain = error_if_not_standard_grain(
+                    context=f"Metric({metric.name}).InputMetric({input_metric.name}).offset_to_grain",
+                    input_granularity=input_metric.offset_to_grain,
+                )
+
             spec = MetricSpec(
                 element_name=input_metric.name,
                 filter_spec_set=filter_spec_set,
@@ -1416,7 +1430,7 @@ class DataflowPlanBuilder:
                     if input_metric.offset_window
                     else None
                 ),
-                offset_to_grain=input_metric.offset_to_grain,
+                offset_to_grain=input_metric_offset_to_grain,
             )
             input_metric_specs.append(spec)
         return tuple(input_metric_specs)
@@ -1521,7 +1535,9 @@ class DataflowPlanBuilder:
             granularity: Optional[TimeGranularity] = None
             count = 0
             if cumulative_window is not None:
-                granularity = cumulative_window.granularity
+                granularity = error_if_not_standard_grain(
+                    context="CumulativeMetric.window.granularity", input_granularity=cumulative_window.granularity
+                )
                 count = cumulative_window.count
             elif cumulative_grain_to_date is not None:
                 count = 1

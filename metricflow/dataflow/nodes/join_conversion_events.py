@@ -78,7 +78,7 @@ class JoinConversionEventsNode(DataflowPlanNode):
 
     @property
     def description(self) -> str:  # noqa: D102
-        return f"Find conversions for {self.entity_spec.qualified_name} within the range of {f'{self.window.count} {self.window.granularity.value}' if self.window else 'INF'}"
+        return f"Find conversions for {self.entity_spec.qualified_name} within the range of {f'{self.window.count} {self.window.granularity}' if self.window else 'INF'}"
 
     @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
