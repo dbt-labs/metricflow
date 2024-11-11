@@ -385,8 +385,10 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
     def visit_source_node(self, node: ReadSqlSourceNode) -> SqlDataSet:
         """Generate the SQL to read from the source."""
         return SqlDataSet(
-            # This visitor is assumed to create a unique SELECT node for each dataflow node, so create a copy.
-            # The column pruner relies on this assumption to keep track of what columns are required at each node.
+            # This visitor is assumed to create a unique SELECT node for each dataflow node, and since
+            # `ReadSqlSourceNode` may be used multiple times in the plan, create a copy of the SELECT.
+            # `SqlColumnPrunerOptimizer` relies on this assumption to keep track of what columns are required at each
+            # node.
             sql_select_node=node.data_set.checked_sql_select_node.create_copy(),
             instance_set=node.data_set.instance_set,
         )
@@ -398,7 +400,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         input_data_set_alias = self._next_unique_table_alias()
 
         # Find requested agg_time_dimensions in parent instance set.
-        # Will use instance with smallest base granularity in time spine join.
+        # Will use instance with the smallest base granularity in time spine join.
         agg_time_dimension_instance_for_join: Optional[TimeDimensionInstance] = None
         requested_agg_time_dimension_instances: Tuple[TimeDimensionInstance, ...] = ()
         for instance in input_data_set.instance_set.time_dimension_instances:

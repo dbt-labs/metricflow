@@ -68,8 +68,9 @@ class SqlColumnPrunerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
             select_columns=pruned_select_columns,
             from_source=node.from_source.accept(self),
             from_source_alias=node.from_source_alias,
-            # TODO: Handle CTEs.
-            cte_sources=(),
+            cte_sources=tuple(
+                cte_source.with_new_select(cte_source.select_statement.accept(self)) for cte_source in node.cte_sources
+            ),
             join_descs=tuple(
                 join_desc.with_right_source(join_desc.right_source.accept(self)) for join_desc in node.join_descs
             ),
@@ -96,7 +97,7 @@ class SqlColumnPrunerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
 
     @override
     def visit_cte_node(self, node: SqlCteNode) -> SqlQueryPlanNode:
-        raise NotImplementedError
+        return node.with_new_select(node.select_statement.accept(self))
 
 
 class SqlColumnPrunerOptimizer(SqlQueryPlanOptimizer):

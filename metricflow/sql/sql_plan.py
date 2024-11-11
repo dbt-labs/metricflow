@@ -432,6 +432,13 @@ class SqlCteNode(SqlQueryPlanNode):
             cte_alias=cte_alias,
         )
 
+    def with_new_select(self, new_select_statement: SqlQueryPlanNode) -> SqlCteNode:
+        """Return a node with the same attributes but with the new SELECT statement."""
+        return SqlCteNode.create(
+            select_statement=new_select_statement,
+            cte_alias=self.cte_alias,
+        )
+
     @override
     def accept(self, visitor: SqlQueryPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:
         return visitor.visit_cte_node(self)

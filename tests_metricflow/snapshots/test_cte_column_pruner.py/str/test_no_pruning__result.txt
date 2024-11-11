@@ -1,0 +1,33 @@
+test_name: test_no_pruning
+test_filename: test_cte_column_pruner.py
+docstring:
+  Tests a case where no pruning should occur for a CTE.
+---
+optimizer:
+  SqlColumnPrunerOptimizer
+
+sql_before_optimizing:
+  -- Top-level SELECT
+  WITH cte_source_0 AS (
+    -- CTE source 0
+    SELECT
+      test_table_alias.col_0 AS cte_source_0__col_0
+    FROM test_schema.test_table test_table_alias
+  )
+
+  SELECT
+    cte_source_0_alias.cte_source_0__col_0 AS top_level__col_0
+  FROM cte_source_0 cte_source_0_alias
+
+sql_after_optimizing:
+  -- Top-level SELECT
+  WITH cte_source_0 AS (
+    -- CTE source 0
+    SELECT
+      test_table_alias.col_0 AS cte_source_0__col_0
+    FROM test_schema.test_table test_table_alias
+  )
+
+  SELECT
+    cte_source_0_alias.cte_source_0__col_0 AS top_level__col_0
+  FROM cte_source_0 cte_source_0_alias
