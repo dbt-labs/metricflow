@@ -70,6 +70,7 @@ class WhereSpecFactory:
                 spec_resolution_lookup=self._spec_resolution_lookup,
                 where_filter_location=filter_location,
                 rendered_spec_tracker=rendered_spec_tracker,
+                custom_granularity_names=self._semantic_model_lookup.custom_granularity_names,
             )
             time_dimension_factory = WhereFilterTimeDimensionFactory(
                 column_association_resolver=self._column_association_resolver,

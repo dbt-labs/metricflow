@@ -23,7 +23,7 @@ from metricflow_semantics.specs.spec_set import InstanceSpecSet, InstanceSpecSet
 class DunderNamingScheme(QueryItemNamingScheme):
     """A naming scheme using the dundered name syntax.
 
-    TODO: Consolidate with StructuredLinkableSpecName / DunderedNameFormatter.
+    TODO: Consolidate with StructuredLinkableSpecName.
     """
 
     _INPUT_REGEX = re.compile(r"\A[a-z]([a-z0-9_])*[a-z0-9]\Z")
