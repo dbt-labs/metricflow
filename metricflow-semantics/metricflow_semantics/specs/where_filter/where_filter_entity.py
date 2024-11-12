@@ -112,7 +112,5 @@ class WhereFilterEntityFactory(ProtocolHint[QueryInterfaceEntityFactory]):
             rendered_spec_tracker=self._rendered_spec_tracker,
             element_name=structured_name.element_name,
             entity_links=tuple(EntityReference(entity_link_name.lower()) for entity_link_name in entity_path)
-            + tuple(
-                EntityReference(entity_link_name.lower()) for entity_link_name in structured_name.entity_link_names
-            ),
+            + structured_name.entity_links,
         )

@@ -4,6 +4,7 @@ import logging
 from functools import lru_cache
 from typing import Optional, Sequence, Tuple
 
+from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
@@ -105,6 +106,11 @@ class StructuredLinkableSpecName:
     def date_part_suffix(date_part: DatePart) -> str:
         """Suffix used for names with a date_part."""
         return f"extract_{date_part.value}"
+
+    @property
+    def entity_links(self) -> Tuple[EntityReference, ...]:
+        """Returns the entity link references."""
+        return tuple(EntityReference(entity_link_name.lower()) for entity_link_name in self.entity_link_names)
 
     @property
     def granularity_free_qualified_name(self) -> str:
