@@ -298,11 +298,14 @@ def test_join_to_scd_dimension(
     """Tests conversion of a plan using a dimension with a validity window inside a measure constraint."""
     query_spec = scd_query_parser.parse_and_validate_query(
         metric_names=("family_bookings",),
-        group_by_names=(METRIC_TIME_ELEMENT_NAME,),
+        # group_by_names=(METRIC_TIME_ELEMENT_NAME,),
         where_constraints=[
             PydanticWhereFilter(
                 where_sql_template="{{ Dimension('listing__capacity') }} > 2",
-            )
+            ),
+            PydanticWhereFilter(
+                where_sql_template="{{ TimeDimension('metric_time') }} > '2020-01-01'",
+            ),
         ],
     ).query_spec
 

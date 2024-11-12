@@ -1,10 +1,9 @@
 -- Constrain Output with WHERE
--- Pass Only Elements: ['bookings', 'metric_time__day']
+-- Pass Only Elements: ['bookings',]
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  metric_time__day
-  , SUM(bookings) AS family_bookings
+  SUM(bookings) AS family_bookings
 FROM (
   -- Join Standard Outputs
   SELECT
@@ -15,7 +14,8 @@ FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
     SELECT
-      DATE_TRUNC('day', ds) AS metric_time__day
+      DATE_TRUNC('second', ds) AS metric_time__second
+      , DATE_TRUNC('day', ds) AS metric_time__day
       , listing_id AS listing
       , 1 AS bookings
     FROM ***************************.fct_bookings bookings_source_src_26000
@@ -27,16 +27,14 @@ FROM (
       subq_9.listing = listings_src_26000.listing_id
     ) AND (
       (
-        subq_9.metric_time__day >= listings_src_26000.active_from
+        subq_9.metric_time__second >= listings_src_26000.active_from
       ) AND (
         (
-          subq_9.metric_time__day < listings_src_26000.active_to
+          subq_9.metric_time__second < listings_src_26000.active_to
         ) OR (
           listings_src_26000.active_to IS NULL
         )
       )
     )
 ) subq_12
-WHERE listing__capacity > 2
-GROUP BY
-  metric_time__day
+WHERE (listing__capacity > 2) AND (metric_time__day > '2020-01-01')

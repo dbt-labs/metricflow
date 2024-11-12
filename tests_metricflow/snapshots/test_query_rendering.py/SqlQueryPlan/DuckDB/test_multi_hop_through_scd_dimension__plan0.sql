@@ -19,8 +19,8 @@ FROM (
       -- Join Standard Outputs
       SELECT
         subq_6.user__home_state_latest AS listing__user__home_state_latest
-        , subq_6.window_start__day AS listing__window_start__day
-        , subq_6.window_end__day AS listing__window_end__day
+        , subq_6.window_start__second AS listing__window_start__second
+        , subq_6.window_end__second AS listing__window_end__second
         , subq_1.ds__day AS ds__day
         , subq_1.ds__week AS ds__week
         , subq_1.ds__month AS ds__month
@@ -297,10 +297,10 @@ FROM (
         ) subq_0
       ) subq_1
       LEFT OUTER JOIN (
-        -- Pass Only Elements: ['user__home_state_latest', 'window_start__day', 'window_end__day', 'listing']
+        -- Pass Only Elements: ['user__home_state_latest', 'window_start__second', 'window_end__second', 'listing']
         SELECT
-          subq_5.window_start__day
-          , subq_5.window_end__day
+          subq_5.window_start__second
+          , subq_5.window_end__second
           , subq_5.listing
           , subq_5.user__home_state_latest
         FROM (
@@ -318,6 +318,9 @@ FROM (
             , subq_4.ds__extract_day AS user__ds__extract_day
             , subq_4.ds__extract_dow AS user__ds__extract_dow
             , subq_4.ds__extract_doy AS user__ds__extract_doy
+            , subq_2.window_start__second AS window_start__second
+            , subq_2.window_start__minute AS window_start__minute
+            , subq_2.window_start__hour AS window_start__hour
             , subq_2.window_start__day AS window_start__day
             , subq_2.window_start__week AS window_start__week
             , subq_2.window_start__month AS window_start__month
@@ -329,6 +332,9 @@ FROM (
             , subq_2.window_start__extract_day AS window_start__extract_day
             , subq_2.window_start__extract_dow AS window_start__extract_dow
             , subq_2.window_start__extract_doy AS window_start__extract_doy
+            , subq_2.window_end__second AS window_end__second
+            , subq_2.window_end__minute AS window_end__minute
+            , subq_2.window_end__hour AS window_end__hour
             , subq_2.window_end__day AS window_end__day
             , subq_2.window_end__week AS window_end__week
             , subq_2.window_end__month AS window_end__month
@@ -340,6 +346,9 @@ FROM (
             , subq_2.window_end__extract_day AS window_end__extract_day
             , subq_2.window_end__extract_dow AS window_end__extract_dow
             , subq_2.window_end__extract_doy AS window_end__extract_doy
+            , subq_2.listing__window_start__second AS listing__window_start__second
+            , subq_2.listing__window_start__minute AS listing__window_start__minute
+            , subq_2.listing__window_start__hour AS listing__window_start__hour
             , subq_2.listing__window_start__day AS listing__window_start__day
             , subq_2.listing__window_start__week AS listing__window_start__week
             , subq_2.listing__window_start__month AS listing__window_start__month
@@ -351,6 +360,9 @@ FROM (
             , subq_2.listing__window_start__extract_day AS listing__window_start__extract_day
             , subq_2.listing__window_start__extract_dow AS listing__window_start__extract_dow
             , subq_2.listing__window_start__extract_doy AS listing__window_start__extract_doy
+            , subq_2.listing__window_end__second AS listing__window_end__second
+            , subq_2.listing__window_end__minute AS listing__window_end__minute
+            , subq_2.listing__window_end__hour AS listing__window_end__hour
             , subq_2.listing__window_end__day AS listing__window_end__day
             , subq_2.listing__window_end__week AS listing__window_end__week
             , subq_2.listing__window_end__month AS listing__window_end__month
@@ -374,7 +386,10 @@ FROM (
           FROM (
             -- Read Elements From Semantic Model 'listings'
             SELECT
-              listings_src_26000.active_from AS window_start__day
+              listings_src_26000.active_from AS window_start__second
+              , DATE_TRUNC('minute', listings_src_26000.active_from) AS window_start__minute
+              , DATE_TRUNC('hour', listings_src_26000.active_from) AS window_start__hour
+              , DATE_TRUNC('day', listings_src_26000.active_from) AS window_start__day
               , DATE_TRUNC('week', listings_src_26000.active_from) AS window_start__week
               , DATE_TRUNC('month', listings_src_26000.active_from) AS window_start__month
               , DATE_TRUNC('quarter', listings_src_26000.active_from) AS window_start__quarter
@@ -385,7 +400,10 @@ FROM (
               , EXTRACT(day FROM listings_src_26000.active_from) AS window_start__extract_day
               , EXTRACT(isodow FROM listings_src_26000.active_from) AS window_start__extract_dow
               , EXTRACT(doy FROM listings_src_26000.active_from) AS window_start__extract_doy
-              , listings_src_26000.active_to AS window_end__day
+              , listings_src_26000.active_to AS window_end__second
+              , DATE_TRUNC('minute', listings_src_26000.active_to) AS window_end__minute
+              , DATE_TRUNC('hour', listings_src_26000.active_to) AS window_end__hour
+              , DATE_TRUNC('day', listings_src_26000.active_to) AS window_end__day
               , DATE_TRUNC('week', listings_src_26000.active_to) AS window_end__week
               , DATE_TRUNC('month', listings_src_26000.active_to) AS window_end__month
               , DATE_TRUNC('quarter', listings_src_26000.active_to) AS window_end__quarter
@@ -399,7 +417,10 @@ FROM (
               , listings_src_26000.country
               , listings_src_26000.is_lux
               , listings_src_26000.capacity
-              , listings_src_26000.active_from AS listing__window_start__day
+              , listings_src_26000.active_from AS listing__window_start__second
+              , DATE_TRUNC('minute', listings_src_26000.active_from) AS listing__window_start__minute
+              , DATE_TRUNC('hour', listings_src_26000.active_from) AS listing__window_start__hour
+              , DATE_TRUNC('day', listings_src_26000.active_from) AS listing__window_start__day
               , DATE_TRUNC('week', listings_src_26000.active_from) AS listing__window_start__week
               , DATE_TRUNC('month', listings_src_26000.active_from) AS listing__window_start__month
               , DATE_TRUNC('quarter', listings_src_26000.active_from) AS listing__window_start__quarter
@@ -410,7 +431,10 @@ FROM (
               , EXTRACT(day FROM listings_src_26000.active_from) AS listing__window_start__extract_day
               , EXTRACT(isodow FROM listings_src_26000.active_from) AS listing__window_start__extract_dow
               , EXTRACT(doy FROM listings_src_26000.active_from) AS listing__window_start__extract_doy
-              , listings_src_26000.active_to AS listing__window_end__day
+              , listings_src_26000.active_to AS listing__window_end__second
+              , DATE_TRUNC('minute', listings_src_26000.active_to) AS listing__window_end__minute
+              , DATE_TRUNC('hour', listings_src_26000.active_to) AS listing__window_end__hour
+              , DATE_TRUNC('day', listings_src_26000.active_to) AS listing__window_end__day
               , DATE_TRUNC('week', listings_src_26000.active_to) AS listing__window_end__week
               , DATE_TRUNC('month', listings_src_26000.active_to) AS listing__window_end__month
               , DATE_TRUNC('quarter', listings_src_26000.active_to) AS listing__window_end__quarter
@@ -523,12 +547,12 @@ FROM (
           subq_1.listing = subq_6.listing
         ) AND (
           (
-            subq_1.metric_time__day >= subq_6.window_start__day
+            subq_1.metric_time__day >= subq_6.window_start__second
           ) AND (
             (
-              subq_1.metric_time__day < subq_6.window_end__day
+              subq_1.metric_time__day < subq_6.window_end__second
             ) OR (
-              subq_6.window_end__day IS NULL
+              subq_6.window_end__second IS NULL
             )
           )
         )

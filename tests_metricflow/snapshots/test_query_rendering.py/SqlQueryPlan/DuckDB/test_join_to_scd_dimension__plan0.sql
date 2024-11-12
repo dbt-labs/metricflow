@@ -1,21 +1,21 @@
 -- Compute Metrics via Expressions
 SELECT
-  subq_7.metric_time__day
-  , subq_7.bookings AS family_bookings
+  subq_7.bookings AS family_bookings
 FROM (
   -- Aggregate Measures
   SELECT
-    subq_6.metric_time__day
-    , SUM(subq_6.bookings) AS bookings
+    SUM(subq_6.bookings) AS bookings
   FROM (
-    -- Pass Only Elements: ['bookings', 'metric_time__day']
+    -- Pass Only Elements: ['bookings',]
     SELECT
-      subq_5.metric_time__day
-      , subq_5.bookings
+      subq_5.bookings
     FROM (
       -- Constrain Output with WHERE
       SELECT
-        subq_4.ds__day
+        subq_4.ds__second
+        , subq_4.ds__minute
+        , subq_4.ds__hour
+        , subq_4.ds__day
         , subq_4.ds__week
         , subq_4.ds__month
         , subq_4.ds__quarter
@@ -48,6 +48,9 @@ FROM (
         , subq_4.paid_at__extract_day
         , subq_4.paid_at__extract_dow
         , subq_4.paid_at__extract_doy
+        , subq_4.booking__ds__second
+        , subq_4.booking__ds__minute
+        , subq_4.booking__ds__hour
         , subq_4.booking__ds__day
         , subq_4.booking__ds__week
         , subq_4.booking__ds__month
@@ -81,6 +84,9 @@ FROM (
         , subq_4.booking__paid_at__extract_day
         , subq_4.booking__paid_at__extract_dow
         , subq_4.booking__paid_at__extract_doy
+        , subq_4.metric_time__second
+        , subq_4.metric_time__minute
+        , subq_4.metric_time__hour
         , subq_4.metric_time__day
         , subq_4.metric_time__week
         , subq_4.metric_time__month
@@ -92,8 +98,8 @@ FROM (
         , subq_4.metric_time__extract_day
         , subq_4.metric_time__extract_dow
         , subq_4.metric_time__extract_doy
-        , subq_4.listing__window_start__day
-        , subq_4.listing__window_end__day
+        , subq_4.listing__window_start__second
+        , subq_4.listing__window_end__second
         , subq_4.listing
         , subq_4.guest
         , subq_4.host
@@ -114,8 +120,11 @@ FROM (
         -- Join Standard Outputs
         SELECT
           subq_3.capacity AS listing__capacity
-          , subq_3.window_start__day AS listing__window_start__day
-          , subq_3.window_end__day AS listing__window_end__day
+          , subq_3.window_start__second AS listing__window_start__second
+          , subq_3.window_end__second AS listing__window_end__second
+          , subq_1.ds__second AS ds__second
+          , subq_1.ds__minute AS ds__minute
+          , subq_1.ds__hour AS ds__hour
           , subq_1.ds__day AS ds__day
           , subq_1.ds__week AS ds__week
           , subq_1.ds__month AS ds__month
@@ -149,6 +158,9 @@ FROM (
           , subq_1.paid_at__extract_day AS paid_at__extract_day
           , subq_1.paid_at__extract_dow AS paid_at__extract_dow
           , subq_1.paid_at__extract_doy AS paid_at__extract_doy
+          , subq_1.booking__ds__second AS booking__ds__second
+          , subq_1.booking__ds__minute AS booking__ds__minute
+          , subq_1.booking__ds__hour AS booking__ds__hour
           , subq_1.booking__ds__day AS booking__ds__day
           , subq_1.booking__ds__week AS booking__ds__week
           , subq_1.booking__ds__month AS booking__ds__month
@@ -182,6 +194,9 @@ FROM (
           , subq_1.booking__paid_at__extract_day AS booking__paid_at__extract_day
           , subq_1.booking__paid_at__extract_dow AS booking__paid_at__extract_dow
           , subq_1.booking__paid_at__extract_doy AS booking__paid_at__extract_doy
+          , subq_1.metric_time__second AS metric_time__second
+          , subq_1.metric_time__minute AS metric_time__minute
+          , subq_1.metric_time__hour AS metric_time__hour
           , subq_1.metric_time__day AS metric_time__day
           , subq_1.metric_time__week AS metric_time__week
           , subq_1.metric_time__month AS metric_time__month
@@ -211,7 +226,10 @@ FROM (
         FROM (
           -- Metric Time Dimension 'ds'
           SELECT
-            subq_0.ds__day
+            subq_0.ds__second
+            , subq_0.ds__minute
+            , subq_0.ds__hour
+            , subq_0.ds__day
             , subq_0.ds__week
             , subq_0.ds__month
             , subq_0.ds__quarter
@@ -244,6 +262,9 @@ FROM (
             , subq_0.paid_at__extract_day
             , subq_0.paid_at__extract_dow
             , subq_0.paid_at__extract_doy
+            , subq_0.booking__ds__second
+            , subq_0.booking__ds__minute
+            , subq_0.booking__ds__hour
             , subq_0.booking__ds__day
             , subq_0.booking__ds__week
             , subq_0.booking__ds__month
@@ -277,6 +298,9 @@ FROM (
             , subq_0.booking__paid_at__extract_day
             , subq_0.booking__paid_at__extract_dow
             , subq_0.booking__paid_at__extract_doy
+            , subq_0.ds__second AS metric_time__second
+            , subq_0.ds__minute AS metric_time__minute
+            , subq_0.ds__hour AS metric_time__hour
             , subq_0.ds__day AS metric_time__day
             , subq_0.ds__week AS metric_time__week
             , subq_0.ds__month AS metric_time__month
@@ -313,6 +337,9 @@ FROM (
               , bookings_source_src_26000.booking_value AS average_booking_value
               , bookings_source_src_26000.booking_value AS booking_payments
               , bookings_source_src_26000.is_instant
+              , DATE_TRUNC('second', bookings_source_src_26000.ds) AS ds__second
+              , DATE_TRUNC('minute', bookings_source_src_26000.ds) AS ds__minute
+              , DATE_TRUNC('hour', bookings_source_src_26000.ds) AS ds__hour
               , DATE_TRUNC('day', bookings_source_src_26000.ds) AS ds__day
               , DATE_TRUNC('week', bookings_source_src_26000.ds) AS ds__week
               , DATE_TRUNC('month', bookings_source_src_26000.ds) AS ds__month
@@ -347,6 +374,9 @@ FROM (
               , EXTRACT(isodow FROM bookings_source_src_26000.paid_at) AS paid_at__extract_dow
               , EXTRACT(doy FROM bookings_source_src_26000.paid_at) AS paid_at__extract_doy
               , bookings_source_src_26000.is_instant AS booking__is_instant
+              , DATE_TRUNC('second', bookings_source_src_26000.ds) AS booking__ds__second
+              , DATE_TRUNC('minute', bookings_source_src_26000.ds) AS booking__ds__minute
+              , DATE_TRUNC('hour', bookings_source_src_26000.ds) AS booking__ds__hour
               , DATE_TRUNC('day', bookings_source_src_26000.ds) AS booking__ds__day
               , DATE_TRUNC('week', bookings_source_src_26000.ds) AS booking__ds__week
               , DATE_TRUNC('month', bookings_source_src_26000.ds) AS booking__ds__month
@@ -392,16 +422,19 @@ FROM (
           ) subq_0
         ) subq_1
         LEFT OUTER JOIN (
-          -- Pass Only Elements: ['capacity', 'window_start__day', 'window_end__day', 'listing']
+          -- Pass Only Elements: ['capacity', 'window_start__second', 'window_end__second', 'listing']
           SELECT
-            subq_2.window_start__day
-            , subq_2.window_end__day
+            subq_2.window_start__second
+            , subq_2.window_end__second
             , subq_2.listing
             , subq_2.capacity
           FROM (
             -- Read Elements From Semantic Model 'listings'
             SELECT
-              listings_src_26000.active_from AS window_start__day
+              listings_src_26000.active_from AS window_start__second
+              , DATE_TRUNC('minute', listings_src_26000.active_from) AS window_start__minute
+              , DATE_TRUNC('hour', listings_src_26000.active_from) AS window_start__hour
+              , DATE_TRUNC('day', listings_src_26000.active_from) AS window_start__day
               , DATE_TRUNC('week', listings_src_26000.active_from) AS window_start__week
               , DATE_TRUNC('month', listings_src_26000.active_from) AS window_start__month
               , DATE_TRUNC('quarter', listings_src_26000.active_from) AS window_start__quarter
@@ -412,7 +445,10 @@ FROM (
               , EXTRACT(day FROM listings_src_26000.active_from) AS window_start__extract_day
               , EXTRACT(isodow FROM listings_src_26000.active_from) AS window_start__extract_dow
               , EXTRACT(doy FROM listings_src_26000.active_from) AS window_start__extract_doy
-              , listings_src_26000.active_to AS window_end__day
+              , listings_src_26000.active_to AS window_end__second
+              , DATE_TRUNC('minute', listings_src_26000.active_to) AS window_end__minute
+              , DATE_TRUNC('hour', listings_src_26000.active_to) AS window_end__hour
+              , DATE_TRUNC('day', listings_src_26000.active_to) AS window_end__day
               , DATE_TRUNC('week', listings_src_26000.active_to) AS window_end__week
               , DATE_TRUNC('month', listings_src_26000.active_to) AS window_end__month
               , DATE_TRUNC('quarter', listings_src_26000.active_to) AS window_end__quarter
@@ -426,7 +462,10 @@ FROM (
               , listings_src_26000.country
               , listings_src_26000.is_lux
               , listings_src_26000.capacity
-              , listings_src_26000.active_from AS listing__window_start__day
+              , listings_src_26000.active_from AS listing__window_start__second
+              , DATE_TRUNC('minute', listings_src_26000.active_from) AS listing__window_start__minute
+              , DATE_TRUNC('hour', listings_src_26000.active_from) AS listing__window_start__hour
+              , DATE_TRUNC('day', listings_src_26000.active_from) AS listing__window_start__day
               , DATE_TRUNC('week', listings_src_26000.active_from) AS listing__window_start__week
               , DATE_TRUNC('month', listings_src_26000.active_from) AS listing__window_start__month
               , DATE_TRUNC('quarter', listings_src_26000.active_from) AS listing__window_start__quarter
@@ -437,7 +476,10 @@ FROM (
               , EXTRACT(day FROM listings_src_26000.active_from) AS listing__window_start__extract_day
               , EXTRACT(isodow FROM listings_src_26000.active_from) AS listing__window_start__extract_dow
               , EXTRACT(doy FROM listings_src_26000.active_from) AS listing__window_start__extract_doy
-              , listings_src_26000.active_to AS listing__window_end__day
+              , listings_src_26000.active_to AS listing__window_end__second
+              , DATE_TRUNC('minute', listings_src_26000.active_to) AS listing__window_end__minute
+              , DATE_TRUNC('hour', listings_src_26000.active_to) AS listing__window_end__hour
+              , DATE_TRUNC('day', listings_src_26000.active_to) AS listing__window_end__day
               , DATE_TRUNC('week', listings_src_26000.active_to) AS listing__window_end__week
               , DATE_TRUNC('month', listings_src_26000.active_to) AS listing__window_end__month
               , DATE_TRUNC('quarter', listings_src_26000.active_to) AS listing__window_end__quarter
@@ -462,19 +504,17 @@ FROM (
             subq_1.listing = subq_3.listing
           ) AND (
             (
-              subq_1.metric_time__day >= subq_3.window_start__day
+              subq_1.metric_time__second >= subq_3.window_start__second
             ) AND (
               (
-                subq_1.metric_time__day < subq_3.window_end__day
+                subq_1.metric_time__second < subq_3.window_end__second
               ) OR (
-                subq_3.window_end__day IS NULL
+                subq_3.window_end__second IS NULL
               )
             )
           )
       ) subq_4
-      WHERE listing__capacity > 2
+      WHERE (listing__capacity > 2) AND (metric_time__day > '2020-01-01')
     ) subq_5
   ) subq_6
-  GROUP BY
-    subq_6.metric_time__day
 ) subq_7

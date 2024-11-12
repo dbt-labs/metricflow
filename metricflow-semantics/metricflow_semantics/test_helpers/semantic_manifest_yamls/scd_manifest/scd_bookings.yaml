@@ -36,7 +36,7 @@ semantic_model:
     - name: ds
       type: time
       type_params:
-        time_granularity: day
+        time_granularity: second
     - name: ds_partitioned
       type: time
       is_partition: true

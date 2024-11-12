@@ -12,14 +12,14 @@ semantic_model:
       type: time
       expr: active_from
       type_params:
-        time_granularity: day
+        time_granularity: second
         validity_params:
           is_start: True
     - name: window_end
       type: time
       expr: active_to
       type_params:
-        time_granularity: day
+        time_granularity: second
         validity_params:
           is_end: True
     - name: country
