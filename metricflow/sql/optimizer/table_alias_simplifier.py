@@ -26,11 +26,11 @@ class SqlTableAliasSimplifierVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
 
     @override
     def visit_cte_node(self, node: SqlCteNode) -> SqlQueryPlanNode:
-        raise NotImplementedError
+        return node.with_new_select(node.select_statement.accept(self))
 
     def visit_select_statement_node(self, node: SqlSelectStatementNode) -> SqlQueryPlanNode:  # noqa: D102
         # If there is only a single parent, no table aliases are required since there's no ambiguity.
-        should_simplify_table_aliases = len(node.parent_nodes) <= 1
+        should_simplify_table_aliases = len(node.join_descs) == 0
 
         if should_simplify_table_aliases:
             return SqlSelectStatementNode.create(
@@ -41,6 +41,10 @@ class SqlTableAliasSimplifierVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
                 ),
                 from_source=node.from_source.accept(self),
                 from_source_alias=node.from_source_alias,
+                cte_sources=tuple(
+                    cte_source.with_new_select(cte_source.select_statement.accept(self))
+                    for cte_source in node.cte_sources
+                ),
                 group_bys=tuple(
                     SqlSelectColumn(expr=x.expr.rewrite(should_render_table_alias=False), column_alias=x.column_alias)
                     for x in node.group_bys
@@ -59,6 +63,9 @@ class SqlTableAliasSimplifierVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
             select_columns=node.select_columns,
             from_source=node.from_source.accept(self),
             from_source_alias=node.from_source_alias,
+            cte_sources=tuple(
+                cte_source.with_new_select(cte_source.select_statement.accept(self)) for cte_source in node.cte_sources
+            ),
             join_descs=tuple(
                 SqlJoinDescription(
                     right_source=x.right_source.accept(self),
