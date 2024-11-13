@@ -1,0 +1,41 @@
+test_name: test_table_alias_no_simplification
+test_filename: test_cte_table_alias_simplifier.py
+docstring:
+  Tests that table aliases in the SELECT statement of a CTE are not removed when required.
+---
+optimizer:
+  SqlTableAliasSimplifier
+
+sql_before_optimizing:
+  -- Top-level SELECT
+  WITH cte_source_0 AS (
+    -- CTE source 0
+    SELECT
+      from_source_alias.col_0 AS cte_source_0__col_0
+    FROM test_schema.test_table_0 from_source_alias
+    INNER JOIN
+      test_schema.test_table_1 right_source_alias
+    ON
+      from_source_alias.col_0 = right_source_alias.col_0
+  )
+
+  SELECT
+    cte_source_0_alias.cte_source_0__col_0 AS top_level__col_0
+  FROM cte_source_0 cte_source_0_alias
+
+sql_after_optimizing:
+  -- Top-level SELECT
+  WITH cte_source_0 AS (
+    -- CTE source 0
+    SELECT
+      from_source_alias.col_0 AS cte_source_0__col_0
+    FROM test_schema.test_table_0 from_source_alias
+    INNER JOIN
+      test_schema.test_table_1 right_source_alias
+    ON
+      from_source_alias.col_0 = right_source_alias.col_0
+  )
+
+  SELECT
+    cte_source_0__col_0 AS top_level__col_0
+  FROM cte_source_0 cte_source_0_alias
