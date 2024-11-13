@@ -14,7 +14,8 @@ from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilte
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.visitor import VisitorOutputT
 
-from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNodeVisitor
+from metricflow.dataflow.dataflow_plan import DataflowPlanNode
+from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
 
 
 @dataclass(frozen=True, eq=False)

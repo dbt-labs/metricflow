@@ -10,7 +10,8 @@ from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.visitor import VisitorOutputT
 
-from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNodeVisitor
+from metricflow.dataflow.dataflow_plan import DataflowPlanNode
+from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
 
 
 @dataclass(frozen=True, eq=False)

@@ -12,8 +12,8 @@ from metricflow_semantics.visitor import VisitorOutputT
 
 from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
-    DataflowPlanNodeVisitor,
 )
+from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
 from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 
 

@@ -9,7 +9,8 @@ from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.visitor import VisitorOutputT
 
-from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNodeVisitor
+from metricflow.dataflow.dataflow_plan import DataflowPlanNode
+from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
 
 
 @dataclass(frozen=True, eq=False)

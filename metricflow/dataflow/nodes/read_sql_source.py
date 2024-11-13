@@ -11,7 +11,8 @@ from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.visitor import VisitorOutputT
 from typing_extensions import override
 
-from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNodeVisitor
+from metricflow.dataflow.dataflow_plan import DataflowPlanNode
+from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
 from metricflow.dataset.sql_dataset import SqlDataSet
 
 
