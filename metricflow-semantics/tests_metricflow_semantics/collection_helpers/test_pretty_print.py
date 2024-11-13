@@ -218,3 +218,19 @@ def test_pformat_dict_with_empty_message() -> None:
         )
         == result
     )
+
+
+def test_pformat_dict_with_pad_sections_with_newline() -> None:
+    """Test `mf_pformat_dict` with new lines between sections."""
+    result = mf_pformat_dict(obj_dict={"object_0": (1, 2, 3), "object_1": {4: 5}}, pad_items_with_newlines=True)
+
+    assert (
+        mf_dedent(
+            """
+            object_0: (1, 2, 3)
+
+            object_1: {4: 5}
+            """
+        )
+        == result
+    )

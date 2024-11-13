@@ -437,15 +437,19 @@ def mf_pformat_dict(  # type: ignore
     include_none_object_fields: bool = False,
     include_empty_object_fields: bool = False,
     preserve_raw_strings: bool = False,
+    pad_items_with_newlines: bool = False,
 ) -> str:
     """Prints many objects in an indented form.
 
-    If preserve_raw_strings is set, and a value of the obj_dict is of type str, then use the value itself, not the
+    If `preserve_raw_strings` is set, and a value of the obj_dict is of type str, then use the value itself, not the
     representation of the string. e.g. if value="foo", then "foo" instead of "'foo'". Useful for values that contain
     newlines.
+
+    If `pad_items_with_newlines` is set , each key / value section is padded with newlines.
     """
-    lines: List[str] = [description] if description is not None else []
+    description_lines: List[str] = [description] if description is not None else []
     obj_dict = obj_dict or {}
+    item_sections = []
     for key, value in obj_dict.items():
         if preserve_raw_strings and isinstance(value, str):
             value_str = value
@@ -460,9 +464,9 @@ def mf_pformat_dict(  # type: ignore
             )
 
         lines_in_value_str = len(value_str.split("\n"))
-        item_block_lines: Tuple[str, ...]
+        item_section_lines: Tuple[str, ...]
         if lines_in_value_str > 1:
-            item_block_lines = (
+            item_section_lines = (
                 f"{key}:",
                 indent(
                     value_str,
@@ -470,11 +474,15 @@ def mf_pformat_dict(  # type: ignore
                 ),
             )
         else:
-            item_block_lines = (f"{key}: {value_str}",)
-        item_block = "\n".join(item_block_lines)
+            item_section_lines = (f"{key}: {value_str}",)
+        item_section = "\n".join(item_section_lines)
 
         if description is None:
-            lines.append(item_block)
+            item_sections.append(item_section)
         else:
-            lines.append(indent(item_block))
-    return "\n".join(lines)
+            item_sections.append(indent(item_section))
+
+    if pad_items_with_newlines:
+        return "\n\n".join(description_lines + item_sections)
+    else:
+        return "\n".join(description_lines + item_sections)

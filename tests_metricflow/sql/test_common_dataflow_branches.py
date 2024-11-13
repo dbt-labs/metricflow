@@ -50,5 +50,6 @@ def test_shared_metric_query(
         snapshot_str=mf_pformat_dict(
             obj_dict=obj_dict,
             preserve_raw_strings=True,
+            pad_items_with_newlines=True,
         ),
     )
