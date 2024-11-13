@@ -17,11 +17,7 @@ test_filename: test_dataflow_to_execution.py
         <!--    '  FROM ***************************.fct_bookings bookings_source_src_28000\n' -->
         <!--    ')\n'                                                                         -->
         <!--    '\n'                                                                          -->
-        <!--    'SELECT\n'                                                                    -->
-        <!--    '  COALESCE(subq_4.is_instant, subq_8.is_instant) AS is_instant\n'            -->
-        <!--    '  , MAX(subq_4.bookings) AS bookings\n'                                      -->
-        <!--    '  , MAX(subq_8.booking_value) AS booking_value\n'                            -->
-        <!--    'FROM (\n'                                                                    -->
+        <!--    ', cm_0_cte AS (\n'                                                           -->
         <!--    '  -- Read From CTE For node_id=sma_28009\n'                                  -->
         <!--    "  -- Pass Only Elements: ['bookings', 'is_instant']\n"                       -->
         <!--    '  -- Aggregate Measures\n'                                                   -->
@@ -32,8 +28,9 @@ test_filename: test_dataflow_to_execution.py
         <!--    '  FROM sma_28009_cte sma_28009_cte\n'                                        -->
         <!--    '  GROUP BY\n'                                                                -->
         <!--    '    is_instant\n'                                                            -->
-        <!--    ') subq_4\n'                                                                  -->
-        <!--    'FULL OUTER JOIN (\n'                                                         -->
+        <!--    ')\n'                                                                         -->
+        <!--    '\n'                                                                          -->
+        <!--    ', cm_1_cte AS (\n'                                                           -->
         <!--    '  -- Read From CTE For node_id=sma_28009\n'                                  -->
         <!--    "  -- Pass Only Elements: ['booking_value', 'is_instant']\n"                  -->
         <!--    '  -- Aggregate Measures\n'                                                   -->
@@ -44,10 +41,18 @@ test_filename: test_dataflow_to_execution.py
         <!--    '  FROM sma_28009_cte sma_28009_cte\n'                                        -->
         <!--    '  GROUP BY\n'                                                                -->
         <!--    '    is_instant\n'                                                            -->
-        <!--    ') subq_8\n'                                                                  -->
+        <!--    ')\n'                                                                         -->
+        <!--    '\n'                                                                          -->
+        <!--    'SELECT\n'                                                                    -->
+        <!--    '  COALESCE(cm_0_cte.is_instant, cm_1_cte.is_instant) AS is_instant\n'        -->
+        <!--    '  , MAX(cm_0_cte.bookings) AS bookings\n'                                    -->
+        <!--    '  , MAX(cm_1_cte.booking_value) AS booking_value\n'                          -->
+        <!--    'FROM cm_0_cte cm_0_cte\n'                                                    -->
+        <!--    'FULL OUTER JOIN\n'                                                           -->
+        <!--    '  cm_1_cte cm_1_cte\n'                                                       -->
         <!--    'ON\n'                                                                        -->
-        <!--    '  subq_4.is_instant = subq_8.is_instant\n'                                   -->
+        <!--    '  cm_0_cte.is_instant = cm_1_cte.is_instant\n'                               -->
         <!--    'GROUP BY\n'                                                                  -->
-        <!--    '  COALESCE(subq_4.is_instant, subq_8.is_instant)')                           -->
+        <!--    '  COALESCE(cm_0_cte.is_instant, cm_1_cte.is_instant)')                       -->
     </SelectSqlQueryToDataTableTask>
 </ExecutionPlan>
