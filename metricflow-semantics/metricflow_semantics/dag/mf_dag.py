@@ -32,7 +32,7 @@ class DisplayedProperty:  # type: ignore
     value: Any  # type: ignore
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, order=True)
 class NodeId:
     """Unique identifier for nodes in DAGs."""
 

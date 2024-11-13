@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC
 from typing import TypeVar
 
-VisitorOutputT = TypeVar("VisitorOutputT")
+VisitorOutputT = TypeVar("VisitorOutputT", covariant=True)
 
 
 class Visitable(ABC):

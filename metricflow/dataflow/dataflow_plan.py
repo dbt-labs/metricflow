@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import functools
 import logging
 import typing
 from abc import ABC, abstractmethod
@@ -23,7 +24,11 @@ logger = logging.getLogger(__name__)
 
 NodeSelfT = TypeVar("NodeSelfT", bound="DataflowPlanNode")
 
+# Make it so that we only have to suppress errors here instead of both at the method and the class.
+ComparisonAnyType = typing.Any  # type: ignore[misc]
 
+
+@functools.total_ordering
 @dataclass(frozen=True, eq=False)
 class DataflowPlanNode(DagNode["DataflowPlanNode"], Visitable, ABC):
     """A node in the graph representation of the dataflow.
@@ -80,6 +85,12 @@ class DataflowPlanNode(DagNode["DataflowPlanNode"], Visitable, ABC):
     def aggregated_to_elements(self) -> Set[LinkableInstanceSpec]:
         """Indicates that the node has been aggregated to these specs, guaranteeing uniqueness in all combinations."""
         return set()
+
+    def __lt__(self, other: ComparisonAnyType) -> bool:  # noqa: D105
+        if not isinstance(other, DataflowPlanNode):
+            raise NotImplementedError
+
+        return self.node_id < other.node_id
 
 
 class DataflowPlan(MetricFlowDag[DataflowPlanNode]):
