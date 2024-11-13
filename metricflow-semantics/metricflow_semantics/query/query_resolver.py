@@ -8,7 +8,7 @@ from typing import List, Optional, Sequence, Set, Tuple
 from dbt_semantic_interfaces.references import MeasureReference, MetricReference, SemanticModelReference
 
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.mf_logging.pretty_print import mf_pformat, mf_pformat_many
+from metricflow_semantics.mf_logging.pretty_print import mf_pformat, mf_pformat_dict
 from metricflow_semantics.mf_logging.runtime import log_runtime
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
@@ -557,7 +557,7 @@ class MetricFlowQueryResolver:
         if len(models_not_in_manifest) > 0:
             logger.error(
                 LazyFormat(
-                    lambda: mf_pformat_many(
+                    lambda: mf_pformat_dict(
                         "Semantic references that aren't in the manifest were found in the set used in "
                         "a query. This is a bug, and to avoid potential issues, they will be filtered out.",
                         {"models_not_in_manifest": models_not_in_manifest},

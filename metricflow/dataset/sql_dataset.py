@@ -5,6 +5,7 @@ from typing import List, Optional, Sequence
 from dbt_semantic_interfaces.references import SemanticModelReference
 from metricflow_semantics.assert_one_arg import assert_exactly_one_arg_set
 from metricflow_semantics.instances import EntityInstance, InstanceSet
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.specs.column_assoc import ColumnAssociation
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
@@ -42,7 +43,9 @@ class SqlDataSet(DataSet):
     def sql_node(self) -> SqlQueryPlanNode:  # noqa: D102
         node_to_return = self._sql_select_node or self._sql_node
         if node_to_return is None:
-            raise RuntimeError("This node was not created with a SQL node.")
+            raise RuntimeError(
+                "This node was not created with a SQL node. This should have been prevented by the initializer."
+            )
         return node_to_return
 
     @property
@@ -52,7 +55,14 @@ class SqlDataSet(DataSet):
         Otherwise, an exception is thrown.
         """
         if self._sql_select_node is None:
-            raise RuntimeError(f"{self} was created with a SQL node that is not a {SqlSelectStatementNode}")
+            raise RuntimeError(
+                str(
+                    LazyFormat(
+                        f"{self.__class__.__name__} was created with a SQL node that is not a {SqlSelectStatementNode.__name__}",
+                        sql_node=self.sql_node.structure_text(),
+                    )
+                )
+            )
         return self._sql_select_node
 
     def column_associations_for_entity(

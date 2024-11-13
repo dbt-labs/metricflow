@@ -56,6 +56,7 @@ def assert_snapshot_text_equal(
     expectation_description: Optional[str] = None,
 ) -> None:
     """Similar to assert_plan_snapshot_text_equal(), but with more controls on how the snapshot paths are generated."""
+    logger.debug(LazyFormat(lambda: "Generated snapshot text:\n" + indent(snapshot_text)))
     file_path = (
         str(
             snapshot_path_prefix(
