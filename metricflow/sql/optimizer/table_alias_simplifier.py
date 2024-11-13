@@ -29,7 +29,7 @@ class SqlTableAliasSimplifierVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
         return node.with_new_select(node.select_statement.accept(self))
 
     def visit_select_statement_node(self, node: SqlSelectStatementNode) -> SqlQueryPlanNode:  # noqa: D102
-        # If there is only a single parent, no table aliases are required since there's no ambiguity.
+        # If there is only a single source in the SELECT, no table aliases are required since there's no ambiguity.
         should_simplify_table_aliases = len(node.join_descs) == 0
 
         if should_simplify_table_aliases:

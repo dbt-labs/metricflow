@@ -34,7 +34,7 @@ def test_table_alias_simplification(
     mf_test_configuration: MetricFlowTestConfiguration,
     sql_plan_renderer: DefaultSqlQueryPlanRenderer,
 ) -> None:
-    """Tests that table aliases are removed when not needed in CTEs."""
+    """Tests that table aliases in the SELECT statement of a CTE are removed when not needed."""
     select_statement = SqlSelectStatementNode.create(
         description="Top-level SELECT",
         select_columns=(
@@ -67,20 +67,6 @@ def test_table_alias_simplification(
                     ),
                 ),
                 join_type=SqlJoinType.INNER,
-            ),
-        ),
-        group_bys=(
-            SqlSelectColumn(
-                expr=SqlColumnReferenceExpression.create(
-                    col_ref=SqlColumnReference(table_alias="cte_source_0_alias", column_name="cte_source_0__col_0")
-                ),
-                column_alias="top_level__col_0",
-            ),
-            SqlSelectColumn(
-                expr=SqlColumnReferenceExpression.create(
-                    col_ref=SqlColumnReference(table_alias="right_source_alias", column_name="right_source__col_1")
-                ),
-                column_alias="top_level__col_1",
             ),
         ),
         cte_sources=(
@@ -170,6 +156,72 @@ def test_table_alias_simplification(
                         from_source_alias="cte_source_0_alias",
                     ),
                     from_source_alias="cte_source_1_subquery",
+                ),
+            ),
+        ),
+    )
+    assert_optimizer_result_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        optimizer=SqlTableAliasSimplifier(),
+        sql_plan_renderer=sql_plan_renderer,
+        select_statement=select_statement,
+    )
+
+
+def test_table_alias_no_simplification(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_plan_renderer: DefaultSqlQueryPlanRenderer,
+) -> None:
+    """Tests that table aliases in the SELECT statement of a CTE are not removed when required."""
+    select_statement = SqlSelectStatementNode.create(
+        description="Top-level SELECT",
+        select_columns=(
+            SqlSelectColumn(
+                expr=SqlColumnReferenceExpression.create(
+                    col_ref=SqlColumnReference(table_alias="cte_source_0_alias", column_name="cte_source_0__col_0")
+                ),
+                column_alias="top_level__col_0",
+            ),
+        ),
+        from_source=SqlTableNode.create(sql_table=SqlTable(schema_name=None, table_name="cte_source_0")),
+        from_source_alias="cte_source_0_alias",
+        cte_sources=(
+            SqlCteNode.create(
+                cte_alias="cte_source_0",
+                select_statement=SqlSelectStatementNode.create(
+                    description="CTE source 0",
+                    select_columns=(
+                        SqlSelectColumn(
+                            expr=SqlColumnReferenceExpression.create(
+                                col_ref=SqlColumnReference(table_alias="from_source_alias", column_name="col_0")
+                            ),
+                            column_alias="cte_source_0__col_0",
+                        ),
+                    ),
+                    from_source=SqlTableNode.create(
+                        sql_table=SqlTable(schema_name="test_schema", table_name="test_table_0")
+                    ),
+                    from_source_alias="from_source_alias",
+                    join_descs=(
+                        SqlJoinDescription(
+                            right_source=SqlTableNode.create(
+                                sql_table=SqlTable(schema_name="test_schema", table_name="test_table_1")
+                            ),
+                            right_source_alias="right_source_alias",
+                            on_condition=SqlComparisonExpression.create(
+                                left_expr=SqlColumnReferenceExpression.create(
+                                    col_ref=SqlColumnReference(table_alias="from_source_alias", column_name="col_0")
+                                ),
+                                comparison=SqlComparison.EQUALS,
+                                right_expr=SqlColumnReferenceExpression.create(
+                                    col_ref=SqlColumnReference(table_alias="right_source_alias", column_name="col_0")
+                                ),
+                            ),
+                            join_type=SqlJoinType.INNER,
+                        ),
+                    ),
                 ),
             ),
         ),
