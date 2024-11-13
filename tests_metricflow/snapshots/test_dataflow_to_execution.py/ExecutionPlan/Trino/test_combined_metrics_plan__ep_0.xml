@@ -5,82 +5,90 @@ test_filename: test_dataflow_to_execution.py
     <SelectSqlQueryToDataTableTask>
         <!-- description = 'Run a query and write the results to a data frame' -->
         <!-- node_id = NodeId(id_str='rsq_0') -->
-        <!-- sql_query =                                                                                 -->
-        <!--   ('-- Combine Aggregated Outputs\n'                                                        -->
-        <!--    'WITH sma_28009_cte AS (\n'                                                              -->
-        <!--    "  -- Read Elements From Semantic Model 'bookings_source'\n"                             -->
-        <!--    "  -- Metric Time Dimension 'ds'\n"                                                      -->
-        <!--    '  SELECT\n'                                                                             -->
-        <!--    "    DATE_TRUNC('day', ds) AS ds__day\n"                                                 -->
-        <!--    '    , is_instant\n'                                                                     -->
-        <!--    '    , 1 AS bookings\n'                                                                  -->
-        <!--    '    , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings\n'                     -->
-        <!--    '    , booking_value\n'                                                                  -->
-        <!--    '  FROM ***************************.fct_bookings bookings_source_src_28000\n'            -->
-        <!--    ')\n'                                                                                    -->
-        <!--    '\n'                                                                                     -->
-        <!--    'SELECT\n'                                                                               -->
-        <!--    '  COALESCE(subq_4.ds__day, subq_8.ds__day, subq_12.ds__day) AS ds__day\n'               -->
-        <!--    '  , COALESCE(subq_4.is_instant, subq_8.is_instant, subq_12.is_instant) AS is_instant\n' -->
-        <!--    '  , MAX(subq_4.bookings) AS bookings\n'                                                 -->
-        <!--    '  , MAX(subq_8.instant_bookings) AS instant_bookings\n'                                 -->
-        <!--    '  , MAX(subq_12.booking_value) AS booking_value\n'                                      -->
-        <!--    'FROM (\n'                                                                               -->
-        <!--    '  -- Read From CTE For node_id=sma_28009\n'                                             -->
-        <!--    "  -- Pass Only Elements: ['bookings', 'is_instant', 'ds__day']\n"                       -->
-        <!--    '  -- Aggregate Measures\n'                                                              -->
-        <!--    '  -- Compute Metrics via Expressions\n'                                                 -->
-        <!--    '  SELECT\n'                                                                             -->
-        <!--    '    ds__day\n'                                                                          -->
-        <!--    '    , is_instant\n'                                                                     -->
-        <!--    '    , SUM(bookings) AS bookings\n'                                                      -->
-        <!--    '  FROM sma_28009_cte sma_28009_cte\n'                                                   -->
-        <!--    '  GROUP BY\n'                                                                           -->
-        <!--    '    ds__day\n'                                                                          -->
-        <!--    '    , is_instant\n'                                                                     -->
-        <!--    ') subq_4\n'                                                                             -->
-        <!--    'FULL OUTER JOIN (\n'                                                                    -->
-        <!--    '  -- Read From CTE For node_id=sma_28009\n'                                             -->
-        <!--    "  -- Pass Only Elements: ['instant_bookings', 'is_instant', 'ds__day']\n"               -->
-        <!--    '  -- Aggregate Measures\n'                                                              -->
-        <!--    '  -- Compute Metrics via Expressions\n'                                                 -->
-        <!--    '  SELECT\n'                                                                             -->
-        <!--    '    ds__day\n'                                                                          -->
-        <!--    '    , is_instant\n'                                                                     -->
-        <!--    '    , SUM(instant_bookings) AS instant_bookings\n'                                      -->
-        <!--    '  FROM sma_28009_cte sma_28009_cte\n'                                                   -->
-        <!--    '  GROUP BY\n'                                                                           -->
-        <!--    '    ds__day\n'                                                                          -->
-        <!--    '    , is_instant\n'                                                                     -->
-        <!--    ') subq_8\n'                                                                             -->
-        <!--    'ON\n'                                                                                   -->
-        <!--    '  (\n'                                                                                  -->
-        <!--    '    subq_4.is_instant = subq_8.is_instant\n'                                            -->
-        <!--    '  ) AND (\n'                                                                            -->
-        <!--    '    subq_4.ds__day = subq_8.ds__day\n'                                                  -->
-        <!--    '  )\n'                                                                                  -->
-        <!--    'FULL OUTER JOIN (\n'                                                                    -->
-        <!--    '  -- Read From CTE For node_id=sma_28009\n'                                             -->
-        <!--    "  -- Pass Only Elements: ['booking_value', 'is_instant', 'ds__day']\n"                  -->
-        <!--    '  -- Aggregate Measures\n'                                                              -->
-        <!--    '  -- Compute Metrics via Expressions\n'                                                 -->
-        <!--    '  SELECT\n'                                                                             -->
-        <!--    '    ds__day\n'                                                                          -->
-        <!--    '    , is_instant\n'                                                                     -->
-        <!--    '    , SUM(booking_value) AS booking_value\n'                                            -->
-        <!--    '  FROM sma_28009_cte sma_28009_cte\n'                                                   -->
-        <!--    '  GROUP BY\n'                                                                           -->
-        <!--    '    ds__day\n'                                                                          -->
-        <!--    '    , is_instant\n'                                                                     -->
-        <!--    ') subq_12\n'                                                                            -->
-        <!--    'ON\n'                                                                                   -->
-        <!--    '  (\n'                                                                                  -->
-        <!--    '    COALESCE(subq_4.is_instant, subq_8.is_instant) = subq_12.is_instant\n'              -->
-        <!--    '  ) AND (\n'                                                                            -->
-        <!--    '    COALESCE(subq_4.ds__day, subq_8.ds__day) = subq_12.ds__day\n'                       -->
-        <!--    '  )\n'                                                                                  -->
-        <!--    'GROUP BY\n'                                                                             -->
-        <!--    '  COALESCE(subq_4.ds__day, subq_8.ds__day, subq_12.ds__day)\n'                          -->
-        <!--    '  , COALESCE(subq_4.is_instant, subq_8.is_instant, subq_12.is_instant)')                -->
+        <!-- sql_query =                                                                                      -->
+        <!--   ('-- Combine Aggregated Outputs\n'                                                             -->
+        <!--    'WITH sma_28009_cte AS (\n'                                                                   -->
+        <!--    "  -- Read Elements From Semantic Model 'bookings_source'\n"                                  -->
+        <!--    "  -- Metric Time Dimension 'ds'\n"                                                           -->
+        <!--    '  SELECT\n'                                                                                  -->
+        <!--    "    DATE_TRUNC('day', ds) AS ds__day\n"                                                      -->
+        <!--    '    , is_instant\n'                                                                          -->
+        <!--    '    , 1 AS bookings\n'                                                                       -->
+        <!--    '    , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings\n'                          -->
+        <!--    '    , booking_value\n'                                                                       -->
+        <!--    '  FROM ***************************.fct_bookings bookings_source_src_28000\n'                 -->
+        <!--    ')\n'                                                                                         -->
+        <!--    '\n'                                                                                          -->
+        <!--    ', cm_0_cte AS (\n'                                                                           -->
+        <!--    '  -- Read From CTE For node_id=sma_28009\n'                                                  -->
+        <!--    "  -- Pass Only Elements: ['bookings', 'is_instant', 'ds__day']\n"                            -->
+        <!--    '  -- Aggregate Measures\n'                                                                   -->
+        <!--    '  -- Compute Metrics via Expressions\n'                                                      -->
+        <!--    '  SELECT\n'                                                                                  -->
+        <!--    '    ds__day\n'                                                                               -->
+        <!--    '    , is_instant\n'                                                                          -->
+        <!--    '    , SUM(bookings) AS bookings\n'                                                           -->
+        <!--    '  FROM sma_28009_cte sma_28009_cte\n'                                                        -->
+        <!--    '  GROUP BY\n'                                                                                -->
+        <!--    '    ds__day\n'                                                                               -->
+        <!--    '    , is_instant\n'                                                                          -->
+        <!--    ')\n'                                                                                         -->
+        <!--    '\n'                                                                                          -->
+        <!--    ', cm_1_cte AS (\n'                                                                           -->
+        <!--    '  -- Read From CTE For node_id=sma_28009\n'                                                  -->
+        <!--    "  -- Pass Only Elements: ['instant_bookings', 'is_instant', 'ds__day']\n"                    -->
+        <!--    '  -- Aggregate Measures\n'                                                                   -->
+        <!--    '  -- Compute Metrics via Expressions\n'                                                      -->
+        <!--    '  SELECT\n'                                                                                  -->
+        <!--    '    ds__day\n'                                                                               -->
+        <!--    '    , is_instant\n'                                                                          -->
+        <!--    '    , SUM(instant_bookings) AS instant_bookings\n'                                           -->
+        <!--    '  FROM sma_28009_cte sma_28009_cte\n'                                                        -->
+        <!--    '  GROUP BY\n'                                                                                -->
+        <!--    '    ds__day\n'                                                                               -->
+        <!--    '    , is_instant\n'                                                                          -->
+        <!--    ')\n'                                                                                         -->
+        <!--    '\n'                                                                                          -->
+        <!--    ', cm_2_cte AS (\n'                                                                           -->
+        <!--    '  -- Read From CTE For node_id=sma_28009\n'                                                  -->
+        <!--    "  -- Pass Only Elements: ['booking_value', 'is_instant', 'ds__day']\n"                       -->
+        <!--    '  -- Aggregate Measures\n'                                                                   -->
+        <!--    '  -- Compute Metrics via Expressions\n'                                                      -->
+        <!--    '  SELECT\n'                                                                                  -->
+        <!--    '    ds__day\n'                                                                               -->
+        <!--    '    , is_instant\n'                                                                          -->
+        <!--    '    , SUM(booking_value) AS booking_value\n'                                                 -->
+        <!--    '  FROM sma_28009_cte sma_28009_cte\n'                                                        -->
+        <!--    '  GROUP BY\n'                                                                                -->
+        <!--    '    ds__day\n'                                                                               -->
+        <!--    '    , is_instant\n'                                                                          -->
+        <!--    ')\n'                                                                                         -->
+        <!--    '\n'                                                                                          -->
+        <!--    'SELECT\n'                                                                                    -->
+        <!--    '  COALESCE(cm_0_cte.ds__day, cm_1_cte.ds__day, cm_2_cte.ds__day) AS ds__day\n'               -->
+        <!--    '  , COALESCE(cm_0_cte.is_instant, cm_1_cte.is_instant, cm_2_cte.is_instant) AS is_instant\n' -->
+        <!--    '  , MAX(cm_0_cte.bookings) AS bookings\n'                                                    -->
+        <!--    '  , MAX(cm_1_cte.instant_bookings) AS instant_bookings\n'                                    -->
+        <!--    '  , MAX(cm_2_cte.booking_value) AS booking_value\n'                                          -->
+        <!--    'FROM cm_0_cte cm_0_cte\n'                                                                    -->
+        <!--    'FULL OUTER JOIN\n'                                                                           -->
+        <!--    '  cm_1_cte cm_1_cte\n'                                                                       -->
+        <!--    'ON\n'                                                                                        -->
+        <!--    '  (\n'                                                                                       -->
+        <!--    '    cm_0_cte.is_instant = cm_1_cte.is_instant\n'                                             -->
+        <!--    '  ) AND (\n'                                                                                 -->
+        <!--    '    cm_0_cte.ds__day = cm_1_cte.ds__day\n'                                                   -->
+        <!--    '  )\n'                                                                                       -->
+        <!--    'FULL OUTER JOIN\n'                                                                           -->
+        <!--    '  cm_2_cte cm_2_cte\n'                                                                       -->
+        <!--    'ON\n'                                                                                        -->
+        <!--    '  (\n'                                                                                       -->
+        <!--    '    COALESCE(cm_0_cte.is_instant, cm_1_cte.is_instant) = cm_2_cte.is_instant\n'              -->
+        <!--    '  ) AND (\n'                                                                                 -->
+        <!--    '    COALESCE(cm_0_cte.ds__day, cm_1_cte.ds__day) = cm_2_cte.ds__day\n'                       -->
+        <!--    '  )\n'                                                                                       -->
+        <!--    'GROUP BY\n'                                                                                  -->
+        <!--    '  COALESCE(cm_0_cte.ds__day, cm_1_cte.ds__day, cm_2_cte.ds__day)\n'                          -->
+        <!--    '  , COALESCE(cm_0_cte.is_instant, cm_1_cte.is_instant, cm_2_cte.is_instant)')                -->
     </SelectSqlQueryToDataTableTask>
 </ExecutionPlan>

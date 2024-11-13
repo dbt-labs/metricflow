@@ -2,11 +2,8 @@ test_name: test_cumulative_time_offset_metric_with_time_constraint
 test_filename: test_derived_metric_rendering.py
 sql_engine: Databricks
 ---
--- Compute Metrics via Expressions
-SELECT
-  metric_time__day
-  , every_2_days_bookers_2_days_ago AS every_2_days_bookers_2_days_ago
-FROM (
+-- Read From CTE For node_id=cm_5
+WITH cm_4_cte AS (
   -- Join to Time Spine Dataset
   -- Constrain Time Range to [2019-12-19T00:00:00, 2020-01-02T00:00:00]
   -- Pass Only Elements: ['bookers', 'metric_time__day']
@@ -42,4 +39,23 @@ FROM (
   WHERE subq_17.metric_time__day BETWEEN '2019-12-19' AND '2020-01-02'
   GROUP BY
     subq_17.metric_time__day
-) subq_23
+)
+
+, cm_5_cte AS (
+  -- Compute Metrics via Expressions
+  SELECT
+    metric_time__day
+    , every_2_days_bookers_2_days_ago AS every_2_days_bookers_2_days_ago
+  FROM (
+    -- Read From CTE For node_id=cm_4
+    SELECT
+      metric_time__day
+      , every_2_days_bookers_2_days_ago
+    FROM cm_4_cte cm_4_cte
+  ) subq_23
+)
+
+SELECT
+  metric_time__day AS metric_time__day
+  , every_2_days_bookers_2_days_ago AS every_2_days_bookers_2_days_ago
+FROM cm_5_cte cm_5_cte

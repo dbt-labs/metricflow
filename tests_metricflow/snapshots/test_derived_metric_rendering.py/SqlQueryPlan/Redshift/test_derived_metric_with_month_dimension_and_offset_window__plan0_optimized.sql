@@ -2,11 +2,8 @@ test_name: test_derived_metric_with_month_dimension_and_offset_window
 test_filename: test_derived_metric_rendering.py
 sql_engine: Redshift
 ---
--- Compute Metrics via Expressions
-SELECT
-  metric_time__month
-  , bookings_last_month AS bookings_last_month
-FROM (
+-- Read From CTE For node_id=cm_5
+WITH cm_4_cte AS (
   -- Join to Time Spine Dataset
   -- Pass Only Elements: ['bookings_monthly', 'metric_time__month']
   -- Aggregate Measures
@@ -28,4 +25,23 @@ FROM (
     DATEADD(month, -1, subq_10.metric_time__month) = DATE_TRUNC('month', monthly_bookings_source_src_16000.ds)
   GROUP BY
     subq_10.metric_time__month
-) subq_15
+)
+
+, cm_5_cte AS (
+  -- Compute Metrics via Expressions
+  SELECT
+    metric_time__month
+    , bookings_last_month AS bookings_last_month
+  FROM (
+    -- Read From CTE For node_id=cm_4
+    SELECT
+      metric_time__month
+      , bookings_last_month
+    FROM cm_4_cte cm_4_cte
+  ) subq_15
+)
+
+SELECT
+  metric_time__month AS metric_time__month
+  , bookings_last_month AS bookings_last_month
+FROM cm_5_cte cm_5_cte

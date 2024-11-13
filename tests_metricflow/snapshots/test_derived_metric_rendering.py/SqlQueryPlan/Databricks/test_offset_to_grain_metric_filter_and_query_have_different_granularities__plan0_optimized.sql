@@ -4,11 +4,8 @@ docstring:
   Test a query where an offset to grain metric is queried with one granularity and filtered by a different one.
 sql_engine: Databricks
 ---
--- Compute Metrics via Expressions
-SELECT
-  metric_time__month
-  , bookings_start_of_month AS bookings_at_start_of_month
-FROM (
+-- Read From CTE For node_id=cm_5
+WITH cm_4_cte AS (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['bookings', 'metric_time__month']
   -- Aggregate Measures
@@ -38,4 +35,23 @@ FROM (
   WHERE metric_time__day = '2020-01-01'
   GROUP BY
     metric_time__month
-) subq_17
+)
+
+, cm_5_cte AS (
+  -- Compute Metrics via Expressions
+  SELECT
+    metric_time__month
+    , bookings_start_of_month AS bookings_at_start_of_month
+  FROM (
+    -- Read From CTE For node_id=cm_4
+    SELECT
+      metric_time__month
+      , bookings_start_of_month
+    FROM cm_4_cte cm_4_cte
+  ) subq_17
+)
+
+SELECT
+  metric_time__month AS metric_time__month
+  , bookings_at_start_of_month AS bookings_at_start_of_month
+FROM cm_5_cte cm_5_cte

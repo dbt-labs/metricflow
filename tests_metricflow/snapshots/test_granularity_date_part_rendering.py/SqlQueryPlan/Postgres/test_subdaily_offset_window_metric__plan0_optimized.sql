@@ -2,11 +2,8 @@ test_name: test_subdaily_offset_window_metric
 test_filename: test_granularity_date_part_rendering.py
 sql_engine: Postgres
 ---
--- Compute Metrics via Expressions
-SELECT
-  metric_time__hour
-  , archived_users AS subdaily_offset_window_metric
-FROM (
+-- Read From CTE For node_id=cm_5
+WITH cm_4_cte AS (
   -- Join to Time Spine Dataset
   -- Pass Only Elements: ['archived_users', 'metric_time__hour']
   -- Aggregate Measures
@@ -27,4 +24,23 @@ FROM (
     subq_11.ts - MAKE_INTERVAL(hours => 1) = subq_9.metric_time__hour
   GROUP BY
     subq_11.ts
-) subq_15
+)
+
+, cm_5_cte AS (
+  -- Compute Metrics via Expressions
+  SELECT
+    metric_time__hour
+    , archived_users AS subdaily_offset_window_metric
+  FROM (
+    -- Read From CTE For node_id=cm_4
+    SELECT
+      metric_time__hour
+      , archived_users
+    FROM cm_4_cte cm_4_cte
+  ) subq_15
+)
+
+SELECT
+  metric_time__hour AS metric_time__hour
+  , subdaily_offset_window_metric AS subdaily_offset_window_metric
+FROM cm_5_cte cm_5_cte

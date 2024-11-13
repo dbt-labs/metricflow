@@ -2,26 +2,13 @@ test_name: test_filter_with_conversion_metric
 test_filename: test_metric_filter_rendering.py
 sql_engine: Trino
 ---
--- Constrain Output with WHERE
--- Pass Only Elements: ['listings',]
--- Aggregate Measures
--- Compute Metrics via Expressions
-SELECT
-  SUM(listings) AS listings
-FROM (
-  -- Join Standard Outputs
+-- Read From CTE For node_id=cm_4
+WITH cm_3_cte AS (
+  -- Compute Metrics via Expressions
   SELECT
-    CAST(subq_39.buys AS DOUBLE) / CAST(NULLIF(subq_39.visits, 0) AS DOUBLE) AS user__visit_buy_conversion_rate
-    , subq_24.listings AS listings
+    subq_39.user
+    , CAST(buys AS DOUBLE) / CAST(NULLIF(visits, 0) AS DOUBLE) AS user__visit_buy_conversion_rate
   FROM (
-    -- Read Elements From Semantic Model 'listings_latest'
-    -- Metric Time Dimension 'ds'
-    SELECT
-      user_id AS user
-      , 1 AS listings
-    FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_24
-  LEFT OUTER JOIN (
     -- Combine Aggregated Outputs
     SELECT
       COALESCE(subq_28.user, subq_38.user) AS user
@@ -116,7 +103,36 @@ FROM (
     GROUP BY
       COALESCE(subq_28.user, subq_38.user)
   ) subq_39
-  ON
-    subq_24.user = subq_39.user
-) subq_42
-WHERE user__visit_buy_conversion_rate > 2
+)
+
+, cm_4_cte AS (
+  -- Constrain Output with WHERE
+  -- Pass Only Elements: ['listings',]
+  -- Aggregate Measures
+  -- Compute Metrics via Expressions
+  SELECT
+    SUM(listings) AS listings
+  FROM (
+    -- Join Standard Outputs
+    SELECT
+      cm_3_cte.user__visit_buy_conversion_rate AS user__visit_buy_conversion_rate
+      , subq_24.listings AS listings
+    FROM (
+      -- Read Elements From Semantic Model 'listings_latest'
+      -- Metric Time Dimension 'ds'
+      SELECT
+        user_id AS user
+        , 1 AS listings
+      FROM ***************************.dim_listings_latest listings_latest_src_28000
+    ) subq_24
+    LEFT OUTER JOIN
+      cm_3_cte cm_3_cte
+    ON
+      subq_24.user = cm_3_cte.user
+  ) subq_42
+  WHERE user__visit_buy_conversion_rate > 2
+)
+
+SELECT
+  listings AS listings
+FROM cm_4_cte cm_4_cte

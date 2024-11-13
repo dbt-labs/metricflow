@@ -2,11 +2,8 @@ test_name: test_derived_offset_cumulative_metric
 test_filename: test_derived_metric_rendering.py
 sql_engine: BigQuery
 ---
--- Compute Metrics via Expressions
-SELECT
-  metric_time__day
-  , every_2_days_bookers_2_days_ago AS every_2_days_bookers_2_days_ago
-FROM (
+-- Read From CTE For node_id=cm_5
+WITH cm_4_cte AS (
   -- Join to Time Spine Dataset
   -- Pass Only Elements: ['bookers', 'metric_time__day']
   -- Aggregate Measures
@@ -34,4 +31,23 @@ FROM (
     DATE_SUB(CAST(subq_17.ds AS DATETIME), INTERVAL 2 day) = subq_15.metric_time__day
   GROUP BY
     metric_time__day
-) subq_21
+)
+
+, cm_5_cte AS (
+  -- Compute Metrics via Expressions
+  SELECT
+    metric_time__day
+    , every_2_days_bookers_2_days_ago AS every_2_days_bookers_2_days_ago
+  FROM (
+    -- Read From CTE For node_id=cm_4
+    SELECT
+      metric_time__day
+      , every_2_days_bookers_2_days_ago
+    FROM cm_4_cte cm_4_cte
+  ) subq_21
+)
+
+SELECT
+  metric_time__day AS metric_time__day
+  , every_2_days_bookers_2_days_ago AS every_2_days_bookers_2_days_ago
+FROM cm_5_cte cm_5_cte

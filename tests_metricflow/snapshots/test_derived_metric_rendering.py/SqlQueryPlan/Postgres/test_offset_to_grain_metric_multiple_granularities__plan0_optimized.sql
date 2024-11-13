@@ -4,13 +4,8 @@ docstring:
   Test a query where an offset to grain metric is queried with multiple granularities.
 sql_engine: Postgres
 ---
--- Compute Metrics via Expressions
-SELECT
-  metric_time__day
-  , metric_time__month
-  , metric_time__year
-  , bookings_start_of_month AS bookings_at_start_of_month
-FROM (
+-- Read From CTE For node_id=cm_5
+WITH cm_4_cte AS (
   -- Join to Time Spine Dataset
   -- Pass Only Elements: ['bookings', 'metric_time__day', 'metric_time__month', 'metric_time__year']
   -- Aggregate Measures
@@ -35,4 +30,29 @@ FROM (
     subq_11.ds
     , DATE_TRUNC('month', subq_11.ds)
     , DATE_TRUNC('year', subq_11.ds)
-) subq_15
+)
+
+, cm_5_cte AS (
+  -- Compute Metrics via Expressions
+  SELECT
+    metric_time__day
+    , metric_time__month
+    , metric_time__year
+    , bookings_start_of_month AS bookings_at_start_of_month
+  FROM (
+    -- Read From CTE For node_id=cm_4
+    SELECT
+      metric_time__day
+      , metric_time__month
+      , metric_time__year
+      , bookings_start_of_month
+    FROM cm_4_cte cm_4_cte
+  ) subq_15
+)
+
+SELECT
+  metric_time__day AS metric_time__day
+  , metric_time__month AS metric_time__month
+  , metric_time__year AS metric_time__year
+  , bookings_at_start_of_month AS bookings_at_start_of_month
+FROM cm_5_cte cm_5_cte

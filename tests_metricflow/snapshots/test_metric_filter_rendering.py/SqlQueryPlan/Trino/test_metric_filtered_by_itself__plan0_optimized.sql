@@ -4,40 +4,42 @@ docstring:
   Tests a query for a metric that filters by the same metric.
 sql_engine: Trino
 ---
--- Constrain Output with WHERE
--- Pass Only Elements: ['bookers',]
--- Aggregate Measures
--- Compute Metrics via Expressions
-SELECT
-  COUNT(DISTINCT bookers) AS bookers
-FROM (
-  -- Join Standard Outputs
+-- Read From CTE For node_id=cm_4
+WITH cm_3_cte AS (
+  -- Read Elements From Semantic Model 'bookings_source'
+  -- Metric Time Dimension 'ds'
+  -- Pass Only Elements: ['bookers', 'listing']
+  -- Aggregate Measures
+  -- Compute Metrics via Expressions
   SELECT
-    subq_19.listing__bookers AS listing__bookers
-    , subq_13.bookers AS bookers
+    listing_id AS listing
+    , COUNT(DISTINCT guest_id) AS listing__bookers
+  FROM ***************************.fct_bookings bookings_source_src_28000
+  GROUP BY
+    listing_id
+)
+
+, cm_4_cte AS (
+  -- Constrain Output with WHERE
+  -- Pass Only Elements: ['bookers',]
+  -- Aggregate Measures
+  -- Compute Metrics via Expressions
+  SELECT
+    COUNT(DISTINCT bookers) AS bookers
   FROM (
-    -- Read Elements From Semantic Model 'bookings_source'
-    -- Metric Time Dimension 'ds'
+    -- Join Standard Outputs
     SELECT
-      listing_id AS listing
-      , guest_id AS bookers
+      cm_3_cte.listing__bookers AS listing__bookers
+      , bookings_source_src_28000.guest_id AS bookers
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_13
-  LEFT OUTER JOIN (
-    -- Read Elements From Semantic Model 'bookings_source'
-    -- Metric Time Dimension 'ds'
-    -- Pass Only Elements: ['bookers', 'listing']
-    -- Aggregate Measures
-    -- Compute Metrics via Expressions
-    -- Pass Only Elements: ['listing', 'listing__bookers']
-    SELECT
-      listing_id AS listing
-      , COUNT(DISTINCT guest_id) AS listing__bookers
-    FROM ***************************.fct_bookings bookings_source_src_28000
-    GROUP BY
-      listing_id
-  ) subq_19
-  ON
-    subq_13.listing = subq_19.listing
-) subq_20
-WHERE listing__bookers > 1.00
+    LEFT OUTER JOIN
+      cm_3_cte cm_3_cte
+    ON
+      bookings_source_src_28000.listing_id = cm_3_cte.listing
+  ) subq_20
+  WHERE listing__bookers > 1.00
+)
+
+SELECT
+  bookers AS bookers
+FROM cm_4_cte cm_4_cte
