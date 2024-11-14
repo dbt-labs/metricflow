@@ -636,6 +636,7 @@ class DataflowPlanBuilder:
             if len(parent_nodes) == 1
             else CombineAggregatedOutputsNode.create(parent_nodes=parent_nodes)
         )
+        # xyx
         output_node: DataflowPlanNode = ComputeMetricsNode.create(
             parent_node=parent_node,
             metric_specs=[metric_spec],
