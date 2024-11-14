@@ -700,7 +700,7 @@ metric:
         alias: bookings_2_weeks_ago
 ---
 metric:
-  name: "bookings_offset_once"
+  name: bookings_offset_once
   description: bookings metric offset once.
   type: derived
   type_params:
@@ -710,7 +710,7 @@ metric:
         offset_window: 5 days
 ---
 metric:
-  name: "bookings_offset_twice"
+  name: bookings_offset_twice
   description: bookings metric offset twice.
   type: derived
   type_params:
@@ -718,6 +718,22 @@ metric:
     metrics:
       - name: bookings_offset_once
         offset_window: 2 days
+---
+metric:
+  name: bookings_offset_twice_with_tiered_filters
+  description: bookings metric offset twice with tiered filters
+  type: derived
+  type_params:
+    expr: bookings
+    metrics:
+      - name: bookings_offset_once
+        offset_window: 1 month
+        filter:
+          - "{{ TimeDimension('metric_time', 'month') }} >= '2019-01-01'"
+          - "{{ Dimension('booking__is_instant') }}"
+  filter:
+    - "{{ TimeDimension('metric_time', 'year') }} >= '2020-01-01'"
+    - "{{ Entity('listing') }} IS NOT NULL"
 ---
 metric:
   name: bookings_at_start_of_month

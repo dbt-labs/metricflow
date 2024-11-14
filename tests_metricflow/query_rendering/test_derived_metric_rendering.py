@@ -821,3 +821,40 @@ def test_derived_metric_that_defines_the_same_alias_in_different_components(
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_nested_offset_metric_with_tiered_filters(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    query_parser: MetricFlowQueryParser,
+    sql_client: SqlClient,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+) -> None:
+    """Tests that filters at different tiers are applied appropriately for derived metrics.
+
+    This includes filters at the input metric, metric, and query level. At each tier there are filters on both
+    metric_time / agg time and another dimension, which might have different behaviors.
+    """
+    # TODO: test with Trino, hard-coded filters might fail
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings_offset_twice_with_tiered_filters",),
+        group_by_names=("metric_time__day",),
+        where_constraints=[
+            # `booking_ds` is the agg_time_dimension
+            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('booking__ds', 'quarter') }} = '2021-01-01'")),
+            PydanticWhereFilter(
+                where_sql_template=("{{ TimeDimension('listing__created_at', 'day') }} = '2021-01-01'")
+            ),
+        ],
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
