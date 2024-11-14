@@ -25,7 +25,7 @@ class SqlQueryOptimizationLevel(Enum):
 
     @staticmethod
     def default_level() -> SqlQueryOptimizationLevel:  # noqa: D102
-        return SqlQueryOptimizationLevel.O4
+        return SqlQueryOptimizationLevel.O5
 
 
 @dataclass(frozen=True)

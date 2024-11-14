@@ -1,0 +1,6 @@
+kind: Features
+body: Use CTEs instead of sub-queries in generated SQL.
+time: 2024-11-12T21:58:17.127471-08:00
+custom:
+  Author: plypaul
+  Issue: "1040"
