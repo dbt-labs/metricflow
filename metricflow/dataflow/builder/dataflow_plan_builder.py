@@ -260,7 +260,7 @@ class DataflowPlanBuilder:
         )
 
         # Build measure recipes
-        base_required_linkable_specs, _ = self.__get_required_and_extraneous_linkable_specs(
+        base_required_linkable_specs = self.__get_required_linkable_specs(
             queried_linkable_specs=queried_linkable_specs,
             filter_specs=base_measure_spec.filter_spec_set.all_filter_specs,
         )
@@ -578,7 +578,7 @@ class DataflowPlanBuilder:
             )
         )
 
-        required_linkable_specs, _ = self.__get_required_and_extraneous_linkable_specs(
+        required_linkable_specs = self.__get_required_linkable_specs(
             queried_linkable_specs=queried_linkable_specs, filter_specs=metric_spec.filter_spec_set.all_filter_specs
         )
 
@@ -811,7 +811,7 @@ class DataflowPlanBuilder:
                 filter_intersection=query_spec.filter_intersection,
             )
 
-        required_linkable_specs, _ = self.__get_required_and_extraneous_linkable_specs(
+        required_linkable_specs = self.__get_required_linkable_specs(
             queried_linkable_specs=query_spec.linkable_specs, filter_specs=query_level_filter_specs
         )
         predicate_pushdown_state = PredicatePushdownState(
@@ -1451,16 +1451,16 @@ class DataflowPlanBuilder:
             measure_recipe=measure_recipe,
         )
 
-    def __get_required_and_extraneous_linkable_specs(
+    def __get_required_linkable_specs(
         self,
         queried_linkable_specs: LinkableSpecSet,
         filter_specs: Sequence[WhereFilterSpec],
         measure_spec_properties: Optional[MeasureSpecProperties] = None,
-    ) -> Tuple[LinkableSpecSet, LinkableSpecSet]:
-        """Get the required and extraneous linkable specs for this query.
+    ) -> LinkableSpecSet:
+        """Get all required linkable specs for this query, including extraneous linkable specs.
 
         Extraneous linkable specs are specs that are used in this phase that should not show up in the final result
-        unless it was already a requested spec in the query (e.g., linkable spec used in where constraint)
+        unless it was already a requested spec in the query, e.g., a linkable spec used in where constraint is extraneous.
         """
         linkable_spec_sets_to_merge: List[LinkableSpecSet] = []
         for filter_spec in filter_specs:
@@ -1487,7 +1487,7 @@ class DataflowPlanBuilder:
         )
         extraneous_linkable_specs = extraneous_linkable_specs.merge(base_grain_set).dedupe()
 
-        return required_linkable_specs, extraneous_linkable_specs
+        return required_linkable_specs
 
     def _build_aggregated_measure_from_measure_source_node(
         self,
@@ -1534,7 +1534,7 @@ class DataflowPlanBuilder:
                 LazyFormat(lambda: f"Adjusted time range constraint to: {cumulative_metric_adjusted_time_constraint}")
             )
 
-        required_linkable_specs, _ = self.__get_required_and_extraneous_linkable_specs(
+        required_linkable_specs = self.__get_required_linkable_specs(
             queried_linkable_specs=queried_linkable_specs,
             filter_specs=metric_input_measure_spec.filter_spec_set.all_filter_specs,
             measure_spec_properties=measure_properties,
