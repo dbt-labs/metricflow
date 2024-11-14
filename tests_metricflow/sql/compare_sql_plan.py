@@ -27,7 +27,6 @@ def assert_default_rendered_sql_equal(
 ) -> None:
     """Helper function to render a select statement and compare with the one saved as a file."""
     sql_query_plan = SqlQueryPlan(render_node=sql_plan_node, plan_id=DagId.from_str(plan_id))
-
     rendered_sql = DefaultSqlQueryPlanRenderer().render_sql_query_plan(sql_query_plan).sql
 
     assert_plan_snapshot_text_equal(

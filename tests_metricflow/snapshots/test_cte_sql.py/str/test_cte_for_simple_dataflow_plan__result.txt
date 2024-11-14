@@ -1,0 +1,26 @@
+test_name: test_cte_for_simple_dataflow_plan
+test_filename: test_cte_sql.py
+docstring:
+  Test a simple case for generating a CTE for a specific dataflow plan node.
+---
+sql_without_cte:
+  -- Read Elements From Semantic Model 'bookings_source'
+  -- Pass Only Elements: ['bookings',]
+  SELECT
+    1 AS bookings
+  FROM ***************************.fct_bookings bookings_source_src_28000
+
+
+sql_with_cte:
+  -- Read From CTE For node_id=rss_28001
+  -- Pass Only Elements: ['bookings',]
+  WITH rss_28001_cte AS (
+    -- Read Elements From Semantic Model 'bookings_source'
+    SELECT
+      1 AS bookings
+    FROM ***************************.fct_bookings bookings_source_src_28000
+  )
+
+  SELECT
+    bookings AS bookings
+  FROM rss_28001_cte rss_28001_cte
