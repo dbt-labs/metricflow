@@ -260,7 +260,7 @@ class DataflowPlanBuilder:
         )
 
         # Build measure recipes
-        base_required_linkable_specs, extraneous_linkable_specs = self.__get_required_and_extraneous_linkable_specs(
+        base_required_linkable_specs, _ = self.__get_required_and_extraneous_linkable_specs(
             queried_linkable_specs=queried_linkable_specs,
             filter_specs=base_measure_spec.filter_spec_set.all_filter_specs,
         )
@@ -578,7 +578,7 @@ class DataflowPlanBuilder:
             )
         )
 
-        required_linkable_specs, extraneous_linkable_specs = self.__get_required_and_extraneous_linkable_specs(
+        required_linkable_specs, _ = self.__get_required_and_extraneous_linkable_specs(
             queried_linkable_specs=queried_linkable_specs, filter_specs=metric_spec.filter_spec_set.all_filter_specs
         )
 
@@ -665,13 +665,18 @@ class DataflowPlanBuilder:
                 output_node = WhereConstraintNode.create(
                     parent_node=output_node, where_specs=metric_spec.filter_spec_set.all_filter_specs
                 )
-            if not extraneous_linkable_specs.is_subset_of(queried_linkable_specs):
-                output_node = FilterElementsNode.create(
-                    parent_node=output_node,
-                    include_specs=InstanceSpecSet(metric_specs=(metric_spec,)).merge(
-                        InstanceSpecSet.create_from_specs(queried_linkable_specs.as_tuple)
-                    ),
+                specs_in_filters = set(
+                    linkable_spec
+                    for filter_spec in metric_spec.filter_spec_set.all_filter_specs
+                    for linkable_spec in filter_spec.linkable_specs
                 )
+                if not specs_in_filters.issubset(queried_linkable_specs.as_tuple):
+                    output_node = FilterElementsNode.create(
+                        parent_node=output_node,
+                        include_specs=InstanceSpecSet(metric_specs=(metric_spec,)).merge(
+                            InstanceSpecSet.create_from_specs(queried_linkable_specs.as_tuple)
+                        ),
+                    )
         return output_node
 
     def _build_any_metric_output_node(self, parameter_set: BuildAnyMetricOutputNodeParameterSet) -> DataflowPlanNode:
@@ -1529,7 +1534,7 @@ class DataflowPlanBuilder:
                 LazyFormat(lambda: f"Adjusted time range constraint to: {cumulative_metric_adjusted_time_constraint}")
             )
 
-        required_linkable_specs, extraneous_linkable_specs = self.__get_required_and_extraneous_linkable_specs(
+        required_linkable_specs, _ = self.__get_required_and_extraneous_linkable_specs(
             queried_linkable_specs=queried_linkable_specs,
             filter_specs=metric_input_measure_spec.filter_spec_set.all_filter_specs,
             measure_spec_properties=measure_properties,
