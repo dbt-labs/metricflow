@@ -429,7 +429,7 @@ FROM (
             ) subq_0
           ) subq_1
           LEFT OUTER JOIN (
-            -- Pass Only Elements: ['capacity_latest', 'is_lux_latest', 'listing', 'listing']
+            -- Pass Only Elements: ['capacity_latest', 'is_lux_latest', 'listing']
             SELECT
               subq_3.listing
               , subq_3.is_lux_latest
@@ -841,7 +841,7 @@ FULL OUTER JOIN (
             ) subq_10
           ) subq_11
           LEFT OUTER JOIN (
-            -- Pass Only Elements: ['capacity_latest', 'is_lux_latest', 'listing', 'listing']
+            -- Pass Only Elements: ['capacity_latest', 'is_lux_latest', 'listing']
             SELECT
               subq_13.listing
               , subq_13.is_lux_latest
@@ -1419,7 +1419,7 @@ FULL OUTER JOIN (
                 ) subq_20
               ) subq_21
               LEFT OUTER JOIN (
-                -- Pass Only Elements: ['capacity_latest', 'is_lux_latest', 'listing', 'listing']
+                -- Pass Only Elements: ['capacity_latest', 'is_lux_latest', 'listing']
                 SELECT
                   subq_23.listing
                   , subq_23.is_lux_latest
@@ -1831,7 +1831,7 @@ FULL OUTER JOIN (
                 ) subq_30
               ) subq_31
               LEFT OUTER JOIN (
-                -- Pass Only Elements: ['capacity_latest', 'is_lux_latest', 'listing', 'listing']
+                -- Pass Only Elements: ['capacity_latest', 'is_lux_latest', 'listing']
                 SELECT
                   subq_33.listing
                   , subq_33.is_lux_latest

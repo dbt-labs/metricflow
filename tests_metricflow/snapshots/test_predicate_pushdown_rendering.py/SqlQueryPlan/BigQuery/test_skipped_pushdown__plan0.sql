@@ -425,7 +425,7 @@ FROM (
           ) subq_0
         ) subq_1
         LEFT OUTER JOIN (
-          -- Pass Only Elements: ['country_latest', 'is_lux_latest', 'listing', 'listing']
+          -- Pass Only Elements: ['country_latest', 'is_lux_latest', 'listing']
           SELECT
             subq_3.listing
             , subq_3.country_latest
