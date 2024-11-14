@@ -3,11 +3,7 @@ test_filename: test_rendered_query.py
 sql_engine: BigQuery
 ---
 -- Combine Aggregated Outputs
-SELECT
-  COALESCE(subq_4.metric_time__day, subq_9.metric_time__day) AS metric_time__day
-  , MAX(subq_4.bookings) AS bookings
-  , MAX(subq_9.listings) AS listings
-FROM (
+WITH cm_2_cte AS (
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
@@ -24,8 +20,9 @@ FROM (
   ) subq_2
   GROUP BY
     metric_time__day
-) subq_4
-FULL OUTER JOIN (
+)
+
+, cm_3_cte AS (
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
@@ -42,8 +39,16 @@ FULL OUTER JOIN (
   ) subq_7
   GROUP BY
     metric_time__day
-) subq_9
+)
+
+SELECT
+  COALESCE(cm_2_cte.metric_time__day, cm_3_cte.metric_time__day) AS metric_time__day
+  , MAX(cm_2_cte.bookings) AS bookings
+  , MAX(cm_3_cte.listings) AS listings
+FROM cm_2_cte cm_2_cte
+FULL OUTER JOIN
+  cm_3_cte cm_3_cte
 ON
-  subq_4.metric_time__day = subq_9.metric_time__day
+  cm_2_cte.metric_time__day = cm_3_cte.metric_time__day
 GROUP BY
   metric_time__day

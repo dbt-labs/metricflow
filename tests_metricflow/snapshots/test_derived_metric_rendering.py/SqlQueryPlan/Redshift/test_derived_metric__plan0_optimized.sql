@@ -2,11 +2,8 @@ test_name: test_derived_metric
 test_filename: test_derived_metric_rendering.py
 sql_engine: Redshift
 ---
--- Compute Metrics via Expressions
-SELECT
-  metric_time__day
-  , (bookings - ref_bookings) * 1.0 / bookings AS non_referred_bookings_pct
-FROM (
+-- Read From CTE For node_id=cm_9
+WITH cm_8_cte AS (
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
@@ -25,4 +22,24 @@ FROM (
   ) subq_13
   GROUP BY
     metric_time__day
-) subq_15
+)
+
+, cm_9_cte AS (
+  -- Compute Metrics via Expressions
+  SELECT
+    metric_time__day
+    , (bookings - ref_bookings) * 1.0 / bookings AS non_referred_bookings_pct
+  FROM (
+    -- Read From CTE For node_id=cm_8
+    SELECT
+      metric_time__day
+      , ref_bookings
+      , bookings
+    FROM cm_8_cte cm_8_cte
+  ) subq_15
+)
+
+SELECT
+  metric_time__day AS metric_time__day
+  , non_referred_bookings_pct AS non_referred_bookings_pct
+FROM cm_9_cte cm_9_cte

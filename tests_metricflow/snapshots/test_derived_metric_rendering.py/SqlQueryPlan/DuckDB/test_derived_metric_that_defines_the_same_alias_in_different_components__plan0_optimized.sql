@@ -6,60 +6,81 @@ sql_engine: DuckDB
 ---
 -- Combine Aggregated Outputs
 -- Order By [] Limit 1
-SELECT
-  COALESCE(subq_18.booking__is_instant, subq_24.booking__is_instant) AS booking__is_instant
-  , MAX(subq_18.derived_shared_alias_1a) AS derived_shared_alias_1a
-  , MAX(subq_24.derived_shared_alias_2) AS derived_shared_alias_2
-FROM (
+WITH cm_8_cte AS (
+  -- Aggregate Measures
+  -- Compute Metrics via Expressions
+  SELECT
+    booking__is_instant
+    , SUM(bookings) AS shared_alias
+  FROM (
+    -- Read Elements From Semantic Model 'bookings_source'
+    -- Metric Time Dimension 'ds'
+    -- Pass Only Elements: ['bookings', 'booking__is_instant']
+    SELECT
+      is_instant AS booking__is_instant
+      , 1 AS bookings
+    FROM ***************************.fct_bookings bookings_source_src_28000
+  ) subq_15
+  GROUP BY
+    booking__is_instant
+)
+
+, cm_9_cte AS (
   -- Compute Metrics via Expressions
   SELECT
     booking__is_instant
     , shared_alias - 10 AS derived_shared_alias_1a
   FROM (
-    -- Aggregate Measures
-    -- Compute Metrics via Expressions
+    -- Read From CTE For node_id=cm_8
     SELECT
       booking__is_instant
-      , SUM(bookings) AS shared_alias
-    FROM (
-      -- Read Elements From Semantic Model 'bookings_source'
-      -- Metric Time Dimension 'ds'
-      -- Pass Only Elements: ['bookings', 'booking__is_instant']
-      SELECT
-        is_instant AS booking__is_instant
-        , 1 AS bookings
-      FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_15
-    GROUP BY
-      booking__is_instant
+      , shared_alias
+    FROM cm_8_cte cm_8_cte
   ) subq_17
-) subq_18
-FULL OUTER JOIN (
+)
+
+, cm_10_cte AS (
+  -- Aggregate Measures
+  -- Compute Metrics via Expressions
+  SELECT
+    booking__is_instant
+    , SUM(instant_bookings) AS shared_alias
+  FROM (
+    -- Read Elements From Semantic Model 'bookings_source'
+    -- Metric Time Dimension 'ds'
+    -- Pass Only Elements: ['instant_bookings', 'booking__is_instant']
+    SELECT
+      is_instant AS booking__is_instant
+      , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
+    FROM ***************************.fct_bookings bookings_source_src_28000
+  ) subq_21
+  GROUP BY
+    booking__is_instant
+)
+
+, cm_11_cte AS (
   -- Compute Metrics via Expressions
   SELECT
     booking__is_instant
     , shared_alias + 10 AS derived_shared_alias_2
   FROM (
-    -- Aggregate Measures
-    -- Compute Metrics via Expressions
+    -- Read From CTE For node_id=cm_10
     SELECT
       booking__is_instant
-      , SUM(instant_bookings) AS shared_alias
-    FROM (
-      -- Read Elements From Semantic Model 'bookings_source'
-      -- Metric Time Dimension 'ds'
-      -- Pass Only Elements: ['instant_bookings', 'booking__is_instant']
-      SELECT
-        is_instant AS booking__is_instant
-        , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
-      FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_21
-    GROUP BY
-      booking__is_instant
+      , shared_alias
+    FROM cm_10_cte cm_10_cte
   ) subq_23
-) subq_24
+)
+
+SELECT
+  COALESCE(cm_9_cte.booking__is_instant, cm_11_cte.booking__is_instant) AS booking__is_instant
+  , MAX(cm_9_cte.derived_shared_alias_1a) AS derived_shared_alias_1a
+  , MAX(cm_11_cte.derived_shared_alias_2) AS derived_shared_alias_2
+FROM cm_9_cte cm_9_cte
+FULL OUTER JOIN
+  cm_11_cte cm_11_cte
 ON
-  subq_18.booking__is_instant = subq_24.booking__is_instant
+  cm_9_cte.booking__is_instant = cm_11_cte.booking__is_instant
 GROUP BY
-  COALESCE(subq_18.booking__is_instant, subq_24.booking__is_instant)
+  COALESCE(cm_9_cte.booking__is_instant, cm_11_cte.booking__is_instant)
 LIMIT 1

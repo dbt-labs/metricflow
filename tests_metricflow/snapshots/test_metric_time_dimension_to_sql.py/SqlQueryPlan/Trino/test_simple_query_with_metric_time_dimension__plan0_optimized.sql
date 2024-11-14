@@ -15,11 +15,7 @@ WITH rss_28020_cte AS (
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
-SELECT
-  COALESCE(subq_14.metric_time__day, subq_19.metric_time__day) AS metric_time__day
-  , MAX(subq_14.bookings) AS bookings
-  , MAX(subq_19.booking_payments) AS booking_payments
-FROM (
+, cm_0_cte AS (
   -- Read From CTE For node_id=rss_28020
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements: ['bookings', 'metric_time__day']
@@ -31,8 +27,9 @@ FROM (
   FROM rss_28020_cte rss_28020_cte
   GROUP BY
     ds__day
-) subq_14
-FULL OUTER JOIN (
+)
+
+, cm_1_cte AS (
   -- Read From CTE For node_id=rss_28020
   -- Metric Time Dimension 'paid_at'
   -- Pass Only Elements: ['booking_payments', 'metric_time__day']
@@ -44,8 +41,16 @@ FULL OUTER JOIN (
   FROM rss_28020_cte rss_28020_cte
   GROUP BY
     paid_at__day
-) subq_19
+)
+
+SELECT
+  COALESCE(cm_0_cte.metric_time__day, cm_1_cte.metric_time__day) AS metric_time__day
+  , MAX(cm_0_cte.bookings) AS bookings
+  , MAX(cm_1_cte.booking_payments) AS booking_payments
+FROM cm_0_cte cm_0_cte
+FULL OUTER JOIN
+  cm_1_cte cm_1_cte
 ON
-  subq_14.metric_time__day = subq_19.metric_time__day
+  cm_0_cte.metric_time__day = cm_1_cte.metric_time__day
 GROUP BY
-  COALESCE(subq_14.metric_time__day, subq_19.metric_time__day)
+  COALESCE(cm_0_cte.metric_time__day, cm_1_cte.metric_time__day)

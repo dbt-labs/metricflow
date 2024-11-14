@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from dataclasses import dataclass
 from typing import Dict, FrozenSet, Mapping, Sequence, Set
 
+from metricflow_semantics.collection_helpers.merger import Mergeable
 from typing_extensions import override
 
 from metricflow.dataflow.dataflow_plan import DataflowPlan, DataflowPlanNode
 from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitorWithDefaultHandler
+from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 
 
 class DataflowPlanAnalyzer:
@@ -35,6 +38,12 @@ class DataflowPlanAnalyzer:
         common_branches_visitor = _FindLargestCommonBranchesVisitor(frozenset(common_nodes))
 
         return tuple(sorted(dataflow_plan.sink_node.accept(common_branches_visitor)))
+
+    @staticmethod
+    def group_nodes_by_type(dataflow_plan: DataflowPlan) -> DataflowPlanNodeSet:
+        """Groups dataflow plan nodes by type."""
+        grouping_visitor = _GroupNodesByTypeVisitor()
+        return dataflow_plan.sink_node.accept(grouping_visitor)
 
 
 class _CountDataflowNodeVisitor(DataflowPlanNodeVisitorWithDefaultHandler[None]):
@@ -77,3 +86,43 @@ class _FindLargestCommonBranchesVisitor(DataflowPlanNodeVisitorWithDefaultHandle
             common_branch_leaf_nodes.update(parent_node.accept(self))
 
         return frozenset(common_branch_leaf_nodes)
+
+
+@dataclass(frozen=True)
+class DataflowPlanNodeSet(Mergeable):
+    """Contains a set of dataflow plan nodes with fields for different types.
+
+    `ComputeMetricsNode` is the only node of interest for current use cases, but fields for other types can be added
+    later.
+    """
+
+    compute_metric_nodes: FrozenSet[ComputeMetricsNode]
+
+    @override
+    def merge(self, other: DataflowPlanNodeSet) -> DataflowPlanNodeSet:
+        return DataflowPlanNodeSet(
+            compute_metric_nodes=self.compute_metric_nodes.union(other.compute_metric_nodes),
+        )
+
+    @classmethod
+    @override
+    def empty_instance(cls) -> DataflowPlanNodeSet:
+        return DataflowPlanNodeSet(
+            compute_metric_nodes=frozenset(),
+        )
+
+
+class _GroupNodesByTypeVisitor(DataflowPlanNodeVisitorWithDefaultHandler[DataflowPlanNodeSet]):
+    """Groups dataflow nodes by type."""
+
+    @override
+    def _default_handler(self, node: DataflowPlanNode) -> DataflowPlanNodeSet:
+        node_sets = []
+        for parent_node in node.parent_nodes:
+            node_sets.append(parent_node.accept(self))
+
+        return DataflowPlanNodeSet.merge_iterable(node_sets)
+
+    @override
+    def visit_compute_metrics_node(self, node: ComputeMetricsNode) -> DataflowPlanNodeSet:
+        return self._default_handler(node).merge(DataflowPlanNodeSet(frozenset({node})))

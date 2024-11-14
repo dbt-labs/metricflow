@@ -2,58 +2,71 @@ test_name: test_derived_metric_with_offset_to_grain
 test_filename: test_derived_metric_rendering.py
 sql_engine: BigQuery
 ---
--- Compute Metrics via Expressions
-SELECT
-  metric_time__day
-  , bookings - bookings_at_start_of_month AS bookings_growth_since_start_of_month
-FROM (
-  -- Combine Aggregated Outputs
+-- Read From CTE For node_id=cm_8
+WITH cm_6_cte AS (
+  -- Aggregate Measures
+  -- Compute Metrics via Expressions
   SELECT
-    COALESCE(subq_18.metric_time__day, subq_26.metric_time__day) AS metric_time__day
-    , MAX(subq_18.bookings) AS bookings
-    , MAX(subq_26.bookings_at_start_of_month) AS bookings_at_start_of_month
+    metric_time__day
+    , SUM(bookings) AS bookings
   FROM (
-    -- Aggregate Measures
-    -- Compute Metrics via Expressions
-    SELECT
-      metric_time__day
-      , SUM(bookings) AS bookings
-    FROM (
-      -- Read Elements From Semantic Model 'bookings_source'
-      -- Metric Time Dimension 'ds'
-      -- Pass Only Elements: ['bookings', 'metric_time__day']
-      SELECT
-        DATETIME_TRUNC(ds, day) AS metric_time__day
-        , 1 AS bookings
-      FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_16
-    GROUP BY
-      metric_time__day
-  ) subq_18
-  FULL OUTER JOIN (
-    -- Join to Time Spine Dataset
+    -- Read Elements From Semantic Model 'bookings_source'
+    -- Metric Time Dimension 'ds'
     -- Pass Only Elements: ['bookings', 'metric_time__day']
-    -- Aggregate Measures
-    -- Compute Metrics via Expressions
     SELECT
-      subq_22.ds AS metric_time__day
-      , SUM(subq_20.bookings) AS bookings_at_start_of_month
-    FROM ***************************.mf_time_spine subq_22
-    INNER JOIN (
-      -- Read Elements From Semantic Model 'bookings_source'
-      -- Metric Time Dimension 'ds'
-      SELECT
-        DATETIME_TRUNC(ds, day) AS metric_time__day
-        , 1 AS bookings
-      FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_20
-    ON
-      DATETIME_TRUNC(subq_22.ds, month) = subq_20.metric_time__day
-    GROUP BY
-      metric_time__day
-  ) subq_26
-  ON
-    subq_18.metric_time__day = subq_26.metric_time__day
+      DATETIME_TRUNC(ds, day) AS metric_time__day
+      , 1 AS bookings
+    FROM ***************************.fct_bookings bookings_source_src_28000
+  ) subq_16
   GROUP BY
     metric_time__day
-) subq_27
+)
+
+, cm_7_cte AS (
+  -- Join to Time Spine Dataset
+  -- Pass Only Elements: ['bookings', 'metric_time__day']
+  -- Aggregate Measures
+  -- Compute Metrics via Expressions
+  SELECT
+    subq_22.ds AS metric_time__day
+    , SUM(subq_20.bookings) AS bookings_at_start_of_month
+  FROM ***************************.mf_time_spine subq_22
+  INNER JOIN (
+    -- Read Elements From Semantic Model 'bookings_source'
+    -- Metric Time Dimension 'ds'
+    SELECT
+      DATETIME_TRUNC(ds, day) AS metric_time__day
+      , 1 AS bookings
+    FROM ***************************.fct_bookings bookings_source_src_28000
+  ) subq_20
+  ON
+    DATETIME_TRUNC(subq_22.ds, month) = subq_20.metric_time__day
+  GROUP BY
+    metric_time__day
+)
+
+, cm_8_cte AS (
+  -- Compute Metrics via Expressions
+  SELECT
+    metric_time__day
+    , bookings - bookings_at_start_of_month AS bookings_growth_since_start_of_month
+  FROM (
+    -- Combine Aggregated Outputs
+    SELECT
+      COALESCE(cm_6_cte.metric_time__day, cm_7_cte.metric_time__day) AS metric_time__day
+      , MAX(cm_6_cte.bookings) AS bookings
+      , MAX(cm_7_cte.bookings_at_start_of_month) AS bookings_at_start_of_month
+    FROM cm_6_cte cm_6_cte
+    FULL OUTER JOIN
+      cm_7_cte cm_7_cte
+    ON
+      cm_6_cte.metric_time__day = cm_7_cte.metric_time__day
+    GROUP BY
+      metric_time__day
+  ) subq_27
+)
+
+SELECT
+  metric_time__day AS metric_time__day
+  , bookings_growth_since_start_of_month AS bookings_growth_since_start_of_month
+FROM cm_8_cte cm_8_cte
