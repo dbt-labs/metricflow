@@ -260,7 +260,7 @@ class DataflowPlanBuilder:
         )
 
         # Build measure recipes
-        base_required_linkable_specs, extraneous_linkable_specs = self.__get_required_and_extraneous_linkable_specs(
+        base_required_linkable_specs = self.__get_required_linkable_specs(
             queried_linkable_specs=queried_linkable_specs,
             filter_specs=base_measure_spec.filter_spec_set.all_filter_specs,
         )
@@ -578,7 +578,7 @@ class DataflowPlanBuilder:
             )
         )
 
-        required_linkable_specs, extraneous_linkable_specs = self.__get_required_and_extraneous_linkable_specs(
+        required_linkable_specs = self.__get_required_linkable_specs(
             queried_linkable_specs=queried_linkable_specs, filter_specs=metric_spec.filter_spec_set.all_filter_specs
         )
 
@@ -665,13 +665,18 @@ class DataflowPlanBuilder:
                 output_node = WhereConstraintNode.create(
                     parent_node=output_node, where_specs=metric_spec.filter_spec_set.all_filter_specs
                 )
-            if not extraneous_linkable_specs.is_subset_of(queried_linkable_specs):
-                output_node = FilterElementsNode.create(
-                    parent_node=output_node,
-                    include_specs=InstanceSpecSet(metric_specs=(metric_spec,)).merge(
-                        InstanceSpecSet.create_from_specs(queried_linkable_specs.as_tuple)
-                    ),
+                specs_in_filters = set(
+                    linkable_spec
+                    for filter_spec in metric_spec.filter_spec_set.all_filter_specs
+                    for linkable_spec in filter_spec.linkable_specs
                 )
+                if not specs_in_filters.issubset(queried_linkable_specs.as_tuple):
+                    output_node = FilterElementsNode.create(
+                        parent_node=output_node,
+                        include_specs=InstanceSpecSet(metric_specs=(metric_spec,)).merge(
+                            InstanceSpecSet.create_from_specs(queried_linkable_specs.as_tuple)
+                        ),
+                    )
         return output_node
 
     def _build_any_metric_output_node(self, parameter_set: BuildAnyMetricOutputNodeParameterSet) -> DataflowPlanNode:
@@ -806,7 +811,7 @@ class DataflowPlanBuilder:
                 filter_intersection=query_spec.filter_intersection,
             )
 
-        required_linkable_specs, _ = self.__get_required_and_extraneous_linkable_specs(
+        required_linkable_specs = self.__get_required_linkable_specs(
             queried_linkable_specs=query_spec.linkable_specs, filter_specs=query_level_filter_specs
         )
         predicate_pushdown_state = PredicatePushdownState(
@@ -1446,16 +1451,16 @@ class DataflowPlanBuilder:
             measure_recipe=measure_recipe,
         )
 
-    def __get_required_and_extraneous_linkable_specs(
+    def __get_required_linkable_specs(
         self,
         queried_linkable_specs: LinkableSpecSet,
         filter_specs: Sequence[WhereFilterSpec],
         measure_spec_properties: Optional[MeasureSpecProperties] = None,
-    ) -> Tuple[LinkableSpecSet, LinkableSpecSet]:
-        """Get the required and extraneous linkable specs for this query.
+    ) -> LinkableSpecSet:
+        """Get all required linkable specs for this query, including extraneous linkable specs.
 
         Extraneous linkable specs are specs that are used in this phase that should not show up in the final result
-        unless it was already a requested spec in the query (e.g., linkable spec used in where constraint)
+        unless it was already a requested spec in the query, e.g., a linkable spec used in where constraint is extraneous.
         """
         linkable_spec_sets_to_merge: List[LinkableSpecSet] = []
         for filter_spec in filter_specs:
@@ -1477,12 +1482,14 @@ class DataflowPlanBuilder:
         required_linkable_specs = queried_linkable_specs.merge(extraneous_linkable_specs).dedupe()
 
         # Custom grains require joining to their base grain, so add base grain to extraneous specs.
-        base_grain_set = LinkableSpecSet.create_from_specs(
-            [spec.with_base_grain() for spec in required_linkable_specs.time_dimension_specs_with_custom_grain]
-        )
-        extraneous_linkable_specs = extraneous_linkable_specs.merge(base_grain_set).dedupe()
+        if required_linkable_specs.time_dimension_specs_with_custom_grain:
+            base_grain_set = LinkableSpecSet.create_from_specs(
+                [spec.with_base_grain() for spec in required_linkable_specs.time_dimension_specs_with_custom_grain]
+            )
+            extraneous_linkable_specs = extraneous_linkable_specs.merge(base_grain_set).dedupe()
+            required_linkable_specs = required_linkable_specs.merge(extraneous_linkable_specs).dedupe()
 
-        return required_linkable_specs, extraneous_linkable_specs
+        return required_linkable_specs
 
     def _build_aggregated_measure_from_measure_source_node(
         self,
@@ -1529,7 +1536,7 @@ class DataflowPlanBuilder:
                 LazyFormat(lambda: f"Adjusted time range constraint to: {cumulative_metric_adjusted_time_constraint}")
             )
 
-        required_linkable_specs, extraneous_linkable_specs = self.__get_required_and_extraneous_linkable_specs(
+        required_linkable_specs = self.__get_required_linkable_specs(
             queried_linkable_specs=queried_linkable_specs,
             filter_specs=metric_input_measure_spec.filter_spec_set.all_filter_specs,
             measure_spec_properties=measure_properties,
@@ -1756,7 +1763,7 @@ class DataflowPlanBuilder:
         if measure_properties and measure_properties.non_additive_dimension_spec:
             if queried_linkable_specs is None:
                 raise ValueError(
-                    "`queried_linkable_specs` must be provided in _build_pre_aggregation_plan() if "
+                    "`queried_linkable_specs` must be provided in when building pre-aggregation plan if "
                     "`non_additive_dimension_spec` is present."
                 )
             output_node = self._build_semi_additive_join_node(
@@ -1764,7 +1771,6 @@ class DataflowPlanBuilder:
                 queried_linkable_specs=queried_linkable_specs,
                 parent_node=output_node,
             )
-
         output_node = FilterElementsNode.create(
             parent_node=output_node, include_specs=filter_to_specs, distinct=distinct
         )
