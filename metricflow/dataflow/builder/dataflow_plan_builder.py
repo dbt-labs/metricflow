@@ -1482,10 +1482,12 @@ class DataflowPlanBuilder:
         required_linkable_specs = queried_linkable_specs.merge(extraneous_linkable_specs).dedupe()
 
         # Custom grains require joining to their base grain, so add base grain to extraneous specs.
-        base_grain_set = LinkableSpecSet.create_from_specs(
-            [spec.with_base_grain() for spec in required_linkable_specs.time_dimension_specs_with_custom_grain]
-        )
-        extraneous_linkable_specs = extraneous_linkable_specs.merge(base_grain_set).dedupe()
+        if required_linkable_specs.time_dimension_specs_with_custom_grain:
+            base_grain_set = LinkableSpecSet.create_from_specs(
+                [spec.with_base_grain() for spec in required_linkable_specs.time_dimension_specs_with_custom_grain]
+            )
+            extraneous_linkable_specs = extraneous_linkable_specs.merge(base_grain_set).dedupe()
+            required_linkable_specs = required_linkable_specs.merge(extraneous_linkable_specs).dedupe()
 
         return required_linkable_specs
 
@@ -1761,7 +1763,7 @@ class DataflowPlanBuilder:
         if measure_properties and measure_properties.non_additive_dimension_spec:
             if queried_linkable_specs is None:
                 raise ValueError(
-                    "`queried_linkable_specs` must be provided in _build_pre_aggregation_plan() if "
+                    "`queried_linkable_specs` must be provided in when building pre-aggregation plan if "
                     "`non_additive_dimension_spec` is present."
                 )
             output_node = self._build_semi_additive_join_node(
@@ -1769,7 +1771,6 @@ class DataflowPlanBuilder:
                 queried_linkable_specs=queried_linkable_specs,
                 parent_node=output_node,
             )
-
         output_node = FilterElementsNode.create(
             parent_node=output_node, include_specs=filter_to_specs, distinct=distinct
         )
