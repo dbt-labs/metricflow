@@ -15,6 +15,7 @@ from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilde
 from metricflow.execution.dataflow_to_execution import DataflowToExecutionPlanConverter
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from tests_metricflow.snapshot_utils import assert_execution_plan_text_equal
 
@@ -30,6 +31,7 @@ def make_execution_plan_converter(  # noqa: D103
         ),
         sql_plan_renderer=DefaultSqlQueryPlanRenderer(),
         sql_client=sql_client,
+        sql_optimization_level=SqlQueryOptimizationLevel.O4,
     )
 
 
@@ -172,17 +174,10 @@ def test_multihop_joined_plan(
         )
     )
 
-    to_execution_plan_converter = DataflowToExecutionPlanConverter(
-        sql_plan_converter=DataflowToSqlQueryPlanConverter(
-            column_association_resolver=DunderColumnAssociationResolver(
-                partitioned_multi_hop_join_semantic_manifest_lookup
-            ),
-            semantic_manifest_lookup=partitioned_multi_hop_join_semantic_manifest_lookup,
-        ),
-        sql_plan_renderer=DefaultSqlQueryPlanRenderer(),
+    to_execution_plan_converter = make_execution_plan_converter(
+        semantic_manifest_lookup=partitioned_multi_hop_join_semantic_manifest_lookup,
         sql_client=sql_client,
     )
-
     execution_plan = to_execution_plan_converter.convert_to_execution_plan(dataflow_plan).execution_plan
 
     assert_execution_plan_text_equal(

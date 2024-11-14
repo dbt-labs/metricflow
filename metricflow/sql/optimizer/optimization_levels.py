@@ -23,6 +23,10 @@ class SqlQueryOptimizationLevel(Enum):
     O4 = "O4"
     O5 = "O5"
 
+    @staticmethod
+    def default_level() -> SqlQueryOptimizationLevel:  # noqa: D102
+        return SqlQueryOptimizationLevel.O4
+
 
 @dataclass(frozen=True)
 class SqlGenerationOptionSet:
