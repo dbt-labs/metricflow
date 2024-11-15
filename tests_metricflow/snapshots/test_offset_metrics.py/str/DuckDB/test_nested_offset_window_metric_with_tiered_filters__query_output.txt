@@ -1,0 +1,5 @@
+test_name: test_nested_offset_window_metric_with_tiered_filters
+test_filename: test_offset_metrics.py
+---
+metric_time__day    bookings_offset_twice_with_tiered_filters
+------------------  -------------------------------------------
