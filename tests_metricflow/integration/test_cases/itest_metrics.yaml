@@ -1618,7 +1618,7 @@ integration_test:
   model: SIMPLE_MODEL
   metrics: ["bookings_offset_twice"]
   group_by_objs: [{"name": "metric_time", "grain": "day"}]
-  where_filter: "{{ render_time_constraint('metric_time__day', '2020-01-08', '2020-01-09') }}"
+  where_filter: "{{ render_time_dimension_template('metric_time__day') }} BETWEEN '2020-01-08' AND '2020-01-09'"
   check_query: |
     SELECT
       subq_9.ds AS metric_time__day
