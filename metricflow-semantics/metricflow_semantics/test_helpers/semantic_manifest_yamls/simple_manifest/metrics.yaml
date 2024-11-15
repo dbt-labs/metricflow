@@ -495,7 +495,7 @@ metric:
 metric:
   name: "bookings_growth_since_start_of_month"
   description: |
-    percentage growth of bookings since the start of the month,
+    number of bookings since the start of the month,
     used to test derived metrics with an offset_to_grain.
   type: derived
   type_params:
@@ -505,6 +505,18 @@ metric:
       - name: bookings
         offset_to_grain: month
         alias: bookings_at_start_of_month
+---
+metric:
+  name: bookings_offset_to_grain_twice
+  description: tests a nested offset_to_grain metric
+  type: derived
+  type_params:
+    expr: bookings_qtd * 2
+    metrics:
+      - name: bookings_growth_since_start_of_month
+        offset_to_grain: quarter
+        alias: bookings_qtd
+        filter: "{{ TimeDimension('metric_time', 'month') }} >= '2020-01-01'"
 ---
 metric:
   name: "bookings_month_start_compared_to_1_month_prior"
