@@ -1,4 +1,4 @@
-test_name: test_nested_offset_metric_with_tiered_filters
+test_name: test_nested_offset_window_metric_with_tiered_filters
 test_filename: test_derived_metric_rendering.py
 docstring:
   Tests that filters at different tiers are applied appropriately for derived metrics.
@@ -23,11 +23,16 @@ FROM (
     FROM (
       -- Time Spine
       SELECT
-        ds AS metric_time__day
+        DATE_TRUNC('quarter', ds) AS booking__ds__quarter
+        , ds AS metric_time__day
         , DATE_TRUNC('year', ds) AS metric_time__year
       FROM ***************************.mf_time_spine subq_35
     ) subq_36
-    WHERE metric_time__year >= '2020-01-01'
+    WHERE (
+      booking__ds__quarter >= '2020-01-01'
+    ) AND (
+      metric_time__year >= '2019-01-01'
+    )
   ) subq_34
   INNER JOIN (
     -- Compute Metrics via Expressions
@@ -47,7 +52,6 @@ FROM (
         SELECT
           DATE_TRUNC('day', listings_latest_src_28000.created_at) AS listing__created_at__day
           , subq_24.metric_time__day AS metric_time__day
-          , subq_24.booking__ds__quarter AS booking__ds__quarter
           , subq_24.listing AS listing
           , subq_24.booking__is_instant AS booking__is_instant
           , subq_24.bookings AS bookings
@@ -55,7 +59,6 @@ FROM (
           -- Join to Time Spine Dataset
           SELECT
             subq_21.metric_time__day AS metric_time__day
-            , subq_20.booking__ds__quarter AS booking__ds__quarter
             , subq_20.listing AS listing
             , subq_20.booking__is_instant AS booking__is_instant
             , subq_20.bookings AS bookings
@@ -70,14 +73,13 @@ FROM (
                 , DATE_TRUNC('month', ds) AS metric_time__month
               FROM ***************************.mf_time_spine subq_22
             ) subq_23
-            WHERE metric_time__month >= '2019-01-01'
+            WHERE metric_time__month >= '2019-12-01'
           ) subq_21
           INNER JOIN (
             -- Read Elements From Semantic Model 'bookings_source'
             -- Metric Time Dimension 'ds'
             SELECT
-              DATE_TRUNC('quarter', ds) AS booking__ds__quarter
-              , DATE_TRUNC('day', ds) AS metric_time__day
+              DATE_TRUNC('day', ds) AS metric_time__day
               , listing_id AS listing
               , is_instant AS booking__is_instant
               , 1 AS bookings
@@ -91,7 +93,7 @@ FROM (
         ON
           subq_24.listing = listings_latest_src_28000.listing_id
       ) subq_28
-      WHERE (((booking__ds__quarter = '2021-01-01') AND (listing__created_at__day = '2021-01-01')) AND (listing IS NOT NULL)) AND (booking__is_instant)
+      WHERE ((listing__created_at__day = '2020-01-01') AND (listing IS NOT NULL)) AND (booking__is_instant)
       GROUP BY
         metric_time__day
     ) subq_32

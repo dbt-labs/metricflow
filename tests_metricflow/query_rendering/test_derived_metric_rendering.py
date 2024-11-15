@@ -824,7 +824,7 @@ def test_derived_metric_that_defines_the_same_alias_in_different_components(
 
 
 @pytest.mark.sql_engine_snapshot
-def test_nested_offset_metric_with_tiered_filters(
+def test_nested_offset_window_metric_with_tiered_filters(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -843,9 +843,9 @@ def test_nested_offset_metric_with_tiered_filters(
         group_by_names=("metric_time__day",),
         where_constraints=[
             # `booking_ds` is the agg_time_dimension
-            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('booking__ds', 'quarter') }} = '2021-01-01'")),
+            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('booking__ds', 'quarter') }} >= '2020-01-01'")),
             PydanticWhereFilter(
-                where_sql_template=("{{ TimeDimension('listing__created_at', 'day') }} = '2021-01-01'")
+                where_sql_template=("{{ TimeDimension('listing__created_at', 'day') }} = '2020-01-01'")
             ),
         ],
     ).query_spec
@@ -872,10 +872,11 @@ def test_nested_offset_to_grain_metric_with_tiered_filters(
     """Tests that filters at different tiers are applied appropriately for derived metrics with offset to grain."""
     # TODO: test with Trino, hard-coded filters might fail
     query_spec = query_parser.parse_and_validate_query(
-        metric_names=("bookings_offset_to_grain_twice",),
+        metric_names=("bookings_offset_to_grain_twice_with_tiered_filters",),
         group_by_names=("metric_time__day",),
         where_constraints=[
             PydanticWhereFilter(where_sql_template=("{{ Entity('listing') }} IS NOT NULL")),
+            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('metric_time', 'quarter') }} >= '2020-01-01'")),
         ],
     ).query_spec
 

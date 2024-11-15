@@ -1,4 +1,4 @@
-test_name: test_nested_offset_metric_with_tiered_filters
+test_name: test_nested_offset_window_metric_with_tiered_filters
 test_filename: test_derived_metric_rendering.py
 docstring:
   Tests that filters at different tiers are applied appropriately for derived metrics.
@@ -23,11 +23,16 @@ FROM (
     FROM (
       -- Time Spine
       SELECT
-        subq_16.ds AS metric_time__day
+        DATE_TRUNC('quarter', subq_16.ds) AS booking__ds__quarter
+        , subq_16.ds AS metric_time__day
         , DATE_TRUNC('year', subq_16.ds) AS metric_time__year
       FROM ***************************.mf_time_spine subq_16
     ) subq_17
-    WHERE metric_time__year >= '2020-01-01'
+    WHERE (
+      booking__ds__quarter >= '2020-01-01'
+    ) AND (
+      metric_time__year >= '2019-01-01'
+    )
   ) subq_15
   INNER JOIN (
     -- Compute Metrics via Expressions
@@ -365,7 +370,7 @@ FROM (
                       , DATE_TRUNC('month', subq_3.ds) AS metric_time__month
                     FROM ***************************.mf_time_spine subq_3
                   ) subq_4
-                  WHERE metric_time__month >= '2019-01-01'
+                  WHERE metric_time__month >= '2019-12-01'
                 ) subq_2
                 INNER JOIN (
                   -- Metric Time Dimension 'ds'
@@ -706,7 +711,7 @@ FROM (
               ON
                 subq_5.listing = subq_8.listing
             ) subq_9
-            WHERE (((booking__ds__quarter = '2021-01-01') AND (listing__created_at__day = '2021-01-01')) AND (listing IS NOT NULL)) AND (booking__is_instant)
+            WHERE ((listing__created_at__day = '2020-01-01') AND (listing IS NOT NULL)) AND (booking__is_instant)
           ) subq_10
         ) subq_11
         GROUP BY
