@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Sequence
 
 from metricflow_semantics.collection_helpers.lru_cache import LruCache
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.metric_spec import MetricSpec
+from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.specs.where_filter.where_filter_transform import WhereSpecFactory
 
 from metricflow.dataflow.builder.measure_spec_properties import MeasureSpecProperties
@@ -39,6 +40,7 @@ class BuildAnyMetricOutputNodeParameterSet:
     filter_spec_factory: WhereSpecFactory
     predicate_pushdown_state: PredicatePushdownState
     for_group_by_source_node: bool
+    time_spine_filter_specs: Sequence[WhereFilterSpec] = ()
 
 
 class DataflowPlanBuilderCache:

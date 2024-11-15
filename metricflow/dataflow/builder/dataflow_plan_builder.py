@@ -245,6 +245,7 @@ class DataflowPlanBuilder:
         window: Optional[MetricTimeWindow],
         queried_linkable_specs: LinkableSpecSet,
         predicate_pushdown_state: PredicatePushdownState,
+        time_spine_filter_specs: Sequence[WhereFilterSpec] = (),
         constant_properties: Optional[Sequence[ConstantPropertyInput]] = None,
     ) -> DataflowPlanNode:
         """Builds a node that contains aggregated values of conversions and opportunities."""
@@ -296,6 +297,7 @@ class DataflowPlanBuilder:
             metric_input_measure_spec=base_measure_spec,
             queried_linkable_specs=queried_linkable_specs,
             predicate_pushdown_state=time_range_only_pushdown_state,
+            time_spine_filter_specs=time_spine_filter_specs,
         )
 
         # Build unaggregated conversions source node
@@ -371,6 +373,7 @@ class DataflowPlanBuilder:
             queried_linkable_specs=queried_linkable_specs,
             predicate_pushdown_state=disabled_pushdown_state,
             measure_recipe=recipe_with_join_conversion_source_node,
+            time_spine_filter_specs=time_spine_filter_specs,
         )
 
         # Combine the aggregated opportunities and conversion data sets
@@ -384,6 +387,7 @@ class DataflowPlanBuilder:
         queried_linkable_specs: LinkableSpecSet,
         filter_spec_factory: WhereSpecFactory,
         predicate_pushdown_state: PredicatePushdownState,
+        time_spine_filter_specs: Sequence[WhereFilterSpec] = (),
         for_group_by_source_node: bool = False,
     ) -> ComputeMetricsNode:
         """Builds a compute metric node for a conversion metric."""
@@ -427,6 +431,7 @@ class DataflowPlanBuilder:
             entity_spec=entity_spec,
             window=conversion_type_params.window,
             constant_properties=conversion_type_params.constant_properties,
+            time_spine_filter_specs=time_spine_filter_specs,
         )
 
         return self.build_computed_metrics_node(
@@ -442,6 +447,7 @@ class DataflowPlanBuilder:
         queried_linkable_specs: LinkableSpecSet,
         filter_spec_factory: WhereSpecFactory,
         predicate_pushdown_state: PredicatePushdownState,
+        time_spine_filter_specs: Sequence[WhereFilterSpec] = (),
         for_group_by_source_node: bool = False,
     ) -> DataflowPlanNode:
         # TODO: [custom granularity] Figure out how to support custom granularities as defaults
@@ -465,6 +471,7 @@ class DataflowPlanBuilder:
                 filter_spec_factory=filter_spec_factory,
                 predicate_pushdown_state=predicate_pushdown_state,
                 for_group_by_source_node=for_group_by_source_node,
+                time_spine_filter_specs=time_spine_filter_specs,
             )
 
         # If a cumulative metric is queried without default granularity, it will need to be aggregated twice -
@@ -495,6 +502,7 @@ class DataflowPlanBuilder:
         queried_linkable_specs: LinkableSpecSet,
         filter_spec_factory: WhereSpecFactory,
         predicate_pushdown_state: PredicatePushdownState,
+        time_spine_filter_specs: Sequence[WhereFilterSpec] = (),
         for_group_by_source_node: bool = False,
     ) -> ComputeMetricsNode:
         """Builds a node to compute a metric that is not defined from other metrics."""
@@ -549,6 +557,7 @@ class DataflowPlanBuilder:
             metric_input_measure_spec=metric_input_measure_spec,
             queried_linkable_specs=queried_linkable_specs,
             predicate_pushdown_state=predicate_pushdown_state,
+            time_spine_filter_specs=time_spine_filter_specs,
         )
         return self.build_computed_metrics_node(
             metric_spec=metric_spec,
@@ -563,73 +572,57 @@ class DataflowPlanBuilder:
         queried_linkable_specs: LinkableSpecSet,
         filter_spec_factory: WhereSpecFactory,
         predicate_pushdown_state: PredicatePushdownState,
+        time_spine_filter_specs: Sequence[WhereFilterSpec] = (),
         for_group_by_source_node: bool = False,
     ) -> DataflowPlanNode:
         """Builds a node to compute a metric defined from other metrics."""
-        metric = self._metric_lookup.get_metric(metric_spec.reference)
-        metric_input_specs = self._build_input_metric_specs_for_derived_metric(
-            metric_reference=metric_spec.reference,
-            filter_spec_factory=filter_spec_factory,
+        input_metric_specs = self._build_input_metric_specs(
+            metric_spec=metric_spec, filter_spec_factory=filter_spec_factory
         )
         logger.debug(
             LazyFormat(
-                lambda: f"For {metric.type} metric: {metric_spec}, needed metrics are:\n"
-                f"{mf_pformat(metric_input_specs)}"
+                lambda: f"For derived metric {metric_spec}, needed metrics are:\n" f"{mf_pformat(input_metric_specs)}"
             )
         )
-
-        required_linkable_specs = self.__get_required_linkable_specs(
-            queried_linkable_specs=queried_linkable_specs, filter_specs=metric_spec.filter_spec_set.all_filter_specs
+        # Pushdown is disabled for offset metrics; we can't apply filters to the source node due to potential changes from the offset.
+        metric_pushdown_state = (
+            PredicatePushdownState.with_pushdown_disabled() if metric_spec.has_time_offset else predicate_pushdown_state
         )
 
         parent_nodes: List[DataflowPlanNode] = []
-
-        # This is the filter that's defined for the metric in the configs.
-        metric_definition_filter_specs = filter_spec_factory.create_from_where_filter_intersection(
-            filter_location=WhereFilterLocation.for_metric(metric_spec.reference),
-            filter_intersection=metric.filter,
-        )
-
-        for metric_input_spec in metric_input_specs:
-            where_filter_spec_set = WhereFilterSpecSet(
-                metric_level_filter_specs=tuple(metric_definition_filter_specs),
-            )
-
-            # These are the filters that's defined as part of the input metric.
-            where_filter_spec_set = where_filter_spec_set.merge(metric_input_spec.filter_spec_set)
-
-            # If metric is offset, we'll apply where constraint after offset to avoid removing values
-            # unexpectedly. Time constraint will be applied by INNER JOINing to time spine.
-            # We may consider encapsulating this in pushdown state later, but as of this moment pushdown
-            # is about post-join to pre-join for dimension access, and relies on the builder to collect
-            # predicates from query and metric specs and make them available at measure level.
-            if not metric_spec.has_time_offset:
-                where_filter_spec_set = where_filter_spec_set.merge(metric_spec.filter_spec_set)
-            metric_pushdown_state = (
-                predicate_pushdown_state
-                if not metric_spec.has_time_offset
-                else PredicatePushdownState.with_pushdown_disabled()
-            )
-
-            parent_nodes.append(
-                self._build_any_metric_output_node(
-                    BuildAnyMetricOutputNodeParameterSet(
-                        metric_spec=MetricSpec(
-                            element_name=metric_input_spec.element_name,
-                            filter_spec_set=where_filter_spec_set,
-                            alias=metric_input_spec.alias,
-                            offset_window=metric_input_spec.offset_window,
-                            offset_to_grain=metric_input_spec.offset_to_grain,
-                        ),
-                        queried_linkable_specs=(
-                            queried_linkable_specs if not metric_spec.has_time_offset else required_linkable_specs
-                        ),
-                        filter_spec_factory=filter_spec_factory,
-                        predicate_pushdown_state=metric_pushdown_state,
-                        for_group_by_source_node=False,
+        for input_metric_spec in input_metric_specs:
+            # If the metric has a time offset, we'll apply any query-level metric_time constraints after the offset because
+            # those values may have changed. Time constraints will be applied by INNER JOINing to time spine.
+            input_metric_filter_set = input_metric_spec.filter_spec_set
+            query_level_agg_time_filter_specs: Tuple[WhereFilterSpec, ...] = ()
+            if input_metric_spec.has_time_offset:
+                query_level_non_agg_time_filter_specs: Tuple[WhereFilterSpec, ...] = ()
+                for filter_spec in input_metric_filter_set.query_level_filter_specs:
+                    included_agg_time_specs = (
+                        filter_spec.linkable_spec_set.included_agg_time_dimension_specs_for_metric(
+                            metric_reference=metric_spec.reference, metric_lookup=self._metric_lookup
+                        )
                     )
+                    if set(included_agg_time_specs) == set(filter_spec.linkable_spec_set.as_tuple):
+                        query_level_agg_time_filter_specs += (filter_spec,)
+                    else:
+                        query_level_non_agg_time_filter_specs += (filter_spec,)
+                # Rewrite input metric spec with non-metric time filters
+                input_metric_spec = input_metric_spec.with_new_filter_spec_set(
+                    input_metric_filter_set.replace_query_level_filter_specs(query_level_non_agg_time_filter_specs)
+                )
+
+            input_metric_parent_node = self._build_any_metric_output_node(
+                BuildAnyMetricOutputNodeParameterSet(
+                    metric_spec=input_metric_spec,
+                    queried_linkable_specs=queried_linkable_specs,
+                    filter_spec_factory=filter_spec_factory,
+                    predicate_pushdown_state=metric_pushdown_state,
+                    time_spine_filter_specs=query_level_agg_time_filter_specs,
+                    for_group_by_source_node=False,
                 )
             )
+            parent_nodes.append(input_metric_parent_node)
 
         parent_node = (
             parent_nodes[0]
@@ -648,35 +641,17 @@ class DataflowPlanBuilder:
             queried_agg_time_dimension_specs = queried_linkable_specs.included_agg_time_dimension_specs_for_metric(
                 metric_reference=metric_spec.reference, metric_lookup=self._metric_lookup
             )
-            assert (
-                queried_agg_time_dimension_specs
-            ), "Joining to time spine requires querying with metric_time or the appropriate agg_time_dimension."
             output_node = JoinToTimeSpineNode.create(
                 parent_node=output_node,
                 requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
                 use_custom_agg_time_dimension=not queried_linkable_specs.contains_metric_time,
                 time_range_constraint=predicate_pushdown_state.time_range_constraint,
+                time_spine_filters=time_spine_filter_specs,
                 offset_window=metric_spec.offset_window,
                 offset_to_grain=metric_spec.offset_to_grain,
                 join_type=SqlJoinType.INNER,
             )
 
-            if len(metric_spec.filter_spec_set.all_filter_specs) > 0:
-                output_node = WhereConstraintNode.create(
-                    parent_node=output_node, where_specs=metric_spec.filter_spec_set.all_filter_specs
-                )
-                specs_in_filters = set(
-                    linkable_spec
-                    for filter_spec in metric_spec.filter_spec_set.all_filter_specs
-                    for linkable_spec in filter_spec.linkable_specs
-                )
-                if not specs_in_filters.issubset(queried_linkable_specs.as_tuple):
-                    output_node = FilterElementsNode.create(
-                        parent_node=output_node,
-                        include_specs=InstanceSpecSet(metric_specs=(metric_spec,)).merge(
-                            InstanceSpecSet.create_from_specs(queried_linkable_specs.as_tuple)
-                        ),
-                    )
         return output_node
 
     def _build_any_metric_output_node(self, parameter_set: BuildAnyMetricOutputNodeParameterSet) -> DataflowPlanNode:
@@ -698,6 +673,7 @@ class DataflowPlanBuilder:
         filter_spec_factory = parameter_set.filter_spec_factory
         predicate_pushdown_state = parameter_set.predicate_pushdown_state
         for_group_by_source_node = parameter_set.for_group_by_source_node
+        time_spine_filter_specs = parameter_set.time_spine_filter_specs
 
         metric = self._metric_lookup.get_metric(metric_spec.reference)
 
@@ -708,6 +684,7 @@ class DataflowPlanBuilder:
                 filter_spec_factory=filter_spec_factory,
                 predicate_pushdown_state=predicate_pushdown_state,
                 for_group_by_source_node=for_group_by_source_node,
+                time_spine_filter_specs=time_spine_filter_specs,
             )
 
         elif metric.type is MetricType.CUMULATIVE:
@@ -717,6 +694,7 @@ class DataflowPlanBuilder:
                 filter_spec_factory=filter_spec_factory,
                 predicate_pushdown_state=predicate_pushdown_state,
                 for_group_by_source_node=for_group_by_source_node,
+                time_spine_filter_specs=time_spine_filter_specs,
             )
 
         elif metric.type is MetricType.RATIO or metric.type is MetricType.DERIVED:
@@ -726,6 +704,7 @@ class DataflowPlanBuilder:
                 filter_spec_factory=filter_spec_factory,
                 predicate_pushdown_state=predicate_pushdown_state,
                 for_group_by_source_node=for_group_by_source_node,
+                time_spine_filter_specs=time_spine_filter_specs,
             )
         elif metric.type is MetricType.CONVERSION:
             return self._build_conversion_metric_output_node(
@@ -734,6 +713,7 @@ class DataflowPlanBuilder:
                 filter_spec_factory=filter_spec_factory,
                 predicate_pushdown_state=predicate_pushdown_state,
                 for_group_by_source_node=for_group_by_source_node,
+                time_spine_filter_specs=time_spine_filter_specs,
             )
 
         assert_values_exhausted(metric.type)
@@ -1383,42 +1363,54 @@ class DataflowPlanBuilder:
         )
         return filter_spec_set.merge(descendent_filter_spec_set)
 
-    def _build_input_metric_specs_for_derived_metric(
+    def _build_input_metric_specs(
         self,
-        metric_reference: MetricReference,
+        metric_spec: MetricSpec,
         filter_spec_factory: WhereSpecFactory,
     ) -> Sequence[MetricSpec]:
         """Return the metric specs referenced by the metric. Current use case is for derived metrics."""
-        metric = self._metric_lookup.get_metric(metric_reference)
+        metric = self._metric_lookup.get_metric(metric_spec.reference)
         input_metric_specs: List[MetricSpec] = []
 
+        # The metric spec already has the query-level filter specs. If the outer metric was also an input metric on another
+        # derived metric (in the case of a nested derived metric) any metric_level_filter_specs here were inherited from that
+        # input metric and should be treated as query-level filters here.
+        query_level_filter_specs = (
+            metric_spec.filter_spec_set.query_level_filter_specs + metric_spec.filter_spec_set.metric_level_filter_specs
+        )
+
+        # For the purpose of input metrics, outer metric filters should be treated as query-level filters.
+        outer_metric_filter_specs = filter_spec_factory.create_from_where_filter_intersection(
+            filter_location=WhereFilterLocation.for_metric(metric_reference=metric_spec.reference),
+            filter_intersection=metric.filter,
+        )
+        query_level_filter_specs += tuple(outer_metric_filter_specs)
+
         for input_metric in metric.input_metrics:
+            input_metric_filter_specs = filter_spec_factory.create_from_where_filter_intersection(
+                filter_location=WhereFilterLocation.for_input_metric(input_metric_reference=input_metric.as_reference),
+                filter_intersection=input_metric.filter,
+            )
             filter_spec_set = WhereFilterSpecSet(
-                metric_level_filter_specs=tuple(
-                    filter_spec_factory.create_from_where_filter_intersection(
-                        filter_location=WhereFilterLocation.for_input_metric(
-                            input_metric_reference=input_metric.as_reference
-                        ),
-                        filter_intersection=input_metric.filter,
-                    )
-                ),
+                metric_level_filter_specs=tuple(input_metric_filter_specs),
+                query_level_filter_specs=tuple(query_level_filter_specs),
             )
 
-            spec = MetricSpec(
+            offset_window = (
+                PydanticMetricTimeWindow(
+                    count=input_metric.offset_window.count, granularity=input_metric.offset_window.granularity
+                )
+                if input_metric.offset_window
+                else None
+            )
+            input_metric_spec = MetricSpec(
                 element_name=input_metric.name,
                 filter_spec_set=filter_spec_set,
                 alias=input_metric.alias,
-                offset_window=(
-                    PydanticMetricTimeWindow(
-                        count=input_metric.offset_window.count,
-                        granularity=input_metric.offset_window.granularity,
-                    )
-                    if input_metric.offset_window
-                    else None
-                ),
+                offset_window=offset_window,
                 offset_to_grain=input_metric.offset_to_grain,
             )
-            input_metric_specs.append(spec)
+            input_metric_specs.append(input_metric_spec)
         return tuple(input_metric_specs)
 
     def build_aggregated_measure(
@@ -1426,6 +1418,7 @@ class DataflowPlanBuilder:
         metric_input_measure_spec: MetricInputMeasureSpec,
         queried_linkable_specs: LinkableSpecSet,
         predicate_pushdown_state: PredicatePushdownState,
+        time_spine_filter_specs: Sequence[WhereFilterSpec],
         measure_recipe: Optional[SourceNodeRecipe] = None,
     ) -> DataflowPlanNode:
         """Returns a node where the measures are aggregated by the linkable specs and constrained appropriately.
@@ -1449,6 +1442,7 @@ class DataflowPlanBuilder:
             queried_linkable_specs=queried_linkable_specs,
             predicate_pushdown_state=predicate_pushdown_state,
             measure_recipe=measure_recipe,
+            time_spine_filter_specs=time_spine_filter_specs,
         )
 
     def __get_required_linkable_specs(
@@ -1497,6 +1491,7 @@ class DataflowPlanBuilder:
         queried_linkable_specs: LinkableSpecSet,
         predicate_pushdown_state: PredicatePushdownState,
         measure_recipe: Optional[SourceNodeRecipe] = None,
+        time_spine_filter_specs: Sequence[WhereFilterSpec] = (),
     ) -> DataflowPlanNode:
         measure_spec = metric_input_measure_spec.measure_spec
         cumulative = metric_input_measure_spec.cumulative_description is not None
@@ -1631,6 +1626,7 @@ class DataflowPlanBuilder:
                 offset_window=before_aggregation_time_spine_join_description.offset_window,
                 offset_to_grain=before_aggregation_time_spine_join_description.offset_to_grain,
                 join_type=before_aggregation_time_spine_join_description.join_type,
+                time_spine_filters=time_spine_filter_specs,
             )
 
         custom_granularity_specs_to_join = [
@@ -1686,6 +1682,7 @@ class DataflowPlanBuilder:
                 if set(included_agg_time_specs) == set(filter_spec.linkable_spec_set.as_tuple):
                     agg_time_only_filters.append(filter_spec)
                     if filter_spec.linkable_spec_set.time_dimension_specs_with_custom_grain:
+                        # TODO: dedupe this logic with where it's used elsewhere once this error is removed
                         raise ValueError(
                             "Using custom granularity in filters for `join_to_timespine` metrics is not yet fully supported. "
                             "This feature is coming soon!"

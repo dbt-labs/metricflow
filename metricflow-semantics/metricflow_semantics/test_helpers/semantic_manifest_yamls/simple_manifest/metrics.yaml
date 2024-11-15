@@ -724,7 +724,7 @@ metric:
   description: bookings metric offset twice with tiered filters
   type: derived
   type_params:
-    expr: bookings
+    expr: bookings_offset_once
     metrics:
       - name: bookings_offset_once
         offset_window: 1 month

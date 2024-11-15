@@ -59,54 +59,13 @@ docstring:
             <ComputeMetricsNode>
                 <!-- description = 'Compute Metrics via Expressions' -->
                 <!-- node_id = NodeId(id_str='cm_0') -->
-                <!-- metric_spec =                                                           -->
-                <!--   MetricSpec(                                                           -->
-                <!--     element_name='bookings',                                            -->
-                <!--     filter_spec_set=WhereFilterSpecSet(                                 -->
-                <!--       query_level_filter_specs=(                                        -->
-                <!--         WhereFilterSpec(                                                -->
-                <!--           where_sql="metric_time__day = '2020-01-01'",                  -->
-                <!--           bind_parameters=SqlBindParameterSet(),                        -->
-                <!--           linkable_element_unions=(                                     -->
-                <!--             LinkableElementUnion(                                       -->
-                <!--               linkable_dimension=LinkableDimension(                     -->
-                <!--                 properties=(                                            -->
-                <!--                   METRIC_TIME,                                          -->
-                <!--                 ),                                                      -->
-                <!--                 defined_in_semantic_model=SemanticModelReference(       -->
-                <!--                   semantic_model_name='bookings_source',                -->
-                <!--                 ),                                                      -->
-                <!--                 element_name='metric_time',                             -->
-                <!--                 dimension_type=TIME,                                    -->
-                <!--                 join_path=SemanticModelJoinPath(                        -->
-                <!--                   left_semantic_model_reference=SemanticModelReference( -->
-                <!--                     semantic_model_name='bookings_source',              -->
-                <!--                   ),                                                    -->
-                <!--                 ),                                                      -->
-                <!--                 time_granularity=ExpandedTimeGranularity(               -->
-                <!--                   name='day',                                           -->
-                <!--                   base_granularity=DAY,                                 -->
-                <!--                 ),                                                      -->
-                <!--               ),                                                        -->
-                <!--             ),                                                          -->
-                <!--           ),                                                            -->
-                <!--           linkable_spec_set=LinkableSpecSet(                            -->
-                <!--             time_dimension_specs=(                                      -->
-                <!--               TimeDimensionSpec(                                        -->
-                <!--                 element_name='metric_time',                             -->
-                <!--                 time_granularity=ExpandedTimeGranularity(               -->
-                <!--                   name='day',                                           -->
-                <!--                   base_granularity=DAY,                                 -->
-                <!--                 ),                                                      -->
-                <!--               ),                                                        -->
-                <!--             ),                                                          -->
-                <!--           ),                                                            -->
-                <!--         ),                                                              -->
-                <!--       ),                                                                -->
-                <!--     ),                                                                  -->
-                <!--     alias='bookings_start_of_month',                                    -->
-                <!--     offset_to_grain=MONTH,                                              -->
-                <!--   )                                                                     -->
+                <!-- metric_spec =                             -->
+                <!--   MetricSpec(                             -->
+                <!--     element_name='bookings',              -->
+                <!--     filter_spec_set=WhereFilterSpecSet(), -->
+                <!--     alias='bookings_start_of_month',      -->
+                <!--     offset_to_grain=MONTH,                -->
+                <!--   )                                       -->
                 <AggregateMeasuresNode>
                     <!-- description = 'Aggregate Measures' -->
                     <!-- node_id = NodeId(id_str='am_0') -->
@@ -120,71 +79,31 @@ docstring:
                         <!--     time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH), -->
                         <!--   )                                                                                 -->
                         <!-- distinct = False -->
-                        <WhereConstraintNode>
-                            <!-- description = 'Constrain Output with WHERE' -->
-                            <!-- node_id = NodeId(id_str='wcc_0') -->
-                            <!-- where_condition =                                                 -->
-                            <!--   WhereFilterSpec(                                                -->
-                            <!--     where_sql="metric_time__day = '2020-01-01'",                  -->
-                            <!--     bind_parameters=SqlBindParameterSet(),                        -->
-                            <!--     linkable_element_unions=(                                     -->
-                            <!--       LinkableElementUnion(                                       -->
-                            <!--         linkable_dimension=LinkableDimension(                     -->
-                            <!--           properties=(METRIC_TIME,),                              -->
-                            <!--           defined_in_semantic_model=SemanticModelReference(       -->
-                            <!--             semantic_model_name='bookings_source',                -->
-                            <!--           ),                                                      -->
-                            <!--           element_name='metric_time',                             -->
-                            <!--           dimension_type=TIME,                                    -->
-                            <!--           join_path=SemanticModelJoinPath(                        -->
-                            <!--             left_semantic_model_reference=SemanticModelReference( -->
-                            <!--               semantic_model_name='bookings_source',              -->
-                            <!--             ),                                                    -->
-                            <!--           ),                                                      -->
-                            <!--           time_granularity=ExpandedTimeGranularity(               -->
-                            <!--             name='day',                                           -->
-                            <!--             base_granularity=DAY,                                 -->
-                            <!--           ),                                                      -->
-                            <!--         ),                                                        -->
-                            <!--       ),                                                          -->
-                            <!--     ),                                                            -->
-                            <!--     linkable_spec_set=LinkableSpecSet(                            -->
-                            <!--       time_dimension_specs=(                                      -->
-                            <!--         TimeDimensionSpec(                                        -->
-                            <!--           element_name='metric_time',                             -->
-                            <!--           time_granularity=ExpandedTimeGranularity(               -->
-                            <!--             name='day',                                           -->
-                            <!--             base_granularity=DAY,                                 -->
-                            <!--           ),                                                      -->
-                            <!--         ),                                                        -->
-                            <!--       ),                                                          -->
-                            <!--     ),                                                            -->
-                            <!--   )                                                               -->
-                            <JoinToTimeSpineNode>
-                                <!-- description = 'Join to Time Spine Dataset' -->
-                                <!-- node_id = NodeId(id_str='jts_0') -->
-                                <!-- requested_agg_time_dimension_specs =                                                  -->
-                                <!--   (                                                                                   -->
-                                <!--     TimeDimensionSpec(                                                                -->
-                                <!--       element_name='metric_time',                                                     -->
-                                <!--       time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH), -->
-                                <!--     ),                                                                                -->
-                                <!--   )                                                                                   -->
-                                <!-- use_custom_agg_time_dimension = False -->
-                                <!-- join_type = INNER -->
-                                <!-- offset_to_grain = MONTH -->
-                                <MetricTimeDimensionTransformNode>
-                                    <!-- description = "Metric Time Dimension 'ds'" -->
-                                    <!-- node_id = NodeId(id_str='sma_28009') -->
-                                    <!-- aggregation_time_dimension = 'ds' -->
-                                    <ReadSqlSourceNode>
-                                        <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
-                                        <!-- node_id = NodeId(id_str='rss_28020') -->
-                                        <!-- data_set = SemanticModelDataSet('bookings_source') -->
-                                    </ReadSqlSourceNode>
-                                </MetricTimeDimensionTransformNode>
-                            </JoinToTimeSpineNode>
-                        </WhereConstraintNode>
+                        <JoinToTimeSpineNode>
+                            <!-- description = 'Join to Time Spine Dataset' -->
+                            <!-- node_id = NodeId(id_str='jts_0') -->
+                            <!-- requested_agg_time_dimension_specs =                                                  -->
+                            <!--   (                                                                                   -->
+                            <!--     TimeDimensionSpec(                                                                -->
+                            <!--       element_name='metric_time',                                                     -->
+                            <!--       time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH), -->
+                            <!--     ),                                                                                -->
+                            <!--   )                                                                                   -->
+                            <!-- use_custom_agg_time_dimension = False -->
+                            <!-- join_type = INNER -->
+                            <!-- offset_to_grain = MONTH -->
+                            <!-- time_spine_filters = ["metric_time__day = '2020-01-01'",] -->
+                            <MetricTimeDimensionTransformNode>
+                                <!-- description = "Metric Time Dimension 'ds'" -->
+                                <!-- node_id = NodeId(id_str='sma_28009') -->
+                                <!-- aggregation_time_dimension = 'ds' -->
+                                <ReadSqlSourceNode>
+                                    <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
+                                    <!-- node_id = NodeId(id_str='rss_28020') -->
+                                    <!-- data_set = SemanticModelDataSet('bookings_source') -->
+                                </ReadSqlSourceNode>
+                            </MetricTimeDimensionTransformNode>
+                        </JoinToTimeSpineNode>
                     </FilterElementsNode>
                 </AggregateMeasuresNode>
             </ComputeMetricsNode>

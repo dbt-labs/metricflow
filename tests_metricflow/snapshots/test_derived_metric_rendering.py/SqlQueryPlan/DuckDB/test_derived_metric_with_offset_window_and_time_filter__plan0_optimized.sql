@@ -33,33 +33,37 @@ FROM (
       metric_time__day
   ) subq_21
   FULL OUTER JOIN (
-    -- Constrain Output with WHERE
+    -- Join to Time Spine Dataset
     -- Pass Only Elements: ['bookings', 'metric_time__day']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      metric_time__day
-      , SUM(bookings) AS bookings_2_weeks_ago
+      subq_24.metric_time__day AS metric_time__day
+      , SUM(subq_23.bookings) AS bookings_2_weeks_ago
     FROM (
-      -- Join to Time Spine Dataset
+      -- Filter Time Spine
       SELECT
-        subq_25.ds AS metric_time__day
-        , subq_23.bookings AS bookings
-      FROM ***************************.mf_time_spine subq_25
-      INNER JOIN (
-        -- Read Elements From Semantic Model 'bookings_source'
-        -- Metric Time Dimension 'ds'
+        metric_time__day
+      FROM (
+        -- Time Spine
         SELECT
-          DATE_TRUNC('day', ds) AS metric_time__day
-          , 1 AS bookings
-        FROM ***************************.fct_bookings bookings_source_src_28000
-      ) subq_23
-      ON
-        subq_25.ds - INTERVAL 14 day = subq_23.metric_time__day
-    ) subq_26
-    WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'
+          ds AS metric_time__day
+        FROM ***************************.mf_time_spine subq_25
+      ) subq_26
+      WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'
+    ) subq_24
+    INNER JOIN (
+      -- Read Elements From Semantic Model 'bookings_source'
+      -- Metric Time Dimension 'ds'
+      SELECT
+        DATE_TRUNC('day', ds) AS metric_time__day
+        , 1 AS bookings
+      FROM ***************************.fct_bookings bookings_source_src_28000
+    ) subq_23
+    ON
+      subq_24.metric_time__day - INTERVAL 14 day = subq_23.metric_time__day
     GROUP BY
-      metric_time__day
+      subq_24.metric_time__day
   ) subq_30
   ON
     subq_21.metric_time__day = subq_30.metric_time__day
