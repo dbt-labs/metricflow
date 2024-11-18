@@ -12,6 +12,7 @@ from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
+from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_MONTH, MTD_SPEC_WEEK, MTD_SPEC_YEAR
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
@@ -62,6 +63,8 @@ def test_input_str(object_builder_naming_scheme: ObjectBuilderNamingScheme) -> N
         )
         == "Metric('bookings', group_by=['listing'])"
     )
+
+    assert object_builder_naming_scheme.input_str(MetricSpec("bookings")) is None
 
 
 def test_input_follows_scheme(object_builder_naming_scheme: ObjectBuilderNamingScheme) -> None:  # noqa: D103
