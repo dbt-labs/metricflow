@@ -175,7 +175,6 @@ docstring:
                                     <!--       ),                                        -->
                                     <!--     ),                                          -->
                                     <!--   )                                             -->
-                                    <!-- use_custom_agg_time_dimension = False -->
                                     <!-- join_type = INNER -->
                                     <!-- offset_window = PydanticMetricTimeWindow(count=1, granularity='week') -->
                                     <MetricTimeDimensionTransformNode>
