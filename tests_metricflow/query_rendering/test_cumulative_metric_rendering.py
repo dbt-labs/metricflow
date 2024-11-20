@@ -611,6 +611,36 @@ def test_derived_cumulative_metric_with_non_default_grains(
     )
 
 
+@pytest.mark.sql_engine_snapshot
+def test_cumulative_metric_with_metric_time_where_filter_not_in_group_by(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    query_parser: MetricFlowQueryParser,
+    # mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
+    sql_client: SqlClient,
+) -> None:
+    """Test querying a derived metric with a cumulative input metric using non-default grains."""
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("trailing_2_months_revenue_sub_10",),
+        group_by_names=("metric_time__week",),
+        where_constraints=[
+            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('metric_time', 'day') }} >= '2020-01-03' "))
+        ],
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+    assert 0
+
+
 # TODO: write the following tests when unblocked
 # - Query cumulative metric with non-day default_grain (using default grain and non-default grain)
 # - Query 2 metrics with different default_grains using metric_time (no grain specified)

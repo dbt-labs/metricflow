@@ -243,6 +243,8 @@ class SqlSelectStatementNode(SqlQueryPlanNode):
             distinct=self.distinct,
         )
 
+    # TODO: add helper to get column from spec
+
 
 @dataclass(frozen=True, eq=False)
 class SqlTableNode(SqlQueryPlanNode):

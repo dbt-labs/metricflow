@@ -31,7 +31,9 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
         offset_to_grain: Granularity period to offset the parent dataset to when joining to time spine.
     """
 
+    # TODO: rename property to required_agg_time_dimension_specs
     requested_agg_time_dimension_specs: Sequence[TimeDimensionSpec]
+    # TODO remove this property
     use_custom_agg_time_dimension: bool
     join_type: SqlJoinType
     time_range_constraint: Optional[TimeRangeConstraint]
