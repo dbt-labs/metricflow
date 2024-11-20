@@ -102,13 +102,28 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
             )
         )
 
+    def add_specs(
+        self,
+        dimension_specs: Tuple[DimensionSpec, ...] = (),
+        time_dimension_specs: Tuple[TimeDimensionSpec, ...] = (),
+        entity_specs: Tuple[EntitySpec, ...] = (),
+        group_by_metric_specs: Tuple[GroupByMetricSpec, ...] = (),
+    ) -> LinkableSpecSet:
+        """Return a new set with the new specs in addition to the existing ones."""
+        return LinkableSpecSet(
+            dimension_specs=self.dimension_specs + dimension_specs,
+            time_dimension_specs=self.time_dimension_specs + time_dimension_specs,
+            entity_specs=self.entity_specs + entity_specs,
+            group_by_metric_specs=self.group_by_metric_specs + group_by_metric_specs,
+        )
+
     @override
     def merge(self, other: LinkableSpecSet) -> LinkableSpecSet:
-        return LinkableSpecSet(
-            dimension_specs=self.dimension_specs + other.dimension_specs,
-            time_dimension_specs=self.time_dimension_specs + other.time_dimension_specs,
-            entity_specs=self.entity_specs + other.entity_specs,
-            group_by_metric_specs=self.group_by_metric_specs + other.group_by_metric_specs,
+        return self.add_specs(
+            dimension_specs=other.dimension_specs,
+            time_dimension_specs=other.time_dimension_specs,
+            entity_specs=other.entity_specs,
+            group_by_metric_specs=other.group_by_metric_specs,
         )
 
     @classmethod
