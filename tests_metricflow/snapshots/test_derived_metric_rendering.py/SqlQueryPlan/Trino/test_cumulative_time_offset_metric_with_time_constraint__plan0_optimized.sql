@@ -13,15 +13,9 @@ FROM (
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
-    subq_17.metric_time__day AS metric_time__day
+    subq_18.ds AS metric_time__day
     , COUNT(DISTINCT subq_16.bookers) AS every_2_days_bookers_2_days_ago
-  FROM (
-    -- Time Spine
-    SELECT
-      ds AS metric_time__day
-    FROM ***************************.mf_time_spine subq_18
-    WHERE ds BETWEEN timestamp '2019-12-19' AND timestamp '2020-01-02'
-  ) subq_17
+  FROM ***************************.mf_time_spine subq_18
   INNER JOIN (
     -- Join Self Over Time Range
     SELECT
@@ -38,8 +32,8 @@ FROM (
       )
   ) subq_16
   ON
-    DATE_ADD('day', -2, subq_17.metric_time__day) = subq_16.metric_time__day
-  WHERE subq_17.metric_time__day BETWEEN timestamp '2019-12-19' AND timestamp '2020-01-02'
+    DATE_ADD('day', -2, subq_18.ds) = subq_16.metric_time__day
+  WHERE subq_18.ds BETWEEN timestamp '2019-12-19' AND timestamp '2020-01-02'
   GROUP BY
-    subq_17.metric_time__day
+    subq_18.ds
 ) subq_23
