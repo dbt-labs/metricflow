@@ -18,8 +18,8 @@ FROM (
     FROM (
       -- Time Spine
       SELECT
-        subq_6.ts AS metric_time__hour
-        , DATETIME_TRUNC(subq_6.ts, day) AS metric_time__day
+        DATETIME_TRUNC(subq_6.ts, day) AS metric_time__day
+        , subq_6.ts AS metric_time__hour
       FROM ***************************.mf_time_spine_hour subq_6
     ) subq_7
     WHERE (

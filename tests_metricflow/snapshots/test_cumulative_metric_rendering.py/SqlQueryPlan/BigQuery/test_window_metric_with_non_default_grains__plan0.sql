@@ -33,14 +33,16 @@ FROM (
     FROM (
       -- Join to Time Spine Dataset
       SELECT
-        DATETIME_TRUNC(subq_7.metric_time__day, month) AS booking__ds__month
+        subq_7.booking__ds__month AS booking__ds__month
         , subq_7.metric_time__day AS metric_time__day
-        , DATETIME_TRUNC(subq_7.metric_time__day, isoweek) AS metric_time__week
+        , subq_7.metric_time__week AS metric_time__week
         , subq_6.bookers AS bookers
       FROM (
         -- Time Spine
         SELECT
-          subq_8.ds AS metric_time__day
+          DATETIME_TRUNC(subq_8.ds, month) AS booking__ds__month
+          , subq_8.ds AS metric_time__day
+          , DATETIME_TRUNC(subq_8.ds, isoweek) AS metric_time__week
         FROM ***************************.mf_time_spine subq_8
       ) subq_7
       LEFT OUTER JOIN (
