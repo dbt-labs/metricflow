@@ -1705,7 +1705,6 @@ integration_test:
         SELECT
           ds AS metric_time__day
         FROM {{ source_schema }}.mf_time_spine
-        WHERE {{ render_time_constraint('ds', '2019-12-19', '2020-01-02') }}
       ) subq_3
       INNER JOIN (
         SELECT
@@ -1716,6 +1715,7 @@ integration_test:
       ON {{ render_date_sub("subq_3", "metric_time__day", 5, TimeGranularity.DAY) }} = subq_2.metric_time__day
       GROUP BY subq_3.metric_time__day
     ) outer_subq
+    WHERE {{ render_time_constraint('metric_time__day', '2019-12-19', '2020-01-02') }}
 ---
 integration_test:
   name: cumulative_time_offset_metric_with_time_constraint
