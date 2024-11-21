@@ -8,28 +8,28 @@ sql_engine: Postgres
 ---
 -- Re-aggregate Metric via Group By
 SELECT
-  metric_time__week
-  , booking__ds__month
+  booking__ds__month
+  , metric_time__week
   , every_two_days_bookers_fill_nulls_with_0
 FROM (
   -- Compute Metrics via Expressions
   -- Window Function for Metric Re-aggregation
   SELECT
-    metric_time__week
-    , booking__ds__month
+    booking__ds__month
+    , metric_time__week
     , FIRST_VALUE(COALESCE(bookers, 0)) OVER (
       PARTITION BY
-        metric_time__week
-        , booking__ds__month
+        booking__ds__month
+        , metric_time__week
       ORDER BY metric_time__day
       ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
     ) AS every_two_days_bookers_fill_nulls_with_0
   FROM (
     -- Join to Time Spine Dataset
     SELECT
-      subq_20.ds AS metric_time__day
+      DATE_TRUNC('month', subq_20.ds) AS booking__ds__month
+      , subq_20.ds AS metric_time__day
       , DATE_TRUNC('week', subq_20.ds) AS metric_time__week
-      , subq_18.booking__ds__month AS booking__ds__month
       , subq_18.bookers AS bookers
     FROM ***************************.mf_time_spine subq_20
     LEFT OUTER JOIN (
@@ -60,6 +60,6 @@ FROM (
   ) subq_21
 ) subq_23
 GROUP BY
-  metric_time__week
-  , booking__ds__month
+  booking__ds__month
+  , metric_time__week
   , every_two_days_bookers_fill_nulls_with_0

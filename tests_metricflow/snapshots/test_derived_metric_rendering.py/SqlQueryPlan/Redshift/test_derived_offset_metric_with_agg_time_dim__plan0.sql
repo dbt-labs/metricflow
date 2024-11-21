@@ -31,16 +31,6 @@ FROM (
           -- Join to Time Spine Dataset
           SELECT
             subq_2.booking__ds__day AS booking__ds__day
-            , DATE_TRUNC('week', subq_2.booking__ds__day) AS booking__ds__week
-            , DATE_TRUNC('month', subq_2.booking__ds__day) AS booking__ds__month
-            , DATE_TRUNC('quarter', subq_2.booking__ds__day) AS booking__ds__quarter
-            , DATE_TRUNC('year', subq_2.booking__ds__day) AS booking__ds__year
-            , EXTRACT(year FROM subq_2.booking__ds__day) AS booking__ds__extract_year
-            , EXTRACT(quarter FROM subq_2.booking__ds__day) AS booking__ds__extract_quarter
-            , EXTRACT(month FROM subq_2.booking__ds__day) AS booking__ds__extract_month
-            , EXTRACT(day FROM subq_2.booking__ds__day) AS booking__ds__extract_day
-            , CASE WHEN EXTRACT(dow FROM subq_2.booking__ds__day) = 0 THEN EXTRACT(dow FROM subq_2.booking__ds__day) + 7 ELSE EXTRACT(dow FROM subq_2.booking__ds__day) END AS booking__ds__extract_dow
-            , EXTRACT(doy FROM subq_2.booking__ds__day) AS booking__ds__extract_doy
             , subq_1.ds__day AS ds__day
             , subq_1.ds__week AS ds__week
             , subq_1.ds__month AS ds__month
@@ -74,6 +64,16 @@ FROM (
             , subq_1.paid_at__extract_day AS paid_at__extract_day
             , subq_1.paid_at__extract_dow AS paid_at__extract_dow
             , subq_1.paid_at__extract_doy AS paid_at__extract_doy
+            , subq_1.booking__ds__week AS booking__ds__week
+            , subq_1.booking__ds__month AS booking__ds__month
+            , subq_1.booking__ds__quarter AS booking__ds__quarter
+            , subq_1.booking__ds__year AS booking__ds__year
+            , subq_1.booking__ds__extract_year AS booking__ds__extract_year
+            , subq_1.booking__ds__extract_quarter AS booking__ds__extract_quarter
+            , subq_1.booking__ds__extract_month AS booking__ds__extract_month
+            , subq_1.booking__ds__extract_day AS booking__ds__extract_day
+            , subq_1.booking__ds__extract_dow AS booking__ds__extract_dow
+            , subq_1.booking__ds__extract_doy AS booking__ds__extract_doy
             , subq_1.booking__ds_partitioned__day AS booking__ds_partitioned__day
             , subq_1.booking__ds_partitioned__week AS booking__ds_partitioned__week
             , subq_1.booking__ds_partitioned__month AS booking__ds_partitioned__month

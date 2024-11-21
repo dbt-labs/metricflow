@@ -244,3 +244,16 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
             date_part=self.date_part,
             aggregation_state=self.aggregation_state,
         )
+
+    @staticmethod
+    def with_base_grains(time_dimension_specs: Sequence[TimeDimensionSpec]) -> List[TimeDimensionSpec]:
+        """Return the list of time dimension specs, replacing any custom grains with base grains.
+
+        Dedupes new specs, but preserves the initial order.
+        """
+        base_grain_specs: List[TimeDimensionSpec] = []
+        for spec in time_dimension_specs:
+            base_grain_spec = spec.with_base_grain()
+            if base_grain_spec not in base_grain_specs:
+                base_grain_specs.append(base_grain_spec)
+        return base_grain_specs

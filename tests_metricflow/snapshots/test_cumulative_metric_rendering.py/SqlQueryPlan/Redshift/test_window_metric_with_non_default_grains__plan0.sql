@@ -8,34 +8,34 @@ sql_engine: Redshift
 ---
 -- Re-aggregate Metric via Group By
 SELECT
-  subq_11.metric_time__week
-  , subq_11.booking__ds__month
+  subq_11.booking__ds__month
+  , subq_11.metric_time__week
   , subq_11.every_two_days_bookers_fill_nulls_with_0
 FROM (
   -- Window Function for Metric Re-aggregation
   SELECT
-    subq_10.metric_time__week
-    , subq_10.booking__ds__month
+    subq_10.booking__ds__month
+    , subq_10.metric_time__week
     , FIRST_VALUE(subq_10.every_two_days_bookers_fill_nulls_with_0) OVER (
       PARTITION BY
-        subq_10.metric_time__week
-        , subq_10.booking__ds__month
+        subq_10.booking__ds__month
+        , subq_10.metric_time__week
       ORDER BY subq_10.metric_time__day
       ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
     ) AS every_two_days_bookers_fill_nulls_with_0
   FROM (
     -- Compute Metrics via Expressions
     SELECT
-      subq_9.metric_time__day
+      subq_9.booking__ds__month
+      , subq_9.metric_time__day
       , subq_9.metric_time__week
-      , subq_9.booking__ds__month
       , COALESCE(subq_9.bookers, 0) AS every_two_days_bookers_fill_nulls_with_0
     FROM (
       -- Join to Time Spine Dataset
       SELECT
-        subq_7.metric_time__day AS metric_time__day
+        DATE_TRUNC('month', subq_7.metric_time__day) AS booking__ds__month
+        , subq_7.metric_time__day AS metric_time__day
         , DATE_TRUNC('week', subq_7.metric_time__day) AS metric_time__week
-        , subq_6.booking__ds__month AS booking__ds__month
         , subq_6.bookers AS bookers
       FROM (
         -- Time Spine
@@ -380,6 +380,6 @@ FROM (
   ) subq_10
 ) subq_11
 GROUP BY
-  subq_11.metric_time__week
-  , subq_11.booking__ds__month
+  subq_11.booking__ds__month
+  , subq_11.metric_time__week
   , subq_11.every_two_days_bookers_fill_nulls_with_0
