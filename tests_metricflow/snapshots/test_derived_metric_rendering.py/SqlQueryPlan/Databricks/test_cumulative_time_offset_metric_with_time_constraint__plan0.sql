@@ -228,7 +228,6 @@ FROM (
             SELECT
               subq_6.ds AS metric_time__day
             FROM ***************************.mf_time_spine subq_6
-            WHERE subq_6.ds BETWEEN '2019-12-19' AND '2020-01-02'
           ) subq_5
           INNER JOIN (
             -- Join Self Over Time Range

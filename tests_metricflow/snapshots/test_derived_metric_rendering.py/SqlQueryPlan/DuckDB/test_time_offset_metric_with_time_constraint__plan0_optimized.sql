@@ -8,19 +8,14 @@ SELECT
   , bookings_5_days_ago AS bookings_5_day_lag
 FROM (
   -- Join to Time Spine Dataset
+  -- Constrain Time Range to [2019-12-19T00:00:00, 2020-01-02T00:00:00]
   -- Pass Only Elements: ['bookings', 'metric_time__day']
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
-    subq_10.metric_time__day AS metric_time__day
-    , SUM(subq_9.bookings) AS bookings_5_days_ago
-  FROM (
-    -- Time Spine
-    SELECT
-      ds AS metric_time__day
-    FROM ***************************.mf_time_spine subq_11
-    WHERE ds BETWEEN '2019-12-19' AND '2020-01-02'
-  ) subq_10
+    subq_12.ds AS metric_time__day
+    , SUM(subq_10.bookings) AS bookings_5_days_ago
+  FROM ***************************.mf_time_spine subq_12
   INNER JOIN (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
@@ -28,9 +23,10 @@ FROM (
       DATE_TRUNC('day', ds) AS metric_time__day
       , 1 AS bookings
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_9
+  ) subq_10
   ON
-    subq_10.metric_time__day - INTERVAL 5 day = subq_9.metric_time__day
+    subq_12.ds - INTERVAL 5 day = subq_10.metric_time__day
+  WHERE subq_12.ds BETWEEN '2019-12-19' AND '2020-01-02'
   GROUP BY
-    subq_10.metric_time__day
-) subq_15
+    subq_12.ds
+) subq_17
