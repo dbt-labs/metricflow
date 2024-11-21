@@ -25,17 +25,6 @@ FROM (
         -- Join to Time Spine Dataset
         SELECT
           subq_2.metric_time__hour AS metric_time__hour
-          , DATE_TRUNC('day', subq_2.metric_time__hour) AS metric_time__day
-          , DATE_TRUNC('week', subq_2.metric_time__hour) AS metric_time__week
-          , DATE_TRUNC('month', subq_2.metric_time__hour) AS metric_time__month
-          , DATE_TRUNC('quarter', subq_2.metric_time__hour) AS metric_time__quarter
-          , DATE_TRUNC('year', subq_2.metric_time__hour) AS metric_time__year
-          , EXTRACT(year FROM subq_2.metric_time__hour) AS metric_time__extract_year
-          , EXTRACT(quarter FROM subq_2.metric_time__hour) AS metric_time__extract_quarter
-          , EXTRACT(month FROM subq_2.metric_time__hour) AS metric_time__extract_month
-          , EXTRACT(day FROM subq_2.metric_time__hour) AS metric_time__extract_day
-          , CASE WHEN EXTRACT(dow FROM subq_2.metric_time__hour) = 0 THEN EXTRACT(dow FROM subq_2.metric_time__hour) + 7 ELSE EXTRACT(dow FROM subq_2.metric_time__hour) END AS metric_time__extract_dow
-          , EXTRACT(doy FROM subq_2.metric_time__hour) AS metric_time__extract_doy
           , subq_1.ds__day AS ds__day
           , subq_1.ds__week AS ds__week
           , subq_1.ds__month AS ds__month
@@ -210,6 +199,17 @@ FROM (
           , subq_1.user__archived_at__extract_day AS user__archived_at__extract_day
           , subq_1.user__archived_at__extract_dow AS user__archived_at__extract_dow
           , subq_1.user__archived_at__extract_doy AS user__archived_at__extract_doy
+          , subq_1.metric_time__day AS metric_time__day
+          , subq_1.metric_time__week AS metric_time__week
+          , subq_1.metric_time__month AS metric_time__month
+          , subq_1.metric_time__quarter AS metric_time__quarter
+          , subq_1.metric_time__year AS metric_time__year
+          , subq_1.metric_time__extract_year AS metric_time__extract_year
+          , subq_1.metric_time__extract_quarter AS metric_time__extract_quarter
+          , subq_1.metric_time__extract_month AS metric_time__extract_month
+          , subq_1.metric_time__extract_day AS metric_time__extract_day
+          , subq_1.metric_time__extract_dow AS metric_time__extract_dow
+          , subq_1.metric_time__extract_doy AS metric_time__extract_doy
           , subq_1.user AS user
           , subq_1.home_state AS home_state
           , subq_1.user__home_state AS user__home_state

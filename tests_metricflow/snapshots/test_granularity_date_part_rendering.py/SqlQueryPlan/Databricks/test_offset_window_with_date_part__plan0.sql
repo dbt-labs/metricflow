@@ -245,17 +245,7 @@ FROM (
         FROM (
           -- Join to Time Spine Dataset
           SELECT
-            subq_7.metric_time__day AS metric_time__day
-            , DATE_TRUNC('week', subq_7.metric_time__day) AS metric_time__week
-            , DATE_TRUNC('month', subq_7.metric_time__day) AS metric_time__month
-            , DATE_TRUNC('quarter', subq_7.metric_time__day) AS metric_time__quarter
-            , DATE_TRUNC('year', subq_7.metric_time__day) AS metric_time__year
-            , EXTRACT(year FROM subq_7.metric_time__day) AS metric_time__extract_year
-            , EXTRACT(quarter FROM subq_7.metric_time__day) AS metric_time__extract_quarter
-            , EXTRACT(month FROM subq_7.metric_time__day) AS metric_time__extract_month
-            , EXTRACT(day FROM subq_7.metric_time__day) AS metric_time__extract_day
-            , EXTRACT(DAYOFWEEK_ISO FROM subq_7.metric_time__day) AS metric_time__extract_dow
-            , EXTRACT(doy FROM subq_7.metric_time__day) AS metric_time__extract_doy
+            EXTRACT(DAYOFWEEK_ISO FROM subq_7.metric_time__day) AS metric_time__extract_dow
             , subq_6.ds__day AS ds__day
             , subq_6.ds__week AS ds__week
             , subq_6.ds__month AS ds__month
@@ -322,6 +312,16 @@ FROM (
             , subq_6.booking__paid_at__extract_day AS booking__paid_at__extract_day
             , subq_6.booking__paid_at__extract_dow AS booking__paid_at__extract_dow
             , subq_6.booking__paid_at__extract_doy AS booking__paid_at__extract_doy
+            , subq_6.metric_time__day AS metric_time__day
+            , subq_6.metric_time__week AS metric_time__week
+            , subq_6.metric_time__month AS metric_time__month
+            , subq_6.metric_time__quarter AS metric_time__quarter
+            , subq_6.metric_time__year AS metric_time__year
+            , subq_6.metric_time__extract_year AS metric_time__extract_year
+            , subq_6.metric_time__extract_quarter AS metric_time__extract_quarter
+            , subq_6.metric_time__extract_month AS metric_time__extract_month
+            , subq_6.metric_time__extract_day AS metric_time__extract_day
+            , subq_6.metric_time__extract_doy AS metric_time__extract_doy
             , subq_6.listing AS listing
             , subq_6.guest AS guest
             , subq_6.host AS host
