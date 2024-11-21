@@ -338,7 +338,6 @@ class DataflowPlanBuilder:
             .merge(base_required_linkable_specs.as_instance_spec_set)
             .dedupe(),
             custom_granularity_specs=base_required_linkable_specs.time_dimension_specs_with_custom_grain,
-            time_range_constraint=None,
             where_filter_specs=base_measure_spec.filter_spec_set.all_filter_specs,
         )
 
@@ -1659,7 +1658,7 @@ class DataflowPlanBuilder:
                 InstanceSpecSet.create_from_specs(queried_linkable_specs.as_tuple)
             ),
             measure_properties=measure_properties,
-            queried_linkable_specs=queried_linkable_specs,
+            queried_linkable_specs_for_semi_additive_join=queried_linkable_specs,
         )
 
         aggregate_measures_node = AggregateMeasuresNode.create(
@@ -1740,7 +1739,7 @@ class DataflowPlanBuilder:
         where_filter_specs: Sequence[WhereFilterSpec] = (),
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         measure_properties: Optional[MeasureSpecProperties] = None,
-        queried_linkable_specs: Optional[LinkableSpecSet] = None,
+        queried_linkable_specs_for_semi_additive_join: Optional[LinkableSpecSet] = None,
         distinct: bool = False,
     ) -> DataflowPlanNode:
         """Adds standard pre-aggegation steps after building source node and before aggregation."""
@@ -1762,14 +1761,14 @@ class DataflowPlanBuilder:
             )
 
         if measure_properties and measure_properties.non_additive_dimension_spec:
-            if queried_linkable_specs is None:
+            if queried_linkable_specs_for_semi_additive_join is None:
                 raise ValueError(
-                    "`queried_linkable_specs` must be provided in when building pre-aggregation plan if "
-                    "`non_additive_dimension_spec` is present."
+                    "`queried_linkable_specs_for_semi_additive_join` must be provided in when building pre-aggregation plan "
+                    "if `non_additive_dimension_spec` is present."
                 )
             output_node = self._build_semi_additive_join_node(
                 measure_properties=measure_properties,
-                queried_linkable_specs=queried_linkable_specs,
+                queried_linkable_specs=queried_linkable_specs_for_semi_additive_join,
                 parent_node=output_node,
             )
         if filter_to_specs:
