@@ -38,7 +38,7 @@ FROM (
         , subq_7.metric_time__week AS metric_time__week
         , subq_6.bookers AS bookers
       FROM (
-        -- Time Spine
+        -- Read From Time Spine 'mf_time_spine'
         SELECT
           DATETIME_TRUNC(subq_8.ds, month) AS booking__ds__month
           , subq_8.ds AS metric_time__day
@@ -161,7 +161,7 @@ FROM (
               , subq_1.approximate_continuous_booking_value_p99 AS approximate_continuous_booking_value_p99
               , subq_1.approximate_discrete_booking_value_p99 AS approximate_discrete_booking_value_p99
             FROM (
-              -- Time Spine
+              -- Read From Time Spine 'mf_time_spine'
               SELECT
                 DATETIME_TRUNC(subq_3.ds, month) AS booking__ds__month
                 , subq_3.ds AS metric_time__day

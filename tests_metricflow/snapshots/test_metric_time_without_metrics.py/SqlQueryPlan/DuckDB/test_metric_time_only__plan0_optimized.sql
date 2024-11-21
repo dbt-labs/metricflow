@@ -4,7 +4,7 @@ docstring:
   Tests querying only metric time.
 sql_engine: DuckDB
 ---
--- Time Spine
+-- Read From Time Spine 'mf_time_spine'
 -- Metric Time Dimension 'ds'
 -- Pass Only Elements: ['metric_time__day',]
 SELECT

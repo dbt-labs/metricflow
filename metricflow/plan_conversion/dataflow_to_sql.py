@@ -41,7 +41,7 @@ from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.time.time_constants import ISO8601_PYTHON_FORMAT, ISO8601_PYTHON_TS_FORMAT
-from metricflow_semantics.time.time_spine_source import TIME_SPINE_DATA_SET_DESCRIPTION, TimeSpineSource
+from metricflow_semantics.time.time_spine_source import TimeSpineSource
 from typing_extensions import override
 
 from metricflow.dataflow.dataflow_plan import (
@@ -398,7 +398,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         )
 
         inner_sql_select_node = SqlSelectStatementNode.create(
-            description=TIME_SPINE_DATA_SET_DESCRIPTION,
+            description=time_spine_source.data_set_description,
             select_columns=select_columns,
             from_source=SqlTableNode.create(sql_table=time_spine_source.spine_table),
             from_source_alias=time_spine_table_alias,

@@ -15,7 +15,7 @@ FROM (
     subq_14.metric_time__day AS metric_time__day
     , subq_13.bookings AS bookings
   FROM (
-    -- Time Spine
+    -- Read From Time Spine 'mf_time_spine'
     SELECT
       ds AS metric_time__day
     FROM ***************************.mf_time_spine subq_15

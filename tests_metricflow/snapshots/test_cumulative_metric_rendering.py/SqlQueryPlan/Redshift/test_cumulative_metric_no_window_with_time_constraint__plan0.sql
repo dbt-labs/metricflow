@@ -97,7 +97,7 @@ FROM (
           , subq_2.revenue_instance__user AS revenue_instance__user
           , subq_2.txn_revenue AS txn_revenue
         FROM (
-          -- Time Spine
+          -- Read From Time Spine 'mf_time_spine'
           SELECT
             subq_4.ds AS metric_time__day
           FROM ***************************.mf_time_spine subq_4

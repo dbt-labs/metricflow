@@ -15,8 +15,6 @@ from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 logger = logging.getLogger(__name__)
 
-TIME_SPINE_DATA_SET_DESCRIPTION = "Time Spine"
-
 
 @dataclass(frozen=True)
 class TimeSpineSource:
@@ -148,3 +146,8 @@ class TimeSpineSource:
             required_time_spines.add(time_spine_sources[max(compatible_time_spines_for_standard_grains)])
 
         return tuple(required_time_spines)
+
+    @property
+    def data_set_description(self) -> str:
+        """Description to be displayed when this time spine is used in a data set."""
+        return f"Read From Time Spine '{self.table_name}'"
