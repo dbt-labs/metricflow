@@ -13,7 +13,7 @@ SELECT
   subq_12.metric_time__day AS metric_time__day
   , SUM(subq_11.txn_revenue) AS revenue_all_time
 FROM (
-  -- Time Spine
+  -- Read From Time Spine 'mf_time_spine'
   SELECT
     ds AS metric_time__day
   FROM ***************************.mf_time_spine subq_13

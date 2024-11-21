@@ -801,7 +801,7 @@ test_filename: test_metric_time_without_metrics.py
                         <!-- where = None -->
                         <!-- distinct = False -->
                         <SqlSelectStatementNode>
-                            <!-- description = 'Time Spine' -->
+                            <!-- description = "Read From Time Spine 'mf_time_spine'" -->
                             <!-- node_id = NodeId(id_str='ss_1') -->
                             <!-- col0 =                                                                                   -->
                             <!--   SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28293), column_alias='ds__day') -->

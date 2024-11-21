@@ -68,7 +68,7 @@ FROM (
       , subq_0.ts__extract_dow AS metric_time__extract_dow
       , subq_0.ts__extract_doy AS metric_time__extract_doy
     FROM (
-      -- Time Spine
+      -- Read From Time Spine 'mf_time_spine_second'
       SELECT
         DATETIME_TRUNC(time_spine_src_28003.ts, second) AS ts__second
         , DATETIME_TRUNC(time_spine_src_28003.ts, minute) AS ts__minute

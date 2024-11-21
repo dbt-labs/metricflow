@@ -12,7 +12,7 @@ FROM (
   SELECT
     booking__ds__day
   FROM (
-    -- Time Spine
+    -- Read From Time Spine 'mf_time_spine'
     SELECT
       ds AS booking__ds__day
       , ds AS metric_time__day
