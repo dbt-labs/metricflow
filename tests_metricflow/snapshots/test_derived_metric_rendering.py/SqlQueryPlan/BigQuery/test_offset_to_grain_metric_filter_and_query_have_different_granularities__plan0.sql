@@ -26,7 +26,8 @@ FROM (
       FROM (
         -- Constrain Output with WHERE
         SELECT
-          subq_4.metric_time__month
+          subq_4.metric_time__day
+          , subq_4.metric_time__month
           , subq_4.ds__day
           , subq_4.ds__week
           , subq_4.ds__month
@@ -93,7 +94,6 @@ FROM (
           , subq_4.booking__paid_at__extract_day
           , subq_4.booking__paid_at__extract_dow
           , subq_4.booking__paid_at__extract_doy
-          , subq_4.metric_time__day
           , subq_4.metric_time__week
           , subq_4.metric_time__quarter
           , subq_4.metric_time__year
@@ -127,8 +127,7 @@ FROM (
         FROM (
           -- Join to Time Spine Dataset
           SELECT
-            DATETIME_TRUNC(subq_2.metric_time__day, month) AS metric_time__month
-            , subq_1.ds__day AS ds__day
+            subq_1.ds__day AS ds__day
             , subq_1.ds__week AS ds__week
             , subq_1.ds__month AS ds__month
             , subq_1.ds__quarter AS ds__quarter
@@ -194,7 +193,6 @@ FROM (
             , subq_1.booking__paid_at__extract_day AS booking__paid_at__extract_day
             , subq_1.booking__paid_at__extract_dow AS booking__paid_at__extract_dow
             , subq_1.booking__paid_at__extract_doy AS booking__paid_at__extract_doy
-            , subq_1.metric_time__day AS metric_time__day
             , subq_1.metric_time__week AS metric_time__week
             , subq_1.metric_time__quarter AS metric_time__quarter
             , subq_1.metric_time__year AS metric_time__year
@@ -204,6 +202,8 @@ FROM (
             , subq_1.metric_time__extract_day AS metric_time__extract_day
             , subq_1.metric_time__extract_dow AS metric_time__extract_dow
             , subq_1.metric_time__extract_doy AS metric_time__extract_doy
+            , subq_2.metric_time__day AS metric_time__day
+            , subq_2.metric_time__month AS metric_time__month
             , subq_1.listing AS listing
             , subq_1.guest AS guest
             , subq_1.host AS host
@@ -229,6 +229,7 @@ FROM (
             -- Time Spine
             SELECT
               subq_3.ds AS metric_time__day
+              , DATETIME_TRUNC(subq_3.ds, month) AS metric_time__month
             FROM ***************************.mf_time_spine subq_3
           ) subq_2
           INNER JOIN (
@@ -428,7 +429,7 @@ FROM (
           ) subq_1
           ON
             DATETIME_TRUNC(subq_2.metric_time__day, month) = subq_1.metric_time__day
-          WHERE DATETIME_TRUNC(subq_2.metric_time__day, month) = subq_2.metric_time__day
+          WHERE subq_2.metric_time__month = subq_2.metric_time__day
         ) subq_4
         WHERE metric_time__day = '2020-01-01'
       ) subq_5

@@ -18,8 +18,8 @@ FROM (
     FROM (
       -- Time Spine
       SELECT
-        DATETIME_TRUNC(subq_6.ds, month) AS booking__ds__month
-        , subq_6.ds AS metric_time__day
+        subq_6.ds AS metric_time__day
+        , DATETIME_TRUNC(subq_6.ds, month) AS booking__ds__month
       FROM ***************************.mf_time_spine subq_6
     ) subq_7
     WHERE (

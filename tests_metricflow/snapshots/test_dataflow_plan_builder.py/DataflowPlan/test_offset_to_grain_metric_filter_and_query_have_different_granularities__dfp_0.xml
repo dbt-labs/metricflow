@@ -170,7 +170,6 @@ docstring:
                                 <!--       time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH), -->
                                 <!--     ),                                                                                -->
                                 <!--   )                                                                                   -->
-                                <!-- use_custom_agg_time_dimension = False -->
                                 <!-- join_type = INNER -->
                                 <!-- offset_to_grain = MONTH -->
                                 <MetricTimeDimensionTransformNode>
