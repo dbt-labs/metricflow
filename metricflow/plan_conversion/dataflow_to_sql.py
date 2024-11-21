@@ -325,16 +325,16 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         """
         time_spine_table_alias = self._next_unique_table_alias()
 
-        queried_specs = {instance.spec for instance in agg_time_dimension_instances}
-        specs_required_for_where_constraints = {
+        queried_specs = [instance.spec for instance in agg_time_dimension_instances]
+        queried_specs_set = set(queried_specs)
+        specs_required_for_where_constraints = [
             spec
             for constraint in time_spine_where_constraints
             for spec in constraint.linkable_spec_set.time_dimension_specs
-        }
-        required_specs = sorted(  # sorted for consistency in snapshots
-            queried_specs.union(specs_required_for_where_constraints),
-            key=lambda spec: (spec.element_name, spec.time_granularity.base_granularity.to_int()),
-        )
+            if spec not in queried_specs_set
+        ]
+        required_specs = queried_specs + specs_required_for_where_constraints
+
         time_spine_sources = TimeSpineSource.choose_time_spine_sources(
             required_time_spine_specs=required_specs, time_spine_sources=self._time_spine_sources
         )
