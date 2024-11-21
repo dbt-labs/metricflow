@@ -1044,15 +1044,8 @@ class DataflowPlanBuilder:
             )
             # If metric_time is requested without metrics, choose appropriate time spine node to select those values from.
             if linkable_specs_to_satisfy.metric_time_specs:
-                time_spine_sources = TimeSpineSource.choose_time_spine_sources(
-                    required_time_spine_specs=linkable_specs_to_satisfy.metric_time_specs,
-                    time_spine_sources=self._source_node_builder.time_spine_sources,
-                )
-                assert len(time_spine_sources) == 1, (
-                    "Exactly one time spine source should have been selected for base grains."
-                    "This indicates internal misconfiguration."
-                )
-                time_spine_node = self._source_node_set.time_spine_nodes[time_spine_sources[0].base_granularity]
+                time_spine_source = self._choose_time_spine_source(linkable_specs_to_satisfy.metric_time_specs)
+                time_spine_node = self._source_node_set.time_spine_nodes[time_spine_source.base_granularity]
                 candidate_nodes_for_right_side_of_join += [time_spine_node]
                 candidate_nodes_for_left_side_of_join += [time_spine_node]
             default_join_type = SqlJoinType.FULL_OUTER
@@ -1827,4 +1820,11 @@ class DataflowPlanBuilder:
             time_dimension_spec=time_dimension_spec,
             agg_by_function=non_additive_dimension_spec.window_choice,
             queried_time_dimension_spec=queried_time_dimension_spec,
+        )
+
+    def _choose_time_spine_source(self, required_time_spine_specs: Sequence[TimeDimensionSpec]) -> TimeSpineSource:
+        """Choose the time spine source that can satisfy the required time spine specs."""
+        return TimeSpineSource.choose_time_spine_source(
+            required_time_spine_specs=required_time_spine_specs,
+            time_spine_sources=self._source_node_builder.time_spine_sources,
         )

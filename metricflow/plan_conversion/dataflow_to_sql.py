@@ -335,15 +335,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         ]
         required_specs = queried_specs + specs_required_for_where_constraints
 
-        time_spine_sources = TimeSpineSource.choose_time_spine_sources(
+        time_spine_source = TimeSpineSource.choose_time_spine_source(
             required_time_spine_specs=required_specs, time_spine_sources=self._time_spine_sources
         )
-        # TODO: handle multiple time spine joins
-        assert len(time_spine_sources) == 1, (
-            "Join to time spine with custom granularity currently only supports one custom granularity per query. "
-            "Full feature coming soon."
-        )
-        time_spine_source = time_spine_sources[0]
         time_spine_base_granularity = ExpandedTimeGranularity.from_time_granularity(time_spine_source.base_granularity)
 
         base_column_expr = SqlColumnReferenceExpression.from_table_and_column_names(
