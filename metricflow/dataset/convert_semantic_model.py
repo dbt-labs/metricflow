@@ -528,13 +528,11 @@ class SemanticModelToDataSetConverter:
             time_granularity=ExpandedTimeGranularity.from_time_granularity(base_granularity),
         )
         time_dimension_instances.append(base_time_dimension_instance)
-        base_dimension_select_expr = SemanticModelToDataSetConverter._make_element_sql_expr(
-            table_alias=from_source_alias, element_name=base_column_name
+        base_dimension_select_expr = SqlColumnReferenceExpression.from_table_and_column_names(
+            table_alias=from_source_alias, column_name=base_column_name
         )
-        base_select_column = self._build_column_for_standard_time_granularity(
-            time_granularity=base_granularity,
-            expr=base_dimension_select_expr,
-            column_alias=base_time_dimension_instance.associated_column.column_name,
+        base_select_column = SqlSelectColumn(
+            expr=base_dimension_select_expr, column_alias=base_time_dimension_instance.associated_column.column_name
         )
         select_columns.append(base_select_column)
         new_base_instances, new_base_columns = self._build_time_dimension_instances_and_columns(
