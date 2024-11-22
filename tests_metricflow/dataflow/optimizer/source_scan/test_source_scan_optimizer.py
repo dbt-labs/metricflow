@@ -34,6 +34,7 @@ from metricflow.dataflow.nodes.min_max import MinMaxNode
 from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
+from metricflow.dataflow.nodes.transform_time_dimensions import TransformTimeDimensionsNode
 from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
 from metricflow.dataflow.nodes.window_reaggregation_node import WindowReaggregationNode
 from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
@@ -108,6 +109,9 @@ class ReadSqlSourceNodeCounter(DataflowPlanNodeVisitor[int]):
         return self._sum_parents(node)
 
     def visit_join_to_custom_granularity_node(self, node: JoinToCustomGranularityNode) -> int:  # noqa: D102
+        return self._sum_parents(node)
+
+    def visit_transform_time_dimensions_node(self, node: TransformTimeDimensionsNode) -> int:  # noqa: D102
         return self._sum_parents(node)
 
     def count_source_nodes(self, dataflow_plan: DataflowPlan) -> int:  # noqa: D102
