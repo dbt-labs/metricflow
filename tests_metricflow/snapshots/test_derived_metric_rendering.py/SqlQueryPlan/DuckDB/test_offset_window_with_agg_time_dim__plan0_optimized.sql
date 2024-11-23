@@ -9,9 +9,9 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_18.booking__ds__day, subq_26.booking__ds__day) AS booking__ds__day
-    , MAX(subq_18.bookings) AS bookings
-    , MAX(subq_26.bookings_2_weeks_ago) AS bookings_2_weeks_ago
+    COALESCE(subq_19.booking__ds__day, subq_28.booking__ds__day) AS booking__ds__day
+    , MAX(subq_19.bookings) AS bookings
+    , MAX(subq_28.bookings_2_weeks_ago) AS bookings_2_weeks_ago
   FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
@@ -26,19 +26,19 @@ FROM (
         DATE_TRUNC('day', ds) AS booking__ds__day
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_16
+    ) subq_17
     GROUP BY
       booking__ds__day
-  ) subq_18
+  ) subq_19
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
     -- Pass Only Elements: ['bookings', 'booking__ds__day']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      subq_22.ds AS booking__ds__day
-      , SUM(subq_20.bookings) AS bookings_2_weeks_ago
-    FROM ***************************.mf_time_spine subq_22
+      time_spine_src_28006.ds AS booking__ds__day
+      , SUM(subq_21.bookings) AS bookings_2_weeks_ago
+    FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
@@ -46,14 +46,14 @@ FROM (
         DATE_TRUNC('day', ds) AS booking__ds__day
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_20
+    ) subq_21
     ON
-      subq_22.ds - INTERVAL 14 day = subq_20.booking__ds__day
+      time_spine_src_28006.ds - INTERVAL 14 day = subq_21.booking__ds__day
     GROUP BY
-      subq_22.ds
-  ) subq_26
+      time_spine_src_28006.ds
+  ) subq_28
   ON
-    subq_18.booking__ds__day = subq_26.booking__ds__day
+    subq_19.booking__ds__day = subq_28.booking__ds__day
   GROUP BY
-    COALESCE(subq_18.booking__ds__day, subq_26.booking__ds__day)
-) subq_27
+    COALESCE(subq_19.booking__ds__day, subq_28.booking__ds__day)
+) subq_29
