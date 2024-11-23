@@ -70,7 +70,7 @@ FROM (
     FROM (
       -- Read From Time Spine 'mf_time_spine_second'
       SELECT
-        DATETIME_TRUNC(time_spine_src_28003.ts, second) AS ts__second
+        time_spine_src_28003.ts AS ts__second
         , DATETIME_TRUNC(time_spine_src_28003.ts, minute) AS ts__minute
         , DATETIME_TRUNC(time_spine_src_28003.ts, hour) AS ts__hour
         , DATETIME_TRUNC(time_spine_src_28003.ts, day) AS ts__day
