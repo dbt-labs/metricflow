@@ -7,8 +7,8 @@ sql_engine: Trino
 -- Constrain Time Range to [2020-01-01T00:00:02, 2020-01-01T00:00:08]
 -- Pass Only Elements: ['metric_time__second',]
 SELECT
-  DATE_TRUNC('second', ts) AS metric_time__second
+  ts AS metric_time__second
 FROM ***************************.mf_time_spine_second time_spine_src_28003
-WHERE DATE_TRUNC('second', ts) BETWEEN timestamp '2020-01-01 00:00:02' AND timestamp '2020-01-01 00:00:08'
+WHERE ts BETWEEN timestamp '2020-01-01 00:00:02' AND timestamp '2020-01-01 00:00:08'
 GROUP BY
-  DATE_TRUNC('second', ts)
+  ts
