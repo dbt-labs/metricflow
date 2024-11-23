@@ -9,25 +9,25 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_21.booking__ds__day, subq_26.booking__ds__day) AS booking__ds__day
-    , MAX(subq_21.booking_value) AS booking_value
-    , MAX(subq_26.bookers) AS bookers
+    COALESCE(subq_23.booking__ds__day, subq_28.booking__ds__day) AS booking__ds__day
+    , MAX(subq_23.booking_value) AS booking_value
+    , MAX(subq_28.bookers) AS bookers
   FROM (
     -- Join to Time Spine Dataset
     -- Pass Only Elements: ['booking_value', 'booking__ds__day']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      subq_17.ds AS booking__ds__day
+      time_spine_src_28006.ds AS booking__ds__day
       , SUM(bookings_source_src_28000.booking_value) AS booking_value
-    FROM ***************************.mf_time_spine subq_17
+    FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN
       ***************************.fct_bookings bookings_source_src_28000
     ON
-      subq_17.ds - INTERVAL 1 week = DATE_TRUNC('day', bookings_source_src_28000.ds)
+      time_spine_src_28006.ds - INTERVAL 1 week = DATE_TRUNC('day', bookings_source_src_28000.ds)
     GROUP BY
-      subq_17.ds
-  ) subq_21
+      time_spine_src_28006.ds
+  ) subq_23
   FULL OUTER JOIN (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
@@ -40,9 +40,9 @@ FROM (
     FROM ***************************.fct_bookings bookings_source_src_28000
     GROUP BY
       DATE_TRUNC('day', ds)
-  ) subq_26
+  ) subq_28
   ON
-    subq_21.booking__ds__day = subq_26.booking__ds__day
+    subq_23.booking__ds__day = subq_28.booking__ds__day
   GROUP BY
-    COALESCE(subq_21.booking__ds__day, subq_26.booking__ds__day)
-) subq_27
+    COALESCE(subq_23.booking__ds__day, subq_28.booking__ds__day)
+) subq_29
