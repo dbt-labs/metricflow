@@ -6,15 +6,18 @@ sql_engine: BigQuery
 -- Constrain Time Range to [2020-01-01T02:00:00, 2020-01-01T05:00:00]
 -- Compute Metrics via Expressions
 SELECT
-  subq_14.metric_time__hour AS metric_time__hour
-  , subq_13.archived_users AS subdaily_join_to_time_spine_metric
+  subq_19.metric_time__hour AS metric_time__hour
+  , subq_15.archived_users AS subdaily_join_to_time_spine_metric
 FROM (
   -- Read From Time Spine 'mf_time_spine_hour'
+  -- Transform Time Dimension Columns
+  -- Constrain Time Range to [2020-01-01T02:00:00, 2020-01-01T05:00:00]
+  -- Pass Only Elements: ['metric_time__hour',]
   SELECT
     ts AS metric_time__hour
-  FROM ***************************.mf_time_spine_hour subq_15
+  FROM ***************************.mf_time_spine_hour time_spine_src_28005
   WHERE ts BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
-) subq_14
+) subq_19
 LEFT OUTER JOIN (
   -- Aggregate Measures
   SELECT
@@ -30,10 +33,10 @@ LEFT OUTER JOIN (
       , 1 AS archived_users
     FROM ***************************.dim_users users_ds_source_src_28000
     WHERE DATETIME_TRUNC(archived_at, hour) BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
-  ) subq_12
+  ) subq_14
   GROUP BY
     metric_time__hour
-) subq_13
+) subq_15
 ON
-  subq_14.metric_time__hour = subq_13.metric_time__hour
-WHERE subq_14.metric_time__hour BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
+  subq_19.metric_time__hour = subq_15.metric_time__hour
+WHERE subq_19.metric_time__hour BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'

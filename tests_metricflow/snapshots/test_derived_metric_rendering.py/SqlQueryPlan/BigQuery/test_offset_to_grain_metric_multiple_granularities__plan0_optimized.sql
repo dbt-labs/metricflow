@@ -16,11 +16,11 @@ FROM (
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
-    subq_11.ds AS metric_time__day
-    , DATETIME_TRUNC(subq_11.ds, month) AS metric_time__month
-    , DATETIME_TRUNC(subq_11.ds, year) AS metric_time__year
-    , SUM(subq_9.bookings) AS bookings_start_of_month
-  FROM ***************************.mf_time_spine subq_11
+    time_spine_src_28006.ds AS metric_time__day
+    , DATETIME_TRUNC(time_spine_src_28006.ds, month) AS metric_time__month
+    , DATETIME_TRUNC(time_spine_src_28006.ds, year) AS metric_time__year
+    , SUM(subq_10.bookings) AS bookings_start_of_month
+  FROM ***************************.mf_time_spine time_spine_src_28006
   INNER JOIN (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
@@ -28,11 +28,11 @@ FROM (
       DATETIME_TRUNC(ds, day) AS metric_time__day
       , 1 AS bookings
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_9
+  ) subq_10
   ON
-    DATETIME_TRUNC(subq_11.ds, month) = subq_9.metric_time__day
+    DATETIME_TRUNC(time_spine_src_28006.ds, month) = subq_10.metric_time__day
   GROUP BY
     metric_time__day
     , metric_time__month
     , metric_time__year
-) subq_15
+) subq_17

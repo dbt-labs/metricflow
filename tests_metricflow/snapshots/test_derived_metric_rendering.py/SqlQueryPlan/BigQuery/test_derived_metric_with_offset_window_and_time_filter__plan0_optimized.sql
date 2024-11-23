@@ -9,9 +9,9 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_21.metric_time__day, subq_30.metric_time__day) AS metric_time__day
-    , MAX(subq_21.bookings) AS bookings
-    , MAX(subq_30.bookings_2_weeks_ago) AS bookings_2_weeks_ago
+    COALESCE(subq_22.metric_time__day, subq_32.metric_time__day) AS metric_time__day
+    , MAX(subq_22.bookings) AS bookings
+    , MAX(subq_32.bookings_2_weeks_ago) AS bookings_2_weeks_ago
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['bookings', 'metric_time__day']
@@ -27,11 +27,11 @@ FROM (
         DATETIME_TRUNC(ds, day) AS metric_time__day
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_17
+    ) subq_18
     WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'
     GROUP BY
       metric_time__day
-  ) subq_21
+  ) subq_22
   FULL OUTER JOIN (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['bookings', 'metric_time__day']
@@ -43,9 +43,9 @@ FROM (
     FROM (
       -- Join to Time Spine Dataset
       SELECT
-        subq_25.ds AS metric_time__day
-        , subq_23.bookings AS bookings
-      FROM ***************************.mf_time_spine subq_25
+        time_spine_src_28006.ds AS metric_time__day
+        , subq_24.bookings AS bookings
+      FROM ***************************.mf_time_spine time_spine_src_28006
       INNER JOIN (
         -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
@@ -53,16 +53,16 @@ FROM (
           DATETIME_TRUNC(ds, day) AS metric_time__day
           , 1 AS bookings
         FROM ***************************.fct_bookings bookings_source_src_28000
-      ) subq_23
+      ) subq_24
       ON
-        DATE_SUB(CAST(subq_25.ds AS DATETIME), INTERVAL 14 day) = subq_23.metric_time__day
-    ) subq_26
+        DATE_SUB(CAST(time_spine_src_28006.ds AS DATETIME), INTERVAL 14 day) = subq_24.metric_time__day
+    ) subq_28
     WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'
     GROUP BY
       metric_time__day
-  ) subq_30
+  ) subq_32
   ON
-    subq_21.metric_time__day = subq_30.metric_time__day
+    subq_22.metric_time__day = subq_32.metric_time__day
   GROUP BY
     metric_time__day
-) subq_31
+) subq_33

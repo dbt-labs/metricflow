@@ -9,16 +9,18 @@ SELECT
 FROM (
   -- Join to Time Spine Dataset
   SELECT
-    subq_11.metric_time__month AS metric_time__month
-    , subq_10.bookings AS bookings
+    subq_14.metric_time__month AS metric_time__month
+    , subq_11.bookings AS bookings
   FROM (
     -- Read From Time Spine 'mf_time_spine'
+    -- Transform Time Dimension Columns
+    -- Pass Only Elements: ['metric_time__month',]
     SELECT
       DATE_TRUNC('month', ds) AS metric_time__month
-    FROM ***************************.mf_time_spine subq_12
+    FROM ***************************.mf_time_spine time_spine_src_28006
     GROUP BY
       DATE_TRUNC('month', ds)
-  ) subq_11
+  ) subq_14
   LEFT OUTER JOIN (
     -- Aggregate Measures
     SELECT
@@ -32,10 +34,10 @@ FROM (
         DATE_TRUNC('month', ds) AS metric_time__month
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_9
+    ) subq_10
     GROUP BY
       metric_time__month
-  ) subq_10
+  ) subq_11
   ON
-    subq_11.metric_time__month = subq_10.metric_time__month
-) subq_13
+    subq_14.metric_time__month = subq_11.metric_time__month
+) subq_15

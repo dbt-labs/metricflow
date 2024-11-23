@@ -9,28 +9,28 @@ SELECT
 FROM (
   -- Join to Time Spine Dataset
   SELECT
-    subq_18.ds AS metric_time__day
-    , subq_16.bookers AS bookers
-  FROM ***************************.mf_time_spine subq_18
+    time_spine_src_28006.ds AS metric_time__day
+    , subq_17.bookers AS bookers
+  FROM ***************************.mf_time_spine time_spine_src_28006
   LEFT OUTER JOIN (
     -- Join Self Over Time Range
     -- Pass Only Elements: ['bookers', 'metric_time__day']
     -- Aggregate Measures
     SELECT
-      subq_13.ds AS metric_time__day
+      subq_14.ds AS metric_time__day
       , COUNT(DISTINCT bookings_source_src_28000.guest_id) AS bookers
-    FROM ***************************.mf_time_spine subq_13
+    FROM ***************************.mf_time_spine subq_14
     INNER JOIN
       ***************************.fct_bookings bookings_source_src_28000
     ON
       (
-        DATE_TRUNC('day', bookings_source_src_28000.ds) <= subq_13.ds
+        DATE_TRUNC('day', bookings_source_src_28000.ds) <= subq_14.ds
       ) AND (
-        DATE_TRUNC('day', bookings_source_src_28000.ds) > subq_13.ds - MAKE_INTERVAL(days => 2)
+        DATE_TRUNC('day', bookings_source_src_28000.ds) > subq_14.ds - MAKE_INTERVAL(days => 2)
       )
     GROUP BY
-      subq_13.ds
-  ) subq_16
+      subq_14.ds
+  ) subq_17
   ON
-    subq_18.ds = subq_16.metric_time__day
-) subq_19
+    time_spine_src_28006.ds = subq_17.metric_time__day
+) subq_21
