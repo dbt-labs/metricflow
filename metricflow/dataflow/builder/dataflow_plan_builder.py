@@ -93,6 +93,7 @@ from metricflow.dataflow.nodes.min_max import MinMaxNode
 from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
+from metricflow.dataflow.nodes.transform_time_dimensions import TransformTimeDimensionsNode
 from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
 from metricflow.dataflow.nodes.window_reaggregation_node import WindowReaggregationNode
 from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
@@ -1840,3 +1841,37 @@ class DataflowPlanBuilder:
     def _choose_time_spine_read_node(self, time_spine_source: TimeSpineSource) -> ReadSqlSourceNode:
         """Return the MetricTimeDimensionTransform time spine node needed to satisfy the specs."""
         return self._source_node_set.time_spine_read_nodes[time_spine_source.base_granularity]
+
+    def _build_time_spine_node(
+        self,
+        queried_time_spine_specs: Sequence[TimeDimensionSpec],
+        where_filter_specs: Sequence[WhereFilterSpec] = (),
+        time_range_constraint: Optional[TimeRangeConstraint] = None,
+    ) -> DataflowPlanNode:
+        """Return the time spine node needed to satisfy the specs."""
+        required_time_spine_spec_set = self.__get_required_linkable_specs(
+            queried_linkable_specs=LinkableSpecSet(time_dimension_specs=tuple(queried_time_spine_specs)),
+            filter_specs=where_filter_specs,
+        )
+        required_time_spine_specs = required_time_spine_spec_set.time_dimension_specs
+
+        # TODO: support multiple time spines here. Build node on the one with the smallest base grain.
+        # Then, pass custom_granularity_specs into _build_pre_aggregation_plan if they aren't satisfied by smallest time spine.
+        time_spine_source = self._choose_time_spine_source(required_time_spine_specs)
+        time_spine_node = TransformTimeDimensionsNode.create(
+            parent_node=self._choose_time_spine_read_node(time_spine_source),
+            requested_time_dimension_specs=required_time_spine_specs,
+        )
+
+        # If the base grain of the time spine isn't selected, it will have duplicate rows that need deduping.
+        should_dedupe = ExpandedTimeGranularity.from_time_granularity(time_spine_source.base_granularity) not in {
+            spec.time_granularity for spec in queried_time_spine_specs
+        }
+
+        return self._build_pre_aggregation_plan(
+            source_node=time_spine_node,
+            filter_to_specs=InstanceSpecSet(time_dimension_specs=tuple(queried_time_spine_specs)),
+            time_range_constraint=time_range_constraint,
+            where_filter_specs=where_filter_specs,
+            distinct=should_dedupe,
+        )
