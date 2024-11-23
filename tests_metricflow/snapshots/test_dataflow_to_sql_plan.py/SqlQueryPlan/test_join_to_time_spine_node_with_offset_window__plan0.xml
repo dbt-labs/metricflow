@@ -21,7 +21,7 @@ docstring:
         <!-- where = None -->
         <!-- distinct = False -->
         <SqlSelectStatementNode>
-            <!-- description = 'Time Spine' -->
+            <!-- description = "Read From Time Spine 'mf_time_spine'" -->
             <!-- node_id = NodeId(id_str='ss_5') -->
             <!-- col0 =                                                                                                -->
             <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_106), column_alias='metric_time__day') -->

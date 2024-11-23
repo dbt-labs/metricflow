@@ -34,7 +34,7 @@ from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY, TimeDimensionSpec
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
-from metricflow_semantics.time.time_spine_source import TIME_SPINE_DATA_SET_DESCRIPTION, TimeSpineSource
+from metricflow_semantics.time.time_spine_source import TimeSpineSource
 
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.dataset.sql_dataset import SqlDataSet
@@ -568,7 +568,7 @@ class SemanticModelToDataSetConverter:
         return SqlDataSet(
             instance_set=InstanceSet(time_dimension_instances=tuple(time_dimension_instances)),
             sql_select_node=SqlSelectStatementNode.create(
-                description=TIME_SPINE_DATA_SET_DESCRIPTION,
+                description=time_spine_source.data_set_description,
                 select_columns=tuple(select_columns),
                 from_source=SqlTableNode.create(sql_table=time_spine_source.spine_table),
                 from_source_alias=from_source_alias,

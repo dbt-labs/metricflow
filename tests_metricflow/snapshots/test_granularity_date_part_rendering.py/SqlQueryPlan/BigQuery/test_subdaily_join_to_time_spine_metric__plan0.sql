@@ -12,7 +12,7 @@ FROM (
     subq_4.metric_time__hour AS metric_time__hour
     , subq_3.archived_users AS archived_users
   FROM (
-    -- Time Spine
+    -- Read From Time Spine 'mf_time_spine_hour'
     SELECT
       subq_5.ts AS metric_time__hour
     FROM ***************************.mf_time_spine_hour subq_5

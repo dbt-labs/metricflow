@@ -344,7 +344,7 @@ FROM (
             , subq_6.approximate_continuous_booking_value_p99 AS approximate_continuous_booking_value_p99
             , subq_6.approximate_discrete_booking_value_p99 AS approximate_discrete_booking_value_p99
           FROM (
-            -- Time Spine
+            -- Read From Time Spine 'mf_time_spine'
             SELECT
               subq_8.ds AS metric_time__day
               , DATETIME_TRUNC(subq_8.ds, isoweek) AS metric_time__week

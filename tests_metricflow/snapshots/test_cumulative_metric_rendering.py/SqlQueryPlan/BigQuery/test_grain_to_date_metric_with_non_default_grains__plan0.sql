@@ -84,7 +84,7 @@ FROM (
             , subq_1.revenue_instance__user AS revenue_instance__user
             , subq_1.txn_revenue AS txn_revenue
           FROM (
-            -- Time Spine
+            -- Read From Time Spine 'mf_time_spine'
             SELECT
               DATETIME_TRUNC(subq_3.ds, quarter) AS revenue_instance__ds__quarter
               , DATETIME_TRUNC(subq_3.ds, year) AS revenue_instance__ds__year

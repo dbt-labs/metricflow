@@ -8,7 +8,7 @@ SELECT
   subq_13.metric_time__martian_day AS metric_time__martian_day
   , subq_12.bookings AS bookings_join_to_time_spine
 FROM (
-  -- Time Spine
+  -- Read From Time Spine 'mf_time_spine'
   SELECT
     martian_day AS metric_time__martian_day
   FROM ***************************.mf_time_spine subq_14

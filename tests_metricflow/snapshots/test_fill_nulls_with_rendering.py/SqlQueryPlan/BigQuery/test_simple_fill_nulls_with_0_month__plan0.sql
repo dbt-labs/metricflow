@@ -12,7 +12,7 @@ FROM (
     subq_4.metric_time__month AS metric_time__month
     , subq_3.bookings AS bookings
   FROM (
-    -- Time Spine
+    -- Read From Time Spine 'mf_time_spine'
     SELECT
       DATETIME_TRUNC(subq_5.ds, month) AS metric_time__month
     FROM ***************************.mf_time_spine subq_5

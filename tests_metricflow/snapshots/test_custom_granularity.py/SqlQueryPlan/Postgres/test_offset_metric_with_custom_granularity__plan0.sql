@@ -125,7 +125,7 @@ FROM (
           , subq_1.approximate_discrete_booking_value_p99 AS approximate_discrete_booking_value_p99
           , subq_4.martian_day AS booking__ds__martian_day
         FROM (
-          -- Time Spine
+          -- Read From Time Spine 'mf_time_spine'
           SELECT
             subq_3.ds AS booking__ds__day
           FROM ***************************.mf_time_spine subq_3

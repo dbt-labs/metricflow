@@ -9,7 +9,7 @@ SELECT
   MIN(metric_time__day) AS metric_time__day__min
   , MAX(metric_time__day) AS metric_time__day__max
 FROM (
-  -- Time Spine
+  -- Read From Time Spine 'mf_time_spine'
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements: ['metric_time__day',]
   SELECT
