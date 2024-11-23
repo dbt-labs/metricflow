@@ -18,44 +18,44 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_24.metric_time__year, subq_31.metric_time__year) AS metric_time__year
-    , MAX(subq_24.month_start_bookings) AS month_start_bookings
-    , MAX(subq_31.bookings_1_month_ago) AS bookings_1_month_ago
+    COALESCE(subq_27.metric_time__year, subq_35.metric_time__year) AS metric_time__year
+    , MAX(subq_27.month_start_bookings) AS month_start_bookings
+    , MAX(subq_35.bookings_1_month_ago) AS bookings_1_month_ago
   FROM (
     -- Join to Time Spine Dataset
     -- Pass Only Elements: ['bookings', 'metric_time__year']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      DATETIME_TRUNC(subq_20.ds, year) AS metric_time__year
+      DATETIME_TRUNC(time_spine_src_28006.ds, year) AS metric_time__year
       , SUM(sma_28009_cte.bookings) AS month_start_bookings
-    FROM ***************************.mf_time_spine subq_20
+    FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN
       sma_28009_cte sma_28009_cte
     ON
-      DATETIME_TRUNC(subq_20.ds, month) = sma_28009_cte.metric_time__day
-    WHERE DATETIME_TRUNC(subq_20.ds, year) = subq_20.ds
+      DATETIME_TRUNC(time_spine_src_28006.ds, month) = sma_28009_cte.metric_time__day
+    WHERE DATETIME_TRUNC(time_spine_src_28006.ds, year) = time_spine_src_28006.ds
     GROUP BY
       metric_time__year
-  ) subq_24
+  ) subq_27
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
     -- Pass Only Elements: ['bookings', 'metric_time__year']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      DATETIME_TRUNC(subq_27.ds, year) AS metric_time__year
+      DATETIME_TRUNC(time_spine_src_28006.ds, year) AS metric_time__year
       , SUM(sma_28009_cte.bookings) AS bookings_1_month_ago
-    FROM ***************************.mf_time_spine subq_27
+    FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN
       sma_28009_cte sma_28009_cte
     ON
-      DATE_SUB(CAST(subq_27.ds AS DATETIME), INTERVAL 1 month) = sma_28009_cte.metric_time__day
+      DATE_SUB(CAST(time_spine_src_28006.ds AS DATETIME), INTERVAL 1 month) = sma_28009_cte.metric_time__day
     GROUP BY
       metric_time__year
-  ) subq_31
+  ) subq_35
   ON
-    subq_24.metric_time__year = subq_31.metric_time__year
+    subq_27.metric_time__year = subq_35.metric_time__year
   GROUP BY
     metric_time__year
-) subq_32
+) subq_36

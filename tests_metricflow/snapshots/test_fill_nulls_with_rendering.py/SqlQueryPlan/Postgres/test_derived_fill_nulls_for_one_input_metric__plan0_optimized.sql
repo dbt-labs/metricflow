@@ -18,9 +18,9 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_24.metric_time__day, subq_31.metric_time__day) AS metric_time__day
-    , COALESCE(MAX(subq_24.bookings_fill_nulls_with_0), 0) AS bookings_fill_nulls_with_0
-    , MAX(subq_31.bookings_2_weeks_ago) AS bookings_2_weeks_ago
+    COALESCE(subq_27.metric_time__day, subq_35.metric_time__day) AS metric_time__day
+    , COALESCE(MAX(subq_27.bookings_fill_nulls_with_0), 0) AS bookings_fill_nulls_with_0
+    , MAX(subq_35.bookings_2_weeks_ago) AS bookings_2_weeks_ago
   FROM (
     -- Compute Metrics via Expressions
     SELECT
@@ -29,9 +29,9 @@ FROM (
     FROM (
       -- Join to Time Spine Dataset
       SELECT
-        subq_22.ds AS metric_time__day
-        , subq_20.bookings AS bookings
-      FROM ***************************.mf_time_spine subq_22
+        time_spine_src_28006.ds AS metric_time__day
+        , subq_22.bookings AS bookings
+      FROM ***************************.mf_time_spine time_spine_src_28006
       LEFT OUTER JOIN (
         -- Read From CTE For node_id=sma_28009
         -- Pass Only Elements: ['bookings', 'metric_time__day']
@@ -42,29 +42,29 @@ FROM (
         FROM sma_28009_cte sma_28009_cte
         GROUP BY
           metric_time__day
-      ) subq_20
+      ) subq_22
       ON
-        subq_22.ds = subq_20.metric_time__day
-    ) subq_23
-  ) subq_24
+        time_spine_src_28006.ds = subq_22.metric_time__day
+    ) subq_26
+  ) subq_27
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
     -- Pass Only Elements: ['bookings', 'metric_time__day']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      subq_27.ds AS metric_time__day
+      time_spine_src_28006.ds AS metric_time__day
       , SUM(sma_28009_cte.bookings) AS bookings_2_weeks_ago
-    FROM ***************************.mf_time_spine subq_27
+    FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN
       sma_28009_cte sma_28009_cte
     ON
-      subq_27.ds - MAKE_INTERVAL(days => 14) = sma_28009_cte.metric_time__day
+      time_spine_src_28006.ds - MAKE_INTERVAL(days => 14) = sma_28009_cte.metric_time__day
     GROUP BY
-      subq_27.ds
-  ) subq_31
+      time_spine_src_28006.ds
+  ) subq_35
   ON
-    subq_24.metric_time__day = subq_31.metric_time__day
+    subq_27.metric_time__day = subq_35.metric_time__day
   GROUP BY
-    COALESCE(subq_24.metric_time__day, subq_31.metric_time__day)
-) subq_32
+    COALESCE(subq_27.metric_time__day, subq_35.metric_time__day)
+) subq_36

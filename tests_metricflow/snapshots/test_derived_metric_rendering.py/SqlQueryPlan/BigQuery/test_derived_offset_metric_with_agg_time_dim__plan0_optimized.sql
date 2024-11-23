@@ -19,25 +19,25 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_21.booking__ds__day, subq_25.booking__ds__day) AS booking__ds__day
-    , MAX(subq_21.booking_value) AS booking_value
-    , MAX(subq_25.bookers) AS bookers
+    COALESCE(subq_23.booking__ds__day, subq_27.booking__ds__day) AS booking__ds__day
+    , MAX(subq_23.booking_value) AS booking_value
+    , MAX(subq_27.bookers) AS bookers
   FROM (
     -- Join to Time Spine Dataset
     -- Pass Only Elements: ['booking_value', 'booking__ds__day']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      subq_17.ds AS booking__ds__day
+      time_spine_src_28006.ds AS booking__ds__day
       , SUM(sma_28009_cte.booking_value) AS booking_value
-    FROM ***************************.mf_time_spine subq_17
+    FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN
       sma_28009_cte sma_28009_cte
     ON
-      DATE_SUB(CAST(subq_17.ds AS DATETIME), INTERVAL 1 week) = sma_28009_cte.booking__ds__day
+      DATE_SUB(CAST(time_spine_src_28006.ds AS DATETIME), INTERVAL 1 week) = sma_28009_cte.booking__ds__day
     GROUP BY
       booking__ds__day
-  ) subq_21
+  ) subq_23
   FULL OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
     -- Pass Only Elements: ['bookers', 'booking__ds__day']
@@ -49,9 +49,9 @@ FROM (
     FROM sma_28009_cte sma_28009_cte
     GROUP BY
       booking__ds__day
-  ) subq_25
+  ) subq_27
   ON
-    subq_21.booking__ds__day = subq_25.booking__ds__day
+    subq_23.booking__ds__day = subq_27.booking__ds__day
   GROUP BY
     booking__ds__day
-) subq_26
+) subq_28

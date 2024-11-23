@@ -6,27 +6,49 @@ sql_engine: Postgres
 ---
 -- Compute Metrics via Expressions
 SELECT
-  subq_8.metric_time__day
-  , subq_8.booking__is_instant
-  , COALESCE(subq_8.bookings, 0) AS bookings_fill_nulls_with_0
+  subq_9.metric_time__day
+  , subq_9.booking__is_instant
+  , COALESCE(subq_9.bookings, 0) AS bookings_fill_nulls_with_0
 FROM (
   -- Constrain Output with WHERE
   SELECT
-    subq_7.metric_time__day
-    , subq_7.booking__is_instant
-    , subq_7.bookings
+    subq_8.metric_time__day
+    , subq_8.booking__is_instant
+    , subq_8.bookings
   FROM (
     -- Join to Time Spine Dataset
     SELECT
-      subq_5.metric_time__day AS metric_time__day
+      subq_7.metric_time__day AS metric_time__day
       , subq_4.booking__is_instant AS booking__is_instant
       , subq_4.bookings AS bookings
     FROM (
-      -- Read From Time Spine 'mf_time_spine'
+      -- Pass Only Elements: ['metric_time__day',]
       SELECT
-        subq_6.ds AS metric_time__day
-      FROM ***************************.mf_time_spine subq_6
-    ) subq_5
+        subq_6.metric_time__day
+      FROM (
+        -- Transform Time Dimension Columns
+        SELECT
+          subq_5.ds__day AS metric_time__day
+          , subq_5.ds__day
+        FROM (
+          -- Read From Time Spine 'mf_time_spine'
+          SELECT
+            time_spine_src_28006.ds AS ds__day
+            , DATE_TRUNC('week', time_spine_src_28006.ds) AS ds__week
+            , DATE_TRUNC('month', time_spine_src_28006.ds) AS ds__month
+            , DATE_TRUNC('quarter', time_spine_src_28006.ds) AS ds__quarter
+            , DATE_TRUNC('year', time_spine_src_28006.ds) AS ds__year
+            , EXTRACT(year FROM time_spine_src_28006.ds) AS ds__extract_year
+            , EXTRACT(quarter FROM time_spine_src_28006.ds) AS ds__extract_quarter
+            , EXTRACT(month FROM time_spine_src_28006.ds) AS ds__extract_month
+            , EXTRACT(day FROM time_spine_src_28006.ds) AS ds__extract_day
+            , EXTRACT(isodow FROM time_spine_src_28006.ds) AS ds__extract_dow
+            , EXTRACT(doy FROM time_spine_src_28006.ds) AS ds__extract_doy
+            , time_spine_src_28006.martian_day AS ds__martian_day
+          FROM ***************************.mf_time_spine time_spine_src_28006
+        ) subq_5
+      ) subq_6
+    ) subq_7
     LEFT OUTER JOIN (
       -- Aggregate Measures
       SELECT
@@ -343,7 +365,7 @@ FROM (
         , subq_3.booking__is_instant
     ) subq_4
     ON
-      subq_5.metric_time__day = subq_4.metric_time__day
-  ) subq_7
+      subq_7.metric_time__day = subq_4.metric_time__day
+  ) subq_8
   WHERE booking__is_instant
-) subq_8
+) subq_9

@@ -22,9 +22,9 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_24.metric_time__month, subq_29.metric_time__month) AS metric_time__month
-    , MAX(subq_24.booking_value) AS booking_value
-    , MAX(subq_29.bookers) AS bookers
+    COALESCE(subq_26.metric_time__month, subq_31.metric_time__month) AS metric_time__month
+    , MAX(subq_26.booking_value) AS booking_value
+    , MAX(subq_31.bookers) AS bookers
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['booking_value', 'metric_time__month']
@@ -36,19 +36,19 @@ FROM (
     FROM (
       -- Join to Time Spine Dataset
       SELECT
-        subq_19.ds AS metric_time__day
-        , DATE_TRUNC('month', subq_19.ds) AS metric_time__month
+        time_spine_src_28006.ds AS metric_time__day
+        , DATE_TRUNC('month', time_spine_src_28006.ds) AS metric_time__month
         , sma_28009_cte.booking_value AS booking_value
-      FROM ***************************.mf_time_spine subq_19
+      FROM ***************************.mf_time_spine time_spine_src_28006
       INNER JOIN
         sma_28009_cte sma_28009_cte
       ON
-        subq_19.ds - MAKE_INTERVAL(weeks => 1) = sma_28009_cte.metric_time__day
-    ) subq_20
+        time_spine_src_28006.ds - MAKE_INTERVAL(weeks => 1) = sma_28009_cte.metric_time__day
+    ) subq_22
     WHERE metric_time__day = '2020-01-01'
     GROUP BY
       metric_time__month
-  ) subq_24
+  ) subq_26
   FULL OUTER JOIN (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['bookers', 'metric_time__month']
@@ -65,13 +65,13 @@ FROM (
         , booking_value
         , bookers
       FROM sma_28009_cte sma_28009_cte
-    ) subq_25
+    ) subq_27
     WHERE metric_time__day = '2020-01-01'
     GROUP BY
       metric_time__month
-  ) subq_29
+  ) subq_31
   ON
-    subq_24.metric_time__month = subq_29.metric_time__month
+    subq_26.metric_time__month = subq_31.metric_time__month
   GROUP BY
-    COALESCE(subq_24.metric_time__month, subq_29.metric_time__month)
-) subq_30
+    COALESCE(subq_26.metric_time__month, subq_31.metric_time__month)
+) subq_32

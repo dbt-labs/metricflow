@@ -25,31 +25,31 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_21.metric_time__day, subq_25.metric_time__day) AS metric_time__day
-    , COALESCE(subq_21.metric_time__month, subq_25.metric_time__month) AS metric_time__month
-    , COALESCE(subq_21.metric_time__year, subq_25.metric_time__year) AS metric_time__year
-    , MAX(subq_21.booking_value) AS booking_value
-    , MAX(subq_25.bookers) AS bookers
+    COALESCE(subq_23.metric_time__day, subq_27.metric_time__day) AS metric_time__day
+    , COALESCE(subq_23.metric_time__month, subq_27.metric_time__month) AS metric_time__month
+    , COALESCE(subq_23.metric_time__year, subq_27.metric_time__year) AS metric_time__year
+    , MAX(subq_23.booking_value) AS booking_value
+    , MAX(subq_27.bookers) AS bookers
   FROM (
     -- Join to Time Spine Dataset
     -- Pass Only Elements: ['booking_value', 'metric_time__day', 'metric_time__month', 'metric_time__year']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      subq_17.ds AS metric_time__day
-      , DATE_TRUNC('month', subq_17.ds) AS metric_time__month
-      , DATE_TRUNC('year', subq_17.ds) AS metric_time__year
+      time_spine_src_28006.ds AS metric_time__day
+      , DATE_TRUNC('month', time_spine_src_28006.ds) AS metric_time__month
+      , DATE_TRUNC('year', time_spine_src_28006.ds) AS metric_time__year
       , SUM(sma_28009_cte.booking_value) AS booking_value
-    FROM ***************************.mf_time_spine subq_17
+    FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN
       sma_28009_cte sma_28009_cte
     ON
-      DATE_ADD('week', -1, subq_17.ds) = sma_28009_cte.metric_time__day
+      DATE_ADD('week', -1, time_spine_src_28006.ds) = sma_28009_cte.metric_time__day
     GROUP BY
-      subq_17.ds
-      , DATE_TRUNC('month', subq_17.ds)
-      , DATE_TRUNC('year', subq_17.ds)
-  ) subq_21
+      time_spine_src_28006.ds
+      , DATE_TRUNC('month', time_spine_src_28006.ds)
+      , DATE_TRUNC('year', time_spine_src_28006.ds)
+  ) subq_23
   FULL OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
     -- Pass Only Elements: ['bookers', 'metric_time__day', 'metric_time__month', 'metric_time__year']
@@ -65,17 +65,17 @@ FROM (
       metric_time__day
       , metric_time__month
       , metric_time__year
-  ) subq_25
+  ) subq_27
   ON
     (
-      subq_21.metric_time__day = subq_25.metric_time__day
+      subq_23.metric_time__day = subq_27.metric_time__day
     ) AND (
-      subq_21.metric_time__month = subq_25.metric_time__month
+      subq_23.metric_time__month = subq_27.metric_time__month
     ) AND (
-      subq_21.metric_time__year = subq_25.metric_time__year
+      subq_23.metric_time__year = subq_27.metric_time__year
     )
   GROUP BY
-    COALESCE(subq_21.metric_time__day, subq_25.metric_time__day)
-    , COALESCE(subq_21.metric_time__month, subq_25.metric_time__month)
-    , COALESCE(subq_21.metric_time__year, subq_25.metric_time__year)
-) subq_26
+    COALESCE(subq_23.metric_time__day, subq_27.metric_time__day)
+    , COALESCE(subq_23.metric_time__month, subq_27.metric_time__month)
+    , COALESCE(subq_23.metric_time__year, subq_27.metric_time__year)
+) subq_28

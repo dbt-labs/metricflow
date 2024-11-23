@@ -19,9 +19,9 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_18.metric_time__extract_dow, subq_25.metric_time__extract_dow) AS metric_time__extract_dow
-    , MAX(subq_18.bookings) AS bookings
-    , MAX(subq_25.bookings_2_weeks_ago) AS bookings_2_weeks_ago
+    COALESCE(subq_19.metric_time__extract_dow, subq_27.metric_time__extract_dow) AS metric_time__extract_dow
+    , MAX(subq_19.bookings) AS bookings
+    , MAX(subq_27.bookings_2_weeks_ago) AS bookings_2_weeks_ago
   FROM (
     -- Read From CTE For node_id=sma_28009
     -- Pass Only Elements: ['bookings', 'metric_time__extract_dow']
@@ -33,25 +33,25 @@ FROM (
     FROM sma_28009_cte sma_28009_cte
     GROUP BY
       metric_time__extract_dow
-  ) subq_18
+  ) subq_19
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
     -- Pass Only Elements: ['bookings', 'metric_time__extract_dow']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      EXTRACT(isodow FROM subq_21.ds) AS metric_time__extract_dow
+      EXTRACT(isodow FROM time_spine_src_28006.ds) AS metric_time__extract_dow
       , SUM(sma_28009_cte.bookings) AS bookings_2_weeks_ago
-    FROM ***************************.mf_time_spine subq_21
+    FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN
       sma_28009_cte sma_28009_cte
     ON
-      subq_21.ds - MAKE_INTERVAL(days => 14) = sma_28009_cte.metric_time__day
+      time_spine_src_28006.ds - MAKE_INTERVAL(days => 14) = sma_28009_cte.metric_time__day
     GROUP BY
-      EXTRACT(isodow FROM subq_21.ds)
-  ) subq_25
+      EXTRACT(isodow FROM time_spine_src_28006.ds)
+  ) subq_27
   ON
-    subq_18.metric_time__extract_dow = subq_25.metric_time__extract_dow
+    subq_19.metric_time__extract_dow = subq_27.metric_time__extract_dow
   GROUP BY
-    COALESCE(subq_18.metric_time__extract_dow, subq_25.metric_time__extract_dow)
-) subq_26
+    COALESCE(subq_19.metric_time__extract_dow, subq_27.metric_time__extract_dow)
+) subq_28
