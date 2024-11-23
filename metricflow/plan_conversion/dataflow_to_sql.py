@@ -315,6 +315,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         """Return the next unique table alias to use in generating queries."""
         return SequentialIdGenerator.create_next_id(StaticIdPrefix.SUB_QUERY).str_value
 
+    # TODO: replace this with a dataflow plan node for cumulative metrics
     def _make_time_spine_data_set(
         self,
         agg_time_dimension_instances: Tuple[TimeDimensionInstance, ...],
@@ -1374,97 +1375,72 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
     def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode) -> SqlDataSet:  # noqa: D102
         parent_data_set = node.parent_node.accept(self)
         parent_alias = self._next_unique_table_alias()
-
-        agg_time_dimension_instances = parent_data_set.instances_for_time_dimensions(
-            node.requested_agg_time_dimension_specs
-        )
-
-        # Select the dimension for the join from the parent node because it may not have been included in the request.
-        # Default to using metric_time for the join if it was requested, otherwise use the agg_time_dimension.
-        included_metric_time_instances = [
-            instance for instance in agg_time_dimension_instances if instance.spec.is_metric_time
-        ]
-        if included_metric_time_instances:
-            join_on_time_dimension_sample = included_metric_time_instances[0].spec
-        else:
-            join_on_time_dimension_sample = agg_time_dimension_instances[0].spec
-        agg_time_dimension_instance_for_join = self._choose_instance_for_time_spine_join(
-            [
-                instance
-                for instance in parent_data_set.instance_set.time_dimension_instances
-                if instance.spec.element_name == join_on_time_dimension_sample.element_name
-                and instance.spec.entity_links == join_on_time_dimension_sample.entity_links
-            ]
-        )
-        if agg_time_dimension_instance_for_join not in agg_time_dimension_instances:
-            agg_time_dimension_instances = (agg_time_dimension_instance_for_join,) + agg_time_dimension_instances
-
-        # Build time spine data set with just the agg_time_dimension instance needed for the join.
+        time_spine_data_set = node.time_spine_node.accept(self)
         time_spine_alias = self._next_unique_table_alias()
-        time_spine_dataset = self._make_time_spine_data_set(
-            agg_time_dimension_instances=agg_time_dimension_instances,
-            time_range_constraint=node.time_range_constraint,
-            time_spine_where_constraints=node.time_spine_filters or (),
-        )
+
+        required_agg_time_dimension_specs = tuple(node.requested_agg_time_dimension_specs)
+        if node.join_on_time_dimension_spec not in node.requested_agg_time_dimension_specs:
+            required_agg_time_dimension_specs += (node.join_on_time_dimension_spec,)
 
         # Build join expression.
+        join_column_name = self._column_association_resolver.resolve_spec(node.join_on_time_dimension_spec).column_name
         join_description = SqlQueryPlanJoinBuilder.make_join_to_time_spine_join_description(
             node=node,
             time_spine_alias=time_spine_alias,
-            agg_time_dimension_column_name=self._column_association_resolver.resolve_spec(
-                agg_time_dimension_instance_for_join.spec
-            ).column_name,
+            agg_time_dimension_column_name=join_column_name,
             parent_sql_select_node=parent_data_set.checked_sql_select_node,
             parent_alias=parent_alias,
         )
 
-        # Remove time spine instances from parent instance set.
-        time_spine_instances = time_spine_dataset.instance_set
-        time_spine_specs = time_spine_instances.spec_set
-        parent_instance_set = parent_data_set.instance_set.transform(FilterElements(exclude_specs=time_spine_specs))
+        # Build combined instance set.
+        time_spine_required_spec_set = InstanceSpecSet(time_dimension_specs=required_agg_time_dimension_specs)
+        parent_instance_set = parent_data_set.instance_set.transform(
+            FilterElements(exclude_specs=time_spine_required_spec_set)
+        )
+        time_spine_instance_set = time_spine_data_set.instance_set.transform(
+            FilterElements(include_specs=time_spine_required_spec_set)
+        )
+        output_instance_set = InstanceSet.merge([parent_instance_set, time_spine_instance_set])
 
-        # Build select columns
+        # Build new simple select columns.
         select_columns = create_simple_select_columns_for_instance_sets(
             self._column_association_resolver,
-            OrderedDict({parent_alias: parent_instance_set, time_spine_alias: time_spine_dataset.instance_set}),
+            OrderedDict({parent_alias: parent_instance_set, time_spine_alias: time_spine_instance_set}),
         )
 
         # If offset_to_grain is used, will need to filter down to rows that match selected granularities.
         # Does not apply if one of the granularities selected matches the time spine column granularity.
         where_filter: Optional[SqlExpressionNode] = None
         need_where_filter = (
-            node.offset_to_grain
-            and agg_time_dimension_instance_for_join.spec not in node.requested_agg_time_dimension_specs
+            node.offset_to_grain and node.join_on_time_dimension_spec not in node.requested_agg_time_dimension_specs
         )
+
+        # Filter down to one row per granularity period requested in the group by. Any other granularities
+        # included here will be filtered out before aggregation and so should not be included in where filter.
         if need_where_filter:
             join_column_expr = SqlColumnReferenceExpression.from_table_and_column_names(
-                table_alias=time_spine_alias,
-                column_name=agg_time_dimension_instance_for_join.associated_column.column_name,
+                table_alias=time_spine_alias, column_name=join_column_name
             )
-            for time_spine_instance in time_spine_instances.as_tuple:
-                # Filter down to one row per granularity period requested in the group by. Any other granularities
-                # included here will be filtered out in later nodes so should not be included in where filter.
-                if need_where_filter and time_spine_instance.spec in node.requested_agg_time_dimension_specs:
-                    column_to_filter_expr = SqlColumnReferenceExpression.from_table_and_column_names(
-                        table_alias=time_spine_alias, column_name=time_spine_instance.associated_column.column_name
-                    )
-                    new_where_filter = SqlComparisonExpression.create(
-                        left_expr=column_to_filter_expr, comparison=SqlComparison.EQUALS, right_expr=join_column_expr
-                    )
-                    where_filter = (
-                        SqlLogicalExpression.create(
-                            operator=SqlLogicalOperator.OR, args=(where_filter, new_where_filter)
-                        )
-                        if where_filter
-                        else new_where_filter
-                    )
+            for requested_spec in node.requested_agg_time_dimension_specs:
+                column_name = self._column_association_resolver.resolve_spec(requested_spec).column_name
+                column_to_filter_expr = SqlColumnReferenceExpression.from_table_and_column_names(
+                    table_alias=time_spine_alias, column_name=column_name
+                )
+                new_where_filter = SqlComparisonExpression.create(
+                    left_expr=column_to_filter_expr, comparison=SqlComparison.EQUALS, right_expr=join_column_expr
+                )
+                where_filter = (
+                    SqlLogicalExpression.create(operator=SqlLogicalOperator.OR, args=(where_filter, new_where_filter))
+                    if where_filter
+                    else new_where_filter
+                )
 
         return SqlDataSet(
-            instance_set=InstanceSet.merge([time_spine_dataset.instance_set, parent_instance_set]),
+            instance_set=output_instance_set,
             sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
                 select_columns=select_columns,
-                from_source=time_spine_dataset.checked_sql_select_node,
+                from_source=time_spine_data_set.checked_sql_select_node,
                 from_source_alias=time_spine_alias,
                 join_descs=(join_description,),
                 where=where_filter,
