@@ -9,9 +9,9 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_18.metric_time__extract_dow, subq_26.metric_time__extract_dow) AS metric_time__extract_dow
-    , MAX(subq_18.bookings) AS bookings
-    , MAX(subq_26.bookings_2_weeks_ago) AS bookings_2_weeks_ago
+    COALESCE(subq_19.metric_time__extract_dow, subq_28.metric_time__extract_dow) AS metric_time__extract_dow
+    , MAX(subq_19.bookings) AS bookings
+    , MAX(subq_28.bookings_2_weeks_ago) AS bookings_2_weeks_ago
   FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
@@ -26,19 +26,19 @@ FROM (
         CASE WHEN EXTRACT(dow FROM ds) = 0 THEN EXTRACT(dow FROM ds) + 7 ELSE EXTRACT(dow FROM ds) END AS metric_time__extract_dow
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_16
+    ) subq_17
     GROUP BY
       metric_time__extract_dow
-  ) subq_18
+  ) subq_19
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
     -- Pass Only Elements: ['bookings', 'metric_time__extract_dow']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      CASE WHEN EXTRACT(dow FROM subq_22.ds) = 0 THEN EXTRACT(dow FROM subq_22.ds) + 7 ELSE EXTRACT(dow FROM subq_22.ds) END AS metric_time__extract_dow
-      , SUM(subq_20.bookings) AS bookings_2_weeks_ago
-    FROM ***************************.mf_time_spine subq_22
+      CASE WHEN EXTRACT(dow FROM time_spine_src_28006.ds) = 0 THEN EXTRACT(dow FROM time_spine_src_28006.ds) + 7 ELSE EXTRACT(dow FROM time_spine_src_28006.ds) END AS metric_time__extract_dow
+      , SUM(subq_21.bookings) AS bookings_2_weeks_ago
+    FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
@@ -46,14 +46,14 @@ FROM (
         DATE_TRUNC('day', ds) AS metric_time__day
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_20
+    ) subq_21
     ON
-      DATEADD(day, -14, subq_22.ds) = subq_20.metric_time__day
+      DATEADD(day, -14, time_spine_src_28006.ds) = subq_21.metric_time__day
     GROUP BY
-      CASE WHEN EXTRACT(dow FROM subq_22.ds) = 0 THEN EXTRACT(dow FROM subq_22.ds) + 7 ELSE EXTRACT(dow FROM subq_22.ds) END
-  ) subq_26
+      CASE WHEN EXTRACT(dow FROM time_spine_src_28006.ds) = 0 THEN EXTRACT(dow FROM time_spine_src_28006.ds) + 7 ELSE EXTRACT(dow FROM time_spine_src_28006.ds) END
+  ) subq_28
   ON
-    subq_18.metric_time__extract_dow = subq_26.metric_time__extract_dow
+    subq_19.metric_time__extract_dow = subq_28.metric_time__extract_dow
   GROUP BY
-    COALESCE(subq_18.metric_time__extract_dow, subq_26.metric_time__extract_dow)
-) subq_27
+    COALESCE(subq_19.metric_time__extract_dow, subq_28.metric_time__extract_dow)
+) subq_29

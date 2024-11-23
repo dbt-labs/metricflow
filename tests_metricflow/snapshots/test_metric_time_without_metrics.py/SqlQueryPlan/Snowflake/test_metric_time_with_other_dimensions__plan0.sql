@@ -163,7 +163,7 @@ FROM (
       FROM (
         -- Read From Time Spine 'mf_time_spine'
         SELECT
-          DATE_TRUNC('day', time_spine_src_28006.ds) AS ds__day
+          time_spine_src_28006.ds AS ds__day
           , DATE_TRUNC('week', time_spine_src_28006.ds) AS ds__week
           , DATE_TRUNC('month', time_spine_src_28006.ds) AS ds__month
           , DATE_TRUNC('quarter', time_spine_src_28006.ds) AS ds__quarter
