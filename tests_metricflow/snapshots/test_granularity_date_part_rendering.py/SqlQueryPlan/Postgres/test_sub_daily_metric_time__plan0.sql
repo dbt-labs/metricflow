@@ -41,7 +41,7 @@ FROM (
   FROM (
     -- Read From Time Spine 'mf_time_spine_millisecond'
     SELECT
-      DATE_TRUNC('millisecond', time_spine_src_28002.ts) AS ts__millisecond
+      time_spine_src_28002.ts AS ts__millisecond
       , DATE_TRUNC('second', time_spine_src_28002.ts) AS ts__second
       , DATE_TRUNC('minute', time_spine_src_28002.ts) AS ts__minute
       , DATE_TRUNC('hour', time_spine_src_28002.ts) AS ts__hour
