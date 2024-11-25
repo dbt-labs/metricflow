@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from typing import Optional, Sequence
 
 from dbt_semantic_interfaces.call_parameter_sets import (
@@ -13,8 +14,11 @@ from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from typing_extensions import override
 
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet, InstanceSpecSetTransform, group_spec_by_type
+
+logger = logging.getLogger(__name__)
 
 
 class ObjectBuilderNameConverter:
@@ -85,14 +89,6 @@ class ObjectBuilderNameConverter:
 
         @override
         def transform(self, spec_set: InstanceSpecSet) -> Sequence[str]:
-            assert (
-                len(spec_set.entity_specs)
-                + len(spec_set.dimension_specs)
-                + len(spec_set.time_dimension_specs)
-                + len(spec_set.group_by_metric_specs)
-                == 1
-            )
-
             names_to_return = []
 
             for entity_spec in spec_set.entity_specs:
@@ -138,11 +134,13 @@ class ObjectBuilderNameConverter:
             return names_to_return
 
     @staticmethod
-    def input_str_from_spec(instance_spec: InstanceSpec) -> str:  # noqa: D102
+    def input_str_from_spec(instance_spec: InstanceSpec) -> Optional[str]:  # noqa: D102
         names = ObjectBuilderNameConverter._ObjectBuilderNameTransform().transform(group_spec_by_type(instance_spec))
 
-        if len(names) != 1:
-            raise RuntimeError(f"Did not get exactly 1 name from {instance_spec}. Got {names}")
+        if len(names) == 0:
+            return None
+        elif len(names) > 1:
+            raise RuntimeError(str(LazyFormat("Expected at most one name", instance_spec=instance_spec, names=names)))
 
         return names[0]
 
