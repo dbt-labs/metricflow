@@ -114,7 +114,7 @@ docstring:
                         <!-- node_id = NodeId(id_str='am_0') -->
                         <FilterElementsNode>
                             <!-- description = "Pass Only Elements: ['booking_value', 'metric_time__month']" -->
-                            <!-- node_id = NodeId(id_str='pfe_0') -->
+                            <!-- node_id = NodeId(id_str='pfe_1') -->
                             <!-- include_spec = MeasureSpec(element_name='booking_value') -->
                             <!-- include_spec =                                                                      -->
                             <!--   TimeDimensionSpec(                                                                -->
@@ -175,6 +175,11 @@ docstring:
                                     <!--       ),                                        -->
                                     <!--     ),                                          -->
                                     <!--   )                                             -->
+                                    <!-- join_on_time_dimension_spec =                                                   -->
+                                    <!--   TimeDimensionSpec(                                                            -->
+                                    <!--     element_name='metric_time',                                                 -->
+                                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                                    <!--   )                                                                             -->
                                     <!-- join_type = INNER -->
                                     <!-- offset_window = PydanticMetricTimeWindow(count=1, granularity=WEEK) -->
                                     <MetricTimeDimensionTransformNode>
@@ -246,7 +251,7 @@ docstring:
                         <!-- node_id = NodeId(id_str='am_1') -->
                         <FilterElementsNode>
                             <!-- description = "Pass Only Elements: ['bookers', 'metric_time__month']" -->
-                            <!-- node_id = NodeId(id_str='pfe_1') -->
+                            <!-- node_id = NodeId(id_str='pfe_2') -->
                             <!-- include_spec = MeasureSpec(element_name='bookers') -->
                             <!-- include_spec =                                                                      -->
                             <!--   TimeDimensionSpec(                                                                -->

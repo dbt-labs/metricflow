@@ -9,9 +9,9 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_18.metric_time__quarter, subq_26.metric_time__quarter) AS metric_time__quarter
-    , MAX(subq_18.bookings) AS bookings
-    , MAX(subq_26.bookings_2_weeks_ago) AS bookings_2_weeks_ago
+    COALESCE(subq_19.metric_time__quarter, subq_28.metric_time__quarter) AS metric_time__quarter
+    , MAX(subq_19.bookings) AS bookings
+    , MAX(subq_28.bookings_2_weeks_ago) AS bookings_2_weeks_ago
   FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
@@ -26,19 +26,19 @@ FROM (
         DATE_TRUNC('quarter', ds) AS metric_time__quarter
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_16
+    ) subq_17
     GROUP BY
       metric_time__quarter
-  ) subq_18
+  ) subq_19
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
     -- Pass Only Elements: ['bookings', 'metric_time__quarter']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      DATE_TRUNC('quarter', subq_22.ds) AS metric_time__quarter
-      , SUM(subq_20.bookings) AS bookings_2_weeks_ago
-    FROM ***************************.mf_time_spine subq_22
+      DATE_TRUNC('quarter', time_spine_src_28006.ds) AS metric_time__quarter
+      , SUM(subq_21.bookings) AS bookings_2_weeks_ago
+    FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
@@ -46,14 +46,14 @@ FROM (
         DATE_TRUNC('day', ds) AS metric_time__day
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_20
+    ) subq_21
     ON
-      subq_22.ds - INTERVAL 14 day = subq_20.metric_time__day
+      time_spine_src_28006.ds - INTERVAL 14 day = subq_21.metric_time__day
     GROUP BY
-      DATE_TRUNC('quarter', subq_22.ds)
-  ) subq_26
+      DATE_TRUNC('quarter', time_spine_src_28006.ds)
+  ) subq_28
   ON
-    subq_18.metric_time__quarter = subq_26.metric_time__quarter
+    subq_19.metric_time__quarter = subq_28.metric_time__quarter
   GROUP BY
-    COALESCE(subq_18.metric_time__quarter, subq_26.metric_time__quarter)
-) subq_27
+    COALESCE(subq_19.metric_time__quarter, subq_28.metric_time__quarter)
+) subq_29

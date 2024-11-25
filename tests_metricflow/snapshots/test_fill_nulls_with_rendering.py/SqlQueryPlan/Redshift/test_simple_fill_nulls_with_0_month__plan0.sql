@@ -4,21 +4,43 @@ sql_engine: Redshift
 ---
 -- Compute Metrics via Expressions
 SELECT
-  subq_6.metric_time__month
-  , COALESCE(subq_6.bookings, 0) AS bookings_fill_nulls_with_0
+  subq_7.metric_time__month
+  , COALESCE(subq_7.bookings, 0) AS bookings_fill_nulls_with_0
 FROM (
   -- Join to Time Spine Dataset
   SELECT
-    subq_4.metric_time__month AS metric_time__month
+    subq_6.metric_time__month AS metric_time__month
     , subq_3.bookings AS bookings
   FROM (
-    -- Read From Time Spine 'mf_time_spine'
+    -- Pass Only Elements: ['metric_time__month',]
     SELECT
-      DATE_TRUNC('month', subq_5.ds) AS metric_time__month
-    FROM ***************************.mf_time_spine subq_5
+      subq_5.metric_time__month
+    FROM (
+      -- Transform Time Dimension Columns
+      SELECT
+        subq_4.ds__month AS metric_time__month
+        , subq_4.ds__month
+      FROM (
+        -- Read From Time Spine 'mf_time_spine'
+        SELECT
+          time_spine_src_28006.ds AS ds__day
+          , DATE_TRUNC('week', time_spine_src_28006.ds) AS ds__week
+          , DATE_TRUNC('month', time_spine_src_28006.ds) AS ds__month
+          , DATE_TRUNC('quarter', time_spine_src_28006.ds) AS ds__quarter
+          , DATE_TRUNC('year', time_spine_src_28006.ds) AS ds__year
+          , EXTRACT(year FROM time_spine_src_28006.ds) AS ds__extract_year
+          , EXTRACT(quarter FROM time_spine_src_28006.ds) AS ds__extract_quarter
+          , EXTRACT(month FROM time_spine_src_28006.ds) AS ds__extract_month
+          , EXTRACT(day FROM time_spine_src_28006.ds) AS ds__extract_day
+          , CASE WHEN EXTRACT(dow FROM time_spine_src_28006.ds) = 0 THEN EXTRACT(dow FROM time_spine_src_28006.ds) + 7 ELSE EXTRACT(dow FROM time_spine_src_28006.ds) END AS ds__extract_dow
+          , EXTRACT(doy FROM time_spine_src_28006.ds) AS ds__extract_doy
+          , time_spine_src_28006.martian_day AS ds__martian_day
+        FROM ***************************.mf_time_spine time_spine_src_28006
+      ) subq_4
+    ) subq_5
     GROUP BY
-      DATE_TRUNC('month', subq_5.ds)
-  ) subq_4
+      subq_5.metric_time__month
+  ) subq_6
   LEFT OUTER JOIN (
     -- Aggregate Measures
     SELECT
@@ -229,5 +251,5 @@ FROM (
       subq_2.metric_time__month
   ) subq_3
   ON
-    subq_4.metric_time__month = subq_3.metric_time__month
-) subq_6
+    subq_6.metric_time__month = subq_3.metric_time__month
+) subq_7

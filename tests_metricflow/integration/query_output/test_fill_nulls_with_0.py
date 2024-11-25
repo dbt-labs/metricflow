@@ -295,3 +295,65 @@ def test_join_to_time_spine_with_custom_grain_in_group_by(  # noqa: D103
         snapshot_str=query_result.result_df.text_format(),
         sql_engine=sql_client.sql_engine_type,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_join_to_timespine_metric_with_custom_granularity_filter(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+    it_helpers: IntegrationTestHelpers,
+) -> None:
+    if sql_client.sql_engine_type is SqlEngine.TRINO:
+        pytest.skip(
+            "Trino does not support the syntax used in this where filter, but it can't be made engine-agnostic."
+        )
+
+    query_result = it_helpers.mf_engine.query(
+        MetricFlowQueryRequest.create_with_random_request_id(
+            metric_names=("bookings_join_to_time_spine",),
+            group_by_names=("metric_time__martian_day",),
+            order_by_names=("metric_time__martian_day",),
+            where_constraints=["{{ TimeDimension('metric_time', 'martian_day') }} = '2020-01-08'"],
+        )
+    )
+    assert query_result.result_df is not None, "Unexpected empty result."
+
+    assert_str_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.text_format(),
+        sql_engine=sql_client.sql_engine_type,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_join_to_timespine_metric_with_custom_granularity_filter_not_in_group_by(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+    it_helpers: IntegrationTestHelpers,
+) -> None:
+    if sql_client.sql_engine_type is SqlEngine.TRINO:
+        pytest.skip(
+            "Trino does not support the syntax used in this where filter, but it can't be made engine-agnostic."
+        )
+
+    query_result = it_helpers.mf_engine.query(
+        MetricFlowQueryRequest.create_with_random_request_id(
+            metric_names=("bookings_join_to_time_spine",),
+            group_by_names=("metric_time__day",),
+            order_by_names=("metric_time__day",),
+            where_constraints=["{{ TimeDimension('metric_time', 'martian_day') }} = '2020-01-08'"],
+        )
+    )
+    assert query_result.result_df is not None, "Unexpected empty result."
+
+    assert_str_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.text_format(),
+        sql_engine=sql_client.sql_engine_type,
+    )

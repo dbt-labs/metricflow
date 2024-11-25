@@ -147,6 +147,22 @@ class SqlDataSet(DataSet):
         """Given the name of the time dimension, return the instance associated with it in the data set."""
         return self.instances_for_time_dimensions((time_dimension_spec,))[0]
 
+    def instance_from_time_dimension_grain_and_date_part(
+        self, time_dimension_spec: TimeDimensionSpec
+    ) -> TimeDimensionInstance:
+        """Find instance in dataset that matches the grain and date part of the given time dimension spec."""
+        for time_dimension_instance in self.instance_set.time_dimension_instances:
+            if (
+                time_dimension_instance.spec.time_granularity == time_dimension_spec.time_granularity
+                and time_dimension_instance.spec.date_part == time_dimension_spec.date_part
+            ):
+                return time_dimension_instance
+
+        raise RuntimeError(
+            f"Did not find a time dimension instance with matching grain and date part for spec: {time_dimension_spec}\n"
+            f"Instances available: {self.instance_set.time_dimension_instances}"
+        )
+
     def column_association_for_time_dimension(self, time_dimension_spec: TimeDimensionSpec) -> ColumnAssociation:
         """Given the name of the time dimension, return the set of columns associated with it in the data set."""
         return self.instance_for_time_dimension(time_dimension_spec).associated_column
