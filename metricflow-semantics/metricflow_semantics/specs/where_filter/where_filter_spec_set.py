@@ -44,3 +44,13 @@ class WhereFilterSpecSet(SerializableDataclass):
             metric_level_filter_specs=self.metric_level_filter_specs + other.metric_level_filter_specs,
             query_level_filter_specs=self.query_level_filter_specs + other.query_level_filter_specs,
         )
+
+    def replace_query_level_filter_specs(
+        self, new_query_level_filter_specs: Tuple[WhereFilterSpec, ...]
+    ) -> WhereFilterSpecSet:
+        """Return the same set but with the query level filter specs replaced."""
+        return WhereFilterSpecSet(
+            measure_level_filter_specs=self.measure_level_filter_specs,
+            metric_level_filter_specs=self.metric_level_filter_specs,
+            query_level_filter_specs=new_query_level_filter_specs,
+        )

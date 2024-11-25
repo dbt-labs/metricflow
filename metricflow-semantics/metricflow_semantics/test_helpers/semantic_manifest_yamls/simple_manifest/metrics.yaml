@@ -495,7 +495,7 @@ metric:
 metric:
   name: "bookings_growth_since_start_of_month"
   description: |
-    percentage growth of bookings since the start of the month,
+    number of bookings since the start of the month,
     used to test derived metrics with an offset_to_grain.
   type: derived
   type_params:
@@ -505,6 +505,24 @@ metric:
       - name: bookings
         offset_to_grain: month
         alias: bookings_at_start_of_month
+---
+metric:
+  name: bookings_offset_to_grain_twice_with_tiered_filters
+  description: tests a nested offset_to_grain metric with filters at each level
+  type: derived
+  type_params:
+    expr: bookings_this_month_wtd - bookings
+    metrics:
+      - name: bookings
+      - name: bookings_growth_since_start_of_month
+        offset_to_grain: week
+        alias: bookings_this_month_wtd
+        filter:
+          - "{{ TimeDimension('booking__ds', 'year') }} >= '2019-01-01'"
+          - "{{ TimeDimension('listing__created_at', 'day') }} >= '2020-01-02'"
+  filter:
+    - "{{ TimeDimension('metric_time', 'month') }} >= '2020-01-01'"
+    - "{{ Dimension('booking__is_instant') }}"
 ---
 metric:
   name: "bookings_month_start_compared_to_1_month_prior"
@@ -700,7 +718,7 @@ metric:
         alias: bookings_2_weeks_ago
 ---
 metric:
-  name: "bookings_offset_once"
+  name: bookings_offset_once
   description: bookings metric offset once.
   type: derived
   type_params:
@@ -710,7 +728,7 @@ metric:
         offset_window: 5 days
 ---
 metric:
-  name: "bookings_offset_twice"
+  name: bookings_offset_twice
   description: bookings metric offset twice.
   type: derived
   type_params:
@@ -718,6 +736,22 @@ metric:
     metrics:
       - name: bookings_offset_once
         offset_window: 2 days
+---
+metric:
+  name: bookings_offset_twice_with_tiered_filters
+  description: bookings metric offset twice with tiered filters
+  type: derived
+  type_params:
+    expr: bookings_offset_once
+    metrics:
+      - name: bookings_offset_once
+        offset_window: 1 month
+        filter:
+          - "{{ TimeDimension('metric_time', 'month') }} >= '2019-12-01'"
+          - "{{ Dimension('booking__is_instant') }}"
+  filter:
+    - "{{ TimeDimension('metric_time', 'year') }} >= '2019-01-01'"
+    - "{{ Entity('listing') }} IS NOT NULL"
 ---
 metric:
   name: bookings_at_start_of_month

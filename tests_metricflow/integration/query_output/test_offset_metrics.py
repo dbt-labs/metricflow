@@ -58,3 +58,61 @@ def test_offset_to_grain_with_multiple_granularities(  # noqa: D103
         snapshot_str=query_result.result_df.text_format(),
         sql_engine=sql_client.sql_engine_type,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_nested_offset_window_metric_with_tiered_filters(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+    it_helpers: IntegrationTestHelpers,
+) -> None:
+    query_result = it_helpers.mf_engine.query(
+        MetricFlowQueryRequest.create_with_random_request_id(
+            metric_names=("bookings_offset_twice_with_tiered_filters",),
+            group_by_names=("metric_time__day",),
+            where_constraints=(
+                "{{ TimeDimension('booking__ds', 'quarter') }} >= '2020-01-02'",
+                "{{ TimeDimension('listing__created_at', 'day') }} = '2020-01-01'",
+            ),
+            order_by_names=["metric_time__day"],
+        )
+    )
+    assert query_result.result_df is not None, "Unexpected empty result."
+
+    assert_str_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.text_format(),
+        sql_engine=sql_client.sql_engine_type,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_nested_offset_to_grain_metric_with_tiered_filters(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+    it_helpers: IntegrationTestHelpers,
+) -> None:
+    query_result = it_helpers.mf_engine.query(
+        MetricFlowQueryRequest.create_with_random_request_id(
+            metric_names=("bookings_offset_to_grain_twice_with_tiered_filters",),
+            group_by_names=("metric_time__day",),
+            where_constraints=(
+                "{{ Entity('listing') }} IS NOT NULL",
+                "{{ TimeDimension('metric_time', 'quarter') }} >= '2020-01-01'",
+            ),
+            order_by_names=["metric_time__day"],
+        )
+    )
+    assert query_result.result_df is not None, "Unexpected empty result."
+
+    assert_str_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.text_format(),
+        sql_engine=sql_client.sql_engine_type,
+    )

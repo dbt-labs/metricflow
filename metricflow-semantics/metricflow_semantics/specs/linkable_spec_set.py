@@ -41,6 +41,11 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
         return len(self.metric_time_specs) > 0
 
     @property
+    def contains_only_metric_time(self) -> bool:
+        """If all specs are metric_time specs, return True.."""
+        return set(self.metric_time_specs) == set(self.as_tuple)
+
+    @property
     def time_dimension_specs_with_custom_grain(self) -> Tuple[TimeDimensionSpec, ...]:  # noqa: D102
         return tuple([spec for spec in self.time_dimension_specs if spec.time_granularity.is_custom_granularity])
 

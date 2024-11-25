@@ -15,28 +15,31 @@ FROM (
     , MAX(subq_24.booking_value) AS booking_value
     , MAX(subq_30.bookers) AS bookers
   FROM (
-    -- Constrain Output with WHERE
+    -- Join to Time Spine Dataset
     -- Pass Only Elements: ['booking_value', 'metric_time__month']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      metric_time__month
-      , SUM(booking_value) AS booking_value
+      DATE_TRUNC('month', subq_18.metric_time__day) AS metric_time__month
+      , SUM(bookings_source_src_28000.booking_value) AS booking_value
     FROM (
-      -- Join to Time Spine Dataset
+      -- Filter Time Spine
       SELECT
-        subq_19.ds AS metric_time__day
-        , DATE_TRUNC('month', subq_19.ds) AS metric_time__month
-        , bookings_source_src_28000.booking_value AS booking_value
-      FROM ***************************.mf_time_spine subq_19
-      INNER JOIN
-        ***************************.fct_bookings bookings_source_src_28000
-      ON
-        subq_19.ds - INTERVAL 1 week = DATE_TRUNC('day', bookings_source_src_28000.ds)
-    ) subq_20
-    WHERE metric_time__day = '2020-01-01'
+        metric_time__day
+      FROM (
+        -- Time Spine
+        SELECT
+          ds AS metric_time__day
+        FROM ***************************.mf_time_spine subq_19
+      ) subq_20
+      WHERE metric_time__day = '2020-01-01'
+    ) subq_18
+    INNER JOIN
+      ***************************.fct_bookings bookings_source_src_28000
+    ON
+      subq_18.metric_time__day - INTERVAL 1 week = DATE_TRUNC('day', bookings_source_src_28000.ds)
     GROUP BY
-      metric_time__month
+      DATE_TRUNC('month', subq_18.metric_time__day)
   ) subq_24
   FULL OUTER JOIN (
     -- Constrain Output with WHERE
