@@ -294,56 +294,56 @@ docstring:
                 <ComputeMetricsNode>
                     <!-- description = 'Compute Metrics via Expressions' -->
                     <!-- node_id = NodeId(id_str='cm_4') -->
-                    <!-- metric_spec =                                                           -->
-                    <!--   MetricSpec(                                                           -->
-                    <!--     element_name='bookings_fill_nulls_with_0',                          -->
-                    <!--     filter_spec_set=WhereFilterSpecSet(                                 -->
-                    <!--       query_level_filter_specs=(                                        -->
-                    <!--         WhereFilterSpec(                                                -->
-                    <!--           where_sql='booking__is_instant',                              -->
-                    <!--           bind_parameters=SqlBindParameterSet(),                        -->
-                    <!--           linkable_element_unions=(                                     -->
-                    <!--             LinkableElementUnion(                                       -->
-                    <!--               linkable_dimension=LinkableDimension(                     -->
-                    <!--                 properties=(                                            -->
-                    <!--                   LOCAL,                                                -->
-                    <!--                 ),                                                      -->
-                    <!--                 defined_in_semantic_model=SemanticModelReference(       -->
-                    <!--                   semantic_model_name='bookings_source',                -->
-                    <!--                 ),                                                      -->
-                    <!--                 element_name='is_instant',                              -->
-                    <!--                 dimension_type=CATEGORICAL,                             -->
-                    <!--                 entity_links=(                                          -->
-                    <!--                   EntityReference(                                      -->
-                    <!--                     element_name='booking',                             -->
-                    <!--                   ),                                                    -->
-                    <!--                 ),                                                      -->
-                    <!--                 join_path=SemanticModelJoinPath(                        -->
-                    <!--                   left_semantic_model_reference=SemanticModelReference( -->
-                    <!--                     semantic_model_name='bookings_source',              -->
-                    <!--                   ),                                                    -->
-                    <!--                 ),                                                      -->
-                    <!--               ),                                                        -->
-                    <!--             ),                                                          -->
-                    <!--           ),                                                            -->
-                    <!--           linkable_spec_set=LinkableSpecSet(                            -->
-                    <!--             dimension_specs=(                                           -->
-                    <!--               DimensionSpec(                                            -->
-                    <!--                 element_name='is_instant',                              -->
-                    <!--                 entity_links=(                                          -->
-                    <!--                   EntityReference(                                      -->
-                    <!--                     element_name='booking',                             -->
-                    <!--                   ),                                                    -->
-                    <!--                 ),                                                      -->
-                    <!--               ),                                                        -->
-                    <!--             ),                                                          -->
-                    <!--           ),                                                            -->
-                    <!--         ),                                                              -->
-                    <!--       ),                                                                -->
-                    <!--     ),                                                                  -->
-                    <!--     alias='bookings_2_weeks_ago',                                       -->
-                    <!--     offset_window=PydanticMetricTimeWindow(count=14, granularity=DAY),  -->
-                    <!--   )                                                                     -->
+                    <!-- metric_spec =                                                            -->
+                    <!--   MetricSpec(                                                            -->
+                    <!--     element_name='bookings_fill_nulls_with_0',                           -->
+                    <!--     filter_spec_set=WhereFilterSpecSet(                                  -->
+                    <!--       query_level_filter_specs=(                                         -->
+                    <!--         WhereFilterSpec(                                                 -->
+                    <!--           where_sql='booking__is_instant',                               -->
+                    <!--           bind_parameters=SqlBindParameterSet(),                         -->
+                    <!--           linkable_element_unions=(                                      -->
+                    <!--             LinkableElementUnion(                                        -->
+                    <!--               linkable_dimension=LinkableDimension(                      -->
+                    <!--                 properties=(                                             -->
+                    <!--                   LOCAL,                                                 -->
+                    <!--                 ),                                                       -->
+                    <!--                 defined_in_semantic_model=SemanticModelReference(        -->
+                    <!--                   semantic_model_name='bookings_source',                 -->
+                    <!--                 ),                                                       -->
+                    <!--                 element_name='is_instant',                               -->
+                    <!--                 dimension_type=CATEGORICAL,                              -->
+                    <!--                 entity_links=(                                           -->
+                    <!--                   EntityReference(                                       -->
+                    <!--                     element_name='booking',                              -->
+                    <!--                   ),                                                     -->
+                    <!--                 ),                                                       -->
+                    <!--                 join_path=SemanticModelJoinPath(                         -->
+                    <!--                   left_semantic_model_reference=SemanticModelReference(  -->
+                    <!--                     semantic_model_name='bookings_source',               -->
+                    <!--                   ),                                                     -->
+                    <!--                 ),                                                       -->
+                    <!--               ),                                                         -->
+                    <!--             ),                                                           -->
+                    <!--           ),                                                             -->
+                    <!--           linkable_spec_set=LinkableSpecSet(                             -->
+                    <!--             dimension_specs=(                                            -->
+                    <!--               DimensionSpec(                                             -->
+                    <!--                 element_name='is_instant',                               -->
+                    <!--                 entity_links=(                                           -->
+                    <!--                   EntityReference(                                       -->
+                    <!--                     element_name='booking',                              -->
+                    <!--                   ),                                                     -->
+                    <!--                 ),                                                       -->
+                    <!--               ),                                                         -->
+                    <!--             ),                                                           -->
+                    <!--           ),                                                             -->
+                    <!--         ),                                                               -->
+                    <!--       ),                                                                 -->
+                    <!--     ),                                                                   -->
+                    <!--     alias='bookings_2_weeks_ago',                                        -->
+                    <!--     offset_window=PydanticMetricTimeWindow(count=14, granularity='day'), -->
+                    <!--   )                                                                      -->
                     <WhereConstraintNode>
                         <!-- description = 'Constrain Output with WHERE' -->
                         <!-- node_id = NodeId(id_str='wcc_7') -->
@@ -490,7 +490,8 @@ docstring:
                                                 <!--   )                                             -->
                                                 <!-- use_custom_agg_time_dimension = False -->
                                                 <!-- join_type = INNER -->
-                                                <!-- offset_window = PydanticMetricTimeWindow(count=14, granularity=DAY) -->
+                                                <!-- offset_window =                                         -->
+                                                <!--   PydanticMetricTimeWindow(count=14, granularity='day') -->
                                                 <MetricTimeDimensionTransformNode>
                                                     <!-- description = "Metric Time Dimension 'ds'" -->
                                                     <!-- node_id = NodeId(id_str='sma_2') -->

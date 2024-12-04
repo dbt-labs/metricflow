@@ -191,7 +191,7 @@ docstring:
                             <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                             <!--   )                                                                             -->
                             <!-- entity_spec = EntitySpec(element_name='user') -->
-                            <!-- window = PydanticMetricTimeWindow(count=7, granularity=DAY) -->
+                            <!-- window = PydanticMetricTimeWindow(count=7, granularity='day') -->
                             <!-- unique_key_specs = MetadataSpec(element_name='mf_internal_uuid') -->
                             <FilterElementsNode>
                                 <!-- description =                                                                         -->
