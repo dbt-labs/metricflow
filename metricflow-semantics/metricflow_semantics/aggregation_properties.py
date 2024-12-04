@@ -5,6 +5,8 @@ from enum import Enum
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 
+from metricflow.sql.sql_exprs import SqlWindowFunction
+
 
 def is_expansive(agg_type: AggregationType) -> bool:
     """Expansive ≝ Op( X ∪ Y ∪ ...) = Op( Op(X) ∪ Op(Y) ∪ ...).
@@ -58,12 +60,28 @@ def can_limit_dimension_values(agg_type: AggregationType) -> bool:
 
 
 class AggregationState(Enum):
-    """Represents how the measure is aggregated."""
+    """Represents how the instance is aggregated."""
 
     # When reading from the source, the measure is considered non-aggregated.
     NON_AGGREGATED = "NON_AGGREGATED"
     PARTIAL = "PARTIAL"
     COMPLETE = "COMPLETE"
+    # Might want to move these to a new enum?
+    FIRST_VALUE = "FIRST_VALUE"
+    LAST_VALUE = "LAST_VALUE"
+    ROW_NUMBER = "ROW_NUMBER"
 
     def __repr__(self) -> str:  # noqa: D105
         return f"{self.__class__.__name__}.{self.name}"
+
+    @property
+    def sql_function(self) -> SqlWindowFunction:
+        """Get matching SQL function for the aggregation state."""
+        if self is AggregationState.FIRST_VALUE:
+            return SqlWindowFunction.FIRST_VALUE
+        elif self is AggregationState.LAST_VALUE:
+            return SqlWindowFunction.LAST_VALUE
+        elif self is AggregationState.ROW_NUMBER:
+            return SqlWindowFunction.ROW_NUMBER
+        else:
+            raise NotImplementedError(f"SQL function for {self} is not implemented.")

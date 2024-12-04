@@ -11,6 +11,7 @@ from dbt_semantic_interfaces.references import MetricModelReference, SemanticMod
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.conversion_calculation_type import ConversionCalculationType
 from dbt_semantic_interfaces.type_enums.period_agg import PeriodAggregation
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 from metricflow_semantics.aggregation_properties import AggregationState
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
@@ -1474,7 +1475,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         specs_to_remove_from_parent: Set[TimeDimensionSpec] = set()
         for spec in node.requested_time_dimension_specs:
             # Find the instance in the parent data set with matching grain & date part.
-            old_instance = parent_data_set.instance_from_time_dimension_grain_and_date_part(spec)
+            old_instance = parent_data_set.instance_from_time_dimension_grain_and_date_part(
+                time_granularity=spec.time_granularity, date_part=spec.date_part
+            )
 
             # Build new instance & select column to match requested spec.
             new_instance = TimeDimensionInstance(
@@ -1823,7 +1826,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
     def visit_window_reaggregation_node(self, node: WindowReaggregationNode) -> SqlDataSet:  # noqa: D102
         from_data_set = node.parent_node.accept(self)
-        parent_instance_set = from_data_set.instance_set  # remove order by col
+        parent_instance_set = from_data_set.instance_set
         parent_data_set_alias = self._next_unique_table_alias()
 
         metric_instance = None
@@ -1947,6 +1950,64 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             ),
             end_expr=SqlStringLiteralExpression.create(
                 literal_value=time_range_constraint.end_time.strftime(time_format_to_render),
+            ),
+        )
+
+    def visit_cutom_granularity_bounds_node(  # noqa: D102
+        self,
+        node: JoinToTimeSpineNode,  # TODO: replace with actual node when built
+    ) -> SqlDataSet:
+        from_data_set = node.parent_node.accept(self)
+        parent_instance_set = from_data_set.instance_set
+        parent_data_set_alias = self._next_unique_table_alias()
+        window_grain = ExpandedTimeGranularity(
+            name="martian_day", base_granularity=TimeGranularity.DAY
+        )  # will be node.time_granularity
+
+        # Build new columns & instances that calculate the start and end of the custom grain.
+        window_instance = from_data_set.instance_from_time_dimension_grain_and_date_part(
+            time_granularity=window_grain, date_part=None
+        )
+        window_column_expr = SqlColumnReferenceExpression.from_table_and_column_names(
+            table_alias=parent_data_set_alias, column_name=self._get_custom_granularity_column_name(window_grain.name)
+        )
+
+        base_column_expr = SqlColumnReferenceExpression.from_table_and_column_names(
+            table_alias=parent_data_set_alias,
+            column_name=self._get_time_spine_for_custom_granularity(window_grain.name).base_column,
+        )
+
+        agg_state_to_func_args: Dict[AggregationState, Tuple[SqlExpressionNode, ...]] = {
+            AggregationState.ROW_NUMBER: (),
+            AggregationState.FIRST_VALUE: (base_column_expr,),
+            AggregationState.LAST_VALUE: (base_column_expr,),
+        }
+        new_instances: Tuple[TimeDimensionInstance, ...] = ()
+        new_select_columns: Tuple[SqlSelectColumn, ...] = ()
+        for agg_state, func_args in agg_state_to_func_args.items():
+            new_instance = window_instance.with_new_spec(
+                new_spec=window_instance.spec.with_aggregation_state(agg_state),
+                column_association_resolver=self._column_association_resolver,
+            )
+            new_instances += (new_instance,)
+            new_select_column = SqlSelectColumn(
+                expr=SqlWindowFunctionExpression.create(
+                    sql_function=agg_state.sql_function,
+                    sql_function_args=func_args,
+                    partition_by_args=(window_column_expr,),
+                    order_by_args=(SqlWindowOrderByArgument(base_column_expr),),
+                ),
+                column_alias=new_instance.associated_column.column_name,
+            )
+            new_select_columns += (new_select_column,)
+
+        return SqlDataSet(
+            instance_set=InstanceSet.merge([InstanceSet(time_dimension_instances=new_instances), parent_instance_set]),
+            sql_select_node=SqlSelectStatementNode.create(
+                description=node.description,
+                select_columns=new_select_columns + from_data_set.checked_sql_select_node.select_columns,
+                from_source=from_data_set.checked_sql_select_node,
+                from_source_alias=parent_data_set_alias,
             ),
         )
 

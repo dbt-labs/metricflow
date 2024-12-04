@@ -134,16 +134,22 @@ class TimeDimensionInstance(LinkableInstance[TimeDimensionSpec], SemanticModelEl
     def accept(self, visitor: InstanceVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_time_dimension_instance(self)
 
+    def with_new_spec(
+        self, new_spec: TimeDimensionSpec, column_association_resolver: ColumnAssociationResolver
+    ) -> TimeDimensionInstance:
+        """Returns a new instance with the spec replaced."""
+        return TimeDimensionInstance(
+            associated_columns=(column_association_resolver.resolve_spec(new_spec),),
+            defined_from=self.defined_from,
+            spec=new_spec,
+        )
+
     def with_entity_prefix(
         self, entity_prefix: EntityReference, column_association_resolver: ColumnAssociationResolver
     ) -> TimeDimensionInstance:
         """Returns a new instance with the entity prefix added to the entity links."""
         transformed_spec = self.spec.with_entity_prefix(entity_prefix)
-        return TimeDimensionInstance(
-            associated_columns=(column_association_resolver.resolve_spec(transformed_spec),),
-            defined_from=self.defined_from,
-            spec=transformed_spec,
-        )
+        return self.with_new_spec(transformed_spec, column_association_resolver)
 
     def with_new_defined_from(self, defined_from: Sequence[SemanticModelElementReference]) -> TimeDimensionInstance:
         """Returns a new instance with the defined_from field replaced."""
