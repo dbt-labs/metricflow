@@ -15,8 +15,6 @@ from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 logger = logging.getLogger(__name__)
 
-TIME_SPINE_DATA_SET_DESCRIPTION = "Time Spine"
-
 
 @dataclass(frozen=True)
 class TimeSpineSource:
@@ -101,10 +99,10 @@ class TimeSpineSource:
         }
 
     @staticmethod
-    def choose_time_spine_sources(
+    def choose_time_spine_source(
         required_time_spine_specs: Sequence[TimeDimensionSpec],
         time_spine_sources: Dict[TimeGranularity, TimeSpineSource],
-    ) -> Sequence[TimeSpineSource]:
+    ) -> TimeSpineSource:
         """Determine which time spine sources to use to satisfy the given specs.
 
         Custom grains can only use the time spine where they are defined. For standard grains, this will choose the time
@@ -147,4 +145,15 @@ class TimeSpineSource:
         if not required_time_spines.intersection(set(compatible_time_spines_for_standard_grains.values())):
             required_time_spines.add(time_spine_sources[max(compatible_time_spines_for_standard_grains)])
 
-        return tuple(required_time_spines)
+        if len(required_time_spines) != 1:
+            raise RuntimeError(
+                "Multiple time spines are required to satisfy the specs, but only one is supported per query currently. "
+                f"Multiple will be supported in the future. Time spines required: {required_time_spines}."
+            )
+
+        return required_time_spines.pop()
+
+    @property
+    def data_set_description(self) -> str:
+        """Description to be displayed when this time spine is used in a data set."""
+        return f"Read From Time Spine '{self.table_name}'"

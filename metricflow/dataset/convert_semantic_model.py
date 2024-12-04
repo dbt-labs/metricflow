@@ -34,7 +34,7 @@ from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY, TimeDimensionSpec
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
-from metricflow_semantics.time.time_spine_source import TIME_SPINE_DATA_SET_DESCRIPTION, TimeSpineSource
+from metricflow_semantics.time.time_spine_source import TimeSpineSource
 
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.dataset.sql_dataset import SqlDataSet
@@ -528,13 +528,11 @@ class SemanticModelToDataSetConverter:
             time_granularity=ExpandedTimeGranularity.from_time_granularity(base_granularity),
         )
         time_dimension_instances.append(base_time_dimension_instance)
-        base_dimension_select_expr = SemanticModelToDataSetConverter._make_element_sql_expr(
-            table_alias=from_source_alias, element_name=base_column_name
+        base_dimension_select_expr = SqlColumnReferenceExpression.from_table_and_column_names(
+            table_alias=from_source_alias, column_name=base_column_name
         )
-        base_select_column = self._build_column_for_standard_time_granularity(
-            time_granularity=base_granularity,
-            expr=base_dimension_select_expr,
-            column_alias=base_time_dimension_instance.associated_column.column_name,
+        base_select_column = SqlSelectColumn(
+            expr=base_dimension_select_expr, column_alias=base_time_dimension_instance.associated_column.column_name
         )
         select_columns.append(base_select_column)
         new_base_instances, new_base_columns = self._build_time_dimension_instances_and_columns(
@@ -568,7 +566,7 @@ class SemanticModelToDataSetConverter:
         return SqlDataSet(
             instance_set=InstanceSet(time_dimension_instances=tuple(time_dimension_instances)),
             sql_select_node=SqlSelectStatementNode.create(
-                description=TIME_SPINE_DATA_SET_DESCRIPTION,
+                description=time_spine_source.data_set_description,
                 select_columns=tuple(select_columns),
                 from_source=SqlTableNode.create(sql_table=time_spine_source.spine_table),
                 from_source_alias=from_source_alias,

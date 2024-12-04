@@ -1,15 +1,18 @@
 from __future__ import annotations
 
-from typing import List, Optional, Sequence
+from dataclasses import dataclass
+from typing import List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.references import SemanticModelReference
+from dbt_semantic_interfaces.type_enums import DatePart
 from metricflow_semantics.assert_one_arg import assert_exactly_one_arg_set
-from metricflow_semantics.instances import EntityInstance, InstanceSet
+from metricflow_semantics.instances import EntityInstance, InstanceSet, TimeDimensionInstance
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.specs.column_assoc import ColumnAssociation
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from typing_extensions import override
 
 from metricflow.dataset.dataset_classes import DataSet
@@ -122,32 +125,73 @@ class SqlDataSet(DataSet):
 
         return column_associations_to_return[0]
 
-    def column_association_for_time_dimension(
-        self,
-        time_dimension_spec: TimeDimensionSpec,
-    ) -> ColumnAssociation:
-        """Given the name of the time dimension, return the set of columns associated with it in the data set."""
+    def instances_for_time_dimensions(
+        self, time_dimension_specs: Sequence[TimeDimensionSpec]
+    ) -> Tuple[TimeDimensionInstance, ...]:
+        """Return the instances associated with these specs in the data set."""
+        time_dimension_specs_set = set(time_dimension_specs)
         matching_instances = 0
-        column_associations_to_return = None
+        instances_to_return: Tuple[TimeDimensionInstance, ...] = ()
         for time_dimension_instance in self.instance_set.time_dimension_instances:
-            if time_dimension_instance.spec == time_dimension_spec:
-                column_associations_to_return = time_dimension_instance.associated_columns
+            if time_dimension_instance.spec in time_dimension_specs_set:
+                instances_to_return += (time_dimension_instance,)
                 matching_instances += 1
 
-        if matching_instances > 1:
+        if matching_instances != len(time_dimension_specs_set):
             raise RuntimeError(
-                f"More than one time dimension instance with spec {time_dimension_spec} in "
-                f"instance set: {self.instance_set}"
+                f"Unexpected number of time dimension instances found matching specs.\nSpecs: {time_dimension_specs_set}\n"
+                f"Instances: {instances_to_return}"
             )
 
-        if not column_associations_to_return:
-            raise RuntimeError(
-                f"No time dimension instances with spec {time_dimension_spec} in instance set: {self.instance_set}"
-            )
+        return instances_to_return
 
-        return column_associations_to_return[0]
+    def instance_for_time_dimension(self, time_dimension_spec: TimeDimensionSpec) -> TimeDimensionInstance:
+        """Given the name of the time dimension, return the instance associated with it in the data set."""
+        return self.instances_for_time_dimensions((time_dimension_spec,))[0]
+
+    def instance_from_time_dimension_grain_and_date_part(
+        self, time_granularity: ExpandedTimeGranularity, date_part: Optional[DatePart]
+    ) -> TimeDimensionInstance:
+        """Find instance in dataset that matches the given grain and date part."""
+        for time_dimension_instance in self.instance_set.time_dimension_instances:
+            if (
+                time_dimension_instance.spec.time_granularity == time_granularity
+                and time_dimension_instance.spec.date_part == date_part
+            ):
+                return time_dimension_instance
+
+        raise RuntimeError(
+            f"Did not find a time dimension instance with grain {time_granularity} and date part {date_part}\n"
+            f"Instances available: {self.instance_set.time_dimension_instances}"
+        )
+
+    def column_association_for_time_dimension(self, time_dimension_spec: TimeDimensionSpec) -> ColumnAssociation:
+        """Given the name of the time dimension, return the set of columns associated with it in the data set."""
+        return self.instance_for_time_dimension(time_dimension_spec).associated_column
 
     @property
     @override
     def semantic_model_reference(self) -> Optional[SemanticModelReference]:
         return None
+
+    def annotate(self, alias: str, metric_time_spec: TimeDimensionSpec) -> AnnotatedSqlDataSet:
+        """Convert to an AnnotatedSqlDataSet with specified metadata."""
+        metric_time_column_name = self.column_association_for_time_dimension(metric_time_spec).column_name
+        return AnnotatedSqlDataSet(data_set=self, alias=alias, _metric_time_column_name=metric_time_column_name)
+
+
+@dataclass(frozen=True)
+class AnnotatedSqlDataSet:
+    """Class to bind a DataSet to transient properties associated with it at a given point in the SqlQueryPlan."""
+
+    data_set: SqlDataSet
+    alias: str
+    _metric_time_column_name: Optional[str] = None
+
+    @property
+    def metric_time_column_name(self) -> str:
+        """Direct accessor for the optional metric time name, only safe to call when we know that value is set."""
+        assert (
+            self._metric_time_column_name
+        ), "Expected a valid metric time dimension name to be associated with this dataset, but did not get one!"
+        return self._metric_time_column_name

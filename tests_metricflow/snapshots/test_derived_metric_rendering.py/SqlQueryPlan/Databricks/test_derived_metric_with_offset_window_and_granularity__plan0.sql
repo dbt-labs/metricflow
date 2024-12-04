@@ -4,14 +4,14 @@ sql_engine: Databricks
 ---
 -- Compute Metrics via Expressions
 SELECT
-  subq_13.metric_time__quarter
+  subq_14.metric_time__quarter
   , bookings - bookings_2_weeks_ago AS bookings_growth_2_weeks
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_4.metric_time__quarter, subq_12.metric_time__quarter) AS metric_time__quarter
+    COALESCE(subq_4.metric_time__quarter, subq_13.metric_time__quarter) AS metric_time__quarter
     , MAX(subq_4.bookings) AS bookings
-    , MAX(subq_12.bookings_2_weeks_ago) AS bookings_2_weeks_ago
+    , MAX(subq_13.bookings_2_weeks_ago) AS bookings_2_weeks_ago
   FROM (
     -- Compute Metrics via Expressions
     SELECT
@@ -230,33 +230,22 @@ FROM (
   FULL OUTER JOIN (
     -- Compute Metrics via Expressions
     SELECT
-      subq_11.metric_time__quarter
-      , subq_11.bookings AS bookings_2_weeks_ago
+      subq_12.metric_time__quarter
+      , subq_12.bookings AS bookings_2_weeks_ago
     FROM (
       -- Aggregate Measures
       SELECT
-        subq_10.metric_time__quarter
-        , SUM(subq_10.bookings) AS bookings
+        subq_11.metric_time__quarter
+        , SUM(subq_11.bookings) AS bookings
       FROM (
         -- Pass Only Elements: ['bookings', 'metric_time__quarter']
         SELECT
-          subq_9.metric_time__quarter
-          , subq_9.bookings
+          subq_10.metric_time__quarter
+          , subq_10.bookings
         FROM (
           -- Join to Time Spine Dataset
           SELECT
-            subq_7.metric_time__day AS metric_time__day
-            , DATE_TRUNC('week', subq_7.metric_time__day) AS metric_time__week
-            , DATE_TRUNC('month', subq_7.metric_time__day) AS metric_time__month
-            , DATE_TRUNC('quarter', subq_7.metric_time__day) AS metric_time__quarter
-            , DATE_TRUNC('year', subq_7.metric_time__day) AS metric_time__year
-            , EXTRACT(year FROM subq_7.metric_time__day) AS metric_time__extract_year
-            , EXTRACT(quarter FROM subq_7.metric_time__day) AS metric_time__extract_quarter
-            , EXTRACT(month FROM subq_7.metric_time__day) AS metric_time__extract_month
-            , EXTRACT(day FROM subq_7.metric_time__day) AS metric_time__extract_day
-            , EXTRACT(DAYOFWEEK_ISO FROM subq_7.metric_time__day) AS metric_time__extract_dow
-            , EXTRACT(doy FROM subq_7.metric_time__day) AS metric_time__extract_doy
-            , subq_6.ds__day AS ds__day
+            subq_6.ds__day AS ds__day
             , subq_6.ds__week AS ds__week
             , subq_6.ds__month AS ds__month
             , subq_6.ds__quarter AS ds__quarter
@@ -322,6 +311,17 @@ FROM (
             , subq_6.booking__paid_at__extract_day AS booking__paid_at__extract_day
             , subq_6.booking__paid_at__extract_dow AS booking__paid_at__extract_dow
             , subq_6.booking__paid_at__extract_doy AS booking__paid_at__extract_doy
+            , subq_6.metric_time__week AS metric_time__week
+            , subq_6.metric_time__month AS metric_time__month
+            , subq_6.metric_time__year AS metric_time__year
+            , subq_6.metric_time__extract_year AS metric_time__extract_year
+            , subq_6.metric_time__extract_quarter AS metric_time__extract_quarter
+            , subq_6.metric_time__extract_month AS metric_time__extract_month
+            , subq_6.metric_time__extract_day AS metric_time__extract_day
+            , subq_6.metric_time__extract_dow AS metric_time__extract_dow
+            , subq_6.metric_time__extract_doy AS metric_time__extract_doy
+            , subq_9.metric_time__day AS metric_time__day
+            , subq_9.metric_time__quarter AS metric_time__quarter
             , subq_6.listing AS listing
             , subq_6.guest AS guest
             , subq_6.host AS host
@@ -344,11 +344,36 @@ FROM (
             , subq_6.approximate_continuous_booking_value_p99 AS approximate_continuous_booking_value_p99
             , subq_6.approximate_discrete_booking_value_p99 AS approximate_discrete_booking_value_p99
           FROM (
-            -- Time Spine
+            -- Pass Only Elements: ['metric_time__day', 'metric_time__quarter']
             SELECT
-              subq_8.ds AS metric_time__day
-            FROM ***************************.mf_time_spine subq_8
-          ) subq_7
+              subq_8.metric_time__day
+              , subq_8.metric_time__quarter
+            FROM (
+              -- Transform Time Dimension Columns
+              SELECT
+                subq_7.ds__day AS metric_time__day
+                , subq_7.ds__quarter AS metric_time__quarter
+                , subq_7.ds__day
+                , subq_7.ds__quarter
+              FROM (
+                -- Read From Time Spine 'mf_time_spine'
+                SELECT
+                  time_spine_src_28006.ds AS ds__day
+                  , DATE_TRUNC('week', time_spine_src_28006.ds) AS ds__week
+                  , DATE_TRUNC('month', time_spine_src_28006.ds) AS ds__month
+                  , DATE_TRUNC('quarter', time_spine_src_28006.ds) AS ds__quarter
+                  , DATE_TRUNC('year', time_spine_src_28006.ds) AS ds__year
+                  , EXTRACT(year FROM time_spine_src_28006.ds) AS ds__extract_year
+                  , EXTRACT(quarter FROM time_spine_src_28006.ds) AS ds__extract_quarter
+                  , EXTRACT(month FROM time_spine_src_28006.ds) AS ds__extract_month
+                  , EXTRACT(day FROM time_spine_src_28006.ds) AS ds__extract_day
+                  , EXTRACT(DAYOFWEEK_ISO FROM time_spine_src_28006.ds) AS ds__extract_dow
+                  , EXTRACT(doy FROM time_spine_src_28006.ds) AS ds__extract_doy
+                  , time_spine_src_28006.martian_day AS ds__martian_day
+                FROM ***************************.mf_time_spine time_spine_src_28006
+              ) subq_7
+            ) subq_8
+          ) subq_9
           INNER JOIN (
             -- Metric Time Dimension 'ds'
             SELECT
@@ -545,15 +570,15 @@ FROM (
             ) subq_5
           ) subq_6
           ON
-            DATEADD(day, -14, subq_7.metric_time__day) = subq_6.metric_time__day
-        ) subq_9
-      ) subq_10
+            DATEADD(day, -14, subq_9.metric_time__day) = subq_6.metric_time__day
+        ) subq_10
+      ) subq_11
       GROUP BY
-        subq_10.metric_time__quarter
-    ) subq_11
-  ) subq_12
+        subq_11.metric_time__quarter
+    ) subq_12
+  ) subq_13
   ON
-    subq_4.metric_time__quarter = subq_12.metric_time__quarter
+    subq_4.metric_time__quarter = subq_13.metric_time__quarter
   GROUP BY
-    COALESCE(subq_4.metric_time__quarter, subq_12.metric_time__quarter)
-) subq_13
+    COALESCE(subq_4.metric_time__quarter, subq_13.metric_time__quarter)
+) subq_14

@@ -803,6 +803,7 @@ class CreateSelectColumnForCombineOutputNode(InstanceSetTransform[SelectColumnSe
         )
 
 
+# TODO: delete this class & all uses. It doesn't do anything.
 class ChangeAssociatedColumns(InstanceSetTransform[InstanceSet]):
     """Change the columns associated with instances to the one specified by the resolver.
 

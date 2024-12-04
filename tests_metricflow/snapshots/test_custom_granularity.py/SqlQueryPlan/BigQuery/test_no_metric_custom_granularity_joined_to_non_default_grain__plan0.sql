@@ -411,9 +411,9 @@ FROM (
         , subq_1.ds__extract_doy AS metric_time__extract_doy
         , subq_1.ds__martian_day AS metric_time__martian_day
       FROM (
-        -- Time Spine
+        -- Read From Time Spine 'mf_time_spine'
         SELECT
-          DATETIME_TRUNC(time_spine_src_28006.ds, day) AS ds__day
+          time_spine_src_28006.ds AS ds__day
           , DATETIME_TRUNC(time_spine_src_28006.ds, isoweek) AS ds__week
           , DATETIME_TRUNC(time_spine_src_28006.ds, month) AS ds__month
           , DATETIME_TRUNC(time_spine_src_28006.ds, quarter) AS ds__quarter

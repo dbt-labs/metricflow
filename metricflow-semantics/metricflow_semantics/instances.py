@@ -49,7 +49,9 @@ class MdoInstance(ABC, Generic[SpecT]):
     @property
     def associated_column(self) -> ColumnAssociation:
         """Helper for getting the associated column until support for multiple associated columns is added."""
-        assert len(self.associated_columns) == 1
+        assert (
+            len(self.associated_columns) == 1
+        ), f"Expected exactly one column for {self.__class__.__name__}, but got {self.associated_columns}"
         return self.associated_columns[0]
 
     def accept(self, visitor: InstanceVisitor[VisitorOutputT]) -> VisitorOutputT:
@@ -132,15 +134,27 @@ class TimeDimensionInstance(LinkableInstance[TimeDimensionSpec], SemanticModelEl
     def accept(self, visitor: InstanceVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_time_dimension_instance(self)
 
+    def with_new_spec(
+        self, new_spec: TimeDimensionSpec, column_association_resolver: ColumnAssociationResolver
+    ) -> TimeDimensionInstance:
+        """Returns a new instance with the spec replaced."""
+        return TimeDimensionInstance(
+            associated_columns=(column_association_resolver.resolve_spec(new_spec),),
+            defined_from=self.defined_from,
+            spec=new_spec,
+        )
+
     def with_entity_prefix(
         self, entity_prefix: EntityReference, column_association_resolver: ColumnAssociationResolver
     ) -> TimeDimensionInstance:
         """Returns a new instance with the entity prefix added to the entity links."""
         transformed_spec = self.spec.with_entity_prefix(entity_prefix)
+        return self.with_new_spec(transformed_spec, column_association_resolver)
+
+    def with_new_defined_from(self, defined_from: Tuple[SemanticModelElementReference, ...]) -> TimeDimensionInstance:
+        """Returns a new instance with the defined_from field replaced."""
         return TimeDimensionInstance(
-            associated_columns=(column_association_resolver.resolve_spec(transformed_spec),),
-            defined_from=self.defined_from,
-            spec=transformed_spec,
+            associated_columns=self.associated_columns, defined_from=defined_from, spec=self.spec
         )
 
 

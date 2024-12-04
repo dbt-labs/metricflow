@@ -1,0 +1,7 @@
+kind: Fixes
+body: Apply time constraints after time offsets to avoid filtering out values that
+  will change later in the query.
+time: 2024-11-21T14:06:07.618628-08:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1544"
