@@ -49,7 +49,9 @@ class MdoInstance(ABC, Generic[SpecT]):
     @property
     def associated_column(self) -> ColumnAssociation:
         """Helper for getting the associated column until support for multiple associated columns is added."""
-        assert len(self.associated_columns) == 1
+        assert (
+            len(self.associated_columns) == 1
+        ), f"Expected exactly one column for {self.__class__.__name__}, but got {self.associated_columns}"
         return self.associated_columns[0]
 
     def accept(self, visitor: InstanceVisitor[VisitorOutputT]) -> VisitorOutputT:
