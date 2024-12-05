@@ -194,6 +194,8 @@ class DataflowToSqlQueryPlanConverter:
             optimization_level, use_column_alias_in_group_by=use_column_alias_in_group_by
         )
 
+        logger.info(LazyFormat("Using option set:", option_set=option_set))
+
         nodes_to_convert_to_cte: FrozenSet[DataflowPlanNode] = frozenset()
         if option_set.allow_cte:
             nodes_to_convert_to_cte = self._get_nodes_to_convert_to_cte(dataflow_plan_node)
