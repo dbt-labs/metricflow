@@ -63,13 +63,13 @@ test_filename: test_dataflow_plan_builder.py
                 <ComputeMetricsNode>
                     <!-- description = 'Compute Metrics via Expressions' -->
                     <!-- node_id = NodeId(id_str='cm_1') -->
-                    <!-- metric_spec =                                                          -->
-                    <!--   MetricSpec(                                                          -->
-                    <!--     element_name='bookings_fill_nulls_with_0',                         -->
-                    <!--     filter_spec_set=WhereFilterSpecSet(),                              -->
-                    <!--     alias='bookings_2_weeks_ago',                                      -->
-                    <!--     offset_window=PydanticMetricTimeWindow(count=14, granularity=DAY), -->
-                    <!--   )                                                                    -->
+                    <!-- metric_spec =                                                            -->
+                    <!--   MetricSpec(                                                            -->
+                    <!--     element_name='bookings_fill_nulls_with_0',                           -->
+                    <!--     filter_spec_set=WhereFilterSpecSet(),                                -->
+                    <!--     alias='bookings_2_weeks_ago',                                        -->
+                    <!--     offset_window=PydanticMetricTimeWindow(count=14, granularity='day'), -->
+                    <!--   )                                                                      -->
                     <JoinToTimeSpineNode>
                         <!-- description = 'Join to Time Spine Dataset' -->
                         <!-- node_id = NodeId(id_str='jts_2') -->
@@ -107,7 +107,7 @@ test_filename: test_dataflow_plan_builder.py
                                     <!--   )                                                                               -->
                                     <!-- use_custom_agg_time_dimension = False -->
                                     <!-- join_type = INNER -->
-                                    <!-- offset_window = PydanticMetricTimeWindow(count=14, granularity=DAY) -->
+                                    <!-- offset_window = PydanticMetricTimeWindow(count=14, granularity='day') -->
                                     <MetricTimeDimensionTransformNode>
                                         <!-- description = "Metric Time Dimension 'ds'" -->
                                         <!-- node_id = NodeId(id_str='sma_28009') -->

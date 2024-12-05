@@ -19,7 +19,7 @@ docstring:
             <!--   )                                                                               -->
             <!-- use_custom_agg_time_dimension = False -->
             <!-- join_type = INNER -->
-            <!-- offset_window = PydanticMetricTimeWindow(count=10, granularity=DAY) -->
+            <!-- offset_window = PydanticMetricTimeWindow(count=10, granularity='day') -->
             <!-- time_range_constraint =                             -->
             <!--   TimeRangeConstraint(                              -->
             <!--     start_time=datetime.datetime(2020, 1, 1, 0, 0), -->

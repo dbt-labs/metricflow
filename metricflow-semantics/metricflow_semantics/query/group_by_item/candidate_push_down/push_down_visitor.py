@@ -12,6 +12,7 @@ from dbt_semantic_interfaces.type_enums import MetricType
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
 
+from metricflow_semantics.errors.custom_grain_not_supported import error_if_not_standard_grain
 from metricflow_semantics.mf_logging.formatting import indent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat, mf_pformat_dict
@@ -401,7 +402,13 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
 
             # If time granularity is not set for the metric, defaults to DAY if available, else the smallest available granularity.
             # Note: ignores any granularity set on input metrics.
-            metric_default_time_granularity = metric_to_use_for_time_granularity_resolution.time_granularity or max(
+            metric_time_granularity: Optional[TimeGranularity] = None
+            if metric_to_use_for_time_granularity_resolution.time_granularity is not None:
+                metric_time_granularity = error_if_not_standard_grain(
+                    context=f"Metric({metric_to_use_for_time_granularity_resolution}).time_granularity",
+                    input_granularity=metric_to_use_for_time_granularity_resolution.time_granularity,
+                )
+            metric_default_time_granularity = metric_time_granularity or max(
                 TimeGranularity.DAY,
                 self._semantic_manifest_lookup.metric_lookup.get_min_queryable_time_granularity(
                     MetricReference(metric_to_use_for_time_granularity_resolution.name)

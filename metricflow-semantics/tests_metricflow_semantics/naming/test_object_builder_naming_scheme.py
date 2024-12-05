@@ -67,20 +67,30 @@ def test_input_str(object_builder_naming_scheme: ObjectBuilderNamingScheme) -> N
     assert object_builder_naming_scheme.input_str(MetricSpec("bookings")) is None
 
 
-def test_input_follows_scheme(object_builder_naming_scheme: ObjectBuilderNamingScheme) -> None:  # noqa: D103
+def test_input_follows_scheme(  # noqa: D103
+    object_builder_naming_scheme: ObjectBuilderNamingScheme, simple_semantic_manifest_lookup: SemanticManifestLookup
+) -> None:
     assert object_builder_naming_scheme.input_str_follows_scheme(
-        "Dimension('listing__country', entity_path=['booking'])"
+        "Dimension('listing__country', entity_path=['booking'])",
+        semantic_manifest_lookup=simple_semantic_manifest_lookup,
     )
     assert object_builder_naming_scheme.input_str_follows_scheme(
         "TimeDimension('listing__creation_time', time_granularity_name='month', date_part_name='day', "
-        "entity_path=['booking'])"
+        "entity_path=['booking'])",
+        semantic_manifest_lookup=simple_semantic_manifest_lookup,
     )
     assert object_builder_naming_scheme.input_str_follows_scheme(
-        "Entity('user', entity_path=['booking', 'listing'])",
+        "Entity('user', entity_path=['booking', 'listing'])", semantic_manifest_lookup=simple_semantic_manifest_lookup
     )
-    assert not object_builder_naming_scheme.input_str_follows_scheme("listing__creation_time__extract_month")
-    assert not object_builder_naming_scheme.input_str_follows_scheme("123")
-    assert not object_builder_naming_scheme.input_str_follows_scheme("NotADimension('listing__country')")
+    assert not object_builder_naming_scheme.input_str_follows_scheme(
+        "listing__creation_time__extract_month", semantic_manifest_lookup=simple_semantic_manifest_lookup
+    )
+    assert not object_builder_naming_scheme.input_str_follows_scheme(
+        "123", semantic_manifest_lookup=simple_semantic_manifest_lookup
+    )
+    assert not object_builder_naming_scheme.input_str_follows_scheme(
+        "NotADimension('listing__country')", semantic_manifest_lookup=simple_semantic_manifest_lookup
+    )
 
 
 def test_spec_pattern(  # noqa: D103

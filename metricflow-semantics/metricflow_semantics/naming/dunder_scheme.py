@@ -23,7 +23,7 @@ from metricflow_semantics.specs.spec_set import InstanceSpecSet, InstanceSpecSet
 class DunderNamingScheme(QueryItemNamingScheme):
     """A naming scheme using the dundered name syntax.
 
-    TODO: Consolidate with StructuredLinkableSpecName / DunderedNameFormatter.
+    TODO: Consolidate with StructuredLinkableSpecName.
     """
 
     _INPUT_REGEX = re.compile(r"\A[a-z]([a-z0-9_])*[a-z0-9]\Z")
@@ -52,7 +52,7 @@ class DunderNamingScheme(QueryItemNamingScheme):
 
     @override
     def spec_pattern(self, input_str: str, semantic_manifest_lookup: SemanticManifestLookup) -> EntityLinkPattern:
-        if not self.input_str_follows_scheme(input_str):
+        if not self.input_str_follows_scheme(input_str, semantic_manifest_lookup=semantic_manifest_lookup):
             raise ValueError(f"{repr(input_str)} does not follow this scheme.")
 
         input_str = input_str.lower()
@@ -119,7 +119,7 @@ class DunderNamingScheme(QueryItemNamingScheme):
         )
 
     @override
-    def input_str_follows_scheme(self, input_str: str) -> bool:
+    def input_str_follows_scheme(self, input_str: str, semantic_manifest_lookup: SemanticManifestLookup) -> bool:
         # This naming scheme is case-insensitive.
         input_str = input_str.lower()
         if DunderNamingScheme._INPUT_REGEX.match(input_str) is None:

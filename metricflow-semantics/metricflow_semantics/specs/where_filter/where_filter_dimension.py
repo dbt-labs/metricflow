@@ -7,7 +7,6 @@ from dbt_semantic_interfaces.call_parameter_sets import (
     DimensionCallParameterSet,
     TimeDimensionCallParameterSet,
 )
-from dbt_semantic_interfaces.naming.dundered import DunderedNameFormatter
 from dbt_semantic_interfaces.protocols.protocol_hint import ProtocolHint
 from dbt_semantic_interfaces.protocols.query_interface import (
     QueryInterfaceDimension,
@@ -18,6 +17,7 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from typing_extensions import override
 
 from metricflow_semantics.errors.error_classes import InvalidQuerySyntax
+from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
     FilterSpecResolutionLookUp,
@@ -134,15 +134,19 @@ class WhereFilterDimensionFactory(ProtocolHint[QueryInterfaceDimensionFactory]):
         spec_resolution_lookup: FilterSpecResolutionLookUp,
         where_filter_location: WhereFilterLocation,
         rendered_spec_tracker: RenderedSpecTracker,
+        custom_granularity_names: Sequence[str],
     ):
         self._column_association_resolver = column_association_resolver
         self._resolved_spec_lookup = spec_resolution_lookup
         self._where_filter_location = where_filter_location
         self._rendered_spec_tracker = rendered_spec_tracker
+        self._custom_granularity_names = custom_granularity_names
 
     def create(self, name: str, entity_path: Sequence[str] = ()) -> WhereFilterDimension:
         """Create a WhereFilterDimension."""
-        structured_name = DunderedNameFormatter.parse_name(name.lower())
+        structured_name = StructuredLinkableSpecName.from_name(
+            name.lower(), custom_granularity_names=self._custom_granularity_names
+        )
 
         return WhereFilterDimension(
             column_association_resolver=self._column_association_resolver,

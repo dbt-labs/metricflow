@@ -210,7 +210,9 @@ class MetricFlowQueryParser:
                 order_by_name_without_prefix = order_by_name
 
             for group_by_item_naming_scheme in self._group_by_item_naming_schemes:
-                if group_by_item_naming_scheme.input_str_follows_scheme(order_by_name_without_prefix):
+                if group_by_item_naming_scheme.input_str_follows_scheme(
+                    order_by_name_without_prefix, semantic_manifest_lookup=self._manifest_lookup
+                ):
                     possible_inputs.append(
                         ResolverInputForGroupByItem(
                             input_obj=order_by_name,
@@ -223,7 +225,9 @@ class MetricFlowQueryParser:
                     break
 
             for metric_naming_scheme in self._metric_naming_schemes:
-                if metric_naming_scheme.input_str_follows_scheme(order_by_name_without_prefix):
+                if metric_naming_scheme.input_str_follows_scheme(
+                    order_by_name_without_prefix, semantic_manifest_lookup=self._manifest_lookup
+                ):
                     possible_inputs.append(
                         ResolverInputForMetric(
                             input_obj=order_by_name,
@@ -373,7 +377,9 @@ class MetricFlowQueryParser:
         for metric_name in metric_names:
             resolver_input_for_metric: Optional[MetricFlowQueryResolverInput] = None
             for metric_naming_scheme in self._metric_naming_schemes:
-                if metric_naming_scheme.input_str_follows_scheme(metric_name):
+                if metric_naming_scheme.input_str_follows_scheme(
+                    metric_name, semantic_manifest_lookup=self._manifest_lookup
+                ):
                     resolver_input_for_metric = ResolverInputForMetric(
                         input_obj=metric_name,
                         naming_scheme=metric_naming_scheme,
@@ -405,7 +411,9 @@ class MetricFlowQueryParser:
         for group_by_name in group_by_names:
             resolver_input_for_group_by_item: Optional[MetricFlowQueryResolverInput] = None
             for group_by_item_naming_scheme in self._group_by_item_naming_schemes:
-                if group_by_item_naming_scheme.input_str_follows_scheme(group_by_name):
+                if group_by_item_naming_scheme.input_str_follows_scheme(
+                    group_by_name, semantic_manifest_lookup=self._manifest_lookup
+                ):
                     spec_pattern = group_by_item_naming_scheme.spec_pattern(
                         group_by_name, semantic_manifest_lookup=self._manifest_lookup
                     )

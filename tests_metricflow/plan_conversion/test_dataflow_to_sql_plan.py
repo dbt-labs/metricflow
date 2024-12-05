@@ -685,7 +685,7 @@ def test_join_to_time_spine_node_with_offset_window(
         time_range_constraint=TimeRangeConstraint(
             start_time=as_datetime("2020-01-01"), end_time=as_datetime("2021-01-01")
         ),
-        offset_window=PydanticMetricTimeWindow(count=10, granularity=TimeGranularity.DAY),
+        offset_window=PydanticMetricTimeWindow(count=10, granularity=TimeGranularity.DAY.value),
         join_type=SqlJoinType.INNER,
     )
 

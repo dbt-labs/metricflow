@@ -75,13 +75,28 @@ def test_input_str(dunder_naming_scheme: DunderNamingScheme) -> None:  # noqa: D
     )
 
 
-def test_input_follows_scheme(dunder_naming_scheme: DunderNamingScheme) -> None:  # noqa: D103
-    assert dunder_naming_scheme.input_str_follows_scheme("listing__country")
-    assert dunder_naming_scheme.input_str_follows_scheme("listing__creation_time__month")
-    assert dunder_naming_scheme.input_str_follows_scheme("booking__listing")
-    assert not dunder_naming_scheme.input_str_follows_scheme("listing__creation_time__extract_month")
-    assert not dunder_naming_scheme.input_str_follows_scheme("123")
-    assert not dunder_naming_scheme.input_str_follows_scheme("TimeDimension('metric_time')")
+def test_input_follows_scheme(  # noqa: D103
+    dunder_naming_scheme: DunderNamingScheme,
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
+) -> None:
+    assert dunder_naming_scheme.input_str_follows_scheme(
+        "listing__country", semantic_manifest_lookup=simple_semantic_manifest_lookup
+    )
+    assert dunder_naming_scheme.input_str_follows_scheme(
+        "listing__creation_time__month", semantic_manifest_lookup=simple_semantic_manifest_lookup
+    )
+    assert dunder_naming_scheme.input_str_follows_scheme(
+        "booking__listing", semantic_manifest_lookup=simple_semantic_manifest_lookup
+    )
+    assert not dunder_naming_scheme.input_str_follows_scheme(
+        "listing__creation_time__extract_month", semantic_manifest_lookup=simple_semantic_manifest_lookup
+    )
+    assert not dunder_naming_scheme.input_str_follows_scheme(
+        "123", semantic_manifest_lookup=simple_semantic_manifest_lookup
+    )
+    assert not dunder_naming_scheme.input_str_follows_scheme(
+        "TimeDimension('metric_time')", semantic_manifest_lookup=simple_semantic_manifest_lookup
+    )
 
 
 def test_spec_pattern(  # noqa: D103

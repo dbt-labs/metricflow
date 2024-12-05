@@ -145,7 +145,7 @@ docstring:
                                 <!--       time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                                 <!--     ),                                                                            -->
                                 <!--   )                                                                               -->
-                                <!-- window = PydanticMetricTimeWindow(count=2, granularity=DAY) -->
+                                <!-- window = PydanticMetricTimeWindow(count=2, granularity='day') -->
                                 <MetricTimeDimensionTransformNode>
                                     <!-- description = "Metric Time Dimension 'ds'" -->
                                     <!-- node_id = NodeId(id_str='sma_28009') -->

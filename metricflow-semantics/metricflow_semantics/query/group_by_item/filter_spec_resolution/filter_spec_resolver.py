@@ -331,7 +331,9 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
         for location, where_filters in where_filters_and_locations.items():
             for where_filter in where_filters:
                 try:
-                    filter_call_parameter_sets = where_filter.call_parameter_sets
+                    filter_call_parameter_sets = where_filter.call_parameter_sets(
+                        custom_granularity_names=self._manifest_lookup.semantic_model_lookup.custom_granularity_names
+                    )
                 except Exception as e:
                     non_parsable_resolutions.append(
                         NonParsableFilterResolution(

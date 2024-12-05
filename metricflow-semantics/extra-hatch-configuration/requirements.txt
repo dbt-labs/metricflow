@@ -1,7 +1,7 @@
 # Always support a range of production DSI versions capped at the next breaking version in metricflow-semantics.
 # This allows us to sync new, non-breaking changes to dbt-core without getting a version mismatch in dbt-mantle,
 # which depends on a specific commit of DSI.
-dbt-semantic-interfaces>=0.7.2, <0.8.0
+dbt-semantic-interfaces>=0.8.3, <0.9.0
 graphviz>=0.18.2, <0.21
 python-dateutil>=2.9.0, <2.10.0
 rapidfuzz>=3.0, <4.0

@@ -103,7 +103,7 @@ docstring:
                             <!--       time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                             <!--     ),                                                                            -->
                             <!--   )                                                                               -->
-                            <!-- window = PydanticMetricTimeWindow(count=2, granularity=DAY) -->
+                            <!-- window = PydanticMetricTimeWindow(count=2, granularity='day') -->
                             <WhereConstraintNode>
                                 <!-- description = 'Constrain Output with WHERE' -->
                                 <!-- node_id = NodeId(id_str='wcc_1') -->

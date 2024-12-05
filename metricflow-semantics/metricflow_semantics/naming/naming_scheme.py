@@ -42,7 +42,7 @@ class QueryItemNamingScheme(ABC):
         pass
 
     @abstractmethod
-    def input_str_follows_scheme(self, input_str: str) -> bool:
+    def input_str_follows_scheme(self, input_str: str, semantic_manifest_lookup: SemanticManifestLookup) -> bool:
         """Returns true if the given input string follows this naming scheme.
 
         Consider adding a structured result that indicates why it does not match the scheme.

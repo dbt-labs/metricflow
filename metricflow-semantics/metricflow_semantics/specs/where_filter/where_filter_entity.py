@@ -5,7 +5,6 @@ from typing import Optional, Sequence
 from dbt_semantic_interfaces.call_parameter_sets import (
     EntityCallParameterSet,
 )
-from dbt_semantic_interfaces.naming.dundered import DunderedNameFormatter
 from dbt_semantic_interfaces.protocols.protocol_hint import ProtocolHint
 from dbt_semantic_interfaces.protocols.query_interface import QueryInterfaceEntity, QueryInterfaceEntityFactory
 from dbt_semantic_interfaces.references import EntityReference
@@ -14,6 +13,7 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from typing_extensions import override
 
 from metricflow_semantics.errors.error_classes import InvalidQuerySyntax
+from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
     FilterSpecResolutionLookUp,
@@ -103,7 +103,7 @@ class WhereFilterEntityFactory(ProtocolHint[QueryInterfaceEntityFactory]):
 
     def create(self, entity_name: str, entity_path: Sequence[str] = ()) -> WhereFilterEntity:
         """Create a WhereFilterEntity."""
-        structured_name = DunderedNameFormatter.parse_name(entity_name.lower())
+        structured_name = StructuredLinkableSpecName.from_name(entity_name.lower(), custom_granularity_names=())
 
         return WhereFilterEntity(
             column_association_resolver=self._column_association_resolver,
