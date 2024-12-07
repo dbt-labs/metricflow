@@ -1,0 +1,155 @@
+PydanticSemanticManifest(
+  semantic_models=[
+    PydanticSemanticModel(
+      name='measure_model_000',
+      node_relation=PydanticNodeRelation(
+        alias='measure_model_000',
+        schema_name='demo',
+        relation_name='demo.measure_model_000',
+      ),
+      entities=[
+        PydanticEntity(name='measure_model_000_primary_entity', type=PRIMARY),
+        PydanticEntity(name='common_entity', type=UNIQUE),
+      ],
+      measures=[
+        PydanticMeasure(name='measure_000', agg=SUM, agg_time_dimension='ds'),
+        PydanticMeasure(name='measure_001', agg=SUM, agg_time_dimension='ds'),
+      ],
+      dimensions=[
+        PydanticDimension(
+          name='ds',
+          type=TIME,
+          is_partition=False,
+          type_params=PydanticDimensionTypeParams(time_granularity=DAY),
+        ),
+      ],
+    ),
+    PydanticSemanticModel(
+      name='measure_model_001',
+      node_relation=PydanticNodeRelation(
+        alias='measure_model_001',
+        schema_name='demo',
+        relation_name='demo.measure_model_001',
+      ),
+      entities=[
+        PydanticEntity(name='measure_model_001_primary_entity', type=PRIMARY),
+        PydanticEntity(name='common_entity', type=UNIQUE),
+      ],
+      measures=[
+        PydanticMeasure(name='measure_002', agg=SUM, agg_time_dimension='ds'),
+        PydanticMeasure(name='measure_003', agg=SUM, agg_time_dimension='ds'),
+      ],
+      dimensions=[
+        PydanticDimension(
+          name='ds',
+          type=TIME,
+          is_partition=False,
+          type_params=PydanticDimensionTypeParams(time_granularity=DAY),
+        ),
+      ],
+    ),
+    PydanticSemanticModel(
+      name='dimension_model_000',
+      node_relation=PydanticNodeRelation(
+        alias='dimension_model_000',
+        schema_name='demo',
+        relation_name='demo.dimension_model_000',
+      ),
+      entities=[
+        PydanticEntity(name='dimension_model_000_primary_entity', type=PRIMARY),
+        PydanticEntity(name='common_entity', type=UNIQUE),
+      ],
+      dimensions=[
+        PydanticDimension(name='dimension_000', type=CATEGORICAL, is_partition=False),
+        PydanticDimension(name='dimension_001', type=CATEGORICAL, is_partition=False),
+      ],
+    ),
+    PydanticSemanticModel(
+      name='dimension_model_001',
+      node_relation=PydanticNodeRelation(
+        alias='dimension_model_001',
+        schema_name='demo',
+        relation_name='demo.dimension_model_001',
+      ),
+      entities=[
+        PydanticEntity(name='dimension_model_001_primary_entity', type=PRIMARY),
+        PydanticEntity(name='common_entity', type=UNIQUE),
+      ],
+      dimensions=[
+        PydanticDimension(name='dimension_002', type=CATEGORICAL, is_partition=False),
+        PydanticDimension(name='dimension_003', type=CATEGORICAL, is_partition=False),
+      ],
+    ),
+  ],
+  metrics=[
+    PydanticMetric(
+      name='metric_0_000',
+      type=SIMPLE,
+      type_params=PydanticMetricTypeParams(
+        measure=PydanticMetricInputMeasure(name='measure_000', join_to_timespine=False),
+      ),
+    ),
+    PydanticMetric(
+      name='metric_0_001',
+      type=SIMPLE,
+      type_params=PydanticMetricTypeParams(
+        measure=PydanticMetricInputMeasure(name='measure_001', join_to_timespine=False),
+      ),
+    ),
+    PydanticMetric(
+      name='metric_1_000',
+      type=DERIVED,
+      type_params=PydanticMetricTypeParams(
+        expr='metric_0_000 + metric_0_001',
+        metrics=[PydanticMetricInput(name='metric_0_000'), PydanticMetricInput(name='metric_0_001')],
+      ),
+    ),
+    PydanticMetric(
+      name='metric_1_001',
+      type=DERIVED,
+      type_params=PydanticMetricTypeParams(
+        expr='metric_0_000 + metric_0_001',
+        metrics=[PydanticMetricInput(name='metric_0_000'), PydanticMetricInput(name='metric_0_001')],
+      ),
+    ),
+  ],
+  project_configuration=PydanticProjectConfiguration(
+    dsi_package_version=PydanticSemanticVersion(
+      major_version='0',
+      minor_version='7',
+      patch_version='2',
+    ),
+    time_spines=[
+      PydanticTimeSpine(
+        node_relation=PydanticNodeRelation(
+          alias='time_spine_source_table',
+          schema_name='demo',
+          relation_name='demo.time_spine_source_table',
+        ),
+        primary_column=PydanticTimeSpinePrimaryColumn(name='ds', time_granularity=DAY),
+      ),
+    ],
+  ),
+  saved_queries=[
+    PydanticSavedQuery(
+      name='saved_query_000',
+      query_params=PydanticSavedQueryQueryParams(
+        metrics=['metric_1_000', 'metric_1_001'],
+        group_by=[
+          "Dimension('common_entity__dimension_000')",
+          "Dimension('common_entity__dimension_001')",
+        ],
+      ),
+    ),
+    PydanticSavedQuery(
+      name='saved_query_001',
+      query_params=PydanticSavedQueryQueryParams(
+        metrics=['metric_1_000', 'metric_1_001'],
+        group_by=[
+          "Dimension('common_entity__dimension_002')",
+          "Dimension('common_entity__dimension_003')",
+        ],
+      ),
+    ),
+  ],
+)
