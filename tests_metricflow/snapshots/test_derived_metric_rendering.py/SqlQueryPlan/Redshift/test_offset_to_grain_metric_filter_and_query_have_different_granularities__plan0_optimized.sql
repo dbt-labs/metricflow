@@ -19,8 +19,8 @@ FROM (
   FROM (
     -- Join to Time Spine Dataset
     SELECT
-      DATE_TRUNC('month', subq_12.ds) AS metric_time__month
-      , subq_10.metric_time__day AS metric_time__day
+      subq_12.ds AS metric_time__day
+      , DATE_TRUNC('month', subq_12.ds) AS metric_time__month
       , subq_10.bookings AS bookings
     FROM ***************************.mf_time_spine subq_12
     INNER JOIN (
