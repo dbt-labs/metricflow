@@ -144,7 +144,13 @@ class SqlDataSet(DataSet):
 
     def instance_for_time_dimension(self, time_dimension_spec: TimeDimensionSpec) -> TimeDimensionInstance:
         """Given the name of the time dimension, return the instance associated with it in the data set."""
-        return self.instances_for_time_dimensions((time_dimension_spec,))[0]
+        instances = self.instances_for_time_dimensions((time_dimension_spec,))
+        if not len(instances) == 1:
+            raise RuntimeError(
+                f"Unexpected number of time dimension instances found matching specs.\nSpecs: {time_dimension_spec}\n"
+                f"Instances: {instances}"
+            )
+        return instances[0]
 
     def column_association_for_time_dimension(self, time_dimension_spec: TimeDimensionSpec) -> ColumnAssociation:
         """Given the name of the time dimension, return the set of columns associated with it in the data set."""
