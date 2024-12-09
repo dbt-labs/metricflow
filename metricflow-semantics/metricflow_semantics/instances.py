@@ -145,10 +145,10 @@ class TimeDimensionInstance(LinkableInstance[TimeDimensionSpec], SemanticModelEl
             spec=transformed_spec,
         )
 
-    def with_new_defined_from(self, defined_from: Tuple[SemanticModelElementReference, ...]) -> TimeDimensionInstance:
+    def with_new_defined_from(self, defined_from: Sequence[SemanticModelElementReference]) -> TimeDimensionInstance:
         """Returns a new instance with the defined_from field replaced."""
         return TimeDimensionInstance(
-            associated_columns=self.associated_columns, defined_from=defined_from, spec=self.spec
+            associated_columns=self.associated_columns, defined_from=tuple(defined_from), spec=self.spec
         )
 
 

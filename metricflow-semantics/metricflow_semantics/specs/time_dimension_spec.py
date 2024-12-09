@@ -246,7 +246,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
         )
 
     @staticmethod
-    def with_base_grains(time_dimension_specs: Sequence[TimeDimensionSpec]) -> List[TimeDimensionSpec]:
+    def with_base_grains(time_dimension_specs: Sequence[TimeDimensionSpec]) -> Sequence[TimeDimensionSpec]:
         """Return the list of time dimension specs, replacing any custom grains with base grains.
 
         Dedupes new specs, but preserves the initial order.
