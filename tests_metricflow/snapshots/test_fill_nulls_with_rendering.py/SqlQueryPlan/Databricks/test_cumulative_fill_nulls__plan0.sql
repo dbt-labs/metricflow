@@ -4,19 +4,41 @@ sql_engine: Databricks
 ---
 -- Compute Metrics via Expressions
 SELECT
-  subq_9.metric_time__day
-  , COALESCE(subq_9.bookers, 0) AS every_two_days_bookers_fill_nulls_with_0
+  subq_10.metric_time__day
+  , COALESCE(subq_10.bookers, 0) AS every_two_days_bookers_fill_nulls_with_0
 FROM (
   -- Join to Time Spine Dataset
   SELECT
-    subq_7.metric_time__day AS metric_time__day
+    subq_9.metric_time__day AS metric_time__day
     , subq_6.bookers AS bookers
   FROM (
-    -- Read From Time Spine 'mf_time_spine'
+    -- Pass Only Elements: ['metric_time__day',]
     SELECT
-      subq_8.ds AS metric_time__day
-    FROM ***************************.mf_time_spine subq_8
-  ) subq_7
+      subq_8.metric_time__day
+    FROM (
+      -- Transform Time Dimension Columns
+      SELECT
+        subq_7.ds__day AS metric_time__day
+        , subq_7.ds__day
+      FROM (
+        -- Read From Time Spine 'mf_time_spine'
+        SELECT
+          time_spine_src_28006.ds AS ds__day
+          , DATE_TRUNC('week', time_spine_src_28006.ds) AS ds__week
+          , DATE_TRUNC('month', time_spine_src_28006.ds) AS ds__month
+          , DATE_TRUNC('quarter', time_spine_src_28006.ds) AS ds__quarter
+          , DATE_TRUNC('year', time_spine_src_28006.ds) AS ds__year
+          , EXTRACT(year FROM time_spine_src_28006.ds) AS ds__extract_year
+          , EXTRACT(quarter FROM time_spine_src_28006.ds) AS ds__extract_quarter
+          , EXTRACT(month FROM time_spine_src_28006.ds) AS ds__extract_month
+          , EXTRACT(day FROM time_spine_src_28006.ds) AS ds__extract_day
+          , EXTRACT(DAYOFWEEK_ISO FROM time_spine_src_28006.ds) AS ds__extract_dow
+          , EXTRACT(doy FROM time_spine_src_28006.ds) AS ds__extract_doy
+          , time_spine_src_28006.martian_day AS ds__martian_day
+        FROM ***************************.mf_time_spine time_spine_src_28006
+      ) subq_7
+    ) subq_8
+  ) subq_9
   LEFT OUTER JOIN (
     -- Aggregate Measures
     SELECT
@@ -341,5 +363,5 @@ FROM (
       subq_5.metric_time__day
   ) subq_6
   ON
-    subq_7.metric_time__day = subq_6.metric_time__day
-) subq_9
+    subq_9.metric_time__day = subq_6.metric_time__day
+) subq_10

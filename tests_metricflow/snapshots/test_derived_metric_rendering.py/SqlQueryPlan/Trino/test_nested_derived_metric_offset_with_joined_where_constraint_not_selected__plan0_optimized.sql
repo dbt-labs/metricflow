@@ -15,10 +15,10 @@ FROM (
   FROM (
     -- Join to Time Spine Dataset
     SELECT
-      subq_24.ds AS metric_time__day
-      , subq_22.booking__is_instant AS booking__is_instant
-      , subq_22.bookings_offset_once AS bookings_offset_once
-    FROM ***************************.mf_time_spine subq_24
+      time_spine_src_28006.ds AS metric_time__day
+      , subq_25.booking__is_instant AS booking__is_instant
+      , subq_25.bookings_offset_once AS bookings_offset_once
+    FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN (
       -- Compute Metrics via Expressions
       SELECT
@@ -31,10 +31,10 @@ FROM (
         -- Aggregate Measures
         -- Compute Metrics via Expressions
         SELECT
-          subq_17.ds AS metric_time__day
-          , subq_15.booking__is_instant AS booking__is_instant
-          , SUM(subq_15.bookings) AS bookings
-        FROM ***************************.mf_time_spine subq_17
+          time_spine_src_28006.ds AS metric_time__day
+          , subq_17.booking__is_instant AS booking__is_instant
+          , SUM(subq_17.bookings) AS bookings
+        FROM ***************************.mf_time_spine time_spine_src_28006
         INNER JOIN (
           -- Read Elements From Semantic Model 'bookings_source'
           -- Metric Time Dimension 'ds'
@@ -43,16 +43,16 @@ FROM (
             , is_instant AS booking__is_instant
             , 1 AS bookings
           FROM ***************************.fct_bookings bookings_source_src_28000
-        ) subq_15
+        ) subq_17
         ON
-          DATE_ADD('day', -5, subq_17.ds) = subq_15.metric_time__day
+          DATE_ADD('day', -5, time_spine_src_28006.ds) = subq_17.metric_time__day
         GROUP BY
-          subq_17.ds
-          , subq_15.booking__is_instant
-      ) subq_21
-    ) subq_22
+          time_spine_src_28006.ds
+          , subq_17.booking__is_instant
+      ) subq_24
+    ) subq_25
     ON
-      DATE_ADD('day', -2, subq_24.ds) = subq_22.metric_time__day
-  ) subq_25
+      DATE_ADD('day', -2, time_spine_src_28006.ds) = subq_25.metric_time__day
+  ) subq_29
   WHERE booking__is_instant
-) subq_27
+) subq_31

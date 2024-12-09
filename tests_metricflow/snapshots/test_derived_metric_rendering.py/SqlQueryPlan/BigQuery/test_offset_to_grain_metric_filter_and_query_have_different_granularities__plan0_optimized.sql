@@ -19,10 +19,10 @@ FROM (
   FROM (
     -- Join to Time Spine Dataset
     SELECT
-      subq_12.ds AS metric_time__day
-      , DATETIME_TRUNC(subq_12.ds, month) AS metric_time__month
-      , subq_10.bookings AS bookings
-    FROM ***************************.mf_time_spine subq_12
+      time_spine_src_28006.ds AS metric_time__day
+      , DATETIME_TRUNC(time_spine_src_28006.ds, month) AS metric_time__month
+      , subq_11.bookings AS bookings
+    FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
@@ -30,12 +30,12 @@ FROM (
         DATETIME_TRUNC(ds, day) AS metric_time__day
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_10
+    ) subq_11
     ON
-      DATETIME_TRUNC(subq_12.ds, month) = subq_10.metric_time__day
-    WHERE DATETIME_TRUNC(subq_12.ds, month) = subq_12.ds
-  ) subq_13
+      DATETIME_TRUNC(time_spine_src_28006.ds, month) = subq_11.metric_time__day
+    WHERE DATETIME_TRUNC(time_spine_src_28006.ds, month) = time_spine_src_28006.ds
+  ) subq_15
   WHERE metric_time__day = '2020-01-01'
   GROUP BY
     metric_time__month
-) subq_17
+) subq_19
