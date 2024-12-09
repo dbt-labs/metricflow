@@ -16,7 +16,7 @@ FROM (
     SELECT
       subq_7.metric_time__day
     FROM (
-      -- Time Spine
+      -- Read From Time Spine 'mf_time_spine_hour'
       SELECT
         DATETIME_TRUNC(subq_6.ts, day) AS metric_time__day
         , subq_6.ts AS metric_time__hour

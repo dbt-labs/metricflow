@@ -17,7 +17,7 @@ FROM (
     SELECT
       metric_time__day
     FROM (
-      -- Time Spine
+      -- Read From Time Spine 'mf_time_spine'
       SELECT
         ds AS metric_time__day
         , DATETIME_TRUNC(ds, isoweek) AS metric_time__week
