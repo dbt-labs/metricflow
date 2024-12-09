@@ -1472,16 +1472,8 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             self._column_association_resolver, OrderedDict({parent_alias: parent_instance_set})
         )
 
-        # Select matching instance from time spine data set (using base grain - custom grain will be joined in a later node).
-        original_time_spine_dim_instance: Optional[TimeDimensionInstance] = None
-        for time_dimension_instance in time_spine_dataset.instance_set.time_dimension_instances:
-            if time_dimension_instance.spec == agg_time_dimension_instance_for_join.spec:
-                original_time_spine_dim_instance = time_dimension_instance
-                break
-        assert original_time_spine_dim_instance, (
-            "Couldn't find requested agg_time_dimension_instance_for_join in time spine data set, which "
-            f"indicates it may have been configured incorrectly. Expected: {agg_time_dimension_instance_for_join.spec};"
-            f" Got: {[instance.spec for instance in time_spine_dataset.instance_set.time_dimension_instances]}"
+        original_time_spine_dim_instance = time_spine_dataset.instance_for_time_dimension(
+            agg_time_dimension_instance_for_join.spec
         )
         time_spine_column_select_expr: Union[
             SqlColumnReferenceExpression, SqlDateTruncExpression
@@ -1592,17 +1584,10 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
         # New dataset will be joined to parent dataset without a subquery, so use the same FROM alias as the parent node.
         parent_alias = parent_data_set.checked_sql_select_node.from_source_alias
-        parent_time_dimension_instance: Optional[TimeDimensionInstance] = None
-        for instance in parent_data_set.instance_set.time_dimension_instances:
-            if instance.spec == node.time_dimension_spec.with_base_grain():
-                parent_time_dimension_instance = instance
-                break
-        parent_column: Optional[SqlSelectColumn] = None
-        assert parent_time_dimension_instance, (
-            "JoinToCustomGranularityNode's expected time_dimension_spec not found in parent dataset instances. "
-            f"This indicates internal misconfiguration. Expected: {node.time_dimension_spec.with_base_grain()}; "
-            f"Got: {[instance.spec for instance in parent_data_set.instance_set.time_dimension_instances]}"
+        parent_time_dimension_instance = parent_data_set.instance_for_time_dimension(
+            node.time_dimension_spec.with_base_grain()
         )
+        parent_column: Optional[SqlSelectColumn] = None
         for select_column in parent_data_set.checked_sql_select_node.select_columns:
             if select_column.column_alias == parent_time_dimension_instance.associated_column.column_name:
                 parent_column = select_column

@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from typing import List, Optional, Sequence
+from typing import List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.references import SemanticModelReference
 from metricflow_semantics.assert_one_arg import assert_exactly_one_arg_set
-from metricflow_semantics.instances import EntityInstance, InstanceSet
+from metricflow_semantics.instances import EntityInstance, InstanceSet, TimeDimensionInstance
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.specs.column_assoc import ColumnAssociation
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
@@ -122,30 +122,39 @@ class SqlDataSet(DataSet):
 
         return column_associations_to_return[0]
 
-    def column_association_for_time_dimension(
-        self,
-        time_dimension_spec: TimeDimensionSpec,
-    ) -> ColumnAssociation:
-        """Given the name of the time dimension, return the set of columns associated with it in the data set."""
+    def instances_for_time_dimensions(
+        self, time_dimension_specs: Sequence[TimeDimensionSpec]
+    ) -> Tuple[TimeDimensionInstance, ...]:
+        """Return the instances associated with these specs in the data set."""
+        time_dimension_specs_set = set(time_dimension_specs)
         matching_instances = 0
-        column_associations_to_return = None
+        instances_to_return: Tuple[TimeDimensionInstance, ...] = ()
         for time_dimension_instance in self.instance_set.time_dimension_instances:
-            if time_dimension_instance.spec == time_dimension_spec:
-                column_associations_to_return = time_dimension_instance.associated_columns
+            if time_dimension_instance.spec in time_dimension_specs_set:
+                instances_to_return += (time_dimension_instance,)
                 matching_instances += 1
 
-        if matching_instances > 1:
+        if matching_instances != len(time_dimension_specs_set):
             raise RuntimeError(
-                f"More than one time dimension instance with spec {time_dimension_spec} in "
-                f"instance set: {self.instance_set}"
+                f"Unexpected number of time dimension instances found matching specs.\nSpecs: {time_dimension_specs_set}\n"
+                f"Instances: {instances_to_return}"
             )
 
-        if not column_associations_to_return:
-            raise RuntimeError(
-                f"No time dimension instances with spec {time_dimension_spec} in instance set: {self.instance_set}"
-            )
+        return instances_to_return
 
-        return column_associations_to_return[0]
+    def instance_for_time_dimension(self, time_dimension_spec: TimeDimensionSpec) -> TimeDimensionInstance:
+        """Given the name of the time dimension, return the instance associated with it in the data set."""
+        instances = self.instances_for_time_dimensions((time_dimension_spec,))
+        if not len(instances) == 1:
+            raise RuntimeError(
+                f"Unexpected number of time dimension instances found matching specs.\nSpecs: {time_dimension_spec}\n"
+                f"Instances: {instances}"
+            )
+        return instances[0]
+
+    def column_association_for_time_dimension(self, time_dimension_spec: TimeDimensionSpec) -> ColumnAssociation:
+        """Given the name of the time dimension, return the set of columns associated with it in the data set."""
+        return self.instance_for_time_dimension(time_dimension_spec).associated_column
 
     @property
     @override
