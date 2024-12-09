@@ -9,7 +9,7 @@ SELECT
   subq_14.metric_time__hour AS metric_time__hour
   , subq_13.archived_users AS subdaily_join_to_time_spine_metric
 FROM (
-  -- Time Spine
+  -- Read From Time Spine 'mf_time_spine_hour'
   SELECT
     ts AS metric_time__hour
   FROM ***************************.mf_time_spine_hour subq_15

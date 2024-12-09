@@ -344,7 +344,7 @@ FROM (
             , subq_6.approximate_continuous_booking_value_p99 AS approximate_continuous_booking_value_p99
             , subq_6.approximate_discrete_booking_value_p99 AS approximate_discrete_booking_value_p99
           FROM (
-            -- Time Spine
+            -- Read From Time Spine 'mf_time_spine'
             SELECT
               subq_8.ds AS metric_time__day
               , CASE WHEN EXTRACT(dow FROM subq_8.ds) = 0 THEN EXTRACT(dow FROM subq_8.ds) + 7 ELSE EXTRACT(dow FROM subq_8.ds) END AS metric_time__extract_dow

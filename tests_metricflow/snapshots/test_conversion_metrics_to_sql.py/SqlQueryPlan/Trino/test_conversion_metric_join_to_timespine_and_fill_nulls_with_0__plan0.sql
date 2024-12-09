@@ -20,7 +20,7 @@ FROM (
       subq_4.metric_time__day AS metric_time__day
       , subq_3.visits AS visits
     FROM (
-      -- Time Spine
+      -- Read From Time Spine 'mf_time_spine'
       SELECT
         subq_5.ds AS metric_time__day
       FROM ***************************.mf_time_spine subq_5
@@ -128,7 +128,7 @@ FROM (
       subq_17.metric_time__day AS metric_time__day
       , subq_16.buys AS buys
     FROM (
-      -- Time Spine
+      -- Read From Time Spine 'mf_time_spine'
       SELECT
         subq_18.ds AS metric_time__day
       FROM ***************************.mf_time_spine subq_18

@@ -31,7 +31,7 @@ FROM (
         , subq_8.listing__country_latest AS listing__country_latest
         , subq_8.bookings AS bookings
       FROM (
-        -- Time Spine
+        -- Read From Time Spine 'mf_time_spine'
         SELECT
           subq_10.ds AS metric_time__day
         FROM ***************************.mf_time_spine subq_10
@@ -612,7 +612,7 @@ FROM (
         , subq_24.listing__country_latest AS listing__country_latest
         , subq_24.bookings AS bookings
       FROM (
-        -- Time Spine
+        -- Read From Time Spine 'mf_time_spine'
         SELECT
           subq_26.ds AS metric_time__day
         FROM ***************************.mf_time_spine subq_26
@@ -935,7 +935,7 @@ FROM (
                   , subq_14.approximate_continuous_booking_value_p99 AS approximate_continuous_booking_value_p99
                   , subq_14.approximate_discrete_booking_value_p99 AS approximate_discrete_booking_value_p99
                 FROM (
-                  -- Time Spine
+                  -- Read From Time Spine 'mf_time_spine'
                   SELECT
                     subq_16.ds AS metric_time__day
                   FROM ***************************.mf_time_spine subq_16

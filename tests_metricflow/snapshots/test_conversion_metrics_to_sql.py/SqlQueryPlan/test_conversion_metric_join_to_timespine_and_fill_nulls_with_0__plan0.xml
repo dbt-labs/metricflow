@@ -66,7 +66,7 @@ docstring:
                 <!-- where = None -->
                 <!-- distinct = False -->
                 <SqlSelectStatementNode>
-                    <!-- description = 'Time Spine' -->
+                    <!-- description = "Read From Time Spine 'mf_time_spine'" -->
                     <!-- node_id = NodeId(id_str='ss_4') -->
                     <!-- col0 =                                                -->
                     <!--   SqlSelectColumn(                                    -->
@@ -504,7 +504,7 @@ docstring:
                 <!-- where = None -->
                 <!-- distinct = False -->
                 <SqlSelectStatementNode>
-                    <!-- description = 'Time Spine' -->
+                    <!-- description = "Read From Time Spine 'mf_time_spine'" -->
                     <!-- node_id = NodeId(id_str='ss_16') -->
                     <!-- col0 =                                                 -->
                     <!--   SqlSelectColumn(                                     -->
