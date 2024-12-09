@@ -1930,7 +1930,6 @@ class DataflowPlanBuilder:
                     time_spine_node = JoinToCustomGranularityNode.create(
                         parent_node=time_spine_node, time_dimension_spec=custom_spec
                     )
-            # TODO: need TransformTimeDimensionsNode in either of the above paths?
         else:
             # TODO: support multiple time spines here. Build node on the one with the smallest base grain.
             # Then, pass custom_granularity_specs into _build_pre_aggregation_plan if they aren't satisfied by smallest time spine.

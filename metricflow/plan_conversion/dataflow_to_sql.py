@@ -1209,9 +1209,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                     spec=metric_time_dimension_spec,
                 )
             )
-            output_column_to_input_column[
-                metric_time_dimension_column_association.column_name
-            ] = matching_time_dimension_instance.associated_column.column_name
+            output_column_to_input_column[metric_time_dimension_column_association.column_name] = (
+                matching_time_dimension_instance.associated_column.column_name
+            )
 
         output_instance_set = InstanceSet(
             measure_instances=tuple(output_measure_instances),
@@ -1965,7 +1965,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         )  # will be node.time_granularity
 
         # Build new columns & instances that calculate the start and end of the custom grain.
-        window_instance = from_data_set.instance_from_time_dimension_grain_and_date_part(
+        parent_window_instance = from_data_set.instance_from_time_dimension_grain_and_date_part(
             time_granularity=window_grain, date_part=None
         )
         window_column_expr = SqlColumnReferenceExpression.from_table_and_column_names(
@@ -1985,8 +1985,8 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         new_instances: Tuple[TimeDimensionInstance, ...] = ()
         new_select_columns: Tuple[SqlSelectColumn, ...] = ()
         for agg_state, func_args in agg_state_to_func_args.items():
-            new_instance = window_instance.with_new_spec(
-                new_spec=window_instance.spec.with_aggregation_state(agg_state),
+            new_instance = parent_window_instance.with_new_spec(
+                new_spec=parent_window_instance.spec.with_aggregation_state(agg_state),
                 column_association_resolver=self._column_association_resolver,
             )
             new_instances += (new_instance,)
