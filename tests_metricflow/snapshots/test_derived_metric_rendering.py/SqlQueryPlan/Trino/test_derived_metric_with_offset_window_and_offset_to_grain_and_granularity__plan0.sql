@@ -30,8 +30,7 @@ FROM (
         FROM (
           -- Join to Time Spine Dataset
           SELECT
-            DATE_TRUNC('year', subq_2.metric_time__day) AS metric_time__year
-            , subq_1.ds__day AS ds__day
+            subq_1.ds__day AS ds__day
             , subq_1.ds__week AS ds__week
             , subq_1.ds__month AS ds__month
             , subq_1.ds__quarter AS ds__quarter
@@ -97,7 +96,6 @@ FROM (
             , subq_1.booking__paid_at__extract_day AS booking__paid_at__extract_day
             , subq_1.booking__paid_at__extract_dow AS booking__paid_at__extract_dow
             , subq_1.booking__paid_at__extract_doy AS booking__paid_at__extract_doy
-            , subq_1.metric_time__day AS metric_time__day
             , subq_1.metric_time__week AS metric_time__week
             , subq_1.metric_time__month AS metric_time__month
             , subq_1.metric_time__quarter AS metric_time__quarter
@@ -107,6 +105,8 @@ FROM (
             , subq_1.metric_time__extract_day AS metric_time__extract_day
             , subq_1.metric_time__extract_dow AS metric_time__extract_dow
             , subq_1.metric_time__extract_doy AS metric_time__extract_doy
+            , subq_2.metric_time__day AS metric_time__day
+            , subq_2.metric_time__year AS metric_time__year
             , subq_1.listing AS listing
             , subq_1.guest AS guest
             , subq_1.host AS host
@@ -132,6 +132,7 @@ FROM (
             -- Time Spine
             SELECT
               subq_3.ds AS metric_time__day
+              , DATE_TRUNC('year', subq_3.ds) AS metric_time__year
             FROM ***************************.mf_time_spine subq_3
           ) subq_2
           INNER JOIN (
@@ -331,7 +332,7 @@ FROM (
           ) subq_1
           ON
             DATE_TRUNC('month', subq_2.metric_time__day) = subq_1.metric_time__day
-          WHERE DATE_TRUNC('year', subq_2.metric_time__day) = subq_2.metric_time__day
+          WHERE subq_2.metric_time__year = subq_2.metric_time__day
         ) subq_4
       ) subq_5
       GROUP BY
@@ -356,8 +357,7 @@ FROM (
         FROM (
           -- Join to Time Spine Dataset
           SELECT
-            DATE_TRUNC('year', subq_10.metric_time__day) AS metric_time__year
-            , subq_9.ds__day AS ds__day
+            subq_9.ds__day AS ds__day
             , subq_9.ds__week AS ds__week
             , subq_9.ds__month AS ds__month
             , subq_9.ds__quarter AS ds__quarter
@@ -423,7 +423,6 @@ FROM (
             , subq_9.booking__paid_at__extract_day AS booking__paid_at__extract_day
             , subq_9.booking__paid_at__extract_dow AS booking__paid_at__extract_dow
             , subq_9.booking__paid_at__extract_doy AS booking__paid_at__extract_doy
-            , subq_9.metric_time__day AS metric_time__day
             , subq_9.metric_time__week AS metric_time__week
             , subq_9.metric_time__month AS metric_time__month
             , subq_9.metric_time__quarter AS metric_time__quarter
@@ -433,6 +432,8 @@ FROM (
             , subq_9.metric_time__extract_day AS metric_time__extract_day
             , subq_9.metric_time__extract_dow AS metric_time__extract_dow
             , subq_9.metric_time__extract_doy AS metric_time__extract_doy
+            , subq_10.metric_time__day AS metric_time__day
+            , subq_10.metric_time__year AS metric_time__year
             , subq_9.listing AS listing
             , subq_9.guest AS guest
             , subq_9.host AS host
@@ -458,6 +459,7 @@ FROM (
             -- Time Spine
             SELECT
               subq_11.ds AS metric_time__day
+              , DATE_TRUNC('year', subq_11.ds) AS metric_time__year
             FROM ***************************.mf_time_spine subq_11
           ) subq_10
           INNER JOIN (
