@@ -4,7 +4,6 @@ from typing import List, Mapping
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
 from dbt_semantic_interfaces.references import EntityReference, SemanticModelReference, TimeDimensionReference
 from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
@@ -29,7 +28,6 @@ from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilte
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
-from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_DAY
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_plan_snapshot_text_equal
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
@@ -44,7 +42,6 @@ from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinOnEntitiesNode
-from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
@@ -561,229 +558,6 @@ def test_compute_metrics_node_simple_expr(
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=compute_metrics_node,
-    )
-
-
-@pytest.mark.sql_engine_snapshot
-def test_join_to_time_spine_node_without_offset(
-    request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
-    sql_client: SqlClient,
-) -> None:
-    """Tests JoinToTimeSpineNode for a single metric with offset_window."""
-    measure_spec = MeasureSpec(element_name="booking_value")
-    entity_spec = LinklessEntitySpec.from_element_name(element_name="listing")
-    metric_input_measure_specs = (MetricInputMeasureSpec(measure_spec=measure_spec),)
-    metric_time_spec = TimeDimensionSpec(
-        element_name="metric_time",
-        entity_links=(),
-        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
-    )
-    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
-        "bookings_source"
-    ]
-    metric_time_node = MetricTimeDimensionTransformNode.create(
-        parent_node=measure_source_node,
-        aggregation_time_dimension_reference=TimeDimensionReference(element_name="ds"),
-    )
-
-    filtered_measure_node = FilterElementsNode.create(
-        parent_node=metric_time_node,
-        include_specs=InstanceSpecSet(
-            measure_specs=(measure_spec,), entity_specs=(entity_spec,), dimension_specs=(metric_time_spec,)
-        ),
-    )
-    aggregated_measures_node = AggregateMeasuresNode.create(
-        parent_node=filtered_measure_node, metric_input_measure_specs=metric_input_measure_specs
-    )
-    metric_spec = MetricSpec(element_name="booking_fees")
-    compute_metrics_node = ComputeMetricsNode.create(
-        parent_node=aggregated_measures_node,
-        metric_specs=[metric_spec],
-        aggregated_to_elements={entity_spec},
-    )
-    join_to_time_spine_node = JoinToTimeSpineNode.create(
-        parent_node=compute_metrics_node,
-        requested_agg_time_dimension_specs=[MTD_SPEC_DAY],
-        time_range_constraint=TimeRangeConstraint(
-            start_time=as_datetime("2020-01-01"), end_time=as_datetime("2021-01-01")
-        ),
-        join_type=SqlJoinType.INNER,
-    )
-
-    sink_node = WriteToResultDataTableNode.create(join_to_time_spine_node)
-    dataflow_plan = DataflowPlan(sink_nodes=[sink_node], plan_id=DagId.from_str("plan0"))
-
-    assert_plan_snapshot_text_equal(
-        request=request,
-        mf_test_configuration=mf_test_configuration,
-        plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan.structure_text(),
-    )
-
-    display_graph_if_requested(
-        request=request,
-        mf_test_configuration=mf_test_configuration,
-        dag_graph=dataflow_plan,
-    )
-
-    convert_and_check(
-        request=request,
-        mf_test_configuration=mf_test_configuration,
-        dataflow_to_sql_converter=dataflow_to_sql_converter,
-        sql_client=sql_client,
-        node=join_to_time_spine_node,
-    )
-
-
-@pytest.mark.sql_engine_snapshot
-def test_join_to_time_spine_node_with_offset_window(
-    request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
-    sql_client: SqlClient,
-) -> None:
-    """Tests JoinToTimeSpineNode for a single metric with offset_window."""
-    measure_spec = MeasureSpec(element_name="booking_value")
-    entity_spec = LinklessEntitySpec.from_element_name(element_name="listing")
-    metric_input_measure_specs = (MetricInputMeasureSpec(measure_spec=measure_spec),)
-    metric_time_spec = TimeDimensionSpec(
-        element_name="metric_time",
-        entity_links=(),
-        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
-    )
-    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
-        "bookings_source"
-    ]
-    metric_time_node = MetricTimeDimensionTransformNode.create(
-        parent_node=measure_source_node,
-        aggregation_time_dimension_reference=TimeDimensionReference(element_name="ds"),
-    )
-    filtered_measure_node = FilterElementsNode.create(
-        parent_node=metric_time_node,
-        include_specs=InstanceSpecSet(
-            measure_specs=(measure_spec,), entity_specs=(entity_spec,), dimension_specs=(metric_time_spec,)
-        ),
-    )
-    aggregated_measures_node = AggregateMeasuresNode.create(
-        parent_node=filtered_measure_node, metric_input_measure_specs=metric_input_measure_specs
-    )
-    metric_spec = MetricSpec(element_name="booking_fees")
-    compute_metrics_node = ComputeMetricsNode.create(
-        parent_node=aggregated_measures_node,
-        metric_specs=[metric_spec],
-        aggregated_to_elements={entity_spec, metric_time_spec},
-    )
-    join_to_time_spine_node = JoinToTimeSpineNode.create(
-        parent_node=compute_metrics_node,
-        requested_agg_time_dimension_specs=[MTD_SPEC_DAY],
-        time_range_constraint=TimeRangeConstraint(
-            start_time=as_datetime("2020-01-01"), end_time=as_datetime("2021-01-01")
-        ),
-        offset_window=PydanticMetricTimeWindow(count=10, granularity=TimeGranularity.DAY),
-        join_type=SqlJoinType.INNER,
-    )
-
-    sink_node = WriteToResultDataTableNode.create(join_to_time_spine_node)
-    dataflow_plan = DataflowPlan(sink_nodes=[sink_node], plan_id=DagId.from_str("plan0"))
-
-    assert_plan_snapshot_text_equal(
-        request=request,
-        mf_test_configuration=mf_test_configuration,
-        plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan.structure_text(),
-    )
-
-    display_graph_if_requested(
-        request=request,
-        mf_test_configuration=mf_test_configuration,
-        dag_graph=dataflow_plan,
-    )
-
-    convert_and_check(
-        request=request,
-        mf_test_configuration=mf_test_configuration,
-        dataflow_to_sql_converter=dataflow_to_sql_converter,
-        sql_client=sql_client,
-        node=join_to_time_spine_node,
-    )
-
-
-@pytest.mark.sql_engine_snapshot
-def test_join_to_time_spine_node_with_offset_to_grain(
-    request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
-    sql_client: SqlClient,
-) -> None:
-    """Tests JoinToTimeSpineNode for a single metric with offset_to_grain."""
-    measure_spec = MeasureSpec(element_name="booking_value")
-    entity_spec = LinklessEntitySpec.from_element_name(element_name="listing")
-    metric_input_measure_specs = (MetricInputMeasureSpec(measure_spec=measure_spec),)
-    metric_time_spec = TimeDimensionSpec(
-        element_name="metric_time",
-        entity_links=(),
-        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
-    )
-    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
-        "bookings_source"
-    ]
-    metric_time_node = MetricTimeDimensionTransformNode.create(
-        parent_node=measure_source_node,
-        aggregation_time_dimension_reference=TimeDimensionReference(element_name="ds"),
-    )
-    filtered_measure_node = FilterElementsNode.create(
-        parent_node=metric_time_node,
-        include_specs=InstanceSpecSet(
-            measure_specs=(measure_spec,), entity_specs=(entity_spec,), dimension_specs=(metric_time_spec,)
-        ),
-    )
-    aggregated_measures_node = AggregateMeasuresNode.create(
-        parent_node=filtered_measure_node, metric_input_measure_specs=metric_input_measure_specs
-    )
-    metric_spec = MetricSpec(element_name="booking_fees")
-    compute_metrics_node = ComputeMetricsNode.create(
-        parent_node=aggregated_measures_node,
-        metric_specs=[metric_spec],
-        aggregated_to_elements={entity_spec, metric_time_spec},
-    )
-    join_to_time_spine_node = JoinToTimeSpineNode.create(
-        parent_node=compute_metrics_node,
-        requested_agg_time_dimension_specs=[MTD_SPEC_DAY],
-        time_range_constraint=TimeRangeConstraint(
-            start_time=as_datetime("2020-01-01"), end_time=as_datetime("2021-01-01")
-        ),
-        offset_window=None,
-        offset_to_grain=TimeGranularity.MONTH,
-        join_type=SqlJoinType.INNER,
-    )
-
-    sink_node = WriteToResultDataTableNode.create(join_to_time_spine_node)
-    dataflow_plan = DataflowPlan(sink_nodes=[sink_node], plan_id=DagId.from_str("plan0"))
-
-    assert_plan_snapshot_text_equal(
-        request=request,
-        mf_test_configuration=mf_test_configuration,
-        plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan.structure_text(),
-    )
-
-    display_graph_if_requested(
-        request=request,
-        mf_test_configuration=mf_test_configuration,
-        dag_graph=dataflow_plan,
-    )
-
-    convert_and_check(
-        request=request,
-        mf_test_configuration=mf_test_configuration,
-        dataflow_to_sql_converter=dataflow_to_sql_converter,
-        sql_client=sql_client,
-        node=join_to_time_spine_node,
     )
 
 
