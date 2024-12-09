@@ -12,7 +12,7 @@ from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEvent
 from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
 from metricflow.dataflow.nodes.join_to_base import JoinDescription
 from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
-from metricflow.dataset.sql_dataset import SqlDataSet
+from metricflow.dataset.sql_dataset import AnnotatedSqlDataSet
 from metricflow.plan_conversion.sql_expression_builders import make_coalesced_expr
 from metricflow.sql.sql_exprs import (
     SqlColumnReference,
@@ -43,23 +43,6 @@ class ColumnEqualityDescription:
     left_column_alias: str
     right_column_alias: str
     treat_nulls_as_equal: bool = False
-
-
-@dataclass(frozen=True)
-class AnnotatedSqlDataSet:
-    """Class to bind a DataSet to transient properties associated with it at a given point in the SqlQueryPlan."""
-
-    data_set: SqlDataSet
-    alias: str
-    _metric_time_column_name: Optional[str] = None
-
-    @property
-    def metric_time_column_name(self) -> str:
-        """Direct accessor for the optional metric time name, only safe to call when we know that value is set."""
-        assert (
-            self._metric_time_column_name
-        ), "Expected a valid metric time dimension name to be associated with this dataset, but did not get one!"
-        return self._metric_time_column_name
 
 
 class SqlQueryPlanJoinBuilder:
