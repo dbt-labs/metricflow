@@ -633,16 +633,6 @@ FROM (
             -- Constrain Output with WHERE
             SELECT
               subq_21.metric_time__day
-              , subq_21.metric_time__week
-              , subq_21.metric_time__month
-              , subq_21.metric_time__quarter
-              , subq_21.metric_time__year
-              , subq_21.metric_time__extract_year
-              , subq_21.metric_time__extract_quarter
-              , subq_21.metric_time__extract_month
-              , subq_21.metric_time__extract_day
-              , subq_21.metric_time__extract_dow
-              , subq_21.metric_time__extract_doy
               , subq_21.ds__day
               , subq_21.ds__week
               , subq_21.ds__month
@@ -709,6 +699,16 @@ FROM (
               , subq_21.booking__paid_at__extract_day
               , subq_21.booking__paid_at__extract_dow
               , subq_21.booking__paid_at__extract_doy
+              , subq_21.metric_time__week
+              , subq_21.metric_time__month
+              , subq_21.metric_time__quarter
+              , subq_21.metric_time__year
+              , subq_21.metric_time__extract_year
+              , subq_21.metric_time__extract_quarter
+              , subq_21.metric_time__extract_month
+              , subq_21.metric_time__extract_day
+              , subq_21.metric_time__extract_dow
+              , subq_21.metric_time__extract_doy
               , subq_21.listing
               , subq_21.guest
               , subq_21.host
@@ -736,16 +736,6 @@ FROM (
               SELECT
                 subq_20.country_latest AS listing__country_latest
                 , subq_17.metric_time__day AS metric_time__day
-                , subq_17.metric_time__week AS metric_time__week
-                , subq_17.metric_time__month AS metric_time__month
-                , subq_17.metric_time__quarter AS metric_time__quarter
-                , subq_17.metric_time__year AS metric_time__year
-                , subq_17.metric_time__extract_year AS metric_time__extract_year
-                , subq_17.metric_time__extract_quarter AS metric_time__extract_quarter
-                , subq_17.metric_time__extract_month AS metric_time__extract_month
-                , subq_17.metric_time__extract_day AS metric_time__extract_day
-                , subq_17.metric_time__extract_dow AS metric_time__extract_dow
-                , subq_17.metric_time__extract_doy AS metric_time__extract_doy
                 , subq_17.ds__day AS ds__day
                 , subq_17.ds__week AS ds__week
                 , subq_17.ds__month AS ds__month
@@ -812,6 +802,16 @@ FROM (
                 , subq_17.booking__paid_at__extract_day AS booking__paid_at__extract_day
                 , subq_17.booking__paid_at__extract_dow AS booking__paid_at__extract_dow
                 , subq_17.booking__paid_at__extract_doy AS booking__paid_at__extract_doy
+                , subq_17.metric_time__week AS metric_time__week
+                , subq_17.metric_time__month AS metric_time__month
+                , subq_17.metric_time__quarter AS metric_time__quarter
+                , subq_17.metric_time__year AS metric_time__year
+                , subq_17.metric_time__extract_year AS metric_time__extract_year
+                , subq_17.metric_time__extract_quarter AS metric_time__extract_quarter
+                , subq_17.metric_time__extract_month AS metric_time__extract_month
+                , subq_17.metric_time__extract_day AS metric_time__extract_day
+                , subq_17.metric_time__extract_dow AS metric_time__extract_dow
+                , subq_17.metric_time__extract_doy AS metric_time__extract_doy
                 , subq_17.listing AS listing
                 , subq_17.guest AS guest
                 , subq_17.host AS host
@@ -837,16 +837,6 @@ FROM (
                 -- Join to Time Spine Dataset
                 SELECT
                   subq_15.metric_time__day AS metric_time__day
-                  , DATE_TRUNC('week', subq_15.metric_time__day) AS metric_time__week
-                  , DATE_TRUNC('month', subq_15.metric_time__day) AS metric_time__month
-                  , DATE_TRUNC('quarter', subq_15.metric_time__day) AS metric_time__quarter
-                  , DATE_TRUNC('year', subq_15.metric_time__day) AS metric_time__year
-                  , EXTRACT(year FROM subq_15.metric_time__day) AS metric_time__extract_year
-                  , EXTRACT(quarter FROM subq_15.metric_time__day) AS metric_time__extract_quarter
-                  , EXTRACT(month FROM subq_15.metric_time__day) AS metric_time__extract_month
-                  , EXTRACT(day FROM subq_15.metric_time__day) AS metric_time__extract_day
-                  , EXTRACT(dayofweekiso FROM subq_15.metric_time__day) AS metric_time__extract_dow
-                  , EXTRACT(doy FROM subq_15.metric_time__day) AS metric_time__extract_doy
                   , subq_14.ds__day AS ds__day
                   , subq_14.ds__week AS ds__week
                   , subq_14.ds__month AS ds__month
@@ -913,6 +903,16 @@ FROM (
                   , subq_14.booking__paid_at__extract_day AS booking__paid_at__extract_day
                   , subq_14.booking__paid_at__extract_dow AS booking__paid_at__extract_dow
                   , subq_14.booking__paid_at__extract_doy AS booking__paid_at__extract_doy
+                  , subq_14.metric_time__week AS metric_time__week
+                  , subq_14.metric_time__month AS metric_time__month
+                  , subq_14.metric_time__quarter AS metric_time__quarter
+                  , subq_14.metric_time__year AS metric_time__year
+                  , subq_14.metric_time__extract_year AS metric_time__extract_year
+                  , subq_14.metric_time__extract_quarter AS metric_time__extract_quarter
+                  , subq_14.metric_time__extract_month AS metric_time__extract_month
+                  , subq_14.metric_time__extract_day AS metric_time__extract_day
+                  , subq_14.metric_time__extract_dow AS metric_time__extract_dow
+                  , subq_14.metric_time__extract_doy AS metric_time__extract_doy
                   , subq_14.listing AS listing
                   , subq_14.guest AS guest
                   , subq_14.host AS host
