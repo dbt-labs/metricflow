@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional, Sequence
+from typing import Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.protocols import MetricTimeWindow
 from dbt_semantic_interfaces.type_enums import TimeGranularity
@@ -26,7 +26,7 @@ class JoinOverTimeRangeNode(DataflowPlanNode):
         time_range_constraint: Time range to aggregate over.
     """
 
-    queried_agg_time_dimension_specs: Sequence[TimeDimensionSpec]
+    queried_agg_time_dimension_specs: Tuple[TimeDimensionSpec, ...]
     window: Optional[MetricTimeWindow]
     grain_to_date: Optional[TimeGranularity]
     time_range_constraint: Optional[TimeRangeConstraint]
@@ -38,7 +38,7 @@ class JoinOverTimeRangeNode(DataflowPlanNode):
     @staticmethod
     def create(  # noqa: D102
         parent_node: DataflowPlanNode,
-        queried_agg_time_dimension_specs: Sequence[TimeDimensionSpec],
+        queried_agg_time_dimension_specs: Tuple[TimeDimensionSpec, ...],
         window: Optional[MetricTimeWindow] = None,
         grain_to_date: Optional[TimeGranularity] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,

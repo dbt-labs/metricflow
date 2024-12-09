@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.references import SemanticModelReference
@@ -160,3 +161,25 @@ class SqlDataSet(DataSet):
     @override
     def semantic_model_reference(self) -> Optional[SemanticModelReference]:
         return None
+
+    def annotate(self, alias: str, metric_time_spec: TimeDimensionSpec) -> AnnotatedSqlDataSet:
+        """Convert to an AnnotatedSqlDataSet with specified metadata."""
+        metric_time_column_name = self.column_association_for_time_dimension(metric_time_spec).column_name
+        return AnnotatedSqlDataSet(data_set=self, alias=alias, _metric_time_column_name=metric_time_column_name)
+
+
+@dataclass(frozen=True)
+class AnnotatedSqlDataSet:
+    """Class to bind a DataSet to transient properties associated with it at a given point in the SqlQueryPlan."""
+
+    data_set: SqlDataSet
+    alias: str
+    _metric_time_column_name: Optional[str] = None
+
+    @property
+    def metric_time_column_name(self) -> str:
+        """Direct accessor for the optional metric time name, only safe to call when we know that value is set."""
+        assert (
+            self._metric_time_column_name
+        ), "Expected a valid metric time dimension name to be associated with this dataset, but did not get one!"
+        return self._metric_time_column_name
