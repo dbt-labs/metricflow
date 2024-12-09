@@ -335,15 +335,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         ]
         required_specs = queried_specs + specs_required_for_where_constraints
 
-        time_spine_sources = TimeSpineSource.choose_time_spine_sources(
+        time_spine_source = TimeSpineSource.choose_time_spine_source(
             required_time_spine_specs=required_specs, time_spine_sources=self._time_spine_sources
         )
-        # TODO: handle multiple time spine joins
-        assert len(time_spine_sources) == 1, (
-            "Join to time spine with custom granularity currently only supports one custom granularity per query. "
-            "Full feature coming soon."
-        )
-        time_spine_source = time_spine_sources[0]
         time_spine_base_granularity = ExpandedTimeGranularity.from_time_granularity(time_spine_source.base_granularity)
 
         base_column_expr = SqlColumnReferenceExpression.from_table_and_column_names(
@@ -1118,7 +1112,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             [
                 instance
                 for instance in from_data_set.metric_time_dimension_instances
-                if not instance.spec.time_granularity.is_custom_granularity
+                if not instance.spec.time_granularity.is_custom_granularity and not instance.spec.date_part
             ],
             key=lambda x: x.spec.time_granularity.base_granularity.to_int(),
         )
@@ -1553,6 +1547,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                 select_columns=parent_data_set.checked_sql_select_node.select_columns + time_spine_select_columns,
                 from_source=parent_data_set.checked_sql_select_node.from_source,
                 from_source_alias=parent_alias,
+                cte_sources=parent_data_set.checked_sql_select_node.cte_sources,
                 join_descs=parent_data_set.checked_sql_select_node.join_descs + (join_description,),
                 where=parent_data_set.checked_sql_select_node.where,
                 group_bys=parent_data_set.checked_sql_select_node.group_bys,

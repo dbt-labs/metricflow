@@ -339,7 +339,6 @@ class DataflowPlanBuilder:
             .merge(base_required_linkable_specs.as_instance_spec_set)
             .dedupe(),
             custom_granularity_specs=base_required_linkable_specs.time_dimension_specs_with_custom_grain,
-            time_range_constraint=None,
             where_filter_specs=base_measure_spec.filter_spec_set.all_filter_specs,
         )
 
@@ -650,10 +649,10 @@ class DataflowPlanBuilder:
 
         # For ratio / derived metrics with time offset, apply offset join here. Constraints will be applied after the offset
         # to avoid filtering out values that will be changed.
-        if metric_spec.has_time_offset:
-            queried_agg_time_dimension_specs = queried_linkable_specs.included_agg_time_dimension_specs_for_metric(
-                metric_reference=metric_spec.reference, metric_lookup=self._metric_lookup
-            )
+        queried_agg_time_dimension_specs = queried_linkable_specs.included_agg_time_dimension_specs_for_metric(
+            metric_reference=metric_spec.reference, metric_lookup=self._metric_lookup
+        )
+        if metric_spec.has_time_offset and queried_agg_time_dimension_specs:
             output_node = JoinToTimeSpineNode.create(
                 parent_node=output_node,
                 requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
@@ -685,7 +684,7 @@ class DataflowPlanBuilder:
 
     def _get_base_agg_time_dimensions(
         self, queried_linkable_specs: LinkableSpecSet, measure_reference: MeasureReference
-    ) -> Sequence[TimeDimensionSpec]:
+    ) -> Tuple[TimeDimensionSpec, ...]:
         """Get queried agg_time_dimensios with their base grains, deduped.
 
         Custom grains are joined right before measure aggregation and after all other pre-aggregation joins,
@@ -1045,15 +1044,8 @@ class DataflowPlanBuilder:
             )
             # If metric_time is requested without metrics, choose appropriate time spine node to select those values from.
             if linkable_specs_to_satisfy.metric_time_specs:
-                time_spine_sources = TimeSpineSource.choose_time_spine_sources(
-                    required_time_spine_specs=linkable_specs_to_satisfy.metric_time_specs,
-                    time_spine_sources=self._source_node_builder.time_spine_sources,
-                )
-                assert len(time_spine_sources) == 1, (
-                    "Exactly one time spine source should have been selected for base grains."
-                    "This indicates internal misconfiguration."
-                )
-                time_spine_node = self._source_node_set.time_spine_nodes[time_spine_sources[0].base_granularity]
+                time_spine_source = self._choose_time_spine_source(linkable_specs_to_satisfy.metric_time_specs)
+                time_spine_node = self._source_node_set.time_spine_nodes[time_spine_source.base_granularity]
                 candidate_nodes_for_right_side_of_join += [time_spine_node]
                 candidate_nodes_for_left_side_of_join += [time_spine_node]
             default_join_type = SqlJoinType.FULL_OUTER
@@ -1615,17 +1607,17 @@ class DataflowPlanBuilder:
                 f"Unable to join all items in request. Measure: {measure_spec.element_name}; Specs to join: {required_linkable_specs}"
             )
 
-        base_agg_time_dimension_specs = self._get_base_agg_time_dimensions(
+        base_queried_agg_time_dimension_specs = self._get_base_agg_time_dimensions(
             queried_linkable_specs=queried_linkable_specs, measure_reference=measure_spec.reference
         )
 
         # If a cumulative metric is queried with metric_time / agg_time_dimension, join over time range.
         # Otherwise, the measure will be aggregated over all time.
         unaggregated_measure_node: DataflowPlanNode = measure_recipe.source_node
-        if cumulative and base_agg_time_dimension_specs:
+        if cumulative and base_queried_agg_time_dimension_specs:
             unaggregated_measure_node = JoinOverTimeRangeNode.create(
                 parent_node=unaggregated_measure_node,
-                queried_agg_time_dimension_specs=tuple(base_agg_time_dimension_specs),
+                queried_agg_time_dimension_specs=base_queried_agg_time_dimension_specs,
                 window=cumulative_window,
                 grain_to_date=cumulative_grain_to_date,
                 # Note: we use the original constraint here because the JoinOverTimeRangeNode will eventually get
@@ -1638,7 +1630,7 @@ class DataflowPlanBuilder:
             )
 
         # If querying an offset metric, join to time spine before aggregation.
-        if before_aggregation_time_spine_join_description is not None:
+        if before_aggregation_time_spine_join_description and base_queried_agg_time_dimension_specs:
             assert before_aggregation_time_spine_join_description.join_type is SqlJoinType.INNER, (
                 f"Expected {SqlJoinType.INNER} for joining to time spine before aggregation. Remove this if there's a "
                 f"new use case."
@@ -1647,7 +1639,7 @@ class DataflowPlanBuilder:
             # in join rendering
             unaggregated_measure_node = JoinToTimeSpineNode.create(
                 parent_node=unaggregated_measure_node,
-                requested_agg_time_dimension_specs=base_agg_time_dimension_specs,
+                requested_agg_time_dimension_specs=base_queried_agg_time_dimension_specs,
                 offset_window=before_aggregation_time_spine_join_description.offset_window,
                 offset_to_grain=before_aggregation_time_spine_join_description.offset_to_grain,
                 join_type=before_aggregation_time_spine_join_description.join_type,
@@ -1675,7 +1667,7 @@ class DataflowPlanBuilder:
                 InstanceSpecSet.create_from_specs(queried_linkable_specs.as_tuple)
             ),
             measure_properties=measure_properties,
-            queried_linkable_specs=queried_linkable_specs,
+            queried_linkable_specs_for_semi_additive_join=queried_linkable_specs,
         )
 
         aggregate_measures_node = AggregateMeasuresNode.create(
@@ -1686,7 +1678,10 @@ class DataflowPlanBuilder:
         after_aggregation_time_spine_join_description = (
             metric_input_measure_spec.after_aggregation_time_spine_join_description
         )
-        if after_aggregation_time_spine_join_description is not None:
+        queried_agg_time_dimension_specs = queried_linkable_specs.included_agg_time_dimension_specs_for_measure(
+            measure_reference=measure_spec.reference, semantic_model_lookup=self._semantic_model_lookup
+        )
+        if after_aggregation_time_spine_join_description and queried_agg_time_dimension_specs:
             assert after_aggregation_time_spine_join_description.join_type is SqlJoinType.LEFT_OUTER, (
                 f"Expected {SqlJoinType.LEFT_OUTER} for joining to time spine after aggregation. Remove this if "
                 f"there's a new use case."
@@ -1710,9 +1705,6 @@ class DataflowPlanBuilder:
 
             # TODO: split this node into TimeSpineSourceNode and JoinToTimeSpineNode - then can use standard nodes here
             # like JoinToCustomGranularityNode, WhereConstraintNode, etc.
-            queried_agg_time_dimension_specs = queried_linkable_specs.included_agg_time_dimension_specs_for_measure(
-                measure_reference=measure_spec.reference, semantic_model_lookup=self._semantic_model_lookup
-            )
             output_node: DataflowPlanNode = JoinToTimeSpineNode.create(
                 parent_node=aggregate_measures_node,
                 requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
@@ -1756,7 +1748,7 @@ class DataflowPlanBuilder:
         where_filter_specs: Sequence[WhereFilterSpec] = (),
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         measure_properties: Optional[MeasureSpecProperties] = None,
-        queried_linkable_specs: Optional[LinkableSpecSet] = None,
+        queried_linkable_specs_for_semi_additive_join: Optional[LinkableSpecSet] = None,
         distinct: bool = False,
     ) -> DataflowPlanNode:
         """Adds standard pre-aggegation steps after building source node and before aggregation."""
@@ -1778,14 +1770,14 @@ class DataflowPlanBuilder:
             )
 
         if measure_properties and measure_properties.non_additive_dimension_spec:
-            if queried_linkable_specs is None:
+            if queried_linkable_specs_for_semi_additive_join is None:
                 raise ValueError(
-                    "`queried_linkable_specs` must be provided in when building pre-aggregation plan if "
-                    "`non_additive_dimension_spec` is present."
+                    "`queried_linkable_specs_for_semi_additive_join` must be provided in when building pre-aggregation plan "
+                    "if `non_additive_dimension_spec` is present."
                 )
             output_node = self._build_semi_additive_join_node(
                 measure_properties=measure_properties,
-                queried_linkable_specs=queried_linkable_specs,
+                queried_linkable_specs=queried_linkable_specs_for_semi_additive_join,
                 parent_node=output_node,
             )
         if filter_to_specs:
@@ -1828,4 +1820,11 @@ class DataflowPlanBuilder:
             time_dimension_spec=time_dimension_spec,
             agg_by_function=non_additive_dimension_spec.window_choice,
             queried_time_dimension_spec=queried_time_dimension_spec,
+        )
+
+    def _choose_time_spine_source(self, required_time_spine_specs: Sequence[TimeDimensionSpec]) -> TimeSpineSource:
+        """Choose the time spine source that can satisfy the required time spine specs."""
+        return TimeSpineSource.choose_time_spine_source(
+            required_time_spine_specs=required_time_spine_specs,
+            time_spine_sources=self._source_node_builder.time_spine_sources,
         )
