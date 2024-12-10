@@ -15,6 +15,7 @@ from metricflow.sql.render.expr_renderer import (
 )
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from metricflow.sql.sql_exprs import (
+    SqlAddTimeExpression,
     SqlGenerateUuidExpression,
     SqlPercentileExpression,
     SqlPercentileFunctionType,
@@ -49,6 +50,22 @@ class DuckDbSqlExpressionRenderer(DefaultSqlExpressionRenderer):
 
         return SqlExpressionRenderResult(
             sql=f"{arg_rendered.sql} - INTERVAL {count} {granularity.value}",
+            bind_parameter_set=arg_rendered.bind_parameter_set,
+        )
+
+    @override
+    def visit_add_time_expr(self, node: SqlAddTimeExpression) -> SqlExpressionRenderResult:
+        """Render time delta expression for DuckDB, which requires slightly different syntax from other engines."""
+        arg_rendered = node.arg.accept(self)
+        count_rendered = node.count_expr.accept(self).sql
+
+        granularity = node.granularity
+        if granularity == TimeGranularity.QUARTER:
+            granularity = TimeGranularity.MONTH
+            count_rendered = f"{count_rendered} * 3"
+
+        return SqlExpressionRenderResult(
+            sql=f"{arg_rendered.sql} + INTERVAL {count_rendered} {granularity.value}",
             bind_parameter_set=arg_rendered.bind_parameter_set,
         )
 

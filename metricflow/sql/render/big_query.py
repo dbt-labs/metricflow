@@ -18,6 +18,7 @@ from metricflow.sql.render.expr_renderer import (
 )
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from metricflow.sql.sql_exprs import (
+    SqlAddTimeExpression,
     SqlCastToTimestampExpression,
     SqlDateTruncExpression,
     SqlExtractExpression,
@@ -173,6 +174,17 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
 
         return SqlExpressionRenderResult(
             sql=f"DATE_SUB(CAST({column.sql} AS {self.timestamp_data_type}), INTERVAL {node.count} {node.granularity.value})",
+            bind_parameter_set=column.bind_parameter_set,
+        )
+
+    @override
+    def visit_add_time_expr(self, node: SqlAddTimeExpression) -> SqlExpressionRenderResult:
+        """Render time delta for BigQuery, which requires ISO prefixing for the WEEK granularity value."""
+        column = node.arg.accept(self)
+        count = node.count_expr.accept(self)
+
+        return SqlExpressionRenderResult(
+            sql=f"DATE_ADD(CAST({column.sql} AS {self.timestamp_data_type}), INTERVAL {count} {node.granularity.value})",
             bind_parameter_set=column.bind_parameter_set,
         )
 
