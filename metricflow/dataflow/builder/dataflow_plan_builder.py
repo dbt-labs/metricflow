@@ -83,6 +83,7 @@ from metricflow.dataflow.nodes.aggregate_measures import AggregateMeasuresNode
 from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
 from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
+from metricflow.dataflow.nodes.custom_granularity_bounds import CustomGranularityBoundsNode
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
 from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
@@ -1898,33 +1899,34 @@ class DataflowPlanBuilder:
             # TODO: make sure this is checking the correct granularity type once DSI is updated
             if {spec.time_granularity for spec in queried_time_spine_specs} == {offset_window.granularity}:
                 # If querying with only the same grain as is used in the offset_window, can use a simpler plan.
-                offset_node = OffsetCustomGranularityNode.create(
-                    parent_node=time_spine_read_node, offset_window=offset_window
-                )
-                time_spine_node: DataflowPlanNode = JoinToTimeSpineNode.create(
-                    parent_node=offset_node,
-                    # TODO: need to make sure we apply both agg time and metric time
-                    requested_agg_time_dimension_specs=queried_time_spine_specs,
-                    time_spine_node=time_spine_read_node,
-                    join_type=SqlJoinType.INNER,
-                    join_on_time_dimension_spec=custom_grain_metric_time_spec,
-                )
+                # offset_node = OffsetCustomGranularityNode.create(
+                #     parent_node=time_spine_read_node, offset_window=offset_window
+                # )
+                # time_spine_node: DataflowPlanNode = JoinToTimeSpineNode.create(
+                #     parent_node=offset_node,
+                #     # TODO: need to make sure we apply both agg time and metric time
+                #     requested_agg_time_dimension_specs=queried_time_spine_specs,
+                #     time_spine_node=time_spine_read_node,
+                #     join_type=SqlJoinType.INNER,
+                #     join_on_time_dimension_spec=custom_grain_metric_time_spec,
+                # )
+                pass
             else:
-                bounds_node = CustomGranularityBoundsNode.create(
-                    parent_node=time_spine_read_node, offset_window=offset_window
+                time_spine_node: DataflowPlanNode = CustomGranularityBoundsNode.create(
+                    parent_node=time_spine_read_node, custom_granularity_name=offset_window.granularity
                 )
-                # need to add a property to these specs to indicate that they are offset or bounds or something
-                filtered_bounds_node = FilterElementsNode.create(
-                    parent_node=bounds_node, include_specs=bounds_node.specs, distinct=True
-                )
-                offset_bounds_node = OffsetCustomGranularityBoundsNode.create(parent_node=filtered_bounds_node)
-                time_spine_node = OffsetByCustomGranularityNode(
-                    parent_node=offset_bounds_node, offset_window=offset_window
-                )
-                if queried_standard_specs:
-                    time_spine_node = ApplyStandardGranularityNode.create(
-                        parent_node=time_spine_node, time_dimension_specs=queried_standard_specs
-                    )
+                # # need to add a property to these specs to indicate that they are offset or bounds or something
+                # filtered_bounds_node = FilterElementsNode.create(
+                #     parent_node=bounds_node, include_specs=bounds_node.specs, distinct=True
+                # )
+                # offset_bounds_node = OffsetCustomGranularityBoundsNode.create(parent_node=filtered_bounds_node)
+                # time_spine_node = OffsetByCustomGranularityNode(
+                #     parent_node=offset_bounds_node, offset_window=offset_window
+                # )
+                # if queried_standard_specs:
+                #     time_spine_node = ApplyStandardGranularityNode.create(
+                #         parent_node=time_spine_node, time_dimension_specs=queried_standard_specs
+                #     )
                 # TODO: check if this join is needed for the same grain as is used in offset window. Later
                 for custom_spec in queried_custom_specs:
                     time_spine_node = JoinToCustomGranularityNode.create(

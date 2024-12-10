@@ -1209,9 +1209,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                     spec=metric_time_dimension_spec,
                 )
             )
-            output_column_to_input_column[metric_time_dimension_column_association.column_name] = (
-                matching_time_dimension_instance.associated_column.column_name
-            )
+            output_column_to_input_column[
+                metric_time_dimension_column_association.column_name
+            ] = matching_time_dimension_instance.associated_column.column_name
 
         output_instance_set = InstanceSet(
             measure_instances=tuple(output_measure_instances),

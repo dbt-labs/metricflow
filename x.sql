@@ -30,7 +30,7 @@ INNER JOIN (
     -- OffsetByCustomGranularityNode
         select
             fiscal_quarter
-            , case 
+            , case
                 when dateadd(day, days_from_start_of_fiscal_quarter, fiscal_quarter_start_date__offset_by_1) <= fiscal_quarter_end_date__offset_by_1
                     then dateadd(day, days_from_start_of_fiscal_quarter, fiscal_quarter_start_date__offset_by_1)
                 else fiscal_quarter_end_date__offset_by_1
@@ -38,7 +38,7 @@ INNER JOIN (
         from cte -- CustomGranularityBoundsNode
         inner join (
         -- OffsetCustomGranularityBoundsNode
-            select 
+            select
                 fiscal_quarter,
                 lag(fiscal_quarter_start_date, 1) over (order by fiscal_quarter) as fiscal_quarter_start_date__offset_by_1,
                 lag(fiscal_quarter_end_date, 1) over (order by fiscal_quarter) as fiscal_quarter_end_date__offset_by_1
