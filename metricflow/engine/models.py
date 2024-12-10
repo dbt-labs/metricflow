@@ -87,6 +87,7 @@ class Dimension:
     entity_links: Tuple[EntityReference, ...]
     type_params: Optional[DimensionTypeParams]
     metadata: Optional[Metadata]
+    config: Optional[SemanticLayerElementConfig] = None
     is_partition: bool = False
     expr: Optional[str] = None
     label: Optional[str] = None
@@ -112,6 +113,7 @@ class Dimension:
             type=pydantic_dimension.type,
             type_params=parsed_type_params,
             metadata=pydantic_dimension.metadata,
+            config=pydantic_dimension.config,
             is_partition=pydantic_dimension.is_partition,
             expr=pydantic_dimension.expr,
             label=pydantic_dimension.label,
@@ -142,6 +144,7 @@ class Entity:
     description: Optional[str]
     type: EntityType
     role: Optional[str]
+    config: Optional[SemanticLayerElementConfig] = None
     expr: Optional[str] = None
 
     @classmethod
@@ -152,6 +155,7 @@ class Entity:
             description=pydantic_entity.description,
             type=pydantic_entity.type,
             role=pydantic_entity.role,
+            config=pydantic_entity.config,
             expr=pydantic_entity.expr,
         )
 
@@ -163,6 +167,7 @@ class Measure:
     name: str
     agg: AggregationType
     agg_time_dimension: str
+    config: Optional[SemanticLayerElementConfig] = None
     description: Optional[str] = None
     expr: Optional[str] = None
     agg_params: Optional[MeasureAggregationParameters] = None
