@@ -229,6 +229,10 @@ class SqlExpressionNodeVisitor(Generic[VisitorOutputT], ABC):
     def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> VisitorOutputT:  # noqa: D102
         pass
 
+    @abstractmethod
+    def visit_case_expr(self, node: SqlCaseExpression) -> VisitorOutputT:  # noqa: D102
+        pass
+
 
 @dataclass(frozen=True, eq=False)
 class SqlStringExpression(SqlExpressionNode):
@@ -942,11 +946,18 @@ class SqlWindowFunction(Enum):
     FIRST_VALUE = "FIRST_VALUE"
     LAST_VALUE = "LAST_VALUE"
     AVERAGE = "AVG"
+    ROW_NUMBER = "ROW_NUMBER"
+    LAG = "LAG"
 
     @property
     def requires_ordering(self) -> bool:
         """Asserts whether or not ordering the window function will have an impact on the resulting value."""
-        if self is SqlWindowFunction.FIRST_VALUE or self is SqlWindowFunction.LAST_VALUE:
+        if (
+            self is SqlWindowFunction.FIRST_VALUE
+            or self is SqlWindowFunction.LAST_VALUE
+            or self is SqlWindowFunction.ROW_NUMBER
+            or self is SqlWindowFunction.LAG
+        ):
             return True
         elif self is SqlWindowFunction.AVERAGE:
             return False
@@ -1249,6 +1260,8 @@ class SqlIsNullExpression(SqlExpressionNode):
         return self._parents_match(other)
 
 
+# TODO: make this SqlTimeDeltaExpression. Renderers will check if the number is positive or negative and update syntax accordingly.
+# Put this in a separate commit
 @dataclass(frozen=True, eq=False)
 class SqlSubtractTimeIntervalExpression(SqlExpressionNode):
     """Represents an interval subtraction from a given timestamp.
@@ -1260,7 +1273,7 @@ class SqlSubtractTimeIntervalExpression(SqlExpressionNode):
     """
 
     arg: SqlExpressionNode
-    count: int
+    count_expr: SqlExpressionNode
     granularity: TimeGranularity
 
     @staticmethod
@@ -1272,7 +1285,20 @@ class SqlSubtractTimeIntervalExpression(SqlExpressionNode):
         return SqlSubtractTimeIntervalExpression(
             parent_nodes=(arg,),
             arg=arg,
-            count=count,
+            count_expr=SqlStringExpression.create(str(count)),
+            granularity=granularity,
+        )
+
+    @staticmethod
+    def create_with_count_expr(  # noqa: D102
+        arg: SqlExpressionNode,
+        count_expr: SqlExpressionNode,
+        granularity: TimeGranularity,
+    ) -> SqlSubtractTimeIntervalExpression:
+        return SqlSubtractTimeIntervalExpression(
+            parent_nodes=(arg, count_expr),
+            arg=arg,
+            count_expr=count_expr,
             granularity=granularity,
         )
 
@@ -1650,3 +1676,64 @@ class SqlGenerateUuidExpression(SqlExpressionNode):
 
     def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D102
         return False
+
+
+@dataclass(frozen=True, eq=False)
+class SqlCaseExpression(SqlExpressionNode):
+    """Renders a CASE WHEN expression."""
+
+    when_to_then_exprs: Dict[SqlExpressionNode, SqlExpressionNode]
+    else_expr: Optional[SqlExpressionNode]
+
+    @staticmethod
+    def create(  # noqa: D102
+        when_to_then_exprs: Dict[SqlExpressionNode, SqlExpressionNode], else_expr: Optional[SqlExpressionNode] = None
+    ) -> SqlCaseExpression:
+        parent_nodes = (else_expr,)
+        for when, then in when_to_then_exprs.items():
+            parent_nodes += (when,)
+            parent_nodes += (then,)
+
+        return SqlCaseExpression(parent_nodes=parent_nodes, when_to_then_exprs=when_to_then_exprs, else_expr=else_expr)
+
+    @classmethod
+    def id_prefix(cls) -> IdPrefix:  # noqa: D102
+        return StaticIdPrefix.SQL_EXPR_CASE_PREFIX
+
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
+        return visitor.visit_case_expr(self)
+
+    @property
+    def description(self) -> str:  # noqa: D102
+        return "Case expression"
+
+    @property
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
+        return super().displayed_properties
+
+    @property
+    def requires_parenthesis(self) -> bool:  # noqa: D102
+        return False
+
+    @property
+    def bind_parameter_set(self) -> SqlBindParameterSet:  # noqa: D102
+        return SqlBindParameterSet()
+
+    def __repr__(self) -> str:  # noqa: D105
+        return f"{self.__class__.__name__}(node_id={self.node_id})"
+
+    def rewrite(  # noqa: D102
+        self,
+        column_replacements: Optional[SqlColumnReplacements] = None,
+        should_render_table_alias: Optional[bool] = None,
+    ) -> SqlExpressionNode:
+        return self
+
+    @property
+    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
+        return SqlExpressionTreeLineage(other_exprs=(self,))
+
+    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D102
+        if not isinstance(other, SqlCaseExpression):
+            return False
+        return self.when_to_then_exprs == other.when_to_then_exprs and self.else_expr == other.else_expr
