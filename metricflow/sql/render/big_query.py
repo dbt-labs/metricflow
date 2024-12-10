@@ -167,7 +167,7 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
         )
 
     @override
-    def visit_time_delta_expr(self, node: SqlSubtractTimeIntervalExpression) -> SqlExpressionRenderResult:
+    def visit_subtract_time_interval_expr(self, node: SqlSubtractTimeIntervalExpression) -> SqlExpressionRenderResult:
         """Render time delta for BigQuery, which requires ISO prefixing for the WEEK granularity value."""
         column = node.arg.accept(self)
 

@@ -45,7 +45,7 @@ class TrinoSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         )
 
     @override
-    def visit_time_delta_expr(self, node: SqlSubtractTimeIntervalExpression) -> SqlExpressionRenderResult:
+    def visit_subtract_time_interval_expr(self, node: SqlSubtractTimeIntervalExpression) -> SqlExpressionRenderResult:
         """Render time delta for Trino, require granularity in quotes and function name change."""
         arg_rendered = node.arg.accept(self)
 

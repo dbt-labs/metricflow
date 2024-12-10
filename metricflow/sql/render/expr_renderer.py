@@ -303,7 +303,9 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
 
         return date_part.value
 
-    def visit_time_delta_expr(self, node: SqlSubtractTimeIntervalExpression) -> SqlExpressionRenderResult:  # noqa: D102
+    def visit_subtract_time_interval_expr(
+        self, node: SqlSubtractTimeIntervalExpression
+    ) -> SqlExpressionRenderResult:  # noqa: D102
         arg_rendered = node.arg.accept(self)
 
         count = node.count

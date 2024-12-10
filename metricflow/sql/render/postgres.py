@@ -40,7 +40,7 @@ class PostgresSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         return {SqlPercentileFunctionType.CONTINUOUS, SqlPercentileFunctionType.DISCRETE}
 
     @override
-    def visit_time_delta_expr(self, node: SqlSubtractTimeIntervalExpression) -> SqlExpressionRenderResult:
+    def visit_subtract_time_interval_expr(self, node: SqlSubtractTimeIntervalExpression) -> SqlExpressionRenderResult:
         """Render time delta operations for PostgreSQL, which needs custom support for quarterly granularity."""
         arg_rendered = node.arg.accept(self)
 
