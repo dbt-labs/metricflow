@@ -16,7 +16,7 @@ FROM (
     , subq_15.bookings AS bookings
   FROM (
     -- Read From Time Spine 'mf_time_spine'
-    -- Transform Time Dimension Columns
+    -- Change Column Aliases
     -- Constrain Time Range to [2020-01-03T00:00:00, 2020-01-05T00:00:00]
     -- Pass Only Elements: ['metric_time__day',]
     SELECT

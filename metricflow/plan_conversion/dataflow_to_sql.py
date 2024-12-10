@@ -36,7 +36,6 @@ from metricflow_semantics.specs.measure_spec import MeasureSpec
 from metricflow_semantics.specs.metadata_spec import MetadataSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
-from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.sql.sql_table import SqlTable
@@ -52,6 +51,7 @@ from metricflow.dataflow.dataflow_plan_analyzer import DataflowPlanAnalyzer
 from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
 from metricflow.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
 from metricflow.dataflow.nodes.aggregate_measures import AggregateMeasuresNode
+from metricflow.dataflow.nodes.alias_specs import AliasSpecsNode
 from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
 from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
@@ -66,7 +66,6 @@ from metricflow.dataflow.nodes.min_max import MinMaxNode
 from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
-from metricflow.dataflow.nodes.transform_time_dimensions import TransformTimeDimensionsNode
 from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
 from metricflow.dataflow.nodes.window_reaggregation_node import WindowReaggregationNode
 from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
@@ -1465,36 +1464,38 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             f"Custom granularity {custom_granularity} not found. This indicates internal misconfiguration."
         )
 
-    def visit_transform_time_dimensions_node(self, node: TransformTimeDimensionsNode) -> SqlDataSet:  # noqa: D102
+    def visit_alias_specs_node(self, node: AliasSpecsNode) -> SqlDataSet:  # noqa: D102
         parent_data_set = node.parent_node.accept(self)
         parent_alias = self._next_unique_table_alias()
 
-        new_instances: Tuple[TimeDimensionInstance, ...] = ()
+        new_instances: Tuple[MdoInstance, ...] = ()
         new_select_columns: Tuple[SqlSelectColumn, ...] = ()
-        specs_to_remove_from_parent: Set[TimeDimensionSpec] = set()
-        for spec in node.requested_time_dimension_specs:
+        instances_to_remove_from_parent: Set[MdoInstance] = set()
+        for old_spec, new_spec in node.change_specs:
             # Find the instance in the parent data set with matching grain & date part.
-            old_instance = parent_data_set.instance_from_time_dimension_grain_and_date_part(spec)
+            old_instance = parent_data_set.instance_for_spec(old_spec)
 
             # Build new instance & select column to match requested spec.
-            new_instance = TimeDimensionInstance(
-                defined_from=old_instance.defined_from,
-                associated_columns=(self._column_association_resolver.resolve_spec(spec),),
-                spec=spec,
+            new_instance = old_instance.with_new_spec(
+                new_spec=new_spec, column_association_resolver=self._column_association_resolver
             )
             new_expr = SqlColumnReferenceExpression.from_table_and_column_names(
                 table_alias=parent_alias, column_name=old_instance.associated_column.column_name
             )
             new_select_column = SqlSelectColumn(expr=new_expr, column_alias=new_instance.associated_column.column_name)
-            specs_to_remove_from_parent.add(old_instance.spec)
+            instances_to_remove_from_parent.add(old_instance)
             new_instances += (new_instance,)
             new_select_columns += (new_select_column,)
 
         # Build full output instance set.
-        filtered_parent_instance_set = parent_data_set.instance_set.transform(
-            FilterElements(include_specs=InstanceSpecSet(time_dimension_specs=tuple(specs_to_remove_from_parent)))
+        filtered_parent_instance_set = group_instances_by_type(
+            tuple(
+                instance
+                for instance in parent_data_set.instance_set.as_tuple
+                if instance not in instances_to_remove_from_parent
+            )
         )
-        new_instance_set = InstanceSet(time_dimension_instances=new_instances)
+        new_instance_set = group_instances_by_type(new_instances)
         transformed_instance_set = InstanceSet.merge([filtered_parent_instance_set, new_instance_set])
 
         # Build final select columns.
@@ -2142,10 +2143,8 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
         )
 
     @override
-    def visit_transform_time_dimensions_node(self, node: TransformTimeDimensionsNode) -> SqlDataSet:  # noqa: D102
-        return self._default_handler(
-            node=node, node_to_select_subquery_function=super().visit_transform_time_dimensions_node
-        )
+    def visit_alias_specs_node(self, node: AliasSpecsNode) -> SqlDataSet:  # noqa: D102
+        return self._default_handler(node=node, node_to_select_subquery_function=super().visit_alias_specs_node)
 
 
 DataflowNodeT = TypeVar("DataflowNodeT", bound=DataflowPlanNode)

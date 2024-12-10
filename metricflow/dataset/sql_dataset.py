@@ -5,11 +5,12 @@ from typing import List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.references import SemanticModelReference
 from metricflow_semantics.assert_one_arg import assert_exactly_one_arg_set
-from metricflow_semantics.instances import EntityInstance, InstanceSet, TimeDimensionInstance
+from metricflow_semantics.instances import EntityInstance, InstanceSet, MdoInstance, TimeDimensionInstance
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.specs.column_assoc import ColumnAssociation
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
+from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from typing_extensions import override
 
@@ -144,7 +145,7 @@ class SqlDataSet(DataSet):
         return instances_to_return
 
     def instance_for_time_dimension(self, time_dimension_spec: TimeDimensionSpec) -> TimeDimensionInstance:
-        """Given the name of the time dimension, return the instance associated with it in the data set."""
+        """Given ta time dimension spec, return the instance associated with it in the data set."""
         instances = self.instances_for_time_dimensions((time_dimension_spec,))
         if not len(instances) == 1:
             raise RuntimeError(
@@ -152,6 +153,14 @@ class SqlDataSet(DataSet):
                 f"Instances: {instances}"
             )
         return instances[0]
+
+    def instance_for_spec(self, spec: InstanceSpec) -> MdoInstance:
+        """Given a spec, return the instance associated with it in the data set."""
+        instances = self.instance_set.as_tuple
+        for instance in instances:
+            if instance.spec == spec:
+                return instance
+        raise RuntimeError(f"Did not find instance matching spec in dataset. Spec: {spec}\nInstances: {instances}")
 
     def instance_from_time_dimension_grain_and_date_part(
         self, time_dimension_spec: TimeDimensionSpec
