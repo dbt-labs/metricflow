@@ -9,7 +9,7 @@ SELECT
   , subq_13.bookings AS bookings_join_to_time_spine
 FROM (
   -- Read From Time Spine 'mf_time_spine'
-  -- Transform Time Dimension Columns
+  -- Change Column Aliases
   -- Pass Only Elements: ['metric_time__martian_day',]
   SELECT
     martian_day AS metric_time__martian_day

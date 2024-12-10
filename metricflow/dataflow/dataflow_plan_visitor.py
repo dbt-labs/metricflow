@@ -11,6 +11,7 @@ if typing.TYPE_CHECKING:
     from metricflow.dataflow.dataflow_plan import DataflowPlanNode
     from metricflow.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
     from metricflow.dataflow.nodes.aggregate_measures import AggregateMeasuresNode
+    from metricflow.dataflow.nodes.alias_specs import AliasSpecsNode
     from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
     from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
     from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
@@ -25,7 +26,6 @@ if typing.TYPE_CHECKING:
     from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
     from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
     from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
-    from metricflow.dataflow.nodes.transform_time_dimensions import TransformTimeDimensionsNode
     from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
     from metricflow.dataflow.nodes.window_reaggregation_node import WindowReaggregationNode
     from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
@@ -123,7 +123,7 @@ class DataflowPlanNodeVisitor(Generic[VisitorOutputT], ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def visit_transform_time_dimensions_node(self, node: TransformTimeDimensionsNode) -> VisitorOutputT:  # noqa: D102
+    def visit_alias_specs_node(self, node: AliasSpecsNode) -> VisitorOutputT:  # noqa: D102
         raise NotImplementedError
 
 
@@ -220,5 +220,5 @@ class DataflowPlanNodeVisitorWithDefaultHandler(DataflowPlanNodeVisitor[VisitorO
         return self._default_handler(node)
 
     @override
-    def visit_transform_time_dimensions_node(self, node: TransformTimeDimensionsNode) -> VisitorOutputT:  # noqa: D102
+    def visit_alias_specs_node(self, node: AliasSpecsNode) -> VisitorOutputT:  # noqa: D102
         return self._default_handler(node)
