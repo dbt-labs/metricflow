@@ -10,8 +10,8 @@ with cte as (
         date_day,
         fiscal_quarter,
         row_number() over (partition by fiscal_quarter order by date_day) - 1 as days_from_start_of_fiscal_quarter
-        , first_value(date_day) over (partition by fiscal_quarter order by date_day) as fiscal_quarter_start_date
-        , last_value(date_day) over (partition by fiscal_quarter order by date_day) as fiscal_quarter_end_date
+        , first_value(date_day) over (partition by fiscal_quarter order by date_day) as fiscal_quarter_start
+        , last_value(date_day) over (partition by fiscal_quarter order by date_day) as fiscal_quarter_end
     FROM ANALYTICS_DEV.DBT_JSTEIN.ALL_DAYS
 )
 
@@ -31,23 +31,23 @@ INNER JOIN (
         select
             fiscal_quarter
             , case
-                when dateadd(day, days_from_start_of_fiscal_quarter, fiscal_quarter_start_date__offset_by_1) <= fiscal_quarter_end_date__offset_by_1
-                    then dateadd(day, days_from_start_of_fiscal_quarter, fiscal_quarter_start_date__offset_by_1)
-                else fiscal_quarter_end_date__offset_by_1
+                when dateadd(day, days_from_start_of_fiscal_quarter, fiscal_quarter_start__offset_by_1) <= fiscal_quarter_end__offset_by_1
+                    then dateadd(day, days_from_start_of_fiscal_quarter, fiscal_quarter_start__offset_by_1)
+                else fiscal_quarter_end__offset_by_1
                 end as date_day
         from cte -- CustomGranularityBoundsNode
         inner join (
         -- OffsetCustomGranularityBoundsNode
             select
                 fiscal_quarter,
-                lag(fiscal_quarter_start_date, 1) over (order by fiscal_quarter) as fiscal_quarter_start_date__offset_by_1,
-                lag(fiscal_quarter_end_date, 1) over (order by fiscal_quarter) as fiscal_quarter_end_date__offset_by_1
+                lag(fiscal_quarter_start, 1) over (order by fiscal_quarter) as fiscal_quarter_start__offset_by_1,
+                lag(fiscal_quarter_end, 1) over (order by fiscal_quarter) as fiscal_quarter_end__offset_by_1
             from (
             -- FilterEelementsNode
                 select
                     fiscal_quarter,
-                    fiscal_quarter_start_date,
-                    fiscal_quarter_end_date
+                    fiscal_quarter_start,
+                    fiscal_quarter_end
                 from cte -- CustomGranularityBoundsNode
                 GROUP BY 1, 2, 3
             ) ts_distinct

@@ -1913,7 +1913,7 @@ class DataflowPlanBuilder:
                 pass
             else:
                 time_spine_node: DataflowPlanNode = CustomGranularityBoundsNode.create(
-                    parent_node=time_spine_read_node, custom_granularity_name=offset_window.granularity
+                    parent_node=time_spine_read_node, offset_window=offset_window
                 )
                 # # need to add a property to these specs to indicate that they are offset or bounds or something
                 # filtered_bounds_node = FilterElementsNode.create(
