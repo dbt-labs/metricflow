@@ -16,6 +16,7 @@ from typing_extensions import override
 
 from metricflow.sql.render.rendering_constants import SqlRenderingConstants
 from metricflow.sql.sql_exprs import (
+    SqlAddTimeExpression,
     SqlAggregateFunctionExpression,
     SqlBetweenExpression,
     SqlCastToTimestampExpression,
@@ -303,9 +304,9 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
 
         return date_part.value
 
-    def visit_subtract_time_interval_expr(
+    def visit_subtract_time_interval_expr(  # noqa: D102
         self, node: SqlSubtractTimeIntervalExpression
-    ) -> SqlExpressionRenderResult:  # noqa: D102
+    ) -> SqlExpressionRenderResult:
         arg_rendered = node.arg.accept(self)
 
         count = node.count
@@ -315,6 +316,20 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
             count *= 3
         return SqlExpressionRenderResult(
             sql=f"DATEADD({granularity.value}, -{count}, {arg_rendered.sql})",
+            bind_parameter_set=arg_rendered.bind_parameter_set,
+        )
+
+    def visit_add_time_expr(self, node: SqlAddTimeExpression) -> SqlExpressionRenderResult:  # noqa: D102
+        arg_rendered = node.arg.accept(self)
+        count_rendered = node.count_expr.accept(self).sql
+
+        granularity = node.granularity
+        if granularity == TimeGranularity.QUARTER:
+            granularity = TimeGranularity.MONTH
+            count_rendered = f"{count_rendered} * 3"
+
+        return SqlExpressionRenderResult(
+            sql=f"DATEADD({granularity.value}, {count_rendered}, {arg_rendered.sql})",
             bind_parameter_set=arg_rendered.bind_parameter_set,
         )
 
