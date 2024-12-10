@@ -212,7 +212,9 @@ class SqlExpressionNodeVisitor(Generic[VisitorOutputT], ABC):
         pass
 
     @abstractmethod
-    def visit_time_delta_expr(self, node: SqlSubtractTimeIntervalExpression) -> VisitorOutputT:  # noqa: D102
+    def visit_subtract_time_interval_expr(
+        self, node: SqlSubtractTimeIntervalExpression
+    ) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
@@ -1289,11 +1291,11 @@ class SqlSubtractTimeIntervalExpression(SqlExpressionNode):
         return False
 
     def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
-        return visitor.visit_time_delta_expr(self)
+        return visitor.visit_subtract_time_interval_expr(self)
 
     @property
     def description(self) -> str:  # noqa: D102
-        return "Time delta"
+        return "Subtract time interval"
 
     def rewrite(  # noqa: D102
         self,

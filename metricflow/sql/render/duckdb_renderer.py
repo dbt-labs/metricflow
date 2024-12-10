@@ -37,7 +37,7 @@ class DuckDbSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         }
 
     @override
-    def visit_time_delta_expr(self, node: SqlSubtractTimeIntervalExpression) -> SqlExpressionRenderResult:
+    def visit_subtract_time_interval_expr(self, node: SqlSubtractTimeIntervalExpression) -> SqlExpressionRenderResult:
         """Render time delta expression for DuckDB, which requires slightly different syntax from other engines."""
         arg_rendered = node.arg.accept(self)
 
