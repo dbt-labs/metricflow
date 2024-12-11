@@ -183,6 +183,7 @@ class SavedQuery:
     query_params: SavedQueryQueryParams
     metadata: Optional[Metadata]
     exports: Sequence[Export]
+    tags: Sequence[str]
 
     @classmethod
     def from_pydantic(cls, pydantic_saved_query: SemanticManifestSavedQuery) -> SavedQuery:
@@ -194,4 +195,5 @@ class SavedQuery:
             query_params=pydantic_saved_query.query_params,
             metadata=pydantic_saved_query.metadata,
             exports=pydantic_saved_query.exports,
+            tags=pydantic_saved_query.tags,
         )
