@@ -219,10 +219,20 @@ FROM (
           SELECT
             subq_3.metric_time__hour
           FROM (
-            -- Transform Time Dimension Columns
+            -- Change Column Aliases
             SELECT
               subq_2.ts__hour AS metric_time__hour
-              , subq_2.ts__hour
+              , subq_2.ts__day
+              , subq_2.ts__week
+              , subq_2.ts__month
+              , subq_2.ts__quarter
+              , subq_2.ts__year
+              , subq_2.ts__extract_year
+              , subq_2.ts__extract_quarter
+              , subq_2.ts__extract_month
+              , subq_2.ts__extract_day
+              , subq_2.ts__extract_dow
+              , subq_2.ts__extract_doy
             FROM (
               -- Read From Time Spine 'mf_time_spine_hour'
               SELECT

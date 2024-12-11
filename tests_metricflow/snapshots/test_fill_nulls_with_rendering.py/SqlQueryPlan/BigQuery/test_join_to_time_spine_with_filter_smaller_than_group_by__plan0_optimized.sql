@@ -14,7 +14,7 @@ FROM (
     metric_time__day
   FROM (
     -- Read From Time Spine 'mf_time_spine_hour'
-    -- Transform Time Dimension Columns
+    -- Change Column Aliases
     SELECT
       DATETIME_TRUNC(ts, day) AS metric_time__day
       , ts AS metric_time__hour

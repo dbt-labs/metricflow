@@ -14,7 +14,7 @@ FROM (
     booking__ds__day
   FROM (
     -- Read From Time Spine 'mf_time_spine'
-    -- Transform Time Dimension Columns
+    -- Change Column Aliases
     SELECT
       ds AS booking__ds__day
       , ds AS metric_time__day

@@ -13,7 +13,7 @@ FROM (
     , subq_11.bookings AS bookings
   FROM (
     -- Read From Time Spine 'mf_time_spine'
-    -- Transform Time Dimension Columns
+    -- Change Column Aliases
     -- Pass Only Elements: ['metric_time__month',]
     SELECT
       DATE_TRUNC('month', ds) AS metric_time__month

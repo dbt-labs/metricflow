@@ -35,10 +35,20 @@ FROM (
         SELECT
           subq_10.metric_time__day
         FROM (
-          -- Transform Time Dimension Columns
+          -- Change Column Aliases
           SELECT
             subq_9.ds__day AS metric_time__day
-            , subq_9.ds__day
+            , subq_9.ds__week
+            , subq_9.ds__month
+            , subq_9.ds__quarter
+            , subq_9.ds__year
+            , subq_9.ds__extract_year
+            , subq_9.ds__extract_quarter
+            , subq_9.ds__extract_month
+            , subq_9.ds__extract_day
+            , subq_9.ds__extract_dow
+            , subq_9.ds__extract_doy
+            , subq_9.ds__martian_day
           FROM (
             -- Read From Time Spine 'mf_time_spine'
             SELECT
@@ -638,10 +648,20 @@ FROM (
         SELECT
           subq_28.metric_time__day
         FROM (
-          -- Transform Time Dimension Columns
+          -- Change Column Aliases
           SELECT
             subq_27.ds__day AS metric_time__day
-            , subq_27.ds__day
+            , subq_27.ds__week
+            , subq_27.ds__month
+            , subq_27.ds__quarter
+            , subq_27.ds__year
+            , subq_27.ds__extract_year
+            , subq_27.ds__extract_quarter
+            , subq_27.ds__extract_month
+            , subq_27.ds__extract_day
+            , subq_27.ds__extract_dow
+            , subq_27.ds__extract_doy
+            , subq_27.ds__martian_day
           FROM (
             -- Read From Time Spine 'mf_time_spine'
             SELECT
@@ -983,10 +1003,20 @@ FROM (
                   SELECT
                     subq_17.metric_time__day
                   FROM (
-                    -- Transform Time Dimension Columns
+                    -- Change Column Aliases
                     SELECT
                       subq_16.ds__day AS metric_time__day
-                      , subq_16.ds__day
+                      , subq_16.ds__week
+                      , subq_16.ds__month
+                      , subq_16.ds__quarter
+                      , subq_16.ds__year
+                      , subq_16.ds__extract_year
+                      , subq_16.ds__extract_quarter
+                      , subq_16.ds__extract_month
+                      , subq_16.ds__extract_day
+                      , subq_16.ds__extract_dow
+                      , subq_16.ds__extract_doy
+                      , subq_16.ds__martian_day
                     FROM (
                       -- Read From Time Spine 'mf_time_spine'
                       SELECT

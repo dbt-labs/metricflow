@@ -19,7 +19,7 @@ FROM (
     metric_time__day
   FROM (
     -- Read From Time Spine 'mf_time_spine'
-    -- Transform Time Dimension Columns
+    -- Change Column Aliases
     SELECT
       ds AS metric_time__day
     FROM ***************************.mf_time_spine time_spine_src_28006

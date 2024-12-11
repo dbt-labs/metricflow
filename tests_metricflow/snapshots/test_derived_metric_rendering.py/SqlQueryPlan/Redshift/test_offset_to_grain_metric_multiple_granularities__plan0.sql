@@ -139,14 +139,20 @@ FROM (
             , subq_3.metric_time__month
             , subq_3.metric_time__year
           FROM (
-            -- Transform Time Dimension Columns
+            -- Change Column Aliases
             SELECT
               subq_2.ds__day AS metric_time__day
               , subq_2.ds__month AS metric_time__month
               , subq_2.ds__year AS metric_time__year
-              , subq_2.ds__day
-              , subq_2.ds__month
-              , subq_2.ds__year
+              , subq_2.ds__week
+              , subq_2.ds__quarter
+              , subq_2.ds__extract_year
+              , subq_2.ds__extract_quarter
+              , subq_2.ds__extract_month
+              , subq_2.ds__extract_day
+              , subq_2.ds__extract_dow
+              , subq_2.ds__extract_doy
+              , subq_2.ds__martian_day
             FROM (
               -- Read From Time Spine 'mf_time_spine'
               SELECT

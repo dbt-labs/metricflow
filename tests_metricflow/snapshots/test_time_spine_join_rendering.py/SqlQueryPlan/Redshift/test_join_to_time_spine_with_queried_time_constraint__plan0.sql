@@ -25,13 +25,33 @@ FROM (
       FROM (
         -- Constrain Time Range to [2020-01-03T00:00:00, 2020-01-05T00:00:00]
         SELECT
-          subq_6.ds__day
+          subq_6.ds__week
+          , subq_6.ds__month
+          , subq_6.ds__quarter
+          , subq_6.ds__year
+          , subq_6.ds__extract_year
+          , subq_6.ds__extract_quarter
+          , subq_6.ds__extract_month
+          , subq_6.ds__extract_day
+          , subq_6.ds__extract_dow
+          , subq_6.ds__extract_doy
+          , subq_6.ds__martian_day
           , subq_6.metric_time__day
         FROM (
-          -- Transform Time Dimension Columns
+          -- Change Column Aliases
           SELECT
             subq_5.ds__day AS metric_time__day
-            , subq_5.ds__day
+            , subq_5.ds__week
+            , subq_5.ds__month
+            , subq_5.ds__quarter
+            , subq_5.ds__year
+            , subq_5.ds__extract_year
+            , subq_5.ds__extract_quarter
+            , subq_5.ds__extract_month
+            , subq_5.ds__extract_day
+            , subq_5.ds__extract_dow
+            , subq_5.ds__extract_doy
+            , subq_5.ds__martian_day
           FROM (
             -- Read From Time Spine 'mf_time_spine'
             SELECT
