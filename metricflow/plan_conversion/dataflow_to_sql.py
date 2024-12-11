@@ -140,7 +140,7 @@ from metricflow.sql.sql_plan import (
     SqlJoinDescription,
     SqlOrderByDescription,
     SqlPlan,
-    SqlQueryPlanNode,
+    SqlPlanNode,
     SqlSelectColumn,
     SqlSelectStatementNode,
     SqlTableNode,
@@ -313,7 +313,7 @@ class DataflowToSqlQueryPlanConverter:
                 ),
             )
 
-        sql_node: SqlQueryPlanNode = data_set.sql_node
+        sql_node: SqlPlanNode = data_set.sql_node
 
         for optimizer in optimizers:
             logger.debug(LazyFormat(lambda: f"Applying optimizer: {optimizer.__class__.__name__}"))

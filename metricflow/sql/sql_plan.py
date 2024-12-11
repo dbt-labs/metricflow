@@ -19,8 +19,8 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True, eq=False)
-class SqlQueryPlanNode(DagNode["SqlQueryPlanNode"], ABC):
-    """Modeling a SQL query plan like a data flow plan as well.
+class SqlPlanNode(DagNode["SqlPlanNode"], ABC):
+    """A node in the SQL plan model.
 
     In that model:
     * A source node that takes data into the graph e.g. SQL tables or SQL queries in a literal string format.
@@ -108,12 +108,12 @@ class SqlJoinDescription:
     """Describes how sources should be joined together."""
 
     # The source that goes on the right side of the JOIN keyword.
-    right_source: SqlQueryPlanNode
+    right_source: SqlPlanNode
     right_source_alias: str
     join_type: SqlJoinType
     on_condition: Optional[SqlExpressionNode] = None
 
-    def with_right_source(self, new_right_source: SqlQueryPlanNode) -> SqlJoinDescription:
+    def with_right_source(self, new_right_source: SqlPlanNode) -> SqlJoinDescription:
         """Return a copy of this but with the right source replaced."""
         return SqlJoinDescription(
             right_source=new_right_source,
@@ -130,7 +130,7 @@ class SqlOrderByDescription:  # noqa: D101
 
 
 @dataclass(frozen=True, eq=False)
-class SqlSelectStatementNode(SqlQueryPlanNode):
+class SqlSelectStatementNode(SqlPlanNode):
     """Represents an SQL Select statement.
 
     Attributes:
@@ -147,7 +147,7 @@ class SqlSelectStatementNode(SqlQueryPlanNode):
 
     _description: str
     select_columns: Tuple[SqlSelectColumn, ...]
-    from_source: SqlQueryPlanNode
+    from_source: SqlPlanNode
     from_source_alias: str
     cte_sources: Tuple[SqlCteNode, ...]
     join_descs: Tuple[SqlJoinDescription, ...]
@@ -161,7 +161,7 @@ class SqlSelectStatementNode(SqlQueryPlanNode):
     def create(  # noqa: D102
         description: str,
         select_columns: Tuple[SqlSelectColumn, ...],
-        from_source: SqlQueryPlanNode,
+        from_source: SqlPlanNode,
         from_source_alias: str,
         cte_sources: Tuple[SqlCteNode, ...] = (),
         join_descs: Tuple[SqlJoinDescription, ...] = (),
@@ -244,7 +244,7 @@ class SqlSelectStatementNode(SqlQueryPlanNode):
 
 
 @dataclass(frozen=True, eq=False)
-class SqlTableNode(SqlQueryPlanNode):
+class SqlTableNode(SqlPlanNode):
     """An SQL table that can go in the FROM clause or the JOIN clause."""
 
     sql_table: SqlTable
@@ -292,7 +292,7 @@ class SqlTableNode(SqlQueryPlanNode):
 
 
 @dataclass(frozen=True, eq=False)
-class SqlSelectQueryFromClauseNode(SqlQueryPlanNode):
+class SqlSelectQueryFromClauseNode(SqlPlanNode):
     """An SQL select query that can go in the FROM clause.
 
     Attributes:
@@ -336,7 +336,7 @@ class SqlSelectQueryFromClauseNode(SqlQueryPlanNode):
 
 
 @dataclass(frozen=True, eq=False)
-class SqlCreateTableAsNode(SqlQueryPlanNode):
+class SqlCreateTableAsNode(SqlPlanNode):
     """An SQL node representing a CREATE TABLE AS statement.
 
     Attributes:
@@ -350,7 +350,7 @@ class SqlCreateTableAsNode(SqlQueryPlanNode):
         assert len(self.parent_nodes) == 1
 
     @staticmethod
-    def create(sql_table: SqlTable, parent_node: SqlQueryPlanNode) -> SqlCreateTableAsNode:  # noqa: D102
+    def create(sql_table: SqlTable, parent_node: SqlPlanNode) -> SqlCreateTableAsNode:  # noqa: D102
         return SqlCreateTableAsNode(
             parent_nodes=(parent_node,),
             sql_table=sql_table,
@@ -376,7 +376,7 @@ class SqlCreateTableAsNode(SqlQueryPlanNode):
         return f"Create table {repr(self.sql_table.sql)}"
 
     @property
-    def parent_node(self) -> SqlQueryPlanNode:  # noqa: D102
+    def parent_node(self) -> SqlPlanNode:  # noqa: D102
         return self.parent_nodes[0]
 
     @classmethod
@@ -391,10 +391,10 @@ class SqlCreateTableAsNode(SqlQueryPlanNode):
         return self.parent_node.nearest_select_columns(cte_source_mapping)
 
 
-class SqlPlan(MetricFlowDag[SqlQueryPlanNode]):
+class SqlPlan(MetricFlowDag[SqlPlanNode]):
     """Model for an SQL statement as a DAG."""
 
-    def __init__(self, render_node: SqlQueryPlanNode, plan_id: Optional[DagId] = None) -> None:
+    def __init__(self, render_node: SqlPlanNode, plan_id: Optional[DagId] = None) -> None:
         """initializer.
 
         Args:
@@ -408,15 +408,15 @@ class SqlPlan(MetricFlowDag[SqlQueryPlanNode]):
         )
 
     @property
-    def render_node(self) -> SqlQueryPlanNode:  # noqa: D102
+    def render_node(self) -> SqlPlanNode:  # noqa: D102
         return self._render_node
 
 
 @dataclass(frozen=True, eq=False)
-class SqlCteNode(SqlQueryPlanNode):
+class SqlCteNode(SqlPlanNode):
     """Represents a single common table expression."""
 
-    select_statement: SqlQueryPlanNode
+    select_statement: SqlPlanNode
     cte_alias: str
 
     def __post_init__(self) -> None:  # noqa: D105
@@ -424,14 +424,14 @@ class SqlCteNode(SqlQueryPlanNode):
         assert len(self.parent_nodes) == 1
 
     @staticmethod
-    def create(select_statement: SqlQueryPlanNode, cte_alias: str) -> SqlCteNode:  # noqa: D102
+    def create(select_statement: SqlPlanNode, cte_alias: str) -> SqlCteNode:  # noqa: D102
         return SqlCteNode(
             parent_nodes=(select_statement,),
             select_statement=select_statement,
             cte_alias=cte_alias,
         )
 
-    def with_new_select(self, new_select_statement: SqlQueryPlanNode) -> SqlCteNode:
+    def with_new_select(self, new_select_statement: SqlPlanNode) -> SqlCteNode:
         """Return a node with the same attributes but with the new SELECT statement."""
         return SqlCteNode.create(
             select_statement=new_select_statement,

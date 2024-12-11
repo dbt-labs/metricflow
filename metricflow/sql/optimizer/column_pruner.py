@@ -11,7 +11,7 @@ from metricflow.sql.optimizer.tag_column_aliases import NodeToColumnAliasMapping
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlCteNode,
-    SqlQueryPlanNode,
+    SqlPlanNode,
     SqlQueryPlanNodeVisitor,
     SqlSelectQueryFromClauseNode,
     SqlSelectStatementNode,
@@ -21,7 +21,7 @@ from metricflow.sql.sql_plan import (
 logger = logging.getLogger(__name__)
 
 
-class SqlColumnPrunerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
+class SqlColumnPrunerVisitor(SqlQueryPlanNodeVisitor[SqlPlanNode]):
     """Removes unnecessary columns from SELECT statements in the SQL query plan.
 
     This requires a set of tagged column aliases that should be kept for each SQL node.
@@ -38,7 +38,7 @@ class SqlColumnPrunerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
         """
         self._required_alias_mapping = required_alias_mapping
 
-    def visit_select_statement_node(self, node: SqlSelectStatementNode) -> SqlQueryPlanNode:  # noqa: D102
+    def visit_select_statement_node(self, node: SqlSelectStatementNode) -> SqlPlanNode:  # noqa: D102
         # Remove columns that are not needed from this SELECT statement because the parent SELECT statement doesn't
         # need them. However, keep columns that are in group bys because that changes the meaning of the query.
         # Similarly, if this node is a distinct select node, keep all columns as it may return a different result set.
@@ -81,29 +81,29 @@ class SqlColumnPrunerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
             distinct=node.distinct,
         )
 
-    def visit_table_node(self, node: SqlTableNode) -> SqlQueryPlanNode:
+    def visit_table_node(self, node: SqlTableNode) -> SqlPlanNode:
         """There are no SELECT columns in this node, so pruning cannot apply."""
         return node
 
-    def visit_query_from_clause_node(self, node: SqlSelectQueryFromClauseNode) -> SqlQueryPlanNode:
+    def visit_query_from_clause_node(self, node: SqlSelectQueryFromClauseNode) -> SqlPlanNode:
         """Pruning cannot be done here since this is an arbitrary user-provided SQL query."""
         return node
 
-    def visit_create_table_as_node(self, node: SqlCreateTableAsNode) -> SqlQueryPlanNode:  # noqa: D102
+    def visit_create_table_as_node(self, node: SqlCreateTableAsNode) -> SqlPlanNode:  # noqa: D102
         return SqlCreateTableAsNode.create(
             sql_table=node.sql_table,
             parent_node=node.parent_node.accept(self),
         )
 
     @override
-    def visit_cte_node(self, node: SqlCteNode) -> SqlQueryPlanNode:
+    def visit_cte_node(self, node: SqlCteNode) -> SqlPlanNode:
         return node.with_new_select(node.select_statement.accept(self))
 
 
 class SqlColumnPrunerOptimizer(SqlQueryPlanOptimizer):
     """Removes unnecessary columns in the SELECT statements."""
 
-    def optimize(self, node: SqlQueryPlanNode) -> SqlQueryPlanNode:  # noqa: D102
+    def optimize(self, node: SqlPlanNode) -> SqlPlanNode:  # noqa: D102
         # ALl columns in the nearest SELECT node need to be kept as otherwise, the meaning of the query changes.
         required_select_columns = node.nearest_select_columns({})
 

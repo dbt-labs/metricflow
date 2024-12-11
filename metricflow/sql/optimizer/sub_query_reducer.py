@@ -12,7 +12,7 @@ from metricflow.sql.sql_plan import (
     SqlCteNode,
     SqlJoinDescription,
     SqlOrderByDescription,
-    SqlQueryPlanNode,
+    SqlPlanNode,
     SqlQueryPlanNodeVisitor,
     SqlSelectQueryFromClauseNode,
     SqlSelectStatementNode,
@@ -22,7 +22,7 @@ from metricflow.sql.sql_plan import (
 logger = logging.getLogger(__name__)
 
 
-class SqlSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
+class SqlSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlPlanNode]):
     """Visits the SQL query plan to simplify sub-queries. On each visit, return a simplfied node."""
 
     def _reduce_parents(
@@ -125,10 +125,10 @@ class SqlSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
         return None
 
     @override
-    def visit_cte_node(self, node: SqlCteNode) -> SqlQueryPlanNode:
+    def visit_cte_node(self, node: SqlCteNode) -> SqlPlanNode:
         raise NotImplementedError
 
-    def visit_select_statement_node(self, node: SqlSelectStatementNode) -> SqlQueryPlanNode:  # noqa: D102
+    def visit_select_statement_node(self, node: SqlSelectStatementNode) -> SqlPlanNode:  # noqa: D102
         node_with_reduced_parents = self._reduce_parents(node)
 
         if not self._reduce_is_possible(node_with_reduced_parents):
@@ -195,13 +195,13 @@ class SqlSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
             distinct=parent_select_node.distinct,
         )
 
-    def visit_table_node(self, node: SqlTableNode) -> SqlQueryPlanNode:  # noqa: D102
+    def visit_table_node(self, node: SqlTableNode) -> SqlPlanNode:  # noqa: D102
         return node
 
-    def visit_query_from_clause_node(self, node: SqlSelectQueryFromClauseNode) -> SqlQueryPlanNode:  # noqa: D102
+    def visit_query_from_clause_node(self, node: SqlSelectQueryFromClauseNode) -> SqlPlanNode:  # noqa: D102
         return node
 
-    def visit_create_table_as_node(self, node: SqlCreateTableAsNode) -> SqlQueryPlanNode:  # noqa: D102
+    def visit_create_table_as_node(self, node: SqlCreateTableAsNode) -> SqlPlanNode:  # noqa: D102
         return SqlCreateTableAsNode.create(
             sql_table=node.sql_table,
             parent_node=node.parent_node.accept(self),
@@ -223,5 +223,5 @@ class SqlSubQueryReducer(SqlQueryPlanOptimizer):
     SELECT a.foo FROM bar a
     """
 
-    def optimize(self, node: SqlQueryPlanNode) -> SqlQueryPlanNode:  # noqa: D102
+    def optimize(self, node: SqlPlanNode) -> SqlPlanNode:  # noqa: D102
         return node.accept(SqlSubQueryReducerVisitor())
