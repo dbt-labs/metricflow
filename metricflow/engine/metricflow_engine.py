@@ -185,7 +185,7 @@ class MetricFlowExplainResult:
                 f"Multiple tasks in the execution plan not yet supported. Got tasks: {execution_plan.tasks}"
             )
 
-        sql_query = execution_plan.tasks[0].sql_query
+        sql_query = execution_plan.tasks[0].sql_statement
         if not sql_query:
             raise NotImplementedError(
                 f"Execution plan tasks without a SQL query not yet supported. Got tasks: {execution_plan.tasks}"
