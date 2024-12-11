@@ -5,15 +5,26 @@ docstring:
 sql_engine: Postgres
 ---
 -- Compute Metrics via Expressions
+WITH sma_28009_cte AS (
+  -- Read Elements From Semantic Model 'bookings_source'
+  -- Metric Time Dimension 'ds'
+  SELECT
+    DATE_TRUNC('day', ds) AS metric_time__day
+    , DATE_TRUNC('month', ds) AS metric_time__month
+    , booking_value
+    , guest_id AS bookers
+  FROM ***************************.fct_bookings bookings_source_src_28000
+)
+
 SELECT
-  metric_time__month
+  metric_time__month AS metric_time__month
   , booking_value * 0.05 / bookers AS booking_fees_last_week_per_booker_this_week
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_24.metric_time__month, subq_30.metric_time__month) AS metric_time__month
+    COALESCE(subq_24.metric_time__month, subq_29.metric_time__month) AS metric_time__month
     , MAX(subq_24.booking_value) AS booking_value
-    , MAX(subq_30.bookers) AS bookers
+    , MAX(subq_29.bookers) AS bookers
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['booking_value', 'metric_time__month']
@@ -27,12 +38,12 @@ FROM (
       SELECT
         subq_19.ds AS metric_time__day
         , DATE_TRUNC('month', subq_19.ds) AS metric_time__month
-        , bookings_source_src_28000.booking_value AS booking_value
+        , sma_28009_cte.booking_value AS booking_value
       FROM ***************************.mf_time_spine subq_19
       INNER JOIN
-        ***************************.fct_bookings bookings_source_src_28000
+        sma_28009_cte sma_28009_cte
       ON
-        subq_19.ds - MAKE_INTERVAL(weeks => 1) = DATE_TRUNC('day', bookings_source_src_28000.ds)
+        subq_19.ds - MAKE_INTERVAL(weeks => 1) = sma_28009_cte.metric_time__day
     ) subq_20
     WHERE metric_time__day = '2020-01-01'
     GROUP BY
@@ -47,20 +58,20 @@ FROM (
       metric_time__month
       , COUNT(DISTINCT bookers) AS bookers
     FROM (
-      -- Read Elements From Semantic Model 'bookings_source'
-      -- Metric Time Dimension 'ds'
+      -- Read From CTE For node_id=sma_28009
       SELECT
-        DATE_TRUNC('day', ds) AS metric_time__day
-        , DATE_TRUNC('month', ds) AS metric_time__month
-        , guest_id AS bookers
-      FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_26
+        metric_time__day
+        , metric_time__month
+        , booking_value
+        , bookers
+      FROM sma_28009_cte sma_28009_cte
+    ) subq_25
     WHERE metric_time__day = '2020-01-01'
     GROUP BY
       metric_time__month
-  ) subq_30
+  ) subq_29
   ON
-    subq_24.metric_time__month = subq_30.metric_time__month
+    subq_24.metric_time__month = subq_29.metric_time__month
   GROUP BY
-    COALESCE(subq_24.metric_time__month, subq_30.metric_time__month)
-) subq_31
+    COALESCE(subq_24.metric_time__month, subq_29.metric_time__month)
+) subq_30

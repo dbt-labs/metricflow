@@ -6,21 +6,24 @@ sql_engine: Databricks
 -- Pass Only Elements: ['listings',]
 -- Aggregate Measures
 -- Compute Metrics via Expressions
+WITH sma_28014_cte AS (
+  -- Read Elements From Semantic Model 'listings_latest'
+  -- Metric Time Dimension 'ds'
+  SELECT
+    listing_id AS listing
+    , user_id AS user
+    , 1 AS listings
+  FROM ***************************.dim_listings_latest listings_latest_src_28000
+)
+
 SELECT
   SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
   SELECT
-    subq_27.listing__user__average_booking_value AS user__listing__user__average_booking_value
-    , subq_17.listings AS listings
-  FROM (
-    -- Read Elements From Semantic Model 'listings_latest'
-    -- Metric Time Dimension 'ds'
-    SELECT
-      user_id AS user
-      , 1 AS listings
-    FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_17
+    subq_26.listing__user__average_booking_value AS user__listing__user__average_booking_value
+    , sma_28014_cte.listings AS listings
+  FROM sma_28014_cte sma_28014_cte
   LEFT OUTER JOIN (
     -- Join Standard Outputs
     -- Pass Only Elements: ['average_booking_value', 'listing__user']
@@ -28,17 +31,17 @@ FROM (
     -- Compute Metrics via Expressions
     -- Pass Only Elements: ['listing__user', 'listing__user__average_booking_value']
     SELECT
-      listings_latest_src_28000.user_id AS listing__user
+      sma_28014_cte.user AS listing__user
       , AVG(bookings_source_src_28000.booking_value) AS listing__user__average_booking_value
     FROM ***************************.fct_bookings bookings_source_src_28000
     LEFT OUTER JOIN
-      ***************************.dim_listings_latest listings_latest_src_28000
+      sma_28014_cte sma_28014_cte
     ON
-      bookings_source_src_28000.listing_id = listings_latest_src_28000.listing_id
+      bookings_source_src_28000.listing_id = sma_28014_cte.listing
     GROUP BY
-      listings_latest_src_28000.user_id
-  ) subq_27
+      sma_28014_cte.user
+  ) subq_26
   ON
-    subq_17.user = subq_27.listing__user
-) subq_28
+    sma_28014_cte.user = subq_26.listing__user
+) subq_27
 WHERE user__listing__user__average_booking_value > 1

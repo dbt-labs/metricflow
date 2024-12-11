@@ -132,7 +132,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         self._current_left_node: DataflowPlanNode = left_branch_node
 
     def _log_visit_node_type(self, node: DataflowPlanNode) -> None:
-        logger.debug(LazyFormat(lambda: f"Visiting {node}"))
+        logger.debug(lambda: f"Visiting {node.node_id}")
 
     def _log_combine_failure(
         self,
@@ -142,8 +142,10 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
     ) -> None:
         logger.debug(
             LazyFormat(
-                lambda: f"Because {combine_failure_reason}, unable to combine nodes "
-                f"left_node={left_node} right_node={right_node}",
+                "Unable to combine nodes",
+                combine_failure_reason=combine_failure_reason,
+                left_node=left_node.node_id,
+                right_node=right_node.node_id,
             )
         )
 
@@ -154,7 +156,12 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         combined_node: DataflowPlanNode,
     ) -> None:
         logger.debug(
-            LazyFormat(lambda: f"Combined left_node={left_node} right_node={right_node} combined_node: {combined_node}")
+            LazyFormat(
+                "Successfully combined nodes",
+                left_node=left_node.node_id,
+                right_node=right_node.node_id,
+                combined_node=combined_node.node_id,
+            )
         )
 
     def _combine_parent_branches(self, current_right_node: DataflowPlanNode) -> Optional[Sequence[DataflowPlanNode]]:

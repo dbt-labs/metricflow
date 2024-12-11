@@ -3,15 +3,24 @@ test_filename: test_derived_metric_rendering.py
 sql_engine: Redshift
 ---
 -- Compute Metrics via Expressions
+WITH sma_28009_cte AS (
+  -- Read Elements From Semantic Model 'bookings_source'
+  -- Metric Time Dimension 'ds'
+  SELECT
+    DATE_TRUNC('day', ds) AS metric_time__day
+    , booking_value
+  FROM ***************************.fct_bookings bookings_source_src_28000
+)
+
 SELECT
-  metric_time__day
+  metric_time__day AS metric_time__day
   , booking_fees - booking_fees_start_of_month AS booking_fees_since_start_of_month
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_24.metric_time__day, subq_30.metric_time__day) AS metric_time__day
+    COALESCE(subq_24.metric_time__day, subq_29.metric_time__day) AS metric_time__day
     , MAX(subq_24.booking_fees_start_of_month) AS booking_fees_start_of_month
-    , MAX(subq_30.booking_fees) AS booking_fees
+    , MAX(subq_29.booking_fees) AS booking_fees
   FROM (
     -- Join to Time Spine Dataset
     SELECT
@@ -24,17 +33,16 @@ FROM (
         metric_time__day
         , booking_value * 0.05 AS booking_fees_start_of_month
       FROM (
-        -- Read Elements From Semantic Model 'bookings_source'
-        -- Metric Time Dimension 'ds'
+        -- Read From CTE For node_id=sma_28009
         -- Pass Only Elements: ['booking_value', 'metric_time__day']
         -- Aggregate Measures
         -- Compute Metrics via Expressions
         SELECT
-          DATE_TRUNC('day', ds) AS metric_time__day
+          metric_time__day
           , SUM(booking_value) AS booking_value
-        FROM ***************************.fct_bookings bookings_source_src_28000
+        FROM sma_28009_cte sma_28009_cte
         GROUP BY
-          DATE_TRUNC('day', ds)
+          metric_time__day
       ) subq_20
     ) subq_21
     ON
@@ -46,21 +54,20 @@ FROM (
       metric_time__day
       , booking_value * 0.05 AS booking_fees
     FROM (
-      -- Read Elements From Semantic Model 'bookings_source'
-      -- Metric Time Dimension 'ds'
+      -- Read From CTE For node_id=sma_28009
       -- Pass Only Elements: ['booking_value', 'metric_time__day']
       -- Aggregate Measures
       -- Compute Metrics via Expressions
       SELECT
-        DATE_TRUNC('day', ds) AS metric_time__day
+        metric_time__day
         , SUM(booking_value) AS booking_value
-      FROM ***************************.fct_bookings bookings_source_src_28000
+      FROM sma_28009_cte sma_28009_cte
       GROUP BY
-        DATE_TRUNC('day', ds)
-    ) subq_29
-  ) subq_30
+        metric_time__day
+    ) subq_28
+  ) subq_29
   ON
-    subq_24.metric_time__day = subq_30.metric_time__day
+    subq_24.metric_time__day = subq_29.metric_time__day
   GROUP BY
-    COALESCE(subq_24.metric_time__day, subq_30.metric_time__day)
-) subq_31
+    COALESCE(subq_24.metric_time__day, subq_29.metric_time__day)
+) subq_30
