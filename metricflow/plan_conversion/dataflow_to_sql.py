@@ -139,7 +139,7 @@ from metricflow.sql.sql_plan import (
     SqlCteNode,
     SqlJoinDescription,
     SqlOrderByDescription,
-    SqlQueryPlan,
+    SqlPlan,
     SqlQueryPlanNode,
     SqlSelectColumn,
     SqlSelectStatementNode,
@@ -327,7 +327,7 @@ class DataflowToSqlQueryPlanConverter:
 
         return ConvertToSqlPlanResult(
             instance_set=data_set.instance_set,
-            sql_plan=SqlQueryPlan(render_node=sql_node, plan_id=sql_query_plan_id),
+            sql_plan=SqlPlan(render_node=sql_node, plan_id=sql_query_plan_id),
         )
 
     def _get_nodes_to_convert_to_cte(

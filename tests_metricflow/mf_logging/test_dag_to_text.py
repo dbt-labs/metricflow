@@ -16,7 +16,7 @@ from metricflow.sql.sql_exprs import (
     SqlStringExpression,
 )
 from metricflow.sql.sql_plan import (
-    SqlQueryPlan,
+    SqlPlan,
     SqlSelectColumn,
     SqlSelectStatementNode,
     SqlTableNode,
@@ -32,7 +32,7 @@ def test_multithread_dag_to_text() -> None:
 
     # Using a nested structure w/ small max_line_length to force recursion / cover recursive width tracking.
     dag_to_text_formatter = MetricFlowDagTextFormatter(max_width=1)
-    dag = SqlQueryPlan(
+    dag = SqlPlan(
         plan_id=DagId("plan"),
         render_node=SqlSelectStatementNode.create(
             description="test",
