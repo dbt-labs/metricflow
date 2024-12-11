@@ -241,13 +241,7 @@ def test_cumulative_metric_grain_to_date(
     """Tests rendering a query against a grain_to_date cumulative metric."""
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec(element_name="revenue_mtd"),),
-        time_dimension_specs=(
-            TimeDimensionSpec(
-                element_name="ds",
-                entity_links=(),
-                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
-            ),
-        ),
+        time_dimension_specs=(MTD_SPEC_DAY,),
     )
 
     render_and_check(
