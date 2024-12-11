@@ -64,7 +64,7 @@ def test_optimization_level(
                 sql_optimization_level=optimization_level,
             )
         )
-        results[optimization_level.value] = explain_result.rendered_sql_without_descriptions.sql
+        results[optimization_level.value] = explain_result.sql_statement.without_descriptions.sql
 
     assert_str_snapshot_equal(
         request=request,

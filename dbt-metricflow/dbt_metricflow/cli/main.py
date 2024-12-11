@@ -298,7 +298,7 @@ def query(
     if explain:
         assert explain_result
         sql = (
-            explain_result.rendered_sql_without_descriptions.sql
+            explain_result.sql_statement.without_descriptions.sql
             if not show_sql_descriptions
             else explain_result.sql_statement.sql
         )

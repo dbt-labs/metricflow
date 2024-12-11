@@ -51,6 +51,19 @@ class SqlStatement:
     sql: str
     bind_parameter_set: SqlBindParameterSet
 
+    @property
+    def without_descriptions(self) -> SqlStatement:
+        """Return the SQL query without the inline descriptions."""
+        return SqlStatement(
+            sql="\n".join(
+                filter(
+                    lambda line: not line.strip().startswith("--"),
+                    self.sql.split("\n"),
+                )
+            ),
+            bind_parameter_set=self.bind_parameter_set,
+        )
+
 
 @dataclass(frozen=True)
 class TaskExecutionError(Exception):
