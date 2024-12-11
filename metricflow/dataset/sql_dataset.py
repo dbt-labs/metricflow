@@ -5,11 +5,12 @@ from typing import List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.references import SemanticModelReference
 from metricflow_semantics.assert_one_arg import assert_exactly_one_arg_set
-from metricflow_semantics.instances import EntityInstance, InstanceSet, TimeDimensionInstance
+from metricflow_semantics.instances import EntityInstance, InstanceSet, MdoInstance, TimeDimensionInstance
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.specs.column_assoc import ColumnAssociation
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
+from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from typing_extensions import override
 
@@ -144,7 +145,7 @@ class SqlDataSet(DataSet):
         return instances_to_return
 
     def instance_for_time_dimension(self, time_dimension_spec: TimeDimensionSpec) -> TimeDimensionInstance:
-        """Given the name of the time dimension, return the instance associated with it in the data set."""
+        """Given a time dimension spec, return the instance associated with it in the data set."""
         instances = self.instances_for_time_dimensions((time_dimension_spec,))
         if not len(instances) == 1:
             raise RuntimeError(
@@ -152,6 +153,32 @@ class SqlDataSet(DataSet):
                 f"Instances: {instances}"
             )
         return instances[0]
+
+    def instance_for_spec(self, spec: InstanceSpec) -> MdoInstance:
+        """Given a spec, return the instance associated with it in the data set."""
+        instances = self.instance_set.as_tuple
+        for instance in instances:
+            if instance.spec == spec:
+                return instance
+        raise RuntimeError(
+            str(LazyFormat("Did not find instance matching spec in dataset.", spec=spec, instances=instances))
+        )
+
+    def instance_from_time_dimension_grain_and_date_part(
+        self, time_dimension_spec: TimeDimensionSpec
+    ) -> TimeDimensionInstance:
+        """Find instance in dataset that matches the grain and date part of the given time dimension spec."""
+        for time_dimension_instance in self.instance_set.time_dimension_instances:
+            if (
+                time_dimension_instance.spec.time_granularity == time_dimension_spec.time_granularity
+                and time_dimension_instance.spec.date_part == time_dimension_spec.date_part
+            ):
+                return time_dimension_instance
+
+        raise RuntimeError(
+            f"Did not find a time dimension instance with matching grain and date part for spec: {time_dimension_spec}\n"
+            f"Instances available: {self.instance_set.time_dimension_instances}"
+        )
 
     def column_association_for_time_dimension(self, time_dimension_spec: TimeDimensionSpec) -> ColumnAssociation:
         """Given the name of the time dimension, return the set of columns associated with it in the data set."""

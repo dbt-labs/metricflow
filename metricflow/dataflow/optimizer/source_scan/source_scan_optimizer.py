@@ -15,6 +15,7 @@ from metricflow.dataflow.dataflow_plan import (
 from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
 from metricflow.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
 from metricflow.dataflow.nodes.aggregate_measures import AggregateMeasuresNode
+from metricflow.dataflow.nodes.alias_specs import AliasSpecsNode
 from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
 from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
@@ -349,5 +350,9 @@ class SourceScanOptimizer(
         return self._default_base_output_handler(node)
 
     def visit_min_max_node(self, node: MinMaxNode) -> OptimizeBranchResult:  # noqa: D102
+        self._log_visit_node_type(node)
+        return self._default_base_output_handler(node)
+
+    def visit_alias_specs_node(self, node: AliasSpecsNode) -> OptimizeBranchResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)

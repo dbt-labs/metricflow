@@ -13,27 +13,27 @@ FROM (
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
-    subq_18.ds AS metric_time__day
-    , COUNT(DISTINCT subq_16.bookers) AS every_2_days_bookers_2_days_ago
-  FROM ***************************.mf_time_spine subq_18
+    time_spine_src_28006.ds AS metric_time__day
+    , COUNT(DISTINCT subq_17.bookers) AS every_2_days_bookers_2_days_ago
+  FROM ***************************.mf_time_spine time_spine_src_28006
   INNER JOIN (
     -- Join Self Over Time Range
     SELECT
-      subq_15.ds AS metric_time__day
+      subq_16.ds AS metric_time__day
       , bookings_source_src_28000.guest_id AS bookers
-    FROM ***************************.mf_time_spine subq_15
+    FROM ***************************.mf_time_spine subq_16
     INNER JOIN
       ***************************.fct_bookings bookings_source_src_28000
     ON
       (
-        DATE_TRUNC('day', bookings_source_src_28000.ds) <= subq_15.ds
+        DATE_TRUNC('day', bookings_source_src_28000.ds) <= subq_16.ds
       ) AND (
-        DATE_TRUNC('day', bookings_source_src_28000.ds) > DATEADD(day, -2, subq_15.ds)
+        DATE_TRUNC('day', bookings_source_src_28000.ds) > DATEADD(day, -2, subq_16.ds)
       )
-  ) subq_16
+  ) subq_17
   ON
-    DATEADD(day, -2, subq_18.ds) = subq_16.metric_time__day
-  WHERE subq_18.ds BETWEEN '2019-12-19' AND '2020-01-02'
+    DATEADD(day, -2, time_spine_src_28006.ds) = subq_17.metric_time__day
+  WHERE time_spine_src_28006.ds BETWEEN '2019-12-19' AND '2020-01-02'
   GROUP BY
-    subq_18.ds
-) subq_23
+    time_spine_src_28006.ds
+) subq_25

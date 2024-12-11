@@ -4,19 +4,51 @@ sql_engine: BigQuery
 ---
 -- Compute Metrics via Expressions
 SELECT
-  subq_9.metric_time__day
-  , COALESCE(subq_9.bookers, 0) AS every_two_days_bookers_fill_nulls_with_0
+  subq_10.metric_time__day
+  , COALESCE(subq_10.bookers, 0) AS every_two_days_bookers_fill_nulls_with_0
 FROM (
   -- Join to Time Spine Dataset
   SELECT
-    subq_7.metric_time__day AS metric_time__day
+    subq_9.metric_time__day AS metric_time__day
     , subq_6.bookers AS bookers
   FROM (
-    -- Read From Time Spine 'mf_time_spine'
+    -- Pass Only Elements: ['metric_time__day',]
     SELECT
-      subq_8.ds AS metric_time__day
-    FROM ***************************.mf_time_spine subq_8
-  ) subq_7
+      subq_8.metric_time__day
+    FROM (
+      -- Change Column Aliases
+      SELECT
+        subq_7.ds__day AS metric_time__day
+        , subq_7.ds__week
+        , subq_7.ds__month
+        , subq_7.ds__quarter
+        , subq_7.ds__year
+        , subq_7.ds__extract_year
+        , subq_7.ds__extract_quarter
+        , subq_7.ds__extract_month
+        , subq_7.ds__extract_day
+        , subq_7.ds__extract_dow
+        , subq_7.ds__extract_doy
+        , subq_7.ds__martian_day
+      FROM (
+        -- Read From Time Spine 'mf_time_spine'
+        SELECT
+          time_spine_src_28006.ds AS ds__day
+          , DATETIME_TRUNC(time_spine_src_28006.ds, isoweek) AS ds__week
+          , DATETIME_TRUNC(time_spine_src_28006.ds, month) AS ds__month
+          , DATETIME_TRUNC(time_spine_src_28006.ds, quarter) AS ds__quarter
+          , DATETIME_TRUNC(time_spine_src_28006.ds, year) AS ds__year
+          , EXTRACT(year FROM time_spine_src_28006.ds) AS ds__extract_year
+          , EXTRACT(quarter FROM time_spine_src_28006.ds) AS ds__extract_quarter
+          , EXTRACT(month FROM time_spine_src_28006.ds) AS ds__extract_month
+          , EXTRACT(day FROM time_spine_src_28006.ds) AS ds__extract_day
+          , IF(EXTRACT(dayofweek FROM time_spine_src_28006.ds) = 1, 7, EXTRACT(dayofweek FROM time_spine_src_28006.ds) - 1) AS ds__extract_dow
+          , EXTRACT(dayofyear FROM time_spine_src_28006.ds) AS ds__extract_doy
+          , time_spine_src_28006.martian_day AS ds__martian_day
+        FROM ***************************.mf_time_spine time_spine_src_28006
+      ) subq_7
+    ) subq_8
+  ) subq_9
   LEFT OUTER JOIN (
     -- Aggregate Measures
     SELECT
@@ -341,5 +373,5 @@ FROM (
       metric_time__day
   ) subq_6
   ON
-    subq_7.metric_time__day = subq_6.metric_time__day
-) subq_9
+    subq_9.metric_time__day = subq_6.metric_time__day
+) subq_10

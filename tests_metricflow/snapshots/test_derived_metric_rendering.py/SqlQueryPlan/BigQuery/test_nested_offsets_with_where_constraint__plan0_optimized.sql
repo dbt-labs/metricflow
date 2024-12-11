@@ -14,9 +14,9 @@ FROM (
   FROM (
     -- Join to Time Spine Dataset
     SELECT
-      subq_23.ds AS metric_time__day
-      , subq_21.bookings_offset_once AS bookings_offset_once
-    FROM ***************************.mf_time_spine subq_23
+      time_spine_src_28006.ds AS metric_time__day
+      , subq_24.bookings_offset_once AS bookings_offset_once
+    FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN (
       -- Compute Metrics via Expressions
       SELECT
@@ -28,9 +28,9 @@ FROM (
         -- Aggregate Measures
         -- Compute Metrics via Expressions
         SELECT
-          subq_16.ds AS metric_time__day
-          , SUM(subq_14.bookings) AS bookings
-        FROM ***************************.mf_time_spine subq_16
+          time_spine_src_28006.ds AS metric_time__day
+          , SUM(subq_16.bookings) AS bookings
+        FROM ***************************.mf_time_spine time_spine_src_28006
         INNER JOIN (
           -- Read Elements From Semantic Model 'bookings_source'
           -- Metric Time Dimension 'ds'
@@ -38,15 +38,15 @@ FROM (
             DATETIME_TRUNC(ds, day) AS metric_time__day
             , 1 AS bookings
           FROM ***************************.fct_bookings bookings_source_src_28000
-        ) subq_14
+        ) subq_16
         ON
-          DATE_SUB(CAST(subq_16.ds AS DATETIME), INTERVAL 5 day) = subq_14.metric_time__day
+          DATE_SUB(CAST(time_spine_src_28006.ds AS DATETIME), INTERVAL 5 day) = subq_16.metric_time__day
         GROUP BY
           metric_time__day
-      ) subq_20
-    ) subq_21
+      ) subq_23
+    ) subq_24
     ON
-      DATE_SUB(CAST(subq_23.ds AS DATETIME), INTERVAL 2 day) = subq_21.metric_time__day
-  ) subq_24
+      DATE_SUB(CAST(time_spine_src_28006.ds AS DATETIME), INTERVAL 2 day) = subq_24.metric_time__day
+  ) subq_28
   WHERE metric_time__day = '2020-01-12' or metric_time__day = '2020-01-13'
-) subq_25
+) subq_29

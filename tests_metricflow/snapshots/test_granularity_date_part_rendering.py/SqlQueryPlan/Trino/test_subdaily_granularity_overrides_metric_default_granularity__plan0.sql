@@ -4,19 +4,51 @@ sql_engine: Trino
 ---
 -- Compute Metrics via Expressions
 SELECT
-  subq_6.metric_time__hour
-  , subq_6.archived_users AS subdaily_join_to_time_spine_metric
+  subq_7.metric_time__hour
+  , subq_7.archived_users AS subdaily_join_to_time_spine_metric
 FROM (
   -- Join to Time Spine Dataset
   SELECT
-    subq_4.metric_time__hour AS metric_time__hour
+    subq_6.metric_time__hour AS metric_time__hour
     , subq_3.archived_users AS archived_users
   FROM (
-    -- Read From Time Spine 'mf_time_spine_hour'
+    -- Pass Only Elements: ['metric_time__hour',]
     SELECT
-      subq_5.ts AS metric_time__hour
-    FROM ***************************.mf_time_spine_hour subq_5
-  ) subq_4
+      subq_5.metric_time__hour
+    FROM (
+      -- Change Column Aliases
+      SELECT
+        subq_4.ts__hour AS metric_time__hour
+        , subq_4.ts__day
+        , subq_4.ts__week
+        , subq_4.ts__month
+        , subq_4.ts__quarter
+        , subq_4.ts__year
+        , subq_4.ts__extract_year
+        , subq_4.ts__extract_quarter
+        , subq_4.ts__extract_month
+        , subq_4.ts__extract_day
+        , subq_4.ts__extract_dow
+        , subq_4.ts__extract_doy
+      FROM (
+        -- Read From Time Spine 'mf_time_spine_hour'
+        SELECT
+          time_spine_src_28005.ts AS ts__hour
+          , DATE_TRUNC('day', time_spine_src_28005.ts) AS ts__day
+          , DATE_TRUNC('week', time_spine_src_28005.ts) AS ts__week
+          , DATE_TRUNC('month', time_spine_src_28005.ts) AS ts__month
+          , DATE_TRUNC('quarter', time_spine_src_28005.ts) AS ts__quarter
+          , DATE_TRUNC('year', time_spine_src_28005.ts) AS ts__year
+          , EXTRACT(year FROM time_spine_src_28005.ts) AS ts__extract_year
+          , EXTRACT(quarter FROM time_spine_src_28005.ts) AS ts__extract_quarter
+          , EXTRACT(month FROM time_spine_src_28005.ts) AS ts__extract_month
+          , EXTRACT(day FROM time_spine_src_28005.ts) AS ts__extract_day
+          , EXTRACT(DAY_OF_WEEK FROM time_spine_src_28005.ts) AS ts__extract_dow
+          , EXTRACT(doy FROM time_spine_src_28005.ts) AS ts__extract_doy
+        FROM ***************************.mf_time_spine_hour time_spine_src_28005
+      ) subq_4
+    ) subq_5
+  ) subq_6
   LEFT OUTER JOIN (
     -- Aggregate Measures
     SELECT
@@ -410,5 +442,5 @@ FROM (
       subq_2.metric_time__hour
   ) subq_3
   ON
-    subq_4.metric_time__hour = subq_3.metric_time__hour
-) subq_6
+    subq_6.metric_time__hour = subq_3.metric_time__hour
+) subq_7
