@@ -36,7 +36,7 @@ from metricflow.execution.execution_plan import (
     ExecutionPlan,
     SelectSqlQueryToDataTableTask,
     SelectSqlQueryToTableTask,
-    SqlQuery,
+    SqlStatement,
 )
 from metricflow.plan_conversion.convert_to_sql_plan import ConvertToSqlPlanResult
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
@@ -91,7 +91,7 @@ class DataflowToExecutionPlanConverter(DataflowPlanNodeVisitor[ConvertToExecutio
             leaf_tasks=(
                 SelectSqlQueryToDataTableTask.create(
                     sql_client=self._sql_client,
-                    sql_query=SqlQuery(render_sql_result.sql, render_sql_result.bind_parameter_set),
+                    sql_query=SqlStatement(render_sql_result.sql, render_sql_result.bind_parameter_set),
                 ),
             )
         )
@@ -109,7 +109,7 @@ class DataflowToExecutionPlanConverter(DataflowPlanNodeVisitor[ConvertToExecutio
             leaf_tasks=(
                 SelectSqlQueryToTableTask.create(
                     sql_client=self._sql_client,
-                    sql_query=SqlQuery(
+                    sql_query=SqlStatement(
                         sql_query=render_sql_result.sql,
                         bind_parameter_set=render_sql_result.bind_parameter_set,
                     ),

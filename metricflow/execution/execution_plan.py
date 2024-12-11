@@ -30,7 +30,7 @@ class ExecutionPlanTask(DagNode["ExecutionPlanTask"], Visitable, ABC):
         sql_query: If this runs a SQL query, return the associated SQL.
     """
 
-    sql_query: Optional[SqlQuery]
+    sql_query: Optional[SqlStatement]
 
     @abstractmethod
     def execute(self) -> TaskExecutionResult:
@@ -44,8 +44,8 @@ class ExecutionPlanTask(DagNode["ExecutionPlanTask"], Visitable, ABC):
 
 
 @dataclass(frozen=True)
-class SqlQuery:
-    """A SQL query that can be run along with bind parameters."""
+class SqlStatement:
+    """Encapsulates a SQL statement along with the bind parameters that should be used."""
 
     # This field will be renamed as it is confusing given the class name.
     sql_query: str
@@ -90,7 +90,7 @@ class SelectSqlQueryToDataTableTask(ExecutionPlanTask):
     @staticmethod
     def create(  # noqa: D102
         sql_client: SqlClient,
-        sql_query: SqlQuery,
+        sql_query: SqlStatement,
         parent_nodes: Sequence[ExecutionPlanTask] = (),
     ) -> SelectSqlQueryToDataTableTask:
         return SelectSqlQueryToDataTableTask(
@@ -154,7 +154,7 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
     @staticmethod
     def create(  # noqa: D102
         sql_client: SqlClient,
-        sql_query: SqlQuery,
+        sql_query: SqlStatement,
         output_table: SqlTable,
         parent_nodes: Sequence[ExecutionPlanTask] = (),
     ) -> SelectSqlQueryToTableTask:

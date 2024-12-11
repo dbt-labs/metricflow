@@ -51,7 +51,7 @@ from metricflow.execution.convert_to_execution_plan import ConvertToExecutionPla
 from metricflow.execution.dataflow_to_execution import (
     DataflowToExecutionPlanConverter,
 )
-from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
+from metricflow.execution.execution_plan import ExecutionPlan, SqlStatement
 from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
@@ -177,7 +177,7 @@ class MetricFlowExplainResult:
     output_table: Optional[SqlTable] = None
 
     @property
-    def rendered_sql(self) -> SqlQuery:
+    def rendered_sql(self) -> SqlStatement:
         """Return the SQL query that would be run for the given query."""
         execution_plan = self.execution_plan
         if len(execution_plan.tasks) != 1:
@@ -194,10 +194,10 @@ class MetricFlowExplainResult:
         return sql_query
 
     @property
-    def rendered_sql_without_descriptions(self) -> SqlQuery:
+    def rendered_sql_without_descriptions(self) -> SqlStatement:
         """Return the SQL query without the inline descriptions."""
         sql_query = self.rendered_sql
-        return SqlQuery(
+        return SqlStatement(
             sql_query="\n".join(
                 filter(
                     lambda line: not line.strip().startswith("--"),
