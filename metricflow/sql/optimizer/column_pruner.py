@@ -5,9 +5,9 @@ import logging
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from typing_extensions import override
 
+from metricflow.sql.optimizer.required_column_aliases import SqlMapRequiredColumnAliasesVisitor
 from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
 from metricflow.sql.optimizer.tag_column_aliases import NodeToColumnAliasMapping
-from metricflow.sql.optimizer.tag_required_column_aliases import SqlMapRequiredColumnAliasesVisitor
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlCteNode,
