@@ -3,15 +3,24 @@ test_filename: test_fill_nulls_with_rendering.py
 sql_engine: Redshift
 ---
 -- Compute Metrics via Expressions
+WITH sma_28009_cte AS (
+  -- Read Elements From Semantic Model 'bookings_source'
+  -- Metric Time Dimension 'ds'
+  SELECT
+    DATE_TRUNC('day', ds) AS metric_time__day
+    , 1 AS bookings
+  FROM ***************************.fct_bookings bookings_source_src_28000
+)
+
 SELECT
-  metric_time__day
+  metric_time__day AS metric_time__day
   , bookings_fill_nulls_with_0 - bookings_2_weeks_ago AS bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_24.metric_time__day, subq_32.metric_time__day) AS metric_time__day
+    COALESCE(subq_24.metric_time__day, subq_31.metric_time__day) AS metric_time__day
     , COALESCE(MAX(subq_24.bookings_fill_nulls_with_0), 0) AS bookings_fill_nulls_with_0
-    , MAX(subq_32.bookings_2_weeks_ago) AS bookings_2_weeks_ago
+    , MAX(subq_31.bookings_2_weeks_ago) AS bookings_2_weeks_ago
   FROM (
     -- Compute Metrics via Expressions
     SELECT
@@ -24,19 +33,13 @@ FROM (
         , subq_20.bookings AS bookings
       FROM ***************************.mf_time_spine subq_22
       LEFT OUTER JOIN (
+        -- Read From CTE For node_id=sma_28009
+        -- Pass Only Elements: ['bookings', 'metric_time__day']
         -- Aggregate Measures
         SELECT
           metric_time__day
           , SUM(bookings) AS bookings
-        FROM (
-          -- Read Elements From Semantic Model 'bookings_source'
-          -- Metric Time Dimension 'ds'
-          -- Pass Only Elements: ['bookings', 'metric_time__day']
-          SELECT
-            DATE_TRUNC('day', ds) AS metric_time__day
-            , 1 AS bookings
-          FROM ***************************.fct_bookings bookings_source_src_28000
-        ) subq_19
+        FROM sma_28009_cte sma_28009_cte
         GROUP BY
           metric_time__day
       ) subq_20
@@ -50,24 +53,18 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      subq_28.ds AS metric_time__day
-      , SUM(subq_26.bookings) AS bookings_2_weeks_ago
-    FROM ***************************.mf_time_spine subq_28
-    INNER JOIN (
-      -- Read Elements From Semantic Model 'bookings_source'
-      -- Metric Time Dimension 'ds'
-      SELECT
-        DATE_TRUNC('day', ds) AS metric_time__day
-        , 1 AS bookings
-      FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_26
+      subq_27.ds AS metric_time__day
+      , SUM(sma_28009_cte.bookings) AS bookings_2_weeks_ago
+    FROM ***************************.mf_time_spine subq_27
+    INNER JOIN
+      sma_28009_cte sma_28009_cte
     ON
-      DATEADD(day, -14, subq_28.ds) = subq_26.metric_time__day
+      DATEADD(day, -14, subq_27.ds) = sma_28009_cte.metric_time__day
     GROUP BY
-      subq_28.ds
-  ) subq_32
+      subq_27.ds
+  ) subq_31
   ON
-    subq_24.metric_time__day = subq_32.metric_time__day
+    subq_24.metric_time__day = subq_31.metric_time__day
   GROUP BY
-    COALESCE(subq_24.metric_time__day, subq_32.metric_time__day)
-) subq_33
+    COALESCE(subq_24.metric_time__day, subq_31.metric_time__day)
+) subq_32

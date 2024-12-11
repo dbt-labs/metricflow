@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from collections import defaultdict
 from typing import Dict, FrozenSet, Mapping, Sequence, Set
 
@@ -7,6 +8,8 @@ from typing_extensions import override
 
 from metricflow.dataflow.dataflow_plan import DataflowPlan, DataflowPlanNode
 from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitorWithDefaultHandler
+
+logger = logging.getLogger(__name__)
 
 
 class DataflowPlanAnalyzer:
