@@ -11,7 +11,7 @@ from metricflow.sql.sql_plan import (
     SqlJoinDescription,
     SqlOrderByDescription,
     SqlPlanNode,
-    SqlQueryPlanNodeVisitor,
+    SqlPlanNodeVisitor,
     SqlSelectColumn,
     SqlSelectQueryFromClauseNode,
     SqlSelectStatementNode,
@@ -21,7 +21,7 @@ from metricflow.sql.sql_plan import (
 logger = logging.getLogger(__name__)
 
 
-class SqlTableAliasSimplifierVisitor(SqlQueryPlanNodeVisitor[SqlPlanNode]):
+class SqlTableAliasSimplifierVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
     """Visits the SQL query plan to see if table aliases can be omitted when rendering column references."""
 
     @override

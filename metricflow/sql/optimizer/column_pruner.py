@@ -12,7 +12,7 @@ from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlCteNode,
     SqlPlanNode,
-    SqlQueryPlanNodeVisitor,
+    SqlPlanNodeVisitor,
     SqlSelectQueryFromClauseNode,
     SqlSelectStatementNode,
     SqlTableNode,
@@ -21,7 +21,7 @@ from metricflow.sql.sql_plan import (
 logger = logging.getLogger(__name__)
 
 
-class SqlColumnPrunerVisitor(SqlQueryPlanNodeVisitor[SqlPlanNode]):
+class SqlColumnPrunerVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
     """Removes unnecessary columns from SELECT statements in the SQL query plan.
 
     This requires a set of tagged column aliases that should be kept for each SQL node.

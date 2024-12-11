@@ -24,7 +24,7 @@ from metricflow.sql.sql_plan import (
     SqlJoinDescription,
     SqlOrderByDescription,
     SqlPlanNode,
-    SqlQueryPlanNodeVisitor,
+    SqlPlanNodeVisitor,
     SqlSelectColumn,
     SqlSelectQueryFromClauseNode,
     SqlSelectStatementNode,
@@ -85,7 +85,7 @@ class RewritableSqlClauses:
         )
 
 
-class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlPlanNode]):
+class SqlRewritingSubQueryReducerVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
     """Visits the SQL query plan to simplify sub-queries. On each visit, return a simplified node.
 
     Unlike SqlSubQueryReducerVisitor, this will re-write expressions to realize more reductions.
@@ -757,7 +757,7 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlPlanNode]):
         )
 
 
-class SqlGroupByRewritingVisitor(SqlQueryPlanNodeVisitor[SqlPlanNode]):
+class SqlGroupByRewritingVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
     """Re-writes the GROUP BY to use a SqlColumnAliasReferenceExpression."""
 
     @staticmethod

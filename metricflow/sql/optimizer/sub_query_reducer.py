@@ -13,7 +13,7 @@ from metricflow.sql.sql_plan import (
     SqlJoinDescription,
     SqlOrderByDescription,
     SqlPlanNode,
-    SqlQueryPlanNodeVisitor,
+    SqlPlanNodeVisitor,
     SqlSelectQueryFromClauseNode,
     SqlSelectStatementNode,
     SqlTableNode,
@@ -22,7 +22,7 @@ from metricflow.sql.sql_plan import (
 logger = logging.getLogger(__name__)
 
 
-class SqlSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlPlanNode]):
+class SqlSubQueryReducerVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
     """Visits the SQL query plan to simplify sub-queries. On each visit, return a simplfied node."""
 
     def _reduce_parents(

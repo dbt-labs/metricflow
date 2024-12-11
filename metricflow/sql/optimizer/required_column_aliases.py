@@ -13,7 +13,7 @@ from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlCteNode,
     SqlPlanNode,
-    SqlQueryPlanNodeVisitor,
+    SqlPlanNodeVisitor,
     SqlSelectColumn,
     SqlSelectQueryFromClauseNode,
     SqlSelectStatementNode,
@@ -23,7 +23,7 @@ from metricflow.sql.sql_plan import (
 logger = logging.getLogger(__name__)
 
 
-class SqlMapRequiredColumnAliasesVisitor(SqlQueryPlanNodeVisitor[None]):
+class SqlMapRequiredColumnAliasesVisitor(SqlPlanNodeVisitor[None]):
     """To aid column pruning, traverse the SQL-query representation DAG and map the SELECT columns needed at each node.
 
     For example, the query:

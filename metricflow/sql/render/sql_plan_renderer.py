@@ -25,7 +25,7 @@ from metricflow.sql.sql_plan import (
     SqlOrderByDescription,
     SqlPlan,
     SqlPlanNode,
-    SqlQueryPlanNodeVisitor,
+    SqlPlanNodeVisitor,
     SqlSelectColumn,
     SqlSelectQueryFromClauseNode,
     SqlSelectStatementNode,
@@ -43,7 +43,7 @@ class SqlPlanRenderResult:  # noqa: D101
     bind_parameter_set: SqlBindParameterSet
 
 
-class SqlQueryPlanRenderer(SqlQueryPlanNodeVisitor[SqlPlanRenderResult], ABC):
+class SqlQueryPlanRenderer(SqlPlanNodeVisitor[SqlPlanRenderResult], ABC):
     """Renders SQL plans to a string."""
 
     def _render_node(self, node: SqlPlanNode) -> SqlPlanRenderResult:

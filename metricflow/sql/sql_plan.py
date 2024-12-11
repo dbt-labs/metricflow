@@ -34,7 +34,7 @@ class SqlPlanNode(DagNode["SqlPlanNode"], ABC):
     """
 
     @abstractmethod
-    def accept(self, visitor: SqlQueryPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:
+    def accept(self, visitor: SqlPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:
         """Called when a visitor needs to visit this node."""
         raise NotImplementedError
 
@@ -67,8 +67,8 @@ class SqlPlanNode(DagNode["SqlPlanNode"], ABC):
         raise NotImplementedError
 
 
-class SqlQueryPlanNodeVisitor(Generic[VisitorOutputT], ABC):
-    """An object that can be used to visit the nodes of an SQL query.
+class SqlPlanNodeVisitor(Generic[VisitorOutputT], ABC):
+    """An object that can be used to visit the nodes of an SQL plan.
 
     See similar visitor DataflowPlanVisitor.
     """
@@ -204,7 +204,7 @@ class SqlSelectStatementNode(SqlPlanNode):
             + (DisplayedProperty("distinct", self.distinct),)
         )
 
-    def accept(self, visitor: SqlQueryPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
+    def accept(self, visitor: SqlPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_select_statement_node(self)
 
     @property
@@ -268,7 +268,7 @@ class SqlTableNode(SqlPlanNode):
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
         return tuple(super().displayed_properties) + (DisplayedProperty("table_id", self.sql_table.sql),)
 
-    def accept(self, visitor: SqlQueryPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
+    def accept(self, visitor: SqlPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_table_node(self)
 
     @property
@@ -316,7 +316,7 @@ class SqlSelectQueryFromClauseNode(SqlPlanNode):
     def description(self) -> str:  # noqa: D102
         return "Read From a Select Query"
 
-    def accept(self, visitor: SqlQueryPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
+    def accept(self, visitor: SqlPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_query_from_clause_node(self)
 
     @property
@@ -357,7 +357,7 @@ class SqlCreateTableAsNode(SqlPlanNode):
         )
 
     @override
-    def accept(self, visitor: SqlQueryPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:
+    def accept(self, visitor: SqlPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:
         return visitor.visit_create_table_as_node(self)
 
     @property
@@ -439,7 +439,7 @@ class SqlCteNode(SqlPlanNode):
         )
 
     @override
-    def accept(self, visitor: SqlQueryPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:
+    def accept(self, visitor: SqlPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:
         return visitor.visit_cte_node(self)
 
     @property
