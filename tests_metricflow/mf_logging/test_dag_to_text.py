@@ -68,7 +68,7 @@ def test_multithread_dag_to_text() -> None:
 
     expected_thread_output = textwrap.dedent(
         """\
-        <SqlQueryPlan>
+        <SqlPlan>
             <SqlSelectStatementNode>
                 <!-- description =  -->
                 <!--   'test' -->
@@ -100,7 +100,7 @@ def test_multithread_dag_to_text() -> None:
                     <!--   'schema.table' -->
                 </SqlTableNode>
             </SqlSelectStatementNode>
-        </SqlQueryPlan>
+        </SqlPlan>
         """
     ).rstrip()
     assert thread_outputs == [expected_thread_output for _ in range(num_threads)]
