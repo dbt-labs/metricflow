@@ -4,23 +4,23 @@ sql_engine: BigQuery
 ---
 -- Compute Metrics via Expressions
 SELECT
-  subq_7.metric_time__hour
+  subq_8.metric_time__hour
   , archived_users AS subdaily_offset_grain_to_date_metric
 FROM (
   -- Compute Metrics via Expressions
   SELECT
-    subq_6.metric_time__hour
-    , subq_6.archived_users
+    subq_7.metric_time__hour
+    , subq_7.archived_users
   FROM (
     -- Aggregate Measures
     SELECT
-      subq_5.metric_time__hour
-      , SUM(subq_5.archived_users) AS archived_users
+      subq_6.metric_time__hour
+      , SUM(subq_6.archived_users) AS archived_users
     FROM (
       -- Pass Only Elements: ['archived_users', 'metric_time__hour']
       SELECT
-        subq_4.metric_time__hour
-        , subq_4.archived_users
+        subq_5.metric_time__hour
+        , subq_5.archived_users
       FROM (
         -- Join to Time Spine Dataset
         SELECT
@@ -209,17 +209,49 @@ FROM (
           , subq_1.metric_time__extract_day AS metric_time__extract_day
           , subq_1.metric_time__extract_dow AS metric_time__extract_dow
           , subq_1.metric_time__extract_doy AS metric_time__extract_doy
-          , subq_2.metric_time__hour AS metric_time__hour
+          , subq_4.metric_time__hour AS metric_time__hour
           , subq_1.user AS user
           , subq_1.home_state AS home_state
           , subq_1.user__home_state AS user__home_state
           , subq_1.archived_users AS archived_users
         FROM (
-          -- Read From Time Spine 'mf_time_spine_hour'
+          -- Pass Only Elements: ['metric_time__hour', 'metric_time__hour']
           SELECT
-            subq_3.ts AS metric_time__hour
-          FROM ***************************.mf_time_spine_hour subq_3
-        ) subq_2
+            subq_3.metric_time__hour
+          FROM (
+            -- Change Column Aliases
+            SELECT
+              subq_2.ts__hour AS metric_time__hour
+              , subq_2.ts__day
+              , subq_2.ts__week
+              , subq_2.ts__month
+              , subq_2.ts__quarter
+              , subq_2.ts__year
+              , subq_2.ts__extract_year
+              , subq_2.ts__extract_quarter
+              , subq_2.ts__extract_month
+              , subq_2.ts__extract_day
+              , subq_2.ts__extract_dow
+              , subq_2.ts__extract_doy
+            FROM (
+              -- Read From Time Spine 'mf_time_spine_hour'
+              SELECT
+                time_spine_src_28005.ts AS ts__hour
+                , DATETIME_TRUNC(time_spine_src_28005.ts, day) AS ts__day
+                , DATETIME_TRUNC(time_spine_src_28005.ts, isoweek) AS ts__week
+                , DATETIME_TRUNC(time_spine_src_28005.ts, month) AS ts__month
+                , DATETIME_TRUNC(time_spine_src_28005.ts, quarter) AS ts__quarter
+                , DATETIME_TRUNC(time_spine_src_28005.ts, year) AS ts__year
+                , EXTRACT(year FROM time_spine_src_28005.ts) AS ts__extract_year
+                , EXTRACT(quarter FROM time_spine_src_28005.ts) AS ts__extract_quarter
+                , EXTRACT(month FROM time_spine_src_28005.ts) AS ts__extract_month
+                , EXTRACT(day FROM time_spine_src_28005.ts) AS ts__extract_day
+                , IF(EXTRACT(dayofweek FROM time_spine_src_28005.ts) = 1, 7, EXTRACT(dayofweek FROM time_spine_src_28005.ts) - 1) AS ts__extract_dow
+                , EXTRACT(dayofyear FROM time_spine_src_28005.ts) AS ts__extract_doy
+              FROM ***************************.mf_time_spine_hour time_spine_src_28005
+            ) subq_2
+          ) subq_3
+        ) subq_4
         INNER JOIN (
           -- Metric Time Dimension 'archived_at'
           SELECT
@@ -599,10 +631,10 @@ FROM (
           ) subq_0
         ) subq_1
         ON
-          DATETIME_TRUNC(subq_2.metric_time__hour, hour) = subq_1.metric_time__hour
-      ) subq_4
-    ) subq_5
+          DATETIME_TRUNC(subq_4.metric_time__hour, hour) = subq_1.metric_time__hour
+      ) subq_5
+    ) subq_6
     GROUP BY
       metric_time__hour
-  ) subq_6
-) subq_7
+  ) subq_7
+) subq_8

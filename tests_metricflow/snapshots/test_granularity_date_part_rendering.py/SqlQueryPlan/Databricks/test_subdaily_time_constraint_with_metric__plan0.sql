@@ -4,25 +4,73 @@ sql_engine: Databricks
 ---
 -- Compute Metrics via Expressions
 SELECT
-  subq_8.metric_time__hour
-  , subq_8.archived_users AS subdaily_join_to_time_spine_metric
+  subq_10.metric_time__hour
+  , subq_10.archived_users AS subdaily_join_to_time_spine_metric
 FROM (
   -- Constrain Time Range to [2020-01-01T02:00:00, 2020-01-01T05:00:00]
   SELECT
-    subq_7.metric_time__hour
-    , subq_7.archived_users
+    subq_9.metric_time__hour
+    , subq_9.archived_users
   FROM (
     -- Join to Time Spine Dataset
     SELECT
-      subq_5.metric_time__hour AS metric_time__hour
+      subq_8.metric_time__hour AS metric_time__hour
       , subq_4.archived_users AS archived_users
     FROM (
-      -- Read From Time Spine 'mf_time_spine_hour'
+      -- Pass Only Elements: ['metric_time__hour',]
       SELECT
-        subq_6.ts AS metric_time__hour
-      FROM ***************************.mf_time_spine_hour subq_6
-      WHERE subq_6.ts BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
-    ) subq_5
+        subq_7.metric_time__hour
+      FROM (
+        -- Constrain Time Range to [2020-01-01T02:00:00, 2020-01-01T05:00:00]
+        SELECT
+          subq_6.ts__day
+          , subq_6.ts__week
+          , subq_6.ts__month
+          , subq_6.ts__quarter
+          , subq_6.ts__year
+          , subq_6.ts__extract_year
+          , subq_6.ts__extract_quarter
+          , subq_6.ts__extract_month
+          , subq_6.ts__extract_day
+          , subq_6.ts__extract_dow
+          , subq_6.ts__extract_doy
+          , subq_6.metric_time__hour
+        FROM (
+          -- Change Column Aliases
+          SELECT
+            subq_5.ts__hour AS metric_time__hour
+            , subq_5.ts__day
+            , subq_5.ts__week
+            , subq_5.ts__month
+            , subq_5.ts__quarter
+            , subq_5.ts__year
+            , subq_5.ts__extract_year
+            , subq_5.ts__extract_quarter
+            , subq_5.ts__extract_month
+            , subq_5.ts__extract_day
+            , subq_5.ts__extract_dow
+            , subq_5.ts__extract_doy
+          FROM (
+            -- Read From Time Spine 'mf_time_spine_hour'
+            SELECT
+              time_spine_src_28005.ts AS ts__hour
+              , DATE_TRUNC('day', time_spine_src_28005.ts) AS ts__day
+              , DATE_TRUNC('week', time_spine_src_28005.ts) AS ts__week
+              , DATE_TRUNC('month', time_spine_src_28005.ts) AS ts__month
+              , DATE_TRUNC('quarter', time_spine_src_28005.ts) AS ts__quarter
+              , DATE_TRUNC('year', time_spine_src_28005.ts) AS ts__year
+              , EXTRACT(year FROM time_spine_src_28005.ts) AS ts__extract_year
+              , EXTRACT(quarter FROM time_spine_src_28005.ts) AS ts__extract_quarter
+              , EXTRACT(month FROM time_spine_src_28005.ts) AS ts__extract_month
+              , EXTRACT(day FROM time_spine_src_28005.ts) AS ts__extract_day
+              , EXTRACT(DAYOFWEEK_ISO FROM time_spine_src_28005.ts) AS ts__extract_dow
+              , EXTRACT(doy FROM time_spine_src_28005.ts) AS ts__extract_doy
+            FROM ***************************.mf_time_spine_hour time_spine_src_28005
+          ) subq_5
+        ) subq_6
+        WHERE subq_6.metric_time__hour BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
+      ) subq_7
+    ) subq_8
     LEFT OUTER JOIN (
       -- Aggregate Measures
       SELECT
@@ -611,7 +659,7 @@ FROM (
         subq_3.metric_time__hour
     ) subq_4
     ON
-      subq_5.metric_time__hour = subq_4.metric_time__hour
-  ) subq_7
-  WHERE subq_7.metric_time__hour BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
-) subq_8
+      subq_8.metric_time__hour = subq_4.metric_time__hour
+  ) subq_9
+  WHERE subq_9.metric_time__hour BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
+) subq_10

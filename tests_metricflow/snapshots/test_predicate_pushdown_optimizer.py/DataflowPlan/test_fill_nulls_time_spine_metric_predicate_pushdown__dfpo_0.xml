@@ -128,6 +128,11 @@ docstring:
                         <!--       time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                         <!--     ),                                                                            -->
                         <!--   )                                                                               -->
+                        <!-- join_on_time_dimension_spec =                                                   -->
+                        <!--   TimeDimensionSpec(                                                            -->
+                        <!--     element_name='metric_time',                                                 -->
+                        <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                        <!--   )                                                                             -->
                         <!-- join_type = LEFT_OUTER -->
                         <AggregateMeasuresNode>
                             <!-- description = 'Aggregate Measures' -->
@@ -135,7 +140,7 @@ docstring:
                             <FilterElementsNode>
                                 <!-- description =                                                                       -->
                                 <!--   "Pass Only Elements: ['bookings', 'listing__country_latest', 'metric_time__day']" -->
-                                <!-- node_id = NodeId(id_str='pfe_5') -->
+                                <!-- node_id = NodeId(id_str='pfe_8') -->
                                 <!-- include_spec = MeasureSpec(element_name='bookings') -->
                                 <!-- include_spec =                                               -->
                                 <!--   DimensionSpec(                                             -->
@@ -151,9 +156,9 @@ docstring:
                                 <JoinOnEntitiesNode>
                                     <!-- description = 'Join Standard Outputs' -->
                                     <!-- node_id = NodeId(id_str='jso_2') -->
-                                    <!-- join0_for_node_id_pfe_4 =                                      -->
+                                    <!-- join0_for_node_id_pfe_7 =                                      -->
                                     <!--   JoinDescription(                                             -->
-                                    <!--     join_node=FilterElementsNode(node_id=pfe_4),               -->
+                                    <!--     join_node=FilterElementsNode(node_id=pfe_7),               -->
                                     <!--     join_on_entity=LinklessEntitySpec(element_name='listing'), -->
                                     <!--     join_type=LEFT_OUTER,                                      -->
                                     <!--   )                                                            -->
@@ -212,7 +217,7 @@ docstring:
                                     </WhereConstraintNode>
                                     <FilterElementsNode>
                                         <!-- description = "Pass Only Elements: ['country_latest', 'listing']" -->
-                                        <!-- node_id = NodeId(id_str='pfe_4') -->
+                                        <!-- node_id = NodeId(id_str='pfe_7') -->
                                         <!-- include_spec = DimensionSpec(element_name='country_latest') -->
                                         <!-- include_spec = LinklessEntitySpec(element_name='listing') -->
                                         <!-- distinct = False -->
@@ -295,6 +300,11 @@ docstring:
                         <!--       time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                         <!--     ),                                                                            -->
                         <!--   )                                                                               -->
+                        <!-- join_on_time_dimension_spec =                                                   -->
+                        <!--   TimeDimensionSpec(                                                            -->
+                        <!--     element_name='metric_time',                                                 -->
+                        <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                        <!--   )                                                                             -->
                         <!-- join_type = LEFT_OUTER -->
                         <AggregateMeasuresNode>
                             <!-- description = 'Aggregate Measures' -->
@@ -302,7 +312,7 @@ docstring:
                             <FilterElementsNode>
                                 <!-- description =                                                                       -->
                                 <!--   "Pass Only Elements: ['bookings', 'listing__country_latest', 'metric_time__day']" -->
-                                <!-- node_id = NodeId(id_str='pfe_7') -->
+                                <!-- node_id = NodeId(id_str='pfe_10') -->
                                 <!-- include_spec = MeasureSpec(element_name='bookings') -->
                                 <!-- include_spec =                                               -->
                                 <!--   DimensionSpec(                                             -->
@@ -360,9 +370,9 @@ docstring:
                                     <JoinOnEntitiesNode>
                                         <!-- description = 'Join Standard Outputs' -->
                                         <!-- node_id = NodeId(id_str='jso_3') -->
-                                        <!-- join0_for_node_id_pfe_6 =                                      -->
+                                        <!-- join0_for_node_id_pfe_9 =                                      -->
                                         <!--   JoinDescription(                                             -->
-                                        <!--     join_node=FilterElementsNode(node_id=pfe_6),               -->
+                                        <!--     join_node=FilterElementsNode(node_id=pfe_9),               -->
                                         <!--     join_on_entity=LinklessEntitySpec(element_name='listing'), -->
                                         <!--     join_type=LEFT_OUTER,                                      -->
                                         <!--   )                                                            -->
@@ -379,6 +389,14 @@ docstring:
                                             <!--       ),                                        -->
                                             <!--     ),                                          -->
                                             <!--   )                                             -->
+                                            <!-- join_on_time_dimension_spec =                 -->
+                                            <!--   TimeDimensionSpec(                          -->
+                                            <!--     element_name='metric_time',               -->
+                                            <!--     time_granularity=ExpandedTimeGranularity( -->
+                                            <!--       name='day',                             -->
+                                            <!--       base_granularity=DAY,                   -->
+                                            <!--     ),                                        -->
+                                            <!--   )                                           -->
                                             <!-- join_type = INNER -->
                                             <!-- offset_window = PydanticMetricTimeWindow(count=14, granularity='day') -->
                                             <MetricTimeDimensionTransformNode>
@@ -395,7 +413,7 @@ docstring:
                                         </JoinToTimeSpineNode>
                                         <FilterElementsNode>
                                             <!-- description = "Pass Only Elements: ['country_latest', 'listing']" -->
-                                            <!-- node_id = NodeId(id_str='pfe_6') -->
+                                            <!-- node_id = NodeId(id_str='pfe_9') -->
                                             <!-- include_spec = DimensionSpec(element_name='country_latest') -->
                                             <!-- include_spec = LinklessEntitySpec(element_name='listing') -->
                                             <!-- distinct = False -->

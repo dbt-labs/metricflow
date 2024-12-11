@@ -622,7 +622,7 @@ class PreJoinNodeProcessor:
         desired_linkable_specs: Sequence[LinkableInstanceSpec],
         nodes: Sequence[DataflowPlanNode],
         metric_time_dimension_reference: TimeDimensionReference,
-        time_spine_nodes: Sequence[MetricTimeDimensionTransformNode],
+        time_spine_metric_time_nodes: Sequence[MetricTimeDimensionTransformNode],
     ) -> List[DataflowPlanNode]:
         """Filters out many of the nodes that can't possibly be useful for joins to obtain the desired linkable specs.
 
@@ -668,7 +668,7 @@ class PreJoinNodeProcessor:
                 continue
 
             # Used for group-by-item-values queries.
-            if node in time_spine_nodes:
+            if node in time_spine_metric_time_nodes:
                 logger.debug(LazyFormat(lambda: f"Including {node} since it matches `time_spine_node`"))
                 relevant_nodes.append(node)
                 continue

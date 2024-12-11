@@ -11,6 +11,7 @@ if typing.TYPE_CHECKING:
     from metricflow.dataflow.dataflow_plan import DataflowPlanNode
     from metricflow.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
     from metricflow.dataflow.nodes.aggregate_measures import AggregateMeasuresNode
+    from metricflow.dataflow.nodes.alias_specs import AliasSpecsNode
     from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
     from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
     from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
@@ -121,6 +122,10 @@ class DataflowPlanNodeVisitor(Generic[VisitorOutputT], ABC):
     def visit_join_to_custom_granularity_node(self, node: JoinToCustomGranularityNode) -> VisitorOutputT:  # noqa: D102
         raise NotImplementedError
 
+    @abstractmethod
+    def visit_alias_specs_node(self, node: AliasSpecsNode) -> VisitorOutputT:  # noqa: D102
+        raise NotImplementedError
+
 
 class DataflowPlanNodeVisitorWithDefaultHandler(DataflowPlanNodeVisitor[VisitorOutputT], Generic[VisitorOutputT]):
     """Similar to `DataflowPlanNodeVisitor`, but with an abstract default handler that gets called for each node.
@@ -191,7 +196,7 @@ class DataflowPlanNodeVisitorWithDefaultHandler(DataflowPlanNodeVisitor[VisitorO
     @override
     def visit_metric_time_dimension_transform_node(  # noqa: D102
         self, node: MetricTimeDimensionTransformNode
-    ) -> VisitorOutputT:  # noqa: D102
+    ) -> VisitorOutputT:
         return self._default_handler(node)
 
     @override
@@ -212,4 +217,8 @@ class DataflowPlanNodeVisitorWithDefaultHandler(DataflowPlanNodeVisitor[VisitorO
 
     @override
     def visit_join_to_custom_granularity_node(self, node: JoinToCustomGranularityNode) -> VisitorOutputT:  # noqa: D102
+        return self._default_handler(node)
+
+    @override
+    def visit_alias_specs_node(self, node: AliasSpecsNode) -> VisitorOutputT:  # noqa: D102
         return self._default_handler(node)

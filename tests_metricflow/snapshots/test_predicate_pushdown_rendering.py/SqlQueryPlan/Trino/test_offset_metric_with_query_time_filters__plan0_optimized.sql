@@ -34,10 +34,10 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_33.metric_time__day, subq_44.metric_time__day) AS metric_time__day
-    , COALESCE(subq_33.listing__country_latest, subq_44.listing__country_latest) AS listing__country_latest
-    , MAX(subq_33.bookings) AS bookings
-    , MAX(subq_44.bookings_2_weeks_ago) AS bookings_2_weeks_ago
+    COALESCE(subq_34.metric_time__day, subq_46.metric_time__day) AS metric_time__day
+    , COALESCE(subq_34.listing__country_latest, subq_46.listing__country_latest) AS listing__country_latest
+    , MAX(subq_34.bookings) AS bookings
+    , MAX(subq_46.bookings_2_weeks_ago) AS bookings_2_weeks_ago
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['bookings', 'listing__country_latest', 'metric_time__day']
@@ -59,12 +59,12 @@ FROM (
         sma_28014_cte sma_28014_cte
       ON
         sma_28009_cte.listing = sma_28014_cte.listing
-    ) subq_29
+    ) subq_30
     WHERE booking__is_instant
     GROUP BY
       metric_time__day
       , listing__country_latest
-  ) subq_33
+  ) subq_34
   FULL OUTER JOIN (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['bookings', 'listing__country_latest', 'metric_time__day']
@@ -78,39 +78,39 @@ FROM (
       -- Join Standard Outputs
       SELECT
         sma_28014_cte.country_latest AS listing__country_latest
-        , subq_37.metric_time__day AS metric_time__day
-        , subq_37.booking__is_instant AS booking__is_instant
-        , subq_37.bookings AS bookings
+        , subq_39.metric_time__day AS metric_time__day
+        , subq_39.booking__is_instant AS booking__is_instant
+        , subq_39.bookings AS bookings
       FROM (
         -- Join to Time Spine Dataset
         SELECT
-          subq_36.ds AS metric_time__day
+          time_spine_src_28006.ds AS metric_time__day
           , sma_28009_cte.listing AS listing
           , sma_28009_cte.booking__is_instant AS booking__is_instant
           , sma_28009_cte.bookings AS bookings
-        FROM ***************************.mf_time_spine subq_36
+        FROM ***************************.mf_time_spine time_spine_src_28006
         INNER JOIN
           sma_28009_cte sma_28009_cte
         ON
-          DATE_ADD('day', -14, subq_36.ds) = sma_28009_cte.metric_time__day
-      ) subq_37
+          DATE_ADD('day', -14, time_spine_src_28006.ds) = sma_28009_cte.metric_time__day
+      ) subq_39
       LEFT OUTER JOIN
         sma_28014_cte sma_28014_cte
       ON
-        subq_37.listing = sma_28014_cte.listing
-    ) subq_40
+        subq_39.listing = sma_28014_cte.listing
+    ) subq_42
     WHERE booking__is_instant
     GROUP BY
       metric_time__day
       , listing__country_latest
-  ) subq_44
+  ) subq_46
   ON
     (
-      subq_33.listing__country_latest = subq_44.listing__country_latest
+      subq_34.listing__country_latest = subq_46.listing__country_latest
     ) AND (
-      subq_33.metric_time__day = subq_44.metric_time__day
+      subq_34.metric_time__day = subq_46.metric_time__day
     )
   GROUP BY
-    COALESCE(subq_33.metric_time__day, subq_44.metric_time__day)
-    , COALESCE(subq_33.listing__country_latest, subq_44.listing__country_latest)
-) subq_45
+    COALESCE(subq_34.metric_time__day, subq_46.metric_time__day)
+    , COALESCE(subq_34.listing__country_latest, subq_46.listing__country_latest)
+) subq_47

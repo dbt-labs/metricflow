@@ -18,9 +18,9 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_21.metric_time__day, subq_29.metric_time__day) AS metric_time__day
-    , MAX(subq_21.bookings) AS bookings
-    , MAX(subq_29.bookings_2_weeks_ago) AS bookings_2_weeks_ago
+    COALESCE(subq_22.metric_time__day, subq_31.metric_time__day) AS metric_time__day
+    , MAX(subq_22.bookings) AS bookings
+    , MAX(subq_31.bookings_2_weeks_ago) AS bookings_2_weeks_ago
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['bookings', 'metric_time__day']
@@ -35,11 +35,11 @@ FROM (
         metric_time__day
         , bookings
       FROM sma_28009_cte sma_28009_cte
-    ) subq_17
+    ) subq_18
     WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'
     GROUP BY
       metric_time__day
-  ) subq_21
+  ) subq_22
   FULL OUTER JOIN (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['bookings', 'metric_time__day']
@@ -51,20 +51,20 @@ FROM (
     FROM (
       -- Join to Time Spine Dataset
       SELECT
-        subq_24.ds AS metric_time__day
+        time_spine_src_28006.ds AS metric_time__day
         , sma_28009_cte.bookings AS bookings
-      FROM ***************************.mf_time_spine subq_24
+      FROM ***************************.mf_time_spine time_spine_src_28006
       INNER JOIN
         sma_28009_cte sma_28009_cte
       ON
-        DATE_ADD('day', -14, subq_24.ds) = sma_28009_cte.metric_time__day
-    ) subq_25
+        DATE_ADD('day', -14, time_spine_src_28006.ds) = sma_28009_cte.metric_time__day
+    ) subq_27
     WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'
     GROUP BY
       metric_time__day
-  ) subq_29
+  ) subq_31
   ON
-    subq_21.metric_time__day = subq_29.metric_time__day
+    subq_22.metric_time__day = subq_31.metric_time__day
   GROUP BY
-    COALESCE(subq_21.metric_time__day, subq_29.metric_time__day)
-) subq_30
+    COALESCE(subq_22.metric_time__day, subq_31.metric_time__day)
+) subq_32

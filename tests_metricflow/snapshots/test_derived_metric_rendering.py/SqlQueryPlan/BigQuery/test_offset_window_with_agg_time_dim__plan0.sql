@@ -4,14 +4,14 @@ sql_engine: BigQuery
 ---
 -- Compute Metrics via Expressions
 SELECT
-  subq_13.booking__ds__day
+  subq_14.booking__ds__day
   , bookings - bookings_2_weeks_ago AS bookings_growth_2_weeks
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_4.booking__ds__day, subq_12.booking__ds__day) AS booking__ds__day
+    COALESCE(subq_4.booking__ds__day, subq_13.booking__ds__day) AS booking__ds__day
     , MAX(subq_4.bookings) AS bookings
-    , MAX(subq_12.bookings_2_weeks_ago) AS bookings_2_weeks_ago
+    , MAX(subq_13.bookings_2_weeks_ago) AS bookings_2_weeks_ago
   FROM (
     -- Compute Metrics via Expressions
     SELECT
@@ -230,18 +230,18 @@ FROM (
   FULL OUTER JOIN (
     -- Compute Metrics via Expressions
     SELECT
-      subq_11.booking__ds__day
-      , subq_11.bookings AS bookings_2_weeks_ago
+      subq_12.booking__ds__day
+      , subq_12.bookings AS bookings_2_weeks_ago
     FROM (
       -- Aggregate Measures
       SELECT
-        subq_10.booking__ds__day
-        , SUM(subq_10.bookings) AS bookings
+        subq_11.booking__ds__day
+        , SUM(subq_11.bookings) AS bookings
       FROM (
         -- Pass Only Elements: ['bookings', 'booking__ds__day']
         SELECT
-          subq_9.booking__ds__day
-          , subq_9.bookings
+          subq_10.booking__ds__day
+          , subq_10.bookings
         FROM (
           -- Join to Time Spine Dataset
           SELECT
@@ -321,7 +321,7 @@ FROM (
             , subq_6.metric_time__extract_day AS metric_time__extract_day
             , subq_6.metric_time__extract_dow AS metric_time__extract_dow
             , subq_6.metric_time__extract_doy AS metric_time__extract_doy
-            , subq_7.booking__ds__day AS booking__ds__day
+            , subq_9.booking__ds__day AS booking__ds__day
             , subq_6.listing AS listing
             , subq_6.guest AS guest
             , subq_6.host AS host
@@ -344,11 +344,43 @@ FROM (
             , subq_6.approximate_continuous_booking_value_p99 AS approximate_continuous_booking_value_p99
             , subq_6.approximate_discrete_booking_value_p99 AS approximate_discrete_booking_value_p99
           FROM (
-            -- Read From Time Spine 'mf_time_spine'
+            -- Pass Only Elements: ['booking__ds__day', 'booking__ds__day']
             SELECT
-              subq_8.ds AS booking__ds__day
-            FROM ***************************.mf_time_spine subq_8
-          ) subq_7
+              subq_8.booking__ds__day
+            FROM (
+              -- Change Column Aliases
+              SELECT
+                subq_7.ds__day AS booking__ds__day
+                , subq_7.ds__week
+                , subq_7.ds__month
+                , subq_7.ds__quarter
+                , subq_7.ds__year
+                , subq_7.ds__extract_year
+                , subq_7.ds__extract_quarter
+                , subq_7.ds__extract_month
+                , subq_7.ds__extract_day
+                , subq_7.ds__extract_dow
+                , subq_7.ds__extract_doy
+                , subq_7.ds__martian_day
+              FROM (
+                -- Read From Time Spine 'mf_time_spine'
+                SELECT
+                  time_spine_src_28006.ds AS ds__day
+                  , DATETIME_TRUNC(time_spine_src_28006.ds, isoweek) AS ds__week
+                  , DATETIME_TRUNC(time_spine_src_28006.ds, month) AS ds__month
+                  , DATETIME_TRUNC(time_spine_src_28006.ds, quarter) AS ds__quarter
+                  , DATETIME_TRUNC(time_spine_src_28006.ds, year) AS ds__year
+                  , EXTRACT(year FROM time_spine_src_28006.ds) AS ds__extract_year
+                  , EXTRACT(quarter FROM time_spine_src_28006.ds) AS ds__extract_quarter
+                  , EXTRACT(month FROM time_spine_src_28006.ds) AS ds__extract_month
+                  , EXTRACT(day FROM time_spine_src_28006.ds) AS ds__extract_day
+                  , IF(EXTRACT(dayofweek FROM time_spine_src_28006.ds) = 1, 7, EXTRACT(dayofweek FROM time_spine_src_28006.ds) - 1) AS ds__extract_dow
+                  , EXTRACT(dayofyear FROM time_spine_src_28006.ds) AS ds__extract_doy
+                  , time_spine_src_28006.martian_day AS ds__martian_day
+                FROM ***************************.mf_time_spine time_spine_src_28006
+              ) subq_7
+            ) subq_8
+          ) subq_9
           INNER JOIN (
             -- Metric Time Dimension 'ds'
             SELECT
@@ -545,15 +577,15 @@ FROM (
             ) subq_5
           ) subq_6
           ON
-            DATE_SUB(CAST(subq_7.booking__ds__day AS DATETIME), INTERVAL 14 day) = subq_6.booking__ds__day
-        ) subq_9
-      ) subq_10
+            DATE_SUB(CAST(subq_9.booking__ds__day AS DATETIME), INTERVAL 14 day) = subq_6.booking__ds__day
+        ) subq_10
+      ) subq_11
       GROUP BY
         booking__ds__day
-    ) subq_11
-  ) subq_12
+    ) subq_12
+  ) subq_13
   ON
-    subq_4.booking__ds__day = subq_12.booking__ds__day
+    subq_4.booking__ds__day = subq_13.booking__ds__day
   GROUP BY
     booking__ds__day
-) subq_13
+) subq_14

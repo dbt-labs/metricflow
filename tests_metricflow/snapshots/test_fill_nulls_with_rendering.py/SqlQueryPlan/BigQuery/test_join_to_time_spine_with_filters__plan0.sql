@@ -4,32 +4,90 @@ sql_engine: BigQuery
 ---
 -- Compute Metrics via Expressions
 SELECT
-  subq_10.metric_time__day
-  , COALESCE(subq_10.bookings, 0) AS bookings_fill_nulls_with_0
+  subq_12.metric_time__day
+  , COALESCE(subq_12.bookings, 0) AS bookings_fill_nulls_with_0
 FROM (
   -- Constrain Time Range to [2020-01-03T00:00:00, 2020-01-05T00:00:00]
   SELECT
-    subq_9.metric_time__day
-    , subq_9.bookings
+    subq_11.metric_time__day
+    , subq_11.bookings
   FROM (
     -- Join to Time Spine Dataset
     SELECT
-      subq_6.metric_time__day AS metric_time__day
+      subq_10.metric_time__day AS metric_time__day
       , subq_5.bookings AS bookings
     FROM (
-      -- Filter Time Spine
+      -- Pass Only Elements: ['metric_time__day',]
       SELECT
-        subq_8.metric_time__day
+        subq_9.metric_time__day
       FROM (
-        -- Read From Time Spine 'mf_time_spine'
+        -- Constrain Time Range to [2020-01-03T00:00:00, 2020-01-05T00:00:00]
         SELECT
-          subq_7.ds AS metric_time__day
-          , DATETIME_TRUNC(subq_7.ds, isoweek) AS metric_time__week
-        FROM ***************************.mf_time_spine subq_7
-        WHERE subq_7.ds BETWEEN '2020-01-03' AND '2020-01-05'
-      ) subq_8
-      WHERE metric_time__week > '2020-01-01'
-    ) subq_6
+          subq_8.ds__month
+          , subq_8.ds__quarter
+          , subq_8.ds__year
+          , subq_8.ds__extract_year
+          , subq_8.ds__extract_quarter
+          , subq_8.ds__extract_month
+          , subq_8.ds__extract_day
+          , subq_8.ds__extract_dow
+          , subq_8.ds__extract_doy
+          , subq_8.ds__martian_day
+          , subq_8.metric_time__day
+          , subq_8.metric_time__week
+        FROM (
+          -- Constrain Output with WHERE
+          SELECT
+            subq_7.ds__month
+            , subq_7.ds__quarter
+            , subq_7.ds__year
+            , subq_7.ds__extract_year
+            , subq_7.ds__extract_quarter
+            , subq_7.ds__extract_month
+            , subq_7.ds__extract_day
+            , subq_7.ds__extract_dow
+            , subq_7.ds__extract_doy
+            , subq_7.ds__martian_day
+            , subq_7.metric_time__day
+            , subq_7.metric_time__week
+          FROM (
+            -- Change Column Aliases
+            SELECT
+              subq_6.ds__day AS metric_time__day
+              , subq_6.ds__week AS metric_time__week
+              , subq_6.ds__month
+              , subq_6.ds__quarter
+              , subq_6.ds__year
+              , subq_6.ds__extract_year
+              , subq_6.ds__extract_quarter
+              , subq_6.ds__extract_month
+              , subq_6.ds__extract_day
+              , subq_6.ds__extract_dow
+              , subq_6.ds__extract_doy
+              , subq_6.ds__martian_day
+            FROM (
+              -- Read From Time Spine 'mf_time_spine'
+              SELECT
+                time_spine_src_28006.ds AS ds__day
+                , DATETIME_TRUNC(time_spine_src_28006.ds, isoweek) AS ds__week
+                , DATETIME_TRUNC(time_spine_src_28006.ds, month) AS ds__month
+                , DATETIME_TRUNC(time_spine_src_28006.ds, quarter) AS ds__quarter
+                , DATETIME_TRUNC(time_spine_src_28006.ds, year) AS ds__year
+                , EXTRACT(year FROM time_spine_src_28006.ds) AS ds__extract_year
+                , EXTRACT(quarter FROM time_spine_src_28006.ds) AS ds__extract_quarter
+                , EXTRACT(month FROM time_spine_src_28006.ds) AS ds__extract_month
+                , EXTRACT(day FROM time_spine_src_28006.ds) AS ds__extract_day
+                , IF(EXTRACT(dayofweek FROM time_spine_src_28006.ds) = 1, 7, EXTRACT(dayofweek FROM time_spine_src_28006.ds) - 1) AS ds__extract_dow
+                , EXTRACT(dayofyear FROM time_spine_src_28006.ds) AS ds__extract_doy
+                , time_spine_src_28006.martian_day AS ds__martian_day
+              FROM ***************************.mf_time_spine time_spine_src_28006
+            ) subq_6
+          ) subq_7
+          WHERE metric_time__week > '2020-01-01'
+        ) subq_8
+        WHERE subq_8.metric_time__day BETWEEN '2020-01-03' AND '2020-01-05'
+      ) subq_9
+    ) subq_10
     LEFT OUTER JOIN (
       -- Aggregate Measures
       SELECT
@@ -446,7 +504,7 @@ FROM (
         metric_time__day
     ) subq_5
     ON
-      subq_6.metric_time__day = subq_5.metric_time__day
-  ) subq_9
-  WHERE subq_9.metric_time__day BETWEEN '2020-01-03' AND '2020-01-05'
-) subq_10
+      subq_10.metric_time__day = subq_5.metric_time__day
+  ) subq_11
+  WHERE subq_11.metric_time__day BETWEEN '2020-01-03' AND '2020-01-05'
+) subq_12
