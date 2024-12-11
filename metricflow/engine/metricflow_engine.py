@@ -198,10 +198,10 @@ class MetricFlowExplainResult:
         """Return the SQL query without the inline descriptions."""
         sql_query = self.rendered_sql
         return SqlStatement(
-            sql_query="\n".join(
+            sql="\n".join(
                 filter(
                     lambda line: not line.strip().startswith("--"),
-                    sql_query.sql_query.split("\n"),
+                    sql_query.sql.split("\n"),
                 )
             ),
             bind_parameter_set=sql_query.bind_parameter_set,

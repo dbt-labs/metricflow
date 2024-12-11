@@ -453,7 +453,7 @@ class DataWarehouseTaskBuilder:
     ) -> Tuple[str, SqlBindParameterSet]:
         explain_result: MetricFlowExplainResult = mf_engine.explain(mf_request=mf_request)
         return (
-            explain_result.rendered_sql_without_descriptions.sql_query,
+            explain_result.rendered_sql_without_descriptions.sql,
             explain_result.rendered_sql_without_descriptions.bind_parameter_set,
         )
 

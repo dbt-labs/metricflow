@@ -21,7 +21,7 @@ def _explain_one_query(mf_engine: MetricFlowEngine) -> str:
     explain_result: MetricFlowExplainResult = mf_engine.explain(
         MetricFlowQueryRequest.create_with_random_request_id(saved_query_name="p0_booking")
     )
-    return explain_result.rendered_sql.sql_query
+    return explain_result.rendered_sql.sql
 
 
 def test_concurrent_explain_consistency(
@@ -64,7 +64,7 @@ def test_optimization_level(
                 sql_optimization_level=optimization_level,
             )
         )
-        results[optimization_level.value] = explain_result.rendered_sql_without_descriptions.sql_query
+        results[optimization_level.value] = explain_result.rendered_sql_without_descriptions.sql
 
     assert_str_snapshot_equal(
         request=request,
