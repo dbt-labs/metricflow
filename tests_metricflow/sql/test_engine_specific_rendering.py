@@ -21,6 +21,10 @@ from metricflow.sql.sql_exprs import (
     SqlStringExpression,
     SqlStringLiteralExpression,
 )
+from metricflow_semantics.sql.sql_table import SqlTable
+from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+
+from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_plan import (
     SqlJoinDescription,
     SqlOrderByDescription,

@@ -12,10 +12,7 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.mf_logging.formatting import indent
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
-from typing_extensions import override
-
-from metricflow.sql.render.rendering_constants import SqlRenderingConstants
-from metricflow.sql.sql_exprs import (
+from metricflow_semantics.sql.sql_exprs import (
     SqlAddTimeExpression,
     SqlAggregateFunctionExpression,
     SqlBetweenExpression,
@@ -40,6 +37,9 @@ from metricflow.sql.sql_exprs import (
     SqlSubtractTimeIntervalExpression,
     SqlWindowFunctionExpression,
 )
+from typing_extensions import override
+
+from metricflow.sql.render.rendering_constants import SqlRenderingConstants
 from metricflow.sql.sql_plan import SqlSelectColumn
 
 if TYPE_CHECKING:

@@ -5,12 +5,7 @@ from typing import List
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from metricflow_semantics.sql.sql_join_type import SqlJoinType
-from metricflow_semantics.sql.sql_table import SqlTable, SqlTableType
-from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
-
-from metricflow.protocols.sql_client import SqlClient
-from metricflow.sql.sql_exprs import (
+from metricflow_semantics.sql.sql_exprs import (
     SqlAggregateFunctionExpression,
     SqlColumnReference,
     SqlColumnReferenceExpression,
@@ -19,6 +14,11 @@ from metricflow.sql.sql_exprs import (
     SqlFunction,
     SqlStringExpression,
 )
+from metricflow_semantics.sql.sql_join_type import SqlJoinType
+from metricflow_semantics.sql.sql_table import SqlTable, SqlTableType
+from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+
+from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlJoinDescription,
