@@ -64,7 +64,7 @@ class MetricFlowTestCredentialSet(FrozenBaseModel):  # noqa: D101
 
 
 @dataclass(frozen=True)
-class MetricFlowTestConfiguration:  # noqa: D101
+class MetricFlowEngineConfiguration:  # noqa: D101
     engine: SqlEngine
     credential_set: MetricFlowTestCredentialSet
 
@@ -79,33 +79,33 @@ class MetricFlowTestCredentialSetForAllEngines(FrozenBaseModel):  # noqa: D101
     trino: MetricFlowTestCredentialSet
 
     @property
-    def as_configurations(self) -> Sequence[MetricFlowTestConfiguration]:  # noqa: D102
+    def as_configurations(self) -> Sequence[MetricFlowEngineConfiguration]:  # noqa: D102
         return (
-            MetricFlowTestConfiguration(
+            MetricFlowEngineConfiguration(
                 engine=SqlEngine.DUCKDB,
                 credential_set=self.duck_db,
             ),
-            MetricFlowTestConfiguration(
+            MetricFlowEngineConfiguration(
                 engine=SqlEngine.REDSHIFT,
                 credential_set=self.redshift,
             ),
-            MetricFlowTestConfiguration(
+            MetricFlowEngineConfiguration(
                 engine=SqlEngine.SNOWFLAKE,
                 credential_set=self.snowflake,
             ),
-            MetricFlowTestConfiguration(
+            MetricFlowEngineConfiguration(
                 engine=SqlEngine.BIGQUERY,
                 credential_set=self.big_query,
             ),
-            MetricFlowTestConfiguration(
+            MetricFlowEngineConfiguration(
                 engine=SqlEngine.DATABRICKS,
                 credential_set=self.databricks,
             ),
-            MetricFlowTestConfiguration(
+            MetricFlowEngineConfiguration(
                 engine=SqlEngine.POSTGRES,
                 credential_set=self.postgres,
             ),
-            MetricFlowTestConfiguration(
+            MetricFlowEngineConfiguration(
                 engine=SqlEngine.TRINO,
                 credential_set=self.trino,
             ),
@@ -119,7 +119,7 @@ def run_command(command: str) -> None:  # noqa: D103
         raise RuntimeError(f"Error running command: {command}")
 
 
-def set_engine_env_variables(test_configuration: MetricFlowTestConfiguration) -> None:
+def set_engine_env_variables(test_configuration: MetricFlowEngineConfiguration) -> None:
     """Set connection env variables dynamically for the engine being used.
 
     Requires MF_TEST_ENGINE_CREDENTIALS env variable to be set with creds for all engines.
@@ -137,7 +137,7 @@ def set_engine_env_variables(test_configuration: MetricFlowTestConfiguration) ->
         os.environ["MF_SQL_ENGINE_PASSWORD"] = test_configuration.credential_set.engine_password
 
 
-def run_tests(test_configuration: MetricFlowTestConfiguration) -> None:  # noqa: D103
+def run_tests(test_configuration: MetricFlowEngineConfiguration) -> None:  # noqa: D103
     set_engine_env_variables(test_configuration)
 
     if test_configuration.engine is SqlEngine.DUCKDB:
