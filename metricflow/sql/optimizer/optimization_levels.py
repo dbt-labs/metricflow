@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import functools
 from dataclasses import dataclass
 from enum import Enum
 from typing import Tuple
@@ -13,6 +14,7 @@ from metricflow.sql.optimizer.sub_query_reducer import SqlSubQueryReducer
 from metricflow.sql.optimizer.table_alias_simplifier import SqlTableAliasSimplifier
 
 
+@functools.total_ordering
 class SqlQueryOptimizationLevel(Enum):
     """Defines the level of query optimization and the associated optimizers to apply."""
 
@@ -26,6 +28,12 @@ class SqlQueryOptimizationLevel(Enum):
     @staticmethod
     def default_level() -> SqlQueryOptimizationLevel:  # noqa: D102
         return SqlQueryOptimizationLevel.O5
+
+    def __lt__(self, other: SqlQueryOptimizationLevel) -> bool:  # noqa: D105
+        if not isinstance(other, SqlQueryOptimizationLevel):
+            return NotImplemented
+
+        return self.name < other.name
 
 
 @dataclass(frozen=True)
