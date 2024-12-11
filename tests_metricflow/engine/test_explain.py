@@ -21,7 +21,7 @@ def _explain_one_query(mf_engine: MetricFlowEngine) -> str:
     explain_result: MetricFlowExplainResult = mf_engine.explain(
         MetricFlowQueryRequest.create_with_random_request_id(saved_query_name="p0_booking")
     )
-    return explain_result.rendered_sql.sql
+    return explain_result.sql_statement.sql
 
 
 def test_concurrent_explain_consistency(

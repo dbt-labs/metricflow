@@ -177,7 +177,7 @@ class MetricFlowExplainResult:
     output_table: Optional[SqlTable] = None
 
     @property
-    def rendered_sql(self) -> SqlStatement:
+    def sql_statement(self) -> SqlStatement:
         """Return the SQL query that would be run for the given query."""
         execution_plan = self.execution_plan
         if len(execution_plan.tasks) != 1:
@@ -196,7 +196,7 @@ class MetricFlowExplainResult:
     @property
     def rendered_sql_without_descriptions(self) -> SqlStatement:
         """Return the SQL query without the inline descriptions."""
-        sql_query = self.rendered_sql
+        sql_query = self.sql_statement
         return SqlStatement(
             sql="\n".join(
                 filter(

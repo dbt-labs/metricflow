@@ -300,7 +300,7 @@ def query(
         sql = (
             explain_result.rendered_sql_without_descriptions.sql
             if not show_sql_descriptions
-            else explain_result.rendered_sql.sql
+            else explain_result.sql_statement.sql
         )
         if show_dataflow_plan:
             click.echo("🔎 Generated Dataflow Plan + SQL (remove --explain to see data):")
