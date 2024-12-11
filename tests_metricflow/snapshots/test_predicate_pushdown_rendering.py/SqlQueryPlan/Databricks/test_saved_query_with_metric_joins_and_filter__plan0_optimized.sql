@@ -7,12 +7,7 @@ docstring:
 sql_engine: Databricks
 ---
 -- Combine Aggregated Outputs
-SELECT
-  COALESCE(subq_51.listing__capacity_latest, subq_61.listing__capacity_latest, subq_82.listing__capacity_latest) AS listing__capacity_latest
-  , MAX(subq_51.bookings) AS bookings
-  , MAX(subq_61.views) AS views
-  , MAX(CAST(subq_82.bookings AS DOUBLE) / CAST(NULLIF(subq_82.views, 0) AS DOUBLE)) AS bookings_per_view
-FROM (
+WITH cm_6_cte AS (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['bookings', 'listing__capacity_latest']
   -- Aggregate Measures
@@ -44,8 +39,9 @@ FROM (
   WHERE (listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')
   GROUP BY
     listing__capacity_latest
-) subq_51
-FULL OUTER JOIN (
+)
+
+, cm_7_cte AS (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['views', 'listing__capacity_latest']
   -- Aggregate Measures
@@ -77,87 +73,33 @@ FULL OUTER JOIN (
   WHERE (listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')
   GROUP BY
     listing__capacity_latest
-) subq_61
+)
+
+SELECT
+  COALESCE(cm_6_cte.listing__capacity_latest, cm_7_cte.listing__capacity_latest, subq_64.listing__capacity_latest) AS listing__capacity_latest
+  , MAX(cm_6_cte.bookings) AS bookings
+  , MAX(cm_7_cte.views) AS views
+  , MAX(CAST(subq_64.bookings AS DOUBLE) / CAST(NULLIF(subq_64.views, 0) AS DOUBLE)) AS bookings_per_view
+FROM cm_6_cte cm_6_cte
+FULL OUTER JOIN
+  cm_7_cte cm_7_cte
 ON
-  subq_51.listing__capacity_latest = subq_61.listing__capacity_latest
+  cm_6_cte.listing__capacity_latest = cm_7_cte.listing__capacity_latest
 FULL OUTER JOIN (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_71.listing__capacity_latest, subq_81.listing__capacity_latest) AS listing__capacity_latest
-    , MAX(subq_71.bookings) AS bookings
-    , MAX(subq_81.views) AS views
-  FROM (
-    -- Constrain Output with WHERE
-    -- Pass Only Elements: ['bookings', 'listing__capacity_latest']
-    -- Aggregate Measures
-    -- Compute Metrics via Expressions
-    SELECT
-      listing__capacity_latest
-      , SUM(bookings) AS bookings
-    FROM (
-      -- Join Standard Outputs
-      SELECT
-        listings_latest_src_28000.is_lux AS listing__is_lux_latest
-        , listings_latest_src_28000.capacity AS listing__capacity_latest
-        , subq_63.metric_time__day AS metric_time__day
-        , subq_63.bookings AS bookings
-      FROM (
-        -- Read Elements From Semantic Model 'bookings_source'
-        -- Metric Time Dimension 'ds'
-        SELECT
-          DATE_TRUNC('day', ds) AS metric_time__day
-          , listing_id AS listing
-          , 1 AS bookings
-        FROM ***************************.fct_bookings bookings_source_src_28000
-      ) subq_63
-      LEFT OUTER JOIN
-        ***************************.dim_listings_latest listings_latest_src_28000
-      ON
-        subq_63.listing = listings_latest_src_28000.listing_id
-    ) subq_67
-    WHERE (listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')
-    GROUP BY
-      listing__capacity_latest
-  ) subq_71
-  FULL OUTER JOIN (
-    -- Constrain Output with WHERE
-    -- Pass Only Elements: ['views', 'listing__capacity_latest']
-    -- Aggregate Measures
-    -- Compute Metrics via Expressions
-    SELECT
-      listing__capacity_latest
-      , SUM(views) AS views
-    FROM (
-      -- Join Standard Outputs
-      SELECT
-        listings_latest_src_28000.is_lux AS listing__is_lux_latest
-        , listings_latest_src_28000.capacity AS listing__capacity_latest
-        , subq_73.metric_time__day AS metric_time__day
-        , subq_73.views AS views
-      FROM (
-        -- Read Elements From Semantic Model 'views_source'
-        -- Metric Time Dimension 'ds'
-        SELECT
-          DATE_TRUNC('day', ds) AS metric_time__day
-          , listing_id AS listing
-          , 1 AS views
-        FROM ***************************.fct_views views_source_src_28000
-      ) subq_73
-      LEFT OUTER JOIN
-        ***************************.dim_listings_latest listings_latest_src_28000
-      ON
-        subq_73.listing = listings_latest_src_28000.listing_id
-    ) subq_77
-    WHERE (listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')
-    GROUP BY
-      listing__capacity_latest
-  ) subq_81
+    COALESCE(cm_6_cte.listing__capacity_latest, cm_7_cte.listing__capacity_latest) AS listing__capacity_latest
+    , MAX(cm_6_cte.bookings) AS bookings
+    , MAX(cm_7_cte.views) AS views
+  FROM cm_6_cte cm_6_cte
+  FULL OUTER JOIN
+    cm_7_cte cm_7_cte
   ON
-    subq_71.listing__capacity_latest = subq_81.listing__capacity_latest
+    cm_6_cte.listing__capacity_latest = cm_7_cte.listing__capacity_latest
   GROUP BY
-    COALESCE(subq_71.listing__capacity_latest, subq_81.listing__capacity_latest)
-) subq_82
+    COALESCE(cm_6_cte.listing__capacity_latest, cm_7_cte.listing__capacity_latest)
+) subq_64
 ON
-  COALESCE(subq_51.listing__capacity_latest, subq_61.listing__capacity_latest) = subq_82.listing__capacity_latest
+  COALESCE(cm_6_cte.listing__capacity_latest, cm_7_cte.listing__capacity_latest) = subq_64.listing__capacity_latest
 GROUP BY
-  COALESCE(subq_51.listing__capacity_latest, subq_61.listing__capacity_latest, subq_82.listing__capacity_latest)
+  COALESCE(cm_6_cte.listing__capacity_latest, cm_7_cte.listing__capacity_latest, subq_64.listing__capacity_latest)
