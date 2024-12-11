@@ -10,7 +10,7 @@ SELECT
   , subq_15.archived_users AS subdaily_join_to_time_spine_metric
 FROM (
   -- Read From Time Spine 'mf_time_spine_hour'
-  -- Transform Time Dimension Columns
+  -- Change Column Aliases
   -- Constrain Time Range to [2020-01-01T02:00:00, 2020-01-01T05:00:00]
   -- Pass Only Elements: ['metric_time__hour',]
   SELECT

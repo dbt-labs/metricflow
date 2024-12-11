@@ -16,10 +16,20 @@ FROM (
     SELECT
       subq_5.metric_time__hour
     FROM (
-      -- Transform Time Dimension Columns
+      -- Change Column Aliases
       SELECT
         subq_4.ts__hour AS metric_time__hour
-        , subq_4.ts__hour
+        , subq_4.ts__day
+        , subq_4.ts__week
+        , subq_4.ts__month
+        , subq_4.ts__quarter
+        , subq_4.ts__year
+        , subq_4.ts__extract_year
+        , subq_4.ts__extract_quarter
+        , subq_4.ts__extract_month
+        , subq_4.ts__extract_day
+        , subq_4.ts__extract_dow
+        , subq_4.ts__extract_doy
       FROM (
         -- Read From Time Spine 'mf_time_spine_hour'
         SELECT

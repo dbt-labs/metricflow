@@ -14,7 +14,7 @@ FROM (
     metric_time__day
   FROM (
     -- Read From Time Spine 'mf_time_spine'
-    -- Transform Time Dimension Columns
+    -- Change Column Aliases
     SELECT
       ds AS metric_time__day
       , martian_day AS metric_time__martian_day

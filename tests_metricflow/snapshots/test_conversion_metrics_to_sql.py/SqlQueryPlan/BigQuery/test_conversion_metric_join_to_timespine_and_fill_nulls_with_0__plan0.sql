@@ -24,10 +24,20 @@ FROM (
       SELECT
         subq_5.metric_time__day
       FROM (
-        -- Transform Time Dimension Columns
+        -- Change Column Aliases
         SELECT
           subq_4.ds__day AS metric_time__day
-          , subq_4.ds__day
+          , subq_4.ds__week
+          , subq_4.ds__month
+          , subq_4.ds__quarter
+          , subq_4.ds__year
+          , subq_4.ds__extract_year
+          , subq_4.ds__extract_quarter
+          , subq_4.ds__extract_month
+          , subq_4.ds__extract_day
+          , subq_4.ds__extract_dow
+          , subq_4.ds__extract_doy
+          , subq_4.ds__martian_day
         FROM (
           -- Read From Time Spine 'mf_time_spine'
           SELECT
@@ -154,10 +164,20 @@ FROM (
       SELECT
         subq_19.metric_time__day
       FROM (
-        -- Transform Time Dimension Columns
+        -- Change Column Aliases
         SELECT
           subq_18.ds__day AS metric_time__day
-          , subq_18.ds__day
+          , subq_18.ds__week
+          , subq_18.ds__month
+          , subq_18.ds__quarter
+          , subq_18.ds__year
+          , subq_18.ds__extract_year
+          , subq_18.ds__extract_quarter
+          , subq_18.ds__extract_month
+          , subq_18.ds__extract_day
+          , subq_18.ds__extract_dow
+          , subq_18.ds__extract_doy
+          , subq_18.ds__martian_day
         FROM (
           -- Read From Time Spine 'mf_time_spine'
           SELECT

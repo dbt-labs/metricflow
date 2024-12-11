@@ -16,7 +16,7 @@ FROM (
     , SUM(monthly_bookings_source_src_16000.bookings_monthly) AS bookings_last_month
   FROM (
     -- Read From Time Spine 'mf_time_spine'
-    -- Transform Time Dimension Columns
+    -- Change Column Aliases
     -- Pass Only Elements: ['metric_time__month', 'metric_time__month']
     SELECT
       DATE_TRUNC('month', ds) AS metric_time__month
