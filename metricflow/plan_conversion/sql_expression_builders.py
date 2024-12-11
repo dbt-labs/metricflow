@@ -1,9 +1,10 @@
 """Utility module for building sql expressions from inputs derived from dataflow plan or other nodes."""
+
 from __future__ import annotations
 
 from typing import List, Sequence
 
-from metricflow.sql.sql_exprs import (
+from metricflow_semantics.sql.sql_exprs import (
     SqlAggregateFunctionExpression,
     SqlColumnReference,
     SqlColumnReferenceExpression,

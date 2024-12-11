@@ -37,6 +37,28 @@ from metricflow_semantics.specs.metadata_spec import MetadataSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
+from metricflow_semantics.sql.sql_exprs import (
+    SqlAggregateFunctionExpression,
+    SqlBetweenExpression,
+    SqlColumnReference,
+    SqlColumnReferenceExpression,
+    SqlComparison,
+    SqlComparisonExpression,
+    SqlDateTruncExpression,
+    SqlExpressionNode,
+    SqlExtractExpression,
+    SqlFunction,
+    SqlFunctionExpression,
+    SqlGenerateUuidExpression,
+    SqlLogicalExpression,
+    SqlLogicalOperator,
+    SqlRatioComputationExpression,
+    SqlStringExpression,
+    SqlStringLiteralExpression,
+    SqlWindowFunction,
+    SqlWindowFunctionExpression,
+    SqlWindowOrderByArgument,
+)
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
@@ -112,28 +134,6 @@ from metricflow.sql.optimizer.optimization_levels import (
     SqlQueryOptimizationLevel,
 )
 from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
-from metricflow.sql.sql_exprs import (
-    SqlAggregateFunctionExpression,
-    SqlBetweenExpression,
-    SqlColumnReference,
-    SqlColumnReferenceExpression,
-    SqlComparison,
-    SqlComparisonExpression,
-    SqlDateTruncExpression,
-    SqlExpressionNode,
-    SqlExtractExpression,
-    SqlFunction,
-    SqlFunctionExpression,
-    SqlGenerateUuidExpression,
-    SqlLogicalExpression,
-    SqlLogicalOperator,
-    SqlRatioComputationExpression,
-    SqlStringExpression,
-    SqlStringLiteralExpression,
-    SqlWindowFunction,
-    SqlWindowFunctionExpression,
-    SqlWindowOrderByArgument,
-)
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlCteNode,

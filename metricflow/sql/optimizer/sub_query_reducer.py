@@ -3,10 +3,10 @@ from __future__ import annotations
 import logging
 from typing import List, Optional
 
+from metricflow_semantics.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression
 from typing_extensions import override
 
 from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
-from metricflow.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlCteNode,
