@@ -1,0 +1,125 @@
+test_name: test_optimization_level
+test_filename: test_explain.py
+docstring:
+  Tests that the results of explain reflect the SQL optimization level in the request.
+expectation_description:
+  The result for SqlQueryOptimizationLevel.O5 should be SQL uses a CTE.
+---
+O4:
+  SELECT
+    COALESCE(subq_8.metric_time__day, subq_17.metric_time__day) AS metric_time__day
+    , COALESCE(subq_8.listing__country_latest, subq_17.listing__country_latest) AS listing__country_latest
+    , MAX(subq_8.bookings) AS bookings
+    , MAX(subq_17.views) AS views
+  FROM (
+    SELECT
+      subq_1.metric_time__day AS metric_time__day
+      , listings_latest_src_10000.country AS listing__country_latest
+      , SUM(subq_1.bookings) AS bookings
+    FROM (
+      SELECT
+        DATE_TRUNC('day', ds) AS metric_time__day
+        , listing_id AS listing
+        , 1 AS bookings
+      FROM ***************************.fct_bookings bookings_source_src_10000
+    ) subq_1
+    LEFT OUTER JOIN
+      ***************************.dim_listings_latest listings_latest_src_10000
+    ON
+      subq_1.listing = listings_latest_src_10000.listing_id
+    GROUP BY
+      subq_1.metric_time__day
+      , listings_latest_src_10000.country
+  ) subq_8
+  FULL OUTER JOIN (
+    SELECT
+      subq_10.metric_time__day AS metric_time__day
+      , listings_latest_src_10000.country AS listing__country_latest
+      , SUM(subq_10.views) AS views
+    FROM (
+      SELECT
+        DATE_TRUNC('day', ds) AS metric_time__day
+        , listing_id AS listing
+        , 1 AS views
+      FROM ***************************.fct_views views_source_src_10000
+    ) subq_10
+    LEFT OUTER JOIN
+      ***************************.dim_listings_latest listings_latest_src_10000
+    ON
+      subq_10.listing = listings_latest_src_10000.listing_id
+    GROUP BY
+      subq_10.metric_time__day
+      , listings_latest_src_10000.country
+  ) subq_17
+  ON
+    (
+      subq_8.listing__country_latest = subq_17.listing__country_latest
+    ) AND (
+      subq_8.metric_time__day = subq_17.metric_time__day
+    )
+  GROUP BY
+    COALESCE(subq_8.metric_time__day, subq_17.metric_time__day)
+    , COALESCE(subq_8.listing__country_latest, subq_17.listing__country_latest)
+
+O5:
+  WITH sma_10014_cte AS (
+    SELECT
+      listing_id AS listing
+      , country AS country_latest
+    FROM ***************************.dim_listings_latest listings_latest_src_10000
+  )
+
+  SELECT
+    COALESCE(subq_8.metric_time__day, subq_16.metric_time__day) AS metric_time__day
+    , COALESCE(subq_8.listing__country_latest, subq_16.listing__country_latest) AS listing__country_latest
+    , MAX(subq_8.bookings) AS bookings
+    , MAX(subq_16.views) AS views
+  FROM (
+    SELECT
+      subq_1.metric_time__day AS metric_time__day
+      , sma_10014_cte.country_latest AS listing__country_latest
+      , SUM(subq_1.bookings) AS bookings
+    FROM (
+      SELECT
+        DATE_TRUNC('day', ds) AS metric_time__day
+        , listing_id AS listing
+        , 1 AS bookings
+      FROM ***************************.fct_bookings bookings_source_src_10000
+    ) subq_1
+    LEFT OUTER JOIN
+      sma_10014_cte sma_10014_cte
+    ON
+      subq_1.listing = sma_10014_cte.listing
+    GROUP BY
+      subq_1.metric_time__day
+      , sma_10014_cte.country_latest
+  ) subq_8
+  FULL OUTER JOIN (
+    SELECT
+      subq_10.metric_time__day AS metric_time__day
+      , sma_10014_cte.country_latest AS listing__country_latest
+      , SUM(subq_10.views) AS views
+    FROM (
+      SELECT
+        DATE_TRUNC('day', ds) AS metric_time__day
+        , listing_id AS listing
+        , 1 AS views
+      FROM ***************************.fct_views views_source_src_10000
+    ) subq_10
+    LEFT OUTER JOIN
+      sma_10014_cte sma_10014_cte
+    ON
+      subq_10.listing = sma_10014_cte.listing
+    GROUP BY
+      subq_10.metric_time__day
+      , sma_10014_cte.country_latest
+  ) subq_16
+  ON
+    (
+      subq_8.listing__country_latest = subq_16.listing__country_latest
+    ) AND (
+      subq_8.metric_time__day = subq_16.metric_time__day
+    )
+  GROUP BY
+    COALESCE(subq_8.metric_time__day, subq_16.metric_time__day)
+    , COALESCE(subq_8.listing__country_latest, subq_16.listing__country_latest)
