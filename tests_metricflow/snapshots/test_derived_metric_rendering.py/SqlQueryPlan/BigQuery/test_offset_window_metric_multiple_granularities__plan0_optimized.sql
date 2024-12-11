@@ -13,31 +13,31 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_21.metric_time__day, subq_26.metric_time__day) AS metric_time__day
-    , COALESCE(subq_21.metric_time__month, subq_26.metric_time__month) AS metric_time__month
-    , COALESCE(subq_21.metric_time__year, subq_26.metric_time__year) AS metric_time__year
-    , MAX(subq_21.booking_value) AS booking_value
-    , MAX(subq_26.bookers) AS bookers
+    COALESCE(subq_23.metric_time__day, subq_28.metric_time__day) AS metric_time__day
+    , COALESCE(subq_23.metric_time__month, subq_28.metric_time__month) AS metric_time__month
+    , COALESCE(subq_23.metric_time__year, subq_28.metric_time__year) AS metric_time__year
+    , MAX(subq_23.booking_value) AS booking_value
+    , MAX(subq_28.bookers) AS bookers
   FROM (
     -- Join to Time Spine Dataset
     -- Pass Only Elements: ['booking_value', 'metric_time__day', 'metric_time__month', 'metric_time__year']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      subq_17.ds AS metric_time__day
-      , DATETIME_TRUNC(subq_17.ds, month) AS metric_time__month
-      , DATETIME_TRUNC(subq_17.ds, year) AS metric_time__year
+      time_spine_src_28006.ds AS metric_time__day
+      , DATETIME_TRUNC(time_spine_src_28006.ds, month) AS metric_time__month
+      , DATETIME_TRUNC(time_spine_src_28006.ds, year) AS metric_time__year
       , SUM(bookings_source_src_28000.booking_value) AS booking_value
-    FROM ***************************.mf_time_spine subq_17
+    FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN
       ***************************.fct_bookings bookings_source_src_28000
     ON
-      DATE_SUB(CAST(subq_17.ds AS DATETIME), INTERVAL 1 week) = DATETIME_TRUNC(bookings_source_src_28000.ds, day)
+      DATE_SUB(CAST(time_spine_src_28006.ds AS DATETIME), INTERVAL 1 week) = DATETIME_TRUNC(bookings_source_src_28000.ds, day)
     GROUP BY
       metric_time__day
       , metric_time__month
       , metric_time__year
-  ) subq_21
+  ) subq_23
   FULL OUTER JOIN (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
@@ -54,17 +54,17 @@ FROM (
       metric_time__day
       , metric_time__month
       , metric_time__year
-  ) subq_26
+  ) subq_28
   ON
     (
-      subq_21.metric_time__day = subq_26.metric_time__day
+      subq_23.metric_time__day = subq_28.metric_time__day
     ) AND (
-      subq_21.metric_time__month = subq_26.metric_time__month
+      subq_23.metric_time__month = subq_28.metric_time__month
     ) AND (
-      subq_21.metric_time__year = subq_26.metric_time__year
+      subq_23.metric_time__year = subq_28.metric_time__year
     )
   GROUP BY
     metric_time__day
     , metric_time__month
     , metric_time__year
-) subq_27
+) subq_29

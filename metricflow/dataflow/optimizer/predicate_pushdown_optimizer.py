@@ -19,6 +19,7 @@ from metricflow.dataflow.dataflow_plan import (
 from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
 from metricflow.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
 from metricflow.dataflow.nodes.aggregate_measures import AggregateMeasuresNode
+from metricflow.dataflow.nodes.alias_specs import AliasSpecsNode
 from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
 from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
@@ -466,6 +467,9 @@ class PredicatePushdownOptimizer(
     def visit_join_to_custom_granularity_node(  # noqa: D102
         self, node: JoinToCustomGranularityNode
     ) -> OptimizeBranchResult:
+        raise NotImplementedError
+
+    def visit_alias_specs_node(self, node: AliasSpecsNode) -> OptimizeBranchResult:  # noqa: D102
         raise NotImplementedError
 
     def visit_join_on_entities_node(self, node: JoinOnEntitiesNode) -> OptimizeBranchResult:

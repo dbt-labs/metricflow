@@ -5,37 +5,39 @@ sql_engine: Redshift
 -- Join to Time Spine Dataset
 -- Compute Metrics via Expressions
 SELECT
-  subq_13.metric_time__martian_day AS metric_time__martian_day
-  , subq_12.bookings AS bookings_join_to_time_spine
+  subq_16.metric_time__martian_day AS metric_time__martian_day
+  , subq_13.bookings AS bookings_join_to_time_spine
 FROM (
   -- Read From Time Spine 'mf_time_spine'
+  -- Change Column Aliases
+  -- Pass Only Elements: ['metric_time__martian_day',]
   SELECT
     martian_day AS metric_time__martian_day
-  FROM ***************************.mf_time_spine subq_14
+  FROM ***************************.mf_time_spine time_spine_src_28006
   GROUP BY
     martian_day
-) subq_13
+) subq_16
 LEFT OUTER JOIN (
   -- Metric Time Dimension 'ds'
   -- Join to Custom Granularity Dataset
   -- Pass Only Elements: ['bookings', 'metric_time__martian_day']
   -- Aggregate Measures
   SELECT
-    subq_9.martian_day AS metric_time__martian_day
-    , SUM(subq_8.bookings) AS bookings
+    subq_10.martian_day AS metric_time__martian_day
+    , SUM(subq_9.bookings) AS bookings
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     SELECT
       1 AS bookings
       , DATE_TRUNC('day', ds) AS ds__day
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_8
+  ) subq_9
   LEFT OUTER JOIN
-    ***************************.mf_time_spine subq_9
+    ***************************.mf_time_spine subq_10
   ON
-    subq_8.ds__day = subq_9.ds
+    subq_9.ds__day = subq_10.ds
   GROUP BY
-    subq_9.martian_day
-) subq_12
+    subq_10.martian_day
+) subq_13
 ON
-  subq_13.metric_time__martian_day = subq_12.metric_time__martian_day
+  subq_16.metric_time__martian_day = subq_13.metric_time__martian_day

@@ -8,9 +8,7 @@ from dbt_semantic_interfaces.protocols import MetricTimeWindow
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
-from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
-from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.visitor import VisitorOutputT
 
@@ -25,17 +23,17 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
     Attributes:
         requested_agg_time_dimension_specs: Time dimensions requested in the query.
         join_type: Join type to use when joining to time spine.
-        time_range_constraint: Time range to constrain the time spine to.
+        join_on_time_dimension_spec: The time dimension to use in the join ON condition.
         offset_window: Time window to offset the parent dataset by when joining to time spine.
         offset_to_grain: Granularity period to offset the parent dataset to when joining to time spine.
     """
 
+    time_spine_node: DataflowPlanNode
     requested_agg_time_dimension_specs: Sequence[TimeDimensionSpec]
+    join_on_time_dimension_spec: TimeDimensionSpec
     join_type: SqlJoinType
-    time_range_constraint: Optional[TimeRangeConstraint]
     offset_window: Optional[MetricTimeWindow]
     offset_to_grain: Optional[TimeGranularity]
-    time_spine_filters: Optional[Sequence[WhereFilterSpec]] = None
 
     def __post_init__(self) -> None:  # noqa: D105
         super().__post_init__()
@@ -51,21 +49,21 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
     @staticmethod
     def create(  # noqa: D102
         parent_node: DataflowPlanNode,
+        time_spine_node: DataflowPlanNode,
         requested_agg_time_dimension_specs: Sequence[TimeDimensionSpec],
+        join_on_time_dimension_spec: TimeDimensionSpec,
         join_type: SqlJoinType,
-        time_range_constraint: Optional[TimeRangeConstraint] = None,
         offset_window: Optional[MetricTimeWindow] = None,
         offset_to_grain: Optional[TimeGranularity] = None,
-        time_spine_filters: Optional[Sequence[WhereFilterSpec]] = None,
     ) -> JoinToTimeSpineNode:
         return JoinToTimeSpineNode(
             parent_nodes=(parent_node,),
+            time_spine_node=time_spine_node,
             requested_agg_time_dimension_specs=tuple(requested_agg_time_dimension_specs),
+            join_on_time_dimension_spec=join_on_time_dimension_spec,
             join_type=join_type,
-            time_range_constraint=time_range_constraint,
             offset_window=offset_window,
             offset_to_grain=offset_to_grain,
-            time_spine_filters=time_spine_filters,
         )
 
     @classmethod
@@ -83,20 +81,13 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
         props = tuple(super().displayed_properties) + (
             DisplayedProperty("requested_agg_time_dimension_specs", self.requested_agg_time_dimension_specs),
+            DisplayedProperty("join_on_time_dimension_spec", self.join_on_time_dimension_spec),
             DisplayedProperty("join_type", self.join_type),
         )
         if self.offset_window:
             props += (DisplayedProperty("offset_window", self.offset_window),)
         if self.offset_to_grain:
             props += (DisplayedProperty("offset_to_grain", self.offset_to_grain),)
-        if self.time_range_constraint:
-            props += (DisplayedProperty("time_range_constraint", self.time_range_constraint),)
-        if self.time_spine_filters:
-            props += (
-                DisplayedProperty(
-                    "time_spine_filters", [time_spine_filter.where_sql for time_spine_filter in self.time_spine_filters]
-                ),
-            )
         return props
 
     @property
@@ -106,22 +97,21 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
         return (
             isinstance(other_node, self.__class__)
-            and other_node.time_range_constraint == self.time_range_constraint
             and other_node.offset_window == self.offset_window
             and other_node.offset_to_grain == self.offset_to_grain
             and other_node.requested_agg_time_dimension_specs == self.requested_agg_time_dimension_specs
+            and other_node.join_on_time_dimension_spec == self.join_on_time_dimension_spec
             and other_node.join_type == self.join_type
-            and other_node.time_spine_filters == self.time_spine_filters
         )
 
     def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> JoinToTimeSpineNode:  # noqa: D102
         assert len(new_parent_nodes) == 1
         return JoinToTimeSpineNode.create(
             parent_node=new_parent_nodes[0],
+            time_spine_node=self.time_spine_node,
             requested_agg_time_dimension_specs=self.requested_agg_time_dimension_specs,
-            time_range_constraint=self.time_range_constraint,
             offset_window=self.offset_window,
             offset_to_grain=self.offset_to_grain,
             join_type=self.join_type,
-            time_spine_filters=self.time_spine_filters,
+            join_on_time_dimension_spec=self.join_on_time_dimension_spec,
         )

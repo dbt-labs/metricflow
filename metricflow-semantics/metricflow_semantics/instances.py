@@ -58,6 +58,10 @@ class MdoInstance(ABC, Generic[SpecT]):
         """See Visitable."""
         raise NotImplementedError()
 
+    def with_new_spec(self, new_spec: SpecT, column_association_resolver: ColumnAssociationResolver) -> MdoInstance:
+        """Returns a new instance with the spec replaced."""
+        raise NotImplementedError()
+
 
 class LinkableInstance(MdoInstance, Generic[SpecT]):
     """An MdoInstance whose spec is linkable (i.e., it can have entity links)."""
@@ -105,6 +109,17 @@ class MeasureInstance(MdoInstance[MeasureSpec], SemanticModelElementInstance):  
     def accept(self, visitor: InstanceVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_measure_instance(self)
 
+    def with_new_spec(
+        self, new_spec: MeasureSpec, column_association_resolver: ColumnAssociationResolver
+    ) -> MeasureInstance:
+        """Returns a new instance with the spec replaced."""
+        return MeasureInstance(
+            associated_columns=(column_association_resolver.resolve_spec(new_spec),),
+            defined_from=self.defined_from,
+            spec=new_spec,
+            aggregation_state=self.aggregation_state,
+        )
+
 
 @dataclass(frozen=True)
 class DimensionInstance(LinkableInstance[DimensionSpec], SemanticModelElementInstance):  # noqa: D101
@@ -123,6 +138,16 @@ class DimensionInstance(LinkableInstance[DimensionSpec], SemanticModelElementIns
             associated_columns=(column_association_resolver.resolve_spec(transformed_spec),),
             defined_from=self.defined_from,
             spec=transformed_spec,
+        )
+
+    def with_new_spec(
+        self, new_spec: DimensionSpec, column_association_resolver: ColumnAssociationResolver
+    ) -> DimensionInstance:
+        """Returns a new instance with the spec replaced."""
+        return DimensionInstance(
+            associated_columns=(column_association_resolver.resolve_spec(new_spec),),
+            defined_from=self.defined_from,
+            spec=new_spec,
         )
 
 
@@ -151,6 +176,16 @@ class TimeDimensionInstance(LinkableInstance[TimeDimensionSpec], SemanticModelEl
             associated_columns=self.associated_columns, defined_from=tuple(defined_from), spec=self.spec
         )
 
+    def with_new_spec(
+        self, new_spec: TimeDimensionSpec, column_association_resolver: ColumnAssociationResolver
+    ) -> TimeDimensionInstance:
+        """Returns a new instance with the spec replaced."""
+        return TimeDimensionInstance(
+            associated_columns=(column_association_resolver.resolve_spec(new_spec),),
+            defined_from=self.defined_from,
+            spec=new_spec,
+        )
+
 
 @dataclass(frozen=True)
 class EntityInstance(LinkableInstance[EntitySpec], SemanticModelElementInstance):  # noqa: D101
@@ -169,6 +204,16 @@ class EntityInstance(LinkableInstance[EntitySpec], SemanticModelElementInstance)
             associated_columns=(column_association_resolver.resolve_spec(transformed_spec),),
             defined_from=self.defined_from,
             spec=transformed_spec,
+        )
+
+    def with_new_spec(
+        self, new_spec: EntitySpec, column_association_resolver: ColumnAssociationResolver
+    ) -> EntityInstance:
+        """Returns a new instance with the spec replaced."""
+        return EntityInstance(
+            associated_columns=(column_association_resolver.resolve_spec(new_spec),),
+            defined_from=self.defined_from,
+            spec=new_spec,
         )
 
 
@@ -192,6 +237,16 @@ class GroupByMetricInstance(LinkableInstance[GroupByMetricSpec], SerializableDat
             spec=transformed_spec,
         )
 
+    def with_new_spec(
+        self, new_spec: GroupByMetricSpec, column_association_resolver: ColumnAssociationResolver
+    ) -> GroupByMetricInstance:
+        """Returns a new instance with the spec replaced."""
+        return GroupByMetricInstance(
+            associated_columns=(column_association_resolver.resolve_spec(new_spec),),
+            defined_from=self.defined_from,
+            spec=new_spec,
+        )
+
 
 @dataclass(frozen=True)
 class MetricInstance(MdoInstance[MetricSpec], SerializableDataclass):  # noqa: D101
@@ -202,6 +257,16 @@ class MetricInstance(MdoInstance[MetricSpec], SerializableDataclass):  # noqa: D
     def accept(self, visitor: InstanceVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_metric_instance(self)
 
+    def with_new_spec(
+        self, new_spec: MetricSpec, column_association_resolver: ColumnAssociationResolver
+    ) -> MetricInstance:
+        """Returns a new instance with the spec replaced."""
+        return MetricInstance(
+            associated_columns=(column_association_resolver.resolve_spec(new_spec),),
+            defined_from=self.defined_from,
+            spec=new_spec,
+        )
+
 
 @dataclass(frozen=True)
 class MetadataInstance(MdoInstance[MetadataSpec], SerializableDataclass):  # noqa: D101
@@ -210,6 +275,15 @@ class MetadataInstance(MdoInstance[MetadataSpec], SerializableDataclass):  # noq
 
     def accept(self, visitor: InstanceVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_metadata_instance(self)
+
+    def with_new_spec(
+        self, new_spec: MetadataSpec, column_association_resolver: ColumnAssociationResolver
+    ) -> MetadataInstance:
+        """Returns a new instance with the spec replaced."""
+        return MetadataInstance(
+            associated_columns=(column_association_resolver.resolve_spec(new_spec),),
+            spec=new_spec,
+        )
 
 
 # Output type of transform function
