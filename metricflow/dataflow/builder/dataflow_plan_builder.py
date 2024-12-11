@@ -80,7 +80,7 @@ from metricflow.dataflow.dataflow_plan import (
 )
 from metricflow.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
 from metricflow.dataflow.nodes.aggregate_measures import AggregateMeasuresNode
-from metricflow.dataflow.nodes.alias_specs import AliasSpecsNode
+from metricflow.dataflow.nodes.alias_specs import AliasSpecsNode, SpecToAlias
 from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
 from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
@@ -1880,9 +1880,9 @@ class DataflowPlanBuilder:
         time_spine_node = AliasSpecsNode.create(
             parent_node=read_node,
             change_specs=tuple(
-                (
-                    time_spine_data_set.instance_from_time_dimension_grain_and_date_part(required_spec).spec,
-                    required_spec,
+                SpecToAlias(
+                    input_spec=time_spine_data_set.instance_from_time_dimension_grain_and_date_part(required_spec).spec,
+                    output_spec=required_spec,
                 )
                 for required_spec in required_time_spine_specs
             ),

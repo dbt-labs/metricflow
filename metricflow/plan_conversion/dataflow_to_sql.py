@@ -1471,7 +1471,10 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         new_instances: Tuple[MdoInstance, ...] = ()
         new_select_columns: Tuple[SqlSelectColumn, ...] = ()
         instances_to_remove_from_parent: Set[MdoInstance] = set()
-        for old_spec, new_spec in node.change_specs:
+        for spec_to_alias in node.change_specs:
+            old_spec = spec_to_alias.input_spec
+            new_spec = spec_to_alias.output_spec
+
             # Find the instance in the parent data set with matching grain & date part.
             old_instance = parent_data_set.instance_for_spec(old_spec)
 

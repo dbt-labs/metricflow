@@ -13,20 +13,26 @@ from metricflow.dataflow.dataflow_plan import DataflowPlanNode
 from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
 
 
+@dataclass
+class SpecToAlias:
+    """A mapping of an input spec that should be aliased to match an output spec."""
+
+    input_spec: InstanceSpec
+    output_spec: InstanceSpec
+
+
 @dataclass(frozen=True, eq=False)
 class AliasSpecsNode(DataflowPlanNode, ABC):
     """Change the columns matching the key specs to match the value specs."""
 
-    change_specs: Sequence[Tuple[InstanceSpec, InstanceSpec]]
+    change_specs: Tuple[SpecToAlias, ...]
 
     def __post_init__(self) -> None:  # noqa: D105
         super().__post_init__()
         assert len(self.change_specs) > 0, "Must have at least one value in change_specs for AliasSpecsNode."
 
     @staticmethod
-    def create(  # noqa: D102
-        parent_node: DataflowPlanNode, change_specs: Sequence[Tuple[InstanceSpec, InstanceSpec]]
-    ) -> AliasSpecsNode:
+    def create(parent_node: DataflowPlanNode, change_specs: Tuple[SpecToAlias, ...]) -> AliasSpecsNode:  # noqa: D102
         return AliasSpecsNode(parent_nodes=(parent_node,), change_specs=change_specs)
 
     @classmethod

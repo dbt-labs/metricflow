@@ -145,7 +145,7 @@ class SqlDataSet(DataSet):
         return instances_to_return
 
     def instance_for_time_dimension(self, time_dimension_spec: TimeDimensionSpec) -> TimeDimensionInstance:
-        """Given ta time dimension spec, return the instance associated with it in the data set."""
+        """Given a time dimension spec, return the instance associated with it in the data set."""
         instances = self.instances_for_time_dimensions((time_dimension_spec,))
         if not len(instances) == 1:
             raise RuntimeError(
@@ -160,7 +160,9 @@ class SqlDataSet(DataSet):
         for instance in instances:
             if instance.spec == spec:
                 return instance
-        raise RuntimeError(f"Did not find instance matching spec in dataset. Spec: {spec}\nInstances: {instances}")
+        raise RuntimeError(
+            str(LazyFormat("Did not find instance matching spec in dataset.", spec=spec, instances=instances))
+        )
 
     def instance_from_time_dimension_grain_and_date_part(
         self, time_dimension_spec: TimeDimensionSpec
