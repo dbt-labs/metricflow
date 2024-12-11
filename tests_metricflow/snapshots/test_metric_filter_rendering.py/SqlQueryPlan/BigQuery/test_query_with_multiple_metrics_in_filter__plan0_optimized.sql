@@ -8,13 +8,23 @@ sql_engine: BigQuery
 -- Pass Only Elements: ['listings',]
 -- Aggregate Measures
 -- Compute Metrics via Expressions
+WITH sma_28009_cte AS (
+  -- Read Elements From Semantic Model 'bookings_source'
+  -- Metric Time Dimension 'ds'
+  SELECT
+    listing_id AS listing
+    , 1 AS bookings
+    , guest_id AS bookers
+  FROM ***************************.fct_bookings bookings_source_src_28000
+)
+
 SELECT
   SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
   SELECT
     subq_25.listing__bookings AS listing__bookings
-    , subq_31.listing__bookers AS listing__bookers
+    , subq_30.listing__bookers AS listing__bookers
     , subq_19.listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
@@ -25,41 +35,34 @@ FROM (
     FROM ***************************.dim_listings_latest listings_latest_src_28000
   ) subq_19
   LEFT OUTER JOIN (
+    -- Read From CTE For node_id=sma_28009
+    -- Pass Only Elements: ['bookings', 'listing']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     -- Pass Only Elements: ['listing', 'listing__bookings']
     SELECT
       listing
       , SUM(bookings) AS listing__bookings
-    FROM (
-      -- Read Elements From Semantic Model 'bookings_source'
-      -- Metric Time Dimension 'ds'
-      -- Pass Only Elements: ['bookings', 'listing']
-      SELECT
-        listing_id AS listing
-        , 1 AS bookings
-      FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_22
+    FROM sma_28009_cte sma_28009_cte
     GROUP BY
       listing
   ) subq_25
   ON
     subq_19.listing = subq_25.listing
   LEFT OUTER JOIN (
-    -- Read Elements From Semantic Model 'bookings_source'
-    -- Metric Time Dimension 'ds'
+    -- Read From CTE For node_id=sma_28009
     -- Pass Only Elements: ['bookers', 'listing']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     -- Pass Only Elements: ['listing', 'listing__bookers']
     SELECT
-      listing_id AS listing
-      , COUNT(DISTINCT guest_id) AS listing__bookers
-    FROM ***************************.fct_bookings bookings_source_src_28000
+      listing
+      , COUNT(DISTINCT bookers) AS listing__bookers
+    FROM sma_28009_cte sma_28009_cte
     GROUP BY
       listing
-  ) subq_31
+  ) subq_30
   ON
-    subq_19.listing = subq_31.listing
-) subq_32
+    subq_19.listing = subq_30.listing
+) subq_31
 WHERE listing__bookings > 2 AND listing__bookers > 1

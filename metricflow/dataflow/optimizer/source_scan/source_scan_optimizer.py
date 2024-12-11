@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import List, Optional, Sequence
+from typing import Dict, List, Optional, Sequence
 
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId
@@ -110,20 +110,32 @@ class SourceScanOptimizer(
     parents.
     """
 
+    def __init__(self) -> None:  # noqa: D107
+        self._node_to_result: Dict[DataflowPlanNode, OptimizeBranchResult] = {}
+
     def _log_visit_node_type(self, node: DataflowPlanNode) -> None:
-        logger.debug(LazyFormat(lambda: f"Visiting {node}"))
+        logger.debug(LazyFormat(lambda: f"Visiting {node.node_id}"))
 
     def _default_base_output_handler(
         self,
         node: DataflowPlanNode,
     ) -> OptimizeBranchResult:
-        optimized_parents: Sequence[OptimizeBranchResult] = tuple(
-            parent_node.accept(self) for parent_node in node.parent_nodes
+        memoized_result = self._node_to_result.get(node)
+        if memoized_result is not None:
+            return memoized_result
+
+        optimized_parent_nodes: Sequence[DataflowPlanNode] = tuple(
+            parent_node.accept(self).optimized_branch for parent_node in node.parent_nodes
         )
-        # Parents should always be DataflowPlanNode
-        return OptimizeBranchResult(
-            optimized_branch=node.with_new_parents(tuple(x.optimized_branch for x in optimized_parents))
-        )
+
+        # If no optimization is done, use the same nodes so that common operations can be identified for CTE generation.
+        if tuple(node.parent_nodes) == optimized_parent_nodes:
+            result = OptimizeBranchResult(optimized_branch=node)
+        else:
+            result = OptimizeBranchResult(optimized_branch=node.with_new_parents(optimized_parent_nodes))
+
+        self._node_to_result[node] = result
+        return result
 
     def visit_source_node(self, node: ReadSqlSourceNode) -> OptimizeBranchResult:  # noqa: D102
         self._log_visit_node_type(node)
@@ -144,9 +156,14 @@ class SourceScanOptimizer(
     def visit_compute_metrics_node(self, node: ComputeMetricsNode) -> OptimizeBranchResult:  # noqa: D102
         self._log_visit_node_type(node)
         # Run the optimizer on the parent branch to handle derived metrics, which are defined recursively in the DAG.
+
+        memoized_result = self._node_to_result.get(node)
+        if memoized_result is not None:
+            return memoized_result
+
         optimized_parent_result: OptimizeBranchResult = node.parent_node.accept(self)
         if optimized_parent_result.optimized_branch is not None:
-            return OptimizeBranchResult(
+            result = OptimizeBranchResult(
                 optimized_branch=ComputeMetricsNode.create(
                     parent_node=optimized_parent_result.optimized_branch,
                     metric_specs=node.metric_specs,
@@ -154,8 +171,11 @@ class SourceScanOptimizer(
                     aggregated_to_elements=node.aggregated_to_elements,
                 )
             )
+        else:
+            result = OptimizeBranchResult(optimized_branch=node)
 
-        return OptimizeBranchResult(optimized_branch=node)
+        self._node_to_result[node] = result
+        return result
 
     def visit_order_by_limit_node(self, node: OrderByLimitNode) -> OptimizeBranchResult:  # noqa: D102
         self._log_visit_node_type(node)
@@ -220,11 +240,16 @@ class SourceScanOptimizer(
         self, node: CombineAggregatedOutputsNode
     ) -> OptimizeBranchResult:  # noqa: D102
         self._log_visit_node_type(node)
-        # The parent node of the CombineAggregatedOutputsNode can be either ComputeMetricsNodes or CombineAggregatedOutputsNodes
 
+        memoized_result = self._node_to_result.get(node)
+        if memoized_result is not None:
+            return memoized_result
+
+        # The parent node of the CombineAggregatedOutputsNode can be either ComputeMetricsNodes or
+        # CombineAggregatedOutputsNodes.
         # Stores the result of running this optimizer on each parent branch separately.
         optimized_parent_branches = []
-        logger.debug(LazyFormat(lambda: f"{node} has {len(node.parent_nodes)} parent branches"))
+        logger.debug(LazyFormat(lambda: f"{node.node_id} has {len(node.parent_nodes)} parent branches"))
 
         # Run the optimizer on the parent branch to handle derived metrics, which are defined recursively in the DAG.
         for parent_branch in node.parent_nodes:
@@ -257,14 +282,17 @@ class SourceScanOptimizer(
         logger.debug(lambda: f"Got {len(combined_parent_branches)} branches after combination")
         assert len(combined_parent_branches) > 0
 
-        # If we were able to reduce the parent branches of the CombineAggregatedOutputsNode into a single one, there's no need
-        # for a CombineAggregatedOutputsNode.
+        # If we were able to reduce the parent branches of the CombineAggregatedOutputsNode into a single one, there's
+        # no need for a CombineAggregatedOutputsNode.
         if len(combined_parent_branches) == 1:
-            return OptimizeBranchResult(optimized_branch=combined_parent_branches[0])
+            result = OptimizeBranchResult(optimized_branch=combined_parent_branches[0])
+        else:
+            result = OptimizeBranchResult(
+                optimized_branch=CombineAggregatedOutputsNode.create(parent_nodes=combined_parent_branches)
+            )
 
-        return OptimizeBranchResult(
-            optimized_branch=CombineAggregatedOutputsNode.create(parent_nodes=combined_parent_branches)
-        )
+        self._node_to_result[node] = result
+        return result
 
     def visit_constrain_time_range_node(self, node: ConstrainTimeRangeNode) -> OptimizeBranchResult:  # noqa: D102
         self._log_visit_node_type(node)
@@ -289,11 +317,10 @@ class SourceScanOptimizer(
 
         logger.debug(
             LazyFormat(
-                lambda: f"Optimized:\n\n"
-                f"{dataflow_plan.sink_node.structure_text()}\n\n"
-                f"to:\n\n"
-                f"{optimized_result.optimized_branch.structure_text()}",
-            ),
+                "Optimized dataflow plan",
+                original_plan=dataflow_plan.sink_node.structure_text(),
+                optimized_plan=optimized_result.optimized_branch.structure_text(),
+            )
         )
 
         return DataflowPlan(
