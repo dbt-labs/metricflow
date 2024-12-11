@@ -6,9 +6,8 @@ import itertools
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, Generic, Iterable, List, Mapping, Optional, Sequence, Tuple
+from typing import Dict, Generic, List, Mapping, Optional, Sequence, Tuple
 
-import more_itertools
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols.measure import MeasureAggregationParameters
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
@@ -109,20 +108,6 @@ class SqlExpressionTreeLineage(Mergeable):
     column_reference_exprs: Tuple[SqlColumnReferenceExpression, ...] = ()
     column_alias_reference_exprs: Tuple[SqlColumnAliasReferenceExpression, ...] = ()
     other_exprs: Tuple[SqlExpressionNode, ...] = ()
-
-    @classmethod
-    @override
-    def merge_iterable(cls, items: Iterable[SqlExpressionTreeLineage]) -> SqlExpressionTreeLineage:
-        """Combine multiple lineages into one lineage, without de-duping."""
-        return SqlExpressionTreeLineage(
-            string_exprs=tuple(more_itertools.flatten(tuple(x.string_exprs for x in items))),
-            function_exprs=tuple(more_itertools.flatten(tuple(x.function_exprs for x in items))),
-            column_reference_exprs=tuple(more_itertools.flatten(tuple(x.column_reference_exprs for x in items))),
-            column_alias_reference_exprs=tuple(
-                more_itertools.flatten(tuple(x.column_alias_reference_exprs for x in items))
-            ),
-            other_exprs=tuple(more_itertools.flatten(tuple(x.other_exprs for x in items))),
-        )
 
     @property
     def contains_string_exprs(self) -> bool:  # noqa: D102
