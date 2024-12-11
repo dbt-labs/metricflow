@@ -6,7 +6,7 @@ import itertools
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, Generic, List, Mapping, Optional, Sequence, Tuple
+from typing import Dict, Generic, Iterable, List, Mapping, Optional, Sequence, Tuple
 
 import more_itertools
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
@@ -15,6 +15,7 @@ from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.period_agg import PeriodAggregation
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from metricflow_semantics.collection_helpers.merger import Mergeable
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagNode, DisplayedProperty
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
@@ -100,7 +101,7 @@ class SqlExpressionNode(DagNode["SqlExpressionNode"], Visitable, ABC):
 
 
 @dataclass(frozen=True)
-class SqlExpressionTreeLineage:
+class SqlExpressionTreeLineage(Mergeable):
     """Captures the lineage of an expression node - contains itself and all ancestor nodes."""
 
     string_exprs: Tuple[SqlStringExpression, ...] = ()
@@ -109,17 +110,18 @@ class SqlExpressionTreeLineage:
     column_alias_reference_exprs: Tuple[SqlColumnAliasReferenceExpression, ...] = ()
     other_exprs: Tuple[SqlExpressionNode, ...] = ()
 
-    @staticmethod
-    def combine(lineages: Sequence[SqlExpressionTreeLineage]) -> SqlExpressionTreeLineage:
+    @classmethod
+    @override
+    def merge_iterable(cls, items: Iterable[SqlExpressionTreeLineage]) -> SqlExpressionTreeLineage:
         """Combine multiple lineages into one lineage, without de-duping."""
         return SqlExpressionTreeLineage(
-            string_exprs=tuple(more_itertools.flatten(tuple(x.string_exprs for x in lineages))),
-            function_exprs=tuple(more_itertools.flatten(tuple(x.function_exprs for x in lineages))),
-            column_reference_exprs=tuple(more_itertools.flatten(tuple(x.column_reference_exprs for x in lineages))),
+            string_exprs=tuple(more_itertools.flatten(tuple(x.string_exprs for x in items))),
+            function_exprs=tuple(more_itertools.flatten(tuple(x.function_exprs for x in items))),
+            column_reference_exprs=tuple(more_itertools.flatten(tuple(x.column_reference_exprs for x in items))),
             column_alias_reference_exprs=tuple(
-                more_itertools.flatten(tuple(x.column_alias_reference_exprs for x in lineages))
+                more_itertools.flatten(tuple(x.column_alias_reference_exprs for x in items))
             ),
-            other_exprs=tuple(more_itertools.flatten(tuple(x.other_exprs for x in lineages))),
+            other_exprs=tuple(more_itertools.flatten(tuple(x.other_exprs for x in items))),
         )
 
     @property
@@ -137,6 +139,21 @@ class SqlExpressionTreeLineage:
     @property
     def contains_aggregate_exprs(self) -> bool:  # noqa: D102
         return any(x.is_aggregate_function for x in self.function_exprs)
+
+    @override
+    def merge(self, other: SqlExpressionTreeLineage) -> SqlExpressionTreeLineage:
+        return SqlExpressionTreeLineage(
+            string_exprs=self.string_exprs + other.string_exprs,
+            function_exprs=self.function_exprs + other.function_exprs,
+            column_reference_exprs=self.column_reference_exprs + other.column_reference_exprs,
+            column_alias_reference_exprs=self.column_alias_reference_exprs + other.column_alias_reference_exprs,
+            other_exprs=self.other_exprs + other.other_exprs,
+        )
+
+    @classmethod
+    @override
+    def empty_instance(cls) -> SqlExpressionTreeLineage:
+        return SqlExpressionTreeLineage()
 
 
 class SqlColumnReplacements:
@@ -604,7 +621,7 @@ class SqlComparisonExpression(SqlExpressionNode):
 
     @property
     def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
-        return SqlExpressionTreeLineage.combine(
+        return SqlExpressionTreeLineage.merge_iterable(
             tuple(x.lineage for x in self.parent_nodes) + (SqlExpressionTreeLineage(other_exprs=(self,)),)
         )
 
@@ -803,7 +820,7 @@ class SqlAggregateFunctionExpression(SqlFunctionExpression):
 
     @property
     def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
-        return SqlExpressionTreeLineage.combine(
+        return SqlExpressionTreeLineage.merge_iterable(
             tuple(x.lineage for x in self.parent_nodes) + (SqlExpressionTreeLineage(function_exprs=(self,)),)
         )
 
@@ -923,7 +940,7 @@ class SqlPercentileExpression(SqlFunctionExpression):
 
     @property
     def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
-        return SqlExpressionTreeLineage.combine(
+        return SqlExpressionTreeLineage.merge_iterable(
             tuple(x.lineage for x in self.parent_nodes) + (SqlExpressionTreeLineage(function_exprs=(self,)),)
         )
 
@@ -1084,7 +1101,7 @@ class SqlWindowFunctionExpression(SqlFunctionExpression):
 
     @property
     def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
-        return SqlExpressionTreeLineage.combine(
+        return SqlExpressionTreeLineage.merge_iterable(
             tuple(x.lineage for x in self.parent_nodes) + (SqlExpressionTreeLineage(function_exprs=(self,)),)
         )
 
@@ -1194,7 +1211,7 @@ class SqlLogicalExpression(SqlExpressionNode):
 
     @property
     def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
-        return SqlExpressionTreeLineage.combine(
+        return SqlExpressionTreeLineage.merge_iterable(
             tuple(x.lineage for x in self.parent_nodes) + (SqlExpressionTreeLineage(other_exprs=(self,)),)
         )
 
@@ -1241,7 +1258,9 @@ class SqlIsNullExpression(SqlExpressionNode):
 
     @property
     def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
-        return SqlExpressionTreeLineage.combine([self.arg.lineage, SqlExpressionTreeLineage(other_exprs=(self,))])
+        return SqlExpressionTreeLineage.merge_iterable(
+            [self.arg.lineage, SqlExpressionTreeLineage(other_exprs=(self,))]
+        )
 
     def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D102
         if not isinstance(other, SqlIsNullExpression):
@@ -1304,7 +1323,7 @@ class SqlSubtractTimeIntervalExpression(SqlExpressionNode):
 
     @property
     def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
-        return SqlExpressionTreeLineage.combine(
+        return SqlExpressionTreeLineage.merge_iterable(
             tuple(x.lineage for x in self.parent_nodes) + (SqlExpressionTreeLineage(other_exprs=(self,)),)
         )
 
@@ -1351,7 +1370,7 @@ class SqlCastToTimestampExpression(SqlExpressionNode):
 
     @property
     def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
-        return SqlExpressionTreeLineage.combine(
+        return SqlExpressionTreeLineage.merge_iterable(
             tuple(x.lineage for x in self.parent_nodes) + (SqlExpressionTreeLineage(other_exprs=(self,)),)
         )
 
@@ -1402,7 +1421,7 @@ class SqlDateTruncExpression(SqlExpressionNode):
 
     @property
     def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
-        return SqlExpressionTreeLineage.combine(
+        return SqlExpressionTreeLineage.merge_iterable(
             tuple(x.lineage for x in self.parent_nodes) + (SqlExpressionTreeLineage(other_exprs=(self,)),)
         )
 
@@ -1461,7 +1480,7 @@ class SqlExtractExpression(SqlExpressionNode):
 
     @property
     def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
-        return SqlExpressionTreeLineage.combine(
+        return SqlExpressionTreeLineage.merge_iterable(
             tuple(x.lineage for x in self.parent_nodes) + (SqlExpressionTreeLineage(other_exprs=(self,)),)
         )
 
@@ -1526,7 +1545,7 @@ class SqlRatioComputationExpression(SqlExpressionNode):
 
     @property
     def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
-        return SqlExpressionTreeLineage.combine(
+        return SqlExpressionTreeLineage.merge_iterable(
             tuple(x.lineage for x in self.parent_nodes) + (SqlExpressionTreeLineage(other_exprs=(self,)),)
         )
 
@@ -1591,7 +1610,7 @@ class SqlBetweenExpression(SqlExpressionNode):
 
     @property
     def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
-        return SqlExpressionTreeLineage.combine(
+        return SqlExpressionTreeLineage.merge_iterable(
             tuple(x.lineage for x in self.parent_nodes) + (SqlExpressionTreeLineage(other_exprs=(self,)),)
         )
 

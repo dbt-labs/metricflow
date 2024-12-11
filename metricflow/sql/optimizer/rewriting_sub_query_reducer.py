@@ -122,7 +122,7 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
 
     @staticmethod
     def _statement_contains_difficult_expressions(node: SqlSelectStatementNode) -> bool:
-        combined_lineage = SqlExpressionTreeLineage.combine(
+        combined_lineage = SqlExpressionTreeLineage.merge_iterable(
             tuple(x.expr.lineage for x in node.select_columns)
             + ((node.where.lineage,) if node.where else ())
             + tuple(x.expr.lineage for x in node.group_bys)
@@ -133,7 +133,7 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
 
     @staticmethod
     def _select_columns_contain_string_expressions(select_columns: Tuple[SqlSelectColumn, ...]) -> bool:
-        combined_lineage = SqlExpressionTreeLineage.combine(tuple(x.expr.lineage for x in select_columns))
+        combined_lineage = SqlExpressionTreeLineage.merge_iterable(tuple(x.expr.lineage for x in select_columns))
 
         return len(combined_lineage.string_exprs) > 0
 
