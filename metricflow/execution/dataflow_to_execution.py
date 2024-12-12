@@ -109,7 +109,7 @@ class DataflowToExecutionPlanConverter(DataflowPlanNodeVisitor[ConvertToExecutio
             leaf_tasks=(
                 SelectSqlQueryToTableTask.create(
                     sql_client=self._sql_client,
-                    sql_query=SqlStatement(
+                    sql_statement=SqlStatement(
                         sql=render_sql_result.sql,
                         bind_parameter_set=render_sql_result.bind_parameter_set,
                     ),

@@ -167,13 +167,13 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
     @staticmethod
     def create(  # noqa: D102
         sql_client: SqlClient,
-        sql_query: SqlStatement,
+        sql_statement: SqlStatement,
         output_table: SqlTable,
         parent_nodes: Sequence[ExecutionPlanTask] = (),
     ) -> SelectSqlQueryToTableTask:
         return SelectSqlQueryToTableTask(
             sql_client=sql_client,
-            sql_statement=sql_query,
+            sql_statement=sql_statement,
             output_table=output_table,
             parent_nodes=tuple(parent_nodes),
         )
@@ -188,31 +188,31 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
 
     @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
-        sql_query = self.sql_statement
-        assert sql_query is not None, f"{self.sql_statement=} should have been set during creation."
+        sql_statement = self.sql_statement
+        assert sql_statement is not None, f"{self.sql_statement=} should have been set during creation."
         return tuple(super().displayed_properties) + (
-            DisplayedProperty(key="sql_query", value=sql_query.sql),
+            DisplayedProperty(key="sql_statement", value=sql_statement.sql),
             DisplayedProperty(key="output_table", value=self.output_table),
-            DisplayedProperty(key="bind_parameter_set", value=sql_query.bind_parameter_set),
+            DisplayedProperty(key="bind_parameter_set", value=sql_statement.bind_parameter_set),
         )
 
     def execute(self) -> TaskExecutionResult:  # noqa: D102
-        sql_query = self.sql_statement
-        assert sql_query is not None, f"{self.sql_statement=} should have been set during creation."
+        sql_statement = self.sql_statement
+        assert sql_statement is not None, f"{self.sql_statement=} should have been set during creation."
         start_time = time.time()
         logger.debug(LazyFormat(lambda: f"Dropping table {self.output_table} in case it already exists"))
         self.sql_client.execute(f"DROP TABLE IF EXISTS {self.output_table.sql}")
         logger.debug(LazyFormat(lambda: f"Creating table {self.output_table} using a query"))
         self.sql_client.execute(
-            sql_query.sql,
-            sql_bind_parameter_set=sql_query.bind_parameter_set,
+            sql_statement.sql,
+            sql_bind_parameter_set=sql_statement.bind_parameter_set,
         )
 
         end_time = time.time()
-        return TaskExecutionResult(start_time=start_time, end_time=end_time, sql=sql_query.sql)
+        return TaskExecutionResult(start_time=start_time, end_time=end_time, sql=sql_statement.sql)
 
     def __repr__(self) -> str:  # noqa: D105
-        return f"{self.__class__.__name__}(sql_query='{self.sql_statement}', output_table={self.output_table})"
+        return f"{self.__class__.__name__}(sql_statement={self.sql_statement!r}', output_table={self.output_table})"
 
 
 class ExecutionPlan(MetricFlowDag[ExecutionPlanTask]):

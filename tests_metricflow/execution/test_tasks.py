@@ -44,7 +44,7 @@ def test_write_table_task(  # noqa: D103
     output_table = SqlTable(schema_name=mf_test_configuration.mf_system_schema, table_name=f"test_table_{random_id()}")
     task = SelectSqlQueryToTableTask.create(
         sql_client=sql_client,
-        sql_query=SqlStatement(
+        sql_statement=SqlStatement(
             sql=f"CREATE TABLE {output_table.sql} AS SELECT 1 AS foo",
             bind_parameter_set=SqlBindParameterSet(),
         ),
