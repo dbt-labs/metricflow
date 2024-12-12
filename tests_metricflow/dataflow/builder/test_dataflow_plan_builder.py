@@ -1403,3 +1403,35 @@ def test_derived_cumulative_metric_with_non_default_grain(
         mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
+
+
+def test_metric_with_alias_plan(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+) -> None:
+    """Tests a simple plan getting an aliased metric and a local dimension."""
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings", alias="bookings_alias"),),
+            dimension_specs=(
+                DimensionSpec(
+                    element_name="is_instant",
+                    entity_links=(EntityReference("booking"),),
+                ),
+            ),
+        )
+    )
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan.structure_text(),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dag_graph=dataflow_plan,
+    )
