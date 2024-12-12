@@ -141,4 +141,8 @@ def assert_str_snapshot_equal(  # type: ignore[misc]
         snapshot_file_extension=".txt",
         additional_sub_directories_for_snapshots=(sql_engine.value,) if sql_engine is not None else (),
         expectation_description=expectation_description,
+        incomparable_strings_replacement_function=make_schema_replacement_function(
+            system_schema=mf_test_configuration.mf_system_schema,
+            source_schema=mf_test_configuration.mf_source_schema,
+        ),
     )

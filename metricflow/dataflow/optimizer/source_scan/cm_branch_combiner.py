@@ -133,7 +133,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         self._current_left_node: DataflowPlanNode = left_branch_node
 
     def _log_visit_node_type(self, node: DataflowPlanNode) -> None:
-        logger.debug(lambda: f"Visiting {node.node_id}")
+        logger.debug(LazyFormat(lambda: f"Visiting {node.node_id}"))
 
     def _log_combine_failure(
         self,
