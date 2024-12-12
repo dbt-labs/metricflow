@@ -204,20 +204,6 @@ class MetricFlowExplainResult:
         return sql_statement
 
     @property
-    def rendered_sql_without_descriptions(self) -> SqlStatement:
-        """Return the SQL query without the inline descriptions."""
-        sql_query = self.sql_statement
-        return SqlStatement(
-            sql="\n".join(
-                filter(
-                    lambda line: not line.strip().startswith("--"),
-                    sql_query.sql.split("\n"),
-                )
-            ),
-            bind_parameter_set=sql_query.bind_parameter_set,
-        )
-
-    @property
     def execution_plan(self) -> ExecutionPlan:  # noqa: D102
         return self.convert_to_execution_plan_result.execution_plan
 
