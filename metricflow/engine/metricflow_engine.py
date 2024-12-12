@@ -182,16 +182,26 @@ class MetricFlowExplainResult:
         execution_plan = self.execution_plan
         if len(execution_plan.tasks) != 1:
             raise NotImplementedError(
-                f"Multiple tasks in the execution plan not yet supported. Got tasks: {execution_plan.tasks}"
+                str(
+                    LazyFormat(
+                        "Multiple tasks in the execution plan not yet supported.",
+                        tasks=[task.task_id for task in execution_plan.tasks],
+                    )
+                )
             )
 
-        sql_query = execution_plan.tasks[0].sql_statement
-        if not sql_query:
+        sql_statement = execution_plan.tasks[0].sql_statement
+        if not sql_statement:
             raise NotImplementedError(
-                f"Execution plan tasks without a SQL query not yet supported. Got tasks: {execution_plan.tasks}"
+                str(
+                    LazyFormat(
+                        "Execution plan tasks without a SQL statement are not yet supported.",
+                        tasks=[task.task_id for task in execution_plan.tasks],
+                    )
+                )
             )
 
-        return sql_query
+        return sql_statement
 
     @property
     def rendered_sql_without_descriptions(self) -> SqlStatement:

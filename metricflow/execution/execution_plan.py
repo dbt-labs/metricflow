@@ -122,9 +122,8 @@ class SelectSqlQueryToDataTableTask(ExecutionPlanTask):
 
     @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
-        sql_query = self.sql_statement
-        assert sql_query is not None, f"{self.sql_statement=} should have been set during creation."
-        return tuple(super().displayed_properties) + (DisplayedProperty(key="sql_query", value=sql_query.sql),)
+        assert self.sql_statement is not None, f"{self.sql_statement=} should have been set during creation."
+        return tuple(super().displayed_properties) + (DisplayedProperty(key="sql", value=self.sql_statement.sql),)
 
     def execute(self) -> TaskExecutionResult:  # noqa: D102
         start_time = time.time()
