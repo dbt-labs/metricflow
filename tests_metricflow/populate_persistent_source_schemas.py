@@ -9,7 +9,7 @@ from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 
 from metricflow.protocols.sql_client import SqlEngine
 from tests_metricflow.generate_snapshots import (
-    MetricFlowTestConfiguration,
+    MetricFlowEngineConfiguration,
     run_cli,
     run_command,
     set_engine_env_variables,
@@ -18,7 +18,7 @@ from tests_metricflow.generate_snapshots import (
 logger = logging.getLogger(__name__)
 
 
-def populate_schemas(test_configuration: MetricFlowTestConfiguration) -> None:  # noqa: D103
+def populate_schemas(test_configuration: MetricFlowEngineConfiguration) -> None:  # noqa: D103
     set_engine_env_variables(test_configuration)
 
     if test_configuration.engine is SqlEngine.DUCKDB or test_configuration.engine is SqlEngine.POSTGRES:
