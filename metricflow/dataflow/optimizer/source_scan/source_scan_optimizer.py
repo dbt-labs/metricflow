@@ -280,7 +280,14 @@ class SourceScanOptimizer(
                     for branch_combination_result in combination_results
                 ]
 
-        logger.debug(lambda: f"Got {len(combined_parent_branches)} branches after combination")
+        logger.debug(
+            LazyFormat(
+                "Possible branches combined.",
+                count_of_branches_before_combination=len(optimized_parent_branches),
+                count_of_branches_after_combination=len(combined_parent_branches),
+            )
+        )
+
         assert len(combined_parent_branches) > 0
 
         # If we were able to reduce the parent branches of the CombineAggregatedOutputsNode into a single one, there's
