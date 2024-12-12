@@ -18,6 +18,7 @@ from metricflow_semantics.test_helpers.snapshot_helpers import (
     add_overwrite_snapshots_cli_flag,
 )
 
+from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from tests_metricflow import TESTS_METRICFLOW_DIRECTORY_ANCHOR
 from tests_metricflow.snapshots import METRICFLOW_SNAPSHOT_DIRECTORY_ANCHOR
 from tests_metricflow.table_snapshot.table_snapshots import SqlTableSnapshotHash, SqlTableSnapshotRepository
@@ -56,13 +57,20 @@ def pytest_addoption(parser: _pytest.config.argparsing.Parser) -> None:
 
 # Name of the pytest marker for tests that generate SQL-engine specific snapshots.
 SQL_ENGINE_SNAPSHOT_MARKER_NAME = "sql_engine_snapshot"
+# Name of the pytest marker to indicate that the test should only be run when the test session is configured to use
+# DuckDB as the SQL engine.
+DUCKDB_ONLY_MARKER_NAME = "duckdb_only"
 
 
 def pytest_configure(config: _pytest.config.Config) -> None:
     """Hook as specified by the pytest API for configuration."""
     config.addinivalue_line(
         name="markers",
-        line=f"{SQL_ENGINE_SNAPSHOT_MARKER_NAME}: mark tests as generating a snapshot specific to a SQL engine",
+        line=f"{SQL_ENGINE_SNAPSHOT_MARKER_NAME}: mark tests as generating a snapshot specific to a SQL engine.",
+    )
+    config.addinivalue_line(
+        name="markers",
+        line=f"{DUCKDB_ONLY_MARKER_NAME}: mark tests as one that should only be run with DuckDB.",
     )
     config.addinivalue_line(
         name="markers",
@@ -72,12 +80,23 @@ def pytest_configure(config: _pytest.config.Config) -> None:
 
 def check_sql_engine_snapshot_marker(request: FixtureRequest) -> None:
     """Raises an error if the given test request does not have the sql-engine-test marker set."""
-    mark_names = set(mark.name for mark in request.node.iter_markers(name=SQL_ENGINE_SNAPSHOT_MARKER_NAME))
-    if SQL_ENGINE_SNAPSHOT_MARKER_NAME not in mark_names:
+    if request.node.get_closest_marker(SQL_ENGINE_SNAPSHOT_MARKER_NAME) is None:
         raise ValueError(
-            f"This test needs to be marked with '{SQL_ENGINE_SNAPSHOT_MARKER_NAME}' to keep track of all tests that "
+            f"This test needs to be marked with {SQL_ENGINE_SNAPSHOT_MARKER_NAME!r} to keep track of all tests that "
             f"generate SQL-engine specific snapshots."
         )
+
+
+@pytest.fixture(autouse=True)
+def skip_if_not_duck_db(request: FixtureRequest, sql_client: SqlClient) -> None:
+    """Skip tests if the test is marked for testing with DuckDB only, but the test session uses a different engine."""
+    if request.node.get_closest_marker(DUCKDB_ONLY_MARKER_NAME) is None:
+        return
+
+    test_session_engine_type = sql_client.sql_engine_type
+    duckdb_engine_type = SqlEngine.DUCKDB
+    if test_session_engine_type is not duckdb_engine_type:
+        pytest.skip(f"Skipping as this test is only run with {duckdb_engine_type}, but {test_session_engine_type=}")
 
 
 @pytest.fixture(scope="session")
