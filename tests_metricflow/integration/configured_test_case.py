@@ -4,7 +4,7 @@ import logging
 import os
 from collections import OrderedDict
 from enum import Enum
-from typing import Dict, Optional, Sequence, Tuple
+from typing import Dict, Optional, Sequence, Tuple, Union
 
 import yaml
 from dbt_semantic_interfaces.implementations.base import FrozenBaseModel
@@ -37,6 +37,13 @@ class RequiredDwEngineFeature(Enum):
         return f"{self.__class__.__name__}.{self.name}"
 
 
+class IntegrationTestMetric(FrozenBaseModel):
+    """A metric for an integration test."""
+
+    name: str
+    alias: Optional[str]
+
+
 class ConfiguredIntegrationTestCase(FrozenBaseModel):
     """Integration test case parsed from YAML files."""
 
@@ -51,7 +58,7 @@ class ConfiguredIntegrationTestCase(FrozenBaseModel):
     # The SQL query that can be run to obtain the expected results.
     check_query: str
     file_path: str
-    metrics: Tuple[str, ...] = ()
+    metrics: Tuple[Union[IntegrationTestMetric, str], ...] = ()
     group_bys: Tuple[str, ...] = ()
     group_by_objs: Tuple[Dict, ...] = ()
     order_bys: Tuple[str, ...] = ()
