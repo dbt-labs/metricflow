@@ -14,6 +14,7 @@ from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifest
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
 from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
 from metricflow_semantics.naming.metric_scheme import MetricNamingScheme
+from metricflow_semantics.protocols.query_parameter import MetricQueryParameter
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_pattern_factory import (
     WhereFilterPatternFactory,
 )
@@ -196,6 +197,18 @@ class MetricFlowQueryResolver:
                     )
                 )
             else:
+                # Add the desired alias to the spec if it's provided in the input object
+                if (
+                    isinstance(metric_input.input_obj, MetricQueryParameter)
+                    and metric_input.input_obj.alias is not None
+                ):
+                    matching_specs = tuple(
+                        MetricSpec(
+                            element_name=ms.element_name,
+                            alias=metric_input.input_obj.alias,
+                        )
+                        for ms in matching_specs
+                    )
                 metric_specs.extend(matching_specs)
 
         return ResolveMetricsResult(
