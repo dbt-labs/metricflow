@@ -5,7 +5,7 @@ test_filename: test_dataflow_to_execution.py
     <SelectSqlQueryToDataTableTask>
         <!-- description = 'Run a query and write the results to a data frame' -->
         <!-- node_id = NodeId(id_str='rsq_0') -->
-        <!-- sql_query =                                                                                 -->
+        <!-- sql =                                                                                       -->
         <!--   ('-- Combine Aggregated Outputs\n'                                                        -->
         <!--    'WITH sma_28009_cte AS (\n'                                                              -->
         <!--    "  -- Read Elements From Semantic Model 'bookings_source'\n"                             -->

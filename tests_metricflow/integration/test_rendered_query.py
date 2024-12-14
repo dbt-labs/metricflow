@@ -31,7 +31,7 @@ def test_render_query(  # noqa: D103
         request=request,
         mf_test_configuration=mf_test_configuration,
         snapshot_id="query0",
-        sql=result.rendered_sql.sql_query,
+        sql=result.sql_statement.sql,
         sql_engine=it_helpers.sql_client.sql_engine_type,
     )
 
@@ -64,7 +64,7 @@ def test_id_enumeration(  # noqa: D103
         request=request,
         mf_test_configuration=mf_test_configuration,
         snapshot_id="query",
-        sql=result.rendered_sql.sql_query,
+        sql=result.sql_statement.sql,
         sql_engine=sql_client.sql_engine_type,
     )
 
@@ -80,6 +80,6 @@ def test_id_enumeration(  # noqa: D103
         request=request,
         mf_test_configuration=mf_test_configuration,
         snapshot_id="query",
-        sql=result.rendered_sql.sql_query,
+        sql=result.sql_statement.sql,
         sql_engine=sql_client.sql_engine_type,
     )

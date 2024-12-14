@@ -5,7 +5,7 @@ test_filename: test_dataflow_to_execution.py
     <SelectSqlQueryToDataTableTask>
         <!-- description = 'Run a query and write the results to a data frame' -->
         <!-- node_id = NodeId(id_str='rsq_0') -->
-        <!-- sql_query =                                                                         -->
+        <!-- sql =                                                                               -->
         <!--   ('-- Join Standard Outputs\n'                                                     -->
         <!--    "-- Pass Only Elements: ['bookings', 'is_instant', 'listing__country_latest']\n" -->
         <!--    '-- Aggregate Measures\n'                                                        -->

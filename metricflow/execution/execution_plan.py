@@ -27,10 +27,10 @@ class ExecutionPlanTask(DagNode["ExecutionPlanTask"], Visitable, ABC):
     for these nodes as it seems more intuitive.
 
     Attributes:
-        sql_query: If this runs a SQL query, return the associated SQL.
+        sql_statement: If this runs a SQL query, return the associated SQL.
     """
 
-    sql_query: Optional[SqlQuery]
+    sql_statement: Optional[SqlStatement]
 
     @abstractmethod
     def execute(self) -> TaskExecutionResult:
@@ -44,12 +44,25 @@ class ExecutionPlanTask(DagNode["ExecutionPlanTask"], Visitable, ABC):
 
 
 @dataclass(frozen=True)
-class SqlQuery:
-    """A SQL query that can be run along with bind parameters."""
+class SqlStatement:
+    """Encapsulates a SQL statement along with the bind parameters that should be used."""
 
     # This field will be renamed as it is confusing given the class name.
-    sql_query: str
+    sql: str
     bind_parameter_set: SqlBindParameterSet
+
+    @property
+    def without_descriptions(self) -> SqlStatement:
+        """Return the SQL query without the inline descriptions."""
+        return SqlStatement(
+            sql="\n".join(
+                filter(
+                    lambda line: not line.strip().startswith("--"),
+                    self.sql.split("\n"),
+                )
+            ),
+            bind_parameter_set=self.bind_parameter_set,
+        )
 
 
 @dataclass(frozen=True)
@@ -80,7 +93,7 @@ class SelectSqlQueryToDataTableTask(ExecutionPlanTask):
 
     Attributes:
         sql_client: The SQL client used to run the query.
-        sql_query: The SQL query to run.
+        sql_statement: The SQL query to run.
         parent_nodes: The parent tasks for this execution plan task.
     """
 
@@ -90,12 +103,12 @@ class SelectSqlQueryToDataTableTask(ExecutionPlanTask):
     @staticmethod
     def create(  # noqa: D102
         sql_client: SqlClient,
-        sql_query: SqlQuery,
+        sql_statement: SqlStatement,
         parent_nodes: Sequence[ExecutionPlanTask] = (),
     ) -> SelectSqlQueryToDataTableTask:
         return SelectSqlQueryToDataTableTask(
             sql_client=sql_client,
-            sql_query=sql_query,
+            sql_statement=sql_statement,
             parent_nodes=tuple(parent_nodes),
         )
 
@@ -109,31 +122,30 @@ class SelectSqlQueryToDataTableTask(ExecutionPlanTask):
 
     @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
-        sql_query = self.sql_query
-        assert sql_query is not None, f"{self.sql_query=} should have been set during creation."
-        return tuple(super().displayed_properties) + (DisplayedProperty(key="sql_query", value=sql_query.sql_query),)
+        assert self.sql_statement is not None, f"{self.sql_statement=} should have been set during creation."
+        return tuple(super().displayed_properties) + (DisplayedProperty(key="sql", value=self.sql_statement.sql),)
 
     def execute(self) -> TaskExecutionResult:  # noqa: D102
         start_time = time.time()
-        sql_query = self.sql_query
-        assert sql_query is not None, f"{self.sql_query=} should have been set during creation."
+        sql_statement = self.sql_statement
+        assert sql_statement is not None, f"{self.sql_statement=} should have been set during creation."
 
         df = self.sql_client.query(
-            sql_query.sql_query,
-            sql_bind_parameter_set=sql_query.bind_parameter_set,
+            sql_statement.sql,
+            sql_bind_parameter_set=sql_statement.bind_parameter_set,
         )
 
         end_time = time.time()
         return TaskExecutionResult(
             start_time=start_time,
             end_time=end_time,
-            sql=sql_query.sql_query,
-            bind_params=sql_query.bind_parameter_set,
+            sql=sql_statement.sql,
+            bind_params=sql_statement.bind_parameter_set,
             df=df,
         )
 
     def __repr__(self) -> str:  # noqa: D105
-        return f"{self.__class__.__name__}(sql_query='{self.sql_query}')"
+        return f"{self.__class__.__name__}(sql_statement={self.sql_statement!r})"
 
 
 @dataclass(frozen=True)
@@ -144,7 +156,7 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
 
     Attributes:
         sql_client: The SQL client used to run the query.
-        sql_query: The SQL query to run.
+        sql_statement: The SQL query to run.
         output_table: The table where the results will be written.
     """
 
@@ -154,13 +166,13 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
     @staticmethod
     def create(  # noqa: D102
         sql_client: SqlClient,
-        sql_query: SqlQuery,
+        sql_statement: SqlStatement,
         output_table: SqlTable,
         parent_nodes: Sequence[ExecutionPlanTask] = (),
     ) -> SelectSqlQueryToTableTask:
         return SelectSqlQueryToTableTask(
             sql_client=sql_client,
-            sql_query=sql_query,
+            sql_statement=sql_statement,
             output_table=output_table,
             parent_nodes=tuple(parent_nodes),
         )
@@ -175,31 +187,31 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
 
     @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
-        sql_query = self.sql_query
-        assert sql_query is not None, f"{self.sql_query=} should have been set during creation."
+        sql_statement = self.sql_statement
+        assert sql_statement is not None, f"{self.sql_statement=} should have been set during creation."
         return tuple(super().displayed_properties) + (
-            DisplayedProperty(key="sql_query", value=sql_query.sql_query),
+            DisplayedProperty(key="sql_statement", value=sql_statement.sql),
             DisplayedProperty(key="output_table", value=self.output_table),
-            DisplayedProperty(key="bind_parameter_set", value=sql_query.bind_parameter_set),
+            DisplayedProperty(key="bind_parameter_set", value=sql_statement.bind_parameter_set),
         )
 
     def execute(self) -> TaskExecutionResult:  # noqa: D102
-        sql_query = self.sql_query
-        assert sql_query is not None, f"{self.sql_query=} should have been set during creation."
+        sql_statement = self.sql_statement
+        assert sql_statement is not None, f"{self.sql_statement=} should have been set during creation."
         start_time = time.time()
         logger.debug(LazyFormat(lambda: f"Dropping table {self.output_table} in case it already exists"))
         self.sql_client.execute(f"DROP TABLE IF EXISTS {self.output_table.sql}")
         logger.debug(LazyFormat(lambda: f"Creating table {self.output_table} using a query"))
         self.sql_client.execute(
-            sql_query.sql_query,
-            sql_bind_parameter_set=sql_query.bind_parameter_set,
+            sql_statement.sql,
+            sql_bind_parameter_set=sql_statement.bind_parameter_set,
         )
 
         end_time = time.time()
-        return TaskExecutionResult(start_time=start_time, end_time=end_time, sql=sql_query.sql_query)
+        return TaskExecutionResult(start_time=start_time, end_time=end_time, sql=sql_statement.sql)
 
     def __repr__(self) -> str:  # noqa: D105
-        return f"{self.__class__.__name__}(sql_query='{self.sql_query}', output_table={self.output_table})"
+        return f"{self.__class__.__name__}(sql_statement={self.sql_statement!r}', output_table={self.output_table})"
 
 
 class ExecutionPlan(MetricFlowDag[ExecutionPlanTask]):

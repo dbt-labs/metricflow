@@ -35,7 +35,7 @@ class NoOpExecutionPlanTask(ExecutionPlanTask):
     ) -> NoOpExecutionPlanTask:
         return NoOpExecutionPlanTask(
             parent_nodes=tuple(parent_tasks),
-            sql_query=None,
+            sql_statement=None,
             should_error=should_error,
         )
 
