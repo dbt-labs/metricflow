@@ -102,7 +102,7 @@ class SqlMapRequiredColumnAliasesVisitor(SqlQueryPlanNodeVisitor[None]):
         if select_node.where:
             all_expr_search_results.append(select_node.where.lineage)
 
-        return SqlExpressionTreeLineage.combine(all_expr_search_results)
+        return SqlExpressionTreeLineage.merge_iterable(all_expr_search_results)
 
     @override
     def visit_cte_node(self, node: SqlCteNode) -> None:
