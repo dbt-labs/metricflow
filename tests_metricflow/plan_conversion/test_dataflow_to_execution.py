@@ -36,6 +36,7 @@ def make_execution_plan_converter(  # noqa: D103
 
 
 @pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
 def test_joined_plan(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -75,6 +76,7 @@ def test_joined_plan(  # noqa: D103
 
 
 @pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
 def test_small_combined_metrics_plan(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -112,6 +114,7 @@ def test_small_combined_metrics_plan(  # noqa: D103
 
 
 @pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
 def test_combined_metrics_plan(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -151,6 +154,7 @@ def test_combined_metrics_plan(  # noqa: D103
 
 
 @pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
 def test_multihop_joined_plan(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,

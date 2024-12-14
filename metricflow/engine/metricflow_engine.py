@@ -51,7 +51,7 @@ from metricflow.execution.convert_to_execution_plan import ConvertToExecutionPla
 from metricflow.execution.dataflow_to_execution import (
     DataflowToExecutionPlanConverter,
 )
-from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
+from metricflow.execution.execution_plan import ExecutionPlan, SqlStatement
 from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
@@ -177,35 +177,31 @@ class MetricFlowExplainResult:
     output_table: Optional[SqlTable] = None
 
     @property
-    def rendered_sql(self) -> SqlQuery:
+    def sql_statement(self) -> SqlStatement:
         """Return the SQL query that would be run for the given query."""
         execution_plan = self.execution_plan
         if len(execution_plan.tasks) != 1:
             raise NotImplementedError(
-                f"Multiple tasks in the execution plan not yet supported. Got tasks: {execution_plan.tasks}"
-            )
-
-        sql_query = execution_plan.tasks[0].sql_query
-        if not sql_query:
-            raise NotImplementedError(
-                f"Execution plan tasks without a SQL query not yet supported. Got tasks: {execution_plan.tasks}"
-            )
-
-        return sql_query
-
-    @property
-    def rendered_sql_without_descriptions(self) -> SqlQuery:
-        """Return the SQL query without the inline descriptions."""
-        sql_query = self.rendered_sql
-        return SqlQuery(
-            sql_query="\n".join(
-                filter(
-                    lambda line: not line.strip().startswith("--"),
-                    sql_query.sql_query.split("\n"),
+                str(
+                    LazyFormat(
+                        "Multiple tasks in the execution plan not yet supported.",
+                        tasks=[task.task_id for task in execution_plan.tasks],
+                    )
                 )
-            ),
-            bind_parameter_set=sql_query.bind_parameter_set,
-        )
+            )
+
+        sql_statement = execution_plan.tasks[0].sql_statement
+        if not sql_statement:
+            raise NotImplementedError(
+                str(
+                    LazyFormat(
+                        "Execution plan tasks without a SQL statement are not yet supported.",
+                        tasks=[task.task_id for task in execution_plan.tasks],
+                    )
+                )
+            )
+
+        return sql_statement
 
     @property
     def execution_plan(self) -> ExecutionPlan:  # noqa: D102
