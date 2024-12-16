@@ -586,7 +586,7 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
 
     @override
     def visit_cte_node(self, node: SqlCteNode) -> SqlQueryPlanNode:
-        raise NotImplementedError
+        return node
 
     def visit_select_statement_node(self, node: SqlSelectStatementNode) -> SqlQueryPlanNode:  # noqa: D102
         node_with_reduced_parents = self._reduce_parents(node)

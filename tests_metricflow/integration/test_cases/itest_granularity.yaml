@@ -961,3 +961,12 @@ integration_test:
       GROUP BY subq_2.martian_day
     ) subq_5
     ON subq_6.metric_time__martian_day = subq_5.metric_time__martian_day
+---
+integration_test:
+  name: custom_offset_window
+  description: Test querying a metric with a custom offset window
+  model: SIMPLE_MODEL
+  metrics: ["bookings_offset_one_martian_day"]
+  group_bys: ["metric_time__day"] # TODO: add other standard grains + custom grain
+  check_query: |
+    SELECT 1
