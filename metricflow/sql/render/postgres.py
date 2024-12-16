@@ -47,7 +47,7 @@ class PostgresSqlExpressionRenderer(DefaultSqlExpressionRenderer):
 
         count = node.count
         granularity = node.granularity
-        if granularity == TimeGranularity.QUARTER:
+        if granularity is TimeGranularity.QUARTER:
             granularity = TimeGranularity.MONTH
             count *= 3
         return SqlExpressionRenderResult(
@@ -62,9 +62,9 @@ class PostgresSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         count_rendered = node.count_expr.accept(self).sql
 
         granularity = node.granularity
-        if granularity == TimeGranularity.QUARTER:
+        if granularity is TimeGranularity.QUARTER:
             granularity = TimeGranularity.MONTH
-            count_rendered = f"{count_rendered} * 3"
+            count_rendered = f"({count_rendered} * 3)"
 
         return SqlExpressionRenderResult(
             sql=f"{arg_rendered.sql} + MAKE_INTERVAL({granularity.value}s => {count_rendered})",

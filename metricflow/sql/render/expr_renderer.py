@@ -311,7 +311,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
 
         count = node.count
         granularity = node.granularity
-        if granularity == TimeGranularity.QUARTER:
+        if granularity is TimeGranularity.QUARTER:
             granularity = TimeGranularity.MONTH
             count *= 3
         return SqlExpressionRenderResult(
@@ -324,9 +324,9 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         count_rendered = node.count_expr.accept(self).sql
 
         granularity = node.granularity
-        if granularity == TimeGranularity.QUARTER:
+        if granularity is TimeGranularity.QUARTER:
             granularity = TimeGranularity.MONTH
-            count_rendered = f"{count_rendered} * 3"
+            count_rendered = f"({count_rendered} * 3)"
 
         return SqlExpressionRenderResult(
             sql=f"DATEADD({granularity.value}, {count_rendered}, {arg_rendered.sql})",

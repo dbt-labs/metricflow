@@ -44,7 +44,7 @@ class DuckDbSqlExpressionRenderer(DefaultSqlExpressionRenderer):
 
         count = node.count
         granularity = node.granularity
-        if granularity == TimeGranularity.QUARTER:
+        if granularity is TimeGranularity.QUARTER:
             granularity = TimeGranularity.MONTH
             count *= 3
 
@@ -60,9 +60,9 @@ class DuckDbSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         count_rendered = node.count_expr.accept(self).sql
 
         granularity = node.granularity
-        if granularity == TimeGranularity.QUARTER:
+        if granularity is TimeGranularity.QUARTER:
             granularity = TimeGranularity.MONTH
-            count_rendered = f"{count_rendered} * 3"
+            count_rendered = f"({count_rendered} * 3)"
 
         return SqlExpressionRenderResult(
             sql=f"{arg_rendered.sql} + INTERVAL {count_rendered} {granularity.value}",
