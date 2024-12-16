@@ -2,7 +2,7 @@ test_name: test_add_time_expr
 test_filename: test_engine_specific_rendering.py
 docstring:
   Tests rendering of the SqlAddTimeExpr in a query.
-sql_engine: Redshift
+sql_engine: Databricks
 ---
 -- Test Add Time Expression
 SELECT
