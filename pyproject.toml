@@ -177,3 +177,4 @@ filterwarnings = [
   'ignore:.*Type google.*:DeprecationWarning',
 ]
 python_functions = "test_* populate_source_schema"
+addopts = "--ignore tests_metricflow/performance/"
