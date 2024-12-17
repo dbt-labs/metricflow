@@ -14,7 +14,11 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.protocols.query_parameter import DimensionOrEntityQueryParameter
-from metricflow_semantics.specs.query_param_implementations import DimensionOrEntityParameter, TimeDimensionParameter
+from metricflow_semantics.specs.query_param_implementations import (
+    DimensionOrEntityParameter,
+    MetricParameter,
+    TimeDimensionParameter,
+)
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.time.time_constants import ISO8601_PYTHON_FORMAT, ISO8601_PYTHON_TS_FORMAT
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
@@ -274,7 +278,12 @@ def test_case(
             group_by.append(DimensionOrEntityParameter(**kwargs))
     query_result = engine.query(
         MetricFlowQueryRequest.create_with_random_request_id(
-            metric_names=case.metrics,
+            metrics=tuple(
+                MetricParameter(name=m, alias=None)
+                if isinstance(m, str)
+                else MetricParameter(name=m.name, alias=m.alias)
+                for m in case.metrics
+            ),
             group_by_names=case.group_bys if len(case.group_bys) > 0 else None,
             group_by=tuple(group_by) if len(group_by) > 0 else None,
             limit=case.limit,
