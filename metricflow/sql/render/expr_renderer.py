@@ -12,13 +12,11 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.mf_logging.formatting import indent
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
-from typing_extensions import override
-
-from metricflow.sql.render.rendering_constants import SqlRenderingConstants
-from metricflow.sql.sql_exprs import (
+from metricflow_semantics.sql.sql_exprs import (
     SqlAddTimeExpression,
     SqlAggregateFunctionExpression,
     SqlBetweenExpression,
+    SqlCaseExpression,
     SqlCastToTimestampExpression,
     SqlColumnAliasReferenceExpression,
     SqlColumnReferenceExpression,
@@ -40,6 +38,9 @@ from metricflow.sql.sql_exprs import (
     SqlSubtractTimeIntervalExpression,
     SqlWindowFunctionExpression,
 )
+from typing_extensions import override
+
+from metricflow.sql.render.rendering_constants import SqlRenderingConstants
 from metricflow.sql.sql_plan import SqlSelectColumn
 
 if TYPE_CHECKING:
@@ -438,3 +439,18 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
             sql="UUID()",
             bind_parameter_set=SqlBindParameterSet(),
         )
+
+    def visit_case_expr(self, node: SqlCaseExpression) -> SqlExpressionRenderResult:  # noqa: D102
+        sql = "CASE\n"
+        for when, then in node.when_to_then_exprs.items():
+            sql += indent(
+                f"WHEN {self.render_sql_expr(when).sql} THEN {self.render_sql_expr(then).sql}\n",
+                indent_prefix=SqlRenderingConstants.INDENT,
+            )
+        if node.else_expr:
+            sql += indent(
+                f"ELSE {self.render_sql_expr(node.else_expr).sql}\n",
+                indent_prefix=SqlRenderingConstants.INDENT,
+            )
+        sql += "END"
+        return SqlExpressionRenderResult(sql=sql, bind_parameter_set=SqlBindParameterSet())

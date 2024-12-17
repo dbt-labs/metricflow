@@ -6,10 +6,7 @@ from typing import List, Optional, Sequence, Tuple
 
 from metricflow_semantics.mf_logging.formatting import indent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from typing_extensions import override
-
-from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
-from metricflow.sql.sql_exprs import (
+from metricflow_semantics.sql.sql_exprs import (
     SqlColumnAliasReferenceExpression,
     SqlColumnReference,
     SqlColumnReplacements,
@@ -18,6 +15,9 @@ from metricflow.sql.sql_exprs import (
     SqlLogicalExpression,
     SqlLogicalOperator,
 )
+from typing_extensions import override
+
+from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlCteNode,
@@ -586,7 +586,7 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
 
     @override
     def visit_cte_node(self, node: SqlCteNode) -> SqlQueryPlanNode:
-        raise NotImplementedError
+        return node
 
     def visit_select_statement_node(self, node: SqlSelectStatementNode) -> SqlQueryPlanNode:  # noqa: D102
         node_with_reduced_parents = self._reduce_parents(node)

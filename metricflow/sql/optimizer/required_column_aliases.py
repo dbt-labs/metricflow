@@ -5,10 +5,10 @@ from collections import defaultdict
 from typing import Dict, FrozenSet, List, Set, Tuple
 
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.sql.sql_exprs import SqlExpressionTreeLineage
 from typing_extensions import override
 
 from metricflow.sql.optimizer.tag_column_aliases import NodeToColumnAliasMapping
-from metricflow.sql.sql_exprs import SqlExpressionTreeLineage
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlCteNode,
@@ -131,6 +131,7 @@ class SqlMapRequiredColumnAliasesVisitor(SqlQueryPlanNodeVisitor[None]):
     def visit_select_statement_node(self, node: SqlSelectStatementNode) -> None:
         """Based on required column aliases for this SELECT, figure out required column aliases in parents."""
         initial_required_column_aliases_in_this_node = self._current_required_column_alias_mapping.get_aliases(node)
+        print(self._current_required_column_alias_mapping._node_to_tagged_aliases[node])
 
         # If this SELECT statement uses DISTINCT, all columns are required as removing them would change the meaning of
         # the query.
@@ -161,10 +162,10 @@ class SqlMapRequiredColumnAliasesVisitor(SqlQueryPlanNodeVisitor[None]):
             if select_column.column_alias in updated_required_column_aliases_in_this_node
         )
 
-        if len(required_select_columns_in_this_node) == 0:
-            raise RuntimeError(
-                "No columns are required in this node - this indicates a bug in this visitor or in the inputs."
-            )
+        # if len(required_select_columns_in_this_node) == 0:
+        #     raise RuntimeError(
+        #         "No columns are required in this node - this indicates a bug in this visitor or in the inputs."
+        #     )
         # It's possible for `required_select_columns_in_this_node` to be empty because we traverse through the ancestors
         # of a CTE node whenever a CTE node is updated. See `test_multi_child_pruning`.
 
