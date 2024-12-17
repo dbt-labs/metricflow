@@ -23,7 +23,7 @@ from metricflow.sql.sql_plan import (
     SqlCteNode,
     SqlJoinDescription,
     SqlOrderByDescription,
-    SqlQueryPlan,
+    SqlPlan,
     SqlQueryPlanNode,
     SqlQueryPlanNodeVisitor,
     SqlSelectColumn,
@@ -49,7 +49,7 @@ class SqlQueryPlanRenderer(SqlQueryPlanNodeVisitor[SqlPlanRenderResult], ABC):
     def _render_node(self, node: SqlQueryPlanNode) -> SqlPlanRenderResult:
         return node.accept(self)
 
-    def render_sql_query_plan(self, sql_query_plan: SqlQueryPlan) -> SqlPlanRenderResult:  # noqa: D102
+    def render_sql_query_plan(self, sql_query_plan: SqlPlan) -> SqlPlanRenderResult:  # noqa: D102
         return self._render_node(sql_query_plan.render_node)
 
     @property
