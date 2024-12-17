@@ -17,6 +17,7 @@ from metricflow.sql.render.expr_renderer import (
 )
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from metricflow.sql.sql_exprs import (
+    SqlAddTimeExpression,
     SqlBetweenExpression,
     SqlGenerateUuidExpression,
     SqlPercentileExpression,
@@ -45,17 +46,33 @@ class TrinoSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         )
 
     @override
-    def visit_time_delta_expr(self, node: SqlSubtractTimeIntervalExpression) -> SqlExpressionRenderResult:
+    def visit_subtract_time_interval_expr(self, node: SqlSubtractTimeIntervalExpression) -> SqlExpressionRenderResult:
         """Render time delta for Trino, require granularity in quotes and function name change."""
         arg_rendered = node.arg.accept(self)
 
         count = node.count
         granularity = node.granularity
-        if granularity == TimeGranularity.QUARTER:
+        if granularity is TimeGranularity.QUARTER:
             granularity = TimeGranularity.MONTH
             count *= 3
         return SqlExpressionRenderResult(
             sql=f"DATE_ADD('{granularity.value}', -{count}, {arg_rendered.sql})",
+            bind_parameter_set=arg_rendered.bind_parameter_set,
+        )
+
+    @override
+    def visit_add_time_expr(self, node: SqlAddTimeExpression) -> SqlExpressionRenderResult:
+        """Render time delta for Trino, require granularity in quotes and function name change."""
+        arg_rendered = node.arg.accept(self)
+        count_rendered = node.count_expr.accept(self).sql
+
+        granularity = node.granularity
+        if granularity is TimeGranularity.QUARTER:
+            granularity = TimeGranularity.MONTH
+            count_rendered = f"({count_rendered} * 3)"
+
+        return SqlExpressionRenderResult(
+            sql=f"DATE_ADD('{granularity.value}', {count_rendered}, {arg_rendered.sql})",
             bind_parameter_set=arg_rendered.bind_parameter_set,
         )
 

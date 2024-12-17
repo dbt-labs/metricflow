@@ -69,6 +69,7 @@ class StaticIdPrefix(IdPrefix, Enum, metaclass=EnumMetaClassHelper):
     SQL_EXPR_CAST_TO_TIMESTAMP_PREFIX = "ctt"
     SQL_EXPR_DATE_TRUNC = "dt"
     SQL_EXPR_SUBTRACT_TIME_INTERVAL_PREFIX = "sti"
+    SQL_EXPR_ADD_TIME_PREFIX = "ati"
     SQL_EXPR_EXTRACT = "ex"
     SQL_EXPR_RATIO_COMPUTATION = "rc"
     SQL_EXPR_BETWEEN_PREFIX = "betw"
