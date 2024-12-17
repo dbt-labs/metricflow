@@ -1373,7 +1373,7 @@ class SqlAddTimeExpression(SqlExpressionNode):
 
     @property
     def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
-        return SqlExpressionTreeLineage.combine(
+        return SqlExpressionTreeLineage.merge_iterable(
             tuple(x.lineage for x in self.parent_nodes) + (SqlExpressionTreeLineage(other_exprs=(self,)),)
         )
 
