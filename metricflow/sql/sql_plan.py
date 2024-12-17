@@ -392,14 +392,14 @@ class SqlCreateTableAsNode(SqlQueryPlanNode):
         return self.parent_node.nearest_select_columns(cte_source_mapping)
 
 
-class SqlQueryPlan(MetricFlowDag[SqlQueryPlanNode]):
-    """Model for an SQL Query as a DAG."""
+class SqlPlan(MetricFlowDag[SqlQueryPlanNode]):
+    """Model for an SQL statement as a DAG."""
 
     def __init__(self, render_node: SqlQueryPlanNode, plan_id: Optional[DagId] = None) -> None:
-        """Constructor.
+        """initializer.
 
         Args:
-            render_node: The node from which to start rendering the SQL query.
+            render_node: The node from which to start rendering the SQL statement.
             plan_id: If specified, use this sql_query_plan_id instead of a generated one.
         """
         self._render_node = render_node
