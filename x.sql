@@ -17,18 +17,16 @@ with cte as (
 
 SELECT
     metric_time__week,
-    metric_time__fiscal_year,
+    fiscal_year AS metric_time__fiscal_year,
     SUM(total_price) AS revenue_last_fiscal_quarter
 FROM ANALYTICS_DEV.DBT_JSTEIN.STG_SALESFORCE__ORDER_ITEMS
 INNER JOIN (
-    -- ApplyStandardGranularityNode
-    -- Also AliasSpecsNode here??
-    SELECT
-        offset_by_custom_grain.date_day AS metric_time__day, -- This alias is only needed if it was requested in the query
-        DATE_TRUNC(week, offset_by_custom_grain.date_day) AS metric_time__week,
-        fiscal_year AS metric_time__fiscal_year
-    FROM (
     -- OffsetByCustomGranularityNode
+    -- Apply grains: include base grain for any requested custom grains, also keep base grain for join
+    SELECT
+        offset_by_custom_grain.date_day,
+        DATE_TRUNC(week, offset_by_custom_grain.date_day) AS metric_time__week,
+    FROM (
         select
             fiscal_quarter
             , case
@@ -38,13 +36,11 @@ INNER JOIN (
                 end as date_day
         from cte -- CustomGranularityBoundsNode
         inner join (
-        -- OffsetCustomGranularityBoundsNode
             select
                 fiscal_quarter,
                 lag(ds__fiscal_quarter__first_value, 1) over (order by fiscal_quarter) as fiscal_quarter_start__offset_by_1,
                 lag(ds__fiscal_quarter__last_value, 1) over (order by fiscal_quarter) as fiscal_quarter_end__offset_by_1
             from (
-            -- FilterEelementsNode
                 select
                     fiscal_quarter,
                     ds__fiscal_quarter__first_value,
@@ -54,9 +50,9 @@ INNER JOIN (
             ) ts_distinct
         ) ts_with_offset_intervals USING (fiscal_quarter)
     ) as offset_by_custom_grain
-     -- JoinToCustomGranularityNode
-    LEFT JOIN ANALYTICS_DEV.DBT_JSTEIN.ALL_DAYS custom ON custom.date_day = offset_by_custom_grain.date_day
 ) ts_offset_dates ON ts_offset_dates.date_day = DATE_TRUNC(day, created_at)::date -- always join on base time spine column
+-- JoinToCustomGranularityNode (only if needed)
+LEFT JOIN ANALYTICS_DEV.DBT_JSTEIN.ALL_DAYS custom ON custom.date_day = ts_offset_dates.date_day
 GROUP BY 1, 2
 ORDER BY 1, 2;
 

@@ -1928,17 +1928,10 @@ class DataflowPlanBuilder:
                     custom_granularity_name=custom_grain.name,
                 )
                 time_spine_node: DataflowPlanNode = OffsetByCustomGranularityNode.create(
-                    parent_node=bounds_node, offset_window=offset_window
+                    parent_node=bounds_node,
+                    offset_window=offset_window,
+                    required_time_spine_specs=required_time_spine_specs,
                 )
-                # if queried_standard_specs:
-                #     # TODO: This is also when we can change the alias names to match the requested specs
-                #     time_spine_node = ApplyStandardGranularityNode.create(
-                #         parent_node=time_spine_node, time_dimension_specs=queried_standard_specs
-                #     )
-                for custom_spec in queried_custom_specs:
-                    time_spine_node = JoinToCustomGranularityNode.create(
-                        parent_node=time_spine_node, time_dimension_spec=custom_spec
-                    )
         else:
             # TODO: support multiple time spines here. Build node on the one with the smallest base grain.
             # Then, pass custom_granularity_specs into _build_pre_aggregation_plan if they aren't satisfied by smallest time spine.
@@ -1964,8 +1957,6 @@ class DataflowPlanBuilder:
             should_dedupe = ExpandedTimeGranularity.from_time_granularity(time_spine_source.base_granularity) not in {
                 spec.time_granularity for spec in queried_time_spine_specs
             }
-
-        # -- JoinToCustomGranularityNode -- if needed to support another custom grain not covered by initial time spine
 
         return self._build_pre_aggregation_plan(
             source_node=time_spine_node,
