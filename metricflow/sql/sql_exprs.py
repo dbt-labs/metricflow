@@ -212,7 +212,13 @@ class SqlExpressionNodeVisitor(Generic[VisitorOutputT], ABC):
         pass
 
     @abstractmethod
-    def visit_time_delta_expr(self, node: SqlSubtractTimeIntervalExpression) -> VisitorOutputT:  # noqa: D102
+    def visit_subtract_time_interval_expr(  # noqa: D102
+        self, node: SqlSubtractTimeIntervalExpression
+    ) -> VisitorOutputT:
+        pass
+
+    @abstractmethod
+    def visit_add_time_expr(self, node: SqlAddTimeExpression) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
@@ -1289,11 +1295,11 @@ class SqlSubtractTimeIntervalExpression(SqlExpressionNode):
         return False
 
     def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
-        return visitor.visit_time_delta_expr(self)
+        return visitor.visit_subtract_time_interval_expr(self)
 
     @property
     def description(self) -> str:  # noqa: D102
-        return "Time delta"
+        return "Subtract time interval"
 
     def rewrite(  # noqa: D102
         self,
@@ -1316,6 +1322,65 @@ class SqlSubtractTimeIntervalExpression(SqlExpressionNode):
         if not isinstance(other, SqlSubtractTimeIntervalExpression):
             return False
         return self.count == other.count and self.granularity == other.granularity and self._parents_match(other)
+
+
+@dataclass(frozen=True, eq=False)
+class SqlAddTimeExpression(SqlExpressionNode):
+    """Add a time interval expr to a timestamp."""
+
+    arg: SqlExpressionNode
+    count_expr: SqlExpressionNode
+    granularity: TimeGranularity
+
+    @staticmethod
+    def create(  # noqa: D102
+        arg: SqlExpressionNode,
+        count_expr: SqlExpressionNode,
+        granularity: TimeGranularity,
+    ) -> SqlAddTimeExpression:
+        return SqlAddTimeExpression(
+            parent_nodes=(arg, count_expr),
+            arg=arg,
+            count_expr=count_expr,
+            granularity=granularity,
+        )
+
+    @classmethod
+    def id_prefix(cls) -> IdPrefix:  # noqa: D102
+        return StaticIdPrefix.SQL_EXPR_ADD_TIME_PREFIX
+
+    @property
+    def requires_parenthesis(self) -> bool:  # noqa: D102
+        return False
+
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
+        return visitor.visit_add_time_expr(self)
+
+    @property
+    def description(self) -> str:  # noqa: D102
+        return "Add time interval"
+
+    def rewrite(  # noqa: D102
+        self,
+        column_replacements: Optional[SqlColumnReplacements] = None,
+        should_render_table_alias: Optional[bool] = None,
+    ) -> SqlExpressionNode:
+        return SqlAddTimeExpression.create(
+            arg=self.arg.rewrite(column_replacements, should_render_table_alias),
+            count_expr=self.count_expr,
+            granularity=self.granularity,
+        )
+
+    @property
+    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
+        return SqlExpressionTreeLineage.merge_iterable(
+            tuple(x.lineage for x in self.parent_nodes) + (SqlExpressionTreeLineage(other_exprs=(self,)),)
+        )
+
+    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D102
+        if not isinstance(other, SqlAddTimeExpression):
+            return False
+        return self.count_expr == other.count_expr and self.granularity == other.granularity and self.arg == other.arg
 
 
 @dataclass(frozen=True, eq=False)

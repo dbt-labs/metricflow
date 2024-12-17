@@ -4,11 +4,13 @@ from typing import List
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_exprs import (
+    SqlAddTimeExpression,
     SqlCastToTimestampExpression,
     SqlColumnReference,
     SqlColumnReferenceExpression,
@@ -16,6 +18,7 @@ from metricflow.sql.sql_exprs import (
     SqlPercentileExpression,
     SqlPercentileExpressionArgument,
     SqlPercentileFunctionType,
+    SqlStringExpression,
     SqlStringLiteralExpression,
 )
 from metricflow.sql.sql_plan import (
@@ -291,6 +294,45 @@ def test_approximate_discrete_percentile_expr(
             where=where,
             group_bys=tuple(group_bys),
             order_bys=tuple(order_bys),
+        ),
+        plan_id="plan0",
+        sql_client=sql_client,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_add_time_expr(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+) -> None:
+    """Tests rendering of the SqlAddTimeExpr in a query."""
+    select_columns = [
+        SqlSelectColumn(
+            expr=SqlAddTimeExpression.create(
+                arg=SqlStringLiteralExpression.create(
+                    "2020-01-01",
+                ),
+                count_expr=SqlStringExpression.create(
+                    "1",
+                ),
+                granularity=TimeGranularity.QUARTER,
+            ),
+            column_alias="add_time",
+        ),
+    ]
+
+    from_source = SqlTableNode.create(sql_table=SqlTable(schema_name="foo", table_name="bar"))
+    from_source_alias = "a"
+
+    assert_rendered_sql_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        sql_plan_node=SqlSelectStatementNode.create(
+            description="Test Add Time Expression",
+            select_columns=tuple(select_columns),
+            from_source=from_source,
+            from_source_alias=from_source_alias,
         ),
         plan_id="plan0",
         sql_client=sql_client,
