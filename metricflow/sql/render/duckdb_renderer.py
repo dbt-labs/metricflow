@@ -7,7 +7,10 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.sql.sql_exprs import (
     SqlAddTimeExpression,
+    SqlArithmeticExpression,
+    SqlArithmeticOperator,
     SqlGenerateUuidExpression,
+    SqlIntegerExpression,
     SqlPercentileExpression,
     SqlPercentileFunctionType,
     SqlSubtractTimeIntervalExpression,
@@ -56,17 +59,25 @@ class DuckDbSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     @override
     def visit_add_time_expr(self, node: SqlAddTimeExpression) -> SqlExpressionRenderResult:
         """Render time delta expression for DuckDB, which requires slightly different syntax from other engines."""
-        arg_rendered = node.arg.accept(self)
-        count_rendered = node.count_expr.accept(self).sql
-
         granularity = node.granularity
+        count_expr = node.count_expr
         if granularity is TimeGranularity.QUARTER:
             granularity = TimeGranularity.MONTH
-            count_rendered = f"({count_rendered} * 3)"
+            count_expr = SqlArithmeticExpression.create(
+                left_expr=node.count_expr,
+                operator=SqlArithmeticOperator.MULTIPLY,
+                right_expr=SqlIntegerExpression.create(3),
+            )
+
+        arg_rendered = node.arg.accept(self)
+        count_rendered = count_expr.accept(self)
+        count_sql = f"({count_rendered.sql})" if count_expr.requires_parenthesis else count_rendered.sql
 
         return SqlExpressionRenderResult(
-            sql=f"{arg_rendered.sql} + INTERVAL {count_rendered} {granularity.value}",
-            bind_parameter_set=arg_rendered.bind_parameter_set,
+            sql=f"{arg_rendered.sql} + INTERVAL {count_sql} {granularity.value}",
+            bind_parameter_set=SqlBindParameterSet.merge_iterable(
+                (arg_rendered.bind_parameter_set, count_rendered.bind_parameter_set)
+            ),
         )
 
     @override

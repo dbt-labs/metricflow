@@ -9,8 +9,11 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.sql.sql_exprs import (
     SqlAddTimeExpression,
+    SqlArithmeticExpression,
+    SqlArithmeticOperator,
     SqlBetweenExpression,
     SqlGenerateUuidExpression,
+    SqlIntegerExpression,
     SqlPercentileExpression,
     SqlPercentileFunctionType,
     SqlSubtractTimeIntervalExpression,
@@ -63,17 +66,25 @@ class TrinoSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     @override
     def visit_add_time_expr(self, node: SqlAddTimeExpression) -> SqlExpressionRenderResult:
         """Render time delta for Trino, require granularity in quotes and function name change."""
-        arg_rendered = node.arg.accept(self)
-        count_rendered = node.count_expr.accept(self).sql
-
         granularity = node.granularity
+        count_expr = node.count_expr
         if granularity is TimeGranularity.QUARTER:
             granularity = TimeGranularity.MONTH
-            count_rendered = f"({count_rendered} * 3)"
+            SqlArithmeticExpression.create(
+                left_expr=node.count_expr,
+                operator=SqlArithmeticOperator.MULTIPLY,
+                right_expr=SqlIntegerExpression.create(3),
+            )
+
+        arg_rendered = node.arg.accept(self)
+        count_rendered = count_expr.accept(self)
+        count_sql = f"({count_rendered.sql})" if count_expr.requires_parenthesis else count_rendered.sql
 
         return SqlExpressionRenderResult(
-            sql=f"DATE_ADD('{granularity.value}', {count_rendered}, {arg_rendered.sql})",
-            bind_parameter_set=arg_rendered.bind_parameter_set,
+            sql=f"DATE_ADD('{granularity.value}', {count_sql}, {arg_rendered.sql})",
+            bind_parameter_set=SqlBindParameterSet.merge_iterable(
+                (arg_rendered.bind_parameter_set, count_rendered.bind_parameter_set)
+            ),
         )
 
     @override

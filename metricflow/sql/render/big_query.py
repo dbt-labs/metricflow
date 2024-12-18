@@ -184,8 +184,8 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
         count = node.count_expr.accept(self)
 
         return SqlExpressionRenderResult(
-            sql=f"DATE_ADD(CAST({column.sql} AS {self.timestamp_data_type}), INTERVAL {count} {node.granularity.value})",
-            bind_parameter_set=column.bind_parameter_set,
+            sql=f"DATE_ADD(CAST({column.sql} AS {self.timestamp_data_type}), INTERVAL {count.sql} {node.granularity.value})",
+            bind_parameter_set=column.bind_parameter_set.merge(count.bind_parameter_set),
         )
 
     @override
