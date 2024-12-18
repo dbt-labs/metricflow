@@ -17,7 +17,7 @@ FROM (
   FROM (
     -- Read From Time Spine 'mf_time_spine'
     -- Change Column Aliases
-    -- Pass Only Elements: ['metric_time__month', 'metric_time__month']
+    -- Pass Only Elements: ['metric_time__month',]
     SELECT
       DATETIME_TRUNC(ds, month) AS metric_time__month
     FROM ***************************.mf_time_spine time_spine_src_16006
