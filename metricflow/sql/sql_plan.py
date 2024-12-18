@@ -404,7 +404,7 @@ class SqlPlan(MetricFlowDag[SqlPlanNode]):
         """
         self._render_node = render_node
         super().__init__(
-            dag_id=plan_id or DagId.from_id_prefix(StaticIdPrefix.SQL_QUERY_PLAN_PREFIX),
+            dag_id=plan_id or DagId.from_id_prefix(StaticIdPrefix.SQL_PLAN_PREFIX),
             sink_nodes=[self._render_node],
         )
 

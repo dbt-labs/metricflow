@@ -22,7 +22,7 @@ from metricflow.dataflow.dataflow_plan import (
 from metricflow.dataflow.dataflow_plan_analyzer import DataflowPlanAnalyzer
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlPlanConverter
-from metricflow.sql.optimizer.optimization_levels import SqlGenerationOptionSet, SqlQueryOptimizationLevel
+from metricflow.sql.optimizer.optimization_levels import SqlGenerationOptionSet, SqlOptimizationLevel
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 
@@ -39,7 +39,7 @@ def convert_and_check(
     """Convert the dataflow plan to SQL and compare with snapshots."""
     # Generate without CTEs
     optimizers = SqlGenerationOptionSet.options_for_level(
-        SqlQueryOptimizationLevel.O5, use_column_alias_in_group_by=False
+        SqlOptimizationLevel.O5, use_column_alias_in_group_by=False
     ).optimizers
     conversion_result = dataflow_to_sql_converter.convert_using_specifics(
         dataflow_plan_node=node,

@@ -96,7 +96,7 @@ class StaticIdPrefix(IdPrefix, Enum, metaclass=EnumMetaClassHelper):
     DATAFLOW_PLAN_PREFIX = "dfp"
     DATAFLOW_PLAN_SUBGRAPH_PREFIX = "dfpsub"
     OPTIMIZED_DATAFLOW_PLAN_PREFIX = "dfpo"
-    SQL_QUERY_PLAN_PREFIX = "sqp"
+    SQL_PLAN_PREFIX = "sqp"
     EXEC_PLAN_PREFIX = "ep"
 
     MF_DAG = "mfd"

@@ -125,7 +125,7 @@ class DataWarehouseTaskBuilder:
         sql_client: SqlClient, plan_converter: DataflowToSqlPlanConverter, plan_id: str, nodes: FilterElementsNode
     ) -> Tuple[str, SqlBindParameterSet]:
         """Generates a sql query plan and returns the rendered sql and bind_parameter_set."""
-        conversion_result = plan_converter.convert_to_sql_query_plan(
+        conversion_result = plan_converter.convert_to_sql_plan(
             sql_engine_type=sql_client.sql_engine_type,
             dataflow_plan_node=nodes,
         )

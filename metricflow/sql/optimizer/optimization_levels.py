@@ -15,7 +15,7 @@ from metricflow.sql.optimizer.table_alias_simplifier import SqlTableAliasSimplif
 
 
 @functools.total_ordering
-class SqlQueryOptimizationLevel(Enum):
+class SqlOptimizationLevel(Enum):
     """Defines the level of query optimization and the associated optimizers to apply."""
 
     O0 = "O0"
@@ -26,11 +26,11 @@ class SqlQueryOptimizationLevel(Enum):
     O5 = "O5"
 
     @staticmethod
-    def default_level() -> SqlQueryOptimizationLevel:  # noqa: D102
-        return SqlQueryOptimizationLevel.O5
+    def default_level() -> SqlOptimizationLevel:  # noqa: D102
+        return SqlOptimizationLevel.O5
 
-    def __lt__(self, other: SqlQueryOptimizationLevel) -> bool:  # noqa: D105
-        if not isinstance(other, SqlQueryOptimizationLevel):
+    def __lt__(self, other: SqlOptimizationLevel) -> bool:  # noqa: D105
+        if not isinstance(other, SqlOptimizationLevel):
             return NotImplemented
 
         return self.name < other.name
@@ -47,25 +47,25 @@ class SqlGenerationOptionSet:
 
     @staticmethod
     def options_for_level(  # noqa: D102
-        level: SqlQueryOptimizationLevel, use_column_alias_in_group_by: bool
+        level: SqlOptimizationLevel, use_column_alias_in_group_by: bool
     ) -> SqlGenerationOptionSet:
         optimizers: Tuple[SqlPlanOptimizer, ...] = ()
         allow_cte = False
-        if level is SqlQueryOptimizationLevel.O0:
+        if level is SqlOptimizationLevel.O0:
             pass
-        elif level is SqlQueryOptimizationLevel.O1:
+        elif level is SqlOptimizationLevel.O1:
             optimizers = (SqlTableAliasSimplifier(),)
-        elif level is SqlQueryOptimizationLevel.O2:
+        elif level is SqlOptimizationLevel.O2:
             optimizers = (SqlColumnPrunerOptimizer(), SqlTableAliasSimplifier())
-        elif level is SqlQueryOptimizationLevel.O3:
+        elif level is SqlOptimizationLevel.O3:
             optimizers = (SqlColumnPrunerOptimizer(), SqlSubQueryReducer(), SqlTableAliasSimplifier())
-        elif level is SqlQueryOptimizationLevel.O4:
+        elif level is SqlOptimizationLevel.O4:
             optimizers = (
                 SqlColumnPrunerOptimizer(),
                 SqlRewritingSubQueryReducer(use_column_alias_in_group_bys=use_column_alias_in_group_by),
                 SqlTableAliasSimplifier(),
             )
-        elif level is SqlQueryOptimizationLevel.O5:
+        elif level is SqlOptimizationLevel.O5:
             optimizers = (
                 SqlColumnPrunerOptimizer(),
                 SqlRewritingSubQueryReducer(use_column_alias_in_group_bys=use_column_alias_in_group_by),

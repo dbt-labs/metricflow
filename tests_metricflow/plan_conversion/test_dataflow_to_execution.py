@@ -15,7 +15,7 @@ from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilde
 from metricflow.execution.dataflow_to_execution import DataflowToExecutionPlanConverter
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
+from metricflow.sql.optimizer.optimization_levels import SqlOptimizationLevel
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from tests_metricflow.snapshot_utils import assert_execution_plan_text_equal
 
@@ -31,7 +31,7 @@ def make_execution_plan_converter(  # noqa: D103
         ),
         sql_plan_renderer=DefaultSqlQueryPlanRenderer(),
         sql_client=sql_client,
-        sql_optimization_level=SqlQueryOptimizationLevel.default_level(),
+        sql_optimization_level=SqlOptimizationLevel.default_level(),
     )
 
 

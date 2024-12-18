@@ -3,7 +3,7 @@ test_filename: test_explain.py
 docstring:
   Tests that the results of explain reflect the SQL optimization level in the request.
 expectation_description:
-  The result for SqlQueryOptimizationLevel.O5 should be SQL uses a CTE.
+  The result for SqlOptimizationLevel.O5 should be SQL uses a CTE.
 ---
 O4:
   SELECT
