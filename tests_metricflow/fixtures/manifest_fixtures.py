@@ -169,7 +169,7 @@ class MetricFlowEngineTestFixture:
         semantic_manifest_lookup = SemanticManifestLookup(semantic_manifest)
         data_set_mapping = MetricFlowEngineTestFixture._create_data_sets(semantic_manifest_lookup)
         read_node_mapping = MetricFlowEngineTestFixture._data_set_to_read_nodes(data_set_mapping)
-        column_association_resolver = DunderColumnAssociationResolver(semantic_manifest_lookup)
+        column_association_resolver = DunderColumnAssociationResolver()
         source_node_builder = SourceNodeBuilder(column_association_resolver, semantic_manifest_lookup)
         source_node_set = source_node_builder.create_from_data_sets(list(data_set_mapping.values()))
         node_output_resolver = DataflowPlanNodeOutputDataSetResolver(
@@ -247,9 +247,7 @@ class MetricFlowEngineTestFixture:
         semantic_models: Sequence[SemanticModel] = semantic_manifest_lookup.semantic_manifest.semantic_models
         semantic_models = sorted(semantic_models, key=lambda x: x.name)
 
-        converter = SemanticModelToDataSetConverter(
-            column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup)
-        )
+        converter = SemanticModelToDataSetConverter(column_association_resolver=DunderColumnAssociationResolver())
 
         for semantic_model in semantic_models:
             data_sets[semantic_model.name] = converter.create_sql_source_data_set(semantic_model)

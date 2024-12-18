@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.naming.linkable_spec_name import DUNDER
 from metricflow_semantics.specs.column_assoc import (
     ColumnAssociation,
@@ -28,8 +27,8 @@ class DunderColumnAssociationResolver(ColumnAssociationResolver):
     listing__country
     """
 
-    def __init__(self, semantic_manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D107
-        self._visitor_helper = DunderColumnAssociationResolverVisitor(semantic_manifest_lookup)
+    def __init__(self) -> None:  # noqa: D107
+        self._visitor_helper = DunderColumnAssociationResolverVisitor()
 
     def resolve_spec(self, spec: InstanceSpec) -> ColumnAssociation:  # noqa: D102
         return spec.accept(self._visitor_helper)
@@ -37,9 +36,6 @@ class DunderColumnAssociationResolver(ColumnAssociationResolver):
 
 class DunderColumnAssociationResolverVisitor(InstanceSpecVisitor[ColumnAssociation]):
     """Visitor helper class for DefaultColumnAssociationResolver2."""
-
-    def __init__(self, semantic_manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D107
-        self._semantic_manifest_lookup = semantic_manifest_lookup
 
     def visit_metric_spec(self, metric_spec: MetricSpec) -> ColumnAssociation:  # noqa: D102
         return ColumnAssociation(metric_spec.element_name if metric_spec.alias is None else metric_spec.alias)
