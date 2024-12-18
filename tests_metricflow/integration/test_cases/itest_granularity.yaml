@@ -961,3 +961,133 @@ integration_test:
       GROUP BY subq_2.martian_day
     ) subq_5
     ON subq_6.metric_time__martian_day = subq_5.metric_time__martian_day
+---
+integration_test:
+  name: custom_offset_window
+  description: Test querying a metric with a custom offset window
+  model: SIMPLE_MODEL
+  metrics: ["bookings_offset_one_martian_day"]
+  group_bys: ["metric_time__day"]
+  check_query: |
+    WITH cte AS (
+      SELECT
+        ds AS ds__day
+        , martian_day AS ds__martian_day
+        , FIRST_VALUE(ds) OVER (
+          PARTITION BY martian_day
+          ORDER BY ds
+          ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+        ) AS ds__martian_day__first_value
+        , LAST_VALUE(ds) OVER (
+          PARTITION BY martian_day
+          ORDER BY ds
+          ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+        ) AS ds__martian_day__last_value
+        , ROW_NUMBER() OVER (
+          PARTITION BY martian_day
+          ORDER BY ds
+        ) AS ds__day__row_number
+      FROM {{ source_schema }}.mf_time_spine ts
+    )
+
+    SELECT
+      subq_8.ds__day__lead AS metric_time__day
+      , SUM(1) AS bookings_offset_one_martian_day
+    FROM (
+      SELECT
+        cte.ds__day AS ds__day
+        , CASE
+          WHEN {{ render_date_add("subq_7.ds__martian_day__first_value__offset", "(cte.ds__day__row_number - 1)", TimeGranularity.DAY) }} <= subq_7.ds__martian_day__last_value__offset
+            THEN {{ render_date_add("subq_7.ds__martian_day__first_value__offset", "(cte.ds__day__row_number - 1)", TimeGranularity.DAY) }}
+          ELSE subq_7.ds__martian_day__last_value__offset
+        END AS ds__day__lead
+      FROM cte
+      INNER JOIN (
+        SELECT
+          ds__martian_day
+          , LEAD(ds__martian_day__first_value, 1) OVER (ORDER BY ds__martian_day) AS ds__martian_day__first_value__offset
+          , LEAD(ds__martian_day__last_value, 1) OVER (ORDER BY ds__martian_day) AS ds__martian_day__last_value__offset
+        FROM (
+          SELECT
+            ds__martian_day__first_value
+            , ds__martian_day__last_value
+            , ds__martian_day
+          FROM cte
+          GROUP BY
+            ds__martian_day__first_value
+            , ds__martian_day__last_value
+            , ds__martian_day
+        ) subq_5
+      ) subq_7
+      ON cte.ds__martian_day = subq_7.ds__martian_day
+    ) subq_8
+    INNER JOIN {{ source_schema }}.fct_bookings b ON subq_8.ds__day = {{ render_date_trunc("b.ds", TimeGranularity.DAY) }}
+    GROUP BY subq_8.ds__day__lead
+---
+integration_test:
+  name: custom_offset_window_with_grain_and_date_part
+  description: Test querying a metric with a custom offset window
+  model: SIMPLE_MODEL
+  metrics: ["bookings_offset_one_martian_day"]
+  group_by_objs: [{"name": "booking__ds", "grain": "week"}, {"name": "metric_time", "date_part": "month"}, {"name": "booking__ds", "grain": "martian_day"}]
+  check_query: |
+    WITH cte AS (
+      SELECT
+        ds AS ds__day
+        , martian_day AS ds__martian_day
+        , FIRST_VALUE(ds) OVER (
+          PARTITION BY martian_day
+          ORDER BY ds
+          ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+        ) AS ds__martian_day__first_value
+        , LAST_VALUE(ds) OVER (
+          PARTITION BY martian_day
+          ORDER BY ds
+          ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+        ) AS ds__martian_day__last_value
+        , ROW_NUMBER() OVER (
+          PARTITION BY martian_day
+          ORDER BY ds
+        ) AS ds__day__row_number
+      FROM {{ source_schema }}.mf_time_spine ts
+    )
+
+    SELECT
+      subq_11.martian_day AS booking__ds__martian_day
+      , {{ render_date_trunc("subq_8.ds__day__lead", TimeGranularity.WEEK) }} AS booking__ds__week
+      , {{ render_extract("subq_8.ds__day__lead", DatePart.MONTH) }} AS metric_time__extract_month
+      , SUM(1) AS bookings_offset_one_martian_day
+    FROM (
+      SELECT
+        cte.ds__day
+        , CASE
+          WHEN {{ render_date_add("subq_7.ds__martian_day__first_value__offset", "(cte.ds__day__row_number - 1)", TimeGranularity.DAY) }} <= subq_7.ds__martian_day__last_value__offset
+            THEN {{ render_date_add("subq_7.ds__martian_day__first_value__offset", "(cte.ds__day__row_number - 1)", TimeGranularity.DAY) }}
+          ELSE subq_7.ds__martian_day__last_value__offset
+        END AS ds__day__lead
+      FROM cte
+      INNER JOIN (
+        SELECT
+          ds__martian_day
+          , LEAD(ds__martian_day__first_value, 1) OVER (ORDER BY ds__martian_day) AS ds__martian_day__first_value__offset
+          , LEAD(ds__martian_day__last_value, 1) OVER (ORDER BY ds__martian_day) AS ds__martian_day__last_value__offset
+        FROM (
+          SELECT
+            ds__martian_day__first_value
+            , ds__martian_day__last_value
+            , ds__martian_day
+          FROM cte
+          GROUP BY
+            ds__martian_day__first_value
+            , ds__martian_day__last_value
+            , ds__martian_day
+        ) subq_5
+      ) subq_7
+      ON cte.ds__martian_day = subq_7.ds__martian_day
+    ) subq_8
+    INNER JOIN {{ source_schema }}.fct_bookings b ON subq_8.ds__day = {{ render_date_trunc("b.ds", TimeGranularity.DAY) }}
+    LEFT OUTER JOIN {{ source_schema }}.mf_time_spine subq_11 ON subq_8.ds__day__lead = subq_11.ds
+    GROUP BY
+      subq_11.martian_day
+      , {{ render_date_trunc("subq_8.ds__day__lead", TimeGranularity.WEEK) }}
+      , {{ render_extract("subq_8.ds__day__lead", DatePart.MONTH) }}
