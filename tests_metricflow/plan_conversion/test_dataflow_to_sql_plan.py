@@ -47,7 +47,7 @@ from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
 from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
 from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
-from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
+from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from tests_metricflow.dataflow_plan_to_svg import display_graph_if_requested
@@ -58,7 +58,7 @@ from tests_metricflow.sql.compare_sql_plan import assert_rendered_sql_from_plan_
 def convert_and_check(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     node: DataflowPlanNode,
 ) -> None:
@@ -115,7 +115,7 @@ def convert_and_check(
 def test_source_node(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
@@ -137,7 +137,7 @@ def test_source_node(
 def test_filter_node(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
@@ -166,7 +166,7 @@ def test_filter_with_where_constraint_node(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     column_association_resolver: ColumnAssociationResolver,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
@@ -233,7 +233,7 @@ def test_filter_with_where_constraint_node(
 def test_measure_aggregation_node(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
@@ -281,7 +281,7 @@ def test_measure_aggregation_node(
 def test_single_join_node(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
@@ -342,7 +342,7 @@ def test_single_join_node(
 def test_multi_join_node(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
@@ -407,7 +407,7 @@ def test_multi_join_node(
 def test_compute_metrics_node(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
@@ -480,7 +480,7 @@ def test_compute_metrics_node(
 def test_compute_metrics_node_simple_expr(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
@@ -565,7 +565,7 @@ def test_compute_metrics_node_simple_expr(
 def test_compute_metrics_node_ratio_from_single_semantic_model(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
@@ -641,7 +641,7 @@ def test_order_by_node(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan where there is a leaf compute metrics node."""
@@ -711,7 +711,7 @@ def test_semi_additive_join_node(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan using a SemiAdditiveJoinNode."""
@@ -742,7 +742,7 @@ def test_semi_additive_join_node_with_queried_group_by(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan using a SemiAdditiveJoinNode."""
@@ -778,7 +778,7 @@ def test_semi_additive_join_node_with_grouping(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan using a SemiAdditiveJoinNode with a window_grouping."""
@@ -813,7 +813,7 @@ def test_constrain_time_range_node(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests converting the ConstrainTimeRangeNode to SQL."""
@@ -864,7 +864,7 @@ def test_compute_metrics_node_ratio_from_multiple_semantic_models(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests the combine metrics node for ratio type metrics."""
@@ -899,7 +899,7 @@ def test_compute_metrics_node_ratio_from_multiple_semantic_models(
 def test_combine_output_node(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
@@ -960,7 +960,7 @@ def test_dimensions_requiring_join(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests querying 2 dimensions that require a join."""
@@ -987,7 +987,7 @@ def test_dimension_with_joined_where_constraint(
     mf_test_configuration: MetricFlowTestConfiguration,
     query_parser: MetricFlowQueryParser,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     column_association_resolver: ColumnAssociationResolver,
 ) -> None:

@@ -13,7 +13,7 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.execution.dataflow_to_execution import DataflowToExecutionPlanConverter
-from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
+from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
@@ -25,7 +25,7 @@ def make_execution_plan_converter(  # noqa: D103
     sql_client: SqlClient,
 ) -> DataflowToExecutionPlanConverter:
     return DataflowToExecutionPlanConverter(
-        sql_plan_converter=DataflowToSqlQueryPlanConverter(
+        sql_plan_converter=DataflowToSqlPlanConverter(
             column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup),
             semantic_manifest_lookup=semantic_manifest_lookup,
         ),

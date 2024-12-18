@@ -16,7 +16,7 @@ from typing_extensions import override
 
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.sql.sql_plan import (
-    SqlQueryPlanNode,
+    SqlPlanNode,
     SqlSelectStatementNode,
 )
 
@@ -28,7 +28,7 @@ class SqlDataSet(DataSet):
         self,
         instance_set: InstanceSet,
         sql_select_node: Optional[SqlSelectStatementNode] = None,
-        sql_node: Optional[SqlQueryPlanNode] = None,
+        sql_node: Optional[SqlPlanNode] = None,
     ) -> None:
         """Constructor.
 
@@ -42,7 +42,7 @@ class SqlDataSet(DataSet):
         super().__init__(instance_set=instance_set)
 
     @property
-    def sql_node(self) -> SqlQueryPlanNode:  # noqa: D102
+    def sql_node(self) -> SqlPlanNode:  # noqa: D102
         node_to_return = self._sql_select_node or self._sql_node
         if node_to_return is None:
             raise RuntimeError(

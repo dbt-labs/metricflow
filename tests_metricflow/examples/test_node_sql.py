@@ -18,7 +18,7 @@ from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
-from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
+from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 
@@ -40,7 +40,7 @@ def test_view_sql_generated_at_a_node(
     )
     to_data_set_converter = SemanticModelToDataSetConverter(column_association_resolver)
 
-    to_sql_plan_converter = DataflowToSqlQueryPlanConverter(
+    to_sql_plan_converter = DataflowToSqlPlanConverter(
         column_association_resolver=DunderColumnAssociationResolver(simple_semantic_manifest_lookup),
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
     )

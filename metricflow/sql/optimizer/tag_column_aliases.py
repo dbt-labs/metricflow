@@ -5,7 +5,7 @@ from collections import defaultdict
 from typing import Dict, FrozenSet, Iterable, Set
 
 from metricflow.sql.sql_plan import (
-    SqlQueryPlanNode,
+    SqlPlanNode,
 )
 
 logger = logging.getLogger(__name__)
@@ -20,14 +20,14 @@ class NodeToColumnAliasMapping:
     """
 
     def __init__(self) -> None:  # noqa: D107
-        self._node_to_tagged_aliases: Dict[SqlQueryPlanNode, Set[str]] = defaultdict(set)
+        self._node_to_tagged_aliases: Dict[SqlPlanNode, Set[str]] = defaultdict(set)
 
-    def get_aliases(self, node: SqlQueryPlanNode) -> FrozenSet[str]:
+    def get_aliases(self, node: SqlPlanNode) -> FrozenSet[str]:
         """Return the column aliases added for the given SQL node."""
         return frozenset(self._node_to_tagged_aliases[node])
 
-    def add_alias(self, node: SqlQueryPlanNode, column_alias: str) -> None:  # noqa: D102
+    def add_alias(self, node: SqlPlanNode, column_alias: str) -> None:  # noqa: D102
         return self._node_to_tagged_aliases[node].add(column_alias)
 
-    def add_aliases(self, node: SqlQueryPlanNode, column_aliases: Iterable[str]) -> None:  # noqa: D102
+    def add_aliases(self, node: SqlPlanNode, column_aliases: Iterable[str]) -> None:  # noqa: D102
         self._node_to_tagged_aliases[node].update(column_aliases)

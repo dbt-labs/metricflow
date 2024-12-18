@@ -19,7 +19,7 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_MONTH
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
+from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from tests_metricflow.query_rendering.compare_rendered_query import render_and_check
 
@@ -29,7 +29,7 @@ def test_simple_fill_nulls_with_0_metric_time(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -52,7 +52,7 @@ def test_simple_fill_nulls_with_0_month(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -75,7 +75,7 @@ def test_simple_fill_nulls_with_0_with_non_metric_time(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -98,7 +98,7 @@ def test_simple_fill_nulls_with_0_with_categorical_dimension(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -121,7 +121,7 @@ def test_simple_fill_nulls_without_time_spine(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -144,7 +144,7 @@ def test_cumulative_fill_nulls(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -167,7 +167,7 @@ def test_derived_fill_nulls_for_one_input_metric(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -190,7 +190,7 @@ def test_join_to_time_spine_with_filters(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     query_parser: MetricFlowQueryParser,
 ) -> None:
@@ -221,7 +221,7 @@ def test_join_to_time_spine_with_filter_not_in_group_by(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     query_parser: MetricFlowQueryParser,
 ) -> None:
@@ -248,7 +248,7 @@ def test_join_to_time_spine_with_filter_smaller_than_group_by(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     query_parser: MetricFlowQueryParser,
 ) -> None:
@@ -278,7 +278,7 @@ def test_join_to_time_spine_with_filter_not_in_group_by_using_agg_time(  # noqa:
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     query_parser: MetricFlowQueryParser,
 ) -> None:
@@ -305,7 +305,7 @@ def test_join_to_time_spine_with_filter_not_in_group_by_using_agg_time_and_metri
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     query_parser: MetricFlowQueryParser,
 ) -> None:

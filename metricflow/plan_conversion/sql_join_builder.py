@@ -46,8 +46,8 @@ class ColumnEqualityDescription:
     treat_nulls_as_equal: bool = False
 
 
-class SqlQueryPlanJoinBuilder:
-    """Helper class for constructing various join components in a SqlQueryPlan."""
+class SqlPlanJoinBuilder:
+    """Helper class for constructing various join components`."""
 
     @staticmethod
     def make_column_equality_sql_join_description(
@@ -194,11 +194,11 @@ class SqlQueryPlanJoinBuilder:
                 )
             )
 
-        validity_conditions = SqlQueryPlanJoinBuilder._make_validity_window_on_conditions(
+        validity_conditions = SqlPlanJoinBuilder._make_validity_window_on_conditions(
             left_data_set=left_data_set, right_data_set=right_data_set, join_description=join_description
         )
 
-        return SqlQueryPlanJoinBuilder.make_column_equality_sql_join_description(
+        return SqlPlanJoinBuilder.make_column_equality_sql_join_description(
             right_source_node=right_data_set.data_set.checked_sql_select_node,
             left_source_alias=left_data_set.alias,
             right_source_alias=right_data_set.alias,
@@ -253,7 +253,7 @@ class SqlQueryPlanJoinBuilder:
         window_end_dimension_name = right_data_set.data_set.column_association_for_time_dimension(
             join_description.validity_window.window_end_dimension
         ).column_name
-        window_join_condition = SqlQueryPlanJoinBuilder._make_time_window_join_condition(
+        window_join_condition = SqlPlanJoinBuilder._make_time_window_join_condition(
             left_source_alias=left_data_set.alias,
             left_source_time_dimension_name=left_data_set_time_dimension_name,
             right_source_alias=right_data_set.alias,
@@ -331,7 +331,7 @@ class SqlQueryPlanJoinBuilder:
                 len(column_names) > 0
             ), "Attempting to do a FULL OUTER JOIN to combine metrics, but no columns were provided for join keys!"
             equality_exprs = [
-                SqlQueryPlanJoinBuilder._make_equality_expression_for_full_outer_join(
+                SqlPlanJoinBuilder._make_equality_expression_for_full_outer_join(
                     table_aliases_for_coalesce, join_data_set.alias, colname
                 )
                 for colname in column_names
@@ -352,7 +352,7 @@ class SqlQueryPlanJoinBuilder:
                 ColumnEqualityDescription(left_column_alias=name, right_column_alias=name, treat_nulls_as_equal=True)
                 for name in column_names
             ]
-            return SqlQueryPlanJoinBuilder.make_column_equality_sql_join_description(
+            return SqlPlanJoinBuilder.make_column_equality_sql_join_description(
                 right_source_node=join_data_set.data_set.checked_sql_select_node,
                 left_source_alias=from_data_set.alias,
                 right_source_alias=join_data_set.alias,
@@ -484,12 +484,12 @@ class SqlQueryPlanJoinBuilder:
         under the condition of being within the time range and other conditions (such as constant properties).
         This builds the join description to satisfy all those conditions.
         """
-        window_condition = SqlQueryPlanJoinBuilder._make_time_range_window_join_condition(
+        window_condition = SqlPlanJoinBuilder._make_time_range_window_join_condition(
             base_data_set=base_data_set,
             time_comparison_dataset=conversion_data_set,
             window=node.window,
         )
-        return SqlQueryPlanJoinBuilder.make_column_equality_sql_join_description(
+        return SqlPlanJoinBuilder.make_column_equality_sql_join_description(
             right_source_node=conversion_data_set.data_set.checked_sql_select_node,
             left_source_alias=base_data_set.alias,
             right_source_alias=conversion_data_set.alias,
@@ -509,7 +509,7 @@ class SqlQueryPlanJoinBuilder:
         Cumulative metrics must be joined against a time spine in a backward-looking fashion, with
         a range determined by a time window (delta against metric_time) and optional cumulative grain.
         """
-        cumulative_join_condition = SqlQueryPlanJoinBuilder._make_time_range_window_join_condition(
+        cumulative_join_condition = SqlPlanJoinBuilder._make_time_range_window_join_condition(
             base_data_set=metric_data_set,
             time_comparison_dataset=time_spine_data_set,
             window=node.window,

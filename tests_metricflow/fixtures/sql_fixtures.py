@@ -4,7 +4,7 @@ from typing import Mapping
 
 import pytest
 
-from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
+from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer, SqlQueryPlanRenderer
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 
@@ -17,21 +17,21 @@ def default_sql_plan_renderer() -> SqlQueryPlanRenderer:  # noqa: D103
 @pytest.fixture(scope="session")
 def dataflow_to_sql_converter(  # noqa: D103
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture]
-) -> DataflowToSqlQueryPlanConverter:
+) -> DataflowToSqlPlanConverter:
     return mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].dataflow_to_sql_converter
 
 
 @pytest.fixture(scope="session")
 def extended_date_dataflow_to_sql_converter(  # noqa: D103
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture]
-) -> DataflowToSqlQueryPlanConverter:
+) -> DataflowToSqlPlanConverter:
     return mf_engine_test_fixture_mapping[SemanticManifestSetup.EXTENDED_DATE_MANIFEST].dataflow_to_sql_converter
 
 
 @pytest.fixture(scope="session")
 def multihop_dataflow_to_sql_converter(  # noqa: D103
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture]
-) -> DataflowToSqlQueryPlanConverter:
+) -> DataflowToSqlPlanConverter:
     return mf_engine_test_fixture_mapping[
         SemanticManifestSetup.PARTITIONED_MULTI_HOP_JOIN_MANIFEST
     ].dataflow_to_sql_converter
@@ -40,5 +40,5 @@ def multihop_dataflow_to_sql_converter(  # noqa: D103
 @pytest.fixture(scope="session")
 def scd_dataflow_to_sql_converter(  # noqa: D103
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture]
-) -> DataflowToSqlQueryPlanConverter:
+) -> DataflowToSqlPlanConverter:
     return mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST].dataflow_to_sql_converter

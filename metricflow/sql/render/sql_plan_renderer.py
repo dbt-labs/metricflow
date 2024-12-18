@@ -24,8 +24,8 @@ from metricflow.sql.sql_plan import (
     SqlJoinDescription,
     SqlOrderByDescription,
     SqlPlan,
-    SqlQueryPlanNode,
-    SqlQueryPlanNodeVisitor,
+    SqlPlanNode,
+    SqlPlanNodeVisitor,
     SqlSelectColumn,
     SqlSelectQueryFromClauseNode,
     SqlSelectStatementNode,
@@ -43,10 +43,10 @@ class SqlPlanRenderResult:  # noqa: D101
     bind_parameter_set: SqlBindParameterSet
 
 
-class SqlQueryPlanRenderer(SqlQueryPlanNodeVisitor[SqlPlanRenderResult], ABC):
+class SqlQueryPlanRenderer(SqlPlanNodeVisitor[SqlPlanRenderResult], ABC):
     """Renders SQL plans to a string."""
 
-    def _render_node(self, node: SqlQueryPlanNode) -> SqlPlanRenderResult:
+    def _render_node(self, node: SqlPlanNode) -> SqlPlanRenderResult:
         return node.accept(self)
 
     def render_sql_query_plan(self, sql_query_plan: SqlPlan) -> SqlPlanRenderResult:  # noqa: D102
@@ -175,7 +175,7 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
 
         return SqlPlanRenderResult("\n".join(select_section_lines), params)
 
-    def _render_from_section(self, from_source: SqlQueryPlanNode, from_source_alias: str) -> SqlPlanRenderResult:
+    def _render_from_section(self, from_source: SqlPlanNode, from_source_alias: str) -> SqlPlanRenderResult:
         """Convert the node into a "FROM" section.
 
         e.g.

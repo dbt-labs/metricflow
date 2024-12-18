@@ -9,7 +9,7 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.optimizer.dataflow_optimizer_factory import DataflowPlanOptimization
-from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
+from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from tests_metricflow.dataflow_plan_to_svg import display_graph_if_requested
@@ -20,7 +20,7 @@ def render_and_check(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     query_spec: MetricFlowQuerySpec,
 ) -> None:
