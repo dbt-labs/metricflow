@@ -9,7 +9,7 @@ from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.sql.optimizer.column_pruner import SqlColumnPrunerOptimizer
-from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer, SqlQueryPlanRenderer
+from metricflow.sql.render.sql_plan_renderer import DefaultSqlPlanRenderer, SqlPlanRenderer
 from metricflow.sql.sql_exprs import (
     SqlColumnReference,
     SqlColumnReferenceExpression,
@@ -34,15 +34,15 @@ def column_pruner() -> SqlColumnPrunerOptimizer:  # noqa: D103
 
 
 @pytest.fixture
-def sql_plan_renderer() -> SqlQueryPlanRenderer:  # noqa: D103
-    return DefaultSqlQueryPlanRenderer()
+def sql_plan_renderer() -> SqlPlanRenderer:  # noqa: D103
+    return DefaultSqlPlanRenderer()
 
 
 def test_no_pruning(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     column_pruner: SqlColumnPrunerOptimizer,
-    sql_plan_renderer: DefaultSqlQueryPlanRenderer,
+    sql_plan_renderer: DefaultSqlPlanRenderer,
 ) -> None:
     """Tests a case where no pruning should occur for a CTE."""
     select_statement = SqlSelectStatementNode.create(
@@ -91,7 +91,7 @@ def test_simple_pruning(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     column_pruner: SqlColumnPrunerOptimizer,
-    sql_plan_renderer: DefaultSqlQueryPlanRenderer,
+    sql_plan_renderer: DefaultSqlPlanRenderer,
 ) -> None:
     """Tests the simplest case of pruning a CTE where a query depends on a CTE, and that CTE is pruned."""
     select_statement = SqlSelectStatementNode.create(
@@ -146,7 +146,7 @@ def test_nested_pruning(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     column_pruner: SqlColumnPrunerOptimizer,
-    sql_plan_renderer: DefaultSqlQueryPlanRenderer,
+    sql_plan_renderer: DefaultSqlPlanRenderer,
 ) -> None:
     """Tests the case of pruning a CTE where a query depends on a CTE, and that CTE depends on another CTE."""
     select_statement = SqlSelectStatementNode.create(
@@ -228,7 +228,7 @@ def test_multi_child_pruning(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     column_pruner: SqlColumnPrunerOptimizer,
-    sql_plan_renderer: DefaultSqlQueryPlanRenderer,
+    sql_plan_renderer: DefaultSqlPlanRenderer,
 ) -> None:
     """Tests the case of pruning a CTE where difference sources depend on the same CTE."""
     select_statement = SqlSelectStatementNode.create(

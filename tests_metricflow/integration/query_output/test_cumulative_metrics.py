@@ -134,8 +134,8 @@ def test_cumulative_metric_with_non_adjustable_filter(
 ) -> None:
     """Tests a cumulative metric with a filter that cannot be adjusted to ensure all data is included."""
     # Handle ds expression based on engine to support Trino.
-    first_ds_expr = f"CAST('2020-03-15' AS {sql_client.sql_query_plan_renderer.expr_renderer.timestamp_data_type})"
-    second_ds_expr = f"CAST('2020-04-30' AS {sql_client.sql_query_plan_renderer.expr_renderer.timestamp_data_type})"
+    first_ds_expr = f"CAST('2020-03-15' AS {sql_client.sql_plan_renderer.expr_renderer.timestamp_data_type})"
+    second_ds_expr = f"CAST('2020-04-30' AS {sql_client.sql_plan_renderer.expr_renderer.timestamp_data_type})"
     where_constraint = f"{{{{ TimeDimension('metric_time', 'day') }}}} = {first_ds_expr} or"
     where_constraint += f" {{{{ TimeDimension('metric_time', 'day') }}}} = {second_ds_expr}"
 

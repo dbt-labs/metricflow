@@ -13,7 +13,7 @@ from metricflow.sql.render.expr_renderer import (
     SqlExpressionRenderer,
     SqlExpressionRenderResult,
 )
-from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
+from metricflow.sql.render.sql_plan_renderer import DefaultSqlPlanRenderer
 from metricflow.sql.sql_exprs import (
     SqlAddTimeExpression,
     SqlGenerateUuidExpression,
@@ -106,7 +106,7 @@ class DuckDbSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         )
 
 
-class DuckDbSqlQueryPlanRenderer(DefaultSqlQueryPlanRenderer):
+class DuckDbSqlPlanRenderer(DefaultSqlPlanRenderer):
     """Plan renderer for the DuckDB engine."""
 
     EXPR_RENDERER = DuckDbSqlExpressionRenderer()

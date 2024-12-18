@@ -10,7 +10,7 @@ from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.sql.optimizer.column_pruner import SqlColumnPrunerOptimizer
-from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer, SqlQueryPlanRenderer
+from metricflow.sql.render.sql_plan_renderer import DefaultSqlPlanRenderer, SqlPlanRenderer
 from metricflow.sql.sql_exprs import (
     SqlColumnReference,
     SqlColumnReferenceExpression,
@@ -37,8 +37,8 @@ def column_pruner() -> SqlColumnPrunerOptimizer:  # noqa: D103
 
 
 @pytest.fixture
-def sql_plan_renderer() -> SqlQueryPlanRenderer:  # noqa: D103
-    return DefaultSqlQueryPlanRenderer()
+def sql_plan_renderer() -> SqlPlanRenderer:  # noqa: D103
+    return DefaultSqlPlanRenderer()
 
 
 @pytest.fixture

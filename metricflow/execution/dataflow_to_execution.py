@@ -42,7 +42,7 @@ from metricflow.plan_conversion.convert_to_sql_plan import ConvertToSqlPlanResul
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlOptimizationLevel
-from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderResult, SqlQueryPlanRenderer
+from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderer, SqlPlanRenderResult
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +53,7 @@ class DataflowToExecutionPlanConverter(DataflowPlanNodeVisitor[ConvertToExecutio
     def __init__(
         self,
         sql_plan_converter: DataflowToSqlPlanConverter,
-        sql_plan_renderer: SqlQueryPlanRenderer,
+        sql_plan_renderer: SqlPlanRenderer,
         sql_client: SqlClient,
         sql_optimization_level: SqlOptimizationLevel,
     ) -> None:
@@ -81,7 +81,7 @@ class DataflowToExecutionPlanConverter(DataflowPlanNodeVisitor[ConvertToExecutio
         return result
 
     def _render_sql(self, convert_to_sql_plan_result: ConvertToSqlPlanResult) -> SqlPlanRenderResult:
-        return self._sql_plan_renderer.render_sql_query_plan(convert_to_sql_plan_result.sql_plan)
+        return self._sql_plan_renderer.render_sql_plan(convert_to_sql_plan_result.sql_plan)
 
     @override
     def visit_write_to_result_data_table_node(self, node: WriteToResultDataTableNode) -> ConvertToExecutionPlanResult:

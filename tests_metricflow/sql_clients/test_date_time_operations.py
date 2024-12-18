@@ -58,7 +58,7 @@ def test_date_trunc_to_year(sql_client: SqlClient) -> None:
     # The ISO year start for 2015 is 2014-12-29, but we should always get 2015-01-01
     ISO_DATE_STRING = "2015-06-15"
     expected = datetime.datetime(year=2015, month=1, day=1)
-    date_trunc_stmt = sql_client.sql_query_plan_renderer.expr_renderer.render_sql_expr(
+    date_trunc_stmt = sql_client.sql_plan_renderer.expr_renderer.render_sql_expr(
         _build_date_trunc_expression(date_string=ISO_DATE_STRING, time_granularity=TimeGranularity.YEAR)
     ).sql
 
@@ -83,7 +83,7 @@ def test_date_trunc_to_quarter(sql_client: SqlClient, input: str, expected: date
     This should generally pin to the first day of the "natural" yearly quarters, for example,
     2015-01-01, 2015-04-01, 2015-07-01, and 2015-10-01.
     """
-    date_trunc_stmt = sql_client.sql_query_plan_renderer.expr_renderer.render_sql_expr(
+    date_trunc_stmt = sql_client.sql_plan_renderer.expr_renderer.render_sql_expr(
         _build_date_trunc_expression(date_string=input, time_granularity=TimeGranularity.QUARTER)
     ).sql
 
@@ -107,7 +107,7 @@ def test_date_trunc_to_week(sql_client: SqlClient, input: str, expected: datetim
     This is needed because some engines default to Monday and some default to Sunday for their week start.
     On a human level, both are reasonable, so we coerce to the ISO standard of Monday.
     """
-    date_trunc_stmt = sql_client.sql_query_plan_renderer.expr_renderer.render_sql_expr(
+    date_trunc_stmt = sql_client.sql_plan_renderer.expr_renderer.render_sql_expr(
         _build_date_trunc_expression(date_string=input, time_granularity=TimeGranularity.WEEK)
     ).sql
 
@@ -132,7 +132,7 @@ def test_date_part_year(sql_client: SqlClient) -> None:
     ISO_DATE_STRING = "2014-12-30"
     # We, however, expect the calendar year
     expected = 2014
-    extract_stmt = sql_client.sql_query_plan_renderer.expr_renderer.render_sql_expr(
+    extract_stmt = sql_client.sql_plan_renderer.expr_renderer.render_sql_expr(
         _build_extract_expression(date_string=ISO_DATE_STRING, date_part=DatePart.YEAR)
     ).sql
 
@@ -157,7 +157,7 @@ def test_date_part_quarter(sql_client: SqlClient, input: str, expected: int) -> 
     We expect the quarter boundaries to line up and results to be in [1, 4] corresponding to the natural
     4 calendar quarters.
     """
-    extract_stmt = sql_client.sql_query_plan_renderer.expr_renderer.render_sql_expr(
+    extract_stmt = sql_client.sql_plan_renderer.expr_renderer.render_sql_expr(
         _build_extract_expression(date_string=input, date_part=DatePart.QUARTER)
     ).sql
 
@@ -176,7 +176,7 @@ def test_date_part_day_of_year(sql_client: SqlClient) -> None:
     ISO_DATE_STRING = "2014-12-30"
     # We, however, expect the calendar year, so it should return 364
     expected = 364
-    extract_stmt = sql_client.sql_query_plan_renderer.expr_renderer.render_sql_expr(
+    extract_stmt = sql_client.sql_plan_renderer.expr_renderer.render_sql_expr(
         _build_extract_expression(date_string=ISO_DATE_STRING, date_part=DatePart.DOY)
     ).sql
 
@@ -200,7 +200,7 @@ def test_date_part_day_of_year(sql_client: SqlClient) -> None:
 )
 def test_date_part_day_of_week(sql_client: SqlClient, input: str, expected: int) -> None:
     """Tests date_part or extract behavior for day of week."""
-    extract_stmt = sql_client.sql_query_plan_renderer.expr_renderer.render_sql_expr(
+    extract_stmt = sql_client.sql_plan_renderer.expr_renderer.render_sql_expr(
         _build_extract_expression(date_string=input, date_part=DatePart.DOW)
     ).sql
 

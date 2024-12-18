@@ -9,7 +9,7 @@ from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.sql.optimizer.rewriting_sub_query_reducer import SqlRewritingSubQueryReducer
-from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer, SqlQueryPlanRenderer
+from metricflow.sql.render.sql_plan_renderer import DefaultSqlPlanRenderer, SqlPlanRenderer
 from metricflow.sql.sql_exprs import (
     SqlColumnReference,
     SqlColumnReferenceExpression,
@@ -34,8 +34,8 @@ def sub_query_reducer() -> SqlRewritingSubQueryReducer:  # noqa: D103
 
 
 @pytest.fixture
-def sql_plan_renderer() -> SqlQueryPlanRenderer:  # noqa: D103
-    return DefaultSqlQueryPlanRenderer()
+def sql_plan_renderer() -> SqlPlanRenderer:  # noqa: D103
+    return DefaultSqlPlanRenderer()
 
 
 @pytest.fixture(scope="module")
@@ -230,7 +230,7 @@ def test_reduce_cte(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     sub_query_reducer: SqlRewritingSubQueryReducer,
-    sql_plan_renderer: DefaultSqlQueryPlanRenderer,
+    sql_plan_renderer: DefaultSqlPlanRenderer,
     base_select_statement_to_reduce: SqlSelectStatementNode,
 ) -> None:
     """Tests that the SELECT statements in CTEs are reduced."""
@@ -246,7 +246,7 @@ def test_reduce_cte(
 def test_reduce_cte_with_use_column_alias_in_group_bys(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    sql_plan_renderer: DefaultSqlQueryPlanRenderer,
+    sql_plan_renderer: DefaultSqlPlanRenderer,
     base_select_statement_to_reduce: SqlSelectStatementNode,
 ) -> None:
     """This tests reducing with the `use_column_alias_in_group_bys` flag set."""

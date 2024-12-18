@@ -15,7 +15,7 @@ from metricflow.sql.render.expr_renderer import (
     SqlExpressionRenderer,
     SqlExpressionRenderResult,
 )
-from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
+from metricflow.sql.render.sql_plan_renderer import DefaultSqlPlanRenderer
 from metricflow.sql.sql_exprs import (
     SqlAddTimeExpression,
     SqlBetweenExpression,
@@ -135,7 +135,7 @@ class TrinoSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         return date_part.value
 
 
-class TrinoSqlQueryPlanRenderer(DefaultSqlQueryPlanRenderer):
+class TrinoSqlPlanRenderer(DefaultSqlPlanRenderer):
     """Plan renderer for the Trino engine."""
 
     EXPR_RENDERER = TrinoSqlExpressionRenderer()

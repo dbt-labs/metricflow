@@ -7,7 +7,7 @@ from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.sql.optimizer.table_alias_simplifier import SqlTableAliasSimplifier
-from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
+from metricflow.sql.render.sql_plan_renderer import DefaultSqlPlanRenderer
 from metricflow.sql.sql_exprs import (
     SqlColumnReference,
     SqlColumnReferenceExpression,
@@ -25,14 +25,14 @@ from tests_metricflow.sql.optimizer.check_optimizer import assert_optimizer_resu
 
 
 @pytest.fixture
-def sql_plan_renderer() -> DefaultSqlQueryPlanRenderer:  # noqa: D103
-    return DefaultSqlQueryPlanRenderer()
+def sql_plan_renderer() -> DefaultSqlPlanRenderer:  # noqa: D103
+    return DefaultSqlPlanRenderer()
 
 
 def test_table_alias_simplification(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    sql_plan_renderer: DefaultSqlQueryPlanRenderer,
+    sql_plan_renderer: DefaultSqlPlanRenderer,
 ) -> None:
     """Tests that table aliases in the SELECT statement of a CTE are removed when not needed."""
     select_statement = SqlSelectStatementNode.create(
@@ -172,7 +172,7 @@ def test_table_alias_simplification(
 def test_table_alias_no_simplification(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    sql_plan_renderer: DefaultSqlQueryPlanRenderer,
+    sql_plan_renderer: DefaultSqlPlanRenderer,
 ) -> None:
     """Tests that table aliases in the SELECT statement of a CTE are not removed when required."""
     select_statement = SqlSelectStatementNode.create(
