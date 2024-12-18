@@ -54,6 +54,11 @@ class DunderColumnAssociationResolverVisitor(InstanceSpecVisitor[ColumnAssociati
                 if time_dimension_spec.aggregation_state
                 else ""
             )
+            + (
+                f"{DUNDER}{time_dimension_spec.window_function.value.lower()}"
+                if time_dimension_spec.window_function
+                else ""
+            )
         )
 
     def visit_entity_spec(self, entity_spec: EntitySpec) -> ColumnAssociation:  # noqa: D102
