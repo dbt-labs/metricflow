@@ -16,6 +16,7 @@ from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.protocols.query_parameter import DimensionOrEntityQueryParameter
 from metricflow_semantics.specs.query_param_implementations import DimensionOrEntityParameter, TimeDimensionParameter
 from metricflow_semantics.sql.sql_exprs import (
+    SqlAddTimeExpression,
     SqlCastToTimestampExpression,
     SqlColumnReference,
     SqlColumnReferenceExpression,
@@ -97,6 +98,20 @@ class CheckQueryHelpers:
             granularity=granularity,
         )
         return self._sql_client.sql_plan_renderer.expr_renderer.render_sql_expr(expr).sql
+
+    def render_date_add(
+        self,
+        date_column: str,
+        count_column: str,
+        granularity: TimeGranularity,
+    ) -> str:
+        """Renders a date add expression."""
+        expr = SqlAddTimeExpression.create(
+            arg=SqlStringExpression.create(sql_expr=date_column, requires_parenthesis=False),
+            count_expr=SqlStringExpression.create(sql_expr=count_column, requires_parenthesis=False),
+            granularity=granularity,
+        )
+        return self._sql_client.sql_query_plan_renderer.expr_renderer.render_sql_expr(expr).sql
 
     def render_date_trunc(self, expr: str, granularity: TimeGranularity) -> str:
         """Return the DATE_TRUNC() call that can be used for converting the given expr to the granularity."""
@@ -291,6 +306,7 @@ def test_case(
                         TimeGranularity=TimeGranularity,
                         DatePart=DatePart,
                         render_date_sub=check_query_helpers.render_date_sub,
+                        render_date_add=check_query_helpers.render_date_add,
                         render_date_trunc=check_query_helpers.render_date_trunc,
                         render_extract=check_query_helpers.render_extract,
                         render_percentile_expr=check_query_helpers.render_percentile_expr,
@@ -324,6 +340,7 @@ def test_case(
             TimeGranularity=TimeGranularity,
             DatePart=DatePart,
             render_date_sub=check_query_helpers.render_date_sub,
+            render_date_add=check_query_helpers.render_date_add,
             render_date_trunc=check_query_helpers.render_date_trunc,
             render_extract=check_query_helpers.render_extract,
             render_percentile_expr=check_query_helpers.render_percentile_expr,
