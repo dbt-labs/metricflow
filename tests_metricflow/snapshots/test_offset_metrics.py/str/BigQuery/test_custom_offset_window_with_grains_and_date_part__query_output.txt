@@ -1,0 +1,7 @@
+test_name: test_custom_offset_window_with_grains_and_date_part
+test_filename: test_offset_metrics.py
+---
+metric_time__martian_day    booking__ds__month      metric_time__extract_year    bookings_offset_one_martian_day
+--------------------------  --------------------  ---------------------------  ---------------------------------
+2020-01-09T00:00:00         2022-08-01T00:00:00                          2022                                  1
+2020-01-09T00:00:00         2022-09-01T00:00:00                          2022                                 45
