@@ -6,6 +6,7 @@ from typing import Optional, Sequence, Tuple
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
+from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.visitor import VisitorOutputT
 
@@ -57,7 +58,8 @@ class FilterElementsNode(DataflowPlanNode):
         if self.replace_description:
             return self.replace_description
 
-        return f"Pass Only Elements: {mf_pformat([x.qualified_name for x in self.include_specs.all_specs])}"
+        column_resolver = DunderColumnAssociationResolver()
+        return f"Pass Only Elements: {mf_pformat([column_resolver.resolve_spec(spec).column_name for spec in self.include_specs.all_specs])}"
 
     @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
