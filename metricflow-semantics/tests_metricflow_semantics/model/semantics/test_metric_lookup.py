@@ -27,12 +27,7 @@ def test_min_queryable_time_granularity_for_different_agg_time_grains(  # noqa: 
 def test_custom_offset_window_for_metric(
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
-    """Test offset window with custom grain supplied.
-
-    TODO: As of now, the functionality of an offset window with a custom grain is not supported in MF.
-          This test is added to show that at least the parsing is successful using a custom grain offset window.
-          Once support for that is added in MF + relevant tests, this test can be removed.
-    """
+    """Test offset window with custom grain supplied."""
     metric = simple_semantic_manifest_lookup.metric_lookup.get_metric(MetricReference("bookings_offset_martian_day"))
 
     assert len(metric.input_metrics) == 1
