@@ -1034,6 +1034,20 @@ class SqlWindowFunction(Enum):
         else:
             assert_values_exhausted(self)
 
+    @property
+    def allows_frame_clause(self) -> bool:
+        """Whether the function allows a frame clause, e.g., 'ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING'."""
+        if (
+            self is SqlWindowFunction.FIRST_VALUE
+            or self is SqlWindowFunction.LAST_VALUE
+            or self is SqlWindowFunction.AVERAGE
+        ):
+            return True
+        if self is SqlWindowFunction.ROW_NUMBER or self is SqlWindowFunction.LEAD:
+            return False
+        else:
+            assert_values_exhausted(self)
+
     @classmethod
     def get_window_function_for_period_agg(cls, period_agg: PeriodAggregation) -> SqlWindowFunction:
         """Get the window function to use for given period agg option."""

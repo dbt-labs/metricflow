@@ -428,7 +428,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
                 )
             )
 
-        if len(order_by_args_rendered) > 0:
+        if len(order_by_args_rendered) > 0 and node.sql_function.allows_frame_clause:
             window_string_lines.append("ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING")
 
         window_string = "\n".join(window_string_lines)
