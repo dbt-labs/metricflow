@@ -12,6 +12,13 @@ WITH sma_28009_cte AS (
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
+, rss_28018_cte AS (
+  -- Read From Time Spine 'mf_time_spine'
+  SELECT
+    ds AS ds__day
+  FROM ***************************.mf_time_spine time_spine_src_28006
+)
+
 SELECT
   metric_time__day AS metric_time__day
   , bookings_fill_nulls_with_0 - bookings_2_weeks_ago AS bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset
@@ -29,9 +36,9 @@ FROM (
     FROM (
       -- Join to Time Spine Dataset
       SELECT
-        time_spine_src_28006.ds AS metric_time__day
+        rss_28018_cte.ds__day AS metric_time__day
         , subq_22.bookings AS bookings
-      FROM ***************************.mf_time_spine time_spine_src_28006
+      FROM rss_28018_cte rss_28018_cte
       LEFT OUTER JOIN (
         -- Read From CTE For node_id=sma_28009
         -- Pass Only Elements: ['bookings', 'metric_time__day']
@@ -44,7 +51,7 @@ FROM (
           metric_time__day
       ) subq_22
       ON
-        time_spine_src_28006.ds = subq_22.metric_time__day
+        rss_28018_cte.ds__day = subq_22.metric_time__day
     ) subq_26
   ) subq_27
   FULL OUTER JOIN (
@@ -53,15 +60,15 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      time_spine_src_28006.ds AS metric_time__day
+      rss_28018_cte.ds__day AS metric_time__day
       , SUM(sma_28009_cte.bookings) AS bookings_2_weeks_ago
-    FROM ***************************.mf_time_spine time_spine_src_28006
+    FROM rss_28018_cte rss_28018_cte
     INNER JOIN
       sma_28009_cte sma_28009_cte
     ON
-      DATE_ADD('day', -14, time_spine_src_28006.ds) = sma_28009_cte.metric_time__day
+      DATE_ADD('day', -14, rss_28018_cte.ds__day) = sma_28009_cte.metric_time__day
     GROUP BY
-      time_spine_src_28006.ds
+      rss_28018_cte.ds__day
   ) subq_35
   ON
     subq_27.metric_time__day = subq_35.metric_time__day
