@@ -15,7 +15,10 @@ from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.sql.sql_exprs import (
     SqlAddTimeExpression,
     SqlAggregateFunctionExpression,
+    SqlArithmeticExpression,
+    SqlArithmeticOperator,
     SqlBetweenExpression,
+    SqlCaseExpression,
     SqlCastToTimestampExpression,
     SqlColumnAliasReferenceExpression,
     SqlColumnReferenceExpression,
@@ -26,6 +29,7 @@ from metricflow_semantics.sql.sql_exprs import (
     SqlExtractExpression,
     SqlFunction,
     SqlGenerateUuidExpression,
+    SqlIntegerExpression,
     SqlIsNullExpression,
     SqlLogicalExpression,
     SqlNullExpression,
@@ -320,17 +324,25 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         )
 
     def visit_add_time_expr(self, node: SqlAddTimeExpression) -> SqlExpressionRenderResult:  # noqa: D102
-        arg_rendered = node.arg.accept(self)
-        count_rendered = node.count_expr.accept(self).sql
-
         granularity = node.granularity
+        count_expr = node.count_expr
         if granularity is TimeGranularity.QUARTER:
             granularity = TimeGranularity.MONTH
-            count_rendered = f"({count_rendered} * 3)"
+            count_expr = SqlArithmeticExpression.create(
+                left_expr=node.count_expr,
+                operator=SqlArithmeticOperator.MULTIPLY,
+                right_expr=SqlIntegerExpression.create(3),
+            )
+
+        arg_rendered = node.arg.accept(self)
+        count_rendered = count_expr.accept(self)
+        count_sql = f"({count_rendered.sql})" if count_expr.requires_parenthesis else count_rendered.sql
 
         return SqlExpressionRenderResult(
-            sql=f"DATEADD({granularity.value}, {count_rendered}, {arg_rendered.sql})",
-            bind_parameter_set=arg_rendered.bind_parameter_set,
+            sql=f"DATEADD({granularity.value}, {count_sql}, {arg_rendered.sql})",
+            bind_parameter_set=SqlBindParameterSet.merge_iterable(
+                (arg_rendered.bind_parameter_set, count_rendered.bind_parameter_set)
+            ),
         )
 
     def visit_ratio_computation_expr(self, node: SqlRatioComputationExpression) -> SqlExpressionRenderResult:
@@ -438,3 +450,27 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
             sql="UUID()",
             bind_parameter_set=SqlBindParameterSet(),
         )
+
+    def visit_case_expr(self, node: SqlCaseExpression) -> SqlExpressionRenderResult:  # noqa: D102
+        sql = "CASE\n"
+        for when, then in node.when_to_then_exprs.items():
+            sql += indent(
+                f"WHEN {self.render_sql_expr(when).sql}\n", indent_prefix=SqlRenderingConstants.INDENT
+            ) + indent(
+                f"THEN {self.render_sql_expr(then).sql}\n",
+                indent_prefix=SqlRenderingConstants.INDENT * 2,
+            )
+        if node.else_expr:
+            sql += indent(
+                f"ELSE {self.render_sql_expr(node.else_expr).sql}\n",
+                indent_prefix=SqlRenderingConstants.INDENT,
+            )
+        sql += "END"
+        return SqlExpressionRenderResult(sql=sql, bind_parameter_set=SqlBindParameterSet())
+
+    def visit_arithmetic_expr(self, node: SqlArithmeticExpression) -> SqlExpressionRenderResult:  # noqa: D102
+        sql = f"{self.render_sql_expr(node.left_expr).sql} {node.operator.value} {self.render_sql_expr(node.right_expr).sql}"
+        return SqlExpressionRenderResult(sql=sql, bind_parameter_set=SqlBindParameterSet())
+
+    def visit_integer_expr(self, node: SqlIntegerExpression) -> SqlExpressionRenderResult:  # noqa: D102
+        return SqlExpressionRenderResult(sql=str(node.integer_value), bind_parameter_set=SqlBindParameterSet())

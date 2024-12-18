@@ -860,3 +860,24 @@ metric:
       - name: instant_bookings
         alias: shared_alias
 ---
+metric:
+  name: bookings_offset_one_martian_day
+  description: bookings offset by one martian_day
+  type: derived
+  type_params:
+    expr: bookings
+    metrics:
+      - name: bookings
+        offset_window: 1 martian_day
+---
+metric:
+  name: bookings_martian_day_over_martian_day
+  description: bookings growth martian day over martian day
+  type: derived
+  type_params:
+    expr: bookings - bookings_offset / NULLIF(bookings_offset, 0)
+    metrics:
+      - name: bookings
+        offset_window: 1 martian_day
+        alias: bookings_offset
+      - name: bookings

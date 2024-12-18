@@ -15,6 +15,7 @@ from metricflow_semantics.model.semantics.linkable_element import ElementPathKey
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.instance_spec import InstanceSpecVisitor
+from metricflow_semantics.sql.sql_exprs import SqlWindowFunction
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.visitor import VisitorOutputT
 
@@ -91,6 +92,8 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
     # Used for semi-additive joins. Some more thought is needed, but this may be useful in InstanceSpec.
     aggregation_state: Optional[AggregationState] = None
 
+    window_function: Optional[SqlWindowFunction] = None
+
     @property
     def without_first_entity_link(self) -> TimeDimensionSpec:  # noqa: D102
         assert len(self.entity_links) > 0, f"Spec does not have any entity links: {self}"
@@ -99,6 +102,8 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
             entity_links=self.entity_links[1:],
             time_granularity=self.time_granularity,
             date_part=self.date_part,
+            aggregation_state=self.aggregation_state,
+            window_function=self.window_function,
         )
 
     @property
@@ -108,6 +113,8 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
             time_granularity=self.time_granularity,
             date_part=self.date_part,
             entity_links=(),
+            aggregation_state=self.aggregation_state,
+            window_function=self.window_function,
         )
 
     @property
@@ -153,6 +160,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
             time_granularity=time_granularity,
             date_part=self.date_part,
             aggregation_state=self.aggregation_state,
+            window_function=self.window_function,
         )
 
     def with_base_grain(self) -> TimeDimensionSpec:  # noqa: D102
@@ -162,6 +170,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
             time_granularity=ExpandedTimeGranularity.from_time_granularity(self.time_granularity.base_granularity),
             date_part=self.date_part,
             aggregation_state=self.aggregation_state,
+            window_function=self.window_function,
         )
 
     def with_grain_and_date_part(  # noqa: D102
@@ -173,6 +182,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
             time_granularity=time_granularity,
             date_part=date_part,
             aggregation_state=self.aggregation_state,
+            window_function=self.window_function,
         )
 
     def with_aggregation_state(self, aggregation_state: AggregationState) -> TimeDimensionSpec:  # noqa: D102
@@ -182,6 +192,17 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
             time_granularity=self.time_granularity,
             date_part=self.date_part,
             aggregation_state=aggregation_state,
+            window_function=self.window_function,
+        )
+
+    def with_window_function(self, window_function: SqlWindowFunction) -> TimeDimensionSpec:  # noqa: D102
+        return TimeDimensionSpec(
+            element_name=self.element_name,
+            entity_links=self.entity_links,
+            time_granularity=self.time_granularity,
+            date_part=self.date_part,
+            aggregation_state=self.aggregation_state,
+            window_function=window_function,
         )
 
     def comparison_key(self, exclude_fields: Sequence[TimeDimensionSpecField] = ()) -> TimeDimensionSpecComparisonKey:
@@ -243,6 +264,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
             time_granularity=self.time_granularity,
             date_part=self.date_part,
             aggregation_state=self.aggregation_state,
+            window_function=self.window_function,
         )
 
     @staticmethod

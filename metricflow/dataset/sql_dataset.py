@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.references import SemanticModelReference
+from dbt_semantic_interfaces.type_enums import DatePart
 from metricflow_semantics.assert_one_arg import assert_exactly_one_arg_set
 from metricflow_semantics.instances import EntityInstance, InstanceSet, MdoInstance, TimeDimensionInstance
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
@@ -12,6 +13,7 @@ from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
+from metricflow_semantics.sql.sql_exprs import SqlWindowFunction
 from typing_extensions import override
 
 from metricflow.dataset.dataset_classes import DataSet
@@ -165,18 +167,30 @@ class SqlDataSet(DataSet):
         )
 
     def instance_from_time_dimension_grain_and_date_part(
-        self, time_dimension_spec: TimeDimensionSpec
+        self, time_granularity_name: str, date_part: Optional[DatePart]
     ) -> TimeDimensionInstance:
-        """Find instance in dataset that matches the grain and date part of the given time dimension spec."""
+        """Find instance in dataset that matches the given grain and date part."""
         for time_dimension_instance in self.instance_set.time_dimension_instances:
             if (
-                time_dimension_instance.spec.time_granularity == time_dimension_spec.time_granularity
-                and time_dimension_instance.spec.date_part == time_dimension_spec.date_part
+                time_dimension_instance.spec.time_granularity.name == time_granularity_name
+                and time_dimension_instance.spec.date_part == date_part
+                and time_dimension_instance.spec.window_function is None
             ):
                 return time_dimension_instance
 
         raise RuntimeError(
-            f"Did not find a time dimension instance with matching grain and date part for spec: {time_dimension_spec}\n"
+            f"Did not find a time dimension instance with grain '{time_granularity_name}' and date part {date_part}\n"
+            f"Instances available: {self.instance_set.time_dimension_instances}"
+        )
+
+    def instance_from_window_function(self, window_function: SqlWindowFunction) -> TimeDimensionInstance:
+        """Find instance in dataset that matches the given window function."""
+        for time_dimension_instance in self.instance_set.time_dimension_instances:
+            if time_dimension_instance.spec.window_function is window_function:
+                return time_dimension_instance
+
+        raise RuntimeError(
+            f"Did not find a time dimension instance with window function {window_function}.\n"
             f"Instances available: {self.instance_set.time_dimension_instances}"
         )
 

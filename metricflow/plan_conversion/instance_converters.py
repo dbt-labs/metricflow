@@ -39,7 +39,7 @@ from metricflow_semantics.sql.sql_exprs import (
     SqlExpressionNode,
     SqlFunction,
     SqlFunctionExpression,
-    SqlStringExpression,
+    SqlIntegerExpression,
 )
 from more_itertools import bucket
 
@@ -764,7 +764,7 @@ class CreateSelectColumnForCombineOutputNode(InstanceSetTransform[SelectColumnSe
                 sql_function=SqlFunction.COALESCE,
                 sql_function_args=[
                     select_expression,
-                    SqlStringExpression.create(str(fill_nulls_with)),
+                    SqlIntegerExpression.create(fill_nulls_with),
                 ],
             )
         return SqlSelectColumn(

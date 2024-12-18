@@ -497,7 +497,11 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
             join_select_node = join_desc.right_source.as_select_node
 
             # Verifying that it's simple makes it easier to reason about the logic.
-            if not join_select_node or not SqlRewritingSubQueryReducerVisitor._is_simple_source(join_select_node):
+            if (
+                not join_select_node
+                or not SqlRewritingSubQueryReducerVisitor._is_simple_source(join_select_node)
+                or any(col.expr.as_window_function_expression for col in join_select_node.select_columns)
+            ):
                 new_join_descs.append(join_desc)
                 continue
 

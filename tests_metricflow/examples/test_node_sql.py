@@ -35,13 +35,11 @@ def test_view_sql_generated_at_a_node(
         SemanticModelReference(semantic_model_name="bookings_source")
     )
     assert bookings_semantic_model
-    column_association_resolver = DunderColumnAssociationResolver(
-        semantic_manifest_lookup=simple_semantic_manifest_lookup,
-    )
+    column_association_resolver = DunderColumnAssociationResolver()
     to_data_set_converter = SemanticModelToDataSetConverter(column_association_resolver)
 
     to_sql_plan_converter = DataflowToSqlQueryPlanConverter(
-        column_association_resolver=DunderColumnAssociationResolver(simple_semantic_manifest_lookup),
+        column_association_resolver=DunderColumnAssociationResolver(),
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
     )
     sql_renderer: SqlQueryPlanRenderer = sql_client.sql_query_plan_renderer

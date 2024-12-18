@@ -130,7 +130,6 @@ class SqlSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
 
     def visit_select_statement_node(self, node: SqlSelectStatementNode) -> SqlQueryPlanNode:  # noqa: D102
         node_with_reduced_parents = self._reduce_parents(node)
-
         if not self._reduce_is_possible(node_with_reduced_parents):
             return node_with_reduced_parents
 

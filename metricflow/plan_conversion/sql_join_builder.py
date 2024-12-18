@@ -535,7 +535,7 @@ class SqlQueryPlanJoinBuilder:
         left_expr: SqlExpressionNode = SqlColumnReferenceExpression.create(
             col_ref=SqlColumnReference(table_alias=time_spine_alias, column_name=agg_time_dimension_column_name)
         )
-        if node.offset_window:
+        if node.offset_window:  # and not node.offset_window.granularity.is_custom_granularity:
             left_expr = SqlSubtractTimeIntervalExpression.create(
                 arg=left_expr,
                 count=node.offset_window.count,
