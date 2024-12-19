@@ -1,0 +1,7 @@
+test_name: test_custom_offset_window_with_grains_and_date_part
+test_filename: test_offset_metrics.py
+---
+METRIC_TIME__MARTIAN_DAY    BOOKING__DS__MONTH      METRIC_TIME__EXTRACT_YEAR    BOOKINGS_OFFSET_ONE_MARTIAN_DAY
+--------------------------  --------------------  ---------------------------  ---------------------------------
+2020-01-09T00:00:00         2022-08-01T00:00:00                          2022                                  1
+2020-01-09T00:00:00         2022-09-01T00:00:00                          2022                                 45
