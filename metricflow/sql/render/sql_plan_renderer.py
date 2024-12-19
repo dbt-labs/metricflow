@@ -9,6 +9,7 @@ from typing import List, Optional, Sequence
 
 from metricflow_semantics.mf_logging.formatting import indent
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
+from metricflow_semantics.sql.sql_exprs import SqlExpressionNode
 from typing_extensions import override
 
 from metricflow.sql.render.expr_renderer import (
@@ -17,7 +18,6 @@ from metricflow.sql.render.expr_renderer import (
     SqlExpressionRenderResult,
 )
 from metricflow.sql.render.rendering_constants import SqlRenderingConstants
-from metricflow.sql.sql_exprs import SqlExpressionNode
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlCteNode,
