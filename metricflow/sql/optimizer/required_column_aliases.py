@@ -5,10 +5,10 @@ from collections import defaultdict
 from typing import Dict, FrozenSet, List, Set, Tuple
 
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.sql.sql_exprs import SqlExpressionTreeLineage
 from typing_extensions import override
 
 from metricflow.sql.optimizer.tag_column_aliases import NodeToColumnAliasMapping
-from metricflow.sql.sql_exprs import SqlExpressionTreeLineage
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlCteNode,

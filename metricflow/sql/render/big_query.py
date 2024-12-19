@@ -8,16 +8,7 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.errors.error_classes import UnsupportedEngineFeatureError
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
-from typing_extensions import override
-
-from metricflow.protocols.sql_client import SqlEngine
-from metricflow.sql.render.expr_renderer import (
-    DefaultSqlExpressionRenderer,
-    SqlExpressionRenderer,
-    SqlExpressionRenderResult,
-)
-from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
-from metricflow.sql.sql_exprs import (
+from metricflow_semantics.sql.sql_exprs import (
     SqlAddTimeExpression,
     SqlCastToTimestampExpression,
     SqlDateTruncExpression,
@@ -27,6 +18,15 @@ from metricflow.sql.sql_exprs import (
     SqlPercentileFunctionType,
     SqlSubtractTimeIntervalExpression,
 )
+from typing_extensions import override
+
+from metricflow.protocols.sql_client import SqlEngine
+from metricflow.sql.render.expr_renderer import (
+    DefaultSqlExpressionRenderer,
+    SqlExpressionRenderer,
+    SqlExpressionRenderResult,
+)
+from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from metricflow.sql.sql_plan import SqlSelectColumn
 
 
@@ -184,8 +184,8 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
         count = node.count_expr.accept(self)
 
         return SqlExpressionRenderResult(
-            sql=f"DATE_ADD(CAST({column.sql} AS {self.timestamp_data_type}), INTERVAL {count} {node.granularity.value})",
-            bind_parameter_set=column.bind_parameter_set,
+            sql=f"DATE_ADD(CAST({column.sql} AS {self.timestamp_data_type}), INTERVAL {count.sql} {node.granularity.value})",
+            bind_parameter_set=column.bind_parameter_set.merge(count.bind_parameter_set),
         )
 
     @override

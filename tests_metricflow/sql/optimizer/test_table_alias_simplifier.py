@@ -2,18 +2,18 @@ from __future__ import annotations
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+from metricflow_semantics.sql.sql_exprs import (
+    SqlColumnReference,
+    SqlColumnReferenceExpression,
+    SqlComparison,
+    SqlComparisonExpression,
+)
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.sql.optimizer.table_alias_simplifier import SqlTableAliasSimplifier
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer, SqlQueryPlanRenderer
-from metricflow.sql.sql_exprs import (
-    SqlColumnReference,
-    SqlColumnReferenceExpression,
-    SqlComparison,
-    SqlComparisonExpression,
-)
 from metricflow.sql.sql_plan import (
     SqlJoinDescription,
     SqlSelectColumn,

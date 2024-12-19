@@ -7,17 +7,17 @@ from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifest
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
 from metricflow_semantics.specs.measure_spec import MeasureSpec, MetricInputMeasureSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
+from metricflow_semantics.sql.sql_exprs import (
+    SqlAggregateFunctionExpression,
+    SqlFunction,
+    SqlPercentileExpression,
+)
 
 from metricflow.plan_conversion.instance_converters import (
     CreateSelectColumnsWithMeasuresAggregated,
     FilterElements,
 )
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
-from metricflow.sql.sql_exprs import (
-    SqlAggregateFunctionExpression,
-    SqlFunction,
-    SqlPercentileExpression,
-)
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 
 __SOURCE_TABLE_ALIAS = "a"
