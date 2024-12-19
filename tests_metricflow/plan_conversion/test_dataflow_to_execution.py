@@ -26,7 +26,7 @@ def make_execution_plan_converter(  # noqa: D103
 ) -> DataflowToExecutionPlanConverter:
     return DataflowToExecutionPlanConverter(
         sql_plan_converter=DataflowToSqlQueryPlanConverter(
-            column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup),
+            column_association_resolver=DunderColumnAssociationResolver(),
             semantic_manifest_lookup=semantic_manifest_lookup,
         ),
         sql_plan_renderer=DefaultSqlQueryPlanRenderer(),

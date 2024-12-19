@@ -364,9 +364,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             SequentialIdGenerator.reset(MetricFlowEngine._ID_ENUMERATION_START_VALUE_FOR_INITIALIZER)
         self._semantic_manifest_lookup = semantic_manifest_lookup
         self._sql_client = sql_client
-        self._column_association_resolver = column_association_resolver or (
-            DunderColumnAssociationResolver(semantic_manifest_lookup)
-        )
+        self._column_association_resolver = column_association_resolver or (DunderColumnAssociationResolver())
         self._time_source = time_source
         self._time_spine_sources = TimeSpineSource.build_standard_time_spine_sources(
             semantic_manifest_lookup.semantic_manifest
@@ -463,12 +461,14 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 raise InvalidQueryException("Group by items can't be specified with a saved query.")
             query_spec = self._query_parser.parse_and_validate_saved_query(
                 saved_query_parameter=SavedQueryParameter(mf_query_request.saved_query_name),
-                where_filters=[
-                    PydanticWhereFilter(where_sql_template=where_constraint)
-                    for where_constraint in mf_query_request.where_constraints
-                ]
-                if mf_query_request.where_constraints is not None
-                else None,
+                where_filters=(
+                    [
+                        PydanticWhereFilter(where_sql_template=where_constraint)
+                        for where_constraint in mf_query_request.where_constraints
+                    ]
+                    if mf_query_request.where_constraints is not None
+                    else None
+                ),
                 limit=mf_query_request.limit,
                 time_constraint_start=mf_query_request.time_constraint_start,
                 time_constraint_end=mf_query_request.time_constraint_end,

@@ -38,9 +38,7 @@ def it_helpers(  # noqa: D103
         mf_engine=MetricFlowEngine(
             semantic_manifest_lookup=simple_semantic_manifest_lookup,
             sql_client=sql_client,
-            column_association_resolver=DunderColumnAssociationResolver(
-                semantic_manifest_lookup=simple_semantic_manifest_lookup
-            ),
+            column_association_resolver=DunderColumnAssociationResolver(),
             time_source=ConfigurableTimeSource(as_datetime("2020-01-01")),
         ),
         mf_system_schema=mf_test_configuration.mf_system_schema,

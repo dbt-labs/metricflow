@@ -47,6 +47,7 @@ def test_classes() -> None:  # noqa: D103
               time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY),
               date_part=None,
               aggregation_state=None,
+              window_function=None,
             )
             """
         ).rstrip()
