@@ -71,6 +71,14 @@ class SqlExpressionNode(DagNode["SqlExpressionNode"], Visitable, ABC):
         """If this is a window function expression, return self."""
         return None
 
+    @property
+    def is_verbose(self) -> bool:
+        """Denotes if the statement is typically verbose, and therefore can be hard to read when optimized.
+
+        This is helpful in determining if statements will be harder to read when collapsed.
+        """
+        return False
+
     @abstractmethod
     def rewrite(
         self,
@@ -1197,6 +1205,10 @@ class SqlWindowFunctionExpression(SqlFunctionExpression):
             and self.sql_function_args == other.sql_function_args
         )
 
+    @property
+    def is_verbose(self) -> bool:  # noqa: D102
+        return True
+
 
 @dataclass(frozen=True, eq=False)
 class SqlNullExpression(SqlExpressionNode):
@@ -1883,6 +1895,10 @@ class SqlCaseExpression(SqlExpressionNode):
         if not isinstance(other, SqlCaseExpression):
             return False
         return self.when_to_then_exprs == other.when_to_then_exprs and self.else_expr == other.else_expr
+
+    @property
+    def is_verbose(self) -> bool:  # noqa: D102
+        return True
 
 
 class SqlArithmeticOperator(Enum):

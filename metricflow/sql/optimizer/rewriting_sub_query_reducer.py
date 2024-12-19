@@ -241,6 +241,10 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
         if len(from_source_node_as_select_node.group_bys) > 0 and len(node.group_bys) > 0:
             return False
 
+        # Skip this case for readability.
+        if any(col.expr.is_verbose for col in from_source_node_as_select_node.select_columns):
+            return False
+
         # If there is a column in the parent group by that is not used in the current select statement, don't reduce or it
         # would leave an unselected column in the group by and change the meaning of the query. For example, in the SQL
         # below, reducing would remove the `is_instant` from the select statement.
@@ -497,7 +501,11 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
             join_select_node = join_desc.right_source.as_select_node
 
             # Verifying that it's simple makes it easier to reason about the logic.
-            if not join_select_node or not SqlRewritingSubQueryReducerVisitor._is_simple_source(join_select_node):
+            if (
+                not join_select_node
+                or not SqlRewritingSubQueryReducerVisitor._is_simple_source(join_select_node)
+                or any(col.expr.is_verbose for col in join_select_node.select_columns)
+            ):
                 new_join_descs.append(join_desc)
                 continue
 
