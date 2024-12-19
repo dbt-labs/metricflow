@@ -1648,7 +1648,9 @@ class DataflowPlanBuilder:
             join_on_time_dimension_spec = self._determine_time_spine_join_spec(
                 measure_properties=measure_properties, required_time_spine_specs=base_queried_agg_time_dimension_specs
             )
-            required_time_spine_specs = (join_on_time_dimension_spec,) + base_queried_agg_time_dimension_specs
+            required_time_spine_specs = base_queried_agg_time_dimension_specs
+            if join_on_time_dimension_spec not in required_time_spine_specs:
+                required_time_spine_specs = (join_on_time_dimension_spec,) + required_time_spine_specs
             time_spine_node = self._build_time_spine_node(required_time_spine_specs)
             unaggregated_measure_node = JoinToTimeSpineNode.create(
                 metric_source_node=unaggregated_measure_node,

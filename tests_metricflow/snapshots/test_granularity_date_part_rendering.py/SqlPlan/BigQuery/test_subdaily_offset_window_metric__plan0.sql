@@ -215,7 +215,7 @@ FROM (
           , subq_1.user__home_state AS user__home_state
           , subq_1.archived_users AS archived_users
         FROM (
-          -- Pass Only Elements: ['metric_time__hour', 'metric_time__hour']
+          -- Pass Only Elements: ['metric_time__hour',]
           SELECT
             subq_3.metric_time__hour
           FROM (

@@ -125,7 +125,7 @@ FROM (
           , subq_1.approximate_discrete_booking_value_p99 AS approximate_discrete_booking_value_p99
           , subq_5.martian_day AS booking__ds__martian_day
         FROM (
-          -- Pass Only Elements: ['booking__ds__day', 'booking__ds__day']
+          -- Pass Only Elements: ['booking__ds__day',]
           SELECT
             subq_3.booking__ds__day
           FROM (
