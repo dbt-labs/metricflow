@@ -27,8 +27,8 @@ from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import (
 )
 from metricflow_semantics.specs.patterns.entity_link_pattern import (
     EntityLinkPattern,
-    EntityLinkPatternParameterSet,
     ParameterSetField,
+    SpecPatternParameterSet,
 )
 
 
@@ -65,7 +65,7 @@ class TimeDimensionParameter(ProtocolHint[TimeDimensionQueryParameter]):
             input_obj=self,
             input_obj_naming_scheme=ObjectBuilderNamingScheme(),
             spec_pattern=EntityLinkPattern(
-                EntityLinkPatternParameterSet.from_parameters(
+                SpecPatternParameterSet.from_parameters(
                     fields_to_compare=tuple(fields_to_compare),
                     element_name=name_structure.element_name,
                     entity_links=tuple(EntityReference(link_name) for link_name in name_structure.entity_link_names),
@@ -108,7 +108,7 @@ class DimensionOrEntityParameter(ProtocolHint[DimensionOrEntityQueryParameter]):
             input_obj=self,
             input_obj_naming_scheme=ObjectBuilderNamingScheme(),
             spec_pattern=EntityLinkPattern(
-                EntityLinkPatternParameterSet.from_parameters(
+                SpecPatternParameterSet.from_parameters(
                     fields_to_compare=(
                         ParameterSetField.ELEMENT_NAME,
                         ParameterSetField.ENTITY_LINKS,

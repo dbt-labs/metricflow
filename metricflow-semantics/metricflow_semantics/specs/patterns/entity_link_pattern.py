@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 class ParameterSetField(Enum):
-    """The fields of the EntityLinkPatternParameterSet class used for matching in the EntityLinkPattern.
+    """The fields of the SpecPatternParameterSet class used for matching in the EntityLinkPattern.
 
     Considering moving this to be a part of the specs module / classes.
     """
@@ -39,7 +39,7 @@ class ParameterSetField(Enum):
 
 
 @dataclass(frozen=True)
-class EntityLinkPatternParameterSet:
+class SpecPatternParameterSet:
     """See EntityPathPattern for more details."""
 
     # Specify the field values to compare. None can't be used to signal "don't compare" because sometimes a pattern
@@ -63,8 +63,8 @@ class EntityLinkPatternParameterSet:
         time_granularity_name: Optional[str] = None,
         date_part: Optional[DatePart] = None,
         metric_subquery_entity_links: Optional[Tuple[EntityReference, ...]] = None,
-    ) -> EntityLinkPatternParameterSet:
-        return EntityLinkPatternParameterSet(
+    ) -> SpecPatternParameterSet:
+        return SpecPatternParameterSet(
             fields_to_compare=tuple(sorted(fields_to_compare)),
             element_name=element_name,
             entity_links=tuple(entity_links) if entity_links is not None else None,
@@ -91,7 +91,7 @@ class EntityLinkPattern(SpecPattern):
     The entity links that are specified is used as a suffix match.
     """
 
-    parameter_set: EntityLinkPatternParameterSet
+    parameter_set: SpecPatternParameterSet
 
     def _match_entity_links(self, candidate_specs: Sequence[LinkableInstanceSpec]) -> Sequence[LinkableInstanceSpec]:
         assert self.parameter_set.entity_links is not None
@@ -129,7 +129,7 @@ class EntityLinkPattern(SpecPattern):
     @override
     def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[LinkableInstanceSpec]:
         filtered_candidate_specs = group_specs_by_type(candidate_specs).linkable_specs
-        # Checks that EntityLinkPatternParameterSetField is valid wrt to the parameter set.
+        # Checks that SpecPatternParameterSetField is valid wrt to the parameter set.
 
         # Entity links could be a partial match, so it's handled separately.
         if ParameterSetField.ENTITY_LINKS in self.parameter_set.fields_to_compare:
