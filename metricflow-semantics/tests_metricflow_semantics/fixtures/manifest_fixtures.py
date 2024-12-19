@@ -137,7 +137,7 @@ def cyclic_join_semantic_manifest_lookup(  # noqa: D103
 def column_association_resolver(  # noqa: D103
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> ColumnAssociationResolver:
-    return DunderColumnAssociationResolver(simple_semantic_manifest_lookup)
+    return DunderColumnAssociationResolver()
 
 
 @pytest.fixture(scope="session")

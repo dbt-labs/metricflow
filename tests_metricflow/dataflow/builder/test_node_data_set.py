@@ -43,7 +43,7 @@ def test_no_parent_node_data_set(
 ) -> None:
     """Tests getting the data set from a single node."""
     resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
-        column_association_resolver=DunderColumnAssociationResolver(simple_semantic_manifest_lookup),
+        column_association_resolver=DunderColumnAssociationResolver(),
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
     )
 
@@ -96,7 +96,7 @@ def test_joined_node_data_set(
 ) -> None:
     """Tests getting the data set from a dataflow plan with a join."""
     resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
-        column_association_resolver=DunderColumnAssociationResolver(simple_semantic_manifest_lookup),
+        column_association_resolver=DunderColumnAssociationResolver(),
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
     )
 
