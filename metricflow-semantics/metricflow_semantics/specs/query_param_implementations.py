@@ -128,6 +128,7 @@ class MetricParameter(ProtocolHint[MetricQueryParameter]):
     """Metric requested in a query."""
 
     name: str
+    alias: Optional[str] = None
 
     @override
     def _implements_protocol(self) -> MetricQueryParameter:

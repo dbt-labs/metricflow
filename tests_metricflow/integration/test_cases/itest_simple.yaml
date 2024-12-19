@@ -47,6 +47,22 @@ integration_test:
       ds
 ---
 integration_test:
+  name: simple_query_with_alias
+  description: Tests selecting a metric with an alias and an associated local dimension.
+  model: SIMPLE_MODEL
+  metrics:
+    - name: "booking_value"
+      alias: "booking_alias"
+  group_bys: ["booking__is_instant"]
+  check_query: |
+    SELECT
+      SUM(booking_value) AS booking_alias
+      , is_instant AS booking__is_instant
+    FROM {{ source_schema }}.fct_bookings
+    GROUP BY
+      is_instant
+---
+integration_test:
   name: simple_query_with_joined_dimension_on_unique_id
   description: Query a metric with a joined dimension where the join key is a unique identifier.
   model: SIMPLE_MODEL
