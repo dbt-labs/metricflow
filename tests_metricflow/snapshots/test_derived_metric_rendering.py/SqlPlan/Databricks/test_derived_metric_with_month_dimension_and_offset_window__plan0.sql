@@ -24,7 +24,8 @@ FROM (
       FROM (
         -- Join to Time Spine Dataset
         SELECT
-          subq_1.ds__month AS ds__month
+          subq_4.metric_time__month AS metric_time__month
+          , subq_1.ds__month AS ds__month
           , subq_1.ds__quarter AS ds__quarter
           , subq_1.ds__year AS ds__year
           , subq_1.ds__extract_year AS ds__extract_year
@@ -41,7 +42,6 @@ FROM (
           , subq_1.metric_time__extract_year AS metric_time__extract_year
           , subq_1.metric_time__extract_quarter AS metric_time__extract_quarter
           , subq_1.metric_time__extract_month AS metric_time__extract_month
-          , subq_4.metric_time__month AS metric_time__month
           , subq_1.listing AS listing
           , subq_1.booking_monthly__listing AS booking_monthly__listing
           , subq_1.bookings_monthly AS bookings_monthly

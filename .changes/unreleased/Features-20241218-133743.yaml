@@ -1,0 +1,6 @@
+kind: Features
+body: Support for custom offset windows.
+time: 2024-12-18T13:37:43.23915-08:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1584"

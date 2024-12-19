@@ -527,13 +527,14 @@ class SqlQueryPlanJoinBuilder:
     def make_join_to_time_spine_join_description(
         node: JoinToTimeSpineNode,
         time_spine_alias: str,
-        agg_time_dimension_column_name: str,
+        time_spine_column_name: str,
+        parent_column_name: str,
         parent_sql_select_node: SqlSelectStatementNode,
         parent_alias: str,
     ) -> SqlJoinDescription:
         """Build join expression used to join a metric to a time spine dataset."""
         left_expr: SqlExpressionNode = SqlColumnReferenceExpression.create(
-            col_ref=SqlColumnReference(table_alias=time_spine_alias, column_name=agg_time_dimension_column_name)
+            col_ref=SqlColumnReference(table_alias=time_spine_alias, column_name=time_spine_column_name)
         )
         if node.offset_window:
             left_expr = SqlSubtractTimeIntervalExpression.create(
@@ -551,7 +552,7 @@ class SqlQueryPlanJoinBuilder:
                 left_expr=left_expr,
                 comparison=SqlComparison.EQUALS,
                 right_expr=SqlColumnReferenceExpression.create(
-                    col_ref=SqlColumnReference(table_alias=parent_alias, column_name=agg_time_dimension_column_name)
+                    col_ref=SqlColumnReference(table_alias=parent_alias, column_name=parent_column_name)
                 ),
             ),
             join_type=node.join_type,

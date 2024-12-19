@@ -53,8 +53,8 @@ docstring:
                 <!-- description = 'Join to Time Spine Dataset' -->
                 <!-- node_id = NodeId(id_str='ss_8') -->
                 <!-- col0 =                                                                                               -->
-                <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_61), column_alias='metric_time__day') -->
-                <!-- col1 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_60), column_alias='visits') -->
+                <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_60), column_alias='metric_time__day') -->
+                <!-- col1 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_61), column_alias='visits') -->
                 <!-- from_source = SqlSelectStatementNode(node_id=ss_7) -->
                 <!-- join_0 =                                                 -->
                 <!--   SqlJoinDescription(                                    -->
@@ -610,8 +610,8 @@ docstring:
                 <!-- description = 'Join to Time Spine Dataset' -->
                 <!-- node_id = NodeId(id_str='ss_22') -->
                 <!-- col0 =                                                                                                -->
-                <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_256), column_alias='metric_time__day') -->
-                <!-- col1 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_255), column_alias='buys') -->
+                <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_255), column_alias='metric_time__day') -->
+                <!-- col1 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_256), column_alias='buys') -->
                 <!-- from_source = SqlSelectStatementNode(node_id=ss_21) -->
                 <!-- join_0 =                                                 -->
                 <!--   SqlJoinDescription(                                    -->

@@ -195,7 +195,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
             window_function=self.window_function,
         )
 
-    def with_window_function(self, window_function: SqlWindowFunction) -> TimeDimensionSpec:  # noqa: D102
+    def with_window_function(self, window_function: Optional[SqlWindowFunction]) -> TimeDimensionSpec:  # noqa: D102
         return TimeDimensionSpec(
             element_name=self.element_name,
             entity_links=self.entity_links,

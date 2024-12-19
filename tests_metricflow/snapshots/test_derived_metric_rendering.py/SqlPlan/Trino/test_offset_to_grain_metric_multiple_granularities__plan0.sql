@@ -34,7 +34,10 @@ FROM (
       FROM (
         -- Join to Time Spine Dataset
         SELECT
-          subq_1.ds__day AS ds__day
+          subq_4.metric_time__day AS metric_time__day
+          , subq_4.metric_time__month AS metric_time__month
+          , subq_4.metric_time__year AS metric_time__year
+          , subq_1.ds__day AS ds__day
           , subq_1.ds__week AS ds__week
           , subq_1.ds__month AS ds__month
           , subq_1.ds__quarter AS ds__quarter
@@ -108,9 +111,6 @@ FROM (
           , subq_1.metric_time__extract_day AS metric_time__extract_day
           , subq_1.metric_time__extract_dow AS metric_time__extract_dow
           , subq_1.metric_time__extract_doy AS metric_time__extract_doy
-          , subq_4.metric_time__day AS metric_time__day
-          , subq_4.metric_time__month AS metric_time__month
-          , subq_4.metric_time__year AS metric_time__year
           , subq_1.listing AS listing
           , subq_1.guest AS guest
           , subq_1.host AS host
