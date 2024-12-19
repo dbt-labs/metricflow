@@ -1883,7 +1883,9 @@ class DataflowPlanBuilder:
             parent_node=read_node,
             change_specs=tuple(
                 SpecToAlias(
-                    input_spec=time_spine_data_set.instance_from_time_dimension_grain_and_date_part(required_spec).spec,
+                    input_spec=time_spine_data_set.instance_from_time_dimension_grain_and_date_part(
+                        time_granularity_name=required_spec.time_granularity.name, date_part=required_spec.date_part
+                    ).spec,
                     output_spec=required_spec,
                 )
                 for required_spec in required_time_spine_specs

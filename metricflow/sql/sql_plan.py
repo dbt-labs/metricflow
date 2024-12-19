@@ -9,7 +9,7 @@ from typing import Generic, Mapping, Optional, Sequence, Tuple
 
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId, DagNode, DisplayedProperty, MetricFlowDag
-from metricflow_semantics.sql.sql_exprs import SqlExpressionNode
+from metricflow_semantics.sql.sql_exprs import SqlColumnReferenceExpression, SqlExpressionNode
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.visitor import VisitorOutputT
@@ -101,6 +101,16 @@ class SqlSelectColumn:
     expr: SqlExpressionNode
     # Always require a column alias for simplicity.
     column_alias: str
+
+    @staticmethod
+    def from_table_and_column_names(table_alias: str, column_name: str) -> SqlSelectColumn:
+        """Create a column that selects a column from a table by name."""
+        return SqlSelectColumn(
+            expr=SqlColumnReferenceExpression.from_table_and_column_names(
+                column_name=column_name, table_alias=table_alias
+            ),
+            column_alias=column_name,
+        )
 
 
 @dataclass(frozen=True)
