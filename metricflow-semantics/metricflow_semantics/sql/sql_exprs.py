@@ -1822,8 +1822,7 @@ class SqlCaseExpression(SqlExpressionNode):
     ) -> SqlCaseExpression:
         parent_nodes: Tuple[SqlExpressionNode, ...] = ()
         for when, then in when_to_then_exprs.items():
-            parent_nodes += (when,)
-            parent_nodes += (then,)
+            parent_nodes += (when, then)
 
         if else_expr:
             parent_nodes += (else_expr,)
