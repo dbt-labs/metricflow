@@ -177,7 +177,13 @@ class MetricFlowQueryResolver:
         # Find the metric that matches the metric pattern from the input.
         for metric_input in metric_inputs:
             matching_specs = metric_input.spec_pattern.match(available_metric_specs)
-            if len(matching_specs) != 1:
+            if len(matching_specs) == 1:
+                matching_spec = matching_specs[0]
+                alias = metric_input.spec_pattern.parameter_set.alias
+                if alias:
+                    matching_spec = matching_spec.with_alias(alias)
+                metric_specs.append(matching_spec)
+            else:
                 suggestion_generator = QueryItemSuggestionGenerator(
                     input_naming_scheme=MetricNamingScheme(),
                     input_str=str(metric_input.input_obj),
@@ -195,8 +201,6 @@ class MetricFlowQueryResolver:
                         ),
                     )
                 )
-            else:
-                metric_specs.extend(matching_specs)
 
         return ResolveMetricsResult(
             metric_specs=tuple(metric_specs),
@@ -371,7 +375,11 @@ class MetricFlowQueryResolver:
         query_resolution_path = MetricFlowQueryResolutionPath.from_path_item(
             QueryGroupByItemResolutionNode.create(
                 parent_nodes=(),
-                metrics_in_query=tuple(metric_input.spec_pattern.metric_reference for metric_input in metric_inputs),
+                metrics_in_query=tuple(
+                    MetricReference(metric_input.spec_pattern.parameter_set.element_name)
+                    for metric_input in metric_inputs
+                    if metric_input.spec_pattern.parameter_set.element_name  # for type checker
+                ),
                 where_filter_intersection=query_level_filter_input.where_filter_intersection,
             )
         )

@@ -30,6 +30,7 @@ from metricflow_semantics.specs.patterns.entity_link_pattern import (
     ParameterSetField,
     SpecPatternParameterSet,
 )
+from metricflow_semantics.specs.patterns.metric_pattern import MetricSpecPattern
 
 
 @dataclass(frozen=True)
@@ -47,7 +48,6 @@ class TimeDimensionParameter(ProtocolHint[TimeDimensionQueryParameter]):
         self,
         semantic_manifest_lookup: SemanticManifestLookup,
     ) -> ResolverInputForGroupByItem:
-        # TODO: [custom granularity] use manifest lookup to handle custom granularities
         fields_to_compare = [
             ParameterSetField.ELEMENT_NAME,
             ParameterSetField.ENTITY_LINKS,
@@ -128,6 +128,7 @@ class MetricParameter(ProtocolHint[MetricQueryParameter]):
     """Metric requested in a query."""
 
     name: str
+    alias: Optional[str] = None
 
     @override
     def _implements_protocol(self) -> MetricQueryParameter:
@@ -140,7 +141,13 @@ class MetricParameter(ProtocolHint[MetricQueryParameter]):
         return ResolverInputForMetric(
             input_obj=self,
             naming_scheme=naming_scheme,
-            spec_pattern=naming_scheme.spec_pattern(self.name, semantic_manifest_lookup=semantic_manifest_lookup),
+            spec_pattern=MetricSpecPattern(
+                SpecPatternParameterSet.from_parameters(
+                    fields_to_compare=(ParameterSetField.ELEMENT_NAME,),
+                    element_name=self.name.lower(),
+                    alias=self.alias,
+                )
+            ),
         )
 
 

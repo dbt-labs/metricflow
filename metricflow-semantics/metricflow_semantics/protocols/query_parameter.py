@@ -22,6 +22,11 @@ class MetricQueryParameter(Protocol):
         """The name of the metric."""
         raise NotImplementedError
 
+    @property
+    def alias(self) -> Optional[str]:
+        """The alias of the metric."""
+        raise NotImplementedError
+
     def query_resolver_input(  # noqa: D102
         self, semantic_manifest_lookup: SemanticManifestLookup
     ) -> ResolverInputForMetric:

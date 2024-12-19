@@ -161,7 +161,6 @@ class DataflowPlanBuilder:
                 len(metric_spec.filter_spec_set.all_filter_specs) > 0
                 or metric_spec.offset_to_grain is not None
                 or metric_spec.offset_window is not None
-                or metric_spec.alias is not None
             ):
                 raise ValueError(
                     f"The metric specs in the query spec should not contain any metric modifiers. Got: {metric_spec}"
@@ -213,6 +212,7 @@ class DataflowPlanBuilder:
 
         sink_node = DataflowPlanBuilder.build_sink_node(
             parent_node=metrics_output_node,
+            metric_specs=query_spec.metric_specs,
             order_by_specs=query_spec.order_by_specs,
             output_sql_table=output_sql_table,
             limit=query_spec.limit,
@@ -866,7 +866,10 @@ class DataflowPlanBuilder:
             output_node = MinMaxNode.create(parent_node=output_node)
 
         sink_node = self.build_sink_node(
-            parent_node=output_node, order_by_specs=query_spec.order_by_specs, limit=query_spec.limit
+            parent_node=output_node,
+            metric_specs=query_spec.metric_specs,
+            order_by_specs=query_spec.order_by_specs,
+            limit=query_spec.limit,
         )
 
         plan = DataflowPlan(sink_nodes=[sink_node])
@@ -875,6 +878,7 @@ class DataflowPlanBuilder:
     @staticmethod
     def build_sink_node(
         parent_node: DataflowPlanNode,
+        metric_specs: Sequence[MetricSpec],
         order_by_specs: Sequence[OrderBySpec],
         output_sql_table: Optional[SqlTable] = None,
         limit: Optional[int] = None,
@@ -891,6 +895,14 @@ class DataflowPlanBuilder:
         if output_selection_specs:
             pre_result_node = FilterElementsNode.create(
                 parent_node=pre_result_node or parent_node, include_specs=output_selection_specs
+            )
+
+        alias_specs = tuple(
+            SpecToAlias(MetricSpec(metric.element_name), metric) for metric in metric_specs if metric.alias is not None
+        )
+        if len(alias_specs) > 0:
+            pre_result_node = AliasSpecsNode.create(
+                parent_node=pre_result_node or parent_node, change_specs=alias_specs
             )
 
         write_result_node: DataflowPlanNode

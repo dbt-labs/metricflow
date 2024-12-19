@@ -49,3 +49,13 @@ class MetricSpec(InstanceSpec):  # noqa: D101
     def without_offset(self) -> MetricSpec:
         """Represents the metric spec with any time offsets removed."""
         return MetricSpec(element_name=self.element_name, filter_spec_set=self.filter_spec_set, alias=self.alias)
+
+    def with_alias(self, alias: str) -> MetricSpec:
+        """Add the alias to the metric spec."""
+        return MetricSpec(
+            element_name=self.element_name,
+            filter_spec_set=self.filter_spec_set,
+            alias=alias,
+            offset_window=self.offset_window,
+            offset_to_grain=self.offset_to_grain,
+        )
