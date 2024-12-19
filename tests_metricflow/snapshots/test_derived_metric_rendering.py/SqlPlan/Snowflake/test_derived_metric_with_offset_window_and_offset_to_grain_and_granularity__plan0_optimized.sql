@@ -12,6 +12,14 @@ WITH sma_28009_cte AS (
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
+, rss_28018_cte AS (
+  -- Read From Time Spine 'mf_time_spine'
+  SELECT
+    ds AS ds__day
+    , DATE_TRUNC('year', ds) AS ds__year
+  FROM ***************************.mf_time_spine time_spine_src_28006
+)
+
 SELECT
   metric_time__year AS metric_time__year
   , month_start_bookings - bookings_1_month_ago AS bookings_month_start_compared_to_1_month_prior
@@ -27,16 +35,16 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      DATE_TRUNC('year', time_spine_src_28006.ds) AS metric_time__year
+      rss_28018_cte.ds__year AS metric_time__year
       , SUM(sma_28009_cte.bookings) AS month_start_bookings
-    FROM ***************************.mf_time_spine time_spine_src_28006
+    FROM rss_28018_cte rss_28018_cte
     INNER JOIN
       sma_28009_cte sma_28009_cte
     ON
-      DATE_TRUNC('month', time_spine_src_28006.ds) = sma_28009_cte.metric_time__day
-    WHERE DATE_TRUNC('year', time_spine_src_28006.ds) = time_spine_src_28006.ds
+      DATE_TRUNC('month', rss_28018_cte.ds__day) = sma_28009_cte.metric_time__day
+    WHERE rss_28018_cte.ds__year = rss_28018_cte.ds__day
     GROUP BY
-      DATE_TRUNC('year', time_spine_src_28006.ds)
+      rss_28018_cte.ds__year
   ) subq_27
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
@@ -44,15 +52,15 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      DATE_TRUNC('year', time_spine_src_28006.ds) AS metric_time__year
+      rss_28018_cte.ds__year AS metric_time__year
       , SUM(sma_28009_cte.bookings) AS bookings_1_month_ago
-    FROM ***************************.mf_time_spine time_spine_src_28006
+    FROM rss_28018_cte rss_28018_cte
     INNER JOIN
       sma_28009_cte sma_28009_cte
     ON
-      DATEADD(month, -1, time_spine_src_28006.ds) = sma_28009_cte.metric_time__day
+      DATEADD(month, -1, rss_28018_cte.ds__day) = sma_28009_cte.metric_time__day
     GROUP BY
-      DATE_TRUNC('year', time_spine_src_28006.ds)
+      rss_28018_cte.ds__year
   ) subq_35
   ON
     subq_27.metric_time__year = subq_35.metric_time__year

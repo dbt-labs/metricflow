@@ -12,6 +12,14 @@ WITH sma_28009_cte AS (
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
+, rss_28018_cte AS (
+  -- Read From Time Spine 'mf_time_spine'
+  SELECT
+    ds AS ds__day
+    , DATETIME_TRUNC(ds, year) AS ds__year
+  FROM ***************************.mf_time_spine time_spine_src_28006
+)
+
 SELECT
   metric_time__year AS metric_time__year
   , month_start_bookings - bookings_1_month_ago AS bookings_month_start_compared_to_1_month_prior
@@ -27,14 +35,14 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      DATETIME_TRUNC(time_spine_src_28006.ds, year) AS metric_time__year
+      rss_28018_cte.ds__year AS metric_time__year
       , SUM(sma_28009_cte.bookings) AS month_start_bookings
-    FROM ***************************.mf_time_spine time_spine_src_28006
+    FROM rss_28018_cte rss_28018_cte
     INNER JOIN
       sma_28009_cte sma_28009_cte
     ON
-      DATETIME_TRUNC(time_spine_src_28006.ds, month) = sma_28009_cte.metric_time__day
-    WHERE DATETIME_TRUNC(time_spine_src_28006.ds, year) = time_spine_src_28006.ds
+      DATETIME_TRUNC(rss_28018_cte.ds__day, month) = sma_28009_cte.metric_time__day
+    WHERE rss_28018_cte.ds__year = rss_28018_cte.ds__day
     GROUP BY
       metric_time__year
   ) subq_27
@@ -44,13 +52,13 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      DATETIME_TRUNC(time_spine_src_28006.ds, year) AS metric_time__year
+      rss_28018_cte.ds__year AS metric_time__year
       , SUM(sma_28009_cte.bookings) AS bookings_1_month_ago
-    FROM ***************************.mf_time_spine time_spine_src_28006
+    FROM rss_28018_cte rss_28018_cte
     INNER JOIN
       sma_28009_cte sma_28009_cte
     ON
-      DATE_SUB(CAST(time_spine_src_28006.ds AS DATETIME), INTERVAL 1 month) = sma_28009_cte.metric_time__day
+      DATE_SUB(CAST(rss_28018_cte.ds__day AS DATETIME), INTERVAL 1 month) = sma_28009_cte.metric_time__day
     GROUP BY
       metric_time__year
   ) subq_35

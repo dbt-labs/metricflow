@@ -1433,7 +1433,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         return agg_time_dimension_instances[0]
 
     def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode) -> SqlDataSet:  # noqa: D102
-        parent_data_set = node.parent_node.accept(self)
+        parent_data_set = node.metric_source_node.accept(self)
         parent_alias = self._next_unique_table_alias()
         time_spine_data_set = node.time_spine_node.accept(self)
         time_spine_alias = self._next_unique_table_alias()

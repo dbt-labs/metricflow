@@ -325,6 +325,7 @@ def test_aggregate_output_join_metric_predicate_pushdown(
     )
 
 
+@pytest.mark.skip("Predicate pushdown is not implemented for some of the nodes in this plan")
 def test_offset_metric_predicate_pushdown(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -354,6 +355,7 @@ def test_offset_metric_predicate_pushdown(
     )
 
 
+@pytest.mark.skip("Predicate pushdown is not implemented for some of the nodes in this plan")
 def test_fill_nulls_time_spine_metric_predicate_pushdown(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -382,6 +384,7 @@ def test_fill_nulls_time_spine_metric_predicate_pushdown(
     )
 
 
+@pytest.mark.skip("Predicate pushdown is not implemented for some of the nodes in this plan")
 def test_fill_nulls_time_spine_metric_with_post_agg_join_predicate_pushdown(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,

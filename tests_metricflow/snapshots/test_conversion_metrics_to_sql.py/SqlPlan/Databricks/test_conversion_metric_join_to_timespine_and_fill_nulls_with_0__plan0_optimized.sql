@@ -15,6 +15,13 @@ WITH sma_28019_cte AS (
   FROM ***************************.fct_visits visits_source_src_28000
 )
 
+, rss_28018_cte AS (
+  -- Read From Time Spine 'mf_time_spine'
+  SELECT
+    ds AS ds__day
+  FROM ***************************.mf_time_spine time_spine_src_28006
+)
+
 SELECT
   metric_time__day AS metric_time__day
   , CAST(buys AS DOUBLE) / CAST(NULLIF(visits, 0) AS DOUBLE) AS visit_buy_conversion_rate_7days_fill_nulls_with_0
@@ -27,9 +34,9 @@ FROM (
   FROM (
     -- Join to Time Spine Dataset
     SELECT
-      time_spine_src_28006.ds AS metric_time__day
+      rss_28018_cte.ds__day AS metric_time__day
       , subq_26.visits AS visits
-    FROM ***************************.mf_time_spine time_spine_src_28006
+    FROM rss_28018_cte rss_28018_cte
     LEFT OUTER JOIN (
       -- Read From CTE For node_id=sma_28019
       -- Pass Only Elements: ['visits', 'metric_time__day']
@@ -42,14 +49,14 @@ FROM (
         metric_time__day
     ) subq_26
     ON
-      time_spine_src_28006.ds = subq_26.metric_time__day
+      rss_28018_cte.ds__day = subq_26.metric_time__day
   ) subq_30
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
     SELECT
-      time_spine_src_28006.ds AS metric_time__day
+      rss_28018_cte.ds__day AS metric_time__day
       , subq_39.buys AS buys
-    FROM ***************************.mf_time_spine time_spine_src_28006
+    FROM rss_28018_cte rss_28018_cte
     LEFT OUTER JOIN (
       -- Find conversions for user within the range of 7 day
       -- Pass Only Elements: ['buys', 'metric_time__day']
@@ -113,7 +120,7 @@ FROM (
         metric_time__day
     ) subq_39
     ON
-      time_spine_src_28006.ds = subq_39.metric_time__day
+      rss_28018_cte.ds__day = subq_39.metric_time__day
   ) subq_43
   ON
     subq_30.metric_time__day = subq_43.metric_time__day
