@@ -18,7 +18,9 @@ FROM (
     FROM (
       -- Constrain Output with WHERE
       SELECT
-        subq_6.ts__week
+        subq_6.metric_time__hour
+        , subq_6.metric_time__day
+        , subq_6.ts__week
         , subq_6.ts__month
         , subq_6.ts__quarter
         , subq_6.ts__year
@@ -28,13 +30,11 @@ FROM (
         , subq_6.ts__extract_day
         , subq_6.ts__extract_dow
         , subq_6.ts__extract_doy
-        , subq_6.metric_time__day
-        , subq_6.metric_time__hour
       FROM (
         -- Change Column Aliases
         SELECT
-          subq_5.ts__day AS metric_time__day
-          , subq_5.ts__hour AS metric_time__hour
+          subq_5.ts__hour AS metric_time__hour
+          , subq_5.ts__day AS metric_time__day
           , subq_5.ts__week
           , subq_5.ts__month
           , subq_5.ts__quarter

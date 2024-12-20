@@ -88,7 +88,7 @@ ParseQueryResult(
             },
           ),
           spec_pattern=DimensionPattern(
-            parameter_set=EntityLinkPatternParameterSet(
+            parameter_set=SpecPatternParameterSet(
               fields_to_compare=(
                 ELEMENT_NAME,
                 ENTITY_LINKS,

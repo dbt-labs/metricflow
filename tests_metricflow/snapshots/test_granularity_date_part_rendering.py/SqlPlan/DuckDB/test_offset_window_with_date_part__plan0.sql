@@ -352,7 +352,6 @@ FROM (
               -- Change Column Aliases
               SELECT
                 subq_7.ds__day AS metric_time__day
-                , subq_7.ds__extract_dow AS metric_time__extract_dow
                 , subq_7.ds__week
                 , subq_7.ds__month
                 , subq_7.ds__quarter
@@ -361,6 +360,7 @@ FROM (
                 , subq_7.ds__extract_quarter
                 , subq_7.ds__extract_month
                 , subq_7.ds__extract_day
+                , subq_7.ds__extract_dow AS metric_time__extract_dow
                 , subq_7.ds__extract_doy
                 , subq_7.ds__martian_day
               FROM (

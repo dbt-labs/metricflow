@@ -150,10 +150,10 @@ FROM (
               -- Change Column Aliases
               SELECT
                 subq_2.ds__day AS metric_time__day
-                , subq_2.ds__month AS metric_time__month
-                , subq_2.ds__year AS metric_time__year
                 , subq_2.ds__week
+                , subq_2.ds__month AS metric_time__month
                 , subq_2.ds__quarter
+                , subq_2.ds__year AS metric_time__year
                 , subq_2.ds__extract_year
                 , subq_2.ds__extract_quarter
                 , subq_2.ds__extract_month

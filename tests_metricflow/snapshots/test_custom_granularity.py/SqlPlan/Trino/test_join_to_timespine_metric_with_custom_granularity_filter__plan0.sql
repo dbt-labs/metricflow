@@ -18,7 +18,8 @@ FROM (
     FROM (
       -- Constrain Output with WHERE
       SELECT
-        subq_7.ds__week
+        subq_7.metric_time__day
+        , subq_7.ds__week
         , subq_7.ds__month
         , subq_7.ds__quarter
         , subq_7.ds__year
@@ -29,12 +30,10 @@ FROM (
         , subq_7.ds__extract_dow
         , subq_7.ds__extract_doy
         , subq_7.metric_time__martian_day
-        , subq_7.metric_time__day
       FROM (
         -- Change Column Aliases
         SELECT
-          subq_6.ds__martian_day AS metric_time__martian_day
-          , subq_6.ds__day AS metric_time__day
+          subq_6.ds__day AS metric_time__day
           , subq_6.ds__week
           , subq_6.ds__month
           , subq_6.ds__quarter
@@ -45,6 +44,7 @@ FROM (
           , subq_6.ds__extract_day
           , subq_6.ds__extract_dow
           , subq_6.ds__extract_doy
+          , subq_6.ds__martian_day AS metric_time__martian_day
         FROM (
           -- Read From Time Spine 'mf_time_spine'
           SELECT

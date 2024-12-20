@@ -352,9 +352,9 @@ FROM (
               -- Change Column Aliases
               SELECT
                 subq_7.ds__day AS metric_time__day
-                , subq_7.ds__quarter AS metric_time__quarter
                 , subq_7.ds__week
                 , subq_7.ds__month
+                , subq_7.ds__quarter AS metric_time__quarter
                 , subq_7.ds__year
                 , subq_7.ds__extract_year
                 , subq_7.ds__extract_quarter

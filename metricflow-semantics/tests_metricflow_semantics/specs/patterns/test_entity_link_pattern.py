@@ -15,8 +15,8 @@ from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.patterns.entity_link_pattern import (
     EntityLinkPattern,
-    EntityLinkPatternParameterSet,
     ParameterSetField,
+    SpecPatternParameterSet,
 )
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_MONTH, MTD_SPEC_WEEK, MTD_SPEC_YEAR
@@ -66,8 +66,8 @@ def specs() -> Sequence[LinkableInstanceSpec]:  # noqa: D103
 
 
 def test_valid_parameter_fields() -> None:
-    """Tests that ParameterSetField.value maps to a valid field in EntityLinkPatternParameterSet."""
-    parameter_set = EntityLinkPatternParameterSet.from_parameters(fields_to_compare=())
+    """Tests that ParameterSetField.value maps to a valid field in SpecPatternParameterSet."""
+    parameter_set = SpecPatternParameterSet.from_parameters(fields_to_compare=())
     parameter_set_dict = set(asdict(parameter_set).keys())
     for spec_field in ParameterSetField:
         assert spec_field.value in parameter_set_dict, f"{spec_field} is not a valid field for {parameter_set}"
@@ -75,7 +75,7 @@ def test_valid_parameter_fields() -> None:
 
 def test_dimension_match(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa: D103
     pattern = EntityLinkPattern(
-        EntityLinkPatternParameterSet.from_parameters(
+        SpecPatternParameterSet.from_parameters(
             element_name="is_instant",
             entity_links=(EntityReference(element_name="booking"),),
             fields_to_compare=(
@@ -92,7 +92,7 @@ def test_dimension_match(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa
 
 def test_entity_match(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa: D103
     pattern = EntityLinkPattern(
-        EntityLinkPatternParameterSet.from_parameters(
+        SpecPatternParameterSet.from_parameters(
             element_name="listing",
             entity_links=(EntityReference(element_name="booking"),),
             fields_to_compare=(
@@ -109,7 +109,7 @@ def test_entity_match(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa: D
 
 def test_group_by_metric_match(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa: D103
     pattern = EntityLinkPattern(
-        EntityLinkPatternParameterSet.from_parameters(
+        SpecPatternParameterSet.from_parameters(
             element_name="bookings",
             entity_links=(EntityReference(element_name="listing"),),
             fields_to_compare=(
@@ -130,7 +130,7 @@ def test_group_by_metric_match(specs: Sequence[LinkableInstanceSpec]) -> None:  
 
 def test_time_dimension_match(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa: D103
     pattern = EntityLinkPattern(
-        EntityLinkPatternParameterSet.from_parameters(
+        SpecPatternParameterSet.from_parameters(
             element_name=METRIC_TIME_ELEMENT_NAME,
             entity_links=(),
             time_granularity_name=TimeGranularity.WEEK.value,
@@ -147,7 +147,7 @@ def test_time_dimension_match(specs: Sequence[LinkableInstanceSpec]) -> None:  #
 
 def test_time_dimension_match_without_grain_specified(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa: D103
     pattern = EntityLinkPattern(
-        EntityLinkPatternParameterSet.from_parameters(
+        SpecPatternParameterSet.from_parameters(
             element_name=METRIC_TIME_ELEMENT_NAME,
             entity_links=(),
             fields_to_compare=(
@@ -167,7 +167,7 @@ def test_time_dimension_match_without_grain_specified(specs: Sequence[LinkableIn
 def test_time_dimension_date_part_mismatch(specs: Sequence[LinkableInstanceSpec]) -> None:
     """Checks that a None for the date_part field does not match to a non-None value."""
     pattern = EntityLinkPattern(
-        EntityLinkPatternParameterSet.from_parameters(
+        SpecPatternParameterSet.from_parameters(
             element_name="creation_time",
             fields_to_compare=(
                 ParameterSetField.ELEMENT_NAME,
@@ -182,7 +182,7 @@ def test_time_dimension_date_part_mismatch(specs: Sequence[LinkableInstanceSpec]
 def test_time_dimension_date_part_match(specs: Sequence[LinkableInstanceSpec]) -> None:
     """Checks that a correct date_part field produces a match."""
     pattern = EntityLinkPattern(
-        EntityLinkPatternParameterSet.from_parameters(
+        SpecPatternParameterSet.from_parameters(
             element_name="creation_time",
             date_part=DatePart.YEAR,
             fields_to_compare=(

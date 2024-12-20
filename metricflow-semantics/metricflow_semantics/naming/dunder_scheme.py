@@ -14,8 +14,8 @@ from metricflow_semantics.naming.naming_scheme import QueryItemNamingScheme
 from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.patterns.entity_link_pattern import (
     EntityLinkPattern,
-    EntityLinkPatternParameterSet,
     ParameterSetField,
+    SpecPatternParameterSet,
 )
 from metricflow_semantics.specs.spec_set import InstanceSpecSet, InstanceSpecSetTransform, group_spec_by_type
 
@@ -67,7 +67,7 @@ class DunderNamingScheme(QueryItemNamingScheme):
         # No dunder, e.g. "ds"
         if len(input_str_parts) == 1:
             return EntityLinkPattern(
-                parameter_set=EntityLinkPatternParameterSet.from_parameters(
+                parameter_set=SpecPatternParameterSet.from_parameters(
                     element_name=input_str_parts[0],
                     entity_links=(),
                     time_granularity_name=None,
@@ -88,7 +88,7 @@ class DunderNamingScheme(QueryItemNamingScheme):
             #  e.g. "ds__month"
             if len(input_str_parts) == 2:
                 return EntityLinkPattern(
-                    parameter_set=EntityLinkPatternParameterSet.from_parameters(
+                    parameter_set=SpecPatternParameterSet.from_parameters(
                         element_name=input_str_parts[0],
                         entity_links=(),
                         time_granularity_name=time_granularity_name,
@@ -98,7 +98,7 @@ class DunderNamingScheme(QueryItemNamingScheme):
                 )
             # e.g. "messages__ds__month"
             return EntityLinkPattern(
-                parameter_set=EntityLinkPatternParameterSet.from_parameters(
+                parameter_set=SpecPatternParameterSet.from_parameters(
                     element_name=input_str_parts[-2],
                     entity_links=tuple(EntityReference(entity_name) for entity_name in input_str_parts[:-2]),
                     time_granularity_name=time_granularity_name,
@@ -109,7 +109,7 @@ class DunderNamingScheme(QueryItemNamingScheme):
 
         # e.g. "messages__ds"
         return EntityLinkPattern(
-            parameter_set=EntityLinkPatternParameterSet.from_parameters(
+            parameter_set=SpecPatternParameterSet.from_parameters(
                 element_name=suffix,
                 entity_links=tuple(EntityReference(entity_name) for entity_name in input_str_parts[:-1]),
                 time_granularity_name=None,

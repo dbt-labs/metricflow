@@ -16,8 +16,8 @@ FROM (
     -- Read From Time Spine 'mf_time_spine_hour'
     -- Change Column Aliases
     SELECT
-      DATE_TRUNC('day', ts) AS metric_time__day
-      , ts AS metric_time__hour
+      ts AS metric_time__hour
+      , DATE_TRUNC('day', ts) AS metric_time__day
     FROM ***************************.mf_time_spine_hour time_spine_src_28005
   ) subq_16
   WHERE (metric_time__hour > '2020-01-01 00:09:00') AND (metric_time__day = '2020-01-01')

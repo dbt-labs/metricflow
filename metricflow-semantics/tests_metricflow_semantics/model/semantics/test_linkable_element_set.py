@@ -37,8 +37,8 @@ from metricflow_semantics.model.semantics.linkable_element import (
 from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
 from metricflow_semantics.specs.patterns.entity_link_pattern import (
     EntityLinkPattern,
-    EntityLinkPatternParameterSet,
     ParameterSetField,
+    SpecPatternParameterSet,
 )
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
@@ -707,7 +707,7 @@ def test_derived_semantic_models(linkable_set: LinkableElementSet) -> None:
 def test_filter_by_pattern(linkable_set: LinkableElementSet) -> None:
     """Tests that the specs produced by the set are properly filtered by spec patterns."""
     spec_pattern = EntityLinkPattern(
-        EntityLinkPatternParameterSet(
+        SpecPatternParameterSet(
             fields_to_compare=(ParameterSetField.ENTITY_LINKS,),
             element_name=None,
             entity_links=(EntityReference("entity_1"),),
