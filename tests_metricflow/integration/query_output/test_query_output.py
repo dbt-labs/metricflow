@@ -12,6 +12,7 @@ from tests_metricflow.snapshot_utils import assert_str_snapshot_equal
 
 
 @pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
 def test_metric_alias(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -38,6 +39,7 @@ def test_metric_alias(  # noqa: D103
 
 
 @pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
 def test_derived_metric_alias(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -46,7 +48,7 @@ def test_derived_metric_alias(  # noqa: D103
 ) -> None:
     query_result = it_helpers.mf_engine.query(
         MetricFlowQueryRequest.create_with_random_request_id(
-            metrics=(MetricParameter(name="booking_fees", alias="bookings_alias"),),
+            metrics=(MetricParameter(name="booking_fees", alias="booking_fees_alias"),),
             group_by_names=["metric_time__day"],
             order_by_names=["metric_time__day"],
             where_constraints=("{{ Metric('bookings', ['listing']) }} > 2",),

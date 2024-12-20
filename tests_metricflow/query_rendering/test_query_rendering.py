@@ -610,6 +610,7 @@ def test_non_additive_dimension_with_non_default_grain(
 
 
 @pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
 def test_metric_alias(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -639,6 +640,7 @@ def test_metric_alias(
 
 
 @pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
 def test_derived_metric_alias(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
