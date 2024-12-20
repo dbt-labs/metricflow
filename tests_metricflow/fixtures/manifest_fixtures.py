@@ -52,7 +52,7 @@ from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.engine.metricflow_engine import MetricFlowEngine
-from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
+from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 
 logger = logging.getLogger(__name__)
@@ -155,7 +155,7 @@ class MetricFlowEngineTestFixture:
     data_set_mapping: OrderedDict[str, SemanticModelDataSet]
     read_node_mapping: OrderedDict[str, ReadSqlSourceNode]
     source_node_set: SourceNodeSet
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter
     query_parser: MetricFlowQueryParser
     metricflow_engine: MetricFlowEngine
     source_node_builder: SourceNodeBuilder
@@ -186,7 +186,7 @@ class MetricFlowEngineTestFixture:
             read_node_mapping=read_node_mapping,
             source_node_set=source_node_set,
             _node_output_resolver=node_output_resolver,
-            dataflow_to_sql_converter=DataflowToSqlQueryPlanConverter(
+            dataflow_to_sql_converter=DataflowToSqlPlanConverter(
                 column_association_resolver=column_association_resolver,
                 semantic_manifest_lookup=semantic_manifest_lookup,
             ),

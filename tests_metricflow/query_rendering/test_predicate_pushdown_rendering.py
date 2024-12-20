@@ -8,7 +8,7 @@ from metricflow_semantics.specs.query_param_implementations import SavedQueryPar
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
+from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from tests_metricflow.query_rendering.compare_rendered_query import render_and_check
 
@@ -19,7 +19,7 @@ def test_single_categorical_dimension_pushdown(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     query_parser: MetricFlowQueryParser,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests rendering a query where we expect predicate pushdown for a single categorical dimension."""
@@ -49,7 +49,7 @@ def test_multiple_categorical_dimension_pushdown(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     query_parser: MetricFlowQueryParser,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests rendering a query where we expect predicate pushdown for more than one categorical dimension."""
@@ -79,7 +79,7 @@ def test_different_filters_on_same_measure_source_categorical_dimension(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     query_parser: MetricFlowQueryParser,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests rendering a query where multiple filters against the same measure dimension need to be an effective OR.
@@ -113,7 +113,7 @@ def test_skipped_pushdown(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     query_parser: MetricFlowQueryParser,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests rendering a query where we expect to skip predicate pushdown because it is unsafe.
@@ -149,7 +149,7 @@ def test_metric_time_filter_with_two_targets(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     query_parser: MetricFlowQueryParser,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests pushdown optimization for a simple metric time predicate through a single join.
@@ -180,7 +180,7 @@ def test_conversion_metric_query_filters(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     query_parser: MetricFlowQueryParser,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests pushdown optimizer behavior for a simple predicate on a conversion metric."""
@@ -206,7 +206,7 @@ def test_cumulative_metric_with_query_time_filters(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     query_parser: MetricFlowQueryParser,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests pushdown optimizer behavior for a query against a cumulative metric.
@@ -235,7 +235,7 @@ def test_offset_metric_with_query_time_filters(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     query_parser: MetricFlowQueryParser,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests pushdown optimizer behavior for a query against a derived offset metric.
@@ -264,7 +264,7 @@ def test_fill_nulls_time_spine_metric_predicate_pushdown(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     query_parser: MetricFlowQueryParser,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests pushdown optimizer behavior for a metric with a time spine and fill_nulls_with enabled.
@@ -293,7 +293,7 @@ def test_simple_join_to_time_spine_pushdown_filter_application(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     query_parser: MetricFlowQueryParser,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests rendering a query where we join to a time spine and query the filter input.
@@ -326,7 +326,7 @@ def test_saved_query_with_metric_joins_and_filter(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     query_parser: MetricFlowQueryParser,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests rendering a query where we join to a time spine and query the filter input.

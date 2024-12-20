@@ -8,7 +8,7 @@ from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_str_snapshot_equal
 
-from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
+from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlPlanOptimizer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_plan import SqlPlan, SqlSelectStatementNode
 
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 def assert_optimizer_result_snapshot_equal(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    optimizer: SqlQueryPlanOptimizer,
+    optimizer: SqlPlanOptimizer,
     sql_plan_renderer: SqlQueryPlanRenderer,
     select_statement: SqlSelectStatementNode,
 ) -> None:

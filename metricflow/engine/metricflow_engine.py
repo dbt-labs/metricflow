@@ -53,7 +53,7 @@ from metricflow.execution.dataflow_to_execution import (
 )
 from metricflow.execution.execution_plan import ExecutionPlan, SqlStatement
 from metricflow.execution.executor import SequentialPlanExecutor
-from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
+from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.telemetry.models import TelemetryLevel
@@ -401,7 +401,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             source_node_builder=source_node_builder,
             dataflow_plan_builder_cache=self._dataflow_plan_builder_cache,
         )
-        self._to_sql_query_plan_converter = DataflowToSqlQueryPlanConverter(
+        self._to_sql_query_plan_converter = DataflowToSqlPlanConverter(
             column_association_resolver=self._column_association_resolver,
             semantic_manifest_lookup=self._semantic_manifest_lookup,
         )

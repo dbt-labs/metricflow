@@ -4,14 +4,14 @@ import logging
 
 from typing_extensions import override
 
-from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
+from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlPlanOptimizer
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlCteNode,
     SqlJoinDescription,
     SqlOrderByDescription,
-    SqlQueryPlanNode,
-    SqlQueryPlanNodeVisitor,
+    SqlPlanNode,
+    SqlPlanNodeVisitor,
     SqlSelectColumn,
     SqlSelectQueryFromClauseNode,
     SqlSelectStatementNode,
@@ -21,14 +21,14 @@ from metricflow.sql.sql_plan import (
 logger = logging.getLogger(__name__)
 
 
-class SqlTableAliasSimplifierVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
+class SqlTableAliasSimplifierVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
     """Visits the SQL query plan to see if table aliases can be omitted when rendering column references."""
 
     @override
-    def visit_cte_node(self, node: SqlCteNode) -> SqlQueryPlanNode:
+    def visit_cte_node(self, node: SqlCteNode) -> SqlPlanNode:
         return node.with_new_select(node.select_statement.accept(self))
 
-    def visit_select_statement_node(self, node: SqlSelectStatementNode) -> SqlQueryPlanNode:  # noqa: D102
+    def visit_select_statement_node(self, node: SqlSelectStatementNode) -> SqlPlanNode:  # noqa: D102
         # If there is only a single source in the SELECT, no table aliases are required since there's no ambiguity.
         should_simplify_table_aliases = len(node.join_descs) == 0
 
@@ -82,20 +82,20 @@ class SqlTableAliasSimplifierVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
             distinct=node.distinct,
         )
 
-    def visit_table_node(self, node: SqlTableNode) -> SqlQueryPlanNode:  # noqa: D102
+    def visit_table_node(self, node: SqlTableNode) -> SqlPlanNode:  # noqa: D102
         return node
 
-    def visit_query_from_clause_node(self, node: SqlSelectQueryFromClauseNode) -> SqlQueryPlanNode:  # noqa: D102
+    def visit_query_from_clause_node(self, node: SqlSelectQueryFromClauseNode) -> SqlPlanNode:  # noqa: D102
         return node
 
-    def visit_create_table_as_node(self, node: SqlCreateTableAsNode) -> SqlQueryPlanNode:  # noqa: D102
+    def visit_create_table_as_node(self, node: SqlCreateTableAsNode) -> SqlPlanNode:  # noqa: D102
         return SqlCreateTableAsNode.create(
             sql_table=node.sql_table,
             parent_node=node.parent_node.accept(self),
         )
 
 
-class SqlTableAliasSimplifier(SqlQueryPlanOptimizer):
+class SqlTableAliasSimplifier(SqlPlanOptimizer):
     """Simplify queries by eliminating table aliases when possible.
 
     e.g. from
@@ -113,5 +113,5 @@ class SqlTableAliasSimplifier(SqlQueryPlanOptimizer):
     ) b
     """
 
-    def optimize(self, node: SqlQueryPlanNode) -> SqlQueryPlanNode:  # noqa: D102
+    def optimize(self, node: SqlPlanNode) -> SqlPlanNode:  # noqa: D102
         return node.accept(SqlTableAliasSimplifierVisitor())

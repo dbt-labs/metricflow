@@ -22,7 +22,7 @@ from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataset.dataset_classes import DataSet
-from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
+from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from tests_metricflow.query_rendering.compare_rendered_query import render_and_check
 
@@ -32,7 +32,7 @@ def test_simple_query_with_date_part(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -60,7 +60,7 @@ def test_simple_query_with_multiple_date_parts(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -108,7 +108,7 @@ def test_offset_window_with_date_part(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -136,7 +136,7 @@ def test_sub_daily_metric_time(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -162,7 +162,7 @@ def test_sub_daily_dimension(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -190,7 +190,7 @@ def test_simple_metric_with_sub_daily_dimension(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -219,7 +219,7 @@ def test_simple_metric_with_joined_sub_daily_dimension(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -251,7 +251,7 @@ def test_subdaily_cumulative_window_metric(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -278,7 +278,7 @@ def test_subdaily_cumulative_grain_to_date_metric(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -305,7 +305,7 @@ def test_subdaily_offset_window_metric(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -332,7 +332,7 @@ def test_subdaily_offset_to_grain_metric(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -359,7 +359,7 @@ def test_subdaily_join_to_time_spine_metric(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -386,7 +386,7 @@ def test_subdaily_time_constraint_without_metrics(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -415,7 +415,7 @@ def test_subdaily_time_constraint_with_metric(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -445,7 +445,7 @@ def test_subdaily_granularity_overrides_metric_default_granularity(  # noqa: D10
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(

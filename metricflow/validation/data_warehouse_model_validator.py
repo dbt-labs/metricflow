@@ -43,7 +43,7 @@ from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
-from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
+from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 
 
@@ -58,7 +58,7 @@ class QueryRenderingTools:
     semantic_manifest_lookup: SemanticManifestLookup
     source_node_builder: SourceNodeBuilder
     converter: SemanticModelToDataSetConverter
-    plan_converter: DataflowToSqlQueryPlanConverter
+    plan_converter: DataflowToSqlPlanConverter
 
     def __init__(self, manifest: SemanticManifest) -> None:  # noqa: D107
         self.semantic_manifest_lookup = SemanticManifestLookup(semantic_manifest=manifest)
@@ -71,7 +71,7 @@ class QueryRenderingTools:
                 semantic_manifest_lookup=self.semantic_manifest_lookup
             )
         )
-        self.plan_converter = DataflowToSqlQueryPlanConverter(
+        self.plan_converter = DataflowToSqlPlanConverter(
             column_association_resolver=DunderColumnAssociationResolver(self.semantic_manifest_lookup),
             semantic_manifest_lookup=self.semantic_manifest_lookup,
         )
@@ -122,7 +122,7 @@ class DataWarehouseTaskBuilder:
 
     @staticmethod
     def renderize(
-        sql_client: SqlClient, plan_converter: DataflowToSqlQueryPlanConverter, plan_id: str, nodes: FilterElementsNode
+        sql_client: SqlClient, plan_converter: DataflowToSqlPlanConverter, plan_id: str, nodes: FilterElementsNode
     ) -> Tuple[str, SqlBindParameterSet]:
         """Generates a sql query plan and returns the rendered sql and bind_parameter_set."""
         conversion_result = plan_converter.convert_to_sql_query_plan(

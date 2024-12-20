@@ -21,7 +21,7 @@ from metricflow.sql.sql_exprs import (
 )
 from metricflow.sql.sql_plan import (
     SqlJoinDescription,
-    SqlQueryPlanNode,
+    SqlPlanNode,
     SqlSelectColumn,
     SqlSelectStatementNode,
     SqlTableNode,
@@ -714,7 +714,7 @@ def test_prune_grandparents(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     column_pruner: SqlColumnPrunerOptimizer,
-    grandparent_pruning_select_statement: SqlQueryPlanNode,
+    grandparent_pruning_select_statement: SqlPlanNode,
 ) -> None:
     """Tests a case where a string expr in a node prevents the parent from being pruned, but prunes grandparents."""
     assert_default_rendered_sql_equal(

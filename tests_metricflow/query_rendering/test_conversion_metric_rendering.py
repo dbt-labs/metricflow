@@ -9,7 +9,7 @@ from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
+from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from tests_metricflow.query_rendering.compare_rendered_query import render_and_check
 
@@ -19,7 +19,7 @@ def test_conversion_metric(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     query_parser: MetricFlowQueryParser,
     create_source_tables: bool,
@@ -48,7 +48,7 @@ def test_conversion_metric_with_window(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     query_parser: MetricFlowQueryParser,
     create_source_tables: bool,
@@ -77,7 +77,7 @@ def test_conversion_metric_with_categorical_filter(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     query_parser: MetricFlowQueryParser,
     create_source_tables: bool,
@@ -106,7 +106,7 @@ def test_conversion_metric_with_time_constraint(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     query_parser: MetricFlowQueryParser,
     create_source_tables: bool,
@@ -137,7 +137,7 @@ def test_conversion_metric_with_window_and_time_constraint(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     query_parser: MetricFlowQueryParser,
     create_source_tables: bool,
@@ -171,7 +171,7 @@ def test_conversion_metric_with_filter(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     query_parser: MetricFlowQueryParser,
     create_source_tables: bool,
@@ -199,7 +199,7 @@ def test_conversion_metric_with_filter_not_in_group_by(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     query_parser: MetricFlowQueryParser,
     create_source_tables: bool,
@@ -227,7 +227,7 @@ def test_conversion_metric_with_different_time_dimension_grains(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     query_parser: MetricFlowQueryParser,
     create_source_tables: bool,
