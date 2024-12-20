@@ -156,12 +156,15 @@ class DataflowPlanBuilder:
         self, query_spec: MetricFlowQuerySpec, for_group_by_source_node: bool = False
     ) -> DataflowPlanNode:
         """Build SQL output node from query inputs. May be used to build query DFP or source node."""
+        metric_specs: Tuple[MetricSpec, ...] = ()
         for metric_spec in query_spec.metric_specs:
             if (
                 len(metric_spec.filter_spec_set.all_filter_specs) > 0
                 or metric_spec.offset_to_grain is not None
                 or metric_spec.offset_window is not None
             ):
+                # Remove aliases here. They will be added back at the very end of the query.
+                metric_specs += (metric_spec.with_alias(None),) if metric_spec.alias else (metric_spec,)
                 raise ValueError(
                     f"The metric specs in the query spec should not contain any metric modifiers. Got: {metric_spec}"
                 )

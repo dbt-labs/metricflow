@@ -1537,7 +1537,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             new_spec = spec_to_alias.output_spec
 
             # Find the instance in the parent data set with matching grain & date part.
-            old_instance = parent_data_set.instance_for_spec(old_spec)
+            old_instance = parent_data_set.instance_for_column_name(
+                self._column_association_resolver.resolve_spec(old_spec).column_name
+            )
 
             # Build new instance & select column to match requested spec.
             new_instance = old_instance.with_new_spec(

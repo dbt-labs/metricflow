@@ -164,6 +164,22 @@ class SqlDataSet(DataSet):
             str(LazyFormat("Did not find instance matching spec in dataset.", spec=spec, instances=instances))
         )
 
+    def instance_for_column_name(self, column_name: str) -> MdoInstance:
+        """Given a spec, return the instance associated with it in the data set."""
+        instances = self.instance_set.as_tuple
+        for instance in instances:
+            if instance.associated_column.column_name == column_name:
+                return instance
+        raise RuntimeError(
+            str(
+                LazyFormat(
+                    "Did not find instance matching column name in dataset.",
+                    column_name=column_name,
+                    instances=instances,
+                )
+            )
+        )
+
     def instance_from_time_dimension_grain_and_date_part(
         self, time_dimension_spec: TimeDimensionSpec
     ) -> TimeDimensionInstance:

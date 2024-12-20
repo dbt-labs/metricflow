@@ -50,7 +50,7 @@ class MetricSpec(InstanceSpec):  # noqa: D101
         """Represents the metric spec with any time offsets removed."""
         return MetricSpec(element_name=self.element_name, filter_spec_set=self.filter_spec_set, alias=self.alias)
 
-    def with_alias(self, alias: str) -> MetricSpec:
+    def with_alias(self, alias: Optional[str]) -> MetricSpec:
         """Add the alias to the metric spec."""
         return MetricSpec(
             element_name=self.element_name,
