@@ -8,47 +8,47 @@ sql_engine: DuckDB
 ---
 -- Re-aggregate Metric via Group By
 SELECT
-  subq_12.booking__ds__month
-  , subq_12.metric_time__week
+  subq_12.metric_time__week
+  , subq_12.booking__ds__month
   , subq_12.every_two_days_bookers_fill_nulls_with_0
 FROM (
   -- Window Function for Metric Re-aggregation
   SELECT
-    subq_11.booking__ds__month
-    , subq_11.metric_time__week
+    subq_11.metric_time__week
+    , subq_11.booking__ds__month
     , FIRST_VALUE(subq_11.every_two_days_bookers_fill_nulls_with_0) OVER (
       PARTITION BY
-        subq_11.booking__ds__month
-        , subq_11.metric_time__week
+        subq_11.metric_time__week
+        , subq_11.booking__ds__month
       ORDER BY subq_11.metric_time__day
       ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
     ) AS every_two_days_bookers_fill_nulls_with_0
   FROM (
     -- Compute Metrics via Expressions
     SELECT
-      subq_10.booking__ds__month
+      subq_10.metric_time__day
       , subq_10.metric_time__week
-      , subq_10.metric_time__day
+      , subq_10.booking__ds__month
       , COALESCE(subq_10.bookers, 0) AS every_two_days_bookers_fill_nulls_with_0
     FROM (
       -- Join to Time Spine Dataset
       SELECT
-        subq_9.booking__ds__month AS booking__ds__month
+        subq_9.metric_time__day AS metric_time__day
         , subq_9.metric_time__week AS metric_time__week
-        , subq_9.metric_time__day AS metric_time__day
+        , subq_9.booking__ds__month AS booking__ds__month
         , subq_6.bookers AS bookers
       FROM (
         -- Pass Only Elements: ['booking__ds__month', 'metric_time__week', 'metric_time__day']
         SELECT
-          subq_8.booking__ds__month
+          subq_8.metric_time__day
           , subq_8.metric_time__week
-          , subq_8.metric_time__day
+          , subq_8.booking__ds__month
         FROM (
           -- Change Column Aliases
           SELECT
-            subq_7.ds__month AS booking__ds__month
+            subq_7.ds__day AS metric_time__day
             , subq_7.ds__week AS metric_time__week
-            , subq_7.ds__day AS metric_time__day
+            , subq_7.ds__month AS booking__ds__month
             , subq_7.ds__quarter
             , subq_7.ds__year
             , subq_7.ds__extract_year
@@ -414,6 +414,6 @@ FROM (
   ) subq_11
 ) subq_12
 GROUP BY
-  subq_12.booking__ds__month
-  , subq_12.metric_time__week
+  subq_12.metric_time__week
+  , subq_12.booking__ds__month
   , subq_12.every_two_days_bookers_fill_nulls_with_0

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime as dt
 import logging
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 from typing import Callable, Dict, FrozenSet, List, Optional, Sequence, Set, Tuple, TypeVar
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
@@ -1529,53 +1529,47 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         parent_data_set = node.parent_node.accept(self)
         parent_alias = self._next_unique_table_alias()
 
-        new_instances: Tuple[MdoInstance, ...] = ()
-        new_select_columns: Tuple[SqlSelectColumn, ...] = ()
-        instances_to_remove_from_parent: Set[MdoInstance] = set()
-        for spec_to_alias in node.change_specs:
-            old_spec = spec_to_alias.input_spec
-            new_spec = spec_to_alias.output_spec
+        input_specs_to_output_specs: Dict[InstanceSpec, List[InstanceSpec]] = defaultdict(list)
+        for change_spec in node.change_specs:
+            input_specs_to_output_specs[change_spec.input_spec].append(change_spec.output_spec)
 
-            # Find the instance in the parent data set with matching grain & date part.
-            old_instance = parent_data_set.instance_for_column_name(
-                self._column_association_resolver.resolve_spec(old_spec).column_name
-            )
-
-            # Build new instance & select column to match requested spec.
-            new_instance = old_instance.with_new_spec(
-                new_spec=new_spec, column_association_resolver=self._column_association_resolver
-            )
-            new_expr = SqlColumnReferenceExpression.from_table_and_column_names(
-                table_alias=parent_alias, column_name=old_instance.associated_column.column_name
-            )
-            new_select_column = SqlSelectColumn(expr=new_expr, column_alias=new_instance.associated_column.column_name)
-            instances_to_remove_from_parent.add(old_instance)
-            new_instances += (new_instance,)
-            new_select_columns += (new_select_column,)
-
-        # Build full output instance set.
-        filtered_parent_instance_set = group_instances_by_type(
-            tuple(
-                instance
-                for instance in parent_data_set.instance_set.as_tuple
-                if instance not in instances_to_remove_from_parent
-            )
-        )
-        new_instance_set = group_instances_by_type(new_instances)
-        transformed_instance_set = InstanceSet.merge([filtered_parent_instance_set, new_instance_set])
-
-        # Build final select columns.
-        filtered_parent_select_columns = create_simple_select_columns_for_instance_sets(
-            column_resolver=self._column_association_resolver,
-            table_alias_to_instance_set=OrderedDict({parent_alias: filtered_parent_instance_set}),
-        )
-        transformed_select_columns = new_select_columns + filtered_parent_select_columns
+        # Build output instances & select columns.
+        output_instances: Tuple[MdoInstance, ...] = ()
+        output_select_columns: Tuple[SqlSelectColumn, ...] = ()
+        for parent_instance in parent_data_set.instance_set.as_tuple:
+            if parent_instance.spec in input_specs_to_output_specs:
+                # If an alias was requested, bild new instance & select column to match requested spec.
+                new_specs = input_specs_to_output_specs[parent_instance.spec]
+                for new_spec in new_specs:
+                    new_instance = parent_instance.with_new_spec(
+                        new_spec=new_spec, column_association_resolver=self._column_association_resolver
+                    )
+                    new_select_column = SqlSelectColumn(
+                        expr=SqlColumnReferenceExpression.from_table_and_column_names(
+                            table_alias=parent_alias, column_name=parent_instance.associated_column.column_name
+                        ),
+                        column_alias=new_instance.associated_column.column_name,
+                    )
+                    output_instances += (new_instance,)
+                    output_select_columns += (new_select_column,)
+            else:
+                # Keep the instance the same and build a column that just references the parent column.
+                output_instances += (parent_instance,)
+                column_name = parent_instance.associated_column.column_name
+                output_select_columns += (
+                    SqlSelectColumn(
+                        expr=SqlColumnReferenceExpression.from_table_and_column_names(
+                            table_alias=parent_alias, column_name=column_name
+                        ),
+                        column_alias=column_name,
+                    ),
+                )
 
         return SqlDataSet(
-            instance_set=transformed_instance_set,
+            instance_set=group_instances_by_type(output_instances),
             sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
-                select_columns=transformed_select_columns,
+                select_columns=output_select_columns,
                 from_source=parent_data_set.checked_sql_select_node,
                 from_source_alias=parent_alias,
             ),

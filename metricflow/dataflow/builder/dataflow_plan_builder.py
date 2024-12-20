@@ -901,7 +901,9 @@ class DataflowPlanBuilder:
             )
 
         alias_specs = tuple(
-            SpecToAlias(MetricSpec(metric.element_name), metric) for metric in metric_specs if metric.alias is not None
+            SpecToAlias(MetricSpec(metric.element_name), MetricSpec(metric.element_name, alias=metric.alias))
+            for metric in metric_specs
+            if metric.alias is not None
         )
         if len(alias_specs) > 0:
             pre_result_node = AliasSpecsNode.create(

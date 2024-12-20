@@ -17,8 +17,8 @@ WITH sma_28009_cte AS (
 )
 
 SELECT
-  booking_fees AS bookings_alias
-  , metric_time__day AS metric_time__day
+  metric_time__day AS metric_time__day
+  , booking_fees AS booking_fees
 FROM (
   -- Compute Metrics via Expressions
   SELECT
