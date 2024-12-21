@@ -5,13 +5,7 @@ import logging
 import pytest
 from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.sql.sql_join_type import SqlJoinType
-from metricflow_semantics.sql.sql_table import SqlTable
-from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
-
-from metricflow.sql.optimizer.column_pruner import SqlColumnPrunerOptimizer
-from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer, SqlQueryPlanRenderer
-from metricflow.sql.sql_exprs import (
+from metricflow_semantics.sql.sql_exprs import (
     SqlColumnReference,
     SqlColumnReferenceExpression,
     SqlComparison,
@@ -19,6 +13,12 @@ from metricflow.sql.sql_exprs import (
     SqlIsNullExpression,
     SqlStringExpression,
 )
+from metricflow_semantics.sql.sql_join_type import SqlJoinType
+from metricflow_semantics.sql.sql_table import SqlTable
+from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+
+from metricflow.sql.optimizer.column_pruner import SqlColumnPrunerOptimizer
+from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer, SqlQueryPlanRenderer
 from metricflow.sql.sql_plan import (
     SqlJoinDescription,
     SqlQueryPlanNode,

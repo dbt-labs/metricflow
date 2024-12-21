@@ -6,5 +6,5 @@ sql_engine: Postgres
 ---
 -- Test Add Time Expression
 SELECT
-  '2020-01-01' + MAKE_INTERVAL(months => (1 * 3)) AS add_time
+  '2020-01-01' + MAKE_INTERVAL(months => CAST ((1) AS INTEGER)) AS add_time
 FROM foo.bar a

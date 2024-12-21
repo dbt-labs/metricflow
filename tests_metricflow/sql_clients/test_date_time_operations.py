@@ -23,15 +23,15 @@ from typing import Any
 import pytest
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
-
-from metricflow.data_table.mf_table import MetricFlowDataTable
-from metricflow.protocols.sql_client import SqlClient
-from metricflow.sql.sql_exprs import (
+from metricflow_semantics.sql.sql_exprs import (
     SqlCastToTimestampExpression,
     SqlDateTruncExpression,
     SqlExtractExpression,
     SqlStringLiteralExpression,
 )
+
+from metricflow.data_table.mf_table import MetricFlowDataTable
+from metricflow.protocols.sql_client import SqlClient
 
 logger = logging.getLogger(__name__)
 
