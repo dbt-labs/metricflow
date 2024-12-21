@@ -75,6 +75,9 @@ class StaticIdPrefix(IdPrefix, Enum, metaclass=EnumMetaClassHelper):
     SQL_EXPR_BETWEEN_PREFIX = "betw"
     SQL_EXPR_WINDOW_FUNCTION_ID_PREFIX = "wfnc"
     SQL_EXPR_GENERATE_UUID_PREFIX = "uuid"
+    SQL_EXPR_CASE_PREFIX = "case"
+    SQL_EXPR_ARITHMETIC_PREFIX = "arit"
+    SQL_EXPR_INTEGER_PREFIX = "int"
 
     SQL_PLAN_SELECT_STATEMENT_ID_PREFIX = "ss"
     SQL_PLAN_TABLE_FROM_CLAUSE_ID_PREFIX = "tfc"

@@ -6,6 +6,16 @@ from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.errors.error_classes import UnsupportedEngineFeatureError
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
+from metricflow_semantics.sql.sql_exprs import (
+    SqlAddTimeExpression,
+    SqlArithmeticExpression,
+    SqlArithmeticOperator,
+    SqlGenerateUuidExpression,
+    SqlIntegerExpression,
+    SqlPercentileExpression,
+    SqlPercentileFunctionType,
+    SqlSubtractTimeIntervalExpression,
+)
 from typing_extensions import override
 
 from metricflow.protocols.sql_client import SqlEngine
@@ -15,13 +25,6 @@ from metricflow.sql.render.expr_renderer import (
     SqlExpressionRenderResult,
 )
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
-from metricflow.sql.sql_exprs import (
-    SqlAddTimeExpression,
-    SqlGenerateUuidExpression,
-    SqlPercentileExpression,
-    SqlPercentileFunctionType,
-    SqlSubtractTimeIntervalExpression,
-)
 
 
 class PostgresSqlExpressionRenderer(DefaultSqlExpressionRenderer):
@@ -58,17 +61,25 @@ class PostgresSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     @override
     def visit_add_time_expr(self, node: SqlAddTimeExpression) -> SqlExpressionRenderResult:
         """Render time delta operations for PostgreSQL, which needs custom support for quarterly granularity."""
-        arg_rendered = node.arg.accept(self)
-        count_rendered = node.count_expr.accept(self).sql
-
         granularity = node.granularity
+        count_expr = node.count_expr
         if granularity is TimeGranularity.QUARTER:
             granularity = TimeGranularity.MONTH
-            count_rendered = f"({count_rendered} * 3)"
+            SqlArithmeticExpression.create(
+                left_expr=node.count_expr,
+                operator=SqlArithmeticOperator.MULTIPLY,
+                right_expr=SqlIntegerExpression.create(3),
+            )
+
+        arg_rendered = node.arg.accept(self)
+        count_rendered = count_expr.accept(self)
+        count_sql = f"({count_rendered.sql})" if count_expr.requires_parenthesis else count_rendered.sql
 
         return SqlExpressionRenderResult(
-            sql=f"{arg_rendered.sql} + MAKE_INTERVAL({granularity.value}s => {count_rendered})",
-            bind_parameter_set=arg_rendered.bind_parameter_set,
+            sql=f"{arg_rendered.sql} + MAKE_INTERVAL({granularity.value}s => CAST ({count_sql} AS INTEGER))",
+            bind_parameter_set=SqlBindParameterSet.merge_iterable(
+                (arg_rendered.bind_parameter_set, count_rendered.bind_parameter_set)
+            ),
         )
 
     @override

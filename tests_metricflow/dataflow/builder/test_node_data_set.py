@@ -16,6 +16,7 @@ from metricflow_semantics.specs.column_assoc import ColumnAssociation
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
 from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
 from metricflow_semantics.specs.measure_spec import MeasureSpec
+from metricflow_semantics.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
@@ -26,7 +27,6 @@ from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputData
 from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinOnEntitiesNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataset.sql_dataset import SqlDataSet
-from metricflow.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression
 from metricflow.sql.sql_plan import (
     SqlSelectColumn,
     SqlSelectStatementNode,

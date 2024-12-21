@@ -32,11 +32,7 @@ from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.measure_spec import MeasureSpec, MetricInputMeasureSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
-from more_itertools import bucket
-
-from metricflow.dataflow.nodes.join_to_base import ValidityWindowJoinDescription
-from metricflow.plan_conversion.select_column_gen import SelectColumnSet
-from metricflow.sql.sql_exprs import (
+from metricflow_semantics.sql.sql_exprs import (
     SqlAggregateFunctionExpression,
     SqlColumnReference,
     SqlColumnReferenceExpression,
@@ -45,6 +41,10 @@ from metricflow.sql.sql_exprs import (
     SqlFunctionExpression,
     SqlStringExpression,
 )
+from more_itertools import bucket
+
+from metricflow.dataflow.nodes.join_to_base import ValidityWindowJoinDescription
+from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.sql.sql_plan import (
     SqlSelectColumn,
 )

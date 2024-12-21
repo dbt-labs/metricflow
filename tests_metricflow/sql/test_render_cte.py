@@ -3,16 +3,16 @@ from __future__ import annotations
 import logging
 
 from _pytest.fixtures import FixtureRequest
-from metricflow_semantics.sql.sql_join_type import SqlJoinType
-from metricflow_semantics.sql.sql_table import SqlTable
-from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
-
-from metricflow.sql.sql_exprs import (
+from metricflow_semantics.sql.sql_exprs import (
     SqlColumnReference,
     SqlColumnReferenceExpression,
     SqlComparison,
     SqlComparisonExpression,
 )
+from metricflow_semantics.sql.sql_join_type import SqlJoinType
+from metricflow_semantics.sql.sql_table import SqlTable
+from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+
 from metricflow.sql.sql_plan import (
     SqlCteNode,
     SqlJoinDescription,

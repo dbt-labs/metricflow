@@ -5,11 +5,7 @@ from typing import List
 import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-from metricflow_semantics.sql.sql_table import SqlTable
-from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
-
-from metricflow.protocols.sql_client import SqlClient
-from metricflow.sql.sql_exprs import (
+from metricflow_semantics.sql.sql_exprs import (
     SqlAddTimeExpression,
     SqlCastToTimestampExpression,
     SqlColumnReference,
@@ -21,6 +17,10 @@ from metricflow.sql.sql_exprs import (
     SqlStringExpression,
     SqlStringLiteralExpression,
 )
+from metricflow_semantics.sql.sql_table import SqlTable
+from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+
+from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_plan import (
     SqlJoinDescription,
     SqlOrderByDescription,
