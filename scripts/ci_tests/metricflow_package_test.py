@@ -64,9 +64,7 @@ def _create_data_sets(
     semantic_models: Sequence[SemanticModel] = semantic_manifest_lookup.semantic_manifest.semantic_models
     semantic_models = sorted(semantic_models, key=lambda x: x.name)
 
-    converter = SemanticModelToDataSetConverter(
-        column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup)
-    )
+    converter = SemanticModelToDataSetConverter(column_association_resolver=DunderColumnAssociationResolver())
 
     for semantic_model in semantic_models:
         data_sets[semantic_model.name] = converter.create_sql_source_data_set(semantic_model)
@@ -138,7 +136,7 @@ def log_dataflow_plan() -> None:  # noqa: D103
     semantic_manifest = _semantic_manifest()
     semantic_manifest_lookup = SemanticManifestLookup(semantic_manifest)
     data_set_mapping = _create_data_sets(semantic_manifest_lookup)
-    column_association_resolver = DunderColumnAssociationResolver(semantic_manifest_lookup)
+    column_association_resolver = DunderColumnAssociationResolver()
 
     source_node_builder = SourceNodeBuilder(column_association_resolver, semantic_manifest_lookup)
     source_node_set = source_node_builder.create_from_data_sets(list(data_set_mapping.values()))
