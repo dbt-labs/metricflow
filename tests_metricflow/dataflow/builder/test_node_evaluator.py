@@ -60,7 +60,7 @@ def make_multihop_node_evaluator(
 ) -> NodeEvaluatorForLinkableInstances:
     """Return a node evaluator using the nodes in multihop_semantic_model_name_to_nodes."""
     node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
-        column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup_with_multihop_links),
+        column_association_resolver=DunderColumnAssociationResolver(),
         semantic_manifest_lookup=semantic_manifest_lookup_with_multihop_links,
     )
 
@@ -510,7 +510,7 @@ def test_node_evaluator_with_scd_target(
 ) -> None:
     """Tests the case where the joined node is an SCD with a validity window filter."""
     node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
-        column_association_resolver=DunderColumnAssociationResolver(scd_semantic_manifest_lookup),
+        column_association_resolver=DunderColumnAssociationResolver(),
         semantic_manifest_lookup=scd_semantic_manifest_lookup,
     )
 
