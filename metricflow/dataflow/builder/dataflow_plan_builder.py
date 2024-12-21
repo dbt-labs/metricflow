@@ -653,7 +653,7 @@ class DataflowPlanBuilder:
             # TODO: move this to a helper method
             time_spine_node = self._build_time_spine_node(queried_agg_time_dimension_specs)
             output_node = JoinToTimeSpineNode.create(
-                parent_node=output_node,
+                metric_source_node=output_node,
                 time_spine_node=time_spine_node,
                 requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
                 join_on_time_dimension_spec=self._sort_by_base_granularity(queried_agg_time_dimension_specs)[0],
@@ -1635,7 +1635,7 @@ class DataflowPlanBuilder:
             required_time_spine_specs = (join_on_time_dimension_spec,) + base_queried_agg_time_dimension_specs
             time_spine_node = self._build_time_spine_node(required_time_spine_specs)
             unaggregated_measure_node = JoinToTimeSpineNode.create(
-                parent_node=unaggregated_measure_node,
+                metric_source_node=unaggregated_measure_node,
                 time_spine_node=time_spine_node,
                 requested_agg_time_dimension_specs=base_queried_agg_time_dimension_specs,
                 join_on_time_dimension_spec=join_on_time_dimension_spec,
@@ -1709,7 +1709,7 @@ class DataflowPlanBuilder:
                 where_filter_specs=agg_time_only_filters,
             )
             output_node: DataflowPlanNode = JoinToTimeSpineNode.create(
-                parent_node=aggregate_measures_node,
+                metric_source_node=aggregate_measures_node,
                 time_spine_node=time_spine_node,
                 requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
                 join_on_time_dimension_spec=self._sort_by_base_granularity(queried_agg_time_dimension_specs)[0],
