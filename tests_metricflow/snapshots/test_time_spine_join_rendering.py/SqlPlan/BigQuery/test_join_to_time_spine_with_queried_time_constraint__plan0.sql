@@ -25,7 +25,8 @@ FROM (
       FROM (
         -- Constrain Time Range to [2020-01-03T00:00:00, 2020-01-05T00:00:00]
         SELECT
-          subq_6.ds__week
+          subq_6.metric_time__day
+          , subq_6.ds__week
           , subq_6.ds__month
           , subq_6.ds__quarter
           , subq_6.ds__year
@@ -36,7 +37,6 @@ FROM (
           , subq_6.ds__extract_dow
           , subq_6.ds__extract_doy
           , subq_6.ds__martian_day
-          , subq_6.metric_time__day
         FROM (
           -- Change Column Aliases
           SELECT
