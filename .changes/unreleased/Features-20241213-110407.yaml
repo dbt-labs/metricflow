@@ -1,0 +1,6 @@
+kind: Features
+body: Allow setting aliases for queried metrics
+time: 2024-12-13T11:04:07.020346+01:00
+custom:
+    Author: serramatutu
+    Issue: "1573"
