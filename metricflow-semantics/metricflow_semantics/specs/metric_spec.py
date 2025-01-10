@@ -59,3 +59,11 @@ class MetricSpec(InstanceSpec):  # noqa: D101
             offset_window=self.offset_window,
             offset_to_grain=self.offset_to_grain,
         )
+
+    def without_filter_specs(self) -> MetricSpec:  # noqa: D102
+        return MetricSpec(
+            element_name=self.element_name,
+            alias=self.alias,
+            offset_window=self.offset_window,
+            offset_to_grain=self.offset_to_grain,
+        )

@@ -1537,9 +1537,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         output_instances: Tuple[MdoInstance, ...] = ()
         output_select_columns: Tuple[SqlSelectColumn, ...] = ()
         for parent_instance in parent_data_set.instance_set.as_tuple:
-            if parent_instance.spec in input_specs_to_output_specs:
-                # If an alias was requested, bild new instance & select column to match requested spec.
-                new_specs = input_specs_to_output_specs[parent_instance.spec]
+            if parent_instance.spec.without_filter_specs() in input_specs_to_output_specs:
+                # If an alias was requested, build new instance & select column to match requested spec.
+                new_specs = input_specs_to_output_specs[parent_instance.spec.without_filter_specs()]
                 for new_spec in new_specs:
                     new_instance = parent_instance.with_new_spec(
                         new_spec=new_spec, column_association_resolver=self._column_association_resolver
