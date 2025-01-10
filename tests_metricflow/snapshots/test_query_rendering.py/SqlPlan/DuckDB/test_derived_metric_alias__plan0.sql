@@ -7,7 +7,7 @@ sql_engine: DuckDB
 -- Change Column Aliases
 SELECT
   subq_15.metric_time__day
-  , subq_15.booking_fees
+  , subq_15.booking_fees AS bookings_alias
 FROM (
   -- Order By ['booking_fees']
   SELECT

@@ -18,7 +18,7 @@ WITH sma_28009_cte AS (
 
 SELECT
   metric_time__month AS metric_time__month
-  , bookings AS bookings
+  , bookings AS bookings_alias
 FROM (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['bookings', 'metric_time__month']
