@@ -52,6 +52,10 @@ class InstanceSpec(SerializableDataclass):
         """See Visitable."""
         raise NotImplementedError()
 
+    def without_filter_specs(self) -> InstanceSpec:
+        """Return the instance spec without any filtering (for comparison purposes)."""
+        return self
+
 
 class InstanceSpecVisitor(Generic[VisitorOutputT], ABC):
     """Visitor for the InstanceSpec classes."""

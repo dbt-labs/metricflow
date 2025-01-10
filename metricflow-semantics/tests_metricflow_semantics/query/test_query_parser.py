@@ -629,7 +629,7 @@ def test_duplicate_metric_query(  # noqa: D103
     mf_test_configuration: MetricFlowTestConfiguration,
     bookings_query_parser: MetricFlowQueryParser,
 ) -> None:
-    with pytest.raises(InvalidQueryException, match="duplicate metrics"):
+    with pytest.raises(InvalidQueryException, match="duplicate metric"):
         bookings_query_parser.parse_and_validate_query(
             metric_names=["bookings", "bookings"],
             group_by_names=[MTD],
@@ -675,4 +675,33 @@ def test_invalid_group_by_metric(bookings_query_parser: MetricFlowQueryParser) -
     with pytest.raises(InvalidQueryException, match="Metric\\('bookings', group_by=\\['listing'\\]\\)"):
         bookings_query_parser.parse_and_validate_query(
             metric_names=("bookings",), where_constraint_strs=["{{ Metric('listings', ['garbage']) }} > 1"]
+        )
+
+
+def test_parse_and_validate_metric_with_duplicate_metric_alias(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+) -> None:
+    """Test that a query with duplicate alias fails parsing."""
+    bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=BOOKINGS_YAML)
+    metrics_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=METRICS_YAML)
+    revenue_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=REVENUE_YAML)
+    query_parser = query_parser_from_yaml(
+        [EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, bookings_yaml_file, revenue_yaml_file, metrics_yaml_file]
+    )
+
+    with pytest.raises(InvalidQueryException, match="Query contains duplicate metric aliases"):
+        query_parser.parse_and_validate_query(
+            metrics=(
+                MetricParameter(name="revenue_cumulative", alias="revenue_alias"),
+                MetricParameter(name="revenue_sub_10", alias="revenue_alias"),
+            ),
+        )
+
+    with pytest.raises(InvalidQueryException, match="Query contains duplicate metric aliases"):
+        query_parser.parse_and_validate_query(
+            metrics=(
+                MetricParameter(name="revenue_cumulative"),
+                MetricParameter(name="revenue_sub_10", alias="revenue_cumulative"),
+            ),
         )

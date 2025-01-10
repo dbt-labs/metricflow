@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import itertools
 import logging
+from collections import defaultdict
 from dataclasses import dataclass
-from typing import List, Optional, Sequence, Set, Tuple
+from typing import Dict, List, Optional, Sequence, Set, Tuple
 
 from dbt_semantic_interfaces.references import MeasureReference, MetricReference, SemanticModelReference
 
@@ -33,6 +34,7 @@ from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQ
 from metricflow_semantics.query.issues.issues_base import (
     MetricFlowQueryResolutionIssueSet,
 )
+from metricflow_semantics.query.issues.parsing.duplicate_metric_alias import DuplicateMetricAliasIssue
 from metricflow_semantics.query.issues.parsing.invalid_limit import InvalidLimitIssue
 from metricflow_semantics.query.issues.parsing.invalid_metric import InvalidMetricIssue
 from metricflow_semantics.query.issues.parsing.invalid_min_max_only import InvalidMinMaxOnlyIssue
@@ -173,11 +175,20 @@ class MetricFlowQueryResolver:
         )
         metric_specs: List[MetricSpec] = []
         input_to_issue_set_mapping_items: List[InputToIssueSetMappingItem] = []
+        alias_to_metrics: Dict[str, List[Tuple[ResolverInputForMetric, MetricReference]]] = defaultdict(list)
 
         # Find the metric that matches the metric pattern from the input.
         for metric_input in metric_inputs:
             matching_specs = metric_input.spec_pattern.match(available_metric_specs)
-            if len(matching_specs) != 1:
+            if len(matching_specs) == 1:
+                matching_spec = matching_specs[0]
+                alias = metric_input.spec_pattern.parameter_set.alias
+                if alias:
+                    matching_spec = matching_spec.with_alias(alias)
+                metric_specs.append(matching_spec)
+                resolved_name = matching_spec.alias or matching_spec.qualified_name
+                alias_to_metrics[resolved_name].append((metric_input, matching_spec.reference))
+            else:
                 suggestion_generator = QueryItemSuggestionGenerator(
                     input_naming_scheme=MetricNamingScheme(),
                     input_str=str(metric_input.input_obj),
@@ -195,8 +206,23 @@ class MetricFlowQueryResolver:
                         ),
                     )
                 )
-            else:
-                metric_specs.extend(matching_specs)
+
+        # Find any duplicate aliases
+        for alias, metrics in alias_to_metrics.items():
+            if len(metrics) > 1:
+                metric_inputs = [m[0] for m in metrics]
+                metric_references = [m[1] for m in metrics]
+                input_to_issue_set_mapping_items.append(
+                    InputToIssueSetMappingItem(
+                        resolver_input=metric_inputs[0],
+                        issue_set=MetricFlowQueryResolutionIssueSet.from_issue(
+                            DuplicateMetricAliasIssue.from_parameters(
+                                duplicate_metric_references=metric_references,
+                                query_resolution_path=query_resolution_path,
+                            )
+                        ),
+                    )
+                )
 
         return ResolveMetricsResult(
             metric_specs=tuple(metric_specs),
@@ -371,7 +397,11 @@ class MetricFlowQueryResolver:
         query_resolution_path = MetricFlowQueryResolutionPath.from_path_item(
             QueryGroupByItemResolutionNode.create(
                 parent_nodes=(),
-                metrics_in_query=tuple(metric_input.spec_pattern.metric_reference for metric_input in metric_inputs),
+                metrics_in_query=tuple(
+                    MetricReference(metric_input.spec_pattern.parameter_set.element_name)
+                    for metric_input in metric_inputs
+                    if metric_input.spec_pattern.parameter_set.element_name  # for type checker
+                ),
                 where_filter_intersection=query_level_filter_input.where_filter_intersection,
             )
         )
