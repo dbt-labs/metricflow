@@ -174,6 +174,10 @@ def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithD
         __configure_test_env_from_url(url, password=password, schema=schema)
         __initialize_dbt()
         return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("trino"))
+    elif dialect is SqlDialect.CLICKHOUSE:
+        __configure_test_env_from_url(url, password=password, schema=schema)
+        __initialize_dbt()
+        return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("clickhouse"))
     else:
         raise ValueError(f"Unknown dialect: `{dialect}` in URL {url}")
 

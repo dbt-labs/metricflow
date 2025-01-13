@@ -114,10 +114,39 @@ jobs:
           python-version: "3.12"
           make-target: "test-trino"
 
+  clickhouse-tests:
+    # Clickhouse tests run on a local service container, which obviates the need for separate Environment hosting.
+    # We run them here instead of in the CI unit test suite because they are a bit slower, and because in future
+    # we may choose to execute them against a hosted instance, at which point this config will look like the other
+    # engine configs in this file.
+    name: Clickhouse Tests
+    if: ${{ github.event.action != 'labeled' || github.event.label.name == 'Run Tests With Other SQL Engines' }}
+    runs-on: ubuntu-latest
+    services:
+      clickhouse:
+        image: clickhouse/clickhouse-server
+        ports:
+          - 8123:8123
+        env:
+          CLICKHOUSE_USER: "metricflow"
+          CLICKHOUSE_PASSWORD: "metricflowing"
+          CLICKHOUSE_DB: "metricflow"
+    steps:
+      - name: Check-out the repo
+        uses: actions/checkout@v3
+
+      - name: Test w/ Python 3.12
+        uses: ./.github/actions/run-mf-tests
+        with:
+          python-version: "3.12"
+          make-target: "test-clickhouse"
+          mf_sql_engine_url: "clickhouse://metricflow:metricflowing@localhost:8123/metricflow"
+          mf_sql_engine_password: "metricflowing"
+
   remove-label:
     name: Remove Label After Running Tests
     runs-on: ubuntu-latest
-    needs: [ snowflake-tests, redshift-tests, bigquery-tests, databricks-tests ]
+    needs: [ snowflake-tests, redshift-tests, bigquery-tests, databricks-tests, clickhouse-tests ]
     # Default behavior for `needs` is that it requires success, so a success / failure needs to be specifically checked.
     if: ${{ (success() || failure()) && github.event.action == 'labeled' }}
     steps:

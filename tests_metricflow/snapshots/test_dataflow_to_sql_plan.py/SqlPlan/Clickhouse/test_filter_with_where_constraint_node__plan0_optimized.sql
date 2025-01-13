@@ -1,0 +1,21 @@
+test_name: test_filter_with_where_constraint_node
+test_filename: test_dataflow_to_sql_plan.py
+docstring:
+  Tests converting a dataflow plan to a SQL query plan where there is a leaf pass filter node.
+sql_engine: Clickhouse
+---
+-- Constrain Output with WHERE
+SELECT
+  ds__day
+  , bookings
+FROM (
+  -- Read Elements From Semantic Model 'bookings_source'
+  -- Pass Only Elements: ['bookings', 'ds__day']
+  SELECT
+    DATE_TRUNC('day', ds) AS ds__day
+    , 1 AS bookings
+  FROM ***************************.fct_bookings bookings_source_src_28000
+  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+) subq_3
+WHERE booking__ds__day = '2020-01-01'
+SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

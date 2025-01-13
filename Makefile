@@ -71,6 +71,10 @@ populate-persistent-source-schema-snowflake:
 test-trino:
 	hatch -v run trino-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW)/
 
+.PHONY: test-clickhouse
+test-clickhouse:
+	hatch -v run clickhouse-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW)/
+
 .PHONY: lint
 lint:
 	hatch -v run dev-env:pre-commit run --all-files
@@ -83,6 +87,10 @@ postgresql postgres:
 .PHONY: trino
 trino:
 	make -C local-data-warehouses trino
+
+.PHONY: clickhouse
+clickhouse:
+	make -C local-data-warehouses clickhouse
 
 # Re-generate test snapshots using all supported SQL engines.
 .PHONY: regenerate-test-snapshots

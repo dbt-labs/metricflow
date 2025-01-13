@@ -1,0 +1,8 @@
+test_name: test_query_with_simple_metric_in_where_filter
+test_filename: test_metric_filter_output.py
+---
+listing      listings    bookings
+---------  ----------  ----------
+l2718281            1          15
+l3141592            1          15
+l5948301            1           7
