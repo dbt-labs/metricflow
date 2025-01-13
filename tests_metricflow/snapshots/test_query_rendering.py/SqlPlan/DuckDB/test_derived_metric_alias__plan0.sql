@@ -670,5 +670,5 @@ FROM (
       ) subq_12
     ) subq_13
   ) subq_14
-  ORDER BY subq_14.bookings_alias
+  ORDER BY subq_14.booking_fees
 ) subq_15
