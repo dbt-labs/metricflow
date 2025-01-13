@@ -464,7 +464,7 @@ class MetricFlowQueryResolver:
         # Resolve order by.
         resolve_order_by_result = MetricFlowQueryResolver._resolve_order_by(
             resolver_inputs_for_order_by_items=order_by_item_inputs,
-            metric_specs=metric_specs,
+            metric_specs=tuple(metric_spec.with_alias(None) for metric_spec in metric_specs),
             group_by_item_specs=group_by_item_specs,
             query_resolution_path=query_resolution_path,
         )

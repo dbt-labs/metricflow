@@ -274,16 +274,15 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
         if not all_parent_group_bys_used_in_current_select:
             return False
 
-        # Don't reduce if the ORDER BYs aren't column reference expressions for simplicity.
-        for order_by in node.order_bys:
-            order_by_column_reference_expression = order_by.expr.as_column_reference_expression
-            if not order_by_column_reference_expression:
-                return False
-            # Also for simplicity, the ORDER BY must match one of the SELECT expressions.
-            if not SqlRewritingSubQueryReducerVisitor._find_matching_select_column(
-                col_ref=order_by_column_reference_expression.col_ref,
-                select_columns=node.select_columns,
-            ):
+        # Don't reduce if the ORDER BYs aren't column reference expressions or column alias reference expressions for simplicity.
+        # Also for simplicity, the ORDER BY must match one of the SELECT expressions.
+        for order_by in node.order_bys or from_source_node_as_select_node.order_bys:
+            try:
+                if not self._get_matching_column_for_order_by(
+                    order_by_expr=order_by.expr, select_columns=node.select_columns
+                ):
+                    return False
+            except RuntimeError:
                 return False
 
         # If the parent has a GROUP BY and this has a WHERE, avoid reducing as the WHERE could reference an
@@ -411,6 +410,19 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
         for select_column in select_columns:
             column_reference_expression = select_column.expr.as_column_reference_expression
             if column_reference_expression and column_reference_expression.col_ref == col_ref:
+                return select_column
+        return None
+
+    @staticmethod
+    def _find_matching_select_column_from_alias_ref_expr(
+        col_alias_ref_expr: SqlColumnAliasReferenceExpression, select_columns: Sequence[SqlSelectColumn]
+    ) -> Optional[SqlSelectColumn]:
+        for select_column in select_columns:
+            column_reference_expression = select_column.expr.as_column_reference_expression
+            if (
+                column_reference_expression
+                and column_reference_expression.col_ref.column_name == col_alias_ref_expr.column_alias
+            ):
                 return select_column
         return None
 
@@ -629,8 +641,6 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
         #     ORDER by b.baz
         #     LIMIT 1
 
-        # The ORDER BY in the parent doesn't matter since the order by in this node will "overwrite" the order in the
-        # parent as long as the parent has no limits.
         column_replacements = SqlRewritingSubQueryReducerVisitor._get_column_replacements(
             parent_node=from_source_select_node,
             parent_node_alias=node.from_source_alias,
@@ -649,19 +659,15 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
         #
         # SELECT SUM(b.bookings) AS bookings
         # FROM fct_bookings b
-        # ORDER BY SUM(b.bookings) -- Throws an error in some engines.
-        if node_with_reduced_parents.order_bys:
-            for order_by_item in node_with_reduced_parents.order_bys:
-                order_by_item_expr = order_by_item.expr.as_column_reference_expression
-                assert order_by_item_expr
+        # ORDER BY SUM(b.bookings) -- Throws an error in some engines. Instead, use the column alias.
 
-                matching_select_column = SqlRewritingSubQueryReducerVisitor._find_matching_select_column(
-                    col_ref=order_by_item_expr.col_ref,
-                    select_columns=node_with_reduced_parents.select_columns,
+        # We don't reduce if both this node and the parent have an ORDER BY, so here pick the order by from either.
+        order_bys_to_use = node_with_reduced_parents.order_bys or from_source_select_node.order_bys
+        if order_bys_to_use:
+            for order_by_item in order_bys_to_use:
+                matching_select_column = self._get_matching_column_for_order_by(
+                    order_by_expr=order_by_item.expr, select_columns=node_with_reduced_parents.select_columns
                 )
-                # This must be the case because of _should_reduce()
-                assert matching_select_column
-
                 new_order_bys.append(
                     SqlOrderByDescription(
                         expr=SqlColumnAliasReferenceExpression.create(column_alias=matching_select_column.column_alias),
@@ -680,7 +686,7 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
         if node.group_bys and from_source_select_node.group_bys:
             raise RuntimeError(
                 "Attempting to reduce sub-queries when this and the parent have GROUP BYs. This should have been "
-                "prevent by _should_reduce()"
+                "prevented by _current_node_can_be_reduced()"
             )
         elif node.group_bys:
             new_group_bys = SqlRewritingSubQueryReducerVisitor._rewrite_select_columns(
@@ -710,6 +716,33 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
             limit=new_limit,
             distinct=from_source_select_node.distinct,
         )
+
+    def _get_matching_column_for_order_by(
+        self, order_by_expr: SqlExpressionNode, select_columns: Sequence[SqlSelectColumn]
+    ) -> SqlSelectColumn:
+        order_by_col_ref_expr = order_by_expr.as_column_reference_expression
+        order_by_col_alias_ref_expr = order_by_expr.as_column_alias_reference_expression
+        if order_by_col_ref_expr:
+            matching_select_column = SqlRewritingSubQueryReducerVisitor._find_matching_select_column(
+                col_ref=order_by_col_ref_expr.col_ref, select_columns=select_columns
+            )
+        elif order_by_col_alias_ref_expr:
+            matching_select_column = (
+                SqlRewritingSubQueryReducerVisitor._find_matching_select_column_from_alias_ref_expr(
+                    col_alias_ref_expr=order_by_col_alias_ref_expr, select_columns=select_columns
+                )
+            )
+        else:
+            raise RuntimeError(
+                f"Expected a column reference expression or a column alias reference expression in ORDER BY but got: {order_by_expr}."
+                "This indicates internal misconfiguration."
+            )
+
+        if not matching_select_column:
+            raise RuntimeError(
+                "Did not find matching select column for order by. This indicates internal misconfiguration."
+            )
+        return matching_select_column
 
     def visit_table_node(self, node: SqlTableNode) -> SqlQueryPlanNode:  # noqa: D102
         return node
