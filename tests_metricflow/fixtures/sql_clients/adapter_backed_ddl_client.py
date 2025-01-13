@@ -49,7 +49,9 @@ class AdapterBackedDDLSqlClient(AdapterBackedSqlClient):
             create_table_statement = f"CREATE TABLE IF NOT EXISTS {sql_table.sql} ({', '.join(columns_to_insert)})"
 
             if self.sql_engine_type == SqlEngine.CLICKHOUSE:
-                create_table_statement = f"{create_table_statement} ENGINE = MergeTree ORDER BY ({columns_to_insert[0].split(" ")[0]})"
+                create_table_statement = (
+                    f"{create_table_statement} ENGINE = MergeTree ORDER BY ({columns_to_insert[0].split(" ")[0]})"
+                )
 
             self._adapter.execute(
                 create_table_statement,

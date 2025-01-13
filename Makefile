@@ -75,6 +75,10 @@ test-trino:
 test-clickhouse:
 	hatch -v run clickhouse-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW)/
 
+.PHONY: populate-persistent-source-schema-clickhouse
+populate-persistent-source-schema-clickhouse:
+	hatch -v run clickhouse-env:pytest -vv $(ADDITIONAL_PYTEST_OPTIONS) $(USE_PERSISTENT_SOURCE_SCHEMA) $(POPULATE_PERSISTENT_SOURCE_SCHEMA)
+
 .PHONY: lint
 lint:
 	hatch -v run dev-env:pre-commit run --all-files

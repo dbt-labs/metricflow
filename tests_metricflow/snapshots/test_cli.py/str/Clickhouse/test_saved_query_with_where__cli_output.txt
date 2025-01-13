@@ -1,46 +1,6 @@
 test_name: test_saved_query_with_where
 test_filename: test_cli.py
 ---
--- Constrain Output with WHERE
--- Pass Only Elements: ['bookings', 'instant_bookings', 'listing__capacity_latest', 'metric_time__day']
--- Aggregate Measures
--- Compute Metrics via Expressions
--- Order By ['metric_time__day', 'listing__capacity_latest']
-SELECT
-  metric_time__day
-  , listing__capacity_latest
-  , SUM(bookings) AS bookings
-  , SUM(instant_bookings) AS instant_bookings
-FROM (
-  -- Join Standard Outputs
-  SELECT
-    listings_latest_src_10000.capacity AS listing__capacity_latest
-    , subq_1.metric_time__day AS metric_time__day
-    , subq_1.bookings AS bookings
-    , subq_1.instant_bookings AS instant_bookings
-  FROM (
-    -- Read Elements From Semantic Model 'bookings_source'
-    -- Metric Time Dimension 'ds'
-    SELECT
-      DATE_TRUNC('day', ds) AS metric_time__day
-      , listing_id AS listing
-      , 1 AS bookings
-      , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
-    FROM ***************************.fct_bookings bookings_source_src_10000
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
-  ) subq_1
-  LEFT OUTER JOIN
-    ***************************.dim_listings_latest listings_latest_src_10000
-  ON
-    subq_1.listing = listings_latest_src_10000.listing_id
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
-) subq_5
-WHERE (listing__capacity_latest > 3) AND (listing__capacity_latest > 4)
-GROUP BY
-  metric_time__day
-  , listing__capacity_latest
-ORDER BY metric_time__day, listing__capacity_latest
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 metric_time__day       listing__capacity_latest    bookings    instant_bookings
 -------------------  --------------------------  ----------  ------------------
 2019-12-01T00:00:00                           5           1                   0

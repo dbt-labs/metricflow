@@ -1,40 +1,6 @@
 test_name: test_saved_query_with_cumulative_metric
 test_filename: test_cli.py
 ---
--- Join Self Over Time Range
--- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-01T00:00:00]
--- Pass Only Elements: ['txn_revenue', 'metric_time__day']
--- Aggregate Measures
--- Compute Metrics via Expressions
--- Order By ['metric_time__day']
-SELECT
-  subq_3.metric_time__day AS metric_time__day
-  , SUM(subq_2.txn_revenue) AS trailing_2_months_revenue
-FROM (
-  -- Read From Time Spine 'mf_time_spine'
-  SELECT
-    ds AS metric_time__day
-  FROM ***************************.mf_time_spine subq_4
-  WHERE ds BETWEEN '2020-01-01' AND '2020-01-01'
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
-) subq_3
-CROSS JOIN
-(
-  -- Read Elements From Semantic Model 'revenue'
-  -- Metric Time Dimension 'ds'
-  -- Constrain Time Range to [2019-11-01T00:00:00, 2020-01-01T00:00:00]
-  SELECT
-    DATE_TRUNC('day', created_at) AS metric_time__day
-    , revenue AS txn_revenue
-  FROM ***************************.fct_revenue revenue_src_10000
-  WHERE DATE_TRUNC('day', created_at) BETWEEN '2019-11-01' AND '2020-01-01'
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
-) subq_2
-WHERE subq_3.metric_time__day BETWEEN '2020-01-01' AND '2020-01-01'
-GROUP BY
-  subq_3.metric_time__day
-ORDER BY metric_time__day
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 metric_time__day       trailing_2_months_revenue
 -------------------  ---------------------------
 2020-01-01T00:00:00                         1000

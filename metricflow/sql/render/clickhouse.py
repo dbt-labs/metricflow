@@ -6,9 +6,6 @@ from typing import Collection, Optional, Sequence
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-
-from metricflow.sql.render.rendering_constants import SqlRenderingConstants
-from metricflow.sql.sql_plan import SqlJoinDescription
 from metricflow_semantics.errors.error_classes import UnsupportedEngineFeatureError
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.sql.sql_exprs import (
@@ -19,7 +16,7 @@ from metricflow_semantics.sql.sql_exprs import (
     SqlIntegerExpression,
     SqlPercentileExpression,
     SqlPercentileFunctionType,
-    SqlSubtractTimeIntervalExpression, SqlExpressionNode,
+    SqlSubtractTimeIntervalExpression,
 )
 from typing_extensions import override
 
@@ -29,7 +26,9 @@ from metricflow.sql.render.expr_renderer import (
     SqlExpressionRenderer,
     SqlExpressionRenderResult,
 )
+from metricflow.sql.render.rendering_constants import SqlRenderingConstants
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer, SqlPlanRenderResult
+from metricflow.sql.sql_plan import SqlJoinDescription
 
 
 class ClickhouseSqlExpressionRenderer(DefaultSqlExpressionRenderer):
@@ -175,15 +174,9 @@ class ClickhouseSqlQueryPlanRenderer(DefaultSqlQueryPlanRenderer):
     @override
     def _render_adapter_specific_flags(self) -> Optional[SqlPlanRenderResult]:
         """Add ClickHouse-specific query settings."""
-        settings = [
-            "allow_experimental_join_condition = 1",
-            "allow_experimental_analyzer = 1",
-            "join_use_nulls = 0"
-        ]
-        return SqlPlanRenderResult(
-            sql=f"SETTINGS {', '.join(settings)}",
-            bind_parameter_set=SqlBindParameterSet()
-        )
+        settings = ["allow_experimental_join_condition = 1", "allow_experimental_analyzer = 1", "join_use_nulls = 0"]
+        return SqlPlanRenderResult(sql=f"SETTINGS {', '.join(settings)}", bind_parameter_set=SqlBindParameterSet())
+
     def _render_joins_section(self, join_descriptions: Sequence[SqlJoinDescription]) -> Optional[SqlPlanRenderResult]:
         """Convert the join descriptions into a "JOIN" section with ClickHouse-specific handling."""
         if len(join_descriptions) == 0:
@@ -205,7 +198,7 @@ class ClickhouseSqlQueryPlanRenderer(DefaultSqlQueryPlanRenderer):
             # Check if this is a time-range join
             is_time_range_join = False
             if on_condition_rendered:
-                is_time_range_join = any(op in on_condition_rendered.sql for op in ['<=', '>=', '<', '>'])
+                is_time_range_join = any(op in on_condition_rendered.sql for op in ["<=", ">=", "<", ">"])
 
             # Add join type
             join_section_lines.append(join_description.join_type.value)
@@ -244,33 +237,3 @@ class ClickhouseSqlQueryPlanRenderer(DefaultSqlQueryPlanRenderer):
             self._stored_where_conditions = where_conditions
 
         return SqlPlanRenderResult("\n".join(join_section_lines), params)
-
-@override
-def _render_where(self, where_expression: Optional[SqlExpressionNode]) -> Optional[SqlPlanRenderResult]:
-    """Override to combine stored where conditions from joins with the main where clause."""
-    original_where = super()._render_where(where_expression)
-    stored_conditions = getattr(self, '_stored_where_conditions', [])
-
-    if not stored_conditions and not original_where:
-        return None
-
-    conditions = []
-
-    # Add original where condition if it exists
-    if original_where:
-        # Strip the "WHERE" prefix if it exists
-        where_sql = original_where.sql
-        if where_sql.upper().startswith('WHERE '):
-            where_sql = where_sql[6:]
-        conditions.append(where_sql)
-
-    # Add stored conditions from joins
-    conditions.extend(stored_conditions)
-
-    # Combine all conditions with AND
-    combined_sql = ' AND '.join(f'({condition})' for condition in conditions if condition.strip())
-
-    return SqlPlanRenderResult(
-        sql=f"WHERE {combined_sql}",
-        bind_parameter_set=original_where.bind_parameter_set if original_where else SqlBindParameterSet(),
-    )

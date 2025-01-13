@@ -51,7 +51,9 @@ class SqlEngine(Enum):
         elif self is SqlEngine.TRINO:
             return {TimeGranularity.NANOSECOND, TimeGranularity.MICROSECOND}
         elif self is SqlEngine.CLICKHOUSE:
-            return set() # TODO: it looks like clickhouse supports nanoseconds (https://clickhouse.com/docs/en/sql-reference/functions/date-time-functions#date_trunc)
+            return (
+                set()
+            )  # TODO: it looks like clickhouse supports nanoseconds (https://clickhouse.com/docs/en/sql-reference/functions/date-time-functions#date_trunc)
         else:
             assert_values_exhausted(self)
 
