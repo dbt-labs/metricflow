@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from functools import lru_cache
 from typing import Dict, Optional, Sequence
 
 from dbt_semantic_interfaces.implementations.time_spine import PydanticTimeSpineCustomGranularityColumn
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
+from metricflow_semantics.collection_helpers.lru_cache import typed_lru_cache
 from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY, TimeDimensionSpec
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
@@ -78,7 +78,7 @@ class TimeSpineSource:
         return time_spine_sources
 
     @staticmethod
-    @lru_cache
+    @typed_lru_cache
     def build_custom_time_spine_sources(time_spine_sources: Sequence[TimeSpineSource]) -> Dict[str, TimeSpineSource]:
         """Creates a set of time spine sources with custom granularities based on what's in the manifest."""
         return {
