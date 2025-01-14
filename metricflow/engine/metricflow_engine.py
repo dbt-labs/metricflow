@@ -570,6 +570,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                         description=measure.description,
                         expr=measure.expr,
                         agg_params=measure.agg_params,
+                        config=measure.config,
                     )
                 )
         return list(measures)
@@ -639,6 +640,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                             ),
                             is_partition=False,
                             type=DimensionType.TIME,
+                            config=linkable_dimension.config,
                         )
                     )
                 else:
