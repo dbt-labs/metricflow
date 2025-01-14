@@ -10,9 +10,8 @@ sql_engine: Clickhouse
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  DATE_TRUNC('month', created_at) AS ds__month
+  date_trunc('month', created_at) AS ds__month
   , SUM(revenue) AS revenue_mtd
 FROM ***************************.fct_revenue revenue_src_28000
 GROUP BY
-  DATE_TRUNC('month', created_at)
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+  ds__month

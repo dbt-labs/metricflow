@@ -78,12 +78,10 @@ FROM (
             -- Read From Time Spine 'mf_time_spine'
             SELECT
               subq_3.ds AS metric_time__day
-              , DATE_TRUNC('month', subq_3.ds) AS metric_time__month
+              , date_trunc('month', subq_3.ds) AS metric_time__month
             FROM ***************************.mf_time_spine subq_3
-            SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
           ) subq_2
-          CROSS JOIN
-          (
+          INNER JOIN (
             -- Metric Time Dimension 'ds'
             SELECT
               subq_0.ds__day
@@ -126,49 +124,47 @@ FROM (
               -- Read Elements From Semantic Model 'revenue'
               SELECT
                 revenue_src_28000.revenue AS txn_revenue
-                , DATE_TRUNC('day', revenue_src_28000.created_at) AS ds__day
-                , DATE_TRUNC('week', revenue_src_28000.created_at) AS ds__week
-                , DATE_TRUNC('month', revenue_src_28000.created_at) AS ds__month
-                , DATE_TRUNC('quarter', revenue_src_28000.created_at) AS ds__quarter
-                , DATE_TRUNC('year', revenue_src_28000.created_at) AS ds__year
-                , EXTRACT(toYear FROM revenue_src_28000.created_at) AS ds__extract_year
-                , EXTRACT(toQuarter FROM revenue_src_28000.created_at) AS ds__extract_quarter
-                , EXTRACT(toMonth FROM revenue_src_28000.created_at) AS ds__extract_month
-                , EXTRACT(toDayOfMonth FROM revenue_src_28000.created_at) AS ds__extract_day
-                , EXTRACT(toDayOfWeek FROM revenue_src_28000.created_at) AS ds__extract_dow
-                , EXTRACT(toDayOfYear FROM revenue_src_28000.created_at) AS ds__extract_doy
-                , DATE_TRUNC('day', revenue_src_28000.created_at) AS revenue_instance__ds__day
-                , DATE_TRUNC('week', revenue_src_28000.created_at) AS revenue_instance__ds__week
-                , DATE_TRUNC('month', revenue_src_28000.created_at) AS revenue_instance__ds__month
-                , DATE_TRUNC('quarter', revenue_src_28000.created_at) AS revenue_instance__ds__quarter
-                , DATE_TRUNC('year', revenue_src_28000.created_at) AS revenue_instance__ds__year
-                , EXTRACT(toYear FROM revenue_src_28000.created_at) AS revenue_instance__ds__extract_year
-                , EXTRACT(toQuarter FROM revenue_src_28000.created_at) AS revenue_instance__ds__extract_quarter
-                , EXTRACT(toMonth FROM revenue_src_28000.created_at) AS revenue_instance__ds__extract_month
-                , EXTRACT(toDayOfMonth FROM revenue_src_28000.created_at) AS revenue_instance__ds__extract_day
-                , EXTRACT(toDayOfWeek FROM revenue_src_28000.created_at) AS revenue_instance__ds__extract_dow
-                , EXTRACT(toDayOfYear FROM revenue_src_28000.created_at) AS revenue_instance__ds__extract_doy
+                , date_trunc('day', revenue_src_28000.created_at) AS ds__day
+                , date_trunc('week', revenue_src_28000.created_at) AS ds__week
+                , date_trunc('month', revenue_src_28000.created_at) AS ds__month
+                , date_trunc('quarter', revenue_src_28000.created_at) AS ds__quarter
+                , date_trunc('year', revenue_src_28000.created_at) AS ds__year
+                , toYear(revenue_src_28000.created_at) AS ds__extract_year
+                , toQuarter(revenue_src_28000.created_at) AS ds__extract_quarter
+                , toMonth(revenue_src_28000.created_at) AS ds__extract_month
+                , toDayOfMonth(revenue_src_28000.created_at) AS ds__extract_day
+                , toDayOfWeek(revenue_src_28000.created_at) AS ds__extract_dow
+                , toDayOfYear(revenue_src_28000.created_at) AS ds__extract_doy
+                , date_trunc('day', revenue_src_28000.created_at) AS revenue_instance__ds__day
+                , date_trunc('week', revenue_src_28000.created_at) AS revenue_instance__ds__week
+                , date_trunc('month', revenue_src_28000.created_at) AS revenue_instance__ds__month
+                , date_trunc('quarter', revenue_src_28000.created_at) AS revenue_instance__ds__quarter
+                , date_trunc('year', revenue_src_28000.created_at) AS revenue_instance__ds__year
+                , toYear(revenue_src_28000.created_at) AS revenue_instance__ds__extract_year
+                , toQuarter(revenue_src_28000.created_at) AS revenue_instance__ds__extract_quarter
+                , toMonth(revenue_src_28000.created_at) AS revenue_instance__ds__extract_month
+                , toDayOfMonth(revenue_src_28000.created_at) AS revenue_instance__ds__extract_day
+                , toDayOfWeek(revenue_src_28000.created_at) AS revenue_instance__ds__extract_dow
+                , toDayOfYear(revenue_src_28000.created_at) AS revenue_instance__ds__extract_doy
                 , revenue_src_28000.user_id AS user
                 , revenue_src_28000.user_id AS revenue_instance__user
               FROM ***************************.fct_revenue revenue_src_28000
-              SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
             ) subq_0
-            SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
           ) subq_1
-          SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+          ON
+            (
+              subq_1.metric_time__day <= subq_2.metric_time__day
+            ) AND (
+              subq_1.metric_time__day >= date_trunc('month', subq_2.metric_time__day)
+            )
         ) subq_4
-        SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
       ) subq_5
       GROUP BY
-        subq_5.metric_time__day
-        , subq_5.metric_time__month
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+        metric_time__day
+        , metric_time__month
     ) subq_6
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_7
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_8
 GROUP BY
-  subq_8.metric_time__month
-  , subq_8.revenue_mtd
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+  metric_time__month
+  , revenue_mtd

@@ -16,18 +16,15 @@ FROM (
     -- Read From Time Spine 'mf_time_spine_hour'
     -- Change Column Aliases
     SELECT
-      DATE_TRUNC('day', ts) AS metric_time__day
-      , ts AS metric_time__hour
+      ts AS metric_time__hour
+      , date_trunc('day', ts) AS metric_time__day
     FROM ***************************.mf_time_spine_hour time_spine_src_28005
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_16
   WHERE (metric_time__hour > '2020-01-01 00:09:00') AND (metric_time__day = '2020-01-01')
   GROUP BY
     metric_time__day
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_18
-LEFT OUTER JOIN
-(
+LEFT OUTER JOIN (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['archived_users', 'metric_time__day']
   -- Aggregate Measures
@@ -38,17 +35,14 @@ LEFT OUTER JOIN
     -- Read Elements From Semantic Model 'users_ds_source'
     -- Metric Time Dimension 'archived_at'
     SELECT
-      DATE_TRUNC('hour', archived_at) AS metric_time__hour
-      , DATE_TRUNC('day', archived_at) AS metric_time__day
+      date_trunc('hour', archived_at) AS metric_time__hour
+      , date_trunc('day', archived_at) AS metric_time__day
       , 1 AS archived_users
     FROM ***************************.dim_users users_ds_source_src_28000
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_11
   WHERE (metric_time__hour > '2020-01-01 00:09:00') AND (metric_time__day = '2020-01-01')
   GROUP BY
     metric_time__day
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_14
 ON
   subq_18.metric_time__day = subq_14.metric_time__day
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

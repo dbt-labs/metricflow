@@ -7,10 +7,9 @@ WITH sma_28009_cte AS (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
   SELECT
-    DATE_TRUNC('day', ds) AS metric_time__day
+    date_trunc('day', ds) AS metric_time__day
     , booking_value
   FROM ***************************.fct_bookings bookings_source_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 SELECT
@@ -28,8 +27,7 @@ FROM (
       time_spine_src_28006.ds AS metric_time__day
       , subq_22.booking_fees_start_of_month AS booking_fees_start_of_month
     FROM ***************************.mf_time_spine time_spine_src_28006
-    INNER JOIN
-    (
+    INNER JOIN (
       -- Compute Metrics via Expressions
       SELECT
         metric_time__day
@@ -45,16 +43,12 @@ FROM (
         FROM sma_28009_cte sma_28009_cte
         GROUP BY
           metric_time__day
-        SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
       ) subq_21
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_22
     ON
-      DATE_TRUNC('month', time_spine_src_28006.ds) = subq_22.metric_time__day
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+      date_trunc('month', time_spine_src_28006.ds) = subq_22.metric_time__day
   ) subq_26
-  FULL OUTER JOIN
-  (
+  FULL OUTER JOIN (
     -- Compute Metrics via Expressions
     SELECT
       metric_time__day
@@ -70,14 +64,10 @@ FROM (
       FROM sma_28009_cte sma_28009_cte
       GROUP BY
         metric_time__day
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_30
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_31
   ON
     subq_26.metric_time__day = subq_31.metric_time__day
   GROUP BY
-    COALESCE(subq_26.metric_time__day, subq_31.metric_time__day)
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    metric_time__day
 ) subq_32
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

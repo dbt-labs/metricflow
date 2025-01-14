@@ -23,13 +23,10 @@ FROM (
     SELECT
       ds AS metric_time__day
     FROM ***************************.mf_time_spine time_spine_src_28006
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_16
   WHERE metric_time__day > '2020-01-01'
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_18
-LEFT OUTER JOIN
-(
+LEFT OUTER JOIN (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['bookings', 'booking__is_instant', 'metric_time__day']
   -- Aggregate Measures
@@ -41,19 +38,16 @@ LEFT OUTER JOIN
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
     SELECT
-      DATE_TRUNC('day', ds) AS metric_time__day
+      date_trunc('day', ds) AS metric_time__day
       , listing_id AS listing
       , is_instant AS booking__is_instant
       , 1 AS bookings
     FROM ***************************.fct_bookings bookings_source_src_28000
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_11
   WHERE ((booking__is_instant) AND (listing IS NOT NULL)) AND (metric_time__day > '2020-01-01')
   GROUP BY
     metric_time__day
     , booking__is_instant
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_14
 ON
   subq_18.metric_time__day = subq_14.metric_time__day
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

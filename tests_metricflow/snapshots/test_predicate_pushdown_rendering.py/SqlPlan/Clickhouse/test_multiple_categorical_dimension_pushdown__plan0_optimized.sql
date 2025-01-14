@@ -27,15 +27,12 @@ FROM (
       , capacity AS listing__capacity_latest
       , 1 AS listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_9
   LEFT OUTER JOIN
     ***************************.dim_users_latest users_latest_src_28000
   ON
     subq_9.user = users_latest_src_28000.user_id
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_12
 WHERE listing__is_lux_latest OR listing__capacity_latest > 4
 GROUP BY
   user__home_state_latest
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

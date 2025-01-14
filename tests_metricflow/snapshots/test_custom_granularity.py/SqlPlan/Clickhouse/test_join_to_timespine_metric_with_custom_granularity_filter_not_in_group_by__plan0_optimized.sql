@@ -19,13 +19,10 @@ FROM (
       ds AS metric_time__day
       , martian_day AS metric_time__martian_day
     FROM ***************************.mf_time_spine time_spine_src_28006
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_18
   WHERE metric_time__martian_day = '2020-01-01'
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_20
-LEFT OUTER JOIN
-(
+LEFT OUTER JOIN (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['bookings', 'metric_time__day']
   -- Aggregate Measures
@@ -43,21 +40,17 @@ LEFT OUTER JOIN
       -- Read Elements From Semantic Model 'bookings_source'
       SELECT
         1 AS bookings
-        , DATE_TRUNC('day', ds) AS ds__day
+        , date_trunc('day', ds) AS ds__day
       FROM ***************************.fct_bookings bookings_source_src_28000
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_11
     LEFT OUTER JOIN
       ***************************.mf_time_spine subq_12
     ON
       subq_11.ds__day = subq_12.ds
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_13
   WHERE metric_time__martian_day = '2020-01-01'
   GROUP BY
     metric_time__day
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_16
 ON
   subq_20.metric_time__day = subq_16.metric_time__day
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

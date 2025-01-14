@@ -26,22 +26,19 @@ WITH cm_6_cte AS (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
       SELECT
-        DATE_TRUNC('day', ds) AS metric_time__day
+        date_trunc('day', ds) AS metric_time__day
         , listing_id AS listing
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_43
     LEFT OUTER JOIN
       ***************************.dim_listings_latest listings_latest_src_28000
     ON
       subq_43.listing = listings_latest_src_28000.listing_id
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_47
   WHERE (listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')
   GROUP BY
     listing__capacity_latest
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 , cm_7_cte AS (
@@ -63,22 +60,19 @@ WITH cm_6_cte AS (
       -- Read Elements From Semantic Model 'views_source'
       -- Metric Time Dimension 'ds'
       SELECT
-        DATE_TRUNC('day', ds) AS metric_time__day
+        date_trunc('day', ds) AS metric_time__day
         , listing_id AS listing
         , 1 AS views
       FROM ***************************.fct_views views_source_src_28000
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_53
     LEFT OUTER JOIN
       ***************************.dim_listings_latest listings_latest_src_28000
     ON
       subq_53.listing = listings_latest_src_28000.listing_id
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_57
   WHERE (listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')
   GROUP BY
     listing__capacity_latest
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 SELECT
@@ -91,8 +85,7 @@ FULL OUTER JOIN
   cm_7_cte cm_7_cte
 ON
   cm_6_cte.listing__capacity_latest = cm_7_cte.listing__capacity_latest
-FULL OUTER JOIN
-(
+FULL OUTER JOIN (
   -- Combine Aggregated Outputs
   SELECT
     COALESCE(cm_6_cte.listing__capacity_latest, cm_7_cte.listing__capacity_latest) AS listing__capacity_latest
@@ -104,11 +97,9 @@ FULL OUTER JOIN
   ON
     cm_6_cte.listing__capacity_latest = cm_7_cte.listing__capacity_latest
   GROUP BY
-    COALESCE(cm_6_cte.listing__capacity_latest, cm_7_cte.listing__capacity_latest)
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    listing__capacity_latest
 ) subq_64
 ON
   COALESCE(cm_6_cte.listing__capacity_latest, cm_7_cte.listing__capacity_latest) = subq_64.listing__capacity_latest
 GROUP BY
-  COALESCE(cm_6_cte.listing__capacity_latest, cm_7_cte.listing__capacity_latest, subq_64.listing__capacity_latest)
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+  listing__capacity_latest

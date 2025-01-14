@@ -12,7 +12,6 @@ WITH pfe_1_cte AS (
     listing_id AS listing
     , country AS country_latest
   FROM ***************************.dim_listings_latest listings_latest_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 SELECT
@@ -27,28 +26,22 @@ FROM (
     listing_id AS listing
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_7
-LEFT OUTER JOIN
-(
+LEFT OUTER JOIN (
   -- Read From CTE For node_id=pfe_1
   SELECT
     listing
     , country_latest
   FROM pfe_1_cte pfe_1_cte
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_9
 ON
   subq_7.listing = subq_9.listing
-LEFT OUTER JOIN
-(
+LEFT OUTER JOIN (
   -- Read From CTE For node_id=pfe_1
   SELECT
     listing
     , country_latest
   FROM pfe_1_cte pfe_1_cte
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_10
 ON
   subq_7.listing = subq_10.listing
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

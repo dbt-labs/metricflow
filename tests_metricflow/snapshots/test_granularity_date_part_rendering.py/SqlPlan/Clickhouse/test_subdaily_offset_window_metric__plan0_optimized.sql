@@ -15,20 +15,16 @@ FROM (
     time_spine_src_28005.ts AS metric_time__hour
     , SUM(subq_10.archived_users) AS archived_users
   FROM ***************************.mf_time_spine_hour time_spine_src_28005
-  INNER JOIN
-  (
+  INNER JOIN (
     -- Read Elements From Semantic Model 'users_ds_source'
     -- Metric Time Dimension 'archived_at'
     SELECT
-      DATE_TRUNC('hour', archived_at) AS metric_time__hour
+      date_trunc('hour', archived_at) AS metric_time__hour
       , 1 AS archived_users
     FROM ***************************.dim_users users_ds_source_src_28000
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_10
   ON
-    addHours(time_spine_src_28005.ts, CAST(-1 AS Integer)) = subq_10.metric_time__hour
+    DATEADD(hour, -1, time_spine_src_28005.ts) = subq_10.metric_time__hour
   GROUP BY
-    time_spine_src_28005.ts
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    metric_time__hour
 ) subq_17
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

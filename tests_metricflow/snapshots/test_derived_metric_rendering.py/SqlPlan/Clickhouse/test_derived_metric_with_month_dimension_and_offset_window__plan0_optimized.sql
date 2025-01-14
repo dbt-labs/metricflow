@@ -19,18 +19,15 @@ FROM (
     -- Change Column Aliases
     -- Pass Only Elements: ['metric_time__month',]
     SELECT
-      DATE_TRUNC('month', ds) AS metric_time__month
+      date_trunc('month', ds) AS metric_time__month
     FROM ***************************.mf_time_spine time_spine_src_16006
     GROUP BY
-      DATE_TRUNC('month', ds)
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+      metric_time__month
   ) subq_13
   INNER JOIN
     ***************************.fct_bookings_extended_monthly monthly_bookings_source_src_16000
   ON
-    addMonths(subq_13.metric_time__month, CAST(-1 AS Integer)) = DATE_TRUNC('month', monthly_bookings_source_src_16000.ds)
+    DATEADD(month, -1, subq_13.metric_time__month) = date_trunc('month', monthly_bookings_source_src_16000.ds)
   GROUP BY
-    subq_13.metric_time__month
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    metric_time__month
 ) subq_17
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

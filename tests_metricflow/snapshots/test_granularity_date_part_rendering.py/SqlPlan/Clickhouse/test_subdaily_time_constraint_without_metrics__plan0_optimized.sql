@@ -11,5 +11,4 @@ SELECT
 FROM ***************************.mf_time_spine_second time_spine_src_28003
 WHERE ts BETWEEN '2020-01-01 00:00:02' AND '2020-01-01 00:00:08'
 GROUP BY
-  ts
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+  metric_time__second

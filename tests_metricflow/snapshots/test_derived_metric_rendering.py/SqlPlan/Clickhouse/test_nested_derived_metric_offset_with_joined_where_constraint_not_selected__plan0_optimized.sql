@@ -8,7 +8,6 @@ WITH rss_28018_cte AS (
   SELECT
     ds AS ds__day
   FROM ***************************.mf_time_spine time_spine_src_28006
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 SELECT
@@ -27,8 +26,7 @@ FROM (
       , subq_25.booking__is_instant AS booking__is_instant
       , subq_25.bookings_offset_once AS bookings_offset_once
     FROM rss_28018_cte rss_28018_cte
-    INNER JOIN
-    (
+    INNER JOIN (
       -- Compute Metrics via Expressions
       SELECT
         metric_time__day
@@ -44,31 +42,24 @@ FROM (
           , subq_17.booking__is_instant AS booking__is_instant
           , SUM(subq_17.bookings) AS bookings
         FROM rss_28018_cte rss_28018_cte
-        INNER JOIN
-        (
+        INNER JOIN (
           -- Read Elements From Semantic Model 'bookings_source'
           -- Metric Time Dimension 'ds'
           SELECT
-            DATE_TRUNC('day', ds) AS metric_time__day
+            date_trunc('day', ds) AS metric_time__day
             , is_instant AS booking__is_instant
             , 1 AS bookings
           FROM ***************************.fct_bookings bookings_source_src_28000
-          SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
         ) subq_17
         ON
-          addDays(rss_28018_cte.ds__day, CAST(-5 AS Integer)) = subq_17.metric_time__day
+          DATEADD(day, -5, rss_28018_cte.ds__day) = subq_17.metric_time__day
         GROUP BY
-          rss_28018_cte.ds__day
-          , subq_17.booking__is_instant
-        SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+          metric_time__day
+          , booking__is_instant
       ) subq_24
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_25
     ON
-      addDays(rss_28018_cte.ds__day, CAST(-2 AS Integer)) = subq_25.metric_time__day
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+      DATEADD(day, -2, rss_28018_cte.ds__day) = subq_25.metric_time__day
   ) subq_29
   WHERE booking__is_instant
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_31
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

@@ -52,9 +52,9 @@ FROM (
           FROM (
             -- Change Column Aliases
             SELECT
-              subq_2.ds__month AS metric_time__month
-              , subq_2.ds__day
+              subq_2.ds__day
               , subq_2.ds__week
+              , subq_2.ds__month AS metric_time__month
               , subq_2.ds__quarter
               , subq_2.ds__year
               , subq_2.ds__extract_year
@@ -68,28 +68,24 @@ FROM (
               -- Read From Time Spine 'mf_time_spine'
               SELECT
                 time_spine_src_16006.ds AS ds__day
-                , DATE_TRUNC('week', time_spine_src_16006.ds) AS ds__week
-                , DATE_TRUNC('month', time_spine_src_16006.ds) AS ds__month
-                , DATE_TRUNC('quarter', time_spine_src_16006.ds) AS ds__quarter
-                , DATE_TRUNC('year', time_spine_src_16006.ds) AS ds__year
-                , EXTRACT(toYear FROM time_spine_src_16006.ds) AS ds__extract_year
-                , EXTRACT(toQuarter FROM time_spine_src_16006.ds) AS ds__extract_quarter
-                , EXTRACT(toMonth FROM time_spine_src_16006.ds) AS ds__extract_month
-                , EXTRACT(toDayOfMonth FROM time_spine_src_16006.ds) AS ds__extract_day
-                , EXTRACT(toDayOfWeek FROM time_spine_src_16006.ds) AS ds__extract_dow
-                , EXTRACT(toDayOfYear FROM time_spine_src_16006.ds) AS ds__extract_doy
+                , date_trunc('week', time_spine_src_16006.ds) AS ds__week
+                , date_trunc('month', time_spine_src_16006.ds) AS ds__month
+                , date_trunc('quarter', time_spine_src_16006.ds) AS ds__quarter
+                , date_trunc('year', time_spine_src_16006.ds) AS ds__year
+                , toYear(time_spine_src_16006.ds) AS ds__extract_year
+                , toQuarter(time_spine_src_16006.ds) AS ds__extract_quarter
+                , toMonth(time_spine_src_16006.ds) AS ds__extract_month
+                , toDayOfMonth(time_spine_src_16006.ds) AS ds__extract_day
+                , toDayOfWeek(time_spine_src_16006.ds) AS ds__extract_dow
+                , toDayOfYear(time_spine_src_16006.ds) AS ds__extract_doy
                 , time_spine_src_16006.martian_day AS ds__martian_day
               FROM ***************************.mf_time_spine time_spine_src_16006
-              SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
             ) subq_2
-            SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
           ) subq_3
           GROUP BY
-            subq_3.metric_time__month
-          SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+            metric_time__month
         ) subq_4
-        INNER JOIN
-        (
+        INNER JOIN (
           -- Metric Time Dimension 'ds'
           SELECT
             subq_0.ds__month
@@ -117,35 +113,28 @@ FROM (
             -- Read Elements From Semantic Model 'monthly_bookings_source'
             SELECT
               monthly_bookings_source_src_16000.bookings_monthly
-              , DATE_TRUNC('month', monthly_bookings_source_src_16000.ds) AS ds__month
-              , DATE_TRUNC('quarter', monthly_bookings_source_src_16000.ds) AS ds__quarter
-              , DATE_TRUNC('year', monthly_bookings_source_src_16000.ds) AS ds__year
-              , EXTRACT(toYear FROM monthly_bookings_source_src_16000.ds) AS ds__extract_year
-              , EXTRACT(toQuarter FROM monthly_bookings_source_src_16000.ds) AS ds__extract_quarter
-              , EXTRACT(toMonth FROM monthly_bookings_source_src_16000.ds) AS ds__extract_month
-              , DATE_TRUNC('month', monthly_bookings_source_src_16000.ds) AS booking_monthly__ds__month
-              , DATE_TRUNC('quarter', monthly_bookings_source_src_16000.ds) AS booking_monthly__ds__quarter
-              , DATE_TRUNC('year', monthly_bookings_source_src_16000.ds) AS booking_monthly__ds__year
-              , EXTRACT(toYear FROM monthly_bookings_source_src_16000.ds) AS booking_monthly__ds__extract_year
-              , EXTRACT(toQuarter FROM monthly_bookings_source_src_16000.ds) AS booking_monthly__ds__extract_quarter
-              , EXTRACT(toMonth FROM monthly_bookings_source_src_16000.ds) AS booking_monthly__ds__extract_month
+              , date_trunc('month', monthly_bookings_source_src_16000.ds) AS ds__month
+              , date_trunc('quarter', monthly_bookings_source_src_16000.ds) AS ds__quarter
+              , date_trunc('year', monthly_bookings_source_src_16000.ds) AS ds__year
+              , toYear(monthly_bookings_source_src_16000.ds) AS ds__extract_year
+              , toQuarter(monthly_bookings_source_src_16000.ds) AS ds__extract_quarter
+              , toMonth(monthly_bookings_source_src_16000.ds) AS ds__extract_month
+              , date_trunc('month', monthly_bookings_source_src_16000.ds) AS booking_monthly__ds__month
+              , date_trunc('quarter', monthly_bookings_source_src_16000.ds) AS booking_monthly__ds__quarter
+              , date_trunc('year', monthly_bookings_source_src_16000.ds) AS booking_monthly__ds__year
+              , toYear(monthly_bookings_source_src_16000.ds) AS booking_monthly__ds__extract_year
+              , toQuarter(monthly_bookings_source_src_16000.ds) AS booking_monthly__ds__extract_quarter
+              , toMonth(monthly_bookings_source_src_16000.ds) AS booking_monthly__ds__extract_month
               , monthly_bookings_source_src_16000.listing_id AS listing
               , monthly_bookings_source_src_16000.listing_id AS booking_monthly__listing
             FROM ***************************.fct_bookings_extended_monthly monthly_bookings_source_src_16000
-            SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
           ) subq_0
-          SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
         ) subq_1
         ON
-          addMonths(subq_4.metric_time__month, CAST(-1 AS Integer)) = subq_1.metric_time__month
-        SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+          DATEADD(month, -1, subq_4.metric_time__month) = subq_1.metric_time__month
       ) subq_5
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_6
     GROUP BY
-      subq_6.metric_time__month
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+      metric_time__month
   ) subq_7
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_8
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

@@ -71,27 +71,23 @@ FROM (
       -- Read From Time Spine 'mf_time_spine_second'
       SELECT
         time_spine_src_28003.ts AS ts__second
-        , DATE_TRUNC('minute', time_spine_src_28003.ts) AS ts__minute
-        , DATE_TRUNC('hour', time_spine_src_28003.ts) AS ts__hour
-        , DATE_TRUNC('day', time_spine_src_28003.ts) AS ts__day
-        , DATE_TRUNC('week', time_spine_src_28003.ts) AS ts__week
-        , DATE_TRUNC('month', time_spine_src_28003.ts) AS ts__month
-        , DATE_TRUNC('quarter', time_spine_src_28003.ts) AS ts__quarter
-        , DATE_TRUNC('year', time_spine_src_28003.ts) AS ts__year
-        , EXTRACT(toYear FROM time_spine_src_28003.ts) AS ts__extract_year
-        , EXTRACT(toQuarter FROM time_spine_src_28003.ts) AS ts__extract_quarter
-        , EXTRACT(toMonth FROM time_spine_src_28003.ts) AS ts__extract_month
-        , EXTRACT(toDayOfMonth FROM time_spine_src_28003.ts) AS ts__extract_day
-        , EXTRACT(toDayOfWeek FROM time_spine_src_28003.ts) AS ts__extract_dow
-        , EXTRACT(toDayOfYear FROM time_spine_src_28003.ts) AS ts__extract_doy
+        , date_trunc('minute', time_spine_src_28003.ts) AS ts__minute
+        , date_trunc('hour', time_spine_src_28003.ts) AS ts__hour
+        , date_trunc('day', time_spine_src_28003.ts) AS ts__day
+        , date_trunc('week', time_spine_src_28003.ts) AS ts__week
+        , date_trunc('month', time_spine_src_28003.ts) AS ts__month
+        , date_trunc('quarter', time_spine_src_28003.ts) AS ts__quarter
+        , date_trunc('year', time_spine_src_28003.ts) AS ts__year
+        , toYear(time_spine_src_28003.ts) AS ts__extract_year
+        , toQuarter(time_spine_src_28003.ts) AS ts__extract_quarter
+        , toMonth(time_spine_src_28003.ts) AS ts__extract_month
+        , toDayOfMonth(time_spine_src_28003.ts) AS ts__extract_day
+        , toDayOfWeek(time_spine_src_28003.ts) AS ts__extract_dow
+        , toDayOfYear(time_spine_src_28003.ts) AS ts__extract_doy
       FROM ***************************.mf_time_spine_second time_spine_src_28003
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_0
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_1
   WHERE subq_1.metric_time__second BETWEEN '2020-01-01 00:00:02' AND '2020-01-01 00:00:08'
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_2
 GROUP BY
-  subq_2.metric_time__second
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+  metric_time__second

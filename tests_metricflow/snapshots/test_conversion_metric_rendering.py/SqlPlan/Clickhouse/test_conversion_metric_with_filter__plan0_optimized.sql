@@ -10,11 +10,10 @@ WITH sma_28019_cte AS (
   -- Read Elements From Semantic Model 'visits_source'
   -- Metric Time Dimension 'ds'
   SELECT
-    DATE_TRUNC('day', ds) AS metric_time__day
+    date_trunc('day', ds) AS metric_time__day
     , user_id AS user
     , 1 AS visits
   FROM ***************************.fct_visits visits_source_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 SELECT
@@ -32,13 +31,10 @@ FROM (
       , sma_28019_cte.user
       , visits
     FROM sma_28019_cte sma_28019_cte
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_18
   WHERE metric_time__day = '2020-01-01'
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_21
-CROSS JOIN
-(
+CROSS JOIN (
   -- Find conversions for user within the range of INF
   -- Pass Only Elements: ['buys',]
   -- Aggregate Measures
@@ -87,26 +83,25 @@ CROSS JOIN
           , sma_28019_cte.user
           , visits
         FROM sma_28019_cte sma_28019_cte
-        SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
       ) subq_22
       WHERE metric_time__day = '2020-01-01'
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_24
-    CROSS JOIN
-    (
+    INNER JOIN (
       -- Read Elements From Semantic Model 'buys_source'
       -- Metric Time Dimension 'ds'
       -- Add column with generated UUID
       SELECT
-        DATE_TRUNC('day', ds) AS metric_time__day
+        date_trunc('day', ds) AS metric_time__day
         , user_id AS user
         , 1 AS buys
         , generateUUIDv4() AS mf_internal_uuid
       FROM ***************************.fct_buys buys_source_src_28000
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_27
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    ON
+      (
+        subq_24.user = subq_27.user
+      ) AND (
+        (subq_24.metric_time__day <= subq_27.metric_time__day)
+      )
   ) subq_28
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_31
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

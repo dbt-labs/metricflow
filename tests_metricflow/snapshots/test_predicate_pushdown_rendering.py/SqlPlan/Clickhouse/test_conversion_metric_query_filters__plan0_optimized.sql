@@ -9,12 +9,11 @@ WITH sma_28019_cte AS (
   -- Read Elements From Semantic Model 'visits_source'
   -- Metric Time Dimension 'ds'
   SELECT
-    DATE_TRUNC('day', ds) AS metric_time__day
+    date_trunc('day', ds) AS metric_time__day
     , user_id AS user
     , referrer_id AS visit__referrer_id
     , 1 AS visits
   FROM ***************************.fct_visits visits_source_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 , rss_28028_cte AS (
@@ -23,7 +22,6 @@ WITH sma_28019_cte AS (
     home_state_latest
     , user_id AS user
   FROM ***************************.dim_users_latest users_latest_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 SELECT
@@ -57,16 +55,13 @@ FROM (
         rss_28028_cte rss_28028_cte
       ON
         sma_28019_cte.user = rss_28028_cte.user
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_27
     WHERE visit__referrer_id = '123456'
     GROUP BY
       metric_time__day
       , user__home_state_latest
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_30
-  FULL OUTER JOIN
-  (
+  FULL OUTER JOIN (
     -- Find conversions for user within the range of 7 day
     -- Pass Only Elements: ['buys', 'user__home_state_latest', 'metric_time__day']
     -- Aggregate Measures
@@ -141,30 +136,34 @@ FROM (
             rss_28028_cte rss_28028_cte
           ON
             sma_28019_cte.user = rss_28028_cte.user
-          SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
         ) subq_34
         WHERE visit__referrer_id = '123456'
-        SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
       ) subq_36
-      CROSS JOIN
-      (
+      INNER JOIN (
         -- Read Elements From Semantic Model 'buys_source'
         -- Metric Time Dimension 'ds'
         -- Add column with generated UUID
         SELECT
-          DATE_TRUNC('day', ds) AS metric_time__day
+          date_trunc('day', ds) AS metric_time__day
           , user_id AS user
           , 1 AS buys
           , generateUUIDv4() AS mf_internal_uuid
         FROM ***************************.fct_buys buys_source_src_28000
-        SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
       ) subq_39
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+      ON
+        (
+          subq_36.user = subq_39.user
+        ) AND (
+          (
+            subq_36.metric_time__day <= subq_39.metric_time__day
+          ) AND (
+            subq_36.metric_time__day > DATEADD(day, -7, subq_39.metric_time__day)
+          )
+        )
     ) subq_40
     GROUP BY
       metric_time__day
       , user__home_state_latest
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_43
   ON
     (
@@ -173,8 +172,6 @@ FROM (
       subq_30.metric_time__day = subq_43.metric_time__day
     )
   GROUP BY
-    COALESCE(subq_30.metric_time__day, subq_43.metric_time__day)
-    , COALESCE(subq_30.user__home_state_latest, subq_43.user__home_state_latest)
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    metric_time__day
+    , user__home_state_latest
 ) subq_44
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

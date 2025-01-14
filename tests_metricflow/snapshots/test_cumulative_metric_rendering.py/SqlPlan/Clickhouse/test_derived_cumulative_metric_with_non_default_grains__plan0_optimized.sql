@@ -25,21 +25,23 @@ FROM (
       -- Aggregate Measures
       SELECT
         subq_13.ds AS metric_time__day
-        , DATE_TRUNC('week', subq_13.ds) AS metric_time__week
+        , date_trunc('week', subq_13.ds) AS metric_time__week
         , SUM(revenue_src_28000.revenue) AS txn_revenue
       FROM ***************************.mf_time_spine subq_13
-      CROSS JOIN
+      INNER JOIN
         ***************************.fct_revenue revenue_src_28000
+      ON
+        (
+          date_trunc('day', revenue_src_28000.created_at) <= subq_13.ds
+        ) AND (
+          date_trunc('day', revenue_src_28000.created_at) > DATEADD(month, -2, subq_13.ds)
+        )
       GROUP BY
-        subq_13.ds
-        , DATE_TRUNC('week', subq_13.ds)
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+        metric_time__day
+        , metric_time__week
     ) subq_16
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_18
   GROUP BY
     metric_time__week
     , t2mr
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_19
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

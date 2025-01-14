@@ -8,57 +8,58 @@ sql_engine: Clickhouse
 ---
 -- Re-aggregate Metric via Group By
 SELECT
-  booking__ds__month
-  , metric_time__week
+  metric_time__week
+  , booking__ds__month
   , every_two_days_bookers_fill_nulls_with_0
 FROM (
   -- Compute Metrics via Expressions
   -- Window Function for Metric Re-aggregation
   SELECT
-    booking__ds__month
-    , metric_time__week
+    metric_time__week
+    , booking__ds__month
     , FIRST_VALUE(COALESCE(bookers, 0)) OVER (
       PARTITION BY
-        booking__ds__month
-        , metric_time__week
+        metric_time__week
+        , booking__ds__month
       ORDER BY metric_time__day
       ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
     ) AS every_two_days_bookers_fill_nulls_with_0
   FROM (
     -- Join to Time Spine Dataset
     SELECT
-      DATE_TRUNC('month', time_spine_src_28006.ds) AS booking__ds__month
-      , DATE_TRUNC('week', time_spine_src_28006.ds) AS metric_time__week
-      , time_spine_src_28006.ds AS metric_time__day
+      time_spine_src_28006.ds AS metric_time__day
+      , date_trunc('week', time_spine_src_28006.ds) AS metric_time__week
+      , date_trunc('month', time_spine_src_28006.ds) AS booking__ds__month
       , subq_19.bookers AS bookers
     FROM ***************************.mf_time_spine time_spine_src_28006
-    LEFT OUTER JOIN
-    (
+    LEFT OUTER JOIN (
       -- Join Self Over Time Range
       -- Pass Only Elements: ['bookers', 'metric_time__week', 'booking__ds__month', 'metric_time__day']
       -- Aggregate Measures
       SELECT
-        DATE_TRUNC('month', subq_16.ds) AS booking__ds__month
+        date_trunc('month', subq_16.ds) AS booking__ds__month
         , subq_16.ds AS metric_time__day
-        , DATE_TRUNC('week', subq_16.ds) AS metric_time__week
+        , date_trunc('week', subq_16.ds) AS metric_time__week
         , COUNT(DISTINCT bookings_source_src_28000.guest_id) AS bookers
       FROM ***************************.mf_time_spine subq_16
-      CROSS JOIN
+      INNER JOIN
         ***************************.fct_bookings bookings_source_src_28000
+      ON
+        (
+          date_trunc('day', bookings_source_src_28000.ds) <= subq_16.ds
+        ) AND (
+          date_trunc('day', bookings_source_src_28000.ds) > DATEADD(day, -2, subq_16.ds)
+        )
       GROUP BY
-        DATE_TRUNC('month', subq_16.ds)
-        , subq_16.ds
-        , DATE_TRUNC('week', subq_16.ds)
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+        booking__ds__month
+        , metric_time__day
+        , metric_time__week
     ) subq_19
     ON
       time_spine_src_28006.ds = subq_19.metric_time__day
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_23
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_25
 GROUP BY
-  booking__ds__month
-  , metric_time__week
+  metric_time__week
+  , booking__ds__month
   , every_two_days_bookers_fill_nulls_with_0
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

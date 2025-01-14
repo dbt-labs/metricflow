@@ -16,7 +16,6 @@ WITH sma_28009_cte AS (
     , booking_value
     , guest_id AS bookers
   FROM ***************************.fct_bookings bookings_source_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 SELECT
@@ -33,10 +32,8 @@ FROM (
       , booking_value
       , bookers
     FROM sma_28009_cte sma_28009_cte
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_13
-  LEFT OUTER JOIN
-  (
+  LEFT OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
     -- Pass Only Elements: ['booking_value', 'guest']
     -- Aggregate Measures
@@ -48,11 +45,8 @@ FROM (
     FROM sma_28009_cte sma_28009_cte
     GROUP BY
       guest
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_18
   ON
     subq_13.guest = subq_18.guest
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_19
 WHERE guest__booking_value > 1.00
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

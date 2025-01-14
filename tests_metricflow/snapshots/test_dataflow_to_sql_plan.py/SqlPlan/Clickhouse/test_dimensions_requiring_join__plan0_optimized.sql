@@ -15,6 +15,5 @@ FULL OUTER JOIN
 ON
   listings_latest_src_28000.user_id = users_latest_src_28000.user_id
 GROUP BY
-  listings_latest_src_28000.is_lux
-  , users_latest_src_28000.home_state_latest
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+  listing__is_lux_latest
+  , user__home_state_latest

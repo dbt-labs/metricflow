@@ -7,10 +7,9 @@ WITH sma_28009_cte AS (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
   SELECT
-    DATE_TRUNC('day', ds) AS metric_time__day
+    date_trunc('day', ds) AS metric_time__day
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 SELECT
@@ -36,15 +35,12 @@ FROM (
         metric_time__day
         , bookings
       FROM sma_28009_cte sma_28009_cte
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_18
     WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'
     GROUP BY
       metric_time__day
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_22
-  FULL OUTER JOIN
-  (
+  FULL OUTER JOIN (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['bookings', 'metric_time__day']
     -- Aggregate Measures
@@ -61,18 +57,14 @@ FROM (
       INNER JOIN
         sma_28009_cte sma_28009_cte
       ON
-        addDays(time_spine_src_28006.ds, CAST(-14 AS Integer)) = sma_28009_cte.metric_time__day
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+        DATEADD(day, -14, time_spine_src_28006.ds) = sma_28009_cte.metric_time__day
     ) subq_27
     WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'
     GROUP BY
       metric_time__day
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_31
   ON
     subq_22.metric_time__day = subq_31.metric_time__day
   GROUP BY
-    COALESCE(subq_22.metric_time__day, subq_31.metric_time__day)
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    metric_time__day
 ) subq_32
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

@@ -13,7 +13,6 @@ WITH rss_28001_cte AS (
     , guest_id AS bookers
     , is_instant
   FROM ***************************.fct_bookings bookings_source_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 SELECT
@@ -31,10 +30,8 @@ FROM (
   FROM rss_28001_cte rss_28001_cte
   GROUP BY
     is_instant
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_8
-FULL OUTER JOIN
-(
+FULL OUTER JOIN (
   -- Read From CTE For node_id=rss_28001
   -- Pass Only Elements: ['instant_bookings', 'bookers', 'is_instant']
   -- Aggregate Measures
@@ -45,10 +42,8 @@ FULL OUTER JOIN
   FROM rss_28001_cte rss_28001_cte
   GROUP BY
     is_instant
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_11
 ON
   subq_8.is_instant = subq_11.is_instant
 GROUP BY
-  COALESCE(subq_8.is_instant, subq_11.is_instant)
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+  is_instant

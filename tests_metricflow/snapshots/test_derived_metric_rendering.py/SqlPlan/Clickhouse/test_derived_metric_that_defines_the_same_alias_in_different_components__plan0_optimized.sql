@@ -14,7 +14,6 @@ WITH sma_28009_cte AS (
     , 1 AS bookings
     , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 SELECT
@@ -37,12 +36,9 @@ FROM (
     FROM sma_28009_cte sma_28009_cte
     GROUP BY
       booking__is_instant
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_17
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_18
-FULL OUTER JOIN
-(
+FULL OUTER JOIN (
   -- Compute Metrics via Expressions
   SELECT
     booking__is_instant
@@ -58,13 +54,10 @@ FULL OUTER JOIN
     FROM sma_28009_cte sma_28009_cte
     GROUP BY
       booking__is_instant
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_22
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_23
 ON
   subq_18.booking__is_instant = subq_23.booking__is_instant
 GROUP BY
-  COALESCE(subq_18.booking__is_instant, subq_23.booking__is_instant)
+  booking__is_instant
 LIMIT 1
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

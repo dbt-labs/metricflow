@@ -10,13 +10,12 @@ WITH ctr_0_cte AS (
   -- Metric Time Dimension 'ds'
   -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-02T00:00:00]
   SELECT
-    DATE_TRUNC('day', ds) AS metric_time__day
+    date_trunc('day', ds) AS metric_time__day
     , user_id AS user
     , referrer_id AS visit__referrer_id
     , 1 AS visits
   FROM ***************************.fct_visits visits_source_src_28000
-  WHERE DATE_TRUNC('day', ds) BETWEEN '2020-01-01' AND '2020-01-02'
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+  WHERE date_trunc('day', ds) BETWEEN '2020-01-01' AND '2020-01-02'
 )
 
 SELECT
@@ -46,16 +45,13 @@ FROM (
         , visit__referrer_id
         , visits
       FROM ctr_0_cte ctr_0_cte
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_21
     WHERE visit__referrer_id = 'ref_id_01'
     GROUP BY
       metric_time__day
       , visit__referrer_id
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_24
-  FULL OUTER JOIN
-  (
+  FULL OUTER JOIN (
     -- Find conversions for user within the range of 7 day
     -- Pass Only Elements: ['buys', 'visit__referrer_id', 'metric_time__day']
     -- Aggregate Measures
@@ -116,30 +112,34 @@ FROM (
             , visit__referrer_id
             , visits
           FROM ctr_0_cte ctr_0_cte
-          SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
         ) subq_25
         WHERE visit__referrer_id = 'ref_id_01'
-        SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
       ) subq_27
-      CROSS JOIN
-      (
+      INNER JOIN (
         -- Read Elements From Semantic Model 'buys_source'
         -- Metric Time Dimension 'ds'
         -- Add column with generated UUID
         SELECT
-          DATE_TRUNC('day', ds) AS metric_time__day
+          date_trunc('day', ds) AS metric_time__day
           , user_id AS user
           , 1 AS buys
           , generateUUIDv4() AS mf_internal_uuid
         FROM ***************************.fct_buys buys_source_src_28000
-        SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
       ) subq_30
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+      ON
+        (
+          subq_27.user = subq_30.user
+        ) AND (
+          (
+            subq_27.metric_time__day <= subq_30.metric_time__day
+          ) AND (
+            subq_27.metric_time__day > DATEADD(day, -7, subq_30.metric_time__day)
+          )
+        )
     ) subq_31
     GROUP BY
       metric_time__day
       , visit__referrer_id
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_34
   ON
     (
@@ -148,8 +148,6 @@ FROM (
       subq_24.metric_time__day = subq_34.metric_time__day
     )
   GROUP BY
-    COALESCE(subq_24.metric_time__day, subq_34.metric_time__day)
-    , COALESCE(subq_24.visit__referrer_id, subq_34.visit__referrer_id)
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    metric_time__day
+    , visit__referrer_id
 ) subq_35
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

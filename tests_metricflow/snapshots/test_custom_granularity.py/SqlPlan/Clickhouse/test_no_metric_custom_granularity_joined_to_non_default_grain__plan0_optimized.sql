@@ -9,7 +9,7 @@ sql_engine: Clickhouse
 SELECT
   subq_12.martian_day AS user__bio_added_ts__martian_day
   , subq_11.martian_day AS metric_time__martian_day
-  , DATE_TRUNC('month', users_ds_source_src_28000.bio_added_ts) AS user__bio_added_ts__month
+  , date_trunc('month', users_ds_source_src_28000.bio_added_ts) AS user__bio_added_ts__month
   , time_spine_src_28006.ds AS metric_time__day
 FROM ***************************.dim_users users_ds_source_src_28000
 CROSS JOIN
@@ -21,10 +21,9 @@ ON
 LEFT OUTER JOIN
   ***************************.mf_time_spine subq_12
 ON
-  DATE_TRUNC('day', users_ds_source_src_28000.bio_added_ts) = subq_12.ds
+  date_trunc('day', users_ds_source_src_28000.bio_added_ts) = subq_12.ds
 GROUP BY
-  subq_12.martian_day
-  , subq_11.martian_day
-  , DATE_TRUNC('month', users_ds_source_src_28000.bio_added_ts)
-  , time_spine_src_28006.ds
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+  user__bio_added_ts__martian_day
+  , metric_time__martian_day
+  , user__bio_added_ts__month
+  , metric_time__day

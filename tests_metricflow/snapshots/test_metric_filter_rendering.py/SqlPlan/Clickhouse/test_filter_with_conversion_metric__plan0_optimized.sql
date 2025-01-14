@@ -10,11 +10,10 @@ WITH sma_28019_cte AS (
   -- Read Elements From Semantic Model 'visits_source'
   -- Metric Time Dimension 'ds'
   SELECT
-    DATE_TRUNC('day', ds) AS metric_time__day
+    date_trunc('day', ds) AS metric_time__day
     , user_id AS user
     , 1 AS visits
   FROM ***************************.fct_visits visits_source_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 SELECT
@@ -31,10 +30,8 @@ FROM (
       user_id AS user
       , 1 AS listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_24
-  LEFT OUTER JOIN
-  (
+  LEFT OUTER JOIN (
     -- Combine Aggregated Outputs
     SELECT
       COALESCE(subq_28.user, subq_37.user) AS user
@@ -49,11 +46,9 @@ FROM (
         , SUM(visits) AS visits
       FROM sma_28019_cte sma_28019_cte
       GROUP BY
-        sma_28019_cte.user
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+        user
     ) subq_28
-    FULL OUTER JOIN
-    (
+    FULL OUTER JOIN (
       -- Find conversions for user within the range of INF
       -- Pass Only Elements: ['buys', 'user']
       -- Aggregate Measures
@@ -90,34 +85,33 @@ FROM (
           , subq_33.mf_internal_uuid AS mf_internal_uuid
           , subq_33.buys AS buys
         FROM sma_28019_cte sma_28019_cte
-        CROSS JOIN
-        (
+        INNER JOIN (
           -- Read Elements From Semantic Model 'buys_source'
           -- Metric Time Dimension 'ds'
           -- Add column with generated UUID
           SELECT
-            DATE_TRUNC('day', ds) AS metric_time__day
+            date_trunc('day', ds) AS metric_time__day
             , user_id AS user
             , 1 AS buys
             , generateUUIDv4() AS mf_internal_uuid
           FROM ***************************.fct_buys buys_source_src_28000
-          SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
         ) subq_33
-        SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+        ON
+          (
+            sma_28019_cte.user = subq_33.user
+          ) AND (
+            (sma_28019_cte.metric_time__day <= subq_33.metric_time__day)
+          )
       ) subq_34
       GROUP BY
-        subq_34.user
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+        user
     ) subq_37
     ON
       subq_28.user = subq_37.user
     GROUP BY
-      COALESCE(subq_28.user, subq_37.user)
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+      user
   ) subq_38
   ON
     subq_24.user = subq_38.user
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_41
 WHERE user__visit_buy_conversion_rate > 2
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

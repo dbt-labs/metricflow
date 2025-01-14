@@ -5,4 +5,4 @@ docstring:
 ---
 visit__referrer_id      visit_buy_conversion_rate
 --------------------  ---------------------------
-fb_ad_1                                         4
+fb_ad_1                                       1.5

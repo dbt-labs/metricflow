@@ -22,20 +22,23 @@ FROM (
       , subq_13.ds AS metric_time__day
       , SUM(revenue_src_28000.revenue) AS txn_revenue
     FROM ***************************.mf_time_spine subq_13
-    CROSS JOIN
+    INNER JOIN
       ***************************.fct_revenue revenue_src_28000
+    ON
+      (
+        date_trunc('day', revenue_src_28000.created_at) <= subq_13.ds
+      ) AND (
+        date_trunc('day', revenue_src_28000.created_at) > DATEADD(month, -2, subq_13.ds)
+      )
     LEFT OUTER JOIN
       ***************************.mf_time_spine subq_14
     ON
       subq_13.ds = subq_14.ds
     GROUP BY
-      subq_14.martian_day
-      , subq_13.ds
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+      metric_time__martian_day
+      , metric_time__day
   ) subq_17
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_19
 GROUP BY
   metric_time__martian_day
   , trailing_2_months_revenue
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

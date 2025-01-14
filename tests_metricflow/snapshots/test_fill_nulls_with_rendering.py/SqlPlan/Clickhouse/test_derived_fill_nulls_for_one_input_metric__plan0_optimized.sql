@@ -7,10 +7,9 @@ WITH sma_28009_cte AS (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
   SELECT
-    DATE_TRUNC('day', ds) AS metric_time__day
+    date_trunc('day', ds) AS metric_time__day
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 , rss_28018_cte AS (
@@ -18,7 +17,6 @@ WITH sma_28009_cte AS (
   SELECT
     ds AS ds__day
   FROM ***************************.mf_time_spine time_spine_src_28006
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 SELECT
@@ -41,8 +39,7 @@ FROM (
         rss_28018_cte.ds__day AS metric_time__day
         , subq_22.bookings AS bookings
       FROM rss_28018_cte rss_28018_cte
-      LEFT OUTER JOIN
-      (
+      LEFT OUTER JOIN (
         -- Read From CTE For node_id=sma_28009
         -- Pass Only Elements: ['bookings', 'metric_time__day']
         -- Aggregate Measures
@@ -52,16 +49,12 @@ FROM (
         FROM sma_28009_cte sma_28009_cte
         GROUP BY
           metric_time__day
-        SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
       ) subq_22
       ON
         rss_28018_cte.ds__day = subq_22.metric_time__day
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_26
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_27
-  FULL OUTER JOIN
-  (
+  FULL OUTER JOIN (
     -- Join to Time Spine Dataset
     -- Pass Only Elements: ['bookings', 'metric_time__day']
     -- Aggregate Measures
@@ -73,15 +66,12 @@ FROM (
     INNER JOIN
       sma_28009_cte sma_28009_cte
     ON
-      addDays(rss_28018_cte.ds__day, CAST(-14 AS Integer)) = sma_28009_cte.metric_time__day
+      DATEADD(day, -14, rss_28018_cte.ds__day) = sma_28009_cte.metric_time__day
     GROUP BY
-      rss_28018_cte.ds__day
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+      metric_time__day
   ) subq_35
   ON
     subq_27.metric_time__day = subq_35.metric_time__day
   GROUP BY
-    COALESCE(subq_27.metric_time__day, subq_35.metric_time__day)
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    metric_time__day
 ) subq_36
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

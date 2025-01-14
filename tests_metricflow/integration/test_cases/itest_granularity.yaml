@@ -268,7 +268,7 @@ integration_test:
         FROM {{ source_schema }}.fct_bookings_extended
         WHERE
           {{ render_time_constraint("ds", "2020-01-01", "2020-02-29") }}
-        GROUP BY {{ render_date_trunc("ds", TimeGranularity.MONTH) }}
+        GROUP BY {{ render_date_trunc("ds", TimeGranularity.MONTH) }} as ds
       ) b
       ON a.ds = b.ds
       ) c

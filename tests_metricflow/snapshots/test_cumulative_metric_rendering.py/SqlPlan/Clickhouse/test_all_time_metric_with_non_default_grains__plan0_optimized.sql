@@ -30,22 +30,23 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       subq_12.ds AS metric_time__day
-      , DATE_TRUNC('week', subq_12.ds) AS metric_time__week
-      , DATE_TRUNC('quarter', subq_12.ds) AS metric_time__quarter
+      , date_trunc('week', subq_12.ds) AS metric_time__week
+      , date_trunc('quarter', subq_12.ds) AS metric_time__quarter
       , SUM(revenue_src_28000.revenue) AS revenue_all_time
     FROM ***************************.mf_time_spine subq_12
-    CROSS JOIN
+    INNER JOIN
       ***************************.fct_revenue revenue_src_28000
+    ON
+      (
+        date_trunc('day', revenue_src_28000.created_at) <= subq_12.ds
+      )
     GROUP BY
-      subq_12.ds
-      , DATE_TRUNC('week', subq_12.ds)
-      , DATE_TRUNC('quarter', subq_12.ds)
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+      metric_time__day
+      , metric_time__week
+      , metric_time__quarter
   ) subq_16
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_17
 GROUP BY
   metric_time__week
   , metric_time__quarter
   , revenue_all_time
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

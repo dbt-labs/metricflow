@@ -15,10 +15,8 @@ FROM (
   SELECT
     SUM(1) AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_15
-CROSS JOIN
-(
+CROSS JOIN (
   -- Read Elements From Semantic Model 'listings_latest'
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements: ['listings',]
@@ -27,6 +25,4 @@ CROSS JOIN
   SELECT
     SUM(1) AS listings
   FROM ***************************.dim_listings_latest listings_latest_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_20
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

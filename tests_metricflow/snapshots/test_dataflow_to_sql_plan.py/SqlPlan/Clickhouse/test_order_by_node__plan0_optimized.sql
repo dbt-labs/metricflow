@@ -15,14 +15,12 @@ FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Pass Only Elements: ['bookings', 'is_instant', 'ds__day']
   SELECT
-    DATE_TRUNC('day', ds) AS ds__day
+    date_trunc('day', ds) AS ds__day
     , is_instant
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_5
 GROUP BY
   ds__day
   , is_instant
 ORDER BY ds__day, bookings DESC
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

@@ -16,11 +16,9 @@ FROM (
   SELECT
     SUM(1) AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-  WHERE DATE_TRUNC('day', ds) BETWEEN '2020-01-01' AND '2020-01-01'
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+  WHERE date_trunc('day', ds) BETWEEN '2020-01-01' AND '2020-01-01'
 ) subq_17
-CROSS JOIN
-(
+CROSS JOIN (
   -- Read Elements From Semantic Model 'listings_latest'
   -- Metric Time Dimension 'ds'
   -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-01T00:00:00]
@@ -30,7 +28,5 @@ CROSS JOIN
   SELECT
     SUM(1) AS listings
   FROM ***************************.dim_listings_latest listings_latest_src_28000
-  WHERE DATE_TRUNC('day', created_at) BETWEEN '2020-01-01' AND '2020-01-01'
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+  WHERE date_trunc('day', created_at) BETWEEN '2020-01-01' AND '2020-01-01'
 ) subq_23
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

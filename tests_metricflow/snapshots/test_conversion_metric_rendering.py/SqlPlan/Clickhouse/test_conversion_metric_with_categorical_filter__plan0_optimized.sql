@@ -9,12 +9,11 @@ WITH sma_28019_cte AS (
   -- Read Elements From Semantic Model 'visits_source'
   -- Metric Time Dimension 'ds'
   SELECT
-    DATE_TRUNC('day', ds) AS metric_time__day
+    date_trunc('day', ds) AS metric_time__day
     , user_id AS user
     , referrer_id AS visit__referrer_id
     , 1 AS visits
   FROM ***************************.fct_visits visits_source_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 SELECT
@@ -44,16 +43,13 @@ FROM (
         , visit__referrer_id
         , visits
       FROM sma_28019_cte sma_28019_cte
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_18
     WHERE visit__referrer_id = 'ref_id_01'
     GROUP BY
       metric_time__day
       , visit__referrer_id
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_21
-  FULL OUTER JOIN
-  (
+  FULL OUTER JOIN (
     -- Find conversions for user within the range of INF
     -- Pass Only Elements: ['buys', 'visit__referrer_id', 'metric_time__day']
     -- Aggregate Measures
@@ -114,30 +110,30 @@ FROM (
             , visit__referrer_id
             , visits
           FROM sma_28019_cte sma_28019_cte
-          SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
         ) subq_22
         WHERE visit__referrer_id = 'ref_id_01'
-        SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
       ) subq_24
-      CROSS JOIN
-      (
+      INNER JOIN (
         -- Read Elements From Semantic Model 'buys_source'
         -- Metric Time Dimension 'ds'
         -- Add column with generated UUID
         SELECT
-          DATE_TRUNC('day', ds) AS metric_time__day
+          date_trunc('day', ds) AS metric_time__day
           , user_id AS user
           , 1 AS buys
           , generateUUIDv4() AS mf_internal_uuid
         FROM ***************************.fct_buys buys_source_src_28000
-        SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
       ) subq_27
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+      ON
+        (
+          subq_24.user = subq_27.user
+        ) AND (
+          (subq_24.metric_time__day <= subq_27.metric_time__day)
+        )
     ) subq_28
     GROUP BY
       metric_time__day
       , visit__referrer_id
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_31
   ON
     (
@@ -146,8 +142,6 @@ FROM (
       subq_21.metric_time__day = subq_31.metric_time__day
     )
   GROUP BY
-    COALESCE(subq_21.metric_time__day, subq_31.metric_time__day)
-    , COALESCE(subq_21.visit__referrer_id, subq_31.visit__referrer_id)
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    metric_time__day
+    , visit__referrer_id
 ) subq_32
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

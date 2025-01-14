@@ -9,11 +9,10 @@ WITH sma_28019_cte AS (
   -- Read Elements From Semantic Model 'visits_source'
   -- Metric Time Dimension 'ds'
   SELECT
-    DATE_TRUNC('day', ds) AS metric_time__day
+    date_trunc('day', ds) AS metric_time__day
     , user_id AS user
     , 1 AS visits
   FROM ***************************.fct_visits visits_source_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 , rss_28018_cte AS (
@@ -21,7 +20,6 @@ WITH sma_28019_cte AS (
   SELECT
     ds AS ds__day
   FROM ***************************.mf_time_spine time_spine_src_28006
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 SELECT
@@ -39,8 +37,7 @@ FROM (
       rss_28018_cte.ds__day AS metric_time__day
       , subq_26.visits AS visits
     FROM rss_28018_cte rss_28018_cte
-    LEFT OUTER JOIN
-    (
+    LEFT OUTER JOIN (
       -- Read From CTE For node_id=sma_28019
       -- Pass Only Elements: ['visits', 'metric_time__day']
       -- Aggregate Measures
@@ -50,21 +47,17 @@ FROM (
       FROM sma_28019_cte sma_28019_cte
       GROUP BY
         metric_time__day
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_26
     ON
       rss_28018_cte.ds__day = subq_26.metric_time__day
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_30
-  FULL OUTER JOIN
-  (
+  FULL OUTER JOIN (
     -- Join to Time Spine Dataset
     SELECT
       rss_28018_cte.ds__day AS metric_time__day
       , subq_39.buys AS buys
     FROM rss_28018_cte rss_28018_cte
-    LEFT OUTER JOIN
-    (
+    LEFT OUTER JOIN (
       -- Find conversions for user within the range of 7 day
       -- Pass Only Elements: ['buys', 'metric_time__day']
       -- Aggregate Measures
@@ -101,33 +94,36 @@ FROM (
           , subq_35.mf_internal_uuid AS mf_internal_uuid
           , subq_35.buys AS buys
         FROM sma_28019_cte sma_28019_cte
-        CROSS JOIN
-        (
+        INNER JOIN (
           -- Read Elements From Semantic Model 'buys_source'
           -- Metric Time Dimension 'ds'
           -- Add column with generated UUID
           SELECT
-            DATE_TRUNC('day', ds) AS metric_time__day
+            date_trunc('day', ds) AS metric_time__day
             , user_id AS user
             , 1 AS buys
             , generateUUIDv4() AS mf_internal_uuid
           FROM ***************************.fct_buys buys_source_src_28000
-          SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
         ) subq_35
-        SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+        ON
+          (
+            sma_28019_cte.user = subq_35.user
+          ) AND (
+            (
+              sma_28019_cte.metric_time__day <= subq_35.metric_time__day
+            ) AND (
+              sma_28019_cte.metric_time__day > DATEADD(day, -7, subq_35.metric_time__day)
+            )
+          )
       ) subq_36
       GROUP BY
         metric_time__day
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_39
     ON
       rss_28018_cte.ds__day = subq_39.metric_time__day
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_43
   ON
     subq_30.metric_time__day = subq_43.metric_time__day
   GROUP BY
-    COALESCE(subq_30.metric_time__day, subq_43.metric_time__day)
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    metric_time__day
 ) subq_44
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

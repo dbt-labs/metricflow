@@ -10,10 +10,9 @@ WITH rss_28020_cte AS (
   SELECT
     1 AS bookings
     , booking_value AS booking_payments
-    , DATE_TRUNC('day', ds) AS ds__day
-    , DATE_TRUNC('day', paid_at) AS paid_at__day
+    , date_trunc('day', ds) AS ds__day
+    , date_trunc('day', paid_at) AS paid_at__day
   FROM ***************************.fct_bookings bookings_source_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 SELECT
@@ -31,11 +30,9 @@ FROM (
     , SUM(bookings) AS bookings
   FROM rss_28020_cte rss_28020_cte
   GROUP BY
-    ds__day
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    metric_time__day
 ) subq_14
-FULL OUTER JOIN
-(
+FULL OUTER JOIN (
   -- Read From CTE For node_id=rss_28020
   -- Metric Time Dimension 'paid_at'
   -- Pass Only Elements: ['booking_payments', 'metric_time__day']
@@ -46,11 +43,9 @@ FULL OUTER JOIN
     , SUM(booking_payments) AS booking_payments
   FROM rss_28020_cte rss_28020_cte
   GROUP BY
-    paid_at__day
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    metric_time__day
 ) subq_19
 ON
   subq_14.metric_time__day = subq_19.metric_time__day
 GROUP BY
-  COALESCE(subq_14.metric_time__day, subq_19.metric_time__day)
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+  metric_time__day

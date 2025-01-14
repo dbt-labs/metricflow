@@ -6,8 +6,7 @@ sql_engine: Clickhouse
 -- Metric Time Dimension 'ds'
 -- Pass Only Elements: ['metric_time__quarter',]
 SELECT
-  DATE_TRUNC('quarter', ds) AS metric_time__quarter
+  date_trunc('quarter', ds) AS metric_time__quarter
 FROM ***************************.mf_time_spine time_spine_src_28006
 GROUP BY
-  DATE_TRUNC('quarter', ds)
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+  metric_time__quarter

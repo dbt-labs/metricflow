@@ -8,8 +8,7 @@ SELECT
   time_spine_src_28005.ts AS metric_time__hour
   , subq_11.archived_users AS subdaily_join_to_time_spine_metric
 FROM ***************************.mf_time_spine_hour time_spine_src_28005
-LEFT OUTER JOIN
-(
+LEFT OUTER JOIN (
   -- Aggregate Measures
   SELECT
     metric_time__hour
@@ -19,15 +18,12 @@ LEFT OUTER JOIN
     -- Metric Time Dimension 'archived_at'
     -- Pass Only Elements: ['archived_users', 'metric_time__hour']
     SELECT
-      DATE_TRUNC('hour', archived_at) AS metric_time__hour
+      date_trunc('hour', archived_at) AS metric_time__hour
       , 1 AS archived_users
     FROM ***************************.dim_users users_ds_source_src_28000
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_10
   GROUP BY
     metric_time__hour
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_11
 ON
   time_spine_src_28005.ts = subq_11.metric_time__hour
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

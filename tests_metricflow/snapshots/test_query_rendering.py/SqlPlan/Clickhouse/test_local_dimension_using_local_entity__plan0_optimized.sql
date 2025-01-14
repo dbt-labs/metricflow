@@ -15,8 +15,6 @@ FROM (
     country AS listing__country_latest
     , 1 AS listings
   FROM ***************************.dim_listings_latest listings_latest_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_6
 GROUP BY
   listing__country_latest
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

@@ -12,10 +12,8 @@ FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Pass Only Elements: ['booking__paid_at__quarter',]
   SELECT
-    DATE_TRUNC('quarter', paid_at) AS booking__paid_at__quarter
+    date_trunc('quarter', paid_at) AS booking__paid_at__quarter
   FROM ***************************.fct_bookings bookings_source_src_28000
   GROUP BY
-    DATE_TRUNC('quarter', paid_at)
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    booking__paid_at__quarter
 ) subq_3
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

@@ -23,19 +23,16 @@ FROM (
       -- Change Column Aliases
       SELECT
         ds AS metric_time__day
-        , DATE_TRUNC('week', ds) AS metric_time__week
+        , date_trunc('week', ds) AS metric_time__week
       FROM ***************************.mf_time_spine time_spine_src_28006
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_20
     WHERE (
       metric_time__day BETWEEN '2020-01-03' AND '2020-01-05'
     ) AND (
       metric_time__week > '2020-01-01'
     )
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_23
-  LEFT OUTER JOIN
-  (
+  LEFT OUTER JOIN (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['bookings', 'metric_time__day']
     -- Aggregate Measures
@@ -47,21 +44,17 @@ FROM (
       -- Metric Time Dimension 'ds'
       -- Constrain Time Range to [2020-01-03T00:00:00, 2020-01-05T00:00:00]
       SELECT
-        DATE_TRUNC('day', ds) AS metric_time__day
-        , DATE_TRUNC('week', ds) AS metric_time__week
+        date_trunc('day', ds) AS metric_time__day
+        , date_trunc('week', ds) AS metric_time__week
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-      WHERE DATE_TRUNC('day', ds) BETWEEN '2020-01-03' AND '2020-01-05'
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+      WHERE date_trunc('day', ds) BETWEEN '2020-01-03' AND '2020-01-05'
     ) subq_15
     WHERE metric_time__week > '2020-01-01'
     GROUP BY
       metric_time__day
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_18
   ON
     subq_23.metric_time__day = subq_18.metric_time__day
   WHERE subq_23.metric_time__day BETWEEN '2020-01-03' AND '2020-01-05'
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_25
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

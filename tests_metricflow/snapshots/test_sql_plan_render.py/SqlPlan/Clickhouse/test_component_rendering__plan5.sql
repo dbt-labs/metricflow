@@ -19,6 +19,5 @@ LEFT OUTER JOIN
 ON
   a.user_id = c.user_id
 GROUP BY
-  b.country
-  , c.country
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+  user__country
+  , listing__country

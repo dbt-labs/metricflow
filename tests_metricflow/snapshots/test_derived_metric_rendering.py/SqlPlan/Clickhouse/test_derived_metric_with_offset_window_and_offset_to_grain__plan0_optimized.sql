@@ -7,10 +7,9 @@ WITH sma_28009_cte AS (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
   SELECT
-    DATE_TRUNC('day', ds) AS metric_time__day
+    date_trunc('day', ds) AS metric_time__day
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 , rss_28018_cte AS (
@@ -18,7 +17,6 @@ WITH sma_28009_cte AS (
   SELECT
     ds AS ds__day
   FROM ***************************.mf_time_spine time_spine_src_28006
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 SELECT
@@ -42,13 +40,11 @@ FROM (
     INNER JOIN
       sma_28009_cte sma_28009_cte
     ON
-      DATE_TRUNC('month', rss_28018_cte.ds__day) = sma_28009_cte.metric_time__day
+      date_trunc('month', rss_28018_cte.ds__day) = sma_28009_cte.metric_time__day
     GROUP BY
-      rss_28018_cte.ds__day
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+      metric_time__day
   ) subq_27
-  FULL OUTER JOIN
-  (
+  FULL OUTER JOIN (
     -- Join to Time Spine Dataset
     -- Pass Only Elements: ['bookings', 'metric_time__day']
     -- Aggregate Measures
@@ -60,15 +56,12 @@ FROM (
     INNER JOIN
       sma_28009_cte sma_28009_cte
     ON
-      addMonths(rss_28018_cte.ds__day, CAST(-1 AS Integer)) = sma_28009_cte.metric_time__day
+      DATEADD(month, -1, rss_28018_cte.ds__day) = sma_28009_cte.metric_time__day
     GROUP BY
-      rss_28018_cte.ds__day
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+      metric_time__day
   ) subq_35
   ON
     subq_27.metric_time__day = subq_35.metric_time__day
   GROUP BY
-    COALESCE(subq_27.metric_time__day, subq_35.metric_time__day)
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    metric_time__day
 ) subq_36
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

@@ -12,7 +12,6 @@ WITH sma_28014_cte AS (
     listing_id AS listing
     , country AS country_latest
   FROM ***************************.dim_listings_latest listings_latest_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 SELECT
@@ -39,23 +38,20 @@ FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
       SELECT
-        DATE_TRUNC('day', ds) AS ds__day
+        date_trunc('day', ds) AS ds__day
         , listing_id AS listing
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_20
     LEFT OUTER JOIN
       sma_28014_cte sma_28014_cte
     ON
       subq_20.listing = sma_28014_cte.listing
     GROUP BY
-      subq_20.ds__day
-      , sma_28014_cte.country_latest
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+      ds__day
+      , listing__country_latest
   ) subq_27
-  FULL OUTER JOIN
-  (
+  FULL OUTER JOIN (
     -- Join Standard Outputs
     -- Pass Only Elements: ['views', 'listing__country_latest', 'ds__day']
     -- Aggregate Measures
@@ -68,20 +64,18 @@ FROM (
       -- Read Elements From Semantic Model 'views_source'
       -- Metric Time Dimension 'ds'
       SELECT
-        DATE_TRUNC('day', ds) AS ds__day
+        date_trunc('day', ds) AS ds__day
         , listing_id AS listing
         , 1 AS views
       FROM ***************************.fct_views views_source_src_28000
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_29
     LEFT OUTER JOIN
       sma_28014_cte sma_28014_cte
     ON
       subq_29.listing = sma_28014_cte.listing
     GROUP BY
-      subq_29.ds__day
-      , sma_28014_cte.country_latest
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+      ds__day
+      , listing__country_latest
   ) subq_35
   ON
     (
@@ -90,8 +84,6 @@ FROM (
       subq_27.ds__day = subq_35.ds__day
     )
   GROUP BY
-    COALESCE(subq_27.ds__day, subq_35.ds__day)
-    , COALESCE(subq_27.listing__country_latest, subq_35.listing__country_latest)
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    ds__day
+    , listing__country_latest
 ) subq_36
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

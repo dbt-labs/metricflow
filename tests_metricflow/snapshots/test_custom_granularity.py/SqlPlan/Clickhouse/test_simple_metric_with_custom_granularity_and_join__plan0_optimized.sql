@@ -17,7 +17,6 @@ FROM (
     listing_id AS listing
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_10
 LEFT OUTER JOIN
   ***************************.dim_listings_latest listings_latest_src_28000
@@ -26,7 +25,6 @@ ON
 LEFT OUTER JOIN
   ***************************.mf_time_spine subq_14
 ON
-  DATE_TRUNC('day', listings_latest_src_28000.created_at) = subq_14.ds
+  date_trunc('day', listings_latest_src_28000.created_at) = subq_14.ds
 GROUP BY
-  subq_14.martian_day
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+  listing__ds__martian_day

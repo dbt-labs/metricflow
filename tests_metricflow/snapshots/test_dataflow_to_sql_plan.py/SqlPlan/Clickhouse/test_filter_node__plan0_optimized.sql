@@ -9,4 +9,3 @@ sql_engine: Clickhouse
 SELECT
   1 AS bookings
 FROM ***************************.fct_bookings bookings_source_src_28000
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

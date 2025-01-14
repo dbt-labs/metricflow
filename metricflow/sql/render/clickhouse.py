@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import textwrap
 from typing import Collection, Optional, Sequence
 
@@ -16,7 +17,8 @@ from metricflow_semantics.sql.sql_exprs import (
     SqlIntegerExpression,
     SqlPercentileExpression,
     SqlPercentileFunctionType,
-    SqlSubtractTimeIntervalExpression,
+    SqlSubtractTimeIntervalExpression, SqlExpressionNode, SqlExtractExpression, SqlDateTruncExpression,
+    SqlCastToTimestampExpression,
 )
 from typing_extensions import override
 
@@ -28,7 +30,8 @@ from metricflow.sql.render.expr_renderer import (
 )
 from metricflow.sql.render.rendering_constants import SqlRenderingConstants
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer, SqlPlanRenderResult
-from metricflow.sql.sql_plan import SqlJoinDescription
+from metricflow.sql.sql_plan import SqlJoinDescription, SqlSelectColumn
+from metricflow_semantics.sql.sql_join_type import SqlJoinType
 
 
 class ClickhouseSqlExpressionRenderer(DefaultSqlExpressionRenderer):
@@ -70,48 +73,84 @@ class ClickhouseSqlExpressionRenderer(DefaultSqlExpressionRenderer):
             return "toDayOfMonth"
         return assert_values_exhausted(date_part)
 
+    # @override
+    # def visit_subtract_time_interval_expr(self, node: SqlSubtractTimeIntervalExpression) -> SqlExpressionRenderResult:
+    #     """Render time delta operations for Clickhouse, which needs custom support for quarterly granularity."""
+    #     arg_rendered = node.arg.accept(self)
+    #
+    #     count = node.count
+    #     granularity = node.granularity
+    #     if granularity is TimeGranularity.QUARTER:
+    #         granularity = TimeGranularity.MONTH
+    #         count *= self.__QUARTER_IN_MONTHS
+    #
+    #     function_name = self.__get_function_operation_from_time_granularity(granularity)
+    #
+    #     return SqlExpressionRenderResult(
+    #         sql=f"{function_name}({arg_rendered.sql}, CAST(-{count} AS Integer))",
+    #         bind_parameter_set=arg_rendered.bind_parameter_set,
+    #     )
+    #
+    # @override
+    # def visit_add_time_expr(self, node: SqlAddTimeExpression) -> SqlExpressionRenderResult:
+    #     """Render time delta operations for Clickhouse, which needs custom support for quarterly granularity."""
+    #     granularity = node.granularity
+    #     count_expr = node.count_expr
+    #     if granularity is TimeGranularity.QUARTER:
+    #         granularity = TimeGranularity.MONTH
+    #         SqlArithmeticExpression.create(
+    #             left_expr=node.count_expr,
+    #             operator=SqlArithmeticOperator.MULTIPLY,
+    #             right_expr=SqlIntegerExpression.create(self.__QUARTER_IN_MONTHS),
+    #         )  # TODO: this is not correct, we need to multiply the count by the number of months in a quarter ?
+    #
+    #     arg_rendered = node.arg.accept(self)
+    #     count_rendered = count_expr.accept(self)
+    #     count_sql = f"({count_rendered.sql})" if count_expr.requires_parenthesis else count_rendered.sql
+    #
+    #     function_operation = self.__get_function_operation_from_time_granularity(granularity)
+    #
+    #     return SqlExpressionRenderResult(
+    #         sql=f"{function_operation}({arg_rendered.sql}, CAST({count_sql} AS Integer))",
+    #         bind_parameter_set=SqlBindParameterSet.merge_iterable(
+    #             (arg_rendered.bind_parameter_set, count_rendered.bind_parameter_set)
+    #         ),
+    #     )
+    #
     @override
-    def visit_subtract_time_interval_expr(self, node: SqlSubtractTimeIntervalExpression) -> SqlExpressionRenderResult:
-        """Render time delta operations for Clickhouse, which needs custom support for quarterly granularity."""
-        arg_rendered = node.arg.accept(self)
+    def visit_cast_to_timestamp_expr(self, node: SqlCastToTimestampExpression) -> SqlExpressionRenderResult:
+        """Override to use Clickhouse's timestamp casting."""
+        arg_rendered = self.render_sql_expr(node.arg)
 
-        count = node.count
-        granularity = node.granularity
-        if granularity is TimeGranularity.QUARTER:
-            granularity = TimeGranularity.MONTH
-            count *= self.__QUARTER_IN_MONTHS
-
-        function_name = self.__get_function_operation_from_time_granularity(granularity)
-
+        # For timestamp casting, use toDateTime
         return SqlExpressionRenderResult(
-            sql=f"{function_name}({arg_rendered.sql}, CAST(-{count} AS Integer))",
+            sql=f"toDateTime({arg_rendered.sql})",
             bind_parameter_set=arg_rendered.bind_parameter_set,
         )
 
     @override
-    def visit_add_time_expr(self, node: SqlAddTimeExpression) -> SqlExpressionRenderResult:
-        """Render time delta operations for Clickhouse, which needs custom support for quarterly granularity."""
-        granularity = node.granularity
-        count_expr = node.count_expr
-        if granularity is TimeGranularity.QUARTER:
-            granularity = TimeGranularity.MONTH
-            SqlArithmeticExpression.create(
-                left_expr=node.count_expr,
-                operator=SqlArithmeticOperator.MULTIPLY,
-                right_expr=SqlIntegerExpression.create(self.__QUARTER_IN_MONTHS),
-            )  # TODO: this is not correct, we need to multiply the count by the number of months in a quarter ?
+    def visit_date_trunc_expr(self, node: SqlDateTruncExpression) -> SqlExpressionRenderResult:
+        self._validate_granularity_for_engine(node.time_granularity)
 
-        arg_rendered = node.arg.accept(self)
-        count_rendered = count_expr.accept(self)
-        count_sql = f"({count_rendered.sql})" if count_expr.requires_parenthesis else count_rendered.sql
+        """Handle date truncation expressions properly."""
+        arg_rendered = self.render_sql_expr(node.arg)
 
-        function_operation = self.__get_function_operation_from_time_granularity(granularity)
+        # Map the granularity to Clickhouse's date truncation functions
+        trunc_function = {
+            TimeGranularity.DAY: "day",
+            TimeGranularity.WEEK: "week",
+            TimeGranularity.MONTH: "month",
+            TimeGranularity.QUARTER: "quarter",
+            TimeGranularity.YEAR: "year",
+            TimeGranularity.HOUR: "hour",
+            TimeGranularity.MILLISECOND: "milisecond",
+            TimeGranularity.SECOND: "second",
+            TimeGranularity.MINUTE: "minute"
+        }[node.time_granularity]
 
         return SqlExpressionRenderResult(
-            sql=f"{function_operation}({arg_rendered.sql}, CAST({count_sql} AS Integer))",
-            bind_parameter_set=SqlBindParameterSet.merge_iterable(
-                (arg_rendered.bind_parameter_set, count_rendered.bind_parameter_set)
-            ),
+            sql=f"date_trunc('{trunc_function}', {arg_rendered.sql})",
+            bind_parameter_set=arg_rendered.bind_parameter_set,
         )
 
     @override
@@ -148,6 +187,20 @@ class ClickhouseSqlExpressionRenderer(DefaultSqlExpressionRenderer):
             bind_parameter_set=params,
         )
 
+    @override
+    def visit_extract_expr(self, node: SqlExtractExpression) -> SqlExpressionRenderResult:
+        """Renders extract expressions with required output conversions for Clickhouse.
+
+        Clickhouse doesn't support extract for dates. It has its own functions to extract data from timestamps.
+        """
+
+        arg_rendered = self.render_sql_expr(node.arg)
+
+        return SqlExpressionRenderResult(
+            sql=f"{self.render_date_part(node.date_part)}({arg_rendered.sql})",
+            bind_parameter_set=arg_rendered.bind_parameter_set,
+        )
+
     def __get_function_operation_from_time_granularity(self, granularity: TimeGranularity) -> str:
         return {
             TimeGranularity.YEAR: "addYears",
@@ -160,6 +213,24 @@ class ClickhouseSqlExpressionRenderer(DefaultSqlExpressionRenderer):
             TimeGranularity.SECOND: "addSeconds",
         }[granularity]
 
+    @override
+    def render_group_by_expr(self, group_by_column: SqlSelectColumn) -> SqlExpressionRenderResult:
+        """Custom rendering of group by column expressions.
+
+        BigQuery requires group bys to be referenced by alias, rather than duplicating the expression from the SELECT
+
+        e.g.,
+          SELECT COALESCE(x, y) AS x_or_y, SUM(1)
+          FROM source_table
+          GROUP BY x_or_y
+
+        By default we would render GROUP BY COALESCE(x, y) on that last line, and BigQuery will throw an exception
+        """
+        return SqlExpressionRenderResult(
+            sql=group_by_column.column_alias,
+            bind_parameter_set=group_by_column.expr.bind_parameter_set,
+        )
+
 
 class ClickhouseSqlQueryPlanRenderer(DefaultSqlQueryPlanRenderer):
     """Plan renderer for the Clickhouse engine."""
@@ -171,69 +242,141 @@ class ClickhouseSqlQueryPlanRenderer(DefaultSqlQueryPlanRenderer):
     def expr_renderer(self) -> SqlExpressionRenderer:
         return self.EXPR_RENDERER
 
-    @override
-    def _render_adapter_specific_flags(self) -> Optional[SqlPlanRenderResult]:
-        """Add ClickHouse-specific query settings."""
-        settings = ["allow_experimental_join_condition = 1", "allow_experimental_analyzer = 1", "join_use_nulls = 0"]
-        return SqlPlanRenderResult(sql=f"SETTINGS {', '.join(settings)}", bind_parameter_set=SqlBindParameterSet())
 
-    def _render_joins_section(self, join_descriptions: Sequence[SqlJoinDescription]) -> Optional[SqlPlanRenderResult]:
-        """Convert the join descriptions into a "JOIN" section with ClickHouse-specific handling."""
-        if len(join_descriptions) == 0:
-            return None
 
-        params = SqlBindParameterSet()
-        join_section_lines = []
-        where_conditions = []
-
-        for join_description in join_descriptions:
-            right_source_rendered = self._render_node(join_description.right_source)
-            params = params.merge(right_source_rendered.bind_parameter_set)
-
-            on_condition_rendered: Optional[SqlExpressionRenderResult] = None
-            if join_description.on_condition:
-                on_condition_rendered = self.EXPR_RENDERER.render_sql_expr(join_description.on_condition)
-                params = params.merge(on_condition_rendered.bind_parameter_set)
-
-            # Check if this is a time-range join
-            is_time_range_join = False
-            if on_condition_rendered:
-                is_time_range_join = any(op in on_condition_rendered.sql for op in ["<=", ">=", "<", ">"])
-
-            # Add join type
-            join_section_lines.append(join_description.join_type.value)
-
-            # Add the source
-            if join_description.right_source.as_sql_table_node is not None:
-                join_section_lines.append(
-                    textwrap.indent(
-                        f"{right_source_rendered.sql} {join_description.right_source_alias}",
-                        prefix=SqlRenderingConstants.INDENT,
-                    )
-                )
-            else:
-                join_section_lines.append("(")
-                join_section_lines.append(
-                    textwrap.indent(right_source_rendered.sql, prefix=SqlRenderingConstants.INDENT)
-                )
-                join_section_lines.append(f") {join_description.right_source_alias}")
-
-            # Add conditions
-            if is_time_range_join:
-                # For time-range joins, convert to CROSS JOIN + WHERE
-                join_section_lines[-len(join_section_lines)] = "CROSS JOIN"  # Replace join type
-                if on_condition_rendered:
-                    where_conditions.append(on_condition_rendered.sql)
-            else:
-                # For regular joins, use ON clause
-                if on_condition_rendered:
-                    join_section_lines.append("ON")
-                    join_section_lines.append(
-                        textwrap.indent(on_condition_rendered.sql, prefix=SqlRenderingConstants.INDENT)
-                    )
-
-        # Store where conditions for use in _render_where_section
-        if where_conditions:
-            self._stored_where_conditions = where_conditions
-
-        return SqlPlanRenderResult("\n".join(join_section_lines), params)
+    #
+    # @override
+    # def _render_where(self, where_expression: Optional[SqlExpressionNode]) -> Optional[SqlPlanRenderResult]:
+    #     """Override to combine stored where conditions from joins with the main where clause."""
+    #     original_where = super()._render_where(where_expression)
+    #     stored_conditions = getattr(self, '_stored_where_conditions', [])
+    #
+    #     # Clear stored conditions to prevent them from being used multiple times
+    #     self._stored_where_conditions = []
+    #
+    #     if not stored_conditions and not original_where:
+    #         return None
+    #
+    #     conditions = []
+    #
+    #     # Add original where condition if it exists
+    #     if original_where:
+    #         # Strip the "WHERE" prefix if it exists
+    #         where_sql = original_where.sql
+    #         if where_sql.upper().startswith('WHERE '):
+    #             where_sql = where_sql[6:]
+    #         conditions.append(where_sql)
+    #
+    #     # Add stored conditions from joins (only unique conditions)
+    #     seen_conditions = set()
+    #     for condition in stored_conditions:
+    #         if condition not in seen_conditions:
+    #             conditions.append(condition)
+    #             seen_conditions.add(condition)
+    #
+    #     # Combine all conditions with AND
+    #     combined_sql = ' AND '.join(f'({condition})' for condition in conditions if condition.strip())
+    #
+    #     return SqlPlanRenderResult(
+    #         sql=f"WHERE {combined_sql}" if combined_sql else "",
+    #         bind_parameter_set=original_where.bind_parameter_set if original_where else SqlBindParameterSet(),
+    #     )
+    #
+    #
+    # @override
+    # def _render_joins_section(self, join_descriptions: Sequence[SqlJoinDescription]) -> Optional[SqlPlanRenderResult]:
+    #     """Convert the join descriptions into a "JOIN" section with ClickHouse-specific handling.
+    #
+    #     Args:
+    #         join_descriptions: Sequence of join descriptions to render
+    #
+    #     Returns:
+    #         SqlPlanRenderResult with the rendered JOIN section, or None if no joins
+    #     """
+    #     if not join_descriptions:
+    #         return None
+    #
+    #     params = SqlBindParameterSet()
+    #     join_section_lines = []
+    #     where_conditions = []
+    #
+    #     for join_description in join_descriptions:
+    #         join_lines, join_params, join_where_conditions = self._render_single_join(join_description)
+    #         join_section_lines.extend(join_lines)
+    #         params = params.merge(join_params)
+    #         where_conditions.extend(join_where_conditions)
+    #
+    #     # Store where conditions for use in _render_where_section
+    #     if where_conditions:
+    #         self._stored_where_conditions = where_conditions
+    #
+    #     return SqlPlanRenderResult("\n".join(join_section_lines), params)
+    #
+    # def _render_single_join(self, join_description: SqlJoinDescription) -> tuple[list[str], SqlBindParameterSet, list[str]]:
+    #     """Renders a single join description."""
+    #     join_lines = []
+    #     where_conditions = []
+    #     params = SqlBindParameterSet()
+    #
+    #     # Render the right source
+    #     right_source_rendered = self._render_node(join_description.right_source)
+    #     params = params.merge(right_source_rendered.bind_parameter_set)
+    #
+    #     # Render the ON condition if present
+    #     on_condition = self._render_join_condition(join_description.on_condition)
+    #     if on_condition:
+    #         on_condition = SqlExpressionRenderResult(
+    #             sql=on_condition.sql,
+    #             bind_parameter_set=on_condition.bind_parameter_set
+    #         )
+    #         params = params.merge(on_condition.bind_parameter_set)
+    #
+    #     # Add join type and source
+    #     join_lines.append(join_description.join_type.value)
+    #     source_lines = self.__render_join_source(
+    #         right_source_rendered.sql,
+    #         join_description.right_source_alias,
+    #         join_description.right_source.as_sql_table_node is not None
+    #     )
+    #     join_lines.extend(source_lines)
+    #
+    #     # Always add ON clause for Clickhouse, even for inequality joins
+    #     if on_condition:
+    #         if self.__is_inequality_join(on_condition.sql):
+    #             # For inequality joins, use a simple 1=1 in ON clause and move real condition to WHERE
+    #             join_lines.extend(["ON", textwrap.indent("1 = 1", prefix=SqlRenderingConstants.INDENT)])
+    #             where_conditions.append(on_condition.sql)
+    #         else:
+    #             join_lines.extend(["ON", textwrap.indent(on_condition.sql, prefix=SqlRenderingConstants.INDENT)])
+    #
+    #     return join_lines, params, where_conditions
+    #
+    # def _render_join_condition(self, condition: Optional[SqlExpressionNode]) -> Optional[SqlExpressionRenderResult]:
+    #     """Renders the JOIN's ON condition if present."""
+    #     if condition:
+    #         return self.EXPR_RENDERER.render_sql_expr(condition)
+    #     return None
+    #
+    # def __get_join_type(self, original_type: SqlJoinType, on_condition: Optional[SqlExpressionRenderResult]) -> SqlJoinType:
+    #     """Determines the final join type, converting to CROSS JOIN for time-range joins."""
+    #     if on_condition and self.__is_inequality_join(on_condition.sql):
+    #         return SqlJoinType.CROSS_JOIN
+    #     return original_type
+    #
+    # @staticmethod
+    # def __is_inequality_join(condition_sql: str) -> bool:
+    #     """Checks if a join condition contains time range operators."""
+    #     inequality_operators = ["<=", ">=", "<", ">"]
+    #     return any(op in condition_sql for op in inequality_operators)
+    #
+    # @staticmethod
+    # def __render_join_source(source_sql: str, alias: str, is_table: bool) -> list[str]:
+    #     """Renders the join's source table or subquery with proper indentation."""
+    #     if is_table:
+    #         return [textwrap.indent(f"{source_sql} AS {alias.lower()}", prefix=SqlRenderingConstants.INDENT)]
+    #
+    #     return [
+    #         "(",
+    #         textwrap.indent(source_sql, prefix=SqlRenderingConstants.INDENT),
+    #         f") AS {alias.lower()}"  # Force lowercase here too
+    #     ]

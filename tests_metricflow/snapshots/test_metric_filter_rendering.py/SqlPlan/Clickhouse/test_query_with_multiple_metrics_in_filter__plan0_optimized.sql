@@ -16,7 +16,6 @@ WITH sma_28009_cte AS (
     , 1 AS bookings
     , guest_id AS bookers
   FROM ***************************.fct_bookings bookings_source_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 SELECT
@@ -34,10 +33,8 @@ FROM (
       listing_id AS listing
       , 1 AS listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_19
-  LEFT OUTER JOIN
-  (
+  LEFT OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
     -- Pass Only Elements: ['bookings', 'listing']
     -- Aggregate Measures
@@ -49,12 +46,10 @@ FROM (
     FROM sma_28009_cte sma_28009_cte
     GROUP BY
       listing
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_25
   ON
     subq_19.listing = subq_25.listing
-  LEFT OUTER JOIN
-  (
+  LEFT OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
     -- Pass Only Elements: ['bookers', 'listing']
     -- Aggregate Measures
@@ -66,11 +61,8 @@ FROM (
     FROM sma_28009_cte sma_28009_cte
     GROUP BY
       listing
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_30
   ON
     subq_19.listing = subq_30.listing
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_31
 WHERE listing__bookings > 2 AND listing__bookers > 1
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

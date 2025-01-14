@@ -3,7 +3,7 @@ version: "3.7"
 services:
   clickhouse:
     container_name: clickhouse
-    image: clickhouse
+    image: clickhouse/clickhouse-server
     expose:
       - "8123"
       - "9000"
@@ -14,3 +14,5 @@ services:
       CLICKHOUSE_USER: "metricflow"
       CLICKHOUSE_PASSWORD: "metricflowing"
       CLICKHOUSE_DB: "metricflow"
+    volumes:
+      - ./config.xml:/etc/clickhouse-server/config.d/config.xml

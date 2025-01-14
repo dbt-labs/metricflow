@@ -9,13 +9,12 @@ WITH sma_28009_cte AS (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
   SELECT
-    DATE_TRUNC('day', ds) AS metric_time__day
-    , DATE_TRUNC('month', ds) AS metric_time__month
-    , DATE_TRUNC('year', ds) AS metric_time__year
+    date_trunc('day', ds) AS metric_time__day
+    , date_trunc('month', ds) AS metric_time__month
+    , date_trunc('year', ds) AS metric_time__year
     , booking_value
     , guest_id AS bookers
   FROM ***************************.fct_bookings bookings_source_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 SELECT
@@ -38,22 +37,20 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       time_spine_src_28006.ds AS metric_time__day
-      , DATE_TRUNC('month', time_spine_src_28006.ds) AS metric_time__month
-      , DATE_TRUNC('year', time_spine_src_28006.ds) AS metric_time__year
+      , date_trunc('month', time_spine_src_28006.ds) AS metric_time__month
+      , date_trunc('year', time_spine_src_28006.ds) AS metric_time__year
       , SUM(sma_28009_cte.booking_value) AS booking_value
     FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN
       sma_28009_cte sma_28009_cte
     ON
-      addWeeks(time_spine_src_28006.ds, CAST(-1 AS Integer)) = sma_28009_cte.metric_time__day
+      DATEADD(week, -1, time_spine_src_28006.ds) = sma_28009_cte.metric_time__day
     GROUP BY
-      time_spine_src_28006.ds
-      , DATE_TRUNC('month', time_spine_src_28006.ds)
-      , DATE_TRUNC('year', time_spine_src_28006.ds)
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+      metric_time__day
+      , metric_time__month
+      , metric_time__year
   ) subq_23
-  FULL OUTER JOIN
-  (
+  FULL OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
     -- Pass Only Elements: ['bookers', 'metric_time__day', 'metric_time__month', 'metric_time__year']
     -- Aggregate Measures
@@ -68,7 +65,6 @@ FROM (
       metric_time__day
       , metric_time__month
       , metric_time__year
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_27
   ON
     (
@@ -79,9 +75,7 @@ FROM (
       subq_23.metric_time__year = subq_27.metric_time__year
     )
   GROUP BY
-    COALESCE(subq_23.metric_time__day, subq_27.metric_time__day)
-    , COALESCE(subq_23.metric_time__month, subq_27.metric_time__month)
-    , COALESCE(subq_23.metric_time__year, subq_27.metric_time__year)
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    metric_time__day
+    , metric_time__month
+    , metric_time__year
 ) subq_28
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

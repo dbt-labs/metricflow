@@ -20,27 +20,22 @@ FROM (
     -- Join to Time Spine Dataset
     SELECT
       time_spine_src_28006.ds AS metric_time__day
-      , DATE_TRUNC('month', time_spine_src_28006.ds) AS metric_time__month
+      , date_trunc('month', time_spine_src_28006.ds) AS metric_time__month
       , subq_11.bookings AS bookings
     FROM ***************************.mf_time_spine time_spine_src_28006
-    INNER JOIN
-    (
+    INNER JOIN (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
       SELECT
-        DATE_TRUNC('day', ds) AS metric_time__day
+        date_trunc('day', ds) AS metric_time__day
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_11
     ON
-      DATE_TRUNC('month', time_spine_src_28006.ds) = subq_11.metric_time__day
-    WHERE DATE_TRUNC('month', time_spine_src_28006.ds) = time_spine_src_28006.ds
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+      date_trunc('month', time_spine_src_28006.ds) = subq_11.metric_time__day
+    WHERE date_trunc('month', time_spine_src_28006.ds) = time_spine_src_28006.ds
   ) subq_15
   WHERE metric_time__day = '2020-01-01'
   GROUP BY
     metric_time__month
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_19
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

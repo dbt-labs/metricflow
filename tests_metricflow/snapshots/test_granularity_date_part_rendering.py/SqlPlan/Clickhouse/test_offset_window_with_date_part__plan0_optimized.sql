@@ -7,11 +7,10 @@ WITH sma_28009_cte AS (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
   SELECT
-    DATE_TRUNC('day', ds) AS metric_time__day
-    , EXTRACT(toDayOfWeek FROM ds) AS metric_time__extract_dow
+    date_trunc('day', ds) AS metric_time__day
+    , toDayOfWeek(ds) AS metric_time__extract_dow
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 SELECT
@@ -34,30 +33,25 @@ FROM (
     FROM sma_28009_cte sma_28009_cte
     GROUP BY
       metric_time__extract_dow
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_19
-  FULL OUTER JOIN
-  (
+  FULL OUTER JOIN (
     -- Join to Time Spine Dataset
     -- Pass Only Elements: ['bookings', 'metric_time__extract_dow']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      EXTRACT(toDayOfWeek FROM time_spine_src_28006.ds) AS metric_time__extract_dow
+      toDayOfWeek(time_spine_src_28006.ds) AS metric_time__extract_dow
       , SUM(sma_28009_cte.bookings) AS bookings_2_weeks_ago
     FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN
       sma_28009_cte sma_28009_cte
     ON
-      addDays(time_spine_src_28006.ds, CAST(-14 AS Integer)) = sma_28009_cte.metric_time__day
+      DATEADD(day, -14, time_spine_src_28006.ds) = sma_28009_cte.metric_time__day
     GROUP BY
-      EXTRACT(toDayOfWeek FROM time_spine_src_28006.ds)
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+      metric_time__extract_dow
   ) subq_27
   ON
     subq_19.metric_time__extract_dow = subq_27.metric_time__extract_dow
   GROUP BY
-    COALESCE(subq_19.metric_time__extract_dow, subq_27.metric_time__extract_dow)
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    metric_time__extract_dow
 ) subq_28
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

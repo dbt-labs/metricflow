@@ -14,4 +14,3 @@ LEFT OUTER JOIN
   demo.dim_users b
 ON
   a.user_id = b.user_id
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

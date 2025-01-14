@@ -319,73 +319,73 @@ FROM (
               , bookings_source_src_26000.booking_value AS average_booking_value
               , bookings_source_src_26000.booking_value AS booking_payments
               , bookings_source_src_26000.is_instant
-              , DATE_TRUNC('day', bookings_source_src_26000.ds) AS ds__day
-              , DATE_TRUNC('week', bookings_source_src_26000.ds) AS ds__week
-              , DATE_TRUNC('month', bookings_source_src_26000.ds) AS ds__month
-              , DATE_TRUNC('quarter', bookings_source_src_26000.ds) AS ds__quarter
-              , DATE_TRUNC('year', bookings_source_src_26000.ds) AS ds__year
-              , EXTRACT(toYear FROM bookings_source_src_26000.ds) AS ds__extract_year
-              , EXTRACT(toQuarter FROM bookings_source_src_26000.ds) AS ds__extract_quarter
-              , EXTRACT(toMonth FROM bookings_source_src_26000.ds) AS ds__extract_month
-              , EXTRACT(toDayOfMonth FROM bookings_source_src_26000.ds) AS ds__extract_day
-              , EXTRACT(toDayOfWeek FROM bookings_source_src_26000.ds) AS ds__extract_dow
-              , EXTRACT(toDayOfYear FROM bookings_source_src_26000.ds) AS ds__extract_doy
-              , DATE_TRUNC('day', bookings_source_src_26000.ds_partitioned) AS ds_partitioned__day
-              , DATE_TRUNC('week', bookings_source_src_26000.ds_partitioned) AS ds_partitioned__week
-              , DATE_TRUNC('month', bookings_source_src_26000.ds_partitioned) AS ds_partitioned__month
-              , DATE_TRUNC('quarter', bookings_source_src_26000.ds_partitioned) AS ds_partitioned__quarter
-              , DATE_TRUNC('year', bookings_source_src_26000.ds_partitioned) AS ds_partitioned__year
-              , EXTRACT(toYear FROM bookings_source_src_26000.ds_partitioned) AS ds_partitioned__extract_year
-              , EXTRACT(toQuarter FROM bookings_source_src_26000.ds_partitioned) AS ds_partitioned__extract_quarter
-              , EXTRACT(toMonth FROM bookings_source_src_26000.ds_partitioned) AS ds_partitioned__extract_month
-              , EXTRACT(toDayOfMonth FROM bookings_source_src_26000.ds_partitioned) AS ds_partitioned__extract_day
-              , EXTRACT(toDayOfWeek FROM bookings_source_src_26000.ds_partitioned) AS ds_partitioned__extract_dow
-              , EXTRACT(toDayOfYear FROM bookings_source_src_26000.ds_partitioned) AS ds_partitioned__extract_doy
-              , DATE_TRUNC('day', bookings_source_src_26000.paid_at) AS paid_at__day
-              , DATE_TRUNC('week', bookings_source_src_26000.paid_at) AS paid_at__week
-              , DATE_TRUNC('month', bookings_source_src_26000.paid_at) AS paid_at__month
-              , DATE_TRUNC('quarter', bookings_source_src_26000.paid_at) AS paid_at__quarter
-              , DATE_TRUNC('year', bookings_source_src_26000.paid_at) AS paid_at__year
-              , EXTRACT(toYear FROM bookings_source_src_26000.paid_at) AS paid_at__extract_year
-              , EXTRACT(toQuarter FROM bookings_source_src_26000.paid_at) AS paid_at__extract_quarter
-              , EXTRACT(toMonth FROM bookings_source_src_26000.paid_at) AS paid_at__extract_month
-              , EXTRACT(toDayOfMonth FROM bookings_source_src_26000.paid_at) AS paid_at__extract_day
-              , EXTRACT(toDayOfWeek FROM bookings_source_src_26000.paid_at) AS paid_at__extract_dow
-              , EXTRACT(toDayOfYear FROM bookings_source_src_26000.paid_at) AS paid_at__extract_doy
+              , date_trunc('day', bookings_source_src_26000.ds) AS ds__day
+              , date_trunc('week', bookings_source_src_26000.ds) AS ds__week
+              , date_trunc('month', bookings_source_src_26000.ds) AS ds__month
+              , date_trunc('quarter', bookings_source_src_26000.ds) AS ds__quarter
+              , date_trunc('year', bookings_source_src_26000.ds) AS ds__year
+              , toYear(bookings_source_src_26000.ds) AS ds__extract_year
+              , toQuarter(bookings_source_src_26000.ds) AS ds__extract_quarter
+              , toMonth(bookings_source_src_26000.ds) AS ds__extract_month
+              , toDayOfMonth(bookings_source_src_26000.ds) AS ds__extract_day
+              , toDayOfWeek(bookings_source_src_26000.ds) AS ds__extract_dow
+              , toDayOfYear(bookings_source_src_26000.ds) AS ds__extract_doy
+              , date_trunc('day', bookings_source_src_26000.ds_partitioned) AS ds_partitioned__day
+              , date_trunc('week', bookings_source_src_26000.ds_partitioned) AS ds_partitioned__week
+              , date_trunc('month', bookings_source_src_26000.ds_partitioned) AS ds_partitioned__month
+              , date_trunc('quarter', bookings_source_src_26000.ds_partitioned) AS ds_partitioned__quarter
+              , date_trunc('year', bookings_source_src_26000.ds_partitioned) AS ds_partitioned__year
+              , toYear(bookings_source_src_26000.ds_partitioned) AS ds_partitioned__extract_year
+              , toQuarter(bookings_source_src_26000.ds_partitioned) AS ds_partitioned__extract_quarter
+              , toMonth(bookings_source_src_26000.ds_partitioned) AS ds_partitioned__extract_month
+              , toDayOfMonth(bookings_source_src_26000.ds_partitioned) AS ds_partitioned__extract_day
+              , toDayOfWeek(bookings_source_src_26000.ds_partitioned) AS ds_partitioned__extract_dow
+              , toDayOfYear(bookings_source_src_26000.ds_partitioned) AS ds_partitioned__extract_doy
+              , date_trunc('day', bookings_source_src_26000.paid_at) AS paid_at__day
+              , date_trunc('week', bookings_source_src_26000.paid_at) AS paid_at__week
+              , date_trunc('month', bookings_source_src_26000.paid_at) AS paid_at__month
+              , date_trunc('quarter', bookings_source_src_26000.paid_at) AS paid_at__quarter
+              , date_trunc('year', bookings_source_src_26000.paid_at) AS paid_at__year
+              , toYear(bookings_source_src_26000.paid_at) AS paid_at__extract_year
+              , toQuarter(bookings_source_src_26000.paid_at) AS paid_at__extract_quarter
+              , toMonth(bookings_source_src_26000.paid_at) AS paid_at__extract_month
+              , toDayOfMonth(bookings_source_src_26000.paid_at) AS paid_at__extract_day
+              , toDayOfWeek(bookings_source_src_26000.paid_at) AS paid_at__extract_dow
+              , toDayOfYear(bookings_source_src_26000.paid_at) AS paid_at__extract_doy
               , bookings_source_src_26000.is_instant AS booking__is_instant
-              , DATE_TRUNC('day', bookings_source_src_26000.ds) AS booking__ds__day
-              , DATE_TRUNC('week', bookings_source_src_26000.ds) AS booking__ds__week
-              , DATE_TRUNC('month', bookings_source_src_26000.ds) AS booking__ds__month
-              , DATE_TRUNC('quarter', bookings_source_src_26000.ds) AS booking__ds__quarter
-              , DATE_TRUNC('year', bookings_source_src_26000.ds) AS booking__ds__year
-              , EXTRACT(toYear FROM bookings_source_src_26000.ds) AS booking__ds__extract_year
-              , EXTRACT(toQuarter FROM bookings_source_src_26000.ds) AS booking__ds__extract_quarter
-              , EXTRACT(toMonth FROM bookings_source_src_26000.ds) AS booking__ds__extract_month
-              , EXTRACT(toDayOfMonth FROM bookings_source_src_26000.ds) AS booking__ds__extract_day
-              , EXTRACT(toDayOfWeek FROM bookings_source_src_26000.ds) AS booking__ds__extract_dow
-              , EXTRACT(toDayOfYear FROM bookings_source_src_26000.ds) AS booking__ds__extract_doy
-              , DATE_TRUNC('day', bookings_source_src_26000.ds_partitioned) AS booking__ds_partitioned__day
-              , DATE_TRUNC('week', bookings_source_src_26000.ds_partitioned) AS booking__ds_partitioned__week
-              , DATE_TRUNC('month', bookings_source_src_26000.ds_partitioned) AS booking__ds_partitioned__month
-              , DATE_TRUNC('quarter', bookings_source_src_26000.ds_partitioned) AS booking__ds_partitioned__quarter
-              , DATE_TRUNC('year', bookings_source_src_26000.ds_partitioned) AS booking__ds_partitioned__year
-              , EXTRACT(toYear FROM bookings_source_src_26000.ds_partitioned) AS booking__ds_partitioned__extract_year
-              , EXTRACT(toQuarter FROM bookings_source_src_26000.ds_partitioned) AS booking__ds_partitioned__extract_quarter
-              , EXTRACT(toMonth FROM bookings_source_src_26000.ds_partitioned) AS booking__ds_partitioned__extract_month
-              , EXTRACT(toDayOfMonth FROM bookings_source_src_26000.ds_partitioned) AS booking__ds_partitioned__extract_day
-              , EXTRACT(toDayOfWeek FROM bookings_source_src_26000.ds_partitioned) AS booking__ds_partitioned__extract_dow
-              , EXTRACT(toDayOfYear FROM bookings_source_src_26000.ds_partitioned) AS booking__ds_partitioned__extract_doy
-              , DATE_TRUNC('day', bookings_source_src_26000.paid_at) AS booking__paid_at__day
-              , DATE_TRUNC('week', bookings_source_src_26000.paid_at) AS booking__paid_at__week
-              , DATE_TRUNC('month', bookings_source_src_26000.paid_at) AS booking__paid_at__month
-              , DATE_TRUNC('quarter', bookings_source_src_26000.paid_at) AS booking__paid_at__quarter
-              , DATE_TRUNC('year', bookings_source_src_26000.paid_at) AS booking__paid_at__year
-              , EXTRACT(toYear FROM bookings_source_src_26000.paid_at) AS booking__paid_at__extract_year
-              , EXTRACT(toQuarter FROM bookings_source_src_26000.paid_at) AS booking__paid_at__extract_quarter
-              , EXTRACT(toMonth FROM bookings_source_src_26000.paid_at) AS booking__paid_at__extract_month
-              , EXTRACT(toDayOfMonth FROM bookings_source_src_26000.paid_at) AS booking__paid_at__extract_day
-              , EXTRACT(toDayOfWeek FROM bookings_source_src_26000.paid_at) AS booking__paid_at__extract_dow
-              , EXTRACT(toDayOfYear FROM bookings_source_src_26000.paid_at) AS booking__paid_at__extract_doy
+              , date_trunc('day', bookings_source_src_26000.ds) AS booking__ds__day
+              , date_trunc('week', bookings_source_src_26000.ds) AS booking__ds__week
+              , date_trunc('month', bookings_source_src_26000.ds) AS booking__ds__month
+              , date_trunc('quarter', bookings_source_src_26000.ds) AS booking__ds__quarter
+              , date_trunc('year', bookings_source_src_26000.ds) AS booking__ds__year
+              , toYear(bookings_source_src_26000.ds) AS booking__ds__extract_year
+              , toQuarter(bookings_source_src_26000.ds) AS booking__ds__extract_quarter
+              , toMonth(bookings_source_src_26000.ds) AS booking__ds__extract_month
+              , toDayOfMonth(bookings_source_src_26000.ds) AS booking__ds__extract_day
+              , toDayOfWeek(bookings_source_src_26000.ds) AS booking__ds__extract_dow
+              , toDayOfYear(bookings_source_src_26000.ds) AS booking__ds__extract_doy
+              , date_trunc('day', bookings_source_src_26000.ds_partitioned) AS booking__ds_partitioned__day
+              , date_trunc('week', bookings_source_src_26000.ds_partitioned) AS booking__ds_partitioned__week
+              , date_trunc('month', bookings_source_src_26000.ds_partitioned) AS booking__ds_partitioned__month
+              , date_trunc('quarter', bookings_source_src_26000.ds_partitioned) AS booking__ds_partitioned__quarter
+              , date_trunc('year', bookings_source_src_26000.ds_partitioned) AS booking__ds_partitioned__year
+              , toYear(bookings_source_src_26000.ds_partitioned) AS booking__ds_partitioned__extract_year
+              , toQuarter(bookings_source_src_26000.ds_partitioned) AS booking__ds_partitioned__extract_quarter
+              , toMonth(bookings_source_src_26000.ds_partitioned) AS booking__ds_partitioned__extract_month
+              , toDayOfMonth(bookings_source_src_26000.ds_partitioned) AS booking__ds_partitioned__extract_day
+              , toDayOfWeek(bookings_source_src_26000.ds_partitioned) AS booking__ds_partitioned__extract_dow
+              , toDayOfYear(bookings_source_src_26000.ds_partitioned) AS booking__ds_partitioned__extract_doy
+              , date_trunc('day', bookings_source_src_26000.paid_at) AS booking__paid_at__day
+              , date_trunc('week', bookings_source_src_26000.paid_at) AS booking__paid_at__week
+              , date_trunc('month', bookings_source_src_26000.paid_at) AS booking__paid_at__month
+              , date_trunc('quarter', bookings_source_src_26000.paid_at) AS booking__paid_at__quarter
+              , date_trunc('year', bookings_source_src_26000.paid_at) AS booking__paid_at__year
+              , toYear(bookings_source_src_26000.paid_at) AS booking__paid_at__extract_year
+              , toQuarter(bookings_source_src_26000.paid_at) AS booking__paid_at__extract_quarter
+              , toMonth(bookings_source_src_26000.paid_at) AS booking__paid_at__extract_month
+              , toDayOfMonth(bookings_source_src_26000.paid_at) AS booking__paid_at__extract_day
+              , toDayOfWeek(bookings_source_src_26000.paid_at) AS booking__paid_at__extract_dow
+              , toDayOfYear(bookings_source_src_26000.paid_at) AS booking__paid_at__extract_doy
               , bookings_source_src_26000.listing_id AS listing
               , bookings_source_src_26000.guest_id AS guest
               , bookings_source_src_26000.host_id AS host
@@ -395,12 +395,9 @@ FROM (
               , bookings_source_src_26000.host_id AS booking__host
               , bookings_source_src_26000.guest_id AS booking__user
             FROM ***************************.fct_bookings bookings_source_src_26000
-            SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
           ) subq_0
-          SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
         ) subq_1
-        CROSS JOIN
-        (
+        LEFT OUTER JOIN (
           -- Pass Only Elements: ['capacity', 'window_start__day', 'window_end__day', 'listing']
           SELECT
             subq_2.window_start__day
@@ -411,52 +408,52 @@ FROM (
             -- Read Elements From Semantic Model 'listings'
             SELECT
               listings_src_26000.active_from AS window_start__day
-              , DATE_TRUNC('week', listings_src_26000.active_from) AS window_start__week
-              , DATE_TRUNC('month', listings_src_26000.active_from) AS window_start__month
-              , DATE_TRUNC('quarter', listings_src_26000.active_from) AS window_start__quarter
-              , DATE_TRUNC('year', listings_src_26000.active_from) AS window_start__year
-              , EXTRACT(toYear FROM listings_src_26000.active_from) AS window_start__extract_year
-              , EXTRACT(toQuarter FROM listings_src_26000.active_from) AS window_start__extract_quarter
-              , EXTRACT(toMonth FROM listings_src_26000.active_from) AS window_start__extract_month
-              , EXTRACT(toDayOfMonth FROM listings_src_26000.active_from) AS window_start__extract_day
-              , EXTRACT(toDayOfWeek FROM listings_src_26000.active_from) AS window_start__extract_dow
-              , EXTRACT(toDayOfYear FROM listings_src_26000.active_from) AS window_start__extract_doy
+              , date_trunc('week', listings_src_26000.active_from) AS window_start__week
+              , date_trunc('month', listings_src_26000.active_from) AS window_start__month
+              , date_trunc('quarter', listings_src_26000.active_from) AS window_start__quarter
+              , date_trunc('year', listings_src_26000.active_from) AS window_start__year
+              , toYear(listings_src_26000.active_from) AS window_start__extract_year
+              , toQuarter(listings_src_26000.active_from) AS window_start__extract_quarter
+              , toMonth(listings_src_26000.active_from) AS window_start__extract_month
+              , toDayOfMonth(listings_src_26000.active_from) AS window_start__extract_day
+              , toDayOfWeek(listings_src_26000.active_from) AS window_start__extract_dow
+              , toDayOfYear(listings_src_26000.active_from) AS window_start__extract_doy
               , listings_src_26000.active_to AS window_end__day
-              , DATE_TRUNC('week', listings_src_26000.active_to) AS window_end__week
-              , DATE_TRUNC('month', listings_src_26000.active_to) AS window_end__month
-              , DATE_TRUNC('quarter', listings_src_26000.active_to) AS window_end__quarter
-              , DATE_TRUNC('year', listings_src_26000.active_to) AS window_end__year
-              , EXTRACT(toYear FROM listings_src_26000.active_to) AS window_end__extract_year
-              , EXTRACT(toQuarter FROM listings_src_26000.active_to) AS window_end__extract_quarter
-              , EXTRACT(toMonth FROM listings_src_26000.active_to) AS window_end__extract_month
-              , EXTRACT(toDayOfMonth FROM listings_src_26000.active_to) AS window_end__extract_day
-              , EXTRACT(toDayOfWeek FROM listings_src_26000.active_to) AS window_end__extract_dow
-              , EXTRACT(toDayOfYear FROM listings_src_26000.active_to) AS window_end__extract_doy
+              , date_trunc('week', listings_src_26000.active_to) AS window_end__week
+              , date_trunc('month', listings_src_26000.active_to) AS window_end__month
+              , date_trunc('quarter', listings_src_26000.active_to) AS window_end__quarter
+              , date_trunc('year', listings_src_26000.active_to) AS window_end__year
+              , toYear(listings_src_26000.active_to) AS window_end__extract_year
+              , toQuarter(listings_src_26000.active_to) AS window_end__extract_quarter
+              , toMonth(listings_src_26000.active_to) AS window_end__extract_month
+              , toDayOfMonth(listings_src_26000.active_to) AS window_end__extract_day
+              , toDayOfWeek(listings_src_26000.active_to) AS window_end__extract_dow
+              , toDayOfYear(listings_src_26000.active_to) AS window_end__extract_doy
               , listings_src_26000.country
               , listings_src_26000.is_lux
               , listings_src_26000.capacity
               , listings_src_26000.active_from AS listing__window_start__day
-              , DATE_TRUNC('week', listings_src_26000.active_from) AS listing__window_start__week
-              , DATE_TRUNC('month', listings_src_26000.active_from) AS listing__window_start__month
-              , DATE_TRUNC('quarter', listings_src_26000.active_from) AS listing__window_start__quarter
-              , DATE_TRUNC('year', listings_src_26000.active_from) AS listing__window_start__year
-              , EXTRACT(toYear FROM listings_src_26000.active_from) AS listing__window_start__extract_year
-              , EXTRACT(toQuarter FROM listings_src_26000.active_from) AS listing__window_start__extract_quarter
-              , EXTRACT(toMonth FROM listings_src_26000.active_from) AS listing__window_start__extract_month
-              , EXTRACT(toDayOfMonth FROM listings_src_26000.active_from) AS listing__window_start__extract_day
-              , EXTRACT(toDayOfWeek FROM listings_src_26000.active_from) AS listing__window_start__extract_dow
-              , EXTRACT(toDayOfYear FROM listings_src_26000.active_from) AS listing__window_start__extract_doy
+              , date_trunc('week', listings_src_26000.active_from) AS listing__window_start__week
+              , date_trunc('month', listings_src_26000.active_from) AS listing__window_start__month
+              , date_trunc('quarter', listings_src_26000.active_from) AS listing__window_start__quarter
+              , date_trunc('year', listings_src_26000.active_from) AS listing__window_start__year
+              , toYear(listings_src_26000.active_from) AS listing__window_start__extract_year
+              , toQuarter(listings_src_26000.active_from) AS listing__window_start__extract_quarter
+              , toMonth(listings_src_26000.active_from) AS listing__window_start__extract_month
+              , toDayOfMonth(listings_src_26000.active_from) AS listing__window_start__extract_day
+              , toDayOfWeek(listings_src_26000.active_from) AS listing__window_start__extract_dow
+              , toDayOfYear(listings_src_26000.active_from) AS listing__window_start__extract_doy
               , listings_src_26000.active_to AS listing__window_end__day
-              , DATE_TRUNC('week', listings_src_26000.active_to) AS listing__window_end__week
-              , DATE_TRUNC('month', listings_src_26000.active_to) AS listing__window_end__month
-              , DATE_TRUNC('quarter', listings_src_26000.active_to) AS listing__window_end__quarter
-              , DATE_TRUNC('year', listings_src_26000.active_to) AS listing__window_end__year
-              , EXTRACT(toYear FROM listings_src_26000.active_to) AS listing__window_end__extract_year
-              , EXTRACT(toQuarter FROM listings_src_26000.active_to) AS listing__window_end__extract_quarter
-              , EXTRACT(toMonth FROM listings_src_26000.active_to) AS listing__window_end__extract_month
-              , EXTRACT(toDayOfMonth FROM listings_src_26000.active_to) AS listing__window_end__extract_day
-              , EXTRACT(toDayOfWeek FROM listings_src_26000.active_to) AS listing__window_end__extract_dow
-              , EXTRACT(toDayOfYear FROM listings_src_26000.active_to) AS listing__window_end__extract_doy
+              , date_trunc('week', listings_src_26000.active_to) AS listing__window_end__week
+              , date_trunc('month', listings_src_26000.active_to) AS listing__window_end__month
+              , date_trunc('quarter', listings_src_26000.active_to) AS listing__window_end__quarter
+              , date_trunc('year', listings_src_26000.active_to) AS listing__window_end__year
+              , toYear(listings_src_26000.active_to) AS listing__window_end__extract_year
+              , toQuarter(listings_src_26000.active_to) AS listing__window_end__extract_quarter
+              , toMonth(listings_src_26000.active_to) AS listing__window_end__extract_month
+              , toDayOfMonth(listings_src_26000.active_to) AS listing__window_end__extract_day
+              , toDayOfWeek(listings_src_26000.active_to) AS listing__window_end__extract_dow
+              , toDayOfYear(listings_src_26000.active_to) AS listing__window_end__extract_doy
               , listings_src_26000.country AS listing__country
               , listings_src_26000.is_lux AS listing__is_lux
               , listings_src_26000.capacity AS listing__capacity
@@ -464,19 +461,26 @@ FROM (
               , listings_src_26000.user_id AS user
               , listings_src_26000.user_id AS listing__user
             FROM ***************************.dim_listings listings_src_26000
-            SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
           ) subq_2
-          SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
         ) subq_3
-        SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+        ON
+          (
+            subq_1.listing = subq_3.listing
+          ) AND (
+            (
+              subq_1.metric_time__day >= subq_3.window_start__day
+            ) AND (
+              (
+                subq_1.metric_time__day < subq_3.window_end__day
+              ) OR (
+                subq_3.window_end__day IS NULL
+              )
+            )
+          )
       ) subq_4
       WHERE listing__capacity > 2
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_5
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_6
   GROUP BY
-    subq_6.metric_time__day
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    metric_time__day
 ) subq_7
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

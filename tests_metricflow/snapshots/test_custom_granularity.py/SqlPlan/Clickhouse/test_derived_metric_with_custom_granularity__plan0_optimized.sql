@@ -20,9 +20,7 @@ FROM (
   LEFT OUTER JOIN
     ***************************.mf_time_spine subq_14
   ON
-    DATE_TRUNC('day', bookings_source_src_28000.ds) = subq_14.ds
+    date_trunc('day', bookings_source_src_28000.ds) = subq_14.ds
   GROUP BY
-    subq_14.martian_day
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    booking__ds__martian_day
 ) subq_18
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

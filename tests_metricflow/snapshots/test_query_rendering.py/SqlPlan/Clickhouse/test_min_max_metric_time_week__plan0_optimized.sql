@@ -13,10 +13,8 @@ FROM (
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements: ['metric_time__week',]
   SELECT
-    DATE_TRUNC('week', ds) AS metric_time__week
+    date_trunc('week', ds) AS metric_time__week
   FROM ***************************.mf_time_spine time_spine_src_28006
   GROUP BY
-    DATE_TRUNC('week', ds)
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    metric_time__week
 ) subq_5
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

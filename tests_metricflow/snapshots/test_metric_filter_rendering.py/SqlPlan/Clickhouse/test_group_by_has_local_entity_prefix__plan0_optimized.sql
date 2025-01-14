@@ -14,7 +14,6 @@ WITH sma_28014_cte AS (
     , user_id AS user
     , 1 AS listings
   FROM ***************************.dim_listings_latest listings_latest_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 SELECT
@@ -25,8 +24,7 @@ FROM (
     subq_26.listing__user__average_booking_value AS user__listing__user__average_booking_value
     , sma_28014_cte.listings AS listings
   FROM sma_28014_cte sma_28014_cte
-  LEFT OUTER JOIN
-  (
+  LEFT OUTER JOIN (
     -- Join Standard Outputs
     -- Pass Only Elements: ['average_booking_value', 'listing__user']
     -- Aggregate Measures
@@ -41,12 +39,9 @@ FROM (
     ON
       bookings_source_src_28000.listing_id = sma_28014_cte.listing
     GROUP BY
-      sma_28014_cte.user
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+      listing__user
   ) subq_26
   ON
     sma_28014_cte.user = subq_26.listing__user
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_27
 WHERE user__listing__user__average_booking_value > 1
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

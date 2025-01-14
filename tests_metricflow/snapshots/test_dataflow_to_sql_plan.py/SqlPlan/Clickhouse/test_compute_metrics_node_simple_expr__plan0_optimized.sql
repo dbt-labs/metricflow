@@ -22,8 +22,6 @@ FROM (
   ON
     bookings_source_src_28000.listing_id = listings_latest_src_28000.listing_id
   GROUP BY
-    bookings_source_src_28000.listing_id
-    , listings_latest_src_28000.country
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    listing
+    , listing__country_latest
 ) subq_11
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

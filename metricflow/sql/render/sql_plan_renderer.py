@@ -322,9 +322,6 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
             return None
         return SqlPlanRenderResult(sql=f"LIMIT {limit_value}", bind_parameter_set=SqlBindParameterSet())
 
-    def _render_adapter_specific_flags(self) -> Optional[SqlPlanRenderResult]:
-        return None
-
     def visit_select_statement_node(self, node: SqlSelectStatementNode) -> SqlPlanRenderResult:  # noqa: D102
         render_results = [
             self._render_description_section(node.description),
@@ -336,7 +333,6 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
             self._render_group_by_section(node.group_bys),
             self._render_order_by_section(node.order_bys),
             self._render_limit_section(node.limit),
-            self._render_adapter_specific_flags(),
         ]
 
         valid_render_results = tuple(render_result for render_result in render_results if render_result is not None)

@@ -14,8 +14,7 @@ FROM (
     subq_15.listing__bookings AS listing__bookings
     , lux_listing_mapping_src_28000.listing_id AS listing
   FROM ***************************.dim_lux_listing_id_mapping lux_listing_mapping_src_28000
-  FULL OUTER JOIN
-  (
+  FULL OUTER JOIN (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     -- Pass Only Elements: ['listing', 'listing__bookings']
@@ -30,17 +29,13 @@ FROM (
         listing_id AS listing
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_12
     GROUP BY
       listing
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_15
   ON
     lux_listing_mapping_src_28000.listing_id = subq_15.listing
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_16
 WHERE listing__bookings > 2
 GROUP BY
   listing
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

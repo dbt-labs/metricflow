@@ -10,11 +10,10 @@ WITH sma_28019_cte AS (
   -- Read Elements From Semantic Model 'visits_source'
   -- Metric Time Dimension 'ds'
   SELECT
-    DATE_TRUNC('month', ds) AS metric_time__month
+    date_trunc('month', ds) AS metric_time__month
     , user_id AS user
     , 1 AS visits
   FROM ***************************.fct_visits visits_source_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 SELECT
@@ -26,10 +25,8 @@ FROM (
   SELECT
     SUM(visits) AS visits
   FROM sma_28019_cte sma_28019_cte
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_18
-CROSS JOIN
-(
+CROSS JOIN (
   -- Find conversions for user within the range of 1 month
   -- Pass Only Elements: ['buys_month',]
   -- Aggregate Measures
@@ -65,21 +62,26 @@ CROSS JOIN
       , subq_23.mf_internal_uuid AS mf_internal_uuid
       , subq_23.buys_month AS buys_month
     FROM sma_28019_cte sma_28019_cte
-    CROSS JOIN
-    (
+    INNER JOIN (
       -- Read Elements From Semantic Model 'buys_source'
       -- Metric Time Dimension 'ds_month'
       -- Add column with generated UUID
       SELECT
-        DATE_TRUNC('month', ds_month) AS metric_time__month
+        date_trunc('month', ds_month) AS metric_time__month
         , user_id AS user
         , 1 AS buys_month
         , generateUUIDv4() AS mf_internal_uuid
       FROM ***************************.fct_buys buys_source_src_28000
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_23
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    ON
+      (
+        sma_28019_cte.user = subq_23.user
+      ) AND (
+        (
+          sma_28019_cte.metric_time__month <= subq_23.metric_time__month
+        ) AND (
+          sma_28019_cte.metric_time__month > DATEADD(month, -1, subq_23.metric_time__month)
+        )
+      )
   ) subq_24
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_27
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

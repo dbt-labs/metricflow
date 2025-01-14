@@ -22,10 +22,8 @@ FROM (
       listing_id AS listing
       , 1 AS listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_20
-  LEFT OUTER JOIN
-  (
+  LEFT OUTER JOIN (
     -- Compute Metrics via Expressions
     -- Pass Only Elements: ['listing', 'listing__views_times_booking_value']
     SELECT
@@ -48,11 +46,9 @@ FROM (
           , SUM(booking_value) AS booking_value
         FROM ***************************.fct_bookings bookings_source_src_28000
         GROUP BY
-          listing_id
-        SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+          listing
       ) subq_25
-      FULL OUTER JOIN
-      (
+      FULL OUTER JOIN (
         -- Aggregate Measures
         -- Compute Metrics via Expressions
         SELECT
@@ -66,23 +62,17 @@ FROM (
             listing_id AS listing
             , 1 AS views
           FROM ***************************.fct_views views_source_src_28000
-          SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
         ) subq_28
         GROUP BY
           listing
-        SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
       ) subq_30
       ON
         subq_25.listing = subq_30.listing
       GROUP BY
-        COALESCE(subq_25.listing, subq_30.listing)
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+        listing
     ) subq_31
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_33
   ON
     subq_20.listing = subq_33.listing
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_34
 WHERE listing__views_times_booking_value > 1
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

@@ -7,11 +7,10 @@ WITH sma_28009_cte AS (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
   SELECT
-    DATE_TRUNC('day', ds) AS metric_time__day
+    date_trunc('day', ds) AS metric_time__day
     , is_instant AS booking__is_instant
     , booking_value
   FROM ***************************.fct_bookings bookings_source_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 SELECT
@@ -38,15 +37,12 @@ FROM (
         , booking__is_instant
         , booking_value
       FROM sma_28009_cte sma_28009_cte
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_13
     WHERE booking__is_instant
     GROUP BY
       metric_time__day
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_17
-  FULL OUTER JOIN
-  (
+  FULL OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
     -- Pass Only Elements: ['booking_value', 'metric_time__day']
     -- Aggregate Measures
@@ -57,12 +53,9 @@ FROM (
     FROM sma_28009_cte sma_28009_cte
     GROUP BY
       metric_time__day
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_21
   ON
     subq_17.metric_time__day = subq_21.metric_time__day
   GROUP BY
-    COALESCE(subq_17.metric_time__day, subq_21.metric_time__day)
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    metric_time__day
 ) subq_22
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

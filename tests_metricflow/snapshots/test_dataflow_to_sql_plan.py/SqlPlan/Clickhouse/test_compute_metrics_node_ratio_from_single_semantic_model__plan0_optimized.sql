@@ -25,15 +25,12 @@ FROM (
       , 1 AS bookings
       , guest_id AS bookers
     FROM ***************************.fct_bookings bookings_source_src_28000
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_7
   LEFT OUTER JOIN
     ***************************.dim_listings_latest listings_latest_src_28000
   ON
     subq_7.listing = listings_latest_src_28000.listing_id
   GROUP BY
-    subq_7.listing
-    , listings_latest_src_28000.country
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    listing
+    , listing__country_latest
 ) subq_11
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

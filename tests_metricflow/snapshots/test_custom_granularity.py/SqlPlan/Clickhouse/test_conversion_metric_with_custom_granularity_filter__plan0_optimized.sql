@@ -7,11 +7,10 @@ WITH sma_28019_cte AS (
   -- Read Elements From Semantic Model 'visits_source'
   -- Metric Time Dimension 'ds'
   SELECT
-    DATE_TRUNC('day', ds) AS metric_time__day
+    date_trunc('day', ds) AS metric_time__day
     , user_id AS user
     , 1 AS visits
   FROM ***************************.fct_visits visits_source_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 SELECT
@@ -41,15 +40,12 @@ FROM (
         ***************************.mf_time_spine subq_20
       ON
         sma_28019_cte.metric_time__day = subq_20.ds
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_21
     WHERE metric_time__martian_day = '2020-01-01'
     GROUP BY
       metric_time__martian_day
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_24
-  FULL OUTER JOIN
-  (
+  FULL OUTER JOIN (
     -- Find conversions for user within the range of 7 day
     -- Pass Only Elements: ['buys', 'metric_time__martian_day']
     -- Aggregate Measures
@@ -114,34 +110,36 @@ FROM (
             ***************************.mf_time_spine subq_25
           ON
             sma_28019_cte.metric_time__day = subq_25.ds
-          SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
         ) subq_26
         WHERE metric_time__martian_day = '2020-01-01'
-        SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
       ) subq_28
-      CROSS JOIN
-      (
+      INNER JOIN (
         -- Read Elements From Semantic Model 'buys_source'
         -- Metric Time Dimension 'ds'
         -- Add column with generated UUID
         SELECT
-          DATE_TRUNC('day', ds) AS metric_time__day
+          date_trunc('day', ds) AS metric_time__day
           , user_id AS user
           , 1 AS buys
           , generateUUIDv4() AS mf_internal_uuid
         FROM ***************************.fct_buys buys_source_src_28000
-        SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
       ) subq_31
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+      ON
+        (
+          subq_28.user = subq_31.user
+        ) AND (
+          (
+            subq_28.metric_time__day <= subq_31.metric_time__day
+          ) AND (
+            subq_28.metric_time__day > DATEADD(day, -7, subq_31.metric_time__day)
+          )
+        )
     ) subq_32
     GROUP BY
       metric_time__martian_day
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_35
   ON
     subq_24.metric_time__martian_day = subq_35.metric_time__martian_day
   GROUP BY
-    COALESCE(subq_24.metric_time__martian_day, subq_35.metric_time__martian_day)
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    metric_time__martian_day
 ) subq_36
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

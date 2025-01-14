@@ -15,11 +15,9 @@ FROM (
     martian_day AS metric_time__martian_day
   FROM ***************************.mf_time_spine time_spine_src_28006
   GROUP BY
-    martian_day
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    metric_time__martian_day
 ) subq_16
-LEFT OUTER JOIN
-(
+LEFT OUTER JOIN (
   -- Metric Time Dimension 'ds'
   -- Join to Custom Granularity Dataset
   -- Pass Only Elements: ['bookings', 'metric_time__martian_day']
@@ -31,18 +29,15 @@ LEFT OUTER JOIN
     -- Read Elements From Semantic Model 'bookings_source'
     SELECT
       1 AS bookings
-      , DATE_TRUNC('day', ds) AS ds__day
+      , date_trunc('day', ds) AS ds__day
     FROM ***************************.fct_bookings bookings_source_src_28000
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_9
   LEFT OUTER JOIN
     ***************************.mf_time_spine subq_10
   ON
     subq_9.ds__day = subq_10.ds
   GROUP BY
-    subq_10.martian_day
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    metric_time__martian_day
 ) subq_13
 ON
   subq_16.metric_time__martian_day = subq_13.metric_time__martian_day
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

@@ -8,7 +8,6 @@ WITH rss_28018_cte AS (
   SELECT
     ds AS ds__day
   FROM ***************************.mf_time_spine time_spine_src_28006
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 SELECT
@@ -20,8 +19,7 @@ FROM (
     rss_28018_cte.ds__day AS metric_time__day
     , subq_23.bookings_offset_once AS bookings_offset_once
   FROM rss_28018_cte rss_28018_cte
-  INNER JOIN
-  (
+  INNER JOIN (
     -- Compute Metrics via Expressions
     SELECT
       metric_time__day
@@ -35,26 +33,20 @@ FROM (
         rss_28018_cte.ds__day AS metric_time__day
         , SUM(subq_15.bookings) AS bookings
       FROM rss_28018_cte rss_28018_cte
-      INNER JOIN
-      (
+      INNER JOIN (
         -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
         SELECT
-          DATE_TRUNC('day', ds) AS metric_time__day
+          date_trunc('day', ds) AS metric_time__day
           , 1 AS bookings
         FROM ***************************.fct_bookings bookings_source_src_28000
-        SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
       ) subq_15
       ON
-        addDays(rss_28018_cte.ds__day, CAST(-5 AS Integer)) = subq_15.metric_time__day
+        DATEADD(day, -5, rss_28018_cte.ds__day) = subq_15.metric_time__day
       GROUP BY
-        rss_28018_cte.ds__day
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+        metric_time__day
     ) subq_22
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_23
   ON
-    addDays(rss_28018_cte.ds__day, CAST(-2 AS Integer)) = subq_23.metric_time__day
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    DATEADD(day, -2, rss_28018_cte.ds__day) = subq_23.metric_time__day
 ) subq_27
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

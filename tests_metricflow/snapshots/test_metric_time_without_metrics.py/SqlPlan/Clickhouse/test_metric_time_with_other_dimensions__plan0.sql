@@ -74,53 +74,53 @@ FROM (
       1 AS listings
       , listings_latest_src_28000.capacity AS largest_listing
       , listings_latest_src_28000.capacity AS smallest_listing
-      , DATE_TRUNC('day', listings_latest_src_28000.created_at) AS ds__day
-      , DATE_TRUNC('week', listings_latest_src_28000.created_at) AS ds__week
-      , DATE_TRUNC('month', listings_latest_src_28000.created_at) AS ds__month
-      , DATE_TRUNC('quarter', listings_latest_src_28000.created_at) AS ds__quarter
-      , DATE_TRUNC('year', listings_latest_src_28000.created_at) AS ds__year
-      , EXTRACT(toYear FROM listings_latest_src_28000.created_at) AS ds__extract_year
-      , EXTRACT(toQuarter FROM listings_latest_src_28000.created_at) AS ds__extract_quarter
-      , EXTRACT(toMonth FROM listings_latest_src_28000.created_at) AS ds__extract_month
-      , EXTRACT(toDayOfMonth FROM listings_latest_src_28000.created_at) AS ds__extract_day
-      , EXTRACT(toDayOfWeek FROM listings_latest_src_28000.created_at) AS ds__extract_dow
-      , EXTRACT(toDayOfYear FROM listings_latest_src_28000.created_at) AS ds__extract_doy
-      , DATE_TRUNC('day', listings_latest_src_28000.created_at) AS created_at__day
-      , DATE_TRUNC('week', listings_latest_src_28000.created_at) AS created_at__week
-      , DATE_TRUNC('month', listings_latest_src_28000.created_at) AS created_at__month
-      , DATE_TRUNC('quarter', listings_latest_src_28000.created_at) AS created_at__quarter
-      , DATE_TRUNC('year', listings_latest_src_28000.created_at) AS created_at__year
-      , EXTRACT(toYear FROM listings_latest_src_28000.created_at) AS created_at__extract_year
-      , EXTRACT(toQuarter FROM listings_latest_src_28000.created_at) AS created_at__extract_quarter
-      , EXTRACT(toMonth FROM listings_latest_src_28000.created_at) AS created_at__extract_month
-      , EXTRACT(toDayOfMonth FROM listings_latest_src_28000.created_at) AS created_at__extract_day
-      , EXTRACT(toDayOfWeek FROM listings_latest_src_28000.created_at) AS created_at__extract_dow
-      , EXTRACT(toDayOfYear FROM listings_latest_src_28000.created_at) AS created_at__extract_doy
+      , date_trunc('day', listings_latest_src_28000.created_at) AS ds__day
+      , date_trunc('week', listings_latest_src_28000.created_at) AS ds__week
+      , date_trunc('month', listings_latest_src_28000.created_at) AS ds__month
+      , date_trunc('quarter', listings_latest_src_28000.created_at) AS ds__quarter
+      , date_trunc('year', listings_latest_src_28000.created_at) AS ds__year
+      , toYear(listings_latest_src_28000.created_at) AS ds__extract_year
+      , toQuarter(listings_latest_src_28000.created_at) AS ds__extract_quarter
+      , toMonth(listings_latest_src_28000.created_at) AS ds__extract_month
+      , toDayOfMonth(listings_latest_src_28000.created_at) AS ds__extract_day
+      , toDayOfWeek(listings_latest_src_28000.created_at) AS ds__extract_dow
+      , toDayOfYear(listings_latest_src_28000.created_at) AS ds__extract_doy
+      , date_trunc('day', listings_latest_src_28000.created_at) AS created_at__day
+      , date_trunc('week', listings_latest_src_28000.created_at) AS created_at__week
+      , date_trunc('month', listings_latest_src_28000.created_at) AS created_at__month
+      , date_trunc('quarter', listings_latest_src_28000.created_at) AS created_at__quarter
+      , date_trunc('year', listings_latest_src_28000.created_at) AS created_at__year
+      , toYear(listings_latest_src_28000.created_at) AS created_at__extract_year
+      , toQuarter(listings_latest_src_28000.created_at) AS created_at__extract_quarter
+      , toMonth(listings_latest_src_28000.created_at) AS created_at__extract_month
+      , toDayOfMonth(listings_latest_src_28000.created_at) AS created_at__extract_day
+      , toDayOfWeek(listings_latest_src_28000.created_at) AS created_at__extract_dow
+      , toDayOfYear(listings_latest_src_28000.created_at) AS created_at__extract_doy
       , listings_latest_src_28000.country AS country_latest
       , listings_latest_src_28000.is_lux AS is_lux_latest
       , listings_latest_src_28000.capacity AS capacity_latest
-      , DATE_TRUNC('day', listings_latest_src_28000.created_at) AS listing__ds__day
-      , DATE_TRUNC('week', listings_latest_src_28000.created_at) AS listing__ds__week
-      , DATE_TRUNC('month', listings_latest_src_28000.created_at) AS listing__ds__month
-      , DATE_TRUNC('quarter', listings_latest_src_28000.created_at) AS listing__ds__quarter
-      , DATE_TRUNC('year', listings_latest_src_28000.created_at) AS listing__ds__year
-      , EXTRACT(toYear FROM listings_latest_src_28000.created_at) AS listing__ds__extract_year
-      , EXTRACT(toQuarter FROM listings_latest_src_28000.created_at) AS listing__ds__extract_quarter
-      , EXTRACT(toMonth FROM listings_latest_src_28000.created_at) AS listing__ds__extract_month
-      , EXTRACT(toDayOfMonth FROM listings_latest_src_28000.created_at) AS listing__ds__extract_day
-      , EXTRACT(toDayOfWeek FROM listings_latest_src_28000.created_at) AS listing__ds__extract_dow
-      , EXTRACT(toDayOfYear FROM listings_latest_src_28000.created_at) AS listing__ds__extract_doy
-      , DATE_TRUNC('day', listings_latest_src_28000.created_at) AS listing__created_at__day
-      , DATE_TRUNC('week', listings_latest_src_28000.created_at) AS listing__created_at__week
-      , DATE_TRUNC('month', listings_latest_src_28000.created_at) AS listing__created_at__month
-      , DATE_TRUNC('quarter', listings_latest_src_28000.created_at) AS listing__created_at__quarter
-      , DATE_TRUNC('year', listings_latest_src_28000.created_at) AS listing__created_at__year
-      , EXTRACT(toYear FROM listings_latest_src_28000.created_at) AS listing__created_at__extract_year
-      , EXTRACT(toQuarter FROM listings_latest_src_28000.created_at) AS listing__created_at__extract_quarter
-      , EXTRACT(toMonth FROM listings_latest_src_28000.created_at) AS listing__created_at__extract_month
-      , EXTRACT(toDayOfMonth FROM listings_latest_src_28000.created_at) AS listing__created_at__extract_day
-      , EXTRACT(toDayOfWeek FROM listings_latest_src_28000.created_at) AS listing__created_at__extract_dow
-      , EXTRACT(toDayOfYear FROM listings_latest_src_28000.created_at) AS listing__created_at__extract_doy
+      , date_trunc('day', listings_latest_src_28000.created_at) AS listing__ds__day
+      , date_trunc('week', listings_latest_src_28000.created_at) AS listing__ds__week
+      , date_trunc('month', listings_latest_src_28000.created_at) AS listing__ds__month
+      , date_trunc('quarter', listings_latest_src_28000.created_at) AS listing__ds__quarter
+      , date_trunc('year', listings_latest_src_28000.created_at) AS listing__ds__year
+      , toYear(listings_latest_src_28000.created_at) AS listing__ds__extract_year
+      , toQuarter(listings_latest_src_28000.created_at) AS listing__ds__extract_quarter
+      , toMonth(listings_latest_src_28000.created_at) AS listing__ds__extract_month
+      , toDayOfMonth(listings_latest_src_28000.created_at) AS listing__ds__extract_day
+      , toDayOfWeek(listings_latest_src_28000.created_at) AS listing__ds__extract_dow
+      , toDayOfYear(listings_latest_src_28000.created_at) AS listing__ds__extract_doy
+      , date_trunc('day', listings_latest_src_28000.created_at) AS listing__created_at__day
+      , date_trunc('week', listings_latest_src_28000.created_at) AS listing__created_at__week
+      , date_trunc('month', listings_latest_src_28000.created_at) AS listing__created_at__month
+      , date_trunc('quarter', listings_latest_src_28000.created_at) AS listing__created_at__quarter
+      , date_trunc('year', listings_latest_src_28000.created_at) AS listing__created_at__year
+      , toYear(listings_latest_src_28000.created_at) AS listing__created_at__extract_year
+      , toQuarter(listings_latest_src_28000.created_at) AS listing__created_at__extract_quarter
+      , toMonth(listings_latest_src_28000.created_at) AS listing__created_at__extract_month
+      , toDayOfMonth(listings_latest_src_28000.created_at) AS listing__created_at__extract_day
+      , toDayOfWeek(listings_latest_src_28000.created_at) AS listing__created_at__extract_dow
+      , toDayOfYear(listings_latest_src_28000.created_at) AS listing__created_at__extract_doy
       , listings_latest_src_28000.country AS listing__country_latest
       , listings_latest_src_28000.is_lux AS listing__is_lux_latest
       , listings_latest_src_28000.capacity AS listing__capacity_latest
@@ -128,10 +128,8 @@ FROM (
       , listings_latest_src_28000.user_id AS user
       , listings_latest_src_28000.user_id AS listing__user
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_0
-  CROSS JOIN
-  (
+  CROSS JOIN (
     -- Pass Only Elements: ['metric_time__day',]
     SELECT
       subq_2.metric_time__day
@@ -166,26 +164,22 @@ FROM (
         -- Read From Time Spine 'mf_time_spine'
         SELECT
           time_spine_src_28006.ds AS ds__day
-          , DATE_TRUNC('week', time_spine_src_28006.ds) AS ds__week
-          , DATE_TRUNC('month', time_spine_src_28006.ds) AS ds__month
-          , DATE_TRUNC('quarter', time_spine_src_28006.ds) AS ds__quarter
-          , DATE_TRUNC('year', time_spine_src_28006.ds) AS ds__year
-          , EXTRACT(toYear FROM time_spine_src_28006.ds) AS ds__extract_year
-          , EXTRACT(toQuarter FROM time_spine_src_28006.ds) AS ds__extract_quarter
-          , EXTRACT(toMonth FROM time_spine_src_28006.ds) AS ds__extract_month
-          , EXTRACT(toDayOfMonth FROM time_spine_src_28006.ds) AS ds__extract_day
-          , EXTRACT(toDayOfWeek FROM time_spine_src_28006.ds) AS ds__extract_dow
-          , EXTRACT(toDayOfYear FROM time_spine_src_28006.ds) AS ds__extract_doy
+          , date_trunc('week', time_spine_src_28006.ds) AS ds__week
+          , date_trunc('month', time_spine_src_28006.ds) AS ds__month
+          , date_trunc('quarter', time_spine_src_28006.ds) AS ds__quarter
+          , date_trunc('year', time_spine_src_28006.ds) AS ds__year
+          , toYear(time_spine_src_28006.ds) AS ds__extract_year
+          , toQuarter(time_spine_src_28006.ds) AS ds__extract_quarter
+          , toMonth(time_spine_src_28006.ds) AS ds__extract_month
+          , toDayOfMonth(time_spine_src_28006.ds) AS ds__extract_day
+          , toDayOfWeek(time_spine_src_28006.ds) AS ds__extract_dow
+          , toDayOfYear(time_spine_src_28006.ds) AS ds__extract_doy
           , time_spine_src_28006.martian_day AS ds__martian_day
         FROM ***************************.mf_time_spine time_spine_src_28006
-        SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
       ) subq_1
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_2
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_3
-  FULL OUTER JOIN
-  (
+  FULL OUTER JOIN (
     -- Pass Only Elements: ['home_state_latest', 'user']
     SELECT
       subq_4.user
@@ -193,42 +187,38 @@ FROM (
     FROM (
       -- Read Elements From Semantic Model 'users_latest'
       SELECT
-        DATE_TRUNC('day', users_latest_src_28000.ds) AS ds_latest__day
-        , DATE_TRUNC('week', users_latest_src_28000.ds) AS ds_latest__week
-        , DATE_TRUNC('month', users_latest_src_28000.ds) AS ds_latest__month
-        , DATE_TRUNC('quarter', users_latest_src_28000.ds) AS ds_latest__quarter
-        , DATE_TRUNC('year', users_latest_src_28000.ds) AS ds_latest__year
-        , EXTRACT(toYear FROM users_latest_src_28000.ds) AS ds_latest__extract_year
-        , EXTRACT(toQuarter FROM users_latest_src_28000.ds) AS ds_latest__extract_quarter
-        , EXTRACT(toMonth FROM users_latest_src_28000.ds) AS ds_latest__extract_month
-        , EXTRACT(toDayOfMonth FROM users_latest_src_28000.ds) AS ds_latest__extract_day
-        , EXTRACT(toDayOfWeek FROM users_latest_src_28000.ds) AS ds_latest__extract_dow
-        , EXTRACT(toDayOfYear FROM users_latest_src_28000.ds) AS ds_latest__extract_doy
+        date_trunc('day', users_latest_src_28000.ds) AS ds_latest__day
+        , date_trunc('week', users_latest_src_28000.ds) AS ds_latest__week
+        , date_trunc('month', users_latest_src_28000.ds) AS ds_latest__month
+        , date_trunc('quarter', users_latest_src_28000.ds) AS ds_latest__quarter
+        , date_trunc('year', users_latest_src_28000.ds) AS ds_latest__year
+        , toYear(users_latest_src_28000.ds) AS ds_latest__extract_year
+        , toQuarter(users_latest_src_28000.ds) AS ds_latest__extract_quarter
+        , toMonth(users_latest_src_28000.ds) AS ds_latest__extract_month
+        , toDayOfMonth(users_latest_src_28000.ds) AS ds_latest__extract_day
+        , toDayOfWeek(users_latest_src_28000.ds) AS ds_latest__extract_dow
+        , toDayOfYear(users_latest_src_28000.ds) AS ds_latest__extract_doy
         , users_latest_src_28000.home_state_latest
-        , DATE_TRUNC('day', users_latest_src_28000.ds) AS user__ds_latest__day
-        , DATE_TRUNC('week', users_latest_src_28000.ds) AS user__ds_latest__week
-        , DATE_TRUNC('month', users_latest_src_28000.ds) AS user__ds_latest__month
-        , DATE_TRUNC('quarter', users_latest_src_28000.ds) AS user__ds_latest__quarter
-        , DATE_TRUNC('year', users_latest_src_28000.ds) AS user__ds_latest__year
-        , EXTRACT(toYear FROM users_latest_src_28000.ds) AS user__ds_latest__extract_year
-        , EXTRACT(toQuarter FROM users_latest_src_28000.ds) AS user__ds_latest__extract_quarter
-        , EXTRACT(toMonth FROM users_latest_src_28000.ds) AS user__ds_latest__extract_month
-        , EXTRACT(toDayOfMonth FROM users_latest_src_28000.ds) AS user__ds_latest__extract_day
-        , EXTRACT(toDayOfWeek FROM users_latest_src_28000.ds) AS user__ds_latest__extract_dow
-        , EXTRACT(toDayOfYear FROM users_latest_src_28000.ds) AS user__ds_latest__extract_doy
+        , date_trunc('day', users_latest_src_28000.ds) AS user__ds_latest__day
+        , date_trunc('week', users_latest_src_28000.ds) AS user__ds_latest__week
+        , date_trunc('month', users_latest_src_28000.ds) AS user__ds_latest__month
+        , date_trunc('quarter', users_latest_src_28000.ds) AS user__ds_latest__quarter
+        , date_trunc('year', users_latest_src_28000.ds) AS user__ds_latest__year
+        , toYear(users_latest_src_28000.ds) AS user__ds_latest__extract_year
+        , toQuarter(users_latest_src_28000.ds) AS user__ds_latest__extract_quarter
+        , toMonth(users_latest_src_28000.ds) AS user__ds_latest__extract_month
+        , toDayOfMonth(users_latest_src_28000.ds) AS user__ds_latest__extract_day
+        , toDayOfWeek(users_latest_src_28000.ds) AS user__ds_latest__extract_dow
+        , toDayOfYear(users_latest_src_28000.ds) AS user__ds_latest__extract_doy
         , users_latest_src_28000.home_state_latest AS user__home_state_latest
         , users_latest_src_28000.user_id AS user
       FROM ***************************.dim_users_latest users_latest_src_28000
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_4
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_5
   ON
     subq_0.user = subq_5.user
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_6
 GROUP BY
-  subq_6.metric_time__day
-  , subq_6.listing__is_lux_latest
-  , subq_6.user__home_state_latest
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+  metric_time__day
+  , listing__is_lux_latest
+  , user__home_state_latest

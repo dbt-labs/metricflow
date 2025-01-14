@@ -14,21 +14,17 @@ FROM (
   -- Read Elements From Semantic Model 'accounts_source'
   -- Metric Time Dimension 'ds_month'
   SELECT
-    DATE_TRUNC('month', ds_month) AS ds_month__month
+    date_trunc('month', ds_month) AS ds_month__month
     , account_balance AS total_account_balance_first_day_of_month
   FROM ***************************.fct_accounts accounts_source_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_8
-INNER JOIN
-(
+INNER JOIN (
   -- Read Elements From Semantic Model 'accounts_source'
   -- Metric Time Dimension 'ds_month'
   -- Filter row on MIN(ds_month__month)
   SELECT
-    MIN(DATE_TRUNC('month', ds_month)) AS ds_month__month__complete
+    MIN(date_trunc('month', ds_month)) AS ds_month__month__complete
   FROM ***************************.fct_accounts accounts_source_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_10
 ON
   subq_8.ds_month__month = subq_10.ds_month__month__complete
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

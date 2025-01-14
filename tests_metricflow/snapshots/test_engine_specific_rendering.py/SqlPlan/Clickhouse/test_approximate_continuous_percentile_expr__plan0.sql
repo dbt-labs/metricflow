@@ -8,4 +8,3 @@ sql_engine: Clickhouse
 SELECT
   quantile(0.5)(a.col0) AS col0_percentile
 FROM foo.bar a
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

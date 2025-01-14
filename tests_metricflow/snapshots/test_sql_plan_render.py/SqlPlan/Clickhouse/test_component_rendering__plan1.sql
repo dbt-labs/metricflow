@@ -10,4 +10,3 @@ SELECT
   , b.country AS user__country
   , c.country AS listing__country
 FROM demo.fct_bookings a
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

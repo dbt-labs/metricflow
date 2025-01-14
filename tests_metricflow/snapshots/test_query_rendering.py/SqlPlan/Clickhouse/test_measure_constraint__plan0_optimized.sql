@@ -33,43 +33,36 @@ FROM (
         -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
         SELECT
-          DATE_TRUNC('day', ds) AS metric_time__day
+          date_trunc('day', ds) AS metric_time__day
           , listing_id AS listing
           , 1 AS bookings
           , booking_value AS average_booking_value
         FROM ***************************.fct_bookings bookings_source_src_28000
-        SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
       ) subq_27
       LEFT OUTER JOIN
         ***************************.dim_listings_latest listings_latest_src_28000
       ON
         subq_27.listing = listings_latest_src_28000.listing_id
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_31
     WHERE listing__is_lux_latest
     GROUP BY
       metric_time__day
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_35
-  FULL OUTER JOIN
-  (
+  FULL OUTER JOIN (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
     -- Pass Only Elements: ['booking_value', 'metric_time__day']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      DATE_TRUNC('day', ds) AS metric_time__day
+      date_trunc('day', ds) AS metric_time__day
       , SUM(booking_value) AS booking_value
     FROM ***************************.fct_bookings bookings_source_src_28000
     GROUP BY
-      DATE_TRUNC('day', ds)
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+      metric_time__day
   ) subq_40
   ON
     subq_35.metric_time__day = subq_40.metric_time__day
   GROUP BY
-    COALESCE(subq_35.metric_time__day, subq_40.metric_time__day)
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    metric_time__day
 ) subq_41
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

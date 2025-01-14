@@ -22,10 +22,8 @@ FROM (
       listing_id AS listing
       , 1 AS listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_20
-  LEFT OUTER JOIN
-  (
+  LEFT OUTER JOIN (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
@@ -41,15 +39,11 @@ FROM (
         , 1 AS bookings
         , guest_id AS bookers
       FROM ***************************.fct_bookings bookings_source_src_28000
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_23
     GROUP BY
       listing
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_25
   ON
     subq_20.listing = subq_25.listing
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_28
 WHERE listing__bookings_per_booker > 1
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

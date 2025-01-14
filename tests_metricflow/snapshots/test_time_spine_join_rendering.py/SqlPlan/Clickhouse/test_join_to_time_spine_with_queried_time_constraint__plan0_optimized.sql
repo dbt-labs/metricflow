@@ -23,10 +23,8 @@ FROM (
       ds AS metric_time__day
     FROM ***************************.mf_time_spine time_spine_src_28006
     WHERE ds BETWEEN '2020-01-03' AND '2020-01-05'
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_19
-  LEFT OUTER JOIN
-  (
+  LEFT OUTER JOIN (
     -- Aggregate Measures
     SELECT
       metric_time__day
@@ -37,19 +35,15 @@ FROM (
       -- Constrain Time Range to [2020-01-03T00:00:00, 2020-01-05T00:00:00]
       -- Pass Only Elements: ['bookings', 'metric_time__day']
       SELECT
-        DATE_TRUNC('day', ds) AS metric_time__day
+        date_trunc('day', ds) AS metric_time__day
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-      WHERE DATE_TRUNC('day', ds) BETWEEN '2020-01-03' AND '2020-01-05'
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+      WHERE date_trunc('day', ds) BETWEEN '2020-01-03' AND '2020-01-05'
     ) subq_14
     GROUP BY
       metric_time__day
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_15
   ON
     subq_19.metric_time__day = subq_15.metric_time__day
   WHERE subq_19.metric_time__day BETWEEN '2020-01-03' AND '2020-01-05'
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_21
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

@@ -9,5 +9,4 @@ SELECT
   ts AS metric_time__millisecond
 FROM ***************************.mf_time_spine_millisecond time_spine_src_28002
 GROUP BY
-  ts
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+  metric_time__millisecond

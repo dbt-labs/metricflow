@@ -25,15 +25,14 @@ FROM (
   --   'metric_time__extract_year',
   -- ]
   SELECT
-    EXTRACT(toYear FROM ds) AS metric_time__extract_year
-    , EXTRACT(toQuarter FROM ds) AS metric_time__extract_quarter
-    , EXTRACT(toMonth FROM ds) AS metric_time__extract_month
-    , EXTRACT(toDayOfMonth FROM ds) AS metric_time__extract_day
-    , EXTRACT(toDayOfWeek FROM ds) AS metric_time__extract_dow
-    , EXTRACT(toDayOfYear FROM ds) AS metric_time__extract_doy
+    toYear(ds) AS metric_time__extract_year
+    , toQuarter(ds) AS metric_time__extract_quarter
+    , toMonth(ds) AS metric_time__extract_month
+    , toDayOfMonth(ds) AS metric_time__extract_day
+    , toDayOfWeek(ds) AS metric_time__extract_dow
+    , toDayOfYear(ds) AS metric_time__extract_doy
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_6
 GROUP BY
   metric_time__extract_year
@@ -42,4 +41,3 @@ GROUP BY
   , metric_time__extract_day
   , metric_time__extract_dow
   , metric_time__extract_doy
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

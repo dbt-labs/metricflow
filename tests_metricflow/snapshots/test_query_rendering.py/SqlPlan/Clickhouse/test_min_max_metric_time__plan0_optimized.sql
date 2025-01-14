@@ -16,7 +16,5 @@ FROM (
     ds AS metric_time__day
   FROM ***************************.mf_time_spine time_spine_src_28006
   GROUP BY
-    ds
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    metric_time__day
 ) subq_5
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

@@ -24,10 +24,8 @@ FROM (
       user_id AS user
       , 1 AS listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_13
-  LEFT OUTER JOIN
-  (
+  LEFT OUTER JOIN (
     -- Read Elements From Semantic Model 'revenue'
     -- Metric Time Dimension 'ds'
     -- Pass Only Elements: ['txn_revenue', 'user']
@@ -39,12 +37,9 @@ FROM (
       , SUM(revenue) AS user__revenue_all_time
     FROM ***************************.fct_revenue revenue_src_28000
     GROUP BY
-      user_id
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+      user
   ) subq_19
   ON
     subq_13.user = subq_19.user
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_20
 WHERE user__revenue_all_time > 1
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

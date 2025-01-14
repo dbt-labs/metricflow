@@ -16,8 +16,7 @@ FROM (
     subq_21.customer_id__customer_third_hop_id__paraguayan_customers AS customer_third_hop_id__customer_id__customer_third_hop_id__paraguayan_customers
     , third_hop_table_src_22000.customer_third_hop_id AS third_hop_count
   FROM ***************************.third_hop_table third_hop_table_src_22000
-  LEFT OUTER JOIN
-  (
+  LEFT OUTER JOIN (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['customers_with_other_data', 'customer_id__customer_third_hop_id']
     -- Aggregate Measures
@@ -34,16 +33,12 @@ FROM (
         , country AS customer_id__country
         , 1 AS customers_with_other_data
       FROM ***************************.customer_other_data customer_other_data_src_22000
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_16
     WHERE customer_id__country = 'paraguay'
     GROUP BY
       customer_id__customer_third_hop_id
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_21
   ON
     third_hop_table_src_22000.customer_third_hop_id = subq_21.customer_id__customer_third_hop_id
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_22
 WHERE customer_third_hop_id__customer_id__customer_third_hop_id__paraguayan_customers > 0
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

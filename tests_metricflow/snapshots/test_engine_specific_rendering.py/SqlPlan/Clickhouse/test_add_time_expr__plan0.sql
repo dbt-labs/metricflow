@@ -6,6 +6,5 @@ sql_engine: Clickhouse
 ---
 -- Test Add Time Expression
 SELECT
-  addMonths('2020-01-01', CAST((1) AS Integer)) AS add_time
+  DATEADD(month, (1 * 3), '2020-01-01') AS add_time
 FROM foo.bar a
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

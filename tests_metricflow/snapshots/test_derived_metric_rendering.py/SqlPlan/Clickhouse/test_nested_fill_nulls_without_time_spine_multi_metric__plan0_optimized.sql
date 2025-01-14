@@ -32,23 +32,17 @@ FROM (
           -- Metric Time Dimension 'ds'
           -- Pass Only Elements: ['bookings', 'metric_time__day']
           SELECT
-            DATE_TRUNC('day', ds) AS metric_time__day
+            date_trunc('day', ds) AS metric_time__day
             , 1 AS bookings
           FROM ***************************.fct_bookings bookings_source_src_28000
-          SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
         ) subq_14
         GROUP BY
           metric_time__day
-        SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
       ) subq_15
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_16
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_17
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_18
-FULL OUTER JOIN
-(
+FULL OUTER JOIN (
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
@@ -59,17 +53,14 @@ FULL OUTER JOIN
     -- Metric Time Dimension 'ds'
     -- Pass Only Elements: ['listings', 'metric_time__day']
     SELECT
-      DATE_TRUNC('day', created_at) AS metric_time__day
+      date_trunc('day', created_at) AS metric_time__day
       , 1 AS listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_21
   GROUP BY
     metric_time__day
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_23
 ON
   subq_18.metric_time__day = subq_23.metric_time__day
 GROUP BY
-  COALESCE(subq_18.metric_time__day, subq_23.metric_time__day)
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+  metric_time__day

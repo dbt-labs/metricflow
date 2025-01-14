@@ -20,20 +20,17 @@ FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     SELECT
       1 AS bookings
-      , DATE_TRUNC('day', ds) AS ds__day
+      , date_trunc('day', ds) AS ds__day
     FROM ***************************.fct_bookings bookings_source_src_28000
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_12
   LEFT OUTER JOIN
     ***************************.mf_time_spine subq_13
   ON
     subq_12.ds__day = subq_13.ds
   GROUP BY
-    subq_13.martian_day
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    metric_time__martian_day
 ) subq_17
-FULL OUTER JOIN
-(
+FULL OUTER JOIN (
   -- Metric Time Dimension 'ds'
   -- Join to Custom Granularity Dataset
   -- Pass Only Elements: ['listings', 'metric_time__martian_day']
@@ -46,20 +43,17 @@ FULL OUTER JOIN
     -- Read Elements From Semantic Model 'listings_latest'
     SELECT
       1 AS listings
-      , DATE_TRUNC('day', created_at) AS ds__day
+      , date_trunc('day', created_at) AS ds__day
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_18
   LEFT OUTER JOIN
     ***************************.mf_time_spine subq_19
   ON
     subq_18.ds__day = subq_19.ds
   GROUP BY
-    subq_19.martian_day
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    metric_time__martian_day
 ) subq_23
 ON
   subq_17.metric_time__martian_day = subq_23.metric_time__martian_day
 GROUP BY
-  COALESCE(subq_17.metric_time__martian_day, subq_23.metric_time__martian_day)
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+  metric_time__martian_day

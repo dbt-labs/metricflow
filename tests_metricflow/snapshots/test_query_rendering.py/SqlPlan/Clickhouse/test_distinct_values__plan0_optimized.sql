@@ -14,11 +14,9 @@ FROM (
   SELECT
     country AS listing__country_latest
   FROM ***************************.dim_listings_latest listings_latest_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_3
 WHERE listing__country_latest = 'us'
 GROUP BY
   listing__country_latest
 ORDER BY listing__country_latest DESC
 LIMIT 100
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

@@ -10,9 +10,8 @@ sql_engine: Clickhouse
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  DATE_TRUNC('day', created_at) AS ds__day
+  date_trunc('day', created_at) AS ds__day
   , SUM(revenue) AS trailing_2_months_revenue
 FROM ***************************.fct_revenue revenue_src_28000
 GROUP BY
-  DATE_TRUNC('day', created_at)
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+  ds__day

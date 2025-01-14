@@ -24,19 +24,22 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       subq_12.ds AS metric_time__day
-      , DATE_TRUNC('month', subq_12.ds) AS metric_time__month
+      , date_trunc('month', subq_12.ds) AS metric_time__month
       , SUM(revenue_src_28000.revenue) AS revenue_mtd
     FROM ***************************.mf_time_spine subq_12
-    CROSS JOIN
+    INNER JOIN
       ***************************.fct_revenue revenue_src_28000
+    ON
+      (
+        date_trunc('day', revenue_src_28000.created_at) <= subq_12.ds
+      ) AND (
+        date_trunc('day', revenue_src_28000.created_at) >= date_trunc('month', subq_12.ds)
+      )
     GROUP BY
-      subq_12.ds
-      , DATE_TRUNC('month', subq_12.ds)
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+      metric_time__day
+      , metric_time__month
   ) subq_16
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_17
 GROUP BY
   metric_time__month
   , revenue_mtd
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

@@ -21,14 +21,12 @@ FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
     SELECT
-      DATE_TRUNC('day', created_at) AS metric_time__day
+      date_trunc('day', created_at) AS metric_time__day
       , listing_id AS listing
       , 1 AS listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_13
-  LEFT OUTER JOIN
-  (
+  LEFT OUTER JOIN (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     -- Pass Only Elements: ['listing', 'listing__bookings']
@@ -43,17 +41,13 @@ FROM (
         listing_id AS listing
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_16
     GROUP BY
       listing
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_19
   ON
     subq_13.listing = subq_19.listing
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_20
 WHERE listing__bookings > 2
 GROUP BY
   metric_time__day
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

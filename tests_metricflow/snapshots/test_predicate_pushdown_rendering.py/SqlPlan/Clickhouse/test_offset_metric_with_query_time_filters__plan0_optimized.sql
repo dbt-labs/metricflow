@@ -11,12 +11,11 @@ WITH sma_28009_cte AS (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
   SELECT
-    DATE_TRUNC('day', ds) AS metric_time__day
+    date_trunc('day', ds) AS metric_time__day
     , listing_id AS listing
     , is_instant AS booking__is_instant
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 , sma_28014_cte AS (
@@ -26,7 +25,6 @@ WITH sma_28009_cte AS (
     listing_id AS listing
     , country AS country_latest
   FROM ***************************.dim_listings_latest listings_latest_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 )
 
 SELECT
@@ -61,16 +59,13 @@ FROM (
         sma_28014_cte sma_28014_cte
       ON
         sma_28009_cte.listing = sma_28014_cte.listing
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_30
     WHERE booking__is_instant
     GROUP BY
       metric_time__day
       , listing__country_latest
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_34
-  FULL OUTER JOIN
-  (
+  FULL OUTER JOIN (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['bookings', 'listing__country_latest', 'metric_time__day']
     -- Aggregate Measures
@@ -97,20 +92,17 @@ FROM (
         INNER JOIN
           sma_28009_cte sma_28009_cte
         ON
-          addDays(time_spine_src_28006.ds, CAST(-14 AS Integer)) = sma_28009_cte.metric_time__day
-        SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+          DATEADD(day, -14, time_spine_src_28006.ds) = sma_28009_cte.metric_time__day
       ) subq_39
       LEFT OUTER JOIN
         sma_28014_cte sma_28014_cte
       ON
         subq_39.listing = sma_28014_cte.listing
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_42
     WHERE booking__is_instant
     GROUP BY
       metric_time__day
       , listing__country_latest
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_46
   ON
     (
@@ -119,8 +111,6 @@ FROM (
       subq_34.metric_time__day = subq_46.metric_time__day
     )
   GROUP BY
-    COALESCE(subq_34.metric_time__day, subq_46.metric_time__day)
-    , COALESCE(subq_34.listing__country_latest, subq_46.listing__country_latest)
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+    metric_time__day
+    , listing__country_latest
 ) subq_47
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

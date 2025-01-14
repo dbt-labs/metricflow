@@ -29,23 +29,26 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      DATE_TRUNC('quarter', subq_12.ds) AS revenue_instance__ds__quarter
-      , DATE_TRUNC('year', subq_12.ds) AS revenue_instance__ds__year
+      date_trunc('quarter', subq_12.ds) AS revenue_instance__ds__quarter
+      , date_trunc('year', subq_12.ds) AS revenue_instance__ds__year
       , subq_12.ds AS metric_time__day
       , SUM(revenue_src_28000.revenue) AS revenue_mtd
     FROM ***************************.mf_time_spine subq_12
-    CROSS JOIN
+    INNER JOIN
       ***************************.fct_revenue revenue_src_28000
+    ON
+      (
+        date_trunc('day', revenue_src_28000.created_at) <= subq_12.ds
+      ) AND (
+        date_trunc('day', revenue_src_28000.created_at) >= date_trunc('month', subq_12.ds)
+      )
     GROUP BY
-      DATE_TRUNC('quarter', subq_12.ds)
-      , DATE_TRUNC('year', subq_12.ds)
-      , subq_12.ds
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+      revenue_instance__ds__quarter
+      , revenue_instance__ds__year
+      , metric_time__day
   ) subq_16
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_17
 GROUP BY
   revenue_instance__ds__quarter
   , revenue_instance__ds__year
   , revenue_mtd
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

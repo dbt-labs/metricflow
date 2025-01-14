@@ -8,4 +8,3 @@ SELECT
   , a.bookings
 FROM demo.fct_bookings a
 ORDER BY a.booking_value, a.bookings DESC
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

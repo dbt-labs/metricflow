@@ -15,16 +15,14 @@ FROM (
   -- Read Elements From Semantic Model 'listings_latest'
   SELECT
     1 AS listings
-    , DATE_TRUNC('day', created_at) AS ds__day
-    , DATE_TRUNC('month', created_at) AS listing__ds__month
+    , date_trunc('day', created_at) AS ds__day
+    , date_trunc('month', created_at) AS listing__ds__month
   FROM ***************************.dim_listings_latest listings_latest_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_5
 LEFT OUTER JOIN
   ***************************.mf_time_spine subq_6
 ON
   subq_5.ds__day = subq_6.ds
 GROUP BY
-  subq_6.martian_day
-  , subq_5.listing__ds__month
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+  metric_time__martian_day
+  , listing__ds__month

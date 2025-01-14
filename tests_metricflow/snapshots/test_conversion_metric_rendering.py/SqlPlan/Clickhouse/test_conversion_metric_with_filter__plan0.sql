@@ -113,48 +113,42 @@ FROM (
             SELECT
               1 AS visits
               , visits_source_src_28000.user_id AS visitors
-              , DATE_TRUNC('day', visits_source_src_28000.ds) AS ds__day
-              , DATE_TRUNC('week', visits_source_src_28000.ds) AS ds__week
-              , DATE_TRUNC('month', visits_source_src_28000.ds) AS ds__month
-              , DATE_TRUNC('quarter', visits_source_src_28000.ds) AS ds__quarter
-              , DATE_TRUNC('year', visits_source_src_28000.ds) AS ds__year
-              , EXTRACT(toYear FROM visits_source_src_28000.ds) AS ds__extract_year
-              , EXTRACT(toQuarter FROM visits_source_src_28000.ds) AS ds__extract_quarter
-              , EXTRACT(toMonth FROM visits_source_src_28000.ds) AS ds__extract_month
-              , EXTRACT(toDayOfMonth FROM visits_source_src_28000.ds) AS ds__extract_day
-              , EXTRACT(toDayOfWeek FROM visits_source_src_28000.ds) AS ds__extract_dow
-              , EXTRACT(toDayOfYear FROM visits_source_src_28000.ds) AS ds__extract_doy
+              , date_trunc('day', visits_source_src_28000.ds) AS ds__day
+              , date_trunc('week', visits_source_src_28000.ds) AS ds__week
+              , date_trunc('month', visits_source_src_28000.ds) AS ds__month
+              , date_trunc('quarter', visits_source_src_28000.ds) AS ds__quarter
+              , date_trunc('year', visits_source_src_28000.ds) AS ds__year
+              , toYear(visits_source_src_28000.ds) AS ds__extract_year
+              , toQuarter(visits_source_src_28000.ds) AS ds__extract_quarter
+              , toMonth(visits_source_src_28000.ds) AS ds__extract_month
+              , toDayOfMonth(visits_source_src_28000.ds) AS ds__extract_day
+              , toDayOfWeek(visits_source_src_28000.ds) AS ds__extract_dow
+              , toDayOfYear(visits_source_src_28000.ds) AS ds__extract_doy
               , visits_source_src_28000.referrer_id
-              , DATE_TRUNC('day', visits_source_src_28000.ds) AS visit__ds__day
-              , DATE_TRUNC('week', visits_source_src_28000.ds) AS visit__ds__week
-              , DATE_TRUNC('month', visits_source_src_28000.ds) AS visit__ds__month
-              , DATE_TRUNC('quarter', visits_source_src_28000.ds) AS visit__ds__quarter
-              , DATE_TRUNC('year', visits_source_src_28000.ds) AS visit__ds__year
-              , EXTRACT(toYear FROM visits_source_src_28000.ds) AS visit__ds__extract_year
-              , EXTRACT(toQuarter FROM visits_source_src_28000.ds) AS visit__ds__extract_quarter
-              , EXTRACT(toMonth FROM visits_source_src_28000.ds) AS visit__ds__extract_month
-              , EXTRACT(toDayOfMonth FROM visits_source_src_28000.ds) AS visit__ds__extract_day
-              , EXTRACT(toDayOfWeek FROM visits_source_src_28000.ds) AS visit__ds__extract_dow
-              , EXTRACT(toDayOfYear FROM visits_source_src_28000.ds) AS visit__ds__extract_doy
+              , date_trunc('day', visits_source_src_28000.ds) AS visit__ds__day
+              , date_trunc('week', visits_source_src_28000.ds) AS visit__ds__week
+              , date_trunc('month', visits_source_src_28000.ds) AS visit__ds__month
+              , date_trunc('quarter', visits_source_src_28000.ds) AS visit__ds__quarter
+              , date_trunc('year', visits_source_src_28000.ds) AS visit__ds__year
+              , toYear(visits_source_src_28000.ds) AS visit__ds__extract_year
+              , toQuarter(visits_source_src_28000.ds) AS visit__ds__extract_quarter
+              , toMonth(visits_source_src_28000.ds) AS visit__ds__extract_month
+              , toDayOfMonth(visits_source_src_28000.ds) AS visit__ds__extract_day
+              , toDayOfWeek(visits_source_src_28000.ds) AS visit__ds__extract_dow
+              , toDayOfYear(visits_source_src_28000.ds) AS visit__ds__extract_doy
               , visits_source_src_28000.referrer_id AS visit__referrer_id
               , visits_source_src_28000.user_id AS user
               , visits_source_src_28000.session_id AS session
               , visits_source_src_28000.user_id AS visit__user
               , visits_source_src_28000.session_id AS visit__session
             FROM ***************************.fct_visits visits_source_src_28000
-            SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
           ) subq_0
-          SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
         ) subq_1
         WHERE metric_time__day = '2020-01-01'
-        SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
       ) subq_2
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_3
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_4
-  CROSS JOIN
-  (
+  CROSS JOIN (
     -- Aggregate Measures
     SELECT
       SUM(subq_14.buys) AS buys
@@ -297,46 +291,41 @@ FROM (
                   SELECT
                     1 AS visits
                     , visits_source_src_28000.user_id AS visitors
-                    , DATE_TRUNC('day', visits_source_src_28000.ds) AS ds__day
-                    , DATE_TRUNC('week', visits_source_src_28000.ds) AS ds__week
-                    , DATE_TRUNC('month', visits_source_src_28000.ds) AS ds__month
-                    , DATE_TRUNC('quarter', visits_source_src_28000.ds) AS ds__quarter
-                    , DATE_TRUNC('year', visits_source_src_28000.ds) AS ds__year
-                    , EXTRACT(toYear FROM visits_source_src_28000.ds) AS ds__extract_year
-                    , EXTRACT(toQuarter FROM visits_source_src_28000.ds) AS ds__extract_quarter
-                    , EXTRACT(toMonth FROM visits_source_src_28000.ds) AS ds__extract_month
-                    , EXTRACT(toDayOfMonth FROM visits_source_src_28000.ds) AS ds__extract_day
-                    , EXTRACT(toDayOfWeek FROM visits_source_src_28000.ds) AS ds__extract_dow
-                    , EXTRACT(toDayOfYear FROM visits_source_src_28000.ds) AS ds__extract_doy
+                    , date_trunc('day', visits_source_src_28000.ds) AS ds__day
+                    , date_trunc('week', visits_source_src_28000.ds) AS ds__week
+                    , date_trunc('month', visits_source_src_28000.ds) AS ds__month
+                    , date_trunc('quarter', visits_source_src_28000.ds) AS ds__quarter
+                    , date_trunc('year', visits_source_src_28000.ds) AS ds__year
+                    , toYear(visits_source_src_28000.ds) AS ds__extract_year
+                    , toQuarter(visits_source_src_28000.ds) AS ds__extract_quarter
+                    , toMonth(visits_source_src_28000.ds) AS ds__extract_month
+                    , toDayOfMonth(visits_source_src_28000.ds) AS ds__extract_day
+                    , toDayOfWeek(visits_source_src_28000.ds) AS ds__extract_dow
+                    , toDayOfYear(visits_source_src_28000.ds) AS ds__extract_doy
                     , visits_source_src_28000.referrer_id
-                    , DATE_TRUNC('day', visits_source_src_28000.ds) AS visit__ds__day
-                    , DATE_TRUNC('week', visits_source_src_28000.ds) AS visit__ds__week
-                    , DATE_TRUNC('month', visits_source_src_28000.ds) AS visit__ds__month
-                    , DATE_TRUNC('quarter', visits_source_src_28000.ds) AS visit__ds__quarter
-                    , DATE_TRUNC('year', visits_source_src_28000.ds) AS visit__ds__year
-                    , EXTRACT(toYear FROM visits_source_src_28000.ds) AS visit__ds__extract_year
-                    , EXTRACT(toQuarter FROM visits_source_src_28000.ds) AS visit__ds__extract_quarter
-                    , EXTRACT(toMonth FROM visits_source_src_28000.ds) AS visit__ds__extract_month
-                    , EXTRACT(toDayOfMonth FROM visits_source_src_28000.ds) AS visit__ds__extract_day
-                    , EXTRACT(toDayOfWeek FROM visits_source_src_28000.ds) AS visit__ds__extract_dow
-                    , EXTRACT(toDayOfYear FROM visits_source_src_28000.ds) AS visit__ds__extract_doy
+                    , date_trunc('day', visits_source_src_28000.ds) AS visit__ds__day
+                    , date_trunc('week', visits_source_src_28000.ds) AS visit__ds__week
+                    , date_trunc('month', visits_source_src_28000.ds) AS visit__ds__month
+                    , date_trunc('quarter', visits_source_src_28000.ds) AS visit__ds__quarter
+                    , date_trunc('year', visits_source_src_28000.ds) AS visit__ds__year
+                    , toYear(visits_source_src_28000.ds) AS visit__ds__extract_year
+                    , toQuarter(visits_source_src_28000.ds) AS visit__ds__extract_quarter
+                    , toMonth(visits_source_src_28000.ds) AS visit__ds__extract_month
+                    , toDayOfMonth(visits_source_src_28000.ds) AS visit__ds__extract_day
+                    , toDayOfWeek(visits_source_src_28000.ds) AS visit__ds__extract_dow
+                    , toDayOfYear(visits_source_src_28000.ds) AS visit__ds__extract_doy
                     , visits_source_src_28000.referrer_id AS visit__referrer_id
                     , visits_source_src_28000.user_id AS user
                     , visits_source_src_28000.session_id AS session
                     , visits_source_src_28000.user_id AS visit__user
                     , visits_source_src_28000.session_id AS visit__session
                   FROM ***************************.fct_visits visits_source_src_28000
-                  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
                 ) subq_5
-                SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
               ) subq_6
               WHERE metric_time__day = '2020-01-01'
-              SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
             ) subq_7
-            SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
           ) subq_8
-          CROSS JOIN
-          (
+          INNER JOIN (
             -- Add column with generated UUID
             SELECT
               subq_10.ds__day
@@ -451,59 +440,56 @@ FROM (
                   1 AS buys
                   , 1 AS buys_month
                   , buys_source_src_28000.user_id AS buyers
-                  , DATE_TRUNC('day', buys_source_src_28000.ds) AS ds__day
-                  , DATE_TRUNC('week', buys_source_src_28000.ds) AS ds__week
-                  , DATE_TRUNC('month', buys_source_src_28000.ds) AS ds__month
-                  , DATE_TRUNC('quarter', buys_source_src_28000.ds) AS ds__quarter
-                  , DATE_TRUNC('year', buys_source_src_28000.ds) AS ds__year
-                  , EXTRACT(toYear FROM buys_source_src_28000.ds) AS ds__extract_year
-                  , EXTRACT(toQuarter FROM buys_source_src_28000.ds) AS ds__extract_quarter
-                  , EXTRACT(toMonth FROM buys_source_src_28000.ds) AS ds__extract_month
-                  , EXTRACT(toDayOfMonth FROM buys_source_src_28000.ds) AS ds__extract_day
-                  , EXTRACT(toDayOfWeek FROM buys_source_src_28000.ds) AS ds__extract_dow
-                  , EXTRACT(toDayOfYear FROM buys_source_src_28000.ds) AS ds__extract_doy
-                  , DATE_TRUNC('month', buys_source_src_28000.ds_month) AS ds_month__month
-                  , DATE_TRUNC('quarter', buys_source_src_28000.ds_month) AS ds_month__quarter
-                  , DATE_TRUNC('year', buys_source_src_28000.ds_month) AS ds_month__year
-                  , EXTRACT(toYear FROM buys_source_src_28000.ds_month) AS ds_month__extract_year
-                  , EXTRACT(toQuarter FROM buys_source_src_28000.ds_month) AS ds_month__extract_quarter
-                  , EXTRACT(toMonth FROM buys_source_src_28000.ds_month) AS ds_month__extract_month
-                  , DATE_TRUNC('day', buys_source_src_28000.ds) AS buy__ds__day
-                  , DATE_TRUNC('week', buys_source_src_28000.ds) AS buy__ds__week
-                  , DATE_TRUNC('month', buys_source_src_28000.ds) AS buy__ds__month
-                  , DATE_TRUNC('quarter', buys_source_src_28000.ds) AS buy__ds__quarter
-                  , DATE_TRUNC('year', buys_source_src_28000.ds) AS buy__ds__year
-                  , EXTRACT(toYear FROM buys_source_src_28000.ds) AS buy__ds__extract_year
-                  , EXTRACT(toQuarter FROM buys_source_src_28000.ds) AS buy__ds__extract_quarter
-                  , EXTRACT(toMonth FROM buys_source_src_28000.ds) AS buy__ds__extract_month
-                  , EXTRACT(toDayOfMonth FROM buys_source_src_28000.ds) AS buy__ds__extract_day
-                  , EXTRACT(toDayOfWeek FROM buys_source_src_28000.ds) AS buy__ds__extract_dow
-                  , EXTRACT(toDayOfYear FROM buys_source_src_28000.ds) AS buy__ds__extract_doy
-                  , DATE_TRUNC('month', buys_source_src_28000.ds_month) AS buy__ds_month__month
-                  , DATE_TRUNC('quarter', buys_source_src_28000.ds_month) AS buy__ds_month__quarter
-                  , DATE_TRUNC('year', buys_source_src_28000.ds_month) AS buy__ds_month__year
-                  , EXTRACT(toYear FROM buys_source_src_28000.ds_month) AS buy__ds_month__extract_year
-                  , EXTRACT(toQuarter FROM buys_source_src_28000.ds_month) AS buy__ds_month__extract_quarter
-                  , EXTRACT(toMonth FROM buys_source_src_28000.ds_month) AS buy__ds_month__extract_month
+                  , date_trunc('day', buys_source_src_28000.ds) AS ds__day
+                  , date_trunc('week', buys_source_src_28000.ds) AS ds__week
+                  , date_trunc('month', buys_source_src_28000.ds) AS ds__month
+                  , date_trunc('quarter', buys_source_src_28000.ds) AS ds__quarter
+                  , date_trunc('year', buys_source_src_28000.ds) AS ds__year
+                  , toYear(buys_source_src_28000.ds) AS ds__extract_year
+                  , toQuarter(buys_source_src_28000.ds) AS ds__extract_quarter
+                  , toMonth(buys_source_src_28000.ds) AS ds__extract_month
+                  , toDayOfMonth(buys_source_src_28000.ds) AS ds__extract_day
+                  , toDayOfWeek(buys_source_src_28000.ds) AS ds__extract_dow
+                  , toDayOfYear(buys_source_src_28000.ds) AS ds__extract_doy
+                  , date_trunc('month', buys_source_src_28000.ds_month) AS ds_month__month
+                  , date_trunc('quarter', buys_source_src_28000.ds_month) AS ds_month__quarter
+                  , date_trunc('year', buys_source_src_28000.ds_month) AS ds_month__year
+                  , toYear(buys_source_src_28000.ds_month) AS ds_month__extract_year
+                  , toQuarter(buys_source_src_28000.ds_month) AS ds_month__extract_quarter
+                  , toMonth(buys_source_src_28000.ds_month) AS ds_month__extract_month
+                  , date_trunc('day', buys_source_src_28000.ds) AS buy__ds__day
+                  , date_trunc('week', buys_source_src_28000.ds) AS buy__ds__week
+                  , date_trunc('month', buys_source_src_28000.ds) AS buy__ds__month
+                  , date_trunc('quarter', buys_source_src_28000.ds) AS buy__ds__quarter
+                  , date_trunc('year', buys_source_src_28000.ds) AS buy__ds__year
+                  , toYear(buys_source_src_28000.ds) AS buy__ds__extract_year
+                  , toQuarter(buys_source_src_28000.ds) AS buy__ds__extract_quarter
+                  , toMonth(buys_source_src_28000.ds) AS buy__ds__extract_month
+                  , toDayOfMonth(buys_source_src_28000.ds) AS buy__ds__extract_day
+                  , toDayOfWeek(buys_source_src_28000.ds) AS buy__ds__extract_dow
+                  , toDayOfYear(buys_source_src_28000.ds) AS buy__ds__extract_doy
+                  , date_trunc('month', buys_source_src_28000.ds_month) AS buy__ds_month__month
+                  , date_trunc('quarter', buys_source_src_28000.ds_month) AS buy__ds_month__quarter
+                  , date_trunc('year', buys_source_src_28000.ds_month) AS buy__ds_month__year
+                  , toYear(buys_source_src_28000.ds_month) AS buy__ds_month__extract_year
+                  , toQuarter(buys_source_src_28000.ds_month) AS buy__ds_month__extract_quarter
+                  , toMonth(buys_source_src_28000.ds_month) AS buy__ds_month__extract_month
                   , buys_source_src_28000.user_id AS user
                   , buys_source_src_28000.session_id
                   , buys_source_src_28000.user_id AS buy__user
                   , buys_source_src_28000.session_id AS buy__session_id
                 FROM ***************************.fct_buys buys_source_src_28000
-                SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
               ) subq_9
-              SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
             ) subq_10
-            SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
           ) subq_11
-          SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+          ON
+            (
+              subq_8.user = subq_11.user
+            ) AND (
+              (subq_8.metric_time__day <= subq_11.metric_time__day)
+            )
         ) subq_12
-        SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
       ) subq_13
-      SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
     ) subq_14
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
   ) subq_15
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_16
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

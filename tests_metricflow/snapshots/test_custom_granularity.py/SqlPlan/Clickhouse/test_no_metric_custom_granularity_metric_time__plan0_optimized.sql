@@ -13,5 +13,4 @@ LEFT OUTER JOIN
 ON
   time_spine_src_28006.ds = subq_4.ds
 GROUP BY
-  subq_4.martian_day
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+  metric_time__martian_day

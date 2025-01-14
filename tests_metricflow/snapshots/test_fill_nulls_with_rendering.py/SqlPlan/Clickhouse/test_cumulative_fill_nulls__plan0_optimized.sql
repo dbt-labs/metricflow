@@ -12,8 +12,7 @@ FROM (
     time_spine_src_28006.ds AS metric_time__day
     , subq_17.bookers AS bookers
   FROM ***************************.mf_time_spine time_spine_src_28006
-  LEFT OUTER JOIN
-  (
+  LEFT OUTER JOIN (
     -- Join Self Over Time Range
     -- Pass Only Elements: ['bookers', 'metric_time__day']
     -- Aggregate Measures
@@ -21,14 +20,17 @@ FROM (
       subq_14.ds AS metric_time__day
       , COUNT(DISTINCT bookings_source_src_28000.guest_id) AS bookers
     FROM ***************************.mf_time_spine subq_14
-    CROSS JOIN
+    INNER JOIN
       ***************************.fct_bookings bookings_source_src_28000
+    ON
+      (
+        date_trunc('day', bookings_source_src_28000.ds) <= subq_14.ds
+      ) AND (
+        date_trunc('day', bookings_source_src_28000.ds) > DATEADD(day, -2, subq_14.ds)
+      )
     GROUP BY
-      subq_14.ds
-    SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+      metric_time__day
   ) subq_17
   ON
     time_spine_src_28006.ds = subq_17.metric_time__day
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_21
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

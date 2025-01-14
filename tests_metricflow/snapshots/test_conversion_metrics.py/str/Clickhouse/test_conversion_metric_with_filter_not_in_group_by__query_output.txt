@@ -5,4 +5,4 @@ docstring:
 ---
   visit_buy_conversions
 -----------------------
-                      8
+                      3

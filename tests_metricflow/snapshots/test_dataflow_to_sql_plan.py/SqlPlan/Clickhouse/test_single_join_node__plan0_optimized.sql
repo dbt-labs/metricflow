@@ -15,10 +15,8 @@ FROM (
     listing_id AS listing
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_5
 LEFT OUTER JOIN
   ***************************.dim_listings_latest listings_latest_src_28000
 ON
   subq_5.listing = listings_latest_src_28000.listing_id
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

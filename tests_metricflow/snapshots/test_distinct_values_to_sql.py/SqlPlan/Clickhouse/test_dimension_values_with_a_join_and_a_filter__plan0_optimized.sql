@@ -19,10 +19,8 @@ FROM (
     ***************************.dim_users_latest users_latest_src_28000
   ON
     listings_latest_src_28000.user_id = users_latest_src_28000.user_id
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_8
 WHERE user__home_state_latest = 'us'
 GROUP BY
   listing__is_lux_latest
   , user__home_state_latest
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0

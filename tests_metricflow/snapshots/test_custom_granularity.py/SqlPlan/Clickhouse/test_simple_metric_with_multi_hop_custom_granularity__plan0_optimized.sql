@@ -16,26 +16,23 @@ FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
   SELECT
-    DATE_TRUNC('day', ds_partitioned) AS ds_partitioned__day
+    date_trunc('day', ds_partitioned) AS ds_partitioned__day
     , listing_id AS listing
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_14
-LEFT OUTER JOIN
-(
+LEFT OUTER JOIN (
   -- Join Standard Outputs
   -- Pass Only Elements: ['user__ds_partitioned__day', 'user__ds__day', 'listing']
   SELECT
-    DATE_TRUNC('day', users_ds_source_src_28000.ds) AS user__ds__day
-    , DATE_TRUNC('day', users_ds_source_src_28000.ds_partitioned) AS user__ds_partitioned__day
+    date_trunc('day', users_ds_source_src_28000.ds) AS user__ds__day
+    , date_trunc('day', users_ds_source_src_28000.ds_partitioned) AS user__ds_partitioned__day
     , listings_latest_src_28000.listing_id AS listing
   FROM ***************************.dim_listings_latest listings_latest_src_28000
   LEFT OUTER JOIN
     ***************************.dim_users users_ds_source_src_28000
   ON
     listings_latest_src_28000.user_id = users_ds_source_src_28000.user_id
-  SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
 ) subq_21
 ON
   (
@@ -48,5 +45,4 @@ LEFT OUTER JOIN
 ON
   subq_21.user__ds__day = subq_22.ds
 GROUP BY
-  subq_22.martian_day
-SETTINGS allow_experimental_join_condition = 1, allow_experimental_analyzer = 1, join_use_nulls = 0
+  listing__user__ds__martian_day
