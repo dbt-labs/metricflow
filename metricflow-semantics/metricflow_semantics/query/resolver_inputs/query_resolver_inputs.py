@@ -3,6 +3,7 @@
 The naming of these classes is a little odd as they have the "For.." suffix. But using the "*ResolverInput" leads to
 some confusing names like "ResolverInputForQuery" -> "QueryResolverInput". Improved naming for these classes is TBD.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -44,6 +45,7 @@ class ResolverInputForMetric(MetricFlowQueryResolverInput):
     input_obj: Union[MetricQueryParameter, str]
     naming_scheme: MetricNamingScheme
     spec_pattern: MetricSpecPattern
+    alias: Optional[str] = None
 
     @property
     @override
