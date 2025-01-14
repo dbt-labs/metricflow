@@ -23,7 +23,7 @@ def test_metric_alias(  # noqa: D103
         MetricFlowQueryRequest.create_with_random_request_id(
             metrics=(MetricParameter(name="bookings", alias="bookings_alias"),),
             group_by_names=["metric_time__day"],
-            order_by_names=["metric_time__day"],
+            order_by_names=["metric_time__day", "bookings"],
             where_constraints=("{{ Metric('bookings', ['listing']) }} > 2",),
         )
     )

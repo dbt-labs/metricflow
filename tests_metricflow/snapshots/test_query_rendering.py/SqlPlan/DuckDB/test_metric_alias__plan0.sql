@@ -658,5 +658,5 @@ FROM (
         subq_10.metric_time__month
     ) subq_11
   ) subq_12
-  ORDER BY subq_12.bookings_alias
+  ORDER BY subq_12.bookings
 ) subq_13

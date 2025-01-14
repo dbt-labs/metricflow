@@ -62,6 +62,11 @@ class SqlExpressionNode(DagNode["SqlExpressionNode"], Visitable, ABC):
         return None
 
     @property
+    def as_column_alias_reference_expression(self) -> Optional[SqlColumnAliasReferenceExpression]:
+        """If this is a column alias reference expression, return self."""
+        return None
+
+    @property
     def as_string_expression(self) -> Optional[SqlStringExpression]:
         """If this is a string expression, return self."""
         return None
@@ -588,8 +593,8 @@ class SqlColumnAliasReferenceExpression(SqlExpressionNode):
         return False
 
     @property
-    def as_column_reference_expression(self) -> Optional[SqlColumnReferenceExpression]:  # noqa: D102
-        return None
+    def as_column_alias_reference_expression(self) -> Optional[SqlColumnAliasReferenceExpression]:  # noqa: D102
+        return self
 
     def rewrite(  # noqa: D102
         self,
