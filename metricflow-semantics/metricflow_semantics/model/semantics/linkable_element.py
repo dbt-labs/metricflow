@@ -11,6 +11,7 @@ from typing import FrozenSet, Iterable, Optional, Sequence, Tuple
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols.dimension import DimensionType
+from dbt_semantic_interfaces.protocols.metric import SemanticLayerElementConfig
 from dbt_semantic_interfaces.references import (
     DimensionReference,
     EntityReference,
@@ -150,6 +151,7 @@ class LinkableDimension(LinkableElement, SerializableDataclass):
     join_path: SemanticModelJoinPath
     time_granularity: Optional[ExpandedTimeGranularity]
     date_part: Optional[DatePart]
+    config: Optional[SemanticLayerElementConfig]
 
     @staticmethod
     def create(  # noqa: D102
@@ -161,6 +163,7 @@ class LinkableDimension(LinkableElement, SerializableDataclass):
         join_path: SemanticModelJoinPath,
         time_granularity: Optional[ExpandedTimeGranularity],
         date_part: Optional[DatePart],
+        config: Optional[SemanticLayerElementConfig],
     ) -> LinkableDimension:
         return LinkableDimension(
             properties=tuple(sorted(set(properties))),
@@ -171,6 +174,7 @@ class LinkableDimension(LinkableElement, SerializableDataclass):
             join_path=join_path,
             time_granularity=time_granularity,
             date_part=date_part,
+            config=config,
         )
 
     @property

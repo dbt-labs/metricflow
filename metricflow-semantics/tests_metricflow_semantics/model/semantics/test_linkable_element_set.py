@@ -99,6 +99,7 @@ _categorical_dimension = LinkableDimension.create(
     properties=frozenset([LinkableElementProperty.LOCAL_LINKED]),
     time_granularity=None,
     date_part=None,
+    config=None,
 )
 _time_dimension = LinkableDimension.create(
     element_name=_time_dimension_reference.element_name,
@@ -109,6 +110,7 @@ _time_dimension = LinkableDimension.create(
     properties=frozenset([LinkableElementProperty.LOCAL_LINKED]),
     time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
     date_part=None,
+    config=None,
 )
 # Resolves to the same local linked name name as _ambiguous_entity
 _ambiguous_categorical_dimension = LinkableDimension.create(
@@ -120,6 +122,7 @@ _ambiguous_categorical_dimension = LinkableDimension.create(
     properties=frozenset([LinkableElementProperty.LOCAL_LINKED]),
     time_granularity=None,
     date_part=None,
+    config=None,
 )
 # The opposite direction of the join for ambiguous_entity_with_join_path
 # For testing deduplication on dimensions
@@ -139,6 +142,7 @@ _ambiguous_categorical_dimension_with_join_path = LinkableDimension.create(
     properties=frozenset([LinkableElementProperty.JOINED]),
     time_granularity=None,
     date_part=None,
+    config=None,
 )
 
 # Metrics
@@ -598,6 +602,7 @@ def linkable_set() -> LinkableElementSet:  # noqa: D103
                     properties=frozenset(),
                     time_granularity=None,
                     date_part=None,
+                    config=None,
                 ),
             ),
             ElementPathKey(
@@ -623,6 +628,7 @@ def linkable_set() -> LinkableElementSet:  # noqa: D103
                     properties=frozenset(),
                     time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
                     date_part=None,
+                    config=None,
                 ),
             ),
         },

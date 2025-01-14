@@ -232,6 +232,7 @@ class ValidLinkableSpecResolver:
                 time_granularity=time_granularity,
                 date_part=date_part,
                 properties=tuple(sorted(properties)),
+                config=dimension.config,
             )
 
         # Build linkable dimensions for all compatible standard granularities and date parts.
@@ -399,6 +400,7 @@ class ValidLinkableSpecResolver:
                             properties=dimension_properties,
                             time_granularity=None,
                             date_part=None,
+                            config=dimension.config,
                         )
                     )
                 elif dimension_type is DimensionType.TIME:
@@ -546,6 +548,7 @@ class ValidLinkableSpecResolver:
                     properties=frozenset(properties),
                     time_granularity=time_granularity,
                     date_part=date_part,
+                    config=None,
                 )
                 path_key_to_linkable_dimensions[linkable_dimension.path_key].append(linkable_dimension)
 
@@ -778,6 +781,7 @@ class ValidLinkableSpecResolver:
                         properties=properties,
                         time_granularity=None,
                         date_part=None,
+                        config=dimension.config,
                     )
                 )
             elif dimension_type == DimensionType.TIME:
