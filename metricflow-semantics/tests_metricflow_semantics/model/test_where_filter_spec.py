@@ -130,6 +130,7 @@ def test_dimension_in_filter(  # noqa: D103
                             properties=frozenset(),
                             time_granularity=None,
                             date_part=None,
+                            config=None,
                         ),
                     )
                 }
@@ -191,6 +192,7 @@ def test_dimension_in_filter_with_grain(  # noqa: D103
                             properties=frozenset(),
                             time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.WEEK),
                             date_part=None,
+                            config=None,
                         ),
                     )
                 }
@@ -258,6 +260,7 @@ def test_time_dimension_in_filter(  # noqa: D103
                             properties=frozenset(),
                             time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
                             date_part=None,
+                            config=None,
                         ),
                     )
                 }
@@ -325,6 +328,7 @@ def test_time_dimension_with_grain_in_name(  # noqa: D103
                             properties=frozenset(),
                             time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
                             date_part=None,
+                            config=None,
                         ),
                     )
                 }
@@ -393,6 +397,7 @@ def test_date_part_in_filter(  # noqa: D103
                             properties=frozenset(),
                             time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
                             date_part=DatePart.YEAR,
+                            config=None,
                         ),
                     )
                 }
@@ -465,6 +470,7 @@ def resolved_spec_lookup(
                                 properties=frozenset(),
                                 time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.WEEK),
                                 date_part=DatePart.YEAR,
+                                config=None,
                             ),
                         )
                     }
@@ -713,6 +719,7 @@ def test_dimension_time_dimension_parity(  # noqa: D103
                                             TimeGranularity.WEEK
                                         ),
                                         date_part=DatePart.YEAR,
+                                        config=None,
                                     ),
                                 )
                             }

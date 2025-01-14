@@ -47,6 +47,7 @@ def test_where_filter_spec_serialization() -> None:  # noqa: D103
                     ),
                     date_part=DatePart.DAY,
                     time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
+                    config=None,
                 ),
             ),
         ),
