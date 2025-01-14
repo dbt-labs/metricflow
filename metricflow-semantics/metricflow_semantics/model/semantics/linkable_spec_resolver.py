@@ -548,7 +548,7 @@ class ValidLinkableSpecResolver:
                     properties=frozenset(properties),
                     time_granularity=time_granularity,
                     date_part=date_part,
-                    config=None,  # TODO: add config
+                    config=None,
                 )
                 path_key_to_linkable_dimensions[linkable_dimension.path_key].append(linkable_dimension)
 
