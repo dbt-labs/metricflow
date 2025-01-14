@@ -18,8 +18,8 @@ from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpe
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.patterns.entity_link_pattern import (
     EntityLinkPattern,
-    EntityLinkPatternParameterSet,
     ParameterSetField,
+    SpecPatternParameterSet,
 )
 from metricflow_semantics.specs.spec_set import group_specs_by_type
 
@@ -42,7 +42,7 @@ class DimensionPattern(EntityLinkPattern):
         dimension_call_parameter_set: DimensionCallParameterSet,
     ) -> DimensionPattern:
         return DimensionPattern(
-            parameter_set=EntityLinkPatternParameterSet.from_parameters(
+            parameter_set=SpecPatternParameterSet.from_parameters(
                 fields_to_compare=(
                     ParameterSetField.ELEMENT_NAME,
                     ParameterSetField.ENTITY_LINKS,
@@ -91,7 +91,7 @@ class TimeDimensionPattern(EntityLinkPattern):
             fields_to_compare.append(ParameterSetField.TIME_GRANULARITY)
 
         return TimeDimensionPattern(
-            parameter_set=EntityLinkPatternParameterSet.from_parameters(
+            parameter_set=SpecPatternParameterSet.from_parameters(
                 fields_to_compare=tuple(fields_to_compare),
                 element_name=time_dimension_call_parameter_set.time_dimension_reference.element_name,
                 entity_links=time_dimension_call_parameter_set.entity_path,
@@ -123,7 +123,7 @@ class EntityPattern(EntityLinkPattern):
     @staticmethod
     def from_call_parameter_set(entity_call_parameter_set: EntityCallParameterSet) -> EntityPattern:  # noqa: D102
         return EntityPattern(
-            parameter_set=EntityLinkPatternParameterSet.from_parameters(
+            parameter_set=SpecPatternParameterSet.from_parameters(
                 fields_to_compare=(
                     ParameterSetField.ELEMENT_NAME,
                     ParameterSetField.ENTITY_LINKS,
@@ -172,7 +172,7 @@ class GroupByMetricPattern(EntityLinkPattern):
         # so just use the last entity. Will need to add another param for that later.
         entity_links = metric_subquery_entity_links[-1:]
         return GroupByMetricPattern(
-            parameter_set=EntityLinkPatternParameterSet.from_parameters(
+            parameter_set=SpecPatternParameterSet.from_parameters(
                 fields_to_compare=(
                     ParameterSetField.ELEMENT_NAME,
                     ParameterSetField.ENTITY_LINKS,

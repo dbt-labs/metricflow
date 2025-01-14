@@ -8,28 +8,28 @@ sql_engine: BigQuery
 ---
 -- Re-aggregate Metric via Group By
 SELECT
-  booking__ds__month
-  , metric_time__week
+  metric_time__week
+  , booking__ds__month
   , every_two_days_bookers_fill_nulls_with_0
 FROM (
   -- Compute Metrics via Expressions
   -- Window Function for Metric Re-aggregation
   SELECT
-    booking__ds__month
-    , metric_time__week
+    metric_time__week
+    , booking__ds__month
     , FIRST_VALUE(COALESCE(bookers, 0)) OVER (
       PARTITION BY
-        booking__ds__month
-        , metric_time__week
+        metric_time__week
+        , booking__ds__month
       ORDER BY metric_time__day
       ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
     ) AS every_two_days_bookers_fill_nulls_with_0
   FROM (
     -- Join to Time Spine Dataset
     SELECT
-      DATETIME_TRUNC(time_spine_src_28006.ds, month) AS booking__ds__month
+      time_spine_src_28006.ds AS metric_time__day
       , DATETIME_TRUNC(time_spine_src_28006.ds, isoweek) AS metric_time__week
-      , time_spine_src_28006.ds AS metric_time__day
+      , DATETIME_TRUNC(time_spine_src_28006.ds, month) AS booking__ds__month
       , subq_19.bookers AS bookers
     FROM ***************************.mf_time_spine time_spine_src_28006
     LEFT OUTER JOIN (
@@ -60,6 +60,6 @@ FROM (
   ) subq_23
 ) subq_25
 GROUP BY
-  booking__ds__month
-  , metric_time__week
+  metric_time__week
+  , booking__ds__month
   , every_two_days_bookers_fill_nulls_with_0

@@ -73,7 +73,7 @@ MetricFlowQuerySpec(
           },
         ),
         spec_pattern=TimeDimensionPattern(
-          parameter_set=EntityLinkPatternParameterSet(
+          parameter_set=SpecPatternParameterSet(
             fields_to_compare=(
               DATE_PART,
               ELEMENT_NAME,
@@ -148,7 +148,7 @@ MetricFlowQuerySpec(
           },
         ),
         spec_pattern=TimeDimensionPattern(
-          parameter_set=EntityLinkPatternParameterSet(
+          parameter_set=SpecPatternParameterSet(
             fields_to_compare=(
               DATE_PART,
               ELEMENT_NAME,
