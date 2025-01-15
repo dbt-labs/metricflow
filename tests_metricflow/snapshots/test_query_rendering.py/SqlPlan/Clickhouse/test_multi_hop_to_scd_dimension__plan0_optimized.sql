@@ -21,7 +21,7 @@ FROM (
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_26000
 ) subq_11
-LEFT OUTER JOIN (
+CROSS JOIN (
   -- Join Standard Outputs
   -- Pass Only Elements: ['lux_listing__is_confirmed_lux', 'lux_listing__window_start__day', 'lux_listing__window_end__day', 'listing']
   SELECT
@@ -35,20 +35,19 @@ LEFT OUTER JOIN (
   ON
     lux_listing_mapping_src_26000.lux_listing_id = lux_listings_src_26000.lux_listing_id
 ) subq_16
-ON
+WHERE ((
+  subq_11.listing = subq_16.listing
+) AND (
   (
-    subq_11.listing = subq_16.listing
+    subq_11.metric_time__day >= subq_16.lux_listing__window_start__day
   ) AND (
     (
-      subq_11.metric_time__day >= subq_16.lux_listing__window_start__day
-    ) AND (
-      (
-        subq_11.metric_time__day < subq_16.lux_listing__window_end__day
-      ) OR (
-        subq_16.lux_listing__window_end__day IS NULL
-      )
+      subq_11.metric_time__day < subq_16.lux_listing__window_end__day
+    ) OR (
+      subq_16.lux_listing__window_end__day IS NULL
     )
   )
+))
 GROUP BY
   metric_time__day
   , listing__lux_listing__is_confirmed_lux

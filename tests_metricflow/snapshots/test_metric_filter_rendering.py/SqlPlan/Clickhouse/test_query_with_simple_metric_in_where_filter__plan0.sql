@@ -513,7 +513,7 @@ FROM (
         ON
           subq_1.listing = subq_7.listing
       ) subq_8
-      WHERE listing__bookings > 2
+      WHERE (listing__bookings > 2)
     ) subq_9
   ) subq_10
 ) subq_11

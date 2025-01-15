@@ -253,7 +253,7 @@ FROM (
     ON
       subq_0.listing = subq_6.listing
   ) subq_7
-  WHERE listing__bookings > 2
+  WHERE (listing__bookings > 2)
 ) subq_8
 GROUP BY
   listing

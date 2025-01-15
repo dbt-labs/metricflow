@@ -21,7 +21,7 @@ SELECT
 FROM (
   -- Join Standard Outputs
   SELECT
-    CAST(subq_38.buys AS DOUBLE PRECISION) / CAST(NULLIF(subq_38.visits, 0) AS DOUBLE PRECISION) AS user__visit_buy_conversion_rate
+    CAST(subq_38.buys AS Nullable(DOUBLE PRECISION)) / CAST(NULLIF(subq_38.visits, 0) AS Nullable(DOUBLE PRECISION)) AS user__visit_buy_conversion_rate
     , subq_24.listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
@@ -85,7 +85,7 @@ FROM (
           , subq_33.mf_internal_uuid AS mf_internal_uuid
           , subq_33.buys AS buys
         FROM sma_28019_cte sma_28019_cte
-        INNER JOIN (
+        CROSS JOIN (
           -- Read Elements From Semantic Model 'buys_source'
           -- Metric Time Dimension 'ds'
           -- Add column with generated UUID
@@ -96,12 +96,11 @@ FROM (
             , generateUUIDv4() AS mf_internal_uuid
           FROM ***************************.fct_buys buys_source_src_28000
         ) subq_33
-        ON
-          (
-            sma_28019_cte.user = subq_33.user
-          ) AND (
-            (sma_28019_cte.metric_time__day <= subq_33.metric_time__day)
-          )
+        WHERE ((
+          sma_28019_cte.user = subq_33.user
+        ) AND (
+          (sma_28019_cte.metric_time__day <= subq_33.metric_time__day)
+        ))
       ) subq_34
       GROUP BY
         user
@@ -114,4 +113,4 @@ FROM (
   ON
     subq_24.user = subq_38.user
 ) subq_41
-WHERE user__visit_buy_conversion_rate > 2
+WHERE (user__visit_buy_conversion_rate > 2)

@@ -468,7 +468,7 @@ FROM (
             ON
               DATEADD(week, -1, subq_4.metric_time__day) = subq_1.metric_time__day
           ) subq_5
-          WHERE metric_time__day = '2020-01-01'
+          WHERE (metric_time__day = '2020-01-01')
         ) subq_6
       ) subq_7
       GROUP BY
@@ -786,7 +786,7 @@ FROM (
               FROM ***************************.fct_bookings bookings_source_src_28000
             ) subq_10
           ) subq_11
-          WHERE metric_time__day = '2020-01-01'
+          WHERE (metric_time__day = '2020-01-01')
         ) subq_12
       ) subq_13
       GROUP BY

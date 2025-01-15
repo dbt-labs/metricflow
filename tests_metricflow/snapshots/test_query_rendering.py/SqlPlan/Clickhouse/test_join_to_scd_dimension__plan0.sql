@@ -397,7 +397,7 @@ FROM (
             FROM ***************************.fct_bookings bookings_source_src_26000
           ) subq_0
         ) subq_1
-        LEFT OUTER JOIN (
+        CROSS JOIN (
           -- Pass Only Elements: ['capacity', 'window_start__day', 'window_end__day', 'listing']
           SELECT
             subq_2.window_start__day
@@ -463,22 +463,21 @@ FROM (
             FROM ***************************.dim_listings listings_src_26000
           ) subq_2
         ) subq_3
-        ON
+        WHERE ((
+          subq_1.listing = subq_3.listing
+        ) AND (
           (
-            subq_1.listing = subq_3.listing
+            subq_1.metric_time__day >= subq_3.window_start__day
           ) AND (
             (
-              subq_1.metric_time__day >= subq_3.window_start__day
-            ) AND (
-              (
-                subq_1.metric_time__day < subq_3.window_end__day
-              ) OR (
-                subq_3.window_end__day IS NULL
-              )
+              subq_1.metric_time__day < subq_3.window_end__day
+            ) OR (
+              subq_3.window_end__day IS NULL
             )
           )
+        ))
       ) subq_4
-      WHERE listing__capacity > 2
+      WHERE (listing__capacity > 2)
     ) subq_5
   ) subq_6
   GROUP BY

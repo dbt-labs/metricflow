@@ -738,7 +738,7 @@ FROM (
         ON
           subq_1.listing = subq_13.listing
       ) subq_14
-      WHERE listing__bookings > 2 AND listing__bookers > 1
+      WHERE (listing__bookings > 2 AND listing__bookers > 1)
     ) subq_15
   ) subq_16
 ) subq_17

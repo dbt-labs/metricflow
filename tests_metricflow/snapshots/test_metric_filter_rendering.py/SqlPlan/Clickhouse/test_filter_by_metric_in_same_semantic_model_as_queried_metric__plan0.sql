@@ -638,7 +638,7 @@ FROM (
         ON
           subq_1.guest = subq_7.guest
       ) subq_8
-      WHERE guest__booking_value > 1.00
+      WHERE (guest__booking_value > 1.00)
     ) subq_9
   ) subq_10
 ) subq_11

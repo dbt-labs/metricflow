@@ -15,7 +15,7 @@ FROM (
     country AS listing__country_latest
   FROM ***************************.dim_listings_latest listings_latest_src_28000
 ) subq_3
-WHERE listing__country_latest = 'us'
+WHERE (listing__country_latest = 'us')
 GROUP BY
   listing__country_latest
 ORDER BY listing__country_latest DESC

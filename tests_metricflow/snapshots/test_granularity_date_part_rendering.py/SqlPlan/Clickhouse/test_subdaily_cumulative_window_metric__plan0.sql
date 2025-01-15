@@ -215,7 +215,7 @@ FROM (
           subq_3.ts AS metric_time__hour
         FROM ***************************.mf_time_spine_hour subq_3
       ) subq_2
-      INNER JOIN (
+      CROSS JOIN (
         -- Metric Time Dimension 'archived_at'
         SELECT
           subq_0.ds__day
@@ -593,12 +593,11 @@ FROM (
           FROM ***************************.dim_users users_ds_source_src_28000
         ) subq_0
       ) subq_1
-      ON
-        (
-          subq_1.metric_time__hour <= subq_2.metric_time__hour
-        ) AND (
-          subq_1.metric_time__hour > DATEADD(hour, -3, subq_2.metric_time__hour)
-        )
+      WHERE ((
+        subq_1.metric_time__hour <= subq_2.metric_time__hour
+      ) AND (
+        subq_1.metric_time__hour > DATEADD(hour, -3, subq_2.metric_time__hour)
+      ))
     ) subq_4
   ) subq_5
   GROUP BY

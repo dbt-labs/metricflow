@@ -47,7 +47,7 @@ FROM (
       sma_28009_cte sma_28009_cte
     ON
       date_trunc('month', time_spine_src_28006.ds) = sma_28009_cte.metric_time__day
-    WHERE date_trunc('week', time_spine_src_28006.ds) = time_spine_src_28006.ds
+    WHERE (date_trunc('week', time_spine_src_28006.ds) = time_spine_src_28006.ds)
     GROUP BY
       metric_time__week
   ) subq_27

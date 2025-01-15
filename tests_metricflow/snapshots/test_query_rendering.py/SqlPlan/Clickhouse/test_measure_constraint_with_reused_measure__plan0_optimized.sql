@@ -15,7 +15,7 @@ WITH sma_28009_cte AS (
 
 SELECT
   metric_time__day AS metric_time__day
-  , CAST(booking_value_with_is_instant_constraint AS DOUBLE PRECISION) / CAST(NULLIF(booking_value, 0) AS DOUBLE PRECISION) AS instant_booking_value_ratio
+  , CAST(booking_value_with_is_instant_constraint AS Nullable(DOUBLE PRECISION)) / CAST(NULLIF(booking_value, 0) AS Nullable(DOUBLE PRECISION)) AS instant_booking_value_ratio
 FROM (
   -- Combine Aggregated Outputs
   SELECT
@@ -38,7 +38,7 @@ FROM (
         , booking_value
       FROM sma_28009_cte sma_28009_cte
     ) subq_13
-    WHERE booking__is_instant
+    WHERE (booking__is_instant)
     GROUP BY
       metric_time__day
   ) subq_17

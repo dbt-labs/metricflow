@@ -302,7 +302,7 @@ FROM (
           FROM ***************************.fct_bookings bookings_source_src_26000
         ) subq_0
       ) subq_1
-      LEFT OUTER JOIN (
+      CROSS JOIN (
         -- Pass Only Elements: ['lux_listing__is_confirmed_lux', 'lux_listing__window_start__day', 'lux_listing__window_end__day', 'listing']
         SELECT
           subq_5.lux_listing__window_start__day
@@ -501,20 +501,19 @@ FROM (
             subq_2.lux_listing = subq_4.lux_listing
         ) subq_5
       ) subq_6
-      ON
+      WHERE ((
+        subq_1.listing = subq_6.listing
+      ) AND (
         (
-          subq_1.listing = subq_6.listing
+          subq_1.metric_time__day >= subq_6.lux_listing__window_start__day
         ) AND (
           (
-            subq_1.metric_time__day >= subq_6.lux_listing__window_start__day
-          ) AND (
-            (
-              subq_1.metric_time__day < subq_6.lux_listing__window_end__day
-            ) OR (
-              subq_6.lux_listing__window_end__day IS NULL
-            )
+            subq_1.metric_time__day < subq_6.lux_listing__window_end__day
+          ) OR (
+            subq_6.lux_listing__window_end__day IS NULL
           )
         )
+      ))
     ) subq_7
   ) subq_8
   GROUP BY

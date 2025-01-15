@@ -75,4 +75,4 @@ FROM (
   ON
     subq_20.listing = subq_33.listing
 ) subq_34
-WHERE listing__views_times_booking_value > 1
+WHERE (listing__views_times_booking_value > 1)

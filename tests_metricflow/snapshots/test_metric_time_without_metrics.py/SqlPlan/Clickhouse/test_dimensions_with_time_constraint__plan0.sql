@@ -279,7 +279,7 @@ FROM (
     ON
       subq_0.user = subq_5.user
   ) subq_6
-  WHERE subq_6.metric_time__day BETWEEN '2020-01-01' AND '2020-01-03'
+  WHERE (subq_6.metric_time__day BETWEEN '2020-01-01' AND '2020-01-03')
 ) subq_7
 GROUP BY
   metric_time__day

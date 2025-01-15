@@ -144,7 +144,7 @@ FROM (
             FROM ***************************.fct_visits visits_source_src_28000
           ) subq_0
         ) subq_1
-        WHERE visit__referrer_id = 'ref_id_01'
+        WHERE (visit__referrer_id = 'ref_id_01')
       ) subq_2
     ) subq_3
   ) subq_4
@@ -332,10 +332,10 @@ FROM (
                   FROM ***************************.fct_visits visits_source_src_28000
                 ) subq_5
               ) subq_6
-              WHERE visit__referrer_id = 'ref_id_01'
+              WHERE (visit__referrer_id = 'ref_id_01')
             ) subq_7
           ) subq_8
-          INNER JOIN (
+          CROSS JOIN (
             -- Add column with generated UUID
             SELECT
               subq_10.ds__day
@@ -492,16 +492,15 @@ FROM (
               ) subq_9
             ) subq_10
           ) subq_11
-          ON
+          WHERE ((
+            subq_8.user = subq_11.user
+          ) AND (
             (
-              subq_8.user = subq_11.user
+              subq_8.metric_time__day <= subq_11.metric_time__day
             ) AND (
-              (
-                subq_8.metric_time__day <= subq_11.metric_time__day
-              ) AND (
-                subq_8.metric_time__day > DATEADD(day, -7, subq_11.metric_time__day)
-              )
+              subq_8.metric_time__day > DATEADD(day, -7, subq_11.metric_time__day)
             )
+          ))
         ) subq_12
       ) subq_13
     ) subq_14

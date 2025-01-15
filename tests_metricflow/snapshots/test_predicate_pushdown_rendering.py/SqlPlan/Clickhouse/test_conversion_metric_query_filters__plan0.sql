@@ -8,7 +8,7 @@ sql_engine: Clickhouse
 SELECT
   subq_22.metric_time__day
   , subq_22.user__home_state_latest
-  , CAST(subq_22.buys AS DOUBLE PRECISION) / CAST(NULLIF(subq_22.visits, 0) AS DOUBLE PRECISION) AS visit_buy_conversion_rate_7days
+  , CAST(subq_22.buys AS Nullable(DOUBLE PRECISION)) / CAST(NULLIF(subq_22.visits, 0) AS Nullable(DOUBLE PRECISION)) AS visit_buy_conversion_rate_7days
 FROM (
   -- Combine Aggregated Outputs
   SELECT
@@ -237,7 +237,7 @@ FROM (
           ON
             subq_1.user = subq_3.user
         ) subq_4
-        WHERE visit__referrer_id = '123456'
+        WHERE (visit__referrer_id = '123456')
       ) subq_5
     ) subq_6
     GROUP BY
@@ -527,10 +527,10 @@ FROM (
                 ON
                   subq_9.user = subq_11.user
               ) subq_12
-              WHERE visit__referrer_id = '123456'
+              WHERE (visit__referrer_id = '123456')
             ) subq_13
           ) subq_14
-          INNER JOIN (
+          CROSS JOIN (
             -- Add column with generated UUID
             SELECT
               subq_16.ds__day
@@ -687,16 +687,15 @@ FROM (
               ) subq_15
             ) subq_16
           ) subq_17
-          ON
+          WHERE ((
+            subq_14.user = subq_17.user
+          ) AND (
             (
-              subq_14.user = subq_17.user
+              subq_14.metric_time__day <= subq_17.metric_time__day
             ) AND (
-              (
-                subq_14.metric_time__day <= subq_17.metric_time__day
-              ) AND (
-                subq_14.metric_time__day > DATEADD(day, -7, subq_17.metric_time__day)
-              )
+              subq_14.metric_time__day > DATEADD(day, -7, subq_17.metric_time__day)
             )
+          ))
         ) subq_18
       ) subq_19
     ) subq_20

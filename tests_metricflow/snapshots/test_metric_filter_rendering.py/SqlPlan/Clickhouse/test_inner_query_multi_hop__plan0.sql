@@ -803,7 +803,7 @@ FROM (
         ON
           subq_1.customer_third_hop_id = subq_15.account_id__customer_id__customer_third_hop_id
       ) subq_16
-      WHERE customer_third_hop_id__account_id__customer_id__customer_third_hop_id__txn_count > 2
+      WHERE (customer_third_hop_id__account_id__customer_id__customer_third_hop_id__txn_count > 2)
     ) subq_17
   ) subq_18
 ) subq_19

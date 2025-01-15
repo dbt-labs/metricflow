@@ -570,7 +570,7 @@ FROM (
           ON
             subq_1.listing = subq_4.listing
         ) subq_5
-        WHERE (listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')
+        WHERE ((listing__is_lux_latest) AND (metric_time__day >= '2020-01-02'))
       ) subq_6
     ) subq_7
     GROUP BY
@@ -982,7 +982,7 @@ FULL OUTER JOIN (
           ON
             subq_11.listing = subq_14.listing
         ) subq_15
-        WHERE (listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')
+        WHERE ((listing__is_lux_latest) AND (metric_time__day >= '2020-01-02'))
       ) subq_16
     ) subq_17
     GROUP BY
@@ -995,7 +995,7 @@ FULL OUTER JOIN (
   -- Compute Metrics via Expressions
   SELECT
     subq_40.listing__capacity_latest
-    , CAST(subq_40.bookings AS DOUBLE PRECISION) / CAST(NULLIF(subq_40.views, 0) AS DOUBLE PRECISION) AS bookings_per_view
+    , CAST(subq_40.bookings AS Nullable(DOUBLE PRECISION)) / CAST(NULLIF(subq_40.views, 0) AS Nullable(DOUBLE PRECISION)) AS bookings_per_view
   FROM (
     -- Combine Aggregated Outputs
     SELECT
@@ -1560,7 +1560,7 @@ FULL OUTER JOIN (
               ON
                 subq_21.listing = subq_24.listing
             ) subq_25
-            WHERE (listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')
+            WHERE ((listing__is_lux_latest) AND (metric_time__day >= '2020-01-02'))
           ) subq_26
         ) subq_27
         GROUP BY
@@ -1972,7 +1972,7 @@ FULL OUTER JOIN (
               ON
                 subq_31.listing = subq_34.listing
             ) subq_35
-            WHERE (listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')
+            WHERE ((listing__is_lux_latest) AND (metric_time__day >= '2020-01-02'))
           ) subq_36
         ) subq_37
         GROUP BY

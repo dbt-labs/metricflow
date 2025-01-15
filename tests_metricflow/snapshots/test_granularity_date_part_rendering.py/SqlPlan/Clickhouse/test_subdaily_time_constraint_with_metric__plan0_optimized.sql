@@ -16,7 +16,7 @@ FROM (
   SELECT
     ts AS metric_time__hour
   FROM ***************************.mf_time_spine_hour time_spine_src_28005
-  WHERE ts BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
+  WHERE (ts BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00')
 ) subq_19
 LEFT OUTER JOIN (
   -- Aggregate Measures
@@ -32,11 +32,11 @@ LEFT OUTER JOIN (
       date_trunc('hour', archived_at) AS metric_time__hour
       , 1 AS archived_users
     FROM ***************************.dim_users users_ds_source_src_28000
-    WHERE date_trunc('hour', archived_at) BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
+    WHERE (date_trunc('hour', archived_at) BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00')
   ) subq_14
   GROUP BY
     metric_time__hour
 ) subq_15
 ON
   subq_19.metric_time__hour = subq_15.metric_time__hour
-WHERE subq_19.metric_time__hour BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
+WHERE (subq_19.metric_time__hour BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00')

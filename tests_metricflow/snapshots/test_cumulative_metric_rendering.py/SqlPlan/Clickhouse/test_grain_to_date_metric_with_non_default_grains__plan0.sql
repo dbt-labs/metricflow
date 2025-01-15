@@ -91,7 +91,7 @@ FROM (
               , subq_3.ds AS metric_time__day
             FROM ***************************.mf_time_spine subq_3
           ) subq_2
-          INNER JOIN (
+          CROSS JOIN (
             -- Metric Time Dimension 'ds'
             SELECT
               subq_0.ds__day
@@ -161,12 +161,11 @@ FROM (
               FROM ***************************.fct_revenue revenue_src_28000
             ) subq_0
           ) subq_1
-          ON
-            (
-              subq_1.metric_time__day <= subq_2.metric_time__day
-            ) AND (
-              subq_1.metric_time__day >= date_trunc('month', subq_2.metric_time__day)
-            )
+          WHERE ((
+            subq_1.metric_time__day <= subq_2.metric_time__day
+          ) AND (
+            subq_1.metric_time__day >= date_trunc('month', subq_2.metric_time__day)
+          ))
         ) subq_4
       ) subq_5
       GROUP BY

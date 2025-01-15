@@ -34,7 +34,7 @@ FROM (
       , visits
     FROM sma_28019_cte sma_28019_cte
   ) subq_18
-  WHERE visit__referrer_id = 'ref_id_01'
+  WHERE (visit__referrer_id = 'ref_id_01')
 ) subq_21
 CROSS JOIN (
   -- Find conversions for user within the range of 7 day
@@ -96,9 +96,9 @@ CROSS JOIN (
           , visits
         FROM sma_28019_cte sma_28019_cte
       ) subq_22
-      WHERE visit__referrer_id = 'ref_id_01'
+      WHERE (visit__referrer_id = 'ref_id_01')
     ) subq_24
-    INNER JOIN (
+    CROSS JOIN (
       -- Read Elements From Semantic Model 'buys_source'
       -- Metric Time Dimension 'ds'
       -- Add column with generated UUID
@@ -109,15 +109,14 @@ CROSS JOIN (
         , generateUUIDv4() AS mf_internal_uuid
       FROM ***************************.fct_buys buys_source_src_28000
     ) subq_27
-    ON
+    WHERE ((
+      subq_24.user = subq_27.user
+    ) AND (
       (
-        subq_24.user = subq_27.user
+        subq_24.metric_time__day <= subq_27.metric_time__day
       ) AND (
-        (
-          subq_24.metric_time__day <= subq_27.metric_time__day
-        ) AND (
-          subq_24.metric_time__day > DATEADD(day, -7, subq_27.metric_time__day)
-        )
+        subq_24.metric_time__day > DATEADD(day, -7, subq_27.metric_time__day)
       )
+    ))
   ) subq_28
 ) subq_31

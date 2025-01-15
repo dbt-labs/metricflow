@@ -48,6 +48,6 @@ FROM (
   ON
     subq_13.listing = subq_19.listing
 ) subq_20
-WHERE listing__bookings > 2
+WHERE (listing__bookings > 2)
 GROUP BY
   metric_time__day

@@ -44,8 +44,13 @@ class ClickhouseSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     @property
     @override
     def double_data_type(self) -> str:
-        """Custom double data type for the Clickhouse engine."""
-        return "DOUBLE PRECISION"
+        """Custom double data type for the Clickhouse engine. It needs to be nullable so null values can be cast to NULL"""
+        return "Nullable(DOUBLE PRECISION)"
+
+    @property
+    @override
+    def timestamp_data_type(self) -> str:
+        return "Nullable(TIMESTAMP)"
 
     @property
     @override
@@ -124,7 +129,7 @@ class ClickhouseSqlExpressionRenderer(DefaultSqlExpressionRenderer):
 
         # For timestamp casting, use toDateTime
         return SqlExpressionRenderResult(
-            sql=f"toDateTime({arg_rendered.sql})",
+            sql=f"toDateTime64({arg_rendered.sql}, 3)",
             bind_parameter_set=arg_rendered.bind_parameter_set,
         )
 
@@ -132,7 +137,6 @@ class ClickhouseSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     def visit_date_trunc_expr(self, node: SqlDateTruncExpression) -> SqlExpressionRenderResult:
         self._validate_granularity_for_engine(node.time_granularity)
 
-        """Handle date truncation expressions properly."""
         arg_rendered = self.render_sql_expr(node.arg)
 
         # Map the granularity to Clickhouse's date truncation functions
@@ -143,10 +147,17 @@ class ClickhouseSqlExpressionRenderer(DefaultSqlExpressionRenderer):
             TimeGranularity.QUARTER: "quarter",
             TimeGranularity.YEAR: "year",
             TimeGranularity.HOUR: "hour",
-            TimeGranularity.MILLISECOND: "milisecond",
             TimeGranularity.SECOND: "second",
-            TimeGranularity.MINUTE: "minute"
+            TimeGranularity.MINUTE: "minute",
+            TimeGranularity.MILLISECOND: "millisecond",
         }[node.time_granularity]
+
+        # For millisecond precision, we need to cast to DateTime64
+        if node.time_granularity == TimeGranularity.MILLISECOND:
+            return SqlExpressionRenderResult(
+                sql=f"date_trunc('{trunc_function}', CAST({arg_rendered.sql} AS DateTime64(3)))",
+                bind_parameter_set=arg_rendered.bind_parameter_set,
+            )
 
         return SqlExpressionRenderResult(
             sql=f"date_trunc('{trunc_function}', {arg_rendered.sql})",
@@ -242,141 +253,111 @@ class ClickhouseSqlQueryPlanRenderer(DefaultSqlQueryPlanRenderer):
     def expr_renderer(self) -> SqlExpressionRenderer:
         return self.EXPR_RENDERER
 
+    @override
+    def _render_joins_section(self, join_descriptions: Sequence[SqlJoinDescription]) -> Optional[SqlPlanRenderResult]:
+        if not join_descriptions:
+            return None
 
+        params = SqlBindParameterSet()
+        join_section_lines = []
 
-    #
-    # @override
-    # def _render_where(self, where_expression: Optional[SqlExpressionNode]) -> Optional[SqlPlanRenderResult]:
-    #     """Override to combine stored where conditions from joins with the main where clause."""
-    #     original_where = super()._render_where(where_expression)
-    #     stored_conditions = getattr(self, '_stored_where_conditions', [])
-    #
-    #     # Clear stored conditions to prevent them from being used multiple times
-    #     self._stored_where_conditions = []
-    #
-    #     if not stored_conditions and not original_where:
-    #         return None
-    #
-    #     conditions = []
-    #
-    #     # Add original where condition if it exists
-    #     if original_where:
-    #         # Strip the "WHERE" prefix if it exists
-    #         where_sql = original_where.sql
-    #         if where_sql.upper().startswith('WHERE '):
-    #             where_sql = where_sql[6:]
-    #         conditions.append(where_sql)
-    #
-    #     # Add stored conditions from joins (only unique conditions)
-    #     seen_conditions = set()
-    #     for condition in stored_conditions:
-    #         if condition not in seen_conditions:
-    #             conditions.append(condition)
-    #             seen_conditions.add(condition)
-    #
-    #     # Combine all conditions with AND
-    #     combined_sql = ' AND '.join(f'({condition})' for condition in conditions if condition.strip())
-    #
-    #     return SqlPlanRenderResult(
-    #         sql=f"WHERE {combined_sql}" if combined_sql else "",
-    #         bind_parameter_set=original_where.bind_parameter_set if original_where else SqlBindParameterSet(),
-    #     )
-    #
-    #
-    # @override
-    # def _render_joins_section(self, join_descriptions: Sequence[SqlJoinDescription]) -> Optional[SqlPlanRenderResult]:
-    #     """Convert the join descriptions into a "JOIN" section with ClickHouse-specific handling.
-    #
-    #     Args:
-    #         join_descriptions: Sequence of join descriptions to render
-    #
-    #     Returns:
-    #         SqlPlanRenderResult with the rendered JOIN section, or None if no joins
-    #     """
-    #     if not join_descriptions:
-    #         return None
-    #
-    #     params = SqlBindParameterSet()
-    #     join_section_lines = []
-    #     where_conditions = []
-    #
-    #     for join_description in join_descriptions:
-    #         join_lines, join_params, join_where_conditions = self._render_single_join(join_description)
-    #         join_section_lines.extend(join_lines)
-    #         params = params.merge(join_params)
-    #         where_conditions.extend(join_where_conditions)
-    #
-    #     # Store where conditions for use in _render_where_section
-    #     if where_conditions:
-    #         self._stored_where_conditions = where_conditions
-    #
-    #     return SqlPlanRenderResult("\n".join(join_section_lines), params)
-    #
-    # def _render_single_join(self, join_description: SqlJoinDescription) -> tuple[list[str], SqlBindParameterSet, list[str]]:
-    #     """Renders a single join description."""
-    #     join_lines = []
-    #     where_conditions = []
-    #     params = SqlBindParameterSet()
-    #
-    #     # Render the right source
-    #     right_source_rendered = self._render_node(join_description.right_source)
-    #     params = params.merge(right_source_rendered.bind_parameter_set)
-    #
-    #     # Render the ON condition if present
-    #     on_condition = self._render_join_condition(join_description.on_condition)
-    #     if on_condition:
-    #         on_condition = SqlExpressionRenderResult(
-    #             sql=on_condition.sql,
-    #             bind_parameter_set=on_condition.bind_parameter_set
-    #         )
-    #         params = params.merge(on_condition.bind_parameter_set)
-    #
-    #     # Add join type and source
-    #     join_lines.append(join_description.join_type.value)
-    #     source_lines = self.__render_join_source(
-    #         right_source_rendered.sql,
-    #         join_description.right_source_alias,
-    #         join_description.right_source.as_sql_table_node is not None
-    #     )
-    #     join_lines.extend(source_lines)
-    #
-    #     # Always add ON clause for Clickhouse, even for inequality joins
-    #     if on_condition:
-    #         if self.__is_inequality_join(on_condition.sql):
-    #             # For inequality joins, use a simple 1=1 in ON clause and move real condition to WHERE
-    #             join_lines.extend(["ON", textwrap.indent("1 = 1", prefix=SqlRenderingConstants.INDENT)])
-    #             where_conditions.append(on_condition.sql)
-    #         else:
-    #             join_lines.extend(["ON", textwrap.indent(on_condition.sql, prefix=SqlRenderingConstants.INDENT)])
-    #
-    #     return join_lines, params, where_conditions
-    #
-    # def _render_join_condition(self, condition: Optional[SqlExpressionNode]) -> Optional[SqlExpressionRenderResult]:
-    #     """Renders the JOIN's ON condition if present."""
-    #     if condition:
-    #         return self.EXPR_RENDERER.render_sql_expr(condition)
-    #     return None
-    #
-    # def __get_join_type(self, original_type: SqlJoinType, on_condition: Optional[SqlExpressionRenderResult]) -> SqlJoinType:
-    #     """Determines the final join type, converting to CROSS JOIN for time-range joins."""
-    #     if on_condition and self.__is_inequality_join(on_condition.sql):
-    #         return SqlJoinType.CROSS_JOIN
-    #     return original_type
-    #
-    # @staticmethod
-    # def __is_inequality_join(condition_sql: str) -> bool:
-    #     """Checks if a join condition contains time range operators."""
-    #     inequality_operators = ["<=", ">=", "<", ">"]
-    #     return any(op in condition_sql for op in inequality_operators)
-    #
-    # @staticmethod
-    # def __render_join_source(source_sql: str, alias: str, is_table: bool) -> list[str]:
-    #     """Renders the join's source table or subquery with proper indentation."""
-    #     if is_table:
-    #         return [textwrap.indent(f"{source_sql} AS {alias.lower()}", prefix=SqlRenderingConstants.INDENT)]
-    #
-    #     return [
-    #         "(",
-    #         textwrap.indent(source_sql, prefix=SqlRenderingConstants.INDENT),
-    #         f") AS {alias.lower()}"  # Force lowercase here too
-    #     ]
+        for join_description in join_descriptions:
+            right_source_rendered = self._render_node(join_description.right_source)
+            params = params.merge(right_source_rendered.bind_parameter_set)
+
+            join_type = join_description.join_type.value
+
+            # Render the on condition
+            on_condition_rendered: Optional[SqlExpressionRenderResult] = None
+            if join_description.on_condition:
+                on_condition_rendered = self.EXPR_RENDERER.render_sql_expr(join_description.on_condition)
+                params = params.merge(on_condition_rendered.bind_parameter_set)
+
+            if on_condition_rendered:
+                conditions = on_condition_rendered.sql.split(' AND ')
+                equality_conditions = []
+                inequality_conditions = []
+
+                for condition in conditions:
+                    if self._is_inequality_join(condition):
+                        inequality_conditions.append(condition)
+                    else:
+                        equality_conditions.append(condition)
+
+                if inequality_conditions:
+                    # Store inequality conditions for WHERE clause
+                    self._stored_where_conditions.extend(inequality_conditions)
+                    # Update ON clause to only include equality conditions
+                    if equality_conditions:
+                        on_condition_rendered = SqlExpressionRenderResult(
+                            sql=' AND '.join(equality_conditions),
+                            bind_parameter_set=on_condition_rendered.bind_parameter_set
+                        )
+                    else:
+                        on_condition_rendered = None
+                        join_type = "CROSS JOIN"
+
+            # Rest of join rendering logic...
+            if join_description.right_source.as_sql_table_node is not None:
+                join_section_lines.append(join_type)
+                join_section_lines.append(
+                    textwrap.indent(
+                        f"{right_source_rendered.sql} {join_description.right_source_alias}",
+                        prefix=SqlRenderingConstants.INDENT,
+                    )
+                )
+            else:
+                join_section_lines.append(f"{join_type} (")
+                join_section_lines.append(
+                    textwrap.indent(right_source_rendered.sql, prefix=SqlRenderingConstants.INDENT)
+                )
+                join_section_lines.append(f") {join_description.right_source_alias}")
+
+            if on_condition_rendered:
+                join_section_lines.append("ON")
+                join_section_lines.append(
+                    textwrap.indent(on_condition_rendered.sql, prefix=SqlRenderingConstants.INDENT)
+                )
+
+        return SqlPlanRenderResult("\n".join(join_section_lines), params)
+
+    @override
+    def _render_where(self, where_expression: Optional[SqlExpressionNode]) -> Optional[SqlPlanRenderResult]:
+        """Combines original WHERE clause with stored join conditions."""
+        original_where = super()._render_where(where_expression)
+        stored_conditions = getattr(self, '_stored_where_conditions', []) or []
+
+        # Clear stored conditions to prevent them from being used multiple times
+        self._stored_where_conditions = []
+
+        if not stored_conditions and not original_where:
+            return None
+
+        conditions = []
+        params = SqlBindParameterSet()
+
+        # Add original where condition if it exists
+        if original_where:
+            where_sql = original_where.sql
+            if where_sql.upper().startswith('WHERE '):
+                where_sql = where_sql[6:]
+            conditions.append(where_sql)
+            params = params.merge(original_where.bind_parameter_set)
+
+        # Add stored conditions from joins
+        conditions.extend(stored_conditions)
+
+        # Combine all conditions with AND
+        combined_sql = ' AND '.join(f'({condition})' for condition in conditions if condition.strip())
+
+        return SqlPlanRenderResult(
+            sql=f"WHERE {combined_sql}" if combined_sql else "",
+            bind_parameter_set=params,
+        )
+
+    def _is_inequality_join(self, condition_sql: str) -> bool:
+        """Checks if a join condition contains inequality operators."""
+        # Add support for combined conditions with AND
+        parts = condition_sql.split(' AND ')
+        inequality_operators = ["<=", ">=", "<", ">"]
+        return any(any(op in part for op in inequality_operators) for part in parts)

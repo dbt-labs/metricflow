@@ -34,12 +34,11 @@ FROM (
       , date_trunc('quarter', subq_12.ds) AS metric_time__quarter
       , SUM(revenue_src_28000.revenue) AS revenue_all_time
     FROM ***************************.mf_time_spine subq_12
-    INNER JOIN
+    CROSS JOIN
       ***************************.fct_revenue revenue_src_28000
-    ON
-      (
-        date_trunc('day', revenue_src_28000.created_at) <= subq_12.ds
-      )
+    WHERE ((
+      date_trunc('day', revenue_src_28000.created_at) <= subq_12.ds
+    ))
     GROUP BY
       metric_time__day
       , metric_time__week

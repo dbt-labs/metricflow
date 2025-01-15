@@ -13,4 +13,4 @@ SELECT
   , date_trunc('day', ds) AS metric_time__day
   , 1 AS bookings
 FROM ***************************.fct_bookings bookings_source_src_28000
-WHERE date_trunc('day', ds) BETWEEN '2020-01-01' AND '2020-01-02'
+WHERE (date_trunc('day', ds) BETWEEN '2020-01-01' AND '2020-01-02')

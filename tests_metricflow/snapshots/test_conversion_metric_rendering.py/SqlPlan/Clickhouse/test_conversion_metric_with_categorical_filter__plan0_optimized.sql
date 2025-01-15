@@ -19,7 +19,7 @@ WITH sma_28019_cte AS (
 SELECT
   metric_time__day AS metric_time__day
   , visit__referrer_id AS visit__referrer_id
-  , CAST(buys AS DOUBLE PRECISION) / CAST(NULLIF(visits, 0) AS DOUBLE PRECISION) AS visit_buy_conversion_rate
+  , CAST(buys AS Nullable(DOUBLE PRECISION)) / CAST(NULLIF(visits, 0) AS Nullable(DOUBLE PRECISION)) AS visit_buy_conversion_rate
 FROM (
   -- Combine Aggregated Outputs
   SELECT
@@ -44,7 +44,7 @@ FROM (
         , visits
       FROM sma_28019_cte sma_28019_cte
     ) subq_18
-    WHERE visit__referrer_id = 'ref_id_01'
+    WHERE (visit__referrer_id = 'ref_id_01')
     GROUP BY
       metric_time__day
       , visit__referrer_id
@@ -111,9 +111,9 @@ FROM (
             , visits
           FROM sma_28019_cte sma_28019_cte
         ) subq_22
-        WHERE visit__referrer_id = 'ref_id_01'
+        WHERE (visit__referrer_id = 'ref_id_01')
       ) subq_24
-      INNER JOIN (
+      CROSS JOIN (
         -- Read Elements From Semantic Model 'buys_source'
         -- Metric Time Dimension 'ds'
         -- Add column with generated UUID
@@ -124,12 +124,11 @@ FROM (
           , generateUUIDv4() AS mf_internal_uuid
         FROM ***************************.fct_buys buys_source_src_28000
       ) subq_27
-      ON
-        (
-          subq_24.user = subq_27.user
-        ) AND (
-          (subq_24.metric_time__day <= subq_27.metric_time__day)
-        )
+      WHERE ((
+        subq_24.user = subq_27.user
+      ) AND (
+        (subq_24.metric_time__day <= subq_27.metric_time__day)
+      ))
     ) subq_28
     GROUP BY
       metric_time__day

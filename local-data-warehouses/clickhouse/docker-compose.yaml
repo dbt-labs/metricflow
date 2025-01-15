@@ -14,5 +14,3 @@ services:
       CLICKHOUSE_USER: "metricflow"
       CLICKHOUSE_PASSWORD: "metricflowing"
       CLICKHOUSE_DB: "metricflow"
-    volumes:
-      - ./config.xml:/etc/clickhouse-server/config.d/config.xml

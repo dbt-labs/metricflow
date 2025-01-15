@@ -314,7 +314,7 @@ FROM (
             FROM ***************************.fct_bookings bookings_source_src_28000
           ) subq_0
         ) subq_1
-        WHERE subq_1.metric_time__day BETWEEN '2020-01-01' AND '2020-01-01'
+        WHERE (subq_1.metric_time__day BETWEEN '2020-01-01' AND '2020-01-01')
       ) subq_2
     ) subq_3
   ) subq_4
@@ -533,7 +533,7 @@ CROSS JOIN (
             FROM ***************************.dim_listings_latest listings_latest_src_28000
           ) subq_6
         ) subq_7
-        WHERE subq_7.metric_time__day BETWEEN '2020-01-01' AND '2020-01-01'
+        WHERE (subq_7.metric_time__day BETWEEN '2020-01-01' AND '2020-01-01')
       ) subq_8
     ) subq_9
   ) subq_10

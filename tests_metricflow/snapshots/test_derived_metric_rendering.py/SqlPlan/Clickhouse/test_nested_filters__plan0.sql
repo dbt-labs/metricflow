@@ -569,7 +569,7 @@ FROM (
               ON
                 subq_1.listing = subq_4.listing
             ) subq_5
-            WHERE (listing__is_lux_latest) AND (booking__is_instant)
+            WHERE ((listing__is_lux_latest) AND (booking__is_instant))
           ) subq_6
         ) subq_7
       ) subq_8
@@ -1126,7 +1126,7 @@ FROM (
               ON
                 subq_11.listing = subq_14.listing
             ) subq_15
-            WHERE (listing__is_lux_latest) AND (booking__is_instant)
+            WHERE ((listing__is_lux_latest) AND (booking__is_instant))
           ) subq_16
         ) subq_17
       ) subq_18
@@ -1439,7 +1439,7 @@ FROM (
                 FROM ***************************.fct_bookings bookings_source_src_28000
               ) subq_20
             ) subq_21
-            WHERE booking__is_instant
+            WHERE (booking__is_instant)
           ) subq_22
         ) subq_23
       ) subq_24

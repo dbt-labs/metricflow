@@ -63,7 +63,7 @@ FROM (
           FROM ***************************.mf_time_spine_hour time_spine_src_28005
         ) subq_5
       ) subq_6
-      WHERE (metric_time__hour > '2020-01-01 00:09:00') AND (metric_time__day = '2020-01-01')
+      WHERE ((metric_time__hour > '2020-01-01 00:09:00') AND (metric_time__day = '2020-01-01'))
     ) subq_7
     GROUP BY
       metric_time__day
@@ -649,7 +649,7 @@ FROM (
             FROM ***************************.dim_users users_ds_source_src_28000
           ) subq_0
         ) subq_1
-        WHERE (metric_time__hour > '2020-01-01 00:09:00') AND (metric_time__day = '2020-01-01')
+        WHERE ((metric_time__hour > '2020-01-01 00:09:00') AND (metric_time__day = '2020-01-01'))
       ) subq_2
     ) subq_3
     GROUP BY

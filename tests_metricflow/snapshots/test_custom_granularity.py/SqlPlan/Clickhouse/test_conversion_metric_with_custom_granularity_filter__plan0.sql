@@ -5,7 +5,7 @@ sql_engine: Clickhouse
 -- Compute Metrics via Expressions
 SELECT
   subq_18.metric_time__martian_day
-  , CAST(subq_18.buys AS DOUBLE PRECISION) / CAST(NULLIF(subq_18.visits, 0) AS DOUBLE PRECISION) AS visit_buy_conversion_rate_7days
+  , CAST(subq_18.buys AS Nullable(DOUBLE PRECISION)) / CAST(NULLIF(subq_18.visits, 0) AS Nullable(DOUBLE PRECISION)) AS visit_buy_conversion_rate_7days
 FROM (
   -- Combine Aggregated Outputs
   SELECT
@@ -153,7 +153,7 @@ FROM (
           ON
             subq_0.ds__day = subq_1.ds
         ) subq_2
-        WHERE metric_time__martian_day = '2020-01-01'
+        WHERE (metric_time__martian_day = '2020-01-01')
       ) subq_3
     ) subq_4
     GROUP BY
@@ -352,10 +352,10 @@ FROM (
                 ON
                   subq_6.ds__day = subq_7.ds
               ) subq_8
-              WHERE metric_time__martian_day = '2020-01-01'
+              WHERE (metric_time__martian_day = '2020-01-01')
             ) subq_9
           ) subq_10
-          INNER JOIN (
+          CROSS JOIN (
             -- Add column with generated UUID
             SELECT
               subq_12.ds__day
@@ -512,16 +512,15 @@ FROM (
               ) subq_11
             ) subq_12
           ) subq_13
-          ON
+          WHERE ((
+            subq_10.user = subq_13.user
+          ) AND (
             (
-              subq_10.user = subq_13.user
+              subq_10.metric_time__day <= subq_13.metric_time__day
             ) AND (
-              (
-                subq_10.metric_time__day <= subq_13.metric_time__day
-              ) AND (
-                subq_10.metric_time__day > DATEADD(day, -7, subq_13.metric_time__day)
-              )
+              subq_10.metric_time__day > DATEADD(day, -7, subq_13.metric_time__day)
             )
+          ))
         ) subq_14
       ) subq_15
     ) subq_16

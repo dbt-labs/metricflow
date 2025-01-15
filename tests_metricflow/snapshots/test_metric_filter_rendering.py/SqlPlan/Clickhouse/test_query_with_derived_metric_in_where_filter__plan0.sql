@@ -668,7 +668,7 @@ FROM (
         ON
           subq_1.listing = subq_14.listing
       ) subq_15
-      WHERE listing__views_times_booking_value > 1
+      WHERE (listing__views_times_booking_value > 1)
     ) subq_16
   ) subq_17
 ) subq_18

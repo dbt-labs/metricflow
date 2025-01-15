@@ -79,7 +79,7 @@ FROM (
           ON
             sma_28009_cte.listing = sma_28014_cte.listing
         ) subq_38
-        WHERE booking__is_instant
+        WHERE (booking__is_instant)
         GROUP BY
           metric_time__day
           , listing__country_latest
@@ -134,7 +134,7 @@ FROM (
           ON
             subq_51.listing = sma_28014_cte.listing
         ) subq_54
-        WHERE booking__is_instant
+        WHERE (booking__is_instant)
         GROUP BY
           metric_time__day
           , listing__country_latest

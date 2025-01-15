@@ -8,7 +8,7 @@ sql_engine: Clickhouse
 SELECT
   subq_18.metric_time__day
   , subq_18.visit__referrer_id
-  , CAST(subq_18.buys AS DOUBLE PRECISION) / CAST(NULLIF(subq_18.visits, 0) AS DOUBLE PRECISION) AS visit_buy_conversion_rate_7days
+  , CAST(subq_18.buys AS Nullable(DOUBLE PRECISION)) / CAST(NULLIF(subq_18.visits, 0) AS Nullable(DOUBLE PRECISION)) AS visit_buy_conversion_rate_7days
 FROM (
   -- Combine Aggregated Outputs
   SELECT
@@ -196,9 +196,9 @@ FROM (
               FROM ***************************.fct_visits visits_source_src_28000
             ) subq_0
           ) subq_1
-          WHERE subq_1.metric_time__day BETWEEN '2020-01-01' AND '2020-01-02'
+          WHERE (subq_1.metric_time__day BETWEEN '2020-01-01' AND '2020-01-02')
         ) subq_2
-        WHERE visit__referrer_id = 'ref_id_01'
+        WHERE (visit__referrer_id = 'ref_id_01')
       ) subq_3
     ) subq_4
     GROUP BY
@@ -437,12 +437,12 @@ FROM (
                     FROM ***************************.fct_visits visits_source_src_28000
                   ) subq_6
                 ) subq_7
-                WHERE subq_7.metric_time__day BETWEEN '2020-01-01' AND '2020-01-02'
+                WHERE (subq_7.metric_time__day BETWEEN '2020-01-01' AND '2020-01-02')
               ) subq_8
-              WHERE visit__referrer_id = 'ref_id_01'
+              WHERE (visit__referrer_id = 'ref_id_01')
             ) subq_9
           ) subq_10
-          INNER JOIN (
+          CROSS JOIN (
             -- Add column with generated UUID
             SELECT
               subq_12.ds__day
@@ -599,16 +599,15 @@ FROM (
               ) subq_11
             ) subq_12
           ) subq_13
-          ON
+          WHERE ((
+            subq_10.user = subq_13.user
+          ) AND (
             (
-              subq_10.user = subq_13.user
+              subq_10.metric_time__day <= subq_13.metric_time__day
             ) AND (
-              (
-                subq_10.metric_time__day <= subq_13.metric_time__day
-              ) AND (
-                subq_10.metric_time__day > DATEADD(day, -7, subq_13.metric_time__day)
-              )
+              subq_10.metric_time__day > DATEADD(day, -7, subq_13.metric_time__day)
             )
+          ))
         ) subq_14
       ) subq_15
     ) subq_16

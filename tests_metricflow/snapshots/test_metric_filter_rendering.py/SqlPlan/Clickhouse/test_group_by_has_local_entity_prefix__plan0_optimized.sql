@@ -44,4 +44,4 @@ FROM (
   ON
     sma_28014_cte.user = subq_26.listing__user
 ) subq_27
-WHERE user__listing__user__average_booking_value > 1
+WHERE (user__listing__user__average_booking_value > 1)

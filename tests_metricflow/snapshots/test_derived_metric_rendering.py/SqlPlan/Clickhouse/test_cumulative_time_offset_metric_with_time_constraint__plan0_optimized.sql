@@ -22,18 +22,17 @@ FROM (
       subq_16.ds AS metric_time__day
       , bookings_source_src_28000.guest_id AS bookers
     FROM ***************************.mf_time_spine subq_16
-    INNER JOIN
+    CROSS JOIN
       ***************************.fct_bookings bookings_source_src_28000
-    ON
-      (
-        date_trunc('day', bookings_source_src_28000.ds) <= subq_16.ds
-      ) AND (
-        date_trunc('day', bookings_source_src_28000.ds) > DATEADD(day, -2, subq_16.ds)
-      )
+    WHERE ((
+      date_trunc('day', bookings_source_src_28000.ds) <= subq_16.ds
+    ) AND (
+      date_trunc('day', bookings_source_src_28000.ds) > DATEADD(day, -2, subq_16.ds)
+    ))
   ) subq_17
   ON
     DATEADD(day, -2, time_spine_src_28006.ds) = subq_17.metric_time__day
-  WHERE time_spine_src_28006.ds BETWEEN '2019-12-19' AND '2020-01-02'
+  WHERE (time_spine_src_28006.ds BETWEEN '2019-12-19' AND '2020-01-02')
   GROUP BY
     metric_time__day
 ) subq_25

@@ -10,7 +10,7 @@ SELECT
   subq_10.ts AS metric_time__hour
   , SUM(subq_8.archived_users) AS subdaily_cumulative_window_metric
 FROM ***************************.mf_time_spine_hour subq_10
-INNER JOIN (
+CROSS JOIN (
   -- Read Elements From Semantic Model 'users_ds_source'
   -- Metric Time Dimension 'archived_at'
   SELECT
@@ -18,11 +18,10 @@ INNER JOIN (
     , 1 AS archived_users
   FROM ***************************.dim_users users_ds_source_src_28000
 ) subq_8
-ON
-  (
-    subq_8.metric_time__hour <= subq_10.ts
-  ) AND (
-    subq_8.metric_time__hour > DATEADD(hour, -3, subq_10.ts)
-  )
+WHERE ((
+  subq_8.metric_time__hour <= subq_10.ts
+) AND (
+  subq_8.metric_time__hour > DATEADD(hour, -3, subq_10.ts)
+))
 GROUP BY
   metric_time__hour

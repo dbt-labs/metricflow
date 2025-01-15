@@ -6,7 +6,7 @@ sql_engine: Clickhouse
 ---
 -- Compute Metrics via Expressions
 SELECT
-  CAST(subq_14.buys_month AS DOUBLE PRECISION) / CAST(NULLIF(subq_14.visits, 0) AS DOUBLE PRECISION) AS visit_buy_conversion_rate_with_monthly_conversion
+  CAST(subq_14.buys_month AS Nullable(DOUBLE PRECISION)) / CAST(NULLIF(subq_14.visits, 0) AS Nullable(DOUBLE PRECISION)) AS visit_buy_conversion_rate_with_monthly_conversion
 FROM (
   -- Combine Aggregated Outputs
   SELECT
@@ -233,7 +233,7 @@ FROM (
               ) subq_4
             ) subq_5
           ) subq_6
-          INNER JOIN (
+          CROSS JOIN (
             -- Add column with generated UUID
             SELECT
               subq_8.ds__day
@@ -378,16 +378,15 @@ FROM (
               ) subq_7
             ) subq_8
           ) subq_9
-          ON
+          WHERE ((
+            subq_6.user = subq_9.user
+          ) AND (
             (
-              subq_6.user = subq_9.user
+              subq_6.metric_time__month <= subq_9.metric_time__month
             ) AND (
-              (
-                subq_6.metric_time__month <= subq_9.metric_time__month
-              ) AND (
-                subq_6.metric_time__month > DATEADD(month, -1, subq_9.metric_time__month)
-              )
+              subq_6.metric_time__month > DATEADD(month, -1, subq_9.metric_time__month)
             )
+          ))
         ) subq_10
       ) subq_11
     ) subq_12

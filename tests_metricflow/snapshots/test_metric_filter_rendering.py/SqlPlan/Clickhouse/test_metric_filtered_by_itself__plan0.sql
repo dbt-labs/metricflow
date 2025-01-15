@@ -638,7 +638,7 @@ FROM (
         ON
           subq_1.listing = subq_7.listing
       ) subq_8
-      WHERE listing__bookers > 1.00
+      WHERE (listing__bookers > 1.00)
     ) subq_9
   ) subq_10
 ) subq_11

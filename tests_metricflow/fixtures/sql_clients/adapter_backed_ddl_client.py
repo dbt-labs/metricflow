@@ -50,7 +50,7 @@ class AdapterBackedDDLSqlClient(AdapterBackedSqlClient):
 
             if self.sql_engine_type == SqlEngine.CLICKHOUSE:
                 create_table_statement = (
-                    f"{create_table_statement} ENGINE = MergeTree ORDER BY ({columns_to_insert[0].split(' ')[0]})"
+                    f"{create_table_statement} ENGINE = MergeTree ORDER BY ({columns_to_insert[0].split(' ')[0]}) SETTINGS allow_nullable_key = 1"
                 )
 
             self._adapter.execute(

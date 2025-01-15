@@ -36,6 +36,6 @@ FROM (
   ON
     lux_listing_mapping_src_28000.listing_id = subq_15.listing
 ) subq_16
-WHERE listing__bookings > 2
+WHERE (listing__bookings > 2)
 GROUP BY
   listing

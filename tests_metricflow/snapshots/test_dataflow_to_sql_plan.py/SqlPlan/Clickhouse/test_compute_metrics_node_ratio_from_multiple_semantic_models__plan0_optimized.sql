@@ -17,7 +17,7 @@ WITH sma_28014_cte AS (
 SELECT
   ds__day AS ds__day
   , listing__country_latest AS listing__country_latest
-  , CAST(bookings AS DOUBLE PRECISION) / CAST(NULLIF(views, 0) AS DOUBLE PRECISION) AS bookings_per_view
+  , CAST(bookings AS Nullable(DOUBLE PRECISION)) / CAST(NULLIF(views, 0) AS Nullable(DOUBLE PRECISION)) AS bookings_per_view
 FROM (
   -- Combine Aggregated Outputs
   SELECT

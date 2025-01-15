@@ -67,7 +67,7 @@ FROM (
           , date_trunc('month', subq_3.ds) AS revenue_instance__ds__month
         FROM ***************************.mf_time_spine subq_3
       ) subq_2
-      INNER JOIN (
+      CROSS JOIN (
         -- Metric Time Dimension 'ds'
         SELECT
           subq_0.ds__day
@@ -137,12 +137,11 @@ FROM (
           FROM ***************************.fct_revenue revenue_src_28000
         ) subq_0
       ) subq_1
-      ON
-        (
-          subq_1.revenue_instance__ds__day <= subq_2.revenue_instance__ds__day
-        ) AND (
-          subq_1.revenue_instance__ds__day > DATEADD(month, -2, subq_2.revenue_instance__ds__day)
-        )
+      WHERE ((
+        subq_1.revenue_instance__ds__day <= subq_2.revenue_instance__ds__day
+      ) AND (
+        subq_1.revenue_instance__ds__day > DATEADD(month, -2, subq_2.revenue_instance__ds__day)
+      ))
     ) subq_4
   ) subq_5
   GROUP BY

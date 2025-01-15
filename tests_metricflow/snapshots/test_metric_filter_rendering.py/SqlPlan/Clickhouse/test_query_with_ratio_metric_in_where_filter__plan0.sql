@@ -298,7 +298,7 @@ FROM (
             -- Compute Metrics via Expressions
             SELECT
               subq_12.listing
-              , CAST(subq_12.bookings AS DOUBLE PRECISION) / CAST(NULLIF(subq_12.bookers, 0) AS DOUBLE PRECISION) AS listing__bookings_per_booker
+              , CAST(subq_12.bookings AS Nullable(DOUBLE PRECISION)) / CAST(NULLIF(subq_12.bookers, 0) AS Nullable(DOUBLE PRECISION)) AS listing__bookings_per_booker
             FROM (
               -- Combine Aggregated Outputs
               SELECT
@@ -745,7 +745,7 @@ FROM (
         ON
           subq_1.listing = subq_14.listing
       ) subq_15
-      WHERE listing__bookings_per_booker > 1
+      WHERE (listing__bookings_per_booker > 1)
     ) subq_16
   ) subq_17
 ) subq_18

@@ -420,5 +420,5 @@ FROM (
     ON
       DATEADD(day, -2, subq_12.metric_time__day) = subq_9.metric_time__day
   ) subq_13
-  WHERE subq_13.metric_time__day BETWEEN '2020-01-12' AND '2020-01-13'
+  WHERE (subq_13.metric_time__day BETWEEN '2020-01-12' AND '2020-01-13')
 ) subq_14

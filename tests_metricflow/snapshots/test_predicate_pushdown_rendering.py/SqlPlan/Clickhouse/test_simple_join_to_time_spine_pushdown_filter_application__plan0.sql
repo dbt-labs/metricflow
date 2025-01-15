@@ -369,7 +369,7 @@ FROM (
               FROM ***************************.fct_bookings bookings_source_src_28000
             ) subq_0
           ) subq_1
-          WHERE booking__is_instant
+          WHERE (booking__is_instant)
         ) subq_2
       ) subq_3
       GROUP BY
@@ -379,5 +379,5 @@ FROM (
     ON
       subq_7.metric_time__day = subq_4.metric_time__day
   ) subq_8
-  WHERE booking__is_instant
+  WHERE (booking__is_instant)
 ) subq_9

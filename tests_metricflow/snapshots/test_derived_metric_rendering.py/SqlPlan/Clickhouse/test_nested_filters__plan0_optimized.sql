@@ -47,7 +47,7 @@ FROM (
         ON
           subq_29.listing = listings_latest_src_28000.listing_id
       ) subq_33
-      WHERE (listing__is_lux_latest) AND (booking__is_instant)
+      WHERE ((listing__is_lux_latest) AND (booking__is_instant))
     ) subq_37
     CROSS JOIN (
       -- Constrain Output with WHERE
@@ -64,7 +64,7 @@ FROM (
           , booking_value
         FROM ***************************.fct_bookings bookings_source_src_28000
       ) subq_39
-      WHERE booking__is_instant
+      WHERE (booking__is_instant)
     ) subq_43
   ) subq_44
 ) subq_45

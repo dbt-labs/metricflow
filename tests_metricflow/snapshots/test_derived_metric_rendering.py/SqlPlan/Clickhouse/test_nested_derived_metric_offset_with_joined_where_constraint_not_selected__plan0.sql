@@ -432,6 +432,6 @@ FROM (
       ON
         DATEADD(day, -2, subq_12.metric_time__day) = subq_9.metric_time__day
     ) subq_13
-    WHERE booking__is_instant
+    WHERE (booking__is_instant)
   ) subq_14
 ) subq_15

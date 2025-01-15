@@ -21,7 +21,7 @@ FROM (
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_26000
 ) subq_11
-LEFT OUTER JOIN (
+CROSS JOIN (
   -- Join Standard Outputs
   -- Pass Only Elements: ['user__home_state_latest', 'window_start__day', 'window_end__day', 'listing']
   SELECT
@@ -35,20 +35,19 @@ LEFT OUTER JOIN (
   ON
     listings_src_26000.user_id = users_latest_src_26000.user_id
 ) subq_16
-ON
+WHERE ((
+  subq_11.listing = subq_16.listing
+) AND (
   (
-    subq_11.listing = subq_16.listing
+    subq_11.metric_time__day >= subq_16.window_start__day
   ) AND (
     (
-      subq_11.metric_time__day >= subq_16.window_start__day
-    ) AND (
-      (
-        subq_11.metric_time__day < subq_16.window_end__day
-      ) OR (
-        subq_16.window_end__day IS NULL
-      )
+      subq_11.metric_time__day < subq_16.window_end__day
+    ) OR (
+      subq_16.window_end__day IS NULL
     )
   )
+))
 GROUP BY
   metric_time__day
   , listing__user__home_state_latest

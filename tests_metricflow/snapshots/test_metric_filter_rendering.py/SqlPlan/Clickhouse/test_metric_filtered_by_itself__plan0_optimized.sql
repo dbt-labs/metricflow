@@ -47,4 +47,4 @@ FROM (
   ON
     subq_13.listing = subq_18.listing
 ) subq_19
-WHERE listing__bookers > 1.00
+WHERE (listing__bookers > 1.00)

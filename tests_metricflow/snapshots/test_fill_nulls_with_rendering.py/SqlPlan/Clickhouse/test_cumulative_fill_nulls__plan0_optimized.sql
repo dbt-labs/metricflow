@@ -20,14 +20,13 @@ FROM (
       subq_14.ds AS metric_time__day
       , COUNT(DISTINCT bookings_source_src_28000.guest_id) AS bookers
     FROM ***************************.mf_time_spine subq_14
-    INNER JOIN
+    CROSS JOIN
       ***************************.fct_bookings bookings_source_src_28000
-    ON
-      (
-        date_trunc('day', bookings_source_src_28000.ds) <= subq_14.ds
-      ) AND (
-        date_trunc('day', bookings_source_src_28000.ds) > DATEADD(day, -2, subq_14.ds)
-      )
+    WHERE ((
+      date_trunc('day', bookings_source_src_28000.ds) <= subq_14.ds
+    ) AND (
+      date_trunc('day', bookings_source_src_28000.ds) > DATEADD(day, -2, subq_14.ds)
+    ))
     GROUP BY
       metric_time__day
   ) subq_17

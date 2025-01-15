@@ -323,7 +323,7 @@ FROM (
               FROM ***************************.fct_bookings bookings_source_src_28000
             ) subq_0
           ) subq_1
-          WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'
+          WHERE (metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14')
         ) subq_2
       ) subq_3
       GROUP BY
@@ -783,7 +783,7 @@ FROM (
             ON
               DATEADD(day, -14, subq_10.metric_time__day) = subq_7.metric_time__day
           ) subq_11
-          WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'
+          WHERE (metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14')
         ) subq_12
       ) subq_13
       GROUP BY

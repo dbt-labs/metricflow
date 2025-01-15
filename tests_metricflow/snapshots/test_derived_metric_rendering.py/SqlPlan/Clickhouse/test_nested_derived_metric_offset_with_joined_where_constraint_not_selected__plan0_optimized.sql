@@ -61,5 +61,5 @@ FROM (
     ON
       DATEADD(day, -2, rss_28018_cte.ds__day) = subq_25.metric_time__day
   ) subq_29
-  WHERE booking__is_instant
+  WHERE (booking__is_instant)
 ) subq_31

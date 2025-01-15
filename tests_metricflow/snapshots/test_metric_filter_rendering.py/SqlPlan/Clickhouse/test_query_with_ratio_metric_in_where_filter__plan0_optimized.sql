@@ -13,7 +13,7 @@ SELECT
 FROM (
   -- Join Standard Outputs
   SELECT
-    CAST(subq_25.bookings AS DOUBLE PRECISION) / CAST(NULLIF(subq_25.bookers, 0) AS DOUBLE PRECISION) AS listing__bookings_per_booker
+    CAST(subq_25.bookings AS Nullable(DOUBLE PRECISION)) / CAST(NULLIF(subq_25.bookers, 0) AS Nullable(DOUBLE PRECISION)) AS listing__bookings_per_booker
     , subq_20.listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
@@ -46,4 +46,4 @@ FROM (
   ON
     subq_20.listing = subq_25.listing
 ) subq_28
-WHERE listing__bookings_per_booker > 1
+WHERE (listing__bookings_per_booker > 1)

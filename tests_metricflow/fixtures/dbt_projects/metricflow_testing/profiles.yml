@@ -89,3 +89,5 @@ clickhouse:
       password: "{{ env_var('DBT_ENV_SECRET_PASSWORD') }}"
       schema: "{{ env_var('DBT_ENV_SECRET_SCHEMA') }}"
       secure: false
+      custom_settings:
+        join_use_nulls: 1

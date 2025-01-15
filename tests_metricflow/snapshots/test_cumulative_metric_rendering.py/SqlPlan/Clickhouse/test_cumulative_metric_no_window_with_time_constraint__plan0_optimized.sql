@@ -17,9 +17,9 @@ FROM (
   SELECT
     ds AS metric_time__day
   FROM ***************************.mf_time_spine subq_13
-  WHERE ds BETWEEN '2020-01-01' AND '2020-01-01'
+  WHERE (ds BETWEEN '2020-01-01' AND '2020-01-01')
 ) subq_12
-INNER JOIN (
+CROSS JOIN (
   -- Read Elements From Semantic Model 'revenue'
   -- Metric Time Dimension 'ds'
   -- Constrain Time Range to [2000-01-01T00:00:00, 2020-01-01T00:00:00]
@@ -27,10 +27,8 @@ INNER JOIN (
     date_trunc('day', created_at) AS metric_time__day
     , revenue AS txn_revenue
   FROM ***************************.fct_revenue revenue_src_28000
-  WHERE date_trunc('day', created_at) BETWEEN '2000-01-01' AND '2020-01-01'
+  WHERE (date_trunc('day', created_at) BETWEEN '2000-01-01' AND '2020-01-01')
 ) subq_11
-ON
-  (subq_11.metric_time__day <= subq_12.metric_time__day)
-WHERE subq_12.metric_time__day BETWEEN '2020-01-01' AND '2020-01-01'
+WHERE (subq_12.metric_time__day BETWEEN '2020-01-01' AND '2020-01-01') AND ((subq_11.metric_time__day <= subq_12.metric_time__day))
 GROUP BY
   metric_time__day

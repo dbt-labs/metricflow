@@ -558,7 +558,7 @@ FROM (
         ON
           subq_1.listing = subq_4.listing
       ) subq_5
-      WHERE listing__country_latest = 'us'
+      WHERE (listing__country_latest = 'us')
     ) subq_6
   ) subq_7
   GROUP BY

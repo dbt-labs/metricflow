@@ -26,23 +26,22 @@ FROM (
       , 1 AS bookings
     FROM ***************************.fct_bookings bookings_source_src_26000
   ) subq_9
-  LEFT OUTER JOIN
+  CROSS JOIN
     ***************************.dim_listings listings_src_26000
-  ON
+  WHERE ((
+    subq_9.listing = listings_src_26000.listing_id
+  ) AND (
     (
-      subq_9.listing = listings_src_26000.listing_id
+      subq_9.metric_time__day >= listings_src_26000.active_from
     ) AND (
       (
-        subq_9.metric_time__day >= listings_src_26000.active_from
-      ) AND (
-        (
-          subq_9.metric_time__day < listings_src_26000.active_to
-        ) OR (
-          listings_src_26000.active_to IS NULL
-        )
+        subq_9.metric_time__day < listings_src_26000.active_to
+      ) OR (
+        listings_src_26000.active_to IS NULL
       )
     )
+  ))
 ) subq_12
-WHERE listing__capacity > 2
+WHERE (listing__capacity > 2)
 GROUP BY
   metric_time__day

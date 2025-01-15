@@ -317,7 +317,7 @@ FROM (
             FROM ***************************.fct_bookings bookings_source_src_28000
           ) subq_0
         ) subq_1
-        WHERE NOT booking__is_instant
+        WHERE (NOT booking__is_instant)
       ) subq_2
     ) subq_3
     GROUP BY

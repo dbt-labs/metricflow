@@ -33,9 +33,9 @@ FROM (
     ) subq_11
     ON
       date_trunc('month', time_spine_src_28006.ds) = subq_11.metric_time__day
-    WHERE date_trunc('month', time_spine_src_28006.ds) = time_spine_src_28006.ds
+    WHERE (date_trunc('month', time_spine_src_28006.ds) = time_spine_src_28006.ds)
   ) subq_15
-  WHERE metric_time__day = '2020-01-01'
+  WHERE (metric_time__day = '2020-01-01')
   GROUP BY
     metric_time__month
 ) subq_19

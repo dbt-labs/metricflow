@@ -233,7 +233,7 @@ FROM (
               ) subq_4
             ) subq_5
           ) subq_6
-          INNER JOIN (
+          CROSS JOIN (
             -- Add column with generated UUID
             SELECT
               subq_8.ds__day
@@ -390,16 +390,15 @@ FROM (
               ) subq_7
             ) subq_8
           ) subq_9
-          ON
+          WHERE ((
+            subq_6.user = subq_9.user
+          ) AND (
             (
-              subq_6.user = subq_9.user
+              subq_6.metric_time__day <= subq_9.metric_time__day
             ) AND (
-              (
-                subq_6.metric_time__day <= subq_9.metric_time__day
-              ) AND (
-                subq_6.metric_time__day > DATEADD(day, -7, subq_9.metric_time__day)
-              )
+              subq_6.metric_time__day > DATEADD(day, -7, subq_9.metric_time__day)
             )
+          ))
         ) subq_10
       ) subq_11
     ) subq_12

@@ -15,7 +15,7 @@ sql_engine: Clickhouse
 -- Compute Metrics via Expressions
 SELECT
   subq_11.metric_time__day
-  , CAST(subq_11.average_booking_value AS DOUBLE PRECISION) / CAST(NULLIF(subq_11.max_booking_value, 0) AS DOUBLE PRECISION) AS instant_booking_fraction_of_max_value
+  , CAST(subq_11.average_booking_value AS Nullable(DOUBLE PRECISION)) / CAST(NULLIF(subq_11.max_booking_value, 0) AS Nullable(DOUBLE PRECISION)) AS instant_booking_fraction_of_max_value
 FROM (
   -- Combine Aggregated Outputs
   SELECT
@@ -333,7 +333,7 @@ FROM (
               FROM ***************************.fct_bookings bookings_source_src_28000
             ) subq_0
           ) subq_1
-          WHERE booking__is_instant
+          WHERE (booking__is_instant)
         ) subq_2
       ) subq_3
       GROUP BY

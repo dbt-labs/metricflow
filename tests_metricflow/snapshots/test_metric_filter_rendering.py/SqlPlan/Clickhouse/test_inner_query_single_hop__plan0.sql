@@ -348,7 +348,7 @@ FROM (
                       FROM ***************************.customer_other_data customer_other_data_src_22000
                     ) subq_2
                   ) subq_3
-                  WHERE customer_id__country = 'paraguay'
+                  WHERE (customer_id__country = 'paraguay')
                 ) subq_4
               ) subq_5
               GROUP BY
@@ -359,7 +359,7 @@ FROM (
         ON
           subq_1.customer_third_hop_id = subq_8.customer_id__customer_third_hop_id
       ) subq_9
-      WHERE customer_third_hop_id__customer_id__customer_third_hop_id__paraguayan_customers > 0
+      WHERE (customer_third_hop_id__customer_id__customer_third_hop_id__paraguayan_customers > 0)
     ) subq_10
   ) subq_11
 ) subq_12

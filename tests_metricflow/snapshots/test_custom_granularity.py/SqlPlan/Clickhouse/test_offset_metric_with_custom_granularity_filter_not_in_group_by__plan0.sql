@@ -466,7 +466,7 @@ FROM (
           ON
             subq_4.metric_time__day = subq_5.ds
         ) subq_6
-        WHERE metric_time__martian_day = '2020-01-01'
+        WHERE (metric_time__martian_day = '2020-01-01')
       ) subq_7
     ) subq_8
     GROUP BY

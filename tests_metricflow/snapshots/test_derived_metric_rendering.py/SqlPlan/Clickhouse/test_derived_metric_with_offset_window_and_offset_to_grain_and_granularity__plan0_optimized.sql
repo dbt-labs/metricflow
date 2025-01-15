@@ -42,7 +42,7 @@ FROM (
       sma_28009_cte sma_28009_cte
     ON
       date_trunc('month', rss_28018_cte.ds__day) = sma_28009_cte.metric_time__day
-    WHERE rss_28018_cte.ds__year = rss_28018_cte.ds__day
+    WHERE (rss_28018_cte.ds__year = rss_28018_cte.ds__day)
     GROUP BY
       metric_time__year
   ) subq_27

@@ -37,7 +37,7 @@ FROM (
     ON
       time_spine_src_28006.ds = subq_16.ds
   ) subq_17
-  WHERE metric_time__martian_day = '2020-01-01'
+  WHERE (metric_time__martian_day = '2020-01-01')
   GROUP BY
     metric_time__day
 ) subq_21

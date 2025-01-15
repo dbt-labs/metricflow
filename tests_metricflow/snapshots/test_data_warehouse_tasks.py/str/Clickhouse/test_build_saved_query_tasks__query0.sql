@@ -26,7 +26,7 @@ FROM (
   ON
     subq_1.listing = listings_latest_src_10000.listing_id
 ) subq_5
-WHERE listing__capacity_latest > 3
+WHERE (listing__capacity_latest > 3)
 GROUP BY
   metric_time__day
   , listing__capacity_latest

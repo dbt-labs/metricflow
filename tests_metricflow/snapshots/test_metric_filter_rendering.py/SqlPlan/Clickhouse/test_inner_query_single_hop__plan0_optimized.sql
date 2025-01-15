@@ -34,11 +34,11 @@ FROM (
         , 1 AS customers_with_other_data
       FROM ***************************.customer_other_data customer_other_data_src_22000
     ) subq_16
-    WHERE customer_id__country = 'paraguay'
+    WHERE (customer_id__country = 'paraguay')
     GROUP BY
       customer_id__customer_third_hop_id
   ) subq_21
   ON
     third_hop_table_src_22000.customer_third_hop_id = subq_21.customer_id__customer_third_hop_id
 ) subq_22
-WHERE customer_third_hop_id__customer_id__customer_third_hop_id__paraguayan_customers > 0
+WHERE (customer_third_hop_id__customer_id__customer_third_hop_id__paraguayan_customers > 0)

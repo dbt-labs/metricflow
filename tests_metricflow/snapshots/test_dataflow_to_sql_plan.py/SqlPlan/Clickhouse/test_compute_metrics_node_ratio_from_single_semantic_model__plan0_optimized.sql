@@ -8,7 +8,7 @@ sql_engine: Clickhouse
 SELECT
   listing
   , listing__country_latest
-  , CAST(bookings AS DOUBLE PRECISION) / CAST(NULLIF(bookers, 0) AS DOUBLE PRECISION) AS bookings_per_booker
+  , CAST(bookings AS Nullable(DOUBLE PRECISION)) / CAST(NULLIF(bookers, 0) AS Nullable(DOUBLE PRECISION)) AS bookings_per_booker
 FROM (
   -- Join Standard Outputs
   -- Aggregate Measures

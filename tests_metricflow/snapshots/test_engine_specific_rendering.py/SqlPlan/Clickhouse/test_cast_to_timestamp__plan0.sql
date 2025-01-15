@@ -6,5 +6,5 @@ sql_engine: Clickhouse
 ---
 -- Test Cast to Timestamp Expression
 SELECT
-  toDateTime('2020-01-01') AS col0
+  toDateTime64('2020-01-01') AS col0
 FROM foo.bar a

@@ -31,6 +31,6 @@ FROM (
   ON
     subq_10.listing = listings_latest_src_28000.listing_id
 ) subq_14
-WHERE booking__is_instant
+WHERE (booking__is_instant)
 GROUP BY
   listing__country_latest

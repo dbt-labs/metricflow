@@ -33,6 +33,6 @@ FROM (
   ON
     subq_9.user = users_latest_src_28000.user_id
 ) subq_12
-WHERE listing__is_lux_latest OR listing__capacity_latest > 4
+WHERE (listing__is_lux_latest OR listing__capacity_latest > 4)
 GROUP BY
   user__home_state_latest

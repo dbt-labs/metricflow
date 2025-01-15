@@ -36,7 +36,7 @@ WITH cm_6_cte AS (
     ON
       subq_43.listing = listings_latest_src_28000.listing_id
   ) subq_47
-  WHERE (listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')
+  WHERE ((listing__is_lux_latest) AND (metric_time__day >= '2020-01-02'))
   GROUP BY
     listing__capacity_latest
 )
@@ -70,7 +70,7 @@ WITH cm_6_cte AS (
     ON
       subq_53.listing = listings_latest_src_28000.listing_id
   ) subq_57
-  WHERE (listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')
+  WHERE ((listing__is_lux_latest) AND (metric_time__day >= '2020-01-02'))
   GROUP BY
     listing__capacity_latest
 )
@@ -79,7 +79,7 @@ SELECT
   COALESCE(cm_6_cte.listing__capacity_latest, cm_7_cte.listing__capacity_latest, subq_64.listing__capacity_latest) AS listing__capacity_latest
   , MAX(cm_6_cte.bookings) AS bookings
   , MAX(cm_7_cte.views) AS views
-  , MAX(CAST(subq_64.bookings AS DOUBLE PRECISION) / CAST(NULLIF(subq_64.views, 0) AS DOUBLE PRECISION)) AS bookings_per_view
+  , MAX(CAST(subq_64.bookings AS Nullable(DOUBLE PRECISION)) / CAST(NULLIF(subq_64.views, 0) AS Nullable(DOUBLE PRECISION))) AS bookings_per_view
 FROM cm_6_cte cm_6_cte
 FULL OUTER JOIN
   cm_7_cte cm_7_cte

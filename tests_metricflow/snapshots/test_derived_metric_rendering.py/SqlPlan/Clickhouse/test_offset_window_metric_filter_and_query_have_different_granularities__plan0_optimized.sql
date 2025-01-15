@@ -45,7 +45,7 @@ FROM (
       ON
         DATEADD(week, -1, time_spine_src_28006.ds) = sma_28009_cte.metric_time__day
     ) subq_22
-    WHERE metric_time__day = '2020-01-01'
+    WHERE (metric_time__day = '2020-01-01')
     GROUP BY
       metric_time__month
   ) subq_26
@@ -66,7 +66,7 @@ FROM (
         , bookers
       FROM sma_28009_cte sma_28009_cte
     ) subq_27
-    WHERE metric_time__day = '2020-01-01'
+    WHERE (metric_time__day = '2020-01-01')
     GROUP BY
       metric_time__month
   ) subq_31

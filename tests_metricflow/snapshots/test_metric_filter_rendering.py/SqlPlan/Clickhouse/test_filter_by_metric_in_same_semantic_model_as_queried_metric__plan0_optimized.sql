@@ -49,4 +49,4 @@ FROM (
   ON
     subq_13.guest = subq_18.guest
 ) subq_19
-WHERE guest__booking_value > 1.00
+WHERE (guest__booking_value > 1.00)

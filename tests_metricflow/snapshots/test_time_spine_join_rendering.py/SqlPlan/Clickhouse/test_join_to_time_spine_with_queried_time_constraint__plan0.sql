@@ -70,7 +70,7 @@ FROM (
             FROM ***************************.mf_time_spine time_spine_src_28006
           ) subq_5
         ) subq_6
-        WHERE subq_6.metric_time__day BETWEEN '2020-01-03' AND '2020-01-05'
+        WHERE (subq_6.metric_time__day BETWEEN '2020-01-03' AND '2020-01-05')
       ) subq_7
     ) subq_8
     LEFT OUTER JOIN (
@@ -379,7 +379,7 @@ FROM (
               FROM ***************************.fct_bookings bookings_source_src_28000
             ) subq_0
           ) subq_1
-          WHERE subq_1.metric_time__day BETWEEN '2020-01-03' AND '2020-01-05'
+          WHERE (subq_1.metric_time__day BETWEEN '2020-01-03' AND '2020-01-05')
         ) subq_2
       ) subq_3
       GROUP BY
@@ -388,5 +388,5 @@ FROM (
     ON
       subq_8.metric_time__day = subq_4.metric_time__day
   ) subq_9
-  WHERE subq_9.metric_time__day BETWEEN '2020-01-03' AND '2020-01-05'
+  WHERE (subq_9.metric_time__day BETWEEN '2020-01-03' AND '2020-01-05')
 ) subq_10

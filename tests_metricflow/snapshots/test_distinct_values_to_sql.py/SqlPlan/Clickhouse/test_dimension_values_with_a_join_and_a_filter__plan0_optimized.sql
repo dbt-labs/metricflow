@@ -20,7 +20,7 @@ FROM (
   ON
     listings_latest_src_28000.user_id = users_latest_src_28000.user_id
 ) subq_8
-WHERE user__home_state_latest = 'us'
+WHERE (user__home_state_latest = 'us')
 GROUP BY
   listing__is_lux_latest
   , user__home_state_latest

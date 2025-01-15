@@ -68,7 +68,7 @@ FROM (
             FROM ***************************.mf_time_spine_hour time_spine_src_28005
           ) subq_5
         ) subq_6
-        WHERE subq_6.metric_time__hour BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
+        WHERE (subq_6.metric_time__hour BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00')
       ) subq_7
     ) subq_8
     LEFT OUTER JOIN (
@@ -652,7 +652,7 @@ FROM (
               FROM ***************************.dim_users users_ds_source_src_28000
             ) subq_0
           ) subq_1
-          WHERE subq_1.metric_time__hour BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
+          WHERE (subq_1.metric_time__hour BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00')
         ) subq_2
       ) subq_3
       GROUP BY
@@ -661,5 +661,5 @@ FROM (
     ON
       subq_8.metric_time__hour = subq_4.metric_time__hour
   ) subq_9
-  WHERE subq_9.metric_time__hour BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
+  WHERE (subq_9.metric_time__hour BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00')
 ) subq_10

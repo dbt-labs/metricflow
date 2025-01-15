@@ -101,9 +101,9 @@ FROM (
           SELECT
             subq_4.ds AS metric_time__day
           FROM ***************************.mf_time_spine subq_4
-          WHERE subq_4.ds BETWEEN '2020-01-01' AND '2020-01-01'
+          WHERE (subq_4.ds BETWEEN '2020-01-01' AND '2020-01-01')
         ) subq_3
-        INNER JOIN (
+        CROSS JOIN (
           -- Constrain Time Range to [2000-01-01T00:00:00, 2020-01-01T00:00:00]
           SELECT
             subq_1.ds__day
@@ -212,12 +212,11 @@ FROM (
               FROM ***************************.fct_revenue revenue_src_28000
             ) subq_0
           ) subq_1
-          WHERE subq_1.metric_time__day BETWEEN '2000-01-01' AND '2020-01-01'
+          WHERE (subq_1.metric_time__day BETWEEN '2000-01-01' AND '2020-01-01')
         ) subq_2
-        ON
-          (subq_2.metric_time__day <= subq_3.metric_time__day)
+        WHERE ((subq_2.metric_time__day <= subq_3.metric_time__day))
       ) subq_5
-      WHERE subq_5.metric_time__day BETWEEN '2020-01-01' AND '2020-01-01'
+      WHERE (subq_5.metric_time__day BETWEEN '2020-01-01' AND '2020-01-01')
     ) subq_6
   ) subq_7
   GROUP BY

@@ -331,7 +331,7 @@ FROM (
         ON
           subq_1.user = subq_3.user
       ) subq_4
-      WHERE listing__is_lux_latest OR listing__capacity_latest > 4
+      WHERE (listing__is_lux_latest OR listing__capacity_latest > 4)
     ) subq_5
   ) subq_6
   GROUP BY

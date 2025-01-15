@@ -390,7 +390,7 @@ FROM (
         ON
           subq_1.user = subq_7.user
       ) subq_8
-      WHERE user__revenue_all_time > 1
+      WHERE (user__revenue_all_time > 1)
     ) subq_9
   ) subq_10
 ) subq_11

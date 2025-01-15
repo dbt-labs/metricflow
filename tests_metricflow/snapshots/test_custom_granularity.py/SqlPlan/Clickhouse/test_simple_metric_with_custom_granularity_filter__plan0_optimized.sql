@@ -28,4 +28,4 @@ FROM (
   ON
     subq_6.ds__day = subq_7.ds
 ) subq_8
-WHERE metric_time__martian_day = '2020-01-01'
+WHERE (metric_time__martian_day = '2020-01-01')

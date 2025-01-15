@@ -8,7 +8,7 @@ sql_engine: Clickhouse
 SELECT
   subq_18.ds__day
   , subq_18.listing__country_latest
-  , CAST(subq_18.bookings AS DOUBLE PRECISION) / CAST(NULLIF(subq_18.views, 0) AS DOUBLE PRECISION) AS bookings_per_view
+  , CAST(subq_18.bookings AS Nullable(DOUBLE PRECISION)) / CAST(NULLIF(subq_18.views, 0) AS Nullable(DOUBLE PRECISION)) AS bookings_per_view
 FROM (
   -- Combine Aggregated Outputs
   SELECT

@@ -4,7 +4,7 @@ sql_engine: Clickhouse
 ---
 -- Compute Metrics via Expressions
 SELECT
-  CAST(subq_10.bookings AS DOUBLE PRECISION) / CAST(NULLIF(subq_10.listings, 0) AS DOUBLE PRECISION) AS bookings_per_listing
+  CAST(subq_10.bookings AS Nullable(DOUBLE PRECISION)) / CAST(NULLIF(subq_10.listings, 0) AS Nullable(DOUBLE PRECISION)) AS bookings_per_listing
 FROM (
   -- Combine Aggregated Outputs
   SELECT

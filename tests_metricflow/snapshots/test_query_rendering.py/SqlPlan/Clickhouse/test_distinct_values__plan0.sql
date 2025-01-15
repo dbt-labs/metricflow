@@ -131,7 +131,7 @@ FROM (
         , listings_latest_src_28000.user_id AS listing__user
       FROM ***************************.dim_listings_latest listings_latest_src_28000
     ) subq_0
-    WHERE listing__country_latest = 'us'
+    WHERE (listing__country_latest = 'us')
   ) subq_1
   GROUP BY
     listing__country_latest

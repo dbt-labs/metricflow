@@ -364,7 +364,7 @@ FROM (
           ) subq_1
           ON
             date_trunc('month', subq_4.metric_time__day) = subq_1.metric_time__day
-          WHERE subq_4.metric_time__year = subq_4.metric_time__day
+          WHERE (subq_4.metric_time__year = subq_4.metric_time__day)
         ) subq_5
       ) subq_6
       GROUP BY

@@ -34,6 +34,6 @@ FROM (
   ON
     subq_10.listing = listings_latest_src_28000.listing_id
 ) subq_14
-WHERE metric_time__day = '2024-01-01'
+WHERE (metric_time__day = '2024-01-01')
 GROUP BY
   listing__country_latest

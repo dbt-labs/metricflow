@@ -368,7 +368,7 @@ FROM (
                 subq_3.ds AS metric_time__day
               FROM ***************************.mf_time_spine subq_3
             ) subq_2
-            INNER JOIN (
+            CROSS JOIN (
               -- Metric Time Dimension 'ds'
               SELECT
                 subq_0.ds__day
@@ -563,17 +563,16 @@ FROM (
                 FROM ***************************.fct_bookings bookings_source_src_28000
               ) subq_0
             ) subq_1
-            ON
-              (
-                subq_1.metric_time__day <= subq_2.metric_time__day
-              ) AND (
-                subq_1.metric_time__day > DATEADD(day, -2, subq_2.metric_time__day)
-              )
+            WHERE ((
+              subq_1.metric_time__day <= subq_2.metric_time__day
+            ) AND (
+              subq_1.metric_time__day > DATEADD(day, -2, subq_2.metric_time__day)
+            ))
           ) subq_4
           ON
             DATEADD(day, -2, subq_7.metric_time__day) = subq_4.metric_time__day
         ) subq_8
-        WHERE subq_8.metric_time__day BETWEEN '2019-12-19' AND '2020-01-02'
+        WHERE (subq_8.metric_time__day BETWEEN '2019-12-19' AND '2020-01-02')
       ) subq_9
     ) subq_10
     GROUP BY

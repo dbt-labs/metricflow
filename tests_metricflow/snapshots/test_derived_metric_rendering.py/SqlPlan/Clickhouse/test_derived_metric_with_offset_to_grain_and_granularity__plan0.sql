@@ -579,7 +579,7 @@ FROM (
           ) subq_6
           ON
             date_trunc('month', subq_9.metric_time__day) = subq_6.metric_time__day
-          WHERE subq_9.metric_time__week = subq_9.metric_time__day
+          WHERE (subq_9.metric_time__week = subq_9.metric_time__day)
         ) subq_10
       ) subq_11
       GROUP BY

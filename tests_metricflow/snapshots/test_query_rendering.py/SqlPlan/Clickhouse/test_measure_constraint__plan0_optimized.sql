@@ -44,7 +44,7 @@ FROM (
       ON
         subq_27.listing = listings_latest_src_28000.listing_id
     ) subq_31
-    WHERE listing__is_lux_latest
+    WHERE (listing__is_lux_latest)
     GROUP BY
       metric_time__day
   ) subq_35

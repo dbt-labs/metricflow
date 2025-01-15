@@ -561,7 +561,7 @@ FROM (
         ON
           subq_1.listing = subq_4.listing
       ) subq_5
-      WHERE metric_time__day = '2024-01-01'
+      WHERE (metric_time__day = '2024-01-01')
     ) subq_6
   ) subq_7
   GROUP BY

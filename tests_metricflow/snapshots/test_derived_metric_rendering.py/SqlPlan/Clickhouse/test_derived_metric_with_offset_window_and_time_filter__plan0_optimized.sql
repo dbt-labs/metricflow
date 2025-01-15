@@ -36,7 +36,7 @@ FROM (
         , bookings
       FROM sma_28009_cte sma_28009_cte
     ) subq_18
-    WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'
+    WHERE (metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14')
     GROUP BY
       metric_time__day
   ) subq_22
@@ -59,7 +59,7 @@ FROM (
       ON
         DATEADD(day, -14, time_spine_src_28006.ds) = sma_28009_cte.metric_time__day
     ) subq_27
-    WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'
+    WHERE (metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14')
     GROUP BY
       metric_time__day
   ) subq_31

@@ -83,9 +83,9 @@ FROM (
               FROM ***************************.mf_time_spine time_spine_src_28006
             ) subq_6
           ) subq_7
-          WHERE metric_time__week > '2020-01-01'
+          WHERE (metric_time__week > '2020-01-01')
         ) subq_8
-        WHERE subq_8.metric_time__day BETWEEN '2020-01-03' AND '2020-01-05'
+        WHERE (subq_8.metric_time__day BETWEEN '2020-01-03' AND '2020-01-05')
       ) subq_9
     ) subq_10
     LEFT OUTER JOIN (
@@ -495,9 +495,9 @@ FROM (
                 FROM ***************************.fct_bookings bookings_source_src_28000
               ) subq_0
             ) subq_1
-            WHERE subq_1.metric_time__day BETWEEN '2020-01-03' AND '2020-01-05'
+            WHERE (subq_1.metric_time__day BETWEEN '2020-01-03' AND '2020-01-05')
           ) subq_2
-          WHERE metric_time__week > '2020-01-01'
+          WHERE (metric_time__week > '2020-01-01')
         ) subq_3
       ) subq_4
       GROUP BY
@@ -506,5 +506,5 @@ FROM (
     ON
       subq_10.metric_time__day = subq_5.metric_time__day
   ) subq_11
-  WHERE subq_11.metric_time__day BETWEEN '2020-01-03' AND '2020-01-05'
+  WHERE (subq_11.metric_time__day BETWEEN '2020-01-03' AND '2020-01-05')
 ) subq_12

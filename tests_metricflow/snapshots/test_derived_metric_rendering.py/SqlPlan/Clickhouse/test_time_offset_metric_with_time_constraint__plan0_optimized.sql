@@ -26,7 +26,7 @@ FROM (
   ) subq_11
   ON
     DATEADD(day, -5, time_spine_src_28006.ds) = subq_11.metric_time__day
-  WHERE time_spine_src_28006.ds BETWEEN '2019-12-19' AND '2020-01-02'
+  WHERE (time_spine_src_28006.ds BETWEEN '2019-12-19' AND '2020-01-02')
   GROUP BY
     metric_time__day
 ) subq_19

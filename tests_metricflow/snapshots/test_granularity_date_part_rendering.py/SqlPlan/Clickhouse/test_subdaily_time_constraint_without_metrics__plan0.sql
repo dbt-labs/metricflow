@@ -87,7 +87,7 @@ FROM (
       FROM ***************************.mf_time_spine_second time_spine_src_28003
     ) subq_0
   ) subq_1
-  WHERE subq_1.metric_time__second BETWEEN '2020-01-01 00:00:02' AND '2020-01-01 00:00:08'
+  WHERE (subq_1.metric_time__second BETWEEN '2020-01-01 00:00:02' AND '2020-01-01 00:00:08')
 ) subq_2
 GROUP BY
   metric_time__second

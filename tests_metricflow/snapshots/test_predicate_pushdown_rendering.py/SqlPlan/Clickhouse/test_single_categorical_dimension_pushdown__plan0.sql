@@ -558,7 +558,7 @@ FROM (
         ON
           subq_1.listing = subq_4.listing
       ) subq_5
-      WHERE booking__is_instant
+      WHERE (booking__is_instant)
     ) subq_6
   ) subq_7
   GROUP BY

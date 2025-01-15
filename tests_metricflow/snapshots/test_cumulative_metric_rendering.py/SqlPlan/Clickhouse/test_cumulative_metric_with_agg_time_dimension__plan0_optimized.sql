@@ -12,13 +12,12 @@ SELECT
   subq_10.ds AS revenue_instance__ds__day
   , SUM(revenue_src_28000.revenue) AS trailing_2_months_revenue
 FROM ***************************.mf_time_spine subq_10
-INNER JOIN
+CROSS JOIN
   ***************************.fct_revenue revenue_src_28000
-ON
-  (
-    date_trunc('day', revenue_src_28000.created_at) <= subq_10.ds
-  ) AND (
-    date_trunc('day', revenue_src_28000.created_at) > DATEADD(month, -2, subq_10.ds)
-  )
+WHERE ((
+  date_trunc('day', revenue_src_28000.created_at) <= subq_10.ds
+) AND (
+  date_trunc('day', revenue_src_28000.created_at) > DATEADD(month, -2, subq_10.ds)
+))
 GROUP BY
   revenue_instance__ds__day

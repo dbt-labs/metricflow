@@ -42,4 +42,4 @@ FROM (
   ON
     subq_13.user = subq_19.user
 ) subq_20
-WHERE user__revenue_all_time > 1
+WHERE (user__revenue_all_time > 1)

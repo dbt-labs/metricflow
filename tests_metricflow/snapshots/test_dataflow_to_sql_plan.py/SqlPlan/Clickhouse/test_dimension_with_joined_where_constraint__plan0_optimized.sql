@@ -19,6 +19,6 @@ FROM (
   ON
     listings_latest_src_28000.user_id = users_latest_src_28000.user_id
 ) subq_8
-WHERE listing__country_latest = 'us'
+WHERE (listing__country_latest = 'us')
 GROUP BY
   user__home_state_latest

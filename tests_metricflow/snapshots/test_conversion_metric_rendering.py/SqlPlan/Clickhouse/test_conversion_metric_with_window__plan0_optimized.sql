@@ -17,7 +17,7 @@ WITH sma_28019_cte AS (
 
 SELECT
   metric_time__day AS metric_time__day
-  , CAST(buys AS DOUBLE PRECISION) / CAST(NULLIF(visits, 0) AS DOUBLE PRECISION) AS visit_buy_conversion_rate_7days
+  , CAST(buys AS Nullable(DOUBLE PRECISION)) / CAST(NULLIF(visits, 0) AS Nullable(DOUBLE PRECISION)) AS visit_buy_conversion_rate_7days
 FROM (
   -- Combine Aggregated Outputs
   SELECT
@@ -39,7 +39,7 @@ FROM (
         , visits
       FROM sma_28019_cte sma_28019_cte
     ) subq_18
-    WHERE metric_time__day = '2020-01-01'
+    WHERE (metric_time__day = '2020-01-01')
     GROUP BY
       metric_time__day
   ) subq_21
@@ -94,9 +94,9 @@ FROM (
             , visits
           FROM sma_28019_cte sma_28019_cte
         ) subq_22
-        WHERE metric_time__day = '2020-01-01'
+        WHERE (metric_time__day = '2020-01-01')
       ) subq_24
-      INNER JOIN (
+      CROSS JOIN (
         -- Read Elements From Semantic Model 'buys_source'
         -- Metric Time Dimension 'ds'
         -- Add column with generated UUID
@@ -107,16 +107,15 @@ FROM (
           , generateUUIDv4() AS mf_internal_uuid
         FROM ***************************.fct_buys buys_source_src_28000
       ) subq_27
-      ON
+      WHERE ((
+        subq_24.user = subq_27.user
+      ) AND (
         (
-          subq_24.user = subq_27.user
+          subq_24.metric_time__day <= subq_27.metric_time__day
         ) AND (
-          (
-            subq_24.metric_time__day <= subq_27.metric_time__day
-          ) AND (
-            subq_24.metric_time__day > DATEADD(day, -7, subq_27.metric_time__day)
-          )
+          subq_24.metric_time__day > DATEADD(day, -7, subq_27.metric_time__day)
         )
+      ))
     ) subq_28
     GROUP BY
       metric_time__day

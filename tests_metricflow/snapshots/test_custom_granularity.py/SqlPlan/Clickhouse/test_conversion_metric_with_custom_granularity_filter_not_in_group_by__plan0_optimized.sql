@@ -15,7 +15,7 @@ WITH sma_28019_cte AS (
 )
 
 SELECT
-  CAST(MAX(subq_35.buys) AS DOUBLE PRECISION) / CAST(NULLIF(MAX(subq_24.visits), 0) AS DOUBLE PRECISION) AS visit_buy_conversion_rate_7days
+  CAST(MAX(subq_35.buys) AS Nullable(DOUBLE PRECISION)) / CAST(NULLIF(MAX(subq_24.visits), 0) AS Nullable(DOUBLE PRECISION)) AS visit_buy_conversion_rate_7days
 FROM (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['visits',]
@@ -34,7 +34,7 @@ FROM (
     ON
       sma_28019_cte.metric_time__day = subq_20.ds
   ) subq_21
-  WHERE metric_time__martian_day = '2020-01-01'
+  WHERE (metric_time__martian_day = '2020-01-01')
 ) subq_24
 CROSS JOIN (
   -- Find conversions for user within the range of 7 day
@@ -101,9 +101,9 @@ CROSS JOIN (
         ON
           sma_28019_cte.metric_time__day = subq_25.ds
       ) subq_26
-      WHERE metric_time__martian_day = '2020-01-01'
+      WHERE (metric_time__martian_day = '2020-01-01')
     ) subq_28
-    INNER JOIN (
+    CROSS JOIN (
       -- Read Elements From Semantic Model 'buys_source'
       -- Metric Time Dimension 'ds'
       -- Add column with generated UUID
@@ -114,15 +114,14 @@ CROSS JOIN (
         , generateUUIDv4() AS mf_internal_uuid
       FROM ***************************.fct_buys buys_source_src_28000
     ) subq_31
-    ON
+    WHERE ((
+      subq_28.user = subq_31.user
+    ) AND (
       (
-        subq_28.user = subq_31.user
+        subq_28.metric_time__day <= subq_31.metric_time__day
       ) AND (
-        (
-          subq_28.metric_time__day <= subq_31.metric_time__day
-        ) AND (
-          subq_28.metric_time__day > DATEADD(day, -7, subq_31.metric_time__day)
-        )
+        subq_28.metric_time__day > DATEADD(day, -7, subq_31.metric_time__day)
       )
+    ))
   ) subq_32
 ) subq_35

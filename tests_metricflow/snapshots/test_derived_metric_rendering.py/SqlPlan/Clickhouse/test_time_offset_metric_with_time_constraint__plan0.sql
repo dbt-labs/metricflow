@@ -459,7 +459,7 @@ FROM (
           ON
             DATEADD(day, -5, subq_4.metric_time__day) = subq_1.metric_time__day
         ) subq_5
-        WHERE subq_5.metric_time__day BETWEEN '2019-12-19' AND '2020-01-02'
+        WHERE (subq_5.metric_time__day BETWEEN '2019-12-19' AND '2020-01-02')
       ) subq_6
     ) subq_7
     GROUP BY

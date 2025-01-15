@@ -51,4 +51,4 @@ FROM (
   ON
     third_hop_table_src_22000.customer_third_hop_id = subq_35.account_id__customer_id__customer_third_hop_id
 ) subq_36
-WHERE customer_third_hop_id__account_id__customer_id__customer_third_hop_id__txn_count > 2
+WHERE (customer_third_hop_id__account_id__customer_id__customer_third_hop_id__txn_count > 2)

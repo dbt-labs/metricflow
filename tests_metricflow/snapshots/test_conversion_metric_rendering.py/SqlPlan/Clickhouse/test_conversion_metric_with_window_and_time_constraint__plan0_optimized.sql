@@ -15,13 +15,13 @@ WITH ctr_0_cte AS (
     , referrer_id AS visit__referrer_id
     , 1 AS visits
   FROM ***************************.fct_visits visits_source_src_28000
-  WHERE date_trunc('day', ds) BETWEEN '2020-01-01' AND '2020-01-02'
+  WHERE (date_trunc('day', ds) BETWEEN '2020-01-01' AND '2020-01-02')
 )
 
 SELECT
   metric_time__day AS metric_time__day
   , visit__referrer_id AS visit__referrer_id
-  , CAST(buys AS DOUBLE PRECISION) / CAST(NULLIF(visits, 0) AS DOUBLE PRECISION) AS visit_buy_conversion_rate_7days
+  , CAST(buys AS Nullable(DOUBLE PRECISION)) / CAST(NULLIF(visits, 0) AS Nullable(DOUBLE PRECISION)) AS visit_buy_conversion_rate_7days
 FROM (
   -- Combine Aggregated Outputs
   SELECT
@@ -46,7 +46,7 @@ FROM (
         , visits
       FROM ctr_0_cte ctr_0_cte
     ) subq_21
-    WHERE visit__referrer_id = 'ref_id_01'
+    WHERE (visit__referrer_id = 'ref_id_01')
     GROUP BY
       metric_time__day
       , visit__referrer_id
@@ -113,9 +113,9 @@ FROM (
             , visits
           FROM ctr_0_cte ctr_0_cte
         ) subq_25
-        WHERE visit__referrer_id = 'ref_id_01'
+        WHERE (visit__referrer_id = 'ref_id_01')
       ) subq_27
-      INNER JOIN (
+      CROSS JOIN (
         -- Read Elements From Semantic Model 'buys_source'
         -- Metric Time Dimension 'ds'
         -- Add column with generated UUID
@@ -126,16 +126,15 @@ FROM (
           , generateUUIDv4() AS mf_internal_uuid
         FROM ***************************.fct_buys buys_source_src_28000
       ) subq_30
-      ON
+      WHERE ((
+        subq_27.user = subq_30.user
+      ) AND (
         (
-          subq_27.user = subq_30.user
+          subq_27.metric_time__day <= subq_30.metric_time__day
         ) AND (
-          (
-            subq_27.metric_time__day <= subq_30.metric_time__day
-          ) AND (
-            subq_27.metric_time__day > DATEADD(day, -7, subq_30.metric_time__day)
-          )
+          subq_27.metric_time__day > DATEADD(day, -7, subq_30.metric_time__day)
         )
+      ))
     ) subq_31
     GROUP BY
       metric_time__day

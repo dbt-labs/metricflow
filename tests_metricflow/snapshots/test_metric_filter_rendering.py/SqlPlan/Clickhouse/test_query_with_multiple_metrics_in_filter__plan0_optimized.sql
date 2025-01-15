@@ -65,4 +65,4 @@ FROM (
   ON
     subq_19.listing = subq_30.listing
 ) subq_31
-WHERE listing__bookings > 2 AND listing__bookers > 1
+WHERE (listing__bookings > 2 AND listing__bookers > 1)

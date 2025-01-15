@@ -756,7 +756,7 @@ FROM (
         ON
           subq_1.user = subq_11.listing__user
       ) subq_12
-      WHERE user__listing__user__average_booking_value > 1
+      WHERE (user__listing__user__average_booking_value > 1)
     ) subq_13
   ) subq_14
 ) subq_15

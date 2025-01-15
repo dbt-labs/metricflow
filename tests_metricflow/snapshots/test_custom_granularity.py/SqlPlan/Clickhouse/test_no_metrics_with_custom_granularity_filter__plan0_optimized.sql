@@ -20,6 +20,6 @@ FROM (
   ON
     date_trunc('day', listings_latest_src_28000.created_at) = subq_3.ds
 ) subq_4
-WHERE listing__ds__martian_day = '2020-01-01'
+WHERE (listing__ds__martian_day = '2020-01-01')
 GROUP BY
   listing__ds__day

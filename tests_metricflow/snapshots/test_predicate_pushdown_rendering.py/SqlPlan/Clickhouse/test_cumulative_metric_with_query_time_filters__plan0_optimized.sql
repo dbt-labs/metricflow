@@ -29,21 +29,20 @@ FROM (
       , bookings_source_src_28000.is_instant AS booking__is_instant
       , bookings_source_src_28000.guest_id AS bookers
     FROM ***************************.mf_time_spine subq_15
-    INNER JOIN
+    CROSS JOIN
       ***************************.fct_bookings bookings_source_src_28000
-    ON
-      (
-        date_trunc('day', bookings_source_src_28000.ds) <= subq_15.ds
-      ) AND (
-        date_trunc('day', bookings_source_src_28000.ds) > DATEADD(day, -2, subq_15.ds)
-      )
+    WHERE ((
+      date_trunc('day', bookings_source_src_28000.ds) <= subq_15.ds
+    ) AND (
+      date_trunc('day', bookings_source_src_28000.ds) > DATEADD(day, -2, subq_15.ds)
+    ))
   ) subq_16
   LEFT OUTER JOIN
     ***************************.dim_listings_latest listings_latest_src_28000
   ON
     subq_16.listing = listings_latest_src_28000.listing_id
 ) subq_20
-WHERE booking__is_instant
+WHERE (booking__is_instant)
 GROUP BY
   metric_time__day
   , listing__country_latest

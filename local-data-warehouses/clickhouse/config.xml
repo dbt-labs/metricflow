@@ -1,6 +1,0 @@
-<clickhouse>
-    <system>
-        <allow_experimental_join_condition>1</allow_experimental_join_condition>
-    </system>
-
-</clickhouse>

@@ -63,7 +63,7 @@ FROM (
           FROM ***************************.mf_time_spine time_spine_src_28006
         ) subq_6
       ) subq_7
-      WHERE metric_time__martian_day = '2020-01-01'
+      WHERE (metric_time__martian_day = '2020-01-01')
     ) subq_8
     GROUP BY
       metric_time__martian_day
@@ -381,7 +381,7 @@ FROM (
           ON
             subq_0.ds__day = subq_1.ds
         ) subq_2
-        WHERE metric_time__martian_day = '2020-01-01'
+        WHERE (metric_time__martian_day = '2020-01-01')
       ) subq_3
     ) subq_4
     GROUP BY

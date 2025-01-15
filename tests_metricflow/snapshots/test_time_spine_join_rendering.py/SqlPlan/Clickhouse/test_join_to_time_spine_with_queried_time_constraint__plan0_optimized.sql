@@ -22,7 +22,7 @@ FROM (
     SELECT
       ds AS metric_time__day
     FROM ***************************.mf_time_spine time_spine_src_28006
-    WHERE ds BETWEEN '2020-01-03' AND '2020-01-05'
+    WHERE (ds BETWEEN '2020-01-03' AND '2020-01-05')
   ) subq_19
   LEFT OUTER JOIN (
     -- Aggregate Measures
@@ -38,12 +38,12 @@ FROM (
         date_trunc('day', ds) AS metric_time__day
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-      WHERE date_trunc('day', ds) BETWEEN '2020-01-03' AND '2020-01-05'
+      WHERE (date_trunc('day', ds) BETWEEN '2020-01-03' AND '2020-01-05')
     ) subq_14
     GROUP BY
       metric_time__day
   ) subq_15
   ON
     subq_19.metric_time__day = subq_15.metric_time__day
-  WHERE subq_19.metric_time__day BETWEEN '2020-01-03' AND '2020-01-05'
+  WHERE (subq_19.metric_time__day BETWEEN '2020-01-03' AND '2020-01-05')
 ) subq_21

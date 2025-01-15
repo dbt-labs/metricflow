@@ -228,7 +228,7 @@ FROM (
     ON
       subq_0.user = subq_2.user
   ) subq_3
-  WHERE user__home_state_latest = 'us'
+  WHERE (user__home_state_latest = 'us')
 ) subq_4
 GROUP BY
   listing__is_lux_latest

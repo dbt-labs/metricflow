@@ -55,5 +55,5 @@ FROM (
     ON
       DATEADD(day, -2, rss_28018_cte.ds__day) = subq_24.metric_time__day
   ) subq_28
-  WHERE metric_time__day = '2020-01-12' or metric_time__day = '2020-01-13'
+  WHERE (metric_time__day = '2020-01-12' or metric_time__day = '2020-01-13')
 ) subq_29

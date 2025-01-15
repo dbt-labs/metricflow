@@ -36,7 +36,7 @@ FROM (
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_11
-    WHERE booking__is_instant
+    WHERE (booking__is_instant)
     GROUP BY
       metric_time__day
       , booking__is_instant
@@ -44,4 +44,4 @@ FROM (
   ON
     time_spine_src_28006.ds = subq_14.metric_time__day
 ) subq_18
-WHERE booking__is_instant
+WHERE (booking__is_instant)

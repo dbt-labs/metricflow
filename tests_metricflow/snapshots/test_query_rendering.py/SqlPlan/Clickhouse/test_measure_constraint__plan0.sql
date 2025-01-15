@@ -568,7 +568,7 @@ FROM (
             ON
               subq_1.listing = subq_4.listing
           ) subq_5
-          WHERE listing__is_lux_latest
+          WHERE (listing__is_lux_latest)
         ) subq_6
       ) subq_7
       GROUP BY
@@ -1130,7 +1130,7 @@ FROM (
             ON
               subq_11.listing = subq_14.listing
           ) subq_15
-          WHERE listing__is_lux_latest
+          WHERE (listing__is_lux_latest)
         ) subq_16
       ) subq_17
       GROUP BY

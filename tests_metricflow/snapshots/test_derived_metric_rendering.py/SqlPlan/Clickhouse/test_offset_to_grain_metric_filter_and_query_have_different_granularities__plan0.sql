@@ -461,9 +461,9 @@ FROM (
           ) subq_1
           ON
             date_trunc('month', subq_4.metric_time__day) = subq_1.metric_time__day
-          WHERE subq_4.metric_time__month = subq_4.metric_time__day
+          WHERE (subq_4.metric_time__month = subq_4.metric_time__day)
         ) subq_5
-        WHERE metric_time__day = '2020-01-01'
+        WHERE (metric_time__day = '2020-01-01')
       ) subq_6
     ) subq_7
     GROUP BY

@@ -107,4 +107,4 @@ FROM (
     FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_0
 ) subq_1
-WHERE booking__ds__day = '2020-01-01'
+WHERE (booking__ds__day = '2020-01-01')
