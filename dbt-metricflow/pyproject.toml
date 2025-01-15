@@ -4,7 +4,6 @@ build-backend = "hatchling.build"
 
 [project]
 name = "dbt-metricflow"
-version = "0.7.0"
 description = "Execute commands against the MetricFlow semantic layer with dbt."
 readme = "README.md"
 requires-python = ">=3.8,<3.13"
@@ -26,7 +25,10 @@ classifiers = [
 ]
 
 # Dependencies are specified through the `hatch-requirements-txt` plug-in.
-dynamic = ["dependencies", "optional-dependencies"]
+dynamic = ["version", "dependencies", "optional-dependencies"]
+
+[tool.hatch.version]
+path = "dbt_metricflow/__about__.py"
 
 [tool.hatch.metadata.hooks.requirements_txt]
 files = [
