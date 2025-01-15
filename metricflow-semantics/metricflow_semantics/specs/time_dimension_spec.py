@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from functools import lru_cache
 from typing import Any, List, Mapping, Optional, Sequence, Tuple, Union
 
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
@@ -11,6 +10,7 @@ from dbt_semantic_interfaces.type_enums import DatePart, TimeGranularity
 from typing_extensions import override
 
 from metricflow_semantics.aggregation_properties import AggregationState
+from metricflow_semantics.collection_helpers.lru_cache import typed_lru_cache
 from metricflow_semantics.model.semantics.linkable_element import ElementPathKey, LinkableElementType
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
@@ -213,7 +213,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
         )
 
     @classmethod
-    @lru_cache
+    @typed_lru_cache
     def _get_compatible_grain_and_date_part(cls) -> Sequence[Tuple[ExpandedTimeGranularity, DatePart]]:
         items = []
         for date_part in DatePart:

@@ -1,7 +1,17 @@
 from __future__ import annotations
 
 import threading
-from typing import Dict, Generic, Optional, TypeVar
+from typing import TYPE_CHECKING, Callable, Dict, Generic, Optional, TypeVar
+
+if TYPE_CHECKING:
+    # Hack: ensure type checking is not erased for parameters in methods decorated with @lru_cache.
+    F = TypeVar("F", bound=Callable)
+
+    def typed_lru_cache(f: F) -> F:  # noqa: D103
+        pass
+
+else:
+    from functools import lru_cache as typed_lru_cache  # noqa: F401
 
 KeyT = TypeVar("KeyT")
 ValueT = TypeVar("ValueT")

@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from functools import cached_property, lru_cache
+from functools import cached_property
 from typing import FrozenSet
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+
+from metricflow_semantics.collection_helpers.lru_cache import typed_lru_cache
 
 
 @dataclass(frozen=True)
@@ -39,18 +41,18 @@ class ExpandedTimeGranularity(SerializableDataclass):
         return self.base_granularity.value != self.name
 
     @classmethod
-    @lru_cache
+    @typed_lru_cache
     def from_time_granularity(cls, granularity: TimeGranularity) -> ExpandedTimeGranularity:
         """Factory method for creating an ExpandedTimeGranularity from a standard TimeGranularity enumeration value.
 
-        This should be appropriate to use with `@lru_cache` since the number of `TimeGranularity` is small.
+        This should be appropriate to use with `@typed_lru_cache` since the number of `TimeGranularity` is small.
         """
         return ExpandedTimeGranularity(name=granularity.value, base_granularity=granularity)
 
     @classmethod
-    @lru_cache
+    @typed_lru_cache
     def _standard_time_granularity_names(cls) -> FrozenSet:
-        """This should be appropriate to use with `@lru_cache` since the number of `TimeGranularity` is small."""
+        """This should be appropriate to use with `@typed_lru_cache` since the number of `TimeGranularity` is small."""
         return frozenset(granularity.value for granularity in TimeGranularity)
 
     @classmethod
