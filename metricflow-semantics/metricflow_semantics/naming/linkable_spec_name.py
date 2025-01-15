@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import logging
-from functools import lru_cache
 from typing import Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+
+from metricflow_semantics.collection_helpers.lru_cache import typed_lru_cache
 
 DUNDER = "__"
 
@@ -36,7 +37,7 @@ class StructuredLinkableSpecName:
         self.date_part = date_part
 
     @staticmethod
-    @lru_cache
+    @typed_lru_cache
     def from_name(qualified_name: str, custom_granularity_names: Sequence[str]) -> StructuredLinkableSpecName:
         """Construct from a name e.g. listing__ds__month."""
         name_parts = qualified_name.split(DUNDER)
