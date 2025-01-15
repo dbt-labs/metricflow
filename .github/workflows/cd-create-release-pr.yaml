@@ -1,0 +1,79 @@
+name: Create Release PR
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        type: choice
+        description: The version bump type.
+        default: minor
+        options:
+          - major
+          - minor
+          - patch
+
+jobs:
+  create-release-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-python-env
+
+      - name: Use Changie to Generate Change Log for the New Release
+        uses: miniscruff/changie-action@v2
+        with:
+          version: latest
+          args: batch ${{ inputs.bump }}
+
+      - name: Use Changie to Update `CHANGELOG.md` To Include All Changes
+        uses: miniscruff/changie-action@v2
+        with:
+          version: latest
+          args: merge
+
+      - name: Use Changie to Get the New Version Number
+        id: changie-latest
+        uses: miniscruff/changie-action@v2
+        with:
+          version: latest
+          args: latest
+
+      - name: Save the New Version Into Context
+        id: get-new-package-version
+        run: |
+          VERSION="${{ steps.changie-latest.outputs.output }}"
+          VERSION_NO_V=$(echo "$VERSION" | cut -c 2-)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "version_no_v=$VERSION_NO_V" >> $GITHUB_OUTPUT
+
+      - name: Update Project Version Via Hatch
+        id: update-package-version
+        run: |
+          hatch version "${{ steps.get-new-package-version.outputs.version }}"
+
+      - name: Install `fossa-cli`
+        # This is the recommended install method on: https://github.com/fossas/fossa-cli
+        run: |
+          curl -H 'Cache-Control: no-cache'
+          https://raw.githubusercontent.com/fossas/fossa-cli/master/install-latest.sh 
+          | bash
+
+      - name: Run `fossa analyze`
+        run: "fossa analyze --ouptput"
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v4
+        with:
+          title: "Release PR for MetricFlow ${{ steps.get-new-package-version.outputs.version }}"
+          branch: release-${{ steps.get-new-package-version.outputs.version_no_v }}
+          labels: "Skip Changelog"
+          commit-message: |
+            Release version: ${{ steps.package-version.outputs.version }}
+
+            * Update change log.
+            * Update version in project configuration.
+            * Update `ATTRIBUTION.md`.
+          body: |
+            ## version: ${{ steps.package-version.outputs.version }}
+
+            ${{ steps.package-version.outputs.message }}
