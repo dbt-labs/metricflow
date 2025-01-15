@@ -54,7 +54,6 @@ class MetricTimeDefaultGranularityPattern(SpecPattern):
             return candidate_specs
 
         # If there are metrics in the query, use max metric default. For no-metric queries, use standard default.
-        # TODO: [custom granularity] allow custom granularities to be used as defaults if appropriate
         default_granularity = ExpandedTimeGranularity.from_time_granularity(
             self.max_metric_default_time_granularity or DEFAULT_TIME_GRANULARITY
         )
@@ -68,11 +67,16 @@ class MetricTimeDefaultGranularityPattern(SpecPattern):
 
         matched_metric_time_specs: Tuple[TimeDimensionSpec, ...] = ()
         for spec_key, time_grains in spec_key_to_grains.items():
-            if default_granularity in time_grains:
-                matched_metric_time_specs += (spec_key_to_specs[spec_key][0].with_grain(default_granularity),)
-            else:
+            if (
+                # If date part was included in the request, don't filter here. Minimium granularity filter will be used instead.
+                # Granularity is essentially overridden by date part, so this is only important for internal resolution.
+                spec_key.source_spec.date_part is None
                 # If default_granularity is not in the available options, then time granularity was specified in the request
                 # and a default is not needed here. Pass all options through for this spec key.
+                and default_granularity in time_grains
+            ):
+                matched_metric_time_specs += (spec_key_to_specs[spec_key][0].with_grain(default_granularity),)
+            else:
                 matched_metric_time_specs += spec_key_to_specs[spec_key]
 
         matching_specs: Sequence[LinkableInstanceSpec] = (

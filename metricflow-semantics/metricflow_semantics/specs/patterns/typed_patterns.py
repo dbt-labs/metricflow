@@ -87,7 +87,11 @@ class TimeDimensionPattern(EntityLinkPattern):
             ParameterSetField.DATE_PART,
         ]
 
-        if time_dimension_call_parameter_set.time_granularity_name is not None:
+        time_granularity = time_dimension_call_parameter_set.time_granularity_name
+        if time_dimension_call_parameter_set.date_part:
+            time_granularity = None
+
+        if time_granularity is not None:
             fields_to_compare.append(ParameterSetField.TIME_GRANULARITY)
 
         return TimeDimensionPattern(
