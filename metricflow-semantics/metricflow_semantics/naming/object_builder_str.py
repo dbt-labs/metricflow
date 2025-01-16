@@ -116,7 +116,7 @@ class ObjectBuilderNameConverter:
                     element_name=time_dimension_spec.element_name,
                     entity_links=time_dimension_spec.entity_links,
                     group_by=(),
-                    time_granularity_name=time_dimension_spec.time_granularity.name,
+                    time_granularity_name=time_dimension_spec.time_granularity_name,
                     date_part=time_dimension_spec.date_part,
                 )
                 names_to_return.append(f"TimeDimension({initializer_parameter_str})")

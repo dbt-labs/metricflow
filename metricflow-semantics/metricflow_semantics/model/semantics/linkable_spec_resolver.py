@@ -216,10 +216,12 @@ class ValidLinkableSpecResolver:
         )
 
         def create(
-            time_granularity: ExpandedTimeGranularity, date_part: Optional[DatePart] = None
+            time_granularity: Optional[ExpandedTimeGranularity] = None, date_part: Optional[DatePart] = None
         ) -> LinkableDimension:
             properties = set(with_properties)
-            if time_granularity.is_custom_granularity or time_granularity.base_granularity != defined_time_granularity:
+            if time_granularity and (
+                time_granularity.is_custom_granularity or time_granularity.base_granularity != defined_time_granularity
+            ):
                 properties.add(LinkableElementProperty.DERIVED_TIME_GRANULARITY)
             if date_part:
                 properties.add(LinkableElementProperty.DATE_PART)
@@ -241,9 +243,9 @@ class ValidLinkableSpecResolver:
                 continue
             expanded_granularity = ExpandedTimeGranularity.from_time_granularity(time_granularity)
             linkable_dimensions.append(create(expanded_granularity))
-            for date_part in DatePart:
-                if time_granularity.to_int() <= date_part.to_int():
-                    linkable_dimensions.append(create(time_granularity=expanded_granularity, date_part=date_part))
+        for date_part in DatePart:
+            if defined_time_granularity.to_int() <= date_part.to_int():
+                linkable_dimensions.append(create(date_part=date_part))
 
         # Build linkable dimensions for all compatible custom granularities.
         for custom_grain in self._custom_granularities.values():
@@ -515,39 +517,50 @@ class ValidLinkableSpecResolver:
         # TODO: group by resolution has different logic than source node builder for combining date part w/ grain. Fix.
         path_key_to_linkable_dimensions: Dict[ElementPathKey, List[LinkableDimension]] = defaultdict(list)
         for time_granularity in possible_metric_time_granularities:
-            possible_date_parts: Tuple[Optional[DatePart], ...] = (None,)
-            if not time_granularity.is_custom_granularity:
-                possible_date_parts += tuple(
-                    date_part
-                    for date_part in DatePart
-                    if time_granularity.base_granularity.to_int() <= date_part.to_int()
-                )
-
-            for date_part in possible_date_parts:
-                properties = {LinkableElementProperty.METRIC_TIME}
-                if time_granularity != defined_granularity:
-                    properties.add(LinkableElementProperty.DERIVED_TIME_GRANULARITY)
-                if date_part:
-                    properties.add(LinkableElementProperty.DATE_PART)
-                if semantic_model_is_scd:
-                    properties.add(LinkableElementProperty.SCD_HOP)
-                linkable_dimension = LinkableDimension.create(
-                    defined_in_semantic_model=measure_semantic_model.reference if measure_semantic_model else None,
-                    element_name=MetricFlowReservedKeywords.METRIC_TIME.value,
-                    dimension_type=DimensionType.TIME,
-                    entity_links=(),
-                    join_path=SemanticModelJoinPath(
-                        left_semantic_model_reference=(
-                            measure_semantic_model.reference
-                            if measure_semantic_model
-                            else SemanticModelDerivation.VIRTUAL_SEMANTIC_MODEL_REFERENCE
-                        ),
+            properties = {LinkableElementProperty.METRIC_TIME}
+            if time_granularity != defined_granularity:
+                properties.add(LinkableElementProperty.DERIVED_TIME_GRANULARITY)
+            if semantic_model_is_scd:
+                properties.add(LinkableElementProperty.SCD_HOP)
+            linkable_dimension = LinkableDimension.create(
+                defined_in_semantic_model=measure_semantic_model.reference if measure_semantic_model else None,
+                element_name=MetricFlowReservedKeywords.METRIC_TIME.value,
+                dimension_type=DimensionType.TIME,
+                entity_links=(),
+                join_path=SemanticModelJoinPath(
+                    left_semantic_model_reference=(
+                        measure_semantic_model.reference
+                        if measure_semantic_model
+                        else SemanticModelDerivation.VIRTUAL_SEMANTIC_MODEL_REFERENCE
                     ),
-                    properties=frozenset(properties),
-                    time_granularity=time_granularity,
-                    date_part=date_part,
-                )
-                path_key_to_linkable_dimensions[linkable_dimension.path_key].append(linkable_dimension)
+                ),
+                properties=frozenset(properties),
+                time_granularity=time_granularity,
+            )
+            path_key_to_linkable_dimensions[linkable_dimension.path_key].append(linkable_dimension)
+
+        for date_part in DatePart:
+            if date_part.to_int() < min_granularity.to_int():
+                continue
+            properties = {LinkableElementProperty.METRIC_TIME, LinkableElementProperty.DATE_PART}
+            if semantic_model_is_scd:
+                properties.add(LinkableElementProperty.SCD_HOP)
+            linkable_dimension = LinkableDimension.create(
+                defined_in_semantic_model=measure_semantic_model.reference if measure_semantic_model else None,
+                element_name=MetricFlowReservedKeywords.METRIC_TIME.value,
+                dimension_type=DimensionType.TIME,
+                entity_links=(),
+                join_path=SemanticModelJoinPath(
+                    left_semantic_model_reference=(
+                        measure_semantic_model.reference
+                        if measure_semantic_model
+                        else SemanticModelDerivation.VIRTUAL_SEMANTIC_MODEL_REFERENCE
+                    ),
+                ),
+                properties=frozenset(properties),
+                date_part=date_part,
+            )
+            path_key_to_linkable_dimensions[linkable_dimension.path_key].append(linkable_dimension)
 
         return LinkableElementSet(
             path_key_to_linkable_dimensions={

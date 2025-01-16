@@ -235,9 +235,9 @@ class SqlPlanJoinBuilder:
             [
                 instance
                 for instance in left_data_set.data_set.metric_time_dimension_instances
-                if not instance.spec.time_granularity.is_custom_granularity
+                if not instance.spec.has_custom_grain
             ],
-            key=lambda x: (x.spec.time_granularity.base_granularity.to_int(), len(x.spec.entity_links)),
+            key=lambda x: (x.spec.base_granularity_sort_key, len(x.spec.entity_links)),
         )
         assert left_data_set_metric_time_dimension_instances, (
             f"Cannot process join to data set with alias {right_data_set.alias} because it has a validity "

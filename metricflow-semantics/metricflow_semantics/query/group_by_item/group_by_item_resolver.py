@@ -248,7 +248,10 @@ class GroupByItemResolver:
             if metric_time_grain_resolution.spec is not None
             else InstanceSpecSet.empty_instance()
         )
-        if len(metric_time_spec_set.time_dimension_specs) != 1:
+        if (
+            len(metric_time_spec_set.time_dimension_specs) != 1
+            or metric_time_spec_set.time_dimension_specs[0].time_granularity is None
+        ):
             raise RuntimeError(
                 f"The grain for {repr(METRIC_TIME_ELEMENT_NAME)} could not be resolved. Got spec "
                 f"{metric_time_grain_resolution.spec} and issues:\n\n"

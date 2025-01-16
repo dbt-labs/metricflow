@@ -80,7 +80,11 @@ class ObjectBuilderNamingScheme(QueryItemNamingScheme):
                 ParameterSetField.DATE_PART,
             ]
 
-            if time_dimension_call_parameter_set.time_granularity_name is not None:
+            # If date part is requested, time granularity should be ignored.
+            if (
+                time_dimension_call_parameter_set.date_part is None
+                and time_dimension_call_parameter_set.time_granularity_name is not None
+            ):
                 fields_to_compare.append(ParameterSetField.TIME_GRANULARITY)
 
             return TimeDimensionPattern(

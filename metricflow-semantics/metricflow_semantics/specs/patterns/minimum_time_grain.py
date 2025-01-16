@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Dict, List, Sequence, Set
+from typing import Dict, List, Sequence, Set, Tuple
 
 from typing_extensions import override
 
@@ -47,9 +47,13 @@ class MinimumTimeGrainPattern(SpecPattern):
     def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[InstanceSpec]:
         spec_set = group_specs_by_type(candidate_specs)
 
+        time_dimension_specs_with_no_grain: Tuple[TimeDimensionSpec, ...] = ()
         spec_key_to_grains: Dict[TimeDimensionSpecComparisonKey, Set[ExpandedTimeGranularity]] = defaultdict(set)
         spec_key_to_specs: Dict[TimeDimensionSpecComparisonKey, List[TimeDimensionSpec]] = defaultdict(list)
         for time_dimension_spec in spec_set.time_dimension_specs:
+            if time_dimension_spec.time_granularity is None:
+                time_dimension_specs_with_no_grain += (time_dimension_spec,)
+                continue
             spec_key = time_dimension_spec.comparison_key(exclude_fields=(TimeDimensionSpecField.TIME_GRANULARITY,))
             spec_key_to_grains[spec_key].add(time_dimension_spec.time_granularity)
             spec_key_to_specs[spec_key].append(time_dimension_spec)
@@ -71,6 +75,7 @@ class MinimumTimeGrainPattern(SpecPattern):
         matching_specs: Sequence[LinkableInstanceSpec] = (
             spec_set.dimension_specs
             + tuple(matched_time_dimension_specs)
+            + time_dimension_specs_with_no_grain
             + spec_set.entity_specs
             + spec_set.group_by_metric_specs
         )

@@ -100,14 +100,12 @@ class PartitionJoinResolver:
         assert len(time_dimension_specs) > 0
         # TODO: [custom granularity] restructure this method to operate on partition collections instead, and
         # move this enforcement to the PartitionSpecSet
-        assert all(not x.time_granularity.is_custom_granularity for x in time_dimension_specs), (
+        assert all(not spec.has_custom_grain for spec in time_dimension_specs), (
             f"Found custom granularity in partition time dimension specs {time_dimension_specs}, but time partitions "
             "can only use standard granularities as they are based on engine date/time types!"
         )
 
-        sorted_specs = sorted(
-            time_dimension_specs, key=lambda x: (x.time_granularity.base_granularity, len(x.entity_links))
-        )
+        sorted_specs = sorted(time_dimension_specs, key=lambda x: (x.base_granularity_sort_key, len(x.entity_links)))
         return sorted_specs[0]
 
     def resolve_partition_time_dimension_joins(

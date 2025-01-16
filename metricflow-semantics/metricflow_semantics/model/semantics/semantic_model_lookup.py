@@ -29,7 +29,7 @@ from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.measure_spec import MeasureSpec
 from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDimensionSpec
-from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
+from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY, TimeDimensionSpec
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 logger = logging.getLogger(__name__)
@@ -173,12 +173,16 @@ class SemanticModelLookup:
                     )
                 )
 
-            # TODO: Construct these specs correctly. All of the time dimension specs have the default granularity
-            self._dimension_ref_to_spec[dim.time_dimension_reference or dim.reference] = (
-                TimeDimensionSpec(element_name=dim.name, entity_links=())
-                if dim.type is DimensionType.TIME
-                else DimensionSpec(element_name=dim.name, entity_links=())
-            )
+            if dim.type is DimensionType.TIME:
+                defined_granularity = dim.type_params.time_granularity if dim.type_params else DEFAULT_TIME_GRANULARITY
+                assert dim.time_dimension_reference, f"Time dimension {dim} does not have a time dimension reference"
+                self._dimension_ref_to_spec[dim.time_dimension_reference] = TimeDimensionSpec(
+                    element_name=dim.name,
+                    entity_links=(),
+                    time_granularity=ExpandedTimeGranularity.from_time_granularity(defined_granularity),
+                )
+            else:
+                self._dimension_ref_to_spec[dim.reference] = DimensionSpec(element_name=dim.name, entity_links=())
 
         for entity in semantic_model.entities:
             semantic_models_for_entity = self._entity_index.get(entity.reference, []) + [semantic_model]

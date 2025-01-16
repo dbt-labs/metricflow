@@ -166,7 +166,7 @@ class MetricFlowQueryParser:
             len(time_dimension_specs) == 1
         ), f"Bug with MinimumTimeGrainPattern - should have returned exactly 1 spec but got {time_dimension_specs}"
 
-        return time_dimension_specs[0].time_granularity.base_granularity
+        return time_dimension_specs[0].base_granularity
 
     def _adjust_time_constraint(
         self,

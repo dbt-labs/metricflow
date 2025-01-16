@@ -155,6 +155,10 @@ class _DunderNameTransform(InstanceSpecSetTransform[Sequence[str]]):
             if time_dimension_spec.date_part is not None:
                 items.append(DunderNamingScheme.date_part_suffix(date_part=time_dimension_spec.date_part))
             else:
+                assert time_dimension_spec.time_granularity, (
+                    f"No time granularity or date part set for time dimension spec {time_dimension_spec}. "
+                    "This indicates internal misconfiguration."
+                )
                 items.append(time_dimension_spec.time_granularity.name)
             names_to_return.append(DUNDER.join(items))
 

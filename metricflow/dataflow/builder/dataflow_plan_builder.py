@@ -1929,8 +1929,8 @@ class DataflowPlanBuilder:
             time_dimension_specs,
             key=lambda spec: (
                 spec.date_part is not None,
-                spec.time_granularity.is_custom_granularity,
-                spec.time_granularity.base_granularity.to_int(),
+                spec.has_custom_grain,
+                spec.base_granularity_sort_key,
             ),
         )
 

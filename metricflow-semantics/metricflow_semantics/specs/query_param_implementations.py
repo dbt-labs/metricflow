@@ -52,7 +52,9 @@ class TimeDimensionParameter(ProtocolHint[TimeDimensionQueryParameter]):
             ParameterSetField.ENTITY_LINKS,
             ParameterSetField.DATE_PART,
         ]
-        if self.grain is not None:
+
+        # If date part is requested, time granularity should be ignored.
+        if self.date_part is None and self.grain is not None:
             fields_to_compare.append(ParameterSetField.TIME_GRANULARITY)
 
         name_structure = StructuredLinkableSpecName.from_name(
