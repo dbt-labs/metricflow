@@ -536,11 +536,11 @@ class SqlPlanJoinBuilder:
         left_expr: SqlExpressionNode = SqlColumnReferenceExpression.create(
             col_ref=SqlColumnReference(table_alias=time_spine_alias, column_name=time_spine_column_name)
         )
-        if node.offset_window:
+        if node.standard_offset_window:
             left_expr = SqlSubtractTimeIntervalExpression.create(
                 arg=left_expr,
-                count=node.offset_window.count,
-                granularity=error_if_not_standard_grain(input_granularity=node.offset_window.granularity),
+                count=node.standard_offset_window.count,
+                granularity=error_if_not_standard_grain(input_granularity=node.standard_offset_window.granularity),
             )
         elif node.offset_to_grain:
             left_expr = SqlDateTruncExpression.create(time_granularity=node.offset_to_grain, arg=left_expr)
