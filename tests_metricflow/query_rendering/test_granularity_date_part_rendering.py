@@ -37,12 +37,7 @@ def test_simple_query_with_date_part(  # noqa: D103
 ) -> None:
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec(element_name="bookings"),),
-        time_dimension_specs=(
-            DataSet.metric_time_dimension_spec(
-                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
-                date_part=DatePart.DOW,
-            ),
-        ),
+        time_dimension_specs=(DataSet.metric_time_dimension_spec(date_part=DatePart.DOW),),
     )
 
     render_and_check(
@@ -66,30 +61,12 @@ def test_simple_query_with_multiple_date_parts(  # noqa: D103
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec(element_name="bookings"),),
         time_dimension_specs=(
-            DataSet.metric_time_dimension_spec(
-                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
-                date_part=DatePart.DAY,
-            ),
-            DataSet.metric_time_dimension_spec(
-                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
-                date_part=DatePart.DOW,
-            ),
-            DataSet.metric_time_dimension_spec(
-                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
-                date_part=DatePart.DOY,
-            ),
-            DataSet.metric_time_dimension_spec(
-                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
-                date_part=DatePart.MONTH,
-            ),
-            DataSet.metric_time_dimension_spec(
-                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
-                date_part=DatePart.QUARTER,
-            ),
-            DataSet.metric_time_dimension_spec(
-                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
-                date_part=DatePart.YEAR,
-            ),
+            DataSet.metric_time_dimension_spec(date_part=DatePart.DAY),
+            DataSet.metric_time_dimension_spec(date_part=DatePart.DOW),
+            DataSet.metric_time_dimension_spec(date_part=DatePart.DOY),
+            DataSet.metric_time_dimension_spec(date_part=DatePart.MONTH),
+            DataSet.metric_time_dimension_spec(date_part=DatePart.QUARTER),
+            DataSet.metric_time_dimension_spec(date_part=DatePart.YEAR),
         ),
     )
 
@@ -113,12 +90,7 @@ def test_offset_window_with_date_part(  # noqa: D103
 ) -> None:
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec(element_name="bookings_growth_2_weeks"),),
-        time_dimension_specs=(
-            DataSet.metric_time_dimension_spec(
-                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
-                date_part=DatePart.DOW,
-            ),
-        ),
+        time_dimension_specs=(DataSet.metric_time_dimension_spec(date_part=DatePart.DOW),),
     )
 
     render_and_check(

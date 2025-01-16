@@ -658,6 +658,7 @@ def test_order_by_node(
     time_dimension_spec = TimeDimensionSpec(
         element_name="ds",
         entity_links=(),
+        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
     )
     measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
@@ -716,7 +717,11 @@ def test_semi_additive_join_node(
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan using a SemiAdditiveJoinNode."""
     non_additive_dimension_spec = NonAdditiveDimensionSpec(name="ds", window_choice=AggregationType.MIN)
-    time_dimension_spec = TimeDimensionSpec(element_name="ds", entity_links=())
+    time_dimension_spec = TimeDimensionSpec(
+        element_name="ds",
+        entity_links=(),
+        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
+    )
 
     measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "accounts_source"
@@ -747,7 +752,11 @@ def test_semi_additive_join_node_with_queried_group_by(
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan using a SemiAdditiveJoinNode."""
     non_additive_dimension_spec = NonAdditiveDimensionSpec(name="ds", window_choice=AggregationType.MIN)
-    time_dimension_spec = TimeDimensionSpec(element_name="ds", entity_links=())
+    time_dimension_spec = TimeDimensionSpec(
+        element_name="ds",
+        entity_links=(),
+        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
+    )
     queried_time_dimension_spec = TimeDimensionSpec(
         element_name="ds",
         entity_links=(),
@@ -788,7 +797,11 @@ def test_semi_additive_join_node_with_grouping(
         window_groupings=("user",),
     )
     entity_spec = LinklessEntitySpec(element_name="user", entity_links=())
-    time_dimension_spec = TimeDimensionSpec(element_name="ds", entity_links=())
+    time_dimension_spec = TimeDimensionSpec(
+        element_name="ds",
+        entity_links=(),
+        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
+    )
 
     measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "accounts_source"
@@ -875,6 +888,7 @@ def test_compute_metrics_node_ratio_from_multiple_semantic_models(
     time_dimension_spec = TimeDimensionSpec(
         element_name="ds",
         entity_links=(),
+        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
     )
     metric_spec = MetricSpec(element_name="bookings_per_view")
 

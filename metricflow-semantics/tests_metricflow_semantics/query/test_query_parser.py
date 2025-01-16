@@ -13,7 +13,6 @@ from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.query_exceptions import InvalidQueryException
@@ -606,15 +605,6 @@ def test_date_part_parsing(
         query_parser.parse_and_validate_query(
             metric_names=["revenue_since_start_of_year"],
             group_by=(TimeDimensionParameter(name="metric_time", date_part=DatePart.MONTH),),
-        )
-
-    # Requested granularity doesn't match resolved granularity
-    with pytest.raises(InvalidQueryException, match="does not match any of the available"):
-        query_parser.parse_and_validate_query(
-            metric_names=["revenue"],
-            group_by=(
-                TimeDimensionParameter(name="metric_time", grain=TimeGranularity.YEAR.value, date_part=DatePart.MONTH),
-            ),
         )
 
     # Date part is compatible

@@ -3,6 +3,7 @@ from __future__ import annotations
 import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.references import EntityReference
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
@@ -10,6 +11,7 @@ from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.execution.dataflow_to_execution import DataflowToExecutionPlanConverter
@@ -135,7 +137,13 @@ def test_combined_metrics_plan(  # noqa: D103
                     entity_links=(),
                 ),
             ),
-            time_dimension_specs=(TimeDimensionSpec(element_name="ds", entity_links=()),),
+            time_dimension_specs=(
+                TimeDimensionSpec(
+                    element_name="ds",
+                    entity_links=(),
+                    time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
+                ),
+            ),
         )
     )
 

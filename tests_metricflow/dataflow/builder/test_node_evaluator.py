@@ -490,10 +490,12 @@ def test_node_evaluator_with_partition_joined_spec(
                         start_node_time_dimension_spec=TimeDimensionSpec(
                             element_name="ds_partitioned",
                             entity_links=(),
+                            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
                         ),
                         node_to_join_time_dimension_spec=TimeDimensionSpec(
                             element_name="ds_partitioned",
                             entity_links=(),
+                            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
                         ),
                     ),
                 ),
@@ -560,8 +562,16 @@ def test_node_evaluator_with_scd_target(
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
                 validity_window=ValidityWindowJoinDescription(
-                    window_start_dimension=TimeDimensionSpec(element_name="window_start", entity_links=()),
-                    window_end_dimension=TimeDimensionSpec(element_name="window_end", entity_links=()),
+                    window_start_dimension=TimeDimensionSpec(
+                        element_name="window_start",
+                        entity_links=(),
+                        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
+                    ),
+                    window_end_dimension=TimeDimensionSpec(
+                        element_name="window_end",
+                        entity_links=(),
+                        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
+                    ),
                 ),
                 join_type=SqlJoinType.LEFT_OUTER,
             ),
@@ -626,10 +636,14 @@ def test_node_evaluator_with_multi_hop_scd_target(
                 join_on_partition_time_dimensions=(),
                 validity_window=ValidityWindowJoinDescription(
                     window_start_dimension=TimeDimensionSpec(
-                        element_name="window_start", entity_links=(EntityReference(element_name="lux_listing"),)
+                        element_name="window_start",
+                        entity_links=(EntityReference(element_name="lux_listing"),),
+                        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
                     ),
                     window_end_dimension=TimeDimensionSpec(
-                        element_name="window_end", entity_links=(EntityReference(element_name="lux_listing"),)
+                        element_name="window_end",
+                        entity_links=(EntityReference(element_name="lux_listing"),),
+                        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
                     ),
                 ),
                 join_type=SqlJoinType.LEFT_OUTER,
@@ -694,8 +708,16 @@ def test_node_evaluator_with_multi_hop_through_scd(
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
                 validity_window=ValidityWindowJoinDescription(
-                    window_start_dimension=TimeDimensionSpec(element_name="window_start", entity_links=()),
-                    window_end_dimension=TimeDimensionSpec(element_name="window_end", entity_links=()),
+                    window_start_dimension=TimeDimensionSpec(
+                        element_name="window_start",
+                        entity_links=(),
+                        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
+                    ),
+                    window_end_dimension=TimeDimensionSpec(
+                        element_name="window_end",
+                        entity_links=(),
+                        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
+                    ),
                 ),
                 join_type=SqlJoinType.LEFT_OUTER,
             ),

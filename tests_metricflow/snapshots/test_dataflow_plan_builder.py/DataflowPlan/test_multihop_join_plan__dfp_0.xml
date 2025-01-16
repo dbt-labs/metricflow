@@ -204,42 +204,14 @@ docstring:
                                     <!--     element_name='ds_partitioned',                                                -->
                                     <!--     time_granularity=ExpandedTimeGranularity(name='year', base_granularity=YEAR), -->
                                     <!--   )                                                                               -->
-                                    <!-- include_spec =                                                                  -->
-                                    <!--   TimeDimensionSpec(                                                            -->
-                                    <!--     element_name='ds_partitioned',                                              -->
-                                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
-                                    <!--     date_part=YEAR,                                                             -->
-                                    <!--   )                                                                             -->
-                                    <!-- include_spec =                                                                  -->
-                                    <!--   TimeDimensionSpec(                                                            -->
-                                    <!--     element_name='ds_partitioned',                                              -->
-                                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
-                                    <!--     date_part=QUARTER,                                                          -->
-                                    <!--   )                                                                             -->
-                                    <!-- include_spec =                                                                  -->
-                                    <!--   TimeDimensionSpec(                                                            -->
-                                    <!--     element_name='ds_partitioned',                                              -->
-                                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
-                                    <!--     date_part=MONTH,                                                            -->
-                                    <!--   )                                                                             -->
-                                    <!-- include_spec =                                                                  -->
-                                    <!--   TimeDimensionSpec(                                                            -->
-                                    <!--     element_name='ds_partitioned',                                              -->
-                                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
-                                    <!--     date_part=DAY,                                                              -->
-                                    <!--   )                                                                             -->
-                                    <!-- include_spec =                                                                  -->
-                                    <!--   TimeDimensionSpec(                                                            -->
-                                    <!--     element_name='ds_partitioned',                                              -->
-                                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
-                                    <!--     date_part=DOW,                                                              -->
-                                    <!--   )                                                                             -->
-                                    <!-- include_spec =                                                                  -->
-                                    <!--   TimeDimensionSpec(                                                            -->
-                                    <!--     element_name='ds_partitioned',                                              -->
-                                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
-                                    <!--     date_part=DOY,                                                              -->
-                                    <!--   )                                                                             -->
+                                    <!-- include_spec = TimeDimensionSpec(element_name='ds_partitioned', date_part=YEAR) -->
+                                    <!-- include_spec =                                                        -->
+                                    <!--   TimeDimensionSpec(element_name='ds_partitioned', date_part=QUARTER) -->
+                                    <!-- include_spec =                                                      -->
+                                    <!--   TimeDimensionSpec(element_name='ds_partitioned', date_part=MONTH) -->
+                                    <!-- include_spec = TimeDimensionSpec(element_name='ds_partitioned', date_part=DAY) -->
+                                    <!-- include_spec = TimeDimensionSpec(element_name='ds_partitioned', date_part=DOW) -->
+                                    <!-- include_spec = TimeDimensionSpec(element_name='ds_partitioned', date_part=DOY) -->
                                     <!-- include_spec =                                                                  -->
                                     <!--   TimeDimensionSpec(                                                            -->
                                     <!--     element_name='ds_partitioned',                                              -->
@@ -276,48 +248,42 @@ docstring:
                                     <!--     entity_links=(EntityReference(element_name='customer_id'),),                  -->
                                     <!--     time_granularity=ExpandedTimeGranularity(name='year', base_granularity=YEAR), -->
                                     <!--   )                                                                               -->
-                                    <!-- include_spec =                                                                  -->
-                                    <!--   TimeDimensionSpec(                                                            -->
-                                    <!--     element_name='ds_partitioned',                                              -->
-                                    <!--     entity_links=(EntityReference(element_name='customer_id'),),                -->
-                                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
-                                    <!--     date_part=YEAR,                                                             -->
-                                    <!--   )                                                                             -->
-                                    <!-- include_spec =                                                                  -->
-                                    <!--   TimeDimensionSpec(                                                            -->
-                                    <!--     element_name='ds_partitioned',                                              -->
-                                    <!--     entity_links=(EntityReference(element_name='customer_id'),),                -->
-                                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
-                                    <!--     date_part=QUARTER,                                                          -->
-                                    <!--   )                                                                             -->
-                                    <!-- include_spec =                                                                  -->
-                                    <!--   TimeDimensionSpec(                                                            -->
-                                    <!--     element_name='ds_partitioned',                                              -->
-                                    <!--     entity_links=(EntityReference(element_name='customer_id'),),                -->
-                                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
-                                    <!--     date_part=MONTH,                                                            -->
-                                    <!--   )                                                                             -->
-                                    <!-- include_spec =                                                                  -->
-                                    <!--   TimeDimensionSpec(                                                            -->
-                                    <!--     element_name='ds_partitioned',                                              -->
-                                    <!--     entity_links=(EntityReference(element_name='customer_id'),),                -->
-                                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
-                                    <!--     date_part=DAY,                                                              -->
-                                    <!--   )                                                                             -->
-                                    <!-- include_spec =                                                                  -->
-                                    <!--   TimeDimensionSpec(                                                            -->
-                                    <!--     element_name='ds_partitioned',                                              -->
-                                    <!--     entity_links=(EntityReference(element_name='customer_id'),),                -->
-                                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
-                                    <!--     date_part=DOW,                                                              -->
-                                    <!--   )                                                                             -->
-                                    <!-- include_spec =                                                                  -->
-                                    <!--   TimeDimensionSpec(                                                            -->
-                                    <!--     element_name='ds_partitioned',                                              -->
-                                    <!--     entity_links=(EntityReference(element_name='customer_id'),),                -->
-                                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
-                                    <!--     date_part=DOY,                                                              -->
-                                    <!--   )                                                                             -->
+                                    <!-- include_spec =                                                   -->
+                                    <!--   TimeDimensionSpec(                                             -->
+                                    <!--     element_name='ds_partitioned',                               -->
+                                    <!--     entity_links=(EntityReference(element_name='customer_id'),), -->
+                                    <!--     date_part=YEAR,                                              -->
+                                    <!--   )                                                              -->
+                                    <!-- include_spec =                                                   -->
+                                    <!--   TimeDimensionSpec(                                             -->
+                                    <!--     element_name='ds_partitioned',                               -->
+                                    <!--     entity_links=(EntityReference(element_name='customer_id'),), -->
+                                    <!--     date_part=QUARTER,                                           -->
+                                    <!--   )                                                              -->
+                                    <!-- include_spec =                                                   -->
+                                    <!--   TimeDimensionSpec(                                             -->
+                                    <!--     element_name='ds_partitioned',                               -->
+                                    <!--     entity_links=(EntityReference(element_name='customer_id'),), -->
+                                    <!--     date_part=MONTH,                                             -->
+                                    <!--   )                                                              -->
+                                    <!-- include_spec =                                                   -->
+                                    <!--   TimeDimensionSpec(                                             -->
+                                    <!--     element_name='ds_partitioned',                               -->
+                                    <!--     entity_links=(EntityReference(element_name='customer_id'),), -->
+                                    <!--     date_part=DAY,                                               -->
+                                    <!--   )                                                              -->
+                                    <!-- include_spec =                                                   -->
+                                    <!--   TimeDimensionSpec(                                             -->
+                                    <!--     element_name='ds_partitioned',                               -->
+                                    <!--     entity_links=(EntityReference(element_name='customer_id'),), -->
+                                    <!--     date_part=DOW,                                               -->
+                                    <!--   )                                                              -->
+                                    <!-- include_spec =                                                   -->
+                                    <!--   TimeDimensionSpec(                                             -->
+                                    <!--     element_name='ds_partitioned',                               -->
+                                    <!--     entity_links=(EntityReference(element_name='customer_id'),), -->
+                                    <!--     date_part=DOY,                                               -->
+                                    <!--   )                                                              -->
                                     <!-- include_spec =                                                                  -->
                                     <!--   TimeDimensionSpec(                                                            -->
                                     <!--     element_name='metric_time',                                                 -->
@@ -349,42 +315,12 @@ docstring:
                                     <!--     element_name='metric_time',                                                   -->
                                     <!--     time_granularity=ExpandedTimeGranularity(name='year', base_granularity=YEAR), -->
                                     <!--   )                                                                               -->
-                                    <!-- include_spec =                                                                  -->
-                                    <!--   TimeDimensionSpec(                                                            -->
-                                    <!--     element_name='metric_time',                                                 -->
-                                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
-                                    <!--     date_part=YEAR,                                                             -->
-                                    <!--   )                                                                             -->
-                                    <!-- include_spec =                                                                  -->
-                                    <!--   TimeDimensionSpec(                                                            -->
-                                    <!--     element_name='metric_time',                                                 -->
-                                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
-                                    <!--     date_part=QUARTER,                                                          -->
-                                    <!--   )                                                                             -->
-                                    <!-- include_spec =                                                                  -->
-                                    <!--   TimeDimensionSpec(                                                            -->
-                                    <!--     element_name='metric_time',                                                 -->
-                                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
-                                    <!--     date_part=MONTH,                                                            -->
-                                    <!--   )                                                                             -->
-                                    <!-- include_spec =                                                                  -->
-                                    <!--   TimeDimensionSpec(                                                            -->
-                                    <!--     element_name='metric_time',                                                 -->
-                                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
-                                    <!--     date_part=DAY,                                                              -->
-                                    <!--   )                                                                             -->
-                                    <!-- include_spec =                                                                  -->
-                                    <!--   TimeDimensionSpec(                                                            -->
-                                    <!--     element_name='metric_time',                                                 -->
-                                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
-                                    <!--     date_part=DOW,                                                              -->
-                                    <!--   )                                                                             -->
-                                    <!-- include_spec =                                                                  -->
-                                    <!--   TimeDimensionSpec(                                                            -->
-                                    <!--     element_name='metric_time',                                                 -->
-                                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
-                                    <!--     date_part=DOY,                                                              -->
-                                    <!--   )                                                                             -->
+                                    <!-- include_spec = TimeDimensionSpec(element_name='metric_time', date_part=YEAR) -->
+                                    <!-- include_spec = TimeDimensionSpec(element_name='metric_time', date_part=QUARTER) -->
+                                    <!-- include_spec = TimeDimensionSpec(element_name='metric_time', date_part=MONTH) -->
+                                    <!-- include_spec = TimeDimensionSpec(element_name='metric_time', date_part=DAY) -->
+                                    <!-- include_spec = TimeDimensionSpec(element_name='metric_time', date_part=DOW) -->
+                                    <!-- include_spec = TimeDimensionSpec(element_name='metric_time', date_part=DOY) -->
                                     <!-- include_spec = EntitySpec(element_name='customer_id') -->
                                     <!-- distinct = False -->
                                     <MetricTimeDimensionTransformNode>

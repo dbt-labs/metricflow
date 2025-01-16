@@ -40,7 +40,6 @@ def test_input_str(dunder_naming_scheme: DunderNamingScheme) -> None:  # noqa: D
             TimeDimensionSpec(
                 element_name="creation_time",
                 entity_links=(EntityReference(element_name="booking"), EntityReference(element_name="listing")),
-                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
                 date_part=DatePart.DAY,
             )
         )
