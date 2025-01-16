@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check-out the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Test w/ Python ${{ env.PYTHON_VERSION }}
         uses: ./.github/actions/run-mf-tests
@@ -48,7 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check-out the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Test w/ Python ${{ env.PYTHON_VERSION }}
         uses: ./.github/actions/run-mf-tests
@@ -73,7 +73,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check-out the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Test w/ Python ${{ env.PYTHON_VERSION }}
         uses: ./.github/actions/run-mf-tests
@@ -98,7 +98,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check-out the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Test w/ Python ${{ env.PYTHON_VERSION }}
         uses: ./.github/actions/run-mf-tests
@@ -131,7 +131,7 @@ jobs:
           - 8080:8080
     steps:
       - name: Check-out the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Test w/ Python 3.12
         uses: ./.github/actions/run-mf-tests

@@ -17,7 +17,7 @@ jobs:
         python-version: ["3.9", "3.12"]
     steps:
       - name: Check-out the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Test w/ Python ${{ matrix.python-version }}
         uses: ./.github/actions/run-mf-tests
@@ -45,7 +45,7 @@ jobs:
     steps:
 
       - name: Check-out the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Test w/ Python 3.12
         uses: ./.github/actions/run-mf-tests
@@ -78,9 +78,9 @@ jobs:
     steps:
 
       - name: Check-out the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Setup Python ${{ inputs.python-version }} Environment
+      - name: Setup Python ${{ matrix.python-version }} Environment
         uses: ./.github/actions/setup-python-env
         with:
           python-version: "${{ matrix.python-version }}"
