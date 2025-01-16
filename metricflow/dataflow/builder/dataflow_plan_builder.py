@@ -1946,7 +1946,5 @@ class DataflowPlanBuilder:
         join_on_time_dimension_spec = DataSet.metric_time_dimension_spec(time_granularity=join_spec_grain)
         if not LinkableSpecSet(time_dimension_specs=required_time_spine_specs).contains_metric_time:
             sample_agg_time_dimension_spec = required_time_spine_specs[0]
-            join_on_time_dimension_spec = sample_agg_time_dimension_spec.with_grain_and_date_part(
-                time_granularity=join_spec_grain, date_part=None
-            )
+            join_on_time_dimension_spec = sample_agg_time_dimension_spec.with_grain(time_granularity=join_spec_grain)
         return join_on_time_dimension_spec

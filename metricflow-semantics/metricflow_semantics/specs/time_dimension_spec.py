@@ -168,11 +168,6 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
             date_part=self.date_part,
         )
 
-    @staticmethod
-    def from_reference(reference: TimeDimensionReference) -> TimeDimensionSpec:
-        """Initialize from a time dimension reference instance."""
-        return TimeDimensionSpec(entity_links=(), element_name=reference.element_name)
-
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_time_dimension_spec(self)
 
@@ -181,7 +176,6 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
             element_name=self.element_name,
             entity_links=self.entity_links,
             time_granularity=time_granularity,
-            date_part=self.date_part,
             aggregation_state=self.aggregation_state,
             window_function=self.window_function,
         )
@@ -194,18 +188,6 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
                 ExpandedTimeGranularity.from_time_granularity(self.base_granularity) if self.base_granularity else None
             ),
             date_part=self.date_part,
-            aggregation_state=self.aggregation_state,
-            window_function=self.window_function,
-        )
-
-    def with_grain_and_date_part(  # noqa: D102
-        self, time_granularity: ExpandedTimeGranularity, date_part: Optional[DatePart]
-    ) -> TimeDimensionSpec:
-        return TimeDimensionSpec(
-            element_name=self.element_name,
-            entity_links=self.entity_links,
-            time_granularity=time_granularity,
-            date_part=date_part,
             aggregation_state=self.aggregation_state,
             window_function=self.window_function,
         )
