@@ -37,3 +37,9 @@ repos:
         # pre-commit. This is set for mypy to use the specified package dependencies in Hatch (assuming pre-commit is
         # run with hatch run ...). Seems like pre-commit calls the mypy on the command line with this settings.
         language: system
+
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.6
+    hooks:
+      - id: actionlint
+        files: ^\.github/workflows/
