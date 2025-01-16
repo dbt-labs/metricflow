@@ -626,4 +626,3 @@
 ### Special thanks
 
 Special thanks to @zzsza for the quick fix for our BigQuery token parsing bug!
-

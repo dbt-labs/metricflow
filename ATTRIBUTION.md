@@ -18826,5 +18826,3 @@ copied and put under another distribution licence
 [FOSSA]: # (Do not touch the comments below)
 
 [FOSSA]: # (==depsig=18307b0566135aa572cbfae928b133ce90f05eabce6cea6c7d34d14d61770c2a==)
-
-
