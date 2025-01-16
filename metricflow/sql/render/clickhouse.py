@@ -141,26 +141,26 @@ class ClickhouseSqlExpressionRenderer(DefaultSqlExpressionRenderer):
 
         # Map the granularity to Clickhouse's date truncation functions
         trunc_function = {
-            TimeGranularity.DAY: "day",
-            TimeGranularity.WEEK: "week",
-            TimeGranularity.MONTH: "month",
-            TimeGranularity.QUARTER: "quarter",
-            TimeGranularity.YEAR: "year",
-            TimeGranularity.HOUR: "hour",
-            TimeGranularity.SECOND: "second",
-            TimeGranularity.MINUTE: "minute",
-            TimeGranularity.MILLISECOND: "millisecond",
+            TimeGranularity.DAY: "toStartOfDay",
+            TimeGranularity.WEEK: "toStartOfWeek",
+            TimeGranularity.MONTH: "toStartOfMonth",
+            TimeGranularity.QUARTER: "toStartOfQuarter",
+            TimeGranularity.YEAR: "toStartOfYear",
+            TimeGranularity.HOUR: "toStartOfHour",
+            TimeGranularity.SECOND: "toStartOfSecond",
+            TimeGranularity.MINUTE: "toStartOfMinute",
+            TimeGranularity.MILLISECOND: "toStartOfMillisecond",
         }[node.time_granularity]
 
         # For millisecond precision, we need to cast to DateTime64
         if node.time_granularity == TimeGranularity.MILLISECOND:
             return SqlExpressionRenderResult(
-                sql=f"date_trunc('{trunc_function}', CAST({arg_rendered.sql} AS DateTime64(3)))",
+                sql=f"{trunc_function}(CAST({arg_rendered.sql} AS DateTime64(3))",
                 bind_parameter_set=arg_rendered.bind_parameter_set,
             )
 
         return SqlExpressionRenderResult(
-            sql=f"date_trunc('{trunc_function}', {arg_rendered.sql})",
+            sql=f"{trunc_function}({arg_rendered.sql})",
             bind_parameter_set=arg_rendered.bind_parameter_set,
         )
 
