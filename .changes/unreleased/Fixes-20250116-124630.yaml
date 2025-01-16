@@ -1,0 +1,6 @@
+kind: Fixes
+body: Add config to get_measures_for_metrics response
+time: 2025-01-16T12:46:30.196593-06:00
+custom:
+    Author: DevonFulcher
+    Issue: None
