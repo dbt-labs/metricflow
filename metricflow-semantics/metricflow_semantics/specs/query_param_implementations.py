@@ -30,7 +30,6 @@ from metricflow_semantics.specs.patterns.entity_link_pattern import (
     ParameterSetField,
     SpecPatternParameterSet,
 )
-from metricflow_semantics.specs.patterns.metric_pattern import MetricSpecPattern
 
 
 @dataclass(frozen=True)
@@ -141,13 +140,8 @@ class MetricParameter(ProtocolHint[MetricQueryParameter]):
         return ResolverInputForMetric(
             input_obj=self,
             naming_scheme=naming_scheme,
-            spec_pattern=MetricSpecPattern(
-                SpecPatternParameterSet.from_parameters(
-                    fields_to_compare=(ParameterSetField.ELEMENT_NAME,),
-                    element_name=self.name.lower(),
-                    alias=self.alias,
-                )
-            ),
+            spec_pattern=naming_scheme.spec_pattern(self.name, semantic_manifest_lookup=semantic_manifest_lookup),
+            alias=self.alias,
         )
 
 

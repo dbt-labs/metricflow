@@ -30,7 +30,6 @@ class ParameterSetField(Enum):
     TIME_GRANULARITY = "time_granularity_name"
     DATE_PART = "date_part"
     METRIC_SUBQUERY_ENTITY_LINKS = "metric_subquery_entity_links"
-    ALIAS = "alias"
 
     def __lt__(self, other: Any) -> bool:  # type: ignore[misc]
         """Allow for ordering so that a sequence of these can be consistently represented for test snapshots."""
@@ -55,7 +54,6 @@ class SpecPatternParameterSet:
     time_granularity_name: Optional[str] = None
     date_part: Optional[DatePart] = None
     metric_subquery_entity_links: Optional[Tuple[EntityReference, ...]] = None
-    alias: Optional[str] = None
 
     @staticmethod
     def from_parameters(  # noqa: D102
@@ -65,7 +63,6 @@ class SpecPatternParameterSet:
         time_granularity_name: Optional[str] = None,
         date_part: Optional[DatePart] = None,
         metric_subquery_entity_links: Optional[Tuple[EntityReference, ...]] = None,
-        alias: Optional[str] = None,
     ) -> SpecPatternParameterSet:
         return SpecPatternParameterSet(
             fields_to_compare=tuple(sorted(fields_to_compare)),
@@ -74,7 +71,6 @@ class SpecPatternParameterSet:
             time_granularity_name=time_granularity_name,
             date_part=date_part,
             metric_subquery_entity_links=metric_subquery_entity_links,
-            alias=alias,
         )
 
     def __post_init__(self) -> None:
