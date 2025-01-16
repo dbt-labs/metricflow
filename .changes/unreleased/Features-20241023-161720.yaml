@@ -1,6 +1,0 @@
-kind: Features
-body: Support conversion metrics queried with custom granularities.
-time: 2024-10-23T16:17:20.92419-07:00
-custom:
-  Author: courtneyholcomb
-  Issue: "1475"

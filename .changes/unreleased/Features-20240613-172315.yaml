@@ -1,6 +1,0 @@
-kind: Features
-body: Build dataflow plan for cumulative metrics queried with non-default granularity.
-time: 2024-06-13T17:23:15.095339-07:00
-custom:
-  Author: courtneyholcomb
-  Issue: "1281"
