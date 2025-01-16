@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
+from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow
 from dbt_semantic_interfaces.references import MetricReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 
@@ -67,3 +68,10 @@ class MetricSpec(InstanceSpec):  # noqa: D101
             offset_window=self.offset_window,
             offset_to_grain=self.offset_to_grain,
         )
+
+    @property
+    def standard_offset_window(self) -> Optional[MetricTimeWindow]:
+        """Return the offset window if it exists and uses a standard granularity."""
+        if self.offset_window and self.offset_window.is_standard_granularity:
+            return self.offset_window
+        return None

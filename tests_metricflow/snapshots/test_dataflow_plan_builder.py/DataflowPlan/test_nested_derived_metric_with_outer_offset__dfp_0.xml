@@ -25,7 +25,7 @@ test_filename: test_dataflow_plan_builder.py
                 <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                 <!--   )                                                                             -->
                 <!-- join_type = INNER -->
-                <!-- offset_window = PydanticMetricTimeWindow(count=2, granularity='day') -->
+                <!-- standard_offset_window = PydanticMetricTimeWindow(count=2, granularity='day') -->
                 <ComputeMetricsNode>
                     <!-- description = 'Compute Metrics via Expressions' -->
                     <!-- node_id = NodeId(id_str='cm_1') -->
@@ -73,7 +73,7 @@ test_filename: test_dataflow_plan_builder.py
                                     <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                                     <!--   )                                                                             -->
                                     <!-- join_type = INNER -->
-                                    <!-- offset_window = PydanticMetricTimeWindow(count=5, granularity='day') -->
+                                    <!-- standard_offset_window = PydanticMetricTimeWindow(count=5, granularity='day') -->
                                     <MetricTimeDimensionTransformNode>
                                         <!-- description = "Metric Time Dimension 'ds'" -->
                                         <!-- node_id = NodeId(id_str='sma_28009') -->

@@ -24,7 +24,8 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
         requested_agg_time_dimension_specs: Time dimensions requested in the query.
         join_type: Join type to use when joining to time spine.
         join_on_time_dimension_spec: The time dimension to use in the join ON condition.
-        offset_window: Time window to offset the parent dataset by when joining to time spine.
+        standard_offset_window: Time window to offset the parent dataset by when joining to time spine.
+            Only standard granularities are accepted for standard_offset_window in this node.
         offset_to_grain: Granularity period to offset the parent dataset to when joining to time spine.
     """
 
@@ -33,18 +34,22 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
     requested_agg_time_dimension_specs: Sequence[TimeDimensionSpec]
     join_on_time_dimension_spec: TimeDimensionSpec
     join_type: SqlJoinType
-    offset_window: Optional[MetricTimeWindow]
+    standard_offset_window: Optional[MetricTimeWindow]
     offset_to_grain: Optional[TimeGranularity]
 
     def __post_init__(self) -> None:  # noqa: D105
         super().__post_init__()
 
         assert not (
-            self.offset_window and self.offset_to_grain
-        ), "Can't set both offset_window and offset_to_grain when joining to time spine. Choose one or the other."
+            self.standard_offset_window and self.offset_to_grain
+        ), "Can't set both standard_offset_window and offset_to_grain when joining to time spine. Choose one or the other."
         assert (
             len(self.requested_agg_time_dimension_specs) > 0
         ), "Must have at least one value in requested_agg_time_dimension_specs for JoinToTimeSpineNode."
+        if self.standard_offset_window and not self.standard_offset_window.is_standard_granularity:
+            raise RuntimeError(
+                f"JoinToTimeSpineNode should not accept a custom standard_offset_window. Got: {self.standard_offset_window}"
+            )
 
     @staticmethod
     def create(  # noqa: D102
@@ -53,7 +58,7 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
         requested_agg_time_dimension_specs: Sequence[TimeDimensionSpec],
         join_on_time_dimension_spec: TimeDimensionSpec,
         join_type: SqlJoinType,
-        offset_window: Optional[MetricTimeWindow] = None,
+        standard_offset_window: Optional[MetricTimeWindow] = None,
         offset_to_grain: Optional[TimeGranularity] = None,
     ) -> JoinToTimeSpineNode:
         return JoinToTimeSpineNode(
@@ -63,7 +68,7 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
             requested_agg_time_dimension_specs=tuple(requested_agg_time_dimension_specs),
             join_on_time_dimension_spec=join_on_time_dimension_spec,
             join_type=join_type,
-            offset_window=offset_window,
+            standard_offset_window=standard_offset_window,
             offset_to_grain=offset_to_grain,
         )
 
@@ -85,8 +90,8 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
             DisplayedProperty("join_on_time_dimension_spec", self.join_on_time_dimension_spec),
             DisplayedProperty("join_type", self.join_type),
         )
-        if self.offset_window:
-            props += (DisplayedProperty("offset_window", self.offset_window),)
+        if self.standard_offset_window:
+            props += (DisplayedProperty("standard_offset_window", self.standard_offset_window),)
         if self.offset_to_grain:
             props += (DisplayedProperty("offset_to_grain", self.offset_to_grain),)
         return props
@@ -94,7 +99,7 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
         return (
             isinstance(other_node, self.__class__)
-            and other_node.offset_window == self.offset_window
+            and other_node.standard_offset_window == self.standard_offset_window
             and other_node.offset_to_grain == self.offset_to_grain
             and other_node.requested_agg_time_dimension_specs == self.requested_agg_time_dimension_specs
             and other_node.join_on_time_dimension_spec == self.join_on_time_dimension_spec
@@ -107,7 +112,7 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
             metric_source_node=self.metric_source_node,
             time_spine_node=self.time_spine_node,
             requested_agg_time_dimension_specs=self.requested_agg_time_dimension_specs,
-            offset_window=self.offset_window,
+            standard_offset_window=self.standard_offset_window,
             offset_to_grain=self.offset_to_grain,
             join_type=self.join_type,
             join_on_time_dimension_spec=self.join_on_time_dimension_spec,

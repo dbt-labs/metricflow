@@ -671,9 +671,7 @@ class DataflowPlanBuilder:
                 time_spine_node=time_spine_node,
                 requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
                 join_on_time_dimension_spec=self._sort_by_base_granularity(queried_agg_time_dimension_specs)[0],
-                offset_window=(
-                    metric_spec.offset_window if not self._offset_window_is_custom(metric_spec.offset_window) else None
-                ),
+                standard_offset_window=metric_spec.standard_offset_window,
                 offset_to_grain=metric_spec.offset_to_grain,
                 join_type=SqlJoinType.INNER,
             )
@@ -1683,11 +1681,7 @@ class DataflowPlanBuilder:
                 time_spine_node=time_spine_node,
                 requested_agg_time_dimension_specs=base_queried_agg_time_dimension_specs,
                 join_on_time_dimension_spec=join_on_time_dimension_spec,
-                offset_window=(
-                    before_aggregation_time_spine_join_description.offset_window
-                    if not self._offset_window_is_custom(before_aggregation_time_spine_join_description.offset_window)
-                    else None
-                ),
+                standard_offset_window=(before_aggregation_time_spine_join_description.standard_offset_window),
                 offset_to_grain=before_aggregation_time_spine_join_description.offset_to_grain,
                 join_type=before_aggregation_time_spine_join_description.join_type,
             )
@@ -1905,7 +1899,7 @@ class DataflowPlanBuilder:
 
         should_dedupe = False
         filter_to_specs = tuple(queried_time_spine_specs)
-        if offset_window and self._offset_window_is_custom(offset_window):
+        if offset_window and not offset_window.is_standard_granularity:
             time_spine_node = self._build_custom_offset_time_spine_node(
                 offset_window=offset_window, required_time_spine_specs=required_time_spine_specs
             )
@@ -1989,9 +1983,3 @@ class DataflowPlanBuilder:
             sample_agg_time_dimension_spec = required_time_spine_specs[0]
             join_on_time_dimension_spec = sample_agg_time_dimension_spec.with_grain(time_granularity=join_spec_grain)
         return join_on_time_dimension_spec
-
-    def _offset_window_is_custom(self, offset_window: Optional[MetricTimeWindow]) -> bool:
-        return (
-            offset_window is not None
-            and offset_window.granularity in self._semantic_model_lookup.custom_granularity_names
-        )

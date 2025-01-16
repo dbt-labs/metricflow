@@ -91,3 +91,10 @@ class JoinToTimeSpineDescription:
     join_type: SqlJoinType
     offset_window: Optional[MetricTimeWindow]
     offset_to_grain: Optional[TimeGranularity]
+
+    @property
+    def standard_offset_window(self) -> Optional[MetricTimeWindow]:
+        """Return the standard offset window if it is a standard granularity."""
+        if self.offset_window and self.offset_window.is_standard_granularity:
+            return self.offset_window
+        return None
