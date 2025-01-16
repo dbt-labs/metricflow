@@ -44,7 +44,7 @@ jobs:
         id: get-new-package-version
         run: |
           VERSION_WITH_V_PREFIX="${{ steps.changie-latest.outputs.output }}"
-          VERSION=$(echo "VERSION_WITH_V_PREFIX" | cut -c 2-)
+          VERSION=$(echo "$VERSION_WITH_V_PREFIX" | cut -c 2-)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Update Project Version in Source Code via Hatch
@@ -80,10 +80,10 @@ jobs:
           title: "Release PR for MetricFlow ${{ steps.get-new-package-version.outputs.version }}"
           body: >
             Update changelog, version, and attribution for release version
-            `${{ steps.package-version.outputs.version }}`
+            `${{ steps.get-package-version.outputs.version }}`
           labels: "Skip Changelog"
           commit-message: |
-            Release version: ${{ steps.package-version.outputs.version }}
+            Release version: ${{ steps.get-package-version.outputs.version }}
 
             * Update change log.
             * Update version in project configuration.
