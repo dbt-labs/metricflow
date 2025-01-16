@@ -1,6 +1,0 @@
-kind: Fixes
-body: Fixes bug where conversion metric query fails when filter with base semantic model's dimension is provided
-time: 2024-08-23T12:31:08.257686-04:00
-custom:
-    Author: WilliamDee
-    Issue: "1210"

@@ -1,7 +1,0 @@
-kind: Features
-body: Support sub-daily granularity options in SQL rendering for all supported SQL
-  engines.
-time: 2024-06-07T16:12:32.270538-07:00
-custom:
-  Author: courtneyholcomb
-  Issue: "1258"

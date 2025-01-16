@@ -1,6 +1,0 @@
-kind: Fixes
-body: Always treat metric_time and the agg_time_dimension the same in the JoinToTimeSpineNode.
-time: 2024-11-21T07:39:23.698194-08:00
-custom:
-  Author: courtneyholcomb
-  Issue: "1541"
