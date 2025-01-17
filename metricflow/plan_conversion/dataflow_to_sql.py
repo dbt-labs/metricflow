@@ -126,7 +126,7 @@ from metricflow.plan_conversion.spec_transforms import (
 from metricflow.plan_conversion.sql_join_builder import (
     AnnotatedSqlDataSet,
     ColumnEqualityDescription,
-    SqlQueryPlanJoinBuilder,
+    SqlPlanJoinBuilder,
 )
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.sql.optimizer.optimization_levels import (
@@ -539,7 +539,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         join_spec = self._choose_instance_for_time_spine_join(agg_time_dimension_instances).spec
         annotated_parent = parent_data_set.annotate(alias=parent_data_set_alias, metric_time_spec=join_spec)
         annotated_time_spine = time_spine_data_set.annotate(alias=time_spine_data_set_alias, metric_time_spec=join_spec)
-        join_desc = SqlQueryPlanJoinBuilder.make_cumulative_metric_time_range_join_description(
+        join_desc = SqlPlanJoinBuilder.make_cumulative_metric_time_range_join_description(
             node=node, metric_data_set=annotated_parent, time_spine_data_set=annotated_time_spine
         )
 
@@ -598,7 +598,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             right_data_set_alias = self._next_unique_table_alias()
 
             # Build join description.
-            sql_join_desc = SqlQueryPlanJoinBuilder.make_base_output_join_description(
+            sql_join_desc = SqlPlanJoinBuilder.make_base_output_join_description(
                 left_data_set=AnnotatedSqlDataSet(data_set=from_data_set, alias=from_data_set_alias),
                 right_data_set=AnnotatedSqlDataSet(data_set=right_data_set, alias=right_data_set_alias),
                 join_description=join_description,
@@ -1110,7 +1110,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         aliases_seen = [from_data_set.alias]
         for join_data_set in join_data_sets:
             joins_descriptions.append(
-                SqlQueryPlanJoinBuilder.make_join_description_for_combining_datasets(
+                SqlPlanJoinBuilder.make_join_description_for_combining_datasets(
                     from_data_set=from_data_set,
                     join_data_set=join_data_set,
                     join_type=join_type,
@@ -1397,7 +1397,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         )
 
         join_data_set_alias = self._next_unique_table_alias()
-        sql_join_desc = SqlQueryPlanJoinBuilder.make_column_equality_sql_join_description(
+        sql_join_desc = SqlPlanJoinBuilder.make_column_equality_sql_join_description(
             right_source_node=row_filter_sql_select_node,
             left_source_alias=from_data_set_alias,
             right_source_alias=join_data_set_alias,
@@ -1444,7 +1444,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
         # Build join expression.
         join_column_name = self._column_association_resolver.resolve_spec(node.join_on_time_dimension_spec).column_name
-        join_description = SqlQueryPlanJoinBuilder.make_join_to_time_spine_join_description(
+        join_description = SqlPlanJoinBuilder.make_join_to_time_spine_join_description(
             node=node,
             time_spine_alias=time_spine_alias,
             agg_time_dimension_column_name=join_column_name,
@@ -1756,7 +1756,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             constant_property_column_names.append((base_property_col_name, conversion_property_col_name))
 
         # Builds the join conditions that is required for a successful conversion
-        sql_join_description = SqlQueryPlanJoinBuilder.make_join_conversion_join_description(
+        sql_join_description = SqlPlanJoinBuilder.make_join_conversion_join_description(
             node=node,
             base_data_set=AnnotatedSqlDataSet(
                 data_set=base_data_set,
