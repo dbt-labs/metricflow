@@ -41,7 +41,7 @@ from metricflow.execution.execution_plan import (
 from metricflow.plan_conversion.convert_to_sql_plan import ConvertToSqlPlanResult
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
+from metricflow.sql.optimizer.optimization_levels import SqlOptimizationLevel
 from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderResult, SqlQueryPlanRenderer
 
 logger = logging.getLogger(__name__)
@@ -55,7 +55,7 @@ class DataflowToExecutionPlanConverter(DataflowPlanNodeVisitor[ConvertToExecutio
         sql_plan_converter: DataflowToSqlPlanConverter,
         sql_plan_renderer: SqlQueryPlanRenderer,
         sql_client: SqlClient,
-        sql_optimization_level: SqlQueryOptimizationLevel,
+        sql_optimization_level: SqlOptimizationLevel,
     ) -> None:
         """Constructor.
 

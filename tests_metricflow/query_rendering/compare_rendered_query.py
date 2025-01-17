@@ -11,7 +11,7 @@ from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilde
 from metricflow.dataflow.optimizer.dataflow_optimizer_factory import DataflowPlanOptimization
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
+from metricflow.sql.optimizer.optimization_levels import SqlOptimizationLevel
 from tests_metricflow.dataflow_plan_to_svg import display_graph_if_requested
 from tests_metricflow.sql.compare_sql_plan import assert_rendered_sql_from_plan_equal
 
@@ -34,7 +34,7 @@ def render_and_check(
     conversion_result = dataflow_to_sql_converter.convert_to_sql_query_plan(
         sql_engine_type=sql_client.sql_engine_type,
         dataflow_plan_node=base_plan.sink_node,
-        optimization_level=SqlQueryOptimizationLevel.O0,
+        optimization_level=SqlOptimizationLevel.O0,
         sql_query_plan_id=DagId.from_str("plan0"),
     )
     sql_query_plan = conversion_result.sql_plan

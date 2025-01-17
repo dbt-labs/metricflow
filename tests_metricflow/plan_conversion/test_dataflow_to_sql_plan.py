@@ -49,7 +49,7 @@ from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
 from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
+from metricflow.sql.optimizer.optimization_levels import SqlOptimizationLevel
 from tests_metricflow.dataflow_plan_to_svg import display_graph_if_requested
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 from tests_metricflow.sql.compare_sql_plan import assert_rendered_sql_from_plan_equal, assert_sql_plan_text_equal
@@ -68,7 +68,7 @@ def convert_and_check(
         sql_engine_type=sql_client.sql_engine_type,
         sql_query_plan_id=DagId.from_str("plan0"),
         dataflow_plan_node=node,
-        optimization_level=SqlQueryOptimizationLevel.O0,
+        optimization_level=SqlOptimizationLevel.O0,
     )
     sql_query_plan = conversion_result.sql_plan
     display_graph_if_requested(

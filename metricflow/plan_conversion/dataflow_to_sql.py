@@ -131,7 +131,7 @@ from metricflow.plan_conversion.sql_join_builder import (
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.sql.optimizer.optimization_levels import (
     SqlGenerationOptionSet,
-    SqlQueryOptimizationLevel,
+    SqlOptimizationLevel,
 )
 from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlPlanOptimizer
 from metricflow.sql.sql_plan import (
@@ -183,19 +183,19 @@ class DataflowToSqlPlanConverter:
         self,
         sql_engine_type: SqlEngine,
         dataflow_plan_node: DataflowPlanNode,
-        optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.default_level(),
+        optimization_level: SqlOptimizationLevel = SqlOptimizationLevel.default_level(),
         sql_query_plan_id: Optional[DagId] = None,
     ) -> ConvertToSqlPlanResult:
         """Create an SQL query plan that represents the computation up to the given dataflow plan node."""
         # In case there are bugs that raise exceptions at higher optimization levels, retry generation at a lower
         # optimization level. Generally skip O0 (unless requested) as that level does not include the column pruner.
         # Without that, the generated SQL can be enormous.
-        optimization_levels_to_attempt: Sequence[SqlQueryOptimizationLevel] = sorted(
+        optimization_levels_to_attempt: Sequence[SqlOptimizationLevel] = sorted(
             # Union handles case if O0 was specifically requested.
             set(
                 possible_level
-                for possible_level in SqlQueryOptimizationLevel
-                if SqlQueryOptimizationLevel.O1 <= possible_level <= optimization_level
+                for possible_level in SqlOptimizationLevel
+                if SqlOptimizationLevel.O1 <= possible_level <= optimization_level
             ).union({optimization_level}),
             reverse=True,
         )
