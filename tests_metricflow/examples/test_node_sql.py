@@ -20,7 +20,7 @@ from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
+from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderer
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +42,7 @@ def test_view_sql_generated_at_a_node(
         column_association_resolver=DunderColumnAssociationResolver(),
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
     )
-    sql_renderer: SqlQueryPlanRenderer = sql_client.sql_plan_renderer
+    sql_renderer: SqlPlanRenderer = sql_client.sql_plan_renderer
     node_output_resolver = DataflowPlanNodeOutputDataSetResolver(
         column_association_resolver=column_association_resolver,
         semantic_manifest_lookup=simple_semantic_manifest_lookup,

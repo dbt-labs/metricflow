@@ -20,7 +20,7 @@ from metricflow.sql.render.duckdb_renderer import DuckDbSqlQueryPlanRenderer
 from metricflow.sql.render.postgres import PostgresSQLSqlQueryPlanRenderer
 from metricflow.sql.render.redshift import RedshiftSqlQueryPlanRenderer
 from metricflow.sql.render.snowflake import SnowflakeSqlQueryPlanRenderer
-from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
+from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderer
 from metricflow.sql.render.trino import TrinoSqlQueryPlanRenderer
 from metricflow.sql_request.sql_request_attributes import SqlRequestId
 
@@ -64,7 +64,7 @@ class SupportedAdapterTypes(enum.Enum):
             assert_values_exhausted(self)
 
     @property
-    def sql_query_plan_renderer(self) -> SqlQueryPlanRenderer:
+    def sql_query_plan_renderer(self) -> SqlPlanRenderer:
         """Return the SqlQueryPlanRenderer corresponding to the supported adapter type."""
         if self is SupportedAdapterTypes.BIGQUERY:
             return BigQuerySqlQueryPlanRenderer()
@@ -120,7 +120,7 @@ class AdapterBackedSqlClient:
         return self._sql_engine_type
 
     @property
-    def sql_query_plan_renderer(self) -> SqlQueryPlanRenderer:
+    def sql_query_plan_renderer(self) -> SqlPlanRenderer:
         """Dialect-specific SQL query plan renderer used for converting MetricFlow's query plan to executable SQL."""
         return self._sql_query_plan_renderer
 

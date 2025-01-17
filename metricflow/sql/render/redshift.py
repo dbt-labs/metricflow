@@ -20,7 +20,7 @@ from metricflow.sql.render.expr_renderer import (
     SqlExpressionRenderer,
     SqlExpressionRenderResult,
 )
-from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
+from metricflow.sql.render.sql_plan_renderer import DefaultSqlPlanRenderer
 
 
 class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
@@ -108,7 +108,7 @@ class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         )
 
 
-class RedshiftSqlQueryPlanRenderer(DefaultSqlQueryPlanRenderer):
+class RedshiftSqlQueryPlanRenderer(DefaultSqlPlanRenderer):
     """Plan renderer for the Redshift engine."""
 
     EXPR_RENDERER = RedshiftSqlExpressionRenderer()

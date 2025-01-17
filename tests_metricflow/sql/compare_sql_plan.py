@@ -10,7 +10,7 @@ from metricflow_semantics.test_helpers.snapshot_helpers import (
 )
 
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
+from metricflow.sql.render.sql_plan_renderer import DefaultSqlPlanRenderer
 from metricflow.sql.sql_plan import SqlPlan, SqlPlanNode
 from tests_metricflow.fixtures.setup_fixtures import check_sql_engine_snapshot_marker
 from tests_metricflow.snapshot_utils import (
@@ -27,7 +27,7 @@ def assert_default_rendered_sql_equal(
 ) -> None:
     """Helper function to render a select statement and compare with the one saved as a file."""
     sql_query_plan = SqlPlan(render_node=sql_plan_node, plan_id=DagId.from_str(plan_id))
-    rendered_sql = DefaultSqlQueryPlanRenderer().render_sql_query_plan(sql_query_plan).sql
+    rendered_sql = DefaultSqlPlanRenderer().render_sql_query_plan(sql_query_plan).sql
 
     assert_plan_snapshot_text_equal(
         request=request,

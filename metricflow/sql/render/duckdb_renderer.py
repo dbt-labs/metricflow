@@ -23,7 +23,7 @@ from metricflow.sql.render.expr_renderer import (
     SqlExpressionRenderer,
     SqlExpressionRenderResult,
 )
-from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
+from metricflow.sql.render.sql_plan_renderer import DefaultSqlPlanRenderer
 
 
 class DuckDbSqlExpressionRenderer(DefaultSqlExpressionRenderer):
@@ -117,7 +117,7 @@ class DuckDbSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         )
 
 
-class DuckDbSqlQueryPlanRenderer(DefaultSqlQueryPlanRenderer):
+class DuckDbSqlQueryPlanRenderer(DefaultSqlPlanRenderer):
     """Plan renderer for the DuckDB engine."""
 
     EXPR_RENDERER = DuckDbSqlExpressionRenderer()

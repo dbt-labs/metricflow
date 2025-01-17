@@ -9,7 +9,7 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_str_snapshot_equal
 
 from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlPlanOptimizer
-from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
+from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderer
 from metricflow.sql.sql_plan import SqlPlan, SqlSelectStatementNode
 
 logger = logging.getLogger(__name__)
@@ -19,7 +19,7 @@ def assert_optimizer_result_snapshot_equal(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     optimizer: SqlPlanOptimizer,
-    sql_plan_renderer: SqlQueryPlanRenderer,
+    sql_plan_renderer: SqlPlanRenderer,
     select_statement: SqlSelectStatementNode,
 ) -> None:
     """Helper to assert that the SQL snapshot of the optimizer result is the same as the stored one."""

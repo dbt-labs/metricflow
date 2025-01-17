@@ -14,7 +14,7 @@ from metricflow.sql.render.expr_renderer import (
     SqlExpressionRenderer,
     SqlExpressionRenderResult,
 )
-from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
+from metricflow.sql.render.sql_plan_renderer import DefaultSqlPlanRenderer
 
 
 class DatabricksSqlExpressionRenderer(DefaultSqlExpressionRenderer):
@@ -68,7 +68,7 @@ class DatabricksSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         )
 
 
-class DatabricksSqlQueryPlanRenderer(DefaultSqlQueryPlanRenderer):
+class DatabricksSqlQueryPlanRenderer(DefaultSqlPlanRenderer):
     """Plan renderer for the Snowflake engine."""
 
     EXPR_RENDERER = DatabricksSqlExpressionRenderer()
