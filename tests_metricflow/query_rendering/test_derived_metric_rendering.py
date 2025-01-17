@@ -24,7 +24,7 @@ from metricflow_semantics.test_helpers.metric_time_dimension import (
 )
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
+from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from tests_metricflow.query_rendering.compare_rendered_query import render_and_check
 
@@ -34,7 +34,7 @@ def test_derived_metric(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -57,7 +57,7 @@ def test_nested_derived_metric(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -80,7 +80,7 @@ def test_derived_metric_with_offset_window(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -105,7 +105,7 @@ def test_derived_metric_with_offset_window_and_time_filter(  # noqa: D103
     column_association_resolver: ColumnAssociationResolver,
     query_parser: MetricFlowQueryParser,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = query_parser.parse_and_validate_query(
@@ -136,7 +136,7 @@ def test_derived_metric_with_offset_to_grain(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -159,7 +159,7 @@ def test_derived_metric_with_offset_window_and_offset_to_grain(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -182,7 +182,7 @@ def test_derived_offset_metric_with_one_input_metric(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -205,7 +205,7 @@ def test_derived_metric_with_offset_window_and_granularity(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -228,7 +228,7 @@ def test_derived_metric_with_month_dimension_and_offset_window(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     extended_date_dataflow_plan_builder: DataflowPlanBuilder,
-    extended_date_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    extended_date_dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -251,7 +251,7 @@ def test_derived_metric_with_offset_to_grain_and_granularity(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -274,7 +274,7 @@ def test_derived_metric_with_offset_window_and_offset_to_grain_and_granularity( 
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -297,7 +297,7 @@ def test_derived_offset_cumulative_metric(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -320,7 +320,7 @@ def test_nested_offsets(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     create_source_tables: bool,
 ) -> None:
@@ -344,7 +344,7 @@ def test_nested_derived_metric_with_offset_multiple_input_metrics(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     create_source_tables: bool,
 ) -> None:
@@ -369,7 +369,7 @@ def test_nested_offsets_with_where_constraint(  # noqa: D103
     mf_test_configuration: MetricFlowTestConfiguration,
     query_parser: MetricFlowQueryParser,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     column_association_resolver: ColumnAssociationResolver,
     create_source_tables: bool,
@@ -402,7 +402,7 @@ def test_nested_offsets_with_time_constraint(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     create_source_tables: bool,
 ) -> None:
@@ -429,7 +429,7 @@ def test_time_offset_metric_with_time_constraint(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     create_source_tables: bool,
 ) -> None:
@@ -457,7 +457,7 @@ def test_nested_filters(
     mf_test_configuration: MetricFlowTestConfiguration,
     query_parser: MetricFlowQueryParser,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     create_source_tables: bool,
 ) -> None:
@@ -479,7 +479,7 @@ def test_cumulative_time_offset_metric_with_time_constraint(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     create_source_tables: bool,
 ) -> None:
@@ -507,7 +507,7 @@ def test_nested_derived_metric_offset_with_joined_where_constraint_not_selected(
     mf_test_configuration: MetricFlowTestConfiguration,
     query_parser: MetricFlowQueryParser,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     create_source_tables: bool,
     column_association_resolver: ColumnAssociationResolver,
@@ -537,7 +537,7 @@ def test_offset_window_with_agg_time_dim(  # noqa: D103
     mf_test_configuration: MetricFlowTestConfiguration,
     query_parser: MetricFlowQueryParser,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     create_source_tables: bool,
     column_association_resolver: ColumnAssociationResolver,
@@ -563,7 +563,7 @@ def test_offset_to_grain_with_agg_time_dim(  # noqa: D103
     mf_test_configuration: MetricFlowTestConfiguration,
     query_parser: MetricFlowQueryParser,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     create_source_tables: bool,
     column_association_resolver: ColumnAssociationResolver,
@@ -589,7 +589,7 @@ def test_derived_offset_metric_with_agg_time_dim(  # noqa: D103
     mf_test_configuration: MetricFlowTestConfiguration,
     query_parser: MetricFlowQueryParser,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     create_source_tables: bool,
     column_association_resolver: ColumnAssociationResolver,
@@ -614,7 +614,7 @@ def test_multi_metric_fill_null(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     create_source_tables: bool,
 ) -> None:
@@ -641,7 +641,7 @@ def test_nested_fill_nulls_without_time_spine(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     create_source_tables: bool,
 ) -> None:
@@ -665,7 +665,7 @@ def test_nested_fill_nulls_without_time_spine_multi_metric(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     create_source_tables: bool,
 ) -> None:
@@ -692,7 +692,7 @@ def test_offset_window_metric_multiple_granularities(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     query_parser: MetricFlowQueryParser,
     create_source_tables: bool,
@@ -718,7 +718,7 @@ def test_offset_to_grain_metric_multiple_granularities(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     query_parser: MetricFlowQueryParser,
     create_source_tables: bool,
@@ -744,7 +744,7 @@ def test_offset_window_metric_filter_and_query_have_different_granularities(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     query_parser: MetricFlowQueryParser,
     create_source_tables: bool,
@@ -773,7 +773,7 @@ def test_offset_to_grain_metric_filter_and_query_have_different_granularities(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
     query_parser: MetricFlowQueryParser,
     create_source_tables: bool,
@@ -804,7 +804,7 @@ def test_derived_metric_that_defines_the_same_alias_in_different_components(
     dataflow_plan_builder: DataflowPlanBuilder,
     query_parser: MetricFlowQueryParser,
     sql_client: SqlClient,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
 ) -> None:
     """Tests querying a derived metric which give the same alias to its components."""
     query_spec = query_parser.parse_and_validate_query(
