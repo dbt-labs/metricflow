@@ -50,3 +50,8 @@ runs:
   - name: Install Dependencies for `dev-env` Hatch Environments
     shell: bash
     run: "hatch run dev-env:true && cd metricflow-semantics && hatch run dev-env:true"
+
+  # Add this step to cache the `pre-commit` environment.
+  - name: Install `pre-commit` Environment
+    shell: bash
+    run: "hatch run dev-env:pre-commit install-hooks"
