@@ -77,7 +77,7 @@ class CheckQueryHelpers:
 
     def cast_expr_to_ts(self, expr: str) -> str:
         """Returns the expression as a new expression cast to the timestamp type, if applicable for the DB."""
-        return f"CAST({expr} AS {self._sql_client.sql_query_plan_renderer.expr_renderer.timestamp_data_type})"
+        return f"CAST({expr} AS {self._sql_client.sql_plan_renderer.expr_renderer.timestamp_data_type})"
 
     def cast_to_ts(self, string_literal: str) -> str:
         """Similar to cast_expr_to_ts, but assumes the input string is to be converted into a string literal."""
@@ -96,7 +96,7 @@ class CheckQueryHelpers:
             count=count,
             granularity=granularity,
         )
-        return self._sql_client.sql_query_plan_renderer.expr_renderer.render_sql_expr(expr).sql
+        return self._sql_client.sql_plan_renderer.expr_renderer.render_sql_expr(expr).sql
 
     def render_date_trunc(self, expr: str, granularity: TimeGranularity) -> str:
         """Return the DATE_TRUNC() call that can be used for converting the given expr to the granularity."""
@@ -109,7 +109,7 @@ class CheckQueryHelpers:
                 )
             ),
         )
-        return self._sql_client.sql_query_plan_renderer.expr_renderer.render_sql_expr(renderable_expr).sql
+        return self._sql_client.sql_plan_renderer.expr_renderer.render_sql_expr(renderable_expr).sql
 
     def render_extract(self, expr: str, date_part: DatePart) -> str:
         """Return the EXTRACT call that can be used for converting the given expr to the date_part."""
@@ -122,7 +122,7 @@ class CheckQueryHelpers:
                 )
             ),
         )
-        return self._sql_client.sql_query_plan_renderer.expr_renderer.render_sql_expr(renderable_expr).sql
+        return self._sql_client.sql_plan_renderer.expr_renderer.render_sql_expr(renderable_expr).sql
 
     def render_percentile_expr(
         self, expr: str, percentile: float, use_discrete_percentile: bool, use_approximate_percentile: bool
@@ -143,12 +143,12 @@ class CheckQueryHelpers:
             ),
             percentile_args=percentile_args,
         )
-        return self._sql_client.sql_query_plan_renderer.expr_renderer.render_sql_expr(renderable_expr).sql
+        return self._sql_client.sql_plan_renderer.expr_renderer.render_sql_expr(renderable_expr).sql
 
     @property
     def double_data_type_name(self) -> str:
         """Return the name of the double data type for the relevant SQL engine."""
-        return self._sql_client.sql_query_plan_renderer.expr_renderer.double_data_type
+        return self._sql_client.sql_plan_renderer.expr_renderer.double_data_type
 
     def render_dimension_template(self, dimension_name: str, entity_path: Sequence[str] = ()) -> str:
         """Renders a template that can be used to retrieve a dimension.
@@ -186,7 +186,7 @@ class CheckQueryHelpers:
     def generate_random_uuid(self) -> str:
         """Returns the generate random UUID SQL function."""
         expr = SqlGenerateUuidExpression.create()
-        return self._sql_client.sql_query_plan_renderer.expr_renderer.render_sql_expr(expr).sql
+        return self._sql_client.sql_plan_renderer.expr_renderer.render_sql_expr(expr).sql
 
 
 def filter_not_supported_features(
@@ -196,22 +196,22 @@ def filter_not_supported_features(
     not_supported_features: List[RequiredDwEngineFeature] = []
     for required_feature in required_features:
         if required_feature is RequiredDwEngineFeature.CONTINUOUS_PERCENTILE_AGGREGATION:
-            if not sql_client.sql_query_plan_renderer.expr_renderer.can_render_percentile_function(
+            if not sql_client.sql_plan_renderer.expr_renderer.can_render_percentile_function(
                 SqlPercentileFunctionType.CONTINUOUS
             ):
                 not_supported_features.append(required_feature)
         elif required_feature is RequiredDwEngineFeature.DISCRETE_PERCENTILE_AGGREGATION:
-            if not sql_client.sql_query_plan_renderer.expr_renderer.can_render_percentile_function(
+            if not sql_client.sql_plan_renderer.expr_renderer.can_render_percentile_function(
                 SqlPercentileFunctionType.DISCRETE
             ):
                 not_supported_features.append(required_feature)
         elif required_feature is RequiredDwEngineFeature.APPROXIMATE_CONTINUOUS_PERCENTILE_AGGREGATION:
-            if not sql_client.sql_query_plan_renderer.expr_renderer.can_render_percentile_function(
+            if not sql_client.sql_plan_renderer.expr_renderer.can_render_percentile_function(
                 SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS
             ):
                 not_supported_features.append(required_feature)
         elif required_feature is RequiredDwEngineFeature.APPROXIMATE_DISCRETE_PERCENTILE_AGGREGATION:
-            if not sql_client.sql_query_plan_renderer.expr_renderer.can_render_percentile_function(
+            if not sql_client.sql_plan_renderer.expr_renderer.can_render_percentile_function(
                 SqlPercentileFunctionType.APPROXIMATE_DISCRETE
             ):
                 not_supported_features.append(required_feature)
