@@ -41,7 +41,7 @@ def _run_package_build_test(package_directory: Path, package_test_script: Path) 
             python_executable = Path(venv_directory, "bin/python")
 
             logger.info(f"Building package at {str(package_directory)!r}")
-            MetricFlowScriptHelper.run_command(["hatch", "clean"], working_directory=package_directory)
+            logger.info(f"Running package build test for {str(package_directory)!r} using {str(package_test_script)!r}")
             MetricFlowScriptHelper.run_command(["hatch", "build"], working_directory=package_directory)
 
             logger.info("Installing package using generated wheels")

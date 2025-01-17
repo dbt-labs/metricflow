@@ -25,6 +25,17 @@ inputs:
     description: "Additional options to pass into pytest."
     required: false
     default: ""
+  hatch-environment-cache-config-json:
+    description: "Configuration JSON to be passed into the script to install `hatch` environments for caching."
+    required: false
+    default: >-
+      {
+        "configs": [
+          {"hatch_project_directory": ".", "hatch_environment_name": "dev-env"},
+          {"hatch_project_directory": "./metricflow-semantics", "hatch_environment_name": "dev-env"}
+        ]
+      }
+
 runs:
   using: "composite"
   steps:
@@ -32,6 +43,7 @@ runs:
     uses: ./.github/actions/setup-python-env
     with:
       python-version: "${{ inputs.python-version }}"
+      hatch-environment-cache-config-json: "${{ inputs.hatch-environment-cache-config-json }}"
   - name: Run Tests
     shell: bash
     run: >
