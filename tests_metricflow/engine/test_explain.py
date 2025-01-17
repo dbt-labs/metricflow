@@ -10,7 +10,7 @@ from metricflow_semantics.mf_logging.pretty_print import mf_pformat_dict
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
-from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
+from metricflow.sql.optimizer.optimization_levels import SqlOptimizationLevel
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 from tests_metricflow.snapshot_utils import assert_str_snapshot_equal
 
@@ -52,9 +52,9 @@ def test_optimization_level(
     mf_engine = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].metricflow_engine
 
     results = {}
-    for optimization_level in SqlQueryOptimizationLevel:
+    for optimization_level in SqlOptimizationLevel:
         # Skip lower optimization levels as they are generally not used.
-        if optimization_level <= SqlQueryOptimizationLevel.O3:
+        if optimization_level <= SqlOptimizationLevel.O3:
             continue
 
         explain_result: MetricFlowExplainResult = mf_engine.explain(
@@ -73,5 +73,5 @@ def test_optimization_level(
         snapshot_str=mf_pformat_dict(
             description=None, obj_dict=results, preserve_raw_strings=True, pad_items_with_newlines=True
         ),
-        expectation_description=f"The result for {SqlQueryOptimizationLevel.O5} should be SQL uses a CTE.",
+        expectation_description=f"The result for {SqlOptimizationLevel.O5} should be SQL uses a CTE.",
     )

@@ -55,7 +55,7 @@ from metricflow.execution.execution_plan import ExecutionPlan, SqlStatement
 from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
+from metricflow.sql.optimizer.optimization_levels import SqlOptimizationLevel
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
 
@@ -112,7 +112,7 @@ class MetricFlowQueryRequest:
     order_by_names: Optional[Sequence[str]]
     order_by: Optional[Sequence[OrderByQueryParameter]]
     min_max_only: bool
-    sql_optimization_level: SqlQueryOptimizationLevel
+    sql_optimization_level: SqlOptimizationLevel
     dataflow_plan_optimizations: FrozenSet[DataflowPlanOptimization]
     query_type: MetricFlowQueryType
 
@@ -129,7 +129,7 @@ class MetricFlowQueryRequest:
         where_constraints: Optional[Sequence[str]] = None,
         order_by_names: Optional[Sequence[str]] = None,
         order_by: Optional[Sequence[OrderByQueryParameter]] = None,
-        sql_optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.default_level(),
+        sql_optimization_level: SqlOptimizationLevel = SqlOptimizationLevel.default_level(),
         dataflow_plan_optimizations: FrozenSet[
             DataflowPlanOptimization
         ] = DataflowPlanOptimization.enabled_optimizations(),
@@ -399,7 +399,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             source_node_builder=source_node_builder,
             dataflow_plan_builder_cache=self._dataflow_plan_builder_cache,
         )
-        self._to_sql_query_plan_converter = DataflowToSqlPlanConverter(
+        self._to_sql_plan_converter = DataflowToSqlPlanConverter(
             column_association_resolver=self._column_association_resolver,
             semantic_manifest_lookup=self._semantic_manifest_lookup,
         )
@@ -531,7 +531,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
         logger.info(LazyFormat("Building execution plan"))
         _to_execution_plan_converter = DataflowToExecutionPlanConverter(
-            sql_plan_converter=self._to_sql_query_plan_converter,
+            sql_plan_converter=self._to_sql_plan_converter,
             sql_plan_renderer=self._sql_client.sql_query_plan_renderer,
             sql_client=self._sql_client,
             sql_optimization_level=mf_query_request.sql_optimization_level,
