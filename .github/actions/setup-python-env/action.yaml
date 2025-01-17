@@ -34,12 +34,14 @@ runs:
         ~/.cache/pre-commit
       # >- means combine all lines to a single line
       # The cache key can be any string. The format used here is just for readability.
+      # `manual_update_key` can be changed to manually force the cache action to create a new cache.
       key: >-
         python_location: "${{ env.pythonLocation }}" AND
         pyproject_hash: "${{ hashFiles('pyproject.toml') }}" AND
         extra_hatch_configuration_hash: "${{ hashFiles('**/extra-hatch-configuration/*') }}" AND
         precommit_config_hash: "${{ hashFiles('.pre-commit-config.yaml') }}" AND
         linux_release: "${{ env.LINUX_RELEASE }}"
+        manual_update_key: 3
 
   - name: Install Hatch
     shell: bash
