@@ -64,8 +64,8 @@ class SupportedAdapterTypes(enum.Enum):
             assert_values_exhausted(self)
 
     @property
-    def sql_query_plan_renderer(self) -> SqlPlanRenderer:
-        """Return the SqlQueryPlanRenderer corresponding to the supported adapter type."""
+    def sql_plan_renderer(self) -> SqlPlanRenderer:
+        """Return the SqlPlanRenderer corresponding to the supported adapter type."""
         if self is SupportedAdapterTypes.BIGQUERY:
             return BigQuerySqlPlanRenderer()
         elif self is SupportedAdapterTypes.DATABRICKS:
@@ -109,7 +109,7 @@ class AdapterBackedSqlClient:
             ) from e
 
         self._sql_engine_type = adapter_type.sql_engine_type
-        self._sql_query_plan_renderer = adapter_type.sql_query_plan_renderer
+        self._sql_plan_renderer = adapter_type.sql_plan_renderer
         logger.debug(
             LazyFormat(lambda: f"Initialized AdapterBackedSqlClient with dbt adapter type `{adapter_type.value}`")
         )
@@ -120,9 +120,9 @@ class AdapterBackedSqlClient:
         return self._sql_engine_type
 
     @property
-    def sql_query_plan_renderer(self) -> SqlPlanRenderer:
+    def sql_plan_renderer(self) -> SqlPlanRenderer:
         """Dialect-specific SQL query plan renderer used for converting MetricFlow's query plan to executable SQL."""
-        return self._sql_query_plan_renderer
+        return self._sql_plan_renderer
 
     def query(
         self,
