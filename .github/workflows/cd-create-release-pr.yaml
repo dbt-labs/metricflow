@@ -44,18 +44,18 @@ jobs:
         id: get-new-package-version
         run: |
           VERSION_WITH_V_PREFIX="${{ steps.changie-latest.outputs.output }}"
-          VERSION=$(echo "$VERSION_WITH_V_PREFIX" | cut -c 2-)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          VERSION="$(echo "$VERSION_WITH_V_PREFIX" | cut -c 2-)"
+          echo "version=\"$VERSION\"" >> "$GITHUB_OUTPUT"
 
       - name: Update Project Version in Source Code via Hatch
         id: update-package-version
-        run: |
+        run: >-
           hatch version "${{ steps.get-new-package-version.outputs.version }}"
 
       - name: Install `fossa-cli`
         # This is the recommended install method on: https://github.com/fossas/fossa-cli
         # There doesn't seem to be a package that can be installed instead.
-        run: |
+        run: >-
           curl -H 'Cache-Control: no-cache'
           https://raw.githubusercontent.com/fossas/fossa-cli/v3.9.42/install-latest.sh
           | bash
@@ -67,23 +67,23 @@ jobs:
 
       - name: Use FOSSA Report to Update `ATTRIBUTION.md`
         env:
-          FOSSA_API_KEY: ${{ secrets.FOSSA_API_KEY }
+          FOSSA_API_KEY: ${{ secrets.FOSSA_API_KEY }}
         run: fossa report attribution --format markdown > ./ATTRIBUTION.md
 
       - name: Fix Lint Issues in Generated Files
         run: "hatch -v run dev-env:pre-commit run --color=always --all-files"
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v4
+        uses: peter-evans/create-pull-request@v7
         with:
           branch: release-${{ steps.get-new-package-version.outputs.version }}
           title: "Release PR for MetricFlow ${{ steps.get-new-package-version.outputs.version }}"
           body: >
             Update changelog, version, and attribution for release version
-            `${{ steps.get-package-version.outputs.version }}`
+            `${{ steps.get-new-package-version.outputs.version }}`
           labels: "Skip Changelog"
           commit-message: |
-            Release version: ${{ steps.get-package-version.outputs.version }}
+            Release version: ${{ steps.get-new-package-version.outputs.version }}
 
             * Update change log.
             * Update version in project configuration.
