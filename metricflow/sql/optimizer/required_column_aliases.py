@@ -12,8 +12,8 @@ from metricflow.sql.optimizer.tag_column_aliases import NodeToColumnAliasMapping
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlCteNode,
-    SqlQueryPlanNode,
-    SqlQueryPlanNodeVisitor,
+    SqlPlanNode,
+    SqlPlanNodeVisitor,
     SqlSelectColumn,
     SqlSelectQueryFromClauseNode,
     SqlSelectStatementNode,
@@ -23,7 +23,7 @@ from metricflow.sql.sql_plan import (
 logger = logging.getLogger(__name__)
 
 
-class SqlMapRequiredColumnAliasesVisitor(SqlQueryPlanNodeVisitor[None]):
+class SqlMapRequiredColumnAliasesVisitor(SqlPlanNodeVisitor[None]):
     """To aid column pruning, traverse the SQL-query representation DAG and map the SELECT columns needed at each node.
 
     For example, the query:
@@ -55,7 +55,7 @@ class SqlMapRequiredColumnAliasesVisitor(SqlQueryPlanNodeVisitor[None]):
         ) source_0
     """
 
-    def __init__(self, start_node: SqlQueryPlanNode, required_column_aliases_in_start_node: FrozenSet[str]) -> None:
+    def __init__(self, start_node: SqlPlanNode, required_column_aliases_in_start_node: FrozenSet[str]) -> None:
         """Initializer.
 
         Args:
@@ -114,7 +114,7 @@ class SqlMapRequiredColumnAliasesVisitor(SqlQueryPlanNodeVisitor[None]):
         # Visit parent nodes.
         select_statement.accept(self)
 
-    def _visit_parents(self, node: SqlQueryPlanNode) -> None:
+    def _visit_parents(self, node: SqlPlanNode) -> None:
         """Default recursive handler to visit the parents of the given node."""
         for parent_node in node.parent_nodes:
             parent_node.accept(self)

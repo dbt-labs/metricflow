@@ -11,7 +11,7 @@ from metricflow_semantics.test_helpers.snapshot_helpers import (
 
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
-from metricflow.sql.sql_plan import SqlPlan, SqlQueryPlanNode
+from metricflow.sql.sql_plan import SqlPlan, SqlPlanNode
 from tests_metricflow.fixtures.setup_fixtures import check_sql_engine_snapshot_marker
 from tests_metricflow.snapshot_utils import (
     _EXCLUDE_TABLE_ALIAS_REGEX,
@@ -23,7 +23,7 @@ def assert_default_rendered_sql_equal(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     plan_id: str,
-    sql_plan_node: SqlQueryPlanNode,
+    sql_plan_node: SqlPlanNode,
 ) -> None:
     """Helper function to render a select statement and compare with the one saved as a file."""
     sql_query_plan = SqlPlan(render_node=sql_plan_node, plan_id=DagId.from_str(plan_id))
@@ -45,7 +45,7 @@ def assert_rendered_sql_equal(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     plan_id: str,
-    sql_plan_node: SqlQueryPlanNode,
+    sql_plan_node: SqlPlanNode,
     sql_client: SqlClient,
 ) -> None:
     """Helper function to render a select statement and compare with the one saved as a file."""

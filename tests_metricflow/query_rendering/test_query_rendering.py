@@ -31,7 +31,7 @@ from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_DAY
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
+from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from tests_metricflow.query_rendering.compare_rendered_query import render_and_check
 
@@ -41,7 +41,7 @@ def test_multihop_node(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     multihop_dataflow_plan_builder: DataflowPlanBuilder,
-    multihop_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    multihop_dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan where there is a join between 1 measure and 2 dimensions."""
@@ -74,7 +74,7 @@ def test_filter_with_where_constraint_on_join_dim(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     query_parser: MetricFlowQueryParser,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan where there is a join between 1 measure and 2 dimensions."""
@@ -103,7 +103,7 @@ def test_partitioned_join(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan where there's a join on a partitioned dimension."""
@@ -132,7 +132,7 @@ def test_limit_rows(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests a plan with a limit to the number of rows returned."""
@@ -163,7 +163,7 @@ def test_distinct_values(
     mf_test_configuration: MetricFlowTestConfiguration,
     query_parser: MetricFlowQueryParser,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     column_association_resolver: ColumnAssociationResolver,
     sql_client: SqlClient,
 ) -> None:
@@ -194,7 +194,7 @@ def test_local_dimension_using_local_entity(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -223,7 +223,7 @@ def test_measure_constraint(  # noqa: D103
     mf_test_configuration: MetricFlowTestConfiguration,
     query_parser: MetricFlowQueryParser,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = query_parser.parse_and_validate_query(
@@ -247,7 +247,7 @@ def test_measure_constraint_with_reused_measure(  # noqa: D103
     mf_test_configuration: MetricFlowTestConfiguration,
     query_parser: MetricFlowQueryParser,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = query_parser.parse_and_validate_query(
@@ -271,7 +271,7 @@ def test_measure_constraint_with_single_expr_and_alias(  # noqa: D103
     mf_test_configuration: MetricFlowTestConfiguration,
     query_parser: MetricFlowQueryParser,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = query_parser.parse_and_validate_query(
@@ -296,7 +296,7 @@ def test_join_to_scd_dimension(
     scd_column_association_resolver: ColumnAssociationResolver,
     scd_query_parser: MetricFlowQueryParser,
     scd_dataflow_plan_builder: DataflowPlanBuilder,
-    scd_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    scd_dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests conversion of a plan using a dimension with a validity window inside a measure constraint."""
@@ -325,7 +325,7 @@ def test_multi_hop_through_scd_dimension(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     scd_dataflow_plan_builder: DataflowPlanBuilder,
-    scd_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    scd_dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests conversion of a plan using a dimension that is reached through an SCD table."""
@@ -354,7 +354,7 @@ def test_multi_hop_to_scd_dimension(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     scd_dataflow_plan_builder: DataflowPlanBuilder,
-    scd_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    scd_dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests conversion of a plan using an SCD dimension that is reached through another table."""
@@ -384,7 +384,7 @@ def test_multiple_metrics_no_dimensions(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -409,7 +409,7 @@ def test_metric_with_measures_from_multiple_sources_no_dimensions(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -431,7 +431,7 @@ def test_common_semantic_model(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
@@ -454,7 +454,7 @@ def test_min_max_only_categorical(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests a min max only query with a categorical dimension."""
@@ -483,7 +483,7 @@ def test_min_max_only_time(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests a min max only query with a time dimension."""
@@ -513,7 +513,7 @@ def test_min_max_only_time_quarter(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests a min max only query with a time dimension and non-default granularity."""
@@ -544,7 +544,7 @@ def test_min_max_metric_time(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     sql_client: SqlClient,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
 ) -> None:
     """Tests a plan to get the min & max distinct values of metric_time."""
     query_spec = MetricFlowQuerySpec(
@@ -568,7 +568,7 @@ def test_min_max_metric_time_week(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     sql_client: SqlClient,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
 ) -> None:
     """Tests a plan to get the min & max distinct values of metric_time with non-default granularity."""
     query_spec = MetricFlowQuerySpec(
@@ -592,7 +592,7 @@ def test_non_additive_dimension_with_non_default_grain(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     sql_client: SqlClient,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
 ) -> None:
     """Tests querying a metric with a non-additive agg_time_dimension that has non-default granularity."""
     query_spec = MetricFlowQuerySpec(
@@ -617,7 +617,7 @@ def test_metric_alias(
     dataflow_plan_builder: DataflowPlanBuilder,
     sql_client: SqlClient,
     query_parser: MetricFlowQueryParser,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
 ) -> None:
     """Tests a plan with an aliased metric."""
     metric = MetricParameter(name="bookings", alias="bookings_alias")
@@ -647,7 +647,7 @@ def test_derived_metric_alias(
     dataflow_plan_builder: DataflowPlanBuilder,
     sql_client: SqlClient,
     query_parser: MetricFlowQueryParser,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
 ) -> None:
     """Tests a plan with an aliased metric."""
     metric = MetricParameter(name="booking_fees", alias="bookings_alias")

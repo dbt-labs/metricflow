@@ -9,7 +9,7 @@ from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 
 from metricflow.sql.optimizer.column_pruner import SqlColumnPrunerOptimizer
 from metricflow.sql.optimizer.rewriting_sub_query_reducer import SqlRewritingSubQueryReducer
-from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
+from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlPlanOptimizer
 from metricflow.sql.optimizer.sub_query_reducer import SqlSubQueryReducer
 from metricflow.sql.optimizer.table_alias_simplifier import SqlTableAliasSimplifier
 
@@ -40,7 +40,7 @@ class SqlQueryOptimizationLevel(Enum):
 class SqlGenerationOptionSet:
     """Defines the different SQL generation optimizers / options that should be used at each level."""
 
-    optimizers: Tuple[SqlQueryPlanOptimizer, ...]
+    optimizers: Tuple[SqlPlanOptimizer, ...]
 
     # Specifies whether CTEs can be used to simplify generated SQL.
     allow_cte: bool
@@ -49,7 +49,7 @@ class SqlGenerationOptionSet:
     def options_for_level(  # noqa: D102
         level: SqlQueryOptimizationLevel, use_column_alias_in_group_by: bool
     ) -> SqlGenerationOptionSet:
-        optimizers: Tuple[SqlQueryPlanOptimizer, ...] = ()
+        optimizers: Tuple[SqlPlanOptimizer, ...] = ()
         allow_cte = False
         if level is SqlQueryOptimizationLevel.O0:
             pass
