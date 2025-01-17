@@ -4,7 +4,6 @@ build-backend = "hatchling.build"
 
 [project]
 name = "metricflow"
-version = "0.207.2.dev0"
 description = "Translates a simple metric definition into reusable SQL and executes it against the SQL engine of your choice."
 readme = "README.md"
 requires-python = ">=3.9,<3.13"
@@ -26,7 +25,10 @@ classifiers = [
 ]
 
 # Dependencies are specified through the `hatch-requirements-txt` plug-in.
-dynamic = ["dependencies", "optional-dependencies"]
+dynamic = ["version", "dependencies", "optional-dependencies"]
+
+[tool.hatch.version]
+path = "metricflow/__about__.py"
 
 [tool.hatch.metadata.hooks.requirements_txt]
 files = [
