@@ -52,6 +52,12 @@ jobs:
         with:
           python-version: "3.12"
           make-target: "test-postgresql"
+          hatch-environment-cache-config-json: >-
+            {
+              "configs": [
+                {"hatch_project_directory": ".", "hatch_environment_name": "postgres-env"}
+              ]
+            }
 
   metricflow-unit-tests:
     name: MetricFlow Unit Tests
@@ -78,6 +84,13 @@ jobs:
         uses: ./.github/actions/setup-python-env
         with:
           python-version: "${{ matrix.python-version }}"
+          hatch-environment-cache-config-json: >-
+            {
+              "configs": [
+                {"hatch_project_directory": ".", "hatch_environment_name": "dev-env"},
+                {"hatch_project_directory": "./metricflow-semantics", "hatch_environment_name": "dev-env"}
+              ]
+            }
 
       - name: Run Package-Build Tests
         run: "make test-build-packages"

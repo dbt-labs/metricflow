@@ -6,6 +6,17 @@ inputs:
     description: "Version of Python to use for testing"
     required: false
     default: "3.8"
+  hatch-environment-cache-config-json:
+    description: "Configuration JSON to be passed into the script to install `hatch` environments for caching."
+    required: false
+    default: >-
+      {
+        "configs": []
+      }
+  cache-pre-commit-environment:
+    description: "Whether to cache the pre-commit-environment."
+    required: false
+    default: "false"
 
 runs:
   using: "composite"
@@ -14,10 +25,15 @@ runs:
   - name: Set Linux Release Environment Variable
     shell: bash
     run: echo "LINUX_RELEASE=$(lsb_release -rs)" >> $GITHUB_ENV
+
   - name: Set up Python ${{ inputs.python_version }}
     uses: actions/setup-python@v4
     with:
       python-version: "${{ inputs.python-version }}"
+
+  - name: Create a JSON File With the `hatch` Environment Cache Configuration
+    shell: bash
+    run: "echo '${{ inputs.hatch-environment-cache-config-json }}' > hatch-environment-cache-config.json"
 
   # Cache the dependencies installed by Hatch so that we don't need to reinstall them on every run.
   - uses: actions/cache@v3
@@ -37,11 +53,17 @@ runs:
       # `manual_update_key` can be changed to manually force the cache action to create a new cache.
       key: >-
         python_location: "${{ env.pythonLocation }}" AND
-        pyproject_hash: "${{ hashFiles('pyproject.toml') }}" AND
-        extra_hatch_configuration_hash: "${{ hashFiles('**/extra-hatch-configuration/*') }}" AND
-        precommit_config_hash: "${{ hashFiles('.pre-commit-config.yaml') }}" AND
-        linux_release: "${{ env.LINUX_RELEASE }}"
-        manual_update_key: 3
+        files_hash: "${{
+          hashFiles(
+            'pyproject.toml'
+            , '**/extra-hatch-configuration/*'
+            , '.pre-commit-config.yaml'
+            , 'hatch-environment-cache-config.json'
+          )
+        }}" AND
+        linux_release: "${{ env.LINUX_RELEASE }}" AND
+        cache-pre-commit-environment: "${{ inputs.cache-pre-commit-environment }}" AND
+        manual_update_key: 2
 
   - name: Install Hatch
     shell: bash
@@ -49,11 +71,15 @@ runs:
 
   # Running any command will install the dependencies for the project. Add this step so that the `hatch` environment is
   # cached.
-  - name: Install Dependencies for `dev-env` Hatch Environments
+  - name: Install Dependencies for Hatch Environment
     shell: bash
-    run: "hatch run dev-env:true && cd metricflow-semantics && hatch run dev-env:true"
+    run: >-
+      PYTHONPATH=.
+      python scripts/ci_tests/install_hatch_environments.py
+      --json-config-file 'hatch-environment-cache-config.json'
 
   # Add this step to cache the `pre-commit` environment.
   - name: Install `pre-commit` Environment
     shell: bash
+    if: ${{ inputs.cache-pre-commit-environment == 'true' }}
     run: "hatch run dev-env:pre-commit install-hooks"
