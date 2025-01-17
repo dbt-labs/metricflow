@@ -34,6 +34,12 @@ jobs:
           parallelism: ${{ env.EXTERNAL_ENGINE_TEST_PARALLELISM }}
           additional-pytest-options: ${{ env.ADDITIONAL_PYTEST_OPTIONS }}
           make-target: "test-snowflake"
+          hatch-environment-cache-config-json: >-
+            {
+              "configs": [
+                {"hatch_project_directory": ".", "hatch_environment_name": "snowflake-env"}
+              ]
+            }
 
   redshift-tests:
     environment: DW_INTEGRATION_TESTS
@@ -53,6 +59,13 @@ jobs:
           parallelism: ${{ env.EXTERNAL_ENGINE_TEST_PARALLELISM }}
           additional-pytest-options: ${{ env.ADDITIONAL_PYTEST_OPTIONS }}
           make-target: "test-redshift"
+          hatch-environment-cache-config-json: >-
+            {
+              "configs": [
+                {"hatch_project_directory": ".", "hatch_environment_name": "redshift-env"}
+              ]
+            }
+
   bigquery-tests:
     environment: DW_INTEGRATION_TESTS
     name: BigQuery Tests
@@ -71,6 +84,12 @@ jobs:
           parallelism: ${{ env.EXTERNAL_ENGINE_TEST_PARALLELISM }}
           additional-pytest-options: ${{ env.ADDITIONAL_PYTEST_OPTIONS }}
           make-target: "test-bigquery"
+          hatch-environment-cache-config-json: >-
+            {
+              "configs": [
+                {"hatch_project_directory": ".", "hatch_environment_name": "bigquery-env"}
+              ]
+            }
 
   databricks-tests:
     environment: DW_INTEGRATION_TESTS
@@ -90,6 +109,12 @@ jobs:
           parallelism: ${{ env.EXTERNAL_ENGINE_TEST_PARALLELISM }}
           additional-pytest-options: ${{ env.ADDITIONAL_PYTEST_OPTIONS }}
           make-target: "test-databricks"
+          hatch-environment-cache-config-json: >-
+            {
+              "configs": [
+                {"hatch_project_directory": ".", "hatch_environment_name": "databricks-env"}
+              ]
+            }
 
   trino-tests:
     # Trino tests run on a local service container, which obviates the need for separate Environment hosting.
@@ -113,6 +138,12 @@ jobs:
         with:
           python-version: "3.12"
           make-target: "test-trino"
+          hatch-environment-cache-config-json: >-
+            {
+              "configs": [
+                {"hatch_project_directory": ".", "hatch_environment_name": "trino-env"}
+              ]
+            }
 
   remove-label:
     name: Remove Label After Running Tests
