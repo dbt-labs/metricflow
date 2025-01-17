@@ -30,6 +30,9 @@ dynamic = ["version", "dependencies", "optional-dependencies"]
 [tool.hatch.version]
 path = "dbt_metricflow/__about__.py"
 
+[tool.hatch.metadata]
+allow-direct-references = true
+
 [tool.hatch.metadata.hooks.requirements_txt]
 files = [
   "extra-hatch-configuration/requirements-cli.txt",
