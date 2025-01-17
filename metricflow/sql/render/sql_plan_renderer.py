@@ -43,13 +43,13 @@ class SqlPlanRenderResult:  # noqa: D101
     bind_parameter_set: SqlBindParameterSet
 
 
-class SqlQueryPlanRenderer(SqlPlanNodeVisitor[SqlPlanRenderResult], ABC):
+class SqlPlanRenderer(SqlPlanNodeVisitor[SqlPlanRenderResult], ABC):
     """Renders SQL plans to a string."""
 
     def _render_node(self, node: SqlPlanNode) -> SqlPlanRenderResult:
         return node.accept(self)
 
-    def render_sql_query_plan(self, sql_query_plan: SqlPlan) -> SqlPlanRenderResult:  # noqa: D102
+    def render_sql_plan(self, sql_query_plan: SqlPlan) -> SqlPlanRenderResult:  # noqa: D102
         return self._render_node(sql_query_plan.render_node)
 
     @property
@@ -69,7 +69,7 @@ class StringJoinDescription:
     on_condition_str: str
 
 
-class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
+class DefaultSqlPlanRenderer(SqlPlanRenderer):
     """Renders an SQL plan following ANSI SQL."""
 
     # The renderer that is used to render the SQL expressions.

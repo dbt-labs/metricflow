@@ -5,13 +5,13 @@ from typing import Mapping
 import pytest
 
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlPlanConverter
-from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer, SqlQueryPlanRenderer
+from metricflow.sql.render.sql_plan_renderer import DefaultSqlPlanRenderer, SqlPlanRenderer
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 
 
 @pytest.fixture
-def default_sql_plan_renderer() -> SqlQueryPlanRenderer:  # noqa: D103
-    return DefaultSqlQueryPlanRenderer()
+def default_sql_plan_renderer() -> SqlPlanRenderer:  # noqa: D103
+    return DefaultSqlPlanRenderer()
 
 
 @pytest.fixture(scope="session")

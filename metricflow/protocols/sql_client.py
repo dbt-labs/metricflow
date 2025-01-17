@@ -9,7 +9,7 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 
 from metricflow.data_table.mf_table import MetricFlowDataTable
-from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
+from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderer
 
 
 class SqlEngine(Enum):
@@ -67,8 +67,8 @@ class SqlClient(Protocol):
 
     @property
     @abstractmethod
-    def sql_query_plan_renderer(self) -> SqlQueryPlanRenderer:
-        """Dialect-specific SQL query plan renderer used for converting MetricFlow's query plan to executable SQL.
+    def sql_plan_renderer(self) -> SqlPlanRenderer:
+        """Dialect-specific SQL plan renderer used for converting MetricFlow's query plan to executable SQL.
 
         This is bundled with the SqlClient partly as a convenenience for accessing a single instance of the renderer,
         and partly due to the close relationship between dialect and engine capabilities.

@@ -26,7 +26,7 @@ from metricflow.sql.render.expr_renderer import (
     SqlExpressionRenderer,
     SqlExpressionRenderResult,
 )
-from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
+from metricflow.sql.render.sql_plan_renderer import DefaultSqlPlanRenderer
 from metricflow.sql.sql_plan import SqlSelectColumn
 
 
@@ -196,7 +196,7 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
         )
 
 
-class BigQuerySqlQueryPlanRenderer(DefaultSqlQueryPlanRenderer):
+class BigQuerySqlPlanRenderer(DefaultSqlPlanRenderer):
     """Plan renderer for the BigQuery engine."""
 
     EXPR_RENDERER = BigQuerySqlExpressionRenderer()

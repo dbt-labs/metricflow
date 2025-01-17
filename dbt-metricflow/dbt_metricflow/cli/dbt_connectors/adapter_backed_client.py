@@ -14,14 +14,14 @@ from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 
 from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.protocols.sql_client import SqlEngine
-from metricflow.sql.render.big_query import BigQuerySqlQueryPlanRenderer
-from metricflow.sql.render.databricks import DatabricksSqlQueryPlanRenderer
-from metricflow.sql.render.duckdb_renderer import DuckDbSqlQueryPlanRenderer
-from metricflow.sql.render.postgres import PostgresSQLSqlQueryPlanRenderer
-from metricflow.sql.render.redshift import RedshiftSqlQueryPlanRenderer
-from metricflow.sql.render.snowflake import SnowflakeSqlQueryPlanRenderer
-from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
-from metricflow.sql.render.trino import TrinoSqlQueryPlanRenderer
+from metricflow.sql.render.big_query import BigQuerySqlPlanRenderer
+from metricflow.sql.render.databricks import DatabricksSqlPlanRenderer
+from metricflow.sql.render.duckdb_renderer import DuckDbSqlPlanRenderer
+from metricflow.sql.render.postgres import PostgresSQLSqlPlanRenderer
+from metricflow.sql.render.redshift import RedshiftSqlPlanRenderer
+from metricflow.sql.render.snowflake import SnowflakeSqlPlanRenderer
+from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderer
+from metricflow.sql.render.trino import TrinoSqlPlanRenderer
 from metricflow.sql_request.sql_request_attributes import SqlRequestId
 
 logger = logging.getLogger(__name__)
@@ -64,22 +64,22 @@ class SupportedAdapterTypes(enum.Enum):
             assert_values_exhausted(self)
 
     @property
-    def sql_query_plan_renderer(self) -> SqlQueryPlanRenderer:
-        """Return the SqlQueryPlanRenderer corresponding to the supported adapter type."""
+    def sql_plan_renderer(self) -> SqlPlanRenderer:
+        """Return the SqlPlanRenderer corresponding to the supported adapter type."""
         if self is SupportedAdapterTypes.BIGQUERY:
-            return BigQuerySqlQueryPlanRenderer()
+            return BigQuerySqlPlanRenderer()
         elif self is SupportedAdapterTypes.DATABRICKS:
-            return DatabricksSqlQueryPlanRenderer()
+            return DatabricksSqlPlanRenderer()
         elif self is SupportedAdapterTypes.POSTGRES:
-            return PostgresSQLSqlQueryPlanRenderer()
+            return PostgresSQLSqlPlanRenderer()
         elif self is SupportedAdapterTypes.REDSHIFT:
-            return RedshiftSqlQueryPlanRenderer()
+            return RedshiftSqlPlanRenderer()
         elif self is SupportedAdapterTypes.SNOWFLAKE:
-            return SnowflakeSqlQueryPlanRenderer()
+            return SnowflakeSqlPlanRenderer()
         elif self is SupportedAdapterTypes.DUCKDB:
-            return DuckDbSqlQueryPlanRenderer()
+            return DuckDbSqlPlanRenderer()
         elif self is SupportedAdapterTypes.TRINO:
-            return TrinoSqlQueryPlanRenderer()
+            return TrinoSqlPlanRenderer()
         else:
             assert_values_exhausted(self)
 
@@ -109,7 +109,7 @@ class AdapterBackedSqlClient:
             ) from e
 
         self._sql_engine_type = adapter_type.sql_engine_type
-        self._sql_query_plan_renderer = adapter_type.sql_query_plan_renderer
+        self._sql_plan_renderer = adapter_type.sql_plan_renderer
         logger.debug(
             LazyFormat(lambda: f"Initialized AdapterBackedSqlClient with dbt adapter type `{adapter_type.value}`")
         )
@@ -120,9 +120,9 @@ class AdapterBackedSqlClient:
         return self._sql_engine_type
 
     @property
-    def sql_query_plan_renderer(self) -> SqlQueryPlanRenderer:
+    def sql_plan_renderer(self) -> SqlPlanRenderer:
         """Dialect-specific SQL query plan renderer used for converting MetricFlow's query plan to executable SQL."""
-        return self._sql_query_plan_renderer
+        return self._sql_plan_renderer
 
     def query(
         self,
