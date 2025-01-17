@@ -24,6 +24,7 @@ if typing.TYPE_CHECKING:
     from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
     from metricflow.dataflow.nodes.min_max import MinMaxNode
     from metricflow.dataflow.nodes.offset_by_custom_granularity import OffsetByCustomGranularityNode
+    from metricflow.dataflow.nodes.offset_custom_granularity import OffsetCustomGranularityNode
     from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
     from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
     from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
@@ -133,6 +134,10 @@ class DataflowPlanNodeVisitor(Generic[VisitorOutputT], ABC):
     ) -> VisitorOutputT:
         raise NotImplementedError
 
+    @abstractmethod
+    def visit_offset_custom_granularity_node(self, node: OffsetCustomGranularityNode) -> VisitorOutputT:  # noqa: D102
+        raise NotImplementedError
+
 
 class DataflowPlanNodeVisitorWithDefaultHandler(DataflowPlanNodeVisitor[VisitorOutputT], Generic[VisitorOutputT]):
     """Similar to `DataflowPlanNodeVisitor`, but with an abstract default handler that gets called for each node.
@@ -234,4 +239,8 @@ class DataflowPlanNodeVisitorWithDefaultHandler(DataflowPlanNodeVisitor[VisitorO
     def visit_offset_by_custom_granularity_node(  # noqa: D102
         self, node: OffsetByCustomGranularityNode
     ) -> VisitorOutputT:
+        return self._default_handler(node)
+
+    @override
+    def visit_offset_custom_granularity_node(self, node: OffsetCustomGranularityNode) -> VisitorOutputT:  # noqa: D102
         return self._default_handler(node)
