@@ -44,3 +44,9 @@ runs:
   - name: Install Hatch
     shell: bash
     run: pip3 install hatch
+
+  # Running any command will install the dependencies for the project. Add this step so that the `hatch` environment is
+  # cached.
+  - name: Install Dependencies for `dev-env` Hatch Environments
+    shell: bash
+    run: "hatch run dev-env:true && cd metricflow-semantics && hatch run dev-env:true"
