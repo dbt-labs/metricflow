@@ -179,7 +179,7 @@ class DataflowToSqlPlanConverter:
     def column_association_resolver(self) -> ColumnAssociationResolver:  # noqa: D102
         return self._column_association_resolver
 
-    def convert_to_sql_query_plan(
+    def convert_to_sql_plan(
         self,
         sql_engine_type: SqlEngine,
         dataflow_plan_node: DataflowPlanNode,

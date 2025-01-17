@@ -72,7 +72,7 @@ class DataflowToExecutionPlanConverter(DataflowPlanNodeVisitor[ConvertToExecutio
 
     def _convert_to_sql_plan(self, node: DataflowPlanNode) -> ConvertToSqlPlanResult:
         logger.debug(LazyFormat(lambda: f"Generating SQL query plan from {node.node_id}"))
-        result = self._sql_plan_converter.convert_to_sql_query_plan(
+        result = self._sql_plan_converter.convert_to_sql_plan(
             sql_engine_type=self._sql_client.sql_engine_type,
             optimization_level=self._optimization_level,
             dataflow_plan_node=node,

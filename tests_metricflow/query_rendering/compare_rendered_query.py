@@ -31,7 +31,7 @@ def render_and_check(
         base_plan = dataflow_plan_builder.build_plan_for_distinct_values(query_spec=query_spec)
     else:
         base_plan = dataflow_plan_builder.build_plan(query_spec)
-    conversion_result = dataflow_to_sql_converter.convert_to_sql_query_plan(
+    conversion_result = dataflow_to_sql_converter.convert_to_sql_plan(
         sql_engine_type=sql_client.sql_engine_type,
         dataflow_plan_node=base_plan.sink_node,
         optimization_level=SqlOptimizationLevel.O0,
@@ -60,7 +60,7 @@ def render_and_check(
         optimized_plan = dataflow_plan_builder.build_plan(
             query_spec, optimizations=DataflowPlanOptimization.enabled_optimizations()
         )
-    conversion_result = dataflow_to_sql_converter.convert_to_sql_query_plan(
+    conversion_result = dataflow_to_sql_converter.convert_to_sql_plan(
         sql_engine_type=sql_client.sql_engine_type,
         dataflow_plan_node=optimized_plan.sink_node,
         sql_query_plan_id=DagId.from_str("plan0_optimized"),
