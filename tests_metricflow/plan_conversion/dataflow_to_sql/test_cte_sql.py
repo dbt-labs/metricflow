@@ -21,7 +21,7 @@ from metricflow.dataflow.dataflow_plan import (
 )
 from metricflow.dataflow.dataflow_plan_analyzer import DataflowPlanAnalyzer
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
-from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
+from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.sql.optimizer.optimization_levels import SqlGenerationOptionSet, SqlQueryOptimizationLevel
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 def convert_and_check(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     node: DataflowPlanNode,
     nodes_to_convert_to_cte: FrozenSet[DataflowPlanNode],
 ) -> None:
@@ -81,7 +81,7 @@ def convert_and_check(
 def test_cte_for_simple_dataflow_plan(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
 ) -> None:
     """Test a simple case for generating a CTE for a specific dataflow plan node."""
@@ -114,7 +114,7 @@ def test_cte_for_shared_metrics(
     column_association_resolver: ColumnAssociationResolver,
     dataflow_plan_builder: DataflowPlanBuilder,
     query_parser: MetricFlowQueryParser,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
 ) -> None:
     """Check common branches in a query that uses derived metrics defined from metrics that are also in the query."""
     parse_result = query_parser.parse_and_validate_query(

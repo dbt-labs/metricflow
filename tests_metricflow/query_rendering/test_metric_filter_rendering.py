@@ -7,7 +7,7 @@ from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
+from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from tests_metricflow.query_rendering.compare_rendered_query import render_and_check
 
@@ -18,7 +18,7 @@ def test_query_with_simple_metric_in_where_filter(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     sql_client: SqlClient,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     query_parser: MetricFlowQueryParser,
 ) -> None:
     """Tests a query with a simple metric in the query-level where filter."""
@@ -47,7 +47,7 @@ def test_metric_with_metric_in_where_filter(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     sql_client: SqlClient,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     query_parser: MetricFlowQueryParser,
 ) -> None:
     """Tests a query with a metric in the metric-level where filter."""
@@ -72,7 +72,7 @@ def test_query_with_derived_metric_in_where_filter(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     sql_client: SqlClient,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     query_parser: MetricFlowQueryParser,
 ) -> None:
     """Tests a query with a derived metric in the query-level where filter."""
@@ -101,7 +101,7 @@ def test_query_with_ratio_metric_in_where_filter(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     sql_client: SqlClient,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     query_parser: MetricFlowQueryParser,
 ) -> None:
     """Tests a query with a ratio metric in the query-level where filter."""
@@ -130,7 +130,7 @@ def test_query_with_cumulative_metric_in_where_filter(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     sql_client: SqlClient,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     query_parser: MetricFlowQueryParser,
 ) -> None:
     """Tests a query with a cumulative metric in the query-level where filter.
@@ -162,7 +162,7 @@ def test_query_with_multiple_metrics_in_filter(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     sql_client: SqlClient,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     query_parser: MetricFlowQueryParser,
 ) -> None:
     """Tests a query with 2 simple metrics in the query-level where filter."""
@@ -191,7 +191,7 @@ def test_filter_by_metric_in_same_semantic_model_as_queried_metric(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     sql_client: SqlClient,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     query_parser: MetricFlowQueryParser,
 ) -> None:
     """Tests a query with a simple metric in the query-level where filter."""
@@ -220,7 +220,7 @@ def test_distinct_values_query_with_metric_filter(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     sql_client: SqlClient,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     query_parser: MetricFlowQueryParser,
 ) -> None:
     """Tests a distinct values query with a metric in the query-level where filter."""
@@ -249,7 +249,7 @@ def test_metric_filtered_by_itself(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     sql_client: SqlClient,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     query_parser: MetricFlowQueryParser,
 ) -> None:
     """Tests a query for a metric that filters by the same metric."""
@@ -278,7 +278,7 @@ def test_group_by_has_local_entity_prefix(  # noqa: D103
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     sql_client: SqlClient,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     query_parser: MetricFlowQueryParser,
 ) -> None:
     query_spec = query_parser.parse_and_validate_query(
@@ -306,7 +306,7 @@ def test_filter_with_conversion_metric(  # noqa: D103
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     sql_client: SqlClient,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     query_parser: MetricFlowQueryParser,
 ) -> None:
     query_spec = query_parser.parse_and_validate_query(
@@ -334,7 +334,7 @@ def test_inner_query_single_hop(
     mf_test_configuration: MetricFlowTestConfiguration,
     multihop_dataflow_plan_builder: DataflowPlanBuilder,
     sql_client: SqlClient,
-    multihop_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    multihop_dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     multihop_query_parser: MetricFlowQueryParser,
 ) -> None:
     """Tests rendering for a metric filter using a one-hop join in the inner query."""
@@ -363,7 +363,7 @@ def test_inner_query_multi_hop(
     mf_test_configuration: MetricFlowTestConfiguration,
     multihop_dataflow_plan_builder: DataflowPlanBuilder,
     sql_client: SqlClient,
-    multihop_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    multihop_dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     multihop_query_parser: MetricFlowQueryParser,
 ) -> None:
     """Tests rendering for a metric filter using a two-hop join in the inner query."""

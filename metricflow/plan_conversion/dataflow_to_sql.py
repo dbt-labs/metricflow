@@ -149,7 +149,7 @@ from metricflow.sql.sql_plan import (
 logger = logging.getLogger(__name__)
 
 
-class DataflowToSqlQueryPlanConverter:
+class DataflowToSqlPlanConverter:
     """Generates an SQL query plan from a node in the metric dataflow plan."""
 
     def __init__(
