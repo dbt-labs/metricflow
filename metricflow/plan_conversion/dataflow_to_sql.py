@@ -133,7 +133,7 @@ from metricflow.sql.optimizer.optimization_levels import (
     SqlGenerationOptionSet,
     SqlQueryOptimizationLevel,
 )
-from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
+from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlPlanOptimizer
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlCteNode,
@@ -272,7 +272,7 @@ class DataflowToSqlPlanConverter:
         dataflow_plan_node: DataflowPlanNode,
         sql_query_plan_id: Optional[DagId],
         nodes_to_convert_to_cte: FrozenSet[DataflowPlanNode],
-        optimizers: Sequence[SqlQueryPlanOptimizer],
+        optimizers: Sequence[SqlPlanOptimizer],
     ) -> ConvertToSqlPlanResult:
         """Helper method to convert using specific options. Main use case are tests."""
         logger.debug(

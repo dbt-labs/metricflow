@@ -17,7 +17,7 @@ from metricflow_semantics.sql.sql_exprs import (
 )
 from typing_extensions import override
 
-from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
+from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlPlanOptimizer
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlCteNode,
@@ -832,7 +832,7 @@ class SqlGroupByRewritingVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
         )
 
 
-class SqlRewritingSubQueryReducer(SqlQueryPlanOptimizer):
+class SqlRewritingSubQueryReducer(SqlPlanOptimizer):
     """Simplify queries by eliminating sub-queries when possible by rewriting expressions.
 
      Expressions in the SELECT, GROUP BY, and WHERE are can be rewritten.

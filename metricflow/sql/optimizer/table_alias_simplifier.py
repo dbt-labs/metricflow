@@ -4,7 +4,7 @@ import logging
 
 from typing_extensions import override
 
-from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
+from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlPlanOptimizer
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlCteNode,
@@ -95,7 +95,7 @@ class SqlTableAliasSimplifierVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
         )
 
 
-class SqlTableAliasSimplifier(SqlQueryPlanOptimizer):
+class SqlTableAliasSimplifier(SqlPlanOptimizer):
     """Simplify queries by eliminating table aliases when possible.
 
     e.g. from

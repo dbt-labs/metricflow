@@ -6,7 +6,7 @@ from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from typing_extensions import override
 
 from metricflow.sql.optimizer.required_column_aliases import SqlMapRequiredColumnAliasesVisitor
-from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
+from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlPlanOptimizer
 from metricflow.sql.optimizer.tag_column_aliases import NodeToColumnAliasMapping
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
@@ -100,7 +100,7 @@ class SqlColumnPrunerVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
         return node.with_new_select(node.select_statement.accept(self))
 
 
-class SqlColumnPrunerOptimizer(SqlQueryPlanOptimizer):
+class SqlColumnPrunerOptimizer(SqlPlanOptimizer):
     """Removes unnecessary columns in the SELECT statements."""
 
     def optimize(self, node: SqlPlanNode) -> SqlPlanNode:  # noqa: D102
