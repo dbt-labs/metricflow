@@ -1,0 +1,6 @@
+test_name: test_join_to_time_spine_with_filter_smaller_than_group_by
+test_filename: test_fill_nulls_with_0.py
+---
+metric_time__day       archived_users_join_to_time_spine
+-------------------  -----------------------------------
+2020-01-01T00:00:00                                   12

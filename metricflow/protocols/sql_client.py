@@ -25,6 +25,7 @@ class SqlEngine(Enum):
     SNOWFLAKE = "Snowflake"
     DATABRICKS = "Databricks"
     TRINO = "Trino"
+    CLICKHOUSE = "Clickhouse"
 
     @property
     def unsupported_granularities(self) -> Set[TimeGranularity]:
@@ -48,6 +49,8 @@ class SqlEngine(Enum):
         elif self is SqlEngine.REDSHIFT:
             return {TimeGranularity.NANOSECOND}
         elif self is SqlEngine.TRINO:
+            return {TimeGranularity.NANOSECOND, TimeGranularity.MICROSECOND}
+        elif self is SqlEngine.CLICKHOUSE:
             return {TimeGranularity.NANOSECOND, TimeGranularity.MICROSECOND}
         else:
             assert_values_exhausted(self)

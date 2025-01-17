@@ -2,7 +2,7 @@
 
 Credentials are stored as a JSON string in an environment variable set via a shell command like:
 
-export MF_TEST_ENGINE_CREDENTIALS=$(cat <<EOF
+export MF_TEST_ENGINE_CREDENTIAL_SETS=$(cat <<EOF
 {
     "duck_db": {
         "engine_url": null,
@@ -32,6 +32,10 @@ export MF_TEST_ENGINE_CREDENTIALS=$(cat <<EOF
         "engine_url": trino://...",
         "engine_password": "..."
     },
+    "clickhouse": {
+        "engine_url": "clickhouse://...",
+        "engine_password": "..."
+    }
 }
 EOF
 )
@@ -77,6 +81,7 @@ class MetricFlowTestCredentialSetForAllEngines(FrozenBaseModel):  # noqa: D101
     databricks: MetricFlowTestCredentialSet
     postgres: MetricFlowTestCredentialSet
     trino: MetricFlowTestCredentialSet
+    clickhouse: MetricFlowTestCredentialSet
 
     @property
     def as_configurations(self) -> Sequence[MetricFlowEngineConfiguration]:  # noqa: D102
@@ -108,6 +113,10 @@ class MetricFlowTestCredentialSetForAllEngines(FrozenBaseModel):  # noqa: D101
             MetricFlowEngineConfiguration(
                 engine=SqlEngine.TRINO,
                 credential_set=self.trino,
+            ),
+            MetricFlowEngineConfiguration(
+                engine=SqlEngine.CLICKHOUSE,
+                credential_set=self.clickhouse,
             ),
         )
 
@@ -154,6 +163,7 @@ def run_tests(test_configuration: MetricFlowEngineConfiguration) -> None:  # noq
         or test_configuration.engine is SqlEngine.DATABRICKS
         or test_configuration.engine is SqlEngine.POSTGRES
         or test_configuration.engine is SqlEngine.TRINO
+        or test_configuration.engine is SqlEngine.CLICKHOUSE
     ):
         engine_name = test_configuration.engine.value.lower()
         os.environ["MF_TEST_ADAPTER_TYPE"] = engine_name

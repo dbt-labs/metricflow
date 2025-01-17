@@ -15,6 +15,7 @@ from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.sql.render.big_query import BigQuerySqlQueryPlanRenderer
+from metricflow.sql.render.clickhouse import ClickhouseSqlQueryPlanRenderer
 from metricflow.sql.render.databricks import DatabricksSqlQueryPlanRenderer
 from metricflow.sql.render.duckdb_renderer import DuckDbSqlQueryPlanRenderer
 from metricflow.sql.render.postgres import PostgresSQLSqlQueryPlanRenderer
@@ -42,6 +43,7 @@ class SupportedAdapterTypes(enum.Enum):
     BIGQUERY = "bigquery"
     DUCKDB = "duckdb"
     TRINO = "trino"
+    CLICKHOUSE = "clickhouse"
 
     @property
     def sql_engine_type(self) -> SqlEngine:
@@ -60,6 +62,8 @@ class SupportedAdapterTypes(enum.Enum):
             return SqlEngine.DUCKDB
         elif self is SupportedAdapterTypes.TRINO:
             return SqlEngine.TRINO
+        elif self is SupportedAdapterTypes.CLICKHOUSE:
+            return SqlEngine.CLICKHOUSE
         else:
             assert_values_exhausted(self)
 
@@ -80,6 +84,8 @@ class SupportedAdapterTypes(enum.Enum):
             return DuckDbSqlQueryPlanRenderer()
         elif self is SupportedAdapterTypes.TRINO:
             return TrinoSqlQueryPlanRenderer()
+        elif self is SupportedAdapterTypes.CLICKHOUSE:
+            return ClickhouseSqlQueryPlanRenderer()
         else:
             assert_values_exhausted(self)
 

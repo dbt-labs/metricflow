@@ -268,7 +268,7 @@ integration_test:
         FROM {{ source_schema }}.fct_bookings_extended
         WHERE
           {{ render_time_constraint("ds", "2020-01-01", "2020-02-29") }}
-        GROUP BY {{ render_date_trunc("ds", TimeGranularity.MONTH) }}
+        GROUP BY {{ render_date_trunc("ds", TimeGranularity.MONTH) }} as ds
       ) b
       ON a.ds = b.ds
       ) c
@@ -573,7 +573,7 @@ integration_test:
           ts.martian_day AS metric_time__martian_day
           , SUM(1) AS visits
         FROM {{ source_schema }}.fct_visits v
-        LEFT OUTER JOIN {{ source_schema }}.mf_time_spine ts ON {{ render_date_trunc("V.ds", TimeGranularity.DAY) }} = ts.ds
+        LEFT OUTER JOIN {{ source_schema }}.mf_time_spine ts ON {{ render_date_trunc("v.ds", TimeGranularity.DAY) }} = ts.ds
         GROUP BY ts.martian_day
       ) subq_5
       FULL OUTER JOIN (
@@ -649,7 +649,7 @@ integration_test:
           ts.martian_day AS metric_time__martian_day
           , SUM(1) AS visits
         FROM {{ source_schema }}.fct_visits v
-        LEFT OUTER JOIN {{ source_schema }}.mf_time_spine ts ON {{ render_date_trunc("V.ds", TimeGranularity.DAY) }} = ts.ds
+        LEFT OUTER JOIN {{ source_schema }}.mf_time_spine ts ON {{ render_date_trunc("v.ds", TimeGranularity.DAY) }} = ts.ds
         GROUP BY ts.martian_day
       ) subq_5
       FULL OUTER JOIN (

@@ -59,7 +59,7 @@ def populate_source_schema(
     schema_name = mf_test_configuration.mf_source_schema
 
     logger.debug(LazyFormat(lambda: f"Dropping schema {schema_name}"))
-    ddl_sql_client.drop_schema(schema_name=schema_name, cascade=True)
+    # ddl_sql_client.drop_schema(schema_name=schema_name, cascade=True) # TODO: this is breaking for clickhouse
     logger.debug(LazyFormat(lambda: f"Creating schema {schema_name}"))
     ddl_sql_client.create_schema(schema_name=schema_name)
     create_tables_listed_in_table_snapshot_repository(

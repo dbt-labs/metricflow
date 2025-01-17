@@ -731,7 +731,7 @@ integration_test:
         GROUP BY
           ds
       ) d
-      ON {{ render_date_sub("C", "ds", 14, TimeGranularity.DAY) }} = d.metric_time__day
+      ON {{ render_date_sub("c", "ds", 14, TimeGranularity.DAY) }} = d.metric_time__day
     ) b
     ON a.metric_time__day = b.metric_time__day
 ---
@@ -1828,7 +1828,7 @@ integration_test:
         GROUP BY
           ds
       ) d
-      ON {{ render_date_sub("C", "ds", 14, TimeGranularity.DAY) }} = d.booking__ds__day
+      ON {{ render_date_sub("c", "ds", 14, TimeGranularity.DAY) }} = d.booking__ds__day
     ) b
     ON a.booking__ds__day = b.booking__ds__day
 ---
@@ -2183,7 +2183,7 @@ integration_test:
         , SUM(1) AS bookings
       FROM {{ source_schema }}.fct_bookings
       WHERE is_instant
-      GROUP BY {{ render_date_trunc("ds", TimeGranularity.DAY) }}
+      GROUP BY {{ render_date_trunc("ds", TimeGranularity.DAY) }} as ds
     ) a ON b.ds = a.ds
 ---
 integration_test:
@@ -2206,7 +2206,7 @@ integration_test:
         , SUM(1) AS bookings
       FROM {{ source_schema }}.fct_bookings
       WHERE is_instant
-      GROUP BY {{ render_date_trunc("ds", TimeGranularity.DAY) }}, is_instant
+      GROUP BY {{ render_date_trunc("ds", TimeGranularity.DAY) }} as ds, is_instant
     ) a ON b.ds = a.ds
     WHERE is_instant
 ---
@@ -2240,7 +2240,7 @@ integration_test:
         , SUM(1) AS bookings
       FROM {{ source_schema }}.fct_bookings
       WHERE {{ render_time_constraint("ds", "2020-01-03", "2020-01-03") }}
-      GROUP BY {{ render_date_trunc("ds", TimeGranularity.DAY) }}
+      GROUP BY {{ render_date_trunc("ds", TimeGranularity.DAY) }} as ds
     ) a ON b.ds = a.ds
     WHERE {{ render_time_constraint("b.ds", "2020-01-03", "2020-01-03") }}
 ---
@@ -2255,7 +2255,7 @@ integration_test:
       {{ render_date_trunc("last_profile_edit_ts", TimeGranularity.MILLISECOND) }} AS user__last_profile_edit_ts__millisecond
       , SUM(1) AS new_users
     FROM {{ source_schema }}.dim_users
-    GROUP BY {{ render_date_trunc("last_profile_edit_ts", TimeGranularity.MILLISECOND) }}
+    GROUP BY {{ render_date_trunc("last_profile_edit_ts", TimeGranularity.MILLISECOND) }} AS user__last_profile_edit_ts__millisecond
 ---
 integration_test:
   name: simple_metric_with_joined_sub_daily_dimension

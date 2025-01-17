@@ -46,11 +46,19 @@ class AdapterBackedDDLSqlClient(AdapterBackedSqlClient):
                 # Format as "column_name column_type"
                 columns_to_insert.append(f"{column_description.column_name} {self._get_sql_type(column_description)}")
 
+            create_table_statement = f"CREATE TABLE IF NOT EXISTS {sql_table.sql} ({', '.join(columns_to_insert)})"
+
+            if self.sql_engine_type == SqlEngine.CLICKHOUSE:
+                create_table_statement = (
+                    f"{create_table_statement} ENGINE = MergeTree ORDER BY ({columns_to_insert[0].split(' ')[0]}) SETTINGS allow_nullable_key = 1"
+                )
+
             self._adapter.execute(
-                f"CREATE TABLE IF NOT EXISTS {sql_table.sql} ({', '.join(columns_to_insert)})",
+                create_table_statement,
                 auto_begin=True,
                 fetch=False,
             )
+
             self._adapter.commit_if_has_connection()
 
             # Insert rows
@@ -132,8 +140,14 @@ class AdapterBackedDDLSqlClient(AdapterBackedSqlClient):
 
     def create_schema(self, schema_name: str) -> None:
         """Create the given schema in a data warehouse. Only used in tutorials and tests."""
-        self.execute(f"CREATE SCHEMA IF NOT EXISTS {schema_name}")
+        if self.sql_engine_type is SqlEngine.CLICKHOUSE:
+            self.execute(f"CREATE DATABASE IF NOT EXISTS {schema_name}")
+        else:
+            self.execute(f"CREATE SCHEMA IF NOT EXISTS {schema_name}")
 
     def drop_schema(self, schema_name: str, cascade: bool = True) -> None:
         """Drop the given schema from the data warehouse. Only used in tests."""
-        self.execute(f"DROP SCHEMA IF EXISTS {schema_name}{' CASCADE' if cascade else ''}")
+        if self.sql_engine_type is SqlEngine.CLICKHOUSE:
+            self.execute(f"DROP DATABASE IF EXISTS {schema_name}")
+        else:
+            self.execute(f"DROP SCHEMA IF EXISTS {schema_name}{' CASCADE' if cascade else ''}")

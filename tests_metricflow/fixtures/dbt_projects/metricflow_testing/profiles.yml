@@ -78,3 +78,16 @@ trino:
       password: "{{ env_var('DBT_ENV_SECRET_PASSWORD') }}"
       catalog: "{{ env_var('DBT_ENV_SECRET_CATALOG') }}"
       schema: "{{ env_var('DBT_ENV_SECRET_SCHEMA') }}"
+clickhouse:
+  target: dev
+  outputs:
+    dev:
+      type: clickhouse
+      host: "{{ env_var('DBT_ENV_SECRET_HOST') }}"
+      port: "{{ env_var('DBT_PROFILE_PORT') | int }}"
+      user: "{{ env_var('DBT_ENV_SECRET_USER') }}"
+      password: "{{ env_var('DBT_ENV_SECRET_PASSWORD') }}"
+      schema: "{{ env_var('DBT_ENV_SECRET_SCHEMA') }}"
+      secure: false
+      custom_settings:
+        join_use_nulls: 1

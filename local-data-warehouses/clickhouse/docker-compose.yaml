@@ -1,0 +1,16 @@
+version: "3.7"
+
+services:
+  clickhouse:
+    container_name: clickhouse
+    image: clickhouse/clickhouse-server
+    expose:
+      - "8123"
+      - "9000"
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    environment:
+      CLICKHOUSE_USER: "metricflow"
+      CLICKHOUSE_PASSWORD: "metricflowing"
+      CLICKHOUSE_DB: "metricflow"
