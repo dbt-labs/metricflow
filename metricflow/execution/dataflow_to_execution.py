@@ -42,7 +42,7 @@ from metricflow.plan_conversion.convert_to_sql_plan import ConvertToSqlPlanResul
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlOptimizationLevel
-from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderResult, SqlPlanRenderer
+from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderer, SqlPlanRenderResult
 
 logger = logging.getLogger(__name__)
 
