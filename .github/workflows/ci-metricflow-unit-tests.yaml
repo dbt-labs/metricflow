@@ -79,8 +79,5 @@ jobs:
         with:
           python-version: "${{ matrix.python-version }}"
 
-      - name: Test `metricflow-semantics` Package
-        run: bash scripts/ci_tests/metricflow_semantics_package_test.sh
-
-      - name: Test `metricflow` Package
-        run: bash scripts/ci_tests/metricflow_package_test.sh
+      - name: Run Package-Build Tests
+        run: "make test-build-packages"

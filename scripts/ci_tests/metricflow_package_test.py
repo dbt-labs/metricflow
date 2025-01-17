@@ -174,5 +174,6 @@ def check_engine_import(metricflow_engine: MetricFlowEngine) -> None:
     logger.debug(LazyFormat(lambda: f"Engine is {metricflow_engine}"))
 
 
-logging.basicConfig(format="%(asctime)s - %(levelname)s -  %(message)s", level=logging.INFO)
-log_dataflow_plan()
+if __name__ == "__main__":
+    logging.basicConfig(format="%(asctime)s %(levelname)s %(filename)s:%(lineno)d - %(message)s", level=logging.INFO)
+    log_dataflow_plan()
