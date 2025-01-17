@@ -23,7 +23,7 @@ def assert_optimizer_result_snapshot_equal(
     select_statement: SqlSelectStatementNode,
 ) -> None:
     """Helper to assert that the SQL snapshot of the optimizer result is the same as the stored one."""
-    sql_before_optimizing = sql_plan_renderer.render_sql_query_plan(SqlPlan(select_statement)).sql
+    sql_before_optimizing = sql_plan_renderer.render_sql_plan(SqlPlan(select_statement)).sql
     logger.debug(
         LazyFormat(
             "Optimizing SELECT statement",
@@ -33,7 +33,7 @@ def assert_optimizer_result_snapshot_equal(
     )
 
     column_pruned_select_node = optimizer.optimize(select_statement)
-    sql_after_optimizing = sql_plan_renderer.render_sql_query_plan(SqlPlan(column_pruned_select_node)).sql
+    sql_after_optimizing = sql_plan_renderer.render_sql_plan(SqlPlan(column_pruned_select_node)).sql
     logger.debug(
         LazyFormat(
             "Optimized SQL",

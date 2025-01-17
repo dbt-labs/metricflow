@@ -49,7 +49,7 @@ class SqlPlanRenderer(SqlPlanNodeVisitor[SqlPlanRenderResult], ABC):
     def _render_node(self, node: SqlPlanNode) -> SqlPlanRenderResult:
         return node.accept(self)
 
-    def render_sql_query_plan(self, sql_query_plan: SqlPlan) -> SqlPlanRenderResult:  # noqa: D102
+    def render_sql_plan(self, sql_query_plan: SqlPlan) -> SqlPlanRenderResult:  # noqa: D102
         return self._render_node(sql_query_plan.render_node)
 
     @property

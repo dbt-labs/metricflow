@@ -127,7 +127,7 @@ class DataWarehouseTaskBuilder:
         )
         sql_plan = conversion_result.sql_plan
 
-        rendered_plan = sql_client.sql_plan_renderer.render_sql_query_plan(sql_plan)
+        rendered_plan = sql_client.sql_plan_renderer.render_sql_plan(sql_plan)
         return (rendered_plan.sql, rendered_plan.bind_parameter_set)
 
     @classmethod

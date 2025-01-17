@@ -81,7 +81,7 @@ class DataflowToExecutionPlanConverter(DataflowPlanNodeVisitor[ConvertToExecutio
         return result
 
     def _render_sql(self, convert_to_sql_plan_result: ConvertToSqlPlanResult) -> SqlPlanRenderResult:
-        return self._sql_plan_renderer.render_sql_query_plan(convert_to_sql_plan_result.sql_plan)
+        return self._sql_plan_renderer.render_sql_plan(convert_to_sql_plan_result.sql_plan)
 
     @override
     def visit_write_to_result_data_table_node(self, node: WriteToResultDataTableNode) -> ConvertToExecutionPlanResult:

@@ -61,10 +61,10 @@ def convert_and_check(
 
     lines = [
         "sql_without_cte:",
-        indent(renderer.render_sql_query_plan(sql_plan_without_cte).sql),
+        indent(renderer.render_sql_plan(sql_plan_without_cte).sql),
         "\n",
         "sql_with_cte:",
-        indent(renderer.render_sql_query_plan(sql_plan_with_cte).sql),
+        indent(renderer.render_sql_plan(sql_plan_with_cte).sql),
     ]
 
     assert_str_snapshot_equal(

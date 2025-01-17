@@ -56,7 +56,7 @@ def test_view_sql_generated_at_a_node(
         dataflow_plan_node=read_source_node,
     )
     sql_plan_at_read_node = conversion_result.sql_plan
-    sql_at_read_node = sql_renderer.render_sql_query_plan(sql_plan_at_read_node).sql
+    sql_at_read_node = sql_renderer.render_sql_plan(sql_plan_at_read_node).sql
     spec_set_at_read_node = node_output_resolver.get_output_data_set(read_source_node).instance_set.spec_set
     logger.debug(LazyFormat(lambda: f"SQL generated at {read_source_node} is:\n\n{sql_at_read_node}"))
     logger.debug(LazyFormat(lambda: f"Spec set at {read_source_node} is:\n\n{mf_pformat(spec_set_at_read_node)}"))
@@ -84,7 +84,7 @@ def test_view_sql_generated_at_a_node(
         dataflow_plan_node=filter_elements_node,
     )
     sql_plan_at_filter_elements_node = conversion_result.sql_plan
-    sql_at_filter_elements_node = sql_renderer.render_sql_query_plan(sql_plan_at_filter_elements_node).sql
+    sql_at_filter_elements_node = sql_renderer.render_sql_plan(sql_plan_at_filter_elements_node).sql
     spec_set_at_filter_elements_node = node_output_resolver.get_output_data_set(
         filter_elements_node
     ).instance_set.spec_set
