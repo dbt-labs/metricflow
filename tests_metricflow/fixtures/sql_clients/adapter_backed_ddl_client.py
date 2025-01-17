@@ -112,9 +112,9 @@ class AdapterBackedDDLSqlClient(AdapterBackedSqlClient):
         elif column_type is int:
             return "bigint"
         elif column_type is float:
-            return self._sql_query_plan_renderer.expr_renderer.double_data_type
+            return self._sql_plan_renderer.expr_renderer.double_data_type
         elif column_type is datetime.datetime:
-            return self._sql_query_plan_renderer.expr_renderer.timestamp_data_type
+            return self._sql_plan_renderer.expr_renderer.timestamp_data_type
         else:
             raise ValueError(f"Encountered unexpected {column_type=}!")
 

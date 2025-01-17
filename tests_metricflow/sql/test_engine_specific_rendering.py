@@ -111,7 +111,7 @@ def test_continuous_percentile_expr(
     sql_client: SqlClient,
 ) -> None:
     """Tests rendering of the continuous percentile expression in a query."""
-    if not sql_client.sql_query_plan_renderer.expr_renderer.can_render_percentile_function(
+    if not sql_client.sql_plan_renderer.expr_renderer.can_render_percentile_function(
         SqlPercentileFunctionType.CONTINUOUS
     ):
         pytest.skip("Warehouse does not support continuous percentile expressions")
@@ -160,7 +160,7 @@ def test_discrete_percentile_expr(
     sql_client: SqlClient,
 ) -> None:
     """Tests rendering of the discrete percentile expression in a query."""
-    if not sql_client.sql_query_plan_renderer.expr_renderer.can_render_percentile_function(
+    if not sql_client.sql_plan_renderer.expr_renderer.can_render_percentile_function(
         SqlPercentileFunctionType.DISCRETE
     ):
         pytest.skip("Warehouse does not support discrete percentile expressions")
@@ -209,7 +209,7 @@ def test_approximate_continuous_percentile_expr(
     sql_client: SqlClient,
 ) -> None:
     """Tests rendering of the approximate continuous percentile expression in a query."""
-    if not sql_client.sql_query_plan_renderer.expr_renderer.can_render_percentile_function(
+    if not sql_client.sql_plan_renderer.expr_renderer.can_render_percentile_function(
         SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS
     ):
         pytest.skip("Warehouse does not support approximate_continuous percentile expressions")
@@ -258,7 +258,7 @@ def test_approximate_discrete_percentile_expr(
     sql_client: SqlClient,
 ) -> None:
     """Tests rendering of the approximate discrete percentile expression in a query."""
-    if not sql_client.sql_query_plan_renderer.expr_renderer.can_render_percentile_function(
+    if not sql_client.sql_plan_renderer.expr_renderer.can_render_percentile_function(
         SqlPercentileFunctionType.APPROXIMATE_DISCRETE
     ):
         pytest.skip("Warehouse does not support percentile expressions")

@@ -24,7 +24,7 @@ from metricflow.sql.render.expr_renderer import (
     SqlExpressionRenderer,
     SqlExpressionRenderResult,
 )
-from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
+from metricflow.sql.render.sql_plan_renderer import DefaultSqlPlanRenderer
 
 
 class PostgresSqlExpressionRenderer(DefaultSqlExpressionRenderer):
@@ -119,7 +119,7 @@ class PostgresSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         )
 
 
-class PostgresSQLSqlQueryPlanRenderer(DefaultSqlQueryPlanRenderer):
+class PostgresSQLSqlPlanRenderer(DefaultSqlPlanRenderer):
     """Plan renderer for the PostgreSQL engine."""
 
     EXPR_RENDERER = PostgresSqlExpressionRenderer()

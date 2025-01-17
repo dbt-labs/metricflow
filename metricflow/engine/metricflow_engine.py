@@ -532,7 +532,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         logger.info(LazyFormat("Building execution plan"))
         _to_execution_plan_converter = DataflowToExecutionPlanConverter(
             sql_plan_converter=self._to_sql_plan_converter,
-            sql_plan_renderer=self._sql_client.sql_query_plan_renderer,
+            sql_plan_renderer=self._sql_client.sql_plan_renderer,
             sql_client=self._sql_client,
             sql_optimization_level=mf_query_request.sql_optimization_level,
         )
