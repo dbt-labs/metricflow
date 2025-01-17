@@ -34,6 +34,7 @@ MetricFlow is a semantic layer that makes it easy to organize metric definitions
 
 The name comes from the approach taken to generate metrics. A query is compiled into a query plan (represented below) called a dataflow that constructs metrics. The plan is then optimized and rendered to engine-specific SQL.
 
+Foo
 <p align="center">
 <img src="https://github.com/dbt-labs/metricflow/raw/main/assets/example_plan.svg" height="500"/>
 <br /><br />
