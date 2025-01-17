@@ -68,7 +68,7 @@ class DatabricksSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         )
 
 
-class DatabricksSqlQueryPlanRenderer(DefaultSqlPlanRenderer):
+class DatabricksSqlPlanRenderer(DefaultSqlPlanRenderer):
     """Plan renderer for the Snowflake engine."""
 
     EXPR_RENDERER = DatabricksSqlExpressionRenderer()

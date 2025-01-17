@@ -146,7 +146,7 @@ class TrinoSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         return date_part.value
 
 
-class TrinoSqlQueryPlanRenderer(DefaultSqlPlanRenderer):
+class TrinoSqlPlanRenderer(DefaultSqlPlanRenderer):
     """Plan renderer for the Trino engine."""
 
     EXPR_RENDERER = TrinoSqlExpressionRenderer()

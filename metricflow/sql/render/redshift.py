@@ -108,7 +108,7 @@ class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         )
 
 
-class RedshiftSqlQueryPlanRenderer(DefaultSqlPlanRenderer):
+class RedshiftSqlPlanRenderer(DefaultSqlPlanRenderer):
     """Plan renderer for the Redshift engine."""
 
     EXPR_RENDERER = RedshiftSqlExpressionRenderer()

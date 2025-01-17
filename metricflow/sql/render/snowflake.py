@@ -80,7 +80,7 @@ class SnowflakeSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         )
 
 
-class SnowflakeSqlQueryPlanRenderer(DefaultSqlPlanRenderer):
+class SnowflakeSqlPlanRenderer(DefaultSqlPlanRenderer):
     """Plan renderer for the Snowflake engine."""
 
     EXPR_RENDERER = SnowflakeSqlExpressionRenderer()

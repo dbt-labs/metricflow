@@ -196,7 +196,7 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
         )
 
 
-class BigQuerySqlQueryPlanRenderer(DefaultSqlPlanRenderer):
+class BigQuerySqlPlanRenderer(DefaultSqlPlanRenderer):
     """Plan renderer for the BigQuery engine."""
 
     EXPR_RENDERER = BigQuerySqlExpressionRenderer()

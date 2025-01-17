@@ -119,7 +119,7 @@ class PostgresSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         )
 
 
-class PostgresSQLSqlQueryPlanRenderer(DefaultSqlPlanRenderer):
+class PostgresSQLSqlPlanRenderer(DefaultSqlPlanRenderer):
     """Plan renderer for the PostgreSQL engine."""
 
     EXPR_RENDERER = PostgresSqlExpressionRenderer()
