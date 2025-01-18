@@ -8,6 +8,7 @@ from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.sql.sql_exprs import SqlExpressionTreeLineage
 from typing_extensions import override
 
+from metricflow.sql.optimizer.cte_alias_to_cte_node_mapping import SqlCteAliasMappingLookup
 from metricflow.sql.optimizer.tag_column_aliases import NodeToColumnAliasMapping
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
@@ -70,14 +71,17 @@ class SqlMapRequiredColumnAliasesVisitor(SqlPlanNodeVisitor[None]):
 
         # Helps lookup the CTE node associated with a given CTE alias. A member variable is needed as any node in the
         # SQL DAG can reference a CTE.
+        self._cte_node_lookup = SqlCteAliasMappingLookup()
         start_node_as_select_node = start_node.as_select_node
 
         self._current_cte_alias_mapping = SqlCteAliasMapping()
-        start_node_as_select_node = start_node.as_select_node
-
         if start_node_as_select_node is not None:
             self._current_cte_alias_mapping = SqlCteAliasMapping.create(
                 {cte_source.cte_alias: cte_source for cte_source in start_node_as_select_node.cte_sources}
+            )
+            self._cte_node_lookup.add_cte_alias_mapping(
+                select_node=start_node_as_select_node,
+                cte_alias_mapping=self._current_cte_alias_mapping,
             )
 
     def _search_for_expressions(
@@ -127,6 +131,7 @@ class SqlMapRequiredColumnAliasesVisitor(SqlPlanNodeVisitor[None]):
     def _tag_potential_cte_node(self, table_name: str, column_aliases: Set[str]) -> None:
         """A reference to a SQL table might be a CTE. If so, tag the appropriate aliases in the CTEs."""
         cte_node = self._current_cte_alias_mapping.get_cte_node_for_alias(table_name)
+
         if cte_node is not None:
             self._current_required_column_alias_mapping.add_aliases(cte_node, column_aliases)
             # `visit_cte_node` will handle propagating the required aliases to all CTEs that this CTE node depends on.
@@ -134,6 +139,26 @@ class SqlMapRequiredColumnAliasesVisitor(SqlPlanNodeVisitor[None]):
 
     def visit_select_statement_node(self, node: SqlSelectStatementNode) -> None:
         """Based on required column aliases for this SELECT, figure out required column aliases in parents."""
+        # If this SELECT node defines any CTEs, it should override ones that were defined in the outer SELECT in case
+        # of CTE alias collisions.
+        if not self._cte_node_lookup.cte_alias_mapping_exists(node):
+            self._cte_node_lookup.add_cte_alias_mapping(
+                select_node=node,
+                cte_alias_mapping=self._current_cte_alias_mapping.merge(
+                    SqlCteAliasMapping.create({cte_node.cte_alias: cte_node for cte_node in node.cte_sources})
+                ),
+            )
+
+        previous_cte_alias_mapping = self._current_cte_alias_mapping
+        self._current_cte_alias_mapping = self._cte_node_lookup.get_cte_alias_mapping(node)
+        logger.debug(
+            LazyFormat(
+                "Starting visit of SELECT statement node with CTE alias mapping",
+                node=node,
+                current_cte_alias_mapping=self._current_cte_alias_mapping,
+            )
+        )
+
         initial_required_column_aliases_in_this_node = self._current_required_column_alias_mapping.get_aliases(node)
 
         # If this SELECT statement uses DISTINCT, all columns are required as removing them would change the meaning of
@@ -191,8 +216,9 @@ class SqlMapRequiredColumnAliasesVisitor(SqlPlanNodeVisitor[None]):
                     self._current_required_column_alias_mapping.add_alias(
                         node=node_to_retain_all_columns, column_alias=select_column.column_alias
                     )
-
+            # TODO: TBD - may be necessary to mark columns in all visible CTEs since a string can reference anything.
             self._visit_parents(node)
+            self._current_cte_alias_mapping = previous_cte_alias_mapping
             return
 
         # Create a mapping from the source alias to the column aliases needed from the corresponding source.
@@ -255,6 +281,7 @@ class SqlMapRequiredColumnAliasesVisitor(SqlPlanNodeVisitor[None]):
 
         # Visit recursively.
         self._visit_parents(node)
+        self._current_cte_alias_mapping = previous_cte_alias_mapping
         return
 
     def visit_table_node(self, node: SqlTableNode) -> None:

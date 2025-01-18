@@ -60,5 +60,5 @@ def assert_optimizer_result_snapshot_equal(
         mf_test_configuration=mf_test_configuration,
         snapshot_id="result",
         snapshot_str=snapshot_str,
-        expectation_description=expectation_description
+        expectation_description=expectation_description,
     )
