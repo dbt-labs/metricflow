@@ -1,0 +1,46 @@
+test_name: test_cte_in_subquery_not_reduced
+test_filename: test_cte_rewriting_sub_query_reducer.py
+docstring:
+  This tests that in cases where there is a CTE defined in a sub-query, it is not reduced.
+expectation_description:
+  A sub-query containing CTEs should not result in the top-level query being merged with the sub-query. For
+  this case, the SQL should be the same before / after optimization.
+---
+optimizer:
+  SqlRewritingSubQueryReducer
+
+sql_before_optimizing:
+  -- top_level_select
+  SELECT
+    from_source_alias.from_source__col_0 AS top_level__col_0
+  FROM (
+    -- from_sub_query
+    WITH cte_source AS (
+      -- CTE source
+      SELECT
+        test_table_alias.col_0 AS cte_source__col_0
+      FROM test_schema.test_table test_table_alias
+    )
+
+    SELECT
+      from_source_alias.cte_source__col_0 AS from_source__col_0
+    FROM cte_source from_source_alias
+  ) from_source_alias
+
+sql_after_optimizing:
+  -- top_level_select
+  SELECT
+    from_source_alias.from_source__col_0 AS top_level__col_0
+  FROM (
+    -- from_sub_query
+    WITH cte_source AS (
+      -- CTE source
+      SELECT
+        test_table_alias.col_0 AS cte_source__col_0
+      FROM test_schema.test_table test_table_alias
+    )
+
+    SELECT
+      from_source_alias.cte_source__col_0 AS from_source__col_0
+    FROM cte_source from_source_alias
+  ) from_source_alias
