@@ -4,6 +4,9 @@ import logging
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+
+from metricflow_semantics.formatting.formatting_helpers import mf_dedent
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.sql.sql_exprs import (
     SqlColumnReference,
     SqlColumnReferenceExpression,
@@ -19,6 +22,7 @@ from metricflow.sql.render.sql_plan_renderer import DefaultSqlPlanRenderer, SqlP
 from metricflow.sql.sql_plan import (
     SqlCteNode,
     SqlJoinDescription,
+    SqlPlan,
     SqlSelectColumn,
     SqlSelectStatementNode,
     SqlTableNode,
@@ -327,4 +331,145 @@ def test_multi_child_pruning(
         optimizer=column_pruner,
         sql_plan_renderer=sql_plan_renderer,
         select_statement=select_statement,
+    )
+
+
+def test_common_cte_aliases_in_nested_query(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    column_pruner: SqlColumnPrunerOptimizer,
+    sql_plan_renderer: DefaultSqlPlanRenderer,
+) -> None:
+    """Test the case where a CTE defined in the top-level SELECT has the same name as a CTE in a sub-query ."""
+
+    top_level_select_ctes = (
+        SqlCteNode.create(
+            cte_alias="cte_source",
+            select_statement=SqlSelectStatementNode.create(
+                description="CTE source",
+                select_columns=(
+                    SqlSelectColumn(
+                        expr=SqlColumnReferenceExpression.create(
+                            col_ref=SqlColumnReference(table_alias="test_table_alias", column_name="col_0")
+                        ),
+                        column_alias="cte_source__col_0",
+                    ),
+                    SqlSelectColumn(
+                        expr=SqlColumnReferenceExpression.create(
+                            col_ref=SqlColumnReference(table_alias="test_table_alias", column_name="col_1")
+                        ),
+                        column_alias="cte_source__col_1",
+                    ),
+                ),
+                from_source=SqlTableNode.create(
+                    sql_table=SqlTable(schema_name="test_schema", table_name="test_table")
+                ),
+                from_source_alias="test_table_alias",
+            ),
+        ),
+    )
+    from_sub_query_ctes = (
+        SqlCteNode.create(
+            cte_alias="cte_source",
+            select_statement=SqlSelectStatementNode.create(
+                description="CTE source",
+                select_columns=(
+                    SqlSelectColumn(
+                        expr=SqlColumnReferenceExpression.create(
+                            col_ref=SqlColumnReference(table_alias="test_table_alias", column_name="col_0")
+                        ),
+                        column_alias="cte_source__col_0",
+                    ),
+                    SqlSelectColumn(
+                        expr=SqlColumnReferenceExpression.create(
+                            col_ref=SqlColumnReference(table_alias="test_table_alias", column_name="col_1")
+                        ),
+                        column_alias="cte_source__col_1",
+                    ),
+                ),
+                from_source=SqlTableNode.create(
+                    sql_table=SqlTable(schema_name="test_schema", table_name="test_table")
+                ),
+                from_source_alias="test_table_alias",
+            ),
+        ),
+    )
+
+    top_level_select = SqlSelectStatementNode.create(
+        description="top_level_select",
+        select_columns=(
+            SqlSelectColumn(
+                expr=SqlColumnReferenceExpression.create(
+                    col_ref=SqlColumnReference(table_alias="from_source_alias", column_name="from_source__col_0")
+                ),
+                column_alias="top_level__col_0",
+            ),
+            SqlSelectColumn(
+                expr=SqlColumnReferenceExpression.create(
+                    col_ref=SqlColumnReference(table_alias="right_source_alias", column_name="right_source__col_1")
+                ),
+                column_alias="top_level__col_1",
+            ),
+        ),
+        from_source=SqlSelectStatementNode.create(
+            description="from_sub_query",
+            select_columns=(
+                SqlSelectColumn(
+                    expr=SqlColumnReferenceExpression.create(
+                        col_ref=SqlColumnReference(table_alias="from_source_alias", column_name="cte_source__col_0")
+                    ),
+                    column_alias="from_source__col_0",
+                ),
+            ),
+            from_source=SqlTableNode.create(sql_table=SqlTable(schema_name=None, table_name="cte_source")),
+            from_source_alias="from_source_alias",
+            cte_sources=from_sub_query_ctes,
+        ),
+        from_source_alias="from_source_alias",
+        join_descs=(
+            SqlJoinDescription(
+                right_source=SqlSelectStatementNode.create(
+                    description="joined_sub_query",
+                    select_columns=(
+                        SqlSelectColumn(
+                            expr=SqlColumnReferenceExpression.create(
+                                col_ref=SqlColumnReference(
+                                    table_alias="from_source_alias", column_name="cte_source__col_1"
+                                )
+                            ),
+                            column_alias="right_source__col_1",
+                        ),
+                    ),
+                    from_source=SqlTableNode.create(sql_table=SqlTable(schema_name=None, table_name="cte_source")),
+                    from_source_alias="from_source_alias",
+                ),
+                right_source_alias="right_source_alias",
+                on_condition=SqlComparisonExpression.create(
+                    left_expr=SqlColumnReferenceExpression.create(
+                        col_ref=SqlColumnReference(table_alias="from_source_alias", column_name="from_source__col_0")
+                    ),
+                    comparison=SqlComparison.EQUALS,
+                    right_expr=SqlColumnReferenceExpression.create(
+                        col_ref=SqlColumnReference(table_alias="right_source_alias", column_name="right_source__col_1")
+                    ),
+                ),
+                join_type=SqlJoinType.INNER,
+            ),
+        ),
+        cte_sources=top_level_select_ctes,
+    )
+
+    assert_optimizer_result_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        optimizer=column_pruner,
+        sql_plan_renderer=sql_plan_renderer,
+        select_statement=top_level_select,
+        expectation_description=mf_dedent(
+            """
+            In the `from_sub_query`, there is a reference to `cte_source__col_0` in a CTE named `cte_source`. Since
+            `from_sub_query` redefines `cte_source`, the column pruner should retain that column in the CTE defined
+            in `from_sub_query` but remove the column from the CTE defined in `from_sub_query`.
+            """
+        )
     )
