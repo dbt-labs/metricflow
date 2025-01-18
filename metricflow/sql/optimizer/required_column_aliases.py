@@ -11,6 +11,7 @@ from typing_extensions import override
 from metricflow.sql.optimizer.tag_column_aliases import NodeToColumnAliasMapping
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
+    SqlCteAliasMapping,
     SqlCteNode,
     SqlPlanNode,
     SqlPlanNodeVisitor,
@@ -70,11 +71,14 @@ class SqlMapRequiredColumnAliasesVisitor(SqlPlanNodeVisitor[None]):
         # Helps lookup the CTE node associated with a given CTE alias. A member variable is needed as any node in the
         # SQL DAG can reference a CTE.
         start_node_as_select_node = start_node.as_select_node
-        self._cte_alias_to_cte_node: Dict[str, SqlCteNode] = (
-            {cte_source.cte_alias: cte_source for cte_source in start_node_as_select_node.cte_sources}
-            if start_node_as_select_node is not None
-            else {}
-        )
+
+        self._current_cte_alias_mapping = SqlCteAliasMapping()
+        start_node_as_select_node = start_node.as_select_node
+
+        if start_node_as_select_node is not None:
+            self._current_cte_alias_mapping = SqlCteAliasMapping.create(
+                {cte_source.cte_alias: cte_source for cte_source in start_node_as_select_node.cte_sources}
+            )
 
     def _search_for_expressions(
         self, select_node: SqlSelectStatementNode, pruned_select_columns: Tuple[SqlSelectColumn, ...]
@@ -122,7 +126,7 @@ class SqlMapRequiredColumnAliasesVisitor(SqlPlanNodeVisitor[None]):
 
     def _tag_potential_cte_node(self, table_name: str, column_aliases: Set[str]) -> None:
         """A reference to a SQL table might be a CTE. If so, tag the appropriate aliases in the CTEs."""
-        cte_node = self._cte_alias_to_cte_node.get(table_name)
+        cte_node = self._current_cte_alias_mapping.get_cte_node_for_alias(table_name)
         if cte_node is not None:
             self._current_required_column_alias_mapping.add_aliases(cte_node, column_aliases)
             # `visit_cte_node` will handle propagating the required aliases to all CTEs that this CTE node depends on.
@@ -180,7 +184,9 @@ class SqlMapRequiredColumnAliasesVisitor(SqlPlanNodeVisitor[None]):
                 nodes_to_retain_all_columns.append(join_desc.right_source)
 
             for node_to_retain_all_columns in nodes_to_retain_all_columns:
-                nearest_select_columns = node_to_retain_all_columns.nearest_select_columns(self._cte_alias_to_cte_node)
+                nearest_select_columns = node_to_retain_all_columns.nearest_select_columns(
+                    self._current_cte_alias_mapping
+                )
                 for select_column in nearest_select_columns or ():
                     self._current_required_column_alias_mapping.add_alias(
                         node=node_to_retain_all_columns, column_alias=select_column.column_alias

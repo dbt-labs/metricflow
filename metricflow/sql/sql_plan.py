@@ -5,8 +5,10 @@ from __future__ import annotations
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from functools import cached_property
 from typing import Generic, Mapping, Optional, Sequence, Tuple
 
+from metricflow_semantics.collection_helpers.merger import Mergeable
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId, DagNode, DisplayedProperty, MetricFlowDag
 from metricflow_semantics.sql.sql_exprs import SqlExpressionNode
@@ -51,9 +53,7 @@ class SqlPlanNode(DagNode["SqlPlanNode"], ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def nearest_select_columns(
-        self, cte_source_mapping: Mapping[str, SqlCteNode]
-    ) -> Optional[Sequence[SqlSelectColumn]]:
+    def nearest_select_columns(self, cte_source_mapping: SqlCteAliasMapping) -> Optional[Sequence[SqlSelectColumn]]:
         """Return the SELECT columns that are in this node or the closest `SqlSelectStatementNode` of its ancestors.
 
         * For a SELECT statement node, this is just the columns in the node.
@@ -222,9 +222,7 @@ class SqlSelectStatementNode(SqlPlanNode):
         return self._description
 
     @override
-    def nearest_select_columns(
-        self, cte_source_mapping: Mapping[str, SqlCteNode]
-    ) -> Optional[Sequence[SqlSelectColumn]]:
+    def nearest_select_columns(self, cte_source_mapping: SqlCteAliasMapping) -> Optional[Sequence[SqlSelectColumn]]:
         return self.select_columns
 
     def create_copy(self) -> SqlSelectStatementNode:  # noqa: D102
@@ -276,11 +274,9 @@ class SqlTableNode(SqlPlanNode):
         return None
 
     @override
-    def nearest_select_columns(
-        self, cte_source_mapping: Mapping[str, SqlCteNode]
-    ) -> Optional[Sequence[SqlSelectColumn]]:
+    def nearest_select_columns(self, cte_source_mapping: SqlCteAliasMapping) -> Optional[Sequence[SqlSelectColumn]]:
         if self.sql_table.schema_name is None:
-            cte_node = cte_source_mapping.get(self.sql_table.table_name)
+            cte_node = cte_source_mapping.get_cte_node_for_alias(self.sql_table.table_name)
             if cte_node is not None:
                 return cte_node.nearest_select_columns(cte_source_mapping)
         return None
@@ -324,9 +320,7 @@ class SqlSelectQueryFromClauseNode(SqlPlanNode):
         return None
 
     @override
-    def nearest_select_columns(
-        self, cte_source_mapping: Mapping[str, SqlCteNode]
-    ) -> Optional[Sequence[SqlSelectColumn]]:
+    def nearest_select_columns(self, cte_source_mapping: SqlCteAliasMapping) -> Optional[Sequence[SqlSelectColumn]]:
         return None
 
     @property
@@ -385,9 +379,7 @@ class SqlCreateTableAsNode(SqlPlanNode):
         return StaticIdPrefix.SQL_PLAN_CREATE_TABLE_AS_ID_PREFIX
 
     @override
-    def nearest_select_columns(
-        self, cte_source_mapping: Mapping[str, SqlCteNode]
-    ) -> Optional[Sequence[SqlSelectColumn]]:
+    def nearest_select_columns(self, cte_source_mapping: SqlCteAliasMapping) -> Optional[Sequence[SqlSelectColumn]]:
         return self.parent_node.nearest_select_columns(cte_source_mapping)
 
 
@@ -463,7 +455,43 @@ class SqlCteNode(SqlPlanNode):
         return StaticIdPrefix.SQL_PLAN_COMMON_TABLE_EXPRESSION_ID_PREFIX
 
     @override
-    def nearest_select_columns(
-        self, cte_source_mapping: Mapping[str, SqlCteNode]
-    ) -> Optional[Sequence[SqlSelectColumn]]:
+    def nearest_select_columns(self, cte_source_mapping: SqlCteAliasMapping) -> Optional[Sequence[SqlSelectColumn]]:
         return self.select_statement.nearest_select_columns(cte_source_mapping)
+
+
+@dataclass(frozen=True)
+class SqlCteAliasMapping(Mergeable):
+    """Thin, dict-like object that maps an alias to the associated `SqlCteNode`.
+
+    When merged, the entries from the right mapping take precedence over the entries from the left.
+    """
+
+    cte_alias_to_cte_node_items: Tuple[Tuple[str, SqlCteNode], ...] = ()
+
+    @staticmethod
+    def create(cte_alias_to_cte_node_mapping: Mapping[str, SqlCteNode]) -> SqlCteAliasMapping:  # noqa: D102
+        cte_alias_to_cte_node_pairs = []
+        for cte_alias, cte_node in cte_alias_to_cte_node_mapping.items():
+            cte_alias_to_cte_node_pairs.append((cte_alias, cte_node))
+
+        return SqlCteAliasMapping(cte_alias_to_cte_node_items=tuple(cte_alias_to_cte_node_pairs))
+
+    @cached_property
+    def _cte_alias_to_cte_node_dict(self) -> Mapping[str, SqlCteNode]:
+        return {item[0]: item[1] for item in self.cte_alias_to_cte_node_items}
+
+    def get_cte_node_for_alias(self, cte_alias: str) -> Optional[SqlCteNode]:
+        """Return the associated `SqlCteNode` for the given alias, or None if the given alias is not known."""
+        return self._cte_alias_to_cte_node_dict.get(cte_alias)
+
+    @override
+    def merge(self, other: SqlCteAliasMapping) -> SqlCteAliasMapping:
+        new_mapping = dict(self._cte_alias_to_cte_node_dict)
+        for cte_alias, cte_node in other.cte_alias_to_cte_node_items:
+            new_mapping[cte_alias] = cte_node
+        return SqlCteAliasMapping.create(new_mapping)
+
+    @classmethod
+    @override
+    def empty_instance(cls) -> SqlCteAliasMapping:
+        return SqlCteAliasMapping()
