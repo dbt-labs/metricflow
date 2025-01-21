@@ -1,5 +1,5 @@
 # Internal dependencies
-dbt-core @ git+https://github.com/dbt-labs/dbt-core@e53420c1d073dc81609ae7aa84cef6ee09650576#subdirectory=core
+dbt-core>=1.9.0, <1.10
 
 # dsi version should be fixed by MetricFlow/dbt-core, not set here
 dbt-semantic-interfaces
