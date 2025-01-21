@@ -31,7 +31,13 @@ def test_metric_time_only(
     """Tests querying only metric time."""
     dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
         query_spec=MetricFlowQuerySpec(
-            time_dimension_specs=(TimeDimensionSpec(element_name="metric_time", entity_links=()),),
+            time_dimension_specs=(
+                TimeDimensionSpec(
+                    element_name="metric_time",
+                    entity_links=(),
+                    time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
+                ),
+            ),
         ),
     )
 

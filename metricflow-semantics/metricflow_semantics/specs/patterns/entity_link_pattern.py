@@ -120,7 +120,7 @@ class EntityLinkPattern(SpecPattern):
         matching_specs: Sequence[LinkableInstanceSpec] = tuple(
             candidate_spec
             for candidate_spec in group_specs_by_type(candidate_specs).time_dimension_specs
-            if candidate_spec.time_granularity.name
+            if candidate_spec.time_granularity_name
             == (self.parameter_set.time_granularity_name.lower() if self.parameter_set.time_granularity_name else None)
         )
 

@@ -39,9 +39,8 @@ def test_input_str(object_builder_naming_scheme: ObjectBuilderNamingScheme) -> N
             element_name="creation_time",
             entity_links=(EntityReference(element_name="booking"), EntityReference(element_name="listing")),
             time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
-            date_part=DatePart.DAY,
         )
-    ) == ("TimeDimension('listing__creation_time', 'month', date_part_name='day', entity_path=['booking'])")
+    ) == ("TimeDimension('listing__creation_time', 'month', entity_path=['booking'])")
 
     assert (
         object_builder_naming_scheme.input_str(
@@ -123,7 +122,6 @@ def test_spec_pattern(  # noqa: D103
         TimeDimensionSpec(
             element_name="creation_time",
             entity_links=(EntityReference("booking"), EntityReference("listing")),
-            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
             date_part=DatePart.DAY,
         ),
     )

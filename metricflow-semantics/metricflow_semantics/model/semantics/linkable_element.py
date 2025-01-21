@@ -70,20 +70,6 @@ class ElementPathKey:
 
     def __post_init__(self) -> None:
         """Asserts all requirements associated with the element_type are met."""
-        element_type = self.element_type
-        if element_type is LinkableElementType.TIME_DIMENSION:
-            assert (
-                self.time_granularity
-            ), "Time granularity must be specified for all ElementPathKeys associated with time dimensions!"
-        elif (
-            element_type is LinkableElementType.DIMENSION
-            or element_type is LinkableElementType.ENTITY
-            or element_type is LinkableElementType.METRIC
-        ):
-            pass
-        else:
-            assert_values_exhausted(element_type)
-
         assert len(set(self.entity_links)) == len(
             self.entity_links
         ), f"Duplicate found in `entity_links`: {self.entity_links}."
@@ -159,8 +145,8 @@ class LinkableDimension(LinkableElement, SerializableDataclass):
         dimension_type: DimensionType,
         entity_links: Tuple[EntityReference, ...],
         join_path: SemanticModelJoinPath,
-        time_granularity: Optional[ExpandedTimeGranularity],
-        date_part: Optional[DatePart],
+        time_granularity: Optional[ExpandedTimeGranularity] = None,
+        date_part: Optional[DatePart] = None,
     ) -> LinkableDimension:
         return LinkableDimension(
             properties=tuple(sorted(set(properties))),

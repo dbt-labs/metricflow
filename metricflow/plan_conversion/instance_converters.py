@@ -338,8 +338,8 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
                 # TODO: [custom_granularity] - support custom granularities for SCDs. Note this requires
                 # addition of SCD support for window sub-selection, similar to what we do for cumulative metrics
                 # when we group by a different time grain (e.g., select last_value from window, etc.)
-                and not spec.time_granularity.is_custom_granularity
-                and spec.time_granularity.base_granularity == start_dim.time_granularity
+                and not spec.has_custom_grain
+                and spec.base_granularity == start_dim.time_granularity
                 and spec.date_part == start_dim.date_part
             ]
             end_specs = [
@@ -349,8 +349,8 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
                 # TODO: [custom_granularity] - support custom granularities for SCDs. Note this requires
                 # addition of SCD support for window sub-selection, similar to what we do for cumulative metrics
                 # when we group by a different time grain (e.g., select last_value from window, etc.)
-                and not spec.time_granularity.is_custom_granularity
-                and spec.time_granularity.base_granularity == end_dim.time_granularity
+                and not spec.has_custom_grain
+                and spec.base_granularity == end_dim.time_granularity
                 and spec.date_part == end_dim.date_part
             ]
             linkless_start_specs = {spec.without_entity_links for spec in start_specs}

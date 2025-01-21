@@ -59,9 +59,13 @@ class MetricTimeDefaultGranularityPattern(SpecPattern):
             self.max_metric_default_time_granularity or DEFAULT_TIME_GRANULARITY
         )
 
+        metric_time_specs_with_no_grain: Tuple[TimeDimensionSpec, ...] = ()
         spec_key_to_grains: Dict[TimeDimensionSpecComparisonKey, Set[ExpandedTimeGranularity]] = defaultdict(set)
         spec_key_to_specs: Dict[TimeDimensionSpecComparisonKey, Tuple[TimeDimensionSpec, ...]] = defaultdict(tuple)
         for metric_time_spec in spec_set.metric_time_specs:
+            if metric_time_spec.time_granularity is None:
+                metric_time_specs_with_no_grain += (metric_time_spec,)
+                continue
             spec_key = metric_time_spec.comparison_key(exclude_fields=(TimeDimensionSpecField.TIME_GRANULARITY,))
             spec_key_to_grains[spec_key].add(metric_time_spec.time_granularity)
             spec_key_to_specs[spec_key] += (metric_time_spec,)
@@ -79,6 +83,7 @@ class MetricTimeDefaultGranularityPattern(SpecPattern):
             spec_set.dimension_specs
             + matched_metric_time_specs
             + tuple(spec for spec in spec_set.time_dimension_specs if not spec.is_metric_time)
+            + metric_time_specs_with_no_grain
             + spec_set.entity_specs
             + spec_set.group_by_metric_specs
         )

@@ -122,12 +122,14 @@ class TimeSpineSource:
         required_time_spines = {
             custom_time_spines[spec.time_granularity.name]
             for spec in required_time_spine_specs
-            if spec.time_granularity.is_custom_granularity
+            if spec.time_granularity and spec.has_custom_grain
         }
 
-        # Standard grains can be satisfied by any time spine with a base grain that's <= the standard grain.
+        # Standard grains can be satisfied by any time spine with a base grain that's <= the standard grain. If date part was
+        # requested instead of grain, assume DAY since is is the largest grain that's compatible with all supported date parts.
         smallest_required_standard_grain = min(
-            spec.time_granularity.base_granularity for spec in required_time_spine_specs
+            TimeGranularity.DAY if spec.time_granularity is None else spec.time_granularity.base_granularity
+            for spec in required_time_spine_specs
         )
         compatible_time_spines_for_standard_grains = {
             grain: time_spine_source

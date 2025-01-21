@@ -74,22 +74,16 @@ class ObjectBuilderNamingScheme(QueryItemNamingScheme):
             )
 
         for time_dimension_call_parameter_set in call_parameter_sets.time_dimension_call_parameter_sets:
-            fields_to_compare = [
-                ParameterSetField.ELEMENT_NAME,
-                ParameterSetField.ENTITY_LINKS,
-                ParameterSetField.DATE_PART,
-            ]
-
-            if time_dimension_call_parameter_set.time_granularity_name is not None:
-                fields_to_compare.append(ParameterSetField.TIME_GRANULARITY)
-
             return TimeDimensionPattern(
                 SpecPatternParameterSet.from_parameters(
                     element_name=time_dimension_call_parameter_set.time_dimension_reference.element_name,
                     entity_links=time_dimension_call_parameter_set.entity_path,
                     time_granularity_name=time_dimension_call_parameter_set.time_granularity_name,
                     date_part=time_dimension_call_parameter_set.date_part,
-                    fields_to_compare=tuple(fields_to_compare),
+                    fields_to_compare=TimeDimensionPattern.get_fields_to_compare(
+                        time_granularity_name=time_dimension_call_parameter_set.time_granularity_name,
+                        date_part=time_dimension_call_parameter_set.date_part,
+                    ),
                 )
             )
 

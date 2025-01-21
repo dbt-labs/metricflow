@@ -42,7 +42,7 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
 
     @property
     def time_dimension_specs_with_custom_grain(self) -> Tuple[TimeDimensionSpec, ...]:  # noqa: D102
-        return tuple([spec for spec in self.time_dimension_specs if spec.time_granularity.is_custom_granularity])
+        return tuple([spec for spec in self.time_dimension_specs if spec.has_custom_grain])
 
     def replace_custom_granularity_with_base_granularity(self) -> LinkableSpecSet:
         """Return the same spec set, replacing any custom time granularity with its base granularity."""

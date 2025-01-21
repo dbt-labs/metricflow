@@ -91,14 +91,6 @@ class LinkableElementSet(SemanticModelDerivation):
             + len(self.path_key_to_linkable_metrics)
         )
 
-        # Check time dimensions have the grain set.
-        for path_key, linkable_dimensions in self.path_key_to_linkable_dimensions.items():
-            if path_key.element_type is LinkableElementType.TIME_DIMENSION:
-                for linkable_dimension in linkable_dimensions:
-                    assert (
-                        linkable_dimension.time_granularity is not None
-                    ), f"{path_key} has a dimension without the time granularity set: {linkable_dimension}"
-
     @staticmethod
     def merge_by_path_key(linkable_element_sets: Sequence[LinkableElementSet]) -> LinkableElementSet:
         """Combine multiple sets together by the path key.
@@ -368,7 +360,6 @@ class LinkableElementSet(SemanticModelDerivation):
                 entity_links=path_key.entity_links,
             )
         elif path_key.element_type is LinkableElementType.TIME_DIMENSION:
-            assert path_key.time_granularity is not None
             return TimeDimensionSpec(
                 element_name=path_key.element_name,
                 entity_links=path_key.entity_links,

@@ -10,6 +10,7 @@ from dbt_semantic_interfaces.implementations.filters.where_filter import (
     PydanticWhereFilter,
 )
 from dbt_semantic_interfaces.references import EntityReference
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
@@ -17,6 +18,7 @@ from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_MONTH
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlPlanConverter
@@ -80,7 +82,13 @@ def test_simple_fill_nulls_with_0_with_non_metric_time(  # noqa: D103
 ) -> None:
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec(element_name="bookings_fill_nulls_with_0"),),
-        time_dimension_specs=(TimeDimensionSpec(element_name="paid_at", entity_links=(EntityReference("booking"),)),),
+        time_dimension_specs=(
+            TimeDimensionSpec(
+                element_name="paid_at",
+                entity_links=(EntityReference("booking"),),
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
+            ),
+        ),
     )
 
     render_and_check(

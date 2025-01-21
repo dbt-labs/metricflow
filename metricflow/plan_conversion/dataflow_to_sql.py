@@ -415,20 +415,25 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                 expr: SqlExpressionNode = SqlExtractExpression.create(
                     date_part=agg_time_dimension_spec.date_part, arg=base_column_expr
                 )
-            # If the requested granularity is the same as the granularity of the spine, do a direct select.
-            elif agg_time_grain == time_spine_base_granularity:
-                expr = base_column_expr
-            # If the granularity is custom, select the appropriate custom granularity column.
-            elif agg_time_grain.is_custom_granularity:
-                for custom_granularity in time_spine_source.custom_granularities:
-                    expr = SqlColumnReferenceExpression.from_table_and_column_names(
-                        table_alias=time_spine_table_alias, column_name=custom_granularity.parsed_column_name
-                    )
-            # Otherwise, apply the requested standard granularity using a DATE_TRUNC() on the base column.
             else:
-                expr = SqlDateTruncExpression.create(
-                    time_granularity=agg_time_grain.base_granularity, arg=base_column_expr
-                )
+                assert (
+                    agg_time_grain is not None
+                ), f"No date part or time granularity specified for time dimension spec {agg_time_dimension_spec}"
+
+                # If the requested granularity is the same as the granularity of the spine, do a direct select.
+                if agg_time_grain == time_spine_base_granularity:
+                    expr = base_column_expr
+                # If the granularity is custom, select the appropriate custom granularity column.
+                elif agg_time_grain.is_custom_granularity:
+                    for custom_granularity in time_spine_source.custom_granularities:
+                        expr = SqlColumnReferenceExpression.from_table_and_column_names(
+                            table_alias=time_spine_table_alias, column_name=custom_granularity.parsed_column_name
+                        )
+                # Otherwise, apply the requested standard granularity using a DATE_TRUNC() on the base column.
+                else:
+                    expr = SqlDateTruncExpression.create(
+                        time_granularity=agg_time_grain.base_granularity, arg=base_column_expr
+                    )
             select_columns += (SqlSelectColumn(expr=expr, column_alias=column_alias),)
 
         output_instance_set = InstanceSet(
@@ -1175,9 +1180,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             [
                 instance
                 for instance in from_data_set.metric_time_dimension_instances
-                if not instance.spec.time_granularity.is_custom_granularity and not instance.spec.date_part
+                if not instance.spec.has_custom_grain and not instance.spec.date_part
             ],
-            key=lambda x: x.spec.time_granularity.base_granularity.to_int(),
+            key=lambda x: x.spec.base_granularity_sort_key,
         )
 
         assert (
@@ -1429,7 +1434,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             "No appropriate agg_time_dimension was found to join to the time spine. "
             "This indicates that the dataflow plan was configured incorrectly."
         )
-        agg_time_dimension_instances.sort(key=lambda instance: instance.spec.time_granularity.base_granularity.to_int())
+        agg_time_dimension_instances.sort(key=lambda instance: (instance.spec.base_granularity_sort_key))
         return agg_time_dimension_instances[0]
 
     def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode) -> SqlDataSet:  # noqa: D102
@@ -1597,7 +1602,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
         # Build join expression.
         time_spine_alias = self._next_unique_table_alias()
-        custom_granularity_name = node.time_dimension_spec.time_granularity.name
+        custom_granularity_name = node.time_dimension_spec.time_granularity_name
+        assert custom_granularity_name, "Got no custom granularity name for JoinToCustomGranularityNode."
+
         time_spine_source = self._get_time_spine_for_custom_granularity(custom_granularity_name)
         join_description = SqlJoinDescription(
             right_source=SqlTableNode.create(sql_table=time_spine_source.spine_table),

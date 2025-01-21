@@ -302,7 +302,11 @@ def test_cumulative_metric_with_agg_time_dimension(
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec(element_name="trailing_2_months_revenue"),),
         time_dimension_specs=(
-            TimeDimensionSpec(element_name="ds", entity_links=(EntityReference("revenue_instance"),)),
+            TimeDimensionSpec(
+                element_name="ds",
+                entity_links=(EntityReference("revenue_instance"),),
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
+            ),
         ),
     )
 

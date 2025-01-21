@@ -105,7 +105,7 @@ class SemanticModelToDataSetConverter:
         self,
         element_name: str,
         entity_links: Tuple[EntityReference, ...],
-        time_granularity: ExpandedTimeGranularity,
+        time_granularity: Optional[ExpandedTimeGranularity] = None,
         date_part: Optional[DatePart] = None,
         semantic_model_name: Optional[str] = None,
     ) -> TimeDimensionInstance:
@@ -359,7 +359,6 @@ class SemanticModelToDataSetConverter:
                     semantic_model_name=semantic_model_name,
                     element_name=element_name,
                     entity_links=entity_links,
-                    time_granularity=ExpandedTimeGranularity.from_time_granularity(defined_time_granularity),
                     date_part=date_part,
                 )
                 time_dimension_instances.append(time_dimension_instance)

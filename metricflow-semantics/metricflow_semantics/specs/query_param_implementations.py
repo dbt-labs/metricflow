@@ -30,6 +30,7 @@ from metricflow_semantics.specs.patterns.entity_link_pattern import (
     ParameterSetField,
     SpecPatternParameterSet,
 )
+from metricflow_semantics.specs.patterns.typed_patterns import TimeDimensionPattern
 
 
 @dataclass(frozen=True)
@@ -47,14 +48,6 @@ class TimeDimensionParameter(ProtocolHint[TimeDimensionQueryParameter]):
         self,
         semantic_manifest_lookup: SemanticManifestLookup,
     ) -> ResolverInputForGroupByItem:
-        fields_to_compare = [
-            ParameterSetField.ELEMENT_NAME,
-            ParameterSetField.ENTITY_LINKS,
-            ParameterSetField.DATE_PART,
-        ]
-        if self.grain is not None:
-            fields_to_compare.append(ParameterSetField.TIME_GRANULARITY)
-
         name_structure = StructuredLinkableSpecName.from_name(
             qualified_name=self.name.lower(),
             custom_granularity_names=semantic_manifest_lookup.semantic_model_lookup.custom_granularity_names,
@@ -65,7 +58,9 @@ class TimeDimensionParameter(ProtocolHint[TimeDimensionQueryParameter]):
             input_obj_naming_scheme=ObjectBuilderNamingScheme(),
             spec_pattern=EntityLinkPattern(
                 SpecPatternParameterSet.from_parameters(
-                    fields_to_compare=tuple(fields_to_compare),
+                    fields_to_compare=TimeDimensionPattern.get_fields_to_compare(
+                        time_granularity_name=self.grain, date_part=self.date_part
+                    ),
                     element_name=name_structure.element_name,
                     entity_links=tuple(EntityReference(link_name) for link_name in name_structure.entity_link_names),
                     time_granularity_name=self.grain,

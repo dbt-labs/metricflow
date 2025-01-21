@@ -50,7 +50,7 @@ class DataSet(ABC):
 
     @staticmethod
     def metric_time_dimension_spec(
-        time_granularity: ExpandedTimeGranularity, date_part: Optional[DatePart] = None
+        time_granularity: Optional[ExpandedTimeGranularity] = None, date_part: Optional[DatePart] = None
     ) -> TimeDimensionSpec:
         """Spec that corresponds to DataSet.metric_time_dimension_reference."""
         return TimeDimensionSpec(

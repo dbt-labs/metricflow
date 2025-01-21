@@ -370,7 +370,6 @@ def test_date_part_in_filter(  # noqa: D103
             resolved_spec=TimeDimensionSpec(
                 element_name="metric_time",
                 entity_links=(),
-                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
                 date_part=DatePart.YEAR,
             ),
             resolved_linkable_element_set=LinkableElementSet(
@@ -379,7 +378,6 @@ def test_date_part_in_filter(  # noqa: D103
                         element_name="metric_time",
                         element_type=LinkableElementType.TIME_DIMENSION,
                         entity_links=(),
-                        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
                         date_part=DatePart.YEAR,
                     ): (
                         LinkableDimension.create(
@@ -391,7 +389,6 @@ def test_date_part_in_filter(  # noqa: D103
                                 left_semantic_model_reference=SemanticModelReference("bookings_source"),
                             ),
                             properties=frozenset(),
-                            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
                             date_part=DatePart.YEAR,
                         ),
                     )
@@ -415,7 +412,6 @@ def test_date_part_in_filter(  # noqa: D103
             TimeDimensionSpec(
                 element_name="metric_time",
                 entity_links=(),
-                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
                 date_part=DatePart.YEAR,
             ),
         ),
@@ -451,7 +447,6 @@ def resolved_spec_lookup(
                             element_name="metric_time",
                             element_type=LinkableElementType.TIME_DIMENSION,
                             entity_links=(),
-                            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.WEEK),
                             date_part=DatePart.YEAR,
                         ): (
                             LinkableDimension.create(
@@ -463,7 +458,6 @@ def resolved_spec_lookup(
                                     left_semantic_model_reference=SemanticModelReference("bookings_source"),
                                 ),
                                 properties=frozenset(),
-                                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.WEEK),
                                 date_part=DatePart.YEAR,
                             ),
                         )
@@ -509,47 +503,7 @@ def test_date_part_and_grain_in_filter(  # noqa: D103
             TimeDimensionSpec(
                 element_name="metric_time",
                 entity_links=(),
-                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.WEEK),
                 date_part=DatePart.YEAR,
-            ),
-        ),
-        entity_specs=(),
-        group_by_metric_specs=(),
-    )
-
-
-@pytest.mark.skip("Invalid test: the time grain must be <= date part")
-@pytest.mark.parametrize(
-    "where_sql",
-    (
-        ("{{ TimeDimension('metric_time', 'WEEK', date_part_name='day') }} = '2020'"),
-        ("{{ Dimension('metric_time').date_part('day').grain('WEEK') }} = '2020'"),
-        ("{{ Dimension('metric_time').grain('WEEK').date_part('day') }} = '2020'"),
-    ),
-)
-def test_date_part_less_than_grain_in_filter(  # noqa: D103
-    column_association_resolver: ColumnAssociationResolver,
-    resolved_spec_lookup: FilterSpecResolutionLookUp,
-    simple_semantic_manifest_lookup: SemanticManifestLookup,
-    where_sql: str,
-) -> None:
-    where_filter = PydanticWhereFilter(where_sql_template=where_sql)
-
-    where_filter_spec = WhereSpecFactory(
-        column_association_resolver=column_association_resolver,
-        spec_resolution_lookup=resolved_spec_lookup,
-        semantic_model_lookup=simple_semantic_manifest_lookup.semantic_model_lookup,
-    ).create_from_where_filter(EXAMPLE_FILTER_LOCATION, where_filter)
-
-    assert where_filter_spec.where_sql == "metric_time__extract_day = '2020'"
-    assert LinkableSpecSet.create_from_specs(where_filter_spec.linkable_specs) == LinkableSpecSet(
-        dimension_specs=(),
-        time_dimension_specs=(
-            TimeDimensionSpec(
-                element_name="metric_time",
-                entity_links=(),
-                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.WEEK),
-                date_part=DatePart.DAY,
             ),
         ),
         entity_specs=(),
@@ -686,7 +640,6 @@ def test_dimension_time_dimension_parity(  # noqa: D103
                                 entity_path=(),
                                 time_dimension_reference=TimeDimensionReference(METRIC_TIME_ELEMENT_NAME),
                                 time_granularity_name=TimeGranularity.WEEK.value,
-                                date_part=DatePart.YEAR,
                             ),
                         ),
                         filter_location_path=MetricFlowQueryResolutionPath(()),
@@ -697,8 +650,9 @@ def test_dimension_time_dimension_parity(  # noqa: D103
                                     element_name=METRIC_TIME_ELEMENT_NAME,
                                     element_type=LinkableElementType.TIME_DIMENSION,
                                     entity_links=(EntityReference("listing"),),
-                                    time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
-                                    date_part=DatePart.YEAR,
+                                    time_granularity=ExpandedTimeGranularity.from_time_granularity(
+                                        TimeGranularity.WEEK
+                                    ),
                                 ): (
                                     LinkableDimension.create(
                                         defined_in_semantic_model=SemanticModelReference("bookings"),
@@ -712,7 +666,6 @@ def test_dimension_time_dimension_parity(  # noqa: D103
                                         time_granularity=ExpandedTimeGranularity.from_time_granularity(
                                             TimeGranularity.WEEK
                                         ),
-                                        date_part=DatePart.YEAR,
                                     ),
                                 )
                             }
@@ -729,7 +682,7 @@ def test_dimension_time_dimension_parity(  # noqa: D103
             semantic_model_lookup=simple_semantic_manifest_lookup.semantic_model_lookup,
         ).create_from_where_filter(filter_location, where_filter)
 
-    time_dimension_spec = get_spec("TimeDimension('metric_time', 'week', date_part_name='year')")
-    dimension_spec = get_spec("Dimension('metric_time').date_part('year').grain('week')")
+    time_dimension_spec = get_spec("TimeDimension('metric_time', 'week')")
+    dimension_spec = get_spec("Dimension('metric_time').grain('week')")
 
     assert time_dimension_spec == dimension_spec

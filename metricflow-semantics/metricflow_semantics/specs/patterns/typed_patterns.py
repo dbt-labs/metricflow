@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Sequence
+from typing import Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.call_parameter_sets import (
     DimensionCallParameterSet,
@@ -10,6 +10,7 @@ from dbt_semantic_interfaces.call_parameter_sets import (
     TimeDimensionCallParameterSet,
 )
 from dbt_semantic_interfaces.references import EntityReference
+from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from typing_extensions import override
 
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
@@ -73,7 +74,25 @@ class TimeDimensionPattern(EntityLinkPattern):
         return super().match(spec_set.time_dimension_specs)
 
     @staticmethod
+    def get_fields_to_compare(
+        time_granularity_name: Optional[str], date_part: Optional[DatePart]
+    ) -> Sequence[ParameterSetField]:
+        """Select which fields to compare based on inputs."""
+        fields_to_compare: Tuple[ParameterSetField, ...] = (
+            ParameterSetField.ELEMENT_NAME,
+            ParameterSetField.ENTITY_LINKS,
+            ParameterSetField.DATE_PART,
+        )
+
+        # If date part is requested, time granularity should be ignored.
+        if date_part is None and time_granularity_name is not None:
+            fields_to_compare += (ParameterSetField.TIME_GRANULARITY,)
+
+        return fields_to_compare
+
+    @classmethod
     def from_call_parameter_set(
+        cls,
         time_dimension_call_parameter_set: TimeDimensionCallParameterSet,
     ) -> TimeDimensionPattern:
         """Create the pattern that represents 'TimeDimension(...)' in the object builder naming scheme.
@@ -81,18 +100,12 @@ class TimeDimensionPattern(EntityLinkPattern):
         For this pattern, A None value for the time grain matches any grain. However, a None value for the date part
         means that the date part has to be None. This follows the interface defined by the object builder naming scheme.
         """
-        fields_to_compare: List[ParameterSetField] = [
-            ParameterSetField.ELEMENT_NAME,
-            ParameterSetField.ENTITY_LINKS,
-            ParameterSetField.DATE_PART,
-        ]
-
-        if time_dimension_call_parameter_set.time_granularity_name is not None:
-            fields_to_compare.append(ParameterSetField.TIME_GRANULARITY)
-
         return TimeDimensionPattern(
             parameter_set=SpecPatternParameterSet.from_parameters(
-                fields_to_compare=tuple(fields_to_compare),
+                fields_to_compare=cls.get_fields_to_compare(
+                    time_granularity_name=time_dimension_call_parameter_set.time_granularity_name,
+                    date_part=time_dimension_call_parameter_set.date_part,
+                ),
                 element_name=time_dimension_call_parameter_set.time_dimension_reference.element_name,
                 entity_links=time_dimension_call_parameter_set.entity_path,
                 time_granularity_name=time_dimension_call_parameter_set.time_granularity_name,

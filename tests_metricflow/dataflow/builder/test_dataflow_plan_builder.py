@@ -860,7 +860,11 @@ def test_join_to_time_spine_with_non_metric_time(  # noqa: D103
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings_fill_nulls_with_0"),),
             time_dimension_specs=(
-                TimeDimensionSpec(element_name="paid_at", entity_links=(EntityReference("booking"),)),
+                TimeDimensionSpec(
+                    element_name="paid_at",
+                    entity_links=(EntityReference("booking"),),
+                    time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
+                ),
             ),
         )
     )
@@ -966,7 +970,11 @@ def test_min_max_only_time(
     dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
         query_spec=MetricFlowQuerySpec(
             time_dimension_specs=(
-                TimeDimensionSpec(element_name="paid_at", entity_links=(EntityReference("booking"),)),
+                TimeDimensionSpec(
+                    element_name="paid_at",
+                    entity_links=(EntityReference("booking"),),
+                    time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
+                ),
             ),
             min_max_only=True,
         )

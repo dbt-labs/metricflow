@@ -142,6 +142,7 @@ def test_limit_rows(
             TimeDimensionSpec(
                 element_name="ds",
                 entity_links=(),
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
             ),
         ),
         limit=1,

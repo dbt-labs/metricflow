@@ -1929,8 +1929,8 @@ class DataflowPlanBuilder:
             time_dimension_specs,
             key=lambda spec: (
                 spec.date_part is not None,
-                spec.time_granularity.is_custom_granularity,
-                spec.time_granularity.base_granularity.to_int(),
+                spec.has_custom_grain,
+                spec.base_granularity_sort_key,
             ),
         )
 
@@ -1946,7 +1946,5 @@ class DataflowPlanBuilder:
         join_on_time_dimension_spec = DataSet.metric_time_dimension_spec(time_granularity=join_spec_grain)
         if not LinkableSpecSet(time_dimension_specs=required_time_spine_specs).contains_metric_time:
             sample_agg_time_dimension_spec = required_time_spine_specs[0]
-            join_on_time_dimension_spec = sample_agg_time_dimension_spec.with_grain_and_date_part(
-                time_granularity=join_spec_grain, date_part=None
-            )
+            join_on_time_dimension_spec = sample_agg_time_dimension_spec.with_grain(time_granularity=join_spec_grain)
         return join_on_time_dimension_spec
