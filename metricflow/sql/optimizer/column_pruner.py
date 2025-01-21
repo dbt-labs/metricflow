@@ -10,6 +10,7 @@ from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlPlanOptimizer
 from metricflow.sql.optimizer.tag_column_aliases import NodeToColumnAliasMapping
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
+    SqlCteAliasMapping,
     SqlCteNode,
     SqlPlanNode,
     SqlPlanNodeVisitor,
@@ -105,7 +106,7 @@ class SqlColumnPrunerOptimizer(SqlPlanOptimizer):
 
     def optimize(self, node: SqlPlanNode) -> SqlPlanNode:  # noqa: D102
         # ALl columns in the nearest SELECT node need to be kept as otherwise, the meaning of the query changes.
-        required_select_columns = node.nearest_select_columns({})
+        required_select_columns = node.nearest_select_columns(SqlCteAliasMapping())
 
         # Can't prune without knowing the structure of the query.
         if required_select_columns is None:
