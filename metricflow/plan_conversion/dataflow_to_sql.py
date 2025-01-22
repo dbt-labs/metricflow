@@ -1405,7 +1405,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         if queried_time_dimension_select_column:
             row_filter_group_bys += (queried_time_dimension_select_column,)
         # Construct SelectNode for Row filtering
-        row_filter_sql_select_node = SqlSelectStatementNode.create(
+        right_source_select_node = SqlSelectStatementNode.create(
             description=f"Filter row on {node.agg_by_function.name}({time_dimension_column_name})",
             select_columns=row_filter_group_bys + (time_dimension_select_column,),
             from_source=from_data_set.checked_sql_select_node,
@@ -1415,7 +1415,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
         join_data_set_alias = self._next_unique_table_alias()
         sql_join_desc = SqlPlanJoinBuilder.make_column_equality_sql_join_description(
-            right_source_node=row_filter_sql_select_node,
+            right_source_node=right_source_select_node,
             left_source_alias=from_data_set_alias,
             right_source_alias=join_data_set_alias,
             column_equality_descriptions=column_equality_descriptions,
