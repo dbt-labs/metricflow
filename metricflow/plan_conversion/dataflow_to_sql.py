@@ -1413,11 +1413,11 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             group_bys=row_filter_group_bys,
         )
 
-        join_data_set_alias = self._next_unique_table_alias()
+        right_source_alias = self._next_unique_table_alias()
         sql_join_desc = SqlPlanJoinBuilder.make_column_equality_sql_join_description(
             right_source_node=right_source_select_node,
             left_source_alias=from_data_set_alias,
-            right_source_alias=join_data_set_alias,
+            right_source_alias=right_source_alias,
             column_equality_descriptions=column_equality_descriptions,
             join_type=SqlJoinType.INNER,
         )
