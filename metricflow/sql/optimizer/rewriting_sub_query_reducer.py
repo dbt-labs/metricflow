@@ -216,6 +216,14 @@ class SqlRewritingSubQueryReducerVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
         if len(node.join_descs) > 0:
             return False
 
+        # If the parent node defines CTEs, don't reduce for simplicity. It's possible to improve this by keeping track
+        # of the CTE-alias mapping as the SQL plan is traversed and then allowing for reduction if there are no
+        # alias collisions (e.g. with other CTEs or the alias in the FROM clause).
+        from_clause_node = node.from_source.as_select_node
+        if from_clause_node is not None:
+            if len(from_clause_node.cte_sources) > 0:
+                return False
+
         # If the parent node is not a SELECT statement, then this can't be collapsed. e.g. with a table as a parent like
         # SELECT foo FROM bar
         from_source_node_as_select_node = node.from_source.as_select_node
@@ -598,7 +606,10 @@ class SqlRewritingSubQueryReducerVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
 
     @override
     def visit_cte_node(self, node: SqlCteNode) -> SqlPlanNode:
-        raise NotImplementedError
+        return SqlCteNode.create(
+            select_statement=node.accept(self),
+            cte_alias=node.cte_alias,
+        )
 
     def visit_select_statement_node(self, node: SqlSelectStatementNode) -> SqlPlanNode:  # noqa: D102
         node_with_reduced_parents = self._reduce_parents(node)

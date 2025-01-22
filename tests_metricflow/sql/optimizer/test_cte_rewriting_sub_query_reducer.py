@@ -4,6 +4,7 @@ import logging
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+from metricflow_semantics.formatting.formatting_helpers import mf_dedent
 from metricflow_semantics.sql.sql_exprs import (
     SqlColumnReference,
     SqlColumnReferenceExpression,
@@ -257,4 +258,73 @@ def test_reduce_cte_with_use_column_alias_in_group_bys(
         optimizer=sub_query_reducer,
         sql_plan_renderer=sql_plan_renderer,
         select_statement=base_select_statement_to_reduce,
+    )
+
+
+def test_cte_in_subquery_not_reduced(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_plan_renderer: DefaultSqlPlanRenderer,
+) -> None:
+    """This tests that in cases where there is a CTE defined in a sub-query, it is not reduced."""
+    from_sub_query_ctes = (
+        SqlCteNode.create(
+            cte_alias="cte_source",
+            select_statement=SqlSelectStatementNode.create(
+                description="CTE source",
+                select_columns=(
+                    SqlSelectColumn(
+                        expr=SqlColumnReferenceExpression.create(
+                            col_ref=SqlColumnReference(table_alias="test_table_alias", column_name="col_0")
+                        ),
+                        column_alias="cte_source__col_0",
+                    ),
+                ),
+                from_source=SqlTableNode.create(sql_table=SqlTable(schema_name="test_schema", table_name="test_table")),
+                from_source_alias="test_table_alias",
+            ),
+        ),
+    )
+
+    top_level_select = SqlSelectStatementNode.create(
+        description="top_level_select",
+        select_columns=(
+            SqlSelectColumn(
+                expr=SqlColumnReferenceExpression.create(
+                    col_ref=SqlColumnReference(table_alias="from_source_alias", column_name="from_source__col_0")
+                ),
+                column_alias="top_level__col_0",
+            ),
+        ),
+        from_source=SqlSelectStatementNode.create(
+            description="from_sub_query",
+            select_columns=(
+                SqlSelectColumn(
+                    expr=SqlColumnReferenceExpression.create(
+                        col_ref=SqlColumnReference(table_alias="from_source_alias", column_name="cte_source__col_0")
+                    ),
+                    column_alias="from_source__col_0",
+                ),
+            ),
+            from_source=SqlTableNode.create(sql_table=SqlTable(schema_name=None, table_name="cte_source")),
+            from_source_alias="from_source_alias",
+            cte_sources=from_sub_query_ctes,
+        ),
+        from_source_alias="from_source_alias",
+        cte_sources=(),
+    )
+
+    sub_query_reducer = SqlRewritingSubQueryReducer()
+    assert_optimizer_result_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        optimizer=sub_query_reducer,
+        sql_plan_renderer=sql_plan_renderer,
+        select_statement=top_level_select,
+        expectation_description=mf_dedent(
+            """
+            A sub-query containing CTEs should not result in the top-level query being merged with the sub-query. For
+            this case, the SQL should be the same before / after optimization.
+            """
+        ),
     )
