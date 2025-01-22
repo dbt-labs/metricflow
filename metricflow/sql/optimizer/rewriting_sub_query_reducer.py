@@ -218,7 +218,7 @@ class SqlRewritingSubQueryReducerVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
 
         # If the parent node defines CTEs, don't reduce for simplicity. It's possible to improve this by keeping track
         # of the CTE-alias mapping as the SQL plan is traversed and then allowing for reduction if there are no
-        # alias collections (e.g. with other CTEs or the alias in the FROM clause).
+        # alias collisions (e.g. with other CTEs or the alias in the FROM clause).
         from_clause_node = node.from_source.as_select_node
         if from_clause_node is not None:
             if len(from_clause_node.cte_sources) > 0:
