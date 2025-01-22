@@ -38,8 +38,12 @@ from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.sql.sql_exprs import (
+    SqlAddTimeExpression,
     SqlAggregateFunctionExpression,
+    SqlArithmeticExpression,
+    SqlArithmeticOperator,
     SqlBetweenExpression,
+    SqlCaseExpression,
     SqlColumnReference,
     SqlColumnReferenceExpression,
     SqlComparison,
@@ -50,8 +54,10 @@ from metricflow_semantics.sql.sql_exprs import (
     SqlFunction,
     SqlFunctionExpression,
     SqlGenerateUuidExpression,
+    SqlIntegerExpression,
     SqlLogicalExpression,
     SqlLogicalOperator,
+    SqlNullExpression,
     SqlRatioComputationExpression,
     SqlStringExpression,
     SqlStringLiteralExpression,
@@ -85,6 +91,7 @@ from metricflow.dataflow.nodes.join_to_custom_granularity import JoinToCustomGra
 from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataflow.nodes.min_max import MinMaxNode
+from metricflow.dataflow.nodes.offset_by_custom_granularity import OffsetByCustomGranularityNode
 from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
@@ -374,6 +381,10 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
     def _next_unique_table_alias(self) -> str:
         """Return the next unique table alias to use in generating queries."""
         return SequentialIdGenerator.create_next_id(StaticIdPrefix.SUB_QUERY).str_value
+
+    def _next_unique_cte_alias(self) -> str:
+        """Return the next unique CTE alias to use in generating queries."""
+        return SequentialIdGenerator.create_next_id(StaticIdPrefix.CTE).str_value
 
     # TODO: replace this with a dataflow plan node for cumulative metrics
     def _make_time_spine_data_set(
@@ -2018,6 +2029,275 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             ),
         )
 
+    def visit_offset_by_custom_granularity_node(self, node: OffsetByCustomGranularityNode) -> SqlDataSet:
+        """Builds a query to implement an offset window that uses a custom grain.
+
+        The query implements the offset window by offsetting the custom grain's base grain by the requested number of custom
+        grain periods. This offset column will later be joined to the non-offset base grain column in order to offset the
+        metric values. The query built by this node will look something like this:
+
+        WITH cte AS (
+          SELECT
+            ds AS ds__day
+            , martian_day AS ds__martian_day
+            , FIRST_VALUE(ds) OVER (PARTITION BY martian_day ORDER BY ds) AS ds__martian_day__first_value
+            , LAST_VALUE(ds) OVER (PARTITION BY martian_day ORDER BY ds) AS ds__martian_day__last_value
+            , ROW_NUMBER() OVER (PARTITION BY martian_day ORDER BY ds) AS ds__day__row_number
+          FROM mf_time_spine
+        )
+
+        SELECT
+          ds__day
+          , DATE_TRUNC('day', ds__day__lead) AS booking__ds__day  -- if standard grain was requested
+          , EXTRACT(year FROM ds__day__lead) AS metric_time__extract_year  -- if date part was requested
+        FROM (
+          SELECT
+            cte.ds__day AS ds__day
+            , CASE
+              WHEN ds__martian_day__first_value__offset + INTERVAL (ds__day__row_number - 1) day <= ds__martian_day__last_value__offset
+              THEN ds__martian_day__first_value__offset + INTERVAL (ds__day__row_number - 1) day
+              ELSE NULL
+            END AS ds__day__lead
+          FROM cte
+          INNER JOIN (
+            SELECT
+              ds__martian_day
+              , LEAD(ds__martian_day__first_value, 1) OVER (ORDER BY ds__martian_day) AS ds__martian_day__first_value__offset
+              , LEAD(ds__martian_day__last_value, 1) OVER (ORDER BY ds__martian_day) AS ds__martian_day__last_value__offset
+            FROM (
+              SELECT
+                ds__martian_day
+                , ds__martian_day__first_value
+                , ds__martian_day__last_value
+              FROM cte
+              GROUP BY
+                ds__martian_day
+                , ds__martian_day__first_value
+                , ds__martian_day__last_value
+            ) a
+          ) b
+          ON cte.ds__martian_day = b.ds__martian_day
+        )
+        """
+        time_spine_data_set = node.time_spine_node.accept(self)
+        time_spine_alias = self._next_unique_table_alias()
+        offset_window = node.offset_window
+        custom_grain_name = offset_window.granularity
+        base_grain = ExpandedTimeGranularity.from_time_granularity(
+            self._get_time_spine_for_custom_granularity(custom_grain_name).base_granularity
+        )
+        time_spine = self._get_time_spine_for_custom_granularity(custom_grain_name)
+        custom_grain_instance = time_spine_data_set.instance_from_time_dimension_grain_and_date_part(
+            time_granularity_name=custom_grain_name, date_part=None
+        )
+        custom_grain_column_name = custom_grain_instance.associated_column.column_name
+        base_grain_instance = time_spine_data_set.instance_from_time_dimension_grain_and_date_part(
+            time_granularity_name=time_spine.base_granularity.value, date_part=None
+        )
+        base_grain_column_name = base_grain_instance.associated_column.column_name
+
+        # Build columns that get start and end of the custom grain period.
+        # Ex: FIRST_VALUE(ds) OVER (PARTITION BY fiscal_quarter ORDER BY ds) AS ds__fiscal_quarter__first_value
+        new_select_columns: Tuple[SqlSelectColumn, ...] = ()
+        bounds_columns: Tuple[SqlSelectColumn, ...] = ()
+        bounds_instances: Tuple[TimeDimensionInstance, ...] = ()
+        custom_column_expr = SqlColumnReferenceExpression.from_table_and_column_names(
+            table_alias=time_spine_alias, column_name=custom_grain_column_name
+        )
+        base_column_expr = SqlColumnReferenceExpression.from_table_and_column_names(
+            table_alias=time_spine_alias, column_name=base_grain_column_name
+        )
+        for window_func in (SqlWindowFunction.FIRST_VALUE, SqlWindowFunction.LAST_VALUE):
+            bounds_instance = custom_grain_instance.with_new_spec(
+                new_spec=custom_grain_instance.spec.with_window_functions((window_func,)),
+                column_association_resolver=self._column_association_resolver,
+            )
+            select_column = SqlSelectColumn(
+                expr=SqlWindowFunctionExpression.create(
+                    sql_function=window_func,
+                    sql_function_args=(base_column_expr,),
+                    partition_by_args=(custom_column_expr,),
+                    order_by_args=(SqlWindowOrderByArgument(base_column_expr),),
+                ),
+                column_alias=bounds_instance.associated_column.column_name,
+            )
+            bounds_instances += (bounds_instance,)
+            bounds_columns += (select_column,)
+            new_select_columns += (select_column,)
+
+        # Build a column that tracks the row number for the base grain column within the custom grain period.
+        # This will be offset by 1 to represent the number of base grain periods since the start of the custom grain period.
+        # Ex: ROW_NUMBER() OVER (PARTITION BY fiscal_quarter ORDER BY ds) AS ds__day__row_number
+        row_number_column = SqlSelectColumn(
+            expr=SqlWindowFunctionExpression.create(
+                sql_function=SqlWindowFunction.ROW_NUMBER,
+                partition_by_args=(custom_column_expr,),
+                order_by_args=(SqlWindowOrderByArgument(base_column_expr),),
+            ),
+            column_alias=self._column_association_resolver.resolve_spec(
+                base_grain_instance.spec.with_window_functions((SqlWindowFunction.ROW_NUMBER,))
+            ).column_name,
+        )
+        new_select_columns += (row_number_column,)
+
+        # Built a CTE for the new select statement.
+        cte_alias = self._next_unique_cte_alias()
+        cte = SqlCteNode.create(
+            SqlSelectStatementNode.create(
+                description="Get Custom Granularity Bounds",
+                select_columns=time_spine_data_set.checked_sql_select_node.select_columns + new_select_columns,
+                from_source=time_spine_data_set.checked_sql_select_node,
+                from_source_alias=time_spine_alias,
+            ),
+            cte_alias=cte_alias,
+        )
+
+        # Create a subquery that gets unique rows for the custom grain and bounds columns.
+        # Ex: SELECT first_value, last_value, custom_grain FROM cte GROUP BY first_value, last_value, custom_grain
+        unique_rows_columns = tuple(
+            SqlSelectColumn.from_table_and_column_names(column_name=column_name, table_alias=cte_alias)
+            for column_name in ([custom_grain_column_name] + [col.column_alias for col in bounds_columns])
+        )
+        unique_rows_alias = self._next_unique_table_alias()
+        unique_rows_subquery = SqlSelectStatementNode.create(
+            description="Get Unique Rows for Custom Granularity Bounds",
+            select_columns=unique_rows_columns,
+            from_source=SqlTableNode.create(sql_table=SqlTable(schema_name=None, table_name=cte_alias)),
+            from_source_alias=cte_alias,
+            group_bys=unique_rows_columns,
+        )
+
+        # Build a subquery that offsets the first and last value columns.
+        # Ex: LEAD(ds__fiscal_quarter__first_value, 1) OVER (ORDER BY ds__fiscal_quarter) AS ds__fiscal_quarter__first_value__offset
+        custom_grain_column = SqlSelectColumn.from_table_and_column_names(
+            column_name=custom_grain_column_name, table_alias=unique_rows_alias
+        )
+        offset_bounds_columns: Tuple[SqlSelectColumn, ...] = ()
+        for i in range(len(bounds_columns)):
+            bounds_instance = bounds_instances[i]
+            bounds_column = bounds_columns[i]
+            offset_bounds_instance = bounds_instance.with_new_spec(
+                bounds_instance.spec.with_window_functions(
+                    (bounds_instance.spec.window_functions + (SqlWindowFunction.LEAD,))
+                ),
+                column_association_resolver=self._column_association_resolver,
+            )
+            offset_bounds_columns += (
+                SqlSelectColumn(
+                    expr=SqlWindowFunctionExpression.create(
+                        sql_function=SqlWindowFunction.LEAD,
+                        sql_function_args=(
+                            bounds_column.ref_with_new_table_alias(unique_rows_alias),
+                            SqlIntegerExpression.create(node.offset_window.count),
+                        ),
+                        order_by_args=(SqlWindowOrderByArgument(custom_grain_column.expr),),
+                    ),
+                    column_alias=offset_bounds_instance.associated_column.column_name,
+                ),
+            )
+        first_value_offset_column, last_value_offset_column = offset_bounds_columns
+        offset_bounds_subquery_alias = self._next_unique_table_alias()
+        offset_bounds_subquery = SqlSelectStatementNode.create(
+            description="Offset Custom Granularity Bounds",
+            select_columns=(custom_grain_column, first_value_offset_column, last_value_offset_column),
+            from_source=unique_rows_subquery,
+            from_source_alias=unique_rows_alias,
+        )
+
+        # Offset the base column by the requested window. If offset date is not within the offset grain period, use NULL. Ex:
+        # CASE
+        #   WHEN DATEADD(day, (ds__day__row_number - 1), ds__fiscal_quarter__first_value__offset)
+        #     <= ds__fiscal_quarter__last_value__offset
+        #   THEN DATEADD(day, (ds__day__row_number - 1), ds__fiscal_quarter__first_value__offset)
+        # ELSE NULL
+        offset_base_grain_expr = SqlAddTimeExpression.create(
+            arg=first_value_offset_column.ref_with_new_table_alias(offset_bounds_subquery_alias),
+            count_expr=SqlArithmeticExpression.create(
+                left_expr=row_number_column.ref_with_new_table_alias(cte_alias),
+                operator=SqlArithmeticOperator.SUBTRACT,
+                right_expr=SqlIntegerExpression.create(1),
+            ),
+            granularity=base_grain.base_granularity,
+        )
+        is_below_last_value_expr = SqlComparisonExpression.create(
+            left_expr=offset_base_grain_expr,
+            comparison=SqlComparison.LESS_THAN_OR_EQUALS,
+            right_expr=last_value_offset_column.ref_with_new_table_alias(offset_bounds_subquery_alias),
+        )
+        # LEAD isn't quite accurate here, but this will differentiate the offset instance (and column) from the original one.
+        offset_base_column_name = self._column_association_resolver.resolve_spec(
+            base_grain_instance.spec.with_window_functions((SqlWindowFunction.LEAD,))
+        ).column_name
+        offset_base_column = SqlSelectColumn(
+            expr=SqlCaseExpression.create(
+                when_to_then_exprs={is_below_last_value_expr: offset_base_grain_expr},
+                else_expr=SqlNullExpression.create(),
+            ),
+            column_alias=offset_base_column_name,
+        )
+        original_base_grain_column = SqlSelectColumn.from_table_and_column_names(
+            column_name=base_grain_column_name, table_alias=cte_alias
+        )
+        join_desc = SqlJoinDescription(
+            right_source=offset_bounds_subquery,
+            right_source_alias=offset_bounds_subquery_alias,
+            join_type=SqlJoinType.INNER,
+            on_condition=SqlComparisonExpression.create(
+                left_expr=custom_grain_column.ref_with_new_table_alias(cte_alias),
+                comparison=SqlComparison.EQUALS,
+                right_expr=custom_grain_column.ref_with_new_table_alias(offset_bounds_subquery_alias),
+            ),
+        )
+        offset_base_grain_subquery = SqlSelectStatementNode.create(
+            description=node.description,
+            select_columns=(original_base_grain_column, offset_base_column),
+            from_source=SqlTableNode.create(sql_table=SqlTable(schema_name=None, table_name=cte_alias)),
+            cte_sources=(cte,),
+            from_source_alias=cte_alias,
+            join_descs=(join_desc,),
+        )
+        offset_base_grain_subquery_alias = self._next_unique_table_alias()
+
+        # Apply standard grains & date parts requested in the query. Use base grain for any custom grains.
+        requested_instances: Tuple[TimeDimensionInstance, ...] = ()
+        requested_columns: Tuple[SqlSelectColumn, ...] = ()
+        offset_base_column_ref = offset_base_column.ref_with_new_table_alias(offset_base_grain_subquery_alias)
+        for spec in node.required_time_spine_specs:
+            new_instance = base_grain_instance.with_new_spec(
+                new_spec=spec, column_association_resolver=self._column_association_resolver
+            )
+            if spec.date_part:
+                expr: SqlExpressionNode = SqlExtractExpression.create(
+                    date_part=spec.date_part, arg=offset_base_column_ref
+                )
+            else:
+                assert (
+                    spec.time_granularity is not None
+                ), "Got no time granularity or date part for required time spine spec."
+                if spec.time_granularity.base_granularity == base_grain.base_granularity:
+                    expr = offset_base_column_ref
+                else:
+                    expr = SqlDateTruncExpression.create(
+                        time_granularity=spec.time_granularity.base_granularity, arg=offset_base_column_ref
+                    )
+            requested_columns += (SqlSelectColumn(expr=expr, column_alias=new_instance.associated_column.column_name),)
+            requested_instances += (new_instance,)
+
+        # Need to keep the non-offset base grain column in the output. This will be used to join to the metric source data set.
+        non_offset_base_grain_column = SqlSelectColumn.from_table_and_column_names(
+            column_name=base_grain_column_name, table_alias=offset_base_grain_subquery_alias
+        )
+
+        return SqlDataSet(
+            instance_set=InstanceSet(time_dimension_instances=(base_grain_instance,) + requested_instances),
+            sql_select_node=SqlSelectStatementNode.create(
+                description="Apply Requested Granularities",
+                select_columns=(non_offset_base_grain_column,) + requested_columns,
+                from_source=offset_base_grain_subquery,
+                from_source_alias=offset_base_grain_subquery_alias,
+            ),
+        )
+
 
 class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
     """Similar to `DataflowNodeToSqlSubqueryVisitor`, except that this converts specific nodes to CTEs.
@@ -2077,7 +2357,7 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
             return select_from_subquery_dataset
         logger.debug(LazyFormat("Handling node via new CTE", node=node))
 
-        cte_alias = node.node_id.id_str + "_cte"
+        cte_alias = f"{node.node_id.id_str}_{StaticIdPrefix.CTE.value}"
 
         if cte_alias in set(node.cte_alias for node in self._generated_cte_nodes):
             raise ValueError(
@@ -2212,6 +2492,12 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
     @override
     def visit_alias_specs_node(self, node: AliasSpecsNode) -> SqlDataSet:  # noqa: D102
         return self._default_handler(node=node, node_to_select_subquery_function=super().visit_alias_specs_node)
+
+    @override
+    def visit_offset_by_custom_granularity_node(self, node: OffsetByCustomGranularityNode) -> SqlDataSet:  # noqa: D102
+        return self._default_handler(
+            node=node, node_to_select_subquery_function=super().visit_offset_by_custom_granularity_node
+        )
 
 
 DataflowNodeT = TypeVar("DataflowNodeT", bound=DataflowPlanNode)
