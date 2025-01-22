@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Optional
 
 from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.mf_logging.formatting import indent
@@ -21,6 +22,7 @@ def assert_optimizer_result_snapshot_equal(
     optimizer: SqlPlanOptimizer,
     sql_plan_renderer: SqlPlanRenderer,
     select_statement: SqlSelectStatementNode,
+    expectation_description: Optional[str] = None,
 ) -> None:
     """Helper to assert that the SQL snapshot of the optimizer result is the same as the stored one."""
     sql_before_optimizing = sql_plan_renderer.render_sql_plan(SqlPlan(select_statement)).sql
@@ -58,4 +60,5 @@ def assert_optimizer_result_snapshot_equal(
         mf_test_configuration=mf_test_configuration,
         snapshot_id="result",
         snapshot_str=snapshot_str,
+        expectation_description=expectation_description,
     )

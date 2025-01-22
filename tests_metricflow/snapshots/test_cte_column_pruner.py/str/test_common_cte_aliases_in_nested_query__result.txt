@@ -1,0 +1,81 @@
+test_name: test_common_cte_aliases_in_nested_query
+test_filename: test_cte_column_pruner.py
+docstring:
+  Test the case where a CTE defined in the top-level SELECT has the same name as a CTE in a sub-query .
+expectation_description:
+  In the `from_sub_query`, there is a reference to `cte_source__col_0` in a CTE named `cte_source`. Since
+  `from_sub_query` redefines `cte_source`, the column pruner should retain that column in the CTE defined
+  in `from_sub_query` but remove the column from the CTE defined in `top_level_select`.
+---
+optimizer:
+  SqlColumnPrunerOptimizer
+
+sql_before_optimizing:
+  -- top_level_select
+  WITH cte_source AS (
+    -- CTE source
+    SELECT
+      test_table_alias.col_0 AS cte_source__col_0
+      , test_table_alias.col_1 AS cte_source__col_1
+    FROM test_schema.test_table test_table_alias
+  )
+
+  SELECT
+    from_source_alias.from_source__col_0 AS top_level__col_0
+    , right_source_alias.right_source__col_1 AS top_level__col_1
+  FROM (
+    -- from_sub_query
+    WITH cte_source AS (
+      -- CTE source
+      SELECT
+        test_table_alias.col_0 AS cte_source__col_0
+        , test_table_alias.col_1 AS cte_source__col_1
+      FROM test_schema.test_table test_table_alias
+    )
+
+    SELECT
+      from_source_alias.cte_source__col_0 AS from_source__col_0
+    FROM cte_source from_source_alias
+  ) from_source_alias
+  INNER JOIN (
+    -- joined_sub_query
+    SELECT
+      from_source_alias.cte_source__col_1 AS right_source__col_1
+    FROM cte_source from_source_alias
+  ) right_source_alias
+  ON
+    from_source_alias.from_source__col_0 = right_source_alias.right_source__col_1
+
+sql_after_optimizing:
+  -- top_level_select
+  WITH cte_source AS (
+    -- CTE source
+    SELECT
+      test_table_alias.col_1 AS cte_source__col_1
+    FROM test_schema.test_table test_table_alias
+  )
+
+  SELECT
+    from_source_alias.from_source__col_0 AS top_level__col_0
+    , right_source_alias.right_source__col_1 AS top_level__col_1
+  FROM (
+    -- from_sub_query
+    WITH cte_source AS (
+      -- CTE source
+      SELECT
+        test_table_alias.col_0 AS cte_source__col_0
+      FROM test_schema.test_table test_table_alias
+    )
+
+    SELECT
+      from_source_alias.cte_source__col_0 AS from_source__col_0
+    FROM cte_source from_source_alias
+  ) from_source_alias
+  INNER JOIN (
+    -- joined_sub_query
+    SELECT
+      from_source_alias.cte_source__col_1 AS right_source__col_1
+    FROM cte_source from_source_alias
+  ) right_source_alias
+  ON
+    from_source_alias.from_source__col_0 = right_source_alias.right_source__col_1
