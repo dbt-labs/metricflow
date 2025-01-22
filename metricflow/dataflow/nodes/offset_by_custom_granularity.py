@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC
 from dataclasses import dataclass
-from typing import Optional, Sequence
+from typing import Sequence
 
 from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
@@ -12,36 +12,31 @@ from metricflow_semantics.visitor import VisitorOutputT
 
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode
 from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
-from metricflow.dataflow.nodes.custom_granularity_bounds import CustomGranularityBoundsNode
-from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 
 
 @dataclass(frozen=True, eq=False)
 class OffsetByCustomGranularityNode(DataflowPlanNode, ABC):
     """For a given custom grain, offset its base grain by the requested number of custom grain periods.
 
-    Only accepts CustomGranularityBoundsNode as parent node.
+    Only accepts DataflowPlanNode as parent node.
     """
 
     offset_window: MetricTimeWindow
     required_time_spine_specs: Sequence[TimeDimensionSpec]
-    custom_granularity_bounds_node: CustomGranularityBoundsNode
-    filter_elements_node: FilterElementsNode
+    time_spine_node: DataflowPlanNode
 
     def __post_init__(self) -> None:  # noqa: D105
         super().__post_init__()
 
     @staticmethod
     def create(  # noqa: D102
-        custom_granularity_bounds_node: CustomGranularityBoundsNode,
-        filter_elements_node: FilterElementsNode,
+        time_spine_node: DataflowPlanNode,
         offset_window: MetricTimeWindow,
         required_time_spine_specs: Sequence[TimeDimensionSpec],
     ) -> OffsetByCustomGranularityNode:
         return OffsetByCustomGranularityNode(
-            parent_nodes=(custom_granularity_bounds_node, filter_elements_node),
-            custom_granularity_bounds_node=custom_granularity_bounds_node,
-            filter_elements_node=filter_elements_node,
+            parent_nodes=(time_spine_node,),
+            time_spine_node=time_spine_node,
             offset_window=offset_window,
             required_time_spine_specs=required_time_spine_specs,
         )
@@ -74,22 +69,10 @@ class OffsetByCustomGranularityNode(DataflowPlanNode, ABC):
     def with_new_parents(  # noqa: D102
         self, new_parent_nodes: Sequence[DataflowPlanNode]
     ) -> OffsetByCustomGranularityNode:
-        custom_granularity_bounds_node: Optional[CustomGranularityBoundsNode] = None
-        filter_elements_node: Optional[FilterElementsNode] = None
-        for parent_node in new_parent_nodes:
-            if isinstance(parent_node, CustomGranularityBoundsNode):
-                custom_granularity_bounds_node = parent_node
-            elif isinstance(parent_node, FilterElementsNode):
-                filter_elements_node = parent_node
-        assert custom_granularity_bounds_node and filter_elements_node, (
-            "Can't rewrite OffsetByCustomGranularityNode because the node requires a CustomGranularityBoundsNode and a "
-            f"FilterElementsNode as parents. Instead, got: {new_parent_nodes}"
-        )
-
+        assert len(new_parent_nodes) == 1
         return OffsetByCustomGranularityNode(
             parent_nodes=tuple(new_parent_nodes),
-            custom_granularity_bounds_node=custom_granularity_bounds_node,
-            filter_elements_node=filter_elements_node,
+            time_spine_node=new_parent_nodes[0],
             offset_window=self.offset_window,
             required_time_spine_specs=self.required_time_spine_specs,
         )

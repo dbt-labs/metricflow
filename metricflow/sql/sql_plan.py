@@ -112,6 +112,15 @@ class SqlSelectColumn:
             column_alias=column_name,
         )
 
+    def ref_with_new_table_alias(self, new_table_alias: str) -> SqlColumnReferenceExpression:
+        """Return a column reference expression for this column with a new table alias.
+
+        Useful when you already have access to the select column from a subquery and want to reference it in an outer query.
+        """
+        return SqlColumnReferenceExpression.from_table_and_column_names(
+            column_name=self.column_alias, table_alias=new_table_alias
+        )
+
 
 @dataclass(frozen=True)
 class SqlJoinDescription:

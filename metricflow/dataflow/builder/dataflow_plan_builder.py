@@ -54,7 +54,6 @@ from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.specs.where_filter.where_filter_spec_set import WhereFilterSpecSet
 from metricflow_semantics.specs.where_filter.where_filter_transform import WhereSpecFactory
-from metricflow_semantics.sql.sql_exprs import SqlWindowFunction
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.time.dateutil_adjuster import DateutilTimePeriodAdjuster
@@ -85,7 +84,6 @@ from metricflow.dataflow.nodes.alias_specs import AliasSpecsNode, SpecToAlias
 from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
 from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
-from metricflow.dataflow.nodes.custom_granularity_bounds import CustomGranularityBoundsNode
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
 from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
@@ -1951,29 +1949,8 @@ class DataflowPlanBuilder:
         if {spec.time_granularity for spec in required_time_spine_specs} == {custom_grain}:
             # TODO: If querying with only the same grain as is used in the offset_window, can use a simpler plan.
             pass
-        # For custom offset windows queried with other granularities, first, build CustomGranularityBoundsNode.
-        # This will be used twice in the output node, and ideally will be turned into a CTE.
-        bounds_node = CustomGranularityBoundsNode.create(
-            parent_node=time_spine_read_node, custom_granularity_name=custom_grain.name
-        )
-        # Build a FilterElementsNode from bounds node to get required unique rows.
-        bounds_data_set = self._node_data_set_resolver.get_output_data_set(bounds_node)
-        bounds_specs = tuple(
-            bounds_data_set.instance_from_window_function(window_func).spec
-            for window_func in (SqlWindowFunction.FIRST_VALUE, SqlWindowFunction.LAST_VALUE)
-        )
-        custom_grain_spec = bounds_data_set.instance_from_time_dimension_grain_and_date_part(
-            time_granularity_name=custom_grain.name, date_part=None
-        ).spec
-        filter_elements_node = FilterElementsNode.create(
-            parent_node=bounds_node,
-            include_specs=InstanceSpecSet(time_dimension_specs=(custom_grain_spec,) + bounds_specs),
-            distinct=True,
-        )
-        # Pass both the CustomGranularityBoundsNode and the FilterElementsNode into the OffsetByCustomGranularityNode.
         return OffsetByCustomGranularityNode.create(
-            custom_granularity_bounds_node=bounds_node,
-            filter_elements_node=filter_elements_node,
+            time_spine_node=time_spine_read_node,
             offset_window=offset_window,
             required_time_spine_specs=required_time_spine_specs,
         )

@@ -23,7 +23,6 @@ from metricflow.dataflow.nodes.alias_specs import AliasSpecsNode
 from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
 from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
-from metricflow.dataflow.nodes.custom_granularity_bounds import CustomGranularityBoundsNode
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
 from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
@@ -472,11 +471,6 @@ class PredicatePushdownOptimizer(
         raise NotImplementedError
 
     def visit_alias_specs_node(self, node: AliasSpecsNode) -> OptimizeBranchResult:  # noqa: D102
-        raise NotImplementedError
-
-    def visit_custom_granularity_bounds_node(  # noqa: D102
-        self, node: CustomGranularityBoundsNode
-    ) -> OptimizeBranchResult:
         raise NotImplementedError
 
     def visit_offset_by_custom_granularity_node(  # noqa: D102

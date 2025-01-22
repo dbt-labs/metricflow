@@ -561,6 +561,12 @@ class SqlColumnReferenceExpression(SqlExpressionNode):
     def from_table_and_column_names(table_alias: str, column_name: str) -> SqlColumnReferenceExpression:  # noqa: D102
         return SqlColumnReferenceExpression.create(SqlColumnReference(table_alias=table_alias, column_name=column_name))
 
+    def with_new_table_alias(self, new_table_alias: str) -> SqlColumnReferenceExpression:
+        """Returns a new column reference expression with the same column name but a new table alias."""
+        return SqlColumnReferenceExpression.from_table_and_column_names(
+            table_alias=new_table_alias, column_name=self.col_ref.column_name
+        )
+
 
 @dataclass(frozen=True, eq=False)
 class SqlColumnAliasReferenceExpression(SqlExpressionNode):

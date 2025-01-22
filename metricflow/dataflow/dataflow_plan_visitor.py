@@ -15,7 +15,6 @@ if typing.TYPE_CHECKING:
     from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
     from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
     from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
-    from metricflow.dataflow.nodes.custom_granularity_bounds import CustomGranularityBoundsNode
     from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
     from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
     from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
@@ -129,10 +128,6 @@ class DataflowPlanNodeVisitor(Generic[VisitorOutputT], ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def visit_custom_granularity_bounds_node(self, node: CustomGranularityBoundsNode) -> VisitorOutputT:  # noqa: D102
-        raise NotImplementedError
-
-    @abstractmethod
     def visit_offset_by_custom_granularity_node(  # noqa: D102
         self, node: OffsetByCustomGranularityNode
     ) -> VisitorOutputT:
@@ -233,10 +228,6 @@ class DataflowPlanNodeVisitorWithDefaultHandler(DataflowPlanNodeVisitor[VisitorO
 
     @override
     def visit_alias_specs_node(self, node: AliasSpecsNode) -> VisitorOutputT:  # noqa: D102
-        return self._default_handler(node)
-
-    @override
-    def visit_custom_granularity_bounds_node(self, node: CustomGranularityBoundsNode) -> VisitorOutputT:  # noqa: D102
         return self._default_handler(node)
 
     @override

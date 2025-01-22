@@ -111,7 +111,7 @@ class CheckQueryHelpers:
             count_expr=SqlStringExpression.create(sql_expr=count_column, requires_parenthesis=False),
             granularity=granularity,
         )
-        return self._sql_client.sql_query_plan_renderer.expr_renderer.render_sql_expr(expr).sql
+        return self._sql_client.sql_plan_renderer.expr_renderer.render_sql_expr(expr).sql
 
     def render_date_trunc(self, expr: str, granularity: TimeGranularity) -> str:
         """Return the DATE_TRUNC() call that can be used for converting the given expr to the granularity."""
