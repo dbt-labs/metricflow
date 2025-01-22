@@ -5,6 +5,7 @@ import logging
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from typing_extensions import override
 
+from metricflow.sql.optimizer.cte_mapping_lookup_builder import SqlCteAliasMappingLookupBuilderVisitor
 from metricflow.sql.optimizer.required_column_aliases import SqlMapRequiredColumnAliasesVisitor
 from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlPlanOptimizer
 from metricflow.sql.optimizer.tag_column_aliases import NodeToColumnAliasMapping
@@ -119,8 +120,13 @@ class SqlColumnPrunerOptimizer(SqlPlanOptimizer):
             )
             return node
 
+        cte_alias_mapping_builder = SqlCteAliasMappingLookupBuilderVisitor()
+        node.accept(cte_alias_mapping_builder)
+        cte_alias_mapping_lookup = cte_alias_mapping_builder.cte_alias_mapping_lookup
+
         map_required_column_aliases_visitor = SqlMapRequiredColumnAliasesVisitor(
             start_node=node,
+            cte_alias_mapping_lookup=cte_alias_mapping_lookup,
             required_column_aliases_in_start_node=frozenset(
                 [select_column.column_alias for select_column in required_select_columns]
             ),
