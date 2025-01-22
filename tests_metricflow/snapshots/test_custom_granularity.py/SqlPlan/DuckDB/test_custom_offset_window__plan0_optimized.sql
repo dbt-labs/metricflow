@@ -16,14 +16,37 @@ FROM (
     , SUM(subq_13.bookings) AS bookings
   FROM (
     -- Offset Base Granularity By Custom Granularity Period(s)
+    WITH cte_6 AS (
+      -- Read From Time Spine 'mf_time_spine'
+      -- Get Custom Granularity Bounds
+      SELECT
+        ds AS ds__day
+        , martian_day AS ds__martian_day
+        , FIRST_VALUE(ds) OVER (
+          PARTITION BY martian_day
+          ORDER BY ds
+          ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+        ) AS ds__martian_day__first_value
+        , LAST_VALUE(ds) OVER (
+          PARTITION BY martian_day
+          ORDER BY ds
+          ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+        ) AS ds__martian_day__last_value
+        , ROW_NUMBER() OVER (
+          PARTITION BY martian_day
+          ORDER BY ds
+        ) AS ds__day__row_number
+      FROM ***************************.mf_time_spine time_spine_src_28006
+    )
+
     SELECT
-      time_spine_src_28006.ds AS ds__day
+      cte_6.ds__day AS ds__day
       , CASE
-        WHEN subq_16.ds__martian_day__first_value__offset + INTERVAL (subq_14.ds__day__row_number - 1) day <= subq_16.ds__martian_day__last_value__offset
-          THEN subq_16.ds__martian_day__first_value__offset + INTERVAL (subq_14.ds__day__row_number - 1) day
+        WHEN subq_16.ds__martian_day__first_value__offset + INTERVAL (cte_6.ds__day__row_number - 1) day <= subq_16.ds__martian_day__last_value__offset
+          THEN subq_16.ds__martian_day__first_value__offset + INTERVAL (cte_6.ds__day__row_number - 1) day
         ELSE NULL
       END AS ds__day__lead
-    FROM ***************************.mf_time_spine time_spine_src_28006
+    FROM cte_6 cte_6
     INNER JOIN (
       -- Offset Custom Granularity Bounds
       SELECT
@@ -32,28 +55,10 @@ FROM (
         , LEAD(ds__martian_day__last_value, 1) OVER (ORDER BY ds__martian_day) AS ds__martian_day__last_value__offset
       FROM (
         -- Get Unique Rows for Custom Granularity Bounds
-        WITH cte_6 AS (
-          -- Read From Time Spine 'mf_time_spine'
-          -- Get Custom Granularity Bounds
-          SELECT
-            martian_day AS ds__martian_day
-            , FIRST_VALUE(ds) OVER (
-              PARTITION BY martian_day
-              ORDER BY ds
-              ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-            ) AS ds__martian_day__first_value
-            , LAST_VALUE(ds) OVER (
-              PARTITION BY martian_day
-              ORDER BY ds
-              ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-            ) AS ds__martian_day__last_value
-          FROM ***************************.mf_time_spine time_spine_src_28006
-        )
-
         SELECT
-          ds__martian_day AS ds__martian_day
-          , ds__martian_day__first_value AS ds__martian_day__first_value
-          , ds__martian_day__last_value AS ds__martian_day__last_value
+          ds__martian_day
+          , ds__martian_day__first_value
+          , ds__martian_day__last_value
         FROM cte_6 cte_6
         GROUP BY
           ds__martian_day

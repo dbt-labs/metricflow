@@ -2164,7 +2164,6 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             description="Get Unique Rows for Custom Granularity Bounds",
             select_columns=unique_rows_columns,
             from_source=SqlTableNode.create(sql_table=SqlTable(schema_name=None, table_name=cte_alias)),
-            cte_sources=(cte,),
             from_source_alias=cte_alias,
             group_bys=unique_rows_columns,
         )
@@ -2205,7 +2204,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         offset_base_grain_expr = SqlAddTimeExpression.create(
             arg=first_value_offset_column.ref_with_new_table_alias(offset_bounds_subquery_alias),
             count_expr=SqlArithmeticExpression.create(
-                left_expr=row_number_column.ref_with_new_table_alias(time_spine_alias),
+                left_expr=row_number_column.ref_with_new_table_alias(cte_alias),
                 operator=SqlArithmeticOperator.SUBTRACT,
                 right_expr=SqlIntegerExpression.create(1),
             ),
@@ -2228,7 +2227,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             column_alias=offset_base_column_name,
         )
         original_base_grain_column = SqlSelectColumn.from_table_and_column_names(
-            column_name=base_grain_column_name, table_alias=time_spine_alias
+            column_name=base_grain_column_name, table_alias=cte_alias
         )
         join_desc = SqlJoinDescription(
             right_source=offset_bounds_subquery,
@@ -2243,8 +2242,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         offset_base_grain_subquery = SqlSelectStatementNode.create(
             description=node.description,
             select_columns=(original_base_grain_column, offset_base_column),
-            from_source=time_spine_data_set.checked_sql_select_node,
-            from_source_alias=time_spine_alias,
+            from_source=SqlTableNode.create(sql_table=SqlTable(schema_name=None, table_name=cte_alias)),
+            cte_sources=(cte,),
+            from_source_alias=cte_alias,
             join_descs=(join_desc,),
         )
         offset_base_grain_subquery_alias = self._next_unique_table_alias()
