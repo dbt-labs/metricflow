@@ -533,7 +533,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             # `ReadSqlSourceNode` may be used multiple times in the plan, create a copy of the SELECT.
             # `SqlColumnPrunerOptimizer` relies on this assumption to keep track of what columns are required at each
             # node.
-            sql_select_node=node.data_set.checked_sql_select_node.create_copy(),
+            sql_select_node=node.data_set.checked_sql_select_node.copy(),
             instance_set=node.data_set.instance_set,
         )
 
