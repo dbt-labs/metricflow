@@ -1408,7 +1408,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         right_source_select_node = SqlSelectStatementNode.create(
             description=f"Filter row on {node.agg_by_function.name}({time_dimension_column_name})",
             select_columns=row_filter_group_bys + (time_dimension_select_column,),
-            from_source=from_data_set.checked_sql_select_node,
+            from_source=from_data_set.checked_sql_select_node.copy(),
             from_source_alias=inner_join_data_set_alias,
             group_bys=row_filter_group_bys,
         )
