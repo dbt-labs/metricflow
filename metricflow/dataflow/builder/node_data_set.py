@@ -58,7 +58,7 @@ class DataflowPlanNodeOutputDataSetResolver:
     it's the same problem as doing a single-hop join. This simplifies the join resolution logic, though now the input
     to NodeEvaluatorForLinkableInstances needs to contain nodes that include all possible multi-hop joins.
 
-    The logic to figure the dataset output by a node is the same as DataflowToSqlQueryPlanConverter because the same
+    The logic to figure the dataset output by a node is the same as DataflowToSqlPlanConverter because the same
     information is needed for generating SQL queries, so inheriting from that. We may want to look later at making
     another class to have better separation of concerns.
     """
