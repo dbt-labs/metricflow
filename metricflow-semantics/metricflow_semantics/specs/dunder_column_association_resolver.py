@@ -55,8 +55,8 @@ class DunderColumnAssociationResolverVisitor(InstanceSpecVisitor[ColumnAssociati
                 else ""
             )
             + (
-                f"{DUNDER}{time_dimension_spec.window_function.value.lower()}"
-                if time_dimension_spec.window_function
+                f"{DUNDER}{DUNDER.join([window_function.value.lower() for window_function in time_dimension_spec.window_functions])}"
+                if time_dimension_spec.window_functions
                 else ""
             )
         )

@@ -93,7 +93,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
     # Used for semi-additive joins. Some more thought is needed, but this may be useful in InstanceSpec.
     aggregation_state: Optional[AggregationState] = None
 
-    window_function: Optional[SqlWindowFunction] = None
+    window_functions: Tuple[SqlWindowFunction, ...] = ()
 
     def __post_init__(self) -> None:
         """Ensure that exactly one time granularity or date part is set."""
@@ -126,7 +126,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
             time_granularity=self.time_granularity,
             date_part=self.date_part,
             aggregation_state=self.aggregation_state,
-            window_function=self.window_function,
+            window_functions=self.window_functions,
         )
 
     @property
@@ -137,7 +137,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
             date_part=self.date_part,
             entity_links=(),
             aggregation_state=self.aggregation_state,
-            window_function=self.window_function,
+            window_functions=self.window_functions,
         )
 
     @property
@@ -177,7 +177,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
             entity_links=self.entity_links,
             time_granularity=time_granularity,
             aggregation_state=self.aggregation_state,
-            window_function=self.window_function,
+            window_functions=self.window_functions,
         )
 
     def with_base_grain(self) -> TimeDimensionSpec:  # noqa: D102
@@ -189,7 +189,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
             ),
             date_part=self.date_part,
             aggregation_state=self.aggregation_state,
-            window_function=self.window_function,
+            window_functions=self.window_functions,
         )
 
     def with_aggregation_state(self, aggregation_state: AggregationState) -> TimeDimensionSpec:  # noqa: D102
@@ -199,17 +199,17 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
             time_granularity=self.time_granularity,
             date_part=self.date_part,
             aggregation_state=aggregation_state,
-            window_function=self.window_function,
+            window_functions=self.window_functions,
         )
 
-    def with_window_function(self, window_function: SqlWindowFunction) -> TimeDimensionSpec:  # noqa: D102
+    def with_window_functions(self, window_functions: Tuple[SqlWindowFunction, ...]) -> TimeDimensionSpec:  # noqa: D102
         return TimeDimensionSpec(
             element_name=self.element_name,
             entity_links=self.entity_links,
             time_granularity=self.time_granularity,
             date_part=self.date_part,
             aggregation_state=self.aggregation_state,
-            window_function=window_function,
+            window_functions=window_functions,
         )
 
     def comparison_key(self, exclude_fields: Sequence[TimeDimensionSpecField] = ()) -> TimeDimensionSpecComparisonKey:
@@ -267,7 +267,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
             time_granularity=self.time_granularity,
             date_part=self.date_part,
             aggregation_state=self.aggregation_state,
-            window_function=self.window_function,
+            window_functions=self.window_functions,
         )
 
     @staticmethod

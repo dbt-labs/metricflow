@@ -527,7 +527,7 @@ class SemanticModelToDataSetConverter:
             time_granularity=ExpandedTimeGranularity.from_time_granularity(base_granularity),
         )
         time_dimension_instances.append(base_time_dimension_instance)
-        base_dimension_select_expr = SqlColumnReferenceExpression.from_table_and_column_names(
+        base_dimension_select_expr = SqlColumnReferenceExpression.from_column_reference(
             table_alias=from_source_alias, column_name=base_column_name
         )
         base_select_column = SqlSelectColumn(
