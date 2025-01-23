@@ -34,23 +34,30 @@ FROM (
   SELECT
     cte_2.ds__day AS ds__day
     , CASE
-      WHEN LEAD(subq_5.ds__martian_day__first_value, 3) OVER (ORDER BY subq_5.ds__martian_day) + INTERVAL (cte_2.ds__day__row_number - 1) day <= LEAD(subq_5.ds__martian_day__last_value, 3) OVER (ORDER BY subq_5.ds__martian_day)
-        THEN LEAD(subq_5.ds__martian_day__first_value, 3) OVER (ORDER BY subq_5.ds__martian_day) + INTERVAL (cte_2.ds__day__row_number - 1) day
+      WHEN subq_6.ds__martian_day__first_value__lead + INTERVAL (cte_2.ds__day__row_number - 1) day <= subq_6.ds__martian_day__last_value__lead
+        THEN subq_6.ds__martian_day__first_value__lead + INTERVAL (cte_2.ds__day__row_number - 1) day
       ELSE NULL
     END AS ds__day__lead
   FROM cte_2 cte_2
   INNER JOIN (
-    -- Get Unique Rows for Custom Granularity Bounds
+    -- Offset Custom Granularity Bounds
     SELECT
       ds__martian_day
-      , ds__martian_day__first_value
-      , ds__martian_day__last_value
-    FROM cte_2 cte_2
-    GROUP BY
-      ds__martian_day
-      , ds__martian_day__first_value
-      , ds__martian_day__last_value
-  ) subq_5
+      , LEAD(ds__martian_day__first_value, 3) OVER (ORDER BY ds__martian_day) AS ds__martian_day__first_value__lead
+      , LEAD(ds__martian_day__last_value, 3) OVER (ORDER BY ds__martian_day) AS ds__martian_day__last_value__lead
+    FROM (
+      -- Get Unique Rows for Custom Granularity Bounds
+      SELECT
+        ds__martian_day
+        , ds__martian_day__first_value
+        , ds__martian_day__last_value
+      FROM cte_2 cte_2
+      GROUP BY
+        ds__martian_day
+        , ds__martian_day__first_value
+        , ds__martian_day__last_value
+    ) subq_5
+  ) subq_6
   ON
-    cte_2.ds__martian_day = subq_5.ds__martian_day
+    cte_2.ds__martian_day = subq_6.ds__martian_day
 ) subq_7
