@@ -37,9 +37,7 @@ FROM (
     FROM (
       -- Read From CTE For node_id=ctr_0
       SELECT
-        metric_time__day
-        , ctr_0_cte.user
-        , visit__referrer_id
+        visit__referrer_id
         , visits
       FROM ctr_0_cte ctr_0_cte
     ) subq_21
