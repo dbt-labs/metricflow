@@ -17,8 +17,8 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 
 from metricflow.sql.optimizer.rewriting_sub_query_reducer import SqlRewritingSubQueryReducer
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlPlanRenderer, SqlPlanRenderer
+from metricflow.sql.sql_cte_node import SqlCteNode
 from metricflow.sql.sql_plan import (
-    SqlCteNode,
     SqlSelectColumn,
 )
 from metricflow.sql.sql_select_node import SqlJoinDescription, SqlSelectStatementNode

@@ -9,7 +9,8 @@ from metricflow_semantics.sql.sql_exprs import SqlExpressionNode
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.visitor import VisitorOutputT
 
-from metricflow.sql.sql_plan import SqlCteAliasMapping, SqlCteNode, SqlPlanNode, SqlPlanNodeVisitor, SqlSelectColumn
+from metricflow.sql.sql_cte_node import SqlCteAliasMapping, SqlCteNode
+from metricflow.sql.sql_plan import SqlPlanNode, SqlPlanNodeVisitor, SqlSelectColumn
 from metricflow.sql.sql_table_node import SqlTableNode
 
 

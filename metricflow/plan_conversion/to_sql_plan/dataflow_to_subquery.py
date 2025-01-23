@@ -118,8 +118,8 @@ from metricflow.plan_conversion.spec_transforms import (
 )
 from metricflow.plan_conversion.to_sql_plan.sql_join_builder import ColumnEqualityDescription, SqlPlanJoinBuilder
 from metricflow.sql.sql_ctas_node import SqlCreateTableAsNode
+from metricflow.sql.sql_cte_node import SqlCteNode
 from metricflow.sql.sql_plan import (
-    SqlCteNode,
     SqlSelectColumn,
 )
 from metricflow.sql.sql_select_node import SqlJoinDescription, SqlOrderByDescription, SqlSelectStatementNode

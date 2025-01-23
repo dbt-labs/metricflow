@@ -10,9 +10,8 @@ from metricflow.sql.optimizer.required_column_aliases import SqlMapRequiredColum
 from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlPlanOptimizer
 from metricflow.sql.optimizer.tag_column_aliases import NodeToColumnAliasMapping
 from metricflow.sql.sql_ctas_node import SqlCreateTableAsNode
+from metricflow.sql.sql_cte_node import SqlCteAliasMapping, SqlCteNode
 from metricflow.sql.sql_plan import (
-    SqlCteAliasMapping,
-    SqlCteNode,
     SqlPlanNode,
     SqlPlanNodeVisitor,
 )

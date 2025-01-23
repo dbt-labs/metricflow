@@ -14,8 +14,8 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 
 from metricflow.sql.optimizer.table_alias_simplifier import SqlTableAliasSimplifier
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlPlanRenderer
+from metricflow.sql.sql_cte_node import SqlCteNode
 from metricflow.sql.sql_plan import (
-    SqlCteNode,
     SqlSelectColumn,
 )
 from metricflow.sql.sql_select_node import SqlJoinDescription, SqlSelectStatementNode

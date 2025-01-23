@@ -19,8 +19,8 @@ from typing_extensions import override
 
 from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlPlanOptimizer
 from metricflow.sql.sql_ctas_node import SqlCreateTableAsNode
+from metricflow.sql.sql_cte_node import SqlCteNode
 from metricflow.sql.sql_plan import (
-    SqlCteNode,
     SqlPlanNode,
     SqlPlanNodeVisitor,
     SqlSelectColumn,

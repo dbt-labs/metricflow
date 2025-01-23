@@ -7,7 +7,8 @@ from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.visitor import VisitorOutputT
 
-from metricflow.sql.sql_plan import SqlCteAliasMapping, SqlPlanNode, SqlPlanNodeVisitor, SqlSelectColumn
+from metricflow.sql.sql_cte_node import SqlCteAliasMapping
+from metricflow.sql.sql_plan import SqlPlanNode, SqlPlanNodeVisitor, SqlSelectColumn
 from metricflow.sql.sql_select_node import SqlSelectStatementNode
 from metricflow.sql.sql_table_node import SqlTableNode
 

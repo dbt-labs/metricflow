@@ -13,8 +13,8 @@ from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
+from metricflow.sql.sql_cte_node import SqlCteNode
 from metricflow.sql.sql_plan import (
-    SqlCteNode,
     SqlSelectColumn,
 )
 from metricflow.sql.sql_select_node import SqlJoinDescription, SqlSelectStatementNode

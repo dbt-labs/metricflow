@@ -5,7 +5,7 @@ from typing import Dict
 
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 
-from metricflow.sql.sql_plan import SqlCteAliasMapping
+from metricflow.sql.sql_cte_node import SqlCteAliasMapping
 from metricflow.sql.sql_select_node import SqlSelectStatementNode
 
 logger = logging.getLogger(__name__)

@@ -19,8 +19,8 @@ from metricflow.sql.render.expr_renderer import (
 )
 from metricflow.sql.render.rendering_constants import SqlRenderingConstants
 from metricflow.sql.sql_ctas_node import SqlCreateTableAsNode
+from metricflow.sql.sql_cte_node import SqlCteNode
 from metricflow.sql.sql_plan import (
-    SqlCteNode,
     SqlPlan,
     SqlPlanNode,
     SqlPlanNodeVisitor,
