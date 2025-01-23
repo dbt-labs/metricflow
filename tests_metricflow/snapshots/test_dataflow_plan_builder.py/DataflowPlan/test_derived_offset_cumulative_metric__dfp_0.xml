@@ -49,7 +49,7 @@ test_filename: test_dataflow_plan_builder.py
                             <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                             <!--   )                                                                             -->
                             <!-- join_type = INNER -->
-                            <!-- offset_window = PydanticMetricTimeWindow(count=2, granularity='day') -->
+                            <!-- standard_offset_window = PydanticMetricTimeWindow(count=2, granularity='day') -->
                             <JoinOverTimeRangeNode>
                                 <!-- description = 'Join Self Over Time Range' -->
                                 <!-- node_id = NodeId(id_str='jotr_0') -->

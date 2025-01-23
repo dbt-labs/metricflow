@@ -181,7 +181,7 @@ docstring:
                                     <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                                     <!--   )                                                                             -->
                                     <!-- join_type = INNER -->
-                                    <!-- offset_window = PydanticMetricTimeWindow(count=1, granularity='week') -->
+                                    <!-- standard_offset_window = PydanticMetricTimeWindow(count=1, granularity='week') -->
                                     <MetricTimeDimensionTransformNode>
                                         <!-- description = "Metric Time Dimension 'ds'" -->
                                         <!-- node_id = NodeId(id_str='sma_28009') -->

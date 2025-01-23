@@ -4,6 +4,7 @@ from typing import List, Mapping
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
 from dbt_semantic_interfaces.references import EntityReference, SemanticModelReference, TimeDimensionReference
 from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
@@ -47,6 +48,7 @@ from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
 from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
 from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
+from metricflow.dataset.dataset_classes import DataSet
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlOptimizationLevel
@@ -704,6 +706,32 @@ def test_order_by_node(
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=order_by_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
+def test_offset_by_custom_granularity_node(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    sql_client: SqlClient,
+) -> None:
+    offset_by_custom_granularity_node = dataflow_plan_builder.build_custom_offset_time_spine_node(
+        offset_window=PydanticMetricTimeWindow(count=3, granularity="martian_day"),
+        required_time_spine_specs=(
+            DataSet.metric_time_dimension_spec(ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH)),
+        ),
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=offset_by_custom_granularity_node,
     )
 
 
