@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import typing
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Generic, Optional, Sequence
@@ -13,11 +14,12 @@ from metricflow_semantics.sql.sql_exprs import SqlColumnReferenceExpression, Sql
 from metricflow_semantics.visitor import VisitorOutputT
 from typing_extensions import Self
 
-from metricflow.sql.sql_ctas_node import SqlCreateTableAsNode
-from metricflow.sql.sql_cte_node import SqlCteAliasMapping, SqlCteNode
-from metricflow.sql.sql_select_node import SqlSelectStatementNode
-from metricflow.sql.sql_select_text_node import SqlSelectTextNode
-from metricflow.sql.sql_table_node import SqlTableNode
+if typing.TYPE_CHECKING:
+    from metricflow.sql.sql_ctas_node import SqlCreateTableAsNode
+    from metricflow.sql.sql_cte_node import SqlCteAliasMapping, SqlCteNode
+    from metricflow.sql.sql_select_node import SqlSelectStatementNode
+    from metricflow.sql.sql_select_text_node import SqlSelectTextNode
+    from metricflow.sql.sql_table_node import SqlTableNode
 
 logger = logging.getLogger(__name__)
 
