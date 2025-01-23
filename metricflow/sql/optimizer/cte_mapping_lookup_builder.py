@@ -8,15 +8,15 @@ from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from typing_extensions import override
 
 from metricflow.sql.optimizer.cte_alias_to_cte_node_mapping import SqlCteAliasMappingLookup
+from metricflow.sql.sql_ctas_node import SqlCreateTableAsNode
 from metricflow.sql.sql_plan import (
-    SqlCreateTableAsNode,
     SqlCteAliasMapping,
     SqlCteNode,
     SqlPlanNode,
     SqlPlanNodeVisitor,
-    SqlSelectQueryFromClauseNode,
 )
 from metricflow.sql.sql_select_node import SqlSelectStatementNode
+from metricflow.sql.sql_select_text_node import SqlSelectTextNode
 from metricflow.sql.sql_table_node import SqlTableNode
 
 logger = logging.getLogger(__name__)
@@ -81,7 +81,7 @@ class SqlCteAliasMappingLookupBuilderVisitor(SqlPlanNodeVisitor[None]):
         self._default_handler(node)
 
     @override
-    def visit_query_from_clause_node(self, node: SqlSelectQueryFromClauseNode) -> None:
+    def visit_query_from_clause_node(self, node: SqlSelectTextNode) -> None:
         self._default_handler(node)
 
     @override

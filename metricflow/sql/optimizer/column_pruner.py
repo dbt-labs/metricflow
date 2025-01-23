@@ -9,15 +9,15 @@ from metricflow.sql.optimizer.cte_mapping_lookup_builder import SqlCteAliasMappi
 from metricflow.sql.optimizer.required_column_aliases import SqlMapRequiredColumnAliasesVisitor
 from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlPlanOptimizer
 from metricflow.sql.optimizer.tag_column_aliases import NodeToColumnAliasMapping
+from metricflow.sql.sql_ctas_node import SqlCreateTableAsNode
 from metricflow.sql.sql_plan import (
-    SqlCreateTableAsNode,
     SqlCteAliasMapping,
     SqlCteNode,
     SqlPlanNode,
     SqlPlanNodeVisitor,
-    SqlSelectQueryFromClauseNode,
 )
 from metricflow.sql.sql_select_node import SqlSelectStatementNode
+from metricflow.sql.sql_select_text_node import SqlSelectTextNode
 from metricflow.sql.sql_table_node import SqlTableNode
 
 logger = logging.getLogger(__name__)
@@ -87,7 +87,7 @@ class SqlColumnPrunerVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
         """There are no SELECT columns in this node, so pruning cannot apply."""
         return node
 
-    def visit_query_from_clause_node(self, node: SqlSelectQueryFromClauseNode) -> SqlPlanNode:
+    def visit_query_from_clause_node(self, node: SqlSelectTextNode) -> SqlPlanNode:
         """Pruning cannot be done here since this is an arbitrary user-provided SQL query."""
         return node
 

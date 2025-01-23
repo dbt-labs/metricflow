@@ -18,16 +18,16 @@ from metricflow.sql.render.expr_renderer import (
     SqlExpressionRenderResult,
 )
 from metricflow.sql.render.rendering_constants import SqlRenderingConstants
+from metricflow.sql.sql_ctas_node import SqlCreateTableAsNode
 from metricflow.sql.sql_plan import (
-    SqlCreateTableAsNode,
     SqlCteNode,
     SqlPlan,
     SqlPlanNode,
     SqlPlanNodeVisitor,
     SqlSelectColumn,
-    SqlSelectQueryFromClauseNode,
 )
 from metricflow.sql.sql_select_node import SqlJoinDescription, SqlOrderByDescription, SqlSelectStatementNode
+from metricflow.sql.sql_select_text_node import SqlSelectTextNode
 from metricflow.sql.sql_table_node import SqlTableNode
 
 logger = logging.getLogger(__name__)
@@ -347,7 +347,7 @@ class DefaultSqlPlanRenderer(SqlPlanRenderer):
             bind_parameter_set=SqlBindParameterSet(),
         )
 
-    def visit_query_from_clause_node(self, node: SqlSelectQueryFromClauseNode) -> SqlPlanRenderResult:  # noqa: D102
+    def visit_query_from_clause_node(self, node: SqlSelectTextNode) -> SqlPlanRenderResult:  # noqa: D102
         return SqlPlanRenderResult(
             sql=node.select_query.rstrip(),
             bind_parameter_set=SqlBindParameterSet(),

@@ -19,8 +19,8 @@ from metricflow_semantics.sql.sql_table import SqlTable, SqlTableType
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.sql.sql_ctas_node import SqlCreateTableAsNode
 from metricflow.sql.sql_plan import (
-    SqlCreateTableAsNode,
     SqlSelectColumn,
 )
 from metricflow.sql.sql_select_node import SqlJoinDescription, SqlOrderByDescription, SqlSelectStatementNode

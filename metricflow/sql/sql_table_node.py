@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Sequence, Optional, override
+from typing import Optional, Sequence, override
 
-from metricflow.sql.sql_plan import SqlPlanNode, SqlPlanNodeVisitor, SqlCteAliasMapping, SqlSelectColumn
-from metricflow.sql.sql_select_node import SqlSelectStatementNode
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.visitor import VisitorOutputT
+
+from metricflow.sql.sql_plan import SqlCteAliasMapping, SqlPlanNode, SqlPlanNodeVisitor, SqlSelectColumn
+from metricflow.sql.sql_select_node import SqlSelectStatementNode
 
 
 @dataclass(frozen=True, eq=False)
