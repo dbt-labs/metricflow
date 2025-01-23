@@ -17,9 +17,9 @@ from metricflow.sql.render.sql_plan_renderer import DefaultSqlPlanRenderer
 from metricflow.sql.sql_plan import (
     SqlCteNode,
     SqlSelectColumn,
-    SqlTableNode,
 )
 from metricflow.sql.sql_select_node import SqlJoinDescription, SqlSelectStatementNode
+from metricflow.sql.sql_table_node import SqlTableNode
 from tests_metricflow.sql.optimizer.check_optimizer import assert_optimizer_result_snapshot_equal
 
 

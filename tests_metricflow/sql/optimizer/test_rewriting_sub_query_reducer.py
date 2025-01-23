@@ -19,9 +19,9 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 from metricflow.sql.optimizer.rewriting_sub_query_reducer import SqlRewritingSubQueryReducer
 from metricflow.sql.sql_plan import (
     SqlSelectColumn,
-    SqlTableNode,
 )
 from metricflow.sql.sql_select_node import SqlJoinDescription, SqlOrderByDescription, SqlSelectStatementNode
+from metricflow.sql.sql_table_node import SqlTableNode
 from tests_metricflow.sql.compare_sql_plan import assert_default_rendered_sql_equal
 
 

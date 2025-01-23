@@ -22,9 +22,9 @@ from metricflow.sql.render.sql_plan_renderer import DefaultSqlPlanRenderer, SqlP
 from metricflow.sql.sql_plan import (
     SqlPlanNode,
     SqlSelectColumn,
-    SqlTableNode,
 )
 from metricflow.sql.sql_select_node import SqlJoinDescription, SqlSelectStatementNode
+from metricflow.sql.sql_table_node import SqlTableNode
 from tests_metricflow.sql.compare_sql_plan import assert_default_rendered_sql_equal
 
 logger = logging.getLogger(__name__)

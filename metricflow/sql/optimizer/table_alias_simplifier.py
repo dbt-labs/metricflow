@@ -12,9 +12,9 @@ from metricflow.sql.sql_plan import (
     SqlPlanNodeVisitor,
     SqlSelectColumn,
     SqlSelectQueryFromClauseNode,
-    SqlTableNode,
 )
 from metricflow.sql.sql_select_node import SqlJoinDescription, SqlOrderByDescription, SqlSelectStatementNode
+from metricflow.sql.sql_table_node import SqlTableNode
 
 logger = logging.getLogger(__name__)
 

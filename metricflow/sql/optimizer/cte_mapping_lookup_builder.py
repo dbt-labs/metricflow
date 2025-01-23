@@ -15,9 +15,9 @@ from metricflow.sql.sql_plan import (
     SqlPlanNode,
     SqlPlanNodeVisitor,
     SqlSelectQueryFromClauseNode,
-    SqlTableNode,
 )
 from metricflow.sql.sql_select_node import SqlSelectStatementNode
+from metricflow.sql.sql_table_node import SqlTableNode
 
 logger = logging.getLogger(__name__)
 

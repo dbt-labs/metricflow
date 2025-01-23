@@ -22,9 +22,9 @@ from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlSelectColumn,
-    SqlTableNode,
 )
 from metricflow.sql.sql_select_node import SqlJoinDescription, SqlOrderByDescription, SqlSelectStatementNode
+from metricflow.sql.sql_table_node import SqlTableNode
 from tests_metricflow.sql.compare_sql_plan import assert_rendered_sql_equal
 
 logger = logging.getLogger(__name__)
