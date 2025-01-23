@@ -116,7 +116,7 @@ from metricflow.plan_conversion.spec_transforms import (
     CreateSelectCoalescedColumnsForLinkableSpecs,
     SelectOnlyLinkableSpecs,
 )
-from metricflow.plan_conversion.sql_join_builder import ColumnEqualityDescription, SqlPlanJoinBuilder
+from metricflow.plan_conversion.to_sql_plan.sql_join_builder import ColumnEqualityDescription, SqlPlanJoinBuilder
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlCteNode,
