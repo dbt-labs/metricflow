@@ -7,7 +7,7 @@ from typing import Tuple
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 
-from metricflow.sql.optimizer.column_pruner import SqlColumnPrunerOptimizer
+from metricflow.sql.optimizer.column_pruning.column_pruner import SqlColumnPrunerOptimizer
 from metricflow.sql.optimizer.rewriting_sub_query_reducer import SqlRewritingSubQueryReducer
 from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlPlanOptimizer
 from metricflow.sql.optimizer.table_alias_simplifier import SqlTableAliasSimplifier

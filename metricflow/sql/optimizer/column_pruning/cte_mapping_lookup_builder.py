@@ -7,7 +7,7 @@ from typing import Iterator
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from typing_extensions import override
 
-from metricflow.sql.optimizer.cte_alias_to_cte_node_mapping import SqlCteAliasMappingLookup
+from metricflow.sql.optimizer.column_pruning.cte_alias_to_cte_node_mapping import SqlCteAliasMappingLookup
 from metricflow.sql.sql_ctas_node import SqlCreateTableAsNode
 from metricflow.sql.sql_cte_node import SqlCteAliasMapping, SqlCteNode
 from metricflow.sql.sql_plan import (
