@@ -1900,7 +1900,7 @@ class DataflowPlanBuilder:
         should_dedupe = False
         filter_to_specs = tuple(queried_time_spine_specs)
         if offset_window and not offset_window.is_standard_granularity:
-            time_spine_node = self._build_custom_offset_time_spine_node(
+            time_spine_node = self.build_custom_offset_time_spine_node(
                 offset_window=offset_window, required_time_spine_specs=required_time_spine_specs
             )
             filter_to_specs = self._node_data_set_resolver.get_output_data_set(
@@ -1939,9 +1939,10 @@ class DataflowPlanBuilder:
             distinct=should_dedupe,
         )
 
-    def _build_custom_offset_time_spine_node(
+    def build_custom_offset_time_spine_node(
         self, offset_window: MetricTimeWindow, required_time_spine_specs: Tuple[TimeDimensionSpec, ...]
     ) -> DataflowPlanNode:
+        """Builds an OffsetByCustomGranularityNode used for custom offset windows."""
         # Build time spine node that offsets agg time dimensions by a custom grain.
         custom_grain = self._semantic_model_lookup._custom_granularities[offset_window.granularity]
         time_spine_source = self._choose_time_spine_source((DataSet.metric_time_dimension_spec(custom_grain),))
