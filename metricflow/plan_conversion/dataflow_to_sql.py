@@ -414,7 +414,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         )
         time_spine_base_granularity = ExpandedTimeGranularity.from_time_granularity(time_spine_source.base_granularity)
 
-        base_column_expr = SqlColumnReferenceExpression.from_table_and_column_names(
+        base_column_expr = SqlColumnReferenceExpression.from_column_reference(
             table_alias=time_spine_table_alias, column_name=time_spine_source.base_column
         )
         select_columns: Tuple[SqlSelectColumn, ...] = ()
@@ -437,7 +437,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                 # If the granularity is custom, select the appropriate custom granularity column.
                 elif agg_time_grain.is_custom_granularity:
                     for custom_granularity in time_spine_source.custom_granularities:
-                        expr = SqlColumnReferenceExpression.from_table_and_column_names(
+                        expr = SqlColumnReferenceExpression.from_column_reference(
                             table_alias=time_spine_table_alias, column_name=custom_granularity.parsed_column_name
                         )
                 # Otherwise, apply the requested standard granularity using a DATE_TRUNC() on the base column.
@@ -638,7 +638,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                     )
                     # Build new select column using the old column name as the expr and the new column name as the alias.
                     select_column = SqlSelectColumn(
-                        expr=SqlColumnReferenceExpression.from_table_and_column_names(
+                        expr=SqlColumnReferenceExpression.from_column_reference(
                             table_alias=right_data_set_alias,
                             column_name=original_instance.associated_column.column_name,
                         ),
@@ -1494,12 +1494,12 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         # Filter down to one row per granularity period requested in the group by. Any other granularities
         # included here will be filtered out before aggregation and so should not be included in where filter.
         if need_where_filter:
-            join_column_expr = SqlColumnReferenceExpression.from_table_and_column_names(
+            join_column_expr = SqlColumnReferenceExpression.from_column_reference(
                 table_alias=time_spine_alias, column_name=join_column_name
             )
             for requested_spec in node.requested_agg_time_dimension_specs:
                 column_name = self._column_association_resolver.resolve_spec(requested_spec).column_name
-                column_to_filter_expr = SqlColumnReferenceExpression.from_table_and_column_names(
+                column_to_filter_expr = SqlColumnReferenceExpression.from_column_reference(
                     table_alias=time_spine_alias, column_name=column_name
                 )
                 new_where_filter = SqlComparisonExpression.create(
@@ -1561,7 +1561,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                         new_spec=new_spec, column_association_resolver=self._column_association_resolver
                     )
                     new_select_column = SqlSelectColumn(
-                        expr=SqlColumnReferenceExpression.from_table_and_column_names(
+                        expr=SqlColumnReferenceExpression.from_column_reference(
                             table_alias=parent_alias, column_name=parent_instance.associated_column.column_name
                         ),
                         column_alias=new_instance.associated_column.column_name,
@@ -1574,7 +1574,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                 column_name = parent_instance.associated_column.column_name
                 output_select_columns += (
                     SqlSelectColumn(
-                        expr=SqlColumnReferenceExpression.from_table_and_column_names(
+                        expr=SqlColumnReferenceExpression.from_column_reference(
                             table_alias=parent_alias, column_name=column_name
                         ),
                         column_alias=column_name,
@@ -1623,7 +1623,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             on_condition=SqlComparisonExpression.create(
                 left_expr=parent_column.expr,
                 comparison=SqlComparison.EQUALS,
-                right_expr=SqlColumnReferenceExpression.from_table_and_column_names(
+                right_expr=SqlColumnReferenceExpression.from_column_reference(
                     table_alias=time_spine_alias, column_name=time_spine_source.base_column
                 ),
             ),
@@ -1639,7 +1639,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         time_spine_instance_set = InstanceSet(time_dimension_instances=(time_spine_instance,))
         time_spine_select_columns = (
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression.from_table_and_column_names(
+                expr=SqlColumnReferenceExpression.from_column_reference(
                     table_alias=time_spine_alias,
                     column_name=self._get_custom_granularity_column_name(custom_granularity_name),
                 ),
@@ -1933,7 +1933,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         if sql_window_function.requires_ordering:
             order_by_args.append(
                 SqlWindowOrderByArgument(
-                    expr=SqlColumnReferenceExpression.from_table_and_column_names(
+                    expr=SqlColumnReferenceExpression.from_column_reference(
                         table_alias=parent_data_set_alias,
                         column_name=order_by_instance.associated_column.column_name,
                     ),
@@ -1943,12 +1943,12 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             expr=SqlWindowFunctionExpression.create(
                 sql_function=sql_window_function,
                 sql_function_args=[
-                    SqlColumnReferenceExpression.from_table_and_column_names(
+                    SqlColumnReferenceExpression.from_column_reference(
                         table_alias=parent_data_set_alias, column_name=metric_instance.associated_column.column_name
                     )
                 ],
                 partition_by_args=[
-                    SqlColumnReferenceExpression.from_table_and_column_names(
+                    SqlColumnReferenceExpression.from_column_reference(
                         table_alias=parent_data_set_alias,
                         column_name=partition_by_instance.associated_column.column_name,
                     )
@@ -2101,10 +2101,10 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         new_select_columns: Tuple[SqlSelectColumn, ...] = ()
         bounds_columns: Tuple[SqlSelectColumn, ...] = ()
         bounds_instances: Tuple[TimeDimensionInstance, ...] = ()
-        custom_column_expr = SqlColumnReferenceExpression.from_table_and_column_names(
+        custom_column_expr = SqlColumnReferenceExpression.from_column_reference(
             table_alias=time_spine_alias, column_name=custom_grain_column_name
         )
-        base_column_expr = SqlColumnReferenceExpression.from_table_and_column_names(
+        base_column_expr = SqlColumnReferenceExpression.from_column_reference(
             table_alias=time_spine_alias, column_name=base_grain_column_name
         )
         for window_func in (SqlWindowFunction.FIRST_VALUE, SqlWindowFunction.LAST_VALUE):
@@ -2155,7 +2155,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         # Create a subquery that gets unique rows for the custom grain and bounds columns.
         # Ex: SELECT first_value, last_value, custom_grain FROM cte GROUP BY first_value, last_value, custom_grain
         unique_rows_columns = tuple(
-            SqlSelectColumn.from_table_and_column_names(column_name=column_name, table_alias=cte_alias)
+            SqlSelectColumn.from_column_reference(column_name=column_name, table_alias=cte_alias)
             for column_name in ([custom_grain_column_name] + [col.column_alias for col in bounds_columns])
         )
         unique_rows_alias = self._next_unique_table_alias()
@@ -2169,7 +2169,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
         # Build a subquery that offsets the first and last value columns.
         # Ex: LEAD(ds__fiscal_quarter__first_value, 1) OVER (ORDER BY ds__fiscal_quarter) AS ds__fiscal_quarter__first_value__offset
-        custom_grain_column = SqlSelectColumn.from_table_and_column_names(
+        custom_grain_column = SqlSelectColumn.from_column_reference(
             column_name=custom_grain_column_name, table_alias=unique_rows_alias
         )
         offset_bounds_columns: Tuple[SqlSelectColumn, ...] = ()
@@ -2187,7 +2187,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                     expr=SqlWindowFunctionExpression.create(
                         sql_function=SqlWindowFunction.LEAD,
                         sql_function_args=(
-                            bounds_column.ref_with_new_table_alias(unique_rows_alias),
+                            bounds_column.reference_from(unique_rows_alias),
                             SqlIntegerExpression.create(node.offset_window.count),
                         ),
                         order_by_args=(SqlWindowOrderByArgument(custom_grain_column.expr),),
@@ -2211,9 +2211,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         #   THEN DATEADD(day, (ds__day__row_number - 1), ds__fiscal_quarter__first_value__offset)
         # ELSE NULL
         offset_base_grain_expr = SqlAddTimeExpression.create(
-            arg=first_value_offset_column.ref_with_new_table_alias(offset_bounds_subquery_alias),
+            arg=first_value_offset_column.reference_from(offset_bounds_subquery_alias),
             count_expr=SqlArithmeticExpression.create(
-                left_expr=row_number_column.ref_with_new_table_alias(cte_alias),
+                left_expr=row_number_column.reference_from(cte_alias),
                 operator=SqlArithmeticOperator.SUBTRACT,
                 right_expr=SqlIntegerExpression.create(1),
             ),
@@ -2222,7 +2222,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         is_below_last_value_expr = SqlComparisonExpression.create(
             left_expr=offset_base_grain_expr,
             comparison=SqlComparison.LESS_THAN_OR_EQUALS,
-            right_expr=last_value_offset_column.ref_with_new_table_alias(offset_bounds_subquery_alias),
+            right_expr=last_value_offset_column.reference_from(offset_bounds_subquery_alias),
         )
         # LEAD isn't quite accurate here, but this will differentiate the offset instance (and column) from the original one.
         offset_base_column_name = self._column_association_resolver.resolve_spec(
@@ -2235,7 +2235,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             ),
             column_alias=offset_base_column_name,
         )
-        original_base_grain_column = SqlSelectColumn.from_table_and_column_names(
+        original_base_grain_column = SqlSelectColumn.from_column_reference(
             column_name=base_grain_column_name, table_alias=cte_alias
         )
         join_desc = SqlJoinDescription(
@@ -2243,9 +2243,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             right_source_alias=offset_bounds_subquery_alias,
             join_type=SqlJoinType.INNER,
             on_condition=SqlComparisonExpression.create(
-                left_expr=custom_grain_column.ref_with_new_table_alias(cte_alias),
+                left_expr=custom_grain_column.reference_from(cte_alias),
                 comparison=SqlComparison.EQUALS,
-                right_expr=custom_grain_column.ref_with_new_table_alias(offset_bounds_subquery_alias),
+                right_expr=custom_grain_column.reference_from(offset_bounds_subquery_alias),
             ),
         )
         offset_base_grain_subquery = SqlSelectStatementNode.create(
@@ -2261,7 +2261,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         # Apply standard grains & date parts requested in the query. Use base grain for any custom grains.
         requested_instances: Tuple[TimeDimensionInstance, ...] = ()
         requested_columns: Tuple[SqlSelectColumn, ...] = ()
-        offset_base_column_ref = offset_base_column.ref_with_new_table_alias(offset_base_grain_subquery_alias)
+        offset_base_column_ref = offset_base_column.reference_from(offset_base_grain_subquery_alias)
         for spec in node.required_time_spine_specs:
             new_instance = base_grain_instance.with_new_spec(
                 new_spec=spec, column_association_resolver=self._column_association_resolver
@@ -2284,7 +2284,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             requested_instances += (new_instance,)
 
         # Need to keep the non-offset base grain column in the output. This will be used to join to the metric source data set.
-        non_offset_base_grain_column = SqlSelectColumn.from_table_and_column_names(
+        non_offset_base_grain_column = SqlSelectColumn.from_column_reference(
             column_name=base_grain_column_name, table_alias=offset_base_grain_subquery_alias
         )
 

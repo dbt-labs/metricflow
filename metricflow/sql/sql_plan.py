@@ -103,22 +103,20 @@ class SqlSelectColumn:
     column_alias: str
 
     @staticmethod
-    def from_table_and_column_names(table_alias: str, column_name: str) -> SqlSelectColumn:
+    def from_column_reference(table_alias: str, column_name: str) -> SqlSelectColumn:
         """Create a column that selects a column from a table by name."""
         return SqlSelectColumn(
-            expr=SqlColumnReferenceExpression.from_table_and_column_names(
-                column_name=column_name, table_alias=table_alias
-            ),
+            expr=SqlColumnReferenceExpression.from_column_reference(column_name=column_name, table_alias=table_alias),
             column_alias=column_name,
         )
 
-    def ref_with_new_table_alias(self, new_table_alias: str) -> SqlColumnReferenceExpression:
+    def reference_from(self, source_table_alias: str) -> SqlColumnReferenceExpression:
         """Return a column reference expression for this column with a new table alias.
 
         Useful when you already have access to the select column from a subquery and want to reference it in an outer query.
         """
-        return SqlColumnReferenceExpression.from_table_and_column_names(
-            column_name=self.column_alias, table_alias=new_table_alias
+        return SqlColumnReferenceExpression.from_column_reference(
+            column_name=self.column_alias, table_alias=source_table_alias
         )
 
 

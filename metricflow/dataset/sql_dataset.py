@@ -195,8 +195,14 @@ class SqlDataSet(DataSet):
                 return time_dimension_instance
 
         raise RuntimeError(
-            f"Did not find a time dimension instance with grain '{time_granularity_name}' and date part {date_part}\n"
-            f"Instances available: {self.instance_set.time_dimension_instances}"
+            str(
+                LazyFormat(
+                    "Did not find a time dimension instance with grain and date part in dataset.",
+                    time_granularity_name=time_granularity_name,
+                    date_part=date_part,
+                    instances_available=self.instance_set.time_dimension_instances,
+                )
+            )
         )
 
     def instance_from_window_function(self, window_function: SqlWindowFunction) -> TimeDimensionInstance:
