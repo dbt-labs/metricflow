@@ -15,7 +15,7 @@ from metricflow_semantics.sql.sql_exprs import SqlColumnReferenceExpression, Sql
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.visitor import VisitorOutputT
-from typing_extensions import override
+from typing_extensions import Self, override
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +64,11 @@ class SqlPlanNode(DagNode["SqlPlanNode"], ABC):
         * A SQL table could refer to a CTE, so a mapping from the name of the CTE to the CTE node should be provided to
           get the associated SELECT columns.
         """
+        raise NotImplementedError
+
+    @abstractmethod
+    def copy(self) -> Self:
+        """Create a shallow copy of this node."""
         raise NotImplementedError
 
 
@@ -242,9 +247,11 @@ class SqlSelectStatementNode(SqlPlanNode):
     def nearest_select_columns(self, cte_source_mapping: SqlCteAliasMapping) -> Optional[Sequence[SqlSelectColumn]]:
         return self.select_columns
 
-    def create_copy(self) -> SqlSelectStatementNode:  # noqa: D102
-        return SqlSelectStatementNode.create(
-            description=self.description,
+    @override
+    def copy(self) -> SqlSelectStatementNode:
+        return SqlSelectStatementNode(
+            parent_nodes=self.parent_nodes,
+            _description=self._description,
             select_columns=self.select_columns,
             from_source=self.from_source,
             from_source_alias=self.from_source_alias,
@@ -303,6 +310,13 @@ class SqlTableNode(SqlPlanNode):
     def as_sql_table_node(self) -> Optional[SqlTableNode]:
         return self
 
+    @override
+    def copy(self) -> SqlTableNode:
+        return SqlTableNode(
+            parent_nodes=self.parent_nodes,
+            sql_table=self.sql_table,
+        )
+
 
 @dataclass(frozen=True, eq=False)
 class SqlSelectQueryFromClauseNode(SqlPlanNode):
@@ -344,6 +358,10 @@ class SqlSelectQueryFromClauseNode(SqlPlanNode):
     @override
     def as_sql_table_node(self) -> Optional[SqlTableNode]:
         return None
+
+    @override
+    def copy(self) -> SqlSelectQueryFromClauseNode:
+        return SqlSelectQueryFromClauseNode(parent_nodes=self.parent_nodes, select_query=self.select_query)
 
 
 @dataclass(frozen=True, eq=False)
@@ -398,6 +416,10 @@ class SqlCreateTableAsNode(SqlPlanNode):
     @override
     def nearest_select_columns(self, cte_source_mapping: SqlCteAliasMapping) -> Optional[Sequence[SqlSelectColumn]]:
         return self.parent_node.nearest_select_columns(cte_source_mapping)
+
+    @override
+    def copy(self) -> SqlCreateTableAsNode:
+        return SqlCreateTableAsNode(parent_nodes=self.parent_nodes, sql_table=self.sql_table)
 
 
 class SqlPlan(MetricFlowDag[SqlPlanNode]):
@@ -474,6 +496,14 @@ class SqlCteNode(SqlPlanNode):
     @override
     def nearest_select_columns(self, cte_source_mapping: SqlCteAliasMapping) -> Optional[Sequence[SqlSelectColumn]]:
         return self.select_statement.nearest_select_columns(cte_source_mapping)
+
+    @override
+    def copy(self) -> SqlCteNode:
+        return SqlCteNode(
+            parent_nodes=self.parent_nodes,
+            select_statement=self.select_statement,
+            cte_alias=self.cte_alias,
+        )
 
 
 @dataclass(frozen=True)
