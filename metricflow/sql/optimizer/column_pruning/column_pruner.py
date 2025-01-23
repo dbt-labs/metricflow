@@ -8,7 +8,7 @@ from typing_extensions import override
 from metricflow.sql.optimizer.column_pruning.cte_mapping_lookup_builder import SqlCteAliasMappingLookupBuilderVisitor
 from metricflow.sql.optimizer.column_pruning.required_column_aliases import SqlMapRequiredColumnAliasesVisitor
 from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlPlanOptimizer
-from metricflow.sql.optimizer.column_pruning.tag_column_aliases import NodeToColumnAliasMapping
+from metricflow.sql.optimizer.column_pruning.node_to_column_alias_maping import NodeToColumnAliasMapping
 from metricflow.sql.sql_ctas_node import SqlCreateTableAsNode
 from metricflow.sql.sql_cte_node import SqlCteAliasMapping, SqlCteNode
 from metricflow.sql.sql_plan import (
