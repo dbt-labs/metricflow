@@ -18,9 +18,9 @@ from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow.sql.sql_plan import (
     SqlPlan,
     SqlSelectColumn,
-    SqlSelectStatementNode,
     SqlTableNode,
 )
+from metricflow.sql.sql_select_node import SqlSelectStatementNode
 
 logger = logging.getLogger(__name__)
 

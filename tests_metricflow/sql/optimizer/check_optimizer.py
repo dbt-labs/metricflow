@@ -11,7 +11,8 @@ from metricflow_semantics.test_helpers.snapshot_helpers import assert_str_snapsh
 
 from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlPlanOptimizer
 from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderer
-from metricflow.sql.sql_plan import SqlPlan, SqlSelectStatementNode
+from metricflow.sql.sql_plan import SqlPlan
+from metricflow.sql.sql_select_node import SqlSelectStatementNode
 
 logger = logging.getLogger(__name__)
 

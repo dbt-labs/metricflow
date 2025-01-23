@@ -16,11 +16,10 @@ from metricflow.sql.optimizer.table_alias_simplifier import SqlTableAliasSimplif
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlPlanRenderer
 from metricflow.sql.sql_plan import (
     SqlCteNode,
-    SqlJoinDescription,
     SqlSelectColumn,
-    SqlSelectStatementNode,
     SqlTableNode,
 )
+from metricflow.sql.sql_select_node import SqlJoinDescription, SqlSelectStatementNode
 from tests_metricflow.sql.optimizer.check_optimizer import assert_optimizer_result_snapshot_equal
 
 

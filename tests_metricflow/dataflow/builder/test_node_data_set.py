@@ -29,9 +29,9 @@ from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.sql.sql_plan import (
     SqlSelectColumn,
-    SqlSelectStatementNode,
     SqlTableNode,
 )
+from metricflow.sql.sql_select_node import SqlSelectStatementNode
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 
 logger = logging.getLogger(__name__)

@@ -120,12 +120,10 @@ from metricflow.plan_conversion.to_sql_plan.sql_join_builder import ColumnEquali
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlCteNode,
-    SqlJoinDescription,
-    SqlOrderByDescription,
     SqlSelectColumn,
-    SqlSelectStatementNode,
     SqlTableNode,
 )
+from metricflow.sql.sql_select_node import SqlJoinDescription, SqlOrderByDescription, SqlSelectStatementNode
 
 
 class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):

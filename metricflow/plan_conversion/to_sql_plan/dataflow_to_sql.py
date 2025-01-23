@@ -27,8 +27,8 @@ from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlPlanOptimizer
 from metricflow.sql.sql_plan import (
     SqlPlan,
     SqlPlanNode,
-    SqlSelectStatementNode,
 )
+from metricflow.sql.sql_select_node import SqlSelectStatementNode
 
 logger = logging.getLogger(__name__)
 

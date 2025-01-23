@@ -26,7 +26,8 @@ from metricflow.dataflow.nodes.join_to_base import JoinDescription
 from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
 from metricflow.dataset.sql_dataset import AnnotatedSqlDataSet
 from metricflow.plan_conversion.sql_expression_builders import make_coalesced_expr
-from metricflow.sql.sql_plan import SqlExpressionNode, SqlJoinDescription, SqlSelectStatementNode
+from metricflow.sql.sql_plan import SqlExpressionNode
+from metricflow.sql.sql_select_node import SqlJoinDescription, SqlSelectStatementNode
 
 
 @dataclass(frozen=True)

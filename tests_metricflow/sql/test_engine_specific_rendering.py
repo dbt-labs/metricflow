@@ -22,12 +22,10 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_plan import (
-    SqlJoinDescription,
-    SqlOrderByDescription,
     SqlSelectColumn,
-    SqlSelectStatementNode,
     SqlTableNode,
 )
+from metricflow.sql.sql_select_node import SqlJoinDescription, SqlOrderByDescription, SqlSelectStatementNode
 from tests_metricflow.sql.compare_sql_plan import assert_rendered_sql_equal
 
 

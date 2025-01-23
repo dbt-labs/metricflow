@@ -21,16 +21,14 @@ from metricflow.sql.render.rendering_constants import SqlRenderingConstants
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlCteNode,
-    SqlJoinDescription,
-    SqlOrderByDescription,
     SqlPlan,
     SqlPlanNode,
     SqlPlanNodeVisitor,
     SqlSelectColumn,
     SqlSelectQueryFromClauseNode,
-    SqlSelectStatementNode,
     SqlTableNode,
 )
+from metricflow.sql.sql_select_node import SqlJoinDescription, SqlOrderByDescription, SqlSelectStatementNode
 
 logger = logging.getLogger(__name__)
 

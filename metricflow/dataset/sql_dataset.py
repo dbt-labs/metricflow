@@ -19,8 +19,8 @@ from typing_extensions import override
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.sql.sql_plan import (
     SqlPlanNode,
-    SqlSelectStatementNode,
 )
+from metricflow.sql.sql_select_node import SqlSelectStatementNode
 
 
 class SqlDataSet(DataSet):

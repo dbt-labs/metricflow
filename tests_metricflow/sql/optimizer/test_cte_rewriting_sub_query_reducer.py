@@ -19,11 +19,10 @@ from metricflow.sql.optimizer.rewriting_sub_query_reducer import SqlRewritingSub
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlPlanRenderer, SqlPlanRenderer
 from metricflow.sql.sql_plan import (
     SqlCteNode,
-    SqlJoinDescription,
     SqlSelectColumn,
-    SqlSelectStatementNode,
     SqlTableNode,
 )
+from metricflow.sql.sql_select_node import SqlJoinDescription, SqlSelectStatementNode
 from tests_metricflow.sql.optimizer.check_optimizer import assert_optimizer_result_snapshot_equal
 
 logger = logging.getLogger(__name__)

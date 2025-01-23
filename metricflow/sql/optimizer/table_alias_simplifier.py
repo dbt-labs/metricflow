@@ -8,15 +8,13 @@ from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlPlanOptimizer
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlCteNode,
-    SqlJoinDescription,
-    SqlOrderByDescription,
     SqlPlanNode,
     SqlPlanNodeVisitor,
     SqlSelectColumn,
     SqlSelectQueryFromClauseNode,
-    SqlSelectStatementNode,
     SqlTableNode,
 )
+from metricflow.sql.sql_select_node import SqlJoinDescription, SqlOrderByDescription, SqlSelectStatementNode
 
 logger = logging.getLogger(__name__)
 
