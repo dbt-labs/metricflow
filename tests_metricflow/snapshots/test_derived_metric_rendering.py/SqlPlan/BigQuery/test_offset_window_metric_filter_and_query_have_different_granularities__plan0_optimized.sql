@@ -62,7 +62,6 @@ FROM (
       SELECT
         metric_time__day
         , metric_time__month
-        , booking_value
         , bookers
       FROM sma_28009_cte sma_28009_cte
     ) subq_27

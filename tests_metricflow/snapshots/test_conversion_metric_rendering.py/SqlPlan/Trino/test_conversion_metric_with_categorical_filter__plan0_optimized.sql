@@ -39,7 +39,6 @@ FROM (
       -- Read From CTE For node_id=sma_28019
       SELECT
         metric_time__day
-        , sma_28019_cte.user
         , visit__referrer_id
         , visits
       FROM sma_28019_cte sma_28019_cte

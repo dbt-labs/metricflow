@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime as dt
 import logging
 from collections import OrderedDict, defaultdict
+from dataclasses import dataclass
 from typing import Callable, Dict, FrozenSet, List, Optional, Sequence, Set, Tuple, TypeVar
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
@@ -14,7 +15,7 @@ from dbt_semantic_interfaces.type_enums.period_agg import PeriodAggregation
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 from metricflow_semantics.aggregation_properties import AggregationState
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
-from metricflow_semantics.dag.mf_dag import DagId
+from metricflow_semantics.dag.mf_dag import DagId, NodeId
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.instances import (
@@ -2012,6 +2013,29 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         )
 
 
+@dataclass(frozen=True)
+class CteGenerationResult:
+    """This stores parameters for creating a dataset from a CTE."""
+
+    source_dataflow_plan_node_id: NodeId
+    cte_node: SqlCteNode
+    select_columns: Tuple[SqlSelectColumn, ...]
+    instance_set: InstanceSet
+
+    def get_sql_data_set(self) -> SqlDataSet:
+        """Return a dataset that represents reading from the CTE."""
+        cte_alias = self.cte_node.cte_alias
+        return SqlDataSet(
+            instance_set=self.instance_set,
+            sql_select_node=SqlSelectStatementNode.create(
+                description=f"Read From CTE For node_id={self.source_dataflow_plan_node_id}",
+                select_columns=self.select_columns,
+                from_source=SqlTableNode.create(SqlTable(schema_name=None, table_name=cte_alias)),
+                from_source_alias=cte_alias,
+            ),
+        )
+
+
 class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
     """Similar to `DataflowNodeToSqlSubqueryVisitor`, except that this converts specific nodes to CTEs.
 
@@ -2034,14 +2058,13 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
             column_association_resolver=column_association_resolver, semantic_manifest_lookup=semantic_manifest_lookup
         )
         self._nodes_to_convert_to_cte = nodes_to_convert_to_cte
-        self._generated_cte_nodes: List[SqlCteNode] = []
 
-        # If a given node is supposed to use a CTE, map the node to the generated dataset that uses a CTE.
-        self._node_to_cte_dataset: Dict[DataflowPlanNode, SqlDataSet] = {}
+        # If a given node is supposed to use a CTE, map the node to the result.
+        self._node_to_cte_generation_result: Dict[DataflowPlanNode, CteGenerationResult] = {}
 
     def generated_cte_nodes(self) -> Sequence[SqlCteNode]:
         """Returns the CTE nodes that have been generated while traversing the dataflow plan."""
-        return self._generated_cte_nodes
+        return tuple(result.cte_node for result in self._node_to_cte_generation_result.values())
 
     def _default_handler(
         self, node: DataflowNodeT, node_to_select_subquery_function: Callable[[DataflowNodeT], SqlDataSet]
@@ -2056,11 +2079,11 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
 
         Returns: The `SqlDataSet` that produces the data for the given node.
         """
-        # For the given node, if there is already a generated dataset that uses a SELECT from a CTE, return it.
-        select_from_cte_dataset = self._node_to_cte_dataset.get(node)
-        if select_from_cte_dataset is not None:
+        # For the given node, if a CTE was generated for it, return the associated data set.
+        cte_generation_result = self._node_to_cte_generation_result.get(node)
+        if cte_generation_result is not None:
             logger.debug(LazyFormat("Handling node via existing CTE", node=node))
-            return select_from_cte_dataset
+            return cte_generation_result.get_sql_data_set()
 
         # If the given node is supposed to use a CTE, generate one for it. Otherwise, use the default subquery as the
         # source for the SELECT.
@@ -2072,7 +2095,7 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
 
         cte_alias = node.node_id.id_str + "_cte"
 
-        if cte_alias in set(node.cte_alias for node in self._generated_cte_nodes):
+        if cte_alias in set(node.cte_alias for node in self.generated_cte_nodes()):
             raise ValueError(
                 f"{cte_alias=} is a duplicate of one that already exists. "
                 f"This implies a bug that is generating a CTE for the same dataflow plan node multiple times."
@@ -2082,25 +2105,20 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
             select_statement=select_from_subquery_dataset.sql_node,
             cte_alias=cte_alias,
         )
-        self._generated_cte_nodes.append(cte_source)
-        node_id = node.node_id
-        select_from_cte_dataset = SqlDataSet(
-            instance_set=select_from_subquery_dataset.instance_set,
-            sql_select_node=SqlSelectStatementNode.create(
-                description=f"Read From CTE For {node_id=}",
-                select_columns=CreateSelectColumnsForInstances(
-                    table_alias=cte_alias,
-                    column_resolver=self._column_association_resolver,
-                )
-                .transform(select_from_subquery_dataset.instance_set)
-                .as_tuple(),
-                from_source=SqlTableNode.create(SqlTable(schema_name=None, table_name=cte_alias)),
-                from_source_alias=cte_alias,
-            ),
-        )
-        self._node_to_cte_dataset[node] = select_from_cte_dataset
 
-        return select_from_cte_dataset
+        cte_generation_result = CteGenerationResult(
+            source_dataflow_plan_node_id=node.node_id,
+            cte_node=cte_source,
+            select_columns=CreateSelectColumnsForInstances(
+                table_alias=cte_alias,
+                column_resolver=self._column_association_resolver,
+            )
+            .transform(select_from_subquery_dataset.instance_set)
+            .as_tuple(),
+            instance_set=select_from_subquery_dataset.instance_set,
+        )
+        self._node_to_cte_generation_result[node] = cte_generation_result
+        return cte_generation_result.get_sql_data_set()
 
     @override
     def visit_source_node(self, node: ReadSqlSourceNode) -> SqlDataSet:
