@@ -1,0 +1,6 @@
+kind: Fixes
+body: Fix `mf tutorial` experience.
+time: 2025-01-24T14:03:00.410289-08:00
+custom:
+  Author: plypaul
+  Issue: "1631"

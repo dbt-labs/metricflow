@@ -17,24 +17,36 @@ from metricflow.protocols.sql_client import SqlClient
 logger = logging.getLogger(__name__)
 
 
-class CLIContext:
-    """Context for the MetricFlow CLI."""
+class CLIConfiguration:
+    """Configuration object used for the MetricFlow CLI."""
 
-    def __init__(self) -> None:
-        """Initialize the CLI context for executing commands.
-
-        The dbt_artifacts construct must be loaded in order for logging configuration to work correctly.
-        """
+    def __init__(self) -> None:  # noqa: D107
         self.verbose = False
-        self._dbt_project_metadata: dbtProjectMetadata = dbtProjectMetadata.load_from_project_path(pathlib.Path.cwd())
+        self._dbt_project_metadata: Optional[dbtProjectMetadata] = None
         self._dbt_artifacts: Optional[dbtArtifacts] = None
         self._mf: Optional[MetricFlowEngine] = None
         self._sql_client: Optional[SqlClient] = None
         self._semantic_manifest: Optional[SemanticManifest] = None
         self._semantic_manifest_lookup: Optional[SemanticManifestLookup] = None
+
+    def setup(self) -> None:
+        """Setup this configuration for executing commands.
+
+        The dbt_artifacts construct must be loaded in order for logging configuration to work correctly.
+        """
+        dbt_project_path = pathlib.Path.cwd()
+        self._dbt_project_metadata = dbtProjectMetadata.load_from_project_path(dbt_project_path)
+
         # self.log_file_path invokes the dbtRunner. If this is done after the configure_logging call all of the
         # dbt CLI logging configuration could be overridden, resulting in lots of things printing to console
         self._configure_logging(log_file_path=self.log_file_path)
+
+    def _get_dbt_project_metadata(self) -> dbtProjectMetadata:
+        if self._dbt_project_metadata is None:
+            raise RuntimeError(
+                f"{self.__class__.__name__}.setup() should have been called before accessing the configuration."
+            )
+        return self._dbt_project_metadata
 
     def _configure_logging(self, log_file_path: pathlib.Path) -> None:
         """Initialize the logging spec for the CLI.
@@ -70,13 +82,13 @@ class CLIContext:
     @property
     def dbt_project_metadata(self) -> dbtProjectMetadata:
         """Property accessor for dbt project metadata, useful in cases where the full manifest load is not needed."""
-        return self._dbt_project_metadata
+        return self._get_dbt_project_metadata()
 
     @property
     def dbt_artifacts(self) -> dbtArtifacts:
         """Property accessor for all dbt artifacts, used for powering the sql client (among other things)."""
         if self._dbt_artifacts is None:
-            self._dbt_artifacts = dbtArtifacts.load_from_project_metadata(self._dbt_project_metadata)
+            self._dbt_artifacts = dbtArtifacts.load_from_project_metadata(self.dbt_project_metadata)
         return self._dbt_artifacts
 
     @property
@@ -85,7 +97,7 @@ class CLIContext:
         # The dbt Project.log_path attribute is currently sourced from the final runtime config value accessible
         # through the CLI state flags. As such, it will deviate from the default based on the DBT_LOG_PATH environment
         # variable. Should this behavior change, we will need to update this call.
-        return pathlib.Path(self._dbt_project_metadata.project.log_path, "metricflow.log")
+        return pathlib.Path(self.dbt_project_metadata.project.log_path, "metricflow.log")
 
     @property
     def sql_client(self) -> SqlClient:
