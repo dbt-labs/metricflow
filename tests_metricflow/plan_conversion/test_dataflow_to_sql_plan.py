@@ -719,7 +719,7 @@ def test_offset_by_custom_granularity_node(  # noqa: D103
     dataflow_plan_builder: DataflowPlanBuilder,
     sql_client: SqlClient,
 ) -> None:
-    offset_by_custom_granularity_node = dataflow_plan_builder.build_custom_offset_time_spine_node(
+    offset_base_grain_by_custom_grain_node = dataflow_plan_builder.build_custom_offset_time_spine_node(
         offset_window=PydanticMetricTimeWindow(count=3, granularity="martian_day"),
         required_time_spine_specs=(
             DataSet.metric_time_dimension_spec(ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH)),
@@ -731,7 +731,7 @@ def test_offset_by_custom_granularity_node(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=offset_by_custom_granularity_node,
+        node=offset_base_grain_by_custom_grain_node,
     )
 
 
