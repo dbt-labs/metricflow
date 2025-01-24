@@ -1,1 +1,2 @@
-metricflow>=0.207.1, <0.208.0
+# metricflow>=0.207.1, <0.208.0
+metricflow @ git+https://github.com/dbt-labs/metricflow@feb9a82669e148dd8f546196db97a024ed69cfac
