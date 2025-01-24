@@ -53,7 +53,6 @@ _telemetry_reporter.add_python_log_handler()
 @click.group()
 @click.option("-v", "--verbose", is_flag=True)
 @click.version_option()
-@error_if_not_in_dbt_project
 @pass_config
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def cli(cfg: CLIContext, verbose: bool) -> None:  # noqa: D103
@@ -252,6 +251,7 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, clean: bool) -
 )
 @pass_config
 @exception_handler
+@error_if_not_in_dbt_project
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def query(
     cfg: CLIContext,
@@ -356,6 +356,7 @@ def query(
 @cli.group()
 @pass_config
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
+@error_if_not_in_dbt_project
 def list(cfg: CLIContext) -> None:
     """Retrieve metadata values about metrics/dimensions/entities/dimension values."""
 
@@ -368,6 +369,7 @@ def list(cfg: CLIContext) -> None:
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
+@error_if_not_in_dbt_project
 def metrics(cfg: CLIContext, show_all_dimensions: bool = False, search: Optional[str] = None) -> None:
     """List the metrics with their available dimensions.
 
@@ -411,6 +413,7 @@ def metrics(cfg: CLIContext, show_all_dimensions: bool = False, search: Optional
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
+@error_if_not_in_dbt_project
 def dimensions(cfg: CLIContext, metrics: List[str]) -> None:
     """List all unique dimensions."""
     spinner = Halo(
@@ -438,6 +441,7 @@ def dimensions(cfg: CLIContext, metrics: List[str]) -> None:
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
+@error_if_not_in_dbt_project
 def entities(cfg: CLIContext, metrics: List[str]) -> None:
     """List all unique entities."""
     spinner = Halo(
@@ -459,6 +463,7 @@ def entities(cfg: CLIContext, metrics: List[str]) -> None:
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
+@error_if_not_in_dbt_project
 def health_checks(cfg: CLIContext) -> None:
     """Performs a health check against the DW provided in the configs."""
     spinner = Halo(
@@ -488,6 +493,7 @@ def health_checks(cfg: CLIContext) -> None:
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
+@error_if_not_in_dbt_project
 def dimension_values(
     cfg: CLIContext,
     metrics: List[str],
@@ -612,6 +618,7 @@ def _data_warehouse_validations_runner(
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
+@error_if_not_in_dbt_project
 def validate_configs(
     cfg: CLIContext,
     dw_timeout: Optional[int] = None,
