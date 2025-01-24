@@ -12,7 +12,7 @@ from dateutil.parser import parse
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 
 import dbt_metricflow.cli.custom_click_types as click_custom
-from dbt_metricflow.cli.cli_context import CLIContext
+from dbt_metricflow.cli.cli_configuration import CLIConfiguration
 
 logger = logging.getLogger(__name__)
 
@@ -117,14 +117,14 @@ def exception_handler(func: Callable[..., Any]) -> Callable[..., Any]:  # type: 
             logging.exception("Got an exception in the exception handler.")
             # Checks if CLIContext has verbose flag set
 
-            if isinstance(args[0], CLIContext):
-                cli_context: CLIContext = args[0]
+            if isinstance(args[0], CLIConfiguration):
+                cli_context: CLIConfiguration = args[0]
                 click.echo(f"\nERROR: {str(e)}\nLog file: {cli_context.log_file_path}")
             else:
-                if not isinstance(args[0], CLIContext):
+                if not isinstance(args[0], CLIConfiguration):
                     logger.error(
                         LazyFormat(
-                            lambda: f"Missing {CLIContext.__name__} as the first argument to the function "
+                            lambda: f"Missing {CLIConfiguration.__name__} as the first argument to the function "
                             f"{getattr(func, '__name__', repr(func))}"
                         )
                     )
