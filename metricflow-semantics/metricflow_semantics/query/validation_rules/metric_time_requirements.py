@@ -27,9 +27,6 @@ from metricflow_semantics.query.issues.parsing.cumulative_metric_requires_metric
 from metricflow_semantics.query.issues.parsing.offset_metric_requires_metric_time import (
     OffsetMetricRequiresMetricTimeIssue,
 )
-from metricflow_semantics.query.issues.parsing.scd_requires_metric_time import (
-    ScdRequiresMetricTimeIssue,
-)
 from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import ResolverInputForQuery
 from metricflow_semantics.query.validation_rules.base_validation_rule import PostResolutionQueryValidationRule
 
@@ -192,19 +189,4 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
         measure_reference: MeasureReference,
         resolution_path: MetricFlowQueryResolutionPath,
     ) -> MetricFlowQueryResolutionIssueSet:
-        scd_linkable_elemenent_set_for_measure = self._scd_linkable_element_set_for_measure(measure_reference)
-
-        if scd_linkable_elemenent_set_for_measure.spec_count == 0:
-            return MetricFlowQueryResolutionIssueSet.empty_instance()
-
-        if self._query_includes_metric_time:
-            return MetricFlowQueryResolutionIssueSet.empty_instance()
-
-        # Queries that join to an SCD don't support direct references to agg_time_dimension, so we
-        # only check for metric_time. If we decide to support agg_time_dimension, we should add a check
-
-        return MetricFlowQueryResolutionIssueSet.from_issue(
-            ScdRequiresMetricTimeIssue.from_parameters(
-                scds_in_query=scd_linkable_elemenent_set_for_measure.specs, query_resolution_path=resolution_path
-            )
-        )
+        return MetricFlowQueryResolutionIssueSet.empty_instance()
