@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv as csv_module
 import datetime as dt
+import importlib.metadata
 import logging
 import os
 import pathlib
@@ -16,6 +17,7 @@ from typing import Callable, List, Optional, Sequence
 
 import click
 import jinja2
+import packaging.version
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 from dbt_semantic_interfaces.validations.validator_helpers import SemanticManifestValidationResults
@@ -120,15 +122,34 @@ def tutorial(ctx: click.core.Context, cfg: CLIConfiguration, message: bool, clea
                 --start-time 2022-03-20 --end-time 2022-04-01
         """
     ).rstrip()
+    # dbt_core_version = importlib.metadata.version("dbt-core")
+    dbt_core_package_name = "dbt-core"
+    dbt_core_version = None
+    try:
+        dbt_core_version = packaging.version.parse(importlib.metadata.version(dbt_core_package_name))
+    except Exception as e:
+        click.secho(
+            textwrap.dedent(
+                f"""
+                Unable to determine the version of package {dbt_core_package_name!r}:
+                    { str(e).splitlines()[0]}
+                Displayed links to dbt docs may not reflect the correct version for your installed version of {dbt_core_package_name!r}
+                """
+            ),
+            fg="yellow",
+        )
+    time_spine_docs_link = "https://docs.getdbt.com/docs/build/metricflow-time-spine"
+    if dbt_core_version is not None:
+        time_spine_docs_link = time_spine_docs_link + f"?version={dbt_core_version.major}.{dbt_core_version.minor}"
     help_msg = textwrap.dedent(
         f"""\
         🤓 {click.style("Please run the following steps:", bold=True)}
 
-        1.  Verify that your adapter credentials are correct in `profiles.yml`.
-            * Skip this step when using the sample project.
-        2.  Add a time spine model to the model directory.
-            * See https://docs.getdbt.com/docs/build/metricflow-time-spine for more details.
-            * Skip this step when using the sample project.
+        1.  If you're using the tutorial-generated dbt project, switch to the root directory of the project.
+        2.  Otherwise, if you're using your own dbt project:
+            * Verify that your adapter credentials are correct in `profiles.yml`.
+            * Add a time spine model to the model directory. See (try <CTRL>+Left Click on the link):
+              {click.style(time_spine_docs_link, fg="blue", bold=True)}
         3.  Run {click.style("`dbt seed`", bold=True)} and check that the steps related to countries, transactions, customers are passing.
         4.  Run {click.style("`dbt build`", bold=True)} to produce the model tables.
         4.  Try validating your data model: {click.style("`mf validate-configs`", bold=True)}
