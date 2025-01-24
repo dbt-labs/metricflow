@@ -137,3 +137,7 @@ dmypy.json
 
 # Performance profiler results.
 **/cprofile_output.bin
+
+# Performance reports
+performance-report.json
+performance-comparison.md
