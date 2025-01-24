@@ -93,3 +93,80 @@ def test_derived_metric_alias(  # noqa: D103
         snapshot_str=query_result.result_df.text_format(),
         sql_engine=sql_client.sql_engine_type,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
+def test_scd_with_coarser_grain(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+    scd_it_helpers: IntegrationTestHelpers,
+) -> None:
+    query_result = scd_it_helpers.mf_engine.query(
+        MetricFlowQueryRequest.create_with_random_request_id(
+            metrics=(MetricParameter(name="family_bookings"),),
+            group_by_names=["listing__capacity", "metric_time__month"],
+            order_by_names=["listing__capacity", "metric_time__month"],
+        )
+    )
+    assert query_result.result_df is not None, "Unexpected empty result."
+
+    assert_str_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.text_format(),
+        sql_engine=sql_client.sql_engine_type,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
+def test_scd_group_by_without_metric_time(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+    scd_it_helpers: IntegrationTestHelpers,
+) -> None:
+    query_result = scd_it_helpers.mf_engine.query(
+        MetricFlowQueryRequest.create_with_random_request_id(
+            metrics=(MetricParameter(name="family_bookings"),),
+            group_by_names=["listing__capacity"],
+            order_by_names=["listing__capacity"],
+        )
+    )
+    assert query_result.result_df is not None, "Unexpected empty result."
+
+    assert_str_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.text_format(),
+        sql_engine=sql_client.sql_engine_type,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
+def test_scd_filter_without_metric_time(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+    scd_it_helpers: IntegrationTestHelpers,
+) -> None:
+    query_result = scd_it_helpers.mf_engine.query(
+        MetricFlowQueryRequest.create_with_random_request_id(
+            metrics=(MetricParameter(name="family_bookings"),),
+            where_constraints=("{{ Dimension('listing__capacity') }} > 2",),
+        )
+    )
+    assert query_result.result_df is not None, "Unexpected empty result."
+
+    assert_str_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.text_format(),
+        sql_engine=sql_client.sql_engine_type,
+    )
