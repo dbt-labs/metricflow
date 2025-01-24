@@ -1,0 +1,6 @@
+mf_tutorial:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: 'mf_tutorial.duckdb'
