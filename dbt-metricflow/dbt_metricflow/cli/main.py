@@ -271,6 +271,7 @@ def query(
     saved_query: Optional[str] = None,
 ) -> None:
     """Create a new query with MetricFlow and assembles a MetricFlowQueryResult."""
+    cfg.setup()
     start = time.time()
     spinner = Halo(text="Initiating query…", spinner="dots")
     spinner.start()
@@ -359,6 +360,7 @@ def query(
 @error_if_not_in_dbt_project
 def list(cfg: CLIConfiguration) -> None:
     """Retrieve metadata values about metrics/dimensions/entities/dimension values."""
+    pass
 
 
 @list.command()
@@ -375,6 +377,7 @@ def metrics(cfg: CLIConfiguration, show_all_dimensions: bool = False, search: Op
 
     Automatically truncates long lists of dimensions, pass --show-all-dims to see all.
     """
+    cfg.setup()
     spinner = Halo(text="🔍 Looking for all available metrics...", spinner="dots")
     spinner.start()
 
@@ -416,6 +419,7 @@ def metrics(cfg: CLIConfiguration, show_all_dimensions: bool = False, search: Op
 @error_if_not_in_dbt_project
 def dimensions(cfg: CLIConfiguration, metrics: List[str]) -> None:
     """List all unique dimensions."""
+    cfg.setup()
     spinner = Halo(
         text="🔍 Looking for all available dimensions...",
         spinner="dots",
@@ -444,6 +448,7 @@ def dimensions(cfg: CLIConfiguration, metrics: List[str]) -> None:
 @error_if_not_in_dbt_project
 def entities(cfg: CLIConfiguration, metrics: List[str]) -> None:
     """List all unique entities."""
+    cfg.setup()
     spinner = Halo(
         text="🔍 Looking for all available entities...",
         spinner="dots",
@@ -466,6 +471,7 @@ def entities(cfg: CLIConfiguration, metrics: List[str]) -> None:
 @error_if_not_in_dbt_project
 def health_checks(cfg: CLIConfiguration) -> None:
     """Performs a health check against the DW provided in the configs."""
+    cfg.setup()
     spinner = Halo(
         text="🏥 Running health checks against your data warehouse... (This should not take longer than 30s for a successful connection)",
         spinner="dots",
@@ -502,6 +508,7 @@ def dimension_values(
     end_time: Optional[dt.datetime] = None,
 ) -> None:
     """List all dimension values with the corresponding metrics."""
+    cfg.setup()
     spinner = Halo(
         text=f"🔍 Retrieving dimension values for dimension '{dimension}' of metrics '{', '.join(metrics)}'...",
         spinner="dots",
@@ -628,6 +635,8 @@ def validate_configs(
     semantic_validation_workers: int = 1,
 ) -> None:
     """Perform validations against the defined model configurations."""
+    cfg.setup()
+
     cfg.verbose = True
 
     if not show_all:
