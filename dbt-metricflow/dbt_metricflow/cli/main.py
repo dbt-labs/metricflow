@@ -25,7 +25,7 @@ from update_checker import UpdateChecker
 
 import dbt_metricflow.cli.custom_click_types as click_custom
 from dbt_metricflow.cli import PACKAGE_NAME
-from dbt_metricflow.cli.cli_context import CLIContext
+from dbt_metricflow.cli.cli_configuration import CLIContext
 from dbt_metricflow.cli.constants import DEFAULT_RESULT_DECIMAL_PLACES, MAX_LIST_OBJECT_ELEMENTS
 from dbt_metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts
 from dbt_metricflow.cli.tutorial import (
