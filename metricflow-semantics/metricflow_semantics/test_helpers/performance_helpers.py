@@ -1,173 +1,186 @@
 from __future__ import annotations
 
-import functools
+import cProfile
 import logging
-import statistics
-import sys
-import time
-from collections import defaultdict
-from contextlib import ExitStack, contextmanager
-from typing import Any, Callable, Dict, Iterator, List, Optional, TypeVar
-from unittest.mock import patch as mock_patch
+from contextlib import contextmanager
+from pstats import FunctionProfile, Stats, StatsProfile
+from typing import Dict, Generic, Iterator, Optional, TypeVar
 
 from dbt_semantic_interfaces.implementations.base import FrozenBaseModel
-from typing_extensions import ParamSpec
-
-from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 
 logger = logging.getLogger(__name__)
 
 
-_tracking_class_methods: List[Callable[..., Any]] = [  # type: ignore
-    DataflowPlanBuilder.build_plan,
-    DataflowPlanBuilder.build_plan_for_distinct_values,
-]
+TNumber = TypeVar("TNumber", int, float)
 
 
-# TODO: maybe do object pooling and prealloc a bunch of these
-# so we dont pay the allocation tax when tracking perf
-class Call(FrozenBaseModel):
-    """A call to some method."""
+class PerformanceMetricComparison(FrozenBaseModel, Generic[TNumber]):
+    """Comparison of a performance metric."""
 
-    # TODO: use psutil to track memory and CPU
-    # https://github.com/giampaolo/psutil
-    total_cpu_ns: int
-    total_wall_ns: int
-
-
-class ContextReport(FrozenBaseModel):
-    """Contains aggregated runtime statistics about a single performance context."""
-
-    context_id: str
-
-    cpu_ns_average: int
-    cpu_ns_median: int
-    cpu_ns_max: int
-
-    wall_ns_average: int
-    wall_ns_median: int
-    wall_ns_max: int
+    a: TNumber
+    b: TNumber
+    abs: TNumber
+    pct: float
 
     @classmethod
-    def from_calls(cls, context_id: str, calls: List[Call]) -> ContextReport:
-        """Init from a list of calls."""
+    def from_metrics(cls, a: TNumber, b: TNumber) -> PerformanceMetricComparison[TNumber]:
+        """Construct a PerformanceMetricComparison from two values."""
+        abs = a - b
+        pct = (abs / a) if a != 0 else float("inf")
+        return PerformanceMetricComparison(
+            a=a,
+            b=b,
+            abs=abs,
+            pct=pct,
+        )
+
+
+class FunctionReport(FrozenBaseModel):
+    """Performance report for a given function.
+
+    We're using this class since the original FunctionProfile has terrible naming, no
+    documentation and weird typing (ncalls is a string that can optionally contain numbers).
+
+    See: https://github.com/python/cpython/blob/732670d93b9b0c0ff8adde07418fd6f8397893ef/Lib/pstats.py#L58
+    """
+
+    function_name: str
+
+    # number of non-recursive calls
+    base_calls: int
+    # total number of times the function was called, including recursion
+    total_calls: int
+
+    # time spent on the function body, not counting function calls
+    body_time: float
+    per_call_body_time: float
+
+    # total time spent on function, including function calls and recursion
+    total_time: float
+    per_call_total_time: float
+
+    @classmethod
+    def from_function_profile(cls, function_name: str, prof: FunctionProfile) -> FunctionReport:
+        """Construct a FunctionReport from a FunctionProfile."""
+        # Who thought this would ever be a good idea?
+        if "/" in prof.ncalls:
+            total_calls_str, base_calls_str = prof.ncalls.split("/")
+            total_calls = int(total_calls_str)
+            base_calls = int(base_calls_str)
+        else:
+            base_calls = total_calls = int(prof.ncalls)
+
         return cls(
-            context_id=context_id,
-            cpu_ns_average=int(statistics.mean(c.total_cpu_ns for c in calls)),
-            cpu_ns_median=int(statistics.median(c.total_cpu_ns for c in calls)),
-            cpu_ns_max=int(max(c.total_cpu_ns for c in calls)),
-            wall_ns_average=int(statistics.mean(c.total_wall_ns for c in calls)),
-            wall_ns_median=int(statistics.median(c.total_wall_ns for c in calls)),
-            wall_ns_max=int(max(c.total_wall_ns for c in calls)),
+            function_name=function_name,
+            base_calls=base_calls,
+            total_calls=total_calls,
+            body_time=prof.tottime,
+            per_call_body_time=prof.percall_tottime,
+            total_time=prof.cumtime,
+            per_call_total_time=prof.percall_cumtime,
         )
 
-    def compare(self, other: ContextReport) -> ContextReportComparison:
-        """Compare this report with other."""
-        assert self.context_id == other.context_id, "Cannot compare unrelated contexts."
+    def compare(self, other: FunctionReport) -> FunctionReportComparison:
+        """Compare self with other."""
+        assert self.function_name == other.function_name, "Cannot compare unrelated functions"
 
-        calculated_keys = (
-            "cpu_ns_average",
-            "cpu_ns_median",
-            "cpu_ns_max",
-            "wall_ns_average",
-            "wall_ns_median",
-            "wall_ns_max",
-        )
-
-        kwargs = {}
-        max_pct_change = float("-inf")
-        for key in calculated_keys:
-            self_val = getattr(self, key)
-            other_val = getattr(other, key)
-
-            diff = self_val - other_val
-            kwargs[f"{key}_abs"] = diff
-
-            pct = diff / self_val
-            kwargs[f"{key}_pct"] = pct
-            if pct > max_pct_change:
-                max_pct_change = pct
-
-        return ContextReportComparison(
-            context_id=self.context_id,
+        return FunctionReportComparison(
+            function_name=self.function_name,
             a=self,
             b=other,
-            max_pct_change=max_pct_change,
-            **kwargs,
+            base_calls=PerformanceMetricComparison[int].from_metrics(self.base_calls, other.base_calls),
+            total_calls=PerformanceMetricComparison[int].from_metrics(self.total_calls, other.total_calls),
+            body_time=PerformanceMetricComparison[float].from_metrics(self.body_time, other.body_time),
+            per_call_body_time=PerformanceMetricComparison[float].from_metrics(
+                self.per_call_body_time, other.per_call_body_time
+            ),
+            total_time=PerformanceMetricComparison[float].from_metrics(self.total_time, other.total_time),
+            per_call_total_time=PerformanceMetricComparison[float].from_metrics(
+                self.per_call_body_time, other.per_call_body_time
+            ),
         )
 
 
-class ContextReportComparison(FrozenBaseModel):
-    """A comparison between two context reports."""
+class FunctionReportComparison(FrozenBaseModel):
+    """Comparison of two function reports."""
 
-    context_id: str
+    function_name: str
 
-    a: ContextReport
-    b: ContextReport
+    a: FunctionReport
+    b: FunctionReport
 
-    max_pct_change: float
-
-    cpu_ns_average_abs: int
-    cpu_ns_average_pct: float
-    cpu_ns_median_abs: int
-    cpu_ns_median_pct: float
-    cpu_ns_max_abs: int
-    cpu_ns_max_pct: float
-
-    wall_ns_average_abs: int
-    wall_ns_average_pct: float
-    wall_ns_median_abs: int
-    wall_ns_median_pct: float
-    wall_ns_max_abs: int
-    wall_ns_max_pct: float
+    base_calls: PerformanceMetricComparison[int]
+    total_calls: PerformanceMetricComparison[int]
+    body_time: PerformanceMetricComparison[float]
+    per_call_body_time: PerformanceMetricComparison[float]
+    total_time: PerformanceMetricComparison[float]
+    per_call_total_time: PerformanceMetricComparison[float]
 
 
 class SessionReport(FrozenBaseModel):
-    """A performance report containing aggregated runtime statistics from a session."""
+    """Contains aggregated runtime statistics about a single performance session."""
 
     session_id: str
-    contexts: Dict[str, ContextReport]
+
+    total_time: float
+    functions: Dict[str, FunctionReport]
+
+    @classmethod
+    def from_stats(cls, session_id: str, stats: StatsProfile) -> SessionReport:
+        """Construct a SessionReport from a StatsProfile instance."""
+        functions: Dict[str, FunctionReport] = {}
+        for (
+            func_name,
+            func_profile,
+        ) in stats.func_profiles.items():
+            full_name = f"{func_profile.file_name}:{func_profile.line_number} :: {func_name}"
+            report = FunctionReport.from_function_profile(full_name, func_profile)
+            functions[full_name] = report
+
+        return cls(
+            session_id=session_id,
+            total_time=stats.total_tt,
+            functions=functions,
+        )
 
     def compare(self, other: SessionReport) -> SessionReportComparison:
-        """Compare this report with other."""
+        """Compare this report with other.
+
+        If some function is present in one report but not the other, the entry for its comparison
+        will be None.
+        """
         assert self.session_id == other.session_id, "Cannot compare unrelated sessions."
 
-        self_contexts = set(self.contexts.keys())
-        other_contexts = set(other.contexts.keys())
-        all_contexts = self_contexts.union(other_contexts)
-
-        comparisons: Dict[str, Optional[ContextReportComparison]] = {}
-        max_pct_change = float("-inf")
-        for context in all_contexts:
-            if context not in self.contexts or context not in other.contexts:
-                comparisons[context] = None
-            else:
-                comp = self.contexts[context].compare(other.contexts[context])
-                comparisons[context] = comp
-                if comp.max_pct_change > max_pct_change:
-                    max_pct_change = comp.max_pct_change
+        self_functions = set(self.functions.keys())
+        other_functions = set(other.functions.keys())
+        all_functions = self_functions.union(other_functions)
 
         return SessionReportComparison(
             session_id=self.session_id,
-            a=self.contexts,
-            b=other.contexts,
-            contexts=comparisons,
-            max_pct_change=max_pct_change,
+            a=self,
+            b=other,
+            total_time=PerformanceMetricComparison[float].from_metrics(self.total_time, other.total_time),
+            functions={
+                func_name: (
+                    self.functions[func_name].compare(other.functions[func_name])
+                    if func_name in self.functions and func_name in other.functions
+                    else None
+                )
+                for func_name in all_functions
+            },
         )
 
 
 class SessionReportComparison(FrozenBaseModel):
-    """A comparison between two session reports.
-
-    If a context is not present in A or B, the absolute and pct values will be None for
-    that entry.
-    """
+    """A comparison between two session reports."""
 
     session_id: str
-    a: Dict[str, ContextReport]
-    b: Dict[str, ContextReport]
-    contexts: Dict[str, Optional[ContextReportComparison]]
-    max_pct_change: float
+
+    a: SessionReport
+    b: SessionReport
+
+    total_time: PerformanceMetricComparison[float]
+    functions: Dict[str, Optional[FunctionReportComparison]]
 
 
 class SessionReportSet(FrozenBaseModel):
@@ -185,23 +198,15 @@ class SessionReportSet(FrozenBaseModel):
         other_sessions = set(other.sessions.keys())
         all_sessions = self_sessions.union(other_sessions)
 
-        comparison: Dict[str, Optional[SessionReportComparison]] = {}
-        max_pct_change = float("-inf")
-        max_pct_change_session = ""
-        for session in all_sessions:
-            if session not in self.sessions or session not in other.sessions:
-                comparison[session] = None
-            else:
-                comp = self.sessions[session].compare(other.sessions[session])
-                comparison[session] = comp
-                if comp.max_pct_change > max_pct_change:
-                    max_pct_change = comp.max_pct_change
-                    max_pct_change_session = session
-
         return SessionReportSetComparison(
-            sessions=comparison,
-            max_pct_change=max_pct_change,
-            max_pct_change_session=max_pct_change_session,
+            sessions={
+                session: (
+                    self.sessions[session].compare(other.sessions[session])
+                    if session in self.sessions and session in other.sessions
+                    else None
+                )
+                for session in all_sessions
+            }
         )
 
 
@@ -213,26 +218,18 @@ class SessionReportSetComparison(FrozenBaseModel):
 
     sessions: Dict[str, Optional[SessionReportComparison]]
 
-    max_pct_change: float
-    max_pct_change_session: str
-
 
 class PerformanceTracker:
-    """Track performance metrics across different contexts.
-
-    Don't use this directly. Instead, use the global methods in this method which interact
-    with the _perf singleton.
-    """
+    """Track performance metrics."""
 
     def __init__(self) -> None:
         """Initialize the tracker."""
         self._session_id: Optional[str] = None
-        self._call_map: Dict[str, List[Call]] = defaultdict(list)
-
-        self._session_set = SessionReportSet()
+        self._last_session_report: Optional[SessionReport] = None
+        self.report_set = SessionReportSet()
 
     @contextmanager
-    def session(self, session_id: str) -> Iterator[None]:
+    def session(self, session_id: str) -> Iterator[PerformanceTracker]:
         """Create a new measurement session.
 
         At session start, all state is fresh and it gets cleaned when the session ends.
@@ -242,109 +239,22 @@ class PerformanceTracker:
 
         self._session_id = session_id
 
-        yield
+        with cProfile.Profile() as profiler:
+            yield self
 
-        report = self.get_session_report()
-        self._session_set.add_report(report)
+        raw_stats = Stats(profiler)
+        stats = raw_stats.strip_dirs().get_stats_profile()
 
-        self._call_map = defaultdict(list)
+        report = SessionReport.from_stats(session_id, stats)
+        self._last_session_report = report
+        self.report_set.add_report(report)
+
         self._session_id = None
 
-    @contextmanager
-    def measure(self, context_id: str) -> Iterator[PerformanceTracker]:
-        """Measure performance while executing this block."""
-        if not self._session_id:
-            raise ValueError("Cannot measure outside of a session.")
+    @property
+    def last_session_report(self) -> SessionReport:
+        """Get the report for the last session."""
+        if not self._last_session_report:
+            raise ValueError("Run the profiler before getting a report.")
 
-        start_wall = time.time_ns()
-        start_cpu = time.process_time_ns()
-
-        yield self
-
-        end_wall = time.time_ns()
-        end_cpu = time.process_time_ns()
-
-        self._call_map[context_id].append(
-            Call(
-                total_wall_ns=(end_wall - start_wall),
-                total_cpu_ns=(end_cpu - start_cpu),
-            )
-        )
-
-    def get_session_report(self) -> SessionReport:
-        """Generate a report based on all the tracked calls in the current session."""
-        if not self._session_id:
-            raise ValueError("Cannot create report outside of a session.")
-
-        return SessionReport(
-            session_id=self._session_id,
-            contexts={
-                context_id: ContextReport.from_calls(context_id, calls) for context_id, calls in self._call_map.items()
-            },
-        )
-
-    def get_report_set(self) -> SessionReportSet:
-        """Get the performance report set for all opened sessions so far."""
-        return self._session_set
-
-
-TRet = TypeVar("TRet")
-TParam = ParamSpec("TParam")
-
-
-@contextmanager
-def _track_performance_single(target: Callable[TParam, TRet], perf: PerformanceTracker) -> Iterator[None]:
-    """Enable tracking for a single target.
-
-    This method patches all instances where it is imported.
-    """
-
-    @functools.wraps(target)
-    def wrap_tracking(*args: TParam.args, **kwargs: TParam.kwargs) -> TRet:
-        with perf.measure(target.__qualname__):
-            return target(*args, **kwargs)
-
-    mod_name = target.__module__
-    class_name, method_name = target.__qualname__.split(".")
-    mod = sys.modules[mod_name]
-    klass = getattr(mod, class_name)
-    full_name = f"{mod_name}.{target.__qualname__}"
-
-    patchers = []
-
-    # patch the module itself for future imports
-    patchers.append(mock_patch(full_name, new=wrap_tracking))
-
-    # patch all current references to the method
-    for module in sys.modules.values():
-        # no need to patch sys modules, third party libraries etc
-        if not module.__name__.startswith("metricflow"):
-            continue
-
-        for module_target_name, module_target in module.__dict__.items():
-            if module_target is klass:
-                module_target_full_name = f"{module.__name__}.{module_target_name}.{method_name}"
-                patchers.append(mock_patch(module_target_full_name, new=wrap_tracking))
-
-    for patcher in patchers:
-        patcher.start()
-
-    yield
-
-    for patcher in patchers:
-        patcher.stop()
-
-
-@contextmanager
-def track_performance() -> Iterator[PerformanceTracker]:
-    """Enable performance tracking while in this context manager."""
-    global _tracking_class_methods
-
-    logger.info("Enabling performance tracking")
-    perf = PerformanceTracker()
-
-    with ExitStack() as stack:
-        for target in _tracking_class_methods:
-            stack.enter_context(_track_performance_single(target, perf))
-
-        yield perf
+        return self._last_session_report
