@@ -12,7 +12,7 @@ from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from typing_extensions import override
 
-from dbt_metricflow.cli.cli_configuration import CLIContext
+from dbt_metricflow.cli.cli_configuration import CLIConfiguration
 from dbt_metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts, dbtProjectMetadata
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.protocols.sql_client import SqlClient
@@ -20,7 +20,7 @@ from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixt
 from tests_metricflow.fixtures.setup_fixtures import dbt_project_dir
 
 
-class FakeCLIContext(CLIContext):
+class FakeCLIConfiguration(CLIConfiguration):
     """Fake context for testing. Manually initialize or override params used by CLIContext as appropriate.
 
     Note - this construct should not exist. It bypasses a fundamental initialization process within the CLI which
@@ -78,9 +78,9 @@ def cli_context(  # noqa: D103
     sql_client: SqlClient,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     create_source_tables: bool,
-) -> Generator[CLIContext, None, None]:
+) -> Generator[CLIConfiguration, None, None]:
     engine_test_fixture = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST]
-    context = FakeCLIContext()
+    context = FakeCLIConfiguration()
     context._mf = engine_test_fixture.metricflow_engine
     context._sql_client = sql_client
     context._semantic_manifest = engine_test_fixture.semantic_manifest
@@ -93,7 +93,7 @@ def cli_context(  # noqa: D103
 class MetricFlowCliRunner(CliRunner):
     """Custom CliRunner class to handle passing context."""
 
-    def __init__(self, cli_context: CLIContext, project_path: str) -> None:  # noqa: D107
+    def __init__(self, cli_context: CLIConfiguration, project_path: str) -> None:  # noqa: D107
         self.cli_context = cli_context
         self.project_path = project_path
         super().__init__()
@@ -107,5 +107,5 @@ class MetricFlowCliRunner(CliRunner):
 
 
 @pytest.fixture(scope="session")
-def cli_runner(cli_context: CLIContext) -> MetricFlowCliRunner:  # noqa: D103
+def cli_runner(cli_context: CLIConfiguration) -> MetricFlowCliRunner:  # noqa: D103
     return MetricFlowCliRunner(cli_context=cli_context, project_path=dbt_project_dir())
