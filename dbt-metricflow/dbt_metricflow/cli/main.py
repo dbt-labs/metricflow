@@ -25,7 +25,7 @@ from update_checker import UpdateChecker
 
 import dbt_metricflow.cli.custom_click_types as click_custom
 from dbt_metricflow.cli import PACKAGE_NAME
-from dbt_metricflow.cli.cli_configuration import CLIContext
+from dbt_metricflow.cli.cli_configuration import CLIConfiguration
 from dbt_metricflow.cli.constants import DEFAULT_RESULT_DECIMAL_PLACES, MAX_LIST_OBJECT_ELEMENTS
 from dbt_metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts
 from dbt_metricflow.cli.tutorial import (
@@ -45,7 +45,7 @@ from metricflow.validation.data_warehouse_model_validator import DataWarehouseMo
 
 logger = logging.getLogger(__name__)
 
-pass_config = click.make_pass_decorator(CLIContext, ensure=True)
+pass_config = click.make_pass_decorator(CLIConfiguration, ensure=True)
 _telemetry_reporter = TelemetryReporter(report_levels_higher_or_equal_to=TelemetryLevel.USAGE)
 _telemetry_reporter.add_python_log_handler()
 
@@ -55,7 +55,7 @@ _telemetry_reporter.add_python_log_handler()
 @click.version_option()
 @pass_config
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-def cli(cfg: CLIContext, verbose: bool) -> None:  # noqa: D103
+def cli(cfg: CLIConfiguration, verbose: bool) -> None:  # noqa: D103
     # Some HTTP logging callback somewhere is failing to close its SSL connections correctly.
     # For now, filter those warnings so they don't pop up in CLI stderr
     # note - this should be addressed as adapter connection issues might produce these as well
@@ -108,7 +108,7 @@ def cli(cfg: CLIContext, verbose: bool) -> None:  # noqa: D103
 @pass_config
 @click.pass_context
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, clean: bool) -> None:
+def tutorial(ctx: click.core.Context, cfg: CLIConfiguration, msg: bool, clean: bool) -> None:
     """Run user through a tutorial."""
     help_msg = textwrap.dedent(
         """\
@@ -254,7 +254,7 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, clean: bool) -
 @error_if_not_in_dbt_project
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def query(
-    cfg: CLIContext,
+    cfg: CLIConfiguration,
     metrics: Optional[Sequence[str]] = None,
     group_by: Optional[Sequence[str]] = None,
     where: Optional[str] = None,
@@ -357,7 +357,7 @@ def query(
 @pass_config
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 @error_if_not_in_dbt_project
-def list(cfg: CLIContext) -> None:
+def list(cfg: CLIConfiguration) -> None:
     """Retrieve metadata values about metrics/dimensions/entities/dimension values."""
 
 
@@ -370,7 +370,7 @@ def list(cfg: CLIContext) -> None:
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 @error_if_not_in_dbt_project
-def metrics(cfg: CLIContext, show_all_dimensions: bool = False, search: Optional[str] = None) -> None:
+def metrics(cfg: CLIConfiguration, show_all_dimensions: bool = False, search: Optional[str] = None) -> None:
     """List the metrics with their available dimensions.
 
     Automatically truncates long lists of dimensions, pass --show-all-dims to see all.
@@ -414,7 +414,7 @@ def metrics(cfg: CLIContext, show_all_dimensions: bool = False, search: Optional
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 @error_if_not_in_dbt_project
-def dimensions(cfg: CLIContext, metrics: List[str]) -> None:
+def dimensions(cfg: CLIConfiguration, metrics: List[str]) -> None:
     """List all unique dimensions."""
     spinner = Halo(
         text="🔍 Looking for all available dimensions...",
@@ -442,7 +442,7 @@ def dimensions(cfg: CLIContext, metrics: List[str]) -> None:
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 @error_if_not_in_dbt_project
-def entities(cfg: CLIContext, metrics: List[str]) -> None:
+def entities(cfg: CLIConfiguration, metrics: List[str]) -> None:
     """List all unique entities."""
     spinner = Halo(
         text="🔍 Looking for all available entities...",
@@ -464,7 +464,7 @@ def entities(cfg: CLIContext, metrics: List[str]) -> None:
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 @error_if_not_in_dbt_project
-def health_checks(cfg: CLIContext) -> None:
+def health_checks(cfg: CLIConfiguration) -> None:
     """Performs a health check against the DW provided in the configs."""
     spinner = Halo(
         text="🏥 Running health checks against your data warehouse... (This should not take longer than 30s for a successful connection)",
@@ -495,7 +495,7 @@ def health_checks(cfg: CLIContext) -> None:
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 @error_if_not_in_dbt_project
 def dimension_values(
-    cfg: CLIContext,
+    cfg: CLIConfiguration,
     metrics: List[str],
     dimension: str,
     start_time: Optional[dt.datetime] = None,
@@ -620,7 +620,7 @@ def _data_warehouse_validations_runner(
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 @error_if_not_in_dbt_project
 def validate_configs(
-    cfg: CLIContext,
+    cfg: CLIConfiguration,
     dw_timeout: Optional[int] = None,
     skip_dw: bool = False,
     show_all: bool = False,

@@ -19,7 +19,7 @@ from metricflow_semantics.test_helpers.example_project_configuration import (
     EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE,
 )
 
-from dbt_metricflow.cli.cli_configuration import CLIContext
+from dbt_metricflow.cli.cli_configuration import CLIConfiguration
 from dbt_metricflow.cli.main import (
     dimension_values,
     dimensions,
@@ -79,7 +79,7 @@ def create_directory(directory_path: str) -> Iterator[None]:
     shutil.rmtree(path)
 
 
-def test_validate_configs(cli_context: CLIContext) -> None:
+def test_validate_configs(cli_context: CLIConfiguration) -> None:
     """Tests config validation from a manifest stored on the filesystem.
 
     This test is special, because the CLI bypasses the semantic manifest read into the CLIContext and

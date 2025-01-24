@@ -17,7 +17,7 @@ from metricflow.protocols.sql_client import SqlClient
 logger = logging.getLogger(__name__)
 
 
-class CLIContext:
+class CLIConfiguration:
     """Context for MetricFlow CLI."""
 
     def __init__(self) -> None:
