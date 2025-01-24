@@ -90,7 +90,7 @@ from metricflow.dataflow.nodes.join_to_custom_granularity import JoinToCustomGra
 from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataflow.nodes.min_max import MinMaxNode
-from metricflow.dataflow.nodes.offset_by_custom_granularity import OffsetByCustomGranularityNode
+from metricflow.dataflow.nodes.offset_base_grain_by_custom_grain import OffsetBaseGrainByCustomGrainNode
 from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
@@ -1986,7 +1986,7 @@ class DataflowPlanBuilder:
     def build_custom_offset_time_spine_node(
         self, offset_window: MetricTimeWindow, required_time_spine_specs: Tuple[TimeDimensionSpec, ...]
     ) -> DataflowPlanNode:
-        """Builds an OffsetByCustomGranularityNode used for custom offset windows."""
+        """Builds an OffsetBaseGrainByCustomGrainNode used for custom offset windows."""
         # Build time spine node that offsets agg time dimensions by a custom grain.
         custom_grain = self._semantic_model_lookup._custom_granularities[offset_window.granularity]
         time_spine_source = self._choose_time_spine_source((DataSet.metric_time_dimension_spec(custom_grain),))
@@ -1994,7 +1994,7 @@ class DataflowPlanBuilder:
         if {spec.time_granularity for spec in required_time_spine_specs} == {custom_grain}:
             # TODO: If querying with only the same grain as is used in the offset_window, can use a simpler plan.
             pass
-        return OffsetByCustomGranularityNode.create(
+        return OffsetBaseGrainByCustomGrainNode.create(
             time_spine_node=time_spine_read_node,
             offset_window=offset_window,
             required_time_spine_specs=required_time_spine_specs,
