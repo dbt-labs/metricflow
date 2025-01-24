@@ -13,6 +13,7 @@ class dbtMetricFlowTutorialHelper:
     SAMPLE_MODELS_DIRECTORY = SAMPLE_DBT_MODEL_DIRECTORY + "/sample_models"
     SAMPLE_SEED_DIRECTORY = SAMPLE_DBT_MODEL_DIRECTORY + "/seeds"
     SAMPLE_SEMANTIC_MANIFEST = SAMPLE_DBT_MODEL_DIRECTORY + "/semantic_manifest.json"
+    SAMPLE_DBT_PROJECT_DIRECTORY = "mf_tutorial_project"
     SAMPLE_SOURCES_FILE = "sources.yml"
 
     @staticmethod
@@ -58,6 +59,18 @@ class dbtMetricFlowTutorialHelper:
             shutil.rmtree(seed_path)
 
     @staticmethod
+    def remove_files(path: pathlib.Path) -> None:
+        """Remove the sample files generated."""
+        if path.exists():
+            shutil.rmtree(path)
+
+    @staticmethod
     def check_if_path_exists(paths: Sequence[pathlib.Path]) -> bool:
         """Check if the given set of paths already exists, return True if any of the paths exists."""
         return any(p.exists() for p in paths)
+
+    @staticmethod
+    def generate_dbt_project(project_path: pathlib.Path) -> None:
+        """Generate a sample dbt project using a self-contained DuckDB instance into the given directory."""
+        sample_project_path = pathlib.Path(__file__).parent / dbtMetricFlowTutorialHelper.SAMPLE_DBT_PROJECT_DIRECTORY
+        shutil.copytree(src=sample_project_path, dst=project_path)

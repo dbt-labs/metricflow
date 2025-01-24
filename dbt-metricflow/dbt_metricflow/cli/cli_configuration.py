@@ -29,13 +29,12 @@ class CLIConfiguration:
         self._semantic_manifest: Optional[SemanticManifest] = None
         self._semantic_manifest_lookup: Optional[SemanticManifestLookup] = None
 
-    def setup(self, dbt_project_path: Optional[pathlib.Path] = None) -> None:
+    def setup(self) -> None:
         """Setup this configuration for executing commands.
 
         The dbt_artifacts construct must be loaded in order for logging configuration to work correctly.
         """
-        if dbt_project_path is None:
-            dbt_project_path = pathlib.Path.cwd()
+        dbt_project_path = pathlib.Path.cwd()
         self._dbt_project_metadata = dbtProjectMetadata.load_from_project_path(dbt_project_path)
 
         # self.log_file_path invokes the dbtRunner. If this is done after the configure_logging call all of the
