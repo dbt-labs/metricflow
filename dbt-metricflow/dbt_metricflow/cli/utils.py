@@ -12,7 +12,7 @@ from dateutil.parser import parse
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 
 import dbt_metricflow.cli.custom_click_types as click_custom
-from dbt_metricflow.cli.cli_context import CLIContext
+from dbt_metricflow.cli.cli_configuration import CLIContext
 
 logger = logging.getLogger(__name__)
 
