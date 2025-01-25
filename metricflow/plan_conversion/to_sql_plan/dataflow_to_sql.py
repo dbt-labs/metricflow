@@ -10,6 +10,7 @@ from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifest
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
 
+from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
 )
@@ -24,10 +25,7 @@ from metricflow.sql.optimizer.optimization_levels import (
     SqlOptimizationLevel,
 )
 from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlPlanOptimizer
-from metricflow.sql.sql_plan import (
-    SqlPlan,
-    SqlPlanNode,
-)
+from metricflow.sql.sql_plan import SqlPlan, SqlPlanNode
 from metricflow.sql.sql_select_node import SqlSelectStatementNode
 
 logger = logging.getLogger(__name__)
@@ -40,6 +38,7 @@ class DataflowToSqlPlanConverter:
         self,
         column_association_resolver: ColumnAssociationResolver,
         semantic_manifest_lookup: SemanticManifestLookup,
+        node_output_resolver: DataflowPlanNodeOutputDataSetResolver,
     ) -> None:
         """Constructor.
 
@@ -58,6 +57,7 @@ class DataflowToSqlPlanConverter:
         self._custom_granularity_time_spine_sources = TimeSpineSource.build_custom_time_spine_sources(
             tuple(self._time_spine_sources.values())
         )
+        self._node_output_resolver = node_output_resolver
 
     @property
     def column_association_resolver(self) -> ColumnAssociationResolver:  # noqa: D102
@@ -170,6 +170,7 @@ class DataflowToSqlPlanConverter:
             to_sql_subquery_visitor = DataflowNodeToSqlSubqueryVisitor(
                 column_association_resolver=self.column_association_resolver,
                 semantic_manifest_lookup=self._semantic_manifest_lookup,
+                node_output_resolver=self._node_output_resolver,
             )
             data_set = dataflow_plan_node.accept(to_sql_subquery_visitor)
         else:
@@ -177,6 +178,7 @@ class DataflowToSqlPlanConverter:
                 column_association_resolver=self.column_association_resolver,
                 semantic_manifest_lookup=self._semantic_manifest_lookup,
                 nodes_to_convert_to_cte=nodes_to_convert_to_cte,
+                node_output_resolver=self._node_output_resolver,
             )
             data_set = dataflow_plan_node.accept(to_sql_cte_visitor)
             select_statement = data_set.checked_sql_select_node

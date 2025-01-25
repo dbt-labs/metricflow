@@ -13,6 +13,7 @@ from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.sql.sql_table import SqlTable
 from typing_extensions import override
 
+from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode
 from metricflow.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
 from metricflow.dataflow.nodes.aggregate_measures import AggregateMeasuresNode
@@ -90,9 +91,12 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
         column_association_resolver: ColumnAssociationResolver,
         semantic_manifest_lookup: SemanticManifestLookup,
         nodes_to_convert_to_cte: FrozenSet[DataflowPlanNode],
+        node_output_resolver: DataflowPlanNodeOutputDataSetResolver,
     ) -> None:
         super().__init__(
-            column_association_resolver=column_association_resolver, semantic_manifest_lookup=semantic_manifest_lookup
+            column_association_resolver=column_association_resolver,
+            semantic_manifest_lookup=semantic_manifest_lookup,
+            node_output_resolver=node_output_resolver,
         )
         self._nodes_to_convert_to_cte = nodes_to_convert_to_cte
 

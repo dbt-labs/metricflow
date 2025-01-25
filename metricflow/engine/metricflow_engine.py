@@ -402,6 +402,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         self._to_sql_plan_converter = DataflowToSqlPlanConverter(
             column_association_resolver=self._column_association_resolver,
             semantic_manifest_lookup=self._semantic_manifest_lookup,
+            node_output_resolver=node_output_resolver,
         )
         self._executor = SequentialPlanExecutor()
 

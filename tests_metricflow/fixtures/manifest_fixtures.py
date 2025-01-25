@@ -189,6 +189,7 @@ class MetricFlowEngineTestFixture:
             dataflow_to_sql_converter=DataflowToSqlPlanConverter(
                 column_association_resolver=column_association_resolver,
                 semantic_manifest_lookup=semantic_manifest_lookup,
+                node_output_resolver=node_output_resolver,
             ),
             query_parser=query_parser,
             metricflow_engine=MetricFlowEngine(

@@ -14,6 +14,7 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
+from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.execution.dataflow_to_execution import DataflowToExecutionPlanConverter
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
@@ -26,10 +27,15 @@ def make_execution_plan_converter(  # noqa: D103
     semantic_manifest_lookup: SemanticManifestLookup,
     sql_client: SqlClient,
 ) -> DataflowToExecutionPlanConverter:
+    column_association_resolver = DunderColumnAssociationResolver()
     return DataflowToExecutionPlanConverter(
         sql_plan_converter=DataflowToSqlPlanConverter(
-            column_association_resolver=DunderColumnAssociationResolver(),
+            column_association_resolver=column_association_resolver,
             semantic_manifest_lookup=semantic_manifest_lookup,
+            node_output_resolver=DataflowPlanNodeOutputDataSetResolver(
+                column_association_resolver=column_association_resolver,
+                semantic_manifest_lookup=semantic_manifest_lookup,
+            ),
         ),
         sql_plan_renderer=DefaultSqlPlanRenderer(),
         sql_client=sql_client,

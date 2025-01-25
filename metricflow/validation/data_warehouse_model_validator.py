@@ -61,19 +61,21 @@ class QueryRenderingTools:
     plan_converter: DataflowToSqlPlanConverter
 
     def __init__(self, manifest: SemanticManifest) -> None:  # noqa: D107
+        column_association_resolver = DunderColumnAssociationResolver()
         self.semantic_manifest_lookup = SemanticManifestLookup(semantic_manifest=manifest)
+        self.node_resolver = DataflowPlanNodeOutputDataSetResolver(
+            column_association_resolver=column_association_resolver,
+            semantic_manifest_lookup=self.semantic_manifest_lookup,
+        )
         self.source_node_builder = SourceNodeBuilder(
-            column_association_resolver=DunderColumnAssociationResolver(),
+            column_association_resolver,
             semantic_manifest_lookup=self.semantic_manifest_lookup,
         )
         self.converter = SemanticModelToDataSetConverter(column_association_resolver=DunderColumnAssociationResolver())
         self.plan_converter = DataflowToSqlPlanConverter(
-            column_association_resolver=DunderColumnAssociationResolver(),
+            column_association_resolver=column_association_resolver,
             semantic_manifest_lookup=self.semantic_manifest_lookup,
-        )
-        self.node_resolver = DataflowPlanNodeOutputDataSetResolver(
-            column_association_resolver=DunderColumnAssociationResolver(),
-            semantic_manifest_lookup=self.semantic_manifest_lookup,
+            node_output_resolver=self.node_resolver,
         )
 
 

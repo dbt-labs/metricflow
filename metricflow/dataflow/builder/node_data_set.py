@@ -73,6 +73,7 @@ class DataflowPlanNodeOutputDataSetResolver:
         self._to_data_set_visitor = _NodeDataSetVisitor(
             column_association_resolver=self._column_association_resolver,
             semantic_manifest_lookup=self._semantic_manifest_lookup,
+            node_output_resolver=self,
         )
 
     def get_output_data_set(self, node: DataflowPlanNode) -> SqlDataSet:
