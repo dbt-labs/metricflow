@@ -1,6 +1,0 @@
-kind: Under the Hood
-body: Added filtering for DWH validation tasks and saved query support
-time: 2024-06-12T23:34:59.094903-04:00
-custom:
-  Author: WilliamDee
-  Issue: "1271"

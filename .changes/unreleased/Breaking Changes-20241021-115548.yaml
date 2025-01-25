@@ -1,6 +1,0 @@
-kind: Breaking Changes
-body: Require Python `>=3.9`
-time: 2024-10-21T11:55:48.188883-07:00
-custom:
-  Author: plypaul
-  Issue: "1470"
