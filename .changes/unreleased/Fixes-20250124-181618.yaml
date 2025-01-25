@@ -1,0 +1,6 @@
+kind: Fixes
+body: Compatibility Issue with dbt-core 1.9.0 and dbt-metricflow 0.7.1.
+time: 2025-01-24T18:16:18.536201-08:00
+custom:
+  Author: plypaul
+  Issue: "1589"
