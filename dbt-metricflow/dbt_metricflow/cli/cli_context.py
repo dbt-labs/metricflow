@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 class CLIContext:
-    """Context for MetricFlow CLI."""
+    """Context for the MetricFlow CLI."""
 
     def __init__(self) -> None:
         """Initialize the CLI context for executing commands.
