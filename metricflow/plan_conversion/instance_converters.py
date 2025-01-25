@@ -26,6 +26,7 @@ from metricflow_semantics.instances import (
     MetricInstance,
     TimeDimensionInstance,
 )
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
@@ -449,26 +450,37 @@ class FilterElements(InstanceSetTransform[InstanceSet]):
 
     def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D102
         # Sanity check to make sure the specs are in the instance set
-
+        available_specs = instance_set.spec_set.all_specs
         if self._include_specs:
             include_specs_not_found = []
             for include_spec in self._include_specs.all_specs:
-                if include_spec not in instance_set.spec_set.all_specs:
+                if include_spec not in available_specs:
                     include_specs_not_found.append(include_spec)
             if include_specs_not_found:
                 raise RuntimeError(
-                    f"Include specs {include_specs_not_found} are not in the spec set {instance_set.spec_set} - "
-                    f"check if this node was constructed correctly."
+                    str(
+                        LazyFormat(
+                            "Include specs are not in the spec set - check if this node was constructed correctly.",
+                            include_specs_not_found=include_specs_not_found,
+                            available_specs=available_specs,
+                        )
+                    )
                 )
         elif self._exclude_specs:
             exclude_specs_not_found = []
+
             for exclude_spec in self._exclude_specs.all_specs:
-                if exclude_spec not in instance_set.spec_set.all_specs:
+                if exclude_spec not in available_specs:
                     exclude_specs_not_found.append(exclude_spec)
             if exclude_specs_not_found:
                 raise RuntimeError(
-                    f"Exclude specs {exclude_specs_not_found} are not in the spec set {instance_set.spec_set} - "
-                    f"check if this node was constructed correctly."
+                    str(
+                        LazyFormat(
+                            "Exclude specs are not in the spec set - check if this node was constructed correctly.",
+                            exclude_specs_not_found=exclude_specs_not_found,
+                            available_specs=available_specs,
+                        )
+                    )
                 )
         else:
             assert False, "Include specs or exclude specs should have been specified."
