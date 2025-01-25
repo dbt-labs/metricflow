@@ -9,6 +9,7 @@ from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 
+from dbt_metricflow.cli import PACKAGE_NAME
 from dbt_metricflow.cli.dbt_connectors.adapter_backed_client import AdapterBackedSqlClient
 from dbt_metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts, dbtProjectMetadata
 from metricflow.engine.metricflow_engine import MetricFlowEngine
@@ -35,11 +36,22 @@ class CLIConfiguration:
         The dbt_artifacts construct must be loaded in order for logging configuration to work correctly.
         """
         dbt_project_path = pathlib.Path.cwd()
-        self._dbt_project_metadata = dbtProjectMetadata.load_from_project_path(dbt_project_path)
+        try:
+            self._dbt_project_metadata = dbtProjectMetadata.load_from_project_path(dbt_project_path)
 
-        # self.log_file_path invokes the dbtRunner. If this is done after the configure_logging call all of the
-        # dbt CLI logging configuration could be overridden, resulting in lots of things printing to console
-        self._configure_logging(log_file_path=self.log_file_path)
+            # self.log_file_path invokes the dbtRunner. If this is done after the configure_logging call all of the
+            # dbt CLI logging configuration could be overridden, resulting in lots of things printing to console
+            self._configure_logging(log_file_path=self.log_file_path)
+        except Exception as e:
+            exception_message = str(e)
+            if exception_message.find("Could not find adapter type") != -1:
+                raise RuntimeError(
+                    f"Got an error during setup, potentially due to a missing adapter package. Has the appropriate "
+                    f"adapter package (`{PACKAGE_NAME}[dbt-*]`) for the dbt project {str(dbt_project_path)!r} been "
+                    f"installed? If not please install it (e.g. `pip install '{PACKAGE_NAME}[dbt-duckdb]')."
+                ) from e
+            else:
+                raise e
 
     def _get_dbt_project_metadata(self) -> dbtProjectMetadata:
         if self._dbt_project_metadata is None:
