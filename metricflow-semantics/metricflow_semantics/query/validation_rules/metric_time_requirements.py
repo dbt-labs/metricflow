@@ -15,7 +15,6 @@ from typing_extensions import override
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
-from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow_semantics.query.issues.issues_base import (
     MetricFlowQueryResolutionIssue,
@@ -41,7 +40,6 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
 
     * Cumulative metrics.
     * Derived metrics with an offset time.
-    * Slowly changing dimensions
     """
 
     def __init__(  # noqa: D107
@@ -130,14 +128,6 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
                 query_resolution_path=resolution_path,
             ),
         )
-
-    def _scd_linkable_element_set_for_measure(self, measure_reference: MeasureReference) -> LinkableElementSet:
-        """Returns subset of the query's `LinkableElements` that are SCDs and associated with the measure."""
-        measure_semantic_model = self._manifest_lookup.semantic_model_lookup.measure_lookup.get_properties(
-            measure_reference
-        ).model_reference
-
-        return self._scd_linkable_element_set.filter_by_left_semantic_model(measure_semantic_model)
 
     @override
     def validate_metric_in_resolution_dag(
