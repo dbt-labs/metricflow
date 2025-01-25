@@ -39,7 +39,10 @@ from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.instance_converters import CreateSelectColumnsForInstances
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
-from metricflow.sql.sql_plan import SqlCteNode, SqlSelectColumn, SqlSelectStatementNode, SqlTableNode
+from metricflow.sql.sql_cte_node import SqlCteNode
+from metricflow.sql.sql_plan import SqlSelectColumn
+from metricflow.sql.sql_select_node import SqlSelectStatementNode
+from metricflow.sql.sql_table_node import SqlTableNode
 
 logger = logging.getLogger(__name__)
 

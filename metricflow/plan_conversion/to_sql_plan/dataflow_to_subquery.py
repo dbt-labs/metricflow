@@ -117,15 +117,13 @@ from metricflow.plan_conversion.spec_transforms import (
     SelectOnlyLinkableSpecs,
 )
 from metricflow.plan_conversion.to_sql_plan.sql_join_builder import ColumnEqualityDescription, SqlPlanJoinBuilder
+from metricflow.sql.sql_ctas_node import SqlCreateTableAsNode
+from metricflow.sql.sql_cte_node import SqlCteNode
 from metricflow.sql.sql_plan import (
-    SqlCreateTableAsNode,
-    SqlCteNode,
-    SqlJoinDescription,
-    SqlOrderByDescription,
     SqlSelectColumn,
-    SqlSelectStatementNode,
-    SqlTableNode,
 )
+from metricflow.sql.sql_select_node import SqlJoinDescription, SqlOrderByDescription, SqlSelectStatementNode
+from metricflow.sql.sql_table_node import SqlTableNode
 
 
 class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):

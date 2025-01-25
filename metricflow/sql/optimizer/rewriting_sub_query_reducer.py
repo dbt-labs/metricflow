@@ -18,18 +18,16 @@ from metricflow_semantics.sql.sql_exprs import (
 from typing_extensions import override
 
 from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlPlanOptimizer
+from metricflow.sql.sql_ctas_node import SqlCreateTableAsNode
+from metricflow.sql.sql_cte_node import SqlCteNode
 from metricflow.sql.sql_plan import (
-    SqlCreateTableAsNode,
-    SqlCteNode,
-    SqlJoinDescription,
-    SqlOrderByDescription,
     SqlPlanNode,
     SqlPlanNodeVisitor,
     SqlSelectColumn,
-    SqlSelectQueryFromClauseNode,
-    SqlSelectStatementNode,
-    SqlTableNode,
 )
+from metricflow.sql.sql_select_node import SqlJoinDescription, SqlOrderByDescription, SqlSelectStatementNode
+from metricflow.sql.sql_select_text_node import SqlSelectTextNode
+from metricflow.sql.sql_table_node import SqlTableNode
 
 logger = logging.getLogger(__name__)
 
@@ -766,7 +764,7 @@ class SqlRewritingSubQueryReducerVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
     def visit_table_node(self, node: SqlTableNode) -> SqlPlanNode:  # noqa: D102
         return node
 
-    def visit_query_from_clause_node(self, node: SqlSelectQueryFromClauseNode) -> SqlPlanNode:  # noqa: D102
+    def visit_query_from_clause_node(self, node: SqlSelectTextNode) -> SqlPlanNode:  # noqa: D102
         return node
 
     def visit_create_table_as_node(self, node: SqlCreateTableAsNode) -> SqlPlanNode:  # noqa: D102
@@ -841,7 +839,7 @@ class SqlGroupByRewritingVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
     def visit_table_node(self, node: SqlTableNode) -> SqlPlanNode:  # noqa: D102
         return node
 
-    def visit_query_from_clause_node(self, node: SqlSelectQueryFromClauseNode) -> SqlPlanNode:  # noqa: D102
+    def visit_query_from_clause_node(self, node: SqlSelectTextNode) -> SqlPlanNode:  # noqa: D102
         return node
 
     def visit_create_table_as_node(self, node: SqlCreateTableAsNode) -> SqlPlanNode:  # noqa: D102

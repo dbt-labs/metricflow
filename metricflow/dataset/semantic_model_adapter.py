@@ -5,7 +5,7 @@ from metricflow_semantics.instances import InstanceSet
 from typing_extensions import override
 
 from metricflow.dataset.sql_dataset import SqlDataSet
-from metricflow.sql.sql_plan import SqlSelectStatementNode
+from metricflow.sql.sql_select_node import SqlSelectStatementNode
 
 
 class SemanticModelDataSet(SqlDataSet):

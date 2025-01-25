@@ -48,9 +48,9 @@ from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.sql.sql_plan import (
     SqlSelectColumn,
-    SqlSelectStatementNode,
-    SqlTableNode,
 )
+from metricflow.sql.sql_select_node import SqlSelectStatementNode
+from metricflow.sql.sql_table_node import SqlTableNode
 
 logger = logging.getLogger(__name__)
 
