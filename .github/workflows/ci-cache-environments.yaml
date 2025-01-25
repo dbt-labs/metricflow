@@ -1,0 +1,33 @@
+# It seems like the caching of the environment needs to be run on the main branch if the cache is to be used by child
+# branches in PRs:
+# https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/caching-dependencies-to-speed-up-workflows#restrictions-for-accessing-a-cache
+name: Cache Python Environments
+on:
+  push:
+    branches:
+      - 'main'
+jobs:
+
+  cache-python-environments:
+    name: Cache Python Environments
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.12"]
+    steps:
+      - name: Check-out the repo
+        uses: actions/checkout@v4
+
+      - name: Cache Python ${{ matrix.python-version }} Environment
+        uses: ./.github/actions/setup-python-env
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache-pre-commit-environment: true
+          hatch-environment-cache-config-json: >-
+            {
+              "configs": [
+                {"hatch_project_directory": ".", "hatch_environment_name": "dev-env"},
+                {"hatch_project_directory": ".", "hatch_environment_name": "postgres-env"},
+                {"hatch_project_directory": "./metricflow-semantics", "hatch_environment_name": "dev-env"}
+              ]
+            }
