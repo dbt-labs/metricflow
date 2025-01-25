@@ -1,6 +1,0 @@
-kind: Features
-body: Use Metric.time_granularity to resolve metric_time.
-time: 2024-06-28T07:46:17.768805-07:00
-custom:
-  Author: courtneyholcomb
-  Issue: "1310"

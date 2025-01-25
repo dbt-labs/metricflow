@@ -1,6 +1,0 @@
-kind: Fixes
-body: dbt-core dependency issue with metricflow==0.207.0.
-time: 2025-01-24T18:17:06.936807-08:00
-custom:
-  Author: plypaul
-  Issue: "1632"

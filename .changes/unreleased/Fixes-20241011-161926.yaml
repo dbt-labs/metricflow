@@ -1,6 +1,0 @@
-kind: Fixes
-body: Add new validation that checks for SCDs in the join path to make grouping by `metric_time` required in this case.
-time: 2024-10-11T16:19:26.928496+02:00
-custom:
-    Author: serramatutu
-    Issue: "1451"

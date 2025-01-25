@@ -1,6 +1,0 @@
-kind: Breaking Changes
-body: Changes MetricFlowQueryRequest.where_constraint to where_constraints and now accepts a list
-time: 2024-10-07T14:20:32.823935-04:00
-custom:
-    Author: WilliamDee,courtneyholcomb
-    Issue: "1431"
