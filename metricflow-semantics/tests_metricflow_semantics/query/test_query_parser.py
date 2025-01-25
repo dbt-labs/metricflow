@@ -30,7 +30,7 @@ from metricflow_semantics.test_helpers.example_project_configuration import (
     EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE,
 )
 from metricflow_semantics.test_helpers.metric_time_dimension import MTD
-from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_snapshot_equal, assert_str_snapshot_equal
+from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_snapshot_equal
 
 logger = logging.getLogger(__name__)
 
@@ -464,52 +464,6 @@ def test_cumulative_metric_agg_time_dimension_name_validation(
         metric_names=["revenue_cumulative"], group_by_names=["revenue_instance__ds"]
     )
     assert_object_snapshot_equal(request=request, mf_test_configuration=mf_test_configuration, obj=result)
-
-
-def test_join_to_scd_no_time_dimension_validation(
-    request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
-    scd_query_parser: MetricFlowQueryParser,
-) -> None:
-    """Test that queries that join to SCD semantic models fail if no time dimensions are selected."""
-    with pytest.raises(InvalidQueryException) as exc_info:
-        scd_query_parser.parse_and_validate_query(
-            metric_names=["bookings"],
-            group_by_names=["listing__country"],
-        )
-
-    assert len(exc_info.value.args) == 1
-    assert isinstance(exc_info.value.args[0], str)
-    assert_str_snapshot_equal(
-        request=request,
-        mf_test_configuration=mf_test_configuration,
-        snapshot_id="error",
-        snapshot_str=exc_info.value.args[0],
-    )
-
-
-def test_join_through_scd_no_time_dimension_validation(
-    request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
-    scd_query_parser: MetricFlowQueryParser,
-) -> None:
-    """Test that queries that join through SCDs semantic models fail if no time dimensions are selected."""
-    with pytest.raises(InvalidQueryException) as exc_info:
-        # "user__home_state_latest" is not an SCD itself, but since we go through
-        # "listing" and that is an SCD, we should raise an exception here as well
-        scd_query_parser.parse_and_validate_query(
-            metric_names=["bookings"],
-            group_by_names=["listing__user__home_state_latest"],
-        )
-
-    assert len(exc_info.value.args) == 1
-    assert isinstance(exc_info.value.args[0], str)
-    assert_str_snapshot_equal(
-        request=request,
-        mf_test_configuration=mf_test_configuration,
-        snapshot_id="error",
-        snapshot_str=exc_info.value.args[0],
-    )
 
 
 def test_derived_metric_query_parsing(

@@ -1,0 +1,6 @@
+test_name: test_scd_filter_without_metric_time
+test_filename: test_query_output.py
+---
+  family_bookings
+-----------------
+                9

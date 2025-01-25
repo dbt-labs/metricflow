@@ -667,3 +667,81 @@ def test_derived_metric_alias(
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_scd_dimension_filter_without_metric_time(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    scd_column_association_resolver: ColumnAssociationResolver,
+    scd_query_parser: MetricFlowQueryParser,
+    scd_dataflow_plan_builder: DataflowPlanBuilder,
+    scd_dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    query_spec = scd_query_parser.parse_and_validate_query(
+        metric_names=("family_bookings",),
+        where_constraints=[
+            PydanticWhereFilter(
+                where_sql_template="{{ Dimension('listing__capacity') }} > 2",
+            )
+        ],
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=scd_dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=scd_dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_scd_dimension_group_by_without_metric_time(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    scd_column_association_resolver: ColumnAssociationResolver,
+    scd_query_parser: MetricFlowQueryParser,
+    scd_dataflow_plan_builder: DataflowPlanBuilder,
+    scd_dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    query_spec = scd_query_parser.parse_and_validate_query(
+        metric_names=("family_bookings",),
+        group_by_names=("listing__capacity",),
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=scd_dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=scd_dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_scd_group_by_and_coarser_grain(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    scd_query_parser: MetricFlowQueryParser,
+    scd_dataflow_plan_builder: DataflowPlanBuilder,
+    scd_dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    query_spec = scd_query_parser.parse_and_validate_query(
+        metric_names=("family_bookings",),
+        group_by_names=("listing__capacity", "metric_time__month"),
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=scd_dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=scd_dataflow_plan_builder,
+        query_spec=query_spec,
+    )
