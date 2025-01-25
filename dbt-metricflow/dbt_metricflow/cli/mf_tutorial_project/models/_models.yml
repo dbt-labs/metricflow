@@ -1,0 +1,11 @@
+# See: https://docs.getdbt.com/docs/build/metricflow-time-spine
+# For the page above, be sure to select the correct version of dbt at the top.
+
+models:
+  - name: all_days
+    description: A time spine with one row per day.
+    time_spine:
+      standard_granularity_column: date_day  # Column for the standard grain of your table
+    columns:
+      - name: date_day
+        granularity: day  # Set the granularity of the column
