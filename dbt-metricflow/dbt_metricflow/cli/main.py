@@ -184,7 +184,7 @@ def tutorial(ctx: click.core.Context, cfg: CLIConfiguration, message: bool, clea
 
         sample_dbt_project_path = (current_directory / tutorial_project_name).absolute()
         click.secho(
-            "Unable to detect a dbt project. Please run this command from the root directory of your dbt project.",
+            "Unable to detect a dbt project. Please run `mf tutorial` from the root directory of your dbt project.",
             fg="yellow",
         )
         click.confirm(
@@ -197,20 +197,20 @@ def tutorial(ctx: click.core.Context, cfg: CLIConfiguration, message: bool, clea
 
                     {click.style(str(sample_dbt_project_path), bold=True)}
 
-                However, the `dbt-metricflow[dbt-duckdb]` package must be installed beforehand. e.g. `pip install
-                'dbt-metricflow[dbt-duckdb]'`. You can break out of the tutorial if you need to install the package.
-                e.g. press <CTRL>+c
-
                 Do you want to create the sample project now?
                 """
             ).rstrip(),
             abort=True,
         )
+
+        _check_duckdb_package_installed_for_sample_project()
+
         if dbtMetricFlowTutorialHelper.check_if_path_exists([sample_dbt_project_path]):
             click.confirm(
                 click.style(
                     textwrap.dedent(
                         f"""\
+
                         The path {str(sample_dbt_project_path)!r} already exists.
                         Do you want to overwrite it?
                         """
@@ -305,6 +305,56 @@ def tutorial(ctx: click.core.Context, cfg: CLIConfiguration, message: bool, clea
     click.echo("\n" + help_msg)
     click.echo("💡 Run `mf tutorial --message` to see this message again without executing everything else")
     exit()
+
+
+def _check_duckdb_package_installed_for_sample_project(yes: bool = False) -> None:
+    """Check if the DuckDB adapter package is installed and prompt user to install it if not.
+
+    The `yes` argument is later used for scripting cases.
+    """
+    click.echo(
+        textwrap.dedent(
+            """\
+
+            Since the sample project uses DuckDB, the `dbt-metricflow[dbt-duckdb]` package must be installed beforehand.
+            """
+        ).rstrip(),
+    )
+
+    duckdb_adapter_package_name = "dbt-duckdb"
+    dbt_duckdb_package_version = None
+    try:
+        dbt_duckdb_package_version = importlib.metadata.version(duckdb_adapter_package_name)
+    except importlib.metadata.PackageNotFoundError:
+        pass
+
+    if dbt_duckdb_package_version is not None:
+        click.secho(
+            f"* Detected installed package {duckdb_adapter_package_name!r} {dbt_duckdb_package_version}",
+            bold=True,
+            fg="green",
+        )
+        return
+
+    click.secho("* Did not detect package is installed", bold=True, fg="red")
+
+    if yes:
+        return
+
+    exit_tutorial = click.confirm(
+        textwrap.dedent(
+            """\
+
+            As the package was not detected as installed, it's recommended to install the package first before
+            generating the sample project. e.g. `pip install 'dbt-metricflow[dbt-duckdb]'`. Otherwise, there may be
+            errors that prevent you from generating the sample project and running the tutorial.
+
+            Do you want to exit the tutorial so that you can install the package?
+            """
+        ).rstrip(),
+    )
+    if exit_tutorial:
+        exit(0)
 
 
 @cli.command()
