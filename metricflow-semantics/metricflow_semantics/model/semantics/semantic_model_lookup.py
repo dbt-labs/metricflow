@@ -29,7 +29,7 @@ from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.measure_spec import MeasureSpec
 from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDimensionSpec
-from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY, TimeDimensionSpec
+from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 logger = logging.getLogger(__name__)
