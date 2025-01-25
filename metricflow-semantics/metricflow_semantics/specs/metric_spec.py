@@ -75,3 +75,10 @@ class MetricSpec(InstanceSpec):  # noqa: D101
         if self.offset_window and self.offset_window.is_standard_granularity:
             return self.offset_window
         return None
+
+    @property
+    def custom_offset_window(self) -> Optional[MetricTimeWindow]:
+        """Return the offset window if it exists and uses a custom granularity."""
+        if self.offset_window and not self.offset_window.is_standard_granularity:
+            return self.offset_window
+        return None

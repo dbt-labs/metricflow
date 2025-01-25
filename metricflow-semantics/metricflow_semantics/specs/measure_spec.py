@@ -94,7 +94,14 @@ class JoinToTimeSpineDescription:
 
     @property
     def standard_offset_window(self) -> Optional[MetricTimeWindow]:
-        """Return the standard offset window if it is a standard granularity."""
+        """Return the offset window if it uses a standard granularity."""
         if self.offset_window and self.offset_window.is_standard_granularity:
+            return self.offset_window
+        return None
+
+    @property
+    def custom_offset_window(self) -> Optional[MetricTimeWindow]:
+        """Return the offset window if it uses a custom granularity."""
+        if self.offset_window and not self.offset_window.is_standard_granularity:
             return self.offset_window
         return None

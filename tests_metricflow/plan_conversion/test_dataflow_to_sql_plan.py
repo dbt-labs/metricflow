@@ -724,6 +724,7 @@ def test_offset_by_custom_granularity_node(  # noqa: D103
         required_time_spine_specs=(
             DataSet.metric_time_dimension_spec(ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH)),
         ),
+        use_offset_custom_granularity_node=False,
     )
 
     convert_and_check(

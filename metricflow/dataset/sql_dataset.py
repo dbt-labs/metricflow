@@ -13,7 +13,6 @@ from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
-from metricflow_semantics.sql.sql_exprs import SqlWindowFunction
 from typing_extensions import override
 
 from metricflow.dataset.dataset_classes import DataSet
@@ -213,17 +212,6 @@ class SqlDataSet(DataSet):
                     instances_available=self.instance_set.time_dimension_instances,
                 )
             )
-        )
-
-    def instance_from_window_function(self, window_function: SqlWindowFunction) -> TimeDimensionInstance:
-        """Find instance in dataset that matches the given window function."""
-        for time_dimension_instance in self.instance_set.time_dimension_instances:
-            if window_function in time_dimension_instance.spec.window_functions:
-                return time_dimension_instance
-
-        raise RuntimeError(
-            f"Did not find a time dimension instance with window function {window_function}.\n"
-            f"Instances available: {self.instance_set.time_dimension_instances}"
         )
 
     def column_association_for_time_dimension(self, time_dimension_spec: TimeDimensionSpec) -> ColumnAssociation:
