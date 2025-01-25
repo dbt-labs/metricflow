@@ -1,6 +1,0 @@
-kind: Fixes
-body: Make ID generation thread-safe
-time: 2024-10-21T12:07:48.313324-07:00
-custom:
-  Author: plypaul
-  Issue: "1473"
