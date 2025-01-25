@@ -31,7 +31,7 @@ FROM (
   FROM (
     -- Join Standard Outputs
     SELECT
-      subq_23.listing__booking_fees AS listing__booking_fees
+      subq_26.listing__booking_fees AS listing__booking_fees
       , sma_28009_cte.metric_time__day AS metric_time__day
       , sma_28009_cte.booking_value AS booking_value
     FROM sma_28009_cte sma_28009_cte
@@ -52,13 +52,13 @@ FROM (
         FROM sma_28009_cte sma_28009_cte
         GROUP BY
           listing
-      ) subq_21
-    ) subq_23
+      ) subq_24
+    ) subq_26
     ON
-      sma_28009_cte.listing = subq_23.listing
-  ) subq_24
+      sma_28009_cte.listing = subq_26.listing
+  ) subq_27
   WHERE listing__booking_fees > 2
   GROUP BY
     metric_time__day
-) subq_28
+) subq_31
 ORDER BY bookings_alias

@@ -23,10 +23,10 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_spec_set_snapshot_equal
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
 
-from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinOnEntitiesNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataset.sql_dataset import SqlDataSet
+from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
 from metricflow.sql.sql_plan import (
     SqlSelectColumn,
 )
@@ -42,7 +42,7 @@ def test_no_parent_node_data_set(
     time_spine_sources: Mapping[TimeGranularity, TimeSpineSource],
 ) -> None:
     """Tests getting the data set from a single node."""
-    resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
+    resolver: DataflowNodeToSqlSubqueryVisitor = DataflowNodeToSqlSubqueryVisitor(
         column_association_resolver=DunderColumnAssociationResolver(),
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
     )
@@ -95,7 +95,7 @@ def test_joined_node_data_set(
     time_spine_sources: Mapping[TimeGranularity, TimeSpineSource],
 ) -> None:
     """Tests getting the data set from a dataflow plan with a join."""
-    resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
+    resolver: DataflowNodeToSqlSubqueryVisitor = DataflowNodeToSqlSubqueryVisitor(
         column_association_resolver=DunderColumnAssociationResolver(),
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
     )

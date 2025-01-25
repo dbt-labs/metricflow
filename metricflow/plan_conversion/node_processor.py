@@ -20,7 +20,6 @@ from metricflow_semantics.specs.spec_set_transforms import ToElementNameSet
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 
-from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.partitions import PartitionJoinResolver
 from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
@@ -30,6 +29,7 @@ from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinOnEntitiesNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
+from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
 from metricflow.validation.dataflow_join_validator import JoinDataflowOutputValidator
 
 logger = logging.getLogger(__name__)
@@ -330,7 +330,7 @@ class PreJoinNodeProcessor:
     def __init__(  # noqa: D107
         self,
         semantic_model_lookup: SemanticModelLookup,
-        node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver,
+        node_data_set_resolver: DataflowNodeToSqlSubqueryVisitor,
     ):
         self._node_data_set_resolver = node_data_set_resolver
         self._partition_resolver = PartitionJoinResolver(semantic_model_lookup)

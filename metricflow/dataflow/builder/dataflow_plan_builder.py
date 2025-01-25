@@ -66,7 +66,6 @@ from metricflow.dataflow.builder.builder_cache import (
     FindSourceNodeRecipeResult,
 )
 from metricflow.dataflow.builder.measure_spec_properties import MeasureSpecProperties
-from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.node_evaluator import (
     LinkableInstanceSatisfiabilityEvaluation,
     NodeEvaluatorForLinkableInstances,
@@ -109,6 +108,7 @@ from metricflow.plan_conversion.node_processor import (
     PredicatePushdownState,
     PreJoinNodeProcessor,
 )
+from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
 
 logger = logging.getLogger(__name__)
 
@@ -120,7 +120,7 @@ class DataflowPlanBuilder:
         self,
         source_node_set: SourceNodeSet,
         semantic_manifest_lookup: SemanticManifestLookup,
-        node_output_resolver: DataflowPlanNodeOutputDataSetResolver,
+        node_output_resolver: DataflowNodeToSqlSubqueryVisitor,
         column_association_resolver: ColumnAssociationResolver,
         source_node_builder: SourceNodeBuilder,
         dataflow_plan_builder_cache: Optional[DataflowPlanBuilderCache] = None,
