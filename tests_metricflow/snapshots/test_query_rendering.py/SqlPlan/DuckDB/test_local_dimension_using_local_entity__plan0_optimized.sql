@@ -15,6 +15,6 @@ FROM (
     country AS listing__country_latest
     , 1 AS listings
   FROM ***************************.dim_listings_latest listings_latest_src_28000
-) subq_6
+) nr_subq_4
 GROUP BY
   listing__country_latest

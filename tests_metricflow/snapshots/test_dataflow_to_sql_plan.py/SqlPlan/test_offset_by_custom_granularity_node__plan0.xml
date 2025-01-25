@@ -4,21 +4,21 @@ test_filename: test_dataflow_to_sql_plan.py
 <SqlPlan>
     <SqlSelectStatementNode>
         <!-- description = 'Apply Requested Granularities' -->
-        <!-- node_id = NodeId(id_str='ss_5') -->
+        <!-- node_id = NodeId(id_str='ss_4') -->
         <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_15), column_alias='ds__day') -->
         <!-- col1 = SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_0), column_alias='metric_time__month') -->
-        <!-- from_source = SqlSelectStatementNode(node_id=ss_4) -->
+        <!-- from_source = SqlSelectStatementNode(node_id=ss_3) -->
         <!-- where = None -->
         <!-- distinct = False -->
         <SqlSelectStatementNode>
             <!-- description = 'Offset Base Granularity By Custom Granularity Period(s)' -->
-            <!-- node_id = NodeId(id_str='ss_4') -->
+            <!-- node_id = NodeId(id_str='ss_3') -->
             <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_11), column_alias='ds__day') -->
             <!-- col1 = SqlSelectColumn(expr=SqlCaseExpression(node_id=case_0), column_alias='ds__day__lead') -->
             <!-- from_source = SqlTableNode(node_id=tfc_1) -->
             <!-- join_0 =                                                 -->
             <!--   SqlJoinDescription(                                    -->
-            <!--     right_source=SqlSelectStatementNode(node_id=ss_3),   -->
+            <!--     right_source=SqlSelectStatementNode(node_id=ss_2),   -->
             <!--     right_source_alias='subq_2',                         -->
             <!--     join_type=INNER,                                     -->
             <!--     on_condition=SqlComparisonExpression(node_id=cmp_1), -->
@@ -32,7 +32,7 @@ test_filename: test_dataflow_to_sql_plan.py
             </SqlTableNode>
             <SqlSelectStatementNode>
                 <!-- description = 'Offset Custom Granularity Bounds' -->
-                <!-- node_id = NodeId(id_str='ss_3') -->
+                <!-- node_id = NodeId(id_str='ss_2') -->
                 <!-- col0 =                                                                                             -->
                 <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_5), column_alias='ds__martian_day') -->
                 <!-- col1 =                                                                   -->
@@ -45,12 +45,12 @@ test_filename: test_dataflow_to_sql_plan.py
                 <!--     expr=SqlWindowFunctionExpression(node_id=wfnc_4, sql_function=LEAD), -->
                 <!--     column_alias='ds__martian_day__last_value__lead',                    -->
                 <!--   )                                                                      -->
-                <!-- from_source = SqlSelectStatementNode(node_id=ss_2) -->
+                <!-- from_source = SqlSelectStatementNode(node_id=ss_1) -->
                 <!-- where = None -->
                 <!-- distinct = False -->
                 <SqlSelectStatementNode>
                     <!-- description = 'Get Unique Rows for Custom Granularity Bounds' -->
-                    <!-- node_id = NodeId(id_str='ss_2') -->
+                    <!-- node_id = NodeId(id_str='ss_1') -->
                     <!-- col0 =                                               -->
                     <!--   SqlSelectColumn(                                   -->
                     <!--     expr=SqlColumnReferenceExpression(node_id=cr_2), -->
@@ -96,7 +96,7 @@ test_filename: test_dataflow_to_sql_plan.py
                 <!-- node_id = NodeId(id_str='cte_1') -->
                 <SqlSelectStatementNode>
                     <!-- description = 'Get Custom Granularity Bounds' -->
-                    <!-- node_id = NodeId(id_str='ss_1') -->
+                    <!-- node_id = NodeId(id_str='ss_0') -->
                     <!-- col0 =                                                                                         -->
                     <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28130), column_alias='ds__day') -->
                     <!-- col1 = SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28287), column_alias='ds__week') -->
@@ -139,12 +139,12 @@ test_filename: test_dataflow_to_sql_plan.py
                     <!--     expr=SqlWindowFunctionExpression(node_id=wfnc_2, sql_function=ROW_NUMBER), -->
                     <!--     column_alias='ds__day__row_number',                                        -->
                     <!--   )                                                                            -->
-                    <!-- from_source = SqlSelectStatementNode(node_id=ss_0) -->
+                    <!-- from_source = SqlSelectStatementNode(node_id=ss_28056) -->
                     <!-- where = None -->
                     <!-- distinct = False -->
                     <SqlSelectStatementNode>
                         <!-- description = "Read From Time Spine 'mf_time_spine'" -->
-                        <!-- node_id = NodeId(id_str='ss_0') -->
+                        <!-- node_id = NodeId(id_str='ss_28056') -->
                         <!-- col0 =                                                   -->
                         <!--   SqlSelectColumn(                                       -->
                         <!--     expr=SqlColumnReferenceExpression(node_id=cr_28130), -->

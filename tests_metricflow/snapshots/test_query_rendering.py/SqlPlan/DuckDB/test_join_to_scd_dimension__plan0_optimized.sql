@@ -15,8 +15,8 @@ FROM (
   -- Join Standard Outputs
   SELECT
     listings_src_26000.capacity AS listing__capacity
-    , subq_9.metric_time__day AS metric_time__day
-    , subq_9.bookings AS bookings
+    , nr_subq_7.metric_time__day AS metric_time__day
+    , nr_subq_7.bookings AS bookings
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
@@ -25,24 +25,24 @@ FROM (
       , listing_id AS listing
       , 1 AS bookings
     FROM ***************************.fct_bookings bookings_source_src_26000
-  ) subq_9
+  ) nr_subq_7
   LEFT OUTER JOIN
     ***************************.dim_listings listings_src_26000
   ON
     (
-      subq_9.listing = listings_src_26000.listing_id
+      nr_subq_7.listing = listings_src_26000.listing_id
     ) AND (
       (
-        subq_9.metric_time__day >= listings_src_26000.active_from
+        nr_subq_7.metric_time__day >= listings_src_26000.active_from
       ) AND (
         (
-          subq_9.metric_time__day < listings_src_26000.active_to
+          nr_subq_7.metric_time__day < listings_src_26000.active_to
         ) OR (
           listings_src_26000.active_to IS NULL
         )
       )
     )
-) subq_12
+) nr_subq_10
 WHERE listing__capacity > 2
 GROUP BY
   metric_time__day

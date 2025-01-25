@@ -7,18 +7,8 @@ sql_engine: DuckDB
 -- Compute Metrics via Expressions
 -- Order By ['booking_fees']
 -- Change Column Aliases
-WITH sma_28009_cte AS (
-  -- Read Elements From Semantic Model 'bookings_source'
-  -- Metric Time Dimension 'ds'
-  SELECT
-    DATE_TRUNC('day', ds) AS metric_time__day
-    , listing_id AS listing
-    , booking_value
-  FROM ***************************.fct_bookings bookings_source_src_28000
-)
-
 SELECT
-  metric_time__day AS metric_time__day
+  metric_time__day
   , booking_value * 0.05 AS bookings_alias
 FROM (
   -- Constrain Output with WHERE
@@ -31,10 +21,10 @@ FROM (
   FROM (
     -- Join Standard Outputs
     SELECT
-      subq_23.listing__booking_fees AS listing__booking_fees
-      , sma_28009_cte.metric_time__day AS metric_time__day
-      , sma_28009_cte.booking_value AS booking_value
-    FROM sma_28009_cte sma_28009_cte
+      nr_subq_22.listing__booking_fees AS listing__booking_fees
+      , DATE_TRUNC('day', bookings_source_src_28000.ds) AS metric_time__day
+      , bookings_source_src_28000.booking_value AS booking_value
+    FROM ***************************.fct_bookings bookings_source_src_28000
     LEFT OUTER JOIN (
       -- Compute Metrics via Expressions
       -- Pass Only Elements: ['listing', 'listing__booking_fees']
@@ -42,23 +32,24 @@ FROM (
         listing
         , booking_value * 0.05 AS listing__booking_fees
       FROM (
-        -- Read From CTE For node_id=sma_28009
+        -- Read Elements From Semantic Model 'bookings_source'
+        -- Metric Time Dimension 'ds'
         -- Pass Only Elements: ['booking_value', 'listing']
         -- Aggregate Measures
         -- Compute Metrics via Expressions
         SELECT
-          listing
+          listing_id AS listing
           , SUM(booking_value) AS booking_value
-        FROM sma_28009_cte sma_28009_cte
+        FROM ***************************.fct_bookings bookings_source_src_28000
         GROUP BY
-          listing
-      ) subq_21
-    ) subq_23
+          listing_id
+      ) nr_subq_20
+    ) nr_subq_22
     ON
-      sma_28009_cte.listing = subq_23.listing
-  ) subq_24
+      bookings_source_src_28000.listing_id = nr_subq_22.listing
+  ) nr_subq_23
   WHERE listing__booking_fees > 2
   GROUP BY
     metric_time__day
-) subq_28
+) nr_subq_27
 ORDER BY bookings_alias

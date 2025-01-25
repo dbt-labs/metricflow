@@ -7,37 +7,17 @@ docstring:
 sql_engine: DuckDB
 ---
 -- Compute Metrics via Expressions
-WITH sma_28009_cte AS (
-  -- Read Elements From Semantic Model 'bookings_source'
-  -- Metric Time Dimension 'ds'
-  SELECT
-    DATE_TRUNC('day', ds) AS metric_time__day
-    , listing_id AS listing
-    , is_instant AS booking__is_instant
-    , 1 AS bookings
-  FROM ***************************.fct_bookings bookings_source_src_28000
-)
-
-, sma_28014_cte AS (
-  -- Read Elements From Semantic Model 'listings_latest'
-  -- Metric Time Dimension 'ds'
-  SELECT
-    listing_id AS listing
-    , country AS country_latest
-  FROM ***************************.dim_listings_latest listings_latest_src_28000
-)
-
 SELECT
-  metric_time__day AS metric_time__day
-  , listing__country_latest AS listing__country_latest
+  metric_time__day
+  , listing__country_latest
   , bookings - bookings_2_weeks_ago AS bookings_growth_2_weeks
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_34.metric_time__day, subq_46.metric_time__day) AS metric_time__day
-    , COALESCE(subq_34.listing__country_latest, subq_46.listing__country_latest) AS listing__country_latest
-    , MAX(subq_34.bookings) AS bookings
-    , MAX(subq_46.bookings_2_weeks_ago) AS bookings_2_weeks_ago
+    COALESCE(nr_subq_28.metric_time__day, nr_subq_40.metric_time__day) AS metric_time__day
+    , COALESCE(nr_subq_28.listing__country_latest, nr_subq_40.listing__country_latest) AS listing__country_latest
+    , MAX(nr_subq_28.bookings) AS bookings
+    , MAX(nr_subq_40.bookings_2_weeks_ago) AS bookings_2_weeks_ago
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['bookings', 'listing__country_latest', 'metric_time__day']
@@ -50,21 +30,30 @@ FROM (
     FROM (
       -- Join Standard Outputs
       SELECT
-        sma_28014_cte.country_latest AS listing__country_latest
-        , sma_28009_cte.metric_time__day AS metric_time__day
-        , sma_28009_cte.booking__is_instant AS booking__is_instant
-        , sma_28009_cte.bookings AS bookings
-      FROM sma_28009_cte sma_28009_cte
+        listings_latest_src_28000.country AS listing__country_latest
+        , nr_subq_21.metric_time__day AS metric_time__day
+        , nr_subq_21.booking__is_instant AS booking__is_instant
+        , nr_subq_21.bookings AS bookings
+      FROM (
+        -- Read Elements From Semantic Model 'bookings_source'
+        -- Metric Time Dimension 'ds'
+        SELECT
+          DATE_TRUNC('day', ds) AS metric_time__day
+          , listing_id AS listing
+          , is_instant AS booking__is_instant
+          , 1 AS bookings
+        FROM ***************************.fct_bookings bookings_source_src_28000
+      ) nr_subq_21
       LEFT OUTER JOIN
-        sma_28014_cte sma_28014_cte
+        ***************************.dim_listings_latest listings_latest_src_28000
       ON
-        sma_28009_cte.listing = sma_28014_cte.listing
-    ) subq_30
+        nr_subq_21.listing = listings_latest_src_28000.listing_id
+    ) nr_subq_24
     WHERE booking__is_instant
     GROUP BY
       metric_time__day
       , listing__country_latest
-  ) subq_34
+  ) nr_subq_28
   FULL OUTER JOIN (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['bookings', 'listing__country_latest', 'metric_time__day']
@@ -77,40 +66,48 @@ FROM (
     FROM (
       -- Join Standard Outputs
       SELECT
-        sma_28014_cte.country_latest AS listing__country_latest
-        , subq_39.metric_time__day AS metric_time__day
-        , subq_39.booking__is_instant AS booking__is_instant
-        , subq_39.bookings AS bookings
+        listings_latest_src_28000.country AS listing__country_latest
+        , nr_subq_33.metric_time__day AS metric_time__day
+        , nr_subq_33.booking__is_instant AS booking__is_instant
+        , nr_subq_33.bookings AS bookings
       FROM (
         -- Join to Time Spine Dataset
         SELECT
           time_spine_src_28006.ds AS metric_time__day
-          , sma_28009_cte.listing AS listing
-          , sma_28009_cte.booking__is_instant AS booking__is_instant
-          , sma_28009_cte.bookings AS bookings
+          , nr_subq_29.listing AS listing
+          , nr_subq_29.booking__is_instant AS booking__is_instant
+          , nr_subq_29.bookings AS bookings
         FROM ***************************.mf_time_spine time_spine_src_28006
-        INNER JOIN
-          sma_28009_cte sma_28009_cte
+        INNER JOIN (
+          -- Read Elements From Semantic Model 'bookings_source'
+          -- Metric Time Dimension 'ds'
+          SELECT
+            DATE_TRUNC('day', ds) AS metric_time__day
+            , listing_id AS listing
+            , is_instant AS booking__is_instant
+            , 1 AS bookings
+          FROM ***************************.fct_bookings bookings_source_src_28000
+        ) nr_subq_29
         ON
-          time_spine_src_28006.ds - INTERVAL 14 day = sma_28009_cte.metric_time__day
-      ) subq_39
+          time_spine_src_28006.ds - INTERVAL 14 day = nr_subq_29.metric_time__day
+      ) nr_subq_33
       LEFT OUTER JOIN
-        sma_28014_cte sma_28014_cte
+        ***************************.dim_listings_latest listings_latest_src_28000
       ON
-        subq_39.listing = sma_28014_cte.listing
-    ) subq_42
+        nr_subq_33.listing = listings_latest_src_28000.listing_id
+    ) nr_subq_36
     WHERE booking__is_instant
     GROUP BY
       metric_time__day
       , listing__country_latest
-  ) subq_46
+  ) nr_subq_40
   ON
     (
-      subq_34.listing__country_latest = subq_46.listing__country_latest
+      nr_subq_28.listing__country_latest = nr_subq_40.listing__country_latest
     ) AND (
-      subq_34.metric_time__day = subq_46.metric_time__day
+      nr_subq_28.metric_time__day = nr_subq_40.metric_time__day
     )
   GROUP BY
-    COALESCE(subq_34.metric_time__day, subq_46.metric_time__day)
-    , COALESCE(subq_34.listing__country_latest, subq_46.listing__country_latest)
-) subq_47
+    COALESCE(nr_subq_28.metric_time__day, nr_subq_40.metric_time__day)
+    , COALESCE(nr_subq_28.listing__country_latest, nr_subq_40.listing__country_latest)
+) nr_subq_41

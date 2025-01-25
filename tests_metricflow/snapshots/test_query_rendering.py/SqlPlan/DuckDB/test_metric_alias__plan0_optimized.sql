@@ -10,49 +10,46 @@ sql_engine: DuckDB
 -- Compute Metrics via Expressions
 -- Order By ['bookings']
 -- Change Column Aliases
-WITH sma_28009_cte AS (
-  -- Read Elements From Semantic Model 'bookings_source'
-  -- Metric Time Dimension 'ds'
-  SELECT
-    DATE_TRUNC('month', ds) AS metric_time__month
-    , listing_id AS listing
-    , 1 AS bookings
-  FROM ***************************.fct_bookings bookings_source_src_28000
-)
-
 SELECT
-  metric_time__month AS metric_time__month
+  metric_time__month
   , SUM(bookings) AS bookings_alias
 FROM (
   -- Join Standard Outputs
   SELECT
-    subq_20.listing__bookings AS listing__bookings
-    , subq_15.metric_time__month AS metric_time__month
-    , subq_15.bookings AS bookings
+    nr_subq_18.listing__bookings AS listing__bookings
+    , nr_subq_15.metric_time__month AS metric_time__month
+    , nr_subq_15.bookings AS bookings
   FROM (
-    -- Read From CTE For node_id=sma_28009
+    -- Read Elements From Semantic Model 'bookings_source'
+    -- Metric Time Dimension 'ds'
     SELECT
-      metric_time__month
-      , listing
-      , bookings
-    FROM sma_28009_cte sma_28009_cte
-  ) subq_15
+      DATE_TRUNC('month', ds) AS metric_time__month
+      , listing_id AS listing
+      , 1 AS bookings
+    FROM ***************************.fct_bookings bookings_source_src_28000
+  ) nr_subq_15
   LEFT OUTER JOIN (
-    -- Read From CTE For node_id=sma_28009
-    -- Pass Only Elements: ['bookings', 'listing']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     -- Pass Only Elements: ['listing', 'listing__bookings']
     SELECT
       listing
       , SUM(bookings) AS listing__bookings
-    FROM sma_28009_cte sma_28009_cte
+    FROM (
+      -- Read Elements From Semantic Model 'bookings_source'
+      -- Metric Time Dimension 'ds'
+      -- Pass Only Elements: ['bookings', 'listing']
+      SELECT
+        listing_id AS listing
+        , 1 AS bookings
+      FROM ***************************.fct_bookings bookings_source_src_28000
+    ) nr_subq_5
     GROUP BY
       listing
-  ) subq_20
+  ) nr_subq_18
   ON
-    subq_15.listing = subq_20.listing
-) subq_21
+    nr_subq_15.listing = nr_subq_18.listing
+) nr_subq_19
 WHERE listing__bookings > 2
 GROUP BY
   metric_time__month

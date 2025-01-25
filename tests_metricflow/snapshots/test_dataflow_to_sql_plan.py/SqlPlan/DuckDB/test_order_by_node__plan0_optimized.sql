@@ -19,7 +19,7 @@ FROM (
     , is_instant
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-) subq_5
+) nr_subq_1
 GROUP BY
   ds__day
   , is_instant

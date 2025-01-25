@@ -6,67 +6,67 @@ sql_engine: DuckDB
 ---
 -- Pass Only Elements: ['listing__ds__martian_day',]
 SELECT
-  subq_2.listing__ds__martian_day
+  nr_subq_2.listing__ds__martian_day
 FROM (
   -- Constrain Output with WHERE
   SELECT
-    subq_1.listing__ds__martian_day
-    , subq_1.ds__day
-    , subq_1.ds__week
-    , subq_1.ds__month
-    , subq_1.ds__quarter
-    , subq_1.ds__year
-    , subq_1.ds__extract_year
-    , subq_1.ds__extract_quarter
-    , subq_1.ds__extract_month
-    , subq_1.ds__extract_day
-    , subq_1.ds__extract_dow
-    , subq_1.ds__extract_doy
-    , subq_1.created_at__day
-    , subq_1.created_at__week
-    , subq_1.created_at__month
-    , subq_1.created_at__quarter
-    , subq_1.created_at__year
-    , subq_1.created_at__extract_year
-    , subq_1.created_at__extract_quarter
-    , subq_1.created_at__extract_month
-    , subq_1.created_at__extract_day
-    , subq_1.created_at__extract_dow
-    , subq_1.created_at__extract_doy
-    , subq_1.listing__ds__day
-    , subq_1.listing__ds__week
-    , subq_1.listing__ds__month
-    , subq_1.listing__ds__quarter
-    , subq_1.listing__ds__year
-    , subq_1.listing__ds__extract_year
-    , subq_1.listing__ds__extract_quarter
-    , subq_1.listing__ds__extract_month
-    , subq_1.listing__ds__extract_day
-    , subq_1.listing__ds__extract_dow
-    , subq_1.listing__ds__extract_doy
-    , subq_1.listing__created_at__day
-    , subq_1.listing__created_at__week
-    , subq_1.listing__created_at__month
-    , subq_1.listing__created_at__quarter
-    , subq_1.listing__created_at__year
-    , subq_1.listing__created_at__extract_year
-    , subq_1.listing__created_at__extract_quarter
-    , subq_1.listing__created_at__extract_month
-    , subq_1.listing__created_at__extract_day
-    , subq_1.listing__created_at__extract_dow
-    , subq_1.listing__created_at__extract_doy
-    , subq_1.listing
-    , subq_1.user
-    , subq_1.listing__user
-    , subq_1.country_latest
-    , subq_1.is_lux_latest
-    , subq_1.capacity_latest
-    , subq_1.listing__country_latest
-    , subq_1.listing__is_lux_latest
-    , subq_1.listing__capacity_latest
-    , subq_1.listings
-    , subq_1.largest_listing
-    , subq_1.smallest_listing
+    nr_subq_1.listing__ds__martian_day
+    , nr_subq_1.ds__day
+    , nr_subq_1.ds__week
+    , nr_subq_1.ds__month
+    , nr_subq_1.ds__quarter
+    , nr_subq_1.ds__year
+    , nr_subq_1.ds__extract_year
+    , nr_subq_1.ds__extract_quarter
+    , nr_subq_1.ds__extract_month
+    , nr_subq_1.ds__extract_day
+    , nr_subq_1.ds__extract_dow
+    , nr_subq_1.ds__extract_doy
+    , nr_subq_1.created_at__day
+    , nr_subq_1.created_at__week
+    , nr_subq_1.created_at__month
+    , nr_subq_1.created_at__quarter
+    , nr_subq_1.created_at__year
+    , nr_subq_1.created_at__extract_year
+    , nr_subq_1.created_at__extract_quarter
+    , nr_subq_1.created_at__extract_month
+    , nr_subq_1.created_at__extract_day
+    , nr_subq_1.created_at__extract_dow
+    , nr_subq_1.created_at__extract_doy
+    , nr_subq_1.listing__ds__day
+    , nr_subq_1.listing__ds__week
+    , nr_subq_1.listing__ds__month
+    , nr_subq_1.listing__ds__quarter
+    , nr_subq_1.listing__ds__year
+    , nr_subq_1.listing__ds__extract_year
+    , nr_subq_1.listing__ds__extract_quarter
+    , nr_subq_1.listing__ds__extract_month
+    , nr_subq_1.listing__ds__extract_day
+    , nr_subq_1.listing__ds__extract_dow
+    , nr_subq_1.listing__ds__extract_doy
+    , nr_subq_1.listing__created_at__day
+    , nr_subq_1.listing__created_at__week
+    , nr_subq_1.listing__created_at__month
+    , nr_subq_1.listing__created_at__quarter
+    , nr_subq_1.listing__created_at__year
+    , nr_subq_1.listing__created_at__extract_year
+    , nr_subq_1.listing__created_at__extract_quarter
+    , nr_subq_1.listing__created_at__extract_month
+    , nr_subq_1.listing__created_at__extract_day
+    , nr_subq_1.listing__created_at__extract_dow
+    , nr_subq_1.listing__created_at__extract_doy
+    , nr_subq_1.listing
+    , nr_subq_1.user
+    , nr_subq_1.listing__user
+    , nr_subq_1.country_latest
+    , nr_subq_1.is_lux_latest
+    , nr_subq_1.capacity_latest
+    , nr_subq_1.listing__country_latest
+    , nr_subq_1.listing__is_lux_latest
+    , nr_subq_1.listing__capacity_latest
+    , nr_subq_1.listings
+    , nr_subq_1.largest_listing
+    , nr_subq_1.smallest_listing
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Join to Custom Granularity Dataset
@@ -127,14 +127,14 @@ FROM (
       , listings_latest_src_28000.listing_id AS listing
       , listings_latest_src_28000.user_id AS user
       , listings_latest_src_28000.user_id AS listing__user
-      , subq_0.martian_day AS listing__ds__martian_day
+      , nr_subq_0.martian_day AS listing__ds__martian_day
     FROM ***************************.dim_listings_latest listings_latest_src_28000
     LEFT OUTER JOIN
-      ***************************.mf_time_spine subq_0
+      ***************************.mf_time_spine nr_subq_0
     ON
-      DATE_TRUNC('day', listings_latest_src_28000.created_at) = subq_0.ds
-  ) subq_1
+      DATE_TRUNC('day', listings_latest_src_28000.created_at) = nr_subq_0.ds
+  ) nr_subq_1
   WHERE listing__ds__martian_day = '2020-01-01'
-) subq_2
+) nr_subq_2
 GROUP BY
-  subq_2.listing__ds__martian_day
+  nr_subq_2.listing__ds__martian_day

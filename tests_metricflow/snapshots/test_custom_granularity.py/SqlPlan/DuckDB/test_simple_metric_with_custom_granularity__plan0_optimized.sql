@@ -8,18 +8,18 @@ sql_engine: DuckDB
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  subq_6.martian_day AS booking__ds__martian_day
-  , SUM(subq_5.bookings) AS bookings
+  nr_subq_4.martian_day AS booking__ds__martian_day
+  , SUM(nr_subq_28002.bookings) AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   SELECT
     1 AS bookings
     , DATE_TRUNC('day', ds) AS booking__ds__day
   FROM ***************************.fct_bookings bookings_source_src_28000
-) subq_5
+) nr_subq_28002
 LEFT OUTER JOIN
-  ***************************.mf_time_spine subq_6
+  ***************************.mf_time_spine nr_subq_4
 ON
-  subq_5.booking__ds__day = subq_6.ds
+  nr_subq_28002.booking__ds__day = nr_subq_4.ds
 GROUP BY
-  subq_6.martian_day
+  nr_subq_4.martian_day

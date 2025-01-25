@@ -16,4 +16,4 @@ FROM (
   FROM ***************************.fct_bookings bookings_source_src_28000
   GROUP BY
     DATE_TRUNC('quarter', paid_at)
-) subq_3
+) nr_subq_3

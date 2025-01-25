@@ -18,7 +18,7 @@ FROM (
     ***************************.dim_users_latest users_latest_src_28000
   ON
     listings_latest_src_28000.user_id = users_latest_src_28000.user_id
-) subq_8
+) nr_subq_3
 WHERE listing__country_latest = 'us'
 GROUP BY
   user__home_state_latest

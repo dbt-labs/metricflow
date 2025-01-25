@@ -9,16 +9,16 @@ sql_engine: DuckDB
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  subq_10.ds AS revenue_instance__ds__day
+  nr_subq_8.ds AS revenue_instance__ds__day
   , SUM(revenue_src_28000.revenue) AS trailing_2_months_revenue
-FROM ***************************.mf_time_spine subq_10
+FROM ***************************.mf_time_spine nr_subq_8
 INNER JOIN
   ***************************.fct_revenue revenue_src_28000
 ON
   (
-    DATE_TRUNC('day', revenue_src_28000.created_at) <= subq_10.ds
+    DATE_TRUNC('day', revenue_src_28000.created_at) <= nr_subq_8.ds
   ) AND (
-    DATE_TRUNC('day', revenue_src_28000.created_at) > subq_10.ds - INTERVAL 2 month
+    DATE_TRUNC('day', revenue_src_28000.created_at) > nr_subq_8.ds - INTERVAL 2 month
   )
 GROUP BY
-  subq_10.ds
+  nr_subq_8.ds

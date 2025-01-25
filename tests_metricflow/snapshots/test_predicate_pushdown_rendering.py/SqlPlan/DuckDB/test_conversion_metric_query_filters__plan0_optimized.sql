@@ -5,36 +5,17 @@ docstring:
 sql_engine: DuckDB
 ---
 -- Compute Metrics via Expressions
-WITH sma_28019_cte AS (
-  -- Read Elements From Semantic Model 'visits_source'
-  -- Metric Time Dimension 'ds'
-  SELECT
-    DATE_TRUNC('day', ds) AS metric_time__day
-    , user_id AS user
-    , referrer_id AS visit__referrer_id
-    , 1 AS visits
-  FROM ***************************.fct_visits visits_source_src_28000
-)
-
-, rss_28028_cte AS (
-  -- Read Elements From Semantic Model 'users_latest'
-  SELECT
-    home_state_latest
-    , user_id AS user
-  FROM ***************************.dim_users_latest users_latest_src_28000
-)
-
 SELECT
-  metric_time__day AS metric_time__day
-  , user__home_state_latest AS user__home_state_latest
+  metric_time__day
+  , user__home_state_latest
   , CAST(buys AS DOUBLE) / CAST(NULLIF(visits, 0) AS DOUBLE) AS visit_buy_conversion_rate_7days
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_30.metric_time__day, subq_43.metric_time__day) AS metric_time__day
-    , COALESCE(subq_30.user__home_state_latest, subq_43.user__home_state_latest) AS user__home_state_latest
-    , MAX(subq_30.visits) AS visits
-    , MAX(subq_43.buys) AS buys
+    COALESCE(nr_subq_26.metric_time__day, nr_subq_38.metric_time__day) AS metric_time__day
+    , COALESCE(nr_subq_26.user__home_state_latest, nr_subq_38.user__home_state_latest) AS user__home_state_latest
+    , MAX(nr_subq_26.visits) AS visits
+    , MAX(nr_subq_38.buys) AS buys
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['visits', 'user__home_state_latest', 'metric_time__day']
@@ -46,21 +27,30 @@ FROM (
     FROM (
       -- Join Standard Outputs
       SELECT
-        rss_28028_cte.home_state_latest AS user__home_state_latest
-        , sma_28019_cte.metric_time__day AS metric_time__day
-        , sma_28019_cte.visit__referrer_id AS visit__referrer_id
-        , sma_28019_cte.visits AS visits
-      FROM sma_28019_cte sma_28019_cte
+        users_latest_src_28000.home_state_latest AS user__home_state_latest
+        , nr_subq_20.metric_time__day AS metric_time__day
+        , nr_subq_20.visit__referrer_id AS visit__referrer_id
+        , nr_subq_20.visits AS visits
+      FROM (
+        -- Read Elements From Semantic Model 'visits_source'
+        -- Metric Time Dimension 'ds'
+        SELECT
+          DATE_TRUNC('day', ds) AS metric_time__day
+          , user_id AS user
+          , referrer_id AS visit__referrer_id
+          , 1 AS visits
+        FROM ***************************.fct_visits visits_source_src_28000
+      ) nr_subq_20
       LEFT OUTER JOIN
-        rss_28028_cte rss_28028_cte
+        ***************************.dim_users_latest users_latest_src_28000
       ON
-        sma_28019_cte.user = rss_28028_cte.user
-    ) subq_27
+        nr_subq_20.user = users_latest_src_28000.user_id
+    ) nr_subq_23
     WHERE visit__referrer_id = '123456'
     GROUP BY
       metric_time__day
       , user__home_state_latest
-  ) subq_30
+  ) nr_subq_26
   FULL OUTER JOIN (
     -- Find conversions for user within the range of 7 day
     -- Pass Only Elements: ['buys', 'user__home_state_latest', 'metric_time__day']
@@ -72,73 +62,82 @@ FROM (
     FROM (
       -- Dedupe the fanout with mf_internal_uuid in the conversion data set
       SELECT DISTINCT
-        FIRST_VALUE(subq_36.visits) OVER (
+        FIRST_VALUE(nr_subq_32.visits) OVER (
           PARTITION BY
-            subq_39.user
-            , subq_39.metric_time__day
-            , subq_39.mf_internal_uuid
-          ORDER BY subq_36.metric_time__day DESC
+            nr_subq_34.user
+            , nr_subq_34.metric_time__day
+            , nr_subq_34.mf_internal_uuid
+          ORDER BY nr_subq_32.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS visits
-        , FIRST_VALUE(subq_36.visit__referrer_id) OVER (
+        , FIRST_VALUE(nr_subq_32.visit__referrer_id) OVER (
           PARTITION BY
-            subq_39.user
-            , subq_39.metric_time__day
-            , subq_39.mf_internal_uuid
-          ORDER BY subq_36.metric_time__day DESC
+            nr_subq_34.user
+            , nr_subq_34.metric_time__day
+            , nr_subq_34.mf_internal_uuid
+          ORDER BY nr_subq_32.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS visit__referrer_id
-        , FIRST_VALUE(subq_36.user__home_state_latest) OVER (
+        , FIRST_VALUE(nr_subq_32.user__home_state_latest) OVER (
           PARTITION BY
-            subq_39.user
-            , subq_39.metric_time__day
-            , subq_39.mf_internal_uuid
-          ORDER BY subq_36.metric_time__day DESC
+            nr_subq_34.user
+            , nr_subq_34.metric_time__day
+            , nr_subq_34.mf_internal_uuid
+          ORDER BY nr_subq_32.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS user__home_state_latest
-        , FIRST_VALUE(subq_36.metric_time__day) OVER (
+        , FIRST_VALUE(nr_subq_32.metric_time__day) OVER (
           PARTITION BY
-            subq_39.user
-            , subq_39.metric_time__day
-            , subq_39.mf_internal_uuid
-          ORDER BY subq_36.metric_time__day DESC
+            nr_subq_34.user
+            , nr_subq_34.metric_time__day
+            , nr_subq_34.mf_internal_uuid
+          ORDER BY nr_subq_32.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS metric_time__day
-        , FIRST_VALUE(subq_36.user) OVER (
+        , FIRST_VALUE(nr_subq_32.user) OVER (
           PARTITION BY
-            subq_39.user
-            , subq_39.metric_time__day
-            , subq_39.mf_internal_uuid
-          ORDER BY subq_36.metric_time__day DESC
+            nr_subq_34.user
+            , nr_subq_34.metric_time__day
+            , nr_subq_34.mf_internal_uuid
+          ORDER BY nr_subq_32.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS user
-        , subq_39.mf_internal_uuid AS mf_internal_uuid
-        , subq_39.buys AS buys
+        , nr_subq_34.mf_internal_uuid AS mf_internal_uuid
+        , nr_subq_34.buys AS buys
       FROM (
         -- Constrain Output with WHERE
         -- Pass Only Elements: ['visits', 'visit__referrer_id', 'user__home_state_latest', 'metric_time__day', 'user']
         SELECT
           metric_time__day
-          , subq_34.user
+          , nr_subq_30.user
           , visit__referrer_id
           , user__home_state_latest
           , visits
         FROM (
           -- Join Standard Outputs
           SELECT
-            rss_28028_cte.home_state_latest AS user__home_state_latest
-            , sma_28019_cte.metric_time__day AS metric_time__day
-            , sma_28019_cte.user AS user
-            , sma_28019_cte.visit__referrer_id AS visit__referrer_id
-            , sma_28019_cte.visits AS visits
-          FROM sma_28019_cte sma_28019_cte
+            users_latest_src_28000.home_state_latest AS user__home_state_latest
+            , nr_subq_27.metric_time__day AS metric_time__day
+            , nr_subq_27.user AS user
+            , nr_subq_27.visit__referrer_id AS visit__referrer_id
+            , nr_subq_27.visits AS visits
+          FROM (
+            -- Read Elements From Semantic Model 'visits_source'
+            -- Metric Time Dimension 'ds'
+            SELECT
+              DATE_TRUNC('day', ds) AS metric_time__day
+              , user_id AS user
+              , referrer_id AS visit__referrer_id
+              , 1 AS visits
+            FROM ***************************.fct_visits visits_source_src_28000
+          ) nr_subq_27
           LEFT OUTER JOIN
-            rss_28028_cte rss_28028_cte
+            ***************************.dim_users_latest users_latest_src_28000
           ON
-            sma_28019_cte.user = rss_28028_cte.user
-        ) subq_34
+            nr_subq_27.user = users_latest_src_28000.user_id
+        ) nr_subq_30
         WHERE visit__referrer_id = '123456'
-      ) subq_36
+      ) nr_subq_32
       INNER JOIN (
         -- Read Elements From Semantic Model 'buys_source'
         -- Metric Time Dimension 'ds'
@@ -149,29 +148,29 @@ FROM (
           , 1 AS buys
           , GEN_RANDOM_UUID() AS mf_internal_uuid
         FROM ***************************.fct_buys buys_source_src_28000
-      ) subq_39
+      ) nr_subq_34
       ON
         (
-          subq_36.user = subq_39.user
+          nr_subq_32.user = nr_subq_34.user
         ) AND (
           (
-            subq_36.metric_time__day <= subq_39.metric_time__day
+            nr_subq_32.metric_time__day <= nr_subq_34.metric_time__day
           ) AND (
-            subq_36.metric_time__day > subq_39.metric_time__day - INTERVAL 7 day
+            nr_subq_32.metric_time__day > nr_subq_34.metric_time__day - INTERVAL 7 day
           )
         )
-    ) subq_40
+    ) nr_subq_35
     GROUP BY
       metric_time__day
       , user__home_state_latest
-  ) subq_43
+  ) nr_subq_38
   ON
     (
-      subq_30.user__home_state_latest = subq_43.user__home_state_latest
+      nr_subq_26.user__home_state_latest = nr_subq_38.user__home_state_latest
     ) AND (
-      subq_30.metric_time__day = subq_43.metric_time__day
+      nr_subq_26.metric_time__day = nr_subq_38.metric_time__day
     )
   GROUP BY
-    COALESCE(subq_30.metric_time__day, subq_43.metric_time__day)
-    , COALESCE(subq_30.user__home_state_latest, subq_43.user__home_state_latest)
-) subq_44
+    COALESCE(nr_subq_26.metric_time__day, nr_subq_38.metric_time__day)
+    , COALESCE(nr_subq_26.user__home_state_latest, nr_subq_38.user__home_state_latest)
+) nr_subq_39
