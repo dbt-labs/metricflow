@@ -108,10 +108,11 @@ def cli(cfg: CLIConfiguration, verbose: bool) -> None:  # noqa: D103
 @click.option("-m", "--message", is_flag=True, help="Output the final steps dialogue")
 # @click.option("--skip-dw", is_flag=True, help="Skip the data warehouse health checks") # TODO: re-enable this
 @click.option("--clean", is_flag=True, help="Remove sample model files.")
+@click.option("--yes", is_flag=True, help="Respond yes to all questions (for scripting).")
 @pass_config
 @click.pass_context
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-def tutorial(ctx: click.core.Context, cfg: CLIConfiguration, message: bool, clean: bool) -> None:
+def tutorial(ctx: click.core.Context, cfg: CLIConfiguration, message: bool, clean: bool, yes: bool) -> None:
     """Run user through a tutorial."""
     # Needed to handle the backslash outside f-string
     complex_query = (
@@ -187,7 +188,7 @@ def tutorial(ctx: click.core.Context, cfg: CLIConfiguration, message: bool, clea
             "Unable to detect a dbt project. Please run `mf tutorial` from the root directory of your dbt project.",
             fg="yellow",
         )
-        click.confirm(
+        yes or click.confirm(
             textwrap.dedent(
                 f"""\
 
@@ -203,10 +204,10 @@ def tutorial(ctx: click.core.Context, cfg: CLIConfiguration, message: bool, clea
             abort=True,
         )
 
-        _check_duckdb_package_installed_for_sample_project()
+        _check_duckdb_package_installed_for_sample_project(yes)
 
         if dbtMetricFlowTutorialHelper.check_if_path_exists([sample_dbt_project_path]):
-            click.confirm(
+            yes or click.confirm(
                 click.style(
                     textwrap.dedent(
                         f"""\
@@ -255,7 +256,7 @@ def tutorial(ctx: click.core.Context, cfg: CLIConfiguration, message: bool, clea
 
     # Remove sample files from dbt project
     if clean:
-        click.confirm("Would you like to remove all the sample files?", abort=True)
+        yes or click.confirm("Would you like to remove all the sample files?", abort=True)
         spinner = Halo(text="Removing sample files...", spinner="dots")
         spinner.start()
         try:
@@ -284,11 +285,11 @@ def tutorial(ctx: click.core.Context, cfg: CLIConfiguration, message: bool, clea
             """
         )
     )
-    click.confirm("Continue and generate the files?", abort=True)
+    yes or click.confirm("Continue and generate the files?", abort=True)
 
     # Generate sample files into dbt project
     if dbtMetricFlowTutorialHelper.check_if_path_exists([model_path, seed_path]):
-        click.confirm(
+        yes or click.confirm(
             click.style("There are existing files in the paths above, would you like to overwrite them?", fg="yellow"),
             abort=True,
         )
@@ -307,10 +308,10 @@ def tutorial(ctx: click.core.Context, cfg: CLIConfiguration, message: bool, clea
     exit()
 
 
-def _check_duckdb_package_installed_for_sample_project(yes: bool = False) -> None:
+def _check_duckdb_package_installed_for_sample_project(yes: bool) -> None:
     """Check if the DuckDB adapter package is installed and prompt user to install it if not.
 
-    The `yes` argument is later used for scripting cases.
+    If `yes` is set, the prompt to exit if the package is not installed will be skipped.
     """
     click.echo(
         textwrap.dedent(
