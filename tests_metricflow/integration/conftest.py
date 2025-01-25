@@ -45,3 +45,24 @@ def it_helpers(  # noqa: D103
         source_schema=mf_test_configuration.mf_source_schema,
         sql_client=sql_client,
     )
+
+
+@pytest.fixture
+def scd_it_helpers(  # noqa: D103
+    sql_client: SqlClient,
+    create_source_tables: bool,
+    scd_semantic_manifest_lookup: SemanticManifestLookup,
+    time_spine_sources: Mapping[TimeGranularity, TimeSpineSource],
+    mf_test_configuration: MetricFlowTestConfiguration,
+) -> IntegrationTestHelpers:
+    return IntegrationTestHelpers(
+        mf_engine=MetricFlowEngine(
+            semantic_manifest_lookup=scd_semantic_manifest_lookup,
+            sql_client=sql_client,
+            column_association_resolver=DunderColumnAssociationResolver(),
+            time_source=ConfigurableTimeSource(as_datetime("2020-01-01")),
+        ),
+        mf_system_schema=mf_test_configuration.mf_system_schema,
+        source_schema=mf_test_configuration.mf_source_schema,
+        sql_client=sql_client,
+    )

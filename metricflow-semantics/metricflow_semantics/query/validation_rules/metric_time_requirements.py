@@ -15,7 +15,6 @@ from typing_extensions import override
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
-from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow_semantics.query.issues.issues_base import (
     MetricFlowQueryResolutionIssue,
@@ -26,9 +25,6 @@ from metricflow_semantics.query.issues.parsing.cumulative_metric_requires_metric
 )
 from metricflow_semantics.query.issues.parsing.offset_metric_requires_metric_time import (
     OffsetMetricRequiresMetricTimeIssue,
-)
-from metricflow_semantics.query.issues.parsing.scd_requires_metric_time import (
-    ScdRequiresMetricTimeIssue,
 )
 from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import ResolverInputForQuery
 from metricflow_semantics.query.validation_rules.base_validation_rule import PostResolutionQueryValidationRule
@@ -44,7 +40,6 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
 
     * Cumulative metrics.
     * Derived metrics with an offset time.
-    * Slowly changing dimensions
     """
 
     def __init__(  # noqa: D107
@@ -134,14 +129,6 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
             ),
         )
 
-    def _scd_linkable_element_set_for_measure(self, measure_reference: MeasureReference) -> LinkableElementSet:
-        """Returns subset of the query's `LinkableElements` that are SCDs and associated with the measure."""
-        measure_semantic_model = self._manifest_lookup.semantic_model_lookup.measure_lookup.get_properties(
-            measure_reference
-        ).model_reference
-
-        return self._scd_linkable_element_set.filter_by_left_semantic_model(measure_semantic_model)
-
     @override
     def validate_metric_in_resolution_dag(
         self,
@@ -192,19 +179,4 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
         measure_reference: MeasureReference,
         resolution_path: MetricFlowQueryResolutionPath,
     ) -> MetricFlowQueryResolutionIssueSet:
-        scd_linkable_elemenent_set_for_measure = self._scd_linkable_element_set_for_measure(measure_reference)
-
-        if scd_linkable_elemenent_set_for_measure.spec_count == 0:
-            return MetricFlowQueryResolutionIssueSet.empty_instance()
-
-        if self._query_includes_metric_time:
-            return MetricFlowQueryResolutionIssueSet.empty_instance()
-
-        # Queries that join to an SCD don't support direct references to agg_time_dimension, so we
-        # only check for metric_time. If we decide to support agg_time_dimension, we should add a check
-
-        return MetricFlowQueryResolutionIssueSet.from_issue(
-            ScdRequiresMetricTimeIssue.from_parameters(
-                scds_in_query=scd_linkable_elemenent_set_for_measure.specs, query_resolution_path=resolution_path
-            )
-        )
+        return MetricFlowQueryResolutionIssueSet.empty_instance()
