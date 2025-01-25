@@ -5,7 +5,7 @@ inputs:
   python-version:
     description: "Version of Python to use for testing"
     required: false
-    default: "3.8"
+    default: "3.9"
 
 runs:
   using: "composite"
