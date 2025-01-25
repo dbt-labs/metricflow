@@ -13,8 +13,8 @@ FROM (
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
-    subq_15.martian_day AS booking__ds__martian_day
-    , SUM(subq_11.bookings) AS bookings_5_days_ago
+    nr_subq_13.martian_day AS booking__ds__martian_day
+    , SUM(nr_subq_9.bookings) AS bookings_5_days_ago
   FROM ***************************.mf_time_spine time_spine_src_28006
   INNER JOIN (
     -- Read Elements From Semantic Model 'bookings_source'
@@ -23,13 +23,13 @@ FROM (
       DATE_TRUNC('day', ds) AS booking__ds__day
       , 1 AS bookings
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_11
+  ) nr_subq_9
   ON
-    time_spine_src_28006.ds - MAKE_INTERVAL(days => 5) = subq_11.booking__ds__day
+    time_spine_src_28006.ds - MAKE_INTERVAL(days => 5) = nr_subq_9.booking__ds__day
   LEFT OUTER JOIN
-    ***************************.mf_time_spine subq_15
+    ***************************.mf_time_spine nr_subq_13
   ON
-    time_spine_src_28006.ds = subq_15.ds
+    time_spine_src_28006.ds = nr_subq_13.ds
   GROUP BY
-    subq_15.martian_day
-) subq_19
+    nr_subq_13.martian_day
+) nr_subq_17

@@ -5,8 +5,8 @@ sql_engine: BigQuery
 -- Join to Time Spine Dataset
 -- Compute Metrics via Expressions
 SELECT
-  subq_16.metric_time__martian_day AS metric_time__martian_day
-  , subq_13.bookings AS bookings_join_to_time_spine
+  nr_subq_14.metric_time__martian_day AS metric_time__martian_day
+  , nr_subq_11.bookings AS bookings_join_to_time_spine
 FROM (
   -- Read From Time Spine 'mf_time_spine'
   -- Change Column Aliases
@@ -16,28 +16,28 @@ FROM (
   FROM ***************************.mf_time_spine time_spine_src_28006
   GROUP BY
     metric_time__martian_day
-) subq_16
+) nr_subq_14
 LEFT OUTER JOIN (
   -- Metric Time Dimension 'ds'
   -- Join to Custom Granularity Dataset
   -- Pass Only Elements: ['bookings', 'metric_time__martian_day']
   -- Aggregate Measures
   SELECT
-    subq_10.martian_day AS metric_time__martian_day
-    , SUM(subq_9.bookings) AS bookings
+    nr_subq_8.martian_day AS metric_time__martian_day
+    , SUM(nr_subq_28002.bookings) AS bookings
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     SELECT
       1 AS bookings
       , DATETIME_TRUNC(ds, day) AS ds__day
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_9
+  ) nr_subq_28002
   LEFT OUTER JOIN
-    ***************************.mf_time_spine subq_10
+    ***************************.mf_time_spine nr_subq_8
   ON
-    subq_9.ds__day = subq_10.ds
+    nr_subq_28002.ds__day = nr_subq_8.ds
   GROUP BY
     metric_time__martian_day
-) subq_13
+) nr_subq_11
 ON
-  subq_16.metric_time__martian_day = subq_13.metric_time__martian_day
+  nr_subq_14.metric_time__martian_day = nr_subq_11.metric_time__martian_day

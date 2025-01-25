@@ -17,4 +17,4 @@ FROM (
   FROM ***************************.mf_time_spine time_spine_src_28006
   GROUP BY
     metric_time__day
-) subq_5
+) nr_subq_3

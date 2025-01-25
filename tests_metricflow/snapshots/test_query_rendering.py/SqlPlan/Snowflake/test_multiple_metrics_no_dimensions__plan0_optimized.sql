@@ -4,8 +4,8 @@ sql_engine: Snowflake
 ---
 -- Combine Aggregated Outputs
 SELECT
-  MAX(subq_17.bookings) AS bookings
-  , MAX(subq_23.listings) AS listings
+  MAX(nr_subq_15.bookings) AS bookings
+  , MAX(nr_subq_19.listings) AS listings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
@@ -17,7 +17,7 @@ FROM (
     SUM(1) AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
   WHERE DATE_TRUNC('day', ds) BETWEEN '2020-01-01' AND '2020-01-01'
-) subq_17
+) nr_subq_15
 CROSS JOIN (
   -- Read Elements From Semantic Model 'listings_latest'
   -- Metric Time Dimension 'ds'
@@ -29,4 +29,4 @@ CROSS JOIN (
     SUM(1) AS listings
   FROM ***************************.dim_listings_latest listings_latest_src_28000
   WHERE DATE_TRUNC('day', created_at) BETWEEN '2020-01-01' AND '2020-01-01'
-) subq_23
+) nr_subq_19

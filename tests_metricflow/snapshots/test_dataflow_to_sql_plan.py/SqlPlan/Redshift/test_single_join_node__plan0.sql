@@ -6,13 +6,13 @@ sql_engine: Redshift
 ---
 -- Join Standard Outputs
 SELECT
-  subq_1.listing AS listing
-  , subq_1.bookings AS bookings
+  subq_0.listing AS listing
+  , subq_0.bookings AS bookings
 FROM (
   -- Pass Only Elements: ['bookings', 'listing']
   SELECT
-    subq_0.listing
-    , subq_0.bookings
+    nr_subq_0.listing
+    , nr_subq_0.bookings
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     SELECT
@@ -105,13 +105,13 @@ FROM (
       , bookings_source_src_28000.guest_id AS booking__guest
       , bookings_source_src_28000.host_id AS booking__host
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_0
-) subq_1
+  ) nr_subq_0
+) subq_0
 LEFT OUTER JOIN (
   -- Pass Only Elements: ['listing__country_latest', 'listing']
   SELECT
-    subq_2.listing
-    , subq_2.listing__country_latest
+    nr_subq_1.listing
+    , nr_subq_1.listing__country_latest
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     SELECT
@@ -172,7 +172,7 @@ LEFT OUTER JOIN (
       , listings_latest_src_28000.user_id AS user
       , listings_latest_src_28000.user_id AS listing__user
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_2
-) subq_3
+  ) nr_subq_1
+) subq_1
 ON
-  subq_1.listing = subq_3.listing
+  subq_0.listing = subq_1.listing

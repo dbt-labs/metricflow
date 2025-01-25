@@ -6,68 +6,68 @@ sql_engine: Databricks
 ---
 -- Pass Only Elements: ['user__home_state_latest', 'listing__is_lux_latest']
 SELECT
-  subq_3.listing__is_lux_latest
-  , subq_3.user__home_state_latest
+  nr_subq_3.listing__is_lux_latest
+  , nr_subq_3.user__home_state_latest
 FROM (
   -- Join Standard Outputs
   SELECT
-    subq_2.home_state_latest AS user__home_state_latest
-    , subq_0.ds__day AS ds__day
-    , subq_0.ds__week AS ds__week
-    , subq_0.ds__month AS ds__month
-    , subq_0.ds__quarter AS ds__quarter
-    , subq_0.ds__year AS ds__year
-    , subq_0.ds__extract_year AS ds__extract_year
-    , subq_0.ds__extract_quarter AS ds__extract_quarter
-    , subq_0.ds__extract_month AS ds__extract_month
-    , subq_0.ds__extract_day AS ds__extract_day
-    , subq_0.ds__extract_dow AS ds__extract_dow
-    , subq_0.ds__extract_doy AS ds__extract_doy
-    , subq_0.created_at__day AS created_at__day
-    , subq_0.created_at__week AS created_at__week
-    , subq_0.created_at__month AS created_at__month
-    , subq_0.created_at__quarter AS created_at__quarter
-    , subq_0.created_at__year AS created_at__year
-    , subq_0.created_at__extract_year AS created_at__extract_year
-    , subq_0.created_at__extract_quarter AS created_at__extract_quarter
-    , subq_0.created_at__extract_month AS created_at__extract_month
-    , subq_0.created_at__extract_day AS created_at__extract_day
-    , subq_0.created_at__extract_dow AS created_at__extract_dow
-    , subq_0.created_at__extract_doy AS created_at__extract_doy
-    , subq_0.listing__ds__day AS listing__ds__day
-    , subq_0.listing__ds__week AS listing__ds__week
-    , subq_0.listing__ds__month AS listing__ds__month
-    , subq_0.listing__ds__quarter AS listing__ds__quarter
-    , subq_0.listing__ds__year AS listing__ds__year
-    , subq_0.listing__ds__extract_year AS listing__ds__extract_year
-    , subq_0.listing__ds__extract_quarter AS listing__ds__extract_quarter
-    , subq_0.listing__ds__extract_month AS listing__ds__extract_month
-    , subq_0.listing__ds__extract_day AS listing__ds__extract_day
-    , subq_0.listing__ds__extract_dow AS listing__ds__extract_dow
-    , subq_0.listing__ds__extract_doy AS listing__ds__extract_doy
-    , subq_0.listing__created_at__day AS listing__created_at__day
-    , subq_0.listing__created_at__week AS listing__created_at__week
-    , subq_0.listing__created_at__month AS listing__created_at__month
-    , subq_0.listing__created_at__quarter AS listing__created_at__quarter
-    , subq_0.listing__created_at__year AS listing__created_at__year
-    , subq_0.listing__created_at__extract_year AS listing__created_at__extract_year
-    , subq_0.listing__created_at__extract_quarter AS listing__created_at__extract_quarter
-    , subq_0.listing__created_at__extract_month AS listing__created_at__extract_month
-    , subq_0.listing__created_at__extract_day AS listing__created_at__extract_day
-    , subq_0.listing__created_at__extract_dow AS listing__created_at__extract_dow
-    , subq_0.listing__created_at__extract_doy AS listing__created_at__extract_doy
-    , subq_0.listing AS listing
-    , subq_0.user AS user
-    , subq_0.listing__user AS listing__user
-    , subq_0.country_latest AS country_latest
-    , subq_0.is_lux_latest AS is_lux_latest
-    , subq_0.capacity_latest AS capacity_latest
-    , subq_0.listing__country_latest AS listing__country_latest
-    , subq_0.listing__is_lux_latest AS listing__is_lux_latest
-    , subq_0.listing__capacity_latest AS listing__capacity_latest
-    , subq_0.listings AS listings
-    , subq_0.largest_listing AS largest_listing
-    , subq_0.smallest_listing AS smallest_listing
+    nr_subq_2.home_state_latest AS user__home_state_latest
+    , nr_subq_0.ds__day AS ds__day
+    , nr_subq_0.ds__week AS ds__week
+    , nr_subq_0.ds__month AS ds__month
+    , nr_subq_0.ds__quarter AS ds__quarter
+    , nr_subq_0.ds__year AS ds__year
+    , nr_subq_0.ds__extract_year AS ds__extract_year
+    , nr_subq_0.ds__extract_quarter AS ds__extract_quarter
+    , nr_subq_0.ds__extract_month AS ds__extract_month
+    , nr_subq_0.ds__extract_day AS ds__extract_day
+    , nr_subq_0.ds__extract_dow AS ds__extract_dow
+    , nr_subq_0.ds__extract_doy AS ds__extract_doy
+    , nr_subq_0.created_at__day AS created_at__day
+    , nr_subq_0.created_at__week AS created_at__week
+    , nr_subq_0.created_at__month AS created_at__month
+    , nr_subq_0.created_at__quarter AS created_at__quarter
+    , nr_subq_0.created_at__year AS created_at__year
+    , nr_subq_0.created_at__extract_year AS created_at__extract_year
+    , nr_subq_0.created_at__extract_quarter AS created_at__extract_quarter
+    , nr_subq_0.created_at__extract_month AS created_at__extract_month
+    , nr_subq_0.created_at__extract_day AS created_at__extract_day
+    , nr_subq_0.created_at__extract_dow AS created_at__extract_dow
+    , nr_subq_0.created_at__extract_doy AS created_at__extract_doy
+    , nr_subq_0.listing__ds__day AS listing__ds__day
+    , nr_subq_0.listing__ds__week AS listing__ds__week
+    , nr_subq_0.listing__ds__month AS listing__ds__month
+    , nr_subq_0.listing__ds__quarter AS listing__ds__quarter
+    , nr_subq_0.listing__ds__year AS listing__ds__year
+    , nr_subq_0.listing__ds__extract_year AS listing__ds__extract_year
+    , nr_subq_0.listing__ds__extract_quarter AS listing__ds__extract_quarter
+    , nr_subq_0.listing__ds__extract_month AS listing__ds__extract_month
+    , nr_subq_0.listing__ds__extract_day AS listing__ds__extract_day
+    , nr_subq_0.listing__ds__extract_dow AS listing__ds__extract_dow
+    , nr_subq_0.listing__ds__extract_doy AS listing__ds__extract_doy
+    , nr_subq_0.listing__created_at__day AS listing__created_at__day
+    , nr_subq_0.listing__created_at__week AS listing__created_at__week
+    , nr_subq_0.listing__created_at__month AS listing__created_at__month
+    , nr_subq_0.listing__created_at__quarter AS listing__created_at__quarter
+    , nr_subq_0.listing__created_at__year AS listing__created_at__year
+    , nr_subq_0.listing__created_at__extract_year AS listing__created_at__extract_year
+    , nr_subq_0.listing__created_at__extract_quarter AS listing__created_at__extract_quarter
+    , nr_subq_0.listing__created_at__extract_month AS listing__created_at__extract_month
+    , nr_subq_0.listing__created_at__extract_day AS listing__created_at__extract_day
+    , nr_subq_0.listing__created_at__extract_dow AS listing__created_at__extract_dow
+    , nr_subq_0.listing__created_at__extract_doy AS listing__created_at__extract_doy
+    , nr_subq_0.listing AS listing
+    , nr_subq_0.user AS user
+    , nr_subq_0.listing__user AS listing__user
+    , nr_subq_0.country_latest AS country_latest
+    , nr_subq_0.is_lux_latest AS is_lux_latest
+    , nr_subq_0.capacity_latest AS capacity_latest
+    , nr_subq_0.listing__country_latest AS listing__country_latest
+    , nr_subq_0.listing__is_lux_latest AS listing__is_lux_latest
+    , nr_subq_0.listing__capacity_latest AS listing__capacity_latest
+    , nr_subq_0.listings AS listings
+    , nr_subq_0.largest_listing AS largest_listing
+    , nr_subq_0.smallest_listing AS smallest_listing
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     SELECT
@@ -128,12 +128,12 @@ FROM (
       , listings_latest_src_28000.user_id AS user
       , listings_latest_src_28000.user_id AS listing__user
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_0
+  ) nr_subq_0
   FULL OUTER JOIN (
     -- Pass Only Elements: ['home_state_latest', 'user']
     SELECT
-      subq_1.user
-      , subq_1.home_state_latest
+      nr_subq_1.user
+      , nr_subq_1.home_state_latest
     FROM (
       -- Read Elements From Semantic Model 'users_latest'
       SELECT
@@ -163,11 +163,11 @@ FROM (
         , users_latest_src_28000.home_state_latest AS user__home_state_latest
         , users_latest_src_28000.user_id AS user
       FROM ***************************.dim_users_latest users_latest_src_28000
-    ) subq_1
-  ) subq_2
+    ) nr_subq_1
+  ) nr_subq_2
   ON
-    subq_0.user = subq_2.user
-) subq_3
+    nr_subq_0.user = nr_subq_2.user
+) nr_subq_3
 GROUP BY
-  subq_3.listing__is_lux_latest
-  , subq_3.user__home_state_latest
+  nr_subq_3.listing__is_lux_latest
+  , nr_subq_3.user__home_state_latest

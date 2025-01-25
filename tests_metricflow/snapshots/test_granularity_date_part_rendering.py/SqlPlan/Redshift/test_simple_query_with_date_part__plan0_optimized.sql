@@ -15,6 +15,6 @@ FROM (
     CASE WHEN EXTRACT(dow FROM ds) = 0 THEN EXTRACT(dow FROM ds) + 7 ELSE EXTRACT(dow FROM ds) END AS metric_time__extract_dow
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-) subq_6
+) nr_subq_4
 GROUP BY
   metric_time__extract_dow

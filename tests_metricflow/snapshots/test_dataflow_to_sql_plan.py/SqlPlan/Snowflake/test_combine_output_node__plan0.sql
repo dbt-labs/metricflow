@@ -6,20 +6,20 @@ sql_engine: Snowflake
 ---
 -- Combine Aggregated Outputs
 SELECT
-  COALESCE(subq_2.is_instant, subq_5.is_instant) AS is_instant
-  , MAX(subq_2.bookings) AS bookings
-  , COALESCE(MAX(subq_5.instant_bookings), 1) AS instant_bookings
-  , COALESCE(MAX(subq_5.bookers), 1) AS bookers
+  COALESCE(subq_0.is_instant, subq_1.is_instant) AS is_instant
+  , MAX(subq_0.bookings) AS bookings
+  , COALESCE(MAX(subq_1.instant_bookings), 1) AS instant_bookings
+  , COALESCE(MAX(subq_1.bookers), 1) AS bookers
 FROM (
   -- Aggregate Measures
   SELECT
-    subq_1.is_instant
-    , SUM(subq_1.bookings) AS bookings
+    nr_subq_1.is_instant
+    , SUM(nr_subq_1.bookings) AS bookings
   FROM (
     -- Pass Only Elements: ['bookings', 'is_instant']
     SELECT
-      subq_0.is_instant
-      , subq_0.bookings
+      nr_subq_0.is_instant
+      , nr_subq_0.bookings
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       SELECT
@@ -112,23 +112,23 @@ FROM (
         , bookings_source_src_28000.guest_id AS booking__guest
         , bookings_source_src_28000.host_id AS booking__host
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_0
-  ) subq_1
+    ) nr_subq_0
+  ) nr_subq_1
   GROUP BY
-    subq_1.is_instant
-) subq_2
+    nr_subq_1.is_instant
+) subq_0
 FULL OUTER JOIN (
   -- Aggregate Measures
   SELECT
-    subq_4.is_instant
-    , SUM(subq_4.instant_bookings) AS instant_bookings
-    , COUNT(DISTINCT subq_4.bookers) AS bookers
+    nr_subq_3.is_instant
+    , SUM(nr_subq_3.instant_bookings) AS instant_bookings
+    , COUNT(DISTINCT nr_subq_3.bookers) AS bookers
   FROM (
     -- Pass Only Elements: ['instant_bookings', 'bookers', 'is_instant']
     SELECT
-      subq_3.is_instant
-      , subq_3.instant_bookings
-      , subq_3.bookers
+      nr_subq_2.is_instant
+      , nr_subq_2.instant_bookings
+      , nr_subq_2.bookers
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       SELECT
@@ -221,12 +221,12 @@ FULL OUTER JOIN (
         , bookings_source_src_28000.guest_id AS booking__guest
         , bookings_source_src_28000.host_id AS booking__host
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_3
-  ) subq_4
+    ) nr_subq_2
+  ) nr_subq_3
   GROUP BY
-    subq_4.is_instant
-) subq_5
+    nr_subq_3.is_instant
+) subq_1
 ON
-  subq_2.is_instant = subq_5.is_instant
+  subq_0.is_instant = subq_1.is_instant
 GROUP BY
-  COALESCE(subq_2.is_instant, subq_5.is_instant)
+  COALESCE(subq_0.is_instant, subq_1.is_instant)

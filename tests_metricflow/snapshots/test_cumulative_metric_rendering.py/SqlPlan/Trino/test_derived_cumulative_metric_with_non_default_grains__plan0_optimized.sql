@@ -24,24 +24,24 @@ FROM (
       -- Pass Only Elements: ['txn_revenue', 'metric_time__week', 'metric_time__day']
       -- Aggregate Measures
       SELECT
-        subq_13.ds AS metric_time__day
-        , DATE_TRUNC('week', subq_13.ds) AS metric_time__week
+        nr_subq_11.ds AS metric_time__day
+        , DATE_TRUNC('week', nr_subq_11.ds) AS metric_time__week
         , SUM(revenue_src_28000.revenue) AS txn_revenue
-      FROM ***************************.mf_time_spine subq_13
+      FROM ***************************.mf_time_spine nr_subq_11
       INNER JOIN
         ***************************.fct_revenue revenue_src_28000
       ON
         (
-          DATE_TRUNC('day', revenue_src_28000.created_at) <= subq_13.ds
+          DATE_TRUNC('day', revenue_src_28000.created_at) <= nr_subq_11.ds
         ) AND (
-          DATE_TRUNC('day', revenue_src_28000.created_at) > DATE_ADD('month', -2, subq_13.ds)
+          DATE_TRUNC('day', revenue_src_28000.created_at) > DATE_ADD('month', -2, nr_subq_11.ds)
         )
       GROUP BY
-        subq_13.ds
-        , DATE_TRUNC('week', subq_13.ds)
-    ) subq_16
-  ) subq_18
+        nr_subq_11.ds
+        , DATE_TRUNC('week', nr_subq_11.ds)
+    ) nr_subq_14
+  ) nr_subq_16
   GROUP BY
     metric_time__week
     , t2mr
-) subq_19
+) nr_subq_17

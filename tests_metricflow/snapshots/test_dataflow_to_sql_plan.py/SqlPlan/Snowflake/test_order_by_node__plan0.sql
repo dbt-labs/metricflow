@@ -6,27 +6,27 @@ sql_engine: Snowflake
 ---
 -- Order By ['ds__day', 'bookings']
 SELECT
-  subq_3.ds__day
-  , subq_3.is_instant
-  , subq_3.bookings
+  subq_0.ds__day
+  , subq_0.is_instant
+  , subq_0.bookings
 FROM (
   -- Compute Metrics via Expressions
   SELECT
-    subq_2.ds__day
-    , subq_2.is_instant
-    , subq_2.bookings
+    nr_subq_2.ds__day
+    , nr_subq_2.is_instant
+    , nr_subq_2.bookings
   FROM (
     -- Aggregate Measures
     SELECT
-      subq_1.ds__day
-      , subq_1.is_instant
-      , SUM(subq_1.bookings) AS bookings
+      nr_subq_1.ds__day
+      , nr_subq_1.is_instant
+      , SUM(nr_subq_1.bookings) AS bookings
     FROM (
       -- Pass Only Elements: ['bookings', 'is_instant', 'ds__day']
       SELECT
-        subq_0.ds__day
-        , subq_0.is_instant
-        , subq_0.bookings
+        nr_subq_0.ds__day
+        , nr_subq_0.is_instant
+        , nr_subq_0.bookings
       FROM (
         -- Read Elements From Semantic Model 'bookings_source'
         SELECT
@@ -119,11 +119,11 @@ FROM (
           , bookings_source_src_28000.guest_id AS booking__guest
           , bookings_source_src_28000.host_id AS booking__host
         FROM ***************************.fct_bookings bookings_source_src_28000
-      ) subq_0
-    ) subq_1
+      ) nr_subq_0
+    ) nr_subq_1
     GROUP BY
-      subq_1.ds__day
-      , subq_1.is_instant
-  ) subq_2
-) subq_3
-ORDER BY subq_3.ds__day, subq_3.bookings DESC
+      nr_subq_1.ds__day
+      , nr_subq_1.is_instant
+  ) nr_subq_2
+) subq_0
+ORDER BY subq_0.ds__day, subq_0.bookings DESC

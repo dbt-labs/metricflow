@@ -12,8 +12,8 @@ FROM (
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
-    subq_17.ds__day__lead AS metric_time__day
-    , SUM(subq_13.bookings) AS bookings
+    nr_subq_23.ds__day__lead AS metric_time__day
+    , SUM(nr_subq_19.bookings) AS bookings
   FROM (
     -- Offset Base Granularity By Custom Granularity Period(s)
     WITH cte_6 AS (
@@ -42,8 +42,8 @@ FROM (
     SELECT
       cte_6.ds__day AS ds__day
       , CASE
-        WHEN subq_16.ds__martian_day__first_value__lead + MAKE_INTERVAL(days => CAST ((cte_6.ds__day__row_number - 1) AS INTEGER)) <= subq_16.ds__martian_day__last_value__lead
-          THEN subq_16.ds__martian_day__first_value__lead + MAKE_INTERVAL(days => CAST ((cte_6.ds__day__row_number - 1) AS INTEGER))
+        WHEN nr_subq_22.ds__martian_day__first_value__lead + MAKE_INTERVAL(days => CAST ((cte_6.ds__day__row_number - 1) AS INTEGER)) <= nr_subq_22.ds__martian_day__last_value__lead
+          THEN nr_subq_22.ds__martian_day__first_value__lead + MAKE_INTERVAL(days => CAST ((cte_6.ds__day__row_number - 1) AS INTEGER))
         ELSE NULL
       END AS ds__day__lead
     FROM cte_6 cte_6
@@ -64,11 +64,11 @@ FROM (
           ds__martian_day
           , ds__martian_day__first_value
           , ds__martian_day__last_value
-      ) subq_15
-    ) subq_16
+      ) nr_subq_21
+    ) nr_subq_22
     ON
-      cte_6.ds__martian_day = subq_16.ds__martian_day
-  ) subq_17
+      cte_6.ds__martian_day = nr_subq_22.ds__martian_day
+  ) nr_subq_23
   INNER JOIN (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
@@ -76,9 +76,9 @@ FROM (
       DATE_TRUNC('day', ds) AS metric_time__day
       , 1 AS bookings
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_13
+  ) nr_subq_19
   ON
-    subq_17.ds__day = subq_13.metric_time__day
+    nr_subq_23.ds__day = nr_subq_19.metric_time__day
   GROUP BY
-    subq_17.ds__day__lead
-) subq_23
+    nr_subq_23.ds__day__lead
+) nr_subq_29

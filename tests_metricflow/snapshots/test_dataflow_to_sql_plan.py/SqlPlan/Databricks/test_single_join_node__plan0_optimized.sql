@@ -6,8 +6,8 @@ sql_engine: Databricks
 ---
 -- Join Standard Outputs
 SELECT
-  subq_5.listing AS listing
-  , subq_5.bookings AS bookings
+  subq_2.listing AS listing
+  , subq_2.bookings AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Pass Only Elements: ['bookings', 'listing']
@@ -15,8 +15,8 @@ FROM (
     listing_id AS listing
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-) subq_5
+) subq_2
 LEFT OUTER JOIN
   ***************************.dim_listings_latest listings_latest_src_28000
 ON
-  subq_5.listing = listings_latest_src_28000.listing_id
+  subq_2.listing = listings_latest_src_28000.listing_id

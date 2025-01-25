@@ -6,12 +6,12 @@ sql_engine: Postgres
 ---
 -- Calculate min and max
 SELECT
-  MIN(subq_1.booking__paid_at__day) AS booking__paid_at__day__min
-  , MAX(subq_1.booking__paid_at__day) AS booking__paid_at__day__max
+  MIN(nr_subq_1.booking__paid_at__day) AS booking__paid_at__day__min
+  , MAX(nr_subq_1.booking__paid_at__day) AS booking__paid_at__day__max
 FROM (
   -- Pass Only Elements: ['booking__paid_at__day',]
   SELECT
-    subq_0.booking__paid_at__day
+    nr_subq_0.booking__paid_at__day
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     SELECT
@@ -104,7 +104,7 @@ FROM (
       , bookings_source_src_28000.guest_id AS booking__guest
       , bookings_source_src_28000.host_id AS booking__host
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_0
+  ) nr_subq_0
   GROUP BY
-    subq_0.booking__paid_at__day
-) subq_1
+    nr_subq_0.booking__paid_at__day
+) nr_subq_1

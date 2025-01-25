@@ -13,8 +13,8 @@ SELECT
 FROM (
   -- Join Standard Outputs
   SELECT
-    subq_19.listing__bookings AS listing__bookings
-    , subq_13.listings AS listings
+    nr_subq_16.listing__bookings AS listing__bookings
+    , nr_subq_13.listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
@@ -22,7 +22,7 @@ FROM (
       listing_id AS listing
       , 1 AS listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_13
+  ) nr_subq_13
   LEFT OUTER JOIN (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
@@ -38,11 +38,11 @@ FROM (
         listing_id AS listing
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_16
+    ) nr_subq_5
     GROUP BY
       listing
-  ) subq_19
+  ) nr_subq_16
   ON
-    subq_13.listing = subq_19.listing
-) subq_20
+    nr_subq_13.listing = nr_subq_16.listing
+) nr_subq_17
 WHERE listing__bookings > 2

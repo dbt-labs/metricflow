@@ -33,7 +33,7 @@ FROM (
     , EXTRACT(dayofyear FROM ds) AS metric_time__extract_doy
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-) subq_6
+) nr_subq_4
 GROUP BY
   metric_time__extract_year
   , metric_time__extract_quarter

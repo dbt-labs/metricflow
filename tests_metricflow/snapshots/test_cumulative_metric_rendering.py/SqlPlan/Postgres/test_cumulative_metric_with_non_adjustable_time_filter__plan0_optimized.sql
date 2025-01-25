@@ -18,18 +18,18 @@ SELECT
 FROM (
   -- Join Self Over Time Range
   SELECT
-    subq_11.ds AS metric_time__day
+    nr_subq_9.ds AS metric_time__day
     , bookings_source_src_28000.guest_id AS bookers
-  FROM ***************************.mf_time_spine subq_11
+  FROM ***************************.mf_time_spine nr_subq_9
   INNER JOIN
     ***************************.fct_bookings bookings_source_src_28000
   ON
     (
-      DATE_TRUNC('day', bookings_source_src_28000.ds) <= subq_11.ds
+      DATE_TRUNC('day', bookings_source_src_28000.ds) <= nr_subq_9.ds
     ) AND (
-      DATE_TRUNC('day', bookings_source_src_28000.ds) > subq_11.ds - MAKE_INTERVAL(days => 2)
+      DATE_TRUNC('day', bookings_source_src_28000.ds) > nr_subq_9.ds - MAKE_INTERVAL(days => 2)
     )
-) subq_12
+) nr_subq_10
 WHERE metric_time__day = '2020-01-03' or metric_time__day = '2020-01-07'
 GROUP BY
   metric_time__day

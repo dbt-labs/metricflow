@@ -4,9 +4,9 @@ sql_engine: Databricks
 ---
 -- Combine Aggregated Outputs
 SELECT
-  COALESCE(subq_17.metric_time__martian_day, subq_23.metric_time__martian_day) AS metric_time__martian_day
-  , MAX(subq_17.bookings) AS bookings
-  , MAX(subq_23.listings) AS listings
+  COALESCE(nr_subq_14.metric_time__martian_day, nr_subq_19.metric_time__martian_day) AS metric_time__martian_day
+  , MAX(nr_subq_14.bookings) AS bookings
+  , MAX(nr_subq_19.listings) AS listings
 FROM (
   -- Metric Time Dimension 'ds'
   -- Join to Custom Granularity Dataset
@@ -14,22 +14,22 @@ FROM (
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
-    subq_13.martian_day AS metric_time__martian_day
-    , SUM(subq_12.bookings) AS bookings
+    nr_subq_10.martian_day AS metric_time__martian_day
+    , SUM(nr_subq_28002.bookings) AS bookings
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     SELECT
       1 AS bookings
       , DATE_TRUNC('day', ds) AS ds__day
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_12
+  ) nr_subq_28002
   LEFT OUTER JOIN
-    ***************************.mf_time_spine subq_13
+    ***************************.mf_time_spine nr_subq_10
   ON
-    subq_12.ds__day = subq_13.ds
+    nr_subq_28002.ds__day = nr_subq_10.ds
   GROUP BY
-    subq_13.martian_day
-) subq_17
+    nr_subq_10.martian_day
+) nr_subq_14
 FULL OUTER JOIN (
   -- Metric Time Dimension 'ds'
   -- Join to Custom Granularity Dataset
@@ -37,23 +37,23 @@ FULL OUTER JOIN (
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
-    subq_19.martian_day AS metric_time__martian_day
-    , SUM(subq_18.listings) AS listings
+    nr_subq_15.martian_day AS metric_time__martian_day
+    , SUM(nr_subq_28007.listings) AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     SELECT
       1 AS listings
       , DATE_TRUNC('day', created_at) AS ds__day
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_18
+  ) nr_subq_28007
   LEFT OUTER JOIN
-    ***************************.mf_time_spine subq_19
+    ***************************.mf_time_spine nr_subq_15
   ON
-    subq_18.ds__day = subq_19.ds
+    nr_subq_28007.ds__day = nr_subq_15.ds
   GROUP BY
-    subq_19.martian_day
-) subq_23
+    nr_subq_15.martian_day
+) nr_subq_19
 ON
-  subq_17.metric_time__martian_day = subq_23.metric_time__martian_day
+  nr_subq_14.metric_time__martian_day = nr_subq_19.metric_time__martian_day
 GROUP BY
-  COALESCE(subq_17.metric_time__martian_day, subq_23.metric_time__martian_day)
+  COALESCE(nr_subq_14.metric_time__martian_day, nr_subq_19.metric_time__martian_day)

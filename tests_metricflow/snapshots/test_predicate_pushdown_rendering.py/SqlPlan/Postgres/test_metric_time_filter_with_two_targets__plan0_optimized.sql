@@ -18,8 +18,8 @@ FROM (
   -- Join Standard Outputs
   SELECT
     listings_latest_src_28000.country AS listing__country_latest
-    , subq_10.metric_time__day AS metric_time__day
-    , subq_10.bookings AS bookings
+    , nr_subq_7.metric_time__day AS metric_time__day
+    , nr_subq_7.bookings AS bookings
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
@@ -28,12 +28,12 @@ FROM (
       , listing_id AS listing
       , 1 AS bookings
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_10
+  ) nr_subq_7
   LEFT OUTER JOIN
     ***************************.dim_listings_latest listings_latest_src_28000
   ON
-    subq_10.listing = listings_latest_src_28000.listing_id
-) subq_14
+    nr_subq_7.listing = listings_latest_src_28000.listing_id
+) nr_subq_10
 WHERE metric_time__day = '2024-01-01'
 GROUP BY
   listing__country_latest

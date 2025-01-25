@@ -8,17 +8,17 @@ sql_engine: Trino
 ---
 -- Aggregate Measures
 SELECT
-  SUM(subq_1.bookings) AS bookings
-  , SUM(subq_1.instant_bookings) AS instant_bookings
-  , COUNT(DISTINCT subq_1.bookers) AS bookers
-  , AVG(subq_1.average_booking_value) AS average_booking_value
+  SUM(subq_0.bookings) AS bookings
+  , SUM(subq_0.instant_bookings) AS instant_bookings
+  , COUNT(DISTINCT subq_0.bookers) AS bookers
+  , AVG(subq_0.average_booking_value) AS average_booking_value
 FROM (
   -- Pass Only Elements: ['bookings', 'instant_bookings', 'average_booking_value', 'bookers']
   SELECT
-    subq_0.bookings
-    , subq_0.instant_bookings
-    , subq_0.bookers
-    , subq_0.average_booking_value
+    nr_subq_0.bookings
+    , nr_subq_0.instant_bookings
+    , nr_subq_0.bookers
+    , nr_subq_0.average_booking_value
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     SELECT
@@ -111,5 +111,5 @@ FROM (
       , bookings_source_src_28000.guest_id AS booking__guest
       , bookings_source_src_28000.host_id AS booking__host
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_0
-) subq_1
+  ) nr_subq_0
+) subq_0

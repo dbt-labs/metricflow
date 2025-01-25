@@ -6,70 +6,70 @@ sql_engine: Snowflake
 ---
 -- Order By ['listing__country_latest'] Limit 100
 SELECT
-  subq_2.listing__country_latest
+  nr_subq_2.listing__country_latest
 FROM (
   -- Pass Only Elements: ['listing__country_latest',]
   SELECT
-    subq_1.listing__country_latest
+    nr_subq_1.listing__country_latest
   FROM (
     -- Constrain Output with WHERE
     SELECT
-      subq_0.ds__day
-      , subq_0.ds__week
-      , subq_0.ds__month
-      , subq_0.ds__quarter
-      , subq_0.ds__year
-      , subq_0.ds__extract_year
-      , subq_0.ds__extract_quarter
-      , subq_0.ds__extract_month
-      , subq_0.ds__extract_day
-      , subq_0.ds__extract_dow
-      , subq_0.ds__extract_doy
-      , subq_0.created_at__day
-      , subq_0.created_at__week
-      , subq_0.created_at__month
-      , subq_0.created_at__quarter
-      , subq_0.created_at__year
-      , subq_0.created_at__extract_year
-      , subq_0.created_at__extract_quarter
-      , subq_0.created_at__extract_month
-      , subq_0.created_at__extract_day
-      , subq_0.created_at__extract_dow
-      , subq_0.created_at__extract_doy
-      , subq_0.listing__ds__day
-      , subq_0.listing__ds__week
-      , subq_0.listing__ds__month
-      , subq_0.listing__ds__quarter
-      , subq_0.listing__ds__year
-      , subq_0.listing__ds__extract_year
-      , subq_0.listing__ds__extract_quarter
-      , subq_0.listing__ds__extract_month
-      , subq_0.listing__ds__extract_day
-      , subq_0.listing__ds__extract_dow
-      , subq_0.listing__ds__extract_doy
-      , subq_0.listing__created_at__day
-      , subq_0.listing__created_at__week
-      , subq_0.listing__created_at__month
-      , subq_0.listing__created_at__quarter
-      , subq_0.listing__created_at__year
-      , subq_0.listing__created_at__extract_year
-      , subq_0.listing__created_at__extract_quarter
-      , subq_0.listing__created_at__extract_month
-      , subq_0.listing__created_at__extract_day
-      , subq_0.listing__created_at__extract_dow
-      , subq_0.listing__created_at__extract_doy
-      , subq_0.listing
-      , subq_0.user
-      , subq_0.listing__user
-      , subq_0.country_latest
-      , subq_0.is_lux_latest
-      , subq_0.capacity_latest
-      , subq_0.listing__country_latest
-      , subq_0.listing__is_lux_latest
-      , subq_0.listing__capacity_latest
-      , subq_0.listings
-      , subq_0.largest_listing
-      , subq_0.smallest_listing
+      nr_subq_0.ds__day
+      , nr_subq_0.ds__week
+      , nr_subq_0.ds__month
+      , nr_subq_0.ds__quarter
+      , nr_subq_0.ds__year
+      , nr_subq_0.ds__extract_year
+      , nr_subq_0.ds__extract_quarter
+      , nr_subq_0.ds__extract_month
+      , nr_subq_0.ds__extract_day
+      , nr_subq_0.ds__extract_dow
+      , nr_subq_0.ds__extract_doy
+      , nr_subq_0.created_at__day
+      , nr_subq_0.created_at__week
+      , nr_subq_0.created_at__month
+      , nr_subq_0.created_at__quarter
+      , nr_subq_0.created_at__year
+      , nr_subq_0.created_at__extract_year
+      , nr_subq_0.created_at__extract_quarter
+      , nr_subq_0.created_at__extract_month
+      , nr_subq_0.created_at__extract_day
+      , nr_subq_0.created_at__extract_dow
+      , nr_subq_0.created_at__extract_doy
+      , nr_subq_0.listing__ds__day
+      , nr_subq_0.listing__ds__week
+      , nr_subq_0.listing__ds__month
+      , nr_subq_0.listing__ds__quarter
+      , nr_subq_0.listing__ds__year
+      , nr_subq_0.listing__ds__extract_year
+      , nr_subq_0.listing__ds__extract_quarter
+      , nr_subq_0.listing__ds__extract_month
+      , nr_subq_0.listing__ds__extract_day
+      , nr_subq_0.listing__ds__extract_dow
+      , nr_subq_0.listing__ds__extract_doy
+      , nr_subq_0.listing__created_at__day
+      , nr_subq_0.listing__created_at__week
+      , nr_subq_0.listing__created_at__month
+      , nr_subq_0.listing__created_at__quarter
+      , nr_subq_0.listing__created_at__year
+      , nr_subq_0.listing__created_at__extract_year
+      , nr_subq_0.listing__created_at__extract_quarter
+      , nr_subq_0.listing__created_at__extract_month
+      , nr_subq_0.listing__created_at__extract_day
+      , nr_subq_0.listing__created_at__extract_dow
+      , nr_subq_0.listing__created_at__extract_doy
+      , nr_subq_0.listing
+      , nr_subq_0.user
+      , nr_subq_0.listing__user
+      , nr_subq_0.country_latest
+      , nr_subq_0.is_lux_latest
+      , nr_subq_0.capacity_latest
+      , nr_subq_0.listing__country_latest
+      , nr_subq_0.listing__is_lux_latest
+      , nr_subq_0.listing__capacity_latest
+      , nr_subq_0.listings
+      , nr_subq_0.largest_listing
+      , nr_subq_0.smallest_listing
     FROM (
       -- Read Elements From Semantic Model 'listings_latest'
       SELECT
@@ -130,11 +130,11 @@ FROM (
         , listings_latest_src_28000.user_id AS user
         , listings_latest_src_28000.user_id AS listing__user
       FROM ***************************.dim_listings_latest listings_latest_src_28000
-    ) subq_0
+    ) nr_subq_0
     WHERE listing__country_latest = 'us'
-  ) subq_1
+  ) nr_subq_1
   GROUP BY
-    subq_1.listing__country_latest
-) subq_2
-ORDER BY subq_2.listing__country_latest DESC
+    nr_subq_1.listing__country_latest
+) nr_subq_2
+ORDER BY nr_subq_2.listing__country_latest DESC
 LIMIT 100

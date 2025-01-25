@@ -6,29 +6,29 @@ sql_engine: Postgres
 ---
 -- Compute Metrics via Expressions
 SELECT
-  subq_5.listing
-  , subq_5.listing__country_latest
-  , CAST(subq_5.bookings AS DOUBLE PRECISION) / CAST(NULLIF(subq_5.bookers, 0) AS DOUBLE PRECISION) AS bookings_per_booker
+  subq_0.listing
+  , subq_0.listing__country_latest
+  , CAST(subq_0.bookings AS DOUBLE PRECISION) / CAST(NULLIF(subq_0.bookers, 0) AS DOUBLE PRECISION) AS bookings_per_booker
 FROM (
   -- Aggregate Measures
   SELECT
-    subq_4.listing
-    , subq_4.listing__country_latest
-    , SUM(subq_4.bookings) AS bookings
-    , COUNT(DISTINCT subq_4.bookers) AS bookers
+    nr_subq_4.listing
+    , nr_subq_4.listing__country_latest
+    , SUM(nr_subq_4.bookings) AS bookings
+    , COUNT(DISTINCT nr_subq_4.bookers) AS bookers
   FROM (
     -- Join Standard Outputs
     SELECT
-      subq_3.country_latest AS listing__country_latest
-      , subq_1.listing AS listing
-      , subq_1.bookings AS bookings
-      , subq_1.bookers AS bookers
+      nr_subq_3.country_latest AS listing__country_latest
+      , nr_subq_1.listing AS listing
+      , nr_subq_1.bookings AS bookings
+      , nr_subq_1.bookers AS bookers
     FROM (
       -- Pass Only Elements: ['bookings', 'bookers', 'listing']
       SELECT
-        subq_0.listing
-        , subq_0.bookings
-        , subq_0.bookers
+        nr_subq_0.listing
+        , nr_subq_0.bookings
+        , nr_subq_0.bookers
       FROM (
         -- Read Elements From Semantic Model 'bookings_source'
         SELECT
@@ -121,13 +121,13 @@ FROM (
           , bookings_source_src_28000.guest_id AS booking__guest
           , bookings_source_src_28000.host_id AS booking__host
         FROM ***************************.fct_bookings bookings_source_src_28000
-      ) subq_0
-    ) subq_1
+      ) nr_subq_0
+    ) nr_subq_1
     LEFT OUTER JOIN (
       -- Pass Only Elements: ['country_latest', 'listing']
       SELECT
-        subq_2.listing
-        , subq_2.country_latest
+        nr_subq_2.listing
+        , nr_subq_2.country_latest
       FROM (
         -- Read Elements From Semantic Model 'listings_latest'
         SELECT
@@ -188,12 +188,12 @@ FROM (
           , listings_latest_src_28000.user_id AS user
           , listings_latest_src_28000.user_id AS listing__user
         FROM ***************************.dim_listings_latest listings_latest_src_28000
-      ) subq_2
-    ) subq_3
+      ) nr_subq_2
+    ) nr_subq_3
     ON
-      subq_1.listing = subq_3.listing
-  ) subq_4
+      nr_subq_1.listing = nr_subq_3.listing
+  ) nr_subq_4
   GROUP BY
-    subq_4.listing
-    , subq_4.listing__country_latest
-) subq_5
+    nr_subq_4.listing
+    , nr_subq_4.listing__country_latest
+) subq_0

@@ -6,144 +6,144 @@ sql_engine: Redshift
 ---
 -- Compute Metrics via Expressions
 SELECT
-  subq_11.account_id__customer_id__customer_name
-  , subq_11.txn_count
+  nr_subq_11.account_id__customer_id__customer_name
+  , nr_subq_11.txn_count
 FROM (
   -- Aggregate Measures
   SELECT
-    subq_10.account_id__customer_id__customer_name
-    , SUM(subq_10.txn_count) AS txn_count
+    nr_subq_10.account_id__customer_id__customer_name
+    , SUM(nr_subq_10.txn_count) AS txn_count
   FROM (
     -- Pass Only Elements: ['txn_count', 'account_id__customer_id__customer_name']
     SELECT
-      subq_9.account_id__customer_id__customer_name
-      , subq_9.txn_count
+      nr_subq_9.account_id__customer_id__customer_name
+      , nr_subq_9.txn_count
     FROM (
       -- Join Standard Outputs
       SELECT
-        subq_8.customer_id__customer_name AS account_id__customer_id__customer_name
-        , subq_8.ds_partitioned__day AS account_id__ds_partitioned__day
-        , subq_1.ds_partitioned__day AS ds_partitioned__day
-        , subq_1.ds_partitioned__week AS ds_partitioned__week
-        , subq_1.ds_partitioned__month AS ds_partitioned__month
-        , subq_1.ds_partitioned__quarter AS ds_partitioned__quarter
-        , subq_1.ds_partitioned__year AS ds_partitioned__year
-        , subq_1.ds_partitioned__extract_year AS ds_partitioned__extract_year
-        , subq_1.ds_partitioned__extract_quarter AS ds_partitioned__extract_quarter
-        , subq_1.ds_partitioned__extract_month AS ds_partitioned__extract_month
-        , subq_1.ds_partitioned__extract_day AS ds_partitioned__extract_day
-        , subq_1.ds_partitioned__extract_dow AS ds_partitioned__extract_dow
-        , subq_1.ds_partitioned__extract_doy AS ds_partitioned__extract_doy
-        , subq_1.ds__day AS ds__day
-        , subq_1.ds__week AS ds__week
-        , subq_1.ds__month AS ds__month
-        , subq_1.ds__quarter AS ds__quarter
-        , subq_1.ds__year AS ds__year
-        , subq_1.ds__extract_year AS ds__extract_year
-        , subq_1.ds__extract_quarter AS ds__extract_quarter
-        , subq_1.ds__extract_month AS ds__extract_month
-        , subq_1.ds__extract_day AS ds__extract_day
-        , subq_1.ds__extract_dow AS ds__extract_dow
-        , subq_1.ds__extract_doy AS ds__extract_doy
-        , subq_1.account_id__ds_partitioned__day AS account_id__ds_partitioned__day
-        , subq_1.account_id__ds_partitioned__week AS account_id__ds_partitioned__week
-        , subq_1.account_id__ds_partitioned__month AS account_id__ds_partitioned__month
-        , subq_1.account_id__ds_partitioned__quarter AS account_id__ds_partitioned__quarter
-        , subq_1.account_id__ds_partitioned__year AS account_id__ds_partitioned__year
-        , subq_1.account_id__ds_partitioned__extract_year AS account_id__ds_partitioned__extract_year
-        , subq_1.account_id__ds_partitioned__extract_quarter AS account_id__ds_partitioned__extract_quarter
-        , subq_1.account_id__ds_partitioned__extract_month AS account_id__ds_partitioned__extract_month
-        , subq_1.account_id__ds_partitioned__extract_day AS account_id__ds_partitioned__extract_day
-        , subq_1.account_id__ds_partitioned__extract_dow AS account_id__ds_partitioned__extract_dow
-        , subq_1.account_id__ds_partitioned__extract_doy AS account_id__ds_partitioned__extract_doy
-        , subq_1.account_id__ds__day AS account_id__ds__day
-        , subq_1.account_id__ds__week AS account_id__ds__week
-        , subq_1.account_id__ds__month AS account_id__ds__month
-        , subq_1.account_id__ds__quarter AS account_id__ds__quarter
-        , subq_1.account_id__ds__year AS account_id__ds__year
-        , subq_1.account_id__ds__extract_year AS account_id__ds__extract_year
-        , subq_1.account_id__ds__extract_quarter AS account_id__ds__extract_quarter
-        , subq_1.account_id__ds__extract_month AS account_id__ds__extract_month
-        , subq_1.account_id__ds__extract_day AS account_id__ds__extract_day
-        , subq_1.account_id__ds__extract_dow AS account_id__ds__extract_dow
-        , subq_1.account_id__ds__extract_doy AS account_id__ds__extract_doy
-        , subq_1.metric_time__day AS metric_time__day
-        , subq_1.metric_time__week AS metric_time__week
-        , subq_1.metric_time__month AS metric_time__month
-        , subq_1.metric_time__quarter AS metric_time__quarter
-        , subq_1.metric_time__year AS metric_time__year
-        , subq_1.metric_time__extract_year AS metric_time__extract_year
-        , subq_1.metric_time__extract_quarter AS metric_time__extract_quarter
-        , subq_1.metric_time__extract_month AS metric_time__extract_month
-        , subq_1.metric_time__extract_day AS metric_time__extract_day
-        , subq_1.metric_time__extract_dow AS metric_time__extract_dow
-        , subq_1.metric_time__extract_doy AS metric_time__extract_doy
-        , subq_1.account_id AS account_id
-        , subq_1.account_month AS account_month
-        , subq_1.account_id__account_month AS account_id__account_month
-        , subq_1.txn_count AS txn_count
+        nr_subq_8.customer_id__customer_name AS account_id__customer_id__customer_name
+        , nr_subq_8.ds_partitioned__day AS account_id__ds_partitioned__day
+        , nr_subq_3.ds_partitioned__day AS ds_partitioned__day
+        , nr_subq_3.ds_partitioned__week AS ds_partitioned__week
+        , nr_subq_3.ds_partitioned__month AS ds_partitioned__month
+        , nr_subq_3.ds_partitioned__quarter AS ds_partitioned__quarter
+        , nr_subq_3.ds_partitioned__year AS ds_partitioned__year
+        , nr_subq_3.ds_partitioned__extract_year AS ds_partitioned__extract_year
+        , nr_subq_3.ds_partitioned__extract_quarter AS ds_partitioned__extract_quarter
+        , nr_subq_3.ds_partitioned__extract_month AS ds_partitioned__extract_month
+        , nr_subq_3.ds_partitioned__extract_day AS ds_partitioned__extract_day
+        , nr_subq_3.ds_partitioned__extract_dow AS ds_partitioned__extract_dow
+        , nr_subq_3.ds_partitioned__extract_doy AS ds_partitioned__extract_doy
+        , nr_subq_3.ds__day AS ds__day
+        , nr_subq_3.ds__week AS ds__week
+        , nr_subq_3.ds__month AS ds__month
+        , nr_subq_3.ds__quarter AS ds__quarter
+        , nr_subq_3.ds__year AS ds__year
+        , nr_subq_3.ds__extract_year AS ds__extract_year
+        , nr_subq_3.ds__extract_quarter AS ds__extract_quarter
+        , nr_subq_3.ds__extract_month AS ds__extract_month
+        , nr_subq_3.ds__extract_day AS ds__extract_day
+        , nr_subq_3.ds__extract_dow AS ds__extract_dow
+        , nr_subq_3.ds__extract_doy AS ds__extract_doy
+        , nr_subq_3.account_id__ds_partitioned__day AS account_id__ds_partitioned__day
+        , nr_subq_3.account_id__ds_partitioned__week AS account_id__ds_partitioned__week
+        , nr_subq_3.account_id__ds_partitioned__month AS account_id__ds_partitioned__month
+        , nr_subq_3.account_id__ds_partitioned__quarter AS account_id__ds_partitioned__quarter
+        , nr_subq_3.account_id__ds_partitioned__year AS account_id__ds_partitioned__year
+        , nr_subq_3.account_id__ds_partitioned__extract_year AS account_id__ds_partitioned__extract_year
+        , nr_subq_3.account_id__ds_partitioned__extract_quarter AS account_id__ds_partitioned__extract_quarter
+        , nr_subq_3.account_id__ds_partitioned__extract_month AS account_id__ds_partitioned__extract_month
+        , nr_subq_3.account_id__ds_partitioned__extract_day AS account_id__ds_partitioned__extract_day
+        , nr_subq_3.account_id__ds_partitioned__extract_dow AS account_id__ds_partitioned__extract_dow
+        , nr_subq_3.account_id__ds_partitioned__extract_doy AS account_id__ds_partitioned__extract_doy
+        , nr_subq_3.account_id__ds__day AS account_id__ds__day
+        , nr_subq_3.account_id__ds__week AS account_id__ds__week
+        , nr_subq_3.account_id__ds__month AS account_id__ds__month
+        , nr_subq_3.account_id__ds__quarter AS account_id__ds__quarter
+        , nr_subq_3.account_id__ds__year AS account_id__ds__year
+        , nr_subq_3.account_id__ds__extract_year AS account_id__ds__extract_year
+        , nr_subq_3.account_id__ds__extract_quarter AS account_id__ds__extract_quarter
+        , nr_subq_3.account_id__ds__extract_month AS account_id__ds__extract_month
+        , nr_subq_3.account_id__ds__extract_day AS account_id__ds__extract_day
+        , nr_subq_3.account_id__ds__extract_dow AS account_id__ds__extract_dow
+        , nr_subq_3.account_id__ds__extract_doy AS account_id__ds__extract_doy
+        , nr_subq_3.metric_time__day AS metric_time__day
+        , nr_subq_3.metric_time__week AS metric_time__week
+        , nr_subq_3.metric_time__month AS metric_time__month
+        , nr_subq_3.metric_time__quarter AS metric_time__quarter
+        , nr_subq_3.metric_time__year AS metric_time__year
+        , nr_subq_3.metric_time__extract_year AS metric_time__extract_year
+        , nr_subq_3.metric_time__extract_quarter AS metric_time__extract_quarter
+        , nr_subq_3.metric_time__extract_month AS metric_time__extract_month
+        , nr_subq_3.metric_time__extract_day AS metric_time__extract_day
+        , nr_subq_3.metric_time__extract_dow AS metric_time__extract_dow
+        , nr_subq_3.metric_time__extract_doy AS metric_time__extract_doy
+        , nr_subq_3.account_id AS account_id
+        , nr_subq_3.account_month AS account_month
+        , nr_subq_3.account_id__account_month AS account_id__account_month
+        , nr_subq_3.txn_count AS txn_count
       FROM (
         -- Metric Time Dimension 'ds'
         SELECT
-          subq_0.ds_partitioned__day
-          , subq_0.ds_partitioned__week
-          , subq_0.ds_partitioned__month
-          , subq_0.ds_partitioned__quarter
-          , subq_0.ds_partitioned__year
-          , subq_0.ds_partitioned__extract_year
-          , subq_0.ds_partitioned__extract_quarter
-          , subq_0.ds_partitioned__extract_month
-          , subq_0.ds_partitioned__extract_day
-          , subq_0.ds_partitioned__extract_dow
-          , subq_0.ds_partitioned__extract_doy
-          , subq_0.ds__day
-          , subq_0.ds__week
-          , subq_0.ds__month
-          , subq_0.ds__quarter
-          , subq_0.ds__year
-          , subq_0.ds__extract_year
-          , subq_0.ds__extract_quarter
-          , subq_0.ds__extract_month
-          , subq_0.ds__extract_day
-          , subq_0.ds__extract_dow
-          , subq_0.ds__extract_doy
-          , subq_0.account_id__ds_partitioned__day
-          , subq_0.account_id__ds_partitioned__week
-          , subq_0.account_id__ds_partitioned__month
-          , subq_0.account_id__ds_partitioned__quarter
-          , subq_0.account_id__ds_partitioned__year
-          , subq_0.account_id__ds_partitioned__extract_year
-          , subq_0.account_id__ds_partitioned__extract_quarter
-          , subq_0.account_id__ds_partitioned__extract_month
-          , subq_0.account_id__ds_partitioned__extract_day
-          , subq_0.account_id__ds_partitioned__extract_dow
-          , subq_0.account_id__ds_partitioned__extract_doy
-          , subq_0.account_id__ds__day
-          , subq_0.account_id__ds__week
-          , subq_0.account_id__ds__month
-          , subq_0.account_id__ds__quarter
-          , subq_0.account_id__ds__year
-          , subq_0.account_id__ds__extract_year
-          , subq_0.account_id__ds__extract_quarter
-          , subq_0.account_id__ds__extract_month
-          , subq_0.account_id__ds__extract_day
-          , subq_0.account_id__ds__extract_dow
-          , subq_0.account_id__ds__extract_doy
-          , subq_0.ds__day AS metric_time__day
-          , subq_0.ds__week AS metric_time__week
-          , subq_0.ds__month AS metric_time__month
-          , subq_0.ds__quarter AS metric_time__quarter
-          , subq_0.ds__year AS metric_time__year
-          , subq_0.ds__extract_year AS metric_time__extract_year
-          , subq_0.ds__extract_quarter AS metric_time__extract_quarter
-          , subq_0.ds__extract_month AS metric_time__extract_month
-          , subq_0.ds__extract_day AS metric_time__extract_day
-          , subq_0.ds__extract_dow AS metric_time__extract_dow
-          , subq_0.ds__extract_doy AS metric_time__extract_doy
-          , subq_0.account_id
-          , subq_0.account_month
-          , subq_0.account_id__account_month
-          , subq_0.txn_count
+          nr_subq_22000.ds_partitioned__day
+          , nr_subq_22000.ds_partitioned__week
+          , nr_subq_22000.ds_partitioned__month
+          , nr_subq_22000.ds_partitioned__quarter
+          , nr_subq_22000.ds_partitioned__year
+          , nr_subq_22000.ds_partitioned__extract_year
+          , nr_subq_22000.ds_partitioned__extract_quarter
+          , nr_subq_22000.ds_partitioned__extract_month
+          , nr_subq_22000.ds_partitioned__extract_day
+          , nr_subq_22000.ds_partitioned__extract_dow
+          , nr_subq_22000.ds_partitioned__extract_doy
+          , nr_subq_22000.ds__day
+          , nr_subq_22000.ds__week
+          , nr_subq_22000.ds__month
+          , nr_subq_22000.ds__quarter
+          , nr_subq_22000.ds__year
+          , nr_subq_22000.ds__extract_year
+          , nr_subq_22000.ds__extract_quarter
+          , nr_subq_22000.ds__extract_month
+          , nr_subq_22000.ds__extract_day
+          , nr_subq_22000.ds__extract_dow
+          , nr_subq_22000.ds__extract_doy
+          , nr_subq_22000.account_id__ds_partitioned__day
+          , nr_subq_22000.account_id__ds_partitioned__week
+          , nr_subq_22000.account_id__ds_partitioned__month
+          , nr_subq_22000.account_id__ds_partitioned__quarter
+          , nr_subq_22000.account_id__ds_partitioned__year
+          , nr_subq_22000.account_id__ds_partitioned__extract_year
+          , nr_subq_22000.account_id__ds_partitioned__extract_quarter
+          , nr_subq_22000.account_id__ds_partitioned__extract_month
+          , nr_subq_22000.account_id__ds_partitioned__extract_day
+          , nr_subq_22000.account_id__ds_partitioned__extract_dow
+          , nr_subq_22000.account_id__ds_partitioned__extract_doy
+          , nr_subq_22000.account_id__ds__day
+          , nr_subq_22000.account_id__ds__week
+          , nr_subq_22000.account_id__ds__month
+          , nr_subq_22000.account_id__ds__quarter
+          , nr_subq_22000.account_id__ds__year
+          , nr_subq_22000.account_id__ds__extract_year
+          , nr_subq_22000.account_id__ds__extract_quarter
+          , nr_subq_22000.account_id__ds__extract_month
+          , nr_subq_22000.account_id__ds__extract_day
+          , nr_subq_22000.account_id__ds__extract_dow
+          , nr_subq_22000.account_id__ds__extract_doy
+          , nr_subq_22000.ds__day AS metric_time__day
+          , nr_subq_22000.ds__week AS metric_time__week
+          , nr_subq_22000.ds__month AS metric_time__month
+          , nr_subq_22000.ds__quarter AS metric_time__quarter
+          , nr_subq_22000.ds__year AS metric_time__year
+          , nr_subq_22000.ds__extract_year AS metric_time__extract_year
+          , nr_subq_22000.ds__extract_quarter AS metric_time__extract_quarter
+          , nr_subq_22000.ds__extract_month AS metric_time__extract_month
+          , nr_subq_22000.ds__extract_day AS metric_time__extract_day
+          , nr_subq_22000.ds__extract_dow AS metric_time__extract_dow
+          , nr_subq_22000.ds__extract_doy AS metric_time__extract_doy
+          , nr_subq_22000.account_id
+          , nr_subq_22000.account_month
+          , nr_subq_22000.account_id__account_month
+          , nr_subq_22000.txn_count
         FROM (
           -- Read Elements From Semantic Model 'account_month_txns'
           SELECT
@@ -196,150 +196,150 @@ FROM (
             , account_month_txns_src_22000.account_month AS account_id__account_month
             , account_month_txns_src_22000.account_id
           FROM ***************************.account_month_txns account_month_txns_src_22000
-        ) subq_0
-      ) subq_1
+        ) nr_subq_22000
+      ) nr_subq_3
       LEFT OUTER JOIN (
         -- Pass Only Elements: ['customer_id__customer_name', 'ds_partitioned__day', 'account_id']
         SELECT
-          subq_7.ds_partitioned__day
-          , subq_7.account_id
-          , subq_7.customer_id__customer_name
+          nr_subq_7.ds_partitioned__day
+          , nr_subq_7.account_id
+          , nr_subq_7.customer_id__customer_name
         FROM (
           -- Join Standard Outputs
           SELECT
-            subq_6.customer_name AS customer_id__customer_name
-            , subq_6.customer_atomic_weight AS customer_id__customer_atomic_weight
-            , subq_6.ds_partitioned__day AS customer_id__ds_partitioned__day
-            , subq_6.ds_partitioned__week AS customer_id__ds_partitioned__week
-            , subq_6.ds_partitioned__month AS customer_id__ds_partitioned__month
-            , subq_6.ds_partitioned__quarter AS customer_id__ds_partitioned__quarter
-            , subq_6.ds_partitioned__year AS customer_id__ds_partitioned__year
-            , subq_6.ds_partitioned__extract_year AS customer_id__ds_partitioned__extract_year
-            , subq_6.ds_partitioned__extract_quarter AS customer_id__ds_partitioned__extract_quarter
-            , subq_6.ds_partitioned__extract_month AS customer_id__ds_partitioned__extract_month
-            , subq_6.ds_partitioned__extract_day AS customer_id__ds_partitioned__extract_day
-            , subq_6.ds_partitioned__extract_dow AS customer_id__ds_partitioned__extract_dow
-            , subq_6.ds_partitioned__extract_doy AS customer_id__ds_partitioned__extract_doy
-            , subq_6.metric_time__day AS customer_id__metric_time__day
-            , subq_6.metric_time__week AS customer_id__metric_time__week
-            , subq_6.metric_time__month AS customer_id__metric_time__month
-            , subq_6.metric_time__quarter AS customer_id__metric_time__quarter
-            , subq_6.metric_time__year AS customer_id__metric_time__year
-            , subq_6.metric_time__extract_year AS customer_id__metric_time__extract_year
-            , subq_6.metric_time__extract_quarter AS customer_id__metric_time__extract_quarter
-            , subq_6.metric_time__extract_month AS customer_id__metric_time__extract_month
-            , subq_6.metric_time__extract_day AS customer_id__metric_time__extract_day
-            , subq_6.metric_time__extract_dow AS customer_id__metric_time__extract_dow
-            , subq_6.metric_time__extract_doy AS customer_id__metric_time__extract_doy
-            , subq_3.ds_partitioned__day AS ds_partitioned__day
-            , subq_3.ds_partitioned__week AS ds_partitioned__week
-            , subq_3.ds_partitioned__month AS ds_partitioned__month
-            , subq_3.ds_partitioned__quarter AS ds_partitioned__quarter
-            , subq_3.ds_partitioned__year AS ds_partitioned__year
-            , subq_3.ds_partitioned__extract_year AS ds_partitioned__extract_year
-            , subq_3.ds_partitioned__extract_quarter AS ds_partitioned__extract_quarter
-            , subq_3.ds_partitioned__extract_month AS ds_partitioned__extract_month
-            , subq_3.ds_partitioned__extract_day AS ds_partitioned__extract_day
-            , subq_3.ds_partitioned__extract_dow AS ds_partitioned__extract_dow
-            , subq_3.ds_partitioned__extract_doy AS ds_partitioned__extract_doy
-            , subq_3.account_id__ds_partitioned__day AS account_id__ds_partitioned__day
-            , subq_3.account_id__ds_partitioned__week AS account_id__ds_partitioned__week
-            , subq_3.account_id__ds_partitioned__month AS account_id__ds_partitioned__month
-            , subq_3.account_id__ds_partitioned__quarter AS account_id__ds_partitioned__quarter
-            , subq_3.account_id__ds_partitioned__year AS account_id__ds_partitioned__year
-            , subq_3.account_id__ds_partitioned__extract_year AS account_id__ds_partitioned__extract_year
-            , subq_3.account_id__ds_partitioned__extract_quarter AS account_id__ds_partitioned__extract_quarter
-            , subq_3.account_id__ds_partitioned__extract_month AS account_id__ds_partitioned__extract_month
-            , subq_3.account_id__ds_partitioned__extract_day AS account_id__ds_partitioned__extract_day
-            , subq_3.account_id__ds_partitioned__extract_dow AS account_id__ds_partitioned__extract_dow
-            , subq_3.account_id__ds_partitioned__extract_doy AS account_id__ds_partitioned__extract_doy
-            , subq_3.bridge_account__ds_partitioned__day AS bridge_account__ds_partitioned__day
-            , subq_3.bridge_account__ds_partitioned__week AS bridge_account__ds_partitioned__week
-            , subq_3.bridge_account__ds_partitioned__month AS bridge_account__ds_partitioned__month
-            , subq_3.bridge_account__ds_partitioned__quarter AS bridge_account__ds_partitioned__quarter
-            , subq_3.bridge_account__ds_partitioned__year AS bridge_account__ds_partitioned__year
-            , subq_3.bridge_account__ds_partitioned__extract_year AS bridge_account__ds_partitioned__extract_year
-            , subq_3.bridge_account__ds_partitioned__extract_quarter AS bridge_account__ds_partitioned__extract_quarter
-            , subq_3.bridge_account__ds_partitioned__extract_month AS bridge_account__ds_partitioned__extract_month
-            , subq_3.bridge_account__ds_partitioned__extract_day AS bridge_account__ds_partitioned__extract_day
-            , subq_3.bridge_account__ds_partitioned__extract_dow AS bridge_account__ds_partitioned__extract_dow
-            , subq_3.bridge_account__ds_partitioned__extract_doy AS bridge_account__ds_partitioned__extract_doy
-            , subq_3.metric_time__day AS metric_time__day
-            , subq_3.metric_time__week AS metric_time__week
-            , subq_3.metric_time__month AS metric_time__month
-            , subq_3.metric_time__quarter AS metric_time__quarter
-            , subq_3.metric_time__year AS metric_time__year
-            , subq_3.metric_time__extract_year AS metric_time__extract_year
-            , subq_3.metric_time__extract_quarter AS metric_time__extract_quarter
-            , subq_3.metric_time__extract_month AS metric_time__extract_month
-            , subq_3.metric_time__extract_day AS metric_time__extract_day
-            , subq_3.metric_time__extract_dow AS metric_time__extract_dow
-            , subq_3.metric_time__extract_doy AS metric_time__extract_doy
-            , subq_3.account_id AS account_id
-            , subq_3.customer_id AS customer_id
-            , subq_3.account_id__customer_id AS account_id__customer_id
-            , subq_3.bridge_account__account_id AS bridge_account__account_id
-            , subq_3.bridge_account__customer_id AS bridge_account__customer_id
-            , subq_3.extra_dim AS extra_dim
-            , subq_3.account_id__extra_dim AS account_id__extra_dim
-            , subq_3.bridge_account__extra_dim AS bridge_account__extra_dim
-            , subq_3.account_customer_combos AS account_customer_combos
+            nr_subq_6.customer_name AS customer_id__customer_name
+            , nr_subq_6.customer_atomic_weight AS customer_id__customer_atomic_weight
+            , nr_subq_6.ds_partitioned__day AS customer_id__ds_partitioned__day
+            , nr_subq_6.ds_partitioned__week AS customer_id__ds_partitioned__week
+            , nr_subq_6.ds_partitioned__month AS customer_id__ds_partitioned__month
+            , nr_subq_6.ds_partitioned__quarter AS customer_id__ds_partitioned__quarter
+            , nr_subq_6.ds_partitioned__year AS customer_id__ds_partitioned__year
+            , nr_subq_6.ds_partitioned__extract_year AS customer_id__ds_partitioned__extract_year
+            , nr_subq_6.ds_partitioned__extract_quarter AS customer_id__ds_partitioned__extract_quarter
+            , nr_subq_6.ds_partitioned__extract_month AS customer_id__ds_partitioned__extract_month
+            , nr_subq_6.ds_partitioned__extract_day AS customer_id__ds_partitioned__extract_day
+            , nr_subq_6.ds_partitioned__extract_dow AS customer_id__ds_partitioned__extract_dow
+            , nr_subq_6.ds_partitioned__extract_doy AS customer_id__ds_partitioned__extract_doy
+            , nr_subq_6.metric_time__day AS customer_id__metric_time__day
+            , nr_subq_6.metric_time__week AS customer_id__metric_time__week
+            , nr_subq_6.metric_time__month AS customer_id__metric_time__month
+            , nr_subq_6.metric_time__quarter AS customer_id__metric_time__quarter
+            , nr_subq_6.metric_time__year AS customer_id__metric_time__year
+            , nr_subq_6.metric_time__extract_year AS customer_id__metric_time__extract_year
+            , nr_subq_6.metric_time__extract_quarter AS customer_id__metric_time__extract_quarter
+            , nr_subq_6.metric_time__extract_month AS customer_id__metric_time__extract_month
+            , nr_subq_6.metric_time__extract_day AS customer_id__metric_time__extract_day
+            , nr_subq_6.metric_time__extract_dow AS customer_id__metric_time__extract_dow
+            , nr_subq_6.metric_time__extract_doy AS customer_id__metric_time__extract_doy
+            , nr_subq_4.ds_partitioned__day AS ds_partitioned__day
+            , nr_subq_4.ds_partitioned__week AS ds_partitioned__week
+            , nr_subq_4.ds_partitioned__month AS ds_partitioned__month
+            , nr_subq_4.ds_partitioned__quarter AS ds_partitioned__quarter
+            , nr_subq_4.ds_partitioned__year AS ds_partitioned__year
+            , nr_subq_4.ds_partitioned__extract_year AS ds_partitioned__extract_year
+            , nr_subq_4.ds_partitioned__extract_quarter AS ds_partitioned__extract_quarter
+            , nr_subq_4.ds_partitioned__extract_month AS ds_partitioned__extract_month
+            , nr_subq_4.ds_partitioned__extract_day AS ds_partitioned__extract_day
+            , nr_subq_4.ds_partitioned__extract_dow AS ds_partitioned__extract_dow
+            , nr_subq_4.ds_partitioned__extract_doy AS ds_partitioned__extract_doy
+            , nr_subq_4.account_id__ds_partitioned__day AS account_id__ds_partitioned__day
+            , nr_subq_4.account_id__ds_partitioned__week AS account_id__ds_partitioned__week
+            , nr_subq_4.account_id__ds_partitioned__month AS account_id__ds_partitioned__month
+            , nr_subq_4.account_id__ds_partitioned__quarter AS account_id__ds_partitioned__quarter
+            , nr_subq_4.account_id__ds_partitioned__year AS account_id__ds_partitioned__year
+            , nr_subq_4.account_id__ds_partitioned__extract_year AS account_id__ds_partitioned__extract_year
+            , nr_subq_4.account_id__ds_partitioned__extract_quarter AS account_id__ds_partitioned__extract_quarter
+            , nr_subq_4.account_id__ds_partitioned__extract_month AS account_id__ds_partitioned__extract_month
+            , nr_subq_4.account_id__ds_partitioned__extract_day AS account_id__ds_partitioned__extract_day
+            , nr_subq_4.account_id__ds_partitioned__extract_dow AS account_id__ds_partitioned__extract_dow
+            , nr_subq_4.account_id__ds_partitioned__extract_doy AS account_id__ds_partitioned__extract_doy
+            , nr_subq_4.bridge_account__ds_partitioned__day AS bridge_account__ds_partitioned__day
+            , nr_subq_4.bridge_account__ds_partitioned__week AS bridge_account__ds_partitioned__week
+            , nr_subq_4.bridge_account__ds_partitioned__month AS bridge_account__ds_partitioned__month
+            , nr_subq_4.bridge_account__ds_partitioned__quarter AS bridge_account__ds_partitioned__quarter
+            , nr_subq_4.bridge_account__ds_partitioned__year AS bridge_account__ds_partitioned__year
+            , nr_subq_4.bridge_account__ds_partitioned__extract_year AS bridge_account__ds_partitioned__extract_year
+            , nr_subq_4.bridge_account__ds_partitioned__extract_quarter AS bridge_account__ds_partitioned__extract_quarter
+            , nr_subq_4.bridge_account__ds_partitioned__extract_month AS bridge_account__ds_partitioned__extract_month
+            , nr_subq_4.bridge_account__ds_partitioned__extract_day AS bridge_account__ds_partitioned__extract_day
+            , nr_subq_4.bridge_account__ds_partitioned__extract_dow AS bridge_account__ds_partitioned__extract_dow
+            , nr_subq_4.bridge_account__ds_partitioned__extract_doy AS bridge_account__ds_partitioned__extract_doy
+            , nr_subq_4.metric_time__day AS metric_time__day
+            , nr_subq_4.metric_time__week AS metric_time__week
+            , nr_subq_4.metric_time__month AS metric_time__month
+            , nr_subq_4.metric_time__quarter AS metric_time__quarter
+            , nr_subq_4.metric_time__year AS metric_time__year
+            , nr_subq_4.metric_time__extract_year AS metric_time__extract_year
+            , nr_subq_4.metric_time__extract_quarter AS metric_time__extract_quarter
+            , nr_subq_4.metric_time__extract_month AS metric_time__extract_month
+            , nr_subq_4.metric_time__extract_day AS metric_time__extract_day
+            , nr_subq_4.metric_time__extract_dow AS metric_time__extract_dow
+            , nr_subq_4.metric_time__extract_doy AS metric_time__extract_doy
+            , nr_subq_4.account_id AS account_id
+            , nr_subq_4.customer_id AS customer_id
+            , nr_subq_4.account_id__customer_id AS account_id__customer_id
+            , nr_subq_4.bridge_account__account_id AS bridge_account__account_id
+            , nr_subq_4.bridge_account__customer_id AS bridge_account__customer_id
+            , nr_subq_4.extra_dim AS extra_dim
+            , nr_subq_4.account_id__extra_dim AS account_id__extra_dim
+            , nr_subq_4.bridge_account__extra_dim AS bridge_account__extra_dim
+            , nr_subq_4.account_customer_combos AS account_customer_combos
           FROM (
             -- Metric Time Dimension 'ds_partitioned'
             SELECT
-              subq_2.ds_partitioned__day
-              , subq_2.ds_partitioned__week
-              , subq_2.ds_partitioned__month
-              , subq_2.ds_partitioned__quarter
-              , subq_2.ds_partitioned__year
-              , subq_2.ds_partitioned__extract_year
-              , subq_2.ds_partitioned__extract_quarter
-              , subq_2.ds_partitioned__extract_month
-              , subq_2.ds_partitioned__extract_day
-              , subq_2.ds_partitioned__extract_dow
-              , subq_2.ds_partitioned__extract_doy
-              , subq_2.account_id__ds_partitioned__day
-              , subq_2.account_id__ds_partitioned__week
-              , subq_2.account_id__ds_partitioned__month
-              , subq_2.account_id__ds_partitioned__quarter
-              , subq_2.account_id__ds_partitioned__year
-              , subq_2.account_id__ds_partitioned__extract_year
-              , subq_2.account_id__ds_partitioned__extract_quarter
-              , subq_2.account_id__ds_partitioned__extract_month
-              , subq_2.account_id__ds_partitioned__extract_day
-              , subq_2.account_id__ds_partitioned__extract_dow
-              , subq_2.account_id__ds_partitioned__extract_doy
-              , subq_2.bridge_account__ds_partitioned__day
-              , subq_2.bridge_account__ds_partitioned__week
-              , subq_2.bridge_account__ds_partitioned__month
-              , subq_2.bridge_account__ds_partitioned__quarter
-              , subq_2.bridge_account__ds_partitioned__year
-              , subq_2.bridge_account__ds_partitioned__extract_year
-              , subq_2.bridge_account__ds_partitioned__extract_quarter
-              , subq_2.bridge_account__ds_partitioned__extract_month
-              , subq_2.bridge_account__ds_partitioned__extract_day
-              , subq_2.bridge_account__ds_partitioned__extract_dow
-              , subq_2.bridge_account__ds_partitioned__extract_doy
-              , subq_2.ds_partitioned__day AS metric_time__day
-              , subq_2.ds_partitioned__week AS metric_time__week
-              , subq_2.ds_partitioned__month AS metric_time__month
-              , subq_2.ds_partitioned__quarter AS metric_time__quarter
-              , subq_2.ds_partitioned__year AS metric_time__year
-              , subq_2.ds_partitioned__extract_year AS metric_time__extract_year
-              , subq_2.ds_partitioned__extract_quarter AS metric_time__extract_quarter
-              , subq_2.ds_partitioned__extract_month AS metric_time__extract_month
-              , subq_2.ds_partitioned__extract_day AS metric_time__extract_day
-              , subq_2.ds_partitioned__extract_dow AS metric_time__extract_dow
-              , subq_2.ds_partitioned__extract_doy AS metric_time__extract_doy
-              , subq_2.account_id
-              , subq_2.customer_id
-              , subq_2.account_id__customer_id
-              , subq_2.bridge_account__account_id
-              , subq_2.bridge_account__customer_id
-              , subq_2.extra_dim
-              , subq_2.account_id__extra_dim
-              , subq_2.bridge_account__extra_dim
-              , subq_2.account_customer_combos
+              nr_subq_22001.ds_partitioned__day
+              , nr_subq_22001.ds_partitioned__week
+              , nr_subq_22001.ds_partitioned__month
+              , nr_subq_22001.ds_partitioned__quarter
+              , nr_subq_22001.ds_partitioned__year
+              , nr_subq_22001.ds_partitioned__extract_year
+              , nr_subq_22001.ds_partitioned__extract_quarter
+              , nr_subq_22001.ds_partitioned__extract_month
+              , nr_subq_22001.ds_partitioned__extract_day
+              , nr_subq_22001.ds_partitioned__extract_dow
+              , nr_subq_22001.ds_partitioned__extract_doy
+              , nr_subq_22001.account_id__ds_partitioned__day
+              , nr_subq_22001.account_id__ds_partitioned__week
+              , nr_subq_22001.account_id__ds_partitioned__month
+              , nr_subq_22001.account_id__ds_partitioned__quarter
+              , nr_subq_22001.account_id__ds_partitioned__year
+              , nr_subq_22001.account_id__ds_partitioned__extract_year
+              , nr_subq_22001.account_id__ds_partitioned__extract_quarter
+              , nr_subq_22001.account_id__ds_partitioned__extract_month
+              , nr_subq_22001.account_id__ds_partitioned__extract_day
+              , nr_subq_22001.account_id__ds_partitioned__extract_dow
+              , nr_subq_22001.account_id__ds_partitioned__extract_doy
+              , nr_subq_22001.bridge_account__ds_partitioned__day
+              , nr_subq_22001.bridge_account__ds_partitioned__week
+              , nr_subq_22001.bridge_account__ds_partitioned__month
+              , nr_subq_22001.bridge_account__ds_partitioned__quarter
+              , nr_subq_22001.bridge_account__ds_partitioned__year
+              , nr_subq_22001.bridge_account__ds_partitioned__extract_year
+              , nr_subq_22001.bridge_account__ds_partitioned__extract_quarter
+              , nr_subq_22001.bridge_account__ds_partitioned__extract_month
+              , nr_subq_22001.bridge_account__ds_partitioned__extract_day
+              , nr_subq_22001.bridge_account__ds_partitioned__extract_dow
+              , nr_subq_22001.bridge_account__ds_partitioned__extract_doy
+              , nr_subq_22001.ds_partitioned__day AS metric_time__day
+              , nr_subq_22001.ds_partitioned__week AS metric_time__week
+              , nr_subq_22001.ds_partitioned__month AS metric_time__month
+              , nr_subq_22001.ds_partitioned__quarter AS metric_time__quarter
+              , nr_subq_22001.ds_partitioned__year AS metric_time__year
+              , nr_subq_22001.ds_partitioned__extract_year AS metric_time__extract_year
+              , nr_subq_22001.ds_partitioned__extract_quarter AS metric_time__extract_quarter
+              , nr_subq_22001.ds_partitioned__extract_month AS metric_time__extract_month
+              , nr_subq_22001.ds_partitioned__extract_day AS metric_time__extract_day
+              , nr_subq_22001.ds_partitioned__extract_dow AS metric_time__extract_dow
+              , nr_subq_22001.ds_partitioned__extract_doy AS metric_time__extract_doy
+              , nr_subq_22001.account_id
+              , nr_subq_22001.customer_id
+              , nr_subq_22001.account_id__customer_id
+              , nr_subq_22001.bridge_account__account_id
+              , nr_subq_22001.bridge_account__customer_id
+              , nr_subq_22001.extra_dim
+              , nr_subq_22001.account_id__extra_dim
+              , nr_subq_22001.bridge_account__extra_dim
+              , nr_subq_22001.account_customer_combos
             FROM (
               -- Read Elements From Semantic Model 'bridge_table'
               SELECT
@@ -386,8 +386,8 @@ FROM (
                 , bridge_table_src_22000.account_id AS bridge_account__account_id
                 , bridge_table_src_22000.customer_id AS bridge_account__customer_id
               FROM ***************************.bridge_table bridge_table_src_22000
-            ) subq_2
-          ) subq_3
+            ) nr_subq_22001
+          ) nr_subq_4
           LEFT OUTER JOIN (
             -- Pass Only Elements: [
             --   'customer_name',
@@ -430,86 +430,86 @@ FROM (
             --   'customer_id',
             -- ]
             SELECT
-              subq_5.ds_partitioned__day
-              , subq_5.ds_partitioned__week
-              , subq_5.ds_partitioned__month
-              , subq_5.ds_partitioned__quarter
-              , subq_5.ds_partitioned__year
-              , subq_5.ds_partitioned__extract_year
-              , subq_5.ds_partitioned__extract_quarter
-              , subq_5.ds_partitioned__extract_month
-              , subq_5.ds_partitioned__extract_day
-              , subq_5.ds_partitioned__extract_dow
-              , subq_5.ds_partitioned__extract_doy
-              , subq_5.customer_id__ds_partitioned__day
-              , subq_5.customer_id__ds_partitioned__week
-              , subq_5.customer_id__ds_partitioned__month
-              , subq_5.customer_id__ds_partitioned__quarter
-              , subq_5.customer_id__ds_partitioned__year
-              , subq_5.customer_id__ds_partitioned__extract_year
-              , subq_5.customer_id__ds_partitioned__extract_quarter
-              , subq_5.customer_id__ds_partitioned__extract_month
-              , subq_5.customer_id__ds_partitioned__extract_day
-              , subq_5.customer_id__ds_partitioned__extract_dow
-              , subq_5.customer_id__ds_partitioned__extract_doy
-              , subq_5.metric_time__day
-              , subq_5.metric_time__week
-              , subq_5.metric_time__month
-              , subq_5.metric_time__quarter
-              , subq_5.metric_time__year
-              , subq_5.metric_time__extract_year
-              , subq_5.metric_time__extract_quarter
-              , subq_5.metric_time__extract_month
-              , subq_5.metric_time__extract_day
-              , subq_5.metric_time__extract_dow
-              , subq_5.metric_time__extract_doy
-              , subq_5.customer_id
-              , subq_5.customer_name
-              , subq_5.customer_atomic_weight
-              , subq_5.customer_id__customer_name
-              , subq_5.customer_id__customer_atomic_weight
+              nr_subq_5.ds_partitioned__day
+              , nr_subq_5.ds_partitioned__week
+              , nr_subq_5.ds_partitioned__month
+              , nr_subq_5.ds_partitioned__quarter
+              , nr_subq_5.ds_partitioned__year
+              , nr_subq_5.ds_partitioned__extract_year
+              , nr_subq_5.ds_partitioned__extract_quarter
+              , nr_subq_5.ds_partitioned__extract_month
+              , nr_subq_5.ds_partitioned__extract_day
+              , nr_subq_5.ds_partitioned__extract_dow
+              , nr_subq_5.ds_partitioned__extract_doy
+              , nr_subq_5.customer_id__ds_partitioned__day
+              , nr_subq_5.customer_id__ds_partitioned__week
+              , nr_subq_5.customer_id__ds_partitioned__month
+              , nr_subq_5.customer_id__ds_partitioned__quarter
+              , nr_subq_5.customer_id__ds_partitioned__year
+              , nr_subq_5.customer_id__ds_partitioned__extract_year
+              , nr_subq_5.customer_id__ds_partitioned__extract_quarter
+              , nr_subq_5.customer_id__ds_partitioned__extract_month
+              , nr_subq_5.customer_id__ds_partitioned__extract_day
+              , nr_subq_5.customer_id__ds_partitioned__extract_dow
+              , nr_subq_5.customer_id__ds_partitioned__extract_doy
+              , nr_subq_5.metric_time__day
+              , nr_subq_5.metric_time__week
+              , nr_subq_5.metric_time__month
+              , nr_subq_5.metric_time__quarter
+              , nr_subq_5.metric_time__year
+              , nr_subq_5.metric_time__extract_year
+              , nr_subq_5.metric_time__extract_quarter
+              , nr_subq_5.metric_time__extract_month
+              , nr_subq_5.metric_time__extract_day
+              , nr_subq_5.metric_time__extract_dow
+              , nr_subq_5.metric_time__extract_doy
+              , nr_subq_5.customer_id
+              , nr_subq_5.customer_name
+              , nr_subq_5.customer_atomic_weight
+              , nr_subq_5.customer_id__customer_name
+              , nr_subq_5.customer_id__customer_atomic_weight
             FROM (
               -- Metric Time Dimension 'ds_partitioned'
               SELECT
-                subq_4.ds_partitioned__day
-                , subq_4.ds_partitioned__week
-                , subq_4.ds_partitioned__month
-                , subq_4.ds_partitioned__quarter
-                , subq_4.ds_partitioned__year
-                , subq_4.ds_partitioned__extract_year
-                , subq_4.ds_partitioned__extract_quarter
-                , subq_4.ds_partitioned__extract_month
-                , subq_4.ds_partitioned__extract_day
-                , subq_4.ds_partitioned__extract_dow
-                , subq_4.ds_partitioned__extract_doy
-                , subq_4.customer_id__ds_partitioned__day
-                , subq_4.customer_id__ds_partitioned__week
-                , subq_4.customer_id__ds_partitioned__month
-                , subq_4.customer_id__ds_partitioned__quarter
-                , subq_4.customer_id__ds_partitioned__year
-                , subq_4.customer_id__ds_partitioned__extract_year
-                , subq_4.customer_id__ds_partitioned__extract_quarter
-                , subq_4.customer_id__ds_partitioned__extract_month
-                , subq_4.customer_id__ds_partitioned__extract_day
-                , subq_4.customer_id__ds_partitioned__extract_dow
-                , subq_4.customer_id__ds_partitioned__extract_doy
-                , subq_4.ds_partitioned__day AS metric_time__day
-                , subq_4.ds_partitioned__week AS metric_time__week
-                , subq_4.ds_partitioned__month AS metric_time__month
-                , subq_4.ds_partitioned__quarter AS metric_time__quarter
-                , subq_4.ds_partitioned__year AS metric_time__year
-                , subq_4.ds_partitioned__extract_year AS metric_time__extract_year
-                , subq_4.ds_partitioned__extract_quarter AS metric_time__extract_quarter
-                , subq_4.ds_partitioned__extract_month AS metric_time__extract_month
-                , subq_4.ds_partitioned__extract_day AS metric_time__extract_day
-                , subq_4.ds_partitioned__extract_dow AS metric_time__extract_dow
-                , subq_4.ds_partitioned__extract_doy AS metric_time__extract_doy
-                , subq_4.customer_id
-                , subq_4.customer_name
-                , subq_4.customer_atomic_weight
-                , subq_4.customer_id__customer_name
-                , subq_4.customer_id__customer_atomic_weight
-                , subq_4.customers
+                nr_subq_22003.ds_partitioned__day
+                , nr_subq_22003.ds_partitioned__week
+                , nr_subq_22003.ds_partitioned__month
+                , nr_subq_22003.ds_partitioned__quarter
+                , nr_subq_22003.ds_partitioned__year
+                , nr_subq_22003.ds_partitioned__extract_year
+                , nr_subq_22003.ds_partitioned__extract_quarter
+                , nr_subq_22003.ds_partitioned__extract_month
+                , nr_subq_22003.ds_partitioned__extract_day
+                , nr_subq_22003.ds_partitioned__extract_dow
+                , nr_subq_22003.ds_partitioned__extract_doy
+                , nr_subq_22003.customer_id__ds_partitioned__day
+                , nr_subq_22003.customer_id__ds_partitioned__week
+                , nr_subq_22003.customer_id__ds_partitioned__month
+                , nr_subq_22003.customer_id__ds_partitioned__quarter
+                , nr_subq_22003.customer_id__ds_partitioned__year
+                , nr_subq_22003.customer_id__ds_partitioned__extract_year
+                , nr_subq_22003.customer_id__ds_partitioned__extract_quarter
+                , nr_subq_22003.customer_id__ds_partitioned__extract_month
+                , nr_subq_22003.customer_id__ds_partitioned__extract_day
+                , nr_subq_22003.customer_id__ds_partitioned__extract_dow
+                , nr_subq_22003.customer_id__ds_partitioned__extract_doy
+                , nr_subq_22003.ds_partitioned__day AS metric_time__day
+                , nr_subq_22003.ds_partitioned__week AS metric_time__week
+                , nr_subq_22003.ds_partitioned__month AS metric_time__month
+                , nr_subq_22003.ds_partitioned__quarter AS metric_time__quarter
+                , nr_subq_22003.ds_partitioned__year AS metric_time__year
+                , nr_subq_22003.ds_partitioned__extract_year AS metric_time__extract_year
+                , nr_subq_22003.ds_partitioned__extract_quarter AS metric_time__extract_quarter
+                , nr_subq_22003.ds_partitioned__extract_month AS metric_time__extract_month
+                , nr_subq_22003.ds_partitioned__extract_day AS metric_time__extract_day
+                , nr_subq_22003.ds_partitioned__extract_dow AS metric_time__extract_dow
+                , nr_subq_22003.ds_partitioned__extract_doy AS metric_time__extract_doy
+                , nr_subq_22003.customer_id
+                , nr_subq_22003.customer_name
+                , nr_subq_22003.customer_atomic_weight
+                , nr_subq_22003.customer_id__customer_name
+                , nr_subq_22003.customer_id__customer_atomic_weight
+                , nr_subq_22003.customers
               FROM (
                 -- Read Elements From Semantic Model 'customer_table'
                 SELECT
@@ -542,25 +542,25 @@ FROM (
                   , EXTRACT(doy FROM customer_table_src_22000.ds_partitioned) AS customer_id__ds_partitioned__extract_doy
                   , customer_table_src_22000.customer_id
                 FROM ***************************.customer_table customer_table_src_22000
-              ) subq_4
-            ) subq_5
-          ) subq_6
+              ) nr_subq_22003
+            ) nr_subq_5
+          ) nr_subq_6
           ON
             (
-              subq_3.customer_id = subq_6.customer_id
+              nr_subq_4.customer_id = nr_subq_6.customer_id
             ) AND (
-              subq_3.ds_partitioned__day = subq_6.ds_partitioned__day
+              nr_subq_4.ds_partitioned__day = nr_subq_6.ds_partitioned__day
             )
-        ) subq_7
-      ) subq_8
+        ) nr_subq_7
+      ) nr_subq_8
       ON
         (
-          subq_1.account_id = subq_8.account_id
+          nr_subq_3.account_id = nr_subq_8.account_id
         ) AND (
-          subq_1.ds_partitioned__day = subq_8.ds_partitioned__day
+          nr_subq_3.ds_partitioned__day = nr_subq_8.ds_partitioned__day
         )
-    ) subq_9
-  ) subq_10
+    ) nr_subq_9
+  ) nr_subq_10
   GROUP BY
-    subq_10.account_id__customer_id__customer_name
-) subq_11
+    nr_subq_10.account_id__customer_id__customer_name
+) nr_subq_11

@@ -4,9 +4,9 @@ sql_engine: BigQuery
 ---
 -- Combine Aggregated Outputs
 SELECT
-  COALESCE(subq_18.metric_time__day, subq_23.metric_time__day) AS metric_time__day
-  , MAX(subq_18.nested_fill_nulls_without_time_spine) AS nested_fill_nulls_without_time_spine
-  , MAX(subq_23.listings) AS listings
+  COALESCE(nr_subq_15.metric_time__day, nr_subq_19.metric_time__day) AS metric_time__day
+  , MAX(nr_subq_15.nested_fill_nulls_without_time_spine) AS nested_fill_nulls_without_time_spine
+  , MAX(nr_subq_19.listings) AS listings
 FROM (
   -- Compute Metrics via Expressions
   SELECT
@@ -35,13 +35,13 @@ FROM (
             DATETIME_TRUNC(ds, day) AS metric_time__day
             , 1 AS bookings
           FROM ***************************.fct_bookings bookings_source_src_28000
-        ) subq_14
+        ) nr_subq_11
         GROUP BY
           metric_time__day
-      ) subq_15
-    ) subq_16
-  ) subq_17
-) subq_18
+      ) nr_subq_12
+    ) nr_subq_13
+  ) nr_subq_14
+) nr_subq_15
 FULL OUTER JOIN (
   -- Aggregate Measures
   -- Compute Metrics via Expressions
@@ -56,11 +56,11 @@ FULL OUTER JOIN (
       DATETIME_TRUNC(created_at, day) AS metric_time__day
       , 1 AS listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_21
+  ) nr_subq_17
   GROUP BY
     metric_time__day
-) subq_23
+) nr_subq_19
 ON
-  subq_18.metric_time__day = subq_23.metric_time__day
+  nr_subq_15.metric_time__day = nr_subq_19.metric_time__day
 GROUP BY
   metric_time__day

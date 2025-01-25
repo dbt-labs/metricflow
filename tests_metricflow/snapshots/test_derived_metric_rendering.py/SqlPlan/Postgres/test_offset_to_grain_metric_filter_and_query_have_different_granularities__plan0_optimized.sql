@@ -21,7 +21,7 @@ FROM (
     SELECT
       time_spine_src_28006.ds AS metric_time__day
       , DATE_TRUNC('month', time_spine_src_28006.ds) AS metric_time__month
-      , subq_11.bookings AS bookings
+      , nr_subq_9.bookings AS bookings
     FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN (
       -- Read Elements From Semantic Model 'bookings_source'
@@ -30,12 +30,12 @@ FROM (
         DATE_TRUNC('day', ds) AS metric_time__day
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_11
+    ) nr_subq_9
     ON
-      DATE_TRUNC('month', time_spine_src_28006.ds) = subq_11.metric_time__day
+      DATE_TRUNC('month', time_spine_src_28006.ds) = nr_subq_9.metric_time__day
     WHERE DATE_TRUNC('month', time_spine_src_28006.ds) = time_spine_src_28006.ds
-  ) subq_15
+  ) nr_subq_13
   WHERE metric_time__day = '2020-01-01'
   GROUP BY
     metric_time__month
-) subq_19
+) nr_subq_17

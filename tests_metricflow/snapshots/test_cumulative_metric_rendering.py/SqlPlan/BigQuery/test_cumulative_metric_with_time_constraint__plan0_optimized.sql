@@ -14,15 +14,15 @@ sql_engine: BigQuery
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  subq_12.metric_time__day AS metric_time__day
-  , SUM(subq_11.txn_revenue) AS trailing_2_months_revenue
+  nr_subq_10.metric_time__day AS metric_time__day
+  , SUM(nr_subq_9.txn_revenue) AS trailing_2_months_revenue
 FROM (
   -- Read From Time Spine 'mf_time_spine'
   SELECT
     ds AS metric_time__day
-  FROM ***************************.mf_time_spine subq_13
+  FROM ***************************.mf_time_spine nr_subq_11
   WHERE ds BETWEEN '2020-01-01' AND '2020-01-01'
-) subq_12
+) nr_subq_10
 INNER JOIN (
   -- Read Elements From Semantic Model 'revenue'
   -- Metric Time Dimension 'ds'
@@ -32,13 +32,13 @@ INNER JOIN (
     , revenue AS txn_revenue
   FROM ***************************.fct_revenue revenue_src_28000
   WHERE DATETIME_TRUNC(created_at, day) BETWEEN '2019-11-01' AND '2020-01-01'
-) subq_11
+) nr_subq_9
 ON
   (
-    subq_11.metric_time__day <= subq_12.metric_time__day
+    nr_subq_9.metric_time__day <= nr_subq_10.metric_time__day
   ) AND (
-    subq_11.metric_time__day > DATE_SUB(CAST(subq_12.metric_time__day AS DATETIME), INTERVAL 2 month)
+    nr_subq_9.metric_time__day > DATE_SUB(CAST(nr_subq_10.metric_time__day AS DATETIME), INTERVAL 2 month)
   )
-WHERE subq_12.metric_time__day BETWEEN '2020-01-01' AND '2020-01-01'
+WHERE nr_subq_10.metric_time__day BETWEEN '2020-01-01' AND '2020-01-01'
 GROUP BY
   metric_time__day

@@ -6,7 +6,7 @@ sql_engine: BigQuery
 -- Compute Metrics via Expressions
 SELECT
   time_spine_src_28005.ts AS metric_time__hour
-  , subq_11.archived_users AS subdaily_join_to_time_spine_metric
+  , nr_subq_9.archived_users AS subdaily_join_to_time_spine_metric
 FROM ***************************.mf_time_spine_hour time_spine_src_28005
 LEFT OUTER JOIN (
   -- Aggregate Measures
@@ -21,9 +21,9 @@ LEFT OUTER JOIN (
       DATETIME_TRUNC(archived_at, hour) AS metric_time__hour
       , 1 AS archived_users
     FROM ***************************.dim_users users_ds_source_src_28000
-  ) subq_10
+  ) nr_subq_8
   GROUP BY
     metric_time__hour
-) subq_11
+) nr_subq_9
 ON
-  time_spine_src_28005.ts = subq_11.metric_time__hour
+  time_spine_src_28005.ts = nr_subq_9.metric_time__hour

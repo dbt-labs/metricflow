@@ -8,8 +8,8 @@ sql_engine: Postgres
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  subq_14.martian_day AS listing__ds__martian_day
-  , SUM(subq_10.bookings) AS bookings
+  nr_subq_10.martian_day AS listing__ds__martian_day
+  , SUM(nr_subq_7.bookings) AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
@@ -17,14 +17,14 @@ FROM (
     listing_id AS listing
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-) subq_10
+) nr_subq_7
 LEFT OUTER JOIN
   ***************************.dim_listings_latest listings_latest_src_28000
 ON
-  subq_10.listing = listings_latest_src_28000.listing_id
+  nr_subq_7.listing = listings_latest_src_28000.listing_id
 LEFT OUTER JOIN
-  ***************************.mf_time_spine subq_14
+  ***************************.mf_time_spine nr_subq_10
 ON
-  DATE_TRUNC('day', listings_latest_src_28000.created_at) = subq_14.ds
+  DATE_TRUNC('day', listings_latest_src_28000.created_at) = nr_subq_10.ds
 GROUP BY
-  subq_14.martian_day
+  nr_subq_10.martian_day

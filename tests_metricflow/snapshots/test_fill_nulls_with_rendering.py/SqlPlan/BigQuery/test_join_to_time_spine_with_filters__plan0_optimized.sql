@@ -10,8 +10,8 @@ FROM (
   -- Join to Time Spine Dataset
   -- Constrain Time Range to [2020-01-03T00:00:00, 2020-01-05T00:00:00]
   SELECT
-    subq_23.metric_time__day AS metric_time__day
-    , subq_18.bookings AS bookings
+    nr_subq_21.metric_time__day AS metric_time__day
+    , nr_subq_16.bookings AS bookings
   FROM (
     -- Constrain Output with WHERE
     -- Constrain Time Range to [2020-01-03T00:00:00, 2020-01-05T00:00:00]
@@ -25,13 +25,13 @@ FROM (
         ds AS metric_time__day
         , DATETIME_TRUNC(ds, isoweek) AS metric_time__week
       FROM ***************************.mf_time_spine time_spine_src_28006
-    ) subq_20
+    ) nr_subq_18
     WHERE (
       metric_time__day BETWEEN '2020-01-03' AND '2020-01-05'
     ) AND (
       metric_time__week > '2020-01-01'
     )
-  ) subq_23
+  ) nr_subq_21
   LEFT OUTER JOIN (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['bookings', 'metric_time__day']
@@ -49,12 +49,12 @@ FROM (
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
       WHERE DATETIME_TRUNC(ds, day) BETWEEN '2020-01-03' AND '2020-01-05'
-    ) subq_15
+    ) nr_subq_13
     WHERE metric_time__week > '2020-01-01'
     GROUP BY
       metric_time__day
-  ) subq_18
+  ) nr_subq_16
   ON
-    subq_23.metric_time__day = subq_18.metric_time__day
-  WHERE subq_23.metric_time__day BETWEEN '2020-01-03' AND '2020-01-05'
-) subq_25
+    nr_subq_21.metric_time__day = nr_subq_16.metric_time__day
+  WHERE nr_subq_21.metric_time__day BETWEEN '2020-01-03' AND '2020-01-05'
+) nr_subq_23

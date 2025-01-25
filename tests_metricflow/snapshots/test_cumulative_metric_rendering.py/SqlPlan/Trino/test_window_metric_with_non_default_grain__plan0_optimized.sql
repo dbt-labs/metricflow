@@ -19,23 +19,23 @@ FROM (
     -- Pass Only Elements: ['txn_revenue', 'metric_time__year', 'metric_time__day']
     -- Aggregate Measures
     SELECT
-      subq_12.ds AS metric_time__day
-      , DATE_TRUNC('year', subq_12.ds) AS metric_time__year
+      nr_subq_10.ds AS metric_time__day
+      , DATE_TRUNC('year', nr_subq_10.ds) AS metric_time__year
       , SUM(revenue_src_28000.revenue) AS txn_revenue
-    FROM ***************************.mf_time_spine subq_12
+    FROM ***************************.mf_time_spine nr_subq_10
     INNER JOIN
       ***************************.fct_revenue revenue_src_28000
     ON
       (
-        DATE_TRUNC('day', revenue_src_28000.created_at) <= subq_12.ds
+        DATE_TRUNC('day', revenue_src_28000.created_at) <= nr_subq_10.ds
       ) AND (
-        DATE_TRUNC('day', revenue_src_28000.created_at) > DATE_ADD('month', -2, subq_12.ds)
+        DATE_TRUNC('day', revenue_src_28000.created_at) > DATE_ADD('month', -2, nr_subq_10.ds)
       )
     GROUP BY
-      subq_12.ds
-      , DATE_TRUNC('year', subq_12.ds)
-  ) subq_15
-) subq_17
+      nr_subq_10.ds
+      , DATE_TRUNC('year', nr_subq_10.ds)
+  ) nr_subq_13
+) nr_subq_15
 GROUP BY
   metric_time__year
   , trailing_2_months_revenue

@@ -5,8 +5,8 @@ sql_engine: Snowflake
 -- Join to Time Spine Dataset
 -- Compute Metrics via Expressions
 SELECT
-  subq_20.metric_time__martian_day AS metric_time__martian_day
-  , subq_16.bookings AS bookings_join_to_time_spine
+  nr_subq_18.metric_time__martian_day AS metric_time__martian_day
+  , nr_subq_14.bookings AS bookings_join_to_time_spine
 FROM (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['metric_time__martian_day',]
@@ -18,11 +18,11 @@ FROM (
     SELECT
       martian_day AS metric_time__martian_day
     FROM ***************************.mf_time_spine time_spine_src_28006
-  ) subq_18
+  ) nr_subq_16
   WHERE metric_time__martian_day = '2020-01-01'
   GROUP BY
     metric_time__martian_day
-) subq_20
+) nr_subq_18
 LEFT OUTER JOIN (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['bookings', 'metric_time__martian_day']
@@ -34,23 +34,23 @@ LEFT OUTER JOIN (
     -- Metric Time Dimension 'ds'
     -- Join to Custom Granularity Dataset
     SELECT
-      subq_11.bookings AS bookings
-      , subq_12.martian_day AS metric_time__martian_day
+      nr_subq_28002.bookings AS bookings
+      , nr_subq_10.martian_day AS metric_time__martian_day
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       SELECT
         1 AS bookings
         , DATE_TRUNC('day', ds) AS ds__day
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_11
+    ) nr_subq_28002
     LEFT OUTER JOIN
-      ***************************.mf_time_spine subq_12
+      ***************************.mf_time_spine nr_subq_10
     ON
-      subq_11.ds__day = subq_12.ds
-  ) subq_13
+      nr_subq_28002.ds__day = nr_subq_10.ds
+  ) nr_subq_11
   WHERE metric_time__martian_day = '2020-01-01'
   GROUP BY
     metric_time__martian_day
-) subq_16
+) nr_subq_14
 ON
-  subq_20.metric_time__martian_day = subq_16.metric_time__martian_day
+  nr_subq_18.metric_time__martian_day = nr_subq_14.metric_time__martian_day

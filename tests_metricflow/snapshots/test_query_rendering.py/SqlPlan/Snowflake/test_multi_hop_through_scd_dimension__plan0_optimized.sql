@@ -9,9 +9,9 @@ sql_engine: Snowflake
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  subq_11.metric_time__day AS metric_time__day
-  , subq_16.user__home_state_latest AS listing__user__home_state_latest
-  , SUM(subq_11.bookings) AS bookings
+  nr_subq_18.metric_time__day AS metric_time__day
+  , nr_subq_20.user__home_state_latest AS listing__user__home_state_latest
+  , SUM(nr_subq_18.bookings) AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
@@ -20,7 +20,7 @@ FROM (
     , listing_id AS listing
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_26000
-) subq_11
+) nr_subq_18
 LEFT OUTER JOIN (
   -- Join Standard Outputs
   -- Pass Only Elements: ['user__home_state_latest', 'window_start__day', 'window_end__day', 'listing']
@@ -34,21 +34,21 @@ LEFT OUTER JOIN (
     ***************************.dim_users_latest users_latest_src_26000
   ON
     listings_src_26000.user_id = users_latest_src_26000.user_id
-) subq_16
+) nr_subq_20
 ON
   (
-    subq_11.listing = subq_16.listing
+    nr_subq_18.listing = nr_subq_20.listing
   ) AND (
     (
-      subq_11.metric_time__day >= subq_16.window_start__day
+      nr_subq_18.metric_time__day >= nr_subq_20.window_start__day
     ) AND (
       (
-        subq_11.metric_time__day < subq_16.window_end__day
+        nr_subq_18.metric_time__day < nr_subq_20.window_end__day
       ) OR (
-        subq_16.window_end__day IS NULL
+        nr_subq_20.window_end__day IS NULL
       )
     )
   )
 GROUP BY
-  subq_11.metric_time__day
-  , subq_16.user__home_state_latest
+  nr_subq_18.metric_time__day
+  , nr_subq_20.user__home_state_latest

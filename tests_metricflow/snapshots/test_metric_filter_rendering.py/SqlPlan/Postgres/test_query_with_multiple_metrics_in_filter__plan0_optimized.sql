@@ -8,24 +8,14 @@ sql_engine: Postgres
 -- Pass Only Elements: ['listings',]
 -- Aggregate Measures
 -- Compute Metrics via Expressions
-WITH sma_28009_cte AS (
-  -- Read Elements From Semantic Model 'bookings_source'
-  -- Metric Time Dimension 'ds'
-  SELECT
-    listing_id AS listing
-    , 1 AS bookings
-    , guest_id AS bookers
-  FROM ***************************.fct_bookings bookings_source_src_28000
-)
-
 SELECT
   SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
   SELECT
-    subq_25.listing__bookings AS listing__bookings
-    , subq_30.listing__bookers AS listing__bookers
-    , subq_19.listings AS listings
+    nr_subq_24.listing__bookings AS listing__bookings
+    , nr_subq_27.listing__bookers AS listing__bookers
+    , nr_subq_21.listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
@@ -33,36 +23,43 @@ FROM (
       listing_id AS listing
       , 1 AS listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_19
+  ) nr_subq_21
   LEFT OUTER JOIN (
-    -- Read From CTE For node_id=sma_28009
-    -- Pass Only Elements: ['bookings', 'listing']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     -- Pass Only Elements: ['listing', 'listing__bookings']
     SELECT
       listing
       , SUM(bookings) AS listing__bookings
-    FROM sma_28009_cte sma_28009_cte
+    FROM (
+      -- Read Elements From Semantic Model 'bookings_source'
+      -- Metric Time Dimension 'ds'
+      -- Pass Only Elements: ['bookings', 'listing']
+      SELECT
+        listing_id AS listing
+        , 1 AS bookings
+      FROM ***************************.fct_bookings bookings_source_src_28000
+    ) nr_subq_8
     GROUP BY
       listing
-  ) subq_25
+  ) nr_subq_24
   ON
-    subq_19.listing = subq_25.listing
+    nr_subq_21.listing = nr_subq_24.listing
   LEFT OUTER JOIN (
-    -- Read From CTE For node_id=sma_28009
+    -- Read Elements From Semantic Model 'bookings_source'
+    -- Metric Time Dimension 'ds'
     -- Pass Only Elements: ['bookers', 'listing']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     -- Pass Only Elements: ['listing', 'listing__bookers']
     SELECT
-      listing
-      , COUNT(DISTINCT bookers) AS listing__bookers
-    FROM sma_28009_cte sma_28009_cte
+      listing_id AS listing
+      , COUNT(DISTINCT guest_id) AS listing__bookers
+    FROM ***************************.fct_bookings bookings_source_src_28000
     GROUP BY
-      listing
-  ) subq_30
+      listing_id
+  ) nr_subq_27
   ON
-    subq_19.listing = subq_30.listing
-) subq_31
+    nr_subq_21.listing = nr_subq_27.listing
+) nr_subq_28
 WHERE listing__bookings > 2 AND listing__bookers > 1

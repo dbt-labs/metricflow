@@ -4,7 +4,7 @@ sql_engine: BigQuery
 ---
 -- Pass Only Elements: ['user__bio_added_ts__second',]
 SELECT
-  subq_0.user__bio_added_ts__second
+  nr_subq_0.user__bio_added_ts__second
 FROM (
   -- Read Elements From Semantic Model 'users_ds_source'
   SELECT
@@ -188,6 +188,6 @@ FROM (
     , EXTRACT(dayofyear FROM users_ds_source_src_28000.archived_at) AS user__archived_at__extract_doy
     , users_ds_source_src_28000.user_id AS user
   FROM ***************************.dim_users users_ds_source_src_28000
-) subq_0
+) nr_subq_0
 GROUP BY
   user__bio_added_ts__second

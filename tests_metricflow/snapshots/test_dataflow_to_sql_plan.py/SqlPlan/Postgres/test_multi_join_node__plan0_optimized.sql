@@ -5,20 +5,11 @@ docstring:
 sql_engine: Postgres
 ---
 -- Join Standard Outputs
-WITH pfe_1_cte AS (
-  -- Read Elements From Semantic Model 'listings_latest'
-  -- Pass Only Elements: ['country_latest', 'listing']
-  SELECT
-    listing_id AS listing
-    , country AS country_latest
-  FROM ***************************.dim_listings_latest listings_latest_src_28000
-)
-
 SELECT
-  subq_9.country_latest AS listing__country_latest
-  , subq_10.country_latest AS listing__country_latest
-  , subq_7.listing AS listing
-  , subq_7.bookings AS bookings
+  subq_4.country_latest AS listing__country_latest
+  , subq_5.country_latest AS listing__country_latest
+  , subq_3.listing AS listing
+  , subq_3.bookings AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Pass Only Elements: ['bookings', 'listing']
@@ -26,22 +17,24 @@ FROM (
     listing_id AS listing
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-) subq_7
+) subq_3
 LEFT OUTER JOIN (
-  -- Read From CTE For node_id=pfe_1
+  -- Read Elements From Semantic Model 'listings_latest'
+  -- Pass Only Elements: ['country_latest', 'listing']
   SELECT
-    listing
-    , country_latest
-  FROM pfe_1_cte pfe_1_cte
-) subq_9
+    listing_id AS listing
+    , country AS country_latest
+  FROM ***************************.dim_listings_latest listings_latest_src_28000
+) subq_4
 ON
-  subq_7.listing = subq_9.listing
+  subq_3.listing = subq_4.listing
 LEFT OUTER JOIN (
-  -- Read From CTE For node_id=pfe_1
+  -- Read Elements From Semantic Model 'listings_latest'
+  -- Pass Only Elements: ['country_latest', 'listing']
   SELECT
-    listing
-    , country_latest
-  FROM pfe_1_cte pfe_1_cte
-) subq_10
+    listing_id AS listing
+    , country AS country_latest
+  FROM ***************************.dim_listings_latest listings_latest_src_28000
+) subq_5
 ON
-  subq_7.listing = subq_10.listing
+  subq_3.listing = subq_5.listing

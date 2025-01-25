@@ -8,9 +8,9 @@ sql_engine: Trino
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  subq_6.martian_day AS metric_time__martian_day
-  , subq_5.listing__ds__month AS listing__ds__month
-  , SUM(subq_5.listings) AS listings
+  nr_subq_4.martian_day AS metric_time__martian_day
+  , nr_subq_28007.listing__ds__month AS listing__ds__month
+  , SUM(nr_subq_28007.listings) AS listings
 FROM (
   -- Read Elements From Semantic Model 'listings_latest'
   SELECT
@@ -18,11 +18,11 @@ FROM (
     , DATE_TRUNC('day', created_at) AS ds__day
     , DATE_TRUNC('month', created_at) AS listing__ds__month
   FROM ***************************.dim_listings_latest listings_latest_src_28000
-) subq_5
+) nr_subq_28007
 LEFT OUTER JOIN
-  ***************************.mf_time_spine subq_6
+  ***************************.mf_time_spine nr_subq_4
 ON
-  subq_5.ds__day = subq_6.ds
+  nr_subq_28007.ds__day = nr_subq_4.ds
 GROUP BY
-  subq_6.martian_day
-  , subq_5.listing__ds__month
+  nr_subq_4.martian_day
+  , nr_subq_28007.listing__ds__month

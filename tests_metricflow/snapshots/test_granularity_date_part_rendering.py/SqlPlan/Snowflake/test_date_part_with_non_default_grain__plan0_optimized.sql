@@ -17,7 +17,7 @@ FROM (
     , EXTRACT(day FROM archived_at) AS metric_time__extract_day
     , 1 AS archived_users
   FROM ***************************.dim_users users_ds_source_src_28000
-) subq_6
+) nr_subq_4
 WHERE metric_time__extract_day = '2020-01-01'
 GROUP BY
   metric_time__extract_year

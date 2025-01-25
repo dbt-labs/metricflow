@@ -5,45 +5,46 @@ docstring:
 sql_engine: BigQuery
 ---
 -- Combine Aggregated Outputs
-WITH rss_28001_cte AS (
-  -- Read Elements From Semantic Model 'bookings_source'
-  SELECT
-    1 AS bookings
-    , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
-    , guest_id AS bookers
-    , is_instant
-  FROM ***************************.fct_bookings bookings_source_src_28000
-)
-
 SELECT
-  COALESCE(subq_8.is_instant, subq_11.is_instant) AS is_instant
-  , MAX(subq_8.bookings) AS bookings
-  , COALESCE(MAX(subq_11.instant_bookings), 1) AS instant_bookings
-  , COALESCE(MAX(subq_11.bookers), 1) AS bookers
+  COALESCE(subq_2.is_instant, subq_3.is_instant) AS is_instant
+  , MAX(subq_2.bookings) AS bookings
+  , COALESCE(MAX(subq_3.instant_bookings), 1) AS instant_bookings
+  , COALESCE(MAX(subq_3.bookers), 1) AS bookers
 FROM (
-  -- Read From CTE For node_id=rss_28001
-  -- Pass Only Elements: ['bookings', 'is_instant']
   -- Aggregate Measures
   SELECT
     is_instant
     , SUM(bookings) AS bookings
-  FROM rss_28001_cte rss_28001_cte
+  FROM (
+    -- Read Elements From Semantic Model 'bookings_source'
+    -- Pass Only Elements: ['bookings', 'is_instant']
+    SELECT
+      is_instant
+      , 1 AS bookings
+    FROM ***************************.fct_bookings bookings_source_src_28000
+  ) nr_subq_1
   GROUP BY
     is_instant
-) subq_8
+) subq_2
 FULL OUTER JOIN (
-  -- Read From CTE For node_id=rss_28001
-  -- Pass Only Elements: ['instant_bookings', 'bookers', 'is_instant']
   -- Aggregate Measures
   SELECT
     is_instant
     , SUM(instant_bookings) AS instant_bookings
     , COUNT(DISTINCT bookers) AS bookers
-  FROM rss_28001_cte rss_28001_cte
+  FROM (
+    -- Read Elements From Semantic Model 'bookings_source'
+    -- Pass Only Elements: ['instant_bookings', 'bookers', 'is_instant']
+    SELECT
+      is_instant
+      , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
+      , guest_id AS bookers
+    FROM ***************************.fct_bookings bookings_source_src_28000
+  ) nr_subq_3
   GROUP BY
     is_instant
-) subq_11
+) subq_3
 ON
-  subq_8.is_instant = subq_11.is_instant
+  subq_2.is_instant = subq_3.is_instant
 GROUP BY
   is_instant

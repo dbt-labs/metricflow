@@ -5,58 +5,47 @@ docstring:
 sql_engine: Databricks
 ---
 -- Compute Metrics via Expressions
-WITH sma_28019_cte AS (
-  -- Read Elements From Semantic Model 'visits_source'
-  -- Metric Time Dimension 'ds'
-  SELECT
-    DATE_TRUNC('day', ds) AS metric_time__day
-    , user_id AS user
-    , 1 AS visits
-  FROM ***************************.fct_visits visits_source_src_28000
-)
-
-, rss_28018_cte AS (
-  -- Read From Time Spine 'mf_time_spine'
-  SELECT
-    ds AS ds__day
-  FROM ***************************.mf_time_spine time_spine_src_28006
-)
-
 SELECT
-  metric_time__day AS metric_time__day
+  metric_time__day
   , CAST(buys AS DOUBLE) / CAST(NULLIF(visits, 0) AS DOUBLE) AS visit_buy_conversion_rate_7days_fill_nulls_with_0
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_30.metric_time__day, subq_43.metric_time__day) AS metric_time__day
-    , COALESCE(MAX(subq_30.visits), 0) AS visits
-    , COALESCE(MAX(subq_43.buys), 0) AS buys
+    COALESCE(nr_subq_6.metric_time__day, nr_subq_18.metric_time__day) AS metric_time__day
+    , COALESCE(MAX(nr_subq_6.visits), 0) AS visits
+    , COALESCE(MAX(nr_subq_18.buys), 0) AS buys
   FROM (
     -- Join to Time Spine Dataset
     SELECT
-      rss_28018_cte.ds__day AS metric_time__day
-      , subq_26.visits AS visits
-    FROM rss_28018_cte rss_28018_cte
+      time_spine_src_28006.ds AS metric_time__day
+      , nr_subq_2.visits AS visits
+    FROM ***************************.mf_time_spine time_spine_src_28006
     LEFT OUTER JOIN (
-      -- Read From CTE For node_id=sma_28019
-      -- Pass Only Elements: ['visits', 'metric_time__day']
       -- Aggregate Measures
       SELECT
         metric_time__day
         , SUM(visits) AS visits
-      FROM sma_28019_cte sma_28019_cte
+      FROM (
+        -- Read Elements From Semantic Model 'visits_source'
+        -- Metric Time Dimension 'ds'
+        -- Pass Only Elements: ['visits', 'metric_time__day']
+        SELECT
+          DATE_TRUNC('day', ds) AS metric_time__day
+          , 1 AS visits
+        FROM ***************************.fct_visits visits_source_src_28000
+      ) nr_subq_1
       GROUP BY
         metric_time__day
-    ) subq_26
+    ) nr_subq_2
     ON
-      rss_28018_cte.ds__day = subq_26.metric_time__day
-  ) subq_30
+      time_spine_src_28006.ds = nr_subq_2.metric_time__day
+  ) nr_subq_6
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
     SELECT
-      rss_28018_cte.ds__day AS metric_time__day
-      , subq_39.buys AS buys
-    FROM rss_28018_cte rss_28018_cte
+      time_spine_src_28006.ds AS metric_time__day
+      , nr_subq_14.buys AS buys
+    FROM ***************************.mf_time_spine time_spine_src_28006
     LEFT OUTER JOIN (
       -- Find conversions for user within the range of 7 day
       -- Pass Only Elements: ['buys', 'metric_time__day']
@@ -67,33 +56,42 @@ FROM (
       FROM (
         -- Dedupe the fanout with mf_internal_uuid in the conversion data set
         SELECT DISTINCT
-          FIRST_VALUE(sma_28019_cte.visits) OVER (
+          FIRST_VALUE(nr_subq_8.visits) OVER (
             PARTITION BY
-              subq_35.user
-              , subq_35.metric_time__day
-              , subq_35.mf_internal_uuid
-            ORDER BY sma_28019_cte.metric_time__day DESC
+              nr_subq_10.user
+              , nr_subq_10.metric_time__day
+              , nr_subq_10.mf_internal_uuid
+            ORDER BY nr_subq_8.metric_time__day DESC
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
           ) AS visits
-          , FIRST_VALUE(sma_28019_cte.metric_time__day) OVER (
+          , FIRST_VALUE(nr_subq_8.metric_time__day) OVER (
             PARTITION BY
-              subq_35.user
-              , subq_35.metric_time__day
-              , subq_35.mf_internal_uuid
-            ORDER BY sma_28019_cte.metric_time__day DESC
+              nr_subq_10.user
+              , nr_subq_10.metric_time__day
+              , nr_subq_10.mf_internal_uuid
+            ORDER BY nr_subq_8.metric_time__day DESC
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
           ) AS metric_time__day
-          , FIRST_VALUE(sma_28019_cte.user) OVER (
+          , FIRST_VALUE(nr_subq_8.user) OVER (
             PARTITION BY
-              subq_35.user
-              , subq_35.metric_time__day
-              , subq_35.mf_internal_uuid
-            ORDER BY sma_28019_cte.metric_time__day DESC
+              nr_subq_10.user
+              , nr_subq_10.metric_time__day
+              , nr_subq_10.mf_internal_uuid
+            ORDER BY nr_subq_8.metric_time__day DESC
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
           ) AS user
-          , subq_35.mf_internal_uuid AS mf_internal_uuid
-          , subq_35.buys AS buys
-        FROM sma_28019_cte sma_28019_cte
+          , nr_subq_10.mf_internal_uuid AS mf_internal_uuid
+          , nr_subq_10.buys AS buys
+        FROM (
+          -- Read Elements From Semantic Model 'visits_source'
+          -- Metric Time Dimension 'ds'
+          -- Pass Only Elements: ['visits', 'metric_time__day', 'user']
+          SELECT
+            DATE_TRUNC('day', ds) AS metric_time__day
+            , user_id AS user
+            , 1 AS visits
+          FROM ***************************.fct_visits visits_source_src_28000
+        ) nr_subq_8
         INNER JOIN (
           -- Read Elements From Semantic Model 'buys_source'
           -- Metric Time Dimension 'ds'
@@ -104,26 +102,26 @@ FROM (
             , 1 AS buys
             , UUID() AS mf_internal_uuid
           FROM ***************************.fct_buys buys_source_src_28000
-        ) subq_35
+        ) nr_subq_10
         ON
           (
-            sma_28019_cte.user = subq_35.user
+            nr_subq_8.user = nr_subq_10.user
           ) AND (
             (
-              sma_28019_cte.metric_time__day <= subq_35.metric_time__day
+              nr_subq_8.metric_time__day <= nr_subq_10.metric_time__day
             ) AND (
-              sma_28019_cte.metric_time__day > DATEADD(day, -7, subq_35.metric_time__day)
+              nr_subq_8.metric_time__day > DATEADD(day, -7, nr_subq_10.metric_time__day)
             )
           )
-      ) subq_36
+      ) nr_subq_11
       GROUP BY
         metric_time__day
-    ) subq_39
+    ) nr_subq_14
     ON
-      rss_28018_cte.ds__day = subq_39.metric_time__day
-  ) subq_43
+      time_spine_src_28006.ds = nr_subq_14.metric_time__day
+  ) nr_subq_18
   ON
-    subq_30.metric_time__day = subq_43.metric_time__day
+    nr_subq_6.metric_time__day = nr_subq_18.metric_time__day
   GROUP BY
-    COALESCE(subq_30.metric_time__day, subq_43.metric_time__day)
-) subq_44
+    COALESCE(nr_subq_6.metric_time__day, nr_subq_18.metric_time__day)
+) nr_subq_19

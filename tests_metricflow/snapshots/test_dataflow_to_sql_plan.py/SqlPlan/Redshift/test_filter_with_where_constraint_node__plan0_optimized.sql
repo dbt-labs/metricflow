@@ -15,5 +15,5 @@ FROM (
     DATE_TRUNC('day', ds) AS ds__day
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-) subq_3
+) subq_1
 WHERE booking__ds__day = '2020-01-01'

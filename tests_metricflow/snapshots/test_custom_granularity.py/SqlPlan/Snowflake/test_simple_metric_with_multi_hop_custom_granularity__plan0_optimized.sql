@@ -10,8 +10,8 @@ sql_engine: Snowflake
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  subq_22.martian_day AS listing__user__ds__martian_day
-  , SUM(subq_14.bookings) AS bookings
+  nr_subq_37.martian_day AS listing__user__ds__martian_day
+  , SUM(nr_subq_34.bookings) AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
@@ -20,7 +20,7 @@ FROM (
     , listing_id AS listing
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-) subq_14
+) nr_subq_34
 LEFT OUTER JOIN (
   -- Join Standard Outputs
   -- Pass Only Elements: ['user__ds_partitioned__day', 'user__ds__day', 'listing']
@@ -33,16 +33,16 @@ LEFT OUTER JOIN (
     ***************************.dim_users users_ds_source_src_28000
   ON
     listings_latest_src_28000.user_id = users_ds_source_src_28000.user_id
-) subq_21
+) nr_subq_36
 ON
   (
-    subq_14.listing = subq_21.listing
+    nr_subq_34.listing = nr_subq_36.listing
   ) AND (
-    subq_14.ds_partitioned__day = subq_21.user__ds_partitioned__day
+    nr_subq_34.ds_partitioned__day = nr_subq_36.user__ds_partitioned__day
   )
 LEFT OUTER JOIN
-  ***************************.mf_time_spine subq_22
+  ***************************.mf_time_spine nr_subq_37
 ON
-  subq_21.user__ds__day = subq_22.ds
+  nr_subq_36.user__ds__day = nr_subq_37.ds
 GROUP BY
-  subq_22.martian_day
+  nr_subq_37.martian_day

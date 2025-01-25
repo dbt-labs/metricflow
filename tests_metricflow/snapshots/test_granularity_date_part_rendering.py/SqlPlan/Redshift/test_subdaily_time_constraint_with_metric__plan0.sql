@@ -4,52 +4,52 @@ sql_engine: Redshift
 ---
 -- Compute Metrics via Expressions
 SELECT
-  subq_10.metric_time__hour
-  , subq_10.archived_users AS subdaily_join_to_time_spine_metric
+  nr_subq_10.metric_time__hour
+  , nr_subq_10.archived_users AS subdaily_join_to_time_spine_metric
 FROM (
   -- Constrain Time Range to [2020-01-01T02:00:00, 2020-01-01T05:00:00]
   SELECT
-    subq_9.metric_time__hour
-    , subq_9.archived_users
+    nr_subq_9.metric_time__hour
+    , nr_subq_9.archived_users
   FROM (
     -- Join to Time Spine Dataset
     SELECT
-      subq_8.metric_time__hour AS metric_time__hour
-      , subq_4.archived_users AS archived_users
+      nr_subq_8.metric_time__hour AS metric_time__hour
+      , nr_subq_4.archived_users AS archived_users
     FROM (
       -- Pass Only Elements: ['metric_time__hour',]
       SELECT
-        subq_7.metric_time__hour
+        nr_subq_7.metric_time__hour
       FROM (
         -- Constrain Time Range to [2020-01-01T02:00:00, 2020-01-01T05:00:00]
         SELECT
-          subq_6.metric_time__hour
-          , subq_6.ts__day
-          , subq_6.ts__week
-          , subq_6.ts__month
-          , subq_6.ts__quarter
-          , subq_6.ts__year
-          , subq_6.ts__extract_year
-          , subq_6.ts__extract_quarter
-          , subq_6.ts__extract_month
-          , subq_6.ts__extract_day
-          , subq_6.ts__extract_dow
-          , subq_6.ts__extract_doy
+          nr_subq_6.metric_time__hour
+          , nr_subq_6.ts__day
+          , nr_subq_6.ts__week
+          , nr_subq_6.ts__month
+          , nr_subq_6.ts__quarter
+          , nr_subq_6.ts__year
+          , nr_subq_6.ts__extract_year
+          , nr_subq_6.ts__extract_quarter
+          , nr_subq_6.ts__extract_month
+          , nr_subq_6.ts__extract_day
+          , nr_subq_6.ts__extract_dow
+          , nr_subq_6.ts__extract_doy
         FROM (
           -- Change Column Aliases
           SELECT
-            subq_5.ts__hour AS metric_time__hour
-            , subq_5.ts__day
-            , subq_5.ts__week
-            , subq_5.ts__month
-            , subq_5.ts__quarter
-            , subq_5.ts__year
-            , subq_5.ts__extract_year
-            , subq_5.ts__extract_quarter
-            , subq_5.ts__extract_month
-            , subq_5.ts__extract_day
-            , subq_5.ts__extract_dow
-            , subq_5.ts__extract_doy
+            nr_subq_5.ts__hour AS metric_time__hour
+            , nr_subq_5.ts__day
+            , nr_subq_5.ts__week
+            , nr_subq_5.ts__month
+            , nr_subq_5.ts__quarter
+            , nr_subq_5.ts__year
+            , nr_subq_5.ts__extract_year
+            , nr_subq_5.ts__extract_quarter
+            , nr_subq_5.ts__extract_month
+            , nr_subq_5.ts__extract_day
+            , nr_subq_5.ts__extract_dow
+            , nr_subq_5.ts__extract_doy
           FROM (
             -- Read From Time Spine 'mf_time_spine_hour'
             SELECT
@@ -66,407 +66,407 @@ FROM (
               , CASE WHEN EXTRACT(dow FROM time_spine_src_28005.ts) = 0 THEN EXTRACT(dow FROM time_spine_src_28005.ts) + 7 ELSE EXTRACT(dow FROM time_spine_src_28005.ts) END AS ts__extract_dow
               , EXTRACT(doy FROM time_spine_src_28005.ts) AS ts__extract_doy
             FROM ***************************.mf_time_spine_hour time_spine_src_28005
-          ) subq_5
-        ) subq_6
-        WHERE subq_6.metric_time__hour BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
-      ) subq_7
-    ) subq_8
+          ) nr_subq_5
+        ) nr_subq_6
+        WHERE nr_subq_6.metric_time__hour BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
+      ) nr_subq_7
+    ) nr_subq_8
     LEFT OUTER JOIN (
       -- Aggregate Measures
       SELECT
-        subq_3.metric_time__hour
-        , SUM(subq_3.archived_users) AS archived_users
+        nr_subq_3.metric_time__hour
+        , SUM(nr_subq_3.archived_users) AS archived_users
       FROM (
         -- Pass Only Elements: ['archived_users', 'metric_time__hour']
         SELECT
-          subq_2.metric_time__hour
-          , subq_2.archived_users
+          nr_subq_2.metric_time__hour
+          , nr_subq_2.archived_users
         FROM (
           -- Constrain Time Range to [2020-01-01T02:00:00, 2020-01-01T05:00:00]
           SELECT
-            subq_1.ds__day
-            , subq_1.ds__week
-            , subq_1.ds__month
-            , subq_1.ds__quarter
-            , subq_1.ds__year
-            , subq_1.ds__extract_year
-            , subq_1.ds__extract_quarter
-            , subq_1.ds__extract_month
-            , subq_1.ds__extract_day
-            , subq_1.ds__extract_dow
-            , subq_1.ds__extract_doy
-            , subq_1.created_at__day
-            , subq_1.created_at__week
-            , subq_1.created_at__month
-            , subq_1.created_at__quarter
-            , subq_1.created_at__year
-            , subq_1.created_at__extract_year
-            , subq_1.created_at__extract_quarter
-            , subq_1.created_at__extract_month
-            , subq_1.created_at__extract_day
-            , subq_1.created_at__extract_dow
-            , subq_1.created_at__extract_doy
-            , subq_1.ds_partitioned__day
-            , subq_1.ds_partitioned__week
-            , subq_1.ds_partitioned__month
-            , subq_1.ds_partitioned__quarter
-            , subq_1.ds_partitioned__year
-            , subq_1.ds_partitioned__extract_year
-            , subq_1.ds_partitioned__extract_quarter
-            , subq_1.ds_partitioned__extract_month
-            , subq_1.ds_partitioned__extract_day
-            , subq_1.ds_partitioned__extract_dow
-            , subq_1.ds_partitioned__extract_doy
-            , subq_1.last_profile_edit_ts__millisecond
-            , subq_1.last_profile_edit_ts__second
-            , subq_1.last_profile_edit_ts__minute
-            , subq_1.last_profile_edit_ts__hour
-            , subq_1.last_profile_edit_ts__day
-            , subq_1.last_profile_edit_ts__week
-            , subq_1.last_profile_edit_ts__month
-            , subq_1.last_profile_edit_ts__quarter
-            , subq_1.last_profile_edit_ts__year
-            , subq_1.last_profile_edit_ts__extract_year
-            , subq_1.last_profile_edit_ts__extract_quarter
-            , subq_1.last_profile_edit_ts__extract_month
-            , subq_1.last_profile_edit_ts__extract_day
-            , subq_1.last_profile_edit_ts__extract_dow
-            , subq_1.last_profile_edit_ts__extract_doy
-            , subq_1.bio_added_ts__second
-            , subq_1.bio_added_ts__minute
-            , subq_1.bio_added_ts__hour
-            , subq_1.bio_added_ts__day
-            , subq_1.bio_added_ts__week
-            , subq_1.bio_added_ts__month
-            , subq_1.bio_added_ts__quarter
-            , subq_1.bio_added_ts__year
-            , subq_1.bio_added_ts__extract_year
-            , subq_1.bio_added_ts__extract_quarter
-            , subq_1.bio_added_ts__extract_month
-            , subq_1.bio_added_ts__extract_day
-            , subq_1.bio_added_ts__extract_dow
-            , subq_1.bio_added_ts__extract_doy
-            , subq_1.last_login_ts__minute
-            , subq_1.last_login_ts__hour
-            , subq_1.last_login_ts__day
-            , subq_1.last_login_ts__week
-            , subq_1.last_login_ts__month
-            , subq_1.last_login_ts__quarter
-            , subq_1.last_login_ts__year
-            , subq_1.last_login_ts__extract_year
-            , subq_1.last_login_ts__extract_quarter
-            , subq_1.last_login_ts__extract_month
-            , subq_1.last_login_ts__extract_day
-            , subq_1.last_login_ts__extract_dow
-            , subq_1.last_login_ts__extract_doy
-            , subq_1.archived_at__hour
-            , subq_1.archived_at__day
-            , subq_1.archived_at__week
-            , subq_1.archived_at__month
-            , subq_1.archived_at__quarter
-            , subq_1.archived_at__year
-            , subq_1.archived_at__extract_year
-            , subq_1.archived_at__extract_quarter
-            , subq_1.archived_at__extract_month
-            , subq_1.archived_at__extract_day
-            , subq_1.archived_at__extract_dow
-            , subq_1.archived_at__extract_doy
-            , subq_1.user__ds__day
-            , subq_1.user__ds__week
-            , subq_1.user__ds__month
-            , subq_1.user__ds__quarter
-            , subq_1.user__ds__year
-            , subq_1.user__ds__extract_year
-            , subq_1.user__ds__extract_quarter
-            , subq_1.user__ds__extract_month
-            , subq_1.user__ds__extract_day
-            , subq_1.user__ds__extract_dow
-            , subq_1.user__ds__extract_doy
-            , subq_1.user__created_at__day
-            , subq_1.user__created_at__week
-            , subq_1.user__created_at__month
-            , subq_1.user__created_at__quarter
-            , subq_1.user__created_at__year
-            , subq_1.user__created_at__extract_year
-            , subq_1.user__created_at__extract_quarter
-            , subq_1.user__created_at__extract_month
-            , subq_1.user__created_at__extract_day
-            , subq_1.user__created_at__extract_dow
-            , subq_1.user__created_at__extract_doy
-            , subq_1.user__ds_partitioned__day
-            , subq_1.user__ds_partitioned__week
-            , subq_1.user__ds_partitioned__month
-            , subq_1.user__ds_partitioned__quarter
-            , subq_1.user__ds_partitioned__year
-            , subq_1.user__ds_partitioned__extract_year
-            , subq_1.user__ds_partitioned__extract_quarter
-            , subq_1.user__ds_partitioned__extract_month
-            , subq_1.user__ds_partitioned__extract_day
-            , subq_1.user__ds_partitioned__extract_dow
-            , subq_1.user__ds_partitioned__extract_doy
-            , subq_1.user__last_profile_edit_ts__millisecond
-            , subq_1.user__last_profile_edit_ts__second
-            , subq_1.user__last_profile_edit_ts__minute
-            , subq_1.user__last_profile_edit_ts__hour
-            , subq_1.user__last_profile_edit_ts__day
-            , subq_1.user__last_profile_edit_ts__week
-            , subq_1.user__last_profile_edit_ts__month
-            , subq_1.user__last_profile_edit_ts__quarter
-            , subq_1.user__last_profile_edit_ts__year
-            , subq_1.user__last_profile_edit_ts__extract_year
-            , subq_1.user__last_profile_edit_ts__extract_quarter
-            , subq_1.user__last_profile_edit_ts__extract_month
-            , subq_1.user__last_profile_edit_ts__extract_day
-            , subq_1.user__last_profile_edit_ts__extract_dow
-            , subq_1.user__last_profile_edit_ts__extract_doy
-            , subq_1.user__bio_added_ts__second
-            , subq_1.user__bio_added_ts__minute
-            , subq_1.user__bio_added_ts__hour
-            , subq_1.user__bio_added_ts__day
-            , subq_1.user__bio_added_ts__week
-            , subq_1.user__bio_added_ts__month
-            , subq_1.user__bio_added_ts__quarter
-            , subq_1.user__bio_added_ts__year
-            , subq_1.user__bio_added_ts__extract_year
-            , subq_1.user__bio_added_ts__extract_quarter
-            , subq_1.user__bio_added_ts__extract_month
-            , subq_1.user__bio_added_ts__extract_day
-            , subq_1.user__bio_added_ts__extract_dow
-            , subq_1.user__bio_added_ts__extract_doy
-            , subq_1.user__last_login_ts__minute
-            , subq_1.user__last_login_ts__hour
-            , subq_1.user__last_login_ts__day
-            , subq_1.user__last_login_ts__week
-            , subq_1.user__last_login_ts__month
-            , subq_1.user__last_login_ts__quarter
-            , subq_1.user__last_login_ts__year
-            , subq_1.user__last_login_ts__extract_year
-            , subq_1.user__last_login_ts__extract_quarter
-            , subq_1.user__last_login_ts__extract_month
-            , subq_1.user__last_login_ts__extract_day
-            , subq_1.user__last_login_ts__extract_dow
-            , subq_1.user__last_login_ts__extract_doy
-            , subq_1.user__archived_at__hour
-            , subq_1.user__archived_at__day
-            , subq_1.user__archived_at__week
-            , subq_1.user__archived_at__month
-            , subq_1.user__archived_at__quarter
-            , subq_1.user__archived_at__year
-            , subq_1.user__archived_at__extract_year
-            , subq_1.user__archived_at__extract_quarter
-            , subq_1.user__archived_at__extract_month
-            , subq_1.user__archived_at__extract_day
-            , subq_1.user__archived_at__extract_dow
-            , subq_1.user__archived_at__extract_doy
-            , subq_1.metric_time__hour
-            , subq_1.metric_time__day
-            , subq_1.metric_time__week
-            , subq_1.metric_time__month
-            , subq_1.metric_time__quarter
-            , subq_1.metric_time__year
-            , subq_1.metric_time__extract_year
-            , subq_1.metric_time__extract_quarter
-            , subq_1.metric_time__extract_month
-            , subq_1.metric_time__extract_day
-            , subq_1.metric_time__extract_dow
-            , subq_1.metric_time__extract_doy
-            , subq_1.user
-            , subq_1.home_state
-            , subq_1.user__home_state
-            , subq_1.archived_users
+            nr_subq_1.ds__day
+            , nr_subq_1.ds__week
+            , nr_subq_1.ds__month
+            , nr_subq_1.ds__quarter
+            , nr_subq_1.ds__year
+            , nr_subq_1.ds__extract_year
+            , nr_subq_1.ds__extract_quarter
+            , nr_subq_1.ds__extract_month
+            , nr_subq_1.ds__extract_day
+            , nr_subq_1.ds__extract_dow
+            , nr_subq_1.ds__extract_doy
+            , nr_subq_1.created_at__day
+            , nr_subq_1.created_at__week
+            , nr_subq_1.created_at__month
+            , nr_subq_1.created_at__quarter
+            , nr_subq_1.created_at__year
+            , nr_subq_1.created_at__extract_year
+            , nr_subq_1.created_at__extract_quarter
+            , nr_subq_1.created_at__extract_month
+            , nr_subq_1.created_at__extract_day
+            , nr_subq_1.created_at__extract_dow
+            , nr_subq_1.created_at__extract_doy
+            , nr_subq_1.ds_partitioned__day
+            , nr_subq_1.ds_partitioned__week
+            , nr_subq_1.ds_partitioned__month
+            , nr_subq_1.ds_partitioned__quarter
+            , nr_subq_1.ds_partitioned__year
+            , nr_subq_1.ds_partitioned__extract_year
+            , nr_subq_1.ds_partitioned__extract_quarter
+            , nr_subq_1.ds_partitioned__extract_month
+            , nr_subq_1.ds_partitioned__extract_day
+            , nr_subq_1.ds_partitioned__extract_dow
+            , nr_subq_1.ds_partitioned__extract_doy
+            , nr_subq_1.last_profile_edit_ts__millisecond
+            , nr_subq_1.last_profile_edit_ts__second
+            , nr_subq_1.last_profile_edit_ts__minute
+            , nr_subq_1.last_profile_edit_ts__hour
+            , nr_subq_1.last_profile_edit_ts__day
+            , nr_subq_1.last_profile_edit_ts__week
+            , nr_subq_1.last_profile_edit_ts__month
+            , nr_subq_1.last_profile_edit_ts__quarter
+            , nr_subq_1.last_profile_edit_ts__year
+            , nr_subq_1.last_profile_edit_ts__extract_year
+            , nr_subq_1.last_profile_edit_ts__extract_quarter
+            , nr_subq_1.last_profile_edit_ts__extract_month
+            , nr_subq_1.last_profile_edit_ts__extract_day
+            , nr_subq_1.last_profile_edit_ts__extract_dow
+            , nr_subq_1.last_profile_edit_ts__extract_doy
+            , nr_subq_1.bio_added_ts__second
+            , nr_subq_1.bio_added_ts__minute
+            , nr_subq_1.bio_added_ts__hour
+            , nr_subq_1.bio_added_ts__day
+            , nr_subq_1.bio_added_ts__week
+            , nr_subq_1.bio_added_ts__month
+            , nr_subq_1.bio_added_ts__quarter
+            , nr_subq_1.bio_added_ts__year
+            , nr_subq_1.bio_added_ts__extract_year
+            , nr_subq_1.bio_added_ts__extract_quarter
+            , nr_subq_1.bio_added_ts__extract_month
+            , nr_subq_1.bio_added_ts__extract_day
+            , nr_subq_1.bio_added_ts__extract_dow
+            , nr_subq_1.bio_added_ts__extract_doy
+            , nr_subq_1.last_login_ts__minute
+            , nr_subq_1.last_login_ts__hour
+            , nr_subq_1.last_login_ts__day
+            , nr_subq_1.last_login_ts__week
+            , nr_subq_1.last_login_ts__month
+            , nr_subq_1.last_login_ts__quarter
+            , nr_subq_1.last_login_ts__year
+            , nr_subq_1.last_login_ts__extract_year
+            , nr_subq_1.last_login_ts__extract_quarter
+            , nr_subq_1.last_login_ts__extract_month
+            , nr_subq_1.last_login_ts__extract_day
+            , nr_subq_1.last_login_ts__extract_dow
+            , nr_subq_1.last_login_ts__extract_doy
+            , nr_subq_1.archived_at__hour
+            , nr_subq_1.archived_at__day
+            , nr_subq_1.archived_at__week
+            , nr_subq_1.archived_at__month
+            , nr_subq_1.archived_at__quarter
+            , nr_subq_1.archived_at__year
+            , nr_subq_1.archived_at__extract_year
+            , nr_subq_1.archived_at__extract_quarter
+            , nr_subq_1.archived_at__extract_month
+            , nr_subq_1.archived_at__extract_day
+            , nr_subq_1.archived_at__extract_dow
+            , nr_subq_1.archived_at__extract_doy
+            , nr_subq_1.user__ds__day
+            , nr_subq_1.user__ds__week
+            , nr_subq_1.user__ds__month
+            , nr_subq_1.user__ds__quarter
+            , nr_subq_1.user__ds__year
+            , nr_subq_1.user__ds__extract_year
+            , nr_subq_1.user__ds__extract_quarter
+            , nr_subq_1.user__ds__extract_month
+            , nr_subq_1.user__ds__extract_day
+            , nr_subq_1.user__ds__extract_dow
+            , nr_subq_1.user__ds__extract_doy
+            , nr_subq_1.user__created_at__day
+            , nr_subq_1.user__created_at__week
+            , nr_subq_1.user__created_at__month
+            , nr_subq_1.user__created_at__quarter
+            , nr_subq_1.user__created_at__year
+            , nr_subq_1.user__created_at__extract_year
+            , nr_subq_1.user__created_at__extract_quarter
+            , nr_subq_1.user__created_at__extract_month
+            , nr_subq_1.user__created_at__extract_day
+            , nr_subq_1.user__created_at__extract_dow
+            , nr_subq_1.user__created_at__extract_doy
+            , nr_subq_1.user__ds_partitioned__day
+            , nr_subq_1.user__ds_partitioned__week
+            , nr_subq_1.user__ds_partitioned__month
+            , nr_subq_1.user__ds_partitioned__quarter
+            , nr_subq_1.user__ds_partitioned__year
+            , nr_subq_1.user__ds_partitioned__extract_year
+            , nr_subq_1.user__ds_partitioned__extract_quarter
+            , nr_subq_1.user__ds_partitioned__extract_month
+            , nr_subq_1.user__ds_partitioned__extract_day
+            , nr_subq_1.user__ds_partitioned__extract_dow
+            , nr_subq_1.user__ds_partitioned__extract_doy
+            , nr_subq_1.user__last_profile_edit_ts__millisecond
+            , nr_subq_1.user__last_profile_edit_ts__second
+            , nr_subq_1.user__last_profile_edit_ts__minute
+            , nr_subq_1.user__last_profile_edit_ts__hour
+            , nr_subq_1.user__last_profile_edit_ts__day
+            , nr_subq_1.user__last_profile_edit_ts__week
+            , nr_subq_1.user__last_profile_edit_ts__month
+            , nr_subq_1.user__last_profile_edit_ts__quarter
+            , nr_subq_1.user__last_profile_edit_ts__year
+            , nr_subq_1.user__last_profile_edit_ts__extract_year
+            , nr_subq_1.user__last_profile_edit_ts__extract_quarter
+            , nr_subq_1.user__last_profile_edit_ts__extract_month
+            , nr_subq_1.user__last_profile_edit_ts__extract_day
+            , nr_subq_1.user__last_profile_edit_ts__extract_dow
+            , nr_subq_1.user__last_profile_edit_ts__extract_doy
+            , nr_subq_1.user__bio_added_ts__second
+            , nr_subq_1.user__bio_added_ts__minute
+            , nr_subq_1.user__bio_added_ts__hour
+            , nr_subq_1.user__bio_added_ts__day
+            , nr_subq_1.user__bio_added_ts__week
+            , nr_subq_1.user__bio_added_ts__month
+            , nr_subq_1.user__bio_added_ts__quarter
+            , nr_subq_1.user__bio_added_ts__year
+            , nr_subq_1.user__bio_added_ts__extract_year
+            , nr_subq_1.user__bio_added_ts__extract_quarter
+            , nr_subq_1.user__bio_added_ts__extract_month
+            , nr_subq_1.user__bio_added_ts__extract_day
+            , nr_subq_1.user__bio_added_ts__extract_dow
+            , nr_subq_1.user__bio_added_ts__extract_doy
+            , nr_subq_1.user__last_login_ts__minute
+            , nr_subq_1.user__last_login_ts__hour
+            , nr_subq_1.user__last_login_ts__day
+            , nr_subq_1.user__last_login_ts__week
+            , nr_subq_1.user__last_login_ts__month
+            , nr_subq_1.user__last_login_ts__quarter
+            , nr_subq_1.user__last_login_ts__year
+            , nr_subq_1.user__last_login_ts__extract_year
+            , nr_subq_1.user__last_login_ts__extract_quarter
+            , nr_subq_1.user__last_login_ts__extract_month
+            , nr_subq_1.user__last_login_ts__extract_day
+            , nr_subq_1.user__last_login_ts__extract_dow
+            , nr_subq_1.user__last_login_ts__extract_doy
+            , nr_subq_1.user__archived_at__hour
+            , nr_subq_1.user__archived_at__day
+            , nr_subq_1.user__archived_at__week
+            , nr_subq_1.user__archived_at__month
+            , nr_subq_1.user__archived_at__quarter
+            , nr_subq_1.user__archived_at__year
+            , nr_subq_1.user__archived_at__extract_year
+            , nr_subq_1.user__archived_at__extract_quarter
+            , nr_subq_1.user__archived_at__extract_month
+            , nr_subq_1.user__archived_at__extract_day
+            , nr_subq_1.user__archived_at__extract_dow
+            , nr_subq_1.user__archived_at__extract_doy
+            , nr_subq_1.metric_time__hour
+            , nr_subq_1.metric_time__day
+            , nr_subq_1.metric_time__week
+            , nr_subq_1.metric_time__month
+            , nr_subq_1.metric_time__quarter
+            , nr_subq_1.metric_time__year
+            , nr_subq_1.metric_time__extract_year
+            , nr_subq_1.metric_time__extract_quarter
+            , nr_subq_1.metric_time__extract_month
+            , nr_subq_1.metric_time__extract_day
+            , nr_subq_1.metric_time__extract_dow
+            , nr_subq_1.metric_time__extract_doy
+            , nr_subq_1.user
+            , nr_subq_1.home_state
+            , nr_subq_1.user__home_state
+            , nr_subq_1.archived_users
           FROM (
             -- Metric Time Dimension 'archived_at'
             SELECT
-              subq_0.ds__day
-              , subq_0.ds__week
-              , subq_0.ds__month
-              , subq_0.ds__quarter
-              , subq_0.ds__year
-              , subq_0.ds__extract_year
-              , subq_0.ds__extract_quarter
-              , subq_0.ds__extract_month
-              , subq_0.ds__extract_day
-              , subq_0.ds__extract_dow
-              , subq_0.ds__extract_doy
-              , subq_0.created_at__day
-              , subq_0.created_at__week
-              , subq_0.created_at__month
-              , subq_0.created_at__quarter
-              , subq_0.created_at__year
-              , subq_0.created_at__extract_year
-              , subq_0.created_at__extract_quarter
-              , subq_0.created_at__extract_month
-              , subq_0.created_at__extract_day
-              , subq_0.created_at__extract_dow
-              , subq_0.created_at__extract_doy
-              , subq_0.ds_partitioned__day
-              , subq_0.ds_partitioned__week
-              , subq_0.ds_partitioned__month
-              , subq_0.ds_partitioned__quarter
-              , subq_0.ds_partitioned__year
-              , subq_0.ds_partitioned__extract_year
-              , subq_0.ds_partitioned__extract_quarter
-              , subq_0.ds_partitioned__extract_month
-              , subq_0.ds_partitioned__extract_day
-              , subq_0.ds_partitioned__extract_dow
-              , subq_0.ds_partitioned__extract_doy
-              , subq_0.last_profile_edit_ts__millisecond
-              , subq_0.last_profile_edit_ts__second
-              , subq_0.last_profile_edit_ts__minute
-              , subq_0.last_profile_edit_ts__hour
-              , subq_0.last_profile_edit_ts__day
-              , subq_0.last_profile_edit_ts__week
-              , subq_0.last_profile_edit_ts__month
-              , subq_0.last_profile_edit_ts__quarter
-              , subq_0.last_profile_edit_ts__year
-              , subq_0.last_profile_edit_ts__extract_year
-              , subq_0.last_profile_edit_ts__extract_quarter
-              , subq_0.last_profile_edit_ts__extract_month
-              , subq_0.last_profile_edit_ts__extract_day
-              , subq_0.last_profile_edit_ts__extract_dow
-              , subq_0.last_profile_edit_ts__extract_doy
-              , subq_0.bio_added_ts__second
-              , subq_0.bio_added_ts__minute
-              , subq_0.bio_added_ts__hour
-              , subq_0.bio_added_ts__day
-              , subq_0.bio_added_ts__week
-              , subq_0.bio_added_ts__month
-              , subq_0.bio_added_ts__quarter
-              , subq_0.bio_added_ts__year
-              , subq_0.bio_added_ts__extract_year
-              , subq_0.bio_added_ts__extract_quarter
-              , subq_0.bio_added_ts__extract_month
-              , subq_0.bio_added_ts__extract_day
-              , subq_0.bio_added_ts__extract_dow
-              , subq_0.bio_added_ts__extract_doy
-              , subq_0.last_login_ts__minute
-              , subq_0.last_login_ts__hour
-              , subq_0.last_login_ts__day
-              , subq_0.last_login_ts__week
-              , subq_0.last_login_ts__month
-              , subq_0.last_login_ts__quarter
-              , subq_0.last_login_ts__year
-              , subq_0.last_login_ts__extract_year
-              , subq_0.last_login_ts__extract_quarter
-              , subq_0.last_login_ts__extract_month
-              , subq_0.last_login_ts__extract_day
-              , subq_0.last_login_ts__extract_dow
-              , subq_0.last_login_ts__extract_doy
-              , subq_0.archived_at__hour
-              , subq_0.archived_at__day
-              , subq_0.archived_at__week
-              , subq_0.archived_at__month
-              , subq_0.archived_at__quarter
-              , subq_0.archived_at__year
-              , subq_0.archived_at__extract_year
-              , subq_0.archived_at__extract_quarter
-              , subq_0.archived_at__extract_month
-              , subq_0.archived_at__extract_day
-              , subq_0.archived_at__extract_dow
-              , subq_0.archived_at__extract_doy
-              , subq_0.user__ds__day
-              , subq_0.user__ds__week
-              , subq_0.user__ds__month
-              , subq_0.user__ds__quarter
-              , subq_0.user__ds__year
-              , subq_0.user__ds__extract_year
-              , subq_0.user__ds__extract_quarter
-              , subq_0.user__ds__extract_month
-              , subq_0.user__ds__extract_day
-              , subq_0.user__ds__extract_dow
-              , subq_0.user__ds__extract_doy
-              , subq_0.user__created_at__day
-              , subq_0.user__created_at__week
-              , subq_0.user__created_at__month
-              , subq_0.user__created_at__quarter
-              , subq_0.user__created_at__year
-              , subq_0.user__created_at__extract_year
-              , subq_0.user__created_at__extract_quarter
-              , subq_0.user__created_at__extract_month
-              , subq_0.user__created_at__extract_day
-              , subq_0.user__created_at__extract_dow
-              , subq_0.user__created_at__extract_doy
-              , subq_0.user__ds_partitioned__day
-              , subq_0.user__ds_partitioned__week
-              , subq_0.user__ds_partitioned__month
-              , subq_0.user__ds_partitioned__quarter
-              , subq_0.user__ds_partitioned__year
-              , subq_0.user__ds_partitioned__extract_year
-              , subq_0.user__ds_partitioned__extract_quarter
-              , subq_0.user__ds_partitioned__extract_month
-              , subq_0.user__ds_partitioned__extract_day
-              , subq_0.user__ds_partitioned__extract_dow
-              , subq_0.user__ds_partitioned__extract_doy
-              , subq_0.user__last_profile_edit_ts__millisecond
-              , subq_0.user__last_profile_edit_ts__second
-              , subq_0.user__last_profile_edit_ts__minute
-              , subq_0.user__last_profile_edit_ts__hour
-              , subq_0.user__last_profile_edit_ts__day
-              , subq_0.user__last_profile_edit_ts__week
-              , subq_0.user__last_profile_edit_ts__month
-              , subq_0.user__last_profile_edit_ts__quarter
-              , subq_0.user__last_profile_edit_ts__year
-              , subq_0.user__last_profile_edit_ts__extract_year
-              , subq_0.user__last_profile_edit_ts__extract_quarter
-              , subq_0.user__last_profile_edit_ts__extract_month
-              , subq_0.user__last_profile_edit_ts__extract_day
-              , subq_0.user__last_profile_edit_ts__extract_dow
-              , subq_0.user__last_profile_edit_ts__extract_doy
-              , subq_0.user__bio_added_ts__second
-              , subq_0.user__bio_added_ts__minute
-              , subq_0.user__bio_added_ts__hour
-              , subq_0.user__bio_added_ts__day
-              , subq_0.user__bio_added_ts__week
-              , subq_0.user__bio_added_ts__month
-              , subq_0.user__bio_added_ts__quarter
-              , subq_0.user__bio_added_ts__year
-              , subq_0.user__bio_added_ts__extract_year
-              , subq_0.user__bio_added_ts__extract_quarter
-              , subq_0.user__bio_added_ts__extract_month
-              , subq_0.user__bio_added_ts__extract_day
-              , subq_0.user__bio_added_ts__extract_dow
-              , subq_0.user__bio_added_ts__extract_doy
-              , subq_0.user__last_login_ts__minute
-              , subq_0.user__last_login_ts__hour
-              , subq_0.user__last_login_ts__day
-              , subq_0.user__last_login_ts__week
-              , subq_0.user__last_login_ts__month
-              , subq_0.user__last_login_ts__quarter
-              , subq_0.user__last_login_ts__year
-              , subq_0.user__last_login_ts__extract_year
-              , subq_0.user__last_login_ts__extract_quarter
-              , subq_0.user__last_login_ts__extract_month
-              , subq_0.user__last_login_ts__extract_day
-              , subq_0.user__last_login_ts__extract_dow
-              , subq_0.user__last_login_ts__extract_doy
-              , subq_0.user__archived_at__hour
-              , subq_0.user__archived_at__day
-              , subq_0.user__archived_at__week
-              , subq_0.user__archived_at__month
-              , subq_0.user__archived_at__quarter
-              , subq_0.user__archived_at__year
-              , subq_0.user__archived_at__extract_year
-              , subq_0.user__archived_at__extract_quarter
-              , subq_0.user__archived_at__extract_month
-              , subq_0.user__archived_at__extract_day
-              , subq_0.user__archived_at__extract_dow
-              , subq_0.user__archived_at__extract_doy
-              , subq_0.archived_at__hour AS metric_time__hour
-              , subq_0.archived_at__day AS metric_time__day
-              , subq_0.archived_at__week AS metric_time__week
-              , subq_0.archived_at__month AS metric_time__month
-              , subq_0.archived_at__quarter AS metric_time__quarter
-              , subq_0.archived_at__year AS metric_time__year
-              , subq_0.archived_at__extract_year AS metric_time__extract_year
-              , subq_0.archived_at__extract_quarter AS metric_time__extract_quarter
-              , subq_0.archived_at__extract_month AS metric_time__extract_month
-              , subq_0.archived_at__extract_day AS metric_time__extract_day
-              , subq_0.archived_at__extract_dow AS metric_time__extract_dow
-              , subq_0.archived_at__extract_doy AS metric_time__extract_doy
-              , subq_0.user
-              , subq_0.home_state
-              , subq_0.user__home_state
-              , subq_0.archived_users
+              nr_subq_28010.ds__day
+              , nr_subq_28010.ds__week
+              , nr_subq_28010.ds__month
+              , nr_subq_28010.ds__quarter
+              , nr_subq_28010.ds__year
+              , nr_subq_28010.ds__extract_year
+              , nr_subq_28010.ds__extract_quarter
+              , nr_subq_28010.ds__extract_month
+              , nr_subq_28010.ds__extract_day
+              , nr_subq_28010.ds__extract_dow
+              , nr_subq_28010.ds__extract_doy
+              , nr_subq_28010.created_at__day
+              , nr_subq_28010.created_at__week
+              , nr_subq_28010.created_at__month
+              , nr_subq_28010.created_at__quarter
+              , nr_subq_28010.created_at__year
+              , nr_subq_28010.created_at__extract_year
+              , nr_subq_28010.created_at__extract_quarter
+              , nr_subq_28010.created_at__extract_month
+              , nr_subq_28010.created_at__extract_day
+              , nr_subq_28010.created_at__extract_dow
+              , nr_subq_28010.created_at__extract_doy
+              , nr_subq_28010.ds_partitioned__day
+              , nr_subq_28010.ds_partitioned__week
+              , nr_subq_28010.ds_partitioned__month
+              , nr_subq_28010.ds_partitioned__quarter
+              , nr_subq_28010.ds_partitioned__year
+              , nr_subq_28010.ds_partitioned__extract_year
+              , nr_subq_28010.ds_partitioned__extract_quarter
+              , nr_subq_28010.ds_partitioned__extract_month
+              , nr_subq_28010.ds_partitioned__extract_day
+              , nr_subq_28010.ds_partitioned__extract_dow
+              , nr_subq_28010.ds_partitioned__extract_doy
+              , nr_subq_28010.last_profile_edit_ts__millisecond
+              , nr_subq_28010.last_profile_edit_ts__second
+              , nr_subq_28010.last_profile_edit_ts__minute
+              , nr_subq_28010.last_profile_edit_ts__hour
+              , nr_subq_28010.last_profile_edit_ts__day
+              , nr_subq_28010.last_profile_edit_ts__week
+              , nr_subq_28010.last_profile_edit_ts__month
+              , nr_subq_28010.last_profile_edit_ts__quarter
+              , nr_subq_28010.last_profile_edit_ts__year
+              , nr_subq_28010.last_profile_edit_ts__extract_year
+              , nr_subq_28010.last_profile_edit_ts__extract_quarter
+              , nr_subq_28010.last_profile_edit_ts__extract_month
+              , nr_subq_28010.last_profile_edit_ts__extract_day
+              , nr_subq_28010.last_profile_edit_ts__extract_dow
+              , nr_subq_28010.last_profile_edit_ts__extract_doy
+              , nr_subq_28010.bio_added_ts__second
+              , nr_subq_28010.bio_added_ts__minute
+              , nr_subq_28010.bio_added_ts__hour
+              , nr_subq_28010.bio_added_ts__day
+              , nr_subq_28010.bio_added_ts__week
+              , nr_subq_28010.bio_added_ts__month
+              , nr_subq_28010.bio_added_ts__quarter
+              , nr_subq_28010.bio_added_ts__year
+              , nr_subq_28010.bio_added_ts__extract_year
+              , nr_subq_28010.bio_added_ts__extract_quarter
+              , nr_subq_28010.bio_added_ts__extract_month
+              , nr_subq_28010.bio_added_ts__extract_day
+              , nr_subq_28010.bio_added_ts__extract_dow
+              , nr_subq_28010.bio_added_ts__extract_doy
+              , nr_subq_28010.last_login_ts__minute
+              , nr_subq_28010.last_login_ts__hour
+              , nr_subq_28010.last_login_ts__day
+              , nr_subq_28010.last_login_ts__week
+              , nr_subq_28010.last_login_ts__month
+              , nr_subq_28010.last_login_ts__quarter
+              , nr_subq_28010.last_login_ts__year
+              , nr_subq_28010.last_login_ts__extract_year
+              , nr_subq_28010.last_login_ts__extract_quarter
+              , nr_subq_28010.last_login_ts__extract_month
+              , nr_subq_28010.last_login_ts__extract_day
+              , nr_subq_28010.last_login_ts__extract_dow
+              , nr_subq_28010.last_login_ts__extract_doy
+              , nr_subq_28010.archived_at__hour
+              , nr_subq_28010.archived_at__day
+              , nr_subq_28010.archived_at__week
+              , nr_subq_28010.archived_at__month
+              , nr_subq_28010.archived_at__quarter
+              , nr_subq_28010.archived_at__year
+              , nr_subq_28010.archived_at__extract_year
+              , nr_subq_28010.archived_at__extract_quarter
+              , nr_subq_28010.archived_at__extract_month
+              , nr_subq_28010.archived_at__extract_day
+              , nr_subq_28010.archived_at__extract_dow
+              , nr_subq_28010.archived_at__extract_doy
+              , nr_subq_28010.user__ds__day
+              , nr_subq_28010.user__ds__week
+              , nr_subq_28010.user__ds__month
+              , nr_subq_28010.user__ds__quarter
+              , nr_subq_28010.user__ds__year
+              , nr_subq_28010.user__ds__extract_year
+              , nr_subq_28010.user__ds__extract_quarter
+              , nr_subq_28010.user__ds__extract_month
+              , nr_subq_28010.user__ds__extract_day
+              , nr_subq_28010.user__ds__extract_dow
+              , nr_subq_28010.user__ds__extract_doy
+              , nr_subq_28010.user__created_at__day
+              , nr_subq_28010.user__created_at__week
+              , nr_subq_28010.user__created_at__month
+              , nr_subq_28010.user__created_at__quarter
+              , nr_subq_28010.user__created_at__year
+              , nr_subq_28010.user__created_at__extract_year
+              , nr_subq_28010.user__created_at__extract_quarter
+              , nr_subq_28010.user__created_at__extract_month
+              , nr_subq_28010.user__created_at__extract_day
+              , nr_subq_28010.user__created_at__extract_dow
+              , nr_subq_28010.user__created_at__extract_doy
+              , nr_subq_28010.user__ds_partitioned__day
+              , nr_subq_28010.user__ds_partitioned__week
+              , nr_subq_28010.user__ds_partitioned__month
+              , nr_subq_28010.user__ds_partitioned__quarter
+              , nr_subq_28010.user__ds_partitioned__year
+              , nr_subq_28010.user__ds_partitioned__extract_year
+              , nr_subq_28010.user__ds_partitioned__extract_quarter
+              , nr_subq_28010.user__ds_partitioned__extract_month
+              , nr_subq_28010.user__ds_partitioned__extract_day
+              , nr_subq_28010.user__ds_partitioned__extract_dow
+              , nr_subq_28010.user__ds_partitioned__extract_doy
+              , nr_subq_28010.user__last_profile_edit_ts__millisecond
+              , nr_subq_28010.user__last_profile_edit_ts__second
+              , nr_subq_28010.user__last_profile_edit_ts__minute
+              , nr_subq_28010.user__last_profile_edit_ts__hour
+              , nr_subq_28010.user__last_profile_edit_ts__day
+              , nr_subq_28010.user__last_profile_edit_ts__week
+              , nr_subq_28010.user__last_profile_edit_ts__month
+              , nr_subq_28010.user__last_profile_edit_ts__quarter
+              , nr_subq_28010.user__last_profile_edit_ts__year
+              , nr_subq_28010.user__last_profile_edit_ts__extract_year
+              , nr_subq_28010.user__last_profile_edit_ts__extract_quarter
+              , nr_subq_28010.user__last_profile_edit_ts__extract_month
+              , nr_subq_28010.user__last_profile_edit_ts__extract_day
+              , nr_subq_28010.user__last_profile_edit_ts__extract_dow
+              , nr_subq_28010.user__last_profile_edit_ts__extract_doy
+              , nr_subq_28010.user__bio_added_ts__second
+              , nr_subq_28010.user__bio_added_ts__minute
+              , nr_subq_28010.user__bio_added_ts__hour
+              , nr_subq_28010.user__bio_added_ts__day
+              , nr_subq_28010.user__bio_added_ts__week
+              , nr_subq_28010.user__bio_added_ts__month
+              , nr_subq_28010.user__bio_added_ts__quarter
+              , nr_subq_28010.user__bio_added_ts__year
+              , nr_subq_28010.user__bio_added_ts__extract_year
+              , nr_subq_28010.user__bio_added_ts__extract_quarter
+              , nr_subq_28010.user__bio_added_ts__extract_month
+              , nr_subq_28010.user__bio_added_ts__extract_day
+              , nr_subq_28010.user__bio_added_ts__extract_dow
+              , nr_subq_28010.user__bio_added_ts__extract_doy
+              , nr_subq_28010.user__last_login_ts__minute
+              , nr_subq_28010.user__last_login_ts__hour
+              , nr_subq_28010.user__last_login_ts__day
+              , nr_subq_28010.user__last_login_ts__week
+              , nr_subq_28010.user__last_login_ts__month
+              , nr_subq_28010.user__last_login_ts__quarter
+              , nr_subq_28010.user__last_login_ts__year
+              , nr_subq_28010.user__last_login_ts__extract_year
+              , nr_subq_28010.user__last_login_ts__extract_quarter
+              , nr_subq_28010.user__last_login_ts__extract_month
+              , nr_subq_28010.user__last_login_ts__extract_day
+              , nr_subq_28010.user__last_login_ts__extract_dow
+              , nr_subq_28010.user__last_login_ts__extract_doy
+              , nr_subq_28010.user__archived_at__hour
+              , nr_subq_28010.user__archived_at__day
+              , nr_subq_28010.user__archived_at__week
+              , nr_subq_28010.user__archived_at__month
+              , nr_subq_28010.user__archived_at__quarter
+              , nr_subq_28010.user__archived_at__year
+              , nr_subq_28010.user__archived_at__extract_year
+              , nr_subq_28010.user__archived_at__extract_quarter
+              , nr_subq_28010.user__archived_at__extract_month
+              , nr_subq_28010.user__archived_at__extract_day
+              , nr_subq_28010.user__archived_at__extract_dow
+              , nr_subq_28010.user__archived_at__extract_doy
+              , nr_subq_28010.archived_at__hour AS metric_time__hour
+              , nr_subq_28010.archived_at__day AS metric_time__day
+              , nr_subq_28010.archived_at__week AS metric_time__week
+              , nr_subq_28010.archived_at__month AS metric_time__month
+              , nr_subq_28010.archived_at__quarter AS metric_time__quarter
+              , nr_subq_28010.archived_at__year AS metric_time__year
+              , nr_subq_28010.archived_at__extract_year AS metric_time__extract_year
+              , nr_subq_28010.archived_at__extract_quarter AS metric_time__extract_quarter
+              , nr_subq_28010.archived_at__extract_month AS metric_time__extract_month
+              , nr_subq_28010.archived_at__extract_day AS metric_time__extract_day
+              , nr_subq_28010.archived_at__extract_dow AS metric_time__extract_dow
+              , nr_subq_28010.archived_at__extract_doy AS metric_time__extract_doy
+              , nr_subq_28010.user
+              , nr_subq_28010.home_state
+              , nr_subq_28010.user__home_state
+              , nr_subq_28010.archived_users
             FROM (
               -- Read Elements From Semantic Model 'users_ds_source'
               SELECT
@@ -650,16 +650,16 @@ FROM (
                 , EXTRACT(doy FROM users_ds_source_src_28000.archived_at) AS user__archived_at__extract_doy
                 , users_ds_source_src_28000.user_id AS user
               FROM ***************************.dim_users users_ds_source_src_28000
-            ) subq_0
-          ) subq_1
-          WHERE subq_1.metric_time__hour BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
-        ) subq_2
-      ) subq_3
+            ) nr_subq_28010
+          ) nr_subq_1
+          WHERE nr_subq_1.metric_time__hour BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
+        ) nr_subq_2
+      ) nr_subq_3
       GROUP BY
-        subq_3.metric_time__hour
-    ) subq_4
+        nr_subq_3.metric_time__hour
+    ) nr_subq_4
     ON
-      subq_8.metric_time__hour = subq_4.metric_time__hour
-  ) subq_9
-  WHERE subq_9.metric_time__hour BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
-) subq_10
+      nr_subq_8.metric_time__hour = nr_subq_4.metric_time__hour
+  ) nr_subq_9
+  WHERE nr_subq_9.metric_time__hour BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
+) nr_subq_10

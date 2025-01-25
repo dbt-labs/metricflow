@@ -24,4 +24,4 @@ FROM (
   GROUP BY
     listing
     , listing__country_latest
-) subq_11
+) subq_1

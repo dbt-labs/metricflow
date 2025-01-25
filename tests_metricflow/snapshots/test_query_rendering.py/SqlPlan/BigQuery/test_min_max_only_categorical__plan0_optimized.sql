@@ -16,4 +16,4 @@ FROM (
   FROM ***************************.dim_listings_latest listings_latest_src_28000
   GROUP BY
     listing__country_latest
-) subq_3
+) nr_subq_3

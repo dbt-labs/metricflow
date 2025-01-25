@@ -9,9 +9,9 @@ sql_engine: BigQuery
 -- Join to Time Spine Dataset
 -- Compute Metrics via Expressions
 SELECT
-  subq_18.metric_time__day AS metric_time__day
-  , subq_14.booking__is_instant AS booking__is_instant
-  , subq_14.bookings AS instant_bookings_with_measure_filter
+  nr_subq_16.metric_time__day AS metric_time__day
+  , nr_subq_12.booking__is_instant AS booking__is_instant
+  , nr_subq_12.bookings AS instant_bookings_with_measure_filter
 FROM (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['metric_time__day',]
@@ -23,9 +23,9 @@ FROM (
     SELECT
       ds AS metric_time__day
     FROM ***************************.mf_time_spine time_spine_src_28006
-  ) subq_16
+  ) nr_subq_14
   WHERE metric_time__day > '2020-01-01'
-) subq_18
+) nr_subq_16
 LEFT OUTER JOIN (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['bookings', 'booking__is_instant', 'metric_time__day']
@@ -43,11 +43,11 @@ LEFT OUTER JOIN (
       , is_instant AS booking__is_instant
       , 1 AS bookings
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_11
+  ) nr_subq_9
   WHERE ((booking__is_instant) AND (listing IS NOT NULL)) AND (metric_time__day > '2020-01-01')
   GROUP BY
     metric_time__day
     , booking__is_instant
-) subq_14
+) nr_subq_12
 ON
-  subq_18.metric_time__day = subq_14.metric_time__day
+  nr_subq_16.metric_time__day = nr_subq_12.metric_time__day

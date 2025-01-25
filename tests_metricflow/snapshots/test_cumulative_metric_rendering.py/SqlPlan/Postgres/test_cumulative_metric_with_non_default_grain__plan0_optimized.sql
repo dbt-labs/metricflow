@@ -23,21 +23,21 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      subq_12.ds AS metric_time__day
-      , DATE_TRUNC('week', subq_12.ds) AS metric_time__week
+      nr_subq_10.ds AS metric_time__day
+      , DATE_TRUNC('week', nr_subq_10.ds) AS metric_time__week
       , SUM(revenue_src_28000.revenue) AS revenue_all_time
-    FROM ***************************.mf_time_spine subq_12
+    FROM ***************************.mf_time_spine nr_subq_10
     INNER JOIN
       ***************************.fct_revenue revenue_src_28000
     ON
       (
-        DATE_TRUNC('day', revenue_src_28000.created_at) <= subq_12.ds
+        DATE_TRUNC('day', revenue_src_28000.created_at) <= nr_subq_10.ds
       )
     GROUP BY
-      subq_12.ds
-      , DATE_TRUNC('week', subq_12.ds)
-  ) subq_16
-) subq_17
+      nr_subq_10.ds
+      , DATE_TRUNC('week', nr_subq_10.ds)
+  ) nr_subq_14
+) nr_subq_15
 GROUP BY
   metric_time__week
   , revenue_all_time

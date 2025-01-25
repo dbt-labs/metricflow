@@ -9,9 +9,9 @@ sql_engine: Databricks
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  subq_11.metric_time__day AS metric_time__day
-  , subq_16.lux_listing__is_confirmed_lux AS listing__lux_listing__is_confirmed_lux
-  , SUM(subq_11.bookings) AS bookings
+  nr_subq_12.metric_time__day AS metric_time__day
+  , nr_subq_14.lux_listing__is_confirmed_lux AS listing__lux_listing__is_confirmed_lux
+  , SUM(nr_subq_12.bookings) AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
@@ -20,7 +20,7 @@ FROM (
     , listing_id AS listing
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_26000
-) subq_11
+) nr_subq_12
 LEFT OUTER JOIN (
   -- Join Standard Outputs
   -- Pass Only Elements: ['lux_listing__is_confirmed_lux', 'lux_listing__window_start__day', 'lux_listing__window_end__day', 'listing']
@@ -34,21 +34,21 @@ LEFT OUTER JOIN (
     ***************************.dim_lux_listings lux_listings_src_26000
   ON
     lux_listing_mapping_src_26000.lux_listing_id = lux_listings_src_26000.lux_listing_id
-) subq_16
+) nr_subq_14
 ON
   (
-    subq_11.listing = subq_16.listing
+    nr_subq_12.listing = nr_subq_14.listing
   ) AND (
     (
-      subq_11.metric_time__day >= subq_16.lux_listing__window_start__day
+      nr_subq_12.metric_time__day >= nr_subq_14.lux_listing__window_start__day
     ) AND (
       (
-        subq_11.metric_time__day < subq_16.lux_listing__window_end__day
+        nr_subq_12.metric_time__day < nr_subq_14.lux_listing__window_end__day
       ) OR (
-        subq_16.lux_listing__window_end__day IS NULL
+        nr_subq_14.lux_listing__window_end__day IS NULL
       )
     )
   )
 GROUP BY
-  subq_11.metric_time__day
-  , subq_16.lux_listing__is_confirmed_lux
+  nr_subq_12.metric_time__day
+  , nr_subq_14.lux_listing__is_confirmed_lux

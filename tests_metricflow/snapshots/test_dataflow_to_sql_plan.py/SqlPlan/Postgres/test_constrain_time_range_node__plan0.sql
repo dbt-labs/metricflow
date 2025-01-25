@@ -6,20 +6,20 @@ sql_engine: Postgres
 ---
 -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-02T00:00:00]
 SELECT
-  subq_2.ds__day
-  , subq_2.metric_time__day
-  , subq_2.bookings
+  subq_0.ds__day
+  , subq_0.metric_time__day
+  , subq_0.bookings
 FROM (
   -- Metric Time Dimension 'ds'
   SELECT
-    subq_1.ds__day
-    , subq_1.ds__day AS metric_time__day
-    , subq_1.bookings
+    nr_subq_1.ds__day
+    , nr_subq_1.ds__day AS metric_time__day
+    , nr_subq_1.bookings
   FROM (
     -- Pass Only Elements: ['bookings', 'ds__day']
     SELECT
-      subq_0.ds__day
-      , subq_0.bookings
+      nr_subq_0.ds__day
+      , nr_subq_0.bookings
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       SELECT
@@ -112,7 +112,7 @@ FROM (
         , bookings_source_src_28000.guest_id AS booking__guest
         , bookings_source_src_28000.host_id AS booking__host
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_0
-  ) subq_1
-) subq_2
-WHERE subq_2.metric_time__day BETWEEN '2020-01-01' AND '2020-01-02'
+    ) nr_subq_0
+  ) nr_subq_1
+) subq_0
+WHERE subq_0.metric_time__day BETWEEN '2020-01-01' AND '2020-01-02'

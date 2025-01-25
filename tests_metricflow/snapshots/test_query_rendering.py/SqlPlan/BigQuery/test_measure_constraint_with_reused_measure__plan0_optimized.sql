@@ -3,25 +3,15 @@ test_filename: test_query_rendering.py
 sql_engine: BigQuery
 ---
 -- Compute Metrics via Expressions
-WITH sma_28009_cte AS (
-  -- Read Elements From Semantic Model 'bookings_source'
-  -- Metric Time Dimension 'ds'
-  SELECT
-    DATETIME_TRUNC(ds, day) AS metric_time__day
-    , is_instant AS booking__is_instant
-    , booking_value
-  FROM ***************************.fct_bookings bookings_source_src_28000
-)
-
 SELECT
-  metric_time__day AS metric_time__day
+  metric_time__day
   , CAST(booking_value_with_is_instant_constraint AS FLOAT64) / CAST(NULLIF(booking_value, 0) AS FLOAT64) AS instant_booking_value_ratio
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_17.metric_time__day, subq_21.metric_time__day) AS metric_time__day
-    , MAX(subq_17.booking_value_with_is_instant_constraint) AS booking_value_with_is_instant_constraint
-    , MAX(subq_21.booking_value) AS booking_value
+    COALESCE(nr_subq_14.metric_time__day, nr_subq_18.metric_time__day) AS metric_time__day
+    , MAX(nr_subq_14.booking_value_with_is_instant_constraint) AS booking_value_with_is_instant_constraint
+    , MAX(nr_subq_18.booking_value) AS booking_value
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['booking_value', 'metric_time__day']
@@ -31,31 +21,33 @@ FROM (
       metric_time__day
       , SUM(booking_value) AS booking_value_with_is_instant_constraint
     FROM (
-      -- Read From CTE For node_id=sma_28009
+      -- Read Elements From Semantic Model 'bookings_source'
+      -- Metric Time Dimension 'ds'
       SELECT
-        metric_time__day
-        , booking__is_instant
+        DATETIME_TRUNC(ds, day) AS metric_time__day
+        , is_instant AS booking__is_instant
         , booking_value
-      FROM sma_28009_cte sma_28009_cte
-    ) subq_13
+      FROM ***************************.fct_bookings bookings_source_src_28000
+    ) nr_subq_10
     WHERE booking__is_instant
     GROUP BY
       metric_time__day
-  ) subq_17
+  ) nr_subq_14
   FULL OUTER JOIN (
-    -- Read From CTE For node_id=sma_28009
+    -- Read Elements From Semantic Model 'bookings_source'
+    -- Metric Time Dimension 'ds'
     -- Pass Only Elements: ['booking_value', 'metric_time__day']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      metric_time__day
+      DATETIME_TRUNC(ds, day) AS metric_time__day
       , SUM(booking_value) AS booking_value
-    FROM sma_28009_cte sma_28009_cte
+    FROM ***************************.fct_bookings bookings_source_src_28000
     GROUP BY
       metric_time__day
-  ) subq_21
+  ) nr_subq_18
   ON
-    subq_17.metric_time__day = subq_21.metric_time__day
+    nr_subq_14.metric_time__day = nr_subq_18.metric_time__day
   GROUP BY
     metric_time__day
-) subq_22
+) nr_subq_19

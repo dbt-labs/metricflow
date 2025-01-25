@@ -5,31 +5,19 @@ docstring:
 sql_engine: Redshift
 ---
 -- Compute Metrics via Expressions
-WITH sma_28009_cte AS (
-  -- Read Elements From Semantic Model 'bookings_source'
-  -- Metric Time Dimension 'ds'
-  SELECT
-    DATE_TRUNC('day', ds) AS metric_time__day
-    , DATE_TRUNC('month', ds) AS metric_time__month
-    , DATE_TRUNC('year', ds) AS metric_time__year
-    , booking_value
-    , guest_id AS bookers
-  FROM ***************************.fct_bookings bookings_source_src_28000
-)
-
 SELECT
-  metric_time__day AS metric_time__day
-  , metric_time__month AS metric_time__month
-  , metric_time__year AS metric_time__year
+  metric_time__day
+  , metric_time__month
+  , metric_time__year
   , booking_value * 0.05 / bookers AS booking_fees_last_week_per_booker_this_week
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_23.metric_time__day, subq_27.metric_time__day) AS metric_time__day
-    , COALESCE(subq_23.metric_time__month, subq_27.metric_time__month) AS metric_time__month
-    , COALESCE(subq_23.metric_time__year, subq_27.metric_time__year) AS metric_time__year
-    , MAX(subq_23.booking_value) AS booking_value
-    , MAX(subq_27.bookers) AS bookers
+    COALESCE(nr_subq_20.metric_time__day, nr_subq_24.metric_time__day) AS metric_time__day
+    , COALESCE(nr_subq_20.metric_time__month, nr_subq_24.metric_time__month) AS metric_time__month
+    , COALESCE(nr_subq_20.metric_time__year, nr_subq_24.metric_time__year) AS metric_time__year
+    , MAX(nr_subq_20.booking_value) AS booking_value
+    , MAX(nr_subq_24.bookers) AS bookers
   FROM (
     -- Join to Time Spine Dataset
     -- Pass Only Elements: ['booking_value', 'metric_time__day', 'metric_time__month', 'metric_time__year']
@@ -39,43 +27,44 @@ FROM (
       time_spine_src_28006.ds AS metric_time__day
       , DATE_TRUNC('month', time_spine_src_28006.ds) AS metric_time__month
       , DATE_TRUNC('year', time_spine_src_28006.ds) AS metric_time__year
-      , SUM(sma_28009_cte.booking_value) AS booking_value
+      , SUM(bookings_source_src_28000.booking_value) AS booking_value
     FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN
-      sma_28009_cte sma_28009_cte
+      ***************************.fct_bookings bookings_source_src_28000
     ON
-      DATEADD(week, -1, time_spine_src_28006.ds) = sma_28009_cte.metric_time__day
+      DATEADD(week, -1, time_spine_src_28006.ds) = DATE_TRUNC('day', bookings_source_src_28000.ds)
     GROUP BY
       time_spine_src_28006.ds
       , DATE_TRUNC('month', time_spine_src_28006.ds)
       , DATE_TRUNC('year', time_spine_src_28006.ds)
-  ) subq_23
+  ) nr_subq_20
   FULL OUTER JOIN (
-    -- Read From CTE For node_id=sma_28009
+    -- Read Elements From Semantic Model 'bookings_source'
+    -- Metric Time Dimension 'ds'
     -- Pass Only Elements: ['bookers', 'metric_time__day', 'metric_time__month', 'metric_time__year']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      metric_time__day
-      , metric_time__month
-      , metric_time__year
-      , COUNT(DISTINCT bookers) AS bookers
-    FROM sma_28009_cte sma_28009_cte
+      DATE_TRUNC('day', ds) AS metric_time__day
+      , DATE_TRUNC('month', ds) AS metric_time__month
+      , DATE_TRUNC('year', ds) AS metric_time__year
+      , COUNT(DISTINCT guest_id) AS bookers
+    FROM ***************************.fct_bookings bookings_source_src_28000
     GROUP BY
-      metric_time__day
-      , metric_time__month
-      , metric_time__year
-  ) subq_27
+      DATE_TRUNC('day', ds)
+      , DATE_TRUNC('month', ds)
+      , DATE_TRUNC('year', ds)
+  ) nr_subq_24
   ON
     (
-      subq_23.metric_time__day = subq_27.metric_time__day
+      nr_subq_20.metric_time__day = nr_subq_24.metric_time__day
     ) AND (
-      subq_23.metric_time__month = subq_27.metric_time__month
+      nr_subq_20.metric_time__month = nr_subq_24.metric_time__month
     ) AND (
-      subq_23.metric_time__year = subq_27.metric_time__year
+      nr_subq_20.metric_time__year = nr_subq_24.metric_time__year
     )
   GROUP BY
-    COALESCE(subq_23.metric_time__day, subq_27.metric_time__day)
-    , COALESCE(subq_23.metric_time__month, subq_27.metric_time__month)
-    , COALESCE(subq_23.metric_time__year, subq_27.metric_time__year)
-) subq_28
+    COALESCE(nr_subq_20.metric_time__day, nr_subq_24.metric_time__day)
+    , COALESCE(nr_subq_20.metric_time__month, nr_subq_24.metric_time__month)
+    , COALESCE(nr_subq_20.metric_time__year, nr_subq_24.metric_time__year)
+) nr_subq_25

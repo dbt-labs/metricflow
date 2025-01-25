@@ -18,31 +18,31 @@ FROM (
   -- Join Standard Outputs
   SELECT
     listings_latest_src_28000.country AS listing__country_latest
-    , subq_16.metric_time__day AS metric_time__day
-    , subq_16.booking__is_instant AS booking__is_instant
-    , subq_16.bookers AS bookers
+    , nr_subq_13.metric_time__day AS metric_time__day
+    , nr_subq_13.booking__is_instant AS booking__is_instant
+    , nr_subq_13.bookers AS bookers
   FROM (
     -- Join Self Over Time Range
     SELECT
-      subq_15.ds AS metric_time__day
+      nr_subq_12.ds AS metric_time__day
       , bookings_source_src_28000.listing_id AS listing
       , bookings_source_src_28000.is_instant AS booking__is_instant
       , bookings_source_src_28000.guest_id AS bookers
-    FROM ***************************.mf_time_spine subq_15
+    FROM ***************************.mf_time_spine nr_subq_12
     INNER JOIN
       ***************************.fct_bookings bookings_source_src_28000
     ON
       (
-        DATE_TRUNC('day', bookings_source_src_28000.ds) <= subq_15.ds
+        DATE_TRUNC('day', bookings_source_src_28000.ds) <= nr_subq_12.ds
       ) AND (
-        DATE_TRUNC('day', bookings_source_src_28000.ds) > subq_15.ds - MAKE_INTERVAL(days => 2)
+        DATE_TRUNC('day', bookings_source_src_28000.ds) > nr_subq_12.ds - MAKE_INTERVAL(days => 2)
       )
-  ) subq_16
+  ) nr_subq_13
   LEFT OUTER JOIN
     ***************************.dim_listings_latest listings_latest_src_28000
   ON
-    subq_16.listing = listings_latest_src_28000.listing_id
-) subq_20
+    nr_subq_13.listing = listings_latest_src_28000.listing_id
+) nr_subq_16
 WHERE booking__is_instant
 GROUP BY
   metric_time__day

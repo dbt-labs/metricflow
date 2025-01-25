@@ -13,25 +13,25 @@ FROM (
   -- Compute Metrics via Expressions
   SELECT
     time_spine_src_28006.ds AS metric_time__day
-    , COUNT(DISTINCT subq_16.bookers) AS every_2_days_bookers_2_days_ago
+    , COUNT(DISTINCT nr_subq_14.bookers) AS every_2_days_bookers_2_days_ago
   FROM ***************************.mf_time_spine time_spine_src_28006
   INNER JOIN (
     -- Join Self Over Time Range
     SELECT
-      subq_15.ds AS metric_time__day
+      nr_subq_13.ds AS metric_time__day
       , bookings_source_src_28000.guest_id AS bookers
-    FROM ***************************.mf_time_spine subq_15
+    FROM ***************************.mf_time_spine nr_subq_13
     INNER JOIN
       ***************************.fct_bookings bookings_source_src_28000
     ON
       (
-        DATE_TRUNC('day', bookings_source_src_28000.ds) <= subq_15.ds
+        DATE_TRUNC('day', bookings_source_src_28000.ds) <= nr_subq_13.ds
       ) AND (
-        DATE_TRUNC('day', bookings_source_src_28000.ds) > DATE_ADD('day', -2, subq_15.ds)
+        DATE_TRUNC('day', bookings_source_src_28000.ds) > DATE_ADD('day', -2, nr_subq_13.ds)
       )
-  ) subq_16
+  ) nr_subq_14
   ON
-    DATE_ADD('day', -2, time_spine_src_28006.ds) = subq_16.metric_time__day
+    DATE_ADD('day', -2, time_spine_src_28006.ds) = nr_subq_14.metric_time__day
   GROUP BY
     time_spine_src_28006.ds
-) subq_23
+) nr_subq_21

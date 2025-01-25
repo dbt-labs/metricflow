@@ -5,8 +5,8 @@ sql_engine: BigQuery
 -- Join to Time Spine Dataset
 -- Compute Metrics via Expressions
 SELECT
-  subq_18.metric_time__day AS metric_time__day
-  , subq_14.archived_users AS archived_users_join_to_time_spine
+  nr_subq_16.metric_time__day AS metric_time__day
+  , nr_subq_12.archived_users AS archived_users_join_to_time_spine
 FROM (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['metric_time__day',]
@@ -19,11 +19,11 @@ FROM (
       ts AS metric_time__hour
       , DATETIME_TRUNC(ts, day) AS metric_time__day
     FROM ***************************.mf_time_spine_hour time_spine_src_28005
-  ) subq_16
+  ) nr_subq_14
   WHERE (metric_time__hour > '2020-01-01 00:09:00') AND (metric_time__day = '2020-01-01')
   GROUP BY
     metric_time__day
-) subq_18
+) nr_subq_16
 LEFT OUTER JOIN (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['archived_users', 'metric_time__day']
@@ -39,10 +39,10 @@ LEFT OUTER JOIN (
       , DATETIME_TRUNC(archived_at, day) AS metric_time__day
       , 1 AS archived_users
     FROM ***************************.dim_users users_ds_source_src_28000
-  ) subq_11
+  ) nr_subq_9
   WHERE (metric_time__hour > '2020-01-01 00:09:00') AND (metric_time__day = '2020-01-01')
   GROUP BY
     metric_time__day
-) subq_14
+) nr_subq_12
 ON
-  subq_18.metric_time__day = subq_14.metric_time__day
+  nr_subq_16.metric_time__day = nr_subq_12.metric_time__day

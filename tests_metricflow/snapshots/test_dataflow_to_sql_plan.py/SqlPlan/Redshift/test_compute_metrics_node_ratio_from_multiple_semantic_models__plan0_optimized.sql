@@ -5,35 +5,26 @@ docstring:
 sql_engine: Redshift
 ---
 -- Compute Metrics via Expressions
-WITH sma_28014_cte AS (
-  -- Read Elements From Semantic Model 'listings_latest'
-  -- Metric Time Dimension 'ds'
-  SELECT
-    listing_id AS listing
-    , country AS country_latest
-  FROM ***************************.dim_listings_latest listings_latest_src_28000
-)
-
 SELECT
-  ds__day AS ds__day
-  , listing__country_latest AS listing__country_latest
+  ds__day
+  , listing__country_latest
   , CAST(bookings AS DOUBLE PRECISION) / CAST(NULLIF(views, 0) AS DOUBLE PRECISION) AS bookings_per_view
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_27.ds__day, subq_35.ds__day) AS ds__day
-    , COALESCE(subq_27.listing__country_latest, subq_35.listing__country_latest) AS listing__country_latest
-    , MAX(subq_27.bookings) AS bookings
-    , MAX(subq_35.views) AS views
+    COALESCE(nr_subq_6.ds__day, nr_subq_13.ds__day) AS ds__day
+    , COALESCE(nr_subq_6.listing__country_latest, nr_subq_13.listing__country_latest) AS listing__country_latest
+    , MAX(nr_subq_6.bookings) AS bookings
+    , MAX(nr_subq_13.views) AS views
   FROM (
     -- Join Standard Outputs
     -- Pass Only Elements: ['bookings', 'listing__country_latest', 'ds__day']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      subq_20.ds__day AS ds__day
-      , sma_28014_cte.country_latest AS listing__country_latest
-      , SUM(subq_20.bookings) AS bookings
+      nr_subq_0.ds__day AS ds__day
+      , listings_latest_src_28000.country AS listing__country_latest
+      , SUM(nr_subq_0.bookings) AS bookings
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
@@ -42,24 +33,24 @@ FROM (
         , listing_id AS listing
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_20
+    ) nr_subq_0
     LEFT OUTER JOIN
-      sma_28014_cte sma_28014_cte
+      ***************************.dim_listings_latest listings_latest_src_28000
     ON
-      subq_20.listing = sma_28014_cte.listing
+      nr_subq_0.listing = listings_latest_src_28000.listing_id
     GROUP BY
-      subq_20.ds__day
-      , sma_28014_cte.country_latest
-  ) subq_27
+      nr_subq_0.ds__day
+      , listings_latest_src_28000.country
+  ) nr_subq_6
   FULL OUTER JOIN (
     -- Join Standard Outputs
     -- Pass Only Elements: ['views', 'listing__country_latest', 'ds__day']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      subq_29.ds__day AS ds__day
-      , sma_28014_cte.country_latest AS listing__country_latest
-      , SUM(subq_29.views) AS views
+      nr_subq_7.ds__day AS ds__day
+      , listings_latest_src_28000.country AS listing__country_latest
+      , SUM(nr_subq_7.views) AS views
     FROM (
       -- Read Elements From Semantic Model 'views_source'
       -- Metric Time Dimension 'ds'
@@ -68,22 +59,22 @@ FROM (
         , listing_id AS listing
         , 1 AS views
       FROM ***************************.fct_views views_source_src_28000
-    ) subq_29
+    ) nr_subq_7
     LEFT OUTER JOIN
-      sma_28014_cte sma_28014_cte
+      ***************************.dim_listings_latest listings_latest_src_28000
     ON
-      subq_29.listing = sma_28014_cte.listing
+      nr_subq_7.listing = listings_latest_src_28000.listing_id
     GROUP BY
-      subq_29.ds__day
-      , sma_28014_cte.country_latest
-  ) subq_35
+      nr_subq_7.ds__day
+      , listings_latest_src_28000.country
+  ) nr_subq_13
   ON
     (
-      subq_27.listing__country_latest = subq_35.listing__country_latest
+      nr_subq_6.listing__country_latest = nr_subq_13.listing__country_latest
     ) AND (
-      subq_27.ds__day = subq_35.ds__day
+      nr_subq_6.ds__day = nr_subq_13.ds__day
     )
   GROUP BY
-    COALESCE(subq_27.ds__day, subq_35.ds__day)
-    , COALESCE(subq_27.listing__country_latest, subq_35.listing__country_latest)
-) subq_36
+    COALESCE(nr_subq_6.ds__day, nr_subq_13.ds__day)
+    , COALESCE(nr_subq_6.listing__country_latest, nr_subq_13.listing__country_latest)
+) nr_subq_14

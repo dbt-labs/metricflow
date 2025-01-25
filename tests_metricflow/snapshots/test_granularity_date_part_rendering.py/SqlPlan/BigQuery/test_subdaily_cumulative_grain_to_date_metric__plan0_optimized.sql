@@ -7,9 +7,9 @@ sql_engine: BigQuery
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  subq_10.ts AS metric_time__hour
-  , SUM(subq_8.archived_users) AS subdaily_cumulative_grain_to_date_metric
-FROM ***************************.mf_time_spine_hour subq_10
+  nr_subq_8.ts AS metric_time__hour
+  , SUM(nr_subq_6.archived_users) AS subdaily_cumulative_grain_to_date_metric
+FROM ***************************.mf_time_spine_hour nr_subq_8
 INNER JOIN (
   -- Read Elements From Semantic Model 'users_ds_source'
   -- Metric Time Dimension 'archived_at'
@@ -17,12 +17,12 @@ INNER JOIN (
     DATETIME_TRUNC(archived_at, hour) AS metric_time__hour
     , 1 AS archived_users
   FROM ***************************.dim_users users_ds_source_src_28000
-) subq_8
+) nr_subq_6
 ON
   (
-    subq_8.metric_time__hour <= subq_10.ts
+    nr_subq_6.metric_time__hour <= nr_subq_8.ts
   ) AND (
-    subq_8.metric_time__hour >= DATETIME_TRUNC(subq_10.ts, hour)
+    nr_subq_6.metric_time__hour >= DATETIME_TRUNC(nr_subq_8.ts, hour)
   )
 GROUP BY
   metric_time__hour

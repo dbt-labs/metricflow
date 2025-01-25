@@ -13,8 +13,8 @@ SELECT
 FROM (
   -- Join Standard Outputs
   SELECT
-    subq_33.listing__views_times_booking_value AS listing__views_times_booking_value
-    , subq_20.listings AS listings
+    nr_subq_32.listing__views_times_booking_value AS listing__views_times_booking_value
+    , nr_subq_25.listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
@@ -22,7 +22,7 @@ FROM (
       listing_id AS listing
       , 1 AS listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_20
+  ) nr_subq_25
   LEFT OUTER JOIN (
     -- Compute Metrics via Expressions
     -- Pass Only Elements: ['listing', 'listing__views_times_booking_value']
@@ -32,9 +32,9 @@ FROM (
     FROM (
       -- Combine Aggregated Outputs
       SELECT
-        COALESCE(subq_25.listing, subq_30.listing) AS listing
-        , MAX(subq_25.booking_value) AS booking_value
-        , MAX(subq_30.views) AS views
+        COALESCE(nr_subq_27.listing, nr_subq_29.listing) AS listing
+        , MAX(nr_subq_27.booking_value) AS booking_value
+        , MAX(nr_subq_29.views) AS views
       FROM (
         -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
@@ -47,7 +47,7 @@ FROM (
         FROM ***************************.fct_bookings bookings_source_src_28000
         GROUP BY
           listing
-      ) subq_25
+      ) nr_subq_27
       FULL OUTER JOIN (
         -- Aggregate Measures
         -- Compute Metrics via Expressions
@@ -62,17 +62,17 @@ FROM (
             listing_id AS listing
             , 1 AS views
           FROM ***************************.fct_views views_source_src_28000
-        ) subq_28
+        ) nr_subq_15
         GROUP BY
           listing
-      ) subq_30
+      ) nr_subq_29
       ON
-        subq_25.listing = subq_30.listing
+        nr_subq_27.listing = nr_subq_29.listing
       GROUP BY
         listing
-    ) subq_31
-  ) subq_33
+    ) nr_subq_30
+  ) nr_subq_32
   ON
-    subq_20.listing = subq_33.listing
-) subq_34
+    nr_subq_25.listing = nr_subq_32.listing
+) nr_subq_33
 WHERE listing__views_times_booking_value > 1

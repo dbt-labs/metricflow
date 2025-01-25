@@ -3,15 +3,8 @@ test_filename: test_derived_metric_rendering.py
 sql_engine: Postgres
 ---
 -- Compute Metrics via Expressions
-WITH rss_28018_cte AS (
-  -- Read From Time Spine 'mf_time_spine'
-  SELECT
-    ds AS ds__day
-  FROM ***************************.mf_time_spine time_spine_src_28006
-)
-
 SELECT
-  metric_time__day AS metric_time__day
+  metric_time__day
   , 2 * bookings_offset_once AS bookings_offset_twice
 FROM (
   -- Constrain Output with WHERE
@@ -21,9 +14,9 @@ FROM (
   FROM (
     -- Join to Time Spine Dataset
     SELECT
-      rss_28018_cte.ds__day AS metric_time__day
-      , subq_24.bookings_offset_once AS bookings_offset_once
-    FROM rss_28018_cte rss_28018_cte
+      time_spine_src_28006.ds AS metric_time__day
+      , nr_subq_22.bookings_offset_once AS bookings_offset_once
+    FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN (
       -- Compute Metrics via Expressions
       SELECT
@@ -35,9 +28,9 @@ FROM (
         -- Aggregate Measures
         -- Compute Metrics via Expressions
         SELECT
-          rss_28018_cte.ds__day AS metric_time__day
-          , SUM(subq_16.bookings) AS bookings
-        FROM rss_28018_cte rss_28018_cte
+          time_spine_src_28006.ds AS metric_time__day
+          , SUM(nr_subq_14.bookings) AS bookings
+        FROM ***************************.mf_time_spine time_spine_src_28006
         INNER JOIN (
           -- Read Elements From Semantic Model 'bookings_source'
           -- Metric Time Dimension 'ds'
@@ -45,15 +38,15 @@ FROM (
             DATE_TRUNC('day', ds) AS metric_time__day
             , 1 AS bookings
           FROM ***************************.fct_bookings bookings_source_src_28000
-        ) subq_16
+        ) nr_subq_14
         ON
-          rss_28018_cte.ds__day - MAKE_INTERVAL(days => 5) = subq_16.metric_time__day
+          time_spine_src_28006.ds - MAKE_INTERVAL(days => 5) = nr_subq_14.metric_time__day
         GROUP BY
-          rss_28018_cte.ds__day
-      ) subq_23
-    ) subq_24
+          time_spine_src_28006.ds
+      ) nr_subq_21
+    ) nr_subq_22
     ON
-      rss_28018_cte.ds__day - MAKE_INTERVAL(days => 2) = subq_24.metric_time__day
-  ) subq_28
+      time_spine_src_28006.ds - MAKE_INTERVAL(days => 2) = nr_subq_22.metric_time__day
+  ) nr_subq_26
   WHERE metric_time__day = '2020-01-12' or metric_time__day = '2020-01-13'
-) subq_29
+) nr_subq_27

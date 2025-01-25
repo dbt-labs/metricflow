@@ -14,7 +14,7 @@ FROM (
   -- Compute Metrics via Expressions
   SELECT
     time_spine_src_28006.ds AS metric_time__day
-    , SUM(subq_11.bookings) AS bookings_5_days_ago
+    , SUM(nr_subq_9.bookings) AS bookings_5_days_ago
   FROM ***************************.mf_time_spine time_spine_src_28006
   INNER JOIN (
     -- Read Elements From Semantic Model 'bookings_source'
@@ -23,10 +23,10 @@ FROM (
       DATETIME_TRUNC(ds, day) AS metric_time__day
       , 1 AS bookings
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_11
+  ) nr_subq_9
   ON
-    DATE_SUB(CAST(time_spine_src_28006.ds AS DATETIME), INTERVAL 5 day) = subq_11.metric_time__day
+    DATE_SUB(CAST(time_spine_src_28006.ds AS DATETIME), INTERVAL 5 day) = nr_subq_9.metric_time__day
   WHERE time_spine_src_28006.ds BETWEEN '2019-12-19' AND '2020-01-02'
   GROUP BY
     metric_time__day
-) subq_19
+) nr_subq_17

@@ -9,17 +9,17 @@ sql_engine: BigQuery
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  subq_10.ds AS metric_time__day
-  , DATETIME_TRUNC(subq_10.ds, month) AS metric_time__month
+  nr_subq_8.ds AS metric_time__day
+  , DATETIME_TRUNC(nr_subq_8.ds, month) AS metric_time__month
   , SUM(revenue_src_28000.revenue) AS trailing_2_months_revenue
-FROM ***************************.mf_time_spine subq_10
+FROM ***************************.mf_time_spine nr_subq_8
 INNER JOIN
   ***************************.fct_revenue revenue_src_28000
 ON
   (
-    DATETIME_TRUNC(revenue_src_28000.created_at, day) <= subq_10.ds
+    DATETIME_TRUNC(revenue_src_28000.created_at, day) <= nr_subq_8.ds
   ) AND (
-    DATETIME_TRUNC(revenue_src_28000.created_at, day) > DATE_SUB(CAST(subq_10.ds AS DATETIME), INTERVAL 2 month)
+    DATETIME_TRUNC(revenue_src_28000.created_at, day) > DATE_SUB(CAST(nr_subq_8.ds AS DATETIME), INTERVAL 2 month)
   )
 GROUP BY
   metric_time__day

@@ -5,8 +5,8 @@ sql_engine: Snowflake
 -- Join to Time Spine Dataset
 -- Compute Metrics via Expressions
 SELECT
-  subq_18.metric_time__day AS metric_time__day
-  , subq_14.bookings AS bookings_join_to_time_spine_with_tiered_filters
+  nr_subq_16.metric_time__day AS metric_time__day
+  , nr_subq_12.bookings AS bookings_join_to_time_spine_with_tiered_filters
 FROM (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['metric_time__day',]
@@ -19,9 +19,9 @@ FROM (
       ds AS metric_time__day
       , DATE_TRUNC('month', ds) AS booking__ds__month
     FROM ***************************.mf_time_spine time_spine_src_28006
-  ) subq_16
+  ) nr_subq_14
   WHERE (metric_time__day <= '2020-01-02') AND (booking__ds__month > '2020-01-01')
-) subq_18
+) nr_subq_16
 LEFT OUTER JOIN (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['bookings', 'metric_time__day']
@@ -37,10 +37,10 @@ LEFT OUTER JOIN (
       , DATE_TRUNC('day', ds) AS metric_time__day
       , 1 AS bookings
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_11
+  ) nr_subq_9
   WHERE ((metric_time__day >= '2020-01-02') AND (metric_time__day <= '2020-01-02')) AND (booking__ds__month > '2020-01-01')
   GROUP BY
     metric_time__day
-) subq_14
+) nr_subq_12
 ON
-  subq_18.metric_time__day = subq_14.metric_time__day
+  nr_subq_16.metric_time__day = nr_subq_12.metric_time__day

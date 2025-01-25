@@ -6,7 +6,7 @@ sql_engine: Snowflake
 -- Compute Metrics via Expressions
 SELECT
   time_spine_src_28006.ds AS metric_time__day
-  , subq_11.bookings AS bookings_join_to_time_spine
+  , nr_subq_9.bookings AS bookings_join_to_time_spine
 FROM ***************************.mf_time_spine time_spine_src_28006
 LEFT OUTER JOIN (
   -- Aggregate Measures
@@ -21,9 +21,9 @@ LEFT OUTER JOIN (
       DATE_TRUNC('day', ds) AS metric_time__day
       , 1 AS bookings
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_10
+  ) nr_subq_8
   GROUP BY
     metric_time__day
-) subq_11
+) nr_subq_9
 ON
-  time_spine_src_28006.ds = subq_11.metric_time__day
+  time_spine_src_28006.ds = nr_subq_9.metric_time__day

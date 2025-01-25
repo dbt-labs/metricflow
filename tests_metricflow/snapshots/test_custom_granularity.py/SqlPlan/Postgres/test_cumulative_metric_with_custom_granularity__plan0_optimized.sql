@@ -18,27 +18,27 @@ FROM (
     -- Pass Only Elements: ['txn_revenue', 'metric_time__martian_day', 'metric_time__day']
     -- Aggregate Measures
     SELECT
-      subq_14.martian_day AS metric_time__martian_day
-      , subq_13.ds AS metric_time__day
+      nr_subq_12.martian_day AS metric_time__martian_day
+      , nr_subq_11.ds AS metric_time__day
       , SUM(revenue_src_28000.revenue) AS txn_revenue
-    FROM ***************************.mf_time_spine subq_13
+    FROM ***************************.mf_time_spine nr_subq_11
     INNER JOIN
       ***************************.fct_revenue revenue_src_28000
     ON
       (
-        DATE_TRUNC('day', revenue_src_28000.created_at) <= subq_13.ds
+        DATE_TRUNC('day', revenue_src_28000.created_at) <= nr_subq_11.ds
       ) AND (
-        DATE_TRUNC('day', revenue_src_28000.created_at) > subq_13.ds - MAKE_INTERVAL(months => 2)
+        DATE_TRUNC('day', revenue_src_28000.created_at) > nr_subq_11.ds - MAKE_INTERVAL(months => 2)
       )
     LEFT OUTER JOIN
-      ***************************.mf_time_spine subq_14
+      ***************************.mf_time_spine nr_subq_12
     ON
-      subq_13.ds = subq_14.ds
+      nr_subq_11.ds = nr_subq_12.ds
     GROUP BY
-      subq_14.martian_day
-      , subq_13.ds
-  ) subq_17
-) subq_19
+      nr_subq_12.martian_day
+      , nr_subq_11.ds
+  ) nr_subq_15
+) nr_subq_17
 GROUP BY
   metric_time__martian_day
   , trailing_2_months_revenue

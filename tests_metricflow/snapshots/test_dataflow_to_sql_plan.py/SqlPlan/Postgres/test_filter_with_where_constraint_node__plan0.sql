@@ -6,13 +6,13 @@ sql_engine: Postgres
 ---
 -- Constrain Output with WHERE
 SELECT
-  subq_1.ds__day
-  , subq_1.bookings
+  subq_0.ds__day
+  , subq_0.bookings
 FROM (
   -- Pass Only Elements: ['bookings', 'ds__day']
   SELECT
-    subq_0.ds__day
-    , subq_0.bookings
+    nr_subq_0.ds__day
+    , nr_subq_0.bookings
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     SELECT
@@ -105,6 +105,6 @@ FROM (
       , bookings_source_src_28000.guest_id AS booking__guest
       , bookings_source_src_28000.host_id AS booking__host
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_0
-) subq_1
+  ) nr_subq_0
+) subq_0
 WHERE booking__ds__day = '2020-01-01'
