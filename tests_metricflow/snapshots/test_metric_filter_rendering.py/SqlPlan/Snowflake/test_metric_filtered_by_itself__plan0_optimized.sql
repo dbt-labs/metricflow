@@ -22,15 +22,15 @@ SELECT
 FROM (
   -- Join Standard Outputs
   SELECT
-    subq_18.listing__bookers AS listing__bookers
-    , subq_13.bookers AS bookers
+    subq_20.listing__bookers AS listing__bookers
+    , subq_15.bookers AS bookers
   FROM (
     -- Read From CTE For node_id=sma_28009
     SELECT
       listing
       , bookers
     FROM sma_28009_cte sma_28009_cte
-  ) subq_13
+  ) subq_15
   LEFT OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
     -- Pass Only Elements: ['bookers', 'listing']
@@ -43,8 +43,8 @@ FROM (
     FROM sma_28009_cte sma_28009_cte
     GROUP BY
       listing
-  ) subq_18
+  ) subq_20
   ON
-    subq_13.listing = subq_18.listing
-) subq_19
+    subq_15.listing = subq_20.listing
+) subq_21
 WHERE listing__bookers > 1.00

@@ -17,6 +17,6 @@ FROM (
     , 1 AS bookings
     , booking_value
   FROM ***************************.fct_bookings bookings_source_src_28000
-) subq_12
+) subq_11
 GROUP BY
   metric_time__day

@@ -22,9 +22,9 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_26.metric_time__month, subq_31.metric_time__month) AS metric_time__month
-    , MAX(subq_26.booking_value) AS booking_value
-    , MAX(subq_31.bookers) AS bookers
+    COALESCE(subq_25.metric_time__month, subq_30.metric_time__month) AS metric_time__month
+    , MAX(subq_25.booking_value) AS booking_value
+    , MAX(subq_30.bookers) AS bookers
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['booking_value', 'metric_time__month']
@@ -44,11 +44,11 @@ FROM (
         sma_28009_cte sma_28009_cte
       ON
         time_spine_src_28006.ds - MAKE_INTERVAL(weeks => 1) = sma_28009_cte.metric_time__day
-    ) subq_22
+    ) subq_21
     WHERE metric_time__day = '2020-01-01'
     GROUP BY
       metric_time__month
-  ) subq_26
+  ) subq_25
   FULL OUTER JOIN (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['bookers', 'metric_time__month']
@@ -62,15 +62,16 @@ FROM (
       SELECT
         metric_time__day
         , metric_time__month
+        , booking_value
         , bookers
       FROM sma_28009_cte sma_28009_cte
-    ) subq_27
+    ) subq_26
     WHERE metric_time__day = '2020-01-01'
     GROUP BY
       metric_time__month
-  ) subq_31
+  ) subq_30
   ON
-    subq_26.metric_time__month = subq_31.metric_time__month
+    subq_25.metric_time__month = subq_30.metric_time__month
   GROUP BY
-    COALESCE(subq_26.metric_time__month, subq_31.metric_time__month)
-) subq_32
+    COALESCE(subq_25.metric_time__month, subq_30.metric_time__month)
+) subq_31
