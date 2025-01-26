@@ -14,9 +14,9 @@ FROM (
   FROM (
     -- Combine Aggregated Outputs
     SELECT
-      MAX(subq_37.average_booking_value) AS average_booking_value
-      , MAX(subq_37.bookings) AS bookings
-      , MAX(subq_43.booking_value) AS booking_value
+      MAX(subq_34.average_booking_value) AS average_booking_value
+      , MAX(subq_34.bookings) AS bookings
+      , MAX(subq_40.booking_value) AS booking_value
     FROM (
       -- Constrain Output with WHERE
       -- Pass Only Elements: ['average_booking_value', 'bookings']
@@ -29,9 +29,9 @@ FROM (
         -- Join Standard Outputs
         SELECT
           listings_latest_src_28000.is_lux AS listing__is_lux_latest
-          , subq_29.booking__is_instant AS booking__is_instant
-          , subq_29.bookings AS bookings
-          , subq_29.average_booking_value AS average_booking_value
+          , subq_26.booking__is_instant AS booking__is_instant
+          , subq_26.bookings AS bookings
+          , subq_26.average_booking_value AS average_booking_value
         FROM (
           -- Read Elements From Semantic Model 'bookings_source'
           -- Metric Time Dimension 'ds'
@@ -41,14 +41,14 @@ FROM (
             , 1 AS bookings
             , booking_value AS average_booking_value
           FROM ***************************.fct_bookings bookings_source_src_28000
-        ) subq_29
+        ) subq_26
         LEFT OUTER JOIN
           ***************************.dim_listings_latest listings_latest_src_28000
         ON
-          subq_29.listing = listings_latest_src_28000.listing_id
-      ) subq_33
+          subq_26.listing = listings_latest_src_28000.listing_id
+      ) subq_30
       WHERE (listing__is_lux_latest) AND (booking__is_instant)
-    ) subq_37
+    ) subq_34
     CROSS JOIN (
       -- Constrain Output with WHERE
       -- Pass Only Elements: ['booking_value',]
@@ -63,8 +63,8 @@ FROM (
           is_instant AS booking__is_instant
           , booking_value
         FROM ***************************.fct_bookings bookings_source_src_28000
-      ) subq_39
+      ) subq_36
       WHERE booking__is_instant
-    ) subq_43
-  ) subq_44
-) subq_45
+    ) subq_40
+  ) subq_41
+) subq_42

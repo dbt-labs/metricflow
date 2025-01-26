@@ -20,12 +20,12 @@ from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder, SourceNodeSet
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.engine.metricflow_engine import MetricFlowEngine
+from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
 
 logger = logging.getLogger(__name__)
 
@@ -140,7 +140,7 @@ def log_dataflow_plan() -> None:  # noqa: D103
 
     source_node_builder = SourceNodeBuilder(column_association_resolver, semantic_manifest_lookup)
     source_node_set = source_node_builder.create_from_data_sets(list(data_set_mapping.values()))
-    node_output_resolver = DataflowPlanNodeOutputDataSetResolver(
+    node_output_resolver = DataflowNodeToSqlSubqueryVisitor(
         column_association_resolver=column_association_resolver,
         semantic_manifest_lookup=semantic_manifest_lookup,
     )

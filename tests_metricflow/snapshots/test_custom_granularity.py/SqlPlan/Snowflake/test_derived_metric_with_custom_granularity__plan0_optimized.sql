@@ -13,14 +13,14 @@ FROM (
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
-    subq_14.martian_day AS booking__ds__martian_day
+    subq_13.martian_day AS booking__ds__martian_day
     , SUM(bookings_source_src_28000.booking_value) AS booking_value
     , COUNT(DISTINCT bookings_source_src_28000.guest_id) AS bookers
   FROM ***************************.fct_bookings bookings_source_src_28000
   LEFT OUTER JOIN
-    ***************************.mf_time_spine subq_14
+    ***************************.mf_time_spine subq_13
   ON
-    DATE_TRUNC('day', bookings_source_src_28000.ds) = subq_14.ds
+    DATE_TRUNC('day', bookings_source_src_28000.ds) = subq_13.ds
   GROUP BY
-    subq_14.martian_day
-) subq_18
+    subq_13.martian_day
+) subq_17

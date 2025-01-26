@@ -13,12 +13,12 @@ from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
-from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_sql import DataflowToSqlPlanConverter
+from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderer
 
@@ -43,7 +43,7 @@ def test_view_sql_generated_at_a_node(
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
     )
     sql_renderer: SqlPlanRenderer = sql_client.sql_plan_renderer
-    node_output_resolver = DataflowPlanNodeOutputDataSetResolver(
+    node_output_resolver = DataflowNodeToSqlSubqueryVisitor(
         column_association_resolver=column_association_resolver,
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
     )

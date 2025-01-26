@@ -15,7 +15,6 @@ from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
-from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.node_evaluator import (
     JoinLinkableInstancesRecipe,
     LinkableInstanceSatisfiabilityEvaluation,
@@ -26,6 +25,7 @@ from metricflow.dataflow.builder.source_node import SourceNodeSet
 from metricflow.dataflow.nodes.join_to_base import ValidityWindowJoinDescription
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.plan_conversion.node_processor import PreJoinNodeProcessor
+from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 
 logger = logging.getLogger(__name__)
@@ -38,7 +38,7 @@ def node_evaluator(
     """Return a node evaluator using the nodes in semantic_model_name_to_nodes."""
     mf_engine_fixture = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST]
 
-    node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
+    node_data_set_resolver: DataflowNodeToSqlSubqueryVisitor = DataflowNodeToSqlSubqueryVisitor(
         column_association_resolver=mf_engine_fixture.column_association_resolver,
         semantic_manifest_lookup=mf_engine_fixture.semantic_manifest_lookup,
     )
@@ -59,7 +59,7 @@ def make_multihop_node_evaluator(
     desired_linkable_specs: Sequence[LinkableInstanceSpec],
 ) -> NodeEvaluatorForLinkableInstances:
     """Return a node evaluator using the nodes in multihop_semantic_model_name_to_nodes."""
-    node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
+    node_data_set_resolver: DataflowNodeToSqlSubqueryVisitor = DataflowNodeToSqlSubqueryVisitor(
         column_association_resolver=DunderColumnAssociationResolver(),
         semantic_manifest_lookup=semantic_manifest_lookup_with_multihop_links,
     )
@@ -511,7 +511,7 @@ def test_node_evaluator_with_scd_target(
     scd_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Tests the case where the joined node is an SCD with a validity window filter."""
-    node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
+    node_data_set_resolver: DataflowNodeToSqlSubqueryVisitor = DataflowNodeToSqlSubqueryVisitor(
         column_association_resolver=DunderColumnAssociationResolver(),
         semantic_manifest_lookup=scd_semantic_manifest_lookup,
     )

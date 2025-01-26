@@ -25,9 +25,9 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_27.metric_time__day, subq_35.metric_time__day) AS metric_time__day
-    , COALESCE(MAX(subq_27.bookings_fill_nulls_with_0), 0) AS bookings_fill_nulls_with_0
-    , MAX(subq_35.bookings_2_weeks_ago) AS bookings_2_weeks_ago
+    COALESCE(subq_26.metric_time__day, subq_34.metric_time__day) AS metric_time__day
+    , COALESCE(MAX(subq_26.bookings_fill_nulls_with_0), 0) AS bookings_fill_nulls_with_0
+    , MAX(subq_34.bookings_2_weeks_ago) AS bookings_2_weeks_ago
   FROM (
     -- Compute Metrics via Expressions
     SELECT
@@ -37,7 +37,7 @@ FROM (
       -- Join to Time Spine Dataset
       SELECT
         rss_28018_cte.ds__day AS metric_time__day
-        , subq_22.bookings AS bookings
+        , subq_21.bookings AS bookings
       FROM rss_28018_cte rss_28018_cte
       LEFT OUTER JOIN (
         -- Read From CTE For node_id=sma_28009
@@ -49,11 +49,11 @@ FROM (
         FROM sma_28009_cte sma_28009_cte
         GROUP BY
           metric_time__day
-      ) subq_22
+      ) subq_21
       ON
-        rss_28018_cte.ds__day = subq_22.metric_time__day
-    ) subq_26
-  ) subq_27
+        rss_28018_cte.ds__day = subq_21.metric_time__day
+    ) subq_25
+  ) subq_26
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
     -- Pass Only Elements: ['bookings', 'metric_time__day']
@@ -69,9 +69,9 @@ FROM (
       rss_28018_cte.ds__day - MAKE_INTERVAL(days => 14) = sma_28009_cte.metric_time__day
     GROUP BY
       rss_28018_cte.ds__day
-  ) subq_35
+  ) subq_34
   ON
-    subq_27.metric_time__day = subq_35.metric_time__day
+    subq_26.metric_time__day = subq_34.metric_time__day
   GROUP BY
-    COALESCE(subq_27.metric_time__day, subq_35.metric_time__day)
-) subq_36
+    COALESCE(subq_26.metric_time__day, subq_34.metric_time__day)
+) subq_35

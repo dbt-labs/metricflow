@@ -38,7 +38,6 @@ from metricflow_semantics.time.time_spine_source import TimeSpineSource
 from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.dataflow.builder.builder_cache import DataflowPlanBuilderCache
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import DataflowPlan
 from metricflow.dataflow.optimizer.dataflow_optimizer_factory import DataflowPlanOptimization
@@ -54,6 +53,7 @@ from metricflow.execution.dataflow_to_execution import (
 from metricflow.execution.execution_plan import ExecutionPlan, SqlStatement
 from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_sql import DataflowToSqlPlanConverter
+from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlOptimizationLevel
 from metricflow.telemetry.models import TelemetryLevel
@@ -384,7 +384,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         )
         source_node_set = source_node_builder.create_from_data_sets(self._source_data_sets)
 
-        node_output_resolver = DataflowPlanNodeOutputDataSetResolver(
+        node_output_resolver = DataflowNodeToSqlSubqueryVisitor(
             column_association_resolver=self._column_association_resolver,
             semantic_manifest_lookup=self._semantic_manifest_lookup,
         )

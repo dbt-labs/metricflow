@@ -11,7 +11,6 @@ from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 
-from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import (
     DataflowPlan,
     DataflowPlanNode,
@@ -42,6 +41,7 @@ from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOptimizer
 from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import OptimizeBranchResult
 from metricflow.plan_conversion.node_processor import PredicateInputType, PredicatePushdownState
+from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
 
 logger = logging.getLogger(__name__)
 
@@ -160,7 +160,7 @@ class PredicatePushdownOptimizer(
     we encounter gets applied exactly once per nested subquery branch encapsulated by a given constraint node.
     """
 
-    def __init__(self, node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver) -> None:
+    def __init__(self, node_data_set_resolver: DataflowNodeToSqlSubqueryVisitor) -> None:
         """Initializer.
 
         Initializes predicate pushdown state with all optimizer-managed pushdown types enabled, but nothing to

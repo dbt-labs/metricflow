@@ -19,9 +19,9 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_19.metric_time__week, subq_27.metric_time__week) AS metric_time__week
-    , MAX(subq_19.bookings) AS bookings
-    , MAX(subq_27.bookings_at_start_of_month) AS bookings_at_start_of_month
+    COALESCE(subq_18.metric_time__week, subq_26.metric_time__week) AS metric_time__week
+    , MAX(subq_18.bookings) AS bookings
+    , MAX(subq_26.bookings_at_start_of_month) AS bookings_at_start_of_month
   FROM (
     -- Read From CTE For node_id=sma_28009
     -- Pass Only Elements: ['bookings', 'metric_time__week']
@@ -33,7 +33,7 @@ FROM (
     FROM sma_28009_cte sma_28009_cte
     GROUP BY
       metric_time__week
-  ) subq_19
+  ) subq_18
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
     -- Pass Only Elements: ['bookings', 'metric_time__week']
@@ -50,9 +50,9 @@ FROM (
     WHERE DATETIME_TRUNC(time_spine_src_28006.ds, isoweek) = time_spine_src_28006.ds
     GROUP BY
       metric_time__week
-  ) subq_27
+  ) subq_26
   ON
-    subq_19.metric_time__week = subq_27.metric_time__week
+    subq_18.metric_time__week = subq_26.metric_time__week
   GROUP BY
     metric_time__week
-) subq_28
+) subq_27

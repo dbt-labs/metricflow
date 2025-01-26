@@ -7,10 +7,10 @@ expectation_description:
 ---
 O4:
   SELECT
-    COALESCE(subq_8.metric_time__day, subq_17.metric_time__day) AS metric_time__day
-    , COALESCE(subq_8.listing__country_latest, subq_17.listing__country_latest) AS listing__country_latest
+    COALESCE(subq_8.metric_time__day, subq_16.metric_time__day) AS metric_time__day
+    , COALESCE(subq_8.listing__country_latest, subq_16.listing__country_latest) AS listing__country_latest
     , MAX(subq_8.bookings) AS bookings
-    , MAX(subq_17.views) AS views
+    , MAX(subq_16.views) AS views
   FROM (
     SELECT
       subq_1.metric_time__day AS metric_time__day
@@ -50,16 +50,16 @@ O4:
     GROUP BY
       subq_10.metric_time__day
       , listings_latest_src_10000.country
-  ) subq_17
+  ) subq_16
   ON
     (
-      subq_8.listing__country_latest = subq_17.listing__country_latest
+      subq_8.listing__country_latest = subq_16.listing__country_latest
     ) AND (
-      subq_8.metric_time__day = subq_17.metric_time__day
+      subq_8.metric_time__day = subq_16.metric_time__day
     )
   GROUP BY
-    COALESCE(subq_8.metric_time__day, subq_17.metric_time__day)
-    , COALESCE(subq_8.listing__country_latest, subq_17.listing__country_latest)
+    COALESCE(subq_8.metric_time__day, subq_16.metric_time__day)
+    , COALESCE(subq_8.listing__country_latest, subq_16.listing__country_latest)
 
 O5:
   WITH sma_10014_cte AS (

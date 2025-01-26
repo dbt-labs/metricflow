@@ -171,7 +171,7 @@ class DataflowToSqlPlanConverter:
                 column_association_resolver=self.column_association_resolver,
                 semantic_manifest_lookup=self._semantic_manifest_lookup,
             )
-            data_set = dataflow_plan_node.accept(to_sql_subquery_visitor)
+            data_set = to_sql_subquery_visitor.get_output_data_set(dataflow_plan_node)
         else:
             to_sql_cte_visitor = DataflowNodeToSqlCteVisitor(
                 column_association_resolver=self.column_association_resolver,

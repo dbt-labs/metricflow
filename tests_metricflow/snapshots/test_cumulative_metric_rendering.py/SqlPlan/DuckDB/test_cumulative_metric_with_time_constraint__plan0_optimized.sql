@@ -14,15 +14,15 @@ sql_engine: DuckDB
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  subq_12.metric_time__day AS metric_time__day
-  , SUM(subq_11.txn_revenue) AS trailing_2_months_revenue
+  subq_13.metric_time__day AS metric_time__day
+  , SUM(subq_12.txn_revenue) AS trailing_2_months_revenue
 FROM (
   -- Read From Time Spine 'mf_time_spine'
   SELECT
     ds AS metric_time__day
-  FROM ***************************.mf_time_spine subq_13
+  FROM ***************************.mf_time_spine subq_14
   WHERE ds BETWEEN '2020-01-01' AND '2020-01-01'
-) subq_12
+) subq_13
 INNER JOIN (
   -- Read Elements From Semantic Model 'revenue'
   -- Metric Time Dimension 'ds'
@@ -32,13 +32,13 @@ INNER JOIN (
     , revenue AS txn_revenue
   FROM ***************************.fct_revenue revenue_src_28000
   WHERE DATE_TRUNC('day', created_at) BETWEEN '2019-11-01' AND '2020-01-01'
-) subq_11
+) subq_12
 ON
   (
-    subq_11.metric_time__day <= subq_12.metric_time__day
+    subq_12.metric_time__day <= subq_13.metric_time__day
   ) AND (
-    subq_11.metric_time__day > subq_12.metric_time__day - INTERVAL 2 month
+    subq_12.metric_time__day > subq_13.metric_time__day - INTERVAL 2 month
   )
-WHERE subq_12.metric_time__day BETWEEN '2020-01-01' AND '2020-01-01'
+WHERE subq_13.metric_time__day BETWEEN '2020-01-01' AND '2020-01-01'
 GROUP BY
-  subq_12.metric_time__day
+  subq_13.metric_time__day

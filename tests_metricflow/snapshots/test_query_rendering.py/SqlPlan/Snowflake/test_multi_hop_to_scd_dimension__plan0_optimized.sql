@@ -9,9 +9,9 @@ sql_engine: Snowflake
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  subq_11.metric_time__day AS metric_time__day
-  , subq_16.lux_listing__is_confirmed_lux AS listing__lux_listing__is_confirmed_lux
-  , SUM(subq_11.bookings) AS bookings
+  subq_14.metric_time__day AS metric_time__day
+  , subq_19.lux_listing__is_confirmed_lux AS listing__lux_listing__is_confirmed_lux
+  , SUM(subq_14.bookings) AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
@@ -20,7 +20,7 @@ FROM (
     , listing_id AS listing
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_26000
-) subq_11
+) subq_14
 LEFT OUTER JOIN (
   -- Join Standard Outputs
   -- Pass Only Elements: ['lux_listing__is_confirmed_lux', 'lux_listing__window_start__day', 'lux_listing__window_end__day', 'listing']
@@ -34,21 +34,21 @@ LEFT OUTER JOIN (
     ***************************.dim_lux_listings lux_listings_src_26000
   ON
     lux_listing_mapping_src_26000.lux_listing_id = lux_listings_src_26000.lux_listing_id
-) subq_16
+) subq_19
 ON
   (
-    subq_11.listing = subq_16.listing
+    subq_14.listing = subq_19.listing
   ) AND (
     (
-      subq_11.metric_time__day >= subq_16.lux_listing__window_start__day
+      subq_14.metric_time__day >= subq_19.lux_listing__window_start__day
     ) AND (
       (
-        subq_11.metric_time__day < subq_16.lux_listing__window_end__day
+        subq_14.metric_time__day < subq_19.lux_listing__window_end__day
       ) OR (
-        subq_16.lux_listing__window_end__day IS NULL
+        subq_19.lux_listing__window_end__day IS NULL
       )
     )
   )
 GROUP BY
-  subq_11.metric_time__day
-  , subq_16.lux_listing__is_confirmed_lux
+  subq_14.metric_time__day
+  , subq_19.lux_listing__is_confirmed_lux

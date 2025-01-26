@@ -19,9 +19,9 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_17.metric_time__day, subq_21.metric_time__day) AS metric_time__day
-    , MAX(subq_17.booking_value_with_is_instant_constraint) AS booking_value_with_is_instant_constraint
-    , MAX(subq_21.booking_value) AS booking_value
+    COALESCE(subq_16.metric_time__day, subq_20.metric_time__day) AS metric_time__day
+    , MAX(subq_16.booking_value_with_is_instant_constraint) AS booking_value_with_is_instant_constraint
+    , MAX(subq_20.booking_value) AS booking_value
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['booking_value', 'metric_time__day']
@@ -37,11 +37,11 @@ FROM (
         , booking__is_instant
         , booking_value
       FROM sma_28009_cte sma_28009_cte
-    ) subq_13
+    ) subq_12
     WHERE booking__is_instant
     GROUP BY
       metric_time__day
-  ) subq_17
+  ) subq_16
   FULL OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
     -- Pass Only Elements: ['booking_value', 'metric_time__day']
@@ -53,9 +53,9 @@ FROM (
     FROM sma_28009_cte sma_28009_cte
     GROUP BY
       metric_time__day
-  ) subq_21
+  ) subq_20
   ON
-    subq_17.metric_time__day = subq_21.metric_time__day
+    subq_16.metric_time__day = subq_20.metric_time__day
   GROUP BY
-    COALESCE(subq_17.metric_time__day, subq_21.metric_time__day)
-) subq_22
+    COALESCE(subq_16.metric_time__day, subq_20.metric_time__day)
+) subq_21
