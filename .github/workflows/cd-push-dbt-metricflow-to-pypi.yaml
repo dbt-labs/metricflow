@@ -7,7 +7,7 @@ on:
       - "dbt-metricflow/v[0-9]+.[0-9]+.[0-9]+*"
 
 env:
-  PYTHON_VERSION: "3.8"
+  PYTHON_VERSION: "3.9"
 
 jobs:
   pypi-publish:
