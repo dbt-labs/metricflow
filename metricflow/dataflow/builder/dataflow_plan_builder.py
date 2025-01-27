@@ -1568,7 +1568,10 @@ class DataflowPlanBuilder:
         time_range_constraint: Optional[TimeRangeConstraint],
         metric_source_node: DataflowPlanNode,
     ) -> DataflowPlanNode:
-        # TODO: nested custom offset window plans
+        # use_offset_custom_granularity_node = self._should_use_offset_custom_granularity_node(
+        #     join_description=before_aggregation_time_spine_join_description,
+        #     queried_agg_time_dimension_specs=queried_agg_time_dimension_specs,
+        # )
         join_spec = self._sort_by_base_granularity(queried_agg_time_dimension_specs)[0]
         time_spine_node = self._build_time_spine_node(
             queried_time_spine_specs=queried_agg_time_dimension_specs,
@@ -1586,6 +1589,7 @@ class DataflowPlanBuilder:
         )
 
         # TODO: fix bug here where filter specs are being included in when aggregating.
+        # After that, can this code be combined with basic offset code?
         if len(metric_spec.filter_spec_set.all_filter_specs) > 0 or time_range_constraint:
             # FilterElementsNode will only be needed if there are where filter specs that were selected in the group by.
             specs_in_filters = set(
@@ -1644,6 +1648,18 @@ class DataflowPlanBuilder:
             standard_offset_window=(join_description.standard_offset_window),
             offset_to_grain=join_description.offset_to_grain,
             join_type=join_description.join_type,
+        )
+
+    def _should_use_offset_custom_granularity_node(
+        self,
+        join_description: Optional[JoinToTimeSpineDescription],
+        queried_agg_time_dimension_specs: Sequence[TimeDimensionSpec],
+    ) -> bool:
+        return bool(
+            join_description
+            and join_description.custom_offset_window
+            and {spec.time_granularity_name for spec in queried_agg_time_dimension_specs}
+            == {join_description.custom_offset_window.granularity}
         )
 
     def _build_aggregated_measure_from_measure_source_node(
@@ -1770,11 +1786,9 @@ class DataflowPlanBuilder:
             )
 
         # If querying an offset metric, join to time spine before aggregation.
-        use_offset_custom_granularity_node = bool(
-            before_aggregation_time_spine_join_description
-            and before_aggregation_time_spine_join_description.custom_offset_window
-            and {spec.time_granularity_name for spec in queried_agg_time_dimension_specs}
-            == {before_aggregation_time_spine_join_description.custom_offset_window.granularity}
+        use_offset_custom_granularity_node = self._should_use_offset_custom_granularity_node(
+            join_description=before_aggregation_time_spine_join_description,
+            queried_agg_time_dimension_specs=queried_agg_time_dimension_specs,
         )
         if before_aggregation_time_spine_join_description and queried_agg_time_dimension_specs:
             unaggregated_measure_node = self._build_time_spine_join_node_for_offset(
@@ -2013,7 +2027,7 @@ class DataflowPlanBuilder:
         required_time_spine_specs: Tuple[TimeDimensionSpec, ...],
         use_offset_custom_granularity_node: bool,
     ) -> DataflowPlanNode:
-        """Builds an OffsetByCustomGranularityNode used for custom offset windows."""
+        """Builds a time spine node used for custom offset windows."""
         time_spine_read_node = self._get_time_spine_read_node_for_custom_grain(offset_window.granularity)
         if use_offset_custom_granularity_node:
             return OffsetCustomGranularityNode.create(
@@ -2042,6 +2056,7 @@ class DataflowPlanBuilder:
             ),
         )
 
+    # TODO: fix this TODO in other PR
     # TODO: label this as more specific; not sure yet what it's specific to.
     def _determine_time_spine_join_spec(
         self, measure_properties: MeasureSpecProperties, required_time_spine_specs: Tuple[TimeDimensionSpec, ...]
