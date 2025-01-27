@@ -881,3 +881,13 @@ metric:
         offset_window: 1 martian_day
         alias: bookings_offset
       - name: bookings
+---
+metric:
+  name: bookings_offset_one_martian_day_then_2_martian_days
+  description: tests a metric with nested custom offset windows
+  type: derived
+  type_params:
+    expr: bookings_offset_one_martian_day
+    metrics:
+      - name: bookings_offset_one_martian_day
+        offset_window: 2 martian_day

@@ -70,10 +70,15 @@ def test_custom_offset_window_with_base_grain(
     sql_client: SqlClient,
     it_helpers: IntegrationTestHelpers,
 ) -> None:
-    """Gives a side by side comparison of bookings and bookings_offset_one_martian_day."""
+    """Gives a side by side comparison of the normal bookings metric with related custom offset metrics, using base grain."""
     query_result = it_helpers.mf_engine.query(
         MetricFlowQueryRequest.create_with_random_request_id(
-            metric_names=["bookings", "bookings_offset_one_martian_day"],
+            metric_names=[
+                "bookings",
+                "bookings_offset_one_martian_day",
+                "bookings_martian_day_over_martian_day",
+                "bookings_offset_one_martian_day_then_2_martian_days",
+            ],
             group_by_names=["metric_time__day", "metric_time__martian_day"],
             order_by_names=["metric_time__day", "metric_time__martian_day"],
         )
@@ -129,10 +134,15 @@ def test_custom_offset_window_with_matching_custom_grain(
     sql_client: SqlClient,
     it_helpers: IntegrationTestHelpers,
 ) -> None:
-    """Gives a side by side comparison of bookings and bookings_offset_one_martian_day."""
+    """Gives a side by side comparison of the normal bookings metric with related custom offset metrics, using matching grain."""
     query_result = it_helpers.mf_engine.query(
         MetricFlowQueryRequest.create_with_random_request_id(
-            metric_names=["bookings", "bookings_offset_one_martian_day"],
+            metric_names=[
+                "bookings",
+                "bookings_offset_one_martian_day",
+                "bookings_martian_day_over_martian_day",
+                # "bookings_offset_one_martian_day_then_2_martian_days",
+            ],
             group_by_names=["booking__ds__martian_day", "metric_time__martian_day"],
             order_by_names=["booking__ds__martian_day", "metric_time__martian_day"],
         )
