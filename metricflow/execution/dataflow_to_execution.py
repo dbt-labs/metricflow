@@ -24,7 +24,8 @@ from metricflow.dataflow.nodes.join_to_custom_granularity import JoinToCustomGra
 from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataflow.nodes.min_max import MinMaxNode
-from metricflow.dataflow.nodes.offset_by_custom_granularity import OffsetByCustomGranularityNode
+from metricflow.dataflow.nodes.offset_base_grain_by_custom_grain import OffsetBaseGrainByCustomGrainNode
+from metricflow.dataflow.nodes.offset_custom_granularity import OffsetCustomGranularityNode
 from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
@@ -208,7 +209,11 @@ class DataflowToExecutionPlanConverter(DataflowPlanNodeVisitor[ConvertToExecutio
         raise NotImplementedError
 
     @override
-    def visit_offset_by_custom_granularity_node(
-        self, node: OffsetByCustomGranularityNode
+    def visit_offset_base_grain_by_custom_grain_node(
+        self, node: OffsetBaseGrainByCustomGrainNode
     ) -> ConvertToExecutionPlanResult:
+        raise NotImplementedError
+
+    @override
+    def visit_offset_custom_granularity_node(self, node: OffsetCustomGranularityNode) -> ConvertToExecutionPlanResult:
         raise NotImplementedError

@@ -83,7 +83,8 @@ from metricflow.dataflow.nodes.join_to_custom_granularity import JoinToCustomGra
 from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataflow.nodes.min_max import MinMaxNode
-from metricflow.dataflow.nodes.offset_by_custom_granularity import OffsetByCustomGranularityNode
+from metricflow.dataflow.nodes.offset_base_grain_by_custom_grain import OffsetBaseGrainByCustomGrainNode
+from metricflow.dataflow.nodes.offset_custom_granularity import OffsetCustomGranularityNode
 from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
@@ -1283,7 +1284,15 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         # Build new instances and columns.
         time_spine_required_spec_set = InstanceSpecSet(time_dimension_specs=required_agg_time_dimension_specs)
         output_parent_instance_set = parent_data_set.instance_set.transform(
-            FilterElements(exclude_specs=time_spine_required_spec_set)
+            FilterElements(
+                exclude_specs=InstanceSpecSet.create_from_specs(
+                    tuple(
+                        spec
+                        for spec in time_spine_required_spec_set.time_dimension_specs
+                        if spec in parent_data_set.instance_set.spec_set.time_dimension_specs
+                    )
+                )
+            )
         )
         output_time_spine_instances: Tuple[TimeDimensionInstance, ...] = ()
         output_time_spine_columns: Tuple[SqlSelectColumn, ...] = ()
@@ -1860,7 +1869,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             ),
         )
 
-    def visit_offset_by_custom_granularity_node(self, node: OffsetByCustomGranularityNode) -> SqlDataSet:
+    def visit_offset_base_grain_by_custom_grain_node(self, node: OffsetBaseGrainByCustomGrainNode) -> SqlDataSet:
         """Builds a query to implement an offset window that uses a custom grain.
 
         The query implements the offset window by offsetting the custom grain's base grain by the requested number of custom
@@ -2126,5 +2135,101 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                 select_columns=(non_offset_base_grain_column,) + requested_columns,
                 from_source=offset_base_grain_subquery,
                 from_source_alias=offset_base_grain_subquery_alias,
+            ),
+        )
+
+    def visit_offset_custom_granularity_node(self, node: OffsetCustomGranularityNode) -> SqlDataSet:  # noqa: D102
+        """Build a SQL query that offsets the given custom grain by the requested number of periods.
+
+        The base grain is also needed in the output query in order to join to the metric source.
+        To offset 1 fiscal_quarter, the SQL would look like this:
+
+        SELECT
+            date_day,
+            fiscal_quarter__lead AS metric_time__fiscal_quarter
+        FROM ANALYTICS_DEV.DBT_JSTEIN.ALL_DAYS a
+        INNER JOIN (
+            SELECT
+                fiscal_quarter,
+                LEAD(fiscal_quarter, 1) OVER (ORDER BY fiscal_quarter) AS fiscal_quarter__lead
+            FROM ANALYTICS_DEV.DBT_JSTEIN.ALL_DAYS
+            GROUP BY fiscal_quarter
+        ) b ON b.fiscal_quarter = a.fiscal_quarter
+        """
+        cte_data_set = self.get_output_data_set(node.time_spine_node)
+        cte_alias = self._next_unique_cte_alias()
+        cte_node = SqlCteNode.create(select_statement=cte_data_set.checked_sql_select_node, cte_alias=cte_alias)
+        custom_grain_name = node.offset_window.granularity
+        custom_grain_instance = cte_data_set.instance_from_time_dimension_grain_and_date_part(
+            time_granularity_name=custom_grain_name, date_part=None
+        )
+
+        # Build subquery with LEAD column.
+        custom_grain_column = SqlSelectColumn.from_column_reference(
+            table_alias=cte_alias, column_name=custom_grain_instance.associated_column.column_name
+        )
+        offset_instance = custom_grain_instance.with_new_spec(
+            new_spec=custom_grain_instance.spec.with_window_functions((SqlWindowFunction.LEAD,)),
+            column_association_resolver=self._column_association_resolver,
+        )
+        offset_column = SqlSelectColumn(
+            expr=SqlWindowFunctionExpression.create(
+                sql_function=SqlWindowFunction.LEAD,
+                sql_function_args=(custom_grain_column.expr, SqlIntegerExpression.create(node.offset_window.count)),
+                order_by_args=(SqlWindowOrderByArgument(custom_grain_column.expr),),
+            ),
+            column_alias=offset_instance.associated_column.column_name,
+        )
+        subquery = SqlSelectStatementNode.create(
+            description="Offset Custom Granularity",
+            select_columns=(custom_grain_column, offset_column),
+            from_source=SqlTableNode.create(sql_table=SqlTable(schema_name=None, table_name=cte_alias)),
+            from_source_alias=cte_alias,
+            group_bys=(custom_grain_column,),
+        )
+        subquery_alias = self._next_unique_table_alias()
+
+        # Build join condition.
+        join_desc = SqlJoinDescription(
+            right_source=subquery,
+            right_source_alias=subquery_alias,
+            join_type=SqlJoinType.INNER,
+            on_condition=SqlComparisonExpression.create(
+                left_expr=custom_grain_column.expr,
+                comparison=SqlComparison.EQUALS,
+                right_expr=custom_grain_column.reference_from(subquery_alias),
+            ),
+        )
+
+        # Build outer query select columns.
+        base_grain = ExpandedTimeGranularity.from_time_granularity(
+            self._get_time_spine_for_custom_granularity(custom_grain_name).base_granularity
+        )
+        base_grain_instance = cte_data_set.instance_from_time_dimension_grain_and_date_part(
+            time_granularity_name=base_grain.name
+        )
+        base_grain_column = SqlSelectColumn.from_column_reference(
+            table_alias=cte_alias, column_name=base_grain_instance.associated_column.column_name
+        )
+        offset_column_ref_expr = offset_column.reference_from(subquery_alias)
+        requested_columns: Tuple[SqlSelectColumn, ...] = ()
+        requested_instances: Tuple[TimeDimensionInstance, ...] = ()
+        for required_spec in node.required_time_spine_specs:
+            new_instance = offset_instance.with_new_spec(
+                new_spec=required_spec, column_association_resolver=self._column_association_resolver
+            )
+            requested_instances += (new_instance,)
+            requested_columns += (
+                SqlSelectColumn(expr=offset_column_ref_expr, column_alias=new_instance.associated_column.column_name),
+            )
+        return SqlDataSet(
+            instance_set=InstanceSet(time_dimension_instances=(base_grain_instance,) + requested_instances),
+            sql_select_node=SqlSelectStatementNode.create(
+                description="Join Offset Custom Granularity to Base Granularity",
+                select_columns=(base_grain_column,) + requested_columns,
+                from_source=SqlTableNode.create(sql_table=SqlTable(schema_name=None, table_name=cte_alias)),
+                from_source_alias=cte_alias,
+                join_descs=(join_desc,),
+                cte_sources=(cte_node,),
             ),
         )

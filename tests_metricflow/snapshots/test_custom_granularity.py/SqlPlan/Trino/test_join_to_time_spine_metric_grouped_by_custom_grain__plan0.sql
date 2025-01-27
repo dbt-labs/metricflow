@@ -18,7 +18,7 @@ FROM (
     FROM (
       -- Change Column Aliases
       SELECT
-        subq_5.ds__day AS metric_time__day
+        subq_5.ds__day
         , subq_5.ds__week
         , subq_5.ds__month
         , subq_5.ds__quarter
