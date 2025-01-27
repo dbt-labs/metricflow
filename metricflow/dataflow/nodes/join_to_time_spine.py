@@ -62,6 +62,7 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
         offset_to_grain: Optional[TimeGranularity] = None,
     ) -> JoinToTimeSpineNode:
         return JoinToTimeSpineNode(
+            # Note: parent nodes must be in the order of metric_source_node, time_spine_node
             parent_nodes=(metric_source_node, time_spine_node),
             metric_source_node=metric_source_node,
             time_spine_node=time_spine_node,
@@ -107,10 +108,12 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
         )
 
     def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> JoinToTimeSpineNode:  # noqa: D102
-        assert len(new_parent_nodes) == 1
+        assert len(new_parent_nodes) == 2, "JoinToTimeSpineNode must have exactly 2 parent nodes."
+        # Note: parent nodes remain in the order of metric_source_node, time_spine_node
+
         return JoinToTimeSpineNode.create(
-            metric_source_node=self.metric_source_node,
-            time_spine_node=self.time_spine_node,
+            metric_source_node=new_parent_nodes[0],
+            time_spine_node=new_parent_nodes[1],
             requested_agg_time_dimension_specs=self.requested_agg_time_dimension_specs,
             standard_offset_window=self.standard_offset_window,
             offset_to_grain=self.offset_to_grain,

@@ -19,8 +19,7 @@ FROM (
     WITH cte_6 AS (
       -- Get Custom Granularity Bounds
       SELECT
-        time_spine_src_28005.ts AS ts__hour
-        , time_spine_src_28006.martian_day AS ds__martian_day
+        time_spine_src_28006.martian_day AS ds__martian_day
         , FIRST_VALUE(time_spine_src_28005.ts) OVER (
           PARTITION BY time_spine_src_28006.martian_day
           ORDER BY time_spine_src_28005.ts
@@ -43,8 +42,7 @@ FROM (
     )
 
     SELECT
-      cte_6.ts__hour AS ts__hour
-      , CASE
+      CASE
         WHEN subq_28.ts__hour__first_value__lead + INTERVAL (cte_6.ts__hour__row_number - 1) hour <= subq_28.ts__hour__last_value__lead
           THEN subq_28.ts__hour__first_value__lead + INTERVAL (cte_6.ts__hour__row_number - 1) hour
         ELSE NULL
@@ -76,12 +74,12 @@ FROM (
     -- Read Elements From Semantic Model 'users_ds_source'
     -- Metric Time Dimension 'archived_at'
     SELECT
-      DATE_TRUNC('hour', archived_at) AS metric_time__hour
+      DATE_TRUNC('day', archived_at) AS metric_time__day
       , 1 AS archived_users
     FROM ***************************.dim_users users_ds_source_src_28000
   ) subq_24
   ON
-    subq_29.ts__hour = subq_24.metric_time__hour
+    DATE_TRUNC('day', subq_29.ts__hour__lead) = subq_24.metric_time__day
   GROUP BY
     subq_29.ts__hour__lead
 ) subq_35
