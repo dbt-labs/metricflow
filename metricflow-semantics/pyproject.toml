@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "metricflow-semantics"
-version = "0.2.0"
+version = "0.3.0.dev0"
 description = "Modules for semantic understanding of a MetricFlow query."
 readme = "README.md"
 requires-python = ">=3.9,<3.13"
