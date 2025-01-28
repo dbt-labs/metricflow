@@ -170,3 +170,29 @@ def test_scd_filter_without_metric_time(  # noqa: D103
         snapshot_str=query_result.result_df.text_format(),
         sql_engine=sql_client.sql_engine_type,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
+def test_multiple_time_spines(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+    it_helpers: IntegrationTestHelpers,
+) -> None:
+    query_result = it_helpers.mf_engine.query(
+        MetricFlowQueryRequest.create_with_random_request_id(
+            metric_names=["subdaily_join_to_time_spine_metric", "subdaily_cumulative_window_metric"],
+            group_by_names=["metric_time__martian_day", "metric_time__hour"],
+            order_by_names=["metric_time__martian_day", "metric_time__hour"],
+        )
+    )
+    assert query_result.result_df is not None, "Unexpected empty result."
+
+    assert_str_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.text_format(),
+        sql_engine=sql_client.sql_engine_type,
+    )
