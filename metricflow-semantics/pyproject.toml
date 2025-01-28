@@ -4,7 +4,6 @@ build-backend = "hatchling.build"
 
 [project]
 name = "metricflow-semantics"
-version = "0.3.0.dev0"
 description = "Modules for semantic understanding of a MetricFlow query."
 readme = "README.md"
 requires-python = ">=3.9,<3.13"
@@ -25,7 +24,10 @@ classifiers = [
 ]
 
 # Dependencies are specified through the `hatch-requirements-txt` plug-in.
-dynamic = ["dependencies"]
+dynamic = ["dependencies", "version"]
+
+[tool.hatch.version]
+path = "metricflow_semantics/__about__.py"
 
 [tool.hatch.metadata.hooks.requirements_txt]
 files = [
