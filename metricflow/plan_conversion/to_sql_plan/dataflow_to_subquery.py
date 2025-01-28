@@ -23,6 +23,7 @@ from metricflow_semantics.instances import (
     TimeDimensionInstance,
     group_instances_by_type,
 )
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.runtime import log_block_runtime
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
@@ -192,7 +193,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             _node_to_output_data_set=dict(self._node_to_output_data_set),
         )
 
-    # TODO: replace this with a dataflow plan node for cumulative metrics
+    # TODO: replace this with a dataflow plan node for cumulative metrics - SL-3324
     def _make_time_spine_data_set(
         self,
         agg_time_dimension_instances: Tuple[TimeDimensionInstance, ...],
@@ -215,9 +216,19 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         ]
         required_specs = queried_specs + specs_required_for_where_constraints
 
-        time_spine_source = TimeSpineSource.choose_time_spine_source(
+        time_spine_sources = TimeSpineSource.choose_time_spine_sources(
             required_time_spine_specs=required_specs, time_spine_sources=self._time_spine_sources
         )
+        if len(time_spine_sources) != 1:
+            raise RuntimeError(
+                str(
+                    LazyFormat(
+                        "Unexpected number of time spine sources required for query - cumulative metrics should require exactly one.",
+                        time_spine_sources=time_spine_sources,
+                    )
+                )
+            )
+        time_spine_source = time_spine_sources[0]
         time_spine_base_granularity = ExpandedTimeGranularity.from_time_granularity(time_spine_source.base_granularity)
 
         base_column_expr = SqlColumnReferenceExpression.from_column_reference(
