@@ -132,3 +132,13 @@ metric:
     measure:
       name: archived_users
       join_to_timespine: true
+---
+metric:
+  name: archived_users_offset_1_martian_day
+  description: archived_users offset by 1 martian_day
+  type: derived
+  type_params:
+    expr: archived_users
+    metrics:
+      - name: archived_users
+        offset_window: 1 martian_day
