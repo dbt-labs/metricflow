@@ -1,0 +1,253 @@
+test_name: test_offset_by_custom_granularity_node_with_smaller_grain
+test_filename: test_dataflow_to_sql_plan.py
+---
+<SqlPlan>
+    <SqlSelectStatementNode>
+        <!-- description = 'Apply Requested Granularities' -->
+        <!-- node_id = NodeId(id_str='ss_6') -->
+        <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_17), column_alias='ts__hour') -->
+        <!-- col1 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_16), column_alias='metric_time__hour') -->
+        <!-- from_source = SqlSelectStatementNode(node_id=ss_5) -->
+        <!-- where = None -->
+        <!-- distinct = False -->
+        <SqlSelectStatementNode>
+            <!-- description = 'Offset Base Granularity By Custom Granularity Period(s)' -->
+            <!-- node_id = NodeId(id_str='ss_5') -->
+            <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_13), column_alias='ts__hour') -->
+            <!-- col1 = SqlSelectColumn(expr=SqlCaseExpression(node_id=case_0), column_alias='ts__hour__lead') -->
+            <!-- from_source = SqlTableNode(node_id=tfc_1) -->
+            <!-- join_0 =                                                 -->
+            <!--   SqlJoinDescription(                                    -->
+            <!--     right_source=SqlSelectStatementNode(node_id=ss_4),   -->
+            <!--     right_source_alias='subq_3',                         -->
+            <!--     join_type=INNER,                                     -->
+            <!--     on_condition=SqlComparisonExpression(node_id=cmp_2), -->
+            <!--   )                                                      -->
+            <!-- where = None -->
+            <!-- distinct = False -->
+            <SqlTableNode>
+                <!-- description = 'Read from cte_0' -->
+                <!-- node_id = NodeId(id_str='tfc_1') -->
+                <!-- table_id = 'cte_0' -->
+            </SqlTableNode>
+            <SqlSelectStatementNode>
+                <!-- description = 'Offset Custom Granularity Bounds' -->
+                <!-- node_id = NodeId(id_str='ss_4') -->
+                <!-- col0 =                                                                                             -->
+                <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_7), column_alias='ds__martian_day') -->
+                <!-- col1 =                                                                   -->
+                <!--   SqlSelectColumn(                                                       -->
+                <!--     expr=SqlWindowFunctionExpression(node_id=wfnc_3, sql_function=LEAD), -->
+                <!--     column_alias='ts__hour__first_value__lead',                          -->
+                <!--   )                                                                      -->
+                <!-- col2 =                                                                   -->
+                <!--   SqlSelectColumn(                                                       -->
+                <!--     expr=SqlWindowFunctionExpression(node_id=wfnc_4, sql_function=LEAD), -->
+                <!--     column_alias='ts__hour__last_value__lead',                           -->
+                <!--   )                                                                      -->
+                <!-- from_source = SqlSelectStatementNode(node_id=ss_3) -->
+                <!-- where = None -->
+                <!-- distinct = False -->
+                <SqlSelectStatementNode>
+                    <!-- description = 'Get Unique Rows for Custom Granularity Bounds' -->
+                    <!-- node_id = NodeId(id_str='ss_3') -->
+                    <!-- col0 =                                               -->
+                    <!--   SqlSelectColumn(                                   -->
+                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_4), -->
+                    <!--     column_alias='ds__martian_day',                  -->
+                    <!--   )                                                  -->
+                    <!-- col1 =                                               -->
+                    <!--   SqlSelectColumn(                                   -->
+                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_5), -->
+                    <!--     column_alias='ts__hour__first_value',            -->
+                    <!--   )                                                  -->
+                    <!-- col2 =                                               -->
+                    <!--   SqlSelectColumn(                                   -->
+                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_6), -->
+                    <!--     column_alias='ts__hour__last_value',             -->
+                    <!--   )                                                  -->
+                    <!-- from_source = SqlTableNode(node_id=tfc_0) -->
+                    <!-- group_by0 =                                          -->
+                    <!--   SqlSelectColumn(                                   -->
+                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_4), -->
+                    <!--     column_alias='ds__martian_day',                  -->
+                    <!--   )                                                  -->
+                    <!-- group_by1 =                                          -->
+                    <!--   SqlSelectColumn(                                   -->
+                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_5), -->
+                    <!--     column_alias='ts__hour__first_value',            -->
+                    <!--   )                                                  -->
+                    <!-- group_by2 =                                          -->
+                    <!--   SqlSelectColumn(                                   -->
+                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_6), -->
+                    <!--     column_alias='ts__hour__last_value',             -->
+                    <!--   )                                                  -->
+                    <!-- where = None -->
+                    <!-- distinct = False -->
+                    <SqlTableNode>
+                        <!-- description = 'Read from cte_0' -->
+                        <!-- node_id = NodeId(id_str='tfc_0') -->
+                        <!-- table_id = 'cte_0' -->
+                    </SqlTableNode>
+                </SqlSelectStatementNode>
+            </SqlSelectStatementNode>
+            <SqlCteNode>
+                <!-- description = 'CTE' -->
+                <!-- node_id = NodeId(id_str='cte_1') -->
+                <SqlSelectStatementNode>
+                    <!-- description = 'Get Custom Granularity Bounds' -->
+                    <!-- node_id = NodeId(id_str='ss_2') -->
+                    <!-- col0 =                                                                                      -->
+                    <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_3), column_alias='ts__hour') -->
+                    <!-- col1 =                                               -->
+                    <!--   SqlSelectColumn(                                   -->
+                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_2), -->
+                    <!--     column_alias='ds__martian_day',                  -->
+                    <!--   )                                                  -->
+                    <!-- col2 =                                                                          -->
+                    <!--   SqlSelectColumn(                                                              -->
+                    <!--     expr=SqlWindowFunctionExpression(node_id=wfnc_0, sql_function=FIRST_VALUE), -->
+                    <!--     column_alias='ts__hour__first_value',                                       -->
+                    <!--   )                                                                             -->
+                    <!-- col3 =                                                                         -->
+                    <!--   SqlSelectColumn(                                                             -->
+                    <!--     expr=SqlWindowFunctionExpression(node_id=wfnc_1, sql_function=LAST_VALUE), -->
+                    <!--     column_alias='ts__hour__last_value',                                       -->
+                    <!--   )                                                                            -->
+                    <!-- col4 =                                                                         -->
+                    <!--   SqlSelectColumn(                                                             -->
+                    <!--     expr=SqlWindowFunctionExpression(node_id=wfnc_2, sql_function=ROW_NUMBER), -->
+                    <!--     column_alias='ts__hour__row_number',                                       -->
+                    <!--   )                                                                            -->
+                    <!-- from_source = SqlSelectStatementNode(node_id=ss_0) -->
+                    <!-- join_0 =                                                 -->
+                    <!--   SqlJoinDescription(                                    -->
+                    <!--     right_source=SqlSelectStatementNode(node_id=ss_1),   -->
+                    <!--     right_source_alias='subq_1',                         -->
+                    <!--     join_type=INNER,                                     -->
+                    <!--     on_condition=SqlComparisonExpression(node_id=cmp_0), -->
+                    <!--   )                                                      -->
+                    <!-- where = None -->
+                    <!-- distinct = False -->
+                    <SqlSelectStatementNode>
+                        <!-- description = "Read From Time Spine 'mf_time_spine'" -->
+                        <!-- node_id = NodeId(id_str='ss_0') -->
+                        <!-- col0 =                                                   -->
+                        <!--   SqlSelectColumn(                                       -->
+                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_28130), -->
+                        <!--     column_alias='ds__day',                              -->
+                        <!--   )                                                      -->
+                        <!-- col1 =                                                                                    -->
+                        <!--   SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28287), column_alias='ds__week') -->
+                        <!-- col2 =                                                                                     -->
+                        <!--   SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28288), column_alias='ds__month') -->
+                        <!-- col3 =                                                                                       -->
+                        <!--   SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28289), column_alias='ds__quarter') -->
+                        <!-- col4 =                                                                                    -->
+                        <!--   SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28290), column_alias='ds__year') -->
+                        <!-- col5 =                                           -->
+                        <!--   SqlSelectColumn(                               -->
+                        <!--     expr=SqlExtractExpression(node_id=ex_28300), -->
+                        <!--     column_alias='ds__extract_year',             -->
+                        <!--   )                                              -->
+                        <!-- col6 =                                           -->
+                        <!--   SqlSelectColumn(                               -->
+                        <!--     expr=SqlExtractExpression(node_id=ex_28301), -->
+                        <!--     column_alias='ds__extract_quarter',          -->
+                        <!--   )                                              -->
+                        <!-- col7 =                                           -->
+                        <!--   SqlSelectColumn(                               -->
+                        <!--     expr=SqlExtractExpression(node_id=ex_28302), -->
+                        <!--     column_alias='ds__extract_month',            -->
+                        <!--   )                                              -->
+                        <!-- col8 =                                           -->
+                        <!--   SqlSelectColumn(                               -->
+                        <!--     expr=SqlExtractExpression(node_id=ex_28303), -->
+                        <!--     column_alias='ds__extract_day',              -->
+                        <!--   )                                              -->
+                        <!-- col9 =                                           -->
+                        <!--   SqlSelectColumn(                               -->
+                        <!--     expr=SqlExtractExpression(node_id=ex_28304), -->
+                        <!--     column_alias='ds__extract_dow',              -->
+                        <!--   )                                              -->
+                        <!-- col10 =                                          -->
+                        <!--   SqlSelectColumn(                               -->
+                        <!--     expr=SqlExtractExpression(node_id=ex_28305), -->
+                        <!--     column_alias='ds__extract_doy',              -->
+                        <!--   )                                              -->
+                        <!-- col11 =                                                  -->
+                        <!--   SqlSelectColumn(                                       -->
+                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_28131), -->
+                        <!--     column_alias='ds__martian_day',                      -->
+                        <!--   )                                                      -->
+                        <!-- from_source = SqlTableNode(node_id=tfc_28018) -->
+                        <!-- where = None -->
+                        <!-- distinct = False -->
+                        <SqlTableNode>
+                            <!-- description = 'Read from ***************************.mf_time_spine' -->
+                            <!-- node_id = NodeId(id_str='tfc_28018') -->
+                            <!-- table_id = '***************************.mf_time_spine' -->
+                        </SqlTableNode>
+                    </SqlSelectStatementNode>
+                    <SqlSelectStatementNode>
+                        <!-- description = "Read From Time Spine 'mf_time_spine_hour'" -->
+                        <!-- node_id = NodeId(id_str='ss_1') -->
+                        <!-- col0 =                                                   -->
+                        <!--   SqlSelectColumn(                                       -->
+                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_28129), -->
+                        <!--     column_alias='ts__hour',                             -->
+                        <!--   )                                                      -->
+                        <!-- col1 =                                                                                   -->
+                        <!--   SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28282), column_alias='ts__day') -->
+                        <!-- col2 =                                                                                    -->
+                        <!--   SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28283), column_alias='ts__week') -->
+                        <!-- col3 =                                                                                     -->
+                        <!--   SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28284), column_alias='ts__month') -->
+                        <!-- col4 =                                                                                       -->
+                        <!--   SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28285), column_alias='ts__quarter') -->
+                        <!-- col5 =                                                                                    -->
+                        <!--   SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28286), column_alias='ts__year') -->
+                        <!-- col6 =                                           -->
+                        <!--   SqlSelectColumn(                               -->
+                        <!--     expr=SqlExtractExpression(node_id=ex_28294), -->
+                        <!--     column_alias='ts__extract_year',             -->
+                        <!--   )                                              -->
+                        <!-- col7 =                                           -->
+                        <!--   SqlSelectColumn(                               -->
+                        <!--     expr=SqlExtractExpression(node_id=ex_28295), -->
+                        <!--     column_alias='ts__extract_quarter',          -->
+                        <!--   )                                              -->
+                        <!-- col8 =                                           -->
+                        <!--   SqlSelectColumn(                               -->
+                        <!--     expr=SqlExtractExpression(node_id=ex_28296), -->
+                        <!--     column_alias='ts__extract_month',            -->
+                        <!--   )                                              -->
+                        <!-- col9 =                                           -->
+                        <!--   SqlSelectColumn(                               -->
+                        <!--     expr=SqlExtractExpression(node_id=ex_28297), -->
+                        <!--     column_alias='ts__extract_day',              -->
+                        <!--   )                                              -->
+                        <!-- col10 =                                          -->
+                        <!--   SqlSelectColumn(                               -->
+                        <!--     expr=SqlExtractExpression(node_id=ex_28298), -->
+                        <!--     column_alias='ts__extract_dow',              -->
+                        <!--   )                                              -->
+                        <!-- col11 =                                          -->
+                        <!--   SqlSelectColumn(                               -->
+                        <!--     expr=SqlExtractExpression(node_id=ex_28299), -->
+                        <!--     column_alias='ts__extract_doy',              -->
+                        <!--   )                                              -->
+                        <!-- from_source = SqlTableNode(node_id=tfc_28017) -->
+                        <!-- where = None -->
+                        <!-- distinct = False -->
+                        <SqlTableNode>
+                            <!-- description = 'Read from ***************************.mf_time_spine_hour' -->
+                            <!-- node_id = NodeId(id_str='tfc_28017') -->
+                            <!-- table_id = '***************************.mf_time_spine_hour' -->
+                        </SqlTableNode>
+                    </SqlSelectStatementNode>
+                </SqlSelectStatementNode>
+            </SqlCteNode>
+        </SqlSelectStatementNode>
+    </SqlSelectStatementNode>
+</SqlPlan>

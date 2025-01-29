@@ -182,7 +182,12 @@ def test_multiple_time_spines(  # noqa: D103
 ) -> None:
     query_result = it_helpers.mf_engine.query(
         MetricFlowQueryRequest.create_with_random_request_id(
-            metric_names=["subdaily_join_to_time_spine_metric", "subdaily_cumulative_window_metric"],
+            metric_names=[
+                "subdaily_join_to_time_spine_metric",
+                "subdaily_cumulative_window_metric",
+                # TODO: this output won't look right until we adjust values for metric_time__hour to include multiple martian days
+                "archived_users_offset_3_martian_days",
+            ],
             group_by_names=["metric_time__martian_day", "metric_time__hour"],
             order_by_names=["metric_time__martian_day", "metric_time__hour"],
         )
