@@ -1929,52 +1929,111 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
           ) b
           ON cte.ds__martian_day = b.ds__martian_day
         )
+
+        Note: if a grain is queried that is smaller than that of the custom grain's base grain, will use that grain in place
+        of the base grain. This requires joining in a second time spine.
         """
-        time_spine_data_set = self.get_output_data_set(node.time_spine_node)
-        time_spine_alias = self._next_unique_table_alias()
-        offset_window = node.offset_window
-        custom_grain_name = offset_window.granularity
-        base_grain = ExpandedTimeGranularity.from_time_granularity(
-            self._get_time_spine_for_custom_granularity(custom_grain_name).base_granularity
+        custom_grain_name = node.offset_window.granularity
+        # If there are multiple time spine nodes, there will only be two - one to satisfy the custom grain and one to satisfy
+        # any required grains that are smaller than the custom grain's base grain. Determine which is which.
+        custom_time_spine_data_set: Optional[SqlDataSet] = None
+        smaller_time_spine_data_set: Optional[SqlDataSet] = None
+        smaller_time_spine_alias: Optional[str] = None
+        if len(node.time_spine_nodes) == 1:
+            data_set = self.get_output_data_set(node.time_spine_nodes[0])
+            custom_time_spine_data_set = data_set
+        else:
+            for time_spine_node in node.time_spine_nodes:
+                data_set = self.get_output_data_set(time_spine_node)
+                data_set_grains = {
+                    spec.time_granularity_name for spec in data_set.instance_set.spec_set.time_dimension_specs
+                }
+                if custom_grain_name in data_set_grains:
+                    custom_time_spine_data_set = data_set
+                else:
+                    smaller_time_spine_data_set = data_set
+        assert custom_time_spine_data_set, "No time spine nodes satisfy custom grain."
+        custom_time_spine_alias = self._next_unique_table_alias()
+        base_grain_name = self._get_time_spine_for_custom_granularity(custom_grain_name).base_granularity.value
+        base_grain_instance = custom_time_spine_data_set.instance_from_time_dimension_grain_and_date_part(
+            time_granularity_name=base_grain_name, date_part=None
         )
-        time_spine = self._get_time_spine_for_custom_granularity(custom_grain_name)
-        custom_grain_instance = time_spine_data_set.instance_from_time_dimension_grain_and_date_part(
+        smallest_grain_instance = base_grain_instance
+        smallest_column_table_alias = custom_time_spine_alias
+
+        join_descs: Tuple[SqlJoinDescription, ...] = ()
+        if smaller_time_spine_data_set:
+            smaller_time_spine_alias = self._next_unique_table_alias()
+            # Will select from the custom grain time spine (left) and join to the smaller time spine (right),
+            # joining on specs with the custom grain's base grain.
+            right_instance = smaller_time_spine_data_set.instance_from_time_dimension_grain_and_date_part(
+                time_granularity_name=base_grain_name, date_part=None
+            )
+            join_desc = SqlJoinDescription(
+                right_source=smaller_time_spine_data_set.checked_sql_select_node,
+                right_source_alias=smaller_time_spine_alias,
+                join_type=SqlJoinType.INNER,
+                on_condition=SqlComparisonExpression.create(
+                    left_expr=SqlColumnReferenceExpression.from_column_reference(
+                        table_alias=custom_time_spine_alias,
+                        column_name=base_grain_instance.associated_column.column_name,
+                    ),
+                    comparison=SqlComparison.EQUALS,
+                    right_expr=SqlColumnReferenceExpression.from_column_reference(
+                        table_alias=smaller_time_spine_alias, column_name=right_instance.associated_column.column_name
+                    ),
+                ),
+            )
+            join_descs += (join_desc,)
+
+            # If we have two time spines, we know one of the requested specs has a smaller grain than the base grain.
+            smallest_requested_grain = sorted(
+                node.required_time_spine_specs, key=lambda spec: spec.base_granularity_sort_key
+            )[0].time_granularity_name
+            smallest_grain_instance = smaller_time_spine_data_set.instance_from_time_dimension_grain_and_date_part(
+                time_granularity_name=smallest_requested_grain, date_part=None
+            )
+            smallest_column_table_alias = smaller_time_spine_alias
+        smallest_grain = smallest_grain_instance.spec.base_granularity
+        assert smallest_grain, "Smallest grain instance does not have a time granularity."
+
+        custom_grain_instance = custom_time_spine_data_set.instance_from_time_dimension_grain_and_date_part(
             time_granularity_name=custom_grain_name, date_part=None
         )
         custom_grain_column_name = custom_grain_instance.associated_column.column_name
-        base_grain_instance = time_spine_data_set.instance_from_time_dimension_grain_and_date_part(
-            time_granularity_name=time_spine.base_granularity.value, date_part=None
-        )
-        base_grain_column_name = base_grain_instance.associated_column.column_name
+        smallest_grain_column_name = smallest_grain_instance.associated_column.column_name
 
         # Build columns that get start and end of the custom grain period.
         # Ex: FIRST_VALUE(ds) OVER (PARTITION BY fiscal_quarter ORDER BY ds) AS ds__fiscal_quarter__first_value
-        new_select_columns: Tuple[SqlSelectColumn, ...] = ()
         bounds_columns: Tuple[SqlSelectColumn, ...] = ()
         bounds_instances: Tuple[TimeDimensionInstance, ...] = ()
         custom_column_expr = SqlColumnReferenceExpression.from_column_reference(
-            table_alias=time_spine_alias, column_name=custom_grain_column_name
+            table_alias=custom_time_spine_alias, column_name=custom_grain_column_name
         )
-        base_column_expr = SqlColumnReferenceExpression.from_column_reference(
-            table_alias=time_spine_alias, column_name=base_grain_column_name
+        smallest_column_expr = SqlColumnReferenceExpression.from_column_reference(
+            table_alias=smallest_column_table_alias, column_name=smallest_grain_column_name
+        )
+        cte_select_columns: Tuple[SqlSelectColumn, ...] = (
+            SqlSelectColumn(expr=smallest_column_expr, column_alias=smallest_grain_column_name),
+            SqlSelectColumn(expr=custom_column_expr, column_alias=custom_grain_column_name),
         )
         for window_func in (SqlWindowFunction.FIRST_VALUE, SqlWindowFunction.LAST_VALUE):
             bounds_instance = custom_grain_instance.with_new_spec(
-                new_spec=custom_grain_instance.spec.with_window_functions((window_func,)),
+                new_spec=smallest_grain_instance.spec.with_window_functions((window_func,)),
                 column_association_resolver=self._column_association_resolver,
             )
             select_column = SqlSelectColumn(
                 expr=SqlWindowFunctionExpression.create(
                     sql_function=window_func,
-                    sql_function_args=(base_column_expr,),
+                    sql_function_args=(smallest_column_expr,),
                     partition_by_args=(custom_column_expr,),
-                    order_by_args=(SqlWindowOrderByArgument(base_column_expr),),
+                    order_by_args=(SqlWindowOrderByArgument(smallest_column_expr),),
                 ),
                 column_alias=bounds_instance.associated_column.column_name,
             )
             bounds_instances += (bounds_instance,)
             bounds_columns += (select_column,)
-            new_select_columns += (select_column,)
+            cte_select_columns += (select_column,)
 
         # Build a column that tracks the row number for the base grain column within the custom grain period.
         # This will be offset by 1 to represent the number of base grain periods since the start of the custom grain period.
@@ -1983,22 +2042,23 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             expr=SqlWindowFunctionExpression.create(
                 sql_function=SqlWindowFunction.ROW_NUMBER,
                 partition_by_args=(custom_column_expr,),
-                order_by_args=(SqlWindowOrderByArgument(base_column_expr),),
+                order_by_args=(SqlWindowOrderByArgument(smallest_column_expr),),
             ),
             column_alias=self._column_association_resolver.resolve_spec(
-                base_grain_instance.spec.with_window_functions((SqlWindowFunction.ROW_NUMBER,))
+                smallest_grain_instance.spec.with_window_functions((SqlWindowFunction.ROW_NUMBER,))
             ).column_name,
         )
-        new_select_columns += (row_number_column,)
+        cte_select_columns += (row_number_column,)
 
         # Built a CTE for the new select statement.
         cte_alias = self._next_unique_cte_alias()
         cte = SqlCteNode.create(
             SqlSelectStatementNode.create(
                 description="Get Custom Granularity Bounds",
-                select_columns=time_spine_data_set.checked_sql_select_node.select_columns + new_select_columns,
-                from_source=time_spine_data_set.checked_sql_select_node,
-                from_source_alias=time_spine_alias,
+                select_columns=cte_select_columns,
+                from_source=custom_time_spine_data_set.checked_sql_select_node,
+                from_source_alias=custom_time_spine_alias,
+                join_descs=join_descs,
             ),
             cte_alias=cte_alias,
         )
@@ -2061,33 +2121,33 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         #     <= ds__fiscal_quarter__last_value__offset
         #   THEN DATEADD(day, (ds__day__row_number - 1), ds__fiscal_quarter__first_value__offset)
         # ELSE NULL
-        offset_base_grain_expr = SqlAddTimeExpression.create(
+        offset_smallest_grain_expr = SqlAddTimeExpression.create(
             arg=first_value_offset_column.reference_from(offset_bounds_subquery_alias),
             count_expr=SqlArithmeticExpression.create(
                 left_expr=row_number_column.reference_from(cte_alias),
                 operator=SqlArithmeticOperator.SUBTRACT,
                 right_expr=SqlIntegerExpression.create(1),
             ),
-            granularity=base_grain.base_granularity,
+            granularity=smallest_grain,
         )
         is_below_last_value_expr = SqlComparisonExpression.create(
-            left_expr=offset_base_grain_expr,
+            left_expr=offset_smallest_grain_expr,
             comparison=SqlComparison.LESS_THAN_OR_EQUALS,
             right_expr=last_value_offset_column.reference_from(offset_bounds_subquery_alias),
         )
         # LEAD isn't quite accurate here, but this will differentiate the offset instance (and column) from the original one.
-        offset_base_column_name = self._column_association_resolver.resolve_spec(
-            base_grain_instance.spec.with_window_functions((SqlWindowFunction.LEAD,))
+        offset_column_name = self._column_association_resolver.resolve_spec(
+            smallest_grain_instance.spec.with_window_functions((SqlWindowFunction.LEAD,))
         ).column_name
-        offset_base_column = SqlSelectColumn(
+        offset_column = SqlSelectColumn(
             expr=SqlCaseExpression.create(
-                when_to_then_exprs={is_below_last_value_expr: offset_base_grain_expr},
+                when_to_then_exprs={is_below_last_value_expr: offset_smallest_grain_expr},
                 else_expr=SqlNullExpression.create(),
             ),
-            column_alias=offset_base_column_name,
+            column_alias=offset_column_name,
         )
-        original_base_grain_column = SqlSelectColumn.from_column_reference(
-            column_name=base_grain_column_name, table_alias=cte_alias
+        original_smallest_grain_column = SqlSelectColumn.from_column_reference(
+            column_name=smallest_grain_column_name, table_alias=cte_alias
         )
         join_desc = SqlJoinDescription(
             right_source=offset_bounds_subquery,
@@ -2099,53 +2159,51 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                 right_expr=custom_grain_column.reference_from(offset_bounds_subquery_alias),
             ),
         )
-        offset_base_grain_subquery = SqlSelectStatementNode.create(
+        offset_smallest_grain_subquery = SqlSelectStatementNode.create(
             description=node.description,
-            select_columns=(original_base_grain_column, offset_base_column),
+            select_columns=(original_smallest_grain_column, offset_column),
             from_source=SqlTableNode.create(sql_table=SqlTable(schema_name=None, table_name=cte_alias)),
             cte_sources=(cte,),
             from_source_alias=cte_alias,
             join_descs=(join_desc,),
         )
-        offset_base_grain_subquery_alias = self._next_unique_table_alias()
+        offset_smallest_grain_subquery_alias = self._next_unique_table_alias()
 
         # Apply standard grains & date parts requested in the query. Use base grain for any custom grains.
         requested_instances: Tuple[TimeDimensionInstance, ...] = ()
         requested_columns: Tuple[SqlSelectColumn, ...] = ()
-        offset_base_column_ref = offset_base_column.reference_from(offset_base_grain_subquery_alias)
+        offset_column_ref = offset_column.reference_from(offset_smallest_grain_subquery_alias)
         for spec in node.required_time_spine_specs:
-            new_instance = base_grain_instance.with_new_spec(
+            new_instance = smallest_grain_instance.with_new_spec(
                 new_spec=spec, column_association_resolver=self._column_association_resolver
             )
             if spec.date_part:
-                expr: SqlExpressionNode = SqlExtractExpression.create(
-                    date_part=spec.date_part, arg=offset_base_column_ref
-                )
+                expr: SqlExpressionNode = SqlExtractExpression.create(date_part=spec.date_part, arg=offset_column_ref)
             else:
                 assert (
                     spec.time_granularity is not None
                 ), "Got no time granularity or date part for required time spine spec."
-                if spec.time_granularity.base_granularity == base_grain.base_granularity:
-                    expr = offset_base_column_ref
+                if spec.time_granularity.base_granularity == smallest_grain:
+                    expr = offset_column_ref
                 else:
                     expr = SqlDateTruncExpression.create(
-                        time_granularity=spec.time_granularity.base_granularity, arg=offset_base_column_ref
+                        time_granularity=spec.time_granularity.base_granularity, arg=offset_column_ref
                     )
             requested_columns += (SqlSelectColumn(expr=expr, column_alias=new_instance.associated_column.column_name),)
             requested_instances += (new_instance,)
 
         # Need to keep the non-offset base grain column in the output. This will be used to join to the metric source data set.
-        non_offset_base_grain_column = SqlSelectColumn.from_column_reference(
-            column_name=base_grain_column_name, table_alias=offset_base_grain_subquery_alias
+        non_offset_smallest_grain_column = SqlSelectColumn.from_column_reference(
+            column_name=smallest_grain_column_name, table_alias=offset_smallest_grain_subquery_alias
         )
 
         return SqlDataSet(
-            instance_set=InstanceSet(time_dimension_instances=(base_grain_instance,) + requested_instances),
+            instance_set=InstanceSet(time_dimension_instances=(smallest_grain_instance,) + requested_instances),
             sql_select_node=SqlSelectStatementNode.create(
                 description="Apply Requested Granularities",
-                select_columns=(non_offset_base_grain_column,) + requested_columns,
-                from_source=offset_base_grain_subquery,
-                from_source_alias=offset_base_grain_subquery_alias,
+                select_columns=(non_offset_smallest_grain_column,) + requested_columns,
+                from_source=offset_smallest_grain_subquery,
+                from_source_alias=offset_smallest_grain_subquery_alias,
             ),
         )
 
