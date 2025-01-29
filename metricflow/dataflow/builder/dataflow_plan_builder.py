@@ -1931,7 +1931,7 @@ class DataflowPlanBuilder:
             queried_time_dimension_spec=queried_time_dimension_spec,
         )
 
-    def _choose_time_spine_sources(
+    def choose_time_spine_sources(
         self, required_time_spine_specs: Sequence[TimeDimensionSpec]
     ) -> Tuple[TimeSpineSource, ...]:
         """Choose the time spine source that can satisfy the required time spine specs."""
@@ -1944,7 +1944,7 @@ class DataflowPlanBuilder:
         self, required_time_spine_specs: Sequence[TimeDimensionSpec]
     ) -> Tuple[MetricTimeDimensionTransformNode, ...]:
         """Return the MetricTimeDimensionTransform time spine node needed to satisfy the specs."""
-        time_spine_sources = self._choose_time_spine_sources(required_time_spine_specs)
+        time_spine_sources = self.choose_time_spine_sources(required_time_spine_specs)
         return tuple(
             self._source_node_set.time_spine_metric_time_nodes[time_spine_source.base_granularity]
             for time_spine_source in time_spine_sources
@@ -1975,6 +1975,8 @@ class DataflowPlanBuilder:
                 if time_dimension_spec not in required_specs:
                     required_specs += (time_dimension_spec,)
 
+        time_spine_sources = self.choose_time_spine_sources(required_specs)
+
         should_dedupe = False
         custom_grain_specs_to_join: Tuple[TimeDimensionSpec, ...] = ()
         if custom_offset_window:
@@ -1982,12 +1984,12 @@ class DataflowPlanBuilder:
                 offset_window=custom_offset_window,
                 required_time_spine_specs=required_specs,
                 use_offset_custom_granularity_node=use_offset_custom_granularity_node,
+                required_time_spine_sources=time_spine_sources,
             )
             filter_to_specs = self._node_data_set_resolver.get_output_data_set(
                 time_spine_node
             ).instance_set.spec_set.time_dimension_specs
         else:
-            time_spine_sources = self._choose_time_spine_sources(required_specs)
             smallest_time_spine_source = time_spine_sources[0]  # these are already sorted by base grain
             read_node = self._choose_time_spine_read_node(smallest_time_spine_source)
 
@@ -2033,7 +2035,7 @@ class DataflowPlanBuilder:
 
     def _get_time_spine_read_node_for_custom_grain(self, custom_grain: str) -> ReadSqlSourceNode:
         """Return the read node for the custom grain."""
-        time_spine_sources = self._choose_time_spine_sources(
+        time_spine_sources = self.choose_time_spine_sources(
             (DataSet.metric_time_dimension_spec(self._semantic_model_lookup.custom_granularities[custom_grain]),)
         )
         time_spine_source = time_spine_sources[0]
@@ -2044,18 +2046,22 @@ class DataflowPlanBuilder:
         offset_window: MetricTimeWindow,
         required_time_spine_specs: Tuple[TimeDimensionSpec, ...],
         use_offset_custom_granularity_node: bool,
+        required_time_spine_sources: Tuple[TimeSpineSource, ...],
     ) -> DataflowPlanNode:
         """Builds an OffsetByCustomGranularityNode used for custom offset windows."""
-        time_spine_read_node = self._get_time_spine_read_node_for_custom_grain(offset_window.granularity)
+        custom_time_spine_read_node = self._get_time_spine_read_node_for_custom_grain(offset_window.granularity)
         if use_offset_custom_granularity_node:
             return OffsetCustomGranularityNode.create(
-                time_spine_node=time_spine_read_node,
+                time_spine_node=custom_time_spine_read_node,
                 offset_window=offset_window,
                 required_time_spine_specs=required_time_spine_specs,
             )
 
+        time_spine_read_nodes = [
+            self._choose_time_spine_read_node(time_spine_source) for time_spine_source in required_time_spine_sources
+        ] + [custom_time_spine_read_node]
         return OffsetBaseGrainByCustomGrainNode.create(
-            time_spine_node=time_spine_read_node,
+            time_spine_nodes=tuple(set(time_spine_read_nodes)),
             offset_window=offset_window,
             required_time_spine_specs=required_time_spine_specs,
         )
