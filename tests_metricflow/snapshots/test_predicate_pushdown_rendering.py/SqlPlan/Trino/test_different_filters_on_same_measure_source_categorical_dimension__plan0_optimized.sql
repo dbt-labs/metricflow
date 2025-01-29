@@ -46,7 +46,6 @@ FROM (
       SELECT
         metric_time__day
         , booking__is_instant
-        , max_booking_value
         , average_booking_value
       FROM sma_28009_cte sma_28009_cte
     ) subq_12

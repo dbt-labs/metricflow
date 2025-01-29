@@ -29,7 +29,6 @@ FROM (
     -- Read From CTE For node_id=sma_28009
     SELECT
       guest
-      , booking_value
       , bookers
     FROM sma_28009_cte sma_28009_cte
   ) subq_15
