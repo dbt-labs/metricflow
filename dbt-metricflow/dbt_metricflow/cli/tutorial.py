@@ -16,9 +16,6 @@ from packaging.version import Version
 from typing_extensions import Optional
 
 from dbt_metricflow.cli.cli_configuration import CLIConfiguration
-from dbt_metricflow.cli.utils import (
-    dbt_project_file_exists,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -91,7 +88,7 @@ class dbtMetricFlowTutorialHelper:
         shutil.copytree(src=sample_project_path, dst=project_path)
 
     @staticmethod
-    def _generate_help_message_text(dbt_core_version: Optional[Version]) -> str:
+    def _generate_help_message_text(dbt_core_version: Optional[Version], tutorial_directory: pathlib.Path) -> str:
         time_spine_docs_link = "https://docs.getdbt.com/docs/build/metricflow-time-spine"
         if dbt_core_version is not None:
             time_spine_docs_link = time_spine_docs_link + f"?version={dbt_core_version.major}.{dbt_core_version.minor}"
@@ -109,13 +106,9 @@ class dbtMetricFlowTutorialHelper:
             f"""\
             🤓 {click.style("Please run the following steps:", bold=True)}
 
-            1.  If you're using the tutorial-generated dbt project, switch to the root directory of the project.
-            2.  Otherwise, if you're using your own dbt project:
-                * Verify that your adapter credentials are correct in `profiles.yml`.
-                * Add a time spine model to the model directory. See (try <CTRL>+Left Click on the link):
-                  {click.style(time_spine_docs_link, fg="blue", bold=True)}
-            3.  Run {click.style("`dbt seed`", bold=True)} and check that the steps related to countries, transactions, customers are passing.
-            4.  Run {click.style("`dbt build`", bold=True)} to produce the model tables.
+            1.  Switch to the root directory of the generated sample project (e.g. {click.style(f"`cd {tutorial_directory.name}`", bold=True)}).
+            2.  Run {click.style("`dbt seed`", bold=True)} and check that the steps related to countries, transactions, customers are passing.
+            3.  Run {click.style("`dbt build`", bold=True)} to produce the model tables.
             4.  Try validating your data model: {click.style("`mf validate-configs`", bold=True)}
             5.  Check out your metrics: {click.style("`mf list metrics`", bold=True)}
             6.  Check out dimensions for your metric {click.style("`mf list dimensions --metrics transactions`", bold=True)}
@@ -123,17 +116,19 @@ class dbtMetricFlowTutorialHelper:
                     {click.style("mf query --metrics transactions --group-by metric_time --order metric_time", bold=True)}
             8.  Show the SQL MetricFlow generates:
                     {click.style("mf query --metrics transactions --group-by metric_time --order metric_time --explain", bold=True)}
-            9.  Visualize the plan:
+            8.  Visualize the plan:
                     {click.style("mf query --metrics transactions --group-by metric_time --order metric_time --explain --display-plans", bold=True)}
                 * This only works if you have graphviz installed - see README.
-            10.  Add another dimension:
+            9.  Add another dimension:
                     {click.style("mf query --metrics transactions --group-by metric_time,customer__customer_country --order metric_time", bold=True)}
-            11.  Add a coarser time granularity:
+            10. Add a coarser time granularity:
                     {click.style("mf query --metrics transactions --group-by metric_time__week --order metric_time__week", bold=True)}
-            12. Try a more complicated query:
+            11. Try a more complicated query:
                     {click.style(complex_query, bold=True)}
-            13. When you're done with the tutorial, run mf tutorial --clean to delete sample models and seeds.
+            12. When you're done with the tutorial, run mf tutorial --clean to delete sample models and seeds.
                 * If a sample project was created, it wil remain.
+            13. Before integrating metrics into your project, read up on adding a time spine (try <CTRL>+Left Click on the link):
+                  {click.style(time_spine_docs_link, fg="blue", bold=True)}
             """
         )
 
@@ -158,28 +153,25 @@ class dbtMetricFlowTutorialHelper:
                 ),
                 fg="yellow",
             )
-        help_message_text = dbtMetricFlowTutorialHelper._generate_help_message_text(dbt_core_version)
+
+        tutorial_project_name = "mf_tutorial_project"
+        help_message_text = dbtMetricFlowTutorialHelper._generate_help_message_text(
+            dbt_core_version=dbt_core_version, tutorial_directory=pathlib.Path(tutorial_project_name)
+        )
         if message:
             click.echo(help_message_text)
             exit()
 
         current_directory = pathlib.Path.cwd()
-        project_path = current_directory
-
-        tutorial_project_name = "mf_tutorial_project"
-
         sample_dbt_project_path = (current_directory / tutorial_project_name).absolute()
-        click.secho(
-            "Unable to detect a dbt project. Please run `mf tutorial` from the root directory of your dbt project.",
-            fg="yellow",
-        )
+
         yes or click.confirm(
             textwrap.dedent(
                 f"""\
 
-                Alternatively, this tutorial can create a sample dbt project with a `profiles.yml` configured to
-                use DuckDB. This will allow you to run the tutorial as a self-contained experience. The sample project
-                will be created at:
+                This tutorial provides a self-contained experience by creating a sample dbt project with a `profiles.yml`
+                configured to use DuckDB. It will include example seed data and models so you can start querying metrics
+                immediately. The sample project will be created at:
 
                     {click.style(str(sample_dbt_project_path), bold=True)}
 
@@ -211,15 +203,7 @@ class dbtMetricFlowTutorialHelper:
 
         dbtMetricFlowTutorialHelper.generate_dbt_project(sample_dbt_project_path)
         spinner.succeed("📦 Sample dbt project has been generated.")
-        click.secho(
-            textwrap.dedent(
-                """\
 
-                Before running the steps in the tutorial, be sure to switch to the sample project directory.
-                """
-            ),
-            bold=True,
-        )
         os.chdir(sample_dbt_project_path.as_posix())
         project_path = sample_dbt_project_path
 
