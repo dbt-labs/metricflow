@@ -38,12 +38,12 @@ test_filename: test_dataflow_to_sql_plan.py
                 <!-- col1 =                                                                   -->
                 <!--   SqlSelectColumn(                                                       -->
                 <!--     expr=SqlWindowFunctionExpression(node_id=wfnc_3, sql_function=LEAD), -->
-                <!--     column_alias='ds__martian_day__first_value__lead',                   -->
+                <!--     column_alias='ds__day__first_value__lead',                           -->
                 <!--   )                                                                      -->
                 <!-- col2 =                                                                   -->
                 <!--   SqlSelectColumn(                                                       -->
                 <!--     expr=SqlWindowFunctionExpression(node_id=wfnc_4, sql_function=LEAD), -->
-                <!--     column_alias='ds__martian_day__last_value__lead',                    -->
+                <!--     column_alias='ds__day__last_value__lead',                            -->
                 <!--   )                                                                      -->
                 <!-- from_source = SqlSelectStatementNode(node_id=ss_3) -->
                 <!-- where = None -->
@@ -59,12 +59,12 @@ test_filename: test_dataflow_to_sql_plan.py
                     <!-- col1 =                                               -->
                     <!--   SqlSelectColumn(                                   -->
                     <!--     expr=SqlColumnReferenceExpression(node_id=cr_3), -->
-                    <!--     column_alias='ds__martian_day__first_value',     -->
+                    <!--     column_alias='ds__day__first_value',             -->
                     <!--   )                                                  -->
                     <!-- col2 =                                               -->
                     <!--   SqlSelectColumn(                                   -->
                     <!--     expr=SqlColumnReferenceExpression(node_id=cr_4), -->
-                    <!--     column_alias='ds__martian_day__last_value',      -->
+                    <!--     column_alias='ds__day__last_value',              -->
                     <!--   )                                                  -->
                     <!-- from_source = SqlTableNode(node_id=tfc_0) -->
                     <!-- group_by0 =                                          -->
@@ -75,12 +75,12 @@ test_filename: test_dataflow_to_sql_plan.py
                     <!-- group_by1 =                                          -->
                     <!--   SqlSelectColumn(                                   -->
                     <!--     expr=SqlColumnReferenceExpression(node_id=cr_3), -->
-                    <!--     column_alias='ds__martian_day__first_value',     -->
+                    <!--     column_alias='ds__day__first_value',             -->
                     <!--   )                                                  -->
                     <!-- group_by2 =                                          -->
                     <!--   SqlSelectColumn(                                   -->
                     <!--     expr=SqlColumnReferenceExpression(node_id=cr_4), -->
-                    <!--     column_alias='ds__martian_day__last_value',      -->
+                    <!--     column_alias='ds__day__last_value',              -->
                     <!--   )                                                  -->
                     <!-- where = None -->
                     <!-- distinct = False -->
@@ -97,44 +97,23 @@ test_filename: test_dataflow_to_sql_plan.py
                 <SqlSelectStatementNode>
                     <!-- description = 'Get Custom Granularity Bounds' -->
                     <!-- node_id = NodeId(id_str='ss_2') -->
-                    <!-- col0 =                                                                                         -->
-                    <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28130), column_alias='ds__day') -->
-                    <!-- col1 = SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28287), column_alias='ds__week') -->
-                    <!-- col2 = SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28288), column_alias='ds__month') -->
-                    <!-- col3 =                                                                                       -->
-                    <!--   SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28289), column_alias='ds__quarter') -->
-                    <!-- col4 = SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28290), column_alias='ds__year') -->
-                    <!-- col5 =                                                                                          -->
-                    <!--   SqlSelectColumn(expr=SqlExtractExpression(node_id=ex_28300), column_alias='ds__extract_year') -->
-                    <!-- col6 =                                           -->
-                    <!--   SqlSelectColumn(                               -->
-                    <!--     expr=SqlExtractExpression(node_id=ex_28301), -->
-                    <!--     column_alias='ds__extract_quarter',          -->
-                    <!--   )                                              -->
-                    <!-- col7 =                                                                                           -->
-                    <!--   SqlSelectColumn(expr=SqlExtractExpression(node_id=ex_28302), column_alias='ds__extract_month') -->
-                    <!-- col8 =                                                                                         -->
-                    <!--   SqlSelectColumn(expr=SqlExtractExpression(node_id=ex_28303), column_alias='ds__extract_day') -->
-                    <!-- col9 =                                                                                         -->
-                    <!--   SqlSelectColumn(expr=SqlExtractExpression(node_id=ex_28304), column_alias='ds__extract_dow') -->
-                    <!-- col10 =                                                                                        -->
-                    <!--   SqlSelectColumn(expr=SqlExtractExpression(node_id=ex_28305), column_alias='ds__extract_doy') -->
-                    <!-- col11 =                                                  -->
-                    <!--   SqlSelectColumn(                                       -->
-                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_28131), -->
-                    <!--     column_alias='ds__martian_day',                      -->
-                    <!--   )                                                      -->
-                    <!-- col12 =                                                                         -->
+                    <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_1), column_alias='ds__day') -->
+                    <!-- col1 =                                               -->
+                    <!--   SqlSelectColumn(                                   -->
+                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_0), -->
+                    <!--     column_alias='ds__martian_day',                  -->
+                    <!--   )                                                  -->
+                    <!-- col2 =                                                                          -->
                     <!--   SqlSelectColumn(                                                              -->
                     <!--     expr=SqlWindowFunctionExpression(node_id=wfnc_0, sql_function=FIRST_VALUE), -->
-                    <!--     column_alias='ds__martian_day__first_value',                                -->
+                    <!--     column_alias='ds__day__first_value',                                        -->
                     <!--   )                                                                             -->
-                    <!-- col13 =                                                                        -->
+                    <!-- col3 =                                                                         -->
                     <!--   SqlSelectColumn(                                                             -->
                     <!--     expr=SqlWindowFunctionExpression(node_id=wfnc_1, sql_function=LAST_VALUE), -->
-                    <!--     column_alias='ds__martian_day__last_value',                                -->
+                    <!--     column_alias='ds__day__last_value',                                        -->
                     <!--   )                                                                            -->
-                    <!-- col14 =                                                                        -->
+                    <!-- col4 =                                                                         -->
                     <!--   SqlSelectColumn(                                                             -->
                     <!--     expr=SqlWindowFunctionExpression(node_id=wfnc_2, sql_function=ROW_NUMBER), -->
                     <!--     column_alias='ds__day__row_number',                                        -->

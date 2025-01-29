@@ -18,12 +18,12 @@ FROM (
         PARTITION BY martian_day
         ORDER BY ds
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-      ) AS ds__martian_day__first_value
+      ) AS ds__day__first_value
       , LAST_VALUE(ds) OVER (
         PARTITION BY martian_day
         ORDER BY ds
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-      ) AS ds__martian_day__last_value
+      ) AS ds__day__last_value
       , ROW_NUMBER() OVER (
         PARTITION BY martian_day
         ORDER BY ds
@@ -34,8 +34,8 @@ FROM (
   SELECT
     cte_2.ds__day AS ds__day
     , CASE
-      WHEN subq_6.ds__martian_day__first_value__lead + INTERVAL (cte_2.ds__day__row_number - 1) day <= subq_6.ds__martian_day__last_value__lead
-        THEN subq_6.ds__martian_day__first_value__lead + INTERVAL (cte_2.ds__day__row_number - 1) day
+      WHEN subq_6.ds__day__first_value__lead + INTERVAL (cte_2.ds__day__row_number - 1) day <= subq_6.ds__day__last_value__lead
+        THEN subq_6.ds__day__first_value__lead + INTERVAL (cte_2.ds__day__row_number - 1) day
       ELSE NULL
     END AS ds__day__lead
   FROM cte_2 cte_2
@@ -43,19 +43,19 @@ FROM (
     -- Offset Custom Granularity Bounds
     SELECT
       ds__martian_day
-      , LEAD(ds__martian_day__first_value, 3) OVER (ORDER BY ds__martian_day) AS ds__martian_day__first_value__lead
-      , LEAD(ds__martian_day__last_value, 3) OVER (ORDER BY ds__martian_day) AS ds__martian_day__last_value__lead
+      , LEAD(ds__day__first_value, 3) OVER (ORDER BY ds__martian_day) AS ds__day__first_value__lead
+      , LEAD(ds__day__last_value, 3) OVER (ORDER BY ds__martian_day) AS ds__day__last_value__lead
     FROM (
       -- Get Unique Rows for Custom Granularity Bounds
       SELECT
         ds__martian_day
-        , ds__martian_day__first_value
-        , ds__martian_day__last_value
+        , ds__day__first_value
+        , ds__day__last_value
       FROM cte_2 cte_2
       GROUP BY
         ds__martian_day
-        , ds__martian_day__first_value
-        , ds__martian_day__last_value
+        , ds__day__first_value
+        , ds__day__last_value
     ) subq_5
   ) subq_6
   ON
