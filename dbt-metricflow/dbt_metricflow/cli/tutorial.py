@@ -12,6 +12,8 @@ from typing import Sequence
 import click
 import packaging.version
 from halo import Halo
+from packaging.version import Version
+from typing_extensions import Optional
 
 from dbt_metricflow.cli.cli_configuration import CLIConfiguration
 from dbt_metricflow.cli.utils import (
@@ -89,11 +91,11 @@ class dbtMetricFlowTutorialHelper:
         shutil.copytree(src=sample_project_path, dst=project_path)
 
     @staticmethod
-    def run_tutorial(cfg: CLIConfiguration, message: bool, clean: bool, yes: bool) -> None:
-        """Run user through a CLI tutorial.
+    def _generate_help_message_text(dbt_core_version: Optional[Version]) -> str:
+        time_spine_docs_link = "https://docs.getdbt.com/docs/build/metricflow-time-spine"
+        if dbt_core_version is not None:
+            time_spine_docs_link = time_spine_docs_link + f"?version={dbt_core_version.major}.{dbt_core_version.minor}"
 
-        See the associated Click command for details on the arguments.
-        """
         # Needed to handle the backslash outside f-string
         complex_query = (
             """mf query \\
@@ -103,25 +105,7 @@ class dbtMetricFlowTutorialHelper:
                     --start-time 2022-03-20 --end-time 2022-04-01
             """
         ).rstrip()
-        dbt_core_package_name = "dbt-core"
-        dbt_core_version = None
-        try:
-            dbt_core_version = packaging.version.parse(importlib.metadata.version(dbt_core_package_name))
-        except Exception as e:
-            click.secho(
-                textwrap.dedent(
-                    f"""
-                        Unable to determine the version of package {dbt_core_package_name!r}:
-                            {str(e).splitlines()[0]}
-                        Displayed links to dbt docs may not reflect the correct version for your installed version of {dbt_core_package_name!r}
-                        """
-                ),
-                fg="yellow",
-            )
-        time_spine_docs_link = "https://docs.getdbt.com/docs/build/metricflow-time-spine"
-        if dbt_core_version is not None:
-            time_spine_docs_link = time_spine_docs_link + f"?version={dbt_core_version.major}.{dbt_core_version.minor}"
-        help_msg = textwrap.dedent(
+        return textwrap.dedent(
             f"""\
             🤓 {click.style("Please run the following steps:", bold=True)}
 
@@ -153,8 +137,30 @@ class dbtMetricFlowTutorialHelper:
             """
         )
 
+    @staticmethod
+    def run_tutorial(cfg: CLIConfiguration, message: bool, clean: bool, yes: bool) -> None:
+        """Run user through a CLI tutorial.
+
+        See the associated Click command for details on the arguments.
+        """
+        dbt_core_package_name = "dbt-core"
+        dbt_core_version = None
+        try:
+            dbt_core_version = packaging.version.parse(importlib.metadata.version(dbt_core_package_name))
+        except Exception as e:
+            click.secho(
+                textwrap.dedent(
+                    f"""
+                        Unable to determine the version of package {dbt_core_package_name!r}:
+                            {str(e).splitlines()[0]}
+                        Displayed links to dbt docs may not reflect the correct version for your installed version of {dbt_core_package_name!r}
+                        """
+                ),
+                fg="yellow",
+            )
+        help_message_text = dbtMetricFlowTutorialHelper._generate_help_message_text(dbt_core_version)
         if message:
-            click.echo(help_msg)
+            click.echo(help_message_text)
             exit()
 
         current_directory = pathlib.Path.cwd()
@@ -287,7 +293,7 @@ class dbtMetricFlowTutorialHelper:
 
         spinner.succeed("📜 Sample files has been generated.")
 
-        click.echo("\n" + help_msg)
+        click.echo("\n" + help_message_text)
         click.echo("💡 Run `mf tutorial --message` to see this message again without executing everything else")
         exit()
 
