@@ -105,10 +105,15 @@ if __name__ == "__main__":
         package_test_script=metricflow_repo_directory.joinpath("scripts/ci_tests/metricflow_package_test.py"),
     )
 
-    # Test building `metricflow-semantics` package.
+    # Test building the `metricflow-semantics` package.
     _run_package_build_test(
         package_directory=metricflow_repo_directory.joinpath("metricflow-semantics"),
         package_test_script=metricflow_repo_directory.joinpath("scripts/ci_tests/metricflow_semantics_package_test.py"),
     )
 
-    # Add entry for `dbt-metricflow` once build issues are resolved.
+    # Test building the `dbt-metricflow` package.
+    _run_package_build_test(
+        package_directory=metricflow_repo_directory.joinpath("dbt-metricflow"),
+        package_test_script=metricflow_repo_directory.joinpath("scripts/ci_tests/dbt_metricflow_package_test.py"),
+        optional_package_dependencies_to_install=("dbt-duckdb",),
+    )
