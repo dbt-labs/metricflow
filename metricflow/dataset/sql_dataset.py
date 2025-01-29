@@ -52,6 +52,16 @@ class SqlDataSet(DataSet):
             )
         return node_to_return
 
+    def with_copied_sql_node(self) -> SqlDataSet:
+        """Return a new instance of the dataset a copy of the SQL node."""
+        sql_select_node = self._sql_select_node
+        if sql_select_node:
+            sql_select_node = sql_select_node.copy()
+        sql_node = self._sql_node
+        if sql_node:
+            sql_node = sql_node.copy()
+        return SqlDataSet(instance_set=self.instance_set, sql_select_node=sql_select_node, sql_node=sql_node)
+
     @property
     def checked_sql_select_node(self) -> SqlSelectStatementNode:
         """If applicable, return a SELECT node that can be used to read data from the given SQL table or SQL query.

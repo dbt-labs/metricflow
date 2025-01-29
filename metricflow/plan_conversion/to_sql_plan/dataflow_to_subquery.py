@@ -175,7 +175,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         if node not in self._node_to_output_data_set:
             self._node_to_output_data_set[node] = node.accept(self)
 
-        return self._node_to_output_data_set[node]
+        return self._node_to_output_data_set[node].with_copied_sql_node()
 
     def cache_output_data_sets(self, nodes: Sequence[DataflowPlanNode]) -> None:
         """Cache the output of the given nodes for consistent retrieval with `get_output_data_set`."""
