@@ -166,63 +166,62 @@ class dbtMetricFlowTutorialHelper:
         current_directory = pathlib.Path.cwd()
         project_path = current_directory
 
-        if not dbt_project_file_exists():
-            tutorial_project_name = "mf_tutorial_project"
+        tutorial_project_name = "mf_tutorial_project"
 
-            sample_dbt_project_path = (current_directory / tutorial_project_name).absolute()
-            click.secho(
-                "Unable to detect a dbt project. Please run `mf tutorial` from the root directory of your dbt project.",
-                fg="yellow",
-            )
+        sample_dbt_project_path = (current_directory / tutorial_project_name).absolute()
+        click.secho(
+            "Unable to detect a dbt project. Please run `mf tutorial` from the root directory of your dbt project.",
+            fg="yellow",
+        )
+        yes or click.confirm(
+            textwrap.dedent(
+                f"""\
+
+                Alternatively, this tutorial can create a sample dbt project with a `profiles.yml` configured to
+                use DuckDB. This will allow you to run the tutorial as a self-contained experience. The sample project
+                will be created at:
+
+                    {click.style(str(sample_dbt_project_path), bold=True)}
+
+                Do you want to create the sample project now?
+                """
+            ).rstrip(),
+            abort=True,
+        )
+
+        dbtMetricFlowTutorialHelper._check_duckdb_package_installed_for_sample_project(yes)
+
+        if dbtMetricFlowTutorialHelper.check_if_path_exists([sample_dbt_project_path]):
             yes or click.confirm(
-                textwrap.dedent(
-                    f"""\
+                click.style(
+                    textwrap.dedent(
+                        f"""\
 
-                    Alternatively, this tutorial can create a sample dbt project with a `profiles.yml` configured to
-                    use DuckDB. This will allow you to run the tutorial as a self-contained experience. The sample project
-                    will be created at:
-
-                        {click.style(str(sample_dbt_project_path), bold=True)}
-
-                    Do you want to create the sample project now?
-                    """
-                ).rstrip(),
+                        The path {str(sample_dbt_project_path)!r} already exists.
+                        Do you want to overwrite it?
+                        """
+                    ).rstrip(),
+                    fg="yellow",
+                ),
                 abort=True,
             )
+            dbtMetricFlowTutorialHelper.remove_files(sample_dbt_project_path)
+        spinner = Halo(text=f"Generating {repr(tutorial_project_name)} files...", spinner="dots")
+        spinner.start()
 
-            dbtMetricFlowTutorialHelper._check_duckdb_package_installed_for_sample_project(yes)
+        dbtMetricFlowTutorialHelper.generate_dbt_project(sample_dbt_project_path)
+        spinner.succeed("📦 Sample dbt project has been generated.")
+        click.secho(
+            textwrap.dedent(
+                """\
 
-            if dbtMetricFlowTutorialHelper.check_if_path_exists([sample_dbt_project_path]):
-                yes or click.confirm(
-                    click.style(
-                        textwrap.dedent(
-                            f"""\
-
-                            The path {str(sample_dbt_project_path)!r} already exists.
-                            Do you want to overwrite it?
-                            """
-                        ).rstrip(),
-                        fg="yellow",
-                    ),
-                    abort=True,
-                )
-                dbtMetricFlowTutorialHelper.remove_files(sample_dbt_project_path)
-            spinner = Halo(text=f"Generating {repr(tutorial_project_name)} files...", spinner="dots")
-            spinner.start()
-
-            dbtMetricFlowTutorialHelper.generate_dbt_project(sample_dbt_project_path)
-            spinner.succeed("📦 Sample dbt project has been generated.")
-            click.secho(
-                textwrap.dedent(
-                    """\
-
-                    Before running the steps in the tutorial, be sure to switch to the sample project directory.
-                    """
-                ),
-                bold=True,
-            )
-            os.chdir(sample_dbt_project_path.as_posix())
-            project_path = sample_dbt_project_path
+                Before running the steps in the tutorial, be sure to switch to the sample project directory.
+                """
+            ),
+            bold=True,
+        )
+        os.chdir(sample_dbt_project_path.as_posix())
+        project_path = sample_dbt_project_path
 
         click.echo(f"Using the project in {str(project_path)!r}\n")
         cfg.setup()
