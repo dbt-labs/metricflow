@@ -7,6 +7,7 @@ from typing import Sequence
 from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.visitor import VisitorOutputT
 
@@ -16,7 +17,12 @@ from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
 
 @dataclass(frozen=True, eq=False)
 class OffsetCustomGranularityNode(DataflowPlanNode, ABC):
-    """For a given custom grain, offset it by the requested number of custom grain periods."""
+    """Offset a custom grain by the requested number of periods.
+
+    Used to build the time spine node when querying a metric with a custom offset window, when the query requires ONLY the same
+    grain as is used in the offset window. The node will output offset columns for all custom grain specs requested and a
+    non-offset column for the base grain. The base grain is needed to join to the source node.
+    """
 
     offset_window: MetricTimeWindow
     required_time_spine_specs: Sequence[TimeDimensionSpec]
@@ -24,6 +30,13 @@ class OffsetCustomGranularityNode(DataflowPlanNode, ABC):
 
     def __post_init__(self) -> None:  # noqa: D105
         super().__post_init__()
+        if self.offset_window.is_standard_granularity:
+            raise ValueError(
+                LazyFormat(
+                    "OffsetBaseGrainByCustomGrainNode should only be used for custom grain offset windows.",
+                    offset_window=self.offset_window,
+                )
+            )
 
     @staticmethod
     def create(  # noqa: D102

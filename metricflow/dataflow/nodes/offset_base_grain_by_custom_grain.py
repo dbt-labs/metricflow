@@ -7,6 +7,7 @@ from typing import Sequence
 from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.visitor import VisitorOutputT
 
@@ -16,7 +17,17 @@ from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
 
 @dataclass(frozen=True, eq=False)
 class OffsetBaseGrainByCustomGrainNode(DataflowPlanNode, ABC):
-    """For a given custom grain, offset its base grain by the requested number of custom grain periods."""
+    """For a given custom grain, offset its base grain by the requested number of custom grain periods.
+
+    Used to build the time spine node when querying a metric with a custom offset window with any grains / date parts.
+    This node should only satisfy base grains - custom grains will be joined later in the dataflow plan. It will also
+    need to include the custom grain's base grain, even if that was not queried, because that will be required to join
+    to the source node.
+
+
+    If the metric is queried with ONLY the same grain as is used in the offset window, should use OffsetCustomGrainNode
+    instead.
+    """
 
     offset_window: MetricTimeWindow
     required_time_spine_specs: Sequence[TimeDimensionSpec]
@@ -24,6 +35,22 @@ class OffsetBaseGrainByCustomGrainNode(DataflowPlanNode, ABC):
 
     def __post_init__(self) -> None:  # noqa: D105
         super().__post_init__()
+
+        for spec in self.required_time_spine_specs:
+            if spec.has_custom_grain:
+                raise ValueError(
+                    LazyFormat(
+                        "Found custom grain in required specs, which is not supported by OffsetBaseGrainByCustomGrainNode.",
+                        required_time_spine_specs=self.required_time_spine_specs,
+                    )
+                )
+        if self.offset_window.is_standard_granularity:
+            raise ValueError(
+                LazyFormat(
+                    "OffsetBaseGrainByCustomGrainNode should only be used for custom grain offset windows.",
+                    offset_window=self.offset_window,
+                )
+            )
 
     @staticmethod
     def create(  # noqa: D102
