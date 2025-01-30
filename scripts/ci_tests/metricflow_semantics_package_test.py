@@ -86,5 +86,6 @@ def log_query_spec() -> None:  # noqa: D103
     logger.debug(LazyFormat(lambda: f"{query_spec.__class__.__name__}:\n{mf_pformat(query_spec)}"))
 
 
-logging.basicConfig(format="%(asctime)s - %(levelname)s -  %(message)s", level=logging.INFO)
-log_query_spec()
+if __name__ == "__main__":
+    logging.basicConfig(format="%(asctime)s %(levelname)s %(filename)s:%(lineno)d - %(message)s", level=logging.INFO)
+    log_query_spec()

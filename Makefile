@@ -106,3 +106,7 @@ testx:
 .PHONY: testx-snap
 testx-snap:
 	make test ADDITIONAL_PYTEST_OPTIONS='-x --overwrite-snapshots'
+
+.PHONY: test-build-packages
+test-build-packages:
+	PYTHONPATH=. python scripts/ci_tests/run_package_build_tests.py --metricflow-repo-directory=.
