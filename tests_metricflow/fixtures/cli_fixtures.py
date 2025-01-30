@@ -38,6 +38,11 @@ class FakeCLIConfiguration(CLIConfiguration):
         self._semantic_manifest_lookup: Optional[SemanticManifestLookup] = None
         self._log_file_path: Optional[pathlib.Path] = None
 
+    @override
+    def setup(self) -> None:
+        # For tests, a dbt project is not needed, so don't try to configure it.
+        return
+
     @property
     @override
     def dbt_artifacts(self) -> dbtArtifacts:
