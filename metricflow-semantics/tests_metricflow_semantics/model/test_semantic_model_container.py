@@ -45,7 +45,7 @@ def metric_lookup(  # noqa: D103
     return MetricLookup(
         semantic_manifest=simple_semantic_manifest,
         semantic_model_lookup=semantic_model_lookup,
-        custom_granularities=semantic_model_lookup._custom_granularities,
+        custom_granularities=semantic_model_lookup.custom_granularities,
     )
 
 
@@ -56,7 +56,7 @@ def multi_hop_metric_lookup(  # noqa: D103
     return MetricLookup(
         semantic_manifest=multi_hop_join_manifest,
         semantic_model_lookup=multi_hop_semantic_model_lookup,
-        custom_granularities=multi_hop_semantic_model_lookup._custom_granularities,
+        custom_granularities=multi_hop_semantic_model_lookup.custom_granularities,
     )
 
 
