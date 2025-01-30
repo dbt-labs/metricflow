@@ -47,12 +47,12 @@ FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
     SELECT
-      DATE_TRUNC('day', ds) AS booking__ds__day
+      DATE_TRUNC('day', ds) AS metric_time__day
       , 1 AS bookings
     FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_12
   ON
-    subq_14.ds__day = subq_12.booking__ds__day
+    subq_14.ds__day = subq_12.metric_time__day
   GROUP BY
     subq_14.booking__ds__martian_day
     , subq_14.metric_time__martian_day

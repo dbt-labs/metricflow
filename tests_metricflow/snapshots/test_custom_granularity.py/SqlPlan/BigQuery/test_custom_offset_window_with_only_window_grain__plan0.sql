@@ -28,7 +28,7 @@ FROM (
       FROM (
         -- Join to Time Spine Dataset
         SELECT
-          subq_5.booking__ds__day AS booking__ds__day
+          subq_5.metric_time__day AS metric_time__day
           , subq_5.booking__ds__martian_day AS booking__ds__martian_day
           , subq_5.metric_time__martian_day AS metric_time__martian_day
           , subq_2.ds__day AS ds__day
@@ -64,6 +64,7 @@ FROM (
           , subq_2.paid_at__extract_day AS paid_at__extract_day
           , subq_2.paid_at__extract_dow AS paid_at__extract_dow
           , subq_2.paid_at__extract_doy AS paid_at__extract_doy
+          , subq_2.booking__ds__day AS booking__ds__day
           , subq_2.booking__ds__week AS booking__ds__week
           , subq_2.booking__ds__month AS booking__ds__month
           , subq_2.booking__ds__quarter AS booking__ds__quarter
@@ -96,7 +97,6 @@ FROM (
           , subq_2.booking__paid_at__extract_day AS booking__paid_at__extract_day
           , subq_2.booking__paid_at__extract_dow AS booking__paid_at__extract_dow
           , subq_2.booking__paid_at__extract_doy AS booking__paid_at__extract_doy
-          , subq_2.metric_time__day AS metric_time__day
           , subq_2.metric_time__week AS metric_time__week
           , subq_2.metric_time__month AS metric_time__month
           , subq_2.metric_time__quarter AS metric_time__quarter
@@ -129,10 +129,10 @@ FROM (
           , subq_2.approximate_continuous_booking_value_p99 AS approximate_continuous_booking_value_p99
           , subq_2.approximate_discrete_booking_value_p99 AS approximate_discrete_booking_value_p99
         FROM (
-          -- Pass Only Elements: ['ds__day', 'booking__ds__day', 'booking__ds__martian_day', 'metric_time__martian_day']
+          -- Pass Only Elements: ['ds__day', 'metric_time__day', 'booking__ds__martian_day', 'metric_time__martian_day']
           SELECT
             subq_4.ds__day
-            , subq_4.booking__ds__day
+            , subq_4.metric_time__day
             , subq_4.booking__ds__martian_day
             , subq_4.metric_time__martian_day
           FROM (
@@ -157,7 +157,7 @@ FROM (
 
             SELECT
               cte_2.ds__day AS ds__day
-              , subq_3.ds__martian_day__lead AS booking__ds__day
+              , subq_3.ds__martian_day__lead AS metric_time__day
               , subq_3.ds__martian_day__lead AS booking__ds__martian_day
               , subq_3.ds__martian_day__lead AS metric_time__martian_day
             FROM cte_2 cte_2
@@ -370,7 +370,7 @@ FROM (
           ) subq_1
         ) subq_2
         ON
-          subq_5.ds__day = subq_2.booking__ds__day
+          subq_5.ds__day = subq_2.metric_time__day
       ) subq_6
     ) subq_7
     GROUP BY
