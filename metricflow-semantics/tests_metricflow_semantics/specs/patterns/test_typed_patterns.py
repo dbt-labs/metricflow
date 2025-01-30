@@ -28,6 +28,11 @@ from metricflow_semantics.specs.patterns.typed_patterns import (
     GroupByMetricPattern,
     TimeDimensionPattern,
 )
+from metricflow_semantics.specs.patterns.entity_link_pattern import (
+    EntityLinkPattern,
+    SpecPatternParameterSet,
+    ParameterSetField,
+)
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
