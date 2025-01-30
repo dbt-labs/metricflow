@@ -25,9 +25,9 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_27.metric_time__day, subq_35.metric_time__day) AS metric_time__day
-    , MAX(subq_27.month_start_bookings) AS month_start_bookings
-    , MAX(subq_35.bookings_1_month_ago) AS bookings_1_month_ago
+    COALESCE(subq_26.metric_time__day, subq_34.metric_time__day) AS metric_time__day
+    , MAX(subq_26.month_start_bookings) AS month_start_bookings
+    , MAX(subq_34.bookings_1_month_ago) AS bookings_1_month_ago
   FROM (
     -- Join to Time Spine Dataset
     -- Pass Only Elements: ['bookings', 'metric_time__day']
@@ -43,7 +43,7 @@ FROM (
       DATETIME_TRUNC(rss_28018_cte.ds__day, month) = sma_28009_cte.metric_time__day
     GROUP BY
       metric_time__day
-  ) subq_27
+  ) subq_26
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
     -- Pass Only Elements: ['bookings', 'metric_time__day']
@@ -59,9 +59,9 @@ FROM (
       DATE_SUB(CAST(rss_28018_cte.ds__day AS DATETIME), INTERVAL 1 month) = sma_28009_cte.metric_time__day
     GROUP BY
       metric_time__day
-  ) subq_35
+  ) subq_34
   ON
-    subq_27.metric_time__day = subq_35.metric_time__day
+    subq_26.metric_time__day = subq_34.metric_time__day
   GROUP BY
     metric_time__day
-) subq_36
+) subq_35

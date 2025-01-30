@@ -22,7 +22,7 @@ FROM (
       , 1 AS bookings
       , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_13
+  ) subq_12
   GROUP BY
     metric_time__day
-) subq_15
+) subq_14

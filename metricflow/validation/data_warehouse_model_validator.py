@@ -36,7 +36,6 @@ from metricflow_semantics.specs.measure_spec import MeasureSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 
-from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
@@ -44,6 +43,7 @@ from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConv
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_sql import DataflowToSqlPlanConverter
+from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
 from metricflow.protocols.sql_client import SqlClient
 
 
@@ -71,7 +71,7 @@ class QueryRenderingTools:
             column_association_resolver=DunderColumnAssociationResolver(),
             semantic_manifest_lookup=self.semantic_manifest_lookup,
         )
-        self.node_resolver = DataflowPlanNodeOutputDataSetResolver(
+        self.node_resolver = DataflowNodeToSqlSubqueryVisitor(
             column_association_resolver=DunderColumnAssociationResolver(),
             semantic_manifest_lookup=self.semantic_manifest_lookup,
         )

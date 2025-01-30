@@ -15,10 +15,10 @@ FROM (
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
-    subq_21.martian_day AS metric_time__martian_day
-    , DATETIME_TRUNC(subq_18.ds__day__lead, month) AS booking__ds__month
-    , EXTRACT(year FROM subq_18.ds__day__lead) AS metric_time__extract_year
-    , SUM(subq_14.bookings) AS bookings
+    subq_29.martian_day AS metric_time__martian_day
+    , DATETIME_TRUNC(subq_26.ds__day__lead, month) AS booking__ds__month
+    , EXTRACT(year FROM subq_26.ds__day__lead) AS metric_time__extract_year
+    , SUM(subq_22.bookings) AS bookings
   FROM (
     -- Offset Base Granularity By Custom Granularity Period(s)
     WITH cte_6 AS (
@@ -47,8 +47,8 @@ FROM (
     SELECT
       cte_6.ds__day AS ds__day
       , CASE
-        WHEN DATE_ADD(CAST(subq_17.ds__martian_day__first_value__lead AS DATETIME), INTERVAL cte_6.ds__day__row_number - 1 day) <= subq_17.ds__martian_day__last_value__lead
-          THEN DATE_ADD(CAST(subq_17.ds__martian_day__first_value__lead AS DATETIME), INTERVAL cte_6.ds__day__row_number - 1 day)
+        WHEN DATE_ADD(CAST(subq_25.ds__martian_day__first_value__lead AS DATETIME), INTERVAL cte_6.ds__day__row_number - 1 day) <= subq_25.ds__martian_day__last_value__lead
+          THEN DATE_ADD(CAST(subq_25.ds__martian_day__first_value__lead AS DATETIME), INTERVAL cte_6.ds__day__row_number - 1 day)
         ELSE NULL
       END AS ds__day__lead
     FROM cte_6 cte_6
@@ -69,11 +69,11 @@ FROM (
           ds__martian_day
           , ds__martian_day__first_value
           , ds__martian_day__last_value
-      ) subq_16
-    ) subq_17
+      ) subq_24
+    ) subq_25
     ON
-      cte_6.ds__martian_day = subq_17.ds__martian_day
-  ) subq_18
+      cte_6.ds__martian_day = subq_25.ds__martian_day
+  ) subq_26
   INNER JOIN (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
@@ -81,15 +81,15 @@ FROM (
       DATETIME_TRUNC(ds, day) AS metric_time__day
       , 1 AS bookings
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_14
+  ) subq_22
   ON
-    subq_18.ds__day = subq_14.metric_time__day
+    subq_26.ds__day = subq_22.metric_time__day
   LEFT OUTER JOIN
-    ***************************.mf_time_spine subq_21
+    ***************************.mf_time_spine subq_29
   ON
-    subq_18.ds__day__lead = subq_21.ds
+    subq_26.ds__day__lead = subq_29.ds
   GROUP BY
     metric_time__martian_day
     , booking__ds__month
     , metric_time__extract_year
-) subq_25
+) subq_33

@@ -9,10 +9,10 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_35.metric_time__day, subq_40.metric_time__day) AS metric_time__day
-    , MAX(subq_35.average_booking_value) AS average_booking_value
-    , MAX(subq_35.bookings) AS bookings
-    , MAX(subq_40.booking_value) AS booking_value
+    COALESCE(subq_32.metric_time__day, subq_37.metric_time__day) AS metric_time__day
+    , MAX(subq_32.average_booking_value) AS average_booking_value
+    , MAX(subq_32.bookings) AS bookings
+    , MAX(subq_37.booking_value) AS booking_value
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['average_booking_value', 'bookings', 'metric_time__day']
@@ -26,9 +26,9 @@ FROM (
       -- Join Standard Outputs
       SELECT
         listings_latest_src_28000.is_lux AS listing__is_lux_latest
-        , subq_27.metric_time__day AS metric_time__day
-        , subq_27.bookings AS bookings
-        , subq_27.average_booking_value AS average_booking_value
+        , subq_24.metric_time__day AS metric_time__day
+        , subq_24.bookings AS bookings
+        , subq_24.average_booking_value AS average_booking_value
       FROM (
         -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
@@ -38,16 +38,16 @@ FROM (
           , 1 AS bookings
           , booking_value AS average_booking_value
         FROM ***************************.fct_bookings bookings_source_src_28000
-      ) subq_27
+      ) subq_24
       LEFT OUTER JOIN
         ***************************.dim_listings_latest listings_latest_src_28000
       ON
-        subq_27.listing = listings_latest_src_28000.listing_id
-    ) subq_31
+        subq_24.listing = listings_latest_src_28000.listing_id
+    ) subq_28
     WHERE listing__is_lux_latest
     GROUP BY
       metric_time__day
-  ) subq_35
+  ) subq_32
   FULL OUTER JOIN (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
@@ -60,9 +60,9 @@ FROM (
     FROM ***************************.fct_bookings bookings_source_src_28000
     GROUP BY
       metric_time__day
-  ) subq_40
+  ) subq_37
   ON
-    subq_35.metric_time__day = subq_40.metric_time__day
+    subq_32.metric_time__day = subq_37.metric_time__day
   GROUP BY
     metric_time__day
-) subq_41
+) subq_38

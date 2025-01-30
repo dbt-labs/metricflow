@@ -7,7 +7,7 @@ sql_engine: DuckDB
 -- Join Standard Outputs
 SELECT
   subq_3.country_latest AS listing__country_latest
-  , subq_5.country_latest AS listing__country_latest
+  , subq_4.country_latest AS listing__country_latest
   , subq_1.listing AS listing
   , subq_1.bookings AS bookings
 FROM (
@@ -181,8 +181,8 @@ ON
 LEFT OUTER JOIN (
   -- Pass Only Elements: ['country_latest', 'listing']
   SELECT
-    subq_4.listing
-    , subq_4.country_latest
+    subq_2.listing
+    , subq_2.country_latest
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     SELECT
@@ -243,7 +243,7 @@ LEFT OUTER JOIN (
       , listings_latest_src_28000.user_id AS user
       , listings_latest_src_28000.user_id AS listing__user
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_4
-) subq_5
+  ) subq_2
+) subq_4
 ON
-  subq_1.listing = subq_5.listing
+  subq_1.listing = subq_4.listing

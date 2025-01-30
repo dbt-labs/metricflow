@@ -25,11 +25,11 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_23.metric_time__day, subq_27.metric_time__day) AS metric_time__day
-    , COALESCE(subq_23.metric_time__month, subq_27.metric_time__month) AS metric_time__month
-    , COALESCE(subq_23.metric_time__year, subq_27.metric_time__year) AS metric_time__year
-    , MAX(subq_23.booking_value) AS booking_value
-    , MAX(subq_27.bookers) AS bookers
+    COALESCE(subq_22.metric_time__day, subq_26.metric_time__day) AS metric_time__day
+    , COALESCE(subq_22.metric_time__month, subq_26.metric_time__month) AS metric_time__month
+    , COALESCE(subq_22.metric_time__year, subq_26.metric_time__year) AS metric_time__year
+    , MAX(subq_22.booking_value) AS booking_value
+    , MAX(subq_26.bookers) AS bookers
   FROM (
     -- Join to Time Spine Dataset
     -- Pass Only Elements: ['booking_value', 'metric_time__day', 'metric_time__month', 'metric_time__year']
@@ -49,7 +49,7 @@ FROM (
       time_spine_src_28006.ds
       , DATE_TRUNC('month', time_spine_src_28006.ds)
       , DATE_TRUNC('year', time_spine_src_28006.ds)
-  ) subq_23
+  ) subq_22
   FULL OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
     -- Pass Only Elements: ['bookers', 'metric_time__day', 'metric_time__month', 'metric_time__year']
@@ -65,17 +65,17 @@ FROM (
       metric_time__day
       , metric_time__month
       , metric_time__year
-  ) subq_27
+  ) subq_26
   ON
     (
-      subq_23.metric_time__day = subq_27.metric_time__day
+      subq_22.metric_time__day = subq_26.metric_time__day
     ) AND (
-      subq_23.metric_time__month = subq_27.metric_time__month
+      subq_22.metric_time__month = subq_26.metric_time__month
     ) AND (
-      subq_23.metric_time__year = subq_27.metric_time__year
+      subq_22.metric_time__year = subq_26.metric_time__year
     )
   GROUP BY
-    COALESCE(subq_23.metric_time__day, subq_27.metric_time__day)
-    , COALESCE(subq_23.metric_time__month, subq_27.metric_time__month)
-    , COALESCE(subq_23.metric_time__year, subq_27.metric_time__year)
-) subq_28
+    COALESCE(subq_22.metric_time__day, subq_26.metric_time__day)
+    , COALESCE(subq_22.metric_time__month, subq_26.metric_time__month)
+    , COALESCE(subq_22.metric_time__year, subq_26.metric_time__year)
+) subq_27

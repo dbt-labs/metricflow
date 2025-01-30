@@ -15,10 +15,10 @@ WITH pfe_1_cte AS (
 )
 
 SELECT
-  subq_9.country_latest AS listing__country_latest
-  , subq_10.country_latest AS listing__country_latest
-  , subq_7.listing AS listing
-  , subq_7.bookings AS bookings
+  subq_8.country_latest AS listing__country_latest
+  , subq_9.country_latest AS listing__country_latest
+  , subq_6.listing AS listing
+  , subq_6.bookings AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Pass Only Elements: ['bookings', 'listing']
@@ -26,7 +26,16 @@ FROM (
     listing_id AS listing
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-) subq_7
+) subq_6
+LEFT OUTER JOIN (
+  -- Read From CTE For node_id=pfe_1
+  SELECT
+    listing
+    , country_latest
+  FROM pfe_1_cte pfe_1_cte
+) subq_8
+ON
+  subq_6.listing = subq_8.listing
 LEFT OUTER JOIN (
   -- Read From CTE For node_id=pfe_1
   SELECT
@@ -35,13 +44,4 @@ LEFT OUTER JOIN (
   FROM pfe_1_cte pfe_1_cte
 ) subq_9
 ON
-  subq_7.listing = subq_9.listing
-LEFT OUTER JOIN (
-  -- Read From CTE For node_id=pfe_1
-  SELECT
-    listing
-    , country_latest
-  FROM pfe_1_cte pfe_1_cte
-) subq_10
-ON
-  subq_7.listing = subq_10.listing
+  subq_6.listing = subq_9.listing

@@ -21,7 +21,7 @@ SELECT
 FROM (
   -- Join Standard Outputs
   SELECT
-    subq_26.listing__user__average_booking_value AS user__listing__user__average_booking_value
+    subq_31.listing__user__average_booking_value AS user__listing__user__average_booking_value
     , sma_28014_cte.listings AS listings
   FROM sma_28014_cte sma_28014_cte
   LEFT OUTER JOIN (
@@ -40,8 +40,8 @@ FROM (
       bookings_source_src_28000.listing_id = sma_28014_cte.listing
     GROUP BY
       sma_28014_cte.user
-  ) subq_26
+  ) subq_31
   ON
-    sma_28014_cte.user = subq_26.listing__user
-) subq_27
+    sma_28014_cte.user = subq_31.listing__user
+) subq_32
 WHERE user__listing__user__average_booking_value > 1
