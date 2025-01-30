@@ -1620,15 +1620,20 @@ class DataflowPlanBuilder:
             f"new use case."
         )
 
-        if use_offset_custom_granularity_node:
-            required_time_spine_specs = queried_agg_time_dimension_specs
-            assert required_time_spine_specs, "No agg time dimension specs found in custom offset query."
-            join_on_time_dimension_spec = required_time_spine_specs[0].with_base_grain()
-        else:
-            required_time_spine_specs = TimeDimensionSpec.with_base_grains(queried_agg_time_dimension_specs)
-            join_on_time_dimension_spec = self._determine_time_spine_join_spec(
-                measure_properties=measure_properties, required_time_spine_specs=required_time_spine_specs
-            )
+        required_time_spine_specs = (
+            queried_agg_time_dimension_specs
+            if use_offset_custom_granularity_node
+            else TimeDimensionSpec.with_base_grains(queried_agg_time_dimension_specs)
+        )
+        join_spec_grain = (
+            self._get_base_grain_for_custom_grain(join_description.custom_offset_window.granularity)
+            if join_description.custom_offset_window
+            else measure_properties.agg_time_dimension_grain
+        )
+        join_on_time_dimension_spec = self._determine_time_spine_join_spec(
+            join_spec_grain=join_spec_grain,
+            required_time_spine_specs=required_time_spine_specs,
+        )
 
         time_spine_node = self._build_time_spine_node(
             queried_time_spine_specs=required_time_spine_specs,
@@ -1645,6 +1650,12 @@ class DataflowPlanBuilder:
             offset_to_grain=join_description.offset_to_grain,
             join_type=join_description.join_type,
         )
+
+    def _get_base_grain_for_custom_grain(self, custom_grain: str) -> TimeGranularity:
+        """Return the base grain for the custom grain."""
+        if custom_grain not in self._semantic_model_lookup.custom_granularities:
+            raise ValueError(LazyFormat("Custom grain not found in semantic model.", custom_grain=custom_grain))
+        return self._semantic_model_lookup.custom_granularities[custom_grain].base_granularity
 
     def _build_aggregated_measure_from_measure_source_node(
         self,
@@ -2003,7 +2014,7 @@ class DataflowPlanBuilder:
     def _get_time_spine_read_node_for_custom_grain(self, custom_grain: str) -> ReadSqlSourceNode:
         """Return the read node for the custom grain."""
         time_spine_source = self._choose_time_spine_source(
-            (DataSet.metric_time_dimension_spec(self._semantic_model_lookup._custom_granularities[custom_grain]),)
+            (DataSet.metric_time_dimension_spec(self._semantic_model_lookup.custom_granularities[custom_grain]),)
         )
         return self._choose_time_spine_read_node(time_spine_source)
 
@@ -2042,18 +2053,16 @@ class DataflowPlanBuilder:
             ),
         )
 
-    # TODO: label this as more specific; not sure yet what it's specific to.
     def _determine_time_spine_join_spec(
-        self, measure_properties: MeasureSpecProperties, required_time_spine_specs: Tuple[TimeDimensionSpec, ...]
+        self, join_spec_grain: TimeGranularity, required_time_spine_specs: Tuple[TimeDimensionSpec, ...]
     ) -> TimeDimensionSpec:
         """Determine the spec to join on for a time spine join.
 
         Defaults to metric_time if it is included in the request, else the agg_time_dimension.
-        Will use the smallest available grain for the meeasure.
         """
-        join_spec_grain = ExpandedTimeGranularity.from_time_granularity(measure_properties.agg_time_dimension_grain)
-        join_on_time_dimension_spec = DataSet.metric_time_dimension_spec(time_granularity=join_spec_grain)
+        expanded_grain = ExpandedTimeGranularity.from_time_granularity(join_spec_grain)
+        join_on_time_dimension_spec = DataSet.metric_time_dimension_spec(time_granularity=expanded_grain)
         if not LinkableSpecSet(time_dimension_specs=required_time_spine_specs).contains_metric_time:
             sample_agg_time_dimension_spec = required_time_spine_specs[0]
-            join_on_time_dimension_spec = sample_agg_time_dimension_spec.with_grain(time_granularity=join_spec_grain)
+            join_on_time_dimension_spec = sample_agg_time_dimension_spec.with_grain(time_granularity=expanded_grain)
         return join_on_time_dimension_spec

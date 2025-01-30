@@ -44,7 +44,7 @@ class SemanticModelLookup:
         Args:
             model: the semantic manifest used for loading semantic model definitions
         """
-        self._custom_granularities = custom_granularities
+        self.custom_granularities = custom_granularities
         self._measure_index: Dict[MeasureReference, SemanticModel] = {}
         self._measure_non_additive_dimension_specs: Dict[MeasureReference, NonAdditiveDimensionSpec] = {}
         self._dimension_index: Dict[DimensionReference, List[SemanticModel]] = {}
@@ -68,7 +68,7 @@ class SemanticModelLookup:
     @cached_property
     def custom_granularity_names(self) -> Tuple[str, ...]:
         """Returns all the custom_granularity names."""
-        return tuple(self._custom_granularities.keys())
+        return tuple(self.custom_granularities.keys())
 
     def get_dimension_references(self) -> Sequence[DimensionReference]:
         """Retrieve all dimension references from the collection of semantic models."""
