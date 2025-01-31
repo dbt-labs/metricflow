@@ -2,12 +2,9 @@ from __future__ import annotations
 
 import logging
 import pprint
-from collections.abc import Mapping
 from dataclasses import fields, is_dataclass
 from enum import Enum
-from typing import Any, List, Optional, Sized, Tuple, Union
-
-from dsi_pydantic_shim import BaseModel
+from typing import Any, List, Mapping, Optional, Sized, Tuple, Union
 
 from metricflow_semantics.mf_logging.formatting import indent
 from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
@@ -34,11 +31,6 @@ class MetricFlowPrettyFormatter:
         self._include_object_field_names = include_object_field_names
         self._include_none_object_fields = include_none_object_fields
         self._include_empty_object_fields = include_empty_object_fields
-
-    @staticmethod
-    def _is_pydantic_base_model(obj: Any):  # type:ignore
-        # Checking the attribute as the BaseModel check fails for newer version of Pydantic.
-        return isinstance(obj, BaseModel) or hasattr(obj, "__config__")
 
     def _handle_sequence_obj(
         self, list_like_obj: Union[list, tuple, set, frozenset], remaining_line_width: Optional[int]
@@ -353,16 +345,22 @@ class MetricFlowPrettyFormatter:
                 remaining_line_width=remaining_line_width,
             )
 
-        if MetricFlowPrettyFormatter._is_pydantic_base_model(obj):
-            mapping = {key: getattr(obj, key) for key in obj.dict().keys()}
-            return self._handle_mapping_like_obj(
-                mapping,
-                left_enclose_str=type(obj).__name__ + "(",
-                key_value_seperator="=",
-                right_enclose_str=")",
-                is_dataclass_like_object=True,
-                remaining_line_width=remaining_line_width,
-            )
+        # For Pydantic-like objects with a `dict` method that returns field keys / values.
+        dict_method = getattr(obj, "dict", None)
+        if dict_method is not None and callable(dict_method):
+            try:
+                mapping = {key: getattr(obj, key) for key in obj.dict().keys()}
+                return self._handle_mapping_like_obj(
+                    mapping,
+                    left_enclose_str=type(obj).__name__ + "(",
+                    key_value_seperator="=",
+                    right_enclose_str=")",
+                    is_dataclass_like_object=True,
+                    remaining_line_width=remaining_line_width,
+                )
+            except Exception:
+                # Fall back to built-in pretty-print in case the dict method can't be called. e.g. requires arguments.
+                pass
 
         # Any other object that's not handled.
         return pprint.pformat(obj, width=self._max_line_width, sort_dicts=False)
