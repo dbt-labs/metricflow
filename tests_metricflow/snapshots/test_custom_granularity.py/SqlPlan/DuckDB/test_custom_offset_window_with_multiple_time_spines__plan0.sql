@@ -24,7 +24,8 @@ FROM (
       FROM (
         -- Join to Time Spine Dataset
         SELECT
-          subq_13.metric_time__hour AS metric_time__hour
+          subq_13.metric_time__day AS metric_time__day
+          , subq_13.metric_time__hour AS metric_time__hour
           , subq_6.ds__day AS ds__day
           , subq_6.ds__week AS ds__week
           , subq_6.ds__month AS ds__month
@@ -199,7 +200,6 @@ FROM (
           , subq_6.user__archived_at__extract_day AS user__archived_at__extract_day
           , subq_6.user__archived_at__extract_dow AS user__archived_at__extract_dow
           , subq_6.user__archived_at__extract_doy AS user__archived_at__extract_doy
-          , subq_6.metric_time__day AS metric_time__day
           , subq_6.metric_time__week AS metric_time__week
           , subq_6.metric_time__month AS metric_time__month
           , subq_6.metric_time__quarter AS metric_time__quarter
@@ -215,14 +215,16 @@ FROM (
           , subq_6.user__home_state AS user__home_state
           , subq_6.archived_users AS archived_users
         FROM (
-          -- Pass Only Elements: ['ts__hour', 'metric_time__hour']
+          -- Pass Only Elements: ['ts__hour', 'metric_time__day', 'metric_time__hour']
           SELECT
             subq_12.ts__hour
+            , subq_12.metric_time__day
             , subq_12.metric_time__hour
           FROM (
             -- Apply Requested Granularities
             SELECT
               subq_11.ts__hour
+              , DATE_TRUNC('day', subq_11.ts__hour__lead) AS metric_time__day
               , subq_11.ts__hour__lead AS metric_time__hour
             FROM (
               -- Offset Base Granularity By Custom Granularity Period(s)
@@ -694,7 +696,7 @@ FROM (
           ) subq_5
         ) subq_6
         ON
-          subq_13.ts__hour = subq_6.metric_time__hour
+          subq_13.metric_time__day = subq_6.metric_time__day
       ) subq_14
     ) subq_15
     GROUP BY

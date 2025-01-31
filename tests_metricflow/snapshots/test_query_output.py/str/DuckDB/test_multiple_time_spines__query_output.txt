@@ -39,4 +39,3 @@ metric_time__martian_day    metric_time__hour    subdaily_join_to_time_spine_met
 2020-01-08T00:00:00         2020-01-03T10:00:00  None                                  None                                 None
 2020-01-08T00:00:00         2020-01-03T11:00:00  None                                  None                                 None
 2020-01-08T00:00:00         2020-01-03T12:00:00  None                                  None                                 None
-None                        None                 None                                  None                                 12

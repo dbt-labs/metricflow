@@ -4,21 +4,21 @@ test_filename: test_dataflow_to_sql_plan.py
 <SqlPlan>
     <SqlSelectStatementNode>
         <!-- description = 'Apply Requested Granularities' -->
-        <!-- node_id = NodeId(id_str='ss_6') -->
+        <!-- node_id = NodeId(id_str='ss_9') -->
         <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_17), column_alias='ts__hour') -->
         <!-- col1 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_16), column_alias='metric_time__hour') -->
-        <!-- from_source = SqlSelectStatementNode(node_id=ss_5) -->
+        <!-- from_source = SqlSelectStatementNode(node_id=ss_7) -->
         <!-- where = None -->
         <!-- distinct = False -->
         <SqlSelectStatementNode>
             <!-- description = 'Offset Base Granularity By Custom Granularity Period(s)' -->
-            <!-- node_id = NodeId(id_str='ss_5') -->
+            <!-- node_id = NodeId(id_str='ss_7') -->
             <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_13), column_alias='ts__hour') -->
             <!-- col1 = SqlSelectColumn(expr=SqlCaseExpression(node_id=case_0), column_alias='ts__hour__lead') -->
             <!-- from_source = SqlTableNode(node_id=tfc_1) -->
             <!-- join_0 =                                                 -->
             <!--   SqlJoinDescription(                                    -->
-            <!--     right_source=SqlSelectStatementNode(node_id=ss_4),   -->
+            <!--     right_source=SqlSelectStatementNode(node_id=ss_6),   -->
             <!--     right_source_alias='subq_3',                         -->
             <!--     join_type=INNER,                                     -->
             <!--     on_condition=SqlComparisonExpression(node_id=cmp_2), -->
@@ -32,7 +32,7 @@ test_filename: test_dataflow_to_sql_plan.py
             </SqlTableNode>
             <SqlSelectStatementNode>
                 <!-- description = 'Offset Custom Granularity Bounds' -->
-                <!-- node_id = NodeId(id_str='ss_4') -->
+                <!-- node_id = NodeId(id_str='ss_6') -->
                 <!-- col0 =                                                                                             -->
                 <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_7), column_alias='ds__martian_day') -->
                 <!-- col1 =                                                                   -->
@@ -45,12 +45,12 @@ test_filename: test_dataflow_to_sql_plan.py
                 <!--     expr=SqlWindowFunctionExpression(node_id=wfnc_4, sql_function=LEAD), -->
                 <!--     column_alias='ts__hour__last_value__lead',                           -->
                 <!--   )                                                                      -->
-                <!-- from_source = SqlSelectStatementNode(node_id=ss_3) -->
+                <!-- from_source = SqlSelectStatementNode(node_id=ss_5) -->
                 <!-- where = None -->
                 <!-- distinct = False -->
                 <SqlSelectStatementNode>
                     <!-- description = 'Get Unique Rows for Custom Granularity Bounds' -->
-                    <!-- node_id = NodeId(id_str='ss_3') -->
+                    <!-- node_id = NodeId(id_str='ss_5') -->
                     <!-- col0 =                                               -->
                     <!--   SqlSelectColumn(                                   -->
                     <!--     expr=SqlColumnReferenceExpression(node_id=cr_4), -->
@@ -96,7 +96,7 @@ test_filename: test_dataflow_to_sql_plan.py
                 <!-- node_id = NodeId(id_str='cte_1') -->
                 <SqlSelectStatementNode>
                     <!-- description = 'Get Custom Granularity Bounds' -->
-                    <!-- node_id = NodeId(id_str='ss_2') -->
+                    <!-- node_id = NodeId(id_str='ss_4') -->
                     <!-- col0 =                                                                                      -->
                     <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_3), column_alias='ts__hour') -->
                     <!-- col1 =                                               -->
@@ -119,10 +119,10 @@ test_filename: test_dataflow_to_sql_plan.py
                     <!--     expr=SqlWindowFunctionExpression(node_id=wfnc_2, sql_function=ROW_NUMBER), -->
                     <!--     column_alias='ts__hour__row_number',                                       -->
                     <!--   )                                                                            -->
-                    <!-- from_source = SqlSelectStatementNode(node_id=ss_0) -->
+                    <!-- from_source = SqlSelectStatementNode(node_id=ss_1) -->
                     <!-- join_0 =                                                 -->
                     <!--   SqlJoinDescription(                                    -->
-                    <!--     right_source=SqlSelectStatementNode(node_id=ss_1),   -->
+                    <!--     right_source=SqlSelectStatementNode(node_id=ss_3),   -->
                     <!--     right_source_alias='subq_1',                         -->
                     <!--     join_type=INNER,                                     -->
                     <!--     on_condition=SqlComparisonExpression(node_id=cmp_0), -->
@@ -131,7 +131,7 @@ test_filename: test_dataflow_to_sql_plan.py
                     <!-- distinct = False -->
                     <SqlSelectStatementNode>
                         <!-- description = "Read From Time Spine 'mf_time_spine'" -->
-                        <!-- node_id = NodeId(id_str='ss_0') -->
+                        <!-- node_id = NodeId(id_str='ss_1') -->
                         <!-- col0 =                                                   -->
                         <!--   SqlSelectColumn(                                       -->
                         <!--     expr=SqlColumnReferenceExpression(node_id=cr_28130), -->
@@ -191,7 +191,7 @@ test_filename: test_dataflow_to_sql_plan.py
                     </SqlSelectStatementNode>
                     <SqlSelectStatementNode>
                         <!-- description = "Read From Time Spine 'mf_time_spine_hour'" -->
-                        <!-- node_id = NodeId(id_str='ss_1') -->
+                        <!-- node_id = NodeId(id_str='ss_3') -->
                         <!-- col0 =                                                   -->
                         <!--   SqlSelectColumn(                                       -->
                         <!--     expr=SqlColumnReferenceExpression(node_id=cr_28129), -->
