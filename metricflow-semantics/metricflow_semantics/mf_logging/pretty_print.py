@@ -4,7 +4,7 @@ import logging
 import pprint
 from dataclasses import fields, is_dataclass
 from enum import Enum
-from typing import Any, List, Mapping, Optional, Sized, Tuple, Union
+from typing import Any, Dict, List, Mapping, Optional, Sized, Tuple, Union
 
 from metricflow_semantics.mf_logging.formatting import indent
 from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
@@ -454,6 +454,8 @@ def mf_pformat_dict(  # type: ignore
     description_lines: List[str] = [description] if description is not None else []
     obj_dict = obj_dict or {}
     item_sections = []
+
+    str_converted_dict: Dict[str, str] = {}
     for key, value in obj_dict.items():
         if preserve_raw_strings and isinstance(value, str):
             value_str = value
@@ -466,10 +468,10 @@ def mf_pformat_dict(  # type: ignore
                 include_none_object_fields=include_none_object_fields,
                 include_empty_object_fields=include_empty_object_fields,
             )
+        str_converted_dict[str(key)] = value_str
 
-        lines_in_value_str = len(value_str.split("\n"))
         item_section_lines: Tuple[str, ...]
-        if lines_in_value_str > 1:
+        if "\n" in value_str:
             item_section_lines = (
                 f"{key}:",
                 indent(
@@ -486,7 +488,51 @@ def mf_pformat_dict(  # type: ignore
         else:
             item_sections.append(indent(item_section))
 
+    result_as_one_line = _as_one_line(
+        description=description, str_converted_dict=str_converted_dict, max_line_length=max_line_length
+    )
+    if result_as_one_line is not None:
+        return result_as_one_line
+
     if pad_items_with_newlines:
         return "\n\n".join(description_lines + item_sections)
     else:
         return "\n".join(description_lines + item_sections)
+
+
+def _as_one_line(description: Optional[str], str_converted_dict: Dict[str, str], max_line_length: int) -> Optional[str]:
+    """See if the result can be returned in a compact, one-line representation.
+
+    e.g. for:
+      mf_pformat_dict("Example output", {"a": 1, "b": 2})
+
+    Compact output:
+      Example output (a=1, b=2)
+
+    Normal output:
+      Example output
+        a: 1
+        b: 2
+    """
+    if description is not None and "\n" in description:
+        return None
+
+    # Keep track of the total length of the keys and values to see if it can be printed on one line.
+    total_key_length = 0
+    total_value_length = 0
+
+    for key_str, value_str in str_converted_dict.items():
+        if "\n" in key_str or "\n" in value_str:
+            return None
+        total_key_length += len(key_str)
+        total_value_length += len(value_str)
+
+    one_line_length = (
+        len(description or "") + 1 + 2 + 2 * len(str_converted_dict) + total_key_length + total_value_length
+    )
+    if one_line_length > max_line_length:
+        return None
+
+    items = tuple(f"{key_str}={value_str}" for key_str, value_str in str_converted_dict.items())
+    value_in_parenthesis = ", ".join(items)
+    return f"{description} ({value_in_parenthesis})"
