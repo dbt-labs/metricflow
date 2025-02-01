@@ -93,7 +93,7 @@ class MetricFlowPrettyFormatter:
         # Convert each item to a pretty string.
         items_as_str = tuple(
             self._handle_any_obj(
-                list_item, remaining_line_width=max(0, remaining_line_width - len(self._indent_prefix))
+                list_item, remaining_line_width=max(1, remaining_line_width - len(self._indent_prefix))
             )
             for list_item in list_like_obj
         )
@@ -216,7 +216,7 @@ class MetricFlowPrettyFormatter:
         # ]
 
         # See if the value fits in the previous line.
-        remaining_width_for_value = max(0, remaining_line_width - len(result_lines[-1]))
+        remaining_width_for_value = max(1, remaining_line_width - len(result_lines[-1]))
         value_str = self._handle_any_obj(value, remaining_line_width=remaining_width_for_value)
         value_lines = value_str.splitlines()
 
@@ -456,7 +456,7 @@ def mf_pformat_dict(  # type: ignore
         else:
             value_str = mf_pformat(
                 obj=value,
-                max_line_length=max(0, max_line_length - len(indent_prefix)),
+                max_line_length=max(1, max_line_length - len(indent_prefix)),
                 indent_prefix=indent_prefix,
                 include_object_field_names=include_object_field_names,
                 include_none_object_fields=include_none_object_fields,

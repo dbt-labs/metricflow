@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import logging
 import textwrap
 
 from metricflow_semantics.formatting.formatting_helpers import mf_dedent
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat_dict
+
+logger = logging.getLogger(__name__)
 
 
 def test_pformat_many() -> None:  # noqa: D103
@@ -78,4 +81,14 @@ def test_pformat_many_with_strings() -> None:  # noqa: D103
             """
         ).rstrip()
         == result
+    )
+
+
+def test_minimal_length() -> None:
+    """Test where the max_line_length is the minimal length."""
+    assert mf_pformat_dict("Example output", {"foo": "bar"}, max_line_length=1) == mf_dedent(
+        """
+        Example output
+          foo: 'bar'
+        """
     )
