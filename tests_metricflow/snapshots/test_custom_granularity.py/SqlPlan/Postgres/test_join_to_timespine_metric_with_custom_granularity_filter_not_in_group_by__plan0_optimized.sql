@@ -17,10 +17,10 @@ FROM (
     -- Change Column Aliases
     SELECT
       ds AS metric_time__day
-      , martian_day AS metric_time__martian_day
+      , alien_day AS metric_time__alien_day
     FROM ***************************.mf_time_spine time_spine_src_28006
   ) subq_18
-  WHERE metric_time__martian_day = '2020-01-01'
+  WHERE metric_time__alien_day = '2020-01-01'
 ) subq_20
 LEFT OUTER JOIN (
   -- Constrain Output with WHERE
@@ -35,7 +35,7 @@ LEFT OUTER JOIN (
     SELECT
       subq_11.ds__day AS metric_time__day
       , subq_11.bookings AS bookings
-      , subq_12.martian_day AS metric_time__martian_day
+      , subq_12.alien_day AS metric_time__alien_day
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       SELECT
@@ -48,7 +48,7 @@ LEFT OUTER JOIN (
     ON
       subq_11.ds__day = subq_12.ds
   ) subq_13
-  WHERE metric_time__martian_day = '2020-01-01'
+  WHERE metric_time__alien_day = '2020-01-01'
   GROUP BY
     metric_time__day
 ) subq_16

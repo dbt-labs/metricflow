@@ -6,22 +6,22 @@ sql_engine: DuckDB
 ---
 -- Compute Metrics via Expressions
 SELECT
-  subq_5.metric_time__martian_day
+  subq_5.metric_time__alien_day
   , subq_5.bookings
 FROM (
   -- Aggregate Measures
   SELECT
-    subq_4.metric_time__martian_day
+    subq_4.metric_time__alien_day
     , SUM(subq_4.bookings) AS bookings
   FROM (
-    -- Pass Only Elements: ['bookings', 'metric_time__martian_day']
+    -- Pass Only Elements: ['bookings', 'metric_time__alien_day']
     SELECT
-      subq_3.metric_time__martian_day
+      subq_3.metric_time__alien_day
       , subq_3.bookings
     FROM (
       -- Constrain Output with WHERE
       SELECT
-        subq_2.metric_time__martian_day
+        subq_2.metric_time__alien_day
         , subq_2.ds__day
         , subq_2.ds__week
         , subq_2.ds__month
@@ -222,7 +222,7 @@ FROM (
           , subq_0.discrete_booking_value_p99 AS discrete_booking_value_p99
           , subq_0.approximate_continuous_booking_value_p99 AS approximate_continuous_booking_value_p99
           , subq_0.approximate_discrete_booking_value_p99 AS approximate_discrete_booking_value_p99
-          , subq_1.martian_day AS metric_time__martian_day
+          , subq_1.alien_day AS metric_time__alien_day
         FROM (
           -- Read Elements From Semantic Model 'bookings_source'
           SELECT
@@ -321,9 +321,9 @@ FROM (
         ON
           subq_0.ds__day = subq_1.ds
       ) subq_2
-      WHERE metric_time__martian_day = '2020-01-01'
+      WHERE metric_time__alien_day = '2020-01-01'
     ) subq_3
   ) subq_4
   GROUP BY
-    subq_4.metric_time__martian_day
+    subq_4.metric_time__alien_day
 ) subq_5

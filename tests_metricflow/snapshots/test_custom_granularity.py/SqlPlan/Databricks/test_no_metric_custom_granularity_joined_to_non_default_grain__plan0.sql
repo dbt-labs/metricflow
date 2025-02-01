@@ -2,10 +2,10 @@ test_name: test_no_metric_custom_granularity_joined_to_non_default_grain
 test_filename: test_custom_granularity.py
 sql_engine: Databricks
 ---
--- Pass Only Elements: ['metric_time__day', 'metric_time__martian_day', 'user__bio_added_ts__martian_day', 'user__bio_added_ts__month']
+-- Pass Only Elements: ['metric_time__day', 'metric_time__alien_day', 'user__bio_added_ts__alien_day', 'user__bio_added_ts__month']
 SELECT
-  subq_6.user__bio_added_ts__martian_day
-  , subq_6.metric_time__martian_day
+  subq_6.user__bio_added_ts__alien_day
+  , subq_6.metric_time__alien_day
   , subq_6.user__bio_added_ts__month
   , subq_6.metric_time__day
 FROM (
@@ -193,8 +193,8 @@ FROM (
     , subq_0.user__home_state AS user__home_state
     , subq_0.new_users AS new_users
     , subq_0.archived_users AS archived_users
-    , subq_4.martian_day AS metric_time__martian_day
-    , subq_5.martian_day AS user__bio_added_ts__martian_day
+    , subq_4.alien_day AS metric_time__alien_day
+    , subq_5.alien_day AS user__bio_added_ts__alien_day
   FROM (
     -- Read Elements From Semantic Model 'users_ds_source'
     SELECT
@@ -397,7 +397,7 @@ FROM (
         , subq_1.ds__extract_day
         , subq_1.ds__extract_dow
         , subq_1.ds__extract_doy
-        , subq_1.ds__martian_day
+        , subq_1.ds__alien_day
         , subq_1.ds__day AS metric_time__day
         , subq_1.ds__week AS metric_time__week
         , subq_1.ds__month AS metric_time__month
@@ -409,7 +409,7 @@ FROM (
         , subq_1.ds__extract_day AS metric_time__extract_day
         , subq_1.ds__extract_dow AS metric_time__extract_dow
         , subq_1.ds__extract_doy AS metric_time__extract_doy
-        , subq_1.ds__martian_day AS metric_time__martian_day
+        , subq_1.ds__alien_day AS metric_time__alien_day
       FROM (
         -- Read From Time Spine 'mf_time_spine'
         SELECT
@@ -424,7 +424,7 @@ FROM (
           , EXTRACT(day FROM time_spine_src_28006.ds) AS ds__extract_day
           , EXTRACT(DAYOFWEEK_ISO FROM time_spine_src_28006.ds) AS ds__extract_dow
           , EXTRACT(doy FROM time_spine_src_28006.ds) AS ds__extract_doy
-          , time_spine_src_28006.martian_day AS ds__martian_day
+          , time_spine_src_28006.alien_day AS ds__alien_day
         FROM ***************************.mf_time_spine time_spine_src_28006
       ) subq_1
     ) subq_2
@@ -439,7 +439,7 @@ FROM (
     subq_0.user__bio_added_ts__day = subq_5.ds
 ) subq_6
 GROUP BY
-  subq_6.user__bio_added_ts__martian_day
-  , subq_6.metric_time__martian_day
+  subq_6.user__bio_added_ts__alien_day
+  , subq_6.metric_time__alien_day
   , subq_6.user__bio_added_ts__month
   , subq_6.metric_time__day

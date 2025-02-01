@@ -99,7 +99,7 @@ docstring:
         element_name='ds',
         entity_links=(EntityReference(element_name='booking'),),
         time_granularity=ExpandedTimeGranularity(
-          name='martian_day',
+          name='alien_day',
           base_granularity=DAY,
         ),
       ),
@@ -233,7 +233,7 @@ docstring:
         element_name='ds',
         entity_links=(EntityReference(element_name='booking_monthly'),),
         time_granularity=ExpandedTimeGranularity(
-          name='martian_day',
+          name='alien_day',
           base_granularity=DAY,
         ),
       ),

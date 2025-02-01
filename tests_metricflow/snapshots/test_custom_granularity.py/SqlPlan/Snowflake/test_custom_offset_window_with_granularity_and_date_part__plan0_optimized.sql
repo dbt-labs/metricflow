@@ -4,18 +4,18 @@ sql_engine: Snowflake
 ---
 -- Compute Metrics via Expressions
 SELECT
-  metric_time__martian_day
+  metric_time__alien_day
   , booking__ds__month
   , metric_time__extract_year
-  , bookings AS bookings_offset_one_martian_day
+  , bookings AS bookings_offset_one_alien_day
 FROM (
   -- Join to Time Spine Dataset
   -- Join to Custom Granularity Dataset
-  -- Pass Only Elements: ['bookings', 'booking__ds__month', 'metric_time__extract_year', 'metric_time__martian_day']
+  -- Pass Only Elements: ['bookings', 'booking__ds__month', 'metric_time__extract_year', 'metric_time__alien_day']
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
-    subq_29.martian_day AS metric_time__martian_day
+    subq_29.alien_day AS metric_time__alien_day
     , DATE_TRUNC('month', subq_26.ds__day__lead) AS booking__ds__month
     , EXTRACT(year FROM subq_26.ds__day__lead) AS metric_time__extract_year
     , SUM(subq_22.bookings) AS bookings
@@ -26,19 +26,19 @@ FROM (
       -- Get Custom Granularity Bounds
       SELECT
         ds AS ds__day
-        , martian_day AS ds__martian_day
+        , alien_day AS ds__alien_day
         , FIRST_VALUE(ds) OVER (
-          PARTITION BY martian_day
+          PARTITION BY alien_day
           ORDER BY ds
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS ds__day__first_value
         , LAST_VALUE(ds) OVER (
-          PARTITION BY martian_day
+          PARTITION BY alien_day
           ORDER BY ds
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS ds__day__last_value
         , ROW_NUMBER() OVER (
-          PARTITION BY martian_day
+          PARTITION BY alien_day
           ORDER BY ds
         ) AS ds__day__row_number
       FROM ***************************.mf_time_spine time_spine_src_28006
@@ -55,24 +55,24 @@ FROM (
     INNER JOIN (
       -- Offset Custom Granularity Bounds
       SELECT
-        ds__martian_day
-        , LEAD(ds__day__first_value, 1) OVER (ORDER BY ds__martian_day) AS ds__day__first_value__lead
-        , LEAD(ds__day__last_value, 1) OVER (ORDER BY ds__martian_day) AS ds__day__last_value__lead
+        ds__alien_day
+        , LEAD(ds__day__first_value, 1) OVER (ORDER BY ds__alien_day) AS ds__day__first_value__lead
+        , LEAD(ds__day__last_value, 1) OVER (ORDER BY ds__alien_day) AS ds__day__last_value__lead
       FROM (
         -- Get Unique Rows for Custom Granularity Bounds
         SELECT
-          ds__martian_day
+          ds__alien_day
           , ds__day__first_value
           , ds__day__last_value
         FROM cte_6 cte_6
         GROUP BY
-          ds__martian_day
+          ds__alien_day
           , ds__day__first_value
           , ds__day__last_value
       ) subq_24
     ) subq_25
     ON
-      cte_6.ds__martian_day = subq_25.ds__martian_day
+      cte_6.ds__alien_day = subq_25.ds__alien_day
   ) subq_26
   INNER JOIN (
     -- Read Elements From Semantic Model 'bookings_source'
@@ -89,7 +89,7 @@ FROM (
   ON
     subq_26.ds__day__lead = subq_29.ds
   GROUP BY
-    subq_29.martian_day
+    subq_29.alien_day
     , DATE_TRUNC('month', subq_26.ds__day__lead)
     , EXTRACT(year FROM subq_26.ds__day__lead)
 ) subq_33

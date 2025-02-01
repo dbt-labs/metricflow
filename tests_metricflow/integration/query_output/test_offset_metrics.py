@@ -70,12 +70,12 @@ def test_custom_offset_window_with_base_grain(
     sql_client: SqlClient,
     it_helpers: IntegrationTestHelpers,
 ) -> None:
-    """Gives a side by side comparison of bookings and bookings_offset_one_martian_day."""
+    """Gives a side by side comparison of bookings and bookings_offset_one_alien_day."""
     query_result = it_helpers.mf_engine.query(
         MetricFlowQueryRequest.create_with_random_request_id(
-            metric_names=["bookings", "bookings_offset_one_martian_day"],
-            group_by_names=["metric_time__day", "metric_time__martian_day"],
-            order_by_names=["metric_time__day", "metric_time__martian_day"],
+            metric_names=["bookings", "bookings_offset_one_alien_day"],
+            group_by_names=["metric_time__day", "metric_time__alien_day"],
+            order_by_names=["metric_time__day", "metric_time__alien_day"],
         )
     )
     assert query_result.result_df is not None, "Unexpected empty result."
@@ -98,16 +98,16 @@ def test_custom_offset_window_with_grains_and_date_part(  # noqa: D103
 ) -> None:
     query_result = it_helpers.mf_engine.query(
         MetricFlowQueryRequest.create_with_random_request_id(
-            metric_names=["bookings_offset_one_martian_day"],
+            metric_names=["bookings_offset_one_alien_day"],
             group_by=(
                 TimeDimensionParameter(name="booking__ds", grain=TimeGranularity.MONTH.name),
                 TimeDimensionParameter(name="metric_time", date_part=DatePart.YEAR),
-                TimeDimensionParameter(name="metric_time", grain="martian_day"),
+                TimeDimensionParameter(name="metric_time", grain="alien_day"),
             ),
             order_by=(
                 OrderByParameter(TimeDimensionParameter(name="booking__ds", grain=TimeGranularity.MONTH.name)),
                 OrderByParameter(TimeDimensionParameter(name="metric_time", date_part=DatePart.YEAR)),
-                OrderByParameter(TimeDimensionParameter(name="metric_time", grain="martian_day")),
+                OrderByParameter(TimeDimensionParameter(name="metric_time", grain="alien_day")),
             ),
         )
     )
@@ -129,12 +129,12 @@ def test_custom_offset_window_with_matching_custom_grain(
     sql_client: SqlClient,
     it_helpers: IntegrationTestHelpers,
 ) -> None:
-    """Gives a side by side comparison of bookings and bookings_offset_one_martian_day."""
+    """Gives a side by side comparison of bookings and bookings_offset_one_alien_day."""
     query_result = it_helpers.mf_engine.query(
         MetricFlowQueryRequest.create_with_random_request_id(
-            metric_names=["bookings", "bookings_offset_one_martian_day"],
-            group_by_names=["booking__ds__martian_day", "metric_time__martian_day"],
-            order_by_names=["booking__ds__martian_day", "metric_time__martian_day"],
+            metric_names=["bookings", "bookings_offset_one_alien_day"],
+            group_by_names=["booking__ds__alien_day", "metric_time__alien_day"],
+            order_by_names=["booking__ds__alien_day", "metric_time__alien_day"],
         )
     )
     assert query_result.result_df is not None, "Unexpected empty result."

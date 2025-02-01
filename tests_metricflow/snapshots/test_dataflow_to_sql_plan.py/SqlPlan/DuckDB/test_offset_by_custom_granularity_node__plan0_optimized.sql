@@ -13,19 +13,19 @@ FROM (
     -- Get Custom Granularity Bounds
     SELECT
       ds AS ds__day
-      , martian_day AS ds__martian_day
+      , alien_day AS ds__alien_day
       , FIRST_VALUE(ds) OVER (
-        PARTITION BY martian_day
+        PARTITION BY alien_day
         ORDER BY ds
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
       ) AS ds__day__first_value
       , LAST_VALUE(ds) OVER (
-        PARTITION BY martian_day
+        PARTITION BY alien_day
         ORDER BY ds
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
       ) AS ds__day__last_value
       , ROW_NUMBER() OVER (
-        PARTITION BY martian_day
+        PARTITION BY alien_day
         ORDER BY ds
       ) AS ds__day__row_number
     FROM ***************************.mf_time_spine time_spine_src_28006
@@ -42,22 +42,22 @@ FROM (
   INNER JOIN (
     -- Offset Custom Granularity Bounds
     SELECT
-      ds__martian_day
-      , LEAD(ds__day__first_value, 3) OVER (ORDER BY ds__martian_day) AS ds__day__first_value__lead
-      , LEAD(ds__day__last_value, 3) OVER (ORDER BY ds__martian_day) AS ds__day__last_value__lead
+      ds__alien_day
+      , LEAD(ds__day__first_value, 3) OVER (ORDER BY ds__alien_day) AS ds__day__first_value__lead
+      , LEAD(ds__day__last_value, 3) OVER (ORDER BY ds__alien_day) AS ds__day__last_value__lead
     FROM (
       -- Get Unique Rows for Custom Granularity Bounds
       SELECT
-        ds__martian_day
+        ds__alien_day
         , ds__day__first_value
         , ds__day__last_value
       FROM cte_2 cte_2
       GROUP BY
-        ds__martian_day
+        ds__alien_day
         , ds__day__first_value
         , ds__day__last_value
     ) subq_5
   ) subq_6
   ON
-    cte_2.ds__martian_day = subq_6.ds__martian_day
+    cte_2.ds__alien_day = subq_6.ds__alien_day
 ) subq_7

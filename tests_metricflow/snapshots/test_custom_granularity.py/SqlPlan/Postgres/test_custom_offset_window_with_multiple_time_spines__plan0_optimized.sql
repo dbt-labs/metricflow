@@ -5,7 +5,7 @@ sql_engine: Postgres
 -- Compute Metrics via Expressions
 SELECT
   metric_time__hour
-  , archived_users AS archived_users_offset_1_martian_day
+  , archived_users AS archived_users_offset_1_alien_day
 FROM (
   -- Join to Time Spine Dataset
   -- Pass Only Elements: ['archived_users', 'metric_time__hour']
@@ -20,19 +20,19 @@ FROM (
       -- Get Custom Granularity Bounds
       SELECT
         time_spine_src_28005.ts AS ts__hour
-        , time_spine_src_28006.martian_day AS ds__martian_day
+        , time_spine_src_28006.alien_day AS ds__alien_day
         , FIRST_VALUE(time_spine_src_28005.ts) OVER (
-          PARTITION BY time_spine_src_28006.martian_day
+          PARTITION BY time_spine_src_28006.alien_day
           ORDER BY time_spine_src_28005.ts
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS ts__hour__first_value
         , LAST_VALUE(time_spine_src_28005.ts) OVER (
-          PARTITION BY time_spine_src_28006.martian_day
+          PARTITION BY time_spine_src_28006.alien_day
           ORDER BY time_spine_src_28005.ts
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS ts__hour__last_value
         , ROW_NUMBER() OVER (
-          PARTITION BY time_spine_src_28006.martian_day
+          PARTITION BY time_spine_src_28006.alien_day
           ORDER BY time_spine_src_28005.ts
         ) AS ts__hour__row_number
       FROM ***************************.mf_time_spine time_spine_src_28006
@@ -53,24 +53,24 @@ FROM (
     INNER JOIN (
       -- Offset Custom Granularity Bounds
       SELECT
-        ds__martian_day
-        , LEAD(ts__hour__first_value, 1) OVER (ORDER BY ds__martian_day) AS ts__hour__first_value__lead
-        , LEAD(ts__hour__last_value, 1) OVER (ORDER BY ds__martian_day) AS ts__hour__last_value__lead
+        ds__alien_day
+        , LEAD(ts__hour__first_value, 1) OVER (ORDER BY ds__alien_day) AS ts__hour__first_value__lead
+        , LEAD(ts__hour__last_value, 1) OVER (ORDER BY ds__alien_day) AS ts__hour__last_value__lead
       FROM (
         -- Get Unique Rows for Custom Granularity Bounds
         SELECT
-          ds__martian_day
+          ds__alien_day
           , ts__hour__first_value
           , ts__hour__last_value
         FROM cte_6 cte_6
         GROUP BY
-          ds__martian_day
+          ds__alien_day
           , ts__hour__first_value
           , ts__hour__last_value
       ) subq_27
     ) subq_28
     ON
-      cte_6.ds__martian_day = subq_28.ds__martian_day
+      cte_6.ds__alien_day = subq_28.ds__alien_day
   ) subq_29
   INNER JOIN (
     -- Read Elements From Semantic Model 'users_ds_source'

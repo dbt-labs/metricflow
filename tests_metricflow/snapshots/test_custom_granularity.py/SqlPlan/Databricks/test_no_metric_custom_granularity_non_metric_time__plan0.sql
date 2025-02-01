@@ -2,9 +2,9 @@ test_name: test_no_metric_custom_granularity_non_metric_time
 test_filename: test_custom_granularity.py
 sql_engine: Databricks
 ---
--- Pass Only Elements: ['booking__ds__martian_day',]
+-- Pass Only Elements: ['booking__ds__alien_day',]
 SELECT
-  subq_1.booking__ds__martian_day
+  subq_1.booking__ds__alien_day
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Join to Custom Granularity Dataset
@@ -97,7 +97,7 @@ FROM (
     , bookings_source_src_28000.listing_id AS booking__listing
     , bookings_source_src_28000.guest_id AS booking__guest
     , bookings_source_src_28000.host_id AS booking__host
-    , subq_0.martian_day AS booking__ds__martian_day
+    , subq_0.alien_day AS booking__ds__alien_day
   FROM ***************************.fct_bookings bookings_source_src_28000
   LEFT OUTER JOIN
     ***************************.mf_time_spine subq_0
@@ -105,4 +105,4 @@ FROM (
     DATE_TRUNC('day', bookings_source_src_28000.ds) = subq_0.ds
 ) subq_1
 GROUP BY
-  subq_1.booking__ds__martian_day
+  subq_1.booking__ds__alien_day

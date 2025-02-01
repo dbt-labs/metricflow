@@ -4,19 +4,19 @@ sql_engine: Trino
 ---
 -- Compute Metrics via Expressions
 SELECT
-  subq_4.metric_time__martian_day
+  subq_4.metric_time__alien_day
   , subq_4.listing__ds__month
   , subq_4.listings
 FROM (
   -- Aggregate Measures
   SELECT
-    subq_3.metric_time__martian_day
+    subq_3.metric_time__alien_day
     , subq_3.listing__ds__month
     , SUM(subq_3.listings) AS listings
   FROM (
-    -- Pass Only Elements: ['listings', 'metric_time__martian_day', 'listing__ds__month']
+    -- Pass Only Elements: ['listings', 'metric_time__alien_day', 'listing__ds__month']
     SELECT
-      subq_2.metric_time__martian_day
+      subq_2.metric_time__alien_day
       , subq_2.listing__ds__month
       , subq_2.listings
     FROM (
@@ -90,7 +90,7 @@ FROM (
         , subq_0.listings AS listings
         , subq_0.largest_listing AS largest_listing
         , subq_0.smallest_listing AS smallest_listing
-        , subq_1.martian_day AS metric_time__martian_day
+        , subq_1.alien_day AS metric_time__alien_day
       FROM (
         -- Read Elements From Semantic Model 'listings_latest'
         SELECT
@@ -159,6 +159,6 @@ FROM (
     ) subq_2
   ) subq_3
   GROUP BY
-    subq_3.metric_time__martian_day
+    subq_3.metric_time__alien_day
     , subq_3.listing__ds__month
 ) subq_4

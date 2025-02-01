@@ -5,25 +5,25 @@ sql_engine: Redshift
 -- Join to Time Spine Dataset
 -- Compute Metrics via Expressions
 SELECT
-  subq_16.metric_time__martian_day AS metric_time__martian_day
+  subq_16.metric_time__alien_day AS metric_time__alien_day
   , subq_13.bookings AS bookings_join_to_time_spine
 FROM (
   -- Read From Time Spine 'mf_time_spine'
   -- Change Column Aliases
-  -- Pass Only Elements: ['metric_time__martian_day',]
+  -- Pass Only Elements: ['metric_time__alien_day',]
   SELECT
-    martian_day AS metric_time__martian_day
+    alien_day AS metric_time__alien_day
   FROM ***************************.mf_time_spine time_spine_src_28006
   GROUP BY
-    martian_day
+    alien_day
 ) subq_16
 LEFT OUTER JOIN (
   -- Metric Time Dimension 'ds'
   -- Join to Custom Granularity Dataset
-  -- Pass Only Elements: ['bookings', 'metric_time__martian_day']
+  -- Pass Only Elements: ['bookings', 'metric_time__alien_day']
   -- Aggregate Measures
   SELECT
-    subq_10.martian_day AS metric_time__martian_day
+    subq_10.alien_day AS metric_time__alien_day
     , SUM(subq_9.bookings) AS bookings
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
@@ -37,7 +37,7 @@ LEFT OUTER JOIN (
   ON
     subq_9.ds__day = subq_10.ds
   GROUP BY
-    subq_10.martian_day
+    subq_10.alien_day
 ) subq_13
 ON
-  subq_16.metric_time__martian_day = subq_13.metric_time__martian_day
+  subq_16.metric_time__alien_day = subq_13.metric_time__alien_day

@@ -4,11 +4,11 @@ sql_engine: DuckDB
 ---
 -- Join Self Over Time Range
 -- Join to Custom Granularity Dataset
--- Pass Only Elements: ['archived_users', 'metric_time__martian_day', 'metric_time__hour']
+-- Pass Only Elements: ['archived_users', 'metric_time__alien_day', 'metric_time__hour']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  subq_12.martian_day AS metric_time__martian_day
+  subq_12.alien_day AS metric_time__alien_day
   , subq_11.ts AS metric_time__hour
   , SUM(subq_9.archived_users) AS subdaily_cumulative_window_metric
 FROM ***************************.mf_time_spine_hour subq_11
@@ -31,5 +31,5 @@ LEFT OUTER JOIN
 ON
   DATE_TRUNC('day', subq_11.ts) = subq_12.ds
 GROUP BY
-  subq_12.martian_day
+  subq_12.alien_day
   , subq_11.ts

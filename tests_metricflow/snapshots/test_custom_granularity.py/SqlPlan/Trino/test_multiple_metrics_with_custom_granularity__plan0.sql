@@ -4,23 +4,23 @@ sql_engine: Trino
 ---
 -- Combine Aggregated Outputs
 SELECT
-  COALESCE(subq_5.metric_time__martian_day, subq_11.metric_time__martian_day) AS metric_time__martian_day
+  COALESCE(subq_5.metric_time__alien_day, subq_11.metric_time__alien_day) AS metric_time__alien_day
   , MAX(subq_5.bookings) AS bookings
   , MAX(subq_11.listings) AS listings
 FROM (
   -- Compute Metrics via Expressions
   SELECT
-    subq_4.metric_time__martian_day
+    subq_4.metric_time__alien_day
     , subq_4.bookings
   FROM (
     -- Aggregate Measures
     SELECT
-      subq_3.metric_time__martian_day
+      subq_3.metric_time__alien_day
       , SUM(subq_3.bookings) AS bookings
     FROM (
-      -- Pass Only Elements: ['bookings', 'metric_time__martian_day']
+      -- Pass Only Elements: ['bookings', 'metric_time__alien_day']
       SELECT
-        subq_2.metric_time__martian_day
+        subq_2.metric_time__alien_day
         , subq_2.bookings
       FROM (
         -- Metric Time Dimension 'ds'
@@ -124,7 +124,7 @@ FROM (
           , subq_0.discrete_booking_value_p99 AS discrete_booking_value_p99
           , subq_0.approximate_continuous_booking_value_p99 AS approximate_continuous_booking_value_p99
           , subq_0.approximate_discrete_booking_value_p99 AS approximate_discrete_booking_value_p99
-          , subq_1.martian_day AS metric_time__martian_day
+          , subq_1.alien_day AS metric_time__alien_day
         FROM (
           -- Read Elements From Semantic Model 'bookings_source'
           SELECT
@@ -225,23 +225,23 @@ FROM (
       ) subq_2
     ) subq_3
     GROUP BY
-      subq_3.metric_time__martian_day
+      subq_3.metric_time__alien_day
   ) subq_4
 ) subq_5
 FULL OUTER JOIN (
   -- Compute Metrics via Expressions
   SELECT
-    subq_10.metric_time__martian_day
+    subq_10.metric_time__alien_day
     , subq_10.listings
   FROM (
     -- Aggregate Measures
     SELECT
-      subq_9.metric_time__martian_day
+      subq_9.metric_time__alien_day
       , SUM(subq_9.listings) AS listings
     FROM (
-      -- Pass Only Elements: ['listings', 'metric_time__martian_day']
+      -- Pass Only Elements: ['listings', 'metric_time__alien_day']
       SELECT
-        subq_8.metric_time__martian_day
+        subq_8.metric_time__alien_day
         , subq_8.listings
       FROM (
         -- Metric Time Dimension 'ds'
@@ -314,7 +314,7 @@ FULL OUTER JOIN (
           , subq_6.listings AS listings
           , subq_6.largest_listing AS largest_listing
           , subq_6.smallest_listing AS smallest_listing
-          , subq_7.martian_day AS metric_time__martian_day
+          , subq_7.alien_day AS metric_time__alien_day
         FROM (
           -- Read Elements From Semantic Model 'listings_latest'
           SELECT
@@ -383,10 +383,10 @@ FULL OUTER JOIN (
       ) subq_8
     ) subq_9
     GROUP BY
-      subq_9.metric_time__martian_day
+      subq_9.metric_time__alien_day
   ) subq_10
 ) subq_11
 ON
-  subq_5.metric_time__martian_day = subq_11.metric_time__martian_day
+  subq_5.metric_time__alien_day = subq_11.metric_time__alien_day
 GROUP BY
-  COALESCE(subq_5.metric_time__martian_day, subq_11.metric_time__martian_day)
+  COALESCE(subq_5.metric_time__alien_day, subq_11.metric_time__alien_day)

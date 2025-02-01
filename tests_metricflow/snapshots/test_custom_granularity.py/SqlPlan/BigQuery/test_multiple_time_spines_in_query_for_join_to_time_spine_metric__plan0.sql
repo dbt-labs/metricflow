@@ -4,19 +4,19 @@ sql_engine: BigQuery
 ---
 -- Compute Metrics via Expressions
 SELECT
-  subq_9.metric_time__martian_day
+  subq_9.metric_time__alien_day
   , subq_9.metric_time__hour
   , subq_9.archived_users AS subdaily_join_to_time_spine_metric
 FROM (
   -- Join to Time Spine Dataset
   SELECT
-    subq_8.metric_time__martian_day AS metric_time__martian_day
+    subq_8.metric_time__alien_day AS metric_time__alien_day
     , subq_8.metric_time__hour AS metric_time__hour
     , subq_4.archived_users AS archived_users
   FROM (
-    -- Pass Only Elements: ['metric_time__martian_day', 'metric_time__hour']
+    -- Pass Only Elements: ['metric_time__alien_day', 'metric_time__hour']
     SELECT
-      subq_7.metric_time__martian_day
+      subq_7.metric_time__alien_day
       , subq_7.metric_time__hour
     FROM (
       -- Change Column Aliases
@@ -34,7 +34,7 @@ FROM (
         , subq_5.ts__extract_day AS ts__extract_day
         , subq_5.ts__extract_dow AS ts__extract_dow
         , subq_5.ts__extract_doy AS ts__extract_doy
-        , subq_6.martian_day AS metric_time__martian_day
+        , subq_6.alien_day AS metric_time__alien_day
       FROM (
         -- Read From Time Spine 'mf_time_spine_hour'
         SELECT
@@ -61,13 +61,13 @@ FROM (
   LEFT OUTER JOIN (
     -- Aggregate Measures
     SELECT
-      subq_3.metric_time__martian_day
+      subq_3.metric_time__alien_day
       , subq_3.metric_time__hour
       , SUM(subq_3.archived_users) AS archived_users
     FROM (
-      -- Pass Only Elements: ['archived_users', 'metric_time__martian_day', 'metric_time__hour']
+      -- Pass Only Elements: ['archived_users', 'metric_time__alien_day', 'metric_time__hour']
       SELECT
-        subq_2.metric_time__martian_day
+        subq_2.metric_time__alien_day
         , subq_2.metric_time__hour
         , subq_2.archived_users
       FROM (
@@ -264,7 +264,7 @@ FROM (
           , subq_0.home_state AS home_state
           , subq_0.user__home_state AS user__home_state
           , subq_0.archived_users AS archived_users
-          , subq_1.martian_day AS metric_time__martian_day
+          , subq_1.alien_day AS metric_time__alien_day
         FROM (
           -- Read Elements From Semantic Model 'users_ds_source'
           SELECT
@@ -456,7 +456,7 @@ FROM (
       ) subq_2
     ) subq_3
     GROUP BY
-      metric_time__martian_day
+      metric_time__alien_day
       , metric_time__hour
   ) subq_4
   ON

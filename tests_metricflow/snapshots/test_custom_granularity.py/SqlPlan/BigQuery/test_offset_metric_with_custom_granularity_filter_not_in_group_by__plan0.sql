@@ -24,7 +24,7 @@ FROM (
       FROM (
         -- Constrain Output with WHERE
         SELECT
-          subq_6.metric_time__martian_day
+          subq_6.metric_time__alien_day
           , subq_6.ds__day
           , subq_6.ds__week
           , subq_6.ds__month
@@ -225,7 +225,7 @@ FROM (
             , subq_1.discrete_booking_value_p99 AS discrete_booking_value_p99
             , subq_1.approximate_continuous_booking_value_p99 AS approximate_continuous_booking_value_p99
             , subq_1.approximate_discrete_booking_value_p99 AS approximate_discrete_booking_value_p99
-            , subq_5.martian_day AS metric_time__martian_day
+            , subq_5.alien_day AS metric_time__alien_day
           FROM (
             -- Pass Only Elements: ['metric_time__day',]
             SELECT
@@ -244,7 +244,7 @@ FROM (
                 , subq_2.ds__extract_day
                 , subq_2.ds__extract_dow
                 , subq_2.ds__extract_doy
-                , subq_2.ds__martian_day
+                , subq_2.ds__alien_day
               FROM (
                 -- Read From Time Spine 'mf_time_spine'
                 SELECT
@@ -259,7 +259,7 @@ FROM (
                   , EXTRACT(day FROM time_spine_src_28006.ds) AS ds__extract_day
                   , IF(EXTRACT(dayofweek FROM time_spine_src_28006.ds) = 1, 7, EXTRACT(dayofweek FROM time_spine_src_28006.ds) - 1) AS ds__extract_dow
                   , EXTRACT(dayofyear FROM time_spine_src_28006.ds) AS ds__extract_doy
-                  , time_spine_src_28006.martian_day AS ds__martian_day
+                  , time_spine_src_28006.alien_day AS ds__alien_day
                 FROM ***************************.mf_time_spine time_spine_src_28006
               ) subq_2
             ) subq_3
@@ -466,7 +466,7 @@ FROM (
           ON
             subq_4.metric_time__day = subq_5.ds
         ) subq_6
-        WHERE metric_time__martian_day = '2020-01-01'
+        WHERE metric_time__alien_day = '2020-01-01'
       ) subq_7
     ) subq_8
     GROUP BY
