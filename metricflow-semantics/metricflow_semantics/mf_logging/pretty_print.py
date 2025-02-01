@@ -534,5 +534,8 @@ def _as_one_line(description: Optional[str], str_converted_dict: Dict[str, str],
         return None
 
     items = tuple(f"{key_str}={value_str}" for key_str, value_str in str_converted_dict.items())
+    if len(items) == 0:
+        return description
+
     value_in_parenthesis = ", ".join(items)
     return f"{description} ({value_in_parenthesis})"
