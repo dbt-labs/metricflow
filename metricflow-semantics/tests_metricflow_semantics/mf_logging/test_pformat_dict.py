@@ -92,3 +92,8 @@ def test_minimal_length() -> None:
           foo: 'bar'
         """
     )
+
+
+def test_one_line() -> None:
+    """Test formatting as a one-line string if possible."""
+    assert mf_pformat_dict("Example output", {"a": 1, "b": 2}) == "Example output (a=1, b=2)"
