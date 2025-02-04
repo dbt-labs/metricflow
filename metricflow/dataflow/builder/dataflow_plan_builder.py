@@ -1034,9 +1034,11 @@ class DataflowPlanBuilder:
             )
             # If metric_time is requested without metrics, choose appropriate time spine node to select those values from.
             if linkable_specs_to_satisfy.metric_time_specs:
-                time_spine_node = self._choose_time_spine_metric_time_node(linkable_specs_to_satisfy.metric_time_specs)
-                candidate_nodes_for_right_side_of_join += [time_spine_node]
-                candidate_nodes_for_left_side_of_join += [time_spine_node]
+                time_spine_nodes = self._choose_time_spine_metric_time_nodes(
+                    linkable_specs_to_satisfy.metric_time_specs
+                )
+                candidate_nodes_for_right_side_of_join += list(time_spine_nodes)
+                candidate_nodes_for_left_side_of_join += list(time_spine_nodes)
             default_join_type = SqlJoinType.FULL_OUTER
 
         logger.debug(
@@ -1929,19 +1931,24 @@ class DataflowPlanBuilder:
             queried_time_dimension_spec=queried_time_dimension_spec,
         )
 
-    def _choose_time_spine_source(self, required_time_spine_specs: Sequence[TimeDimensionSpec]) -> TimeSpineSource:
+    def _choose_time_spine_sources(
+        self, required_time_spine_specs: Sequence[TimeDimensionSpec]
+    ) -> Tuple[TimeSpineSource, ...]:
         """Choose the time spine source that can satisfy the required time spine specs."""
-        return TimeSpineSource.choose_time_spine_source(
+        return TimeSpineSource.choose_time_spine_sources(
             required_time_spine_specs=required_time_spine_specs,
             time_spine_sources=self._source_node_builder.time_spine_sources,
         )
 
-    def _choose_time_spine_metric_time_node(
+    def _choose_time_spine_metric_time_nodes(
         self, required_time_spine_specs: Sequence[TimeDimensionSpec]
-    ) -> MetricTimeDimensionTransformNode:
+    ) -> Tuple[MetricTimeDimensionTransformNode, ...]:
         """Return the MetricTimeDimensionTransform time spine node needed to satisfy the specs."""
-        time_spine_source = self._choose_time_spine_source(required_time_spine_specs)
-        return self._source_node_set.time_spine_metric_time_nodes[time_spine_source.base_granularity]
+        time_spine_sources = self._choose_time_spine_sources(required_time_spine_specs)
+        return tuple(
+            self._source_node_set.time_spine_metric_time_nodes[time_spine_source.base_granularity]
+            for time_spine_source in time_spine_sources
+        )
 
     def _choose_time_spine_read_node(self, time_spine_source: TimeSpineSource) -> ReadSqlSourceNode:
         """Return the MetricTimeDimensionTransform time spine node needed to satisfy the specs."""
@@ -1969,6 +1976,7 @@ class DataflowPlanBuilder:
                     required_specs += (time_dimension_spec,)
 
         should_dedupe = False
+        custom_grain_specs_to_join: Tuple[TimeDimensionSpec, ...] = ()
         if custom_offset_window:
             time_spine_node = self.build_custom_offset_time_spine_node(
                 offset_window=custom_offset_window,
@@ -1979,13 +1987,24 @@ class DataflowPlanBuilder:
                 time_spine_node
             ).instance_set.spec_set.time_dimension_specs
         else:
-            # For simpler time spine queries, choose the appropriate time spine node and apply requested aliases.
-            time_spine_source = self._choose_time_spine_source(required_specs)
-            # TODO: support multiple time spines here. Build node on the one with the smallest base grain.
-            # Then, pass custom_granularity_specs into _build_pre_aggregation_plan if they aren't satisfied by smallest time spine.
-            read_node = self._choose_time_spine_read_node(time_spine_source)
-            time_spine_data_set = self._node_data_set_resolver.get_output_data_set(read_node)
+            time_spine_sources = self._choose_time_spine_sources(required_specs)
+            smallest_time_spine_source = time_spine_sources[0]  # these are already sorted by base grain
+            read_node = self._choose_time_spine_read_node(smallest_time_spine_source)
+
+            # If any custom grains cannot be satisfied by the time spine read node, they will need to be joined later.
+            updated_required_specs: Tuple[TimeDimensionSpec, ...] = ()
+            for spec in required_specs:
+                if (
+                    spec.has_custom_grain
+                    and spec.time_granularity_name not in smallest_time_spine_source.custom_grain_names
+                ):
+                    custom_grain_specs_to_join += (spec,)
+                    updated_required_specs += (spec.with_base_grain(),)
+                else:
+                    updated_required_specs += (spec,)
+
             # Change the column aliases to match the specs that were requested in the query.
+            time_spine_data_set = self._node_data_set_resolver.get_output_data_set(read_node)
             time_spine_node = AliasSpecsNode.create(
                 parent_node=read_node,
                 change_specs=tuple(
@@ -1995,27 +2014,29 @@ class DataflowPlanBuilder:
                         ).spec,
                         output_spec=required_spec,
                     )
-                    for required_spec in required_specs
+                    for required_spec in updated_required_specs
                 ),
             )
             # If the base grain of the time spine isn't selected, it will have duplicate rows that need deduping.
-            should_dedupe = ExpandedTimeGranularity.from_time_granularity(time_spine_source.base_granularity) not in {
-                spec.time_granularity for spec in filter_to_specs
-            }
+            should_dedupe = ExpandedTimeGranularity.from_time_granularity(
+                smallest_time_spine_source.base_granularity
+            ) not in {spec.time_granularity for spec in filter_to_specs}
 
         return self._build_pre_aggregation_plan(
             source_node=time_spine_node,
             filter_to_specs=InstanceSpecSet(time_dimension_specs=filter_to_specs),
             time_range_constraint=time_range_constraint,
             where_filter_specs=where_filter_specs,
+            custom_granularity_specs=custom_grain_specs_to_join,
             distinct=should_dedupe,
         )
 
     def _get_time_spine_read_node_for_custom_grain(self, custom_grain: str) -> ReadSqlSourceNode:
         """Return the read node for the custom grain."""
-        time_spine_source = self._choose_time_spine_source(
+        time_spine_sources = self._choose_time_spine_sources(
             (DataSet.metric_time_dimension_spec(self._semantic_model_lookup.custom_granularities[custom_grain]),)
         )
+        time_spine_source = time_spine_sources[0]
         return self._choose_time_spine_read_node(time_spine_source)
 
     def build_custom_offset_time_spine_node(

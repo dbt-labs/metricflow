@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Dict, Optional, Sequence
+from typing import Dict, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.implementations.time_spine import PydanticTimeSpineCustomGranularityColumn
 from dbt_semantic_interfaces.protocols import SemanticManifest
@@ -99,10 +99,10 @@ class TimeSpineSource:
         }
 
     @staticmethod
-    def choose_time_spine_source(
+    def choose_time_spine_sources(
         required_time_spine_specs: Sequence[TimeDimensionSpec],
         time_spine_sources: Dict[TimeGranularity, TimeSpineSource],
-    ) -> TimeSpineSource:
+    ) -> Tuple[TimeSpineSource, ...]:
         """Determine which time spine sources to use to satisfy the given specs.
 
         Custom grains can only use the time spine where they are defined. For standard grains, this will choose the time
@@ -147,15 +147,14 @@ class TimeSpineSource:
         if not required_time_spines.intersection(set(compatible_time_spines_for_standard_grains.values())):
             required_time_spines.add(time_spine_sources[max(compatible_time_spines_for_standard_grains)])
 
-        if len(required_time_spines) != 1:
-            raise RuntimeError(
-                "Multiple time spines are required to satisfy the specs, but only one is supported per query currently. "
-                f"Multiple will be supported in the future. Time spines required: {required_time_spines}."
-            )
-
-        return required_time_spines.pop()
+        return tuple(sorted(required_time_spines, key=lambda x: x.base_granularity.to_int()))
 
     @property
     def data_set_description(self) -> str:
         """Description to be displayed when this time spine is used in a data set."""
         return f"Read From Time Spine '{self.table_name}'"
+
+    @property
+    def custom_grain_names(self) -> Sequence[str]:
+        """Names of custom grains defined in this time spine."""
+        return tuple(custom_granularity.name for custom_granularity in self.custom_granularities)
