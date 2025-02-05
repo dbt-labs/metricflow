@@ -28,7 +28,7 @@ def test_custom_offset_window_for_metric(
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Test offset window with custom grain supplied."""
-    metric = simple_semantic_manifest_lookup.metric_lookup.get_metric(MetricReference("bookings_offset_martian_day"))
+    metric = simple_semantic_manifest_lookup.metric_lookup.get_metric(MetricReference("bookings_offset_alien_day"))
 
     assert len(metric.input_metrics) == 1
-    assert metric.input_metrics[0].offset_window == PydanticMetricTimeWindow(count=1, granularity="martian_day")
+    assert metric.input_metrics[0].offset_window == PydanticMetricTimeWindow(count=1, granularity="alien_day")

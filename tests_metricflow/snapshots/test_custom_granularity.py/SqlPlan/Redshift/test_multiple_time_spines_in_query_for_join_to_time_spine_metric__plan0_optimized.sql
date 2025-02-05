@@ -5,15 +5,15 @@ sql_engine: Redshift
 -- Join to Time Spine Dataset
 -- Compute Metrics via Expressions
 SELECT
-  subq_18.metric_time__martian_day AS metric_time__martian_day
+  subq_18.metric_time__alien_day AS metric_time__alien_day
   , subq_18.metric_time__hour AS metric_time__hour
   , subq_14.archived_users AS subdaily_join_to_time_spine_metric
 FROM (
   -- Change Column Aliases
   -- Join to Custom Granularity Dataset
-  -- Pass Only Elements: ['metric_time__martian_day', 'metric_time__hour']
+  -- Pass Only Elements: ['metric_time__alien_day', 'metric_time__hour']
   SELECT
-    subq_16.martian_day AS metric_time__martian_day
+    subq_16.alien_day AS metric_time__alien_day
     , time_spine_src_28005.ts AS metric_time__hour
   FROM ***************************.mf_time_spine_hour time_spine_src_28005
   LEFT OUTER JOIN
@@ -24,10 +24,10 @@ FROM (
 LEFT OUTER JOIN (
   -- Metric Time Dimension 'archived_at'
   -- Join to Custom Granularity Dataset
-  -- Pass Only Elements: ['archived_users', 'metric_time__martian_day', 'metric_time__hour']
+  -- Pass Only Elements: ['archived_users', 'metric_time__alien_day', 'metric_time__hour']
   -- Aggregate Measures
   SELECT
-    subq_11.martian_day AS metric_time__martian_day
+    subq_11.alien_day AS metric_time__alien_day
     , subq_10.archived_at__hour AS metric_time__hour
     , SUM(subq_10.archived_users) AS archived_users
   FROM (
@@ -43,7 +43,7 @@ LEFT OUTER JOIN (
   ON
     subq_10.archived_at__day = subq_11.ds
   GROUP BY
-    subq_11.martian_day
+    subq_11.alien_day
     , subq_10.archived_at__hour
 ) subq_14
 ON

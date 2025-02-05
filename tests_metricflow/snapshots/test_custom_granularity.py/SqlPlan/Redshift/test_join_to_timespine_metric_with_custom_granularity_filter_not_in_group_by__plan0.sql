@@ -29,7 +29,7 @@ FROM (
         , subq_7.ds__extract_day
         , subq_7.ds__extract_dow
         , subq_7.ds__extract_doy
-        , subq_7.metric_time__martian_day
+        , subq_7.metric_time__alien_day
       FROM (
         -- Change Column Aliases
         SELECT
@@ -44,7 +44,7 @@ FROM (
           , subq_6.ds__extract_day
           , subq_6.ds__extract_dow
           , subq_6.ds__extract_doy
-          , subq_6.ds__martian_day AS metric_time__martian_day
+          , subq_6.ds__alien_day AS metric_time__alien_day
         FROM (
           -- Read From Time Spine 'mf_time_spine'
           SELECT
@@ -59,11 +59,11 @@ FROM (
             , EXTRACT(day FROM time_spine_src_28006.ds) AS ds__extract_day
             , CASE WHEN EXTRACT(dow FROM time_spine_src_28006.ds) = 0 THEN EXTRACT(dow FROM time_spine_src_28006.ds) + 7 ELSE EXTRACT(dow FROM time_spine_src_28006.ds) END AS ds__extract_dow
             , EXTRACT(doy FROM time_spine_src_28006.ds) AS ds__extract_doy
-            , time_spine_src_28006.martian_day AS ds__martian_day
+            , time_spine_src_28006.alien_day AS ds__alien_day
           FROM ***************************.mf_time_spine time_spine_src_28006
         ) subq_6
       ) subq_7
-      WHERE metric_time__martian_day = '2020-01-01'
+      WHERE metric_time__alien_day = '2020-01-01'
     ) subq_8
   ) subq_9
   LEFT OUTER JOIN (
@@ -79,7 +79,7 @@ FROM (
       FROM (
         -- Constrain Output with WHERE
         SELECT
-          subq_2.metric_time__martian_day
+          subq_2.metric_time__alien_day
           , subq_2.ds__day
           , subq_2.ds__week
           , subq_2.ds__month
@@ -280,7 +280,7 @@ FROM (
             , subq_0.discrete_booking_value_p99 AS discrete_booking_value_p99
             , subq_0.approximate_continuous_booking_value_p99 AS approximate_continuous_booking_value_p99
             , subq_0.approximate_discrete_booking_value_p99 AS approximate_discrete_booking_value_p99
-            , subq_1.martian_day AS metric_time__martian_day
+            , subq_1.alien_day AS metric_time__alien_day
           FROM (
             -- Read Elements From Semantic Model 'bookings_source'
             SELECT
@@ -379,7 +379,7 @@ FROM (
           ON
             subq_0.ds__day = subq_1.ds
         ) subq_2
-        WHERE metric_time__martian_day = '2020-01-01'
+        WHERE metric_time__alien_day = '2020-01-01'
       ) subq_3
     ) subq_4
     GROUP BY

@@ -4,13 +4,13 @@ docstring:
   Group by items only queried with a filter on a custom grain, where that grain is also used in the group by.
 sql_engine: BigQuery
 ---
--- Pass Only Elements: ['listing__ds__martian_day',]
+-- Pass Only Elements: ['listing__ds__alien_day',]
 SELECT
-  subq_2.listing__ds__martian_day
+  subq_2.listing__ds__alien_day
 FROM (
   -- Constrain Output with WHERE
   SELECT
-    subq_1.listing__ds__martian_day
+    subq_1.listing__ds__alien_day
     , subq_1.ds__day
     , subq_1.ds__week
     , subq_1.ds__month
@@ -127,14 +127,14 @@ FROM (
       , listings_latest_src_28000.listing_id AS listing
       , listings_latest_src_28000.user_id AS user
       , listings_latest_src_28000.user_id AS listing__user
-      , subq_0.martian_day AS listing__ds__martian_day
+      , subq_0.alien_day AS listing__ds__alien_day
     FROM ***************************.dim_listings_latest listings_latest_src_28000
     LEFT OUTER JOIN
       ***************************.mf_time_spine subq_0
     ON
       DATETIME_TRUNC(listings_latest_src_28000.created_at, day) = subq_0.ds
   ) subq_1
-  WHERE listing__ds__martian_day = '2020-01-01'
+  WHERE listing__ds__alien_day = '2020-01-01'
 ) subq_2
 GROUP BY
-  listing__ds__martian_day
+  listing__ds__alien_day

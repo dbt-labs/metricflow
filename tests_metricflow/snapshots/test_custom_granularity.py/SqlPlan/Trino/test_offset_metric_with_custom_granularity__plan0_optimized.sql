@@ -4,16 +4,16 @@ sql_engine: Trino
 ---
 -- Compute Metrics via Expressions
 SELECT
-  booking__ds__martian_day
+  booking__ds__alien_day
   , bookings_5_days_ago AS bookings_5_day_lag
 FROM (
   -- Join to Time Spine Dataset
   -- Join to Custom Granularity Dataset
-  -- Pass Only Elements: ['bookings', 'booking__ds__martian_day']
+  -- Pass Only Elements: ['bookings', 'booking__ds__alien_day']
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
-    subq_15.martian_day AS booking__ds__martian_day
+    subq_15.alien_day AS booking__ds__alien_day
     , SUM(subq_11.bookings) AS bookings_5_days_ago
   FROM ***************************.mf_time_spine time_spine_src_28006
   INNER JOIN (
@@ -31,5 +31,5 @@ FROM (
   ON
     time_spine_src_28006.ds = subq_15.ds
   GROUP BY
-    subq_15.martian_day
+    subq_15.alien_day
 ) subq_19

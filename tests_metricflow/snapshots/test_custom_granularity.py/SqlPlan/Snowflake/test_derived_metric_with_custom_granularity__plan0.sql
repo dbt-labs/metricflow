@@ -4,28 +4,28 @@ sql_engine: Snowflake
 ---
 -- Compute Metrics via Expressions
 SELECT
-  subq_11.booking__ds__martian_day
+  subq_11.booking__ds__alien_day
   , booking_value * 0.05 / bookers AS booking_fees_per_booker
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_5.booking__ds__martian_day, subq_10.booking__ds__martian_day) AS booking__ds__martian_day
+    COALESCE(subq_5.booking__ds__alien_day, subq_10.booking__ds__alien_day) AS booking__ds__alien_day
     , MAX(subq_5.booking_value) AS booking_value
     , MAX(subq_10.bookers) AS bookers
   FROM (
     -- Compute Metrics via Expressions
     SELECT
-      subq_4.booking__ds__martian_day
+      subq_4.booking__ds__alien_day
       , subq_4.booking_value
     FROM (
       -- Aggregate Measures
       SELECT
-        subq_3.booking__ds__martian_day
+        subq_3.booking__ds__alien_day
         , SUM(subq_3.booking_value) AS booking_value
       FROM (
-        -- Pass Only Elements: ['booking_value', 'booking__ds__martian_day']
+        -- Pass Only Elements: ['booking_value', 'booking__ds__alien_day']
         SELECT
-          subq_2.booking__ds__martian_day
+          subq_2.booking__ds__alien_day
           , subq_2.booking_value
         FROM (
           -- Metric Time Dimension 'ds'
@@ -129,7 +129,7 @@ FROM (
             , subq_0.discrete_booking_value_p99 AS discrete_booking_value_p99
             , subq_0.approximate_continuous_booking_value_p99 AS approximate_continuous_booking_value_p99
             , subq_0.approximate_discrete_booking_value_p99 AS approximate_discrete_booking_value_p99
-            , subq_1.martian_day AS booking__ds__martian_day
+            , subq_1.alien_day AS booking__ds__alien_day
           FROM (
             -- Read Elements From Semantic Model 'bookings_source'
             SELECT
@@ -230,23 +230,23 @@ FROM (
         ) subq_2
       ) subq_3
       GROUP BY
-        subq_3.booking__ds__martian_day
+        subq_3.booking__ds__alien_day
     ) subq_4
   ) subq_5
   FULL OUTER JOIN (
     -- Compute Metrics via Expressions
     SELECT
-      subq_9.booking__ds__martian_day
+      subq_9.booking__ds__alien_day
       , subq_9.bookers
     FROM (
       -- Aggregate Measures
       SELECT
-        subq_8.booking__ds__martian_day
+        subq_8.booking__ds__alien_day
         , COUNT(DISTINCT subq_8.bookers) AS bookers
       FROM (
-        -- Pass Only Elements: ['bookers', 'booking__ds__martian_day']
+        -- Pass Only Elements: ['bookers', 'booking__ds__alien_day']
         SELECT
-          subq_7.booking__ds__martian_day
+          subq_7.booking__ds__alien_day
           , subq_7.bookers
         FROM (
           -- Metric Time Dimension 'ds'
@@ -350,7 +350,7 @@ FROM (
             , subq_0.discrete_booking_value_p99 AS discrete_booking_value_p99
             , subq_0.approximate_continuous_booking_value_p99 AS approximate_continuous_booking_value_p99
             , subq_0.approximate_discrete_booking_value_p99 AS approximate_discrete_booking_value_p99
-            , subq_6.martian_day AS booking__ds__martian_day
+            , subq_6.alien_day AS booking__ds__alien_day
           FROM (
             -- Read Elements From Semantic Model 'bookings_source'
             SELECT
@@ -451,11 +451,11 @@ FROM (
         ) subq_7
       ) subq_8
       GROUP BY
-        subq_8.booking__ds__martian_day
+        subq_8.booking__ds__alien_day
     ) subq_9
   ) subq_10
   ON
-    subq_5.booking__ds__martian_day = subq_10.booking__ds__martian_day
+    subq_5.booking__ds__alien_day = subq_10.booking__ds__alien_day
   GROUP BY
-    COALESCE(subq_5.booking__ds__martian_day, subq_10.booking__ds__martian_day)
+    COALESCE(subq_5.booking__ds__alien_day, subq_10.booking__ds__alien_day)
 ) subq_11

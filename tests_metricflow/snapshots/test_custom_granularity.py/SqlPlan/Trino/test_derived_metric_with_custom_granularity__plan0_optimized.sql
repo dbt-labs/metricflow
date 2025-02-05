@@ -4,16 +4,16 @@ sql_engine: Trino
 ---
 -- Compute Metrics via Expressions
 SELECT
-  booking__ds__martian_day
+  booking__ds__alien_day
   , booking_value * 0.05 / bookers AS booking_fees_per_booker
 FROM (
   -- Metric Time Dimension 'ds'
   -- Join to Custom Granularity Dataset
-  -- Pass Only Elements: ['booking_value', 'bookers', 'booking__ds__martian_day']
+  -- Pass Only Elements: ['booking_value', 'bookers', 'booking__ds__alien_day']
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
-    subq_13.martian_day AS booking__ds__martian_day
+    subq_13.alien_day AS booking__ds__alien_day
     , SUM(bookings_source_src_28000.booking_value) AS booking_value
     , COUNT(DISTINCT bookings_source_src_28000.guest_id) AS bookers
   FROM ***************************.fct_bookings bookings_source_src_28000
@@ -22,5 +22,5 @@ FROM (
   ON
     DATE_TRUNC('day', bookings_source_src_28000.ds) = subq_13.ds
   GROUP BY
-    subq_13.martian_day
+    subq_13.alien_day
 ) subq_17

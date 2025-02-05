@@ -7,7 +7,7 @@ table_snapshot:
       type: STRING
     - name: fiscal_year
       type: STRING
-    - name: martian_day
+    - name: alien_day
       type: TIME
 
   rows:

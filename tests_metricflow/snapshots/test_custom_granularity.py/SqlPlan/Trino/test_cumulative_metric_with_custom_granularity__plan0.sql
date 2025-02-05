@@ -4,29 +4,29 @@ sql_engine: Trino
 ---
 -- Re-aggregate Metric via Group By
 SELECT
-  subq_9.metric_time__martian_day
+  subq_9.metric_time__alien_day
   , subq_9.trailing_2_months_revenue
 FROM (
   -- Window Function for Metric Re-aggregation
   SELECT
-    subq_8.metric_time__martian_day
-    , AVG(subq_8.trailing_2_months_revenue) OVER (PARTITION BY subq_8.metric_time__martian_day) AS trailing_2_months_revenue
+    subq_8.metric_time__alien_day
+    , AVG(subq_8.trailing_2_months_revenue) OVER (PARTITION BY subq_8.metric_time__alien_day) AS trailing_2_months_revenue
   FROM (
     -- Compute Metrics via Expressions
     SELECT
-      subq_7.metric_time__martian_day
+      subq_7.metric_time__alien_day
       , subq_7.metric_time__day
       , subq_7.txn_revenue AS trailing_2_months_revenue
     FROM (
       -- Aggregate Measures
       SELECT
-        subq_6.metric_time__martian_day
+        subq_6.metric_time__alien_day
         , subq_6.metric_time__day
         , SUM(subq_6.txn_revenue) AS txn_revenue
       FROM (
-        -- Pass Only Elements: ['txn_revenue', 'metric_time__martian_day', 'metric_time__day']
+        -- Pass Only Elements: ['txn_revenue', 'metric_time__alien_day', 'metric_time__day']
         SELECT
-          subq_5.metric_time__martian_day
+          subq_5.metric_time__alien_day
           , subq_5.metric_time__day
           , subq_5.txn_revenue
         FROM (
@@ -69,7 +69,7 @@ FROM (
             , subq_1.user AS user
             , subq_1.revenue_instance__user AS revenue_instance__user
             , subq_1.txn_revenue AS txn_revenue
-            , subq_4.martian_day AS metric_time__martian_day
+            , subq_4.alien_day AS metric_time__alien_day
           FROM (
             -- Read From Time Spine 'mf_time_spine'
             SELECT
@@ -159,11 +159,11 @@ FROM (
         ) subq_5
       ) subq_6
       GROUP BY
-        subq_6.metric_time__martian_day
+        subq_6.metric_time__alien_day
         , subq_6.metric_time__day
     ) subq_7
   ) subq_8
 ) subq_9
 GROUP BY
-  subq_9.metric_time__martian_day
+  subq_9.metric_time__alien_day
   , subq_9.trailing_2_months_revenue

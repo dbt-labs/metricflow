@@ -21,7 +21,7 @@ FROM (
       FROM (
         -- Constrain Output with WHERE
         SELECT
-          subq_2.metric_time__martian_day
+          subq_2.metric_time__alien_day
           , subq_2.ds__day
           , subq_2.ds__week
           , subq_2.ds__month
@@ -108,7 +108,7 @@ FROM (
             , subq_0.visit__referrer_id AS visit__referrer_id
             , subq_0.visits AS visits
             , subq_0.visitors AS visitors
-            , subq_1.martian_day AS metric_time__martian_day
+            , subq_1.alien_day AS metric_time__alien_day
           FROM (
             -- Read Elements From Semantic Model 'visits_source'
             SELECT
@@ -149,7 +149,7 @@ FROM (
           ON
             subq_0.ds__day = subq_1.ds
         ) subq_2
-        WHERE metric_time__martian_day = '2020-01-01'
+        WHERE metric_time__alien_day = '2020-01-01'
       ) subq_3
     ) subq_4
   ) subq_5
@@ -164,7 +164,7 @@ FROM (
       FROM (
         -- Find conversions for user within the range of 7 day
         SELECT
-          subq_13.metric_time__martian_day
+          subq_13.metric_time__alien_day
           , subq_13.metric_time__day
           , subq_13.user
           , subq_13.buys
@@ -180,14 +180,14 @@ FROM (
               ORDER BY subq_9.metric_time__day DESC
               ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
             ) AS visits
-            , FIRST_VALUE(subq_9.metric_time__martian_day) OVER (
+            , FIRST_VALUE(subq_9.metric_time__alien_day) OVER (
               PARTITION BY
                 subq_12.user
                 , subq_12.metric_time__day
                 , subq_12.mf_internal_uuid
               ORDER BY subq_9.metric_time__day DESC
               ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-            ) AS metric_time__martian_day
+            ) AS metric_time__alien_day
             , FIRST_VALUE(subq_9.metric_time__day) OVER (
               PARTITION BY
                 subq_12.user
@@ -207,16 +207,16 @@ FROM (
             , subq_12.mf_internal_uuid AS mf_internal_uuid
             , subq_12.buys AS buys
           FROM (
-            -- Pass Only Elements: ['visits', 'metric_time__day', 'metric_time__martian_day', 'user']
+            -- Pass Only Elements: ['visits', 'metric_time__day', 'metric_time__alien_day', 'user']
             SELECT
-              subq_8.metric_time__martian_day
+              subq_8.metric_time__alien_day
               , subq_8.metric_time__day
               , subq_8.user
               , subq_8.visits
             FROM (
               -- Constrain Output with WHERE
               SELECT
-                subq_7.metric_time__martian_day
+                subq_7.metric_time__alien_day
                 , subq_7.ds__day
                 , subq_7.ds__week
                 , subq_7.ds__month
@@ -303,7 +303,7 @@ FROM (
                   , subq_0.visit__referrer_id AS visit__referrer_id
                   , subq_0.visits AS visits
                   , subq_0.visitors AS visitors
-                  , subq_6.martian_day AS metric_time__martian_day
+                  , subq_6.alien_day AS metric_time__alien_day
                 FROM (
                   -- Read Elements From Semantic Model 'visits_source'
                   SELECT
@@ -344,7 +344,7 @@ FROM (
                 ON
                   subq_0.ds__day = subq_6.ds
               ) subq_7
-              WHERE metric_time__martian_day = '2020-01-01'
+              WHERE metric_time__alien_day = '2020-01-01'
             ) subq_8
           ) subq_9
           INNER JOIN (
