@@ -600,7 +600,7 @@ def test_join_to_timespine_metric_with_custom_granularity_filter_not_in_group_by
         metric_names=("bookings_join_to_time_spine",),
         group_by_names=("metric_time__day",),
         where_constraints=[
-            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('metric_time', 'alien_day') }} = '2020-01-01'"))
+            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('metric_time', 'alien_day') }} = '2020-01-02'"))
         ],
     ).query_spec
 

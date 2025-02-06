@@ -314,7 +314,7 @@ def test_join_to_timespine_metric_with_custom_granularity_filter(  # noqa: D103
             metric_names=("bookings_join_to_time_spine",),
             group_by_names=("metric_time__alien_day",),
             order_by_names=("metric_time__alien_day",),
-            where_constraints=["{{ TimeDimension('metric_time', 'alien_day') }} = '2020-01-08'"],
+            where_constraints=["{{ TimeDimension('metric_time', 'alien_day') }} = '2020-01-02'"],
         )
     )
     assert query_result.result_df is not None, "Unexpected empty result."
@@ -345,7 +345,10 @@ def test_join_to_timespine_metric_with_custom_granularity_filter_not_in_group_by
             metric_names=("bookings_join_to_time_spine",),
             group_by_names=("metric_time__day",),
             order_by_names=("metric_time__day",),
-            where_constraints=["{{ TimeDimension('metric_time', 'alien_day') }} = '2020-01-08'"],
+            where_constraints=[
+                "{{ TimeDimension('metric_time', 'alien_day') }} = '2020-01-02'",
+                "{{ TimeDimension('metric_time', 'year') }} = '2019-01-01'",
+            ],
         )
     )
     assert query_result.result_df is not None, "Unexpected empty result."

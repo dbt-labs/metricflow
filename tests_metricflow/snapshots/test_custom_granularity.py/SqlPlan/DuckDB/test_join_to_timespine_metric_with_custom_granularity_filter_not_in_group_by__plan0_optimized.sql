@@ -20,7 +20,7 @@ FROM (
       , alien_day AS metric_time__alien_day
     FROM ***************************.mf_time_spine time_spine_src_28006
   ) subq_18
-  WHERE metric_time__alien_day = '2020-01-01'
+  WHERE metric_time__alien_day = '2020-01-02'
 ) subq_20
 LEFT OUTER JOIN (
   -- Constrain Output with WHERE
@@ -48,7 +48,7 @@ LEFT OUTER JOIN (
     ON
       subq_11.ds__day = subq_12.ds
   ) subq_13
-  WHERE metric_time__alien_day = '2020-01-01'
+  WHERE metric_time__alien_day = '2020-01-02'
   GROUP BY
     metric_time__day
 ) subq_16
