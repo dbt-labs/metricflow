@@ -17,9 +17,9 @@ WITH sma_28009_cte AS (
 )
 
 SELECT
-  COALESCE(subq_18.booking__is_instant, subq_23.booking__is_instant) AS booking__is_instant
-  , MAX(subq_18.derived_shared_alias_1a) AS derived_shared_alias_1a
-  , MAX(subq_23.derived_shared_alias_2) AS derived_shared_alias_2
+  COALESCE(subq_17.booking__is_instant, subq_22.booking__is_instant) AS booking__is_instant
+  , MAX(subq_17.derived_shared_alias_1a) AS derived_shared_alias_1a
+  , MAX(subq_22.derived_shared_alias_2) AS derived_shared_alias_2
 FROM (
   -- Compute Metrics via Expressions
   SELECT
@@ -36,8 +36,8 @@ FROM (
     FROM sma_28009_cte sma_28009_cte
     GROUP BY
       booking__is_instant
-  ) subq_17
-) subq_18
+  ) subq_16
+) subq_17
 FULL OUTER JOIN (
   -- Compute Metrics via Expressions
   SELECT
@@ -54,10 +54,10 @@ FULL OUTER JOIN (
     FROM sma_28009_cte sma_28009_cte
     GROUP BY
       booking__is_instant
-  ) subq_22
-) subq_23
+  ) subq_21
+) subq_22
 ON
-  subq_18.booking__is_instant = subq_23.booking__is_instant
+  subq_17.booking__is_instant = subq_22.booking__is_instant
 GROUP BY
   booking__is_instant
 LIMIT 1

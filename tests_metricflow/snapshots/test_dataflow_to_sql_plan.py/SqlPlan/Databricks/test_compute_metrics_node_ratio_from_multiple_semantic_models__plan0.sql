@@ -6,16 +6,16 @@ sql_engine: Databricks
 ---
 -- Compute Metrics via Expressions
 SELECT
-  subq_18.ds__day
-  , subq_18.listing__country_latest
-  , CAST(subq_18.bookings AS DOUBLE) / CAST(NULLIF(subq_18.views, 0) AS DOUBLE) AS bookings_per_view
+  subq_17.ds__day
+  , subq_17.listing__country_latest
+  , CAST(subq_17.bookings AS DOUBLE) / CAST(NULLIF(subq_17.views, 0) AS DOUBLE) AS bookings_per_view
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_8.ds__day, subq_17.ds__day) AS ds__day
-    , COALESCE(subq_8.listing__country_latest, subq_17.listing__country_latest) AS listing__country_latest
+    COALESCE(subq_8.ds__day, subq_16.ds__day) AS ds__day
+    , COALESCE(subq_8.listing__country_latest, subq_16.listing__country_latest) AS listing__country_latest
     , MAX(subq_8.bookings) AS bookings
-    , MAX(subq_17.views) AS views
+    , MAX(subq_16.views) AS views
   FROM (
     -- Compute Metrics via Expressions
     SELECT
@@ -481,25 +481,25 @@ FROM (
   FULL OUTER JOIN (
     -- Compute Metrics via Expressions
     SELECT
-      subq_16.ds__day
-      , subq_16.listing__country_latest
-      , subq_16.views
+      subq_15.ds__day
+      , subq_15.listing__country_latest
+      , subq_15.views
     FROM (
       -- Aggregate Measures
       SELECT
-        subq_15.ds__day
-        , subq_15.listing__country_latest
-        , SUM(subq_15.views) AS views
+        subq_14.ds__day
+        , subq_14.listing__country_latest
+        , SUM(subq_14.views) AS views
       FROM (
         -- Pass Only Elements: ['views', 'listing__country_latest', 'ds__day']
         SELECT
-          subq_14.ds__day
-          , subq_14.listing__country_latest
-          , subq_14.views
+          subq_13.ds__day
+          , subq_13.listing__country_latest
+          , subq_13.views
         FROM (
           -- Join Standard Outputs
           SELECT
-            subq_13.country_latest AS listing__country_latest
+            subq_12.country_latest AS listing__country_latest
             , subq_10.ds__day AS ds__day
             , subq_10.ds__week AS ds__week
             , subq_10.ds__month AS ds__month
@@ -681,78 +681,78 @@ FROM (
           LEFT OUTER JOIN (
             -- Pass Only Elements: ['country_latest', 'listing']
             SELECT
-              subq_12.listing
-              , subq_12.country_latest
+              subq_11.listing
+              , subq_11.country_latest
             FROM (
               -- Metric Time Dimension 'ds'
               SELECT
-                subq_11.ds__day
-                , subq_11.ds__week
-                , subq_11.ds__month
-                , subq_11.ds__quarter
-                , subq_11.ds__year
-                , subq_11.ds__extract_year
-                , subq_11.ds__extract_quarter
-                , subq_11.ds__extract_month
-                , subq_11.ds__extract_day
-                , subq_11.ds__extract_dow
-                , subq_11.ds__extract_doy
-                , subq_11.created_at__day
-                , subq_11.created_at__week
-                , subq_11.created_at__month
-                , subq_11.created_at__quarter
-                , subq_11.created_at__year
-                , subq_11.created_at__extract_year
-                , subq_11.created_at__extract_quarter
-                , subq_11.created_at__extract_month
-                , subq_11.created_at__extract_day
-                , subq_11.created_at__extract_dow
-                , subq_11.created_at__extract_doy
-                , subq_11.listing__ds__day
-                , subq_11.listing__ds__week
-                , subq_11.listing__ds__month
-                , subq_11.listing__ds__quarter
-                , subq_11.listing__ds__year
-                , subq_11.listing__ds__extract_year
-                , subq_11.listing__ds__extract_quarter
-                , subq_11.listing__ds__extract_month
-                , subq_11.listing__ds__extract_day
-                , subq_11.listing__ds__extract_dow
-                , subq_11.listing__ds__extract_doy
-                , subq_11.listing__created_at__day
-                , subq_11.listing__created_at__week
-                , subq_11.listing__created_at__month
-                , subq_11.listing__created_at__quarter
-                , subq_11.listing__created_at__year
-                , subq_11.listing__created_at__extract_year
-                , subq_11.listing__created_at__extract_quarter
-                , subq_11.listing__created_at__extract_month
-                , subq_11.listing__created_at__extract_day
-                , subq_11.listing__created_at__extract_dow
-                , subq_11.listing__created_at__extract_doy
-                , subq_11.ds__day AS metric_time__day
-                , subq_11.ds__week AS metric_time__week
-                , subq_11.ds__month AS metric_time__month
-                , subq_11.ds__quarter AS metric_time__quarter
-                , subq_11.ds__year AS metric_time__year
-                , subq_11.ds__extract_year AS metric_time__extract_year
-                , subq_11.ds__extract_quarter AS metric_time__extract_quarter
-                , subq_11.ds__extract_month AS metric_time__extract_month
-                , subq_11.ds__extract_day AS metric_time__extract_day
-                , subq_11.ds__extract_dow AS metric_time__extract_dow
-                , subq_11.ds__extract_doy AS metric_time__extract_doy
-                , subq_11.listing
-                , subq_11.user
-                , subq_11.listing__user
-                , subq_11.country_latest
-                , subq_11.is_lux_latest
-                , subq_11.capacity_latest
-                , subq_11.listing__country_latest
-                , subq_11.listing__is_lux_latest
-                , subq_11.listing__capacity_latest
-                , subq_11.listings
-                , subq_11.largest_listing
-                , subq_11.smallest_listing
+                subq_2.ds__day
+                , subq_2.ds__week
+                , subq_2.ds__month
+                , subq_2.ds__quarter
+                , subq_2.ds__year
+                , subq_2.ds__extract_year
+                , subq_2.ds__extract_quarter
+                , subq_2.ds__extract_month
+                , subq_2.ds__extract_day
+                , subq_2.ds__extract_dow
+                , subq_2.ds__extract_doy
+                , subq_2.created_at__day
+                , subq_2.created_at__week
+                , subq_2.created_at__month
+                , subq_2.created_at__quarter
+                , subq_2.created_at__year
+                , subq_2.created_at__extract_year
+                , subq_2.created_at__extract_quarter
+                , subq_2.created_at__extract_month
+                , subq_2.created_at__extract_day
+                , subq_2.created_at__extract_dow
+                , subq_2.created_at__extract_doy
+                , subq_2.listing__ds__day
+                , subq_2.listing__ds__week
+                , subq_2.listing__ds__month
+                , subq_2.listing__ds__quarter
+                , subq_2.listing__ds__year
+                , subq_2.listing__ds__extract_year
+                , subq_2.listing__ds__extract_quarter
+                , subq_2.listing__ds__extract_month
+                , subq_2.listing__ds__extract_day
+                , subq_2.listing__ds__extract_dow
+                , subq_2.listing__ds__extract_doy
+                , subq_2.listing__created_at__day
+                , subq_2.listing__created_at__week
+                , subq_2.listing__created_at__month
+                , subq_2.listing__created_at__quarter
+                , subq_2.listing__created_at__year
+                , subq_2.listing__created_at__extract_year
+                , subq_2.listing__created_at__extract_quarter
+                , subq_2.listing__created_at__extract_month
+                , subq_2.listing__created_at__extract_day
+                , subq_2.listing__created_at__extract_dow
+                , subq_2.listing__created_at__extract_doy
+                , subq_2.ds__day AS metric_time__day
+                , subq_2.ds__week AS metric_time__week
+                , subq_2.ds__month AS metric_time__month
+                , subq_2.ds__quarter AS metric_time__quarter
+                , subq_2.ds__year AS metric_time__year
+                , subq_2.ds__extract_year AS metric_time__extract_year
+                , subq_2.ds__extract_quarter AS metric_time__extract_quarter
+                , subq_2.ds__extract_month AS metric_time__extract_month
+                , subq_2.ds__extract_day AS metric_time__extract_day
+                , subq_2.ds__extract_dow AS metric_time__extract_dow
+                , subq_2.ds__extract_doy AS metric_time__extract_doy
+                , subq_2.listing
+                , subq_2.user
+                , subq_2.listing__user
+                , subq_2.country_latest
+                , subq_2.is_lux_latest
+                , subq_2.capacity_latest
+                , subq_2.listing__country_latest
+                , subq_2.listing__is_lux_latest
+                , subq_2.listing__capacity_latest
+                , subq_2.listings
+                , subq_2.largest_listing
+                , subq_2.smallest_listing
               FROM (
                 -- Read Elements From Semantic Model 'listings_latest'
                 SELECT
@@ -813,25 +813,25 @@ FROM (
                   , listings_latest_src_28000.user_id AS user
                   , listings_latest_src_28000.user_id AS listing__user
                 FROM ***************************.dim_listings_latest listings_latest_src_28000
-              ) subq_11
-            ) subq_12
-          ) subq_13
+              ) subq_2
+            ) subq_11
+          ) subq_12
           ON
-            subq_10.listing = subq_13.listing
-        ) subq_14
-      ) subq_15
+            subq_10.listing = subq_12.listing
+        ) subq_13
+      ) subq_14
       GROUP BY
-        subq_15.ds__day
-        , subq_15.listing__country_latest
-    ) subq_16
-  ) subq_17
+        subq_14.ds__day
+        , subq_14.listing__country_latest
+    ) subq_15
+  ) subq_16
   ON
     (
-      subq_8.listing__country_latest = subq_17.listing__country_latest
+      subq_8.listing__country_latest = subq_16.listing__country_latest
     ) AND (
-      subq_8.ds__day = subq_17.ds__day
+      subq_8.ds__day = subq_16.ds__day
     )
   GROUP BY
-    COALESCE(subq_8.ds__day, subq_17.ds__day)
-    , COALESCE(subq_8.listing__country_latest, subq_17.listing__country_latest)
-) subq_18
+    COALESCE(subq_8.ds__day, subq_16.ds__day)
+    , COALESCE(subq_8.listing__country_latest, subq_16.listing__country_latest)
+) subq_17

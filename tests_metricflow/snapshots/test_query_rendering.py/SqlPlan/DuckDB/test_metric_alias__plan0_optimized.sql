@@ -26,9 +26,9 @@ SELECT
 FROM (
   -- Join Standard Outputs
   SELECT
-    subq_20.listing__bookings AS listing__bookings
-    , subq_15.metric_time__month AS metric_time__month
-    , subq_15.bookings AS bookings
+    subq_22.listing__bookings AS listing__bookings
+    , subq_17.metric_time__month AS metric_time__month
+    , subq_17.bookings AS bookings
   FROM (
     -- Read From CTE For node_id=sma_28009
     SELECT
@@ -36,7 +36,7 @@ FROM (
       , listing
       , bookings
     FROM sma_28009_cte sma_28009_cte
-  ) subq_15
+  ) subq_17
   LEFT OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
     -- Pass Only Elements: ['bookings', 'listing']
@@ -49,10 +49,10 @@ FROM (
     FROM sma_28009_cte sma_28009_cte
     GROUP BY
       listing
-  ) subq_20
+  ) subq_22
   ON
-    subq_15.listing = subq_20.listing
-) subq_21
+    subq_17.listing = subq_22.listing
+) subq_23
 WHERE listing__bookings > 2
 GROUP BY
   metric_time__month

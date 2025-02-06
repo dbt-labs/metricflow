@@ -13,7 +13,6 @@ from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
-from metricflow_semantics.sql.sql_exprs import SqlWindowFunction
 from typing_extensions import override
 
 from metricflow.dataset.dataset_classes import DataSet
@@ -51,6 +50,16 @@ class SqlDataSet(DataSet):
                 "This node was not created with a SQL node. This should have been prevented by the initializer."
             )
         return node_to_return
+
+    def with_copied_sql_node(self) -> SqlDataSet:
+        """Return a new instance of the dataset a copy of the SQL node."""
+        sql_select_node = self._sql_select_node
+        if sql_select_node:
+            sql_select_node = sql_select_node.copy()
+        sql_node = self._sql_node
+        if sql_node:
+            sql_node = sql_node.copy()
+        return SqlDataSet(instance_set=self.instance_set, sql_select_node=sql_select_node, sql_node=sql_node)
 
     @property
     def checked_sql_select_node(self) -> SqlSelectStatementNode:
@@ -203,17 +212,6 @@ class SqlDataSet(DataSet):
                     instances_available=self.instance_set.time_dimension_instances,
                 )
             )
-        )
-
-    def instance_from_window_function(self, window_function: SqlWindowFunction) -> TimeDimensionInstance:
-        """Find instance in dataset that matches the given window function."""
-        for time_dimension_instance in self.instance_set.time_dimension_instances:
-            if window_function in time_dimension_instance.spec.window_functions:
-                return time_dimension_instance
-
-        raise RuntimeError(
-            f"Did not find a time dimension instance with window function {window_function}.\n"
-            f"Instances available: {self.instance_set.time_dimension_instances}"
         )
 
     def column_association_for_time_dimension(self, time_dimension_spec: TimeDimensionSpec) -> ColumnAssociation:

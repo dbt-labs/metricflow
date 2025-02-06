@@ -5,10 +5,10 @@ from typing import FrozenSet, List, Sequence
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 
-from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOptimizer
 from metricflow.dataflow.optimizer.predicate_pushdown_optimizer import PredicatePushdownOptimizer
 from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import SourceScanOptimizer
+from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
 
 
 class DataflowPlanOptimization(Enum):
@@ -45,7 +45,7 @@ class DataflowPlanOptimizerFactory:
     processing between the DataflowPlanBuilder and the optimizer instances requiring that functionality.
     """
 
-    def __init__(self, node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver) -> None:
+    def __init__(self, node_data_set_resolver: DataflowNodeToSqlSubqueryVisitor) -> None:
         """Initializer.
 
         This collects all of the initialization requirements for the optimizers it manages.

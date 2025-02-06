@@ -18,7 +18,7 @@ FROM (
     FROM (
       -- Constrain Output with WHERE
       SELECT
-        subq_7.metric_time__day
+        subq_7.ds__day
         , subq_7.ds__week
         , subq_7.ds__month
         , subq_7.ds__quarter
@@ -33,7 +33,7 @@ FROM (
       FROM (
         -- Change Column Aliases
         SELECT
-          subq_6.ds__day AS metric_time__day
+          subq_6.ds__day
           , subq_6.ds__week
           , subq_6.ds__month
           , subq_6.ds__quarter

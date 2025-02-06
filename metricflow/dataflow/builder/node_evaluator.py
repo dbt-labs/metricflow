@@ -32,7 +32,6 @@ from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.spec_set import group_specs_by_type
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 
-from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.partitions import (
     PartitionDimensionJoinDescription,
     PartitionJoinResolver,
@@ -45,6 +44,7 @@ from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionT
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
+from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
 
 logger = logging.getLogger(__name__)
 
@@ -168,7 +168,7 @@ class NodeEvaluatorForLinkableInstances:
         self,
         semantic_model_lookup: SemanticModelLookup,
         nodes_available_for_joins: Sequence[DataflowPlanNode],
-        node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver,
+        node_data_set_resolver: DataflowNodeToSqlSubqueryVisitor,
         time_spine_metric_time_nodes: Sequence[MetricTimeDimensionTransformNode],
     ) -> None:
         """Initializer.

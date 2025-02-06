@@ -41,10 +41,10 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_46.metric_time__day, subq_62.metric_time__day) AS metric_time__day
-    , COALESCE(subq_46.listing__country_latest, subq_62.listing__country_latest) AS listing__country_latest
-    , COALESCE(MAX(subq_46.bookings_fill_nulls_with_0), 0) AS bookings_fill_nulls_with_0
-    , COALESCE(MAX(subq_62.bookings_2_weeks_ago), 0) AS bookings_2_weeks_ago
+    COALESCE(subq_44.metric_time__day, subq_60.metric_time__day) AS metric_time__day
+    , COALESCE(subq_44.listing__country_latest, subq_60.listing__country_latest) AS listing__country_latest
+    , COALESCE(MAX(subq_44.bookings_fill_nulls_with_0), 0) AS bookings_fill_nulls_with_0
+    , COALESCE(MAX(subq_60.bookings_2_weeks_ago), 0) AS bookings_2_weeks_ago
   FROM (
     -- Compute Metrics via Expressions
     SELECT
@@ -55,8 +55,8 @@ FROM (
       -- Join to Time Spine Dataset
       SELECT
         rss_28018_cte.ds__day AS metric_time__day
-        , subq_41.listing__country_latest AS listing__country_latest
-        , subq_41.bookings AS bookings
+        , subq_39.listing__country_latest AS listing__country_latest
+        , subq_39.bookings AS bookings
       FROM rss_28018_cte rss_28018_cte
       LEFT OUTER JOIN (
         -- Constrain Output with WHERE
@@ -78,16 +78,16 @@ FROM (
             sma_28014_cte sma_28014_cte
           ON
             sma_28009_cte.listing = sma_28014_cte.listing
-        ) subq_38
+        ) subq_36
         WHERE booking__is_instant
         GROUP BY
           metric_time__day
           , listing__country_latest
-      ) subq_41
+      ) subq_39
       ON
-        rss_28018_cte.ds__day = subq_41.metric_time__day
-    ) subq_45
-  ) subq_46
+        rss_28018_cte.ds__day = subq_39.metric_time__day
+    ) subq_43
+  ) subq_44
   FULL OUTER JOIN (
     -- Compute Metrics via Expressions
     SELECT
@@ -98,8 +98,8 @@ FROM (
       -- Join to Time Spine Dataset
       SELECT
         rss_28018_cte.ds__day AS metric_time__day
-        , subq_57.listing__country_latest AS listing__country_latest
-        , subq_57.bookings AS bookings
+        , subq_55.listing__country_latest AS listing__country_latest
+        , subq_55.bookings AS bookings
       FROM rss_28018_cte rss_28018_cte
       LEFT OUTER JOIN (
         -- Constrain Output with WHERE
@@ -113,9 +113,9 @@ FROM (
           -- Join Standard Outputs
           SELECT
             sma_28014_cte.country_latest AS listing__country_latest
-            , subq_51.metric_time__day AS metric_time__day
-            , subq_51.booking__is_instant AS booking__is_instant
-            , subq_51.bookings AS bookings
+            , subq_49.metric_time__day AS metric_time__day
+            , subq_49.booking__is_instant AS booking__is_instant
+            , subq_49.bookings AS bookings
           FROM (
             -- Join to Time Spine Dataset
             SELECT
@@ -128,28 +128,28 @@ FROM (
               sma_28009_cte sma_28009_cte
             ON
               DATE_SUB(CAST(rss_28018_cte.ds__day AS DATETIME), INTERVAL 14 day) = sma_28009_cte.metric_time__day
-          ) subq_51
+          ) subq_49
           LEFT OUTER JOIN
             sma_28014_cte sma_28014_cte
           ON
-            subq_51.listing = sma_28014_cte.listing
-        ) subq_54
+            subq_49.listing = sma_28014_cte.listing
+        ) subq_52
         WHERE booking__is_instant
         GROUP BY
           metric_time__day
           , listing__country_latest
-      ) subq_57
+      ) subq_55
       ON
-        rss_28018_cte.ds__day = subq_57.metric_time__day
-    ) subq_61
-  ) subq_62
+        rss_28018_cte.ds__day = subq_55.metric_time__day
+    ) subq_59
+  ) subq_60
   ON
     (
-      subq_46.listing__country_latest = subq_62.listing__country_latest
+      subq_44.listing__country_latest = subq_60.listing__country_latest
     ) AND (
-      subq_46.metric_time__day = subq_62.metric_time__day
+      subq_44.metric_time__day = subq_60.metric_time__day
     )
   GROUP BY
     metric_time__day
     , listing__country_latest
-) subq_63
+) subq_61

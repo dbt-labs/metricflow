@@ -23,6 +23,8 @@ from metricflow_semantics.instances import (
     TimeDimensionInstance,
     group_instances_by_type,
 )
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.mf_logging.runtime import log_block_runtime
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
@@ -66,6 +68,7 @@ from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.time.time_constants import ISO8601_PYTHON_FORMAT, ISO8601_PYTHON_TS_FORMAT
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
 
+from metricflow.dataflow.dataflow_plan import DataflowPlanNode
 from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
 from metricflow.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
 from metricflow.dataflow.nodes.aggregate_measures import AggregateMeasuresNode
@@ -81,7 +84,8 @@ from metricflow.dataflow.nodes.join_to_custom_granularity import JoinToCustomGra
 from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataflow.nodes.min_max import MinMaxNode
-from metricflow.dataflow.nodes.offset_by_custom_granularity import OffsetByCustomGranularityNode
+from metricflow.dataflow.nodes.offset_base_grain_by_custom_grain import OffsetBaseGrainByCustomGrainNode
+from metricflow.dataflow.nodes.offset_custom_granularity import OffsetCustomGranularityNode
 from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
@@ -136,6 +140,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         self,
         column_association_resolver: ColumnAssociationResolver,
         semantic_manifest_lookup: SemanticManifestLookup,
+        _node_to_output_data_set: Optional[Dict[DataflowPlanNode, SqlDataSet]] = None,
     ) -> None:
         """Initializer.
 
@@ -154,6 +159,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         self._custom_granularity_time_spine_sources = TimeSpineSource.build_custom_time_spine_sources(
             tuple(self._time_spine_sources.values())
         )
+        self._node_to_output_data_set: Dict[DataflowPlanNode, SqlDataSet] = _node_to_output_data_set or {}
 
     def _next_unique_table_alias(self) -> str:
         """Return the next unique table alias to use in generating queries."""
@@ -163,7 +169,31 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         """Return the next unique CTE alias to use in generating queries."""
         return SequentialIdGenerator.create_next_id(StaticIdPrefix.CTE).str_value
 
-    # TODO: replace this with a dataflow plan node for cumulative metrics
+    def get_output_data_set(self, node: DataflowPlanNode) -> SqlDataSet:
+        """Cached since this will be called repeatedly during the computation of multiple metrics.
+
+        # TODO: The cache needs to be pruned, but has not yet been an issue.
+        """
+        if node not in self._node_to_output_data_set:
+            self._node_to_output_data_set[node] = node.accept(self)
+
+        return self._node_to_output_data_set[node].with_copied_sql_node()
+
+    def cache_output_data_sets(self, nodes: Sequence[DataflowPlanNode]) -> None:
+        """Cache the output of the given nodes for consistent retrieval with `get_output_data_set`."""
+        with log_block_runtime(f"cache_output_data_sets for {len(nodes)} nodes"):
+            for node in nodes:
+                self.get_output_data_set(node)
+
+    def copy(self) -> DataflowNodeToSqlSubqueryVisitor:
+        """Return a copy of this with the same nodes cached."""
+        return DataflowNodeToSqlSubqueryVisitor(
+            column_association_resolver=self._column_association_resolver,
+            semantic_manifest_lookup=self._semantic_manifest_lookup,
+            _node_to_output_data_set=dict(self._node_to_output_data_set),
+        )
+
+    # TODO: replace this with a dataflow plan node for cumulative metrics - SL-3324
     def _make_time_spine_data_set(
         self,
         agg_time_dimension_instances: Tuple[TimeDimensionInstance, ...],
@@ -186,9 +216,19 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         ]
         required_specs = queried_specs + specs_required_for_where_constraints
 
-        time_spine_source = TimeSpineSource.choose_time_spine_source(
+        time_spine_sources = TimeSpineSource.choose_time_spine_sources(
             required_time_spine_specs=required_specs, time_spine_sources=self._time_spine_sources
         )
+        if len(time_spine_sources) != 1:
+            raise RuntimeError(
+                str(
+                    LazyFormat(
+                        "Unexpected number of time spine sources required for query - cumulative metrics should require exactly one.",
+                        time_spine_sources=time_spine_sources,
+                    )
+                )
+            )
+        time_spine_source = time_spine_sources[0]
         time_spine_base_granularity = ExpandedTimeGranularity.from_time_granularity(time_spine_source.base_granularity)
 
         base_column_expr = SqlColumnReferenceExpression.from_column_reference(
@@ -316,7 +356,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
     def visit_join_over_time_range_node(self, node: JoinOverTimeRangeNode) -> SqlDataSet:
         """Generate time range join SQL."""
         table_alias_to_instance_set: OrderedDict[str, InstanceSet] = OrderedDict()
-        parent_data_set = node.parent_node.accept(self)
+        parent_data_set = self.get_output_data_set(node.parent_node)
         parent_data_set_alias = self._next_unique_table_alias()
 
         # Assemble time_spine dataset with a column for each agg_time_dimension requested.
@@ -358,7 +398,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
     def visit_join_on_entities_node(self, node: JoinOnEntitiesNode) -> SqlDataSet:
         """Generates the query that realizes the behavior of the JoinOnEntitiesNode."""
-        from_data_set = node.left_node.accept(self)
+        from_data_set = self.get_output_data_set(node.left_node)
         from_data_set_alias = self._next_unique_table_alias()
 
         # Change the aggregation state for the measures to be partially aggregated if it was previously aggregated
@@ -387,7 +427,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         for join_description in node.join_targets:
             join_on_entity = join_description.join_on_entity
             right_node_to_join = join_description.join_node
-            right_data_set: SqlDataSet = right_node_to_join.accept(self)
+            right_data_set: SqlDataSet = self.get_output_data_set(right_node_to_join)
             right_data_set_alias = self._next_unique_table_alias()
 
             # Build join description.
@@ -461,7 +501,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
         """
         # Get the data from the parent, and change measure instances to the aggregated state.
-        from_data_set: SqlDataSet = node.parent_node.accept(self)
+        from_data_set: SqlDataSet = self.get_output_data_set(node.parent_node)
         aggregated_instance_set = from_data_set.instance_set.transform(
             ChangeMeasureAggregationState(
                 {
@@ -522,7 +562,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
     def visit_compute_metrics_node(self, node: ComputeMetricsNode) -> SqlDataSet:
         """Generates the query that realizes the behavior of ComputeMetricsNode."""
-        from_data_set: SqlDataSet = node.parent_node.accept(self)
+        from_data_set: SqlDataSet = self.get_output_data_set(node.parent_node)
         from_data_set_alias = self._next_unique_table_alias()
 
         # TODO: Check that all measures for the metrics are in the input instance set
@@ -714,7 +754,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         return metric_expr
 
     def visit_order_by_limit_node(self, node: OrderByLimitNode) -> SqlDataSet:  # noqa: D102
-        from_data_set: SqlDataSet = node.parent_node.accept(self)
+        from_data_set: SqlDataSet = self.get_output_data_set(node.parent_node)
         output_instance_set = from_data_set.instance_set
         from_data_set_alias = self._next_unique_table_alias()
 
@@ -754,10 +794,10 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
     def visit_write_to_result_data_table_node(self, node: WriteToResultDataTableNode) -> SqlDataSet:  # noqa: D102
         # Returning the parent-node SQL as an approximation since you can't write to a data_table via SQL.
-        return node.parent_node.accept(self)
+        return self.get_output_data_set(node.parent_node)
 
     def visit_write_to_result_table_node(self, node: WriteToResultTableNode) -> SqlDataSet:  # noqa: D102
-        input_data_set: SqlDataSet = node.parent_node.accept(self)
+        input_data_set: SqlDataSet = self.get_output_data_set(node.parent_node)
         input_instance_set: InstanceSet = input_data_set.instance_set
         return SqlDataSet(
             instance_set=input_instance_set,
@@ -769,7 +809,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
     def visit_filter_elements_node(self, node: FilterElementsNode) -> SqlDataSet:
         """Generates the query that realizes the behavior of FilterElementsNode."""
-        from_data_set: SqlDataSet = node.parent_node.accept(self)
+        from_data_set: SqlDataSet = self.get_output_data_set(node.parent_node)
         output_instance_set = from_data_set.instance_set.transform(FilterElements(node.include_specs))
         from_data_set_alias = self._next_unique_table_alias()
 
@@ -796,7 +836,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
     def visit_where_constraint_node(self, node: WhereConstraintNode) -> SqlDataSet:
         """Adds where clause to SQL statement from parent node."""
-        parent_data_set: SqlDataSet = node.parent_node.accept(self)
+        parent_data_set: SqlDataSet = self.get_output_data_set(node.parent_node)
         # Since we're copying the instance set from the parent to conveniently generate the output instance set for this
         # node, we'll need to change the column names.
         output_instance_set = parent_data_set.instance_set.transform(
@@ -870,7 +910,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         table_alias_to_instance_set: OrderedDict[str, InstanceSet] = OrderedDict()
 
         for parent_node in node.parent_nodes:
-            parent_sql_data_set = parent_node.accept(self)
+            parent_sql_data_set = self.get_output_data_set(parent_node)
             table_alias = self._next_unique_table_alias()
             parent_data_sets.append(AnnotatedSqlDataSet(data_set=parent_sql_data_set, alias=table_alias))
             table_alias_to_instance_set[table_alias] = parent_sql_data_set.instance_set
@@ -961,7 +1001,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         Since time range constraints are always bound by a range of standard date/time values, this conversion
         cannot use custom granularities.
         """
-        from_data_set: SqlDataSet = node.parent_node.accept(self)
+        from_data_set: SqlDataSet = self.get_output_data_set(node.parent_node)
         from_data_set_alias = self._next_unique_table_alias()
 
         time_dimension_instances_for_metric_time = sorted(
@@ -1012,7 +1052,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         matching the one defined in the node will be passed. In addition, an additional time dimension instance for
         "metric time" will be included. See DataSet.metric_time_dimension_reference().
         """
-        input_data_set: SqlDataSet = node.parent_node.accept(self)
+        input_data_set: SqlDataSet = self.get_output_data_set(node.parent_node)
 
         # Find which measures have an aggregation time dimension that is the same as the one specified in the node.
         # Only these measures will be in the output data set.
@@ -1100,7 +1140,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         specified dimension that is non-additive. Then that dataset would be joined with the input data
         on that dimension along with grouping by entities that are also passed in.
         """
-        from_data_set: SqlDataSet = node.parent_node.accept(self)
+        from_data_set: SqlDataSet = self.get_output_data_set(node.parent_node)
 
         from_data_set_alias = self._next_unique_table_alias()
 
@@ -1226,9 +1266,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         return agg_time_dimension_instances[0]
 
     def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode) -> SqlDataSet:  # noqa: D102
-        parent_data_set = node.metric_source_node.accept(self)
+        parent_data_set = self.get_output_data_set(node.metric_source_node)
         parent_alias = self._next_unique_table_alias()
-        time_spine_data_set = node.time_spine_node.accept(self)
+        time_spine_data_set = self.get_output_data_set(node.time_spine_node)
         time_spine_alias = self._next_unique_table_alias()
 
         required_agg_time_dimension_specs = tuple(node.requested_agg_time_dimension_specs)
@@ -1255,7 +1295,15 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         # Build new instances and columns.
         time_spine_required_spec_set = InstanceSpecSet(time_dimension_specs=required_agg_time_dimension_specs)
         output_parent_instance_set = parent_data_set.instance_set.transform(
-            FilterElements(exclude_specs=time_spine_required_spec_set)
+            FilterElements(
+                exclude_specs=InstanceSpecSet.create_from_specs(
+                    tuple(
+                        spec
+                        for spec in time_spine_required_spec_set.time_dimension_specs
+                        if spec in parent_data_set.instance_set.spec_set.time_dimension_specs
+                    )
+                )
+            )
         )
         output_time_spine_instances: Tuple[TimeDimensionInstance, ...] = ()
         output_time_spine_columns: Tuple[SqlSelectColumn, ...] = ()
@@ -1345,7 +1393,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         )
 
     def visit_alias_specs_node(self, node: AliasSpecsNode) -> SqlDataSet:  # noqa: D102
-        parent_data_set = node.parent_node.accept(self)
+        parent_data_set = self.get_output_data_set(node.parent_node)
         parent_alias = self._next_unique_table_alias()
 
         input_specs_to_output_specs: Dict[InstanceSpec, List[InstanceSpec]] = defaultdict(list)
@@ -1395,7 +1443,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         )
 
     def visit_join_to_custom_granularity_node(self, node: JoinToCustomGranularityNode) -> SqlDataSet:  # noqa: D102
-        parent_data_set = node.parent_node.accept(self)
+        parent_data_set = self.get_output_data_set(node.parent_node)
 
         # New dataset will be joined to parent dataset without a subquery, so use the same FROM alias as the parent node.
         parent_alias = parent_data_set.checked_sql_select_node.from_source_alias
@@ -1467,7 +1515,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         )
 
     def visit_min_max_node(self, node: MinMaxNode) -> SqlDataSet:  # noqa: D102
-        parent_data_set = node.parent_node.accept(self)
+        parent_data_set = self.get_output_data_set(node.parent_node)
         parent_table_alias = self._next_unique_table_alias()
         assert (
             len(parent_data_set.checked_sql_select_node.select_columns) == 1
@@ -1510,7 +1558,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         Builds a new dataset that is the same as the output dataset, but with an additional column
         that contains a randomly generated UUID.
         """
-        input_data_set: SqlDataSet = node.parent_node.accept(self)
+        input_data_set: SqlDataSet = self.get_output_data_set(node.parent_node)
         input_data_set_alias = self._next_unique_table_alias()
 
         gen_uuid_spec = MetadataSpec(MetricFlowReservedKeywords.MF_INTERNAL_UUID.value)
@@ -1552,10 +1600,10 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         successful conversion. Duplication may exist in the result due to a single base event
         being able to link to multiple conversion events.
         """
-        base_data_set: SqlDataSet = node.base_node.accept(self)
+        base_data_set: SqlDataSet = self.get_output_data_set(node.base_node)
         base_data_set_alias = self._next_unique_table_alias()
 
-        conversion_data_set: SqlDataSet = node.conversion_node.accept(self)
+        conversion_data_set: SqlDataSet = self.get_output_data_set(node.conversion_node)
         conversion_data_set_alias = self._next_unique_table_alias()
 
         base_time_dimension_column_name = self._column_association_resolver.resolve_spec(
@@ -1704,7 +1752,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         )
 
     def visit_window_reaggregation_node(self, node: WindowReaggregationNode) -> SqlDataSet:  # noqa: D102
-        from_data_set = node.parent_node.accept(self)
+        from_data_set = self.get_output_data_set(node.parent_node)
         parent_instance_set = from_data_set.instance_set
         parent_data_set_alias = self._next_unique_table_alias()
 
@@ -1832,7 +1880,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             ),
         )
 
-    def visit_offset_by_custom_granularity_node(self, node: OffsetByCustomGranularityNode) -> SqlDataSet:
+    def visit_offset_base_grain_by_custom_grain_node(self, node: OffsetBaseGrainByCustomGrainNode) -> SqlDataSet:
         """Builds a query to implement an offset window that uses a custom grain.
 
         The query implements the offset window by offsetting the custom grain's base grain by the requested number of custom
@@ -1882,7 +1930,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
           ON cte.ds__martian_day = b.ds__martian_day
         )
         """
-        time_spine_data_set = node.time_spine_node.accept(self)
+        time_spine_data_set = self.get_output_data_set(node.time_spine_node)
         time_spine_alias = self._next_unique_table_alias()
         offset_window = node.offset_window
         custom_grain_name = offset_window.granularity
@@ -2098,5 +2146,101 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                 select_columns=(non_offset_base_grain_column,) + requested_columns,
                 from_source=offset_base_grain_subquery,
                 from_source_alias=offset_base_grain_subquery_alias,
+            ),
+        )
+
+    def visit_offset_custom_granularity_node(self, node: OffsetCustomGranularityNode) -> SqlDataSet:  # noqa: D102
+        """Build a SQL query that offsets the given custom grain by the requested number of periods.
+
+        The base grain is also needed in the output query in order to join to the metric source.
+        To offset 1 fiscal_quarter, the SQL would look like this:
+
+        SELECT
+            date_day,
+            fiscal_quarter__lead AS metric_time__fiscal_quarter
+        FROM ANALYTICS_DEV.DBT_JSTEIN.ALL_DAYS a
+        INNER JOIN (
+            SELECT
+                fiscal_quarter,
+                LEAD(fiscal_quarter, 1) OVER (ORDER BY fiscal_quarter) AS fiscal_quarter__lead
+            FROM ANALYTICS_DEV.DBT_JSTEIN.ALL_DAYS
+            GROUP BY fiscal_quarter
+        ) b ON b.fiscal_quarter = a.fiscal_quarter
+        """
+        cte_data_set = self.get_output_data_set(node.time_spine_node)
+        cte_alias = self._next_unique_cte_alias()
+        cte_node = SqlCteNode.create(select_statement=cte_data_set.checked_sql_select_node, cte_alias=cte_alias)
+        custom_grain_name = node.offset_window.granularity
+        custom_grain_instance = cte_data_set.instance_from_time_dimension_grain_and_date_part(
+            time_granularity_name=custom_grain_name, date_part=None
+        )
+
+        # Build subquery with LEAD column.
+        custom_grain_column = SqlSelectColumn.from_column_reference(
+            table_alias=cte_alias, column_name=custom_grain_instance.associated_column.column_name
+        )
+        offset_instance = custom_grain_instance.with_new_spec(
+            new_spec=custom_grain_instance.spec.with_window_functions((SqlWindowFunction.LEAD,)),
+            column_association_resolver=self._column_association_resolver,
+        )
+        offset_column = SqlSelectColumn(
+            expr=SqlWindowFunctionExpression.create(
+                sql_function=SqlWindowFunction.LEAD,
+                sql_function_args=(custom_grain_column.expr, SqlIntegerExpression.create(node.offset_window.count)),
+                order_by_args=(SqlWindowOrderByArgument(custom_grain_column.expr),),
+            ),
+            column_alias=offset_instance.associated_column.column_name,
+        )
+        subquery = SqlSelectStatementNode.create(
+            description="Offset Custom Granularity",
+            select_columns=(custom_grain_column, offset_column),
+            from_source=SqlTableNode.create(sql_table=SqlTable(schema_name=None, table_name=cte_alias)),
+            from_source_alias=cte_alias,
+            group_bys=(custom_grain_column,),
+        )
+        subquery_alias = self._next_unique_table_alias()
+
+        # Build join condition.
+        join_desc = SqlJoinDescription(
+            right_source=subquery,
+            right_source_alias=subquery_alias,
+            join_type=SqlJoinType.INNER,
+            on_condition=SqlComparisonExpression.create(
+                left_expr=custom_grain_column.expr,
+                comparison=SqlComparison.EQUALS,
+                right_expr=custom_grain_column.reference_from(subquery_alias),
+            ),
+        )
+
+        # Build outer query select columns.
+        base_grain = ExpandedTimeGranularity.from_time_granularity(
+            self._get_time_spine_for_custom_granularity(custom_grain_name).base_granularity
+        )
+        base_grain_instance = cte_data_set.instance_from_time_dimension_grain_and_date_part(
+            time_granularity_name=base_grain.name
+        )
+        base_grain_column = SqlSelectColumn.from_column_reference(
+            table_alias=cte_alias, column_name=base_grain_instance.associated_column.column_name
+        )
+        offset_column_ref_expr = offset_column.reference_from(subquery_alias)
+        requested_columns: Tuple[SqlSelectColumn, ...] = ()
+        requested_instances: Tuple[TimeDimensionInstance, ...] = ()
+        for required_spec in node.required_time_spine_specs:
+            new_instance = offset_instance.with_new_spec(
+                new_spec=required_spec, column_association_resolver=self._column_association_resolver
+            )
+            requested_instances += (new_instance,)
+            requested_columns += (
+                SqlSelectColumn(expr=offset_column_ref_expr, column_alias=new_instance.associated_column.column_name),
+            )
+        return SqlDataSet(
+            instance_set=InstanceSet(time_dimension_instances=(base_grain_instance,) + requested_instances),
+            sql_select_node=SqlSelectStatementNode.create(
+                description="Join Offset Custom Granularity to Base Granularity",
+                select_columns=(base_grain_column,) + requested_columns,
+                from_source=SqlTableNode.create(sql_table=SqlTable(schema_name=None, table_name=cte_alias)),
+                from_source_alias=cte_alias,
+                join_descs=(join_desc,),
+                cte_sources=(cte_node,),
             ),
         )
