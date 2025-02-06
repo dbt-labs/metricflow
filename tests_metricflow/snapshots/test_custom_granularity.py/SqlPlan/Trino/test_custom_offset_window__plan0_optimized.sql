@@ -26,12 +26,12 @@ FROM (
           PARTITION BY alien_day
           ORDER BY ds
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-        ) AS ds__alien_day__first_value
+        ) AS ds__day__first_value
         , LAST_VALUE(ds) OVER (
           PARTITION BY alien_day
           ORDER BY ds
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-        ) AS ds__alien_day__last_value
+        ) AS ds__day__last_value
         , ROW_NUMBER() OVER (
           PARTITION BY alien_day
           ORDER BY ds
@@ -42,8 +42,8 @@ FROM (
     SELECT
       cte_6.ds__day AS ds__day
       , CASE
-        WHEN DATE_ADD('day', (cte_6.ds__day__row_number - 1), subq_24.ds__alien_day__first_value__lead) <= subq_24.ds__alien_day__last_value__lead
-          THEN DATE_ADD('day', (cte_6.ds__day__row_number - 1), subq_24.ds__alien_day__first_value__lead)
+        WHEN DATE_ADD('day', (cte_6.ds__day__row_number - 1), subq_24.ds__day__first_value__lead) <= subq_24.ds__day__last_value__lead
+          THEN DATE_ADD('day', (cte_6.ds__day__row_number - 1), subq_24.ds__day__first_value__lead)
         ELSE NULL
       END AS ds__day__lead
     FROM cte_6 cte_6
@@ -51,19 +51,19 @@ FROM (
       -- Offset Custom Granularity Bounds
       SELECT
         ds__alien_day
-        , LEAD(ds__alien_day__first_value, 1) OVER (ORDER BY ds__alien_day) AS ds__alien_day__first_value__lead
-        , LEAD(ds__alien_day__last_value, 1) OVER (ORDER BY ds__alien_day) AS ds__alien_day__last_value__lead
+        , LEAD(ds__day__first_value, 1) OVER (ORDER BY ds__alien_day) AS ds__day__first_value__lead
+        , LEAD(ds__day__last_value, 1) OVER (ORDER BY ds__alien_day) AS ds__day__last_value__lead
       FROM (
         -- Get Unique Rows for Custom Granularity Bounds
         SELECT
           ds__alien_day
-          , ds__alien_day__first_value
-          , ds__alien_day__last_value
+          , ds__day__first_value
+          , ds__day__last_value
         FROM cte_6 cte_6
         GROUP BY
           ds__alien_day
-          , ds__alien_day__first_value
-          , ds__alien_day__last_value
+          , ds__day__first_value
+          , ds__day__last_value
       ) subq_23
     ) subq_24
     ON
