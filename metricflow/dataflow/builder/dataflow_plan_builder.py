@@ -90,7 +90,7 @@ from metricflow.dataflow.nodes.join_to_custom_granularity import JoinToCustomGra
 from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataflow.nodes.min_max import MinMaxNode
-from metricflow.dataflow.nodes.offset_base_grain_by_custom_grain import OffsetBaseGrainByCustomGrainNode
+from metricflow.dataflow.nodes.offset_base_grain_by_custom_grain import OffsetQueriedGrainByCustomGrainNode
 from metricflow.dataflow.nodes.offset_custom_granularity import OffsetCustomGranularityNode
 from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
@@ -2068,7 +2068,7 @@ class DataflowPlanBuilder:
         time_spine_read_nodes = {custom_time_spine_read_node: None}
         for time_spine_source in required_time_spine_sources:
             time_spine_read_nodes[self._choose_time_spine_read_node(time_spine_source)] = None
-        return OffsetBaseGrainByCustomGrainNode.create(
+        return OffsetQueriedGrainByCustomGrainNode.create(
             time_spine_nodes=tuple(time_spine_read_nodes.keys()),
             offset_window=offset_window,
             required_time_spine_specs=required_time_spine_specs,
