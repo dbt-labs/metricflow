@@ -9,6 +9,8 @@ from tests_metricflow_semantics.mf_logging.recorded_logging_context import Recor
 
 logger = logging.getLogger(__name__)
 
+_NOT_FORMATTED_ASSERTION_MESSAGE = "This should not have been formatted as a string."
+
 
 def test_log_kwargs() -> None:
     """Test that objects included via keyword args are formatted."""
@@ -36,12 +38,11 @@ def test_lambda() -> None:
 
 def test_lazy_object() -> None:
     """Test that formatting of objects are done lazily and not when the logging level is not appropriate."""
-    assertion_message = "This should not have been formatted as a string."
 
     class _NotFormattedObject:
         @override
         def __repr__(self) -> str:
-            raise AssertionError(assertion_message)
+            raise AssertionError(_NOT_FORMATTED_ASSERTION_MESSAGE)
 
     # Logging level is INFO, so DEBUG messages shouldn't be logged / formatted.
     recorded_logger: logging.Logger
@@ -51,14 +52,35 @@ def test_lazy_object() -> None:
 
 
 def test_lazy_lambda() -> None:
-    """Test that a lambda input is not evaluated when the logging level is not appropriate."""
-    assertion_message = "This should not have been formatted as a string."
+    """Test that a lambda message is not evaluated when the logging level is not appropriate."""
 
     def _should_not_be_called() -> str:
-        raise AssertionError(assertion_message)
+        raise AssertionError(_NOT_FORMATTED_ASSERTION_MESSAGE)
 
     # Logging level is INFO, so DEBUG messages shouldn't be logged / formatted.
     recorded_logger: logging.Logger
     handler: RecordingLogHandler
     with recorded_logging_context(logger, logging.INFO) as (recorded_logger, handler):
         recorded_logger.debug(LazyFormat(lambda: f"{_should_not_be_called()}"))
+
+
+def test_lambda_argument() -> None:
+    """Tests that a callable that's supplied as an argument value is evaluated."""
+    recorded_logger: logging.Logger
+    handler: RecordingLogHandler
+    with recorded_logging_context(logger, logging.INFO) as (recorded_logger, handler):
+        recorded_logger.info(LazyFormat("Example message", arg_0=lambda: 1))
+        assert handler.get_last_message() == "Example message (arg_0=1)"
+
+
+def test_lazy_lambda_argument() -> None:
+    """Test that a lambda input is not evaluated when the logging level is not appropriate."""
+
+    def _should_not_be_called() -> str:
+        raise AssertionError(_NOT_FORMATTED_ASSERTION_MESSAGE)
+
+    # Logging level is INFO, so DEBUG messages shouldn't be logged / formatted.
+    recorded_logger: logging.Logger
+    handler: RecordingLogHandler
+    with recorded_logging_context(logger, logging.INFO) as (recorded_logger, handler):
+        recorded_logger.debug(LazyFormat("Example message", arg_0=lambda: f"{_should_not_be_called()}"))
