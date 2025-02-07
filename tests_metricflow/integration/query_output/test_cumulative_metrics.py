@@ -145,6 +145,7 @@ def test_cumulative_metric_with_non_adjustable_filter(
             group_by_names=["metric_time"],
             order_by_names=["metric_time"],
             where_constraints=[where_constraint],
+            time_constraint_start=as_datetime("2020-01-01"),
             time_constraint_end=as_datetime("2020-12-31"),
         )
     )

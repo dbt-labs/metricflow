@@ -1252,7 +1252,6 @@ class DataflowPlanBuilder:
                 all_linkable_specs_required_for_source_nodes=linkable_specs_to_satisfy,
             )
 
-        logger.error(LazyFormat(lambda: "No recipe could be constructed."))
         return None
 
     def build_computed_metrics_node(
