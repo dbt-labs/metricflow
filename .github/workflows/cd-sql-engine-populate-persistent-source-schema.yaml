@@ -15,7 +15,6 @@ on:
 
 env:
   # Unclear on how to make 'Reload Test Data in SQL Engines' a constant here as it does not work here.
-  PYTHON_VERSION: "3.8"
   ADDITIONAL_PYTEST_OPTIONS: "--log-cli-level info"
 
 jobs:
@@ -28,10 +27,9 @@ jobs:
       - name: Check-out the repo
         uses: actions/checkout@v4
 
-      - name: Populate w/Python ${{ env.PYTHON_VERSION }}
+      - name: Populate Snowflake
         uses: ./.github/actions/run-mf-tests
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
           mf_sql_engine_url: ${{ secrets.MF_SNOWFLAKE_URL }}
           mf_sql_engine_password: ${{ secrets.MF_SNOWFLAKE_PWD }}
           parallelism: 1
@@ -47,10 +45,9 @@ jobs:
       - name: Check-out the repo
         uses: actions/checkout@v4
 
-      - name: Populate w/Python ${{ env.PYTHON_VERSION }}
+      - name: Populate Redshift
         uses: ./.github/actions/run-mf-tests
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
           mf_sql_engine_url: ${{ secrets.MF_REDSHIFT_URL }}
           mf_sql_engine_password: ${{ secrets.MF_REDSHIFT_PWD }}
           parallelism: 1
@@ -66,10 +63,9 @@ jobs:
       - name: Check-out the repo
         uses: actions/checkout@v4
 
-      - name: Populate w/Python ${{ env.PYTHON_VERSION }}
+      - name: Populate BigQuery
         uses: ./.github/actions/run-mf-tests
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
           MF_SQL_ENGINE_URL: ${{ secrets.MF_BIGQUERY_URL }}
           MF_SQL_ENGINE_PASSWORD: ${{ secrets.MF_BIGQUERY_PWD }}
           parallelism: 1
@@ -85,10 +81,9 @@ jobs:
       - name: Check-out the repo
         uses: actions/checkout@v4
 
-      - name: Populate w/Python ${{ env.PYTHON_VERSION }}
+      - name: Populate Databricks
         uses: ./.github/actions/run-mf-tests
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
           mf_sql_engine_url: ${{ secrets.MF_DATABRICKS_URL }}
           mf_sql_engine_password: ${{ secrets.MF_DATABRICKS_PWD }}
           parallelism: 1

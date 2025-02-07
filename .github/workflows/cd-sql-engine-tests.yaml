@@ -9,7 +9,6 @@ on:
     types: [labeled]
 
 env:
-  PYTHON_VERSION: "3.8"
   EXTERNAL_ENGINE_TEST_PARALLELISM: 8
   ADDITIONAL_PYTEST_OPTIONS: "--use-persistent-source-schema"
 
@@ -25,10 +24,8 @@ jobs:
       - name: Check-out the repo
         uses: actions/checkout@v4
 
-      - name: Test w/ Python ${{ env.PYTHON_VERSION }}
-        uses: ./.github/actions/run-mf-tests
+      - uses: ./.github/actions/run-mf-tests
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
           mf_sql_engine_url: ${{ secrets.MF_SNOWFLAKE_URL }}
           mf_sql_engine_password: ${{ secrets.MF_SNOWFLAKE_PWD }}
           parallelism: ${{ env.EXTERNAL_ENGINE_TEST_PARALLELISM }}
@@ -50,10 +47,8 @@ jobs:
       - name: Check-out the repo
         uses: actions/checkout@v4
 
-      - name: Test w/ Python ${{ env.PYTHON_VERSION }}
-        uses: ./.github/actions/run-mf-tests
+      - uses: ./.github/actions/run-mf-tests
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
           mf_sql_engine_url: ${{ secrets.MF_REDSHIFT_URL }}
           mf_sql_engine_password: ${{ secrets.MF_REDSHIFT_PWD }}
           parallelism: ${{ env.EXTERNAL_ENGINE_TEST_PARALLELISM }}
@@ -75,10 +70,8 @@ jobs:
       - name: Check-out the repo
         uses: actions/checkout@v4
 
-      - name: Test w/ Python ${{ env.PYTHON_VERSION }}
-        uses: ./.github/actions/run-mf-tests
+      - uses: ./.github/actions/run-mf-tests
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
           MF_SQL_ENGINE_URL: ${{ secrets.MF_BIGQUERY_URL }}
           MF_SQL_ENGINE_PASSWORD: ${{ secrets.MF_BIGQUERY_PWD }}
           parallelism: ${{ env.EXTERNAL_ENGINE_TEST_PARALLELISM }}
@@ -100,10 +93,8 @@ jobs:
       - name: Check-out the repo
         uses: actions/checkout@v4
 
-      - name: Test w/ Python ${{ env.PYTHON_VERSION }}
-        uses: ./.github/actions/run-mf-tests
+      - uses: ./.github/actions/run-mf-tests
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
           mf_sql_engine_url: ${{ secrets.MF_DATABRICKS_URL }}
           mf_sql_engine_password: ${{ secrets.MF_DATABRICKS_PWD }}
           parallelism: ${{ env.EXTERNAL_ENGINE_TEST_PARALLELISM }}
@@ -133,10 +124,8 @@ jobs:
       - name: Check-out the repo
         uses: actions/checkout@v4
 
-      - name: Test w/ Python 3.12
-        uses: ./.github/actions/run-mf-tests
+      - uses: ./.github/actions/run-mf-tests
         with:
-          python-version: "3.12"
           make-target: "test-trino"
           hatch-environment-cache-config-json: >-
             {

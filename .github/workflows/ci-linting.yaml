@@ -17,17 +17,13 @@ jobs:
   pre-commit:
     name: Run Pre-Commit Linting Hooks
     runs-on: ubuntu-latest
-    env:
-      python-version: "3.8"
     steps:
 
       - name: Check-out the repo
         uses: actions/checkout@v4
 
-      - name: Setup Python ${{ env.python-version }} Environment
-        uses: ./.github/actions/setup-python-env
+      - uses: ./.github/actions/setup-python-env
         with:
-          python-version: "${{ env.python-version }}"
           hatch-environment-cache-config-json: >-
             {
               "configs": [
