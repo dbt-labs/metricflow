@@ -229,18 +229,31 @@ class DataflowPlanBuilder:
 
     def _optimize_plan(self, plan: DataflowPlan, optimizations: FrozenSet[DataflowPlanOptimization]) -> DataflowPlan:
         optimizer_factory = DataflowPlanOptimizerFactory(self._node_data_set_resolver)
+
         for optimizer in optimizer_factory.get_optimizers(optimizations):
-            logger.debug(LazyFormat(lambda: f"Applying optimizer: {optimizer.__class__.__name__}"))
+            optimizer_name = optimizer.__class__.__name__
+            logger.debug(LazyFormat("Applying optimizer", optimizer_name=optimizer_name))
             try:
-                plan = optimizer.optimize(plan)
-                logger.debug(
-                    LazyFormat(
-                        lambda: f"After applying optimizer {optimizer.__class__.__name__}, the dataflow plan is:\n"
-                        f"{indent(plan.structure_text())}"
+                optimized_plan = optimizer.optimize(plan)
+
+                if plan == optimized_plan:
+                    logger.debug(
+                        LazyFormat(
+                            "Running the given optimizer resulted in the same plan.", optimizer_name=optimizer_name
+                        )
                     )
-                )
+                else:
+                    logger.debug(
+                        LazyFormat(
+                            "Running the given optimizer resulted in a different plan.",
+                            optimizer_name=optimizer_name,
+                            previous_plan=plan.structure_text,
+                            optimized_plan=optimized_plan.structure_text,
+                        )
+                    )
+                    plan = optimized_plan
             except Exception:
-                logger.exception(f"Got an exception applying {optimizer.__class__.__name__}")
+                logger.exception(f"Skipping {optimizer_name} due to an exception.")
 
         return plan
 
@@ -551,9 +564,9 @@ class DataflowPlanBuilder:
         )
         logger.debug(
             LazyFormat(
-                lambda: f"For\n{indent(mf_pformat(metric_spec))}"
-                f"\nneeded measure is:"
-                f"\n{indent(mf_pformat(metric_input_measure_spec))}"
+                "Determined needed measure for metric",
+                metric_spec=metric_spec,
+                metric_input_measure_spec=metric_input_measure_spec,
             )
         )
 
@@ -585,8 +598,10 @@ class DataflowPlanBuilder:
         )
         logger.debug(
             LazyFormat(
-                lambda: f"For {metric.type} metric: {metric_spec}, needed metrics are:\n"
-                f"{mf_pformat(metric_input_specs)}"
+                "Determined metric input specs",
+                metric_name=metric_spec.element_name,
+                metric_type=metric.type,
+                metric_input_specs=metric_input_specs,
             )
         )
 
