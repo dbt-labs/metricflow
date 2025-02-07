@@ -17,6 +17,7 @@ from dbt_semantic_interfaces.protocols.metric import (
 from dbt_semantic_interfaces.references import MeasureReference, MetricReference, TimeDimensionReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
+from metricflow_semantics.assert_one_arg import assert_exactly_one_arg_set
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.errors.custom_grain_not_supported import error_if_not_standard_grain
@@ -587,10 +588,6 @@ class DataflowPlanBuilder:
             )
         )
 
-        required_linkable_specs = self.__get_required_linkable_specs(
-            queried_linkable_specs=queried_linkable_specs, filter_specs=metric_spec.filter_spec_set.all_filter_specs
-        )
-
         parent_nodes: List[DataflowPlanNode] = []
 
         # This is the filter that's defined for the metric in the configs.
@@ -599,26 +596,48 @@ class DataflowPlanBuilder:
             filter_intersection=metric.filter,
         )
 
+        outer_agg_time_only_filters = WhereFilterSpecSet()
+        outer_non_agg_time_filters = WhereFilterSpecSet()
+        where_filter_spec_set = WhereFilterSpecSet()
+        if metric_spec.has_time_offset:
+            # Here, we have filters defined on outer metrics or at the query level. Separate out agg time only
+            # filters from other filters. Agg time only filters will be applied after the offset join to avoid
+            # filtering out values that will change. Other filters can be applied earlier since their values won't change.
+            outer_metric_filters = metric_spec.filter_spec_set.metric_level_filter_specs
+            query_level_filters = metric_spec.filter_spec_set.query_level_filter_specs
+            (
+                outer_metric_agg_time_only_filters,
+                outer_metric_non_agg_time_filters,
+            ) = self._separate_agg_time_only_filters(
+                where_filter_specs=outer_metric_filters, metric_reference=metric_spec.reference
+            )
+            query_level_agg_time_only_filters, query_level_non_agg_time_filters = self._separate_agg_time_only_filters(
+                where_filter_specs=query_level_filters, metric_reference=metric_spec.reference
+            )
+            outer_agg_time_only_filters = WhereFilterSpecSet(
+                metric_level_filter_specs=outer_metric_agg_time_only_filters,
+                query_level_filter_specs=query_level_agg_time_only_filters,
+            )
+            outer_non_agg_time_filters = WhereFilterSpecSet(
+                metric_level_filter_specs=outer_metric_non_agg_time_filters,
+                query_level_filter_specs=query_level_non_agg_time_filters,
+            )
+
         for metric_input_spec in metric_input_specs:
-            where_filter_spec_set = WhereFilterSpecSet(
-                metric_level_filter_specs=tuple(metric_definition_filter_specs),
-            )
+            # Add filters defined on both the input metric and the metric itself.
+            where_filter_spec_set = where_filter_spec_set.merge(
+                WhereFilterSpecSet(
+                    metric_level_filter_specs=tuple(metric_definition_filter_specs),
+                )
+            ).merge(metric_input_spec.filter_spec_set)
 
-            # These are the filters that's defined as part of the input metric.
-            where_filter_spec_set = where_filter_spec_set.merge(metric_input_spec.filter_spec_set)
-
-            # If metric is offset, we'll apply where constraint after offset to avoid removing values
-            # unexpectedly. Time constraint will be applied by INNER JOINing to time spine.
-            # We may consider encapsulating this in pushdown state later, but as of this moment pushdown
-            # is about post-join to pre-join for dimension access, and relies on the builder to collect
-            # predicates from query and metric specs and make them available at measure level.
-            if not metric_spec.has_time_offset:
+            # If there is a time offset at this level, will need to apply agg time only filters after the offset join.
+            if metric_spec.has_time_offset:
+                where_filter_spec_set = where_filter_spec_set.merge(outer_non_agg_time_filters)
+                metric_pushdown_state = PredicatePushdownState.with_pushdown_disabled()
+            else:
                 where_filter_spec_set = where_filter_spec_set.merge(metric_spec.filter_spec_set)
-            metric_pushdown_state = (
-                predicate_pushdown_state
-                if not metric_spec.has_time_offset
-                else PredicatePushdownState.with_pushdown_disabled()
-            )
+                metric_pushdown_state = predicate_pushdown_state
 
             parent_nodes.append(
                 self._build_any_metric_output_node(
@@ -630,9 +649,7 @@ class DataflowPlanBuilder:
                             offset_window=metric_input_spec.offset_window,
                             offset_to_grain=metric_input_spec.offset_to_grain,
                         ),
-                        queried_linkable_specs=(
-                            queried_linkable_specs if not metric_spec.has_time_offset else required_linkable_specs
-                        ),
+                        queried_linkable_specs=queried_linkable_specs,
                         filter_spec_factory=filter_spec_factory,
                         predicate_pushdown_state=metric_pushdown_state,
                         for_group_by_source_node=False,
@@ -651,9 +668,10 @@ class DataflowPlanBuilder:
             for_group_by_source_node=for_group_by_source_node,
             aggregated_to_elements=set(queried_linkable_specs.as_tuple),
         )
+        # TODO: this function should only know abt filters that should be applied at this level.
 
-        # For ratio / derived metrics with time offset, apply offset join here. Constraints will be applied after the offset
-        # to avoid filtering out values that will be changed.
+        # For nested derived metrics, there might be an offset on an input metric that is also a derived metric.
+        # Apply offset join here. Constraints will be applied after the offset to avoid filtering out values that will change.
         queried_agg_time_dimension_specs = queried_linkable_specs.included_agg_time_dimension_specs_for_metric(
             metric_reference=metric_spec.reference, metric_lookup=self._metric_lookup
         )
@@ -662,6 +680,7 @@ class DataflowPlanBuilder:
                 queried_agg_time_dimension_specs=tuple(queried_agg_time_dimension_specs),
                 queried_linkable_specs=queried_linkable_specs.as_tuple,
                 metric_spec=metric_spec,
+                where_filter_spec_set=outer_agg_time_only_filters,  # make sure this works
                 time_range_constraint=predicate_pushdown_state.time_range_constraint,
                 metric_source_node=output_node,
             )
@@ -1494,6 +1513,37 @@ class DataflowPlanBuilder:
 
         return required_linkable_specs
 
+    def _separate_agg_time_only_filters(
+        self,
+        where_filter_specs: Sequence[WhereFilterSpec],
+        measure_reference: Optional[MeasureReference] = None,
+        metric_reference: Optional[MetricReference] = None,
+    ) -> Tuple[Tuple[WhereFilterSpec, ...], Tuple[WhereFilterSpec, ...]]:
+        """Separate filters that contain only metric_time or agg_time_dimension from those that contain other linkable specs.
+
+        This is useful in multiple scenarios where a time spine join will change the data in the agg time dimension column.
+        In those cases, agg time filters should be applied after the time spine join to avoid unexpected results.
+        """
+        assert_exactly_one_arg_set(measure_reference=measure_reference, metric_reference=metric_reference)
+        agg_time_only_filters: Tuple[WhereFilterSpec, ...] = ()
+        non_agg_time_filters: Tuple[WhereFilterSpec, ...] = ()
+        for filter_spec in where_filter_specs:
+            if measure_reference:
+                included_agg_time_specs = filter_spec.linkable_spec_set.included_agg_time_dimension_specs_for_measure(
+                    measure_reference=measure_reference, semantic_model_lookup=self._semantic_model_lookup
+                )
+            else:
+                assert metric_reference, "Either measure_reference or metric_reference must be provided."
+                included_agg_time_specs = filter_spec.linkable_spec_set.included_agg_time_dimension_specs_for_metric(
+                    metric_reference=metric_reference, metric_lookup=self._metric_lookup
+                )
+            if set(included_agg_time_specs) == set(filter_spec.linkable_spec_set.as_tuple):
+                agg_time_only_filters += (filter_spec,)
+            else:
+                non_agg_time_filters += (filter_spec,)
+
+        return agg_time_only_filters, non_agg_time_filters
+
     def _build_time_spine_join_node_for_measure_config(
         self,
         join_description: JoinToTimeSpineDescription,
@@ -1510,16 +1560,9 @@ class DataflowPlanBuilder:
         )
 
         # Find filters that contain only metric_time or agg_time_dimension. They will be applied to the time spine table.
-        agg_time_only_filters: List[WhereFilterSpec] = []
-        non_agg_time_filters: List[WhereFilterSpec] = []
-        for filter_spec in after_aggregation_where_filter_specs:
-            included_agg_time_specs = filter_spec.linkable_spec_set.included_agg_time_dimension_specs_for_measure(
-                measure_reference=measure_reference, semantic_model_lookup=self._semantic_model_lookup
-            )
-            if set(included_agg_time_specs) == set(filter_spec.linkable_spec_set.as_tuple):
-                agg_time_only_filters.append(filter_spec)
-            else:
-                non_agg_time_filters.append(filter_spec)
+        agg_time_only_filters, non_agg_time_filters = self._separate_agg_time_only_filters(
+            where_filter_specs=after_aggregation_where_filter_specs, measure_reference=measure_reference
+        )
 
         join_spec = self._sort_by_base_granularity(queried_agg_time_dimension_specs)[0]
         time_spine_node = self._build_time_spine_node(
@@ -1565,6 +1608,7 @@ class DataflowPlanBuilder:
         metric_spec: MetricSpec,
         time_range_constraint: Optional[TimeRangeConstraint],
         metric_source_node: DataflowPlanNode,
+        where_filter_spec_set: WhereFilterSpecSet,
     ) -> DataflowPlanNode:
         # TODO: nested custom offset window plans
         join_spec = self._sort_by_base_granularity(queried_agg_time_dimension_specs)[0]
@@ -1573,6 +1617,7 @@ class DataflowPlanBuilder:
             custom_offset_window=metric_spec.custom_offset_window,
             join_on_time_dimension_spec=join_spec,
         )
+        # figure out how to pass where filter specs into this node so that we can filter before we change the alias
         output_node: DataflowPlanNode = JoinToTimeSpineNode.create(
             metric_source_node=metric_source_node,
             time_spine_node=time_spine_node,
@@ -1583,12 +1628,13 @@ class DataflowPlanBuilder:
             join_type=SqlJoinType.INNER,
         )
 
-        # TODO: fix bug here where filter specs are being included in when aggregating.
-        if len(metric_spec.filter_spec_set.all_filter_specs) > 0 or time_range_constraint:
+        # agg time filters applied after offset. same for time constraints. is this poss if not included in group by? what did we do with join to ts
+        if len(where_filter_spec_set.all_filter_specs) > 0 or time_range_constraint:
+            # TODO: this clause shouldn't be necessary anymore. double check though.
             # FilterElementsNode will only be needed if there are where filter specs that were selected in the group by.
             specs_in_filters = set(
                 linkable_spec
-                for filter_spec in metric_spec.filter_spec_set.all_filter_specs
+                for filter_spec in where_filter_spec_set.all_filter_specs
                 for linkable_spec in filter_spec.linkable_specs
             )
             filter_to_specs = None
@@ -1598,7 +1644,7 @@ class DataflowPlanBuilder:
                 )
             output_node = self._build_pre_aggregation_plan(
                 source_node=output_node,
-                where_filter_specs=metric_spec.filter_spec_set.all_filter_specs,
+                where_filter_specs=where_filter_spec_set.all_filter_specs,
                 time_range_constraint=time_range_constraint,
                 filter_to_specs=filter_to_specs,
             )

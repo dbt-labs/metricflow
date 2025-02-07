@@ -14,33 +14,30 @@ SELECT
   metric_time__day AS metric_time__day
   , 2 * bookings_offset_once AS bookings_offset_twice
 FROM (
-  -- Constrain Output with WHERE
-  -- Pass Only Elements: ['metric_time__day', 'bookings_offset_once']
+  -- Join to Time Spine Dataset
   SELECT
-    metric_time__day
-    , bookings_offset_once
-  FROM (
-    -- Join to Time Spine Dataset
+    rss_28018_cte.ds__day AS metric_time__day
+    , subq_25.bookings_offset_once AS bookings_offset_once
+  FROM rss_28018_cte rss_28018_cte
+  INNER JOIN (
+    -- Compute Metrics via Expressions
     SELECT
-      rss_28018_cte.ds__day AS metric_time__day
-      , subq_25.booking__is_instant AS booking__is_instant
-      , subq_25.bookings_offset_once AS bookings_offset_once
-    FROM rss_28018_cte rss_28018_cte
-    INNER JOIN (
+      metric_time__day
+      , 2 * bookings AS bookings_offset_once
+    FROM (
+      -- Constrain Output with WHERE
+      -- Pass Only Elements: ['bookings', 'metric_time__day']
+      -- Aggregate Measures
       -- Compute Metrics via Expressions
       SELECT
         metric_time__day
-        , booking__is_instant
-        , 2 * bookings AS bookings_offset_once
+        , SUM(bookings) AS bookings
       FROM (
         -- Join to Time Spine Dataset
-        -- Pass Only Elements: ['bookings', 'booking__is_instant', 'metric_time__day']
-        -- Aggregate Measures
-        -- Compute Metrics via Expressions
         SELECT
           rss_28018_cte.ds__day AS metric_time__day
-          , subq_17.booking__is_instant AS booking__is_instant
-          , SUM(subq_17.bookings) AS bookings
+          , subq_16.booking__is_instant AS booking__is_instant
+          , subq_16.bookings AS bookings
         FROM rss_28018_cte rss_28018_cte
         INNER JOIN (
           -- Read Elements From Semantic Model 'bookings_source'
@@ -50,16 +47,15 @@ FROM (
             , is_instant AS booking__is_instant
             , 1 AS bookings
           FROM ***************************.fct_bookings bookings_source_src_28000
-        ) subq_17
+        ) subq_16
         ON
-          rss_28018_cte.ds__day - INTERVAL 5 day = subq_17.metric_time__day
-        GROUP BY
-          rss_28018_cte.ds__day
-          , subq_17.booking__is_instant
-      ) subq_24
-    ) subq_25
-    ON
-      rss_28018_cte.ds__day - INTERVAL 2 day = subq_25.metric_time__day
-  ) subq_29
-  WHERE booking__is_instant
-) subq_31
+          rss_28018_cte.ds__day - INTERVAL 5 day = subq_16.metric_time__day
+      ) subq_20
+      WHERE booking__is_instant
+      GROUP BY
+        metric_time__day
+    ) subq_24
+  ) subq_25
+  ON
+    rss_28018_cte.ds__day - INTERVAL 2 day = subq_25.metric_time__day
+) subq_29

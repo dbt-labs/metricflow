@@ -8,10 +8,10 @@ sql_engine: DuckDB
 ---
 -- Combine Aggregated Outputs
 SELECT
-  COALESCE(subq_9.listing__capacity_latest, subq_18.listing__capacity_latest, subq_22.listing__capacity_latest) AS listing__capacity_latest
+  COALESCE(subq_9.listing__capacity_latest, subq_18.listing__capacity_latest, subq_29.listing__capacity_latest) AS listing__capacity_latest
   , MAX(subq_9.bookings) AS bookings
   , MAX(subq_18.views) AS views
-  , MAX(subq_22.bookings_per_view) AS bookings_per_view
+  , MAX(subq_29.bookings_per_view) AS bookings_per_view
 FROM (
   -- Compute Metrics via Expressions
   SELECT
@@ -994,14 +994,14 @@ ON
 FULL OUTER JOIN (
   -- Compute Metrics via Expressions
   SELECT
-    subq_21.listing__capacity_latest
-    , CAST(subq_21.bookings AS DOUBLE) / CAST(NULLIF(subq_21.views, 0) AS DOUBLE) AS bookings_per_view
+    subq_28.listing__capacity_latest
+    , CAST(subq_28.bookings AS DOUBLE) / CAST(NULLIF(subq_28.views, 0) AS DOUBLE) AS bookings_per_view
   FROM (
     -- Combine Aggregated Outputs
     SELECT
-      COALESCE(subq_19.listing__capacity_latest, subq_20.listing__capacity_latest) AS listing__capacity_latest
+      COALESCE(subq_19.listing__capacity_latest, subq_27.listing__capacity_latest) AS listing__capacity_latest
       , MAX(subq_19.bookings) AS bookings
-      , MAX(subq_20.views) AS views
+      , MAX(subq_27.views) AS views
     FROM (
       -- Compute Metrics via Expressions
       SELECT
@@ -1570,148 +1570,148 @@ FULL OUTER JOIN (
     FULL OUTER JOIN (
       -- Compute Metrics via Expressions
       SELECT
-        subq_17.listing__capacity_latest
-        , subq_17.views
+        subq_26.listing__capacity_latest
+        , subq_26.views
       FROM (
         -- Aggregate Measures
         SELECT
-          subq_16.listing__capacity_latest
-          , SUM(subq_16.views) AS views
+          subq_25.listing__capacity_latest
+          , SUM(subq_25.views) AS views
         FROM (
           -- Pass Only Elements: ['views', 'listing__capacity_latest']
           SELECT
-            subq_15.listing__capacity_latest
-            , subq_15.views
+            subq_24.listing__capacity_latest
+            , subq_24.views
           FROM (
             -- Constrain Output with WHERE
             SELECT
-              subq_14.ds__day
-              , subq_14.ds__week
-              , subq_14.ds__month
-              , subq_14.ds__quarter
-              , subq_14.ds__year
-              , subq_14.ds__extract_year
-              , subq_14.ds__extract_quarter
-              , subq_14.ds__extract_month
-              , subq_14.ds__extract_day
-              , subq_14.ds__extract_dow
-              , subq_14.ds__extract_doy
-              , subq_14.ds_partitioned__day
-              , subq_14.ds_partitioned__week
-              , subq_14.ds_partitioned__month
-              , subq_14.ds_partitioned__quarter
-              , subq_14.ds_partitioned__year
-              , subq_14.ds_partitioned__extract_year
-              , subq_14.ds_partitioned__extract_quarter
-              , subq_14.ds_partitioned__extract_month
-              , subq_14.ds_partitioned__extract_day
-              , subq_14.ds_partitioned__extract_dow
-              , subq_14.ds_partitioned__extract_doy
-              , subq_14.view__ds__day
-              , subq_14.view__ds__week
-              , subq_14.view__ds__month
-              , subq_14.view__ds__quarter
-              , subq_14.view__ds__year
-              , subq_14.view__ds__extract_year
-              , subq_14.view__ds__extract_quarter
-              , subq_14.view__ds__extract_month
-              , subq_14.view__ds__extract_day
-              , subq_14.view__ds__extract_dow
-              , subq_14.view__ds__extract_doy
-              , subq_14.view__ds_partitioned__day
-              , subq_14.view__ds_partitioned__week
-              , subq_14.view__ds_partitioned__month
-              , subq_14.view__ds_partitioned__quarter
-              , subq_14.view__ds_partitioned__year
-              , subq_14.view__ds_partitioned__extract_year
-              , subq_14.view__ds_partitioned__extract_quarter
-              , subq_14.view__ds_partitioned__extract_month
-              , subq_14.view__ds_partitioned__extract_day
-              , subq_14.view__ds_partitioned__extract_dow
-              , subq_14.view__ds_partitioned__extract_doy
-              , subq_14.metric_time__day
-              , subq_14.metric_time__week
-              , subq_14.metric_time__month
-              , subq_14.metric_time__quarter
-              , subq_14.metric_time__year
-              , subq_14.metric_time__extract_year
-              , subq_14.metric_time__extract_quarter
-              , subq_14.metric_time__extract_month
-              , subq_14.metric_time__extract_day
-              , subq_14.metric_time__extract_dow
-              , subq_14.metric_time__extract_doy
-              , subq_14.listing
-              , subq_14.user
-              , subq_14.view__listing
-              , subq_14.view__user
-              , subq_14.listing__is_lux_latest
-              , subq_14.listing__capacity_latest
-              , subq_14.views
+              subq_23.ds__day
+              , subq_23.ds__week
+              , subq_23.ds__month
+              , subq_23.ds__quarter
+              , subq_23.ds__year
+              , subq_23.ds__extract_year
+              , subq_23.ds__extract_quarter
+              , subq_23.ds__extract_month
+              , subq_23.ds__extract_day
+              , subq_23.ds__extract_dow
+              , subq_23.ds__extract_doy
+              , subq_23.ds_partitioned__day
+              , subq_23.ds_partitioned__week
+              , subq_23.ds_partitioned__month
+              , subq_23.ds_partitioned__quarter
+              , subq_23.ds_partitioned__year
+              , subq_23.ds_partitioned__extract_year
+              , subq_23.ds_partitioned__extract_quarter
+              , subq_23.ds_partitioned__extract_month
+              , subq_23.ds_partitioned__extract_day
+              , subq_23.ds_partitioned__extract_dow
+              , subq_23.ds_partitioned__extract_doy
+              , subq_23.view__ds__day
+              , subq_23.view__ds__week
+              , subq_23.view__ds__month
+              , subq_23.view__ds__quarter
+              , subq_23.view__ds__year
+              , subq_23.view__ds__extract_year
+              , subq_23.view__ds__extract_quarter
+              , subq_23.view__ds__extract_month
+              , subq_23.view__ds__extract_day
+              , subq_23.view__ds__extract_dow
+              , subq_23.view__ds__extract_doy
+              , subq_23.view__ds_partitioned__day
+              , subq_23.view__ds_partitioned__week
+              , subq_23.view__ds_partitioned__month
+              , subq_23.view__ds_partitioned__quarter
+              , subq_23.view__ds_partitioned__year
+              , subq_23.view__ds_partitioned__extract_year
+              , subq_23.view__ds_partitioned__extract_quarter
+              , subq_23.view__ds_partitioned__extract_month
+              , subq_23.view__ds_partitioned__extract_day
+              , subq_23.view__ds_partitioned__extract_dow
+              , subq_23.view__ds_partitioned__extract_doy
+              , subq_23.metric_time__day
+              , subq_23.metric_time__week
+              , subq_23.metric_time__month
+              , subq_23.metric_time__quarter
+              , subq_23.metric_time__year
+              , subq_23.metric_time__extract_year
+              , subq_23.metric_time__extract_quarter
+              , subq_23.metric_time__extract_month
+              , subq_23.metric_time__extract_day
+              , subq_23.metric_time__extract_dow
+              , subq_23.metric_time__extract_doy
+              , subq_23.listing
+              , subq_23.user
+              , subq_23.view__listing
+              , subq_23.view__user
+              , subq_23.listing__is_lux_latest
+              , subq_23.listing__capacity_latest
+              , subq_23.views
             FROM (
               -- Join Standard Outputs
               SELECT
-                subq_13.is_lux_latest AS listing__is_lux_latest
-                , subq_13.capacity_latest AS listing__capacity_latest
-                , subq_11.ds__day AS ds__day
-                , subq_11.ds__week AS ds__week
-                , subq_11.ds__month AS ds__month
-                , subq_11.ds__quarter AS ds__quarter
-                , subq_11.ds__year AS ds__year
-                , subq_11.ds__extract_year AS ds__extract_year
-                , subq_11.ds__extract_quarter AS ds__extract_quarter
-                , subq_11.ds__extract_month AS ds__extract_month
-                , subq_11.ds__extract_day AS ds__extract_day
-                , subq_11.ds__extract_dow AS ds__extract_dow
-                , subq_11.ds__extract_doy AS ds__extract_doy
-                , subq_11.ds_partitioned__day AS ds_partitioned__day
-                , subq_11.ds_partitioned__week AS ds_partitioned__week
-                , subq_11.ds_partitioned__month AS ds_partitioned__month
-                , subq_11.ds_partitioned__quarter AS ds_partitioned__quarter
-                , subq_11.ds_partitioned__year AS ds_partitioned__year
-                , subq_11.ds_partitioned__extract_year AS ds_partitioned__extract_year
-                , subq_11.ds_partitioned__extract_quarter AS ds_partitioned__extract_quarter
-                , subq_11.ds_partitioned__extract_month AS ds_partitioned__extract_month
-                , subq_11.ds_partitioned__extract_day AS ds_partitioned__extract_day
-                , subq_11.ds_partitioned__extract_dow AS ds_partitioned__extract_dow
-                , subq_11.ds_partitioned__extract_doy AS ds_partitioned__extract_doy
-                , subq_11.view__ds__day AS view__ds__day
-                , subq_11.view__ds__week AS view__ds__week
-                , subq_11.view__ds__month AS view__ds__month
-                , subq_11.view__ds__quarter AS view__ds__quarter
-                , subq_11.view__ds__year AS view__ds__year
-                , subq_11.view__ds__extract_year AS view__ds__extract_year
-                , subq_11.view__ds__extract_quarter AS view__ds__extract_quarter
-                , subq_11.view__ds__extract_month AS view__ds__extract_month
-                , subq_11.view__ds__extract_day AS view__ds__extract_day
-                , subq_11.view__ds__extract_dow AS view__ds__extract_dow
-                , subq_11.view__ds__extract_doy AS view__ds__extract_doy
-                , subq_11.view__ds_partitioned__day AS view__ds_partitioned__day
-                , subq_11.view__ds_partitioned__week AS view__ds_partitioned__week
-                , subq_11.view__ds_partitioned__month AS view__ds_partitioned__month
-                , subq_11.view__ds_partitioned__quarter AS view__ds_partitioned__quarter
-                , subq_11.view__ds_partitioned__year AS view__ds_partitioned__year
-                , subq_11.view__ds_partitioned__extract_year AS view__ds_partitioned__extract_year
-                , subq_11.view__ds_partitioned__extract_quarter AS view__ds_partitioned__extract_quarter
-                , subq_11.view__ds_partitioned__extract_month AS view__ds_partitioned__extract_month
-                , subq_11.view__ds_partitioned__extract_day AS view__ds_partitioned__extract_day
-                , subq_11.view__ds_partitioned__extract_dow AS view__ds_partitioned__extract_dow
-                , subq_11.view__ds_partitioned__extract_doy AS view__ds_partitioned__extract_doy
-                , subq_11.metric_time__day AS metric_time__day
-                , subq_11.metric_time__week AS metric_time__week
-                , subq_11.metric_time__month AS metric_time__month
-                , subq_11.metric_time__quarter AS metric_time__quarter
-                , subq_11.metric_time__year AS metric_time__year
-                , subq_11.metric_time__extract_year AS metric_time__extract_year
-                , subq_11.metric_time__extract_quarter AS metric_time__extract_quarter
-                , subq_11.metric_time__extract_month AS metric_time__extract_month
-                , subq_11.metric_time__extract_day AS metric_time__extract_day
-                , subq_11.metric_time__extract_dow AS metric_time__extract_dow
-                , subq_11.metric_time__extract_doy AS metric_time__extract_doy
-                , subq_11.listing AS listing
-                , subq_11.user AS user
-                , subq_11.view__listing AS view__listing
-                , subq_11.view__user AS view__user
-                , subq_11.views AS views
+                subq_22.is_lux_latest AS listing__is_lux_latest
+                , subq_22.capacity_latest AS listing__capacity_latest
+                , subq_20.ds__day AS ds__day
+                , subq_20.ds__week AS ds__week
+                , subq_20.ds__month AS ds__month
+                , subq_20.ds__quarter AS ds__quarter
+                , subq_20.ds__year AS ds__year
+                , subq_20.ds__extract_year AS ds__extract_year
+                , subq_20.ds__extract_quarter AS ds__extract_quarter
+                , subq_20.ds__extract_month AS ds__extract_month
+                , subq_20.ds__extract_day AS ds__extract_day
+                , subq_20.ds__extract_dow AS ds__extract_dow
+                , subq_20.ds__extract_doy AS ds__extract_doy
+                , subq_20.ds_partitioned__day AS ds_partitioned__day
+                , subq_20.ds_partitioned__week AS ds_partitioned__week
+                , subq_20.ds_partitioned__month AS ds_partitioned__month
+                , subq_20.ds_partitioned__quarter AS ds_partitioned__quarter
+                , subq_20.ds_partitioned__year AS ds_partitioned__year
+                , subq_20.ds_partitioned__extract_year AS ds_partitioned__extract_year
+                , subq_20.ds_partitioned__extract_quarter AS ds_partitioned__extract_quarter
+                , subq_20.ds_partitioned__extract_month AS ds_partitioned__extract_month
+                , subq_20.ds_partitioned__extract_day AS ds_partitioned__extract_day
+                , subq_20.ds_partitioned__extract_dow AS ds_partitioned__extract_dow
+                , subq_20.ds_partitioned__extract_doy AS ds_partitioned__extract_doy
+                , subq_20.view__ds__day AS view__ds__day
+                , subq_20.view__ds__week AS view__ds__week
+                , subq_20.view__ds__month AS view__ds__month
+                , subq_20.view__ds__quarter AS view__ds__quarter
+                , subq_20.view__ds__year AS view__ds__year
+                , subq_20.view__ds__extract_year AS view__ds__extract_year
+                , subq_20.view__ds__extract_quarter AS view__ds__extract_quarter
+                , subq_20.view__ds__extract_month AS view__ds__extract_month
+                , subq_20.view__ds__extract_day AS view__ds__extract_day
+                , subq_20.view__ds__extract_dow AS view__ds__extract_dow
+                , subq_20.view__ds__extract_doy AS view__ds__extract_doy
+                , subq_20.view__ds_partitioned__day AS view__ds_partitioned__day
+                , subq_20.view__ds_partitioned__week AS view__ds_partitioned__week
+                , subq_20.view__ds_partitioned__month AS view__ds_partitioned__month
+                , subq_20.view__ds_partitioned__quarter AS view__ds_partitioned__quarter
+                , subq_20.view__ds_partitioned__year AS view__ds_partitioned__year
+                , subq_20.view__ds_partitioned__extract_year AS view__ds_partitioned__extract_year
+                , subq_20.view__ds_partitioned__extract_quarter AS view__ds_partitioned__extract_quarter
+                , subq_20.view__ds_partitioned__extract_month AS view__ds_partitioned__extract_month
+                , subq_20.view__ds_partitioned__extract_day AS view__ds_partitioned__extract_day
+                , subq_20.view__ds_partitioned__extract_dow AS view__ds_partitioned__extract_dow
+                , subq_20.view__ds_partitioned__extract_doy AS view__ds_partitioned__extract_doy
+                , subq_20.metric_time__day AS metric_time__day
+                , subq_20.metric_time__week AS metric_time__week
+                , subq_20.metric_time__month AS metric_time__month
+                , subq_20.metric_time__quarter AS metric_time__quarter
+                , subq_20.metric_time__year AS metric_time__year
+                , subq_20.metric_time__extract_year AS metric_time__extract_year
+                , subq_20.metric_time__extract_quarter AS metric_time__extract_quarter
+                , subq_20.metric_time__extract_month AS metric_time__extract_month
+                , subq_20.metric_time__extract_day AS metric_time__extract_day
+                , subq_20.metric_time__extract_dow AS metric_time__extract_dow
+                , subq_20.metric_time__extract_doy AS metric_time__extract_doy
+                , subq_20.listing AS listing
+                , subq_20.user AS user
+                , subq_20.view__listing AS view__listing
+                , subq_20.view__user AS view__user
+                , subq_20.views AS views
               FROM (
                 -- Metric Time Dimension 'ds'
                 SELECT
@@ -1829,13 +1829,13 @@ FULL OUTER JOIN (
                     , views_source_src_28000.user_id AS view__user
                   FROM ***************************.fct_views views_source_src_28000
                 ) subq_10
-              ) subq_11
+              ) subq_20
               LEFT OUTER JOIN (
                 -- Pass Only Elements: ['capacity_latest', 'is_lux_latest', 'listing']
                 SELECT
-                  subq_12.listing
-                  , subq_12.is_lux_latest
-                  , subq_12.capacity_latest
+                  subq_21.listing
+                  , subq_21.is_lux_latest
+                  , subq_21.capacity_latest
                 FROM (
                   -- Metric Time Dimension 'ds'
                   SELECT
@@ -1967,25 +1967,25 @@ FULL OUTER JOIN (
                       , listings_latest_src_28000.user_id AS listing__user
                     FROM ***************************.dim_listings_latest listings_latest_src_28000
                   ) subq_2
-                ) subq_12
-              ) subq_13
+                ) subq_21
+              ) subq_22
               ON
-                subq_11.listing = subq_13.listing
-            ) subq_14
-            WHERE (listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')
-          ) subq_15
-        ) subq_16
+                subq_20.listing = subq_22.listing
+            ) subq_23
+            WHERE (((listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')) AND (listing__is_lux_latest)) AND (metric_time__day >= '2020-01-02')
+          ) subq_24
+        ) subq_25
         GROUP BY
-          subq_16.listing__capacity_latest
-      ) subq_17
-    ) subq_20
+          subq_25.listing__capacity_latest
+      ) subq_26
+    ) subq_27
     ON
-      subq_19.listing__capacity_latest = subq_20.listing__capacity_latest
+      subq_19.listing__capacity_latest = subq_27.listing__capacity_latest
     GROUP BY
-      COALESCE(subq_19.listing__capacity_latest, subq_20.listing__capacity_latest)
-  ) subq_21
-) subq_22
+      COALESCE(subq_19.listing__capacity_latest, subq_27.listing__capacity_latest)
+  ) subq_28
+) subq_29
 ON
-  COALESCE(subq_9.listing__capacity_latest, subq_18.listing__capacity_latest) = subq_22.listing__capacity_latest
+  COALESCE(subq_9.listing__capacity_latest, subq_18.listing__capacity_latest) = subq_29.listing__capacity_latest
 GROUP BY
-  COALESCE(subq_9.listing__capacity_latest, subq_18.listing__capacity_latest, subq_22.listing__capacity_latest)
+  COALESCE(subq_9.listing__capacity_latest, subq_18.listing__capacity_latest, subq_29.listing__capacity_latest)
