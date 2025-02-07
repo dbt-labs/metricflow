@@ -72,7 +72,10 @@ class SqlPlanNode(DagNode["SqlPlanNode"], ABC):
 
     @abstractmethod
     def copy(self) -> Self:
-        """Create a shallow copy of this node."""
+        """Return a copy of the branch represented by this node.
+
+        The node fields are copied by reference, similar to shallow copying.
+        """
         raise NotImplementedError
 
 

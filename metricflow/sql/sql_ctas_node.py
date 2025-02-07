@@ -69,4 +69,4 @@ class SqlCreateTableAsNode(SqlPlanNode):
 
     @override
     def copy(self) -> SqlCreateTableAsNode:
-        return SqlCreateTableAsNode(parent_nodes=self.parent_nodes, sql_table=self.sql_table)
+        return SqlCreateTableAsNode.create(parent_node=self.parent_node.copy(), sql_table=self.sql_table)

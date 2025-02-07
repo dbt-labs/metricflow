@@ -64,7 +64,6 @@ class SqlTableNode(SqlPlanNode):
 
     @override
     def copy(self) -> SqlTableNode:
-        return SqlTableNode(
-            parent_nodes=self.parent_nodes,
+        return SqlTableNode.create(
             sql_table=self.sql_table,
         )
