@@ -181,11 +181,7 @@ class SqlMapRequiredColumnAliasesVisitor(SqlPlanNodeVisitor[None]):
         # If any of the string expressions don't have context on what columns are used in the expression, then it's
         # impossible to know what columns can be pruned from the parent sources. Tag all columns in parents as required.
         if any([string_expr.used_columns is None for string_expr in exprs_used_in_this_node.string_exprs]):
-            nodes_to_retain_all_columns = [node.from_source]
-            for join_desc in node.join_descs:
-                nodes_to_retain_all_columns.append(join_desc.right_source)
-
-            for node_to_retain_all_columns in nodes_to_retain_all_columns:
+            for node_to_retain_all_columns in node.sources_in_from_clause:
                 nearest_select_columns = node_to_retain_all_columns.nearest_select_columns(cte_alias_mapping)
                 for select_column in nearest_select_columns or ():
                     self._current_required_column_alias_mapping.add_alias(
@@ -239,9 +235,7 @@ class SqlMapRequiredColumnAliasesVisitor(SqlPlanNodeVisitor[None]):
         for string_expr in exprs_used_in_this_node.string_exprs:
             if string_expr.used_columns:
                 for column_alias in string_expr.used_columns:
-                    for node_to_retain_column_alias in (node.from_source,) + tuple(
-                        join_desc.right_source for join_desc in node.join_descs
-                    ):
+                    for node_to_retain_column_alias in node.sources_in_from_clause:
                         self._current_required_column_alias_mapping.add_alias(node_to_retain_column_alias, column_alias)
 
         # Same with unqualified column references - it's hard to tell which source it came from, so it's safest to say
@@ -250,9 +244,7 @@ class SqlMapRequiredColumnAliasesVisitor(SqlPlanNodeVisitor[None]):
         # expression is like `SELECT table_0.col_0`.
         for unqualified_column_reference_expr in exprs_used_in_this_node.column_alias_reference_exprs:
             column_alias = unqualified_column_reference_expr.column_alias
-            for node_to_retain_column_alias in (node.from_source,) + tuple(
-                join_desc.right_source for join_desc in node.join_descs
-            ):
+            for node_to_retain_column_alias in node.sources_in_from_clause:
                 self._current_required_column_alias_mapping.add_alias(node_to_retain_column_alias, column_alias)
 
         # Visit recursively.

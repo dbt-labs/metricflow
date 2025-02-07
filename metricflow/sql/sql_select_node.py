@@ -157,3 +157,17 @@ class SqlSelectStatementNode(SqlPlanNode):
             limit=self.limit,
             distinct=self.distinct,
         )
+
+    @property
+    def sources_in_from_clause(self) -> Sequence[SqlPlanNode]:
+        """Return the nodes that represent the tables in the FROM clause.
+
+        Sources in the FROM clause can be a base table, a derived table (i.e. subquery), or a CTE reference. Note that
+        CTE expressions (`WITH cte AS ...`) are not a part of the FROM clause.
+
+        Other names considered:
+        * `tables_in_from_clause` - might imply that it only returns base tables.
+        * `table_expressions` - might imply that it returns CTEs and CTE references.
+        * `from_sources` - similar to common naming pattern for creating new objects.
+        """
+        return (self.from_source,) + tuple(join_desc.right_source for join_desc in self.join_descs)
