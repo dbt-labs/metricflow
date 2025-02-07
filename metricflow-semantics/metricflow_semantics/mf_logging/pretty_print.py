@@ -345,11 +345,16 @@ class MetricFlowPrettyFormatter:
                 remaining_line_width=remaining_line_width,
             )
 
-        # For Pydantic-like objects with a `dict` method that returns field keys / values.
-        dict_method = getattr(obj, "dict", None)
-        if dict_method is not None and callable(dict_method):
+        # For Pydantic-like objects with a `dict`-like method that returns field keys / values.
+        # In Pydantic v1, it's `.dict()`, in v2 it's `.model_dump()`.
+        # Going with this approach for now to check for a Pydantic model as using `isinstance()` requires more
+        # consideration when dealing with Pydantic v1 and Pydantic v2 objects.
+        pydantic_dict_method = getattr(obj, "model_dump", None) or getattr(obj, "dict", None)
+        if pydantic_dict_method is not None and callable(pydantic_dict_method):
             try:
-                mapping = {key: getattr(obj, key) for key in obj.dict().keys()}
+                # Calling `dict` on a Pydantic model does not recursively convert nested fields into dictionaries,
+                # which is what we want. `.model_dump()` does the recursive conversion.
+                mapping = dict(obj)
                 return self._handle_mapping_like_obj(
                     mapping,
                     left_enclose_str=type(obj).__name__ + "(",
@@ -360,6 +365,7 @@ class MetricFlowPrettyFormatter:
                 )
             except Exception:
                 # Fall back to built-in pretty-print in case the dict method can't be called. e.g. requires arguments.
+                # Consider logging a warning.
                 pass
 
         # Any other object that's not handled.
