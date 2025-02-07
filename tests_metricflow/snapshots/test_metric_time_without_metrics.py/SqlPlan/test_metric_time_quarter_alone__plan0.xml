@@ -4,17 +4,17 @@ test_filename: test_metric_time_without_metrics.py
 <SqlPlan>
     <SqlSelectStatementNode>
         <!-- description = "Pass Only Elements: ['metric_time__quarter',]" -->
-        <!-- node_id = NodeId(id_str='ss_36') -->
+        <!-- node_id = NodeId(id_str='ss_38') -->
         <!-- col0 =                                                                                                   -->
         <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_24), column_alias='metric_time__quarter') -->
-        <!-- from_source = SqlSelectStatementNode(node_id=ss_33) -->
+        <!-- from_source = SqlSelectStatementNode(node_id=ss_37) -->
         <!-- group_by0 =                                                                                              -->
         <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_24), column_alias='metric_time__quarter') -->
         <!-- where = None -->
         <!-- distinct = False -->
         <SqlSelectStatementNode>
             <!-- description = "Metric Time Dimension 'ds'" -->
-            <!-- node_id = NodeId(id_str='ss_33') -->
+            <!-- node_id = NodeId(id_str='ss_37') -->
             <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_0), column_alias='ds__day') -->
             <!-- col1 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_1), column_alias='ds__week') -->
             <!-- col2 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_2), column_alias='ds__month') -->
@@ -76,12 +76,12 @@ test_filename: test_metric_time_without_metrics.py
             <!--     expr=SqlColumnReferenceExpression(node_id=cr_23), -->
             <!--     column_alias='metric_time__alien_day',            -->
             <!--   )                                                   -->
-            <!-- from_source = SqlSelectStatementNode(node_id=ss_31) -->
+            <!-- from_source = SqlSelectStatementNode(node_id=ss_36) -->
             <!-- where = None -->
             <!-- distinct = False -->
             <SqlSelectStatementNode>
                 <!-- description = "Read From Time Spine 'mf_time_spine'" -->
-                <!-- node_id = NodeId(id_str='ss_31') -->
+                <!-- node_id = NodeId(id_str='ss_36') -->
                 <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28130), column_alias='ds__day') -->
                 <!-- col1 = SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28287), column_alias='ds__week') -->
                 <!-- col2 = SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28288), column_alias='ds__month') -->
@@ -99,12 +99,12 @@ test_filename: test_metric_time_without_metrics.py
                 <!--   SqlSelectColumn(expr=SqlExtractExpression(node_id=ex_28305), column_alias='ds__extract_doy') -->
                 <!-- col11 =                                                                                              -->
                 <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28131), column_alias='ds__alien_day') -->
-                <!-- from_source = SqlTableNode(node_id=tfc_28018) -->
+                <!-- from_source = SqlTableNode(node_id=tfc_30) -->
                 <!-- where = None -->
                 <!-- distinct = False -->
                 <SqlTableNode>
                     <!-- description = 'Read from ***************************.mf_time_spine' -->
-                    <!-- node_id = NodeId(id_str='tfc_28018') -->
+                    <!-- node_id = NodeId(id_str='tfc_30') -->
                     <!-- table_id = '***************************.mf_time_spine' -->
                 </SqlTableNode>
             </SqlSelectStatementNode>

@@ -6,7 +6,7 @@ docstring:
 <SqlPlan>
     <SqlSelectStatementNode>
         <!-- description = "Join on MAX(ds) and ['user'] grouping by None" -->
-        <!-- node_id = NodeId(id_str='ss_5') -->
+        <!-- node_id = NodeId(id_str='ss_3') -->
         <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_12), column_alias='ds__day') -->
         <!-- col1 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_13), column_alias='ds__week') -->
         <!-- col2 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_14), column_alias='ds__month') -->
@@ -98,10 +98,10 @@ docstring:
         <!--     expr=SqlColumnReferenceExpression(node_id=cr_9),         -->
         <!--     column_alias='total_account_balance_first_day_of_month', -->
         <!--   )                                                          -->
-        <!-- from_source = SqlSelectStatementNode(node_id=ss_1) -->
+        <!-- from_source = SqlSelectStatementNode(node_id=ss_0) -->
         <!-- join_0 =                                               -->
         <!--   SqlJoinDescription(                                  -->
-        <!--     right_source=SqlSelectStatementNode(node_id=ss_3), -->
+        <!--     right_source=SqlSelectStatementNode(node_id=ss_2), -->
         <!--     right_source_alias='subq_2',                       -->
         <!--     join_type=INNER,                                   -->
         <!--     on_condition=SqlLogicalExpression(node_id=lo_0),   -->
@@ -110,7 +110,7 @@ docstring:
         <!-- distinct = False -->
         <SqlSelectStatementNode>
             <!-- description = "Read Elements From Semantic Model 'accounts_source'" -->
-            <!-- node_id = NodeId(id_str='ss_1') -->
+            <!-- node_id = NodeId(id_str='ss_0') -->
             <!-- col0 =                                                                                                 -->
             <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28000), column_alias='account_balance') -->
             <!-- col1 =                                                   -->
@@ -208,31 +208,31 @@ docstring:
             <!-- col40 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28010), column_alias='user') -->
             <!-- col41 =                                                                                              -->
             <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28011), column_alias='account__user') -->
-            <!-- from_source = SqlTableNode(node_id=tfc_28000) -->
+            <!-- from_source = SqlTableNode(node_id=tfc_0) -->
             <!-- where = None -->
             <!-- distinct = False -->
             <SqlTableNode>
                 <!-- description = 'Read from ***************************.fct_accounts' -->
-                <!-- node_id = NodeId(id_str='tfc_28000') -->
+                <!-- node_id = NodeId(id_str='tfc_0') -->
                 <!-- table_id = '***************************.fct_accounts' -->
             </SqlTableNode>
         </SqlSelectStatementNode>
         <SqlSelectStatementNode>
             <!-- description = 'Filter row on MAX(ds__day)' -->
-            <!-- node_id = NodeId(id_str='ss_3') -->
+            <!-- node_id = NodeId(id_str='ss_2') -->
             <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_1), column_alias='user') -->
             <!-- col1 =                                                                    -->
             <!--   SqlSelectColumn(                                                        -->
             <!--     expr=SqlAggregateFunctionExpression(node_id=fnc_0, sql_function=MAX), -->
             <!--     column_alias='ds__day__complete',                                     -->
             <!--   )                                                                       -->
-            <!-- from_source = SqlSelectStatementNode(node_id=ss_2) -->
+            <!-- from_source = SqlSelectStatementNode(node_id=ss_1) -->
             <!-- group_by0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_1), column_alias='user') -->
             <!-- where = None -->
             <!-- distinct = False -->
             <SqlSelectStatementNode>
                 <!-- description = "Read Elements From Semantic Model 'accounts_source'" -->
-                <!-- node_id = NodeId(id_str='ss_2') -->
+                <!-- node_id = NodeId(id_str='ss_1') -->
                 <!-- col0 =                                                   -->
                 <!--   SqlSelectColumn(                                       -->
                 <!--     expr=SqlColumnReferenceExpression(node_id=cr_28000), -->
@@ -368,12 +368,12 @@ docstring:
                 <!-- col40 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28010), column_alias='user') -->
                 <!-- col41 =                                                                                              -->
                 <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28011), column_alias='account__user') -->
-                <!-- from_source = SqlTableNode(node_id=tfc_28000) -->
+                <!-- from_source = SqlTableNode(node_id=tfc_1) -->
                 <!-- where = None -->
                 <!-- distinct = False -->
                 <SqlTableNode>
                     <!-- description = 'Read from ***************************.fct_accounts' -->
-                    <!-- node_id = NodeId(id_str='tfc_28000') -->
+                    <!-- node_id = NodeId(id_str='tfc_1') -->
                     <!-- table_id = '***************************.fct_accounts' -->
                 </SqlTableNode>
             </SqlSelectStatementNode>
