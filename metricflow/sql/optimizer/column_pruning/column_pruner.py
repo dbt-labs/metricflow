@@ -32,10 +32,10 @@ class SqlColumnPrunerVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
         self,
         required_alias_mapping: NodeToColumnAliasMapping,
     ) -> None:
-        """Constructor.
+        """Initializer.
 
         Args:
-            required_alias_mapping: Describes columns aliases that should be kept / not pruned for each node.
+            required_alias_mapping: Describes columns aliases that should be retained for each node.
         """
         self._required_alias_mapping = required_alias_mapping
 
@@ -46,19 +46,25 @@ class SqlColumnPrunerVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
         required_column_aliases = self._required_alias_mapping.get_aliases(node)
         if required_column_aliases is None:
             logger.error(
-                f"Did not find {node.node_id=} in the required alias mapping. Returning the non-pruned version "
-                f"as it should be valid SQL, but this is a bug and should be investigated."
+                LazyFormat(
+                    "Did not find the given node in the required alias mapping. Returning the original version "
+                    "as it should be valid SQL, but this is a bug and should be investigated.",
+                    node_id=node.node_id,
+                )
             )
             return node
 
         if len(required_column_aliases) == 0:
             logger.error(
-                f"Got no required column aliases for {node}. Returning the non-pruned version as it should be valid "
-                f"SQL, but this is a bug and should be investigated."
+                LazyFormat(
+                    "Got no required column aliases the given node. Returning the original version as it should be valid "
+                    "SQL, but this is a bug and should be investigated.",
+                    node_id=node.node_id,
+                )
             )
             return node
 
-        pruned_select_columns = tuple(
+        retained_select_columns = tuple(
             select_column
             for select_column in node.select_columns
             if select_column.column_alias in required_column_aliases
@@ -66,7 +72,7 @@ class SqlColumnPrunerVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
 
         return SqlSelectStatementNode.create(
             description=node.description,
-            select_columns=pruned_select_columns,
+            select_columns=retained_select_columns,
             from_source=node.from_source.accept(self),
             from_source_alias=node.from_source_alias,
             cte_sources=tuple(
