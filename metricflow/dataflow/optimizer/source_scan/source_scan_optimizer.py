@@ -132,9 +132,19 @@ class SourceScanOptimizer(
         )
 
         # If no optimization is done, use the same nodes so that common operations can be identified for CTE generation.
-        if tuple(node.parent_nodes) == optimized_parent_nodes:
+        previous_parent_nodes = tuple(node.parent_nodes)
+        if previous_parent_nodes == optimized_parent_nodes:
+            logger.debug(LazyFormat("No combination occurred in a parent branch", node=node))
             result = OptimizeBranchResult(optimized_branch=node)
         else:
+            logger.debug(
+                LazyFormat(
+                    "Since a combination occurred in a parent branch, recreating node with new parents",
+                    node=node,
+                    previous_parent_nodes=previous_parent_nodes,
+                    optimized_parent_nodes=optimized_parent_nodes,
+                )
+            )
             result = OptimizeBranchResult(optimized_branch=node.with_new_parents(optimized_parent_nodes))
 
         self._node_to_result[node] = result
@@ -165,7 +175,15 @@ class SourceScanOptimizer(
             return memoized_result
 
         optimized_parent_result: OptimizeBranchResult = node.parent_node.accept(self)
-        if optimized_parent_result.optimized_branch is not None:
+        if optimized_parent_result.optimized_branch != node.parent_node:
+            logger.debug(
+                LazyFormat(
+                    "Combination occurred in ancestors",
+                    node=node,
+                    parent_node=node.parent_node,
+                    optimized_parent_node=optimized_parent_result.optimized_branch,
+                )
+            )
             result = OptimizeBranchResult(
                 optimized_branch=ComputeMetricsNode.create(
                     parent_node=optimized_parent_result.optimized_branch,
@@ -175,6 +193,7 @@ class SourceScanOptimizer(
                 )
             )
         else:
+            logger.debug(LazyFormat("No combination occurred in ancestors", node=node))
             result = OptimizeBranchResult(optimized_branch=node)
 
         self._node_to_result[node] = result
@@ -282,24 +301,38 @@ class SourceScanOptimizer(
                     for branch_combination_result in combination_results
                 ]
 
-        logger.debug(
-            LazyFormat(
-                "Possible branches combined.",
-                count_of_branches_before_combination=len(optimized_parent_branches),
-                count_of_branches_after_combination=len(combined_parent_branches),
+        combination_occurred_in_ancestor = tuple(node.parent_nodes) != tuple(combined_parent_branches)
+        if combination_occurred_in_ancestor:
+            logger.debug(
+                LazyFormat(
+                    "Combination occurred in ancestors.",
+                    current_node=node,
+                    count_of_branches_before_combination=len(optimized_parent_branches),
+                    count_of_branches_after_combination=len(combined_parent_branches),
+                )
             )
-        )
 
-        assert len(combined_parent_branches) > 0
+            assert len(combined_parent_branches) > 0
 
-        # If we were able to reduce the parent branches of the CombineAggregatedOutputsNode into a single one, there's
-        # no need for a CombineAggregatedOutputsNode.
-        if len(combined_parent_branches) == 1:
-            result = OptimizeBranchResult(optimized_branch=combined_parent_branches[0])
+            # If we were able to reduce the parent branches of the CombineAggregatedOutputsNode into a single one, there's
+            # no need for a CombineAggregatedOutputsNode.
+            if len(combined_parent_branches) == 1:
+                result = OptimizeBranchResult(optimized_branch=combined_parent_branches[0])
+            else:
+                result = OptimizeBranchResult(
+                    optimized_branch=CombineAggregatedOutputsNode.create(parent_nodes=combined_parent_branches)
+                )
         else:
-            result = OptimizeBranchResult(
-                optimized_branch=CombineAggregatedOutputsNode.create(parent_nodes=combined_parent_branches)
+            # No combination took place, so return the original.
+            logger.debug(
+                LazyFormat(
+                    "No combination occurred in ancestors.",
+                    node=node,
+                    optimized_parent_branches=optimized_parent_branches,
+                    combined_parent_branches=combined_parent_branches,
+                )
             )
+            result = OptimizeBranchResult(optimized_branch=node)
 
         self._node_to_result[node] = result
         return result
@@ -324,6 +357,10 @@ class SourceScanOptimizer(
 
     def optimize(self, dataflow_plan: DataflowPlan) -> DataflowPlan:  # noqa: D102
         optimized_result: OptimizeBranchResult = dataflow_plan.sink_node.accept(self)
+
+        if optimized_result.optimized_branch == dataflow_plan.sink_node:
+            logger.debug("Did not find source-scan optimization opportunities.")
+            return dataflow_plan
 
         logger.debug(
             LazyFormat(
