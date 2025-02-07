@@ -4,7 +4,8 @@ description: Runs MetricFlow using the specified Python version and engine setti
 inputs:
   python-version:
     description: "Version of Python to use for testing."
-    required: true
+    required: False
+    default: "3.9"
   mf_sql_engine_url:
     description: "URL for configuring SQL engine connection."
     required: false
@@ -39,12 +40,11 @@ inputs:
 runs:
   using: "composite"
   steps:
-  - name: Setup Python ${{ inputs.python-version }} Environment
-    uses: ./.github/actions/setup-python-env
+  - uses: ./.github/actions/setup-python-env
     with:
       python-version: "${{ inputs.python-version }}"
       hatch-environment-cache-config-json: "${{ inputs.hatch-environment-cache-config-json }}"
-  - name: Run Tests
+  - name: Run Tests w/ Python ${{ inputs.python-version }}
     shell: bash
     run: >
       make -e
