@@ -77,3 +77,7 @@ class LazyFormat:
     @override
     def __str__(self) -> str:
         return self._str_value
+
+    def evaluate(self) -> str:
+        """Same as calling `str` on this, but requires less indentation and allows for IDE auto-completion."""
+        return str(self)
