@@ -56,4 +56,6 @@ class SqlSelectTextNode(SqlPlanNode):
 
     @override
     def copy(self) -> SqlSelectTextNode:
-        return SqlSelectTextNode(parent_nodes=self.parent_nodes, select_query=self.select_query)
+        return SqlSelectTextNode(
+            parent_nodes=tuple(node.copy() for node in self.parent_nodes), select_query=self.select_query
+        )
