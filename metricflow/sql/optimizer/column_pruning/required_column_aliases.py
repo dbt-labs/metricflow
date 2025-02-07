@@ -183,10 +183,10 @@ class SqlMapRequiredColumnAliasesVisitor(SqlPlanNodeVisitor[None]):
         if any([string_expr.used_columns is None for string_expr in exprs_used_in_this_node.string_exprs]):
             for node_to_retain_all_columns in node.sources_in_from_clause:
                 nearest_select_columns = node_to_retain_all_columns.nearest_select_columns(cte_alias_mapping)
-                for select_column in nearest_select_columns or ():
-                    self._current_required_column_alias_mapping.add_alias(
-                        node=node_to_retain_all_columns, column_alias=select_column.column_alias
-                    )
+                self._current_required_column_alias_mapping.add_aliases(
+                    node=node_to_retain_all_columns,
+                    column_aliases={select_column.column_alias for select_column in (nearest_select_columns or ())},
+                )
             # TODO: TBD - may be necessary to mark columns in all visible CTEs since a string can reference anything.
             self._visit_parents(node)
             return
@@ -230,22 +230,32 @@ class SqlMapRequiredColumnAliasesVisitor(SqlPlanNodeVisitor[None]):
                         column_aliases=aliases_required_in_parent,
                     )
 
-        # For all string columns, assume that they are needed from all sources since we don't have a table alias
-        # in SqlStringExpression.used_columns
+        # For all string columns with known column references, assume that they are needed from all sources since we
+        # don't have a table alias in `SqlStringExpression.used_columns`.
+        column_aliases_to_retain: Set[str] = set()
         for string_expr in exprs_used_in_this_node.string_exprs:
-            if string_expr.used_columns:
-                for column_alias in string_expr.used_columns:
-                    for node_to_retain_column_alias in node.sources_in_from_clause:
-                        self._current_required_column_alias_mapping.add_alias(node_to_retain_column_alias, column_alias)
+            # `string_expr.used_columns` should be not None as we previously did a check.
+            if string_expr.used_columns is None:
+                logger.error(
+                    "`string_expr.used_columns` is None, but this should have been checked as not None earlier. "
+                    "Continuing with best-effort as this doesn't necessarily cause an error, but this is a bug and "
+                    "should be investigated."
+                )
+                continue
+            column_aliases_to_retain.update(string_expr.used_columns)
 
         # Same with unqualified column references - it's hard to tell which source it came from, so it's safest to say
         # it's required from all parents.
         # An unqualified column reference expression is like `SELECT col_0` whereas a qualified column reference
         # expression is like `SELECT table_0.col_0`.
         for unqualified_column_reference_expr in exprs_used_in_this_node.column_alias_reference_exprs:
-            column_alias = unqualified_column_reference_expr.column_alias
-            for node_to_retain_column_alias in node.sources_in_from_clause:
-                self._current_required_column_alias_mapping.add_alias(node_to_retain_column_alias, column_alias)
+            column_aliases_to_retain.add(unqualified_column_reference_expr.column_alias)
+
+        # Add the collected aliases to the mapping.
+        for node_to_retain_column_alias in node.sources_in_from_clause:
+            self._current_required_column_alias_mapping.add_aliases(
+                node_to_retain_column_alias, column_aliases_to_retain
+            )
 
         # Visit recursively.
         self._visit_parents(node)
