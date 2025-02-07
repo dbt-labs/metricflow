@@ -82,3 +82,13 @@ class MetricSpec(InstanceSpec):  # noqa: D101
         if self.offset_window and not self.offset_window.is_standard_granularity:
             return self.offset_window
         return None
+
+    def with_filter_spec_set(self, filter_spec_set: WhereFilterSpecSet) -> MetricSpec:
+        """Return a copy of the metric spec with the filter spec set replaced."""
+        return MetricSpec(
+            element_name=self.element_name,
+            filter_spec_set=filter_spec_set,
+            alias=self.alias,
+            offset_window=self.offset_window,
+            offset_to_grain=self.offset_to_grain,
+        )

@@ -159,13 +159,13 @@ class DataflowPlanBuilder:
         """Build SQL output node from query inputs. May be used to build query DFP or source node."""
         metric_specs: Tuple[MetricSpec, ...] = ()
         for metric_spec in query_spec.metric_specs:
+            # Remove aliases here. They will be added back at the very end of the query.
+            metric_specs += (metric_spec.with_alias(None),)
             if (
                 len(metric_spec.filter_spec_set.all_filter_specs) > 0
                 or metric_spec.offset_to_grain is not None
                 or metric_spec.offset_window is not None
             ):
-                # Remove aliases here. They will be added back at the very end of the query.
-                metric_specs += (metric_spec.with_alias(None),) if metric_spec.alias else (metric_spec,)
                 raise ValueError(
                     f"The metric specs in the query spec should not contain any metric modifiers. Got: {metric_spec}"
                 )
@@ -179,7 +179,7 @@ class DataflowPlanBuilder:
         query_level_filter_specs = tuple(
             filter_spec_factory.create_from_where_filter_intersection(
                 filter_location=WhereFilterLocation.for_query(
-                    tuple(metric_spec.reference for metric_spec in query_spec.metric_specs)
+                    tuple(metric_spec.reference for metric_spec in metric_specs)
                 ),
                 filter_intersection=query_spec.filter_intersection,
             )
@@ -192,11 +192,8 @@ class DataflowPlanBuilder:
         )
         return self._build_metrics_output_node(
             metric_specs=tuple(
-                MetricSpec(
-                    element_name=metric_spec.element_name,
-                    filter_spec_set=WhereFilterSpecSet(query_level_filter_specs=query_level_filter_specs),
-                )
-                for metric_spec in query_spec.metric_specs
+                metric_spec.with_filter_spec_set(WhereFilterSpecSet(query_level_filter_specs=query_level_filter_specs))
+                for metric_spec in metric_specs
             ),
             queried_linkable_specs=query_spec.linkable_specs,
             filter_spec_factory=filter_spec_factory,
@@ -834,7 +831,6 @@ class DataflowPlanBuilder:
 
         sink_node = self.build_sink_node(
             parent_node=output_node,
-            metric_specs=query_spec.metric_specs,
             order_by_specs=query_spec.order_by_specs,
             limit=query_spec.limit,
         )
@@ -845,8 +841,8 @@ class DataflowPlanBuilder:
     @staticmethod
     def build_sink_node(
         parent_node: DataflowPlanNode,
-        metric_specs: Sequence[MetricSpec],
-        order_by_specs: Sequence[OrderBySpec],
+        metric_specs: Sequence[MetricSpec] = (),
+        order_by_specs: Sequence[OrderBySpec] = (),
         output_sql_table: Optional[SqlTable] = None,
         limit: Optional[int] = None,
         output_selection_specs: Optional[InstanceSpecSet] = None,
