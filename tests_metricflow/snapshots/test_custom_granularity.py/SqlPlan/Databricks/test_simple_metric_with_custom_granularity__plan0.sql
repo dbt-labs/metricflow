@@ -4,17 +4,17 @@ sql_engine: Databricks
 ---
 -- Compute Metrics via Expressions
 SELECT
-  subq_4.booking__ds__martian_day
+  subq_4.booking__ds__alien_day
   , subq_4.bookings
 FROM (
   -- Aggregate Measures
   SELECT
-    subq_3.booking__ds__martian_day
+    subq_3.booking__ds__alien_day
     , SUM(subq_3.bookings) AS bookings
   FROM (
-    -- Pass Only Elements: ['bookings', 'booking__ds__martian_day']
+    -- Pass Only Elements: ['bookings', 'booking__ds__alien_day']
     SELECT
-      subq_2.booking__ds__martian_day
+      subq_2.booking__ds__alien_day
       , subq_2.bookings
     FROM (
       -- Metric Time Dimension 'ds'
@@ -118,7 +118,7 @@ FROM (
         , subq_0.discrete_booking_value_p99 AS discrete_booking_value_p99
         , subq_0.approximate_continuous_booking_value_p99 AS approximate_continuous_booking_value_p99
         , subq_0.approximate_discrete_booking_value_p99 AS approximate_discrete_booking_value_p99
-        , subq_1.martian_day AS booking__ds__martian_day
+        , subq_1.alien_day AS booking__ds__alien_day
       FROM (
         -- Read Elements From Semantic Model 'bookings_source'
         SELECT
@@ -219,5 +219,5 @@ FROM (
     ) subq_2
   ) subq_3
   GROUP BY
-    subq_3.booking__ds__martian_day
+    subq_3.booking__ds__alien_day
 ) subq_4

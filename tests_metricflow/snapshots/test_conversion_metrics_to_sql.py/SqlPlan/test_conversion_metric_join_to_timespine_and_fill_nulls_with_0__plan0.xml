@@ -128,7 +128,7 @@ docstring:
                         <!-- col11 =                                               -->
                         <!--   SqlSelectColumn(                                    -->
                         <!--     expr=SqlColumnReferenceExpression(node_id=cr_56), -->
-                        <!--     column_alias='ds__martian_day',                   -->
+                        <!--     column_alias='ds__alien_day',                     -->
                         <!--   )                                                   -->
                         <!-- from_source = SqlSelectStatementNode(node_id=ss_116) -->
                         <!-- where = None -->
@@ -188,7 +188,7 @@ docstring:
                             <!-- col11 =                                                  -->
                             <!--   SqlSelectColumn(                                       -->
                             <!--     expr=SqlColumnReferenceExpression(node_id=cr_28131), -->
-                            <!--     column_alias='ds__martian_day',                      -->
+                            <!--     column_alias='ds__alien_day',                        -->
                             <!--   )                                                      -->
                             <!-- from_source = SqlTableNode(node_id=tfc_28018) -->
                             <!-- where = None -->
@@ -688,7 +688,7 @@ docstring:
                         <!-- col11 =                                                -->
                         <!--   SqlSelectColumn(                                     -->
                         <!--     expr=SqlColumnReferenceExpression(node_id=cr_210), -->
-                        <!--     column_alias='ds__martian_day',                    -->
+                        <!--     column_alias='ds__alien_day',                      -->
                         <!--   )                                                    -->
                         <!-- from_source = SqlSelectStatementNode(node_id=ss_139) -->
                         <!-- where = None -->
@@ -748,7 +748,7 @@ docstring:
                             <!-- col11 =                                                  -->
                             <!--   SqlSelectColumn(                                       -->
                             <!--     expr=SqlColumnReferenceExpression(node_id=cr_28131), -->
-                            <!--     column_alias='ds__martian_day',                      -->
+                            <!--     column_alias='ds__alien_day',                        -->
                             <!--   )                                                      -->
                             <!-- from_source = SqlTableNode(node_id=tfc_28018) -->
                             <!-- where = None -->

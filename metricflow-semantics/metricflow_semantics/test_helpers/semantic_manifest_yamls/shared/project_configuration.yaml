@@ -49,4 +49,4 @@ project_configuration:
         name: ds
         time_granularity: day
       custom_granularities:
-        - name: martian_day
+        - name: alien_day

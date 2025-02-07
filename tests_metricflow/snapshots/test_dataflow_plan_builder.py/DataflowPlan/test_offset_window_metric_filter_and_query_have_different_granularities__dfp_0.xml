@@ -309,6 +309,44 @@ docstring:
                     <!--             ),                                                          -->
                     <!--           ),                                                            -->
                     <!--         ),                                                              -->
+                    <!--         WhereFilterSpec(                                                -->
+                    <!--           where_sql="metric_time__day = '2020-01-01'",                  -->
+                    <!--           bind_parameters=SqlBindParameterSet(),                        -->
+                    <!--           linkable_element_unions=(                                     -->
+                    <!--             LinkableElementUnion(                                       -->
+                    <!--               linkable_dimension=LinkableDimension(                     -->
+                    <!--                 properties=(                                            -->
+                    <!--                   METRIC_TIME,                                          -->
+                    <!--                 ),                                                      -->
+                    <!--                 defined_in_semantic_model=SemanticModelReference(       -->
+                    <!--                   semantic_model_name='bookings_source',                -->
+                    <!--                 ),                                                      -->
+                    <!--                 element_name='metric_time',                             -->
+                    <!--                 dimension_type=TIME,                                    -->
+                    <!--                 join_path=SemanticModelJoinPath(                        -->
+                    <!--                   left_semantic_model_reference=SemanticModelReference( -->
+                    <!--                     semantic_model_name='bookings_source',              -->
+                    <!--                   ),                                                    -->
+                    <!--                 ),                                                      -->
+                    <!--                 time_granularity=ExpandedTimeGranularity(               -->
+                    <!--                   name='day',                                           -->
+                    <!--                   base_granularity=DAY,                                 -->
+                    <!--                 ),                                                      -->
+                    <!--               ),                                                        -->
+                    <!--             ),                                                          -->
+                    <!--           ),                                                            -->
+                    <!--           linkable_spec_set=LinkableSpecSet(                            -->
+                    <!--             time_dimension_specs=(                                      -->
+                    <!--               TimeDimensionSpec(                                        -->
+                    <!--                 element_name='metric_time',                             -->
+                    <!--                 time_granularity=ExpandedTimeGranularity(               -->
+                    <!--                   name='day',                                           -->
+                    <!--                   base_granularity=DAY,                                 -->
+                    <!--                 ),                                                      -->
+                    <!--               ),                                                        -->
+                    <!--             ),                                                          -->
+                    <!--           ),                                                            -->
+                    <!--         ),                                                              -->
                     <!--       ),                                                                -->
                     <!--     ),                                                                  -->
                     <!--   )                                                                     -->

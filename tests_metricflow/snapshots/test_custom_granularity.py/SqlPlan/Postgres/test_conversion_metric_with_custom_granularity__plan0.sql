@@ -4,23 +4,23 @@ sql_engine: Postgres
 ---
 -- Compute Metrics via Expressions
 SELECT
-  subq_15.metric_time__martian_day
+  subq_15.metric_time__alien_day
   , CAST(subq_15.buys AS DOUBLE PRECISION) / CAST(NULLIF(subq_15.visits, 0) AS DOUBLE PRECISION) AS visit_buy_conversion_rate_7days
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_4.metric_time__martian_day, subq_14.metric_time__martian_day) AS metric_time__martian_day
+    COALESCE(subq_4.metric_time__alien_day, subq_14.metric_time__alien_day) AS metric_time__alien_day
     , MAX(subq_4.visits) AS visits
     , MAX(subq_14.buys) AS buys
   FROM (
     -- Aggregate Measures
     SELECT
-      subq_3.metric_time__martian_day
+      subq_3.metric_time__alien_day
       , SUM(subq_3.visits) AS visits
     FROM (
-      -- Pass Only Elements: ['visits', 'metric_time__martian_day']
+      -- Pass Only Elements: ['visits', 'metric_time__alien_day']
       SELECT
-        subq_2.metric_time__martian_day
+        subq_2.metric_time__alien_day
         , subq_2.visits
       FROM (
         -- Metric Time Dimension 'ds'
@@ -67,7 +67,7 @@ FROM (
           , subq_0.visit__referrer_id AS visit__referrer_id
           , subq_0.visits AS visits
           , subq_0.visitors AS visitors
-          , subq_1.martian_day AS metric_time__martian_day
+          , subq_1.alien_day AS metric_time__alien_day
         FROM (
           -- Read Elements From Semantic Model 'visits_source'
           SELECT
@@ -110,22 +110,22 @@ FROM (
       ) subq_2
     ) subq_3
     GROUP BY
-      subq_3.metric_time__martian_day
+      subq_3.metric_time__alien_day
   ) subq_4
   FULL OUTER JOIN (
     -- Aggregate Measures
     SELECT
-      subq_13.metric_time__martian_day
+      subq_13.metric_time__alien_day
       , SUM(subq_13.buys) AS buys
     FROM (
-      -- Pass Only Elements: ['buys', 'metric_time__martian_day']
+      -- Pass Only Elements: ['buys', 'metric_time__alien_day']
       SELECT
-        subq_12.metric_time__martian_day
+        subq_12.metric_time__alien_day
         , subq_12.buys
       FROM (
         -- Find conversions for user within the range of 7 day
         SELECT
-          subq_11.metric_time__martian_day
+          subq_11.metric_time__alien_day
           , subq_11.metric_time__day
           , subq_11.user
           , subq_11.buys
@@ -141,14 +141,14 @@ FROM (
               ORDER BY subq_7.metric_time__day DESC
               ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
             ) AS visits
-            , FIRST_VALUE(subq_7.metric_time__martian_day) OVER (
+            , FIRST_VALUE(subq_7.metric_time__alien_day) OVER (
               PARTITION BY
                 subq_10.user
                 , subq_10.metric_time__day
                 , subq_10.mf_internal_uuid
               ORDER BY subq_7.metric_time__day DESC
               ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-            ) AS metric_time__martian_day
+            ) AS metric_time__alien_day
             , FIRST_VALUE(subq_7.metric_time__day) OVER (
               PARTITION BY
                 subq_10.user
@@ -168,9 +168,9 @@ FROM (
             , subq_10.mf_internal_uuid AS mf_internal_uuid
             , subq_10.buys AS buys
           FROM (
-            -- Pass Only Elements: ['visits', 'metric_time__day', 'metric_time__martian_day', 'user']
+            -- Pass Only Elements: ['visits', 'metric_time__day', 'metric_time__alien_day', 'user']
             SELECT
-              subq_6.metric_time__martian_day
+              subq_6.metric_time__alien_day
               , subq_6.metric_time__day
               , subq_6.user
               , subq_6.visits
@@ -219,7 +219,7 @@ FROM (
                 , subq_0.visit__referrer_id AS visit__referrer_id
                 , subq_0.visits AS visits
                 , subq_0.visitors AS visitors
-                , subq_5.martian_day AS metric_time__martian_day
+                , subq_5.alien_day AS metric_time__alien_day
               FROM (
                 -- Read Elements From Semantic Model 'visits_source'
                 SELECT
@@ -432,10 +432,10 @@ FROM (
       ) subq_12
     ) subq_13
     GROUP BY
-      subq_13.metric_time__martian_day
+      subq_13.metric_time__alien_day
   ) subq_14
   ON
-    subq_4.metric_time__martian_day = subq_14.metric_time__martian_day
+    subq_4.metric_time__alien_day = subq_14.metric_time__alien_day
   GROUP BY
-    COALESCE(subq_4.metric_time__martian_day, subq_14.metric_time__martian_day)
+    COALESCE(subq_4.metric_time__alien_day, subq_14.metric_time__alien_day)
 ) subq_15

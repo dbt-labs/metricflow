@@ -4,11 +4,11 @@ sql_engine: DuckDB
 ---
 -- Metric Time Dimension 'ds'
 -- Join to Custom Granularity Dataset
--- Pass Only Elements: ['listings', 'metric_time__martian_day', 'listing__ds__month']
+-- Pass Only Elements: ['listings', 'metric_time__alien_day', 'listing__ds__month']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  subq_6.martian_day AS metric_time__martian_day
+  subq_6.alien_day AS metric_time__alien_day
   , subq_5.listing__ds__month AS listing__ds__month
   , SUM(subq_5.listings) AS listings
 FROM (
@@ -24,5 +24,5 @@ LEFT OUTER JOIN
 ON
   subq_5.ds__day = subq_6.ds
 GROUP BY
-  subq_6.martian_day
+  subq_6.alien_day
   , subq_5.listing__ds__month

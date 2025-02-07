@@ -27,14 +27,14 @@ FROM (
     -- Join to Custom Granularity Dataset
     SELECT
       sma_28019_cte.visits AS visits
-      , subq_19.martian_day AS metric_time__martian_day
+      , subq_19.alien_day AS metric_time__alien_day
     FROM sma_28019_cte sma_28019_cte
     LEFT OUTER JOIN
       ***************************.mf_time_spine subq_19
     ON
       sma_28019_cte.metric_time__day = subq_19.ds
   ) subq_20
-  WHERE metric_time__martian_day = '2020-01-01'
+  WHERE metric_time__alien_day = '2020-01-01'
 ) subq_23
 CROSS JOIN (
   -- Find conversions for user within the range of 7 day
@@ -53,14 +53,14 @@ CROSS JOIN (
         ORDER BY subq_27.metric_time__day DESC
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
       ) AS visits
-      , FIRST_VALUE(subq_27.metric_time__martian_day) OVER (
+      , FIRST_VALUE(subq_27.metric_time__alien_day) OVER (
         PARTITION BY
           subq_30.user
           , subq_30.metric_time__day
           , subq_30.mf_internal_uuid
         ORDER BY subq_27.metric_time__day DESC
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-      ) AS metric_time__martian_day
+      ) AS metric_time__alien_day
       , FIRST_VALUE(subq_27.metric_time__day) OVER (
         PARTITION BY
           subq_30.user
@@ -81,9 +81,9 @@ CROSS JOIN (
       , subq_30.buys AS buys
     FROM (
       -- Constrain Output with WHERE
-      -- Pass Only Elements: ['visits', 'metric_time__day', 'metric_time__martian_day', 'user']
+      -- Pass Only Elements: ['visits', 'metric_time__day', 'metric_time__alien_day', 'user']
       SELECT
-        metric_time__martian_day
+        metric_time__alien_day
         , metric_time__day
         , subq_25.user
         , visits
@@ -94,14 +94,14 @@ CROSS JOIN (
           sma_28019_cte.metric_time__day AS metric_time__day
           , sma_28019_cte.user AS user
           , sma_28019_cte.visits AS visits
-          , subq_24.martian_day AS metric_time__martian_day
+          , subq_24.alien_day AS metric_time__alien_day
         FROM sma_28019_cte sma_28019_cte
         LEFT OUTER JOIN
           ***************************.mf_time_spine subq_24
         ON
           sma_28019_cte.metric_time__day = subq_24.ds
       ) subq_25
-      WHERE metric_time__martian_day = '2020-01-01'
+      WHERE metric_time__alien_day = '2020-01-01'
     ) subq_27
     INNER JOIN (
       -- Read Elements From Semantic Model 'buys_source'

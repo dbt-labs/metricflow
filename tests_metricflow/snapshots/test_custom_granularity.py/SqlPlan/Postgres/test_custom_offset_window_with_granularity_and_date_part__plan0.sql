@@ -4,28 +4,28 @@ sql_engine: Postgres
 ---
 -- Compute Metrics via Expressions
 SELECT
-  subq_16.metric_time__martian_day
+  subq_16.metric_time__alien_day
   , subq_16.booking__ds__month
   , subq_16.metric_time__extract_year
-  , bookings AS bookings_offset_one_martian_day
+  , bookings AS bookings_offset_one_alien_day
 FROM (
   -- Compute Metrics via Expressions
   SELECT
-    subq_15.metric_time__martian_day
+    subq_15.metric_time__alien_day
     , subq_15.booking__ds__month
     , subq_15.metric_time__extract_year
     , subq_15.bookings
   FROM (
     -- Aggregate Measures
     SELECT
-      subq_14.metric_time__martian_day
+      subq_14.metric_time__alien_day
       , subq_14.booking__ds__month
       , subq_14.metric_time__extract_year
       , SUM(subq_14.bookings) AS bookings
     FROM (
-      -- Pass Only Elements: ['bookings', 'booking__ds__month', 'metric_time__extract_year', 'metric_time__martian_day']
+      -- Pass Only Elements: ['bookings', 'booking__ds__month', 'metric_time__extract_year', 'metric_time__alien_day']
       SELECT
-        subq_13.metric_time__martian_day
+        subq_13.metric_time__alien_day
         , subq_13.booking__ds__month
         , subq_13.metric_time__extract_year
         , subq_13.bookings
@@ -131,7 +131,7 @@ FROM (
           , subq_5.discrete_booking_value_p99 AS discrete_booking_value_p99
           , subq_5.approximate_continuous_booking_value_p99 AS approximate_continuous_booking_value_p99
           , subq_5.approximate_discrete_booking_value_p99 AS approximate_discrete_booking_value_p99
-          , subq_12.martian_day AS metric_time__martian_day
+          , subq_12.alien_day AS metric_time__alien_day
         FROM (
           -- Pass Only Elements: ['ds__day', 'booking__ds__month', 'metric_time__extract_year', 'metric_time__day']
           SELECT
@@ -151,30 +151,20 @@ FROM (
               WITH cte_2 AS (
                 -- Get Custom Granularity Bounds
                 SELECT
-                  time_spine_src_28006.ds AS ds__day
-                  , DATE_TRUNC('week', time_spine_src_28006.ds) AS ds__week
-                  , DATE_TRUNC('month', time_spine_src_28006.ds) AS ds__month
-                  , DATE_TRUNC('quarter', time_spine_src_28006.ds) AS ds__quarter
-                  , DATE_TRUNC('year', time_spine_src_28006.ds) AS ds__year
-                  , EXTRACT(year FROM time_spine_src_28006.ds) AS ds__extract_year
-                  , EXTRACT(quarter FROM time_spine_src_28006.ds) AS ds__extract_quarter
-                  , EXTRACT(month FROM time_spine_src_28006.ds) AS ds__extract_month
-                  , EXTRACT(day FROM time_spine_src_28006.ds) AS ds__extract_day
-                  , EXTRACT(isodow FROM time_spine_src_28006.ds) AS ds__extract_dow
-                  , EXTRACT(doy FROM time_spine_src_28006.ds) AS ds__extract_doy
-                  , time_spine_src_28006.martian_day AS ds__martian_day
+                  subq_6.ds__day
+                  , subq_6.ds__alien_day
                   , FIRST_VALUE(subq_6.ds__day) OVER (
-                    PARTITION BY subq_6.ds__martian_day
+                    PARTITION BY subq_6.ds__alien_day
                     ORDER BY subq_6.ds__day
                     ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-                  ) AS ds__martian_day__first_value
+                  ) AS ds__day__first_value
                   , LAST_VALUE(subq_6.ds__day) OVER (
-                    PARTITION BY subq_6.ds__martian_day
+                    PARTITION BY subq_6.ds__alien_day
                     ORDER BY subq_6.ds__day
                     ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-                  ) AS ds__martian_day__last_value
+                  ) AS ds__day__last_value
                   , ROW_NUMBER() OVER (
-                    PARTITION BY subq_6.ds__martian_day
+                    PARTITION BY subq_6.ds__alien_day
                     ORDER BY subq_6.ds__day
                   ) AS ds__day__row_number
                 FROM (
@@ -191,7 +181,7 @@ FROM (
                     , EXTRACT(day FROM time_spine_src_28006.ds) AS ds__extract_day
                     , EXTRACT(isodow FROM time_spine_src_28006.ds) AS ds__extract_dow
                     , EXTRACT(doy FROM time_spine_src_28006.ds) AS ds__extract_doy
-                    , time_spine_src_28006.martian_day AS ds__martian_day
+                    , time_spine_src_28006.alien_day AS ds__alien_day
                   FROM ***************************.mf_time_spine time_spine_src_28006
                 ) subq_6
               )
@@ -199,32 +189,32 @@ FROM (
               SELECT
                 cte_2.ds__day AS ds__day
                 , CASE
-                  WHEN subq_8.ds__martian_day__first_value__lead + MAKE_INTERVAL(days => CAST ((cte_2.ds__day__row_number - 1) AS INTEGER)) <= subq_8.ds__martian_day__last_value__lead
-                    THEN subq_8.ds__martian_day__first_value__lead + MAKE_INTERVAL(days => CAST ((cte_2.ds__day__row_number - 1) AS INTEGER))
+                  WHEN subq_8.ds__day__first_value__lead + MAKE_INTERVAL(days => CAST ((cte_2.ds__day__row_number - 1) AS INTEGER)) <= subq_8.ds__day__last_value__lead
+                    THEN subq_8.ds__day__first_value__lead + MAKE_INTERVAL(days => CAST ((cte_2.ds__day__row_number - 1) AS INTEGER))
                   ELSE NULL
                 END AS ds__day__lead
               FROM cte_2 cte_2
               INNER JOIN (
                 -- Offset Custom Granularity Bounds
                 SELECT
-                  subq_7.ds__martian_day
-                  , LEAD(subq_7.ds__martian_day__first_value, 1) OVER (ORDER BY subq_7.ds__martian_day) AS ds__martian_day__first_value__lead
-                  , LEAD(subq_7.ds__martian_day__last_value, 1) OVER (ORDER BY subq_7.ds__martian_day) AS ds__martian_day__last_value__lead
+                  subq_7.ds__alien_day
+                  , LEAD(subq_7.ds__day__first_value, 1) OVER (ORDER BY subq_7.ds__alien_day) AS ds__day__first_value__lead
+                  , LEAD(subq_7.ds__day__last_value, 1) OVER (ORDER BY subq_7.ds__alien_day) AS ds__day__last_value__lead
                 FROM (
                   -- Get Unique Rows for Custom Granularity Bounds
                   SELECT
-                    cte_2.ds__martian_day
-                    , cte_2.ds__martian_day__first_value
-                    , cte_2.ds__martian_day__last_value
+                    cte_2.ds__alien_day
+                    , cte_2.ds__day__first_value
+                    , cte_2.ds__day__last_value
                   FROM cte_2 cte_2
                   GROUP BY
-                    cte_2.ds__martian_day
-                    , cte_2.ds__martian_day__first_value
-                    , cte_2.ds__martian_day__last_value
+                    cte_2.ds__alien_day
+                    , cte_2.ds__day__first_value
+                    , cte_2.ds__day__last_value
                 ) subq_7
               ) subq_8
               ON
-                cte_2.ds__martian_day = subq_8.ds__martian_day
+                cte_2.ds__alien_day = subq_8.ds__alien_day
             ) subq_9
           ) subq_10
         ) subq_11
@@ -432,7 +422,7 @@ FROM (
       ) subq_13
     ) subq_14
     GROUP BY
-      subq_14.metric_time__martian_day
+      subq_14.metric_time__alien_day
       , subq_14.booking__ds__month
       , subq_14.metric_time__extract_year
   ) subq_15

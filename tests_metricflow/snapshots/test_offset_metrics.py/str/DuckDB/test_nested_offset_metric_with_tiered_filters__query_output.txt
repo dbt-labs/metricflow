@@ -1,0 +1,7 @@
+test_name: test_nested_offset_metric_with_tiered_filters
+test_filename: test_offset_metrics.py
+docstring:
+  Tests a derived offset metric with tiered filters.
+---
+metric_time__day    bookings_offset_twice_with_tiered_filters
+------------------  -------------------------------------------

@@ -29,16 +29,16 @@ from tests_metricflow.query_rendering.compare_rendered_query import render_and_c
 metric_time_with_custom_grain = TimeDimensionSpec(
     "metric_time",
     entity_links=(),
-    time_granularity=ExpandedTimeGranularity(name="martian_day", base_granularity=TimeGranularity.DAY),
+    time_granularity=ExpandedTimeGranularity(name="alien_day", base_granularity=TimeGranularity.DAY),
 )
 normal_time_dim_with_custom_grain1 = TimeDimensionSpec(
     element_name="ds",
-    time_granularity=ExpandedTimeGranularity(name="martian_day", base_granularity=TimeGranularity.DAY),
+    time_granularity=ExpandedTimeGranularity(name="alien_day", base_granularity=TimeGranularity.DAY),
     entity_links=(EntityReference("booking"),),
 )
 normal_time_dim_with_custom_grain2 = TimeDimensionSpec(
     element_name="bio_added_ts",
-    time_granularity=ExpandedTimeGranularity(name="martian_day", base_granularity=TimeGranularity.DAY),
+    time_granularity=ExpandedTimeGranularity(name="alien_day", base_granularity=TimeGranularity.DAY),
     entity_links=(EntityReference("user"),),
 )
 
@@ -257,7 +257,7 @@ def test_simple_metric_with_custom_granularity_and_join(  # noqa: D103
         time_dimension_specs=(
             TimeDimensionSpec(
                 element_name="ds",
-                time_granularity=ExpandedTimeGranularity(name="martian_day", base_granularity=TimeGranularity.DAY),
+                time_granularity=ExpandedTimeGranularity(name="alien_day", base_granularity=TimeGranularity.DAY),
                 entity_links=(EntityReference("listing"),),
             ),
         ),
@@ -287,7 +287,7 @@ def test_simple_metric_with_custom_granularity_filter(
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("bookings",),
         where_constraints=[
-            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('metric_time', 'martian_day') }} = '2020-01-01'"))
+            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('metric_time', 'alien_day') }} = '2020-01-01'"))
         ],
     ).query_spec
 
@@ -314,9 +314,9 @@ def test_simple_metric_with_custom_granularity_in_filter_and_group_by(
     """Simple metric queried with a filter on a custom grain, where that grain is also used in the group by."""
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("bookings",),
-        group_by_names=("metric_time__martian_day",),
+        group_by_names=("metric_time__alien_day",),
         where_constraints=[
-            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('metric_time', 'martian_day') }} = '2020-01-01'"))
+            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('metric_time', 'alien_day') }} = '2020-01-01'"))
         ],
     ).query_spec
 
@@ -343,7 +343,7 @@ def test_no_metrics_with_custom_granularity_filter(
     query_spec = query_parser.parse_and_validate_query(
         group_by_names=("listing__ds__day",),
         where_constraints=[
-            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('listing__ds', 'martian_day') }} = '2020-01-01'"))
+            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('listing__ds', 'alien_day') }} = '2020-01-01'"))
         ],
     ).query_spec
 
@@ -368,9 +368,9 @@ def test_no_metrics_with_custom_granularity_in_filter_and_group_by(
 ) -> None:
     """Group by items only queried with a filter on a custom grain, where that grain is also used in the group by."""
     query_spec = query_parser.parse_and_validate_query(
-        group_by_names=("listing__ds__martian_day",),
+        group_by_names=("listing__ds__alien_day",),
         where_constraints=[
-            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('listing__ds', 'martian_day') }} = '2020-01-01'"))
+            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('listing__ds', 'alien_day') }} = '2020-01-01'"))
         ],
     ).query_spec
 
@@ -396,7 +396,7 @@ def test_simple_metric_with_multi_hop_custom_granularity(
     """Test simple metric with a multi hop dimension and custom grain."""
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("bookings",),
-        group_by_names=("listing__user__ds__martian_day",),
+        group_by_names=("listing__user__ds__alien_day",),
     ).query_spec
 
     render_and_check(
@@ -445,7 +445,7 @@ def test_offset_metric_with_custom_granularity_filter_not_in_group_by(  # noqa: 
         metric_names=("bookings_5_day_lag",),
         group_by_names=("metric_time__day",),
         where_constraints=[
-            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('metric_time', 'martian_day') }} = '2020-01-01'"))
+            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('metric_time', 'alien_day') }} = '2020-01-01'"))
         ],
     ).query_spec
 
@@ -470,7 +470,7 @@ def test_conversion_metric_with_custom_granularity(  # noqa: D103
 ) -> None:
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("visit_buy_conversion_rate_7days",),
-        group_by_names=("metric_time__martian_day",),
+        group_by_names=("metric_time__alien_day",),
     ).query_spec
 
     render_and_check(
@@ -494,9 +494,9 @@ def test_conversion_metric_with_custom_granularity_filter(  # noqa: D103
 ) -> None:
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("visit_buy_conversion_rate_7days",),
-        group_by_names=("metric_time__martian_day",),
+        group_by_names=("metric_time__alien_day",),
         where_constraints=[
-            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('metric_time', 'martian_day') }} = '2020-01-01'"))
+            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('metric_time', 'alien_day') }} = '2020-01-01'"))
         ],
     ).query_spec
 
@@ -522,7 +522,7 @@ def test_conversion_metric_with_custom_granularity_filter_not_in_group_by(  # no
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("visit_buy_conversion_rate_7days",),
         where_constraints=[
-            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('metric_time', 'martian_day') }} = '2020-01-01'"))
+            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('metric_time', 'alien_day') }} = '2020-01-01'"))
         ],
     ).query_spec
 
@@ -547,7 +547,7 @@ def test_join_to_time_spine_metric_grouped_by_custom_grain(  # noqa: D103
 ) -> None:
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("bookings_join_to_time_spine",),
-        group_by_names=("metric_time__martian_day",),
+        group_by_names=("metric_time__alien_day",),
     ).query_spec
 
     render_and_check(
@@ -571,9 +571,9 @@ def test_join_to_timespine_metric_with_custom_granularity_filter(  # noqa: D103
 ) -> None:
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("bookings_join_to_time_spine",),
-        group_by_names=("metric_time__martian_day",),
+        group_by_names=("metric_time__alien_day",),
         where_constraints=[
-            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('metric_time', 'martian_day') }} = '2020-01-01'"))
+            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('metric_time', 'alien_day') }} = '2020-01-01'"))
         ],
     ).query_spec
 
@@ -600,7 +600,7 @@ def test_join_to_timespine_metric_with_custom_granularity_filter_not_in_group_by
         metric_names=("bookings_join_to_time_spine",),
         group_by_names=("metric_time__day",),
         where_constraints=[
-            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('metric_time', 'martian_day') }} = '2020-01-01'"))
+            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('metric_time', 'alien_day') }} = '2020-01-02'"))
         ],
     ).query_spec
 
@@ -624,7 +624,7 @@ def test_custom_offset_window(  # noqa: D103
     query_parser: MetricFlowQueryParser,
 ) -> None:
     query_spec = query_parser.parse_and_validate_query(
-        metric_names=("bookings_offset_one_martian_day",),
+        metric_names=("bookings_offset_one_alien_day",),
         group_by_names=("metric_time__day",),
     ).query_spec
 
@@ -648,11 +648,11 @@ def test_custom_offset_window_with_granularity_and_date_part(  # noqa: D103
     query_parser: MetricFlowQueryParser,
 ) -> None:
     query_spec = query_parser.parse_and_validate_query(
-        metric_names=("bookings_offset_one_martian_day",),
+        metric_names=("bookings_offset_one_alien_day",),
         group_by=(
             TimeDimensionParameter(name="booking__ds", grain=TimeGranularity.MONTH.name),
             TimeDimensionParameter(name="metric_time", date_part=DatePart.YEAR),
-            TimeDimensionParameter(name="metric_time", grain="martian_day"),
+            TimeDimensionParameter(name="metric_time", grain="alien_day"),
         ),
     ).query_spec
 
@@ -676,8 +676,8 @@ def test_custom_offset_window_with_only_window_grain(  # noqa: D103
     query_parser: MetricFlowQueryParser,
 ) -> None:
     query_spec = query_parser.parse_and_validate_query(
-        metric_names=("bookings_offset_one_martian_day",),
-        group_by_names=("metric_time__martian_day", "booking__ds__martian_day"),
+        metric_names=("bookings_offset_one_alien_day",),
+        group_by_names=("metric_time__alien_day", "booking__ds__alien_day"),
     ).query_spec
 
     render_and_check(
@@ -688,11 +688,6 @@ def test_custom_offset_window_with_only_window_grain(  # noqa: D103
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
     )
-
-
-# TODO: add more tests
-# - with where filter not included in group by
-# - nested custom offset
 
 
 @pytest.mark.sql_engine_snapshot
@@ -706,7 +701,7 @@ def test_multiple_time_spines_in_query_for_join_to_time_spine_metric(  # noqa: D
 ) -> None:
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("subdaily_join_to_time_spine_metric",),
-        group_by_names=("metric_time__martian_day", "metric_time__hour"),
+        group_by_names=("metric_time__alien_day", "metric_time__hour"),
     ).query_spec
 
     render_and_check(
@@ -730,7 +725,82 @@ def test_multiple_time_spines_in_query_for_cumulative_metric(  # noqa: D103
 ) -> None:
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("subdaily_cumulative_window_metric",),
-        group_by_names=("metric_time__martian_day", "metric_time__hour"),
+        group_by_names=("metric_time__alien_day", "metric_time__hour"),
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_custom_offset_window_with_multiple_time_spines(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    sql_client: SqlClient,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("archived_users_offset_1_alien_day",),
+        group_by_names=("metric_time__hour",),
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_custom_offset_window_with_filter_not_in_group_by(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    sql_client: SqlClient,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings_offset_one_alien_day",),
+        group_by_names=("metric_time__day",),
+        where_constraints=[
+            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('metric_time', 'month') }} = '2020-01-01'"))
+        ],
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_custom_grain_in_metric_yaml_filter(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    sql_client: SqlClient,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings_on_first_alien_day",),
+        group_by_names=("metric_time__day",),
     ).query_spec
 
     render_and_check(

@@ -6,11 +6,11 @@ sql_engine: Postgres
 ---
 -- Join Standard Outputs
 -- Join to Custom Granularity Dataset
--- Pass Only Elements: ['bookings', 'listing__user__ds__martian_day']
+-- Pass Only Elements: ['bookings', 'listing__user__ds__alien_day']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  subq_46.martian_day AS listing__user__ds__martian_day
+  subq_46.alien_day AS listing__user__ds__alien_day
   , SUM(subq_38.bookings) AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
@@ -45,4 +45,4 @@ LEFT OUTER JOIN
 ON
   subq_45.user__ds__day = subq_46.ds
 GROUP BY
-  subq_46.martian_day
+  subq_46.alien_day

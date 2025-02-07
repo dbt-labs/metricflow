@@ -20,7 +20,7 @@ FROM (
     SELECT
       time_spine_src_28006.ds AS metric_time__day
       , subq_12.bookings AS bookings
-      , subq_16.martian_day AS metric_time__martian_day
+      , subq_16.alien_day AS metric_time__alien_day
     FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN (
       -- Read Elements From Semantic Model 'bookings_source'
@@ -37,7 +37,7 @@ FROM (
     ON
       time_spine_src_28006.ds = subq_16.ds
   ) subq_17
-  WHERE metric_time__martian_day = '2020-01-01'
+  WHERE metric_time__alien_day = '2020-01-01'
   GROUP BY
     metric_time__day
 ) subq_21

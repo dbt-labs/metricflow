@@ -5,7 +5,7 @@ sql_engine: Trino
 -- Compute Metrics via Expressions
 SELECT
   subq_15.metric_time__day
-  , bookings AS bookings_offset_one_martian_day
+  , bookings AS bookings_offset_one_alien_day
 FROM (
   -- Compute Metrics via Expressions
   SELECT
@@ -137,30 +137,20 @@ FROM (
               WITH cte_2 AS (
                 -- Get Custom Granularity Bounds
                 SELECT
-                  time_spine_src_28006.ds AS ds__day
-                  , DATE_TRUNC('week', time_spine_src_28006.ds) AS ds__week
-                  , DATE_TRUNC('month', time_spine_src_28006.ds) AS ds__month
-                  , DATE_TRUNC('quarter', time_spine_src_28006.ds) AS ds__quarter
-                  , DATE_TRUNC('year', time_spine_src_28006.ds) AS ds__year
-                  , EXTRACT(year FROM time_spine_src_28006.ds) AS ds__extract_year
-                  , EXTRACT(quarter FROM time_spine_src_28006.ds) AS ds__extract_quarter
-                  , EXTRACT(month FROM time_spine_src_28006.ds) AS ds__extract_month
-                  , EXTRACT(day FROM time_spine_src_28006.ds) AS ds__extract_day
-                  , EXTRACT(DAY_OF_WEEK FROM time_spine_src_28006.ds) AS ds__extract_dow
-                  , EXTRACT(doy FROM time_spine_src_28006.ds) AS ds__extract_doy
-                  , time_spine_src_28006.martian_day AS ds__martian_day
+                  subq_6.ds__day
+                  , subq_6.ds__alien_day
                   , FIRST_VALUE(subq_6.ds__day) OVER (
-                    PARTITION BY subq_6.ds__martian_day
+                    PARTITION BY subq_6.ds__alien_day
                     ORDER BY subq_6.ds__day
                     ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-                  ) AS ds__martian_day__first_value
+                  ) AS ds__day__first_value
                   , LAST_VALUE(subq_6.ds__day) OVER (
-                    PARTITION BY subq_6.ds__martian_day
+                    PARTITION BY subq_6.ds__alien_day
                     ORDER BY subq_6.ds__day
                     ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-                  ) AS ds__martian_day__last_value
+                  ) AS ds__day__last_value
                   , ROW_NUMBER() OVER (
-                    PARTITION BY subq_6.ds__martian_day
+                    PARTITION BY subq_6.ds__alien_day
                     ORDER BY subq_6.ds__day
                   ) AS ds__day__row_number
                 FROM (
@@ -177,7 +167,7 @@ FROM (
                     , EXTRACT(day FROM time_spine_src_28006.ds) AS ds__extract_day
                     , EXTRACT(DAY_OF_WEEK FROM time_spine_src_28006.ds) AS ds__extract_dow
                     , EXTRACT(doy FROM time_spine_src_28006.ds) AS ds__extract_doy
-                    , time_spine_src_28006.martian_day AS ds__martian_day
+                    , time_spine_src_28006.alien_day AS ds__alien_day
                   FROM ***************************.mf_time_spine time_spine_src_28006
                 ) subq_6
               )
@@ -185,32 +175,32 @@ FROM (
               SELECT
                 cte_2.ds__day AS ds__day
                 , CASE
-                  WHEN DATE_ADD('day', (cte_2.ds__day__row_number - 1), subq_8.ds__martian_day__first_value__lead) <= subq_8.ds__martian_day__last_value__lead
-                    THEN DATE_ADD('day', (cte_2.ds__day__row_number - 1), subq_8.ds__martian_day__first_value__lead)
+                  WHEN DATE_ADD('day', (cte_2.ds__day__row_number - 1), subq_8.ds__day__first_value__lead) <= subq_8.ds__day__last_value__lead
+                    THEN DATE_ADD('day', (cte_2.ds__day__row_number - 1), subq_8.ds__day__first_value__lead)
                   ELSE NULL
                 END AS ds__day__lead
               FROM cte_2 cte_2
               INNER JOIN (
                 -- Offset Custom Granularity Bounds
                 SELECT
-                  subq_7.ds__martian_day
-                  , LEAD(subq_7.ds__martian_day__first_value, 1) OVER (ORDER BY subq_7.ds__martian_day) AS ds__martian_day__first_value__lead
-                  , LEAD(subq_7.ds__martian_day__last_value, 1) OVER (ORDER BY subq_7.ds__martian_day) AS ds__martian_day__last_value__lead
+                  subq_7.ds__alien_day
+                  , LEAD(subq_7.ds__day__first_value, 1) OVER (ORDER BY subq_7.ds__alien_day) AS ds__day__first_value__lead
+                  , LEAD(subq_7.ds__day__last_value, 1) OVER (ORDER BY subq_7.ds__alien_day) AS ds__day__last_value__lead
                 FROM (
                   -- Get Unique Rows for Custom Granularity Bounds
                   SELECT
-                    cte_2.ds__martian_day
-                    , cte_2.ds__martian_day__first_value
-                    , cte_2.ds__martian_day__last_value
+                    cte_2.ds__alien_day
+                    , cte_2.ds__day__first_value
+                    , cte_2.ds__day__last_value
                   FROM cte_2 cte_2
                   GROUP BY
-                    cte_2.ds__martian_day
-                    , cte_2.ds__martian_day__first_value
-                    , cte_2.ds__martian_day__last_value
+                    cte_2.ds__alien_day
+                    , cte_2.ds__day__first_value
+                    , cte_2.ds__day__last_value
                 ) subq_7
               ) subq_8
               ON
-                cte_2.ds__martian_day = subq_8.ds__martian_day
+                cte_2.ds__alien_day = subq_8.ds__alien_day
             ) subq_9
           ) subq_10
         ) subq_11
