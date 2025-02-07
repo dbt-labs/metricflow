@@ -175,7 +175,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         # TODO: The cache needs to be pruned, but has not yet been an issue.
         """
         if node not in self._node_to_output_data_set:
-            self._node_to_output_data_set[node] = node.accept(self)
+            result = node.accept(self)
+            self._node_to_output_data_set[node] = result
+            return result
 
         return self._node_to_output_data_set[node].with_copied_sql_node()
 
