@@ -890,3 +890,19 @@ metric:
   type_params:
     measure: bookings
   filter: "{{ TimeDimension('metric_time', 'alien_day') }}"
+---
+metric:
+  name: bookings_offset_twice_with_tiered_filters
+  description: bookings metric offset twice with tiered filters
+  type: derived
+  type_params:
+    expr: bookings_offset_once
+    metrics:
+      - name: bookings_offset_once
+        offset_window: 1 month
+        filter:
+          - "{{ TimeDimension('metric_time', 'month') }} >= '2019-01-01'"
+          - "{{ Dimension('booking__is_instant') }}"
+  filter:
+    - "{{ TimeDimension('metric_time', 'year') }} >= '2020-01-01'"
+    - "{{ Entity('listing') }} IS NOT NULL"

@@ -25,7 +25,7 @@ from metricflow_semantics.test_helpers.metric_time_dimension import (
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_sql import DataflowToSqlPlanConverter
-from metricflow.protocols.sql_client import SqlClient
+from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from tests_metricflow.query_rendering.compare_rendered_query import render_and_check
 
 
@@ -811,6 +811,47 @@ def test_derived_metric_that_defines_the_same_alias_in_different_components(
         metric_names=("derived_shared_alias_1a", "derived_shared_alias_2"),
         group_by_names=("booking__is_instant",),
         limit=1,
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_nested_offset_metric_with_tiered_filters(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    query_parser: MetricFlowQueryParser,
+    sql_client: SqlClient,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+) -> None:
+    """Tests that filters at different tiers are applied appropriately for derived metrics.
+
+    This includes filters at the input metric, metric, and query level. At each tier there are filters on both
+    metric_time / agg time and another dimension, which might have different behaviors.
+    """
+    if sql_client.sql_engine_type is SqlEngine.TRINO:
+        pytest.skip(
+            "Trino does not support the syntax used in this where filter, but it can't be made engine-agnostic."
+        )
+
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings_offset_twice_with_tiered_filters",),
+        group_by_names=("metric_time__day",),
+        where_constraints=[
+            # `booking_ds` is the agg_time_dimension
+            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('booking__ds', 'quarter') }} = '2021-01-01'")),
+            PydanticWhereFilter(
+                where_sql_template=("{{ TimeDimension('listing__created_at', 'day') }} = '2021-01-01'")
+            ),
+        ],
     ).query_spec
 
     render_and_check(
