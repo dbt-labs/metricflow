@@ -3,11 +3,15 @@ from __future__ import annotations
 import datetime
 import logging
 import os
+from collections.abc import Sequence
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Iterator, Literal
 
 import _pytest.config
 import pytest
 from _pytest.fixtures import FixtureRequest
+from _pytest.logging import LogCaptureFixture
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.random_id import random_id
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
@@ -179,3 +183,46 @@ def dbt_project_dir() -> str:
     This is necessary for configuring both the dbt adapter for integration tests and the project location for CLI tests.
     """
     return os.path.join(os.path.dirname(__file__), Path("dbt_projects", "metricflow_testing"))
+
+
+@dataclass(frozen=True)
+class EmittedLogRecord:
+    """Helps to print out context in `check_log_messages`."""
+
+    test_phase: str
+    level_name: str
+    message: str
+    filename: str
+    line_number: int
+
+
+@pytest.fixture(autouse=True)
+def check_log_messages(caplog: LogCaptureFixture) -> Iterator[None]:
+    """Checks that log messages above INFO (e.g. ERROR) are not emitted during a test."""
+    # Yield so the check below runs after the test.
+    yield None
+
+    # Type hint needed for `get_records`.
+    test_phases: Sequence[Literal["setup", "call"]] = ("setup", "call")
+    for test_phase in test_phases:
+        emitted_records_above_info = [
+            EmittedLogRecord(
+                test_phase=test_phase,
+                level_name=log_record.levelname,
+                message=log_record.getMessage(),
+                filename=log_record.filename,
+                line_number=log_record.lineno,
+                # Stack could be helpful too.
+            )
+            for log_record in caplog.get_records(test_phase)
+            if log_record.levelno > logging.INFO
+        ]
+        if len(emitted_records_above_info) > 0:
+            pytest.fail(
+                str(
+                    LazyFormat(
+                        "Log messages at a level above INFO emitted",
+                        emitted_records_above_info=emitted_records_above_info,
+                    )
+                )
+            )
