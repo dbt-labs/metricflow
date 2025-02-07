@@ -4,11 +4,11 @@ sql_engine: DuckDB
 ---
 -- Metric Time Dimension 'ds'
 -- Join to Custom Granularity Dataset
--- Pass Only Elements: ['bookings', 'booking__ds__martian_day']
+-- Pass Only Elements: ['bookings', 'booking__ds__alien_day']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  subq_6.martian_day AS booking__ds__martian_day
+  subq_6.alien_day AS booking__ds__alien_day
   , SUM(subq_5.bookings) AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
@@ -22,4 +22,4 @@ LEFT OUTER JOIN
 ON
   subq_5.booking__ds__day = subq_6.ds
 GROUP BY
-  subq_6.martian_day
+  subq_6.alien_day

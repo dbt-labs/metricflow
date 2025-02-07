@@ -33,17 +33,17 @@ test_filename: test_dataflow_to_sql_plan.py
             <SqlSelectStatementNode>
                 <!-- description = 'Offset Custom Granularity Bounds' -->
                 <!-- node_id = NodeId(id_str='ss_4') -->
-                <!-- col0 =                                                                                             -->
-                <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_5), column_alias='ds__martian_day') -->
+                <!-- col0 =                                                                                           -->
+                <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_5), column_alias='ds__alien_day') -->
                 <!-- col1 =                                                                   -->
                 <!--   SqlSelectColumn(                                                       -->
                 <!--     expr=SqlWindowFunctionExpression(node_id=wfnc_3, sql_function=LEAD), -->
-                <!--     column_alias='ds__martian_day__first_value__lead',                   -->
+                <!--     column_alias='ds__alien_day__first_value__lead',                     -->
                 <!--   )                                                                      -->
                 <!-- col2 =                                                                   -->
                 <!--   SqlSelectColumn(                                                       -->
                 <!--     expr=SqlWindowFunctionExpression(node_id=wfnc_4, sql_function=LEAD), -->
-                <!--     column_alias='ds__martian_day__last_value__lead',                    -->
+                <!--     column_alias='ds__alien_day__last_value__lead',                      -->
                 <!--   )                                                                      -->
                 <!-- from_source = SqlSelectStatementNode(node_id=ss_3) -->
                 <!-- where = None -->
@@ -51,36 +51,30 @@ test_filename: test_dataflow_to_sql_plan.py
                 <SqlSelectStatementNode>
                     <!-- description = 'Get Unique Rows for Custom Granularity Bounds' -->
                     <!-- node_id = NodeId(id_str='ss_3') -->
-                    <!-- col0 =                                               -->
-                    <!--   SqlSelectColumn(                                   -->
-                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_2), -->
-                    <!--     column_alias='ds__martian_day',                  -->
-                    <!--   )                                                  -->
+                    <!-- col0 =                                                                                           -->
+                    <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_2), column_alias='ds__alien_day') -->
                     <!-- col1 =                                               -->
                     <!--   SqlSelectColumn(                                   -->
                     <!--     expr=SqlColumnReferenceExpression(node_id=cr_3), -->
-                    <!--     column_alias='ds__martian_day__first_value',     -->
+                    <!--     column_alias='ds__alien_day__first_value',       -->
                     <!--   )                                                  -->
                     <!-- col2 =                                               -->
                     <!--   SqlSelectColumn(                                   -->
                     <!--     expr=SqlColumnReferenceExpression(node_id=cr_4), -->
-                    <!--     column_alias='ds__martian_day__last_value',      -->
+                    <!--     column_alias='ds__alien_day__last_value',        -->
                     <!--   )                                                  -->
                     <!-- from_source = SqlTableNode(node_id=tfc_0) -->
-                    <!-- group_by0 =                                          -->
-                    <!--   SqlSelectColumn(                                   -->
-                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_2), -->
-                    <!--     column_alias='ds__martian_day',                  -->
-                    <!--   )                                                  -->
+                    <!-- group_by0 =                                                                                      -->
+                    <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_2), column_alias='ds__alien_day') -->
                     <!-- group_by1 =                                          -->
                     <!--   SqlSelectColumn(                                   -->
                     <!--     expr=SqlColumnReferenceExpression(node_id=cr_3), -->
-                    <!--     column_alias='ds__martian_day__first_value',     -->
+                    <!--     column_alias='ds__alien_day__first_value',       -->
                     <!--   )                                                  -->
                     <!-- group_by2 =                                          -->
                     <!--   SqlSelectColumn(                                   -->
                     <!--     expr=SqlColumnReferenceExpression(node_id=cr_4), -->
-                    <!--     column_alias='ds__martian_day__last_value',      -->
+                    <!--     column_alias='ds__alien_day__last_value',        -->
                     <!--   )                                                  -->
                     <!-- where = None -->
                     <!-- distinct = False -->
@@ -122,17 +116,17 @@ test_filename: test_dataflow_to_sql_plan.py
                     <!-- col11 =                                                  -->
                     <!--   SqlSelectColumn(                                       -->
                     <!--     expr=SqlColumnReferenceExpression(node_id=cr_28131), -->
-                    <!--     column_alias='ds__martian_day',                      -->
+                    <!--     column_alias='ds__alien_day',                        -->
                     <!--   )                                                      -->
                     <!-- col12 =                                                                         -->
                     <!--   SqlSelectColumn(                                                              -->
                     <!--     expr=SqlWindowFunctionExpression(node_id=wfnc_0, sql_function=FIRST_VALUE), -->
-                    <!--     column_alias='ds__martian_day__first_value',                                -->
+                    <!--     column_alias='ds__alien_day__first_value',                                  -->
                     <!--   )                                                                             -->
                     <!-- col13 =                                                                        -->
                     <!--   SqlSelectColumn(                                                             -->
                     <!--     expr=SqlWindowFunctionExpression(node_id=wfnc_1, sql_function=LAST_VALUE), -->
-                    <!--     column_alias='ds__martian_day__last_value',                                -->
+                    <!--     column_alias='ds__alien_day__last_value',                                  -->
                     <!--   )                                                                            -->
                     <!-- col14 =                                                                        -->
                     <!--   SqlSelectColumn(                                                             -->
@@ -191,7 +185,7 @@ test_filename: test_dataflow_to_sql_plan.py
                         <!-- col11 =                                                  -->
                         <!--   SqlSelectColumn(                                       -->
                         <!--     expr=SqlColumnReferenceExpression(node_id=cr_28131), -->
-                        <!--     column_alias='ds__martian_day',                      -->
+                        <!--     column_alias='ds__alien_day',                        -->
                         <!--   )                                                      -->
                         <!-- from_source = SqlTableNode(node_id=tfc_28018) -->
                         <!-- where = None -->

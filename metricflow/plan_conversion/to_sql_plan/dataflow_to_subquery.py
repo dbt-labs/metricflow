@@ -1890,10 +1890,10 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         WITH cte AS (
           SELECT
             ds AS ds__day
-            , martian_day AS ds__martian_day
-            , FIRST_VALUE(ds) OVER (PARTITION BY martian_day ORDER BY ds) AS ds__martian_day__first_value
-            , LAST_VALUE(ds) OVER (PARTITION BY martian_day ORDER BY ds) AS ds__martian_day__last_value
-            , ROW_NUMBER() OVER (PARTITION BY martian_day ORDER BY ds) AS ds__day__row_number
+            , alien_day AS ds__alien_day
+            , FIRST_VALUE(ds) OVER (PARTITION BY alien_day ORDER BY ds) AS ds__alien_day__first_value
+            , LAST_VALUE(ds) OVER (PARTITION BY alien_day ORDER BY ds) AS ds__alien_day__last_value
+            , ROW_NUMBER() OVER (PARTITION BY alien_day ORDER BY ds) AS ds__day__row_number
           FROM mf_time_spine
         )
 
@@ -1905,29 +1905,29 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
           SELECT
             cte.ds__day AS ds__day
             , CASE
-              WHEN ds__martian_day__first_value__offset + INTERVAL (ds__day__row_number - 1) day <= ds__martian_day__last_value__offset
-              THEN ds__martian_day__first_value__offset + INTERVAL (ds__day__row_number - 1) day
+              WHEN ds__alien_day__first_value__offset + INTERVAL (ds__day__row_number - 1) day <= ds__alien_day__last_value__offset
+              THEN ds__alien_day__first_value__offset + INTERVAL (ds__day__row_number - 1) day
               ELSE NULL
             END AS ds__day__lead
           FROM cte
           INNER JOIN (
             SELECT
-              ds__martian_day
-              , LEAD(ds__martian_day__first_value, 1) OVER (ORDER BY ds__martian_day) AS ds__martian_day__first_value__offset
-              , LEAD(ds__martian_day__last_value, 1) OVER (ORDER BY ds__martian_day) AS ds__martian_day__last_value__offset
+              ds__alien_day
+              , LEAD(ds__alien_day__first_value, 1) OVER (ORDER BY ds__alien_day) AS ds__alien_day__first_value__offset
+              , LEAD(ds__alien_day__last_value, 1) OVER (ORDER BY ds__alien_day) AS ds__alien_day__last_value__offset
             FROM (
               SELECT
-                ds__martian_day
-                , ds__martian_day__first_value
-                , ds__martian_day__last_value
+                ds__alien_day
+                , ds__alien_day__first_value
+                , ds__alien_day__last_value
               FROM cte
               GROUP BY
-                ds__martian_day
-                , ds__martian_day__first_value
-                , ds__martian_day__last_value
+                ds__alien_day
+                , ds__alien_day__first_value
+                , ds__alien_day__last_value
             ) a
           ) b
-          ON cte.ds__martian_day = b.ds__martian_day
+          ON cte.ds__alien_day = b.ds__alien_day
         )
         """
         time_spine_data_set = self.get_output_data_set(node.time_spine_node)

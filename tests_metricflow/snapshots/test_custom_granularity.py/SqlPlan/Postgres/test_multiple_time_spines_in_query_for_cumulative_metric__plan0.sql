@@ -4,19 +4,19 @@ sql_engine: Postgres
 ---
 -- Compute Metrics via Expressions
 SELECT
-  subq_7.metric_time__martian_day
+  subq_7.metric_time__alien_day
   , subq_7.metric_time__hour
   , subq_7.archived_users AS subdaily_cumulative_window_metric
 FROM (
   -- Aggregate Measures
   SELECT
-    subq_6.metric_time__martian_day
+    subq_6.metric_time__alien_day
     , subq_6.metric_time__hour
     , SUM(subq_6.archived_users) AS archived_users
   FROM (
-    -- Pass Only Elements: ['archived_users', 'metric_time__martian_day', 'metric_time__hour']
+    -- Pass Only Elements: ['archived_users', 'metric_time__alien_day', 'metric_time__hour']
     SELECT
-      subq_5.metric_time__martian_day
+      subq_5.metric_time__alien_day
       , subq_5.metric_time__hour
       , subq_5.archived_users
     FROM (
@@ -213,7 +213,7 @@ FROM (
         , subq_1.home_state AS home_state
         , subq_1.user__home_state AS user__home_state
         , subq_1.archived_users AS archived_users
-        , subq_4.martian_day AS metric_time__martian_day
+        , subq_4.alien_day AS metric_time__alien_day
       FROM (
         -- Read From Time Spine 'mf_time_spine_hour'
         SELECT
@@ -612,6 +612,6 @@ FROM (
     ) subq_5
   ) subq_6
   GROUP BY
-    subq_6.metric_time__martian_day
+    subq_6.metric_time__alien_day
     , subq_6.metric_time__hour
 ) subq_7

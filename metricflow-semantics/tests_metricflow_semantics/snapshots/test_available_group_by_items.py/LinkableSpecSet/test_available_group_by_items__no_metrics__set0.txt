@@ -2,9 +2,9 @@ test_name: test_available_group_by_items[no_metrics]
 test_filename: test_available_group_by_items.py
 ---
 [
+  "TimeDimension('metric_time', 'alien_day')",
   "TimeDimension('metric_time', 'day')",
   "TimeDimension('metric_time', 'hour')",
-  "TimeDimension('metric_time', 'martian_day')",
   "TimeDimension('metric_time', 'microsecond')",
   "TimeDimension('metric_time', 'millisecond')",
   "TimeDimension('metric_time', 'minute')",

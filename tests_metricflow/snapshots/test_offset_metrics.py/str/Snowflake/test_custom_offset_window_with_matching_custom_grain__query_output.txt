@@ -1,9 +1,10 @@
 test_name: test_custom_offset_window_with_matching_custom_grain
 test_filename: test_offset_metrics.py
 docstring:
-  Gives a side by side comparison of bookings and bookings_offset_one_martian_day.
+  Gives a side by side comparison of bookings and bookings_offset_one_alien_day.
 ---
-METRIC_TIME__MARTIAN_DAY    BOOKING__DS__MARTIAN_DAY    BOOKINGS    BOOKINGS_OFFSET_ONE_MARTIAN_DAY
---------------------------  --------------------------  ----------  ---------------------------------
-2020-01-08T00:00:00         2020-01-08T00:00:00         46          None
-2020-01-09T00:00:00         2020-01-09T00:00:00         None        46
+METRIC_TIME__ALIEN_DAY    BOOKING__DS__ALIEN_DAY    BOOKINGS    BOOKINGS_OFFSET_ONE_ALIEN_DAY
+------------------------  ------------------------  ----------  -------------------------------
+2020-01-02T00:00:00       2020-01-02T00:00:00       31          None
+2020-01-03T00:00:00       2020-01-03T00:00:00       15          31
+2020-01-04T00:00:00       2020-01-04T00:00:00       None        15

@@ -15,7 +15,7 @@ FROM (
   -- Join to Custom Granularity Dataset
   SELECT
     subq_6.bookings AS bookings
-    , subq_7.martian_day AS metric_time__martian_day
+    , subq_7.alien_day AS metric_time__alien_day
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     SELECT
@@ -28,4 +28,4 @@ FROM (
   ON
     subq_6.ds__day = subq_7.ds
 ) subq_8
-WHERE metric_time__martian_day = '2020-01-01'
+WHERE metric_time__alien_day = '2020-01-01'

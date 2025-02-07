@@ -57,7 +57,7 @@ FROM (
             , subq_7.ds__extract_day
             , subq_7.ds__extract_dow
             , subq_7.ds__extract_doy
-            , subq_7.ds__martian_day
+            , subq_7.ds__alien_day
           FROM (
             -- Read From Time Spine 'mf_time_spine'
             SELECT
@@ -72,7 +72,7 @@ FROM (
               , EXTRACT(day FROM time_spine_src_28006.ds) AS ds__extract_day
               , EXTRACT(DAYOFWEEK_ISO FROM time_spine_src_28006.ds) AS ds__extract_dow
               , EXTRACT(doy FROM time_spine_src_28006.ds) AS ds__extract_doy
-              , time_spine_src_28006.martian_day AS ds__martian_day
+              , time_spine_src_28006.alien_day AS ds__alien_day
             FROM ***************************.mf_time_spine time_spine_src_28006
           ) subq_7
         ) subq_8

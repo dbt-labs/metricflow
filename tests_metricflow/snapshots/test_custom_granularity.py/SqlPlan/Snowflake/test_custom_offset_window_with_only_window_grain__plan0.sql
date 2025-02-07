@@ -4,33 +4,33 @@ sql_engine: Snowflake
 ---
 -- Compute Metrics via Expressions
 SELECT
-  subq_9.booking__ds__martian_day
-  , subq_9.metric_time__martian_day
-  , bookings AS bookings_offset_one_martian_day
+  subq_9.booking__ds__alien_day
+  , subq_9.metric_time__alien_day
+  , bookings AS bookings_offset_one_alien_day
 FROM (
   -- Compute Metrics via Expressions
   SELECT
-    subq_8.booking__ds__martian_day
-    , subq_8.metric_time__martian_day
+    subq_8.booking__ds__alien_day
+    , subq_8.metric_time__alien_day
     , subq_8.bookings
   FROM (
     -- Aggregate Measures
     SELECT
-      subq_7.booking__ds__martian_day
-      , subq_7.metric_time__martian_day
+      subq_7.booking__ds__alien_day
+      , subq_7.metric_time__alien_day
       , SUM(subq_7.bookings) AS bookings
     FROM (
-      -- Pass Only Elements: ['bookings', 'metric_time__martian_day', 'booking__ds__martian_day']
+      -- Pass Only Elements: ['bookings', 'metric_time__alien_day', 'booking__ds__alien_day']
       SELECT
-        subq_6.booking__ds__martian_day
-        , subq_6.metric_time__martian_day
+        subq_6.booking__ds__alien_day
+        , subq_6.metric_time__alien_day
         , subq_6.bookings
       FROM (
         -- Join to Time Spine Dataset
         SELECT
           subq_5.metric_time__day AS metric_time__day
-          , subq_5.booking__ds__martian_day AS booking__ds__martian_day
-          , subq_5.metric_time__martian_day AS metric_time__martian_day
+          , subq_5.booking__ds__alien_day AS booking__ds__alien_day
+          , subq_5.metric_time__alien_day AS metric_time__alien_day
           , subq_2.ds__day AS ds__day
           , subq_2.ds__week AS ds__week
           , subq_2.ds__month AS ds__month
@@ -129,12 +129,12 @@ FROM (
           , subq_2.approximate_continuous_booking_value_p99 AS approximate_continuous_booking_value_p99
           , subq_2.approximate_discrete_booking_value_p99 AS approximate_discrete_booking_value_p99
         FROM (
-          -- Pass Only Elements: ['ds__day', 'metric_time__day', 'booking__ds__martian_day', 'metric_time__martian_day']
+          -- Pass Only Elements: ['ds__day', 'metric_time__day', 'booking__ds__alien_day', 'metric_time__alien_day']
           SELECT
             subq_4.ds__day
             , subq_4.metric_time__day
-            , subq_4.booking__ds__martian_day
-            , subq_4.metric_time__martian_day
+            , subq_4.booking__ds__alien_day
+            , subq_4.metric_time__alien_day
           FROM (
             -- Join Offset Custom Granularity to Base Granularity
             WITH cte_2 AS (
@@ -151,27 +151,27 @@ FROM (
                 , EXTRACT(day FROM time_spine_src_28006.ds) AS ds__extract_day
                 , EXTRACT(dayofweekiso FROM time_spine_src_28006.ds) AS ds__extract_dow
                 , EXTRACT(doy FROM time_spine_src_28006.ds) AS ds__extract_doy
-                , time_spine_src_28006.martian_day AS ds__martian_day
+                , time_spine_src_28006.alien_day AS ds__alien_day
               FROM ***************************.mf_time_spine time_spine_src_28006
             )
 
             SELECT
               cte_2.ds__day AS ds__day
-              , subq_3.ds__martian_day__lead AS metric_time__day
-              , subq_3.ds__martian_day__lead AS booking__ds__martian_day
-              , subq_3.ds__martian_day__lead AS metric_time__martian_day
+              , subq_3.ds__alien_day__lead AS metric_time__day
+              , subq_3.ds__alien_day__lead AS booking__ds__alien_day
+              , subq_3.ds__alien_day__lead AS metric_time__alien_day
             FROM cte_2 cte_2
             INNER JOIN (
               -- Offset Custom Granularity
               SELECT
-                cte_2.ds__martian_day
-                , LEAD(cte_2.ds__martian_day, 1) OVER (ORDER BY cte_2.ds__martian_day) AS ds__martian_day__lead
+                cte_2.ds__alien_day
+                , LEAD(cte_2.ds__alien_day, 1) OVER (ORDER BY cte_2.ds__alien_day) AS ds__alien_day__lead
               FROM cte_2 cte_2
               GROUP BY
-                cte_2.ds__martian_day
+                cte_2.ds__alien_day
             ) subq_3
             ON
-              cte_2.ds__martian_day = subq_3.ds__martian_day
+              cte_2.ds__alien_day = subq_3.ds__alien_day
           ) subq_4
         ) subq_5
         INNER JOIN (
@@ -374,7 +374,7 @@ FROM (
       ) subq_6
     ) subq_7
     GROUP BY
-      subq_7.booking__ds__martian_day
-      , subq_7.metric_time__martian_day
+      subq_7.booking__ds__alien_day
+      , subq_7.metric_time__alien_day
   ) subq_8
 ) subq_9
