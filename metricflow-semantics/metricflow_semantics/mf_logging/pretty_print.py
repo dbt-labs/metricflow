@@ -514,28 +514,11 @@ def _as_one_line(description: Optional[str], str_converted_dict: Dict[str, str],
         a: 1
         b: 2
     """
-    if description is not None and "\n" in description:
-        return None
-
-    # Keep track of the total length of the keys and values to see if it can be printed on one line.
-    total_key_length = 0
-    total_value_length = 0
-
-    for key_str, value_str in str_converted_dict.items():
-        if "\n" in key_str or "\n" in value_str:
-            return None
-        total_key_length += len(key_str)
-        total_value_length += len(value_str)
-
-    one_line_length = (
-        len(description or "") + 1 + 2 + 2 * len(str_converted_dict) + total_key_length + total_value_length
-    )
-    if one_line_length > max_line_length:
-        return None
-
     items = tuple(f"{key_str}={value_str}" for key_str, value_str in str_converted_dict.items())
-    if len(items) == 0:
-        return description
-
     value_in_parenthesis = ", ".join(items)
-    return f"{description} ({value_in_parenthesis})"
+    result = f"{description}" + (f" ({value_in_parenthesis})" if len(value_in_parenthesis) > 0 else "")
+
+    if "\n" in result or len(result) > max_line_length:
+        return None
+
+    return result
