@@ -128,7 +128,10 @@ class dbtMetricFlowTutorialHelper:
             12. When you're done with the tutorial, run mf tutorial --clean to delete sample models and seeds.
                 * If a sample project was created, it wil remain.
             13. Before integrating metrics into your project, read up on adding a time spine (try <CTRL>+Left Click on the link):
-                  {click.style(time_spine_docs_link, fg="blue", bold=True)}
+                   {click.style(time_spine_docs_link, fg="blue", bold=True)}
+
+            If you found MetricFlow to be helpful, consider adding a Github star to promote the project:
+                   {click.style('https://github.com/dbt-labs/metricflow', fg="blue", bold=True)}
             """
         )
 
