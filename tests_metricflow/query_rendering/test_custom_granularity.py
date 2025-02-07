@@ -690,11 +690,6 @@ def test_custom_offset_window_with_only_window_grain(  # noqa: D103
     )
 
 
-# TODO: add more tests
-# - with where filter not included in group by
-# - nested custom offset
-
-
 @pytest.mark.sql_engine_snapshot
 def test_multiple_time_spines_in_query_for_join_to_time_spine_metric(  # noqa: D103
     request: FixtureRequest,
@@ -755,6 +750,57 @@ def test_custom_offset_window_with_multiple_time_spines(  # noqa: D103
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("archived_users_offset_1_alien_day",),
         group_by_names=("metric_time__hour",),
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_custom_offset_window_with_filter_not_in_group_by(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    sql_client: SqlClient,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings_offset_one_alien_day",),
+        group_by_names=("metric_time__day",),
+        where_constraints=[
+            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('metric_time', 'month') }} = '2020-01-01'"))
+        ],
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_custom_grain_in_metric_yaml_filter(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    sql_client: SqlClient,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings_on_first_alien_day",),
+        group_by_names=("metric_time__day",),
     ).query_spec
 
     render_and_check(

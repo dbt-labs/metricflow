@@ -881,3 +881,12 @@ metric:
         offset_window: 1 alien_day
         alias: bookings_offset
       - name: bookings
+---
+---
+metric:
+  name: bookings_on_first_alien_day
+  description: tests a metric filter using a custom grain
+  type: simple
+  type_params:
+    measure: bookings
+  filter: "{{ TimeDimension('metric_time', 'alien_day') }}"
