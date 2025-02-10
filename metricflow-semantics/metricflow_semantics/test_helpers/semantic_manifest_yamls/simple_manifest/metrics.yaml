@@ -882,7 +882,6 @@ metric:
         alias: bookings_offset
       - name: bookings
 ---
----
 metric:
   name: bookings_on_first_alien_day
   description: tests a metric filter using a custom grain
