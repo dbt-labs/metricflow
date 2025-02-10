@@ -113,7 +113,7 @@ class SqlColumnPrunerOptimizer(SqlPlanOptimizer):
             logger.error(
                 LazyFormat(
                     "The columns required at this node can't be determined, so skipping column pruning",
-                    node=node.structure_text(),
+                    node=node.structure_text,
                     required_select_columns=required_select_columns,
                 )
             )

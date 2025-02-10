@@ -328,8 +328,8 @@ class SourceScanOptimizer(
         logger.debug(
             LazyFormat(
                 "Optimized dataflow plan",
-                original_plan=dataflow_plan.sink_node.structure_text(),
-                optimized_plan=optimized_result.optimized_branch.structure_text(),
+                original_plan=dataflow_plan.sink_node.structure_text,
+                optimized_plan=optimized_result.optimized_branch.structure_text,
             )
         )
 
