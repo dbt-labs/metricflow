@@ -10,7 +10,9 @@ logger = logging.getLogger(__name__)
 
 
 def test_pformat_many() -> None:  # noqa: D103
-    result = mf_pformat_dict("Example description:", obj_dict={"object_0": (1, 2, 3), "object_1": {4: 5}})
+    result = mf_pformat_dict(
+        "Example description:", obj_dict={"object_0": (1, 2, 3), "object_1": {4: 5}}, max_line_length=30
+    )
 
     assert (
         textwrap.dedent(
@@ -25,7 +27,9 @@ def test_pformat_many() -> None:  # noqa: D103
 
 
 def test_pformat_many_with_raw_strings() -> None:  # noqa: D103
-    result = mf_pformat_dict("Example description:", obj_dict={"object_0": "foo\nbar"}, preserve_raw_strings=True)
+    result = mf_pformat_dict(
+        "Example description:", obj_dict={"object_0": "foo\nbar"}, preserve_raw_strings=True, max_line_length=30
+    )
 
     assert (
         textwrap.dedent(
@@ -42,7 +46,7 @@ def test_pformat_many_with_raw_strings() -> None:  # noqa: D103
 
 def test_pformat_dict_with_empty_message() -> None:
     """Test `mf_pformat_dict` without a description."""
-    result = mf_pformat_dict(obj_dict={"object_0": (1, 2, 3), "object_1": {4: 5}})
+    result = mf_pformat_dict(obj_dict={"object_0": (1, 2, 3), "object_1": {4: 5}}, max_line_length=30)
 
     assert (
         mf_dedent(
@@ -57,7 +61,9 @@ def test_pformat_dict_with_empty_message() -> None:
 
 def test_pformat_dict_with_pad_sections_with_newline() -> None:
     """Test `mf_pformat_dict` with new lines between sections."""
-    result = mf_pformat_dict(obj_dict={"object_0": (1, 2, 3), "object_1": {4: 5}}, pad_items_with_newlines=True)
+    result = mf_pformat_dict(
+        obj_dict={"object_0": (1, 2, 3), "object_1": {4: 5}}, pad_items_with_newlines=True, max_line_length=30
+    )
 
     assert (
         mf_dedent(
@@ -72,7 +78,7 @@ def test_pformat_dict_with_pad_sections_with_newline() -> None:
 
 
 def test_pformat_many_with_strings() -> None:  # noqa: D103
-    result = mf_pformat_dict("Example description:", obj_dict={"object_0": "foo\nbar"})
+    result = mf_pformat_dict("Example description:", obj_dict={"object_0": "foo\nbar"}, max_line_length=30)
     assert (
         textwrap.dedent(
             """\
@@ -92,3 +98,8 @@ def test_minimal_length() -> None:
           foo: 'bar'
         """
     )
+
+
+def test_one_line() -> None:
+    """Test formatting as a one-line string if possible."""
+    assert mf_pformat_dict("Example output", {"a": 1, "b": 2}, max_line_length=80) == "Example output (a=1, b=2)"
