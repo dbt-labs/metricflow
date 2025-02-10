@@ -38,6 +38,8 @@ FROM (
           , subq_4.ds__extract_dow
           , subq_4.ds__extract_doy
           , subq_4.ds__alien_day
+          , subq_4.ds__fiscal_quarter
+          , subq_4.ds__fiscal_year
         FROM (
           -- Read From Time Spine 'mf_time_spine'
           SELECT
@@ -53,6 +55,8 @@ FROM (
             , EXTRACT(isodow FROM time_spine_src_28006.ds) AS ds__extract_dow
             , EXTRACT(doy FROM time_spine_src_28006.ds) AS ds__extract_doy
             , time_spine_src_28006.alien_day AS ds__alien_day
+            , time_spine_src_28006.fiscal_quarter AS ds__fiscal_quarter
+            , time_spine_src_28006.fiscal_year AS ds__fiscal_year
           FROM ***************************.mf_time_spine time_spine_src_28006
         ) subq_4
       ) subq_5
@@ -178,6 +182,8 @@ FROM (
           , subq_17.ds__extract_dow
           , subq_17.ds__extract_doy
           , subq_17.ds__alien_day
+          , subq_17.ds__fiscal_quarter
+          , subq_17.ds__fiscal_year
         FROM (
           -- Read From Time Spine 'mf_time_spine'
           SELECT
@@ -193,6 +199,8 @@ FROM (
             , EXTRACT(isodow FROM time_spine_src_28006.ds) AS ds__extract_dow
             , EXTRACT(doy FROM time_spine_src_28006.ds) AS ds__extract_doy
             , time_spine_src_28006.alien_day AS ds__alien_day
+            , time_spine_src_28006.fiscal_quarter AS ds__fiscal_quarter
+            , time_spine_src_28006.fiscal_year AS ds__fiscal_year
           FROM ***************************.mf_time_spine time_spine_src_28006
         ) subq_17
       ) subq_18

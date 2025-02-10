@@ -22,6 +22,8 @@ FROM (
     , subq_0.ds__extract_dow
     , subq_0.ds__extract_doy
     , subq_0.ds__alien_day
+    , subq_0.ds__fiscal_quarter
+    , subq_0.ds__fiscal_year
     , subq_0.ds__day AS metric_time__day
     , subq_0.ds__week AS metric_time__week
     , subq_0.ds__month AS metric_time__month
@@ -34,6 +36,8 @@ FROM (
     , subq_0.ds__extract_dow AS metric_time__extract_dow
     , subq_0.ds__extract_doy AS metric_time__extract_doy
     , subq_0.ds__alien_day AS metric_time__alien_day
+    , subq_0.ds__fiscal_quarter AS metric_time__fiscal_quarter
+    , subq_0.ds__fiscal_year AS metric_time__fiscal_year
   FROM (
     -- Read From Time Spine 'mf_time_spine'
     SELECT
@@ -49,6 +53,8 @@ FROM (
       , EXTRACT(isodow FROM time_spine_src_28006.ds) AS ds__extract_dow
       , EXTRACT(doy FROM time_spine_src_28006.ds) AS ds__extract_doy
       , time_spine_src_28006.alien_day AS ds__alien_day
+      , time_spine_src_28006.fiscal_quarter AS ds__fiscal_quarter
+      , time_spine_src_28006.fiscal_year AS ds__fiscal_year
     FROM ***************************.mf_time_spine time_spine_src_28006
   ) subq_0
 ) subq_1

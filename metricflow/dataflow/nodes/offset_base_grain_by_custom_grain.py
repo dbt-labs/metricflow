@@ -36,14 +36,14 @@ class OffsetQueriedGrainByCustomGrainNode(DataflowPlanNode, ABC):
     def __post_init__(self) -> None:  # noqa: D105
         super().__post_init__()
 
-        for spec in self.required_time_spine_specs:
-            if spec.has_custom_grain:
-                raise ValueError(
-                    LazyFormat(
-                        "Found custom grain in required specs, which is not supported by OffsetQueriedGrainByCustomGrainNode.",
-                        required_time_spine_specs=self.required_time_spine_specs,
-                    )
-                )
+        # for spec in self.required_time_spine_specs:
+        # if spec.has_custom_grain:
+        #     raise ValueError(
+        #         LazyFormat(
+        #             "Found custom grain in required specs, which is not supported by OffsetQueriedGrainByCustomGrainNode.",
+        #             required_time_spine_specs=self.required_time_spine_specs,
+        #         )
+        # )
         if self.offset_window.is_standard_granularity:
             raise ValueError(
                 LazyFormat(

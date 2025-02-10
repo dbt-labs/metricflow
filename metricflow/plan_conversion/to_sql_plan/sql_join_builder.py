@@ -7,6 +7,7 @@ from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.assert_one_arg import assert_exactly_one_arg_set
 from metricflow_semantics.errors.custom_grain_not_supported import error_if_not_standard_grain
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.sql.sql_exprs import (
     SqlColumnReference,
     SqlColumnReferenceExpression,
@@ -527,34 +528,53 @@ class SqlPlanJoinBuilder:
     @staticmethod
     def make_join_to_time_spine_join_description(
         node: JoinToTimeSpineNode,
+        parent_to_time_spine_join_column_names: Tuple[Tuple[str, str], ...],
         time_spine_alias: str,
-        time_spine_column_name: str,
-        parent_column_name: str,
         parent_sql_select_node: SqlSelectStatementNode,
         parent_alias: str,
     ) -> SqlJoinDescription:
         """Build join expression used to join a metric to a time spine dataset."""
-        left_expr: SqlExpressionNode = SqlColumnReferenceExpression.create(
-            col_ref=SqlColumnReference(table_alias=time_spine_alias, column_name=time_spine_column_name)
-        )
-        if node.standard_offset_window:
-            left_expr = SqlSubtractTimeIntervalExpression.create(
-                arg=left_expr,
-                count=node.standard_offset_window.count,
-                granularity=error_if_not_standard_grain(input_granularity=node.standard_offset_window.granularity),
+        if (node.standard_offset_window or node.offset_to_grain) and len(parent_to_time_spine_join_column_names) != 1:
+            raise ValueError(
+                LazyFormat(
+                    "Multiple join column pairs not supported for offset joins.",
+                    join_column_pairs=parent_to_time_spine_join_column_names,
+                    leng=len(parent_to_time_spine_join_column_names),
+                )
             )
-        elif node.offset_to_grain:
-            left_expr = SqlDateTruncExpression.create(time_granularity=node.offset_to_grain, arg=left_expr)
+
+        on_conditions: Tuple[SqlComparisonExpression, ...] = ()
+        for parent_column_name, time_spine_column_name in parent_to_time_spine_join_column_names:
+            left_expr: SqlExpressionNode = SqlColumnReferenceExpression.create(
+                col_ref=SqlColumnReference(table_alias=time_spine_alias, column_name=time_spine_column_name)
+            )
+            if node.standard_offset_window:
+                left_expr = SqlSubtractTimeIntervalExpression.create(
+                    arg=left_expr,
+                    count=node.standard_offset_window.count,
+                    granularity=error_if_not_standard_grain(input_granularity=node.standard_offset_window.granularity),
+                )
+            elif node.offset_to_grain:
+                left_expr = SqlDateTruncExpression.create(time_granularity=node.offset_to_grain, arg=left_expr)
+
+            on_conditions += (
+                SqlComparisonExpression.create(
+                    left_expr=left_expr,
+                    comparison=SqlComparison.EQUALS,
+                    right_expr=SqlColumnReferenceExpression.create(
+                        col_ref=SqlColumnReference(table_alias=parent_alias, column_name=parent_column_name)
+                    ),
+                ),
+            )
+        print("on_conditions: ", on_conditions)
 
         return SqlJoinDescription(
             right_source=parent_sql_select_node,
             right_source_alias=parent_alias,
-            on_condition=SqlComparisonExpression.create(
-                left_expr=left_expr,
-                comparison=SqlComparison.EQUALS,
-                right_expr=SqlColumnReferenceExpression.create(
-                    col_ref=SqlColumnReference(table_alias=parent_alias, column_name=parent_column_name)
-                ),
+            on_condition=(
+                on_conditions[0]
+                if len(on_conditions) == 1
+                else SqlLogicalExpression.create(operator=SqlLogicalOperator.AND, args=on_conditions)
             ),
             join_type=node.join_type,
         )

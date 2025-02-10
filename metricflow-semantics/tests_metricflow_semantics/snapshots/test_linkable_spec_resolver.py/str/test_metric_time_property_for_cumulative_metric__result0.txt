@@ -5,6 +5,8 @@ Model Join-Path    Entity Links    Name         Time Granularity    Date Part   
 -----------------  --------------  -----------  ------------------  -----------  -------------------------------------------
 ('revenue',)       ()              metric_time  alien_day                        ['DERIVED_TIME_GRANULARITY', 'METRIC_TIME']
 ('revenue',)       ()              metric_time  day                              ['METRIC_TIME']
+('revenue',)       ()              metric_time  fiscal_quarter                   ['DERIVED_TIME_GRANULARITY', 'METRIC_TIME']
+('revenue',)       ()              metric_time  fiscal_year                      ['DERIVED_TIME_GRANULARITY', 'METRIC_TIME']
 ('revenue',)       ()              metric_time  month                            ['DERIVED_TIME_GRANULARITY', 'METRIC_TIME']
 ('revenue',)       ()              metric_time  quarter                          ['DERIVED_TIME_GRANULARITY', 'METRIC_TIME']
 ('revenue',)       ()              metric_time  week                             ['DERIVED_TIME_GRANULARITY', 'METRIC_TIME']

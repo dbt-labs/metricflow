@@ -1,41 +1,32 @@
-test_name: test_custom_offset_window_with_granularity_and_date_part
+test_name: test_custom_offset_window_with_larger_grain
 test_filename: test_custom_granularity.py
 sql_engine: DuckDB
 ---
 -- Compute Metrics via Expressions
 SELECT
-  subq_16.metric_time__alien_day
-  , subq_16.booking__ds__month
-  , subq_16.metric_time__extract_year
-  , bookings AS bookings_offset_one_alien_day
+  subq_16.metric_time__month
+  , bookings AS bookings_last_fiscal_quarter
 FROM (
   -- Compute Metrics via Expressions
   SELECT
-    subq_15.metric_time__alien_day
-    , subq_15.booking__ds__month
-    , subq_15.metric_time__extract_year
+    subq_15.metric_time__month
     , subq_15.bookings
   FROM (
     -- Aggregate Measures
     SELECT
-      subq_14.metric_time__alien_day
-      , subq_14.booking__ds__month
-      , subq_14.metric_time__extract_year
+      subq_14.metric_time__month
       , SUM(subq_14.bookings) AS bookings
     FROM (
-      -- Pass Only Elements: ['bookings', 'booking__ds__month', 'metric_time__extract_year', 'metric_time__alien_day']
+      -- Pass Only Elements: ['bookings', 'metric_time__month']
       SELECT
-        subq_13.metric_time__alien_day
-        , subq_13.booking__ds__month
-        , subq_13.metric_time__extract_year
+        subq_13.metric_time__month
         , subq_13.bookings
       FROM (
         -- Join to Time Spine Dataset
         -- Join to Custom Granularity Dataset
         SELECT
-          subq_11.booking__ds__month AS booking__ds__month
-          , subq_11.metric_time__extract_year AS metric_time__extract_year
-          , subq_11.metric_time__day AS metric_time__day
+          subq_11.metric_time__fiscal_quarter AS metric_time__fiscal_quarter
+          , subq_11.metric_time__month AS metric_time__month
           , subq_5.ds__day AS ds__day
           , subq_5.ds__week AS ds__week
           , subq_5.ds__month AS ds__month
@@ -71,6 +62,7 @@ FROM (
           , subq_5.paid_at__extract_doy AS paid_at__extract_doy
           , subq_5.booking__ds__day AS booking__ds__day
           , subq_5.booking__ds__week AS booking__ds__week
+          , subq_5.booking__ds__month AS booking__ds__month
           , subq_5.booking__ds__quarter AS booking__ds__quarter
           , subq_5.booking__ds__year AS booking__ds__year
           , subq_5.booking__ds__extract_year AS booking__ds__extract_year
@@ -101,10 +93,11 @@ FROM (
           , subq_5.booking__paid_at__extract_day AS booking__paid_at__extract_day
           , subq_5.booking__paid_at__extract_dow AS booking__paid_at__extract_dow
           , subq_5.booking__paid_at__extract_doy AS booking__paid_at__extract_doy
+          , subq_5.metric_time__day AS metric_time__day
           , subq_5.metric_time__week AS metric_time__week
-          , subq_5.metric_time__month AS metric_time__month
           , subq_5.metric_time__quarter AS metric_time__quarter
           , subq_5.metric_time__year AS metric_time__year
+          , subq_5.metric_time__extract_year AS metric_time__extract_year
           , subq_5.metric_time__extract_quarter AS metric_time__extract_quarter
           , subq_5.metric_time__extract_month AS metric_time__extract_month
           , subq_5.metric_time__extract_day AS metric_time__extract_day
@@ -131,40 +124,38 @@ FROM (
           , subq_5.discrete_booking_value_p99 AS discrete_booking_value_p99
           , subq_5.approximate_continuous_booking_value_p99 AS approximate_continuous_booking_value_p99
           , subq_5.approximate_discrete_booking_value_p99 AS approximate_discrete_booking_value_p99
-          , subq_12.alien_day AS metric_time__alien_day
+          , subq_12.fiscal_quarter AS metric_time__fiscal_quarter
         FROM (
-          -- Pass Only Elements: ['ds__day', 'booking__ds__month', 'metric_time__extract_year', 'metric_time__day']
+          -- Pass Only Elements: ['ds__day', 'metric_time__fiscal_quarter', 'metric_time__month']
           SELECT
             subq_10.ds__day
-            , subq_10.booking__ds__month
-            , subq_10.metric_time__extract_year
-            , subq_10.metric_time__day
+            , subq_10.metric_time__fiscal_quarter
+            , subq_10.metric_time__month
           FROM (
             -- Apply Requested Granularities
             SELECT
               subq_9.ds__day
-              , DATE_TRUNC('month', subq_9.ds__day__lead) AS booking__ds__month
-              , EXTRACT(year FROM subq_9.ds__day__lead) AS metric_time__extract_year
-              , subq_9.ds__day__lead AS metric_time__day
+              , subq_9.ds__day__lead AS metric_time__fiscal_quarter
+              , DATE_TRUNC('month', subq_9.ds__day__lead) AS metric_time__month
             FROM (
               -- Offset Base Granularity By Custom Granularity Period(s)
               WITH cte_2 AS (
                 -- Get Custom Granularity Bounds
                 SELECT
                   subq_6.ds__day
-                  , subq_6.ds__alien_day
+                  , subq_6.ds__fiscal_quarter
                   , FIRST_VALUE(subq_6.ds__day) OVER (
-                    PARTITION BY subq_6.ds__alien_day
+                    PARTITION BY subq_6.ds__fiscal_quarter
                     ORDER BY subq_6.ds__day
                     ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
                   ) AS ds__day__first_value
                   , LAST_VALUE(subq_6.ds__day) OVER (
-                    PARTITION BY subq_6.ds__alien_day
+                    PARTITION BY subq_6.ds__fiscal_quarter
                     ORDER BY subq_6.ds__day
                     ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
                   ) AS ds__day__last_value
                   , ROW_NUMBER() OVER (
-                    PARTITION BY subq_6.ds__alien_day
+                    PARTITION BY subq_6.ds__fiscal_quarter
                     ORDER BY subq_6.ds__day
                   ) AS ds__day__row_number
                 FROM (
@@ -199,24 +190,24 @@ FROM (
               INNER JOIN (
                 -- Offset Custom Granularity Bounds
                 SELECT
-                  subq_7.ds__alien_day
-                  , LEAD(subq_7.ds__day__first_value, 1) OVER (ORDER BY subq_7.ds__alien_day) AS ds__day__first_value__lead
-                  , LEAD(subq_7.ds__day__last_value, 1) OVER (ORDER BY subq_7.ds__alien_day) AS ds__day__last_value__lead
+                  subq_7.ds__fiscal_quarter
+                  , LEAD(subq_7.ds__day__first_value, 1) OVER (ORDER BY subq_7.ds__fiscal_quarter) AS ds__day__first_value__lead
+                  , LEAD(subq_7.ds__day__last_value, 1) OVER (ORDER BY subq_7.ds__fiscal_quarter) AS ds__day__last_value__lead
                 FROM (
                   -- Get Unique Rows for Custom Granularity Bounds
                   SELECT
-                    cte_2.ds__alien_day
+                    cte_2.ds__fiscal_quarter
                     , cte_2.ds__day__first_value
                     , cte_2.ds__day__last_value
                   FROM cte_2 cte_2
                   GROUP BY
-                    cte_2.ds__alien_day
+                    cte_2.ds__fiscal_quarter
                     , cte_2.ds__day__first_value
                     , cte_2.ds__day__last_value
                 ) subq_7
               ) subq_8
               ON
-                cte_2.ds__alien_day = subq_8.ds__alien_day
+                cte_2.ds__fiscal_quarter = subq_8.ds__fiscal_quarter
             ) subq_9
           ) subq_10
         ) subq_11
@@ -416,16 +407,18 @@ FROM (
           ) subq_4
         ) subq_5
         ON
-          subq_11.ds__day = subq_5.metric_time__day
+          (
+            subq_11.metric_time__fiscal_quarter = subq_5.metric_time__fiscal_quarter
+          ) AND (
+            subq_11.metric_time__month = subq_5.metric_time__month
+          )
         LEFT OUTER JOIN
           ***************************.mf_time_spine subq_12
         ON
-          subq_11.metric_time__day = subq_12.ds
+          subq_5.metric_time__day = subq_12.ds
       ) subq_13
     ) subq_14
     GROUP BY
-      subq_14.metric_time__alien_day
-      , subq_14.booking__ds__month
-      , subq_14.metric_time__extract_year
+      subq_14.metric_time__month
   ) subq_15
 ) subq_16

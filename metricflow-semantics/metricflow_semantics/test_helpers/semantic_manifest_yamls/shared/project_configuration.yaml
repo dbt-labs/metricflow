@@ -50,3 +50,5 @@ project_configuration:
         time_granularity: day
       custom_granularities:
         - name: alien_day
+        - name: fiscal_quarter
+        - name: fiscal_year

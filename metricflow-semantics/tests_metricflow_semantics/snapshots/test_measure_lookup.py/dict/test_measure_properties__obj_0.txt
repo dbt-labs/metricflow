@@ -106,6 +106,22 @@ docstring:
       TimeDimensionSpec(
         element_name='ds',
         entity_links=(EntityReference(element_name='booking'),),
+        time_granularity=ExpandedTimeGranularity(
+          name='fiscal_quarter',
+          base_granularity=DAY,
+        ),
+      ),
+      TimeDimensionSpec(
+        element_name='ds',
+        entity_links=(EntityReference(element_name='booking'),),
+        time_granularity=ExpandedTimeGranularity(
+          name='fiscal_year',
+          base_granularity=DAY,
+        ),
+      ),
+      TimeDimensionSpec(
+        element_name='ds',
+        entity_links=(EntityReference(element_name='booking'),),
         date_part=YEAR,
       ),
       TimeDimensionSpec(
@@ -234,6 +250,22 @@ docstring:
         entity_links=(EntityReference(element_name='booking_monthly'),),
         time_granularity=ExpandedTimeGranularity(
           name='alien_day',
+          base_granularity=DAY,
+        ),
+      ),
+      TimeDimensionSpec(
+        element_name='ds',
+        entity_links=(EntityReference(element_name='booking_monthly'),),
+        time_granularity=ExpandedTimeGranularity(
+          name='fiscal_quarter',
+          base_granularity=DAY,
+        ),
+      ),
+      TimeDimensionSpec(
+        element_name='ds',
+        entity_links=(EntityReference(element_name='booking_monthly'),),
+        time_granularity=ExpandedTimeGranularity(
+          name='fiscal_year',
           base_granularity=DAY,
         ),
       ),

@@ -71,11 +71,13 @@ docstring:
                     <!--       time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                     <!--     ),                                                                            -->
                     <!--   )                                                                               -->
-                    <!-- join_on_time_dimension_spec =                                                   -->
-                    <!--   TimeDimensionSpec(                                                            -->
-                    <!--     element_name='metric_time',                                                 -->
-                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
-                    <!--   )                                                                             -->
+                    <!-- join_on_time_dimension_specs =                                                    -->
+                    <!--   (                                                                               -->
+                    <!--     TimeDimensionSpec(                                                            -->
+                    <!--       element_name='metric_time',                                                 -->
+                    <!--       time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                    <!--     ),                                                                            -->
+                    <!--   )                                                                               -->
                     <!-- join_type = LEFT_OUTER -->
                     <AggregateMeasuresNode>
                         <!-- description = 'Aggregate Measures' -->

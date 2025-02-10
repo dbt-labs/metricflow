@@ -7,7 +7,13 @@ from typing import Dict, List, Optional, Sequence, Set, Tuple
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols import MetricInputMeasure
 from dbt_semantic_interfaces.references import MetricModelReference, SemanticModelElementReference
-from dbt_semantic_interfaces.type_enums import AggregationType, ConversionCalculationType, MetricType, PeriodAggregation
+from dbt_semantic_interfaces.type_enums import (
+    AggregationType,
+    ConversionCalculationType,
+    MetricType,
+    PeriodAggregation,
+    TimeGranularity,
+)
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 from metricflow_semantics.aggregation_properties import AggregationState
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
@@ -1101,9 +1107,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                     spec=metric_time_dimension_spec,
                 )
             )
-            output_column_to_input_column[
-                metric_time_dimension_column_association.column_name
-            ] = matching_time_dimension_instance.associated_column.column_name
+            output_column_to_input_column[metric_time_dimension_column_association.column_name] = (
+                matching_time_dimension_instance.associated_column.column_name
+            )
 
         output_instance_set = InstanceSet(
             measure_instances=tuple(output_measure_instances),
@@ -1272,22 +1278,24 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         time_spine_alias = self._next_unique_table_alias()
 
         required_agg_time_dimension_specs = tuple(node.requested_agg_time_dimension_specs)
-        join_spec_was_requested = node.join_on_time_dimension_spec in node.requested_agg_time_dimension_specs
+        join_spec_was_requested = all(
+            spec in node.requested_agg_time_dimension_specs for spec in node.join_on_time_dimension_specs
+        )
         if not join_spec_was_requested:
-            required_agg_time_dimension_specs += (node.join_on_time_dimension_spec,)
+            required_agg_time_dimension_specs += tuple(node.join_on_time_dimension_specs)
 
         # Build join expression.
-        parent_join_column_name = self._column_association_resolver.resolve_spec(
-            node.join_on_time_dimension_spec
-        ).column_name
-        time_spine_jon_column_name = time_spine_data_set.instance_from_time_dimension_grain_and_date_part(
-            time_granularity_name=node.join_on_time_dimension_spec.time_granularity_name, date_part=None
-        ).associated_column.column_name
+        parent_to_time_spine_join_column_names: Tuple[Tuple[str, str], ...] = ()
+        for join_on_time_dimension_spec in node.join_on_time_dimension_specs:
+            parent_column_name = self._column_association_resolver.resolve_spec(join_on_time_dimension_spec).column_name
+            time_spine_column_name = time_spine_data_set.instance_from_time_dimension_grain_and_date_part(
+                time_granularity_name=join_on_time_dimension_spec.time_granularity_name, date_part=None
+            ).associated_column.column_name
+            parent_to_time_spine_join_column_names += ((parent_column_name, time_spine_column_name),)
         join_description = SqlPlanJoinBuilder.make_join_to_time_spine_join_description(
             node=node,
             time_spine_alias=time_spine_alias,
-            time_spine_column_name=time_spine_jon_column_name,
-            parent_column_name=parent_join_column_name,
+            parent_to_time_spine_join_column_names=parent_to_time_spine_join_column_names,
             parent_sql_select_node=parent_data_set.checked_sql_select_node,
             parent_alias=parent_alias,
         )
@@ -1345,8 +1353,12 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         # Filter down to one row per granularity period requested in the group by. Any other granularities
         # included here will be filtered out before aggregation and so should not be included in where filter.
         if need_where_filter:
+            # Why do we use join column here? is this a proxy for smallest column available?
             join_column_expr = SqlColumnReferenceExpression.from_column_reference(
-                table_alias=time_spine_alias, column_name=parent_join_column_name
+                table_alias=time_spine_alias,
+                column_name=parent_to_time_spine_join_column_names[0][
+                    0
+                ],  # assume there's only one in this scenario... need to clarify
             )
             for requested_spec in node.requested_agg_time_dimension_specs:
                 column_name = self._column_association_resolver.resolve_spec(requested_spec).column_name
@@ -1881,6 +1893,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         )
 
     def visit_offset_queried_grain_by_custom_grain_node(self, node: OffsetQueriedGrainByCustomGrainNode) -> SqlDataSet:
+        # TODO: update doc string
         """Builds a query to implement an offset window that uses a custom grain.
 
         The query implements the offset window by offsetting the custom grain's base grain by the requested number of custom
@@ -1939,26 +1952,24 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         custom_time_spine_data_set: Optional[SqlDataSet] = None
         smaller_time_spine_data_set: Optional[SqlDataSet] = None
         smaller_time_spine_alias: Optional[str] = None
-        if len(node.time_spine_nodes) == 1:
-            data_set = self.get_output_data_set(node.time_spine_nodes[0])
-            custom_time_spine_data_set = data_set
-        else:
-            for time_spine_node in node.time_spine_nodes:
-                data_set = self.get_output_data_set(time_spine_node)
-                data_set_grains = {
-                    spec.time_granularity_name for spec in data_set.instance_set.spec_set.time_dimension_specs
-                }
-                if custom_grain_name in data_set_grains:
+        smallest_grain_available: Optional[TimeGranularity] = None
+        for time_spine_node in node.time_spine_nodes:
+            data_set = self.get_output_data_set(time_spine_node)
+            for spec in data_set.instance_set.spec_set.time_dimension_specs:
+                if custom_grain_name == spec.time_granularity_name:
                     custom_time_spine_data_set = data_set
-                else:
-                    smaller_time_spine_data_set = data_set
+                if spec.base_granularity and (
+                    smallest_grain_available is None
+                    or (spec.base_granularity.to_int() < smallest_grain_available.to_int())
+                ):
+                    smallest_grain_available = spec.base_granularity
+            if custom_time_spine_data_set != data_set:
+                smaller_time_spine_data_set = data_set
         assert custom_time_spine_data_set, "No time spine nodes satisfy custom grain."
+        assert (
+            smallest_grain_available
+        ), "No base grains found in time spine nodes, this indicates internal misconfiguration"
         custom_time_spine_alias = self._next_unique_table_alias()
-        base_grain_name = self._get_time_spine_for_custom_granularity(custom_grain_name).base_granularity.value
-        base_grain_instance = custom_time_spine_data_set.instance_from_time_dimension_grain_and_date_part(
-            time_granularity_name=base_grain_name, date_part=None
-        )
-        smallest_grain_instance = base_grain_instance
         smallest_column_table_alias = custom_time_spine_alias
 
         join_descs: Tuple[SqlJoinDescription, ...] = ()
@@ -1966,6 +1977,10 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             smaller_time_spine_alias = self._next_unique_table_alias()
             # Will select from the custom grain time spine (left) and join to the smaller time spine (right),
             # joining on specs with the custom grain's base grain.
+            base_grain_name = self._get_time_spine_for_custom_granularity(custom_grain_name).base_granularity.value
+            base_grain_instance = custom_time_spine_data_set.instance_from_time_dimension_grain_and_date_part(
+                time_granularity_name=base_grain_name, date_part=None
+            )
             right_instance = smaller_time_spine_data_set.instance_from_time_dimension_grain_and_date_part(
                 time_granularity_name=base_grain_name, date_part=None
             )
@@ -1985,28 +2000,30 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                 ),
             )
             join_descs += (join_desc,)
-
-            # If we have two time spines, we know one of the requested specs has a smaller grain than the base grain.
-            smallest_requested_grain = sorted(
-                node.required_time_spine_specs, key=lambda spec: spec.base_granularity_sort_key
-            )[0].time_granularity_name
-            smallest_grain_instance = smaller_time_spine_data_set.instance_from_time_dimension_grain_and_date_part(
-                time_granularity_name=smallest_requested_grain, date_part=None
-            )
             smallest_column_table_alias = smaller_time_spine_alias
-        smallest_grain = smallest_grain_instance.spec.base_granularity
-        assert smallest_grain, "Smallest grain instance does not have a time granularity."
 
         custom_grain_instance = custom_time_spine_data_set.instance_from_time_dimension_grain_and_date_part(
             time_granularity_name=custom_grain_name, date_part=None
         )
         custom_grain_column_name = custom_grain_instance.associated_column.column_name
+
+        # Find the instance with the smallest requested grain. If it is larger than the smallest grain available,
+        # we'll need an additional subquery to filter down to unique rows.
+        smallest_requested_grain = sorted(
+            node.required_time_spine_specs, key=lambda spec: spec.base_granularity_sort_key
+        )[0].base_granularity
+        # TODO: Test with just date part. Probably need to assume DAY grain or something.
+        assert smallest_requested_grain, "Smallest grain instance does not have a time granularity."
+        smallest_grain_instance = (
+            smaller_time_spine_data_set or custom_time_spine_data_set
+        ).instance_from_time_dimension_grain_and_date_part(
+            time_granularity_name=smallest_requested_grain.value, date_part=None
+        )
         smallest_grain_column_name = smallest_grain_instance.associated_column.column_name
 
-        # Build columns that get start and end of the custom grain period.
-        # Ex: FIRST_VALUE(ds) OVER (PARTITION BY fiscal_quarter ORDER BY ds) AS ds__fiscal_quarter__first_value
-        bounds_columns: Tuple[SqlSelectColumn, ...] = ()
-        bounds_instances: Tuple[TimeDimensionInstance, ...] = ()
+        # TODO: Build another select stmt that selects unique rows for the smallest column and the custom grain column
+        cte_from_source = custom_time_spine_data_set.checked_sql_select_node
+        cte_from_alias = custom_time_spine_alias
         custom_column_expr = SqlColumnReferenceExpression.from_column_reference(
             table_alias=custom_time_spine_alias, column_name=custom_grain_column_name
         )
@@ -2017,6 +2034,32 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             SqlSelectColumn(expr=smallest_column_expr, column_alias=smallest_grain_column_name),
             SqlSelectColumn(expr=custom_column_expr, column_alias=custom_grain_column_name),
         )
+        if smallest_requested_grain.to_int() > smallest_grain_available.to_int():
+            cte_from_source = SqlSelectStatementNode.create(
+                description="Get Unique Rows for Grains",
+                select_columns=cte_select_columns,
+                from_source=cte_from_source,
+                from_source_alias=cte_from_alias,
+                join_descs=join_descs,
+                group_bys=cte_select_columns,
+            )
+            cte_from_alias = self._next_unique_table_alias()
+            custom_column_expr = SqlColumnReferenceExpression.from_column_reference(
+                table_alias=cte_from_alias, column_name=custom_grain_column_name
+            )
+            smallest_column_expr = SqlColumnReferenceExpression.from_column_reference(
+                table_alias=cte_from_alias, column_name=smallest_grain_column_name
+            )
+            cte_select_columns = (
+                SqlSelectColumn(expr=smallest_column_expr, column_alias=smallest_grain_column_name),
+                SqlSelectColumn(expr=custom_column_expr, column_alias=custom_grain_column_name),
+            )
+            join_descs = ()
+
+        # Build columns that get start and end of the custom grain period.
+        # Ex: FIRST_VALUE(ds) OVER (PARTITION BY fiscal_quarter ORDER BY ds) AS ds__fiscal_quarter__first_value
+        bounds_columns: Tuple[SqlSelectColumn, ...] = ()
+        bounds_instances: Tuple[TimeDimensionInstance, ...] = ()
         for window_func in (SqlWindowFunction.FIRST_VALUE, SqlWindowFunction.LAST_VALUE):
             bounds_instance = custom_grain_instance.with_new_spec(
                 new_spec=smallest_grain_instance.spec.with_window_functions((window_func,)),
@@ -2056,8 +2099,8 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             SqlSelectStatementNode.create(
                 description="Get Custom Granularity Bounds",
                 select_columns=cte_select_columns,
-                from_source=custom_time_spine_data_set.checked_sql_select_node,
-                from_source_alias=custom_time_spine_alias,
+                from_source=cte_from_source,
+                from_source_alias=cte_from_alias,
                 join_descs=join_descs,
             ),
             cte_alias=cte_alias,
@@ -2128,7 +2171,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                 operator=SqlArithmeticOperator.SUBTRACT,
                 right_expr=SqlIntegerExpression.create(1),
             ),
-            granularity=smallest_grain,
+            granularity=smallest_requested_grain,
         )
         is_below_last_value_expr = SqlComparisonExpression.create(
             left_expr=offset_smallest_grain_expr,
@@ -2183,7 +2226,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                 assert (
                     spec.time_granularity is not None
                 ), "Got no time granularity or date part for required time spine spec."
-                if spec.time_granularity.base_granularity == smallest_grain:
+                if spec.time_granularity.base_granularity == smallest_requested_grain:
                     expr = offset_column_ref
                 else:
                     expr = SqlDateTruncExpression.create(

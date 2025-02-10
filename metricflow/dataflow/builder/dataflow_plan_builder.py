@@ -1530,13 +1530,13 @@ class DataflowPlanBuilder:
             queried_time_spine_specs=queried_agg_time_dimension_specs,
             time_range_constraint=time_range_constraint,
             where_filter_specs=agg_time_only_filters,
-            join_on_time_dimension_spec=join_spec,
+            join_on_time_dimension_specs=(join_spec,),
         )
         output_node: DataflowPlanNode = JoinToTimeSpineNode.create(
             metric_source_node=measure_source_node,
             time_spine_node=time_spine_node,
             requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
-            join_on_time_dimension_spec=join_spec,
+            join_on_time_dimension_specs=(join_spec,),
             join_type=join_description.join_type,
         )
 
@@ -1575,13 +1575,13 @@ class DataflowPlanBuilder:
         time_spine_node = self._build_time_spine_node(
             queried_time_spine_specs=queried_agg_time_dimension_specs,
             custom_offset_window=metric_spec.custom_offset_window,
-            join_on_time_dimension_spec=join_spec,
+            join_on_time_dimension_specs=(join_spec,),
         )
         output_node: DataflowPlanNode = JoinToTimeSpineNode.create(
             metric_source_node=metric_source_node,
             time_spine_node=time_spine_node,
             requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
-            join_on_time_dimension_spec=join_spec,
+            join_on_time_dimension_specs=(join_spec,),
             standard_offset_window=metric_spec.standard_offset_window,
             offset_to_grain=metric_spec.offset_to_grain,
             join_type=SqlJoinType.INNER,
@@ -1622,37 +1622,55 @@ class DataflowPlanBuilder:
             f"new use case."
         )
 
+        # TODO: restructure this code for readability. if custom offset window and use_offset_custom_granularity_node /
+        # elif custom offset window / else logic.
+
         required_time_spine_specs = (
             queried_agg_time_dimension_specs
             if use_offset_custom_granularity_node
             else TimeDimensionSpec.with_base_grains(queried_agg_time_dimension_specs)
         )
         join_spec_grain = measure_properties.agg_time_dimension_grain
+        join_on_time_dimension_specs: Tuple[TimeDimensionSpec, ...] = ()
         if join_description.custom_offset_window:
-            join_spec_grain = self._get_base_grain_for_custom_grain(join_description.custom_offset_window.granularity)
-            if not use_offset_custom_granularity_node:
+            custom_grain = join_description.custom_offset_window.granularity
+            base_grain = self._get_base_grain_for_custom_grain(custom_grain)
+            if use_offset_custom_granularity_node:
+                join_spec_grain = base_grain
+            else:
                 assert required_time_spine_specs, "No requred time spine specs found for time spine node"
-                smallest_agg_time_grain = sorted(
-                    required_time_spine_specs, key=lambda spec: spec.base_granularity_sort_key
-                )[0].base_granularity
-                if smallest_agg_time_grain and smallest_agg_time_grain.to_int() < join_spec_grain.to_int():
-                    join_spec_grain = smallest_agg_time_grain
-        join_on_time_dimension_spec = self._determine_time_spine_join_spec(
-            join_spec_grain=join_spec_grain,
-            required_time_spine_specs=required_time_spine_specs,
+                smallest_grain = sorted(required_time_spine_specs, key=lambda spec: spec.base_granularity_sort_key)[
+                    0
+                ].base_granularity
+                assert smallest_grain, "No grain found for time spine node"  # might not work for date part
+                join_spec_grain = smallest_grain
+                if smallest_grain > base_grain:
+                    join_on_time_dimension_specs += (
+                        DataSet.metric_time_dimension_spec(
+                            time_granularity=ExpandedTimeGranularity(name=custom_grain, base_granularity=base_grain)
+                        ),
+                    )
+
+        join_on_time_dimension_specs += (
+            self._determine_time_spine_join_spec(
+                join_spec_grain=join_spec_grain,
+                required_time_spine_specs=required_time_spine_specs,
+            ),
         )
 
+        # also need to join in the custom grain to the parent node
         time_spine_node = self._build_time_spine_node(
             queried_time_spine_specs=required_time_spine_specs,
             custom_offset_window=join_description.custom_offset_window,
-            join_on_time_dimension_spec=join_on_time_dimension_spec,
+            join_on_time_dimension_specs=join_on_time_dimension_specs,
             use_offset_custom_granularity_node=use_offset_custom_granularity_node,
         )
+
         return JoinToTimeSpineNode.create(
             metric_source_node=metric_source_node,
             time_spine_node=time_spine_node,
             requested_agg_time_dimension_specs=required_time_spine_specs,
-            join_on_time_dimension_spec=join_on_time_dimension_spec,
+            join_on_time_dimension_specs=join_on_time_dimension_specs,
             standard_offset_window=(join_description.standard_offset_window),
             offset_to_grain=join_description.offset_to_grain,
             join_type=join_description.join_type,
@@ -1803,13 +1821,25 @@ class DataflowPlanBuilder:
                 use_offset_custom_granularity_node=use_offset_custom_granularity_node,
             )
 
-        custom_granularity_specs_to_join = [
+        custom_granularity_specs_to_join = tuple(
             spec
             for spec in required_linkable_specs.time_dimension_specs_with_custom_grain
             # In some circumstances, the custom grain has already been joined.
             if (not use_offset_custom_granularity_node)
             and (spec not in measure_recipe.all_linkable_specs_required_for_source_nodes.as_tuple)
-        ]
+        )
+        if (
+            before_aggregation_time_spine_join_description
+            and before_aggregation_time_spine_join_description.custom_offset_window
+        ):
+            custom_grain = before_aggregation_time_spine_join_description.custom_offset_window.granularity
+            base_grain = self._get_base_grain_for_custom_grain(custom_grain)
+            custom_granularity_specs_to_join += (
+                DataSet.metric_time_dimension_spec(
+                    time_granularity=ExpandedTimeGranularity(name=custom_grain, base_granularity=base_grain)
+                ),
+            )
+
         # Apply original time constraint if it wasn't applied to the source node recipe. For cumulative metrics, the constraint
         # may have been expanded and needs to be narrowed here. For offsets, the constraint was deferred to after the offset.
         # TODO - Pushdown: Encapsulate all of this window sliding bookkeeping in the pushdown params object
@@ -1962,7 +1992,7 @@ class DataflowPlanBuilder:
     def _build_time_spine_node(
         self,
         queried_time_spine_specs: Sequence[TimeDimensionSpec],
-        join_on_time_dimension_spec: TimeDimensionSpec,
+        join_on_time_dimension_specs: Sequence[TimeDimensionSpec],
         where_filter_specs: Sequence[WhereFilterSpec] = (),
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         custom_offset_window: Optional[MetricTimeWindow] = None,
@@ -1970,8 +2000,10 @@ class DataflowPlanBuilder:
     ) -> DataflowPlanNode:
         """Return the time spine node needed to satisfy the specs."""
         required_specs = tuple(queried_time_spine_specs)
-        if join_on_time_dimension_spec not in required_specs:
-            required_specs = (join_on_time_dimension_spec,) + required_specs
+        # if not custom_offset_window:
+        for join_on_time_dimension_spec in join_on_time_dimension_specs:
+            if join_on_time_dimension_spec not in required_specs:
+                required_specs = (join_on_time_dimension_spec,) + required_specs
 
         filter_to_specs = required_specs  # Filter to specs should not include where filter specs
 
@@ -1991,6 +2023,8 @@ class DataflowPlanBuilder:
                 use_offset_custom_granularity_node=use_offset_custom_granularity_node,
                 required_time_spine_sources=time_spine_sources,
             )
+            # Add custom grain needed for join
+            # custom_grain_specs_to_join += ()
             filter_to_specs = self._node_data_set_resolver.get_output_data_set(
                 time_spine_node
             ).instance_set.spec_set.time_dimension_specs

@@ -32,7 +32,7 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
     time_spine_node: DataflowPlanNode
     metric_source_node: DataflowPlanNode
     requested_agg_time_dimension_specs: Sequence[TimeDimensionSpec]
-    join_on_time_dimension_spec: TimeDimensionSpec
+    join_on_time_dimension_specs: Sequence[TimeDimensionSpec]
     join_type: SqlJoinType
     standard_offset_window: Optional[MetricTimeWindow]
     offset_to_grain: Optional[TimeGranularity]
@@ -56,7 +56,7 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
         metric_source_node: DataflowPlanNode,
         time_spine_node: DataflowPlanNode,
         requested_agg_time_dimension_specs: Sequence[TimeDimensionSpec],
-        join_on_time_dimension_spec: TimeDimensionSpec,
+        join_on_time_dimension_specs: Sequence[TimeDimensionSpec],
         join_type: SqlJoinType,
         standard_offset_window: Optional[MetricTimeWindow] = None,
         offset_to_grain: Optional[TimeGranularity] = None,
@@ -66,7 +66,7 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
             metric_source_node=metric_source_node,
             time_spine_node=time_spine_node,
             requested_agg_time_dimension_specs=tuple(requested_agg_time_dimension_specs),
-            join_on_time_dimension_spec=join_on_time_dimension_spec,
+            join_on_time_dimension_specs=join_on_time_dimension_specs,
             join_type=join_type,
             standard_offset_window=standard_offset_window,
             offset_to_grain=offset_to_grain,
@@ -87,7 +87,7 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
         props = tuple(super().displayed_properties) + (
             DisplayedProperty("requested_agg_time_dimension_specs", self.requested_agg_time_dimension_specs),
-            DisplayedProperty("join_on_time_dimension_spec", self.join_on_time_dimension_spec),
+            DisplayedProperty("join_on_time_dimension_specs", self.join_on_time_dimension_specs),
             DisplayedProperty("join_type", self.join_type),
         )
         if self.standard_offset_window:
@@ -102,7 +102,7 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
             and other_node.standard_offset_window == self.standard_offset_window
             and other_node.offset_to_grain == self.offset_to_grain
             and other_node.requested_agg_time_dimension_specs == self.requested_agg_time_dimension_specs
-            and other_node.join_on_time_dimension_spec == self.join_on_time_dimension_spec
+            and other_node.join_on_time_dimension_specs == self.join_on_time_dimension_specs
             and other_node.join_type == self.join_type
         )
 
@@ -115,5 +115,5 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
             standard_offset_window=self.standard_offset_window,
             offset_to_grain=self.offset_to_grain,
             join_type=self.join_type,
-            join_on_time_dimension_spec=self.join_on_time_dimension_spec,
+            join_on_time_dimension_specs=self.join_on_time_dimension_specs,
         )

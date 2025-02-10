@@ -171,6 +171,16 @@ test_filename: test_dataflow_to_sql_plan.py
                         <!--     expr=SqlColumnReferenceExpression(node_id=cr_28131), -->
                         <!--     column_alias='ds__alien_day',                        -->
                         <!--   )                                                      -->
+                        <!-- col12 =                                                  -->
+                        <!--   SqlSelectColumn(                                       -->
+                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_28132), -->
+                        <!--     column_alias='ds__fiscal_quarter',                   -->
+                        <!--   )                                                      -->
+                        <!-- col13 =                                                  -->
+                        <!--   SqlSelectColumn(                                       -->
+                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_28133), -->
+                        <!--     column_alias='ds__fiscal_year',                      -->
+                        <!--   )                                                      -->
                         <!-- from_source = SqlTableNode(node_id=tfc_28018) -->
                         <!-- where = None -->
                         <!-- distinct = False -->

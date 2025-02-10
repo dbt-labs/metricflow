@@ -720,7 +720,7 @@ metric:
         offset_window: 2 days
 ---
 metric:
-  name: "bookings_offset_alien_day"
+  name: bookings_offset_alien_day
   description: bookings metric offset by a martian day.
   type: derived
   type_params:
@@ -728,6 +728,16 @@ metric:
     metrics:
       - name: bookings
         offset_window: 1 alien_day
+---
+metric:
+  name: bookings_last_fiscal_quarter
+  description: bookings metric offset by a fiscal quarter
+  type: derived
+  type_params:
+    expr: bookings
+    metrics:
+      - name: bookings
+        offset_window: 1 fiscal_quarter
 ---
 metric:
   name: bookings_at_start_of_month

@@ -4,6 +4,8 @@ test_filename: test_available_group_by_items.py
 [
   "TimeDimension('metric_time', 'alien_day')",
   "TimeDimension('metric_time', 'day')",
+  "TimeDimension('metric_time', 'fiscal_quarter')",
+  "TimeDimension('metric_time', 'fiscal_year')",
   "TimeDimension('metric_time', 'hour')",
   "TimeDimension('metric_time', 'microsecond')",
   "TimeDimension('metric_time', 'millisecond')",
