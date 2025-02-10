@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 
-from metricflow_semantics.formatting.formatting_helpers import mf_dedent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from typing_extensions import override
 
@@ -19,12 +18,8 @@ def test_log_kwargs() -> None:
         recorded_logger.debug(
             LazyFormat("Found candidates.", matches=[1, 2, 3], parameters={"field_0": "value_0", "field_1": "value_1"})
         )
-        assert handler.get_last_message() == mf_dedent(
-            """
-            Found candidates.
-              matches: [1, 2, 3]
-              parameters: {'field_0': 'value_0', 'field_1': 'value_1'}
-            """
+        assert handler.get_last_message() == (
+            "Found candidates. (matches=[1, 2, 3], parameters={'field_0': 'value_0', 'field_1': 'value_1'})"
         )
 
 
