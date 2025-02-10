@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import logging
 from functools import cached_property
 from typing import Callable, Union
 
 from typing_extensions import override
 
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat_dict
+
+logger = logging.getLogger(__name__)
 
 
 class LazyFormat:
@@ -40,7 +43,8 @@ class LazyFormat:
 
         Args:
             message: The message or a function that returns a message.
-            **kwargs: A dictionary of objects to format to text when `__str__` is called on this object.
+            **kwargs: A dictionary of objects to format to text when `__str__` is called on this object. To allow for
+            lazy evaluation of argument values, a callable that takes no arguments can be supplied for a key's value.
         """
         self._message = message
         self._kwargs = kwargs
@@ -52,7 +56,23 @@ class LazyFormat:
             message = self._message()
         else:
             message = self._message
-        return mf_pformat_dict(message, self._kwargs, preserve_raw_strings=True)
+
+        evaluated_args = {}
+        for arg_name, arg_value in self._kwargs.items():
+            if callable(arg_value):
+                try:
+                    evaluated_args[arg_name] = arg_value()
+                    continue
+                except Exception:
+                    logger.warning(
+                        f"Got an exception while evaluating {arg_name=} {arg_value=}. Since this is an error with "
+                        f"formatting log output, this should not result in system issues. However, the exception "
+                        f"indicates a bug with how the logging call is made and should be investigated.",
+                        exc_info=True,
+                    )
+
+            evaluated_args[arg_name] = arg_value
+        return mf_pformat_dict(message, evaluated_args, preserve_raw_strings=True)
 
     @override
     def __str__(self) -> str:
