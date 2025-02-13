@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime as dt
 import logging
 import pathlib
+import textwrap
 import traceback
 from functools import update_wrapper, wraps
 from typing import Any, Callable, List, Optional
@@ -13,6 +14,7 @@ from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 
 import dbt_metricflow.cli.custom_click_types as click_custom
 from dbt_metricflow.cli.cli_configuration import CLIConfiguration
+from dbt_metricflow.cli.cli_link import CliLink
 
 logger = logging.getLogger(__name__)
 
@@ -114,8 +116,7 @@ def exception_handler(func: Callable[..., Any]) -> Callable[..., Any]:  # type: 
             func(*args, **kwargs)
         except Exception as e:
             # This will log to the file handlers registered in the root.
-            logging.exception("Got an exception in the exception handler.")
-            # Checks if CLIContext has verbose flag set
+            logging.exception("Logging exception")
 
             if isinstance(args[0], CLIConfiguration):
                 cli_context: CLIConfiguration = args[0]
@@ -129,6 +130,18 @@ def exception_handler(func: Callable[..., Any]) -> Callable[..., Any]:  # type: 
                         )
                     )
                 click.echo(f"\nERROR: {str(e)}")
+
+            click.echo(
+                "\n"
+                + textwrap.dedent(
+                    f"""\
+                    If you think you found a bug, please report it here:
+                        {CliLink.get_report_issue_link()}
+                    """
+                )
+            )
+
+            # Checks if CLIContext has verbose flag set
             if args and hasattr(args[0], "verbose") and args[0].verbose is True:
                 click.echo(traceback.format_exc())
 
