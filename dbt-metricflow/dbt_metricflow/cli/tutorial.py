@@ -16,6 +16,7 @@ from packaging.version import Version
 from typing_extensions import Optional
 
 from dbt_metricflow.cli.cli_configuration import CLIConfiguration
+from dbt_metricflow.cli.cli_link import CliLink
 
 logger = logging.getLogger(__name__)
 
@@ -127,11 +128,12 @@ class dbtMetricFlowTutorialHelper:
                     {click.style(complex_query, bold=True)}
             12. When you're done with the tutorial, run mf tutorial --clean to delete sample models and seeds.
                 * If a sample project was created, it wil remain.
-            13. Before integrating metrics into your project, read up on adding a time spine (try <CTRL>+Left Click on the link):
-                   {click.style(time_spine_docs_link, fg="blue", bold=True)}
+            13. Before integrating metrics into your project, read up on adding a time spine.
+                (<Control>+<Left Click> may work in your terminal to follow the link)
+                   {CliLink.get_time_spine_docs_link(dbt_core_version)}
 
             If you found MetricFlow to be helpful, consider adding a Github star to promote the project:
-                   {click.style('https://github.com/dbt-labs/metricflow', fg="blue", bold=True)}
+                   {CliLink.get_github_repository_link()}
             """
         )
 
