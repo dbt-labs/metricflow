@@ -72,6 +72,9 @@ class DataflowPlanNode(DagNode["DataflowPlanNode"], Visitable, ABC):
     def with_new_parents(self: NodeSelfT, new_parent_nodes: Sequence[DataflowPlanNode]) -> NodeSelfT:
         """Creates a node with the same behavior as this node, but with a different set of parents.
 
+        Callers are required to call this method with new parent nodes that are of the appropriate type and order as
+        required by the subclass.
+
         typing.Self would be useful here, but not available in Python 3.8.
         """
         raise NotImplementedError
