@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC
 from dataclasses import dataclass
-from typing import Sequence
+from typing import Sequence, Tuple
 
 from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
@@ -16,7 +16,7 @@ from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
 
 
 @dataclass(frozen=True, eq=False)
-class OffsetBaseGrainByCustomGrainNode(DataflowPlanNode, ABC):
+class OffsetQueriedGrainByCustomGrainNode(DataflowPlanNode, ABC):
     """For a given custom grain, offset its base grain by the requested number of custom grain periods.
 
     Used to build the time spine node when querying a metric with a custom offset window with any grains / date parts.
@@ -31,7 +31,7 @@ class OffsetBaseGrainByCustomGrainNode(DataflowPlanNode, ABC):
 
     offset_window: MetricTimeWindow
     required_time_spine_specs: Sequence[TimeDimensionSpec]
-    time_spine_node: DataflowPlanNode
+    time_spine_nodes: Tuple[DataflowPlanNode, ...]
 
     def __post_init__(self) -> None:  # noqa: D105
         super().__post_init__()
@@ -40,27 +40,38 @@ class OffsetBaseGrainByCustomGrainNode(DataflowPlanNode, ABC):
             if spec.has_custom_grain:
                 raise ValueError(
                     LazyFormat(
-                        "Found custom grain in required specs, which is not supported by OffsetBaseGrainByCustomGrainNode.",
+                        "Found custom grain in required specs, which is not supported by OffsetQueriedGrainByCustomGrainNode.",
                         required_time_spine_specs=self.required_time_spine_specs,
                     )
                 )
         if self.offset_window.is_standard_granularity:
             raise ValueError(
                 LazyFormat(
-                    "OffsetBaseGrainByCustomGrainNode should only be used for custom grain offset windows.",
+                    "OffsetQueriedGrainByCustomGrainNode should only be used for custom grain offset windows.",
                     offset_window=self.offset_window,
                 )
             )
+        num_time_spine_nodes = len(self.time_spine_nodes)
+        if num_time_spine_nodes == 0 or num_time_spine_nodes > 2:
+            raise RuntimeError(
+                LazyFormat(
+                    "1-2 time spine nodes required for OffsetQueriedGrainByCustomGrainNode.",
+                    time_spine_nodes=self.time_spine_nodes,
+                )
+            )
+        assert (
+            len(self.required_time_spine_specs) > 0
+        ), "At least one time spine spec required for OffsetQueriedGrainByCustomGrainNode."
 
     @staticmethod
     def create(  # noqa: D102
-        time_spine_node: DataflowPlanNode,
+        time_spine_nodes: Tuple[DataflowPlanNode, ...],
         offset_window: MetricTimeWindow,
         required_time_spine_specs: Sequence[TimeDimensionSpec],
-    ) -> OffsetBaseGrainByCustomGrainNode:
-        return OffsetBaseGrainByCustomGrainNode(
-            parent_nodes=(time_spine_node,),
-            time_spine_node=time_spine_node,
+    ) -> OffsetQueriedGrainByCustomGrainNode:
+        return OffsetQueriedGrainByCustomGrainNode(
+            parent_nodes=time_spine_nodes,
+            time_spine_nodes=time_spine_nodes,
             offset_window=offset_window,
             required_time_spine_specs=required_time_spine_specs,
         )
@@ -70,7 +81,7 @@ class OffsetBaseGrainByCustomGrainNode(DataflowPlanNode, ABC):
         return StaticIdPrefix.DATAFLOW_NODE_OFFSET_BY_CUSTOM_GRANULARITY_ID_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
-        return visitor.visit_offset_base_grain_by_custom_grain_node(self)
+        return visitor.visit_offset_queried_grain_by_custom_grain_node(self)
 
     @property
     def description(self) -> str:  # noqa: D102
@@ -92,11 +103,10 @@ class OffsetBaseGrainByCustomGrainNode(DataflowPlanNode, ABC):
 
     def with_new_parents(  # noqa: D102
         self, new_parent_nodes: Sequence[DataflowPlanNode]
-    ) -> OffsetBaseGrainByCustomGrainNode:
-        assert len(new_parent_nodes) == 1
-        return OffsetBaseGrainByCustomGrainNode(
+    ) -> OffsetQueriedGrainByCustomGrainNode:
+        return OffsetQueriedGrainByCustomGrainNode(
             parent_nodes=tuple(new_parent_nodes),
-            time_spine_node=new_parent_nodes[0],
+            time_spine_nodes=tuple(new_parent_nodes),
             offset_window=self.offset_window,
             required_time_spine_specs=self.required_time_spine_specs,
         )

@@ -718,12 +718,13 @@ def test_offset_by_custom_granularity_node(  # noqa: D103
     dataflow_plan_builder: DataflowPlanBuilder,
     sql_client: SqlClient,
 ) -> None:
-    offset_base_grain_by_custom_grain_node = dataflow_plan_builder.build_custom_offset_time_spine_node(
+    offset_queried_grain_by_custom_grain_node = dataflow_plan_builder.build_custom_offset_time_spine_node(
         offset_window=PydanticMetricTimeWindow(count=3, granularity="alien_day"),
         required_time_spine_specs=(
             DataSet.metric_time_dimension_spec(ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH)),
         ),
         use_offset_custom_granularity_node=False,
+        required_time_spine_sources=(),
     )
 
     convert_and_check(
@@ -731,7 +732,35 @@ def test_offset_by_custom_granularity_node(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=offset_base_grain_by_custom_grain_node,
+        node=offset_queried_grain_by_custom_grain_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
+def test_offset_by_custom_granularity_node_with_smaller_grain(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    sql_client: SqlClient,
+) -> None:
+    time_spine_specs = (
+        DataSet.metric_time_dimension_spec(ExpandedTimeGranularity.from_time_granularity(TimeGranularity.HOUR)),
+    )
+    offset_queried_grain_by_custom_grain_node = dataflow_plan_builder.build_custom_offset_time_spine_node(
+        offset_window=PydanticMetricTimeWindow(count=5, granularity="alien_day"),
+        required_time_spine_specs=time_spine_specs,
+        use_offset_custom_granularity_node=False,
+        required_time_spine_sources=dataflow_plan_builder.choose_time_spine_sources(time_spine_specs),
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=offset_queried_grain_by_custom_grain_node,
     )
 
 
@@ -744,7 +773,7 @@ def test_offset_custom_granularity_node(  # noqa: D103
     dataflow_plan_builder: DataflowPlanBuilder,
     sql_client: SqlClient,
 ) -> None:
-    offset_base_grain_by_custom_grain_node = dataflow_plan_builder.build_custom_offset_time_spine_node(
+    offset_queried_grain_by_custom_grain_node = dataflow_plan_builder.build_custom_offset_time_spine_node(
         offset_window=PydanticMetricTimeWindow(count=3, granularity="alien_day"),
         required_time_spine_specs=(
             DataSet.metric_time_dimension_spec(
@@ -752,6 +781,7 @@ def test_offset_custom_granularity_node(  # noqa: D103
             ),
         ),
         use_offset_custom_granularity_node=True,
+        required_time_spine_sources=(),
     )
 
     convert_and_check(
@@ -759,7 +789,7 @@ def test_offset_custom_granularity_node(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=offset_base_grain_by_custom_grain_node,
+        node=offset_queried_grain_by_custom_grain_node,
     )
 
 

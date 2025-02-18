@@ -33,7 +33,7 @@ class OffsetCustomGranularityNode(DataflowPlanNode, ABC):
         if self.offset_window.is_standard_granularity:
             raise ValueError(
                 LazyFormat(
-                    "OffsetBaseGrainByCustomGrainNode should only be used for custom grain offset windows.",
+                    "OffsetQueriedGrainByCustomGrainNode should only be used for custom grain offset windows.",
                     offset_window=self.offset_window,
                 )
             )

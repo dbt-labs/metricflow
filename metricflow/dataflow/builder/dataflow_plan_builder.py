@@ -90,7 +90,7 @@ from metricflow.dataflow.nodes.join_to_custom_granularity import JoinToCustomGra
 from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataflow.nodes.min_max import MinMaxNode
-from metricflow.dataflow.nodes.offset_base_grain_by_custom_grain import OffsetBaseGrainByCustomGrainNode
+from metricflow.dataflow.nodes.offset_base_grain_by_custom_grain import OffsetQueriedGrainByCustomGrainNode
 from metricflow.dataflow.nodes.offset_custom_granularity import OffsetCustomGranularityNode
 from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
@@ -1627,11 +1627,16 @@ class DataflowPlanBuilder:
             if use_offset_custom_granularity_node
             else TimeDimensionSpec.with_base_grains(queried_agg_time_dimension_specs)
         )
-        join_spec_grain = (
-            self._get_base_grain_for_custom_grain(join_description.custom_offset_window.granularity)
-            if join_description.custom_offset_window
-            else measure_properties.agg_time_dimension_grain
-        )
+        join_spec_grain = measure_properties.agg_time_dimension_grain
+        if join_description.custom_offset_window:
+            join_spec_grain = self._get_base_grain_for_custom_grain(join_description.custom_offset_window.granularity)
+            if not use_offset_custom_granularity_node:
+                assert required_time_spine_specs, "No requred time spine specs found for time spine node"
+                smallest_agg_time_grain = sorted(
+                    required_time_spine_specs, key=lambda spec: spec.base_granularity_sort_key
+                )[0].base_granularity
+                if smallest_agg_time_grain and smallest_agg_time_grain.to_int() < join_spec_grain.to_int():
+                    join_spec_grain = smallest_agg_time_grain
         join_on_time_dimension_spec = self._determine_time_spine_join_spec(
             join_spec_grain=join_spec_grain,
             required_time_spine_specs=required_time_spine_specs,
@@ -1931,7 +1936,7 @@ class DataflowPlanBuilder:
             queried_time_dimension_spec=queried_time_dimension_spec,
         )
 
-    def _choose_time_spine_sources(
+    def choose_time_spine_sources(
         self, required_time_spine_specs: Sequence[TimeDimensionSpec]
     ) -> Tuple[TimeSpineSource, ...]:
         """Choose the time spine source that can satisfy the required time spine specs."""
@@ -1944,7 +1949,7 @@ class DataflowPlanBuilder:
         self, required_time_spine_specs: Sequence[TimeDimensionSpec]
     ) -> Tuple[MetricTimeDimensionTransformNode, ...]:
         """Return the MetricTimeDimensionTransform time spine node needed to satisfy the specs."""
-        time_spine_sources = self._choose_time_spine_sources(required_time_spine_specs)
+        time_spine_sources = self.choose_time_spine_sources(required_time_spine_specs)
         return tuple(
             self._source_node_set.time_spine_metric_time_nodes[time_spine_source.base_granularity]
             for time_spine_source in time_spine_sources
@@ -1975,6 +1980,8 @@ class DataflowPlanBuilder:
                 if time_dimension_spec not in required_specs:
                     required_specs += (time_dimension_spec,)
 
+        time_spine_sources = self.choose_time_spine_sources(required_specs)
+
         should_dedupe = False
         custom_grain_specs_to_join: Tuple[TimeDimensionSpec, ...] = ()
         if custom_offset_window:
@@ -1982,12 +1989,12 @@ class DataflowPlanBuilder:
                 offset_window=custom_offset_window,
                 required_time_spine_specs=required_specs,
                 use_offset_custom_granularity_node=use_offset_custom_granularity_node,
+                required_time_spine_sources=time_spine_sources,
             )
             filter_to_specs = self._node_data_set_resolver.get_output_data_set(
                 time_spine_node
             ).instance_set.spec_set.time_dimension_specs
         else:
-            time_spine_sources = self._choose_time_spine_sources(required_specs)
             smallest_time_spine_source = time_spine_sources[0]  # these are already sorted by base grain
             read_node = self._choose_time_spine_read_node(smallest_time_spine_source)
 
@@ -1999,7 +2006,9 @@ class DataflowPlanBuilder:
                     and spec.time_granularity_name not in smallest_time_spine_source.custom_grain_names
                 ):
                     custom_grain_specs_to_join += (spec,)
-                    updated_required_specs += (spec.with_base_grain(),)
+                    base_grain_spec = spec.with_base_grain()
+                    if base_grain_spec not in required_specs:  # dedupe
+                        updated_required_specs += (base_grain_spec,)
                 else:
                     updated_required_specs += (spec,)
 
@@ -2033,7 +2042,7 @@ class DataflowPlanBuilder:
 
     def _get_time_spine_read_node_for_custom_grain(self, custom_grain: str) -> ReadSqlSourceNode:
         """Return the read node for the custom grain."""
-        time_spine_sources = self._choose_time_spine_sources(
+        time_spine_sources = self.choose_time_spine_sources(
             (DataSet.metric_time_dimension_spec(self._semantic_model_lookup.custom_granularities[custom_grain]),)
         )
         time_spine_source = time_spine_sources[0]
@@ -2044,18 +2053,23 @@ class DataflowPlanBuilder:
         offset_window: MetricTimeWindow,
         required_time_spine_specs: Tuple[TimeDimensionSpec, ...],
         use_offset_custom_granularity_node: bool,
+        required_time_spine_sources: Tuple[TimeSpineSource, ...],
     ) -> DataflowPlanNode:
         """Builds an OffsetByCustomGranularityNode used for custom offset windows."""
-        time_spine_read_node = self._get_time_spine_read_node_for_custom_grain(offset_window.granularity)
+        custom_time_spine_read_node = self._get_time_spine_read_node_for_custom_grain(offset_window.granularity)
         if use_offset_custom_granularity_node:
             return OffsetCustomGranularityNode.create(
-                time_spine_node=time_spine_read_node,
+                time_spine_node=custom_time_spine_read_node,
                 offset_window=offset_window,
                 required_time_spine_specs=required_time_spine_specs,
             )
 
-        return OffsetBaseGrainByCustomGrainNode.create(
-            time_spine_node=time_spine_read_node,
+        # Get all required time spine nodes. Dedupe using a dict to retain order.
+        time_spine_read_nodes = {custom_time_spine_read_node: None}
+        for time_spine_source in required_time_spine_sources:
+            time_spine_read_nodes[self._choose_time_spine_read_node(time_spine_source)] = None
+        return OffsetQueriedGrainByCustomGrainNode.create(
+            time_spine_nodes=tuple(time_spine_read_nodes.keys()),
             offset_window=offset_window,
             required_time_spine_specs=required_time_spine_specs,
         )
