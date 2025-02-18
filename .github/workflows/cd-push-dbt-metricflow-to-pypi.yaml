@@ -6,9 +6,6 @@ on:
     tags:
       - "dbt-metricflow/v[0-9]+.[0-9]+.[0-9]+*"
 
-env:
-  PYTHON_VERSION: "3.8"
-
 jobs:
   pypi-publish:
     runs-on: ubuntu-latest
@@ -21,10 +18,7 @@ jobs:
       - name: Check-out the repo
         uses: actions/checkout@v4
 
-      - name: Setup Python ${{ env.PYTHON_VERSION }} Environment
-        uses: ./.github/actions/setup-python-env
-        with:
-          python-version: "${{ env.PYTHON_VERSION }}"
+      - uses: ./.github/actions/setup-python-env
 
       - name: Build `dbt-metricflow` package
         working-directory: ./dbt-metricflow

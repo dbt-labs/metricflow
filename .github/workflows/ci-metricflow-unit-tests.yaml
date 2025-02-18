@@ -19,8 +19,7 @@ jobs:
       - name: Check-out the repo
         uses: actions/checkout@v4
 
-      - name: Test w/ Python ${{ matrix.python-version }}
-        uses: ./.github/actions/run-mf-tests
+      - uses: ./.github/actions/run-mf-tests
         with:
           python-version: ${{ matrix.python-version }}
           make-target: "test-include-slow"
@@ -47,10 +46,8 @@ jobs:
       - name: Check-out the repo
         uses: actions/checkout@v4
 
-      - name: Test w/ Python 3.12
-        uses: ./.github/actions/run-mf-tests
+      - uses: ./.github/actions/run-mf-tests
         with:
-          python-version: "3.12"
           make-target: "test-postgresql"
           hatch-environment-cache-config-json: >-
             {
