@@ -121,10 +121,10 @@ class SqlMapRequiredColumnAliasesVisitor(SqlPlanNodeVisitor[None]):
             parent_node.accept(self)
         return
 
-    def _tag_potential_cte_node(
+    def _map_required_column_aliases_in_potential_cte(
         self, cte_alias_mapping: SqlCteAliasMapping, table_name: str, column_aliases: Set[str]
     ) -> None:
-        """A reference to a SQL table might be a CTE. If so, tag the appropriate aliases in the CTEs."""
+        """A reference to a SQL table might be a CTE. If so, map the required column aliases in the CTEs."""
         cte_node = cte_alias_mapping.get_cte_node_for_alias(table_name)
 
         if cte_node is not None:
@@ -215,7 +215,7 @@ class SqlMapRequiredColumnAliasesVisitor(SqlPlanNodeVisitor[None]):
             )
             from_source_as_sql_table_node = node.from_source.as_sql_table_node
             if from_source_as_sql_table_node is not None:
-                self._tag_potential_cte_node(
+                self._map_required_column_aliases_in_potential_cte(
                     cte_alias_mapping=cte_alias_mapping,
                     table_name=from_source_as_sql_table_node.sql_table.table_name,
                     column_aliases=aliases_required_in_parent,
@@ -228,7 +228,7 @@ class SqlMapRequiredColumnAliasesVisitor(SqlPlanNodeVisitor[None]):
                 )
                 right_source_as_sql_table_node = join_desc.right_source.as_sql_table_node
                 if right_source_as_sql_table_node is not None:
-                    self._tag_potential_cte_node(
+                    self._map_required_column_aliases_in_potential_cte(
                         cte_alias_mapping=cte_alias_mapping,
                         table_name=right_source_as_sql_table_node.sql_table.table_name,
                         column_aliases=aliases_required_in_parent,
