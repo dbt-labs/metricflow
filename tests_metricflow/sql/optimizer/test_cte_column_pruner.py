@@ -10,6 +10,7 @@ from metricflow_semantics.sql.sql_exprs import (
     SqlColumnReferenceExpression,
     SqlComparison,
     SqlComparisonExpression,
+    SqlStringExpression,
 )
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.sql.sql_table import SqlTable
@@ -463,4 +464,112 @@ def test_common_cte_aliases_in_nested_query(
             in `from_sub_query` but remove the column from the CTE defined in `top_level_select`.
             """
         ),
+    )
+
+
+def test_string_expression(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    column_pruner: SqlColumnPrunerOptimizer,
+    sql_plan_renderer: DefaultSqlPlanRenderer,
+) -> None:
+    """Test a string expression that references a column in the cte."""
+    select_statement = SqlSelectStatementNode.create(
+        description="Top-level SELECT",
+        select_columns=(
+            SqlSelectColumn(
+                expr=SqlStringExpression.create(sql_expr="cte_source_0__col_0", used_columns=("cte_source_0__col_0",)),
+                column_alias="top_level__col_0",
+            ),
+        ),
+        from_source=SqlTableNode.create(sql_table=SqlTable(schema_name=None, table_name="cte_source_0")),
+        from_source_alias="cte_source_0_alias",
+        cte_sources=(
+            SqlCteNode.create(
+                cte_alias="cte_source_0",
+                select_statement=SqlSelectStatementNode.create(
+                    description="CTE source 0",
+                    select_columns=(
+                        SqlSelectColumn(
+                            expr=SqlColumnReferenceExpression.create(
+                                col_ref=SqlColumnReference(table_alias="test_table_alias", column_name="col_0")
+                            ),
+                            column_alias="cte_source_0__col_0",
+                        ),
+                        SqlSelectColumn(
+                            expr=SqlColumnReferenceExpression.create(
+                                col_ref=SqlColumnReference(table_alias="test_table_alias", column_name="col_0")
+                            ),
+                            column_alias="cte_source_0__col_1",
+                        ),
+                    ),
+                    from_source=SqlTableNode.create(
+                        sql_table=SqlTable(schema_name="test_schema", table_name="test_table")
+                    ),
+                    from_source_alias="test_table_alias",
+                ),
+            ),
+        ),
+    )
+    assert_optimizer_result_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        optimizer=column_pruner,
+        sql_plan_renderer=sql_plan_renderer,
+        select_statement=select_statement,
+        expectation_description="`cte_source_0__col_01` should be retained in the CTE.",
+    )
+
+
+def test_column_reference_expression(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    column_pruner: SqlColumnPrunerOptimizer,
+    sql_plan_renderer: DefaultSqlPlanRenderer,
+) -> None:
+    """Test a column reference expression that does not specify a table alias."""
+    select_statement = SqlSelectStatementNode.create(
+        description="Top-level SELECT",
+        select_columns=(
+            SqlSelectColumn(
+                expr=SqlStringExpression.create(sql_expr="cte_source_0__col_0", used_columns=("cte_source_0__col_0",)),
+                column_alias="top_level__col_0",
+            ),
+        ),
+        from_source=SqlTableNode.create(sql_table=SqlTable(schema_name=None, table_name="cte_source_0")),
+        from_source_alias="cte_source_0_alias",
+        cte_sources=(
+            SqlCteNode.create(
+                cte_alias="cte_source_0",
+                select_statement=SqlSelectStatementNode.create(
+                    description="CTE source 0",
+                    select_columns=(
+                        SqlSelectColumn(
+                            expr=SqlColumnReferenceExpression.create(
+                                col_ref=SqlColumnReference(table_alias="test_table_alias", column_name="col_0")
+                            ),
+                            column_alias="cte_source_0__col_0",
+                        ),
+                        SqlSelectColumn(
+                            expr=SqlColumnReferenceExpression.create(
+                                col_ref=SqlColumnReference(table_alias="test_table_alias", column_name="col_0")
+                            ),
+                            column_alias="cte_source_0__col_1",
+                        ),
+                    ),
+                    from_source=SqlTableNode.create(
+                        sql_table=SqlTable(schema_name="test_schema", table_name="test_table")
+                    ),
+                    from_source_alias="test_table_alias",
+                ),
+            ),
+        ),
+    )
+    assert_optimizer_result_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        optimizer=column_pruner,
+        sql_plan_renderer=sql_plan_renderer,
+        select_statement=select_statement,
+        expectation_description="`cte_source_0__col_01` should be retained in the CTE.",
     )
