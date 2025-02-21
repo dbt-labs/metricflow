@@ -1,0 +1,17 @@
+test_name: test_explain
+test_filename: test_cli_quiet.py
+docstring:
+  Test that the `--quiet` flag only shows the SQL when explaining a query.
+---
+SELECT
+  metric_time__day
+  , SUM(bookings) AS bookings
+FROM (
+  SELECT
+    DATE_TRUNC('day', ds) AS metric_time__day
+    , 1 AS bookings
+  FROM ***************************.fct_bookings bookings_source_src_10000
+) subq_2
+GROUP BY
+  metric_time__day
+ORDER BY metric_time__day
