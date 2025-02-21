@@ -113,6 +113,12 @@ def tutorial(ctx: click.core.Context, cfg: CLIConfiguration, message: bool, clea
     dbtMetricFlowTutorialHelper.run_tutorial(cfg=cfg, message=message, clean=clean, yes=yes)
 
 
+def _click_echo(message: str, quiet: bool) -> None:
+    """Helper method to call echo depending on whether `quiet` is set."""
+    if not quiet:
+        click.echo(message)
+
+
 @cli.command()
 @query_options
 @click.option(
@@ -158,6 +164,12 @@ def tutorial(ctx: click.core.Context, cfg: CLIConfiguration, message: bool, clea
     required=False,
     help="Specify the name of the saved query to use for applicable parameters",
 )
+@click.option(
+    "--quiet",
+    required=False,
+    help="Minimize output to the console.",
+    is_flag=True,
+)
 @pass_config
 @exception_handler
 @error_if_not_in_dbt_project
@@ -178,12 +190,16 @@ def query(
     decimals: int = DEFAULT_RESULT_DECIMAL_PLACES,
     show_sql_descriptions: bool = False,
     saved_query: Optional[str] = None,
+    quiet: bool = False,
 ) -> None:
     """Create a new query with MetricFlow and assembles a MetricFlowQueryResult."""
     cfg.setup()
     start = time.time()
-    spinner = Halo(text="Initiating query…", spinner="dots")
-    spinner.start()
+    spinner: Optional[Halo] = None
+    if not quiet:
+        spinner = Halo(text="Initiating query…", spinner="dots")
+        spinner.start()
+
     mf_request = MetricFlowQueryRequest.create_with_random_request_id(
         saved_query_name=saved_query,
         metric_names=metrics,
@@ -203,7 +219,8 @@ def query(
     else:
         query_result = cfg.mf.query(mf_request=mf_request)
 
-    spinner.succeed(f"Success 🦄 - query completed after {time.time() - start:.2f} seconds")
+    if spinner is not None:
+        spinner.succeed(f"Success 🦄 - query completed after {time.time() - start:.2f} seconds")
 
     if explain:
         assert explain_result
@@ -213,7 +230,7 @@ def query(
             else explain_result.sql_statement.sql
         )
         if show_dataflow_plan:
-            click.echo("🔎 Generated Dataflow Plan + SQL (remove --explain to see data):")
+            _click_echo("🔎 Generated Dataflow Plan + SQL (remove --explain to see data):", quiet=quiet)
             click.echo(
                 textwrap.indent(
                     jinja2.Template(
@@ -230,16 +247,17 @@ def query(
             )
             click.echo("")
         else:
-            click.echo(
+            _click_echo(
                 "🔎 SQL (remove --explain to see data or add --show-dataflow-plan to see the generated dataflow plan):"
-                "\n"
+                "\n",
+                quiet=quiet,
             )
         click.echo(sql)
         if display_plans:
-            click.echo("Creating temporary directory for storing visualization output.")
+            _click_echo("Creating temporary directory for storing visualization output.", quiet=quiet)
             temp_path = tempfile.mkdtemp()
             svg_path = display_dag_as_svg(explain_result.dataflow_plan, temp_path)
-            click.echo("")
+            _click_echo("", quiet=quiet)
             click.echo(f"Plan SVG saved to: {svg_path}")
         exit()
 
@@ -248,14 +266,14 @@ def query(
     # Show the data if returned successfully
     if df is not None:
         if df.row_count == 0:
-            click.echo("🕳 Successful MQL query returned an empty result set.")
+            _click_echo("🕳 Successful MQL query returned an empty result set.", quiet=quiet)
         elif csv is not None:
             # csv is a LazyFile that is file-like that works in this case.
             csv_writer = csv_module.writer(csv)
             csv_writer.writerow(df.column_names)
             for row in df.rows:
                 csv_writer.writerow(row)
-            click.echo(f"🖨 Successfully written query output to {csv.name}")
+            _click_echo(f"🖨 Successfully written query output to {csv.name}", quiet=quiet)
         else:
             click.echo(df.text_format(decimals))
         if display_plans:
