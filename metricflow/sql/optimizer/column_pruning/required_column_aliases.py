@@ -121,10 +121,10 @@ class SqlMapRequiredColumnAliasesVisitor(SqlPlanNodeVisitor[None]):
             parent_node.accept(self)
         return
 
-    def _tag_potential_cte_node(
+    def _map_required_column_aliases_in_potential_cte(
         self, cte_alias_mapping: SqlCteAliasMapping, table_name: str, column_aliases: Set[str]
     ) -> None:
-        """A reference to a SQL table might be a CTE. If so, tag the appropriate aliases in the CTEs."""
+        """A reference to a SQL table might be a CTE. If so, map the required column aliases in the CTEs."""
         cte_node = cte_alias_mapping.get_cte_node_for_alias(table_name)
 
         if cte_node is not None:
@@ -215,7 +215,7 @@ class SqlMapRequiredColumnAliasesVisitor(SqlPlanNodeVisitor[None]):
             )
             from_source_as_sql_table_node = node.from_source.as_sql_table_node
             if from_source_as_sql_table_node is not None:
-                self._tag_potential_cte_node(
+                self._map_required_column_aliases_in_potential_cte(
                     cte_alias_mapping=cte_alias_mapping,
                     table_name=from_source_as_sql_table_node.sql_table.table_name,
                     column_aliases=aliases_required_in_parent,
@@ -228,7 +228,7 @@ class SqlMapRequiredColumnAliasesVisitor(SqlPlanNodeVisitor[None]):
                 )
                 right_source_as_sql_table_node = join_desc.right_source.as_sql_table_node
                 if right_source_as_sql_table_node is not None:
-                    self._tag_potential_cte_node(
+                    self._map_required_column_aliases_in_potential_cte(
                         cte_alias_mapping=cte_alias_mapping,
                         table_name=right_source_as_sql_table_node.sql_table.table_name,
                         column_aliases=aliases_required_in_parent,
@@ -239,10 +239,10 @@ class SqlMapRequiredColumnAliasesVisitor(SqlPlanNodeVisitor[None]):
         for string_expr in exprs_used_in_this_node.string_exprs:
             if string_expr.used_columns:
                 for column_alias in string_expr.used_columns:
-                    for node_to_retain_all_columns in (node.from_source,) + tuple(
+                    for node_to_retain_columns in (node.from_source,) + tuple(
                         join_desc.right_source for join_desc in node.join_descs
                     ):
-                        self._current_required_column_alias_mapping.add_alias(node_to_retain_all_columns, column_alias)
+                        self._current_required_column_alias_mapping.add_alias(node_to_retain_columns, column_alias)
 
         # Same with unqualified column references - it's hard to tell which source it came from, so it's safest to say
         # it's required from all parents.
@@ -250,10 +250,10 @@ class SqlMapRequiredColumnAliasesVisitor(SqlPlanNodeVisitor[None]):
         # expression is like `SELECT table_0.col_0`.
         for unqualified_column_reference_expr in exprs_used_in_this_node.column_alias_reference_exprs:
             column_alias = unqualified_column_reference_expr.column_alias
-            for node_to_retain_all_columns in (node.from_source,) + tuple(
+            for node_to_retain_columns in (node.from_source,) + tuple(
                 join_desc.right_source for join_desc in node.join_descs
             ):
-                self._current_required_column_alias_mapping.add_alias(node_to_retain_all_columns, column_alias)
+                self._current_required_column_alias_mapping.add_alias(node_to_retain_columns, column_alias)
 
         # Visit recursively.
         self._visit_parents(node)
