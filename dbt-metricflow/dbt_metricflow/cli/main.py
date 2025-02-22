@@ -266,14 +266,14 @@ def query(
     # Show the data if returned successfully
     if df is not None:
         if df.row_count == 0:
-            _click_echo("🕳 Successful MQL query returned an empty result set.", quiet=quiet)
+            _click_echo("🕳 Query returned an empty result set", quiet=quiet)
         elif csv is not None:
             # csv is a LazyFile that is file-like that works in this case.
             csv_writer = csv_module.writer(csv)
             csv_writer.writerow(df.column_names)
             for row in df.rows:
                 csv_writer.writerow(row)
-            _click_echo(f"🖨 Successfully written query output to {csv.name}", quiet=quiet)
+            _click_echo(f"🖨 Wrote query output to {csv.name}", quiet=quiet)
         else:
             click.echo(df.text_format(decimals))
         if display_plans:
