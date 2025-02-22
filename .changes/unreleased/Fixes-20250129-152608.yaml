@@ -1,6 +1,0 @@
-kind: Fixes
-body: Update mf tutorial flow to always create / use the sample dbt project.
-time: 2025-01-29T15:26:08.261521-08:00
-custom:
-  Author: plypaul
-  Issue: "1651"
