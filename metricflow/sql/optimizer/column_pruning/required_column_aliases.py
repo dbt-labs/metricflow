@@ -252,6 +252,13 @@ class SqlMapRequiredColumnAliasesVisitor(SqlPlanNodeVisitor[None]):
             join_desc.right_source for join_desc in node.join_descs
         ):
             self._current_required_column_alias_mapping.add_aliases(node_to_retain_columns, column_aliases_to_retain)
+            sql_table_node = node_to_retain_columns.as_sql_table_node
+            if sql_table_node is not None and sql_table_node.sql_table.schema_name is None:
+                self._map_required_column_aliases_in_potential_cte(
+                    cte_alias_mapping=cte_alias_mapping,
+                    table_name=sql_table_node.sql_table.table_name,
+                    column_aliases=column_aliases_to_retain,
+                )
 
         # Visit recursively.
         self._visit_parents(node)

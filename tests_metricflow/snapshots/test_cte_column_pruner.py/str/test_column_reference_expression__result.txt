@@ -1,0 +1,36 @@
+test_name: test_column_reference_expression
+test_filename: test_cte_column_pruner.py
+docstring:
+  Test a column reference expression that does not specify a table alias.
+expectation_description:
+  `cte_source_0__col_01` should be retained in the CTE.
+---
+optimizer:
+  SqlColumnPrunerOptimizer
+
+sql_before_optimizing:
+  -- Top-level SELECT
+  WITH cte_source_0 AS (
+    -- CTE source 0
+    SELECT
+      test_table_alias.col_0 AS cte_source_0__col_0
+      , test_table_alias.col_0 AS cte_source_0__col_1
+    FROM test_schema.test_table test_table_alias
+  )
+
+  SELECT
+    cte_source_0__col_0 AS top_level__col_0
+  FROM cte_source_0 cte_source_0_alias
+
+sql_after_optimizing:
+  -- Top-level SELECT
+  WITH cte_source_0 AS (
+    -- CTE source 0
+    SELECT
+      test_table_alias.col_0 AS cte_source_0__col_0
+    FROM test_schema.test_table test_table_alias
+  )
+
+  SELECT
+    cte_source_0__col_0 AS top_level__col_0
+  FROM cte_source_0 cte_source_0_alias
