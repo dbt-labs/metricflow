@@ -112,8 +112,15 @@ if __name__ == "__main__":
     )
 
     # Test building the `dbt-metricflow` package.
-    _run_package_build_test(
-        package_directory=metricflow_repo_directory.joinpath("dbt-metricflow"),
-        package_test_script=metricflow_repo_directory.joinpath("scripts/ci_tests/dbt_metricflow_package_test.py"),
-        optional_package_dependencies_to_install=("dbt-duckdb",),
-    )
+    # TODO: Re-enable once `metricflow==0.207.2` is published.
+    # This is because the `dbt-metricflow` package specifies a published version of `metricflow` as a dependency, so a
+    # a change that affects both `metricflow` and `dbt-metricflow` requires the following steps:
+    # * Publish a new version of `metricflow`
+    # * Update the dependency in `dbt-metricflow` to the new version.
+    # * Re-enable this test.
+    # * Publish a new version of `dbt-metricflow`.
+    # _run_package_build_test(
+    #     package_directory=metricflow_repo_directory.joinpath("dbt-metricflow"),
+    #     package_test_script=metricflow_repo_directory.joinpath("scripts/ci_tests/dbt_metricflow_package_test.py"),
+    #     optional_package_dependencies_to_install=("dbt-duckdb",),
+    # )
