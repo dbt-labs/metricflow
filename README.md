@@ -91,6 +91,7 @@ This project will be a place where people can easily contribute high-quality upd
 
 Please read our [code of conduct](https://docs.getdbt.com/community/resources/code-of-conduct) before diving in.
 
+
 To get started on direct contributions, head on over to our [contributor guide](https://github.com/dbt-labs/metricflow/blob/main/CONTRIBUTING.md).
 
 ## License
