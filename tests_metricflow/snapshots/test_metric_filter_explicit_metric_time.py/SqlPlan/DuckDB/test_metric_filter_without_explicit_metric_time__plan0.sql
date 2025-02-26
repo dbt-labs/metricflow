@@ -2,7 +2,7 @@ test_name: test_metric_filter_without_explicit_metric_time
 test_filename: test_metric_filter_explicit_metric_time.py
 docstring:
   Tests a query with a metric filter that does not include metric_time in its group_by list.
-    
+
       This test verifies that time granularity inheritance does not happen when metric_time is not
       explicitly included in the filter's group_by list, even if the parent query has a time granularity.
 sql_engine: DuckDB

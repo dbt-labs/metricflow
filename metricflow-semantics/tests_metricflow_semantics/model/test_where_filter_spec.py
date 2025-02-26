@@ -621,13 +621,14 @@ def test_metric_in_filter(  # noqa: D103
         group_by_metric_specs=(group_by_metric_spec,),
     )
 
+
 def test_metric_in_filter_with_metric_time(  # noqa: D103
     column_association_resolver: ColumnAssociationResolver,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
-    """
-    Verifies that using metric_time alongside another group_by key (e.g. listing)
-    in a Metric filter works as expected.
+    """Verifies that using metric_time alongside another group_by key (e.g. listing).
+
+    This test ensures the filter works as expected when using multiple group_by items.
     """
     # This time, we want to test that 'metric_time' is allowed in the group_by array:
     where_filter = PydanticWhereFilter(
@@ -670,9 +671,7 @@ def test_metric_in_filter_with_metric_time(  # noqa: D103
                         ),
                     ): (
                         LinkableMetric.create(
-                            properties=frozenset(
-                                {LinkableElementProperty.METRIC, LinkableElementProperty.JOINED}
-                            ),
+                            properties=frozenset({LinkableElementProperty.METRIC, LinkableElementProperty.JOINED}),
                             join_path=SemanticModelToMetricSubqueryJoinPath(
                                 metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
                                     metric_reference=MetricReference("bookings"),
@@ -706,7 +705,6 @@ def test_metric_in_filter_with_metric_time(  # noqa: D103
         entity_specs=(),
         group_by_metric_specs=(group_by_metric_spec,),
     )
-
 
 
 def test_dimension_time_dimension_parity(  # noqa: D103

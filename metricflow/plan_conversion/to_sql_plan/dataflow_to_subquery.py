@@ -33,6 +33,7 @@ from metricflow_semantics.specs.measure_spec import MeasureSpec
 from metricflow_semantics.specs.metadata_spec import MetadataSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
+from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.sql.sql_exprs import (
     SqlAddTimeExpression,
@@ -873,7 +874,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             ),
         )
 
-    def _render_where_constraint_expr(self, where_filter: WhereFilterSpec, parent_time_dimension_spec=None) -> SqlStringExpression:
+    def _render_where_constraint_expr(
+        self, where_filter: WhereFilterSpec, parent_time_dimension_spec: Optional[TimeDimensionSpec] = None
+    ) -> SqlStringExpression:
         """Build SqlStringExpression from WhereFilterSpec."""
         column_associations_in_where_sql = CreateColumnAssociations(
             column_association_resolver=self._column_association_resolver

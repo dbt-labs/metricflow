@@ -80,20 +80,32 @@ class WhereFilterMetric(ProtocolHint[QueryInterfaceMetric]):
         resolved_spec = self._resolved_spec_lookup.checked_resolved_spec(resolved_spec_key)
         resolved_elements = self._resolved_spec_lookup.checked_resolved_linkable_elements(resolved_spec_key)
         self._rendered_spec_tracker.record_rendered_spec_to_elements_mapping((resolved_spec, resolved_elements))
-        
+
         # Time granularity inheritance only happens when:
         # 1. 'metric_time' is EXPLICITLY included in the filter's group_by list
         # 2. We have a parent time dimension spec with a time granularity
         # 3. The resolved spec is a GroupByMetricSpec
         if (
-            has_metric_time 
-            and self._parent_time_dimension_spec is not None 
+            has_metric_time
+            and self._parent_time_dimension_spec is not None
             and isinstance(resolved_spec, GroupByMetricSpec)
         ):
             # Create a new spec with the parent time granularity
             # The SQL rendering will use this column name which includes the time granularity
+            # Convert ExpandedTimeGranularity to TimeGranularity if needed
+            from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+
+            time_granularity: Optional[TimeGranularity] = None
+            if self._parent_time_dimension_spec and self._parent_time_dimension_spec.time_granularity:
+                if hasattr(self._parent_time_dimension_spec.time_granularity, "base_granularity"):
+                    # If it's an ExpandedTimeGranularity, extract the base_granularity (TimeGranularity)
+                    time_granularity = self._parent_time_dimension_spec.time_granularity.base_granularity
+                elif isinstance(self._parent_time_dimension_spec.time_granularity, TimeGranularity):
+                    # If it's already a TimeGranularity, use it directly
+                    time_granularity = self._parent_time_dimension_spec.time_granularity
+
             column_association = self._column_association_resolver.resolve_spec(
-                resolved_spec.with_time_granularity(self._parent_time_dimension_spec.time_granularity)
+                resolved_spec.with_time_granularity(time_granularity)
             )
         else:
             # If 'metric_time' is not in the group_by list, or we don't have a parent time dimension spec,

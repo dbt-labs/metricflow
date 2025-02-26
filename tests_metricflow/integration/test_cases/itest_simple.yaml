@@ -7,8 +7,8 @@ integration_test:
   group_bys: ["booking__is_instant"]
   check_query: |
     SELECT
-      SUM(booking_value) AS booking_value
-      , is_instant AS booking__is_instant
+      SUM(booking_value) AS booking_value,
+      is_instant AS booking__is_instant
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       is_instant

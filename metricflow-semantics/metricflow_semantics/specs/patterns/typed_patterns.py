@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+# ruff: noqa: D205
 from dataclasses import dataclass
 from typing import Optional, Sequence, Tuple
 
@@ -39,9 +40,14 @@ class DimensionPattern(EntityLinkPattern):
         return super().match(filtered_specs)
 
     @staticmethod
-    def from_call_parameter_set(  # noqa: D102
+    def from_call_parameter_set(
         dimension_call_parameter_set: DimensionCallParameterSet,
     ) -> DimensionPattern:
+        """Create a DimensionPattern from a DimensionCallParameterSet.
+
+        Args:
+            dimension_call_parameter_set: The parameter set to create the pattern from.
+        """
         return DimensionPattern(
             parameter_set=SpecPatternParameterSet.from_parameters(
                 fields_to_compare=(
@@ -97,6 +103,9 @@ class TimeDimensionPattern(EntityLinkPattern):
     ) -> TimeDimensionPattern:
         """Create the pattern that represents 'TimeDimension(...)' in the object builder naming scheme.
 
+        Args:
+            time_dimension_call_parameter_set: The parameter set to create the pattern from.
+
         For this pattern, A None value for the time grain matches any grain. However, a None value for the date part
         means that the date part has to be None. This follows the interface defined by the object builder naming scheme.
         """
@@ -134,7 +143,12 @@ class EntityPattern(EntityLinkPattern):
         return super().match(spec_set.entity_specs)
 
     @staticmethod
-    def from_call_parameter_set(entity_call_parameter_set: EntityCallParameterSet) -> EntityPattern:  # noqa: D102
+    def from_call_parameter_set(entity_call_parameter_set: EntityCallParameterSet) -> EntityPattern:  # noqa: D205
+        """Create an EntityPattern from an EntityCallParameterSet.
+
+        Args:
+            entity_call_parameter_set: The parameter set to create the pattern from.
+        """
         return EntityPattern(
             parameter_set=SpecPatternParameterSet.from_parameters(
                 fields_to_compare=(
@@ -163,8 +177,7 @@ class GroupByMetricPattern(EntityLinkPattern):
 
     @staticmethod
     def from_call_parameter_set(metric_call_parameter_set: MetricCallParameterSet) -> GroupByMetricPattern:
-        """
-        Builds a GroupByMetricPattern that can handle multiple group_by items, including the special case
+        """Builds a GroupByMetricPattern that can handle multiple group_by items, including the special case
         of 'metric_time' (treated as a time dimension / virtual dimension for the metric).
 
         Implementation notes:
@@ -200,12 +213,10 @@ class GroupByMetricPattern(EntityLinkPattern):
         # Convert each item in group_by to something we can store in metric_subquery_entity_links.
         # We'll parse them via StructuredLinkableSpecName (handles "listing__user" style references)
         # but treat "metric_time" specially if found.
-        has_metric_time = False
         for group_by_ref in all_group_by_refs:
             if group_by_ref.element_name == "metric_time":
                 # For minimal changes, store 'metric_time' as an entity reference with no link names.
                 metric_subquery_entity_links_list.append(EntityReference("metric_time"))
-                has_metric_time = True
             else:
                 structured_name = StructuredLinkableSpecName.from_name(
                     qualified_name=group_by_ref.element_name,
@@ -219,15 +230,14 @@ class GroupByMetricPattern(EntityLinkPattern):
 
         # The last item in metric_subquery_entity_links_list is used as the top-level entity link
         # for the outer metric reference. This is the same behavior as prior to multi-group-by support.
+        final_entity_links = tuple()  # type: Tuple[EntityReference, ...]
         if metric_subquery_entity_links_list:
-            entity_links = (metric_subquery_entity_links_list[-1],)
-        else:
-            entity_links = ()
+            final_entity_links = (metric_subquery_entity_links_list[-1],)
 
         # Note: The actual time granularity inheritance happens during query execution.
         # This pattern just identifies that metric_time is included in the group_by,
         # and the query execution logic will apply the appropriate time granularity.
-        
+
         return GroupByMetricPattern(
             parameter_set=SpecPatternParameterSet.from_parameters(
                 fields_to_compare=(
@@ -236,7 +246,7 @@ class GroupByMetricPattern(EntityLinkPattern):
                     ParameterSetField.METRIC_SUBQUERY_ENTITY_LINKS,
                 ),
                 element_name=metric_call_parameter_set.metric_reference.element_name,
-                entity_links=entity_links,
+                entity_links=final_entity_links,
                 metric_subquery_entity_links=tuple(metric_subquery_entity_links_list),
             )
         )

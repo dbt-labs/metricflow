@@ -24,11 +24,6 @@ from metricflow_semantics.specs.query_param_implementations import (
     OrderByParameter,
     TimeDimensionParameter,
 )
-from metricflow_semantics.specs.patterns.entity_link_pattern import (
-    EntityLinkPattern,
-    SpecPatternParameterSet,
-    ParameterSetField,
-)
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.example_project_configuration import (
     EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE,

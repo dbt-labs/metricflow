@@ -2,7 +2,7 @@ test_name: test_metric_filter_with_different_time_granularity
 test_filename: test_metric_filter_explicit_metric_time.py
 docstring:
   Tests a query with a metric filter where the parent query has a different time granularity.
-    
+
       This test verifies that the parent query's time granularity is respected even when the filter
       doesn't explicitly include metric_time in its group_by list.
 sql_engine: DuckDB

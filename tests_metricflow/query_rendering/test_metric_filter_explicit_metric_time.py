@@ -27,7 +27,7 @@ def test_metric_filter_without_explicit_metric_time(
     query_parser: MetricFlowQueryParser,
 ) -> None:
     """Tests a query with a metric filter that does not include metric_time in its group_by list.
-    
+
     This test verifies that time granularity inheritance does not happen when metric_time is not
     explicitly included in the filter's group_by list, even if the parent query has a time granularity.
     """
@@ -63,7 +63,7 @@ def test_metric_filter_with_different_time_granularity(
     query_parser: MetricFlowQueryParser,
 ) -> None:
     """Tests a query with a metric filter where the parent query has a different time granularity.
-    
+
     This test verifies that the parent query's time granularity is respected even when the filter
     doesn't explicitly include metric_time in its group_by list.
     """
