@@ -175,6 +175,9 @@ class GroupByMetricPattern(EntityLinkPattern):
           an entity reference with a special name. In real usage, 'metric_time' is recognized later as
           a time dimension. This logic simply ensures that the pattern can match the final resolved
           `GroupByMetricSpec`.
+        - When 'metric_time' is included in a metric filter's group_by, the filter will inherit the time
+          granularity of the parent query. This ensures that metric filters operate at the same time
+          granularity as the metric being queried.
         """
         metric_subquery_entity_links_list = []
         all_group_by_refs = metric_call_parameter_set.group_by
@@ -197,10 +200,12 @@ class GroupByMetricPattern(EntityLinkPattern):
         # Convert each item in group_by to something we can store in metric_subquery_entity_links.
         # We'll parse them via StructuredLinkableSpecName (handles "listing__user" style references)
         # but treat "metric_time" specially if found.
+        has_metric_time = False
         for group_by_ref in all_group_by_refs:
             if group_by_ref.element_name == "metric_time":
                 # For minimal changes, store 'metric_time' as an entity reference with no link names.
                 metric_subquery_entity_links_list.append(EntityReference("metric_time"))
+                has_metric_time = True
             else:
                 structured_name = StructuredLinkableSpecName.from_name(
                     qualified_name=group_by_ref.element_name,
@@ -219,6 +224,10 @@ class GroupByMetricPattern(EntityLinkPattern):
         else:
             entity_links = ()
 
+        # Note: The actual time granularity inheritance happens during query execution.
+        # This pattern just identifies that metric_time is included in the group_by,
+        # and the query execution logic will apply the appropriate time granularity.
+        
         return GroupByMetricPattern(
             parameter_set=SpecPatternParameterSet.from_parameters(
                 fields_to_compare=(

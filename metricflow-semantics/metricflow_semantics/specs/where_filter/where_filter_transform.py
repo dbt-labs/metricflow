@@ -16,6 +16,7 @@ from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.rendered_spec_tracker import RenderedSpecTracker
+from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.specs.where_filter.where_filter_dimension import WhereFilterDimensionFactory
 from metricflow_semantics.specs.where_filter.where_filter_entity import WhereFilterEntityFactory
 from metricflow_semantics.specs.where_filter.where_filter_metric import WhereFilterMetricFactory
@@ -57,6 +58,7 @@ class WhereSpecFactory:
         self,
         filter_location: WhereFilterLocation,
         filter_intersection: Optional[WhereFilterIntersection],
+        parent_time_dimension_spec: Optional[TimeDimensionSpec] = None,
     ) -> Sequence[WhereFilterSpec]:
         if filter_intersection is None:
             return ()
@@ -90,6 +92,7 @@ class WhereSpecFactory:
                 spec_resolution_lookup=self._spec_resolution_lookup,
                 where_filter_location=filter_location,
                 rendered_spec_tracker=rendered_spec_tracker,
+                parent_time_dimension_spec=parent_time_dimension_spec,
             )
             try:
                 # If there was an error with the template, it should have been caught while resolving the specs for

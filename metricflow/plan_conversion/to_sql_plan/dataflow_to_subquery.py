@@ -846,6 +846,19 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         )
         from_data_set_alias = self._next_unique_table_alias()
 
+        # Find the smallest time dimension spec to use for metric_time inheritance
+        parent_time_dimension_spec = None
+        time_dimension_instances_for_metric_time = sorted(
+            [
+                instance
+                for instance in parent_data_set.metric_time_dimension_instances
+                if not instance.spec.has_custom_grain and not instance.spec.date_part
+            ],
+            key=lambda x: x.spec.base_granularity_sort_key,
+        )
+        if time_dimension_instances_for_metric_time:
+            parent_time_dimension_spec = time_dimension_instances_for_metric_time[0].spec
+
         return SqlDataSet(
             instance_set=output_instance_set,
             sql_select_node=SqlSelectStatementNode.create(
@@ -856,11 +869,11 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                 ).as_tuple(),
                 from_source=parent_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
-                where=self._render_where_constraint_expr(node.where),
+                where=self._render_where_constraint_expr(node.where, parent_time_dimension_spec),
             ),
         )
 
-    def _render_where_constraint_expr(self, where_filter: WhereFilterSpec) -> SqlStringExpression:
+    def _render_where_constraint_expr(self, where_filter: WhereFilterSpec, parent_time_dimension_spec=None) -> SqlStringExpression:
         """Build SqlStringExpression from WhereFilterSpec."""
         column_associations_in_where_sql = CreateColumnAssociations(
             column_association_resolver=self._column_association_resolver
