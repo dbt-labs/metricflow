@@ -621,6 +621,93 @@ def test_metric_in_filter(  # noqa: D103
         group_by_metric_specs=(group_by_metric_spec,),
     )
 
+def test_metric_in_filter_with_metric_time(  # noqa: D103
+    column_association_resolver: ColumnAssociationResolver,
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
+) -> None:
+    """
+    Verifies that using metric_time alongside another group_by key (e.g. listing)
+    in a Metric filter works as expected.
+    """
+    # This time, we want to test that 'metric_time' is allowed in the group_by array:
+    where_filter = PydanticWhereFilter(
+        where_sql_template="{{ Metric('bookings', group_by=['listing','metric_time']) }} > 2"
+    )
+
+    # Because the multi-group_by logic typically sets the last group_by item as the top-level
+    # entity link for the final metric spec, we define entity_links so that 'metric_time' is last.
+    group_by_metric_spec = GroupByMetricSpec(
+        element_name="bookings",
+        # The last item in the group_by array is used as entity_links in typed_patterns.
+        entity_links=(EntityReference("metric_time"),),
+        # The entire chain includes both listing and metric_time
+        metric_subquery_entity_links=(
+            EntityReference("listing"),
+            EntityReference("metric_time"),
+        ),
+    )
+
+    # Build the FilterSpecResolutionLookUp with the call_parameter_set that has both listing + metric_time.
+    where_filter_spec = WhereSpecFactory(
+        column_association_resolver=column_association_resolver,
+        spec_resolution_lookup=create_spec_lookup(
+            call_parameter_set=MetricCallParameterSet(
+                group_by=(EntityReference("listing"), EntityReference("metric_time")),
+                metric_reference=MetricReference("bookings"),
+            ),
+            resolved_spec=group_by_metric_spec,
+            resolved_linkable_element_set=LinkableElementSet(
+                path_key_to_linkable_metrics={
+                    ElementPathKey(
+                        element_name="bookings",
+                        element_type=LinkableElementType.METRIC,
+                        entity_links=(EntityReference("metric_time"),),
+                        time_granularity=None,
+                        date_part=None,
+                        metric_subquery_entity_links=(
+                            EntityReference("listing"),
+                            EntityReference("metric_time"),
+                        ),
+                    ): (
+                        LinkableMetric.create(
+                            properties=frozenset(
+                                {LinkableElementProperty.METRIC, LinkableElementProperty.JOINED}
+                            ),
+                            join_path=SemanticModelToMetricSubqueryJoinPath(
+                                metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
+                                    metric_reference=MetricReference("bookings"),
+                                    derived_from_semantic_models=(SemanticModelReference("bookings"),),
+                                    join_on_entity=EntityReference("listing"),
+                                    entity_links=(),
+                                ),
+                                semantic_model_join_path=SemanticModelJoinPath(
+                                    left_semantic_model_reference=SemanticModelReference("listings_latest")
+                                ),
+                            ),
+                        ),
+                    )
+                }
+            ),
+            semantic_manifest_lookup=simple_semantic_manifest_lookup,
+        ),
+        semantic_model_lookup=simple_semantic_manifest_lookup.semantic_model_lookup,
+    ).create_from_where_filter(
+        filter_location=EXAMPLE_FILTER_LOCATION,
+        where_filter=where_filter,
+    )
+
+    # Need to be careful about the dundering conventions
+    assert where_filter_spec.where_sql == "metric_time__listing__metric_time__bookings > 2"
+
+    # Also verify that the linkable specs in the filter reference the correct metric spec.
+    assert LinkableSpecSet.create_from_specs(where_filter_spec.linkable_specs) == LinkableSpecSet(
+        dimension_specs=(),
+        time_dimension_specs=(),
+        entity_specs=(),
+        group_by_metric_specs=(group_by_metric_spec,),
+    )
+
+
 
 def test_dimension_time_dimension_parity(  # noqa: D103
     column_association_resolver: ColumnAssociationResolver,

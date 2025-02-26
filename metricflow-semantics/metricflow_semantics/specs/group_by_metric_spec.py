@@ -1,16 +1,18 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Tuple
+from typing import Any, Optional, Tuple
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.references import EntityReference, GroupByMetricReference
+from dbt_semantic_interfaces.type_enums import TimeGranularity
 from typing_extensions import override
 
 from metricflow_semantics.model.semantics.linkable_element import ElementPathKey, LinkableElementType
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.instance_spec import InstanceSpecVisitor, LinkableInstanceSpec
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.visitor import VisitorOutputT
 
 
@@ -116,5 +118,31 @@ class GroupByMetricSpec(LinkableInstanceSpec, SerializableDataclass):
         return GroupByMetricSpec(
             element_name=self.element_name,
             entity_links=(entity_prefix,) + self.entity_links,
+            metric_subquery_entity_links=self.metric_subquery_entity_links,
+        )
+        
+    def with_time_granularity(self, time_granularity: Optional[TimeGranularity]) -> GroupByMetricSpec:
+        """Create a new GroupByMetricSpec with the specified time granularity.
+        
+        This is used when a metric filter includes 'metric_time' in its group_by, to ensure
+        that the filter is applied using the same time granularity as the parent query.
+        
+        Args:
+            time_granularity: The time granularity to apply to the metric filter.
+            
+        Returns:
+            A new GroupByMetricSpec with the time granularity applied.
+        """
+        if time_granularity is None:
+            return self
+            
+        # Create a new element name that includes the time granularity
+        # This will be used in SQL rendering to ensure the filter is applied at the correct granularity
+        expanded_granularity = ExpandedTimeGranularity.from_time_granularity(time_granularity)
+        new_element_name = f"{self.element_name}__{expanded_granularity.name}"
+        
+        return GroupByMetricSpec(
+            element_name=new_element_name,
+            entity_links=self.entity_links,
             metric_subquery_entity_links=self.metric_subquery_entity_links,
         )

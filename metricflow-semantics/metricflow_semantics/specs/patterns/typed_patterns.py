@@ -162,28 +162,72 @@ class GroupByMetricPattern(EntityLinkPattern):
         return super().match(spec_set.group_by_metric_specs)
 
     @staticmethod
-    def from_call_parameter_set(  # noqa: D102
-        metric_call_parameter_set: MetricCallParameterSet,
-    ) -> GroupByMetricPattern:
-        # This looks hacky because the typing for the interface does not match the implementation, but that's temporary!
-        # This will get a lot less hacky once we enable multiple entities and dimensions in the group by.
-        if len(metric_call_parameter_set.group_by) != 1:
-            raise RuntimeError(
-                "Currently only one group by item is allowed for Metric filters. "
-                "This should have been caught by validations."
+    def from_call_parameter_set(metric_call_parameter_set: MetricCallParameterSet) -> GroupByMetricPattern:
+        """
+        Builds a GroupByMetricPattern that can handle multiple group_by items, including the special case
+        of 'metric_time' (treated as a time dimension / virtual dimension for the metric).
+
+        Implementation notes:
+        - We accumulate all group_by items into 'metric_subquery_entity_links' for now.
+        - The 'entity_links' used in the top-level pattern is set to the last group_by item by default.
+          (This preserves backward compatibility, while allowing multiple group_by items.)
+        - If any group_by item is 'metric_time', we allow that to be included as though it is a dimension or
+          an entity reference with a special name. In real usage, 'metric_time' is recognized later as
+          a time dimension. This logic simply ensures that the pattern can match the final resolved
+          `GroupByMetricSpec`.
+        - When 'metric_time' is included in a metric filter's group_by, the filter will inherit the time
+          granularity of the parent query. This ensures that metric filters operate at the same time
+          granularity as the metric being queried.
+        """
+        metric_subquery_entity_links_list = []
+        all_group_by_refs = metric_call_parameter_set.group_by
+
+        # If there are no group_by items, we proceed with empty links.
+        if not all_group_by_refs:
+            return GroupByMetricPattern(
+                parameter_set=SpecPatternParameterSet.from_parameters(
+                    fields_to_compare=(
+                        ParameterSetField.ELEMENT_NAME,
+                        ParameterSetField.ENTITY_LINKS,
+                        ParameterSetField.METRIC_SUBQUERY_ENTITY_LINKS,
+                    ),
+                    element_name=metric_call_parameter_set.metric_reference.element_name,
+                    entity_links=(),
+                    metric_subquery_entity_links=(),
+                )
             )
-        group_by = metric_call_parameter_set.group_by[0]
-        # custom_granularity_names is empty because we are not parsing any dimensions here with grain
-        structured_name = StructuredLinkableSpecName.from_name(
-            qualified_name=group_by.element_name, custom_granularity_names=()
-        )
-        metric_subquery_entity_links = tuple(
-            EntityReference(entity_name)
-            for entity_name in (structured_name.entity_link_names + (structured_name.element_name,))
-        )
-        # Temp: we don't have a parameter to specify the join path from the outer query to the metric subquery,
-        # so just use the last entity. Will need to add another param for that later.
-        entity_links = metric_subquery_entity_links[-1:]
+
+        # Convert each item in group_by to something we can store in metric_subquery_entity_links.
+        # We'll parse them via StructuredLinkableSpecName (handles "listing__user" style references)
+        # but treat "metric_time" specially if found.
+        has_metric_time = False
+        for group_by_ref in all_group_by_refs:
+            if group_by_ref.element_name == "metric_time":
+                # For minimal changes, store 'metric_time' as an entity reference with no link names.
+                metric_subquery_entity_links_list.append(EntityReference("metric_time"))
+                has_metric_time = True
+            else:
+                structured_name = StructuredLinkableSpecName.from_name(
+                    qualified_name=group_by_ref.element_name,
+                    custom_granularity_names=(),
+                )
+                # E.g. "listing__account_id" => entity_link_names=["listing"], element_name="account_id"
+                # So we place them in one linear chain: ("listing","account_id"), etc.
+                subquery_entity_names = list(structured_name.entity_link_names) + [structured_name.element_name]
+                for entity_name in subquery_entity_names:
+                    metric_subquery_entity_links_list.append(EntityReference(entity_name))
+
+        # The last item in metric_subquery_entity_links_list is used as the top-level entity link
+        # for the outer metric reference. This is the same behavior as prior to multi-group-by support.
+        if metric_subquery_entity_links_list:
+            entity_links = (metric_subquery_entity_links_list[-1],)
+        else:
+            entity_links = ()
+
+        # Note: The actual time granularity inheritance happens during query execution.
+        # This pattern just identifies that metric_time is included in the group_by,
+        # and the query execution logic will apply the appropriate time granularity.
+        
         return GroupByMetricPattern(
             parameter_set=SpecPatternParameterSet.from_parameters(
                 fields_to_compare=(
@@ -193,6 +237,6 @@ class GroupByMetricPattern(EntityLinkPattern):
                 ),
                 element_name=metric_call_parameter_set.metric_reference.element_name,
                 entity_links=entity_links,
-                metric_subquery_entity_links=metric_subquery_entity_links,
+                metric_subquery_entity_links=tuple(metric_subquery_entity_links_list),
             )
         )
