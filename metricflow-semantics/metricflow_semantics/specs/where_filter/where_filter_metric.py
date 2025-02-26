@@ -59,12 +59,12 @@ class WhereFilterMetric(ProtocolHint[QueryInterfaceMetric]):
 
         Important in the Jinja sandbox.
         """
-        # Check if metric_time is in the group_by and if we have a parent time dimension spec
-        has_metric_time = False
-        for group_by_ref in self._group_by:
-            if group_by_ref.element_name.lower() == METRIC_TIME_ELEMENT_NAME.lower():
-                has_metric_time = True
-                break
+        # Check if metric_time is EXPLICITLY included in the group_by list from the YML definition
+        # This is important because time granularity inheritance only happens when metric_time is
+        # explicitly included in the filter's group_by list
+        # Use a set for O(1) lookup instead of iterating through the list
+        group_by_names = {group_by_ref.element_name.lower() for group_by_ref in self._group_by}
+        has_metric_time = METRIC_TIME_ELEMENT_NAME.lower() in group_by_names
 
         # Create the call parameter set with the group_by items
         call_parameter_set = MetricCallParameterSet(
@@ -81,8 +81,10 @@ class WhereFilterMetric(ProtocolHint[QueryInterfaceMetric]):
         resolved_elements = self._resolved_spec_lookup.checked_resolved_linkable_elements(resolved_spec_key)
         self._rendered_spec_tracker.record_rendered_spec_to_elements_mapping((resolved_spec, resolved_elements))
         
-        # If this is a GroupByMetricSpec and it includes metric_time, and we have a parent time dimension spec,
-        # we need to apply the parent time granularity to the metric filter
+        # Time granularity inheritance only happens when:
+        # 1. 'metric_time' is EXPLICITLY included in the filter's group_by list
+        # 2. We have a parent time dimension spec with a time granularity
+        # 3. The resolved spec is a GroupByMetricSpec
         if (
             has_metric_time 
             and self._parent_time_dimension_spec is not None 
@@ -94,6 +96,8 @@ class WhereFilterMetric(ProtocolHint[QueryInterfaceMetric]):
                 resolved_spec.with_time_granularity(self._parent_time_dimension_spec.time_granularity)
             )
         else:
+            # If 'metric_time' is not in the group_by list, or we don't have a parent time dimension spec,
+            # or the resolved spec is not a GroupByMetricSpec, then we don't apply time granularity inheritance
             column_association = self._column_association_resolver.resolve_spec(resolved_spec)
 
         return column_association.column_name
