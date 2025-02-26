@@ -6,7 +6,7 @@ docstring:
 <SqlPlan>
     <SqlSelectStatementNode>
         <!-- description = "Read Elements From Semantic Model 'bookings_source'" -->
-        <!-- node_id = NodeId(id_str='ss_1') -->
+        <!-- node_id = NodeId(id_str='ss_0') -->
         <!-- col0 = SqlSelectColumn(expr=SqlStringExpression(node_id=str_28000 sql_expr=1), column_alias='bookings') -->
         <!-- col1 =                                                                                           -->
         <!--   SqlSelectColumn(                                                                               -->
@@ -199,12 +199,12 @@ docstring:
         <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28034), column_alias='booking__listing') -->
         <!-- col86 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28035), column_alias='booking__guest') -->
         <!-- col87 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28036), column_alias='booking__host') -->
-        <!-- from_source = SqlTableNode(node_id=tfc_28001) -->
+        <!-- from_source = SqlTableNode(node_id=tfc_0) -->
         <!-- where = None -->
         <!-- distinct = False -->
         <SqlTableNode>
             <!-- description = 'Read from ***************************.fct_bookings' -->
-            <!-- node_id = NodeId(id_str='tfc_28001') -->
+            <!-- node_id = NodeId(id_str='tfc_0') -->
             <!-- table_id = '***************************.fct_bookings' -->
         </SqlTableNode>
     </SqlSelectStatementNode>

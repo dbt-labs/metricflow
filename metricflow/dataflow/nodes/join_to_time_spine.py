@@ -107,10 +107,12 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
         )
 
     def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> JoinToTimeSpineNode:  # noqa: D102
-        assert len(new_parent_nodes) == 1
+        assert len(new_parent_nodes) == 2
+        metric_source_node = new_parent_nodes[0]
+        time_spine_node = new_parent_nodes[1]
         return JoinToTimeSpineNode.create(
-            metric_source_node=self.metric_source_node,
-            time_spine_node=self.time_spine_node,
+            metric_source_node=metric_source_node,
+            time_spine_node=time_spine_node,
             requested_agg_time_dimension_specs=self.requested_agg_time_dimension_specs,
             standard_offset_window=self.standard_offset_window,
             offset_to_grain=self.offset_to_grain,

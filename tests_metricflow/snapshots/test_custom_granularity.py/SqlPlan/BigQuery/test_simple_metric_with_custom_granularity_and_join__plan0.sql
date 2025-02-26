@@ -4,17 +4,17 @@ sql_engine: BigQuery
 ---
 -- Compute Metrics via Expressions
 SELECT
-  subq_8.listing__ds__martian_day
+  subq_8.listing__ds__alien_day
   , subq_8.bookings
 FROM (
   -- Aggregate Measures
   SELECT
-    subq_7.listing__ds__martian_day
+    subq_7.listing__ds__alien_day
     , SUM(subq_7.bookings) AS bookings
   FROM (
-    -- Pass Only Elements: ['bookings', 'listing__ds__martian_day']
+    -- Pass Only Elements: ['bookings', 'listing__ds__alien_day']
     SELECT
-      subq_6.listing__ds__martian_day
+      subq_6.listing__ds__alien_day
       , subq_6.bookings
     FROM (
       -- Join Standard Outputs
@@ -119,7 +119,7 @@ FROM (
         , subq_1.discrete_booking_value_p99 AS discrete_booking_value_p99
         , subq_1.approximate_continuous_booking_value_p99 AS approximate_continuous_booking_value_p99
         , subq_1.approximate_discrete_booking_value_p99 AS approximate_discrete_booking_value_p99
-        , subq_5.martian_day AS listing__ds__martian_day
+        , subq_5.alien_day AS listing__ds__alien_day
       FROM (
         -- Metric Time Dimension 'ds'
         SELECT
@@ -462,5 +462,5 @@ FROM (
     ) subq_6
   ) subq_7
   GROUP BY
-    listing__ds__martian_day
+    listing__ds__alien_day
 ) subq_8

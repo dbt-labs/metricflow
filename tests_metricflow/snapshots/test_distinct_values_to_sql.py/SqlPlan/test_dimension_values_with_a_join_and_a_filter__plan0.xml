@@ -6,12 +6,12 @@ docstring:
 <SqlPlan>
     <SqlSelectStatementNode>
         <!-- description = "Pass Only Elements: ['user__home_state_latest', 'listing__is_lux_latest']" -->
-        <!-- node_id = NodeId(id_str='ss_78') -->
+        <!-- node_id = NodeId(id_str='ss_71') -->
         <!-- col0 =                                                                                                      -->
         <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_118), column_alias='listing__is_lux_latest') -->
         <!-- col1 =                                                                                                       -->
         <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_119), column_alias='user__home_state_latest') -->
-        <!-- from_source = SqlSelectStatementNode(node_id=ss_75) -->
+        <!-- from_source = SqlSelectStatementNode(node_id=ss_70) -->
         <!-- group_by0 =                                                                                                 -->
         <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_118), column_alias='listing__is_lux_latest') -->
         <!-- group_by1 =                                                                                                  -->
@@ -20,7 +20,7 @@ docstring:
         <!-- distinct = False -->
         <SqlSelectStatementNode>
             <!-- description = 'Constrain Output with WHERE' -->
-            <!-- node_id = NodeId(id_str='ss_75') -->
+            <!-- node_id = NodeId(id_str='ss_70') -->
             <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_71), column_alias='ds__day') -->
             <!-- col1 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_72), column_alias='ds__week') -->
             <!-- col2 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_73), column_alias='ds__month') -->
@@ -207,12 +207,12 @@ docstring:
             <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_62), column_alias='largest_listing') -->
             <!-- col56 =                                                                                              -->
             <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_63), column_alias='smallest_listing') -->
-            <!-- from_source = SqlSelectStatementNode(node_id=ss_73) -->
+            <!-- from_source = SqlSelectStatementNode(node_id=ss_69) -->
             <!-- where = SqlStringExpression(node_id=str_0 sql_expr=user__home_state_latest = 'us') -->
             <!-- distinct = False -->
             <SqlSelectStatementNode>
                 <!-- description = 'Join Standard Outputs' -->
-                <!-- node_id = NodeId(id_str='ss_73') -->
+                <!-- node_id = NodeId(id_str='ss_69') -->
                 <!-- col0 =                                               -->
                 <!--   SqlSelectColumn(                                   -->
                 <!--     expr=SqlColumnReferenceExpression(node_id=cr_4), -->
@@ -413,10 +413,10 @@ docstring:
                 <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_6), column_alias='largest_listing') -->
                 <!-- col56 =                                                                                             -->
                 <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_7), column_alias='smallest_listing') -->
-                <!-- from_source = SqlSelectStatementNode(node_id=ss_67) -->
+                <!-- from_source = SqlSelectStatementNode(node_id=ss_66) -->
                 <!-- join_0 =                                                 -->
                 <!--   SqlJoinDescription(                                    -->
-                <!--     right_source=SqlSelectStatementNode(node_id=ss_71),  -->
+                <!--     right_source=SqlSelectStatementNode(node_id=ss_68),  -->
                 <!--     right_source_alias='subq_2',                         -->
                 <!--     join_type=FULL_OUTER,                                -->
                 <!--     on_condition=SqlComparisonExpression(node_id=cmp_0), -->
@@ -425,7 +425,7 @@ docstring:
                 <!-- distinct = False -->
                 <SqlSelectStatementNode>
                     <!-- description = "Read Elements From Semantic Model 'listings_latest'" -->
-                    <!-- node_id = NodeId(id_str='ss_67') -->
+                    <!-- node_id = NodeId(id_str='ss_66') -->
                     <!-- col0 =                                                      -->
                     <!--   SqlSelectColumn(                                          -->
                     <!--     expr=SqlStringExpression(node_id=str_28006 sql_expr=1), -->
@@ -654,30 +654,30 @@ docstring:
                     <!--     expr=SqlColumnReferenceExpression(node_id=cr_28076), -->
                     <!--     column_alias='listing__user',                        -->
                     <!--   )                                                      -->
-                    <!-- from_source = SqlTableNode(node_id=tfc_28005) -->
+                    <!-- from_source = SqlTableNode(node_id=tfc_66) -->
                     <!-- where = None -->
                     <!-- distinct = False -->
                     <SqlTableNode>
                         <!-- description = 'Read from ***************************.dim_listings_latest' -->
-                        <!-- node_id = NodeId(id_str='tfc_28005') -->
+                        <!-- node_id = NodeId(id_str='tfc_66') -->
                         <!-- table_id = '***************************.dim_listings_latest' -->
                     </SqlTableNode>
                 </SqlSelectStatementNode>
                 <SqlSelectStatementNode>
                     <!-- description = "Pass Only Elements: ['home_state_latest', 'user']" -->
-                    <!-- node_id = NodeId(id_str='ss_71') -->
+                    <!-- node_id = NodeId(id_str='ss_68') -->
                     <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_1), column_alias='user') -->
                     <!-- col1 =                                               -->
                     <!--   SqlSelectColumn(                                   -->
                     <!--     expr=SqlColumnReferenceExpression(node_id=cr_0), -->
                     <!--     column_alias='home_state_latest',                -->
                     <!--   )                                                  -->
-                    <!-- from_source = SqlSelectStatementNode(node_id=ss_69) -->
+                    <!-- from_source = SqlSelectStatementNode(node_id=ss_67) -->
                     <!-- where = None -->
                     <!-- distinct = False -->
                     <SqlSelectStatementNode>
                         <!-- description = "Read Elements From Semantic Model 'users_latest'" -->
-                        <!-- node_id = NodeId(id_str='ss_69') -->
+                        <!-- node_id = NodeId(id_str='ss_67') -->
                         <!-- col0 =                                             -->
                         <!--   SqlSelectColumn(                                 -->
                         <!--     expr=SqlDateTruncExpression(node_id=dt_28202), -->
@@ -800,12 +800,12 @@ docstring:
                         <!--   )                                                      -->
                         <!-- col24 =                                                                                     -->
                         <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28106), column_alias='user') -->
-                        <!-- from_source = SqlTableNode(node_id=tfc_28009) -->
+                        <!-- from_source = SqlTableNode(node_id=tfc_67) -->
                         <!-- where = None -->
                         <!-- distinct = False -->
                         <SqlTableNode>
                             <!-- description = 'Read from ***************************.dim_users_latest' -->
-                            <!-- node_id = NodeId(id_str='tfc_28009') -->
+                            <!-- node_id = NodeId(id_str='tfc_67') -->
                             <!-- table_id = '***************************.dim_users_latest' -->
                         </SqlTableNode>
                     </SqlSelectStatementNode>

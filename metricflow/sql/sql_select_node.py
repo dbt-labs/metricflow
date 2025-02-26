@@ -142,14 +142,15 @@ class SqlSelectStatementNode(SqlPlanNode):
 
     @override
     def copy(self) -> SqlSelectStatementNode:
-        return SqlSelectStatementNode(
-            parent_nodes=self.parent_nodes,
-            _description=self._description,
+        return SqlSelectStatementNode.create(
+            description=self._description,
             select_columns=self.select_columns,
-            from_source=self.from_source,
+            from_source=self.from_source.copy(),
             from_source_alias=self.from_source_alias,
-            cte_sources=self.cte_sources,
-            join_descs=self.join_descs,
+            cte_sources=tuple(node.copy() for node in self.cte_sources),
+            join_descs=tuple(
+                join_desc.with_right_source(join_desc.right_source.copy()) for join_desc in self.join_descs
+            ),
             group_bys=self.group_bys,
             order_bys=self.order_bys,
             where=self.where,

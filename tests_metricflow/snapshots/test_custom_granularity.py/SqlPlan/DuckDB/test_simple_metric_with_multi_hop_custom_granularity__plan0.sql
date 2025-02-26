@@ -6,17 +6,17 @@ sql_engine: DuckDB
 ---
 -- Compute Metrics via Expressions
 SELECT
-  subq_36.listing__user__ds__martian_day
+  subq_36.listing__user__ds__alien_day
   , subq_36.bookings
 FROM (
   -- Aggregate Measures
   SELECT
-    subq_35.listing__user__ds__martian_day
+    subq_35.listing__user__ds__alien_day
     , SUM(subq_35.bookings) AS bookings
   FROM (
-    -- Pass Only Elements: ['bookings', 'listing__user__ds__martian_day']
+    -- Pass Only Elements: ['bookings', 'listing__user__ds__alien_day']
     SELECT
-      subq_34.listing__user__ds__martian_day
+      subq_34.listing__user__ds__alien_day
       , subq_34.bookings
     FROM (
       -- Join Standard Outputs
@@ -122,7 +122,7 @@ FROM (
         , subq_25.discrete_booking_value_p99 AS discrete_booking_value_p99
         , subq_25.approximate_continuous_booking_value_p99 AS approximate_continuous_booking_value_p99
         , subq_25.approximate_discrete_booking_value_p99 AS approximate_discrete_booking_value_p99
-        , subq_33.martian_day AS listing__user__ds__martian_day
+        , subq_33.alien_day AS listing__user__ds__alien_day
       FROM (
         -- Metric Time Dimension 'ds'
         SELECT
@@ -1400,5 +1400,5 @@ FROM (
     ) subq_34
   ) subq_35
   GROUP BY
-    subq_35.listing__user__ds__martian_day
+    subq_35.listing__user__ds__alien_day
 ) subq_36

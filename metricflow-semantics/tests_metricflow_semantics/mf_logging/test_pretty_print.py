@@ -7,10 +7,9 @@ from typing import Optional
 
 from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimension
 from dbt_semantic_interfaces.type_enums import DimensionType
-from metricflow_semantics.formatting.formatting_helpers import mf_dedent
 from metricflow_semantics.mf_logging.formatting import indent
 from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
-from metricflow_semantics.mf_logging.pretty_print import mf_pformat, mf_pformat_dict
+from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_DAY
 from typing_extensions import override
 
@@ -146,50 +145,6 @@ def test_pydantic_model() -> None:  # noqa: D103
     )
 
 
-def test_pformat_many() -> None:  # noqa: D103
-    result = mf_pformat_dict("Example description:", obj_dict={"object_0": (1, 2, 3), "object_1": {4: 5}})
-
-    assert (
-        textwrap.dedent(
-            """\
-            Example description:
-              object_0: (1, 2, 3)
-              object_1: {4: 5}
-            """
-        ).rstrip()
-        == result
-    )
-
-
-def test_pformat_many_with_raw_strings() -> None:  # noqa: D103
-    result = mf_pformat_dict("Example description:", obj_dict={"object_0": "foo\nbar"}, preserve_raw_strings=True)
-
-    assert (
-        textwrap.dedent(
-            """\
-            Example description:
-              object_0:
-                foo
-                bar
-            """
-        ).rstrip()
-        == result
-    )
-
-
-def test_pformat_many_with_strings() -> None:  # noqa: D103
-    result = mf_pformat_dict("Example description:", obj_dict={"object_0": "foo\nbar"})
-    assert (
-        textwrap.dedent(
-            """\
-            Example description:
-              object_0: 'foo\\nbar'
-            """
-        ).rstrip()
-        == result
-    )
-
-
 def test_custom_pretty_print() -> None:
     """Check that `MetricFlowPrettyFormattable` can be used to override the result when using MF's pretty-printer."""
 
@@ -204,34 +159,3 @@ def test_custom_pretty_print() -> None:
             return f"{self.__class__.__name__}({self.field_0:.2f})"
 
     assert mf_pformat(_ExampleDataclass(1.2345)) == f"{_ExampleDataclass.__name__}(1.23)"
-
-
-def test_pformat_dict_with_empty_message() -> None:
-    """Test `mf_pformat_dict` without a description."""
-    result = mf_pformat_dict(obj_dict={"object_0": (1, 2, 3), "object_1": {4: 5}})
-
-    assert (
-        mf_dedent(
-            """
-            object_0: (1, 2, 3)
-            object_1: {4: 5}
-            """
-        )
-        == result
-    )
-
-
-def test_pformat_dict_with_pad_sections_with_newline() -> None:
-    """Test `mf_pformat_dict` with new lines between sections."""
-    result = mf_pformat_dict(obj_dict={"object_0": (1, 2, 3), "object_1": {4: 5}}, pad_items_with_newlines=True)
-
-    assert (
-        mf_dedent(
-            """
-            object_0: (1, 2, 3)
-
-            object_1: {4: 5}
-            """
-        )
-        == result
-    )

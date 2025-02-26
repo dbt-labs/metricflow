@@ -70,9 +70,8 @@ class SqlCteNode(SqlPlanNode):
 
     @override
     def copy(self) -> SqlCteNode:
-        return SqlCteNode(
-            parent_nodes=self.parent_nodes,
-            select_statement=self.select_statement,
+        return SqlCteNode.create(
+            select_statement=self.select_statement.copy(),
             cte_alias=self.cte_alias,
         )
 

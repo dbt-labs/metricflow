@@ -4,13 +4,13 @@ sql_engine: Postgres
 ---
 -- Read Elements From Semantic Model 'bookings_source'
 -- Join to Custom Granularity Dataset
--- Pass Only Elements: ['booking__ds__martian_day',]
+-- Pass Only Elements: ['booking__ds__alien_day',]
 SELECT
-  subq_2.martian_day AS booking__ds__martian_day
+  subq_2.alien_day AS booking__ds__alien_day
 FROM ***************************.fct_bookings bookings_source_src_28000
 LEFT OUTER JOIN
   ***************************.mf_time_spine subq_2
 ON
   DATE_TRUNC('day', bookings_source_src_28000.ds) = subq_2.ds
 GROUP BY
-  subq_2.martian_day
+  subq_2.alien_day

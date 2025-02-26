@@ -1,0 +1,14 @@
+test_name: test_query
+test_filename: test_cli_quiet.py
+docstring:
+  Test that the `--quiet` flag only shows the table when running a query.
+---
+metric_time__day       bookings
+-------------------  ----------
+2019-12-01T00:00:00           1
+2019-12-18T00:00:00          10
+2019-12-19T00:00:00          18
+2019-12-20T00:00:00           2
+2020-01-01T00:00:00           5
+2020-01-02T00:00:00           9
+2020-01-03T00:00:00           1

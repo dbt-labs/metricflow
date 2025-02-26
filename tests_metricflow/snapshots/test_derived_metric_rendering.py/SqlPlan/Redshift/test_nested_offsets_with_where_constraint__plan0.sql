@@ -34,7 +34,7 @@ FROM (
           , subq_10.ds__extract_day
           , subq_10.ds__extract_dow
           , subq_10.ds__extract_doy
-          , subq_10.ds__martian_day
+          , subq_10.ds__alien_day
         FROM (
           -- Read From Time Spine 'mf_time_spine'
           SELECT
@@ -49,7 +49,7 @@ FROM (
             , EXTRACT(day FROM time_spine_src_28006.ds) AS ds__extract_day
             , CASE WHEN EXTRACT(dow FROM time_spine_src_28006.ds) = 0 THEN EXTRACT(dow FROM time_spine_src_28006.ds) + 7 ELSE EXTRACT(dow FROM time_spine_src_28006.ds) END AS ds__extract_dow
             , EXTRACT(doy FROM time_spine_src_28006.ds) AS ds__extract_doy
-            , time_spine_src_28006.martian_day AS ds__martian_day
+            , time_spine_src_28006.alien_day AS ds__alien_day
           FROM ***************************.mf_time_spine time_spine_src_28006
         ) subq_10
       ) subq_11
@@ -193,7 +193,7 @@ FROM (
                     , subq_2.ds__extract_day
                     , subq_2.ds__extract_dow
                     , subq_2.ds__extract_doy
-                    , subq_2.ds__martian_day
+                    , subq_2.ds__alien_day
                   FROM (
                     -- Read From Time Spine 'mf_time_spine'
                     SELECT
@@ -208,7 +208,7 @@ FROM (
                       , EXTRACT(day FROM time_spine_src_28006.ds) AS ds__extract_day
                       , CASE WHEN EXTRACT(dow FROM time_spine_src_28006.ds) = 0 THEN EXTRACT(dow FROM time_spine_src_28006.ds) + 7 ELSE EXTRACT(dow FROM time_spine_src_28006.ds) END AS ds__extract_dow
                       , EXTRACT(doy FROM time_spine_src_28006.ds) AS ds__extract_doy
-                      , time_spine_src_28006.martian_day AS ds__martian_day
+                      , time_spine_src_28006.alien_day AS ds__alien_day
                     FROM ***************************.mf_time_spine time_spine_src_28006
                   ) subq_2
                 ) subq_3

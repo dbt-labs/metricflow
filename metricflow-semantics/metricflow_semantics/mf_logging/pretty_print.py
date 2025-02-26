@@ -2,12 +2,9 @@ from __future__ import annotations
 
 import logging
 import pprint
-from collections.abc import Mapping
 from dataclasses import fields, is_dataclass
 from enum import Enum
-from typing import Any, List, Optional, Sized, Tuple, Union
-
-from dsi_pydantic_shim import BaseModel
+from typing import Any, Dict, List, Mapping, Optional, Sized, Tuple, Union
 
 from metricflow_semantics.mf_logging.formatting import indent
 from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
@@ -34,11 +31,6 @@ class MetricFlowPrettyFormatter:
         self._include_object_field_names = include_object_field_names
         self._include_none_object_fields = include_none_object_fields
         self._include_empty_object_fields = include_empty_object_fields
-
-    @staticmethod
-    def _is_pydantic_base_model(obj: Any):  # type:ignore
-        # Checking the attribute as the BaseModel check fails for newer version of Pydantic.
-        return isinstance(obj, BaseModel) or hasattr(obj, "__config__")
 
     def _handle_sequence_obj(
         self, list_like_obj: Union[list, tuple, set, frozenset], remaining_line_width: Optional[int]
@@ -93,7 +85,7 @@ class MetricFlowPrettyFormatter:
         # Convert each item to a pretty string.
         items_as_str = tuple(
             self._handle_any_obj(
-                list_item, remaining_line_width=max(0, remaining_line_width - len(self._indent_prefix))
+                list_item, remaining_line_width=max(1, remaining_line_width - len(self._indent_prefix))
             )
             for list_item in list_like_obj
         )
@@ -216,7 +208,7 @@ class MetricFlowPrettyFormatter:
         # ]
 
         # See if the value fits in the previous line.
-        remaining_width_for_value = max(0, remaining_line_width - len(result_lines[-1]))
+        remaining_width_for_value = max(1, remaining_line_width - len(result_lines[-1]))
         value_str = self._handle_any_obj(value, remaining_line_width=remaining_width_for_value)
         value_lines = value_str.splitlines()
 
@@ -353,16 +345,28 @@ class MetricFlowPrettyFormatter:
                 remaining_line_width=remaining_line_width,
             )
 
-        if MetricFlowPrettyFormatter._is_pydantic_base_model(obj):
-            mapping = {key: getattr(obj, key) for key in obj.dict().keys()}
-            return self._handle_mapping_like_obj(
-                mapping,
-                left_enclose_str=type(obj).__name__ + "(",
-                key_value_seperator="=",
-                right_enclose_str=")",
-                is_dataclass_like_object=True,
-                remaining_line_width=remaining_line_width,
-            )
+        # For Pydantic-like objects with a `dict`-like method that returns field keys / values.
+        # In Pydantic v1, it's `.dict()`, in v2 it's `.model_dump()`.
+        # Going with this approach for now to check for a Pydantic model as using `isinstance()` requires more
+        # consideration when dealing with Pydantic v1 and Pydantic v2 objects.
+        pydantic_dict_method = getattr(obj, "model_dump", None) or getattr(obj, "dict", None)
+        if pydantic_dict_method is not None and callable(pydantic_dict_method):
+            try:
+                # Calling `dict` on a Pydantic model does not recursively convert nested fields into dictionaries,
+                # which is what we want. `.model_dump()` does the recursive conversion.
+                mapping = dict(obj)
+                return self._handle_mapping_like_obj(
+                    mapping,
+                    left_enclose_str=type(obj).__name__ + "(",
+                    key_value_seperator="=",
+                    right_enclose_str=")",
+                    is_dataclass_like_object=True,
+                    remaining_line_width=remaining_line_width,
+                )
+            except Exception:
+                # Fall back to built-in pretty-print in case the dict method can't be called. e.g. requires arguments.
+                # Consider logging a warning.
+                pass
 
         # Any other object that's not handled.
         return pprint.pformat(obj, width=self._max_line_width, sort_dicts=False)
@@ -450,22 +454,24 @@ def mf_pformat_dict(  # type: ignore
     description_lines: List[str] = [description] if description is not None else []
     obj_dict = obj_dict or {}
     item_sections = []
+
+    str_converted_dict: Dict[str, str] = {}
     for key, value in obj_dict.items():
         if preserve_raw_strings and isinstance(value, str):
             value_str = value
         else:
             value_str = mf_pformat(
                 obj=value,
-                max_line_length=max(0, max_line_length - len(indent_prefix)),
+                max_line_length=max(1, max_line_length - len(indent_prefix)),
                 indent_prefix=indent_prefix,
                 include_object_field_names=include_object_field_names,
                 include_none_object_fields=include_none_object_fields,
                 include_empty_object_fields=include_empty_object_fields,
             )
+        str_converted_dict[str(key)] = value_str
 
-        lines_in_value_str = len(value_str.split("\n"))
         item_section_lines: Tuple[str, ...]
-        if lines_in_value_str > 1:
+        if "\n" in value_str:
             item_section_lines = (
                 f"{key}:",
                 indent(
@@ -482,7 +488,37 @@ def mf_pformat_dict(  # type: ignore
         else:
             item_sections.append(indent(item_section))
 
+    result_as_one_line = _as_one_line(
+        description=description, str_converted_dict=str_converted_dict, max_line_length=max_line_length
+    )
+    if result_as_one_line is not None:
+        return result_as_one_line
+
     if pad_items_with_newlines:
         return "\n\n".join(description_lines + item_sections)
     else:
         return "\n".join(description_lines + item_sections)
+
+
+def _as_one_line(description: Optional[str], str_converted_dict: Dict[str, str], max_line_length: int) -> Optional[str]:
+    """See if the result can be returned in a compact, one-line representation.
+
+    e.g. for:
+      mf_pformat_dict("Example output", {"a": 1, "b": 2})
+
+    Compact output:
+      Example output (a=1, b=2)
+
+    Normal output:
+      Example output
+        a: 1
+        b: 2
+    """
+    items = tuple(f"{key_str}={value_str}" for key_str, value_str in str_converted_dict.items())
+    value_in_parenthesis = ", ".join(items)
+    result = f"{description}" + (f" ({value_in_parenthesis})" if len(value_in_parenthesis) > 0 else "")
+
+    if "\n" in result or len(result) > max_line_length:
+        return None
+
+    return result

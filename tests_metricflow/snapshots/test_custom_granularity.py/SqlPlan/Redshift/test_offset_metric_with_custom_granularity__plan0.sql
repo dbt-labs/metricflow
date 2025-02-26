@@ -4,22 +4,22 @@ sql_engine: Redshift
 ---
 -- Compute Metrics via Expressions
 SELECT
-  subq_9.booking__ds__martian_day
+  subq_9.booking__ds__alien_day
   , bookings_5_days_ago AS bookings_5_day_lag
 FROM (
   -- Compute Metrics via Expressions
   SELECT
-    subq_8.booking__ds__martian_day
+    subq_8.booking__ds__alien_day
     , subq_8.bookings AS bookings_5_days_ago
   FROM (
     -- Aggregate Measures
     SELECT
-      subq_7.booking__ds__martian_day
+      subq_7.booking__ds__alien_day
       , SUM(subq_7.bookings) AS bookings
     FROM (
-      -- Pass Only Elements: ['bookings', 'booking__ds__martian_day']
+      -- Pass Only Elements: ['bookings', 'booking__ds__alien_day']
       SELECT
-        subq_6.booking__ds__martian_day
+        subq_6.booking__ds__alien_day
         , subq_6.bookings
       FROM (
         -- Join to Time Spine Dataset
@@ -123,7 +123,7 @@ FROM (
           , subq_1.discrete_booking_value_p99 AS discrete_booking_value_p99
           , subq_1.approximate_continuous_booking_value_p99 AS approximate_continuous_booking_value_p99
           , subq_1.approximate_discrete_booking_value_p99 AS approximate_discrete_booking_value_p99
-          , subq_5.martian_day AS booking__ds__martian_day
+          , subq_5.alien_day AS booking__ds__alien_day
         FROM (
           -- Pass Only Elements: ['booking__ds__day',]
           SELECT
@@ -142,7 +142,7 @@ FROM (
               , subq_2.ds__extract_day
               , subq_2.ds__extract_dow
               , subq_2.ds__extract_doy
-              , subq_2.ds__martian_day
+              , subq_2.ds__alien_day
             FROM (
               -- Read From Time Spine 'mf_time_spine'
               SELECT
@@ -157,7 +157,7 @@ FROM (
                 , EXTRACT(day FROM time_spine_src_28006.ds) AS ds__extract_day
                 , CASE WHEN EXTRACT(dow FROM time_spine_src_28006.ds) = 0 THEN EXTRACT(dow FROM time_spine_src_28006.ds) + 7 ELSE EXTRACT(dow FROM time_spine_src_28006.ds) END AS ds__extract_dow
                 , EXTRACT(doy FROM time_spine_src_28006.ds) AS ds__extract_doy
-                , time_spine_src_28006.martian_day AS ds__martian_day
+                , time_spine_src_28006.alien_day AS ds__alien_day
               FROM ***************************.mf_time_spine time_spine_src_28006
             ) subq_2
           ) subq_3
@@ -366,6 +366,6 @@ FROM (
       ) subq_6
     ) subq_7
     GROUP BY
-      subq_7.booking__ds__martian_day
+      subq_7.booking__ds__alien_day
   ) subq_8
 ) subq_9

@@ -183,8 +183,8 @@ def test_multiple_time_spines(  # noqa: D103
     query_result = it_helpers.mf_engine.query(
         MetricFlowQueryRequest.create_with_random_request_id(
             metric_names=["subdaily_join_to_time_spine_metric", "subdaily_cumulative_window_metric"],
-            group_by_names=["metric_time__martian_day", "metric_time__hour"],
-            order_by_names=["metric_time__martian_day", "metric_time__hour"],
+            group_by_names=["metric_time__alien_day", "metric_time__hour"],
+            order_by_names=["metric_time__alien_day", "metric_time__hour"],
         )
     )
     assert query_result.result_df is not None, "Unexpected empty result."
