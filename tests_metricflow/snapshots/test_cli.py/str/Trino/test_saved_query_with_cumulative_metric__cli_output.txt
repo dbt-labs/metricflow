@@ -1,6 +1,0 @@
-test_name: test_saved_query_with_cumulative_metric
-test_filename: test_cli.py
----
-metric_time__day       trailing_2_months_revenue
--------------------  ---------------------------
-2020-01-01T00:00:00                         1000
