@@ -165,6 +165,7 @@ def test_list_entities(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D103
     assert "host" in resp.output
 
 
+@pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
 def test_saved_query(  # noqa: D103
     request: FixtureRequest,
@@ -188,6 +189,7 @@ def test_saved_query(  # noqa: D103
     )
 
 
+@pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
 def test_saved_query_with_where(  # noqa: D103
     request: FixtureRequest,
@@ -219,6 +221,7 @@ def test_saved_query_with_where(  # noqa: D103
     )
 
 
+@pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
 def test_saved_query_with_limit(  # noqa: D103
     request: FixtureRequest,
@@ -264,6 +267,7 @@ def test_saved_query_explain(  # noqa: D103
     assert resp.exit_code == 0
 
 
+@pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
 def test_saved_query_with_cumulative_metric(  # noqa: D103
     request: FixtureRequest,
