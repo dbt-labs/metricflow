@@ -20,7 +20,8 @@ def run_and_check_cli_command(
     command: click.BaseCommand,
     args: Sequence[str],
     sql_client: Optional[SqlClient] = None,
-    assert_zero_exit_code: bool = True,
+    expected_exit_code: int = 0,
+    expectation_description: Optional[str] = None,
 ) -> None:
     """Helper to run a CLI command and check that the output matches the stored snapshot."""
     # Needed to resolve `ValueError: I/O operation on closed file` when running CLI tests individually.
@@ -33,6 +34,6 @@ def run_and_check_cli_command(
         snapshot_id="result",
         snapshot_str=result.stdout,
         sql_engine=sql_client.sql_engine_type if sql_client else None,
+        expectation_description=expectation_description,
     )
-    if assert_zero_exit_code:
-        assert result.exit_code == 0
+    assert result.exit_code == expected_exit_code
