@@ -5,6 +5,7 @@ import pathlib
 from logging.handlers import TimedRotatingFileHandler
 from typing import Dict, Optional
 
+import click
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
@@ -29,6 +30,16 @@ class CLIConfiguration:
         self._sql_client: Optional[SqlClient] = None
         self._semantic_manifest: Optional[SemanticManifest] = None
         self._semantic_manifest_lookup: Optional[SemanticManifestLookup] = None
+        self._is_setup = False
+
+    @property
+    def is_setup(self) -> bool:
+        """Returns true if this configuration object has already been set up.
+
+        This can be used of avoid running `setup()` multiple times when a single configuration object is shared
+        between test cases.
+        """
+        return self._is_setup
 
     def setup(
         self,
@@ -55,6 +66,10 @@ class CLIConfiguration:
         if dbt_project_path is None:
             dbt_project_path = cwd
 
+        if not (dbt_project_path / "dbt_project.yml").exists():
+            click.echo("\n".join(["❌ Unable to locate 'dbt_project.yml' in:", f"  {dbt_project_path}", ""]))
+            exit(1)
+
         try:
             self._dbt_project_metadata = dbtProjectMetadata.load_from_paths(
                 profiles_path=dbt_profiles_path,
@@ -75,6 +90,8 @@ class CLIConfiguration:
                 ) from e
             else:
                 raise e
+
+        self._is_setup = True
 
     def _get_dbt_project_metadata(self) -> dbtProjectMetadata:
         if self._dbt_project_metadata is None:
