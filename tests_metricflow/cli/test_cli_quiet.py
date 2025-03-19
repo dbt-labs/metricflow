@@ -9,7 +9,7 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 
 from dbt_metricflow.cli.main import query
 from metricflow.protocols.sql_client import SqlClient
-from tests_metricflow.cli.conftest import run_and_check_cli_command
+from tests_metricflow.cli.cli_test_helpers import run_and_check_cli_command
 from tests_metricflow.fixtures.cli_fixtures import MetricFlowCliRunner
 
 logger = logging.getLogger(__name__)
