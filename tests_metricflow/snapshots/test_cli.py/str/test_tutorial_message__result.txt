@@ -1,0 +1,47 @@
+test_name: test_tutorial_message
+test_filename: test_cli.py
+docstring:
+  Tests the message output of the tutorial.
+
+      The tutorial now essentially compiles a semantic manifest and then asks the user to run dbt seed,
+      so from an end user perspective it's little more than the output with -m.
+
+      The tutorial currently requires execution from a dbt project path. Rather than go all the way on testing the
+      tutorial given the path and dbt project requirements, we simply check the message output. When we allow for
+      project path overrides it might warrant a more complete test of the semantic manifest building steps in the
+      tutorial flow.
+---
+🤓 Please run the following steps:
+
+1.  Switch to the root directory of the generated sample project (e.g. `cd mf_tutorial_project`).
+2.  Run `dbt seed` and check that the steps related to countries, transactions, customers are passing.
+3.  Run `dbt build` to produce the model tables.
+4.  Try validating your data model: `mf validate-configs`
+5.  Check out your metrics: `mf list metrics`
+6.  Check out dimensions for your metric `mf list dimensions --metrics transactions`
+7.  Query your first metric:
+        mf query --metrics transactions --group-by metric_time --order metric_time
+8.  Show the SQL MetricFlow generates:
+        mf query --metrics transactions --group-by metric_time --order metric_time --explain
+8.  Visualize the plan:
+        mf query --metrics transactions --group-by metric_time --order metric_time --explain --display-plans
+    * This only works if you have graphviz installed - see README.
+9.  Add another dimension:
+        mf query --metrics transactions --group-by metric_time,customer__customer_country --order metric_time
+10. Add a coarser time granularity:
+        mf query --metrics transactions --group-by metric_time__week --order metric_time__week
+11. Try a more complicated query:
+        mf query \
+        --metrics transactions,transaction_usd_na \
+        --group-by metric_time,transaction__is_large \
+        --order metric_time \
+        --start-time 2022-03-20 --end-time 2022-04-01
+12. When you're done with the tutorial, run mf tutorial --clean to delete sample models and seeds.
+    * If a sample project was created, it wil remain.
+13. Before integrating metrics into your project, read up on adding a time spine.
+    (<Control>+<Left Click> may work in your terminal to follow the link)
+       https://docs.getdbt.com/docs/build/metricflow-time-spine?version=1.10
+
+If you found MetricFlow to be helpful, consider adding a Github star to promote the project:
+       https://github.com/dbt-labs/metricflow
+
