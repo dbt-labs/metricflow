@@ -1,3 +1,3 @@
 select
     *
-from {{source('tutorial', 'countries_seed')}}
+from {{ref('countries_seed')}}
