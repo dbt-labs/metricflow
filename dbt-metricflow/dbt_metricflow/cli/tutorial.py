@@ -17,7 +17,6 @@ from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from packaging.version import Version
 from typing_extensions import Optional
 
-from dbt_metricflow.cli.cli_configuration import CLIConfiguration
 from dbt_metricflow.cli.cli_link import CliLink
 
 logger = logging.getLogger(__name__)
@@ -136,7 +135,7 @@ class dbtMetricFlowTutorialHelper:
         )
 
     @staticmethod
-    def run_tutorial(cfg: CLIConfiguration, message: bool, clean: bool, yes: bool) -> None:
+    def run_tutorial(message: bool, clean: bool, yes: bool) -> None:
         """Run user through a CLI tutorial.
 
         See the associated Click command for details on the arguments.
@@ -211,20 +210,13 @@ class dbtMetricFlowTutorialHelper:
         project_path = sample_dbt_project_path
 
         click.echo(f"Using the project in {str(project_path)!r}\n")
-        cfg.setup()
 
         # TODO: Health checks
 
         # Load the metadata from dbt project
-        try:
-            dbt_project_metadata = cfg.dbt_project_metadata
-            dbt_paths = dbt_project_metadata.dbt_paths
-            model_path = pathlib.Path(dbt_paths.model_paths[0]) / "sample_model"
-            seed_path = pathlib.Path(dbt_paths.seed_paths[0]) / "sample_seed"
-            manifest_path = pathlib.Path(dbt_paths.target_path) / "semantic_manifest.json"
-        except Exception as e:
-            click.echo(f"Unable to parse path metadata from dbt project.\nERROR: {str(e)}")
-            exit(1)
+        model_path = project_path / "models" / "sample_model"
+        seed_path = project_path / "seeds" / "sample_seeds"
+        manifest_path = project_path / "semantic_manifest.json"
 
         # Remove sample files from dbt project
         if clean:
@@ -271,9 +263,7 @@ class dbtMetricFlowTutorialHelper:
 
         spinner = Halo(text="Generating sample files...", spinner="dots")
         spinner.start()
-        dbtMetricFlowTutorialHelper.generate_model_files(
-            model_path=model_path, profile_schema=dbt_project_metadata.schema
-        )
+        dbtMetricFlowTutorialHelper.generate_model_files(model_path=model_path)
         dbtMetricFlowTutorialHelper.generate_seed_files(seed_path=seed_path)
         dbtMetricFlowTutorialHelper.generate_semantic_manifest_file(manifest_path=manifest_path)
 
