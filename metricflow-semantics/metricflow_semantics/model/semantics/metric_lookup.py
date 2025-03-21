@@ -166,7 +166,7 @@ class MetricLookup:
 
     @property
     def metric_references(self) -> Sequence[MetricReference]:  # noqa: D102
-        return list(self._metrics.keys())
+        return sorted(self._metrics.keys())
 
     def get_metric(self, metric_reference: MetricReference) -> Metric:  # noqa: D102
         if metric_reference not in self._metrics:
