@@ -34,23 +34,11 @@ class dbtMetricFlowTutorialHelper:
     SAMPLE_SOURCES_FILE = "sources.yml"
 
     @staticmethod
-    def generate_model_files(model_path: pathlib.Path, profile_schema: str) -> None:
+    def generate_model_files(model_path: pathlib.Path) -> None:
         """Generates the sample model files to the given dbt model path."""
         sample_model_path = pathlib.Path(__file__).parent / dbtMetricFlowTutorialHelper.SAMPLE_MODELS_DIRECTORY
         logger.debug(LazyFormat("Copying model files", sample_model_path=sample_model_path, model_path=model_path))
         shutil.copytree(src=sample_model_path, dst=model_path)
-
-        # Generate the sources.yml file with the schema given in profiles.yml
-        sample_sources_path = (
-            pathlib.Path(__file__).parent
-            / dbtMetricFlowTutorialHelper.SAMPLE_DBT_MODEL_DIRECTORY
-            / dbtMetricFlowTutorialHelper.SAMPLE_SOURCES_FILE
-        )
-        with open(sample_sources_path) as file:
-            contents = Template(file.read()).substitute({"system_schema": profile_schema})
-        dest_sources_path = pathlib.Path(model_path) / dbtMetricFlowTutorialHelper.SAMPLE_SOURCES_FILE
-        with open(dest_sources_path, "w") as file:
-            file.write(contents)
 
     @staticmethod
     def generate_seed_files(seed_path: pathlib.Path) -> None:
