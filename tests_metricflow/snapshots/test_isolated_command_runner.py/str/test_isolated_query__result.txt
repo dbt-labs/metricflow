@@ -1,0 +1,10 @@
+test_name: test_isolated_query
+test_filename: test_isolated_command_runner.py
+docstring:
+  Tests running an MF query using the isolated runner.
+expectation_description:
+  A table showing the `transactions` metric.
+---
+  transactions
+--------------
+            50
