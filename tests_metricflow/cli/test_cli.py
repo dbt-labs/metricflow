@@ -30,22 +30,18 @@ from dbt_metricflow.cli.main import (
     tutorial,
     validate_configs,
 )
-from metricflow.protocols.sql_client import SqlClient
 from tests_metricflow.cli.cli_test_helpers import run_and_check_cli_command
 from tests_metricflow.fixtures.cli_fixtures import MetricFlowCliRunner
-from tests_metricflow.snapshot_utils import assert_str_snapshot_equal
 
 logger = logging.getLogger(__name__)
 
 
-@pytest.mark.sql_engine_snapshot
 @pytest.mark.duckdb_only
 def test_query(  # noqa: D103
     request: FixtureRequest,
     capsys: pytest.CaptureFixture,
     mf_test_configuration: MetricFlowTestConfiguration,
     cli_runner: MetricFlowCliRunner,
-    sql_client: SqlClient,
 ) -> None:
     run_and_check_cli_command(
         request=request,
@@ -54,10 +50,10 @@ def test_query(  # noqa: D103
         cli_runner=cli_runner,
         command=query,
         args=["--metrics", "bookings", "--group-by", "metric_time", "--order", "metric_time,bookings"],
-        sql_client=sql_client,
     )
 
 
+@pytest.mark.duckdb_only
 def test_list_dimensions(  # noqa: D103
     request: FixtureRequest,
     capsys: pytest.CaptureFixture,
@@ -74,6 +70,7 @@ def test_list_dimensions(  # noqa: D103
     )
 
 
+@pytest.mark.duckdb_only
 def test_list_metrics(  # noqa: D103
     request: FixtureRequest,
     capsys: pytest.CaptureFixture,
@@ -90,14 +87,12 @@ def test_list_metrics(  # noqa: D103
     )
 
 
-@pytest.mark.sql_engine_snapshot
 @pytest.mark.duckdb_only
 def test_get_dimension_values(  # noqa: D103
     request: FixtureRequest,
     capsys: pytest.CaptureFixture,
     mf_test_configuration: MetricFlowTestConfiguration,
     cli_runner: MetricFlowCliRunner,
-    sql_client: SqlClient,
 ) -> None:
     run_and_check_cli_command(
         request=request,
@@ -106,7 +101,6 @@ def test_get_dimension_values(  # noqa: D103
         cli_runner=cli_runner,
         command=dimension_values,
         args=["--metrics", "bookings", "--dimension", "booking__is_instant"],
-        sql_client=sql_client,
     )
 
 
@@ -185,14 +179,12 @@ def test_validate_configs(  # noqa: D103
         dummy_project.unlink()
 
 
-@pytest.mark.sql_engine_snapshot
 @pytest.mark.duckdb_only
 def test_health_checks(  # noqa: D103
     request: FixtureRequest,
     capsys: pytest.CaptureFixture,
     mf_test_configuration: MetricFlowTestConfiguration,
     cli_runner: MetricFlowCliRunner,
-    sql_client: SqlClient,
 ) -> None:
     run_and_check_cli_command(
         request=request,
@@ -201,7 +193,6 @@ def test_health_checks(  # noqa: D103
         cli_runner=cli_runner,
         command=health_checks,
         args=[],
-        sql_client=sql_client,
     )
 
 
@@ -248,40 +239,35 @@ def test_list_entities(  # noqa: D103
 
 
 @pytest.mark.duckdb_only
-@pytest.mark.sql_engine_snapshot
 def test_saved_query(  # noqa: D103
     request: FixtureRequest,
     capsys: pytest.CaptureFixture,
     mf_test_configuration: MetricFlowTestConfiguration,
     cli_runner: MetricFlowCliRunner,
-    sql_client: SqlClient,
 ) -> None:
-    resp = cli_runner.run(
-        query, args=["--saved-query", "p0_booking", "--order", "metric_time__day,listing__capacity_latest"]
-    )
-
-    assert resp.exit_code == 0
-
-    assert_str_snapshot_equal(
+    run_and_check_cli_command(
         request=request,
+        capsys=capsys,
         mf_test_configuration=mf_test_configuration,
-        snapshot_id="cli_output",
-        snapshot_str=resp.output,
-        sql_engine=sql_client.sql_engine_type,
+        cli_runner=cli_runner,
+        command=query,
+        args=["--saved-query", "p0_booking", "--order", "metric_time__day,listing__capacity_latest"],
     )
 
 
 @pytest.mark.duckdb_only
-@pytest.mark.sql_engine_snapshot
 def test_saved_query_with_where(  # noqa: D103
     request: FixtureRequest,
     capsys: pytest.CaptureFixture,
     mf_test_configuration: MetricFlowTestConfiguration,
     cli_runner: MetricFlowCliRunner,
-    sql_client: SqlClient,
 ) -> None:
-    resp = cli_runner.run(
-        query,
+    run_and_check_cli_command(
+        request=request,
+        capsys=capsys,
+        mf_test_configuration=mf_test_configuration,
+        cli_runner=cli_runner,
+        command=query,
         args=[
             "--saved-query",
             "p0_booking",
@@ -292,28 +278,20 @@ def test_saved_query_with_where(  # noqa: D103
         ],
     )
 
-    assert resp.exit_code == 0
-
-    assert_str_snapshot_equal(
-        request=request,
-        mf_test_configuration=mf_test_configuration,
-        snapshot_id="cli_output",
-        snapshot_str=resp.output,
-        sql_engine=sql_client.sql_engine_type,
-    )
-
 
 @pytest.mark.duckdb_only
-@pytest.mark.sql_engine_snapshot
 def test_saved_query_with_limit(  # noqa: D103
     request: FixtureRequest,
     capsys: pytest.CaptureFixture,
     mf_test_configuration: MetricFlowTestConfiguration,
     cli_runner: MetricFlowCliRunner,
-    sql_client: SqlClient,
 ) -> None:
-    resp = cli_runner.run(
-        query,
+    run_and_check_cli_command(
+        request=request,
+        capsys=capsys,
+        mf_test_configuration=mf_test_configuration,
+        cli_runner=cli_runner,
+        command=query,
         args=[
             "--saved-query",
             "p0_booking",
@@ -324,25 +302,13 @@ def test_saved_query_with_limit(  # noqa: D103
         ],
     )
 
-    assert resp.exit_code == 0
-
-    assert_str_snapshot_equal(
-        request=request,
-        mf_test_configuration=mf_test_configuration,
-        snapshot_id="cli_output",
-        snapshot_str=resp.output,
-        sql_engine=sql_client.sql_engine_type,
-    )
-
 
 @pytest.mark.duckdb_only
-@pytest.mark.sql_engine_snapshot
 def test_saved_query_explain(  # noqa: D103
     request: FixtureRequest,
     capsys: pytest.CaptureFixture,
     mf_test_configuration: MetricFlowTestConfiguration,
     cli_runner: MetricFlowCliRunner,
-    sql_client: SqlClient,
 ) -> None:
     run_and_check_cli_command(
         request=request,
@@ -351,21 +317,22 @@ def test_saved_query_explain(  # noqa: D103
         cli_runner=cli_runner,
         command=query,
         args=["--explain", "--saved-query", "p0_booking", "--order", "metric_time__day,listing__capacity_latest"],
-        sql_client=sql_client,
     )
 
 
 @pytest.mark.duckdb_only
-@pytest.mark.sql_engine_snapshot
 def test_saved_query_with_cumulative_metric(  # noqa: D103
     request: FixtureRequest,
     capsys: pytest.CaptureFixture,
     mf_test_configuration: MetricFlowTestConfiguration,
     cli_runner: MetricFlowCliRunner,
-    sql_client: SqlClient,
 ) -> None:
-    resp = cli_runner.run(
-        query,
+    run_and_check_cli_command(
+        request=request,
+        capsys=capsys,
+        mf_test_configuration=mf_test_configuration,
+        cli_runner=cli_runner,
+        command=query,
         args=[
             "--saved-query",
             "saved_query_with_cumulative_metric",
@@ -377,12 +344,3 @@ def test_saved_query_with_cumulative_metric(  # noqa: D103
             "2020-01-01",
         ],
     )
-
-    assert_str_snapshot_equal(
-        request=request,
-        mf_test_configuration=mf_test_configuration,
-        snapshot_id="cli_output",
-        snapshot_str=resp.output,
-        sql_engine=sql_client.sql_engine_type,
-    )
-    assert resp.exit_code == 0
