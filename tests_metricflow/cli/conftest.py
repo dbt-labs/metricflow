@@ -19,5 +19,6 @@ def cli_runner() -> Iterator[IsolatedCliCommandRunner]:  # noqa: D103
             dbt_profiles_path=dbt_project_path,
             dbt_project_path=dbt_project_path,
         )
-        run_dbt_build(cli_runner)
-        yield cli_runner
+        with cli_runner.running_context():
+            run_dbt_build(cli_runner)
+            yield cli_runner
