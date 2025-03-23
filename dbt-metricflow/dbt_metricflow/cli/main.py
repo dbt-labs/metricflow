@@ -280,15 +280,15 @@ def query(
             click.echo(f"Plan SVG saved to: {svg_path}")
 
 
-@cli.group()
+@cli.group(name="list")
 @pass_config
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-def list(cfg: CLIConfiguration) -> None:
+def list_command_group(cfg: CLIConfiguration) -> None:
     """Retrieve metadata values about metrics/dimensions/entities/dimension values."""
     pass
 
 
-@list.command()
+@list_command_group.command()
 @click.option("--search", required=False, type=str, help="Filter available metrics by this search term")
 @click.option(
     "--show-all-dimensions", is_flag=True, default=False, help="Show all dimensions associated with a metric."
@@ -331,7 +331,7 @@ def metrics(cfg: CLIConfiguration, show_all_dimensions: bool = False, search: Op
         )
 
 
-@list.command()
+@list_command_group.command()
 @click.option(
     "--metrics",
     type=click_custom.SequenceParamType(min_length=1),
@@ -360,7 +360,7 @@ def dimensions(cfg: CLIConfiguration, metrics: List[str]) -> None:
         click.echo(f"• {click.style(dimension.granularity_free_qualified_name, bold=True, fg='green')}")
 
 
-@list.command()
+@list_command_group.command()
 @click.option(
     "--metrics",
     type=click_custom.SequenceParamType(min_length=1),
@@ -412,7 +412,7 @@ def health_checks(cfg: CLIConfiguration) -> None:
             click.echo(f"• ✅ {click.style(test, bold=True, fg=('green'))}: Success!")
 
 
-@list.command()
+@list_command_group.command()
 @click.option("--dimension", required=True, type=str, help="Dimension to query values from")
 @click.option(
     "--metrics",
