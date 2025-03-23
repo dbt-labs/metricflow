@@ -1,8 +1,8 @@
 test_name: test_saved_query_with_limit
 test_filename: test_cli.py
 ---
-metric_time__day       listing__capacity_latest    bookings    instant_bookings
--------------------  --------------------------  ----------  ------------------
-2019-12-01T00:00:00                           5           1                   0
-2019-12-18T00:00:00                           4           4                   2
-2019-12-19T00:00:00                           4           6                   6
+metric_time__day     customer__customer_country      transactions    quick_buy_transactions
+-------------------  ----------------------------  --------------  ------------------------
+2022-03-07T00:00:00  CA                                         1                         1
+2022-03-07T00:00:00  FR                                         1                         0
+2022-03-08T00:00:00  CA                                         1                         0

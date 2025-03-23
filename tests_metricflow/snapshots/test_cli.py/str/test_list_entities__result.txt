@@ -1,12 +1,9 @@
 test_name: test_list_entities
 test_filename: test_cli.py
 ---
-• listing
-• listing
-• guest
-• guest
-• host
-• host
-• user
-• lux_listing
-• company
+• transaction
+• customer
+• customer
+• id_order
+• id_order
+• country
