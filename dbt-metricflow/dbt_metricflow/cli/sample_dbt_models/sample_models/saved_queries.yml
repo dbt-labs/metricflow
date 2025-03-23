@@ -1,0 +1,19 @@
+---
+saved_queries:
+  - name: core_transaction_metrics
+    description: Important transaction metrics.
+    query_params:
+      metrics:
+        - transactions
+        - quick_buy_transactions
+      group_by:
+        - TimeDimension('metric_time', 'day')
+        - Dimension('customer__customer_country')
+  - name: cumulative_transaction_metrics
+    description: Cumulative metrics related to transactions.
+    query_params:
+      metrics:
+        - cumulative_transactions
+        - cumulative_transactions_in_last_7_days
+      group_by:
+        - TimeDimension('metric_time', 'day')

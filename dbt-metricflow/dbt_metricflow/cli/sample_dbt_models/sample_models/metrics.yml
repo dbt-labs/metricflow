@@ -64,3 +64,15 @@ metrics:
     filter: |
       {{ Dimension('country__region', entity_path=['customer']) }} = 'NA'
     label: "Transaction Amount in NA"
+  - name: cumulative_transactions
+    label: "Total Transactions"
+    type: cumulative
+    type_params:
+      measure: transactions
+  - name: cumulative_transactions_in_last_7_days
+    label: "Total Transaction in the Last 7 Days"
+    type: cumulative
+    type_params:
+      measure: transactions
+      cumulative_type_params:
+        window: 7 days
