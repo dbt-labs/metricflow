@@ -3,7 +3,6 @@ from __future__ import annotations
 import csv as csv_module
 import datetime as dt
 import logging
-import pathlib
 import signal
 import sys
 import tempfile
@@ -570,10 +569,11 @@ def validate_configs(
     # Parsing Validation
     parsing_spinner = Halo(text="Building manifest from dbt project root", spinner="dots")
     parsing_spinner.start()
-    project_root = pathlib.Path.cwd()
 
     try:
-        semantic_manifest = dbtArtifacts.build_semantic_manifest_from_dbt_project_root(project_root=project_root)
+        semantic_manifest = dbtArtifacts.build_semantic_manifest_from_dbt_project_root(
+            project_root=cfg.dbt_project_metadata.project_path
+        )
         parsing_spinner.succeed("🎉 Successfully parsed manifest from dbt project")
     except Exception as e:
         parsing_spinner.fail(f"Exception found when parsing manifest from dbt project ({str(e)})")
