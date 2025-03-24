@@ -3,5 +3,5 @@ test_filename: test_fill_nulls_with_0.py
 ---
 metric_time__day       bookings_join_to_time_spine_with_tiered_filters
 -------------------  -------------------------------------------------
-2020-01-01T00:00:00                                               None
+2020-01-01T00:00:00
 2020-01-02T00:00:00                                                  9
