@@ -1,0 +1,15 @@
+test_name: test_print_string
+test_filename: test_output_format.py
+docstring:
+  Tests the default display of strings in the output of `mf query`.
+---
+  row  row__str_value    row__description                               demo_metric
+-----  ----------------  -------------------------------------------  -------------
+   11                    Single space (' ').                                      1
+   12  None              String literal 'None'                                    1
+   13  none              String literal 'none'                                    1
+   14  NULL              String literal 'NULL'                                    1
+   15  null              String literal 'null'                                    1
+   16  Line 1            String with a newline.                                   1
+       Line 2
+   17  Space Padded      String with leading / trailing space (' ').              1
