@@ -1,7 +1,7 @@
 test_name: test_join_to_time_spine_with_filter_not_in_group_by_using_agg_time
 test_filename: test_fill_nulls_with_0.py
 ---
-BOOKING__DS__DAY     BOOKINGS_JOIN_TO_TIME_SPINE_WITH_TIERED_FILTERS
+BOOKING__DS__DAY       BOOKINGS_JOIN_TO_TIME_SPINE_WITH_TIERED_FILTERS
 -------------------  -------------------------------------------------
-2020-01-01T00:00:00  None
-2020-01-02T00:00:00  9
+2020-01-01T00:00:00                                               None
+2020-01-02T00:00:00                                                  9
