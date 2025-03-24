@@ -12,4 +12,4 @@ docstring:
    15  null              String literal 'null'                                    1
    16  Line 1            String with a newline.                                   1
        Line 2
-   17  Space Padded      String with leading / trailing space (' ').              1
+   17   Space Padded     String with leading / trailing space (' ').              1
