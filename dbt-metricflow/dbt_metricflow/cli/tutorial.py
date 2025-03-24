@@ -28,7 +28,6 @@ class dbtMetricFlowTutorialHelper:
     SAMPLE_DBT_MODEL_DIRECTORY = "sample_dbt_models"
     SAMPLE_MODELS_DIRECTORY = SAMPLE_DBT_MODEL_DIRECTORY + "/sample_models"
     SAMPLE_SEED_DIRECTORY = SAMPLE_DBT_MODEL_DIRECTORY + "/seeds"
-    SAMPLE_SEMANTIC_MANIFEST = SAMPLE_DBT_MODEL_DIRECTORY + "/semantic_manifest.json"
     SAMPLE_DBT_PROJECT_DIRECTORY = "mf_tutorial_project"
     SAMPLE_SOURCES_FILE = "sources.yml"
 
@@ -44,16 +43,6 @@ class dbtMetricFlowTutorialHelper:
         """Generates the sample seed files to the given dbt seed path."""
         sample_seed_path = pathlib.Path(__file__).parent / dbtMetricFlowTutorialHelper.SAMPLE_SEED_DIRECTORY
         shutil.copytree(src=sample_seed_path, dst=seed_path)
-
-    @staticmethod
-    def generate_semantic_manifest_file(manifest_path: pathlib.Path) -> None:
-        """Generates the sample semantic manifest to the given dbt semantic manifest path."""
-        target_path = manifest_path.parent
-        if not target_path.exists():
-            target_path.mkdir()
-
-        sample_manifest_path = pathlib.Path(__file__).parent / dbtMetricFlowTutorialHelper.SAMPLE_SEMANTIC_MANIFEST
-        shutil.copy(src=sample_manifest_path, dst=manifest_path)
 
     @staticmethod
     def remove_sample_files(model_path: pathlib.Path, seed_path: pathlib.Path) -> None:
@@ -216,7 +205,6 @@ class dbtMetricFlowTutorialHelper:
         # Load the metadata from dbt project
         model_path = project_path / "models" / "sample_model"
         seed_path = project_path / "seeds" / "sample_seeds"
-        manifest_path = project_path / "semantic_manifest.json"
 
         # Remove sample files from dbt project
         if clean:
@@ -241,11 +229,9 @@ class dbtMetricFlowTutorialHelper:
                 As part of this tutorial, we will generate the following files to help you get started:
 
                 📜 Model Files
-                    -> {model_path.absolute().as_posix()}
+                    -> {model_path.absolute()}
                 🌱 Seed Files
-                    -> {seed_path.absolute().as_posix()}
-                ✅ Semantic Manifest JSON File
-                    -> {manifest_path.absolute().as_posix()}
+                    -> {seed_path.absolute()}
                 """
             )
         )
@@ -265,8 +251,6 @@ class dbtMetricFlowTutorialHelper:
         spinner.start()
         dbtMetricFlowTutorialHelper.generate_model_files(model_path=model_path)
         dbtMetricFlowTutorialHelper.generate_seed_files(seed_path=seed_path)
-        dbtMetricFlowTutorialHelper.generate_semantic_manifest_file(manifest_path=manifest_path)
-
         spinner.succeed("📜 Sample files has been generated.")
 
         click.echo("\n" + help_message_text)
