@@ -5,8 +5,8 @@ docstring:
 
       Originally added to reproduce a bug with how large numbers were displayed due to use of `tabulate`.
 expectation_description:
-  Numeric values should not be displayed in exponent notation and should have 2 decimals.
+  Non-integer numeric values should not be displayed in exponent notation and should have 2 decimals.
 ---
-  row    row__str_value    row__int_value    row__float_value    row__decimal_value    demo_metric
+  row  row__str_value      row__int_value    row__float_value    row__decimal_value    demo_metric
 -----  ----------------  ----------------  ------------------  --------------------  -------------
-   18        1234000000        1234000000           1.234e+09             1.234e+09              1
+   18  1234000000              1234000000       1234000000.00         1234000000.00              1

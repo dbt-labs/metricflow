@@ -1,0 +1,11 @@
+test_name: test_decimals_option_invalid
+test_filename: test_output_format.py
+docstring:
+  Tests the output of `mf query --decimals invalid_value ...`.
+expectation_description:
+  An error should be displayed due to the invalid argument value.
+---
+Usage: query [OPTIONS]
+Try 'query --help' for help.
+
+Error: Invalid value for '--decimals': 'invalid_value' is not a valid integer.
