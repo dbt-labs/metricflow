@@ -5,4 +5,4 @@ docstring:
 ---
 row    row__str_value    row__int_value    row__float_value    row__decimal_value    row__description      demo_metric
 -----  ----------------  ----------------  ------------------  --------------------  ------------------  -------------
-None   None              None              None                None                  Each type as NULL.              1
+                                                                                     Each type as NULL.              1
