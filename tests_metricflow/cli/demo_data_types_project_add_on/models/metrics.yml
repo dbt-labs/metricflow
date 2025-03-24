@@ -1,0 +1,7 @@
+---
+metrics:
+  - name: demo_metric
+    type: SIMPLE
+    type_params:
+      measure: demo_measure
+    label: "Demo Metric"

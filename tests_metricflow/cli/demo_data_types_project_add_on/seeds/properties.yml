@@ -1,0 +1,8 @@
+seeds:
+  - name: demo_data_types_seed
+    config:
+      column_types:
+        str_value: VARCHAR
+        int_value: BIGINT
+        float_value: FLOAT
+        decimal_value: DECIMAL(38,19)
