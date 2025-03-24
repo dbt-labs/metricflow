@@ -131,15 +131,13 @@ class MetricFlowDataTable:
 
     def text_format(self, float_decimals: Optional[int] = None) -> str:
         """Return a text version of this table that is suitable for printing."""
-        str_rows: List[List[str]] = []
+        str_rows: List[List[Optional[str]]] = []
 
         for row in self.rows:
-            str_row: List[str] = []
+            str_row: List[Optional[str]] = []
             for column_index, cell_value in enumerate(row):
                 if cell_value is None:
-                    # This will be changed in a later PR - leaving with incorrect behavior to reduce snapshot changes
-                    # for the numeric-type-display fix.
-                    str_row.append(str(None))
+                    str_row.append(None)
                 elif self.column_descriptions[column_index].column_type in {float, Decimal}:
                     # Use `g` (general number format) by default.
                     float_format = f".{float_decimals}f" if float_decimals is not None else "g"
