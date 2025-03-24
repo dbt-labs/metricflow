@@ -1,0 +1,31 @@
+semantic_models:
+  - name: demo_data_types
+    description: Demonstrates different data types.
+    defaults:
+      agg_time_dimension: ds
+    model: ref('demo_data_types')
+
+    measures:
+      - name: demo_measure
+        expr: 1
+        agg: MAX
+    entities:
+      - name: row
+        type: primary
+    dimensions:
+      - name: ds
+        type: time
+        type_params:
+          time_granularity: day
+      - name: str_value
+        type: categorical
+      - name: int_value
+        type: categorical
+      - name: float_value
+        type: categorical
+      - name: decimal_value
+        type: categorical
+      - name: test_group
+        type: categorical
+      - name: description
+        type: categorical

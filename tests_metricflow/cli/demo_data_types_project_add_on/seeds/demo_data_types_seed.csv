@@ -1,0 +1,20 @@
+ds,row,str_value,int_value,float_value,decimal_value,test_group,description
+,,,,,,null,Each type as NULL.
+2020-01-01,1,-1234000000,-1234000000,-1.234e9,-1234000000,numeric,
+2020-01-02,2,-1234,-1234,-1234,-1234,numeric,
+2020-01-03,3,-1.234,-1,-1.234,-1.234,numeric,
+2020-01-04,4,-0.000000001234,0,-1.234e-9,-0.000000001234,numeric,
+2020-01-05,5,0,0,0,0,numeric,
+2020-01-06,6,0.000000001234,0,1.234e-9,0.000000001234,numeric,
+2020-01-07,7,1.234,1,1.234,1.234,numeric,
+2020-01-08,8,1234,1234,1234,1234,numeric,
+2020-01-09,9,1234000000,1234000000,1.234e9,1234000000,numeric,
+2020-01-10,11, ,,,,string,Single space (' ').
+2020-01-11,12,None,,,,string,String literal 'None'
+2020-01-12,13,none,,,,string,String literal 'none'
+2020-01-13,14,NULL,,,,string,String literal 'NULL'
+2020-01-14,15,null,,,,string,String literal 'null'
+2020-01-15,16,"Line 1
+Line 2",,,,string,String with a newline.
+2020-01-16,17, Space Padded ,,,,string,String with leading / trailing space (' ').
+2020-01-17,18,1234000000,1234000000,1.234e9,1234000000,large_numbers_in_one_row,
