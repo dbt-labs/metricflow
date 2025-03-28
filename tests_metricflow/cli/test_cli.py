@@ -17,6 +17,7 @@ from typing import Iterator
 import pytest
 from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.random_id import random_id
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from dbt_metricflow.cli.cli_configuration import CLIConfiguration
@@ -339,3 +340,44 @@ def test_missing_time_spine_error(
                 args=["metrics"],
                 expected_exit_code=1,
             )
+
+
+@pytest.mark.slow
+def test_csv(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+) -> None:
+    """Test the error message that a user gets when a time spine is not configured in the project."""
+    with tempfile.TemporaryDirectory() as working_directory:
+        working_directory_path = Path(working_directory)
+        # dbt_project_path = working_directory_path / "mf_tutorial_project"
+        # dbtMetricFlowTutorialHelper.generate_dbt_project(dbt_project_path)
+        #
+        # model_yaml_file_path = dbt_project_path / "models" / "_models.yml"
+        # Path.unlink(model_yaml_file_path)
+        # logger.debug(LazyFormat("Removed time spine model file", model_yaml_file_path=model_yaml_file_path))
+        dbt_project_path = create_tutorial_project_files(working_directory_path)
+
+        cli_runner = IsolatedCliCommandRunner(
+            dbt_profiles_path=dbt_project_path,
+            dbt_project_path=dbt_project_path,
+        )
+        with cli_runner.running_context():
+            run_dbt_build(cli_runner)
+
+            for _ in range(10):
+                filename = f"csv_output_{random_id()}.csv"
+                result = cli_runner.run_command(
+                    command_enum=IsolatedCliCommandEnum.MF_QUERY,
+                    command_args=["--metrics", "transactions", "--csv", filename],
+                    working_directory_path=working_directory_path,
+                )
+                result.raise_exception_on_failure()
+                csv_file_path = (working_directory_path / filename).absolute()
+                with open(csv_file_path, "r") as csv_file:
+                    csv_file_contents = csv_file.read()
+                    logger.debug(
+                        LazyFormat(
+                            "Read CSV contents", csv_file_path=str(csv_file_path), csv_file_contents=csv_file_contents
+                        )
+                    )
