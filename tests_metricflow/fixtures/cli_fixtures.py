@@ -38,6 +38,11 @@ class FakeCLIConfiguration(CLIConfiguration):
         self._semantic_manifest_lookup: Optional[SemanticManifestLookup] = None
         self._log_file_path: Optional[pathlib.Path] = None
 
+    @property
+    @override
+    def is_setup(self) -> bool:
+        return True
+
     @override
     def setup(
         self,
