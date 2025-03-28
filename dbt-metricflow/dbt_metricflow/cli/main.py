@@ -105,12 +105,11 @@ def cli(cfg: CLIConfiguration, verbose: bool) -> None:  # noqa: D103
 # @click.option("--skip-dw", is_flag=True, help="Skip the data warehouse health checks") # TODO: re-enable this
 @click.option("--clean", is_flag=True, help="Remove sample model files.")
 @click.option("--yes", is_flag=True, help="Respond yes to all questions (for scripting).")
-@pass_config
 @click.pass_context
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-def tutorial(ctx: click.core.Context, cfg: CLIConfiguration, message: bool, clean: bool, yes: bool) -> None:
+def tutorial(ctx: click.core.Context, message: bool, clean: bool, yes: bool) -> None:
     """Click command to run the tutorial."""
-    dbtMetricFlowTutorialHelper.run_tutorial(cfg=cfg, message=message, clean=clean, yes=yes)
+    dbtMetricFlowTutorialHelper.run_tutorial(message=message, clean=clean, yes=yes)
 
 
 def _click_echo(message: str, quiet: bool) -> None:
