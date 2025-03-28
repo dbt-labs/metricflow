@@ -1,0 +1,6 @@
+kind: Fixes
+body: Address display of whitespace-padded strings in the output of `mf query`
+time: 2025-03-28T14:18:17.834268-07:00
+custom:
+  Author: plypaul
+  Issue: "1701"
