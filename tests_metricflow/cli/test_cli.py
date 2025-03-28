@@ -1,7 +1,14 @@
+"""Tests MF CLI commands e.g. `mf query ...`.
+
+These tests could be parameterized to reduce boilerplate.
+Tests are marked as slow because each CLI command is run in a new process, and the dbt adapter needs to be
+initialized.
+"""
 from __future__ import annotations
 
 import logging
 import shutil
+import tempfile
 import textwrap
 from contextlib import contextmanager
 from pathlib import Path
@@ -9,98 +16,77 @@ from typing import Iterator
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.parsing.dir_to_model import (
-    parse_yaml_files_to_validation_ready_semantic_manifest,
-)
-from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
-from dbt_semantic_interfaces.test_utils import base_semantic_manifest_file
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
-from metricflow_semantics.test_helpers.example_project_configuration import (
-    EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE,
-)
 
 from dbt_metricflow.cli.cli_configuration import CLIConfiguration
-from dbt_metricflow.cli.main import (
-    dimension_values,
-    dimensions,
-    entities,
-    health_checks,
-    metrics,
-    query,
-    tutorial,
-    validate_configs,
+from tests_metricflow.cli.cli_test_helpers import (
+    create_tutorial_project_files,
+    run_and_check_cli_command,
+    run_dbt_build,
 )
-from tests_metricflow.cli.cli_test_helpers import run_and_check_cli_command
-from tests_metricflow.fixtures.cli_fixtures import MetricFlowCliRunner
+from tests_metricflow.cli.isolated_cli_command_interface import IsolatedCliCommandEnum
+from tests_metricflow.cli.isolated_cli_command_runner import IsolatedCliCommandRunner
 
 logger = logging.getLogger(__name__)
 
 
-@pytest.mark.duckdb_only
+@pytest.mark.slow
 def test_query(  # noqa: D103
     request: FixtureRequest,
-    capsys: pytest.CaptureFixture,
     mf_test_configuration: MetricFlowTestConfiguration,
-    cli_runner: MetricFlowCliRunner,
+    cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     run_and_check_cli_command(
         request=request,
-        capsys=capsys,
         mf_test_configuration=mf_test_configuration,
         cli_runner=cli_runner,
-        command=query,
-        args=["--metrics", "bookings", "--group-by", "metric_time", "--order", "metric_time,bookings"],
+        command_enum=IsolatedCliCommandEnum.MF_QUERY,
+        args=["--metrics", "transactions", "--group-by", "metric_time", "--order", "metric_time,transactions"],
     )
 
 
-@pytest.mark.duckdb_only
+@pytest.mark.slow
 def test_list_dimensions(  # noqa: D103
     request: FixtureRequest,
-    capsys: pytest.CaptureFixture,
     mf_test_configuration: MetricFlowTestConfiguration,
-    cli_runner: MetricFlowCliRunner,
+    cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     run_and_check_cli_command(
         request=request,
-        capsys=capsys,
         mf_test_configuration=mf_test_configuration,
         cli_runner=cli_runner,
-        command=dimensions,
-        args=["--metrics", "bookings"],
+        command_enum=IsolatedCliCommandEnum.MF_DIMENSIONS,
+        args=["--metrics", "transactions"],
     )
 
 
-@pytest.mark.duckdb_only
+@pytest.mark.slow
 def test_list_metrics(  # noqa: D103
     request: FixtureRequest,
-    capsys: pytest.CaptureFixture,
     mf_test_configuration: MetricFlowTestConfiguration,
-    cli_runner: MetricFlowCliRunner,
+    cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     run_and_check_cli_command(
         request=request,
-        capsys=capsys,
         mf_test_configuration=mf_test_configuration,
         cli_runner=cli_runner,
-        command=metrics,
+        command_enum=IsolatedCliCommandEnum.MF_METRICS,
         args=[],
     )
 
 
-@pytest.mark.duckdb_only
+@pytest.mark.slow
 def test_get_dimension_values(  # noqa: D103
     request: FixtureRequest,
-    capsys: pytest.CaptureFixture,
     mf_test_configuration: MetricFlowTestConfiguration,
-    cli_runner: MetricFlowCliRunner,
+    cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     run_and_check_cli_command(
         request=request,
-        capsys=capsys,
         mf_test_configuration=mf_test_configuration,
         cli_runner=cli_runner,
-        command=dimension_values,
-        args=["--metrics", "bookings", "--dimension", "booking__is_instant"],
+        command_enum=IsolatedCliCommandEnum.MF_DIMENSION_VALUES,
+        args=["--metrics", "transactions", "--dimension", "customer__customer_country"],
     )
 
 
@@ -113,94 +99,73 @@ def create_directory(directory_path: str) -> Iterator[None]:
     shutil.rmtree(path)
 
 
+@pytest.mark.slow
 def test_validate_configs(  # noqa: D103
     request: FixtureRequest,
-    capsys: pytest.CaptureFixture,
     mf_test_configuration: MetricFlowTestConfiguration,
     cli_context: CLIConfiguration,
 ) -> None:
-    """Tests config validation from a manifest stored on the filesystem.
-
-    This test is special, because the CLI bypasses the semantic manifest read into the CLIContext and
-    validates the config files on disk. It's not entirely clear why we do this, so we should probably
-    figure that out and, if possible, stop doing it so we can have this test depend on an injectable
-    in-memory semantic manifest instead of whatever is stored in the filesystem.
-
-    At any rate, due to the direct read from disk, we have to store a serialized semantic manifest
-    in a temporary location. In order to spin up the CLI this requires us to ALSO have a dbt_project.yml
-    on the filesystem in the project path. Since we don't want to clobber whatever semantic_manifest.json is
-    in the real filesystem location we do all of this stuff here.
-    """
+    """Tests configuration validation by adding a semantic model file with errors."""
     yaml_contents = textwrap.dedent(
         """\
-        semantic_model:
-          name: bad_semantic_model
-          node_relation:
-            schema_name: some_schema
-            alias: some_table
-          defaults:
-            agg_time_dimension: ds
-          dimensions:
-            - name: country
-              type: categorical
+        semantic_models:
+          - name: bad_semantic_model
+            model: ref('transactions')
+            defaults:
+              agg_time_dimension: ds
+            primary_entity: bad_semantic_model_primary_entity
+            dimensions:
+              - name: ds
+                type: time
+                type_params:
+                  time_granularity: day
+              - name: bad_dimension
+                expr: non_existent_column
+                type: categorical
         """
     )
-    bad_semantic_model = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
-    # JSON-stored manifests from dbt are not transformed, so we run this test on that style of output
-    manifest = parse_yaml_files_to_validation_ready_semantic_manifest(
-        [EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, base_semantic_manifest_file(), bad_semantic_model],
-        apply_transformations=False,
-    ).semantic_manifest
-
-    project_directory = Path().absolute()
-    # If the dbt_project.yml doesn't exist in this path location the CLI will throw an exception.
-    dummy_project = Path(project_directory, "dbt_project.yml")
-    dummy_project.touch()
-
-    try:
-        cli_runner = MetricFlowCliRunner(cli_context=cli_context, project_path=str(project_directory))
-        target_directory = Path(project_directory, "target")
-        with create_directory(target_directory.as_posix()):
-            manifest_file = Path(target_directory, "semantic_manifest.json")
-            manifest_file.write_text(manifest.json())
+    with tempfile.TemporaryDirectory() as tmp_directory_str:
+        dbt_project_path = create_tutorial_project_files(Path(tmp_directory_str))
+        with open(dbt_project_path / "models" / "bad_semantic_model.yml", "w") as f:
+            f.write(yaml_contents)
+        cli_runner = IsolatedCliCommandRunner(
+            dbt_profiles_path=dbt_project_path,
+            dbt_project_path=dbt_project_path,
+        )
+        with cli_runner.running_context():
+            run_dbt_build(cli_runner)
 
             run_and_check_cli_command(
                 request=request,
-                capsys=capsys,
                 mf_test_configuration=mf_test_configuration,
                 cli_runner=cli_runner,
-                command=validate_configs,
+                command_enum=IsolatedCliCommandEnum.MF_VALIDATE_CONFIGS,
                 args=[],
                 expectation_description="There should be two validation failures with `bad_semantic_model`.",
                 expected_exit_code=1,
             )
 
-    finally:
-        dummy_project.unlink()
 
-
-@pytest.mark.duckdb_only
+@pytest.mark.slow
 def test_health_checks(  # noqa: D103
     request: FixtureRequest,
-    capsys: pytest.CaptureFixture,
     mf_test_configuration: MetricFlowTestConfiguration,
-    cli_runner: MetricFlowCliRunner,
+    cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     run_and_check_cli_command(
         request=request,
-        capsys=capsys,
         mf_test_configuration=mf_test_configuration,
         cli_runner=cli_runner,
-        command=health_checks,
+        command_enum=IsolatedCliCommandEnum.MF_HEALTH_CHECKS,
         args=[],
     )
 
 
+@pytest.mark.slow
 def test_tutorial_message(  # noqa: D103
     request: FixtureRequest,
-    capsys: pytest.CaptureFixture,
     mf_test_configuration: MetricFlowTestConfiguration,
-    cli_runner: MetricFlowCliRunner,
+    cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     """Tests the message output of the tutorial.
 
@@ -214,133 +179,129 @@ def test_tutorial_message(  # noqa: D103
     """
     run_and_check_cli_command(
         request=request,
-        capsys=capsys,
         mf_test_configuration=mf_test_configuration,
         cli_runner=cli_runner,
-        command=tutorial,
+        command_enum=IsolatedCliCommandEnum.MF_TUTORIAL,
         args=["-m"],
     )
 
 
+@pytest.mark.slow
 def test_list_entities(  # noqa: D103
     request: FixtureRequest,
-    capsys: pytest.CaptureFixture,
     mf_test_configuration: MetricFlowTestConfiguration,
-    cli_runner: MetricFlowCliRunner,
+    cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     run_and_check_cli_command(
         request=request,
-        capsys=capsys,
         mf_test_configuration=mf_test_configuration,
         cli_runner=cli_runner,
-        command=entities,
-        args=["--metrics", "bookings"],
+        command_enum=IsolatedCliCommandEnum.MF_ENTITIES,
+        args=["--metrics", "transactions"],
     )
 
 
-@pytest.mark.duckdb_only
+@pytest.mark.slow
 def test_saved_query(  # noqa: D103
     request: FixtureRequest,
-    capsys: pytest.CaptureFixture,
     mf_test_configuration: MetricFlowTestConfiguration,
-    cli_runner: MetricFlowCliRunner,
+    cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     run_and_check_cli_command(
         request=request,
-        capsys=capsys,
         mf_test_configuration=mf_test_configuration,
         cli_runner=cli_runner,
-        command=query,
-        args=["--saved-query", "p0_booking", "--order", "metric_time__day,listing__capacity_latest"],
-    )
-
-
-@pytest.mark.duckdb_only
-def test_saved_query_with_where(  # noqa: D103
-    request: FixtureRequest,
-    capsys: pytest.CaptureFixture,
-    mf_test_configuration: MetricFlowTestConfiguration,
-    cli_runner: MetricFlowCliRunner,
-) -> None:
-    run_and_check_cli_command(
-        request=request,
-        capsys=capsys,
-        mf_test_configuration=mf_test_configuration,
-        cli_runner=cli_runner,
-        command=query,
+        command_enum=IsolatedCliCommandEnum.MF_QUERY,
         args=[
             "--saved-query",
-            "p0_booking",
+            "core_transaction_metrics",
             "--order",
-            "metric_time__day,listing__capacity_latest",
-            "--where",
-            "{{ Dimension('listing__capacity_latest') }} > 4",
+            "metric_time__day,customer__customer_country,transactions,quick_buy_transactions",
         ],
     )
 
 
-@pytest.mark.duckdb_only
+@pytest.mark.slow
+def test_saved_query_with_where(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_runner: IsolatedCliCommandRunner,
+) -> None:
+    where_argument_value = (
+        "{{ Dimension('customer__customer_country') }}  = 'US' AND {{ TimeDimension('metric_time') }} <= '2022-03-12'"
+    )
+    run_and_check_cli_command(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        cli_runner=cli_runner,
+        command_enum=IsolatedCliCommandEnum.MF_QUERY,
+        args=[
+            "--saved-query",
+            "core_transaction_metrics",
+            "--where",
+            where_argument_value,
+            "--order",
+            "metric_time__day,customer__customer_country,transactions,quick_buy_transactions",
+        ],
+    )
+
+
+@pytest.mark.slow
 def test_saved_query_with_limit(  # noqa: D103
     request: FixtureRequest,
-    capsys: pytest.CaptureFixture,
     mf_test_configuration: MetricFlowTestConfiguration,
-    cli_runner: MetricFlowCliRunner,
+    cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     run_and_check_cli_command(
         request=request,
-        capsys=capsys,
         mf_test_configuration=mf_test_configuration,
         cli_runner=cli_runner,
-        command=query,
+        command_enum=IsolatedCliCommandEnum.MF_QUERY,
         args=[
             "--saved-query",
-            "p0_booking",
+            "core_transaction_metrics",
             "--order",
-            "metric_time__day,listing__capacity_latest",
+            "metric_time__day,customer__customer_country,transactions,quick_buy_transactions",
             "--limit",
             "3",
         ],
     )
 
 
-@pytest.mark.duckdb_only
+@pytest.mark.slow
 def test_saved_query_explain(  # noqa: D103
     request: FixtureRequest,
-    capsys: pytest.CaptureFixture,
     mf_test_configuration: MetricFlowTestConfiguration,
-    cli_runner: MetricFlowCliRunner,
+    cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     run_and_check_cli_command(
         request=request,
-        capsys=capsys,
         mf_test_configuration=mf_test_configuration,
         cli_runner=cli_runner,
-        command=query,
-        args=["--explain", "--saved-query", "p0_booking", "--order", "metric_time__day,listing__capacity_latest"],
+        command_enum=IsolatedCliCommandEnum.MF_QUERY,
+        args=["--explain", "--saved-query", "core_transaction_metrics"],
     )
 
 
-@pytest.mark.duckdb_only
+@pytest.mark.slow
 def test_saved_query_with_cumulative_metric(  # noqa: D103
     request: FixtureRequest,
-    capsys: pytest.CaptureFixture,
     mf_test_configuration: MetricFlowTestConfiguration,
-    cli_runner: MetricFlowCliRunner,
+    cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     run_and_check_cli_command(
         request=request,
-        capsys=capsys,
         mf_test_configuration=mf_test_configuration,
         cli_runner=cli_runner,
-        command=query,
+        command_enum=IsolatedCliCommandEnum.MF_QUERY,
         args=[
             "--saved-query",
-            "saved_query_with_cumulative_metric",
-            "--order",
-            "metric_time__day",
+            "cumulative_transaction_metrics",
             "--start-time",
-            "2020-01-01",
+            "2022-03-29",
             "--end-time",
-            "2020-01-01",
+            "2022-03-31",
+            "--order",
+            "metric_time__day,cumulative_transactions,cumulative_transactions_in_last_7_days",
         ],
     )

@@ -1,6 +1,8 @@
 test_name: test_saved_query_with_cumulative_metric
 test_filename: test_cli.py
 ---
-metric_time__day       trailing_2_months_revenue
--------------------  ---------------------------
-2020-01-01T00:00:00                         1000
+metric_time__day       cumulative_transactions    cumulative_transactions_in_last_7_days
+-------------------  -------------------------  ----------------------------------------
+2022-03-29T00:00:00                         36                                        12
+2022-03-30T00:00:00                         40                                        14
+2022-03-31T00:00:00                         45                                        19

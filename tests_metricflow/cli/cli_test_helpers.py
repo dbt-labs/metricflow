@@ -1,16 +1,16 @@
 from __future__ import annotations
 
 import logging
+import re
 from pathlib import Path
 from typing import Optional, Sequence
 
-import click
-from _pytest.capture import CaptureFixture
 from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from dbt_metricflow.cli.cli_configuration import CLIConfiguration
+from dbt_metricflow.cli.cli_string import CLIString
 from dbt_metricflow.cli.tutorial import dbtMetricFlowTutorialHelper
 from metricflow.protocols.sql_client import SqlClient
 from tests_metricflow.cli.isolated_cli_command_interface import IsolatedCliCommandEnum
@@ -23,25 +23,41 @@ logger = logging.getLogger(__name__)
 
 def run_and_check_cli_command(
     request: FixtureRequest,
-    capsys: CaptureFixture,
     mf_test_configuration: MetricFlowTestConfiguration,
-    cli_runner: MetricFlowCliRunner,
-    command: click.BaseCommand,
+    cli_runner: IsolatedCliCommandRunner,
+    command_enum: IsolatedCliCommandEnum,
     args: Sequence[str],
     sql_client: Optional[SqlClient] = None,
     expected_exit_code: int = 0,
     expectation_description: Optional[str] = None,
 ) -> None:
-    """Helper to run a CLI command and check that the output matches the stored snapshot."""
-    # Needed to resolve `ValueError: I/O operation on closed file` when running CLI tests individually.
-    # See: https://github.com/pallets/click/issues/824
-    with capsys.disabled():
-        result = cli_runner.run(command, args=args)
+    """Run the given CLI command and check that the output matches the stored snapshot."""
+    result = cli_runner.run_command(
+        command_enum=command_enum,
+        command_args=args,
+    )
+
+    if result.exit_code != expected_exit_code:
+        assert False, str(
+            LazyFormat(
+                "Command exit code mismatch",
+                expected_exit_code=expected_exit_code,
+                actual_exit_code=result.exit_code,
+                result=result,
+            )
+        )
+
+    # Replace incomparable values in snapshots with `***`.
+    snapshot_str = result.stdout
+    for prefix in (CLIString.LOG_FILE_PREFIX,):
+        regex_parts = (r"(?P<prefix>", prefix, r").*")
+        snapshot_str = re.sub("".join(regex_parts), repl=r"\g<prefix> ***", string=snapshot_str)
+
     assert_str_snapshot_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
         snapshot_id="result",
-        snapshot_str=result.stdout,
+        snapshot_str=snapshot_str,
         sql_engine=sql_client.sql_engine_type if sql_client else None,
         expectation_description=expectation_description,
     )
