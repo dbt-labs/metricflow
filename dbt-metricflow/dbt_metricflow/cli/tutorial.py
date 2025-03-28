@@ -17,7 +17,6 @@ from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from packaging.version import Version
 from typing_extensions import Optional
 
-from dbt_metricflow.cli.cli_configuration import CLIConfiguration
 from dbt_metricflow.cli.cli_link import CliLink
 
 logger = logging.getLogger(__name__)
@@ -34,23 +33,11 @@ class dbtMetricFlowTutorialHelper:
     SAMPLE_SOURCES_FILE = "sources.yml"
 
     @staticmethod
-    def generate_model_files(model_path: pathlib.Path, profile_schema: str) -> None:
+    def generate_model_files(model_path: pathlib.Path) -> None:
         """Generates the sample model files to the given dbt model path."""
         sample_model_path = pathlib.Path(__file__).parent / dbtMetricFlowTutorialHelper.SAMPLE_MODELS_DIRECTORY
         logger.debug(LazyFormat("Copying model files", sample_model_path=sample_model_path, model_path=model_path))
         shutil.copytree(src=sample_model_path, dst=model_path)
-
-        # Generate the sources.yml file with the schema given in profiles.yml
-        sample_sources_path = (
-            pathlib.Path(__file__).parent
-            / dbtMetricFlowTutorialHelper.SAMPLE_DBT_MODEL_DIRECTORY
-            / dbtMetricFlowTutorialHelper.SAMPLE_SOURCES_FILE
-        )
-        with open(sample_sources_path) as file:
-            contents = Template(file.read()).substitute({"system_schema": profile_schema})
-        dest_sources_path = pathlib.Path(model_path) / dbtMetricFlowTutorialHelper.SAMPLE_SOURCES_FILE
-        with open(dest_sources_path, "w") as file:
-            file.write(contents)
 
     @staticmethod
     def generate_seed_files(seed_path: pathlib.Path) -> None:
@@ -148,7 +135,7 @@ class dbtMetricFlowTutorialHelper:
         )
 
     @staticmethod
-    def run_tutorial(cfg: CLIConfiguration, message: bool, clean: bool, yes: bool) -> None:
+    def run_tutorial(message: bool, clean: bool, yes: bool) -> None:
         """Run user through a CLI tutorial.
 
         See the associated Click command for details on the arguments.
@@ -223,20 +210,13 @@ class dbtMetricFlowTutorialHelper:
         project_path = sample_dbt_project_path
 
         click.echo(f"Using the project in {str(project_path)!r}\n")
-        cfg.setup()
 
         # TODO: Health checks
 
         # Load the metadata from dbt project
-        try:
-            dbt_project_metadata = cfg.dbt_project_metadata
-            dbt_paths = dbt_project_metadata.dbt_paths
-            model_path = pathlib.Path(dbt_paths.model_paths[0]) / "sample_model"
-            seed_path = pathlib.Path(dbt_paths.seed_paths[0]) / "sample_seed"
-            manifest_path = pathlib.Path(dbt_paths.target_path) / "semantic_manifest.json"
-        except Exception as e:
-            click.echo(f"Unable to parse path metadata from dbt project.\nERROR: {str(e)}")
-            exit(1)
+        model_path = project_path / "models" / "sample_model"
+        seed_path = project_path / "seeds" / "sample_seeds"
+        manifest_path = project_path / "semantic_manifest.json"
 
         # Remove sample files from dbt project
         if clean:
@@ -283,9 +263,7 @@ class dbtMetricFlowTutorialHelper:
 
         spinner = Halo(text="Generating sample files...", spinner="dots")
         spinner.start()
-        dbtMetricFlowTutorialHelper.generate_model_files(
-            model_path=model_path, profile_schema=dbt_project_metadata.schema
-        )
+        dbtMetricFlowTutorialHelper.generate_model_files(model_path=model_path)
         dbtMetricFlowTutorialHelper.generate_seed_files(seed_path=seed_path)
         dbtMetricFlowTutorialHelper.generate_semantic_manifest_file(manifest_path=manifest_path)
 
