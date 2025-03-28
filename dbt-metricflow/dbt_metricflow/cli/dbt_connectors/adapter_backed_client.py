@@ -87,7 +87,7 @@ class SupportedAdapterTypes(enum.Enum):
 class AdapterBackedSqlClient:
     """SqlClient implementation which delegates database operations to a dbt BaseAdapter instance.
 
-    This is a generic wrpaper class meant to cover all of our logging, querying, and internal configuration
+    This is a generic wrapper class meant to cover all of our logging, querying, and internal configuration
     needs while delegating all connection state management and warehouse communication work to an underlying
     dbt adapter instance. This relies on BaseAdapter, rather than SQLAdapter, because BigQuery is an instance
     of the more generic BaseAdapter class.

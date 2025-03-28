@@ -39,7 +39,12 @@ class FakeCLIConfiguration(CLIConfiguration):
         self._log_file_path: Optional[pathlib.Path] = None
 
     @override
-    def setup(self) -> None:
+    def setup(
+        self,
+        dbt_profiles_path: Optional[pathlib.Path] = None,
+        dbt_project_path: Optional[pathlib.Path] = None,
+        configure_file_logging: bool = True,
+    ) -> None:
         # For tests, a dbt project is not needed, so don't try to configure it.
         return
 
