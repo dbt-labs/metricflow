@@ -15,7 +15,17 @@ from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from typing_extensions import TextIO
 
 from dbt_metricflow.cli.cli_configuration import CLIConfiguration
-from dbt_metricflow.cli.main import metrics, query
+from dbt_metricflow.cli.main import (
+    dimension_values,
+    dimensions,
+    entities,
+    health_checks,
+    list_command_group,
+    metrics,
+    query,
+    tutorial,
+    validate_configs,
+)
 from tests_metricflow.cli.isolated_cli_command_interface import (
     CommandParameterSet,
     ExecutorProcessStartingParameterSet,
@@ -168,6 +178,31 @@ class ExecutorProcessMainFunction:
                 formatted_exception=formatted_exception,
                 executor_process_log_path=self._starting_parameter_set.log_file_path,
             )
+        elif parameter_set.command_enum is IsolatedCliCommandEnum.MF_DIMENSIONS:
+            return self._run_mf_cli_command(
+                parameter_set=parameter_set,
+                click_command=dimensions,
+            )
+        elif parameter_set.command_enum is IsolatedCliCommandEnum.MF_DIMENSION_VALUES:
+            return self._run_mf_cli_command(
+                parameter_set=parameter_set,
+                click_command=dimension_values,
+            )
+        elif parameter_set.command_enum is IsolatedCliCommandEnum.MF_ENTITIES:
+            return self._run_mf_cli_command(
+                parameter_set=parameter_set,
+                click_command=entities,
+            )
+        elif parameter_set.command_enum is IsolatedCliCommandEnum.MF_HEALTH_CHECKS:
+            return self._run_mf_cli_command(
+                parameter_set=parameter_set,
+                click_command=health_checks,
+            )
+        elif parameter_set.command_enum is IsolatedCliCommandEnum.MF_LIST:
+            return self._run_mf_cli_command(
+                parameter_set=parameter_set,
+                click_command=list_command_group,
+            )
         elif parameter_set.command_enum is IsolatedCliCommandEnum.MF_METRICS:
             return self._run_mf_cli_command(
                 parameter_set=parameter_set,
@@ -177,6 +212,16 @@ class ExecutorProcessMainFunction:
             return self._run_mf_cli_command(
                 parameter_set=parameter_set,
                 click_command=query,
+            )
+        elif parameter_set.command_enum is IsolatedCliCommandEnum.MF_TUTORIAL:
+            return self._run_mf_cli_command(
+                parameter_set=parameter_set,
+                click_command=tutorial,
+            )
+        elif parameter_set.command_enum is IsolatedCliCommandEnum.MF_VALIDATE_CONFIGS:
+            return self._run_mf_cli_command(
+                parameter_set=parameter_set,
+                click_command=validate_configs,
             )
         else:
             assert_values_exhausted(parameter_set.command_enum)

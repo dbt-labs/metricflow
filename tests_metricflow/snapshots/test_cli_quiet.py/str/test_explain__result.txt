@@ -5,12 +5,12 @@ docstring:
 ---
 SELECT
   metric_time__day
-  , SUM(bookings) AS bookings
+  , SUM(transactions) AS transactions
 FROM (
   SELECT
     DATE_TRUNC('day', ds) AS metric_time__day
-    , 1 AS bookings
-  FROM ***************************.fct_bookings bookings_source_src_10000
+    , 1 AS transactions
+  FROM "mf_tutorial"."main"."transactions" transactions_src_10000
 ) subq_2
 GROUP BY
   metric_time__day

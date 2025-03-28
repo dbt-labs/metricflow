@@ -18,8 +18,15 @@ class IsolatedCliCommandEnum(Enum):
     # `dbt ...` commands
     DBT_BUILD = "dbt_build"
     # `mf ...` commands
-    MF_QUERY = "mf_query"
+    MF_DIMENSIONS = "mf_dimensions"
+    MF_DIMENSION_VALUES = "mf_dimension_values"
+    MF_ENTITIES = "mf_entities"
+    MF_HEALTH_CHECKS = "mf_health_checks"
     MF_METRICS = "mf_metrics"
+    MF_LIST = "mf_list"
+    MF_QUERY = "mf_query"
+    MF_TUTORIAL = "mf_tutorial"
+    MF_VALIDATE_CONFIGS = "mf_validate_configs"
 
 
 class IsolatedCliCommandException(Exception):
