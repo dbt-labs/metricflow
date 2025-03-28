@@ -1,0 +1,4 @@
+test_name: test_health_checks
+test_filename: test_cli.py
+---
+• ✅ SqlEngine.DUCKDB - SELECT 1: Success!

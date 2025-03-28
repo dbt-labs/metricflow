@@ -1,0 +1,5 @@
+test_name: test_get_dimension_values
+test_filename: test_cli.py
+---
+• False
+• True
