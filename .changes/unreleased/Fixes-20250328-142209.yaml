@@ -1,0 +1,6 @@
+kind: Fixes
+body: Remove `semantic_manifest.json` from the tutorial project
+time: 2025-03-28T14:22:09.498545-07:00
+custom:
+  Author: plypaul
+  Issue: "1704"
