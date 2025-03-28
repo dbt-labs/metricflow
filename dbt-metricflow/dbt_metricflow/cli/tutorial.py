@@ -108,27 +108,24 @@ class dbtMetricFlowTutorialHelper:
             🤓 {click.style("Please run the following steps:", bold=True)}
 
             1.  Switch to the root directory of the generated sample project (e.g. {click.style(f"`cd {tutorial_directory.name}`", bold=True)}).
-            2.  Run {click.style("`dbt seed`", bold=True)} and check that the steps related to countries, transactions, customers are passing.
-            3.  Run {click.style("`dbt build`", bold=True)} to produce the model tables.
-            4.  Try validating your data model: {click.style("`mf validate-configs`", bold=True)}
-            5.  Check out your metrics: {click.style("`mf list metrics`", bold=True)}
-            6.  Check out dimensions for your metric {click.style("`mf list dimensions --metrics transactions`", bold=True)}
-            7.  Query your first metric:
+                This enables use of the tutorial project and associated connection profile in later steps.
+            2.  Run {click.style("`dbt build`", bold=True)} to seed tables and produce artifacts.
+            3.  Try validating your data model: {click.style("`mf validate-configs`", bold=True)}
+            4.  Check out your metrics: {click.style("`mf list metrics`", bold=True)}
+            5.  Check out dimensions for your metric {click.style("`mf list dimensions --metrics transactions`", bold=True)}
+            6.  Query your first metric:
                     {click.style("mf query --metrics transactions --group-by metric_time --order metric_time", bold=True)}
-            8.  Show the SQL MetricFlow generates:
+            7.  Show the SQL MetricFlow generates:
                     {click.style("mf query --metrics transactions --group-by metric_time --order metric_time --explain", bold=True)}
-            8.  Visualize the plan:
+            8.  Visualize the plan (if you have graphviz installed - see README):
                     {click.style("mf query --metrics transactions --group-by metric_time --order metric_time --explain --display-plans", bold=True)}
-                * This only works if you have graphviz installed - see README.
             9.  Add another dimension:
                     {click.style("mf query --metrics transactions --group-by metric_time,customer__customer_country --order metric_time", bold=True)}
             10. Add a coarser time granularity:
                     {click.style("mf query --metrics transactions --group-by metric_time__week --order metric_time__week", bold=True)}
             11. Try a more complicated query:
                     {click.style(complex_query, bold=True)}
-            12. When you're done with the tutorial, run mf tutorial --clean to delete sample models and seeds.
-                * If a sample project was created, it wil remain.
-            13. Before integrating metrics into your project, read up on adding a time spine.
+            12. Before integrating metrics into your project, read up on adding a time spine.
                 (<Control>+<Left Click> may work in your terminal to follow the link)
                    {CliLink.get_time_spine_docs_link(dbt_core_version)}
 
