@@ -1,0 +1,6 @@
+kind: Features
+body: Specify DB file path in tutorial-project profile
+time: 2025-03-28T14:05:06.062055-07:00
+custom:
+  Author: plypaul
+  Issue: "1692"
