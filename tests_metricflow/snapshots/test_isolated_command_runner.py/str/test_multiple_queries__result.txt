@@ -1,0 +1,16 @@
+test_name: test_multiple_queries
+test_filename: test_isolated_command_runner.py
+docstring:
+  Tests running multiple sequential MF queries using a single runner.
+expectation_description:
+  2 results showing the`transactions` and `quick_buy_transactions` metrics.
+---
+transactions_query:
+    transactions
+  --------------
+              50
+
+quick_buy_transactions_query:
+    quick_buy_transactions
+  ------------------------
+                        10
