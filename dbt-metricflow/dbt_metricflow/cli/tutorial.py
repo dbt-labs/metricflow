@@ -11,7 +11,9 @@ from typing import Sequence
 
 import click
 import packaging.version
+import yaml
 from halo import Halo
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from packaging.version import Version
 from typing_extensions import Optional
 
@@ -35,6 +37,7 @@ class dbtMetricFlowTutorialHelper:
     def generate_model_files(model_path: pathlib.Path, profile_schema: str) -> None:
         """Generates the sample model files to the given dbt model path."""
         sample_model_path = pathlib.Path(__file__).parent / dbtMetricFlowTutorialHelper.SAMPLE_MODELS_DIRECTORY
+        logger.debug(LazyFormat("Copying model files", sample_model_path=sample_model_path, model_path=model_path))
         shutil.copytree(src=sample_model_path, dst=model_path)
 
         # Generate the sources.yml file with the schema given in profiles.yml
@@ -87,6 +90,16 @@ class dbtMetricFlowTutorialHelper:
         """Generate a sample dbt project using a self-contained DuckDB instance into the given directory."""
         sample_project_path = pathlib.Path(__file__).parent / dbtMetricFlowTutorialHelper.SAMPLE_DBT_PROJECT_DIRECTORY
         shutil.copytree(src=sample_project_path, dst=project_path)
+        profiles_yml_path = project_path / "profiles.yml"
+
+        # Replace `$db_file_path with` the quoted path for the database file.
+        db_file_path = project_path / "mf_tutorial.duckdb"
+        with open(profiles_yml_path) as file:
+            contents = Template(file.read()).substitute(
+                {"db_file_path": yaml.dump(str(db_file_path), default_style="'")}
+            )
+        with open(profiles_yml_path, "w") as file:
+            file.write(contents)
 
     @staticmethod
     def _generate_help_message_text(dbt_core_version: Optional[Version], tutorial_directory: pathlib.Path) -> str:

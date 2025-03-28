@@ -3,4 +3,4 @@ mf_tutorial:
   outputs:
     dev:
       type: duckdb
-      path: 'mf_tutorial.duckdb'
+      path: $db_file_path
