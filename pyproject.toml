@@ -82,6 +82,9 @@ dependencies = [
   "click>=8.1.6",
   "dbt-core @ git+https://github.com/dbt-labs/dbt-core@84eb0ff6720ec82ce4015c2657d512bf51381732#subdirectory=core",
   "dbt-duckdb>=1.8.0, <1.9.0",
+  # Excluding 1.2.1 due to window functions returning incorrect results:
+  # https://github.com/duckdb/duckdb/issues/16617
+  "duckdb !=1.2.1"
 ]
 
 
