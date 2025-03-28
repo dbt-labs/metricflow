@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Remove `dbt` project metadata dependency in tutorial project generation
+time: 2025-03-28T14:08:47.035802-07:00
+custom:
+  Author: plypaul
+  Issue: "1694"
