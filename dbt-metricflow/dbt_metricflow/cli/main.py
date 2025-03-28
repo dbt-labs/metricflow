@@ -32,7 +32,6 @@ from dbt_metricflow.cli.tutorial import (
     dbtMetricFlowTutorialHelper,
 )
 from dbt_metricflow.cli.utils import (
-    error_if_not_in_dbt_project,
     exception_handler,
     query_options,
     start_end_time_options,
@@ -171,7 +170,6 @@ def _click_echo(message: str, quiet: bool) -> None:
 )
 @pass_config
 @exception_handler
-@error_if_not_in_dbt_project
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def query(
     cfg: CLIConfiguration,
@@ -192,7 +190,8 @@ def query(
     quiet: bool = False,
 ) -> None:
     """Create a new query with MetricFlow and assembles a MetricFlowQueryResult."""
-    cfg.setup()
+    if not cfg.is_setup:
+        cfg.setup()
     start = time.time()
     spinner: Optional[Halo] = None
     if not quiet:
@@ -284,7 +283,6 @@ def query(
 @cli.group()
 @pass_config
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-@error_if_not_in_dbt_project
 def list(cfg: CLIConfiguration) -> None:
     """Retrieve metadata values about metrics/dimensions/entities/dimension values."""
     pass
@@ -298,13 +296,13 @@ def list(cfg: CLIConfiguration) -> None:
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-@error_if_not_in_dbt_project
 def metrics(cfg: CLIConfiguration, show_all_dimensions: bool = False, search: Optional[str] = None) -> None:
     """List the metrics with their available dimensions.
 
     Automatically truncates long lists of dimensions, pass --show-all-dims to see all.
     """
-    cfg.setup()
+    if not cfg.is_setup:
+        cfg.setup()
     spinner = Halo(text="🔍 Looking for all available metrics...", spinner="dots")
     spinner.start()
 
@@ -343,10 +341,10 @@ def metrics(cfg: CLIConfiguration, show_all_dimensions: bool = False, search: Op
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-@error_if_not_in_dbt_project
 def dimensions(cfg: CLIConfiguration, metrics: List[str]) -> None:
     """List all unique dimensions."""
-    cfg.setup()
+    if not cfg.is_setup:
+        cfg.setup()
     spinner = Halo(
         text="🔍 Looking for all available dimensions...",
         spinner="dots",
@@ -372,10 +370,10 @@ def dimensions(cfg: CLIConfiguration, metrics: List[str]) -> None:
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-@error_if_not_in_dbt_project
 def entities(cfg: CLIConfiguration, metrics: List[str]) -> None:
     """List all unique entities."""
-    cfg.setup()
+    if not cfg.is_setup:
+        cfg.setup()
     spinner = Halo(
         text="🔍 Looking for all available entities...",
         spinner="dots",
@@ -395,10 +393,10 @@ def entities(cfg: CLIConfiguration, metrics: List[str]) -> None:
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-@error_if_not_in_dbt_project
 def health_checks(cfg: CLIConfiguration) -> None:
     """Performs a health check against the DW provided in the configs."""
-    cfg.setup()
+    if not cfg.is_setup:
+        cfg.setup()
     spinner = Halo(
         text="🏥 Running health checks against your data warehouse... (This should not take longer than 30s for a successful connection)",
         spinner="dots",
@@ -426,7 +424,6 @@ def health_checks(cfg: CLIConfiguration) -> None:
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-@error_if_not_in_dbt_project
 def dimension_values(
     cfg: CLIConfiguration,
     metrics: List[str],
@@ -435,7 +432,8 @@ def dimension_values(
     end_time: Optional[dt.datetime] = None,
 ) -> None:
     """List all dimension values with the corresponding metrics."""
-    cfg.setup()
+    if not cfg.is_setup:
+        cfg.setup()
     spinner = Halo(
         text=f"🔍 Retrieving dimension values for dimension '{dimension}' of metrics '{', '.join(metrics)}'...",
         spinner="dots",
@@ -552,7 +550,6 @@ def _data_warehouse_validations_runner(
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-@error_if_not_in_dbt_project
 def validate_configs(
     cfg: CLIConfiguration,
     dw_timeout: Optional[int] = None,
@@ -562,7 +559,8 @@ def validate_configs(
     semantic_validation_workers: int = 1,
 ) -> None:
     """Perform validations against the defined model configurations."""
-    cfg.setup()
+    if not cfg.is_setup:
+        cfg.setup()
 
     cfg.verbose = True
 
