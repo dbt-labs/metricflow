@@ -1,0 +1,6 @@
+kind: Fixes
+body: Address issues with the display of numeric types
+time: 2025-03-28T14:14:38.794526-07:00
+custom:
+  Author: plypaul
+  Issue: "1699"
