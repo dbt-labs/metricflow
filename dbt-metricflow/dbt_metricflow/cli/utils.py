@@ -15,6 +15,7 @@ from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 import dbt_metricflow.cli.custom_click_types as click_custom
 from dbt_metricflow.cli.cli_configuration import CLIConfiguration
 from dbt_metricflow.cli.cli_link import CliLink
+from dbt_metricflow.cli.cli_string import CLIString
 
 logger = logging.getLogger(__name__)
 
@@ -119,8 +120,8 @@ def exception_handler(func: Callable[..., Any]) -> Callable[..., Any]:  # type: 
             logging.exception("Logging exception")
 
             if isinstance(args[0], CLIConfiguration):
-                cli_context: CLIConfiguration = args[0]
-                click.echo(f"\nERROR: {str(e)}\nLog file: {cli_context.log_file_path}")
+                cli_configuration: CLIConfiguration = args[0]
+                click.echo(f"\nERROR: {str(e)}\n\n{CLIString.LOG_FILE_PREFIX}: {cli_configuration.log_file_path}")
             else:
                 if not isinstance(args[0], CLIConfiguration):
                     logger.error(
