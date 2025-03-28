@@ -30,18 +30,41 @@ class CLIConfiguration:
         self._semantic_manifest: Optional[SemanticManifest] = None
         self._semantic_manifest_lookup: Optional[SemanticManifestLookup] = None
 
-    def setup(self) -> None:
+    def setup(
+        self,
+        dbt_profiles_path: Optional[pathlib.Path] = None,
+        dbt_project_path: Optional[pathlib.Path] = None,
+        configure_file_logging: bool = True,
+    ) -> None:
         """Setup this configuration for executing commands.
 
         The dbt_artifacts construct must be loaded in order for logging configuration to work correctly.
+
+        Args:
+            dbt_profiles_path: The directory containing the `profiles.yml` file. If not specified, the CWD is used.
+            dbt_project_path: The directory containing the dbt project. If not specified, the CWD is used.
+            configure_file_logging: If true, configure the Python logger to log to a rotating log file as specified by
+            `self.log_file_path`. This can be set to false in tests to better manage log output.
+
+        Returns: None
         """
-        dbt_project_path = pathlib.Path.cwd()
+        cwd = pathlib.Path.cwd()
+
+        if dbt_profiles_path is None:
+            dbt_profiles_path = cwd
+        if dbt_project_path is None:
+            dbt_project_path = cwd
+
         try:
-            self._dbt_project_metadata = dbtProjectMetadata.load_from_project_path(dbt_project_path)
+            self._dbt_project_metadata = dbtProjectMetadata.load_from_paths(
+                profiles_path=dbt_profiles_path,
+                project_path=dbt_project_path,
+            )
 
             # self.log_file_path invokes the dbtRunner. If this is done after the configure_logging call all of the
             # dbt CLI logging configuration could be overridden, resulting in lots of things printing to console
-            self._configure_logging(log_file_path=self.log_file_path)
+            if configure_file_logging:
+                self._configure_logging(log_file_path=self.log_file_path)
         except Exception as e:
             exception_message = str(e)
             if exception_message.find("Could not find adapter type") != -1:
@@ -66,10 +89,12 @@ class CLIConfiguration:
         This requires a fully loaded dbt project, including what amounts to a call to dbt debug.
         As a practical matter, this should not have much end user impact except in cases where they are
         using commands that do not require a working adapter AND the call to dbt debug runs slowly.
-        In future we may have better API access to the log file location for the project, at which time
+        In the future we may have better API access to the log file location for the project, at which time
         we can swap this out and return to full lazy loading for any context attributes that are slow
         to initialize.
         """
+        logger.debug(LazyFormat("Setting up logging to rotating file", log_file_path=self.log_file_path))
+
         log_format = "%(asctime)s %(levelname)s %(filename)s:%(lineno)d [%(threadName)s] - %(message)s"
         logging.basicConfig(level=logging.INFO, format=log_format)
 

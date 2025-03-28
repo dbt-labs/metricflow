@@ -14,7 +14,6 @@ from dbt.config.runtime import load_profile, load_project
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from metricflow_semantics.errors.error_classes import ModelCreationException
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.dbt_manifest_parser import parse_manifest_from_dbt_generated_manifest
 from typing_extensions import Self
 
@@ -39,16 +38,44 @@ class dbtProjectMetadata:
     project_path: Path
 
     @classmethod
-    def load_from_project_path(cls: Type[Self], project_path: Path) -> Self:
-        """Loads all dbt artifacts for the project associated with the given project path."""
-        logger.debug(LazyFormat(lambda: f"Loading dbt project metadata for project located at {project_path}"))
-        dbtRunner().invoke(["-q", "debug"], project_dir=str(project_path))
-        profile = load_profile(str(project_path), {})
-        project = load_project(str(project_path), version_check=False, profile=profile)
-        project_path = project_path
+    def load_from_paths(cls: Type[Self], profiles_path: Path, project_path: Path) -> Self:
+        """Loads all dbt artifacts for the project associated with the given profile / project path.
+
+        Note: calling this method can update global state in the dbt libraries.
+        """
+        profiles_path_str = str(profiles_path)
+        project_path_str = str(project_path)
+
         logger.debug(
-            LazyFormat(lambda: f"Loaded project {project.project_name} with profile details:\n{mf_pformat(profile)}")
+            LazyFormat("Loading dbt project metadata", profiles_path=profiles_path_str, project_path=project_path_str)
         )
+        # The `debug` command runs a few validations on the project
+        # See: https://docs.getdbt.com/reference/commands/debug
+        #
+        # `--quiet` will show only error logs and suppress non-error logs.
+        #
+        # Running this command also has a side effect of mutating some global state in the dbt libraries.
+        # e.g. interacts with `load_profile` and adapters. Without this, `load_profile` throws an exception.
+        validation_result = dbtRunner().invoke(
+            ["debug", "--quiet", "--profiles-dir", profiles_path_str, "--project-dir", project_path_str]
+        )
+
+        logger.debug(LazyFormat("Ran validation", validation_result=validation_result))
+        if validation_result.exception is not None:
+            exception_message = str(
+                LazyFormat(
+                    "Error validating the dbt project",
+                    profiles_path=profiles_path_str,
+                    project_path=project_path_str,
+                )
+            )
+            raise RuntimeError(exception_message) from validation_result.exception
+
+        profile = load_profile(project_root=project_path_str, cli_vars={})
+        logger.debug(LazyFormat("Loaded profile", profile=profile))
+
+        project = load_project(project_path_str, version_check=False, profile=profile)
+        logger.debug(LazyFormat("Loaded project", project_name=project.project_name))
         return cls(profile=profile, project=project, project_path=project_path)
 
     @property
