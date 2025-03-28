@@ -30,44 +30,78 @@ from dbt_metricflow.cli.main import (
     tutorial,
     validate_configs,
 )
-from metricflow.protocols.sql_client import SqlClient, SqlEngine
+from tests_metricflow.cli.cli_test_helpers import run_and_check_cli_command
 from tests_metricflow.fixtures.cli_fixtures import MetricFlowCliRunner
-from tests_metricflow.snapshot_utils import assert_str_snapshot_equal
 
 logger = logging.getLogger(__name__)
 
 
-# TODO: Use snapshots to compare CLI output for all tests here.
+@pytest.mark.duckdb_only
+def test_query(  # noqa: D103
+    request: FixtureRequest,
+    capsys: pytest.CaptureFixture,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_runner: MetricFlowCliRunner,
+) -> None:
+    run_and_check_cli_command(
+        request=request,
+        capsys=capsys,
+        mf_test_configuration=mf_test_configuration,
+        cli_runner=cli_runner,
+        command=query,
+        args=["--metrics", "bookings", "--group-by", "metric_time", "--order", "metric_time,bookings"],
+    )
 
 
-def test_query(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D103
-    resp = cli_runner.run(query, args=["--metrics", "bookings", "--group-by", "metric_time"])
-    # case insensitive matches are needed for snowflake due to the capitalization thing
-    engine_is_snowflake = cli_runner.cli_context.sql_client.sql_engine_type is SqlEngine.SNOWFLAKE
-    assert "bookings" in resp.output or ("bookings" in resp.output.lower() and engine_is_snowflake)
-    assert resp.exit_code == 0
+@pytest.mark.duckdb_only
+def test_list_dimensions(  # noqa: D103
+    request: FixtureRequest,
+    capsys: pytest.CaptureFixture,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_runner: MetricFlowCliRunner,
+) -> None:
+    run_and_check_cli_command(
+        request=request,
+        capsys=capsys,
+        mf_test_configuration=mf_test_configuration,
+        cli_runner=cli_runner,
+        command=dimensions,
+        args=["--metrics", "bookings"],
+    )
 
 
-def test_list_dimensions(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D103
-    resp = cli_runner.run(dimensions, args=["--metrics", "bookings"])
+@pytest.mark.duckdb_only
+def test_list_metrics(  # noqa: D103
+    request: FixtureRequest,
+    capsys: pytest.CaptureFixture,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_runner: MetricFlowCliRunner,
+) -> None:
+    run_and_check_cli_command(
+        request=request,
+        capsys=capsys,
+        mf_test_configuration=mf_test_configuration,
+        cli_runner=cli_runner,
+        command=metrics,
+        args=[],
+    )
 
-    assert "ds" in resp.output
-    assert resp.exit_code == 0
 
-
-def test_list_metrics(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D103
-    resp = cli_runner.run(metrics)
-
-    assert "bookings_per_listing: listing__capacity_latest" in resp.output
-    assert resp.exit_code == 0
-
-
-def test_get_dimension_values(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D103
-    resp = cli_runner.run(dimension_values, args=["--metrics", "bookings", "--dimension", "booking__is_instant"])
-
-    actual_output_lines = sorted(resp.output.split("\n"))
-    assert ["", "• False", "• True"] == actual_output_lines
-    assert resp.exit_code == 0
+@pytest.mark.duckdb_only
+def test_get_dimension_values(  # noqa: D103
+    request: FixtureRequest,
+    capsys: pytest.CaptureFixture,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_runner: MetricFlowCliRunner,
+) -> None:
+    run_and_check_cli_command(
+        request=request,
+        capsys=capsys,
+        mf_test_configuration=mf_test_configuration,
+        cli_runner=cli_runner,
+        command=dimension_values,
+        args=["--metrics", "bookings", "--dimension", "booking__is_instant"],
+    )
 
 
 @contextmanager
@@ -79,7 +113,12 @@ def create_directory(directory_path: str) -> Iterator[None]:
     shutil.rmtree(path)
 
 
-def test_validate_configs(cli_context: CLIConfiguration) -> None:
+def test_validate_configs(  # noqa: D103
+    request: FixtureRequest,
+    capsys: pytest.CaptureFixture,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_context: CLIConfiguration,
+) -> None:
     """Tests config validation from a manifest stored on the filesystem.
 
     This test is special, because the CLI bypasses the semantic manifest read into the CLIContext and
@@ -125,23 +164,44 @@ def test_validate_configs(cli_context: CLIConfiguration) -> None:
             manifest_file = Path(target_directory, "semantic_manifest.json")
             manifest_file.write_text(manifest.json())
 
-            resp = cli_runner.run(validate_configs)
-
-        assert "ERROR" in resp.output
-        assert resp.exit_code == 1
+            run_and_check_cli_command(
+                request=request,
+                capsys=capsys,
+                mf_test_configuration=mf_test_configuration,
+                cli_runner=cli_runner,
+                command=validate_configs,
+                args=[],
+                expectation_description="There should be two validation failures with `bad_semantic_model`.",
+                expected_exit_code=1,
+            )
 
     finally:
         dummy_project.unlink()
 
 
-def test_health_checks(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D103
-    resp = cli_runner.run(health_checks)
+@pytest.mark.duckdb_only
+def test_health_checks(  # noqa: D103
+    request: FixtureRequest,
+    capsys: pytest.CaptureFixture,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_runner: MetricFlowCliRunner,
+) -> None:
+    run_and_check_cli_command(
+        request=request,
+        capsys=capsys,
+        mf_test_configuration=mf_test_configuration,
+        cli_runner=cli_runner,
+        command=health_checks,
+        args=[],
+    )
 
-    assert "SELECT 1: Success!" in resp.output
-    assert resp.exit_code == 0
 
-
-def test_tutorial_message(cli_runner: MetricFlowCliRunner) -> None:
+def test_tutorial_message(  # noqa: D103
+    request: FixtureRequest,
+    capsys: pytest.CaptureFixture,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_runner: MetricFlowCliRunner,
+) -> None:
     """Tests the message output of the tutorial.
 
     The tutorial now essentially compiles a semantic manifest and then asks the user to run dbt seed,
@@ -152,54 +212,62 @@ def test_tutorial_message(cli_runner: MetricFlowCliRunner) -> None:
     project path overrides it might warrant a more complete test of the semantic manifest building steps in the
     tutorial flow.
     """
-    resp = cli_runner.run(tutorial, args=["-m"])
-    assert "Please run the following steps" in resp.output
-    assert "dbt seed" in resp.output
+    run_and_check_cli_command(
+        request=request,
+        capsys=capsys,
+        mf_test_configuration=mf_test_configuration,
+        cli_runner=cli_runner,
+        command=tutorial,
+        args=["-m"],
+    )
 
 
-def test_list_entities(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D103
-    # Disabling capsys to resolve error "ValueError: I/O operation on closed file". Better solution TBD.
-    resp = cli_runner.run(entities, args=["--metrics", "bookings"])
-
-    assert "guest" in resp.output
-    assert "host" in resp.output
+def test_list_entities(  # noqa: D103
+    request: FixtureRequest,
+    capsys: pytest.CaptureFixture,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_runner: MetricFlowCliRunner,
+) -> None:
+    run_and_check_cli_command(
+        request=request,
+        capsys=capsys,
+        mf_test_configuration=mf_test_configuration,
+        cli_runner=cli_runner,
+        command=entities,
+        args=["--metrics", "bookings"],
+    )
 
 
 @pytest.mark.duckdb_only
-@pytest.mark.sql_engine_snapshot
 def test_saved_query(  # noqa: D103
     request: FixtureRequest,
     capsys: pytest.CaptureFixture,
     mf_test_configuration: MetricFlowTestConfiguration,
     cli_runner: MetricFlowCliRunner,
-    sql_client: SqlClient,
 ) -> None:
-    resp = cli_runner.run(
-        query, args=["--saved-query", "p0_booking", "--order", "metric_time__day,listing__capacity_latest"]
-    )
-
-    assert resp.exit_code == 0
-
-    assert_str_snapshot_equal(
+    run_and_check_cli_command(
         request=request,
+        capsys=capsys,
         mf_test_configuration=mf_test_configuration,
-        snapshot_id="cli_output",
-        snapshot_str=resp.output,
-        sql_engine=sql_client.sql_engine_type,
+        cli_runner=cli_runner,
+        command=query,
+        args=["--saved-query", "p0_booking", "--order", "metric_time__day,listing__capacity_latest"],
     )
 
 
 @pytest.mark.duckdb_only
-@pytest.mark.sql_engine_snapshot
 def test_saved_query_with_where(  # noqa: D103
     request: FixtureRequest,
     capsys: pytest.CaptureFixture,
     mf_test_configuration: MetricFlowTestConfiguration,
     cli_runner: MetricFlowCliRunner,
-    sql_client: SqlClient,
 ) -> None:
-    resp = cli_runner.run(
-        query,
+    run_and_check_cli_command(
+        request=request,
+        capsys=capsys,
+        mf_test_configuration=mf_test_configuration,
+        cli_runner=cli_runner,
+        command=query,
         args=[
             "--saved-query",
             "p0_booking",
@@ -210,28 +278,20 @@ def test_saved_query_with_where(  # noqa: D103
         ],
     )
 
-    assert resp.exit_code == 0
-
-    assert_str_snapshot_equal(
-        request=request,
-        mf_test_configuration=mf_test_configuration,
-        snapshot_id="cli_output",
-        snapshot_str=resp.output,
-        sql_engine=sql_client.sql_engine_type,
-    )
-
 
 @pytest.mark.duckdb_only
-@pytest.mark.sql_engine_snapshot
 def test_saved_query_with_limit(  # noqa: D103
     request: FixtureRequest,
     capsys: pytest.CaptureFixture,
     mf_test_configuration: MetricFlowTestConfiguration,
     cli_runner: MetricFlowCliRunner,
-    sql_client: SqlClient,
 ) -> None:
-    resp = cli_runner.run(
-        query,
+    run_and_check_cli_command(
+        request=request,
+        capsys=capsys,
+        mf_test_configuration=mf_test_configuration,
+        cli_runner=cli_runner,
+        command=query,
         args=[
             "--saved-query",
             "p0_booking",
@@ -242,42 +302,37 @@ def test_saved_query_with_limit(  # noqa: D103
         ],
     )
 
-    assert resp.exit_code == 0
 
-    assert_str_snapshot_equal(
-        request=request,
-        mf_test_configuration=mf_test_configuration,
-        snapshot_id="cli_output",
-        snapshot_str=resp.output,
-        sql_engine=sql_client.sql_engine_type,
-    )
-
-
+@pytest.mark.duckdb_only
 def test_saved_query_explain(  # noqa: D103
+    request: FixtureRequest,
     capsys: pytest.CaptureFixture,
     mf_test_configuration: MetricFlowTestConfiguration,
     cli_runner: MetricFlowCliRunner,
 ) -> None:
-    resp = cli_runner.run(
-        query,
+    run_and_check_cli_command(
+        request=request,
+        capsys=capsys,
+        mf_test_configuration=mf_test_configuration,
+        cli_runner=cli_runner,
+        command=query,
         args=["--explain", "--saved-query", "p0_booking", "--order", "metric_time__day,listing__capacity_latest"],
     )
 
-    # Currently difficult to compare explain output due to randomly generated IDs.
-    assert resp.exit_code == 0
-
 
 @pytest.mark.duckdb_only
-@pytest.mark.sql_engine_snapshot
 def test_saved_query_with_cumulative_metric(  # noqa: D103
     request: FixtureRequest,
     capsys: pytest.CaptureFixture,
     mf_test_configuration: MetricFlowTestConfiguration,
     cli_runner: MetricFlowCliRunner,
-    sql_client: SqlClient,
 ) -> None:
-    resp = cli_runner.run(
-        query,
+    run_and_check_cli_command(
+        request=request,
+        capsys=capsys,
+        mf_test_configuration=mf_test_configuration,
+        cli_runner=cli_runner,
+        command=query,
         args=[
             "--saved-query",
             "saved_query_with_cumulative_metric",
@@ -289,12 +344,3 @@ def test_saved_query_with_cumulative_metric(  # noqa: D103
             "2020-01-01",
         ],
     )
-
-    assert_str_snapshot_equal(
-        request=request,
-        mf_test_configuration=mf_test_configuration,
-        snapshot_id="cli_output",
-        snapshot_str=resp.output,
-        sql_engine=sql_client.sql_engine_type,
-    )
-    assert resp.exit_code == 0

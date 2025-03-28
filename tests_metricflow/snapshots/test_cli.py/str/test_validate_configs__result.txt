@@ -1,0 +1,20 @@
+test_name: test_validate_configs
+test_filename: test_cli.py
+docstring:
+  Tests config validation from a manifest stored on the filesystem.
+
+      This test is special, because the CLI bypasses the semantic manifest read into the CLIContext and
+      validates the config files on disk. It's not entirely clear why we do this, so we should probably
+      figure that out and, if possible, stop doing it so we can have this test depend on an injectable
+      in-memory semantic manifest instead of whatever is stored in the filesystem.
+
+      At any rate, due to the direct read from disk, we have to store a serialized semantic manifest
+      in a temporary location. In order to spin up the CLI this requires us to ALSO have a dbt_project.yml
+      on the filesystem in the project path. Since we don't want to clobber whatever semantic_manifest.json is
+      in the real filesystem location we do all of this stuff here.
+expectation_description:
+  There should be two validation failures with `bad_semantic_model`.
+---
+(To see warnings and future-errors, run again with flag `--show-all`)
+• [91m[1mERROR[0m: with semantic model `bad_semantic_model` in file `inline_for_test` on line #2 - Default aggregation time dimension was specified as 'ds' which doesn't exist as a time dimension in semantic model named 'bad_semantic_model'.
+• [91m[1mERROR[0m: with semantic model `bad_semantic_model` in file `inline_for_test` on line #2 - The semantic model bad_semantic_model contains dimensions, but it does not define a primary entity. Either add an entity with type PRIMARY or set a value for the primary_entity key.

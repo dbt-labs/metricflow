@@ -1,3 +1,5 @@
+# Exclude snapshots as they can represent specific output and formatting hooks may strip newlines.
+exclude: '^(?:tests_metricflow|tests_metricflow_semantics)/snapshots/.*$'
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v3.2.0
