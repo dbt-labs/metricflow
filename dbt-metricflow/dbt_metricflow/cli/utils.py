@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 import datetime as dt
 import logging
 import pathlib
@@ -107,6 +108,19 @@ def validate_limit(limit: Optional[str]) -> Optional[int]:
     return int(limit) if limit else None
 
 
+def echo_semantic_manifest_context(cli_configuration: CLIConfiguration) -> None:
+    try:
+        project = cli_configuration.dbt_project_metadata.project
+        target_path = pathlib.Path(project.project_root) / pathlib.Path(project.target_path)
+        semantic_manifest_json_path = target_path / "semantic_manifest.json"
+
+        if semantic_manifest_json_path.exists():
+            click.echo(f"Semantic Manifest Artifact: {semantic_manifest_json_path}")
+            modified_time = datetime.datetime.fromtimestamp(semantic_manifest_json_path.stat().st_mtime)
+            click.echo(f"Artifact Modified Time: {modified_time.isoformat()}")
+    except:
+        logger.exception("Got an exception while trying to echo semantic manifest context")
+
 # Misc
 def exception_handler(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[misc]
     """Decorator to handle exceptions."""
@@ -122,6 +136,7 @@ def exception_handler(func: Callable[..., Any]) -> Callable[..., Any]:  # type: 
             if isinstance(args[0], CLIConfiguration):
                 cli_configuration: CLIConfiguration = args[0]
                 click.echo(f"\nERROR: {str(e)}\n\n{CLIString.LOG_FILE_PREFIX}: {cli_configuration.log_file_path}")
+                echo_semantic_manifest_context(cli_configuration)
             else:
                 if not isinstance(args[0], CLIConfiguration):
                     logger.error(
