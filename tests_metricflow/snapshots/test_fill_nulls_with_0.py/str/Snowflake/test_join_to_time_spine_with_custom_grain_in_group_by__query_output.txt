@@ -1,6 +1,7 @@
 test_name: test_join_to_time_spine_with_custom_grain_in_group_by
 test_filename: test_fill_nulls_with_0.py
 ---
+<<<<<<< HEAD
 BOOKING__DS__MARTIAN_DAY    BOOKINGS_JOIN_TO_TIME_SPINE
 --------------------------  -----------------------------
 2020-01-01T00:00:00         None
@@ -18,3 +19,12 @@ BOOKING__DS__MARTIAN_DAY    BOOKINGS_JOIN_TO_TIME_SPINE
 2020-01-13T00:00:00         None
 2020-01-14T00:00:00         None
 2020-01-15T00:00:00         None
+=======
+BOOKING__DS__ALIEN_DAY      BOOKINGS_JOIN_TO_TIME_SPINE
+------------------------  -----------------------------
+2020-01-01T00:00:00                                None
+2020-01-02T00:00:00                                  31
+2020-01-03T00:00:00                                  15
+2020-01-04T00:00:00                                None
+2020-01-05T00:00:00                                None
+>>>>>>> 266adf733 (Address issues with the display of numeric types (#1699))

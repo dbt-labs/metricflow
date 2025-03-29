@@ -1,0 +1,8 @@
+test_name: test_decimals_option_negative
+test_filename: test_output_format.py
+docstring:
+  Tests the output of `mf query --decimals -1 ...`.
+expectation_description:
+  An error should be displayed due to the invalid argument value.
+---
+❌ The `decimals` option was set to -1, but it should be a non-negative integer.

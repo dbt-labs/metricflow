@@ -129,25 +129,46 @@ class MetricFlowDataTable:
         """Returns this but with the columns in order by name, and the rows in order by values."""
         return self._sorted_by_column_name()._sorted_by_row()
 
-    def text_format(self, float_decimals: int = 2) -> str:
+    def text_format(self, float_decimals: Optional[int] = None) -> str:
         """Return a text version of this table that is suitable for printing."""
         str_rows: List[List[str]] = []
+
         for row in self.rows:
             str_row: List[str] = []
-            for cell_value in row:
-                if isinstance(cell_value, float):
-                    str_row.append(f"{cell_value:.{float_decimals}f}")
-                    continue
-
-                if isinstance(cell_value, datetime.datetime):
+            for column_index, cell_value in enumerate(row):
+                if cell_value is None:
+                    # This will be changed in a later PR - leaving with incorrect behavior to reduce snapshot changes
+                    # for the numeric-type-display fix.
+                    str_row.append(str(None))
+                elif self.column_descriptions[column_index].column_type in {float, Decimal}:
+                    # Use `g` (general number format) by default.
+                    float_format = f".{float_decimals}f" if float_decimals is not None else "g"
+                    str_row.append(format(cell_value, float_format))
+                elif isinstance(cell_value, datetime.datetime):
                     str_row.append(cell_value.isoformat())
-                    continue
+                else:
+                    str_row.append(str(cell_value))
 
-                str_row.append(str(cell_value))
             str_rows.append(str_row)
+
+        column_alignment: List[str] = []
+        # Align numeric values by the decimal point, otherwise to the left.
+        # Numeric values could also be aligned to the right to be similar to spreadsheets.
+        for column_description in self.column_descriptions:
+            if column_description.column_type in {int, float, Decimal}:
+                column_alignment.append("decimal")
+            else:
+                column_alignment.append("left")
+
+        headers = tuple(column_description.column_name for column_description in self.column_descriptions)
+
         return tabulate.tabulate(
-            tabular_data=tuple(tuple(str_row) for str_row in str_rows),
-            headers=tuple(column_description.column_name for column_description in self.column_descriptions),
+            tabular_data=str_rows,
+            headers=headers,
+            # `tabulate.tabulate` can detect numeric values and apply special formatting rules. This can
+            # result in unexpected values when coupled with the `--decimals` option, so disabling this feature.
+            disable_numparse=True,
+            colalign=column_alignment,
         )
 
     def with_lower_case_column_names(self) -> MetricFlowDataTable:
