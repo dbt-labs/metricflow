@@ -160,6 +160,92 @@ def test_decimals_option(
 
 
 @pytest.mark.slow
+def test_decimals_option_invalid(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_runner: IsolatedCliCommandRunner,
+) -> None:
+    """Tests the output of `mf query --decimals invalid_value ...`."""
+    run_and_check_cli_command(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        cli_runner=cli_runner,
+        command_enum=IsolatedCliCommandEnum.MF_QUERY,
+        args=[
+            "--metrics",
+            "demo_metric",
+            "--group-by",
+            "row,row__str_value,row__int_value,row__float_value,row__decimal_value",
+            "--where",
+            "{{ Dimension('row__test_group') }} = 'numeric'",
+            "--order",
+            "row",
+            "--decimals",
+            "invalid_value",
+        ],
+        expectation_description="An error should be displayed due to the invalid argument value.",
+        expected_exit_code=2,
+    )
+
+
+@pytest.mark.slow
+def test_decimals_option_zero(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_runner: IsolatedCliCommandRunner,
+) -> None:
+    """Tests the output of `mf query --decimals 0 ...`."""
+    run_and_check_cli_command(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        cli_runner=cli_runner,
+        command_enum=IsolatedCliCommandEnum.MF_QUERY,
+        args=[
+            "--metrics",
+            "demo_metric",
+            "--group-by",
+            "row,row__str_value,row__int_value,row__float_value,row__decimal_value",
+            "--where",
+            "{{ Dimension('row__test_group') }} = 'numeric'",
+            "--order",
+            "row",
+            "--decimals",
+            "0",
+        ],
+        expectation_description="A decimal point should not appear.",
+    )
+
+
+@pytest.mark.slow
+def test_decimals_option_negative(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_runner: IsolatedCliCommandRunner,
+) -> None:
+    """Tests the output of `mf query --decimals -1 ...`."""
+    run_and_check_cli_command(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        cli_runner=cli_runner,
+        command_enum=IsolatedCliCommandEnum.MF_QUERY,
+        args=[
+            "--metrics",
+            "demo_metric",
+            "--group-by",
+            "row,row__str_value,row__int_value,row__float_value,row__decimal_value",
+            "--where",
+            "{{ Dimension('row__test_group') }} = 'numeric'",
+            "--order",
+            "row",
+            "--decimals",
+            "-1",
+        ],
+        expectation_description="An error should be displayed due to the invalid argument value.",
+        expected_exit_code=1,
+    )
+
+
+@pytest.mark.slow
 def test_single_large_number_with_decimals_option(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -187,6 +273,6 @@ def test_single_large_number_with_decimals_option(
             "2",
         ],
         expectation_description=(
-            "Numeric values should not be displayed in exponent notation and should have 2 decimals."
+            "Non-integer numeric values should not be displayed in exponent notation and should have 2 decimals."
         ),
     )

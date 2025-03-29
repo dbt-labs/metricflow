@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import datetime
 import decimal
+from decimal import Decimal
 from typing import Sequence, Tuple, Type, Union
 
 # Types supported by `MetricFlowDataTable`.
-CellValue = Union[float, str, datetime.datetime, bool, None]
+CellValue = Union[Decimal, float, str, datetime.datetime, bool, None]
 # Types supported as inputs when building a `MetricFlowDataTable`. These inputs will get converted into
 # one of the `CellValue` types.
 InputCellValue = Union[int, float, str, datetime.datetime, bool, None, decimal.Decimal, datetime.date]

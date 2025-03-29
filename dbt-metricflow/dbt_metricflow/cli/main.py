@@ -25,7 +25,7 @@ from update_checker import UpdateChecker
 import dbt_metricflow.cli.custom_click_types as click_custom
 from dbt_metricflow.cli import PACKAGE_NAME
 from dbt_metricflow.cli.cli_configuration import CLIConfiguration
-from dbt_metricflow.cli.constants import DEFAULT_RESULT_DECIMAL_PLACES, MAX_LIST_OBJECT_ELEMENTS
+from dbt_metricflow.cli.constants import MAX_LIST_OBJECT_ELEMENTS
 from dbt_metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts
 from dbt_metricflow.cli.tutorial import (
     dbtMetricFlowTutorialHelper,
@@ -147,8 +147,11 @@ def _click_echo(message: str, quiet: bool) -> None:
 @click.option(
     "--decimals",
     required=False,
-    default=2,
-    help="Choose the number of decimal places to round for the numerical values",
+    help=(
+        "If specified, display non-integer numeric types in fixed point with the given number of digits after "
+        "the decimal point."
+    ),
+    type=int,
 )
 @click.option(
     "--show-sql-descriptions",
@@ -183,7 +186,7 @@ def query(
     explain: bool = False,
     show_dataflow_plan: bool = False,
     display_plans: bool = False,
-    decimals: int = DEFAULT_RESULT_DECIMAL_PLACES,
+    decimals: Optional[int] = None,
     show_sql_descriptions: bool = False,
     saved_query: Optional[str] = None,
     quiet: bool = False,
@@ -191,6 +194,11 @@ def query(
     """Create a new query with MetricFlow and assembles a MetricFlowQueryResult."""
     if not cfg.is_setup:
         cfg.setup()
+
+    if decimals is not None and decimals < 0:
+        click.echo(f"❌ The `decimals` option was set to {decimals!r}, but it should be a non-negative integer.")
+        exit(1)
+
     start = time.time()
     spinner: Optional[Halo] = None
     if not quiet:
