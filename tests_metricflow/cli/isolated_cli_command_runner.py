@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from multiprocessing.context import SpawnProcess
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Iterator, Optional, Sequence
+from typing import Iterator, Mapping, Optional, Sequence
 
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 
@@ -42,15 +42,18 @@ class IsolatedCliCommandRunner:
         self,
         dbt_profiles_path: Optional[Path] = None,
         dbt_project_path: Optional[Path] = None,
+        environment_variable_mapping: Optional[Mapping[str, str]] = None,
     ) -> None:
         """Initializer.
 
         Args:
             dbt_profiles_path: The path to the directory containing dbt profiles.
             dbt_project_path: The path to the directory containing the dbt project.
+            environment_variable_mapping: Environment variables to set in the process.
         """
         self._dbt_profiles_path = dbt_profiles_path
         self._dbt_project_path = dbt_project_path
+        self._environment_variable_mapping = environment_variable_mapping
 
         # Use this context to use the `spawn` method to create new processes.
         # `spawn` helps avoid seg faults vs. `fork`.
@@ -91,12 +94,18 @@ class IsolatedCliCommandRunner:
         input_queue = self._multiprocessing_context.Queue()
         output_queue = self._multiprocessing_context.Queue()
 
+        if self._environment_variable_mapping is not None:
+            environment_variables = tuple((key, value) for key, value in (self._environment_variable_mapping.items()))
+        else:
+            environment_variables = ()
+
         executor_process_starting_parameter_set = ExecutorProcessStartingParameterSet(
             log_file_path=log_file_path,
             input_queue=input_queue,
             output_queue=output_queue,
             dbt_profiles_path=self._dbt_profiles_path,
             dbt_project_path=self._dbt_project_path,
+            environment_variables=environment_variables,
         )
 
         executor_process: multiprocessing.context.SpawnProcess = self._multiprocessing_context.Process(
@@ -155,11 +164,18 @@ class IsolatedCliCommandRunner:
 
         if logger.isEnabledFor(logging.DEBUG):
             delete_temporary_directory = False
+
+        if self._environment_variable_mapping is not None:
+            environment_variables = tuple((key, value) for key, value in (self._environment_variable_mapping.items()))
+        else:
+            environment_variables = ()
+
         try:
             command_parameter_set = CommandParameterSet(
                 working_directory_path=working_directory_path,
                 command_enum=command_enum,
                 command_args=tuple(command_args),
+                environment_variables=environment_variables,
             )
             logger.debug(LazyFormat("Put command in input queue", command_parameter_set=command_parameter_set))
             result = self._running_executor_process_context.send_command_and_get_result(command_parameter_set)

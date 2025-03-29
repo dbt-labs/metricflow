@@ -1,0 +1,10 @@
+test_name: test_environment_variables
+test_filename: test_isolated_command_runner.py
+docstring:
+  Tests running an MF CLI command that configures the profile / project location using environment variables.
+expectation_description:
+  A table showing the `transactions` metric.
+---
+  transactions
+--------------
+            50

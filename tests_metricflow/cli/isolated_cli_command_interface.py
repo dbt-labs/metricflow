@@ -75,6 +75,7 @@ class ExecutorProcessStartingParameterSet:
     output_queue: Queue[IsolatedCliCommandResult]
     dbt_profiles_path: Optional[Path]
     dbt_project_path: Optional[Path]
+    environment_variables: Tuple[Tuple[str, str], ...]
 
 
 @dataclass(frozen=True)
@@ -84,3 +85,4 @@ class CommandParameterSet:
     working_directory_path: Path
     command_enum: IsolatedCliCommandEnum
     command_args: Tuple[str, ...]
+    environment_variables: Tuple[Tuple[str, str], ...]

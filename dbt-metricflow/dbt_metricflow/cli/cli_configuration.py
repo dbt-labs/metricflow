@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import pathlib
 from logging.handlers import TimedRotatingFileHandler
 from typing import Dict, Optional
@@ -21,6 +22,9 @@ logger = logging.getLogger(__name__)
 
 class CLIConfiguration:
     """Configuration object used for the MetricFlow CLI."""
+
+    DBT_PROFILES_DIR_ENV_VAR_NAME = "DBT_PROFILES_DIR"
+    DBT_PROJECT_DIR_ENV_VAR_NAME = "DBT_PROJECT_DIR"
 
     def __init__(self) -> None:  # noqa: D107
         self.verbose = False
@@ -61,10 +65,18 @@ class CLIConfiguration:
         """
         cwd = pathlib.Path.cwd()
 
-        if dbt_profiles_path is None:
-            dbt_profiles_path = cwd
-        if dbt_project_path is None:
-            dbt_project_path = cwd
+        dbt_profiles_dir_env_var = os.environ.get(CLIConfiguration.DBT_PROFILES_DIR_ENV_VAR_NAME)
+        dbt_profiles_dir_from_env = (
+            pathlib.Path(dbt_profiles_dir_env_var) if dbt_profiles_dir_env_var is not None else None
+        )
+
+        dbt_project_dir_env_var = os.environ.get(CLIConfiguration.DBT_PROJECT_DIR_ENV_VAR_NAME)
+        dbt_project_dir_from_env = (
+            pathlib.Path(dbt_project_dir_env_var) if dbt_project_dir_env_var is not None else None
+        )
+
+        dbt_profiles_path = dbt_profiles_path or dbt_profiles_dir_from_env or cwd
+        dbt_project_path = dbt_project_path or dbt_project_dir_from_env or cwd
 
         if not (dbt_project_path / "dbt_project.yml").exists():
             click.echo("\n".join(["❌ Unable to locate 'dbt_project.yml' in:", f"  {dbt_project_path}", ""]))
