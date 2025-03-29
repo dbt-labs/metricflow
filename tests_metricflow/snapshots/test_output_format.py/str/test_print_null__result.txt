@@ -1,0 +1,8 @@
+test_name: test_print_null
+test_filename: test_output_format.py
+docstring:
+  Tests the default display of `NULL` in the output of `mf query`.
+---
+row    row__str_value    row__int_value    row__float_value    row__decimal_value    row__description      demo_metric
+-----  ----------------  ----------------  ------------------  --------------------  ------------------  -------------
+None   None              None              None                None                  Each type as NULL.              1
