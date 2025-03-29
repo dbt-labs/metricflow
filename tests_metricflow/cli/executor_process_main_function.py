@@ -64,6 +64,9 @@ class ExecutorProcessMainFunction:
         input_queue = self._starting_parameter_set.input_queue
         output_queue = self._starting_parameter_set.output_queue
 
+        for key, value in self._starting_parameter_set.environment_variables or ():
+            os.environ[key] = value
+
         root_logger = logging.getLogger()
         root_logger.setLevel(self._log_level)
 
