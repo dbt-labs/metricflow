@@ -4,7 +4,7 @@ docstring:
   Test the error message that a user gets when a time spine is not configured in the project.
 ---
 
-ERROR: min() iterable argument is empty
+ERROR: At least one time spine must be configured to use the semantic layer, but none were found.
 
 Log File: ***
 Artifact Path: ***
