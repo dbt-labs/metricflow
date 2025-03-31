@@ -1,0 +1,17 @@
+test_name: test_missing_semantic_manifest
+test_filename: test_cli_error.py
+docstring:
+  Tests a case where a semantic manifest is not found.
+---
+
+ERROR: Unable to load the semantic manifest.
+  Please ensure that you are running `mf` in the root directory of a dbt project
+  and that the semantic manifest artifact exists. If this is your first time
+  running `mf`, run `dbt parse` or `dbt build` to generate the artifact.
+
+Log File: ***
+Artifact Path: ***
+
+If you think you found a bug, please report it here:
+    https://github.com/dbt-labs/metricflow/issues
+
