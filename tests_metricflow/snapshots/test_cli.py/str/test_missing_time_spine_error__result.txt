@@ -1,0 +1,15 @@
+test_name: test_missing_time_spine_error
+test_filename: test_cli.py
+docstring:
+  Test the error message that a user gets when a time spine is not configured in the project.
+---
+
+ERROR: min() iterable argument is empty
+
+Log File: ***
+Artifact Path: ***
+Artifact Modified Time: ***
+
+If you think you found a bug, please report it here:
+    https://github.com/dbt-labs/metricflow/issues
+
