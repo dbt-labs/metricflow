@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import dataclasses
 import logging
+import textwrap
 from pathlib import Path
 from typing import List, Type
 
@@ -132,10 +133,15 @@ class dbtArtifacts:
         full_path_to_manifest = Path(project_root, DEFAULT_TARGET_PATH).resolve()
         if not full_path_to_manifest.exists():
             raise ModelCreationException(
-                f"Unable to find {full_path_to_manifest}\n"
-                "Please ensure that you are running `mf` in the root directory of a dbt project "
-                "and that the semantic_manifest JSON exists. If this is your first time running "
-                "`mf`, run `dbt parse` to generate the semantic_manifest JSON."
+                "\n"
+                + "\n".join(
+                    textwrap.wrap(
+                        "Please ensure that you are running `mf` in the root directory of a dbt project "
+                        "and that the semantic manifest artifact exists. If this is your first time running "
+                        "`mf`, run `dbt parse` or `dbt build` to generate the artifact.",
+                        width=80,
+                    )
+                )
             )
         try:
             with open(full_path_to_manifest, "r") as file:
