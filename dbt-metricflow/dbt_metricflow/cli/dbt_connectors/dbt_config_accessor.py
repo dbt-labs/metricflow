@@ -17,7 +17,7 @@ from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.dbt_manifest_parser import parse_manifest_from_dbt_generated_manifest
 from typing_extensions import Self
 
-from dbt_metricflow.cli.cli_errors import ModelCreationException
+from dbt_metricflow.cli.cli_errors import LoadSemanticManifestException
 
 logger = logging.getLogger(__name__)
 
@@ -133,7 +133,7 @@ class dbtArtifacts:
         DEFAULT_TARGET_PATH = "target/semantic_manifest.json"
         full_path_to_manifest = Path(project_root, DEFAULT_TARGET_PATH).resolve()
         if not full_path_to_manifest.exists():
-            raise ModelCreationException(
+            raise LoadSemanticManifestException(
                 "\n"
                 + "\n".join(
                     textwrap.wrap(
@@ -149,4 +149,4 @@ class dbtArtifacts:
                 raw_contents = file.read()
                 return parse_manifest_from_dbt_generated_manifest(manifest_json_string=raw_contents)
         except Exception as e:
-            raise ModelCreationException from e
+            raise LoadSemanticManifestException from e
