@@ -37,7 +37,7 @@ docstring:
         --start-time 2022-03-20 --end-time 2022-04-01
 12. Before integrating metrics into your project, read up on adding a time spine.
     (<Control>+<Left Click> may work in your terminal to follow the link)
-       https://docs.getdbt.com/docs/build/metricflow-time-spine?version=1.10
+       https://docs.getdbt.com/docs/build/metricflow-time-spine?version=1.9
 
 If you found MetricFlow to be helpful, consider adding a Github star to promote the project:
        https://github.com/dbt-labs/metricflow
