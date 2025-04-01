@@ -10,24 +10,15 @@ jobs:
   metricflow-pip-install-tests:
     name: MetricFlow `pip` Install Tests
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.10"]
     steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
 
-      - name: Check-out the repo
-        uses: actions/checkout@v4
-
-      - name: Setup Python ${{ matrix.python-version }} Environment
-        uses: ./.github/actions/setup-python-env
+      - name: Install Python
+        uses: actions/setup-python@v4
         with:
-          python-version: "${{ matrix.python-version }}"
+          python-version: '3.10.9'
+          cache: 'pip'
 
-      - name: Run `pip install dbt-metricflow`
-        run: >-
-          pip install dbt-core==1.9.0
-          dbt-snowflake==1.8.3
-          sqlfluff-templater-dbt==3.3.1
-          sqlglot[rs]
-          elementary-data
-          dbt-metricflow==0.8.1
+      - name: Install pip dependencies
+        run: pip install -r debug_requirements.txt
