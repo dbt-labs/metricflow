@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 import datetime as dt
 import logging
 import pathlib
@@ -107,6 +108,28 @@ def validate_limit(limit: Optional[str]) -> Optional[int]:
     return int(limit) if limit else None
 
 
+def echo_semantic_manifest_context(cli_configuration: CLIConfiguration) -> None:
+    """Best-effort attempt to print details about the semantic manifest to the console when an error occurs.
+
+    These messages could help the user figure out if their error is caused by an out-of-date artifact. If so, they
+    can re-run `dbt parse` or `dbt build`.
+    """
+    try:
+        if not cli_configuration.is_setup:
+            logger.debug("Skipping retrieval of semantic manifest context as the configuration has not been set up.")
+            return
+        project = cli_configuration.dbt_project_metadata.project
+        target_path = pathlib.Path(project.project_root) / pathlib.Path(project.target_path)
+        semantic_manifest_json_path = target_path / "semantic_manifest.json"
+
+        click.echo(f"{CLIString.ARTIFACT_PATH} {semantic_manifest_json_path}")
+        if semantic_manifest_json_path.exists():
+            modified_time = datetime.datetime.fromtimestamp(semantic_manifest_json_path.stat().st_mtime)
+            click.echo(f"{CLIString.ARTIFACT_MODIFIED_TIME} {modified_time.isoformat()}")
+    except Exception:
+        logger.exception("Got an exception while trying to get the semantic-manifest context")
+
+
 # Misc
 def exception_handler(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[misc]
     """Decorator to handle exceptions."""
@@ -117,20 +140,30 @@ def exception_handler(func: Callable[..., Any]) -> Callable[..., Any]:  # type: 
             func(*args, **kwargs)
         except Exception as e:
             # This will log to the file handlers registered in the root.
-            logging.exception("Logging exception")
+            logging.exception("Logging exception handled by the CLI exception handler")
+            click.echo(f"\nERROR: {str(e)}".rstrip())
 
-            if isinstance(args[0], CLIConfiguration):
-                cli_configuration: CLIConfiguration = args[0]
-                click.echo(f"\nERROR: {str(e)}\n\n{CLIString.LOG_FILE_PREFIX}: {cli_configuration.log_file_path}")
-            else:
-                if not isinstance(args[0], CLIConfiguration):
-                    logger.error(
-                        LazyFormat(
-                            lambda: f"Missing {CLIConfiguration.__name__} as the first argument to the function "
-                            f"{getattr(func, '__name__', repr(func))}"
-                        )
+            cli_configuration: Optional[CLIConfiguration] = None
+            first_argument = args[0]
+            if isinstance(first_argument, CLIConfiguration):
+                cli_configuration = first_argument
+
+            if cli_configuration is not None:
+                if cli_configuration.is_setup:
+                    click.echo(f"\n{CLIString.LOG_FILE_PREFIX}: {cli_configuration.log_file_path}")
+                    echo_semantic_manifest_context(cli_configuration)
+                else:
+                    logger.debug(
+                        "CLI configuration is not setup, possibly due to an exception during configuration setup."
                     )
-                click.echo(f"\nERROR: {str(e)}")
+            else:
+                logger.error(
+                    LazyFormat(
+                        "Unexpected first argument in the exception handler - it should have been passed a configuration.",
+                        expected_argument_class=CLIConfiguration.__name__,
+                        first_argument=first_argument,
+                    )
+                )
 
             click.echo(
                 "\n"
@@ -143,7 +176,7 @@ def exception_handler(func: Callable[..., Any]) -> Callable[..., Any]:  # type: 
             )
 
             # Checks if CLIContext has verbose flag set
-            if args and hasattr(args[0], "verbose") and args[0].verbose is True:
+            if args and hasattr(first_argument, "verbose") and first_argument.verbose is True:
                 click.echo(traceback.format_exc())
 
             exit(1)

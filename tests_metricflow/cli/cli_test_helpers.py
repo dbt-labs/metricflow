@@ -49,7 +49,11 @@ def run_and_check_cli_command(
 
     # Replace incomparable values in snapshots with `***`.
     snapshot_str = result.stdout
-    for prefix in (CLIString.LOG_FILE_PREFIX,):
+    for prefix in (
+        CLIString.LOG_FILE_PREFIX,
+        CLIString.ARTIFACT_PATH,
+        CLIString.ARTIFACT_MODIFIED_TIME,
+    ):
         regex_parts = (r"(?P<prefix>", prefix, r").*")
         snapshot_str = re.sub("".join(regex_parts), repl=r"\g<prefix> ***", string=snapshot_str)
 

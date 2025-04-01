@@ -146,11 +146,17 @@ class ExecutorProcessMainFunction:
     def _dbt_project_path(self) -> Optional[Path]:
         return self._starting_parameter_set.dbt_project_path
 
-    def _get_mf_cli_config(self) -> CLIConfiguration:
+    def _get_mf_cli_config(self) -> Optional[CLIConfiguration]:
         """Cache `CLIConfiguration` since it's slow to create."""
         if self._mf_cli_cfg is None:
-            self._mf_cli_cfg = CLIConfiguration()
-            self._mf_cli_cfg.setup(dbt_profiles_path=self._dbt_profiles_path, dbt_project_path=self._dbt_project_path)
+            try:
+                self._mf_cli_cfg = CLIConfiguration()
+                self._mf_cli_cfg.setup(
+                    dbt_profiles_path=self._dbt_profiles_path, dbt_project_path=self._dbt_project_path
+                )
+            except Exception:
+                logger.exception("Got an exception while creating the CLI configuration.")
+
         return self._mf_cli_cfg
 
     def _run_cli_command(self, parameter_set: CommandParameterSet) -> IsolatedCliCommandResult:

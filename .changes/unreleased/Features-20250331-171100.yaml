@@ -1,0 +1,6 @@
+kind: Features
+body: Add semantic manifest artifact context to error messages
+time: 2025-03-31T17:11:00.964937-07:00
+custom:
+  Author: plypaul
+  Issue: "1708"
