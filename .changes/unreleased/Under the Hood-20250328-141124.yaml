@@ -1,6 +1,0 @@
-kind: Under the Hood
-body: Avoid reinitialization of `CLIConfiguration`
-time: 2025-03-28T14:11:24.889683-07:00
-custom:
-  Author: plypaul
-  Issue: "1697"

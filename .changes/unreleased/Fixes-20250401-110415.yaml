@@ -1,6 +1,0 @@
-kind: Fixes
-body: Fix issue counter when generating error messages.
-time: 2025-04-01T11:04:15.636629-07:00
-custom:
-  Author: plypaul
-  Issue: "1708"
