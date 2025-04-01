@@ -3,7 +3,7 @@ test_filename: test_suggestions.py
 docstring:
   Tests that the suggestions for invalid items in filters are specific to the metric.
 ---
-Got errors while resolving the query.
+Got error(s) during query resolution.
 
 Error #1:
   Message:

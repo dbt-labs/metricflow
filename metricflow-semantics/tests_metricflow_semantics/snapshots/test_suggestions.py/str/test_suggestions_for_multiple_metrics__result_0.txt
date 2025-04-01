@@ -1,7 +1,7 @@
 test_name: test_suggestions_for_multiple_metrics
 test_filename: test_suggestions.py
 ---
-Got errors while resolving the query.
+Got error(s) during query resolution.
 
 Error #1:
   Message:

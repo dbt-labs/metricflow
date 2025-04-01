@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import dataclasses
 import logging
+import textwrap
 from pathlib import Path
 from typing import List, Type
 
@@ -12,10 +13,11 @@ from dbt.config.profile import Profile
 from dbt.config.project import Project
 from dbt.config.runtime import load_profile, load_project
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
-from metricflow_semantics.errors.error_classes import ModelCreationException
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.dbt_manifest_parser import parse_manifest_from_dbt_generated_manifest
 from typing_extensions import Self
+
+from dbt_metricflow.cli.cli_errors import LoadSemanticManifestException
 
 logger = logging.getLogger(__name__)
 
@@ -131,15 +133,19 @@ class dbtArtifacts:
         DEFAULT_TARGET_PATH = "target/semantic_manifest.json"
         full_path_to_manifest = Path(project_root, DEFAULT_TARGET_PATH).resolve()
         if not full_path_to_manifest.exists():
-            raise ModelCreationException(
-                f"Unable to find {full_path_to_manifest}\n"
-                "Please ensure that you are running `mf` in the root directory of a dbt project "
-                "and that the semantic_manifest JSON exists. If this is your first time running "
-                "`mf`, run `dbt parse` to generate the semantic_manifest JSON."
+            raise LoadSemanticManifestException(
+                "\n".join(
+                    textwrap.wrap(
+                        "Please ensure that you are running `mf` in the root directory of a dbt project "
+                        "and that the semantic manifest artifact exists. If this is your first time running "
+                        "`mf`, run `dbt parse` or `dbt build` to generate the artifact.",
+                        width=80,
+                    )
+                )
             )
         try:
             with open(full_path_to_manifest, "r") as file:
                 raw_contents = file.read()
                 return parse_manifest_from_dbt_generated_manifest(manifest_json_string=raw_contents)
         except Exception as e:
-            raise ModelCreationException from e
+            raise LoadSemanticManifestException from e

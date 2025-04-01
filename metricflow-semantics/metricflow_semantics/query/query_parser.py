@@ -258,7 +258,7 @@ class MetricFlowQueryParser:
         input_to_issue_set: InputToIssueSetMapping,
     ) -> Optional[str]:
         """Create an error message that formats the inputs / issues."""
-        lines: List[str] = ["Got errors while resolving the query."]
+        lines: List[str] = ["Got error(s) during query resolution."]
         issue_counter = 0
 
         for item in input_to_issue_set.items:
@@ -268,8 +268,8 @@ class MetricFlowQueryParser:
             if not issue_set.has_errors:
                 continue
 
-            issue_counter += 1
             for error_issue in issue_set.errors:
+                issue_counter += 1
                 lines.append(f"\nError #{issue_counter}:")
                 issue_set_lines: List[str] = [
                     "Message:\n",

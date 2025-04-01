@@ -5,7 +5,7 @@ docstring:
 
       'entity_0__country' matches ['entity_1__entity_0__country', 'entity_2__entity_0__country']
 ---
-Got errors while resolving the query.
+Got error(s) during query resolution.
 
 Error #1:
   Message:
