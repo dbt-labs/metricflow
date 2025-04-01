@@ -6,12 +6,12 @@ import pathlib
 from logging.handlers import TimedRotatingFileHandler
 from typing import Dict, Optional
 
-import click
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 
 from dbt_metricflow.cli import PACKAGE_NAME
+from dbt_metricflow.cli.cli_errors import LoadSemanticManifestException
 from dbt_metricflow.cli.dbt_connectors.adapter_backed_client import AdapterBackedSqlClient
 from dbt_metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts, dbtProjectMetadata
 from metricflow.engine.metricflow_engine import MetricFlowEngine
@@ -77,10 +77,9 @@ class CLIConfiguration:
 
         dbt_profiles_path = dbt_profiles_path or dbt_profiles_dir_from_env or cwd
         dbt_project_path = dbt_project_path or dbt_project_dir_from_env or cwd
-
-        if not (dbt_project_path / "dbt_project.yml").exists():
-            click.echo("\n".join(["❌ Unable to locate 'dbt_project.yml' in:", f"  {dbt_project_path}", ""]))
-            exit(1)
+        dbt_project_yaml_path = dbt_project_path / "dbt_project.yml"
+        if not dbt_project_yaml_path.exists():
+            raise LoadSemanticManifestException(f"Missing: {str(dbt_project_yaml_path)!r}")
 
         try:
             self._dbt_project_metadata = dbtProjectMetadata.load_from_paths(

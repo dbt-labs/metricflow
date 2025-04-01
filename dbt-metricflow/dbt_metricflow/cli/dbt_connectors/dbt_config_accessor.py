@@ -134,8 +134,7 @@ class dbtArtifacts:
         full_path_to_manifest = Path(project_root, DEFAULT_TARGET_PATH).resolve()
         if not full_path_to_manifest.exists():
             raise LoadSemanticManifestException(
-                "\n"
-                + "\n".join(
+                "\n".join(
                     textwrap.wrap(
                         "Please ensure that you are running `mf` in the root directory of a dbt project "
                         "and that the semantic manifest artifact exists. If this is your first time running "
