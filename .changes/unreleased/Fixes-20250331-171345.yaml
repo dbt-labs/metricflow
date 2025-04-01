@@ -1,0 +1,6 @@
+kind: Fixes
+body: Configure `pytest` to skip scanning snapshots directory
+time: 2025-03-31T17:13:45.236488-07:00
+custom:
+  Author: plypaul
+  Issue: "1710"
