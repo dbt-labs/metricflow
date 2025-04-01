@@ -16,6 +16,7 @@ from typing import Iterator
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from dbt_metricflow.cli.cli_configuration import CLIConfiguration
@@ -26,6 +27,7 @@ from tests_metricflow.cli.cli_test_helpers import (
 )
 from tests_metricflow.cli.isolated_cli_command_interface import IsolatedCliCommandEnum
 from tests_metricflow.cli.isolated_cli_command_runner import IsolatedCliCommandRunner
+from tests_metricflow.snapshot_utils import assert_str_snapshot_equal
 
 logger = logging.getLogger(__name__)
 
@@ -305,3 +307,48 @@ def test_saved_query_with_cumulative_metric(  # noqa: D103
             "metric_time__day,cumulative_transactions,cumulative_transactions_in_last_7_days",
         ],
     )
+
+
+@pytest.mark.slow
+def test_csv(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+) -> None:
+    """Tests writing the results of a query to a file."""
+    with tempfile.TemporaryDirectory() as working_directory:
+        working_directory_path = Path(working_directory)
+        dbt_project_path = create_tutorial_project_files(working_directory_path)
+
+        cli_runner = IsolatedCliCommandRunner(
+            dbt_profiles_path=dbt_project_path,
+            dbt_project_path=dbt_project_path,
+        )
+        with cli_runner.running_context():
+            run_dbt_build(cli_runner)
+            command_enum = IsolatedCliCommandEnum.MF_QUERY
+            csv_filename = "transactions.csv"
+            command_args = ["--metrics", "transactions,quick_buy_transactions", "--csv", str(csv_filename)]
+            logger.info(
+                LazyFormat(
+                    "Running query and writing results to a CSV",
+                    command_enum=command_enum,
+                    csv_filename=csv_filename,
+                    command_args=command_args,
+                )
+            )
+            result = cli_runner.run_command(
+                command_enum=IsolatedCliCommandEnum.MF_QUERY,
+                command_args=command_args,
+                working_directory_path=working_directory_path,
+            )
+            result.raise_exception_on_failure()
+            csv_file_path = (working_directory_path / csv_filename).absolute()
+            with open(csv_file_path, "r") as csv_file:
+                csv_file_contents = csv_file.read()
+                assert_str_snapshot_equal(
+                    request=request,
+                    mf_test_configuration=mf_test_configuration,
+                    snapshot_id="result",
+                    snapshot_str=csv_file_contents,
+                    expectation_description="A CSV file containing the values for 2 metrics.",
+                )

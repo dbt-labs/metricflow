@@ -10,6 +10,7 @@ import textwrap
 import time
 import warnings
 from importlib.metadata import version as pkg_version
+from pathlib import Path
 from typing import Callable, List, Optional, Sequence
 
 import click
@@ -120,9 +121,10 @@ def _click_echo(message: str, quiet: bool) -> None:
 @query_options
 @click.option(
     "--csv",
-    type=click.File("w"),
+    # Using `click.Path` so that `click` generates error messages for invalid inputs.
+    type=click.Path(writable=True, file_okay=True, dir_okay=False, path_type=Path),
     required=False,
-    help="Provide filepath for data_table output to csv",
+    help="Write the data table as a CSV file to the given path",
 )
 @click.option(
     "--explain",
@@ -182,7 +184,7 @@ def query(
     end_time: Optional[dt.datetime] = None,
     order: Optional[List[str]] = None,
     limit: Optional[int] = None,
-    csv: Optional[click.utils.LazyFile] = None,
+    csv: Optional[Path] = None,
     explain: bool = False,
     show_dataflow_plan: bool = False,
     display_plans: bool = False,
@@ -273,12 +275,12 @@ def query(
         if df.row_count == 0:
             _click_echo("🕳 Query returned an empty result set", quiet=quiet)
         elif csv is not None:
-            # csv is a LazyFile that is file-like that works in this case.
-            csv_writer = csv_module.writer(csv)
-            csv_writer.writerow(df.column_names)
-            for row in df.rows:
-                csv_writer.writerow(row)
-            _click_echo(f"🖨 Wrote query output to {csv.name}", quiet=quiet)
+            with open(csv, "w") as csv_fp:
+                csv_writer = csv_module.writer(csv_fp)
+                csv_writer.writerow(df.column_names)
+                for row in df.rows:
+                    csv_writer.writerow(row)
+            _click_echo(f"🖨 Wrote query output to {csv}", quiet=quiet)
         else:
             click.echo(df.text_format(decimals))
         if display_plans:

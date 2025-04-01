@@ -1,0 +1,9 @@
+test_name: test_csv
+test_filename: test_cli.py
+docstring:
+  Tests writing the results of a query to a file.
+expectation_description:
+  A CSV file containing the values for 2 metrics.
+---
+transactions,quick_buy_transactions
+50,10

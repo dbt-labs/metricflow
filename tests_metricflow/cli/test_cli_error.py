@@ -64,3 +64,46 @@ def test_invalid_metric(
         args=["--metrics", "invalid_metric_0,invalid_metric_1"],
         expected_exit_code=1,
     )
+
+
+@pytest.mark.slow
+@pytest.mark.skip("Need to sanitize the snapshot output for temporary paths.")
+def test_csv_non_writeable_file(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_runner: IsolatedCliCommandRunner,
+) -> None:
+    """Test the error message when a read-only is passed in for the CSV file path."""
+    with tempfile.TemporaryDirectory() as tmp_directory:
+        tmp_directory_path = Path(tmp_directory)
+        read_only_file_path = tmp_directory_path / "read_only_file.csv"
+        read_only_file_path.touch(mode=0o400)
+
+        run_and_check_cli_command(
+            request=request,
+            mf_test_configuration=mf_test_configuration,
+            cli_runner=cli_runner,
+            command_enum=IsolatedCliCommandEnum.MF_QUERY,
+            args=["--metrics", "transactions", "--csv", str(read_only_file_path)],
+            expected_exit_code=2,
+        )
+
+
+@pytest.mark.slow
+@pytest.mark.skip("Need to sanitize the snapshot output for temporary paths.")
+def test_csv_directory(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_runner: IsolatedCliCommandRunner,
+) -> None:
+    """Test the error message when a directory is passed in for the CSV file path."""
+    with tempfile.TemporaryDirectory() as tmp_directory:
+        tmp_directory_path = Path(tmp_directory)
+        run_and_check_cli_command(
+            request=request,
+            mf_test_configuration=mf_test_configuration,
+            cli_runner=cli_runner,
+            command_enum=IsolatedCliCommandEnum.MF_QUERY,
+            args=["--metrics", "transactions", "--csv", str(tmp_directory_path)],
+            expected_exit_code=2,
+        )
