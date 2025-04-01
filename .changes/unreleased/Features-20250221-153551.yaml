@@ -1,6 +1,0 @@
-kind: Features
-body: Add `--quiet` option to the `query` CLI command.
-time: 2025-02-21T15:35:51.935247-08:00
-custom:
-  Author: plypaul
-  Issue: "1554"

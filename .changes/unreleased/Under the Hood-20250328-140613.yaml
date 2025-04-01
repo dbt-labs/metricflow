@@ -1,6 +1,0 @@
-kind: Under the Hood
-body: Allow `CliConfiguration` to be loaded from specified paths
-time: 2025-03-28T14:06:13.836158-07:00
-custom:
-  Author: plypaul
-  Issue: "1693"

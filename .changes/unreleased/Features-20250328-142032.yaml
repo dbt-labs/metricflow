@@ -1,6 +1,0 @@
-kind: Features
-body: Add support for `DBT_PROFILES_DIR` / `DBT_PROJECT_DIR` in the CLI
-time: 2025-03-28T14:20:32.008585-07:00
-custom:
-  Author: plypaul
-  Issue: 1702,1591

@@ -1,6 +1,0 @@
-kind: Features
-body: Allow querying SCDs without metric_time.
-time: 2025-01-24T13:35:35.800322-08:00
-custom:
-  Author: courtneyholcomb
-  Issue: "1621"
