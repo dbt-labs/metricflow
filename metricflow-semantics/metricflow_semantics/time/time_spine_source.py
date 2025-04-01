@@ -75,6 +75,12 @@ class TimeSpineSource:
                     base_granularity=legacy_time_spine.grain,
                 )
 
+        # Sanity check: this should have been validated during manifest parsing.
+        if not time_spine_sources:
+            raise RuntimeError(
+                "At least one time spine must be configured to use the semantic layer, but none were found."
+            )
+
         return time_spine_sources
 
     @staticmethod

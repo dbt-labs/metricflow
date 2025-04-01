@@ -20,6 +20,7 @@ from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from dbt_metricflow.cli.cli_configuration import CLIConfiguration
+from dbt_metricflow.cli.tutorial import dbtMetricFlowTutorialHelper
 from tests_metricflow.cli.cli_test_helpers import (
     create_tutorial_project_files,
     run_and_check_cli_command,
@@ -352,3 +353,35 @@ def test_csv(
                     snapshot_str=csv_file_contents,
                     expectation_description="A CSV file containing the values for 2 metrics.",
                 )
+
+
+@pytest.mark.slow
+def test_missing_time_spine_error(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+) -> None:
+    """Test the error message that a user gets when a time spine is not configured in the project."""
+    with tempfile.TemporaryDirectory() as tmp_directory:
+        tmp_directory_path = Path(tmp_directory)
+        dbt_project_path = tmp_directory_path / "mf_tutorial_project"
+        dbtMetricFlowTutorialHelper.generate_dbt_project(dbt_project_path)
+
+        model_yaml_file_path = dbt_project_path / "models" / "_models.yml"
+        Path.unlink(model_yaml_file_path)
+        logger.debug(LazyFormat("Removed time spine model file", model_yaml_file_path=model_yaml_file_path))
+
+        cli_runner = IsolatedCliCommandRunner(
+            dbt_profiles_path=dbt_project_path,
+            dbt_project_path=dbt_project_path,
+        )
+        with cli_runner.running_context():
+            run_dbt_build(cli_runner)
+
+            run_and_check_cli_command(
+                request=request,
+                mf_test_configuration=mf_test_configuration,
+                cli_runner=cli_runner,
+                command_enum=IsolatedCliCommandEnum.MF_LIST,
+                args=["metrics"],
+                expected_exit_code=1,
+            )
