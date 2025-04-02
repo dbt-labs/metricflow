@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from functools import cached_property
-from typing import Any, Callable, Union
+from typing import Any, Callable, Mapping, Union
 
 from typing_extensions import override
 
@@ -67,6 +67,18 @@ class LazyFormat:
         else:
             message_title = self._message_title
 
+        return mf_pformat_dict(message_title, self.evaluated_kwargs, preserve_raw_strings=True)
+
+    @override
+    def __str__(self) -> str:
+        return self._str_value
+
+    @cached_property
+    def evaluated_kwargs(self) -> Mapping[str, LoggedObject]:
+        """Return the `kwargs` that was used to construct this object, evaluating value if `Callable`.
+
+        This is cached to avoid repeated evaluation.
+        """
         evaluated_args = {}
         for arg_name, arg_value in self._kwargs.items():
             if callable(arg_value):
@@ -82,8 +94,4 @@ class LazyFormat:
                     )
 
             evaluated_args[arg_name] = arg_value
-        return mf_pformat_dict(message_title, evaluated_args, preserve_raw_strings=True)
-
-    @override
-    def __str__(self) -> str:
-        return self._str_value
+        return evaluated_args
