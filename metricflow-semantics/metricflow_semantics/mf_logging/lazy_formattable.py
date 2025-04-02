@@ -38,24 +38,26 @@ class LazyFormat:
         logger.debug(LazyFormat(lambda: f"Result is: {expensive_function()}")
     """
 
-    def __init__(self, message: Union[str, Callable[[], str]], **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def __init__(self, message_title: Union[str, Callable[[], str]], **kwargs) -> None:  # type: ignore[no-untyped-def]
         """Initializer.
 
         Args:
-            message: The message or a function that returns a message.
+            message_title: The message title or a function that returns a message title. A message is composed of the
+            message title and the message body. For this class, the message body is derived from the values of the
+            keyword arguments.
             **kwargs: A dictionary of objects to format to text when `__str__` is called on this object. To allow for
             lazy evaluation of argument values, a callable that takes no arguments can be supplied for a key's value.
         """
-        self._message = message
+        self._message_title = message_title
         self._kwargs = kwargs
 
     @cached_property
     def _str_value(self) -> str:
         """Cache the result as `__str__` can be called multiple times for multiple log handlers."""
-        if callable(self._message):
-            message = self._message()
+        if callable(self._message_title):
+            message_title = self._message_title()
         else:
-            message = self._message
+            message_title = self._message_title
 
         evaluated_args = {}
         for arg_name, arg_value in self._kwargs.items():
@@ -72,7 +74,7 @@ class LazyFormat:
                     )
 
             evaluated_args[arg_name] = arg_value
-        return mf_pformat_dict(message, evaluated_args, preserve_raw_strings=True)
+        return mf_pformat_dict(message_title, evaluated_args, preserve_raw_strings=True)
 
     @override
     def __str__(self) -> str:
