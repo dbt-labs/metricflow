@@ -87,10 +87,12 @@ class LazyFormat:
                     continue
                 except Exception:
                     logger.warning(
-                        f"Got an exception while evaluating {arg_name=} {arg_value=}. Since this is an error with "
-                        f"formatting log output, this should not result in system issues. However, the exception "
-                        f"indicates a bug with how the logging call is made and should be investigated.",
+                        "Got an exception while evaluating an argument (see `extra` for this log record). Since"
+                        " this is an error with formatting log output, this should not result in system issues."
+                        " However, the exception indicates a bug with how the logging call is made and should be"
+                        " investigated.",
                         exc_info=True,
+                        extra={"arg_name": arg_name, "arg_value": arg_value},
                     )
 
             evaluated_args[arg_name] = arg_value
