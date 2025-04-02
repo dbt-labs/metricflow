@@ -62,12 +62,7 @@ class LazyFormat:
     @cached_property
     def _str_value(self) -> str:
         """Cache the result as `__str__` can be called multiple times for multiple log handlers."""
-        if callable(self._message_title):
-            message_title = self._message_title()
-        else:
-            message_title = self._message_title
-
-        return mf_pformat_dict(message_title, self.evaluated_kwargs, preserve_raw_strings=True)
+        return mf_pformat_dict(self.evaluated_message_title, self.evaluated_kwargs, preserve_raw_strings=True)
 
     @override
     def __str__(self) -> str:
@@ -97,3 +92,14 @@ class LazyFormat:
 
             evaluated_args[arg_name] = arg_value
         return evaluated_args
+
+    @cached_property
+    def evaluated_message_title(self) -> str:
+        """Return the `message_title` that was used to construct this object, evaluating value if `Callable`.
+
+        This is cached to avoid repeated evaluation.
+        """
+        if callable(self._message_title):
+            return self._message_title()
+        else:
+            return self._message_title
