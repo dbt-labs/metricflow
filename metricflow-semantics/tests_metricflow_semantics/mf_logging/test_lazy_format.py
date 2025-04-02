@@ -3,9 +3,8 @@ from __future__ import annotations
 import logging
 
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.test_helpers.recorded_logging_context import RecordingLogHandler, recorded_logging_context
 from typing_extensions import override
-
-from tests_metricflow_semantics.mf_logging.recorded_logging_context import RecordingLogHandler, recorded_logging_context
 
 logger = logging.getLogger(__name__)
 
