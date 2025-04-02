@@ -83,3 +83,30 @@ def test_lazy_lambda_argument() -> None:
     handler: RecordingLogHandler
     with recorded_logging_context(logger, logging.INFO) as (recorded_logger, handler):
         recorded_logger.debug(LazyFormat("Example message", arg_0=lambda: f"{_should_not_be_called()}"))
+
+
+def test_evaluated_properties() -> None:
+    """Test `LazyFormat.evaluated_*` properties."""
+    generate_message_call_count = 0
+
+    def _generate_message_title() -> str:
+        nonlocal generate_message_call_count
+        generate_message_call_count += 1
+        return "title"
+
+    generate_argument_value_call_count = 0
+
+    def _generate_argument_value() -> str:
+        nonlocal generate_argument_value_call_count
+        generate_argument_value_call_count += 1
+        return "value"
+
+    lazy_format = LazyFormat(_generate_message_title, argument_key=_generate_argument_value)
+
+    # Get properties twice and check that it's only evaluated once.
+    for _ in range(2):
+        assert lazy_format.evaluated_message_title == "title"
+        assert dict(lazy_format.evaluated_kwargs) == {"argument_key": "value"}
+
+    assert generate_message_call_count == 1
+    assert generate_argument_value_call_count == 1
