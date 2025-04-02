@@ -2,13 +2,16 @@ from __future__ import annotations
 
 import logging
 from functools import cached_property
-from typing import Callable, Union
+from typing import Any, Callable, Union
 
 from typing_extensions import override
 
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat_dict
 
 logger = logging.getLogger(__name__)
+
+
+LoggedObject = Any  # type: ignore[misc]
 
 
 class LazyFormat:
@@ -38,15 +41,20 @@ class LazyFormat:
         logger.debug(LazyFormat(lambda: f"Result is: {expensive_function()}")
     """
 
-    def __init__(self, message_title: Union[str, Callable[[], str]], **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def __init__(
+        self,
+        message_title: Union[str, Callable[[], str]],
+        **kwargs: Union[LoggedObject, Callable[[], LoggedObject]],
+    ) -> None:
         """Initializer.
 
         Args:
             message_title: The message title or a function that returns a message title. A message is composed of the
             message title and the message body. For this class, the message body is derived from the values of the
             keyword arguments.
-            **kwargs: A dictionary of objects to format to text when `__str__` is called on this object. To allow for
-            lazy evaluation of argument values, a callable that takes no arguments can be supplied for a key's value.
+            **kwargs: A dictionary of objects to format to text when `__str__` is called on this object. To allow
+            for lazy evaluation of argument values, a callable that takes no arguments can be supplied for a key's
+            value.
         """
         self._message_title = message_title
         self._kwargs = kwargs
