@@ -16,9 +16,12 @@ from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
+from metricflow_semantics.model.semantics.linkable_spec_index import LinkableSpecIndex
+from metricflow_semantics.model.semantics.linkable_spec_index_builder import LinkableSpecIndexBuilder
 from metricflow_semantics.model.semantics.linkable_spec_resolver import (
     ValidLinkableSpecResolver,
 )
+from metricflow_semantics.model.semantics.manifest_object_lookup import SemanticManifestObjectLookup
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
@@ -31,11 +34,63 @@ logger = logging.getLogger(__name__)
 class MetricLookup:
     """Tracks semantic information for metrics by linking them to semantic models."""
 
+    @staticmethod
+    def create(  # noqa: D102
+        semantic_manifest: SemanticManifest,
+        semantic_model_lookup: SemanticModelLookup,
+        custom_granularities: Dict[str, ExpandedTimeGranularity],
+    ) -> MetricLookup:
+        manifest_object_lookup = SemanticManifestObjectLookup(semantic_manifest)
+
+        linkable_spec_index_builder = LinkableSpecIndexBuilder(
+            semantic_manifest=semantic_manifest,
+            semantic_model_lookup=semantic_model_lookup,
+            manifest_object_lookup=manifest_object_lookup,
+            max_entity_links=MAX_JOIN_HOPS,
+        )
+        linkable_spec_index = linkable_spec_index_builder.build_index()
+        linkable_spec_resolver = ValidLinkableSpecResolver(
+            semantic_manifest=semantic_manifest,
+            semantic_model_lookup=semantic_model_lookup,
+            manifest_object_lookup=manifest_object_lookup,
+            linkable_spec_index=linkable_spec_index,
+        )
+
+        return MetricLookup(
+            semantic_manifest=semantic_manifest,
+            semantic_model_lookup=semantic_model_lookup,
+            custom_granularities=custom_granularities,
+            linkable_spec_resolver=linkable_spec_resolver,
+        )
+
+    @staticmethod
+    def create_using_index(  # noqa: D102
+        semantic_manifest: SemanticManifest,
+        semantic_model_lookup: SemanticModelLookup,
+        custom_granularities: Dict[str, ExpandedTimeGranularity],
+        linkable_spec_index: LinkableSpecIndex,
+    ) -> MetricLookup:
+        manifest_object_lookup = SemanticManifestObjectLookup(semantic_manifest)
+        linkable_spec_resolver = ValidLinkableSpecResolver(
+            semantic_manifest=semantic_manifest,
+            semantic_model_lookup=semantic_model_lookup,
+            manifest_object_lookup=manifest_object_lookup,
+            linkable_spec_index=linkable_spec_index,
+        )
+
+        return MetricLookup(
+            semantic_manifest=semantic_manifest,
+            semantic_model_lookup=semantic_model_lookup,
+            custom_granularities=custom_granularities,
+            linkable_spec_resolver=linkable_spec_resolver,
+        )
+
     def __init__(
         self,
         semantic_manifest: SemanticManifest,
         semantic_model_lookup: SemanticModelLookup,
         custom_granularities: Dict[str, ExpandedTimeGranularity],
+        linkable_spec_resolver: ValidLinkableSpecResolver,
     ) -> None:
         """Initializer.
 
@@ -50,11 +105,7 @@ class MetricLookup:
         for metric in semantic_manifest.metrics:
             self._add_metric(metric)
 
-        self._linkable_spec_resolver = ValidLinkableSpecResolver(
-            semantic_manifest=semantic_manifest,
-            semantic_model_lookup=semantic_model_lookup,
-            max_entity_links=MAX_JOIN_HOPS,
-        )
+        self._linkable_spec_resolver = linkable_spec_resolver
 
         # Cache for `get_min_queryable_time_granularity()`
         self._metric_reference_to_min_metric_time_grain: Dict[MetricReference, TimeGranularity] = {}

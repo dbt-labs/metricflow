@@ -14,7 +14,9 @@ from metricflow_semantics.model.linkable_element_property import LinkableElement
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 from metricflow_semantics.model.semantics.linkable_element import SemanticModelJoinPath, SemanticModelJoinPathElement
+from metricflow_semantics.model.semantics.linkable_spec_index_builder import LinkableSpecIndexBuilder
 from metricflow_semantics.model.semantics.linkable_spec_resolver import ValidLinkableSpecResolver
+from metricflow_semantics.model.semantics.manifest_object_lookup import SemanticManifestObjectLookup
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
@@ -30,10 +32,19 @@ logger = logging.getLogger(__name__)
 def simple_model_spec_resolver(  # noqa: D103
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> ValidLinkableSpecResolver:
+    manifest_object_lookup = SemanticManifestObjectLookup(simple_semantic_manifest_lookup.semantic_manifest)
+    index_builder = LinkableSpecIndexBuilder(
+        semantic_manifest=simple_semantic_manifest_lookup.semantic_manifest,
+        semantic_model_lookup=simple_semantic_manifest_lookup.semantic_model_lookup,
+        manifest_object_lookup=manifest_object_lookup,
+        max_entity_links=MAX_JOIN_HOPS,
+    )
+    linkable_spec_index = index_builder.build_index()
     return ValidLinkableSpecResolver(
         semantic_manifest=simple_semantic_manifest_lookup.semantic_manifest,
         semantic_model_lookup=simple_semantic_manifest_lookup.semantic_model_lookup,
-        max_entity_links=MAX_JOIN_HOPS,
+        manifest_object_lookup=manifest_object_lookup,
+        linkable_spec_index=linkable_spec_index,
     )
 
 
@@ -41,10 +52,19 @@ def simple_model_spec_resolver(  # noqa: D103
 def cyclic_join_manifest_spec_resolver(  # noqa: D103
     cyclic_join_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> ValidLinkableSpecResolver:
+    manifest_object_lookup = SemanticManifestObjectLookup(cyclic_join_semantic_manifest_lookup.semantic_manifest)
+    index_builder = LinkableSpecIndexBuilder(
+        semantic_manifest=cyclic_join_semantic_manifest_lookup.semantic_manifest,
+        semantic_model_lookup=cyclic_join_semantic_manifest_lookup.semantic_model_lookup,
+        manifest_object_lookup=manifest_object_lookup,
+        max_entity_links=MAX_JOIN_HOPS,
+    )
+    linkable_spec_index = index_builder.build_index()
     return ValidLinkableSpecResolver(
         semantic_manifest=cyclic_join_semantic_manifest_lookup.semantic_manifest,
         semantic_model_lookup=cyclic_join_semantic_manifest_lookup.semantic_model_lookup,
-        max_entity_links=MAX_JOIN_HOPS,
+        manifest_object_lookup=manifest_object_lookup,
+        linkable_spec_index=linkable_spec_index,
     )
 
 
