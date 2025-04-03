@@ -60,19 +60,19 @@ class LazyFormat:
         self._kwargs = kwargs
 
     @cached_property
-    def _str_value(self) -> str:
+    def evaluated_value(self) -> str:
         """Cache the result as `__str__` can be called multiple times for multiple log handlers."""
         return mf_pformat_dict(self.evaluated_message_title, self.evaluated_kwargs, preserve_raw_strings=True)
 
     @override
     def __str__(self) -> str:
-        return self._str_value
+        return self.evaluated_value
 
     @cached_property
     def evaluated_kwargs(self) -> Mapping[str, LoggedObject]:
         """Return the `kwargs` that was used to construct this object, evaluating value if `Callable`.
 
-        This is cached to avoid repeated evaluation.
+        This is cached for similar reasons as `evaluated_value`.
         """
         evaluated_args = {}
         for arg_name, arg_value in self._kwargs.items():
@@ -97,9 +97,10 @@ class LazyFormat:
     def evaluated_message_title(self) -> str:
         """Return the `message_title` that was used to construct this object, evaluating value if `Callable`.
 
-        This is cached to avoid repeated evaluation.
+        This is cached for similar reasons as `evaluated_value`.
         """
         if callable(self._message_title):
+            # May be helpful to wrap this with a try/except as similar to `evaluated_kwargs`.
             return self._message_title()
         else:
             return self._message_title
