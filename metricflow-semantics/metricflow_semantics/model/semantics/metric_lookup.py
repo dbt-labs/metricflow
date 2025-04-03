@@ -49,18 +49,11 @@ class MetricLookup:
             max_entity_links=MAX_JOIN_HOPS,
         )
         linkable_spec_index = linkable_spec_index_builder.build_index()
-        linkable_spec_resolver = ValidLinkableSpecResolver(
-            semantic_manifest=semantic_manifest,
-            semantic_model_lookup=semantic_model_lookup,
-            manifest_object_lookup=manifest_object_lookup,
-            linkable_spec_index=linkable_spec_index,
-        )
-
-        return MetricLookup(
+        return MetricLookup.create_using_index(
             semantic_manifest=semantic_manifest,
             semantic_model_lookup=semantic_model_lookup,
             custom_granularities=custom_granularities,
-            linkable_spec_resolver=linkable_spec_resolver,
+            linkable_spec_index=linkable_spec_index,
         )
 
     @staticmethod

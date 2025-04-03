@@ -14,11 +14,19 @@ logger = logging.getLogger(__name__)
 
 
 class SemanticManifestLookup:
-    """Adds semantics information to the user configured model."""
+    """Provides convenient lookup methods to get semantic attributes for a manifest."""
 
-    def __init__(  # noqa: D107
+    def __init__(
         self, semantic_manifest: SemanticManifest, linkable_spec_index: Optional[LinkableSpecIndex] = None
     ) -> None:
+        """Initializer.
+
+        Args:
+            semantic_manifest: The semantic manifest for lookups.
+            linkable_spec_index: If provided, use this to initialize internal data structures. The index can be
+            precomputed and stored to improve initialization times. It must be generated for the given manifest - no
+            checks are performed and there will be incorrect results if there's a mismatch.
+        """
         self._semantic_manifest = semantic_manifest
         self._time_spine_sources = TimeSpineSource.build_standard_time_spine_sources(semantic_manifest)
         self.custom_granularities = TimeSpineSource.build_custom_granularities(list(self._time_spine_sources.values()))

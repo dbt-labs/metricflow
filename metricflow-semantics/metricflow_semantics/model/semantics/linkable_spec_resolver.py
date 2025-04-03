@@ -238,7 +238,6 @@ class ValidLinkableSpecResolver:
         element_filter: LinkableElementFilter = LinkableElementFilter(),
     ) -> LinkableElementSet:
         """See get_linkable_element_set_for_measure()."""
-        # measure_semantic_model = self._get_semantic_model_for_measure(measure_reference)
         measure_semantic_model = self._manifest_object_lookup.get_semantic_model_containing_measure(measure_reference)
         elements_in_semantic_model = self._linkable_spec_index.semantic_model_reference_to_local_elements[
             measure_semantic_model.reference
@@ -284,11 +283,9 @@ class ValidLinkableSpecResolver:
 
         A distinct group-by-item values query does not include any metrics.
         """
-        # return self._no_metric_linkable_element_set.filter(element_filter)
         return self._linkable_spec_index.no_metric_linkable_element_set.filter(element_filter)
 
     # TODO: the results of this method don't actually match what will be allowed for the metric. This method checks
-    # _metric_to_linkable_element_sets, while the actual group by resolution DAG calls _get_linkable_element_set_for_measure.
     def get_linkable_elements_for_metrics(
         self,
         metric_references: Sequence[MetricReference],
@@ -297,7 +294,6 @@ class ValidLinkableSpecResolver:
         """Gets the valid linkable elements that are common to all requested metrics."""
         linkable_element_sets = []
         for metric_reference in metric_references:
-            # element_sets = self._metric_to_linkable_element_sets.get(metric_reference.element_name)
             element_sets = self._linkable_spec_index.metric_to_linkable_element_sets.get(metric_reference.element_name)
             if not element_sets:
                 raise UnknownMetricLinkingError(f"Unknown metric: {metric_reference} in element set")
