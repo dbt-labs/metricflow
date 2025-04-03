@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Add properties to `LazyFormat` for custom logging handlers
+time: 2025-04-03T03:21:24.624064-07:00
+custom:
+  Author: plypaul
+  Issue: "1713"
