@@ -54,6 +54,7 @@ class ConfiguredIntegrationTestCase(FrozenBaseModel):
     metrics: Tuple[str, ...] = ()
     group_bys: Tuple[str, ...] = ()
     group_by_objs: Tuple[Dict, ...] = ()
+    saved_query_name: Optional[str] = None
     order_bys: Tuple[str, ...] = ()
     # The required features in the DW engine for the test to complete.
     required_features: Tuple[RequiredDwEngineFeature, ...] = ()
@@ -65,6 +66,7 @@ class ConfiguredIntegrationTestCase(FrozenBaseModel):
     limit: Optional[int] = None
     description: Optional[str] = None
     min_max_only: bool = False
+    dedupe: bool = True
 
 
 class TestCaseParseException(Exception):

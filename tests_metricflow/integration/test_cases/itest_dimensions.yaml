@@ -394,3 +394,34 @@ integration_test:
     FROM {{ source_schema }}.dim_users
     GROUP BY
       {{ render_date_trunc("bio_added_ts", TimeGranularity.SECOND) }}
+---
+integration_test:
+  name: no_dedupe
+  description: Query without dedupe
+  model: SIMPLE_MODEL
+  group_bys: ["user__home_state", "metric_time__month"]
+  dedupe: false
+  where_filter: "{{ render_dimension_template('listing__country_latest') }} = 'us'"
+  check_query: |
+    SELECT
+      u.home_state AS user__home_state
+      , {{ render_date_trunc("ts.ds", TimeGranularity.MONTH) }} AS metric_time__month
+    FROM {{ source_schema }}.dim_listings_latest l
+    CROSS JOIN {{ source_schema }}.mf_time_spine ts
+    FULL OUTER JOIN {{ source_schema }}.dim_users u ON l.user_id = u.user_id
+    WHERE l.country = 'us'
+---
+integration_test:
+  name: saved_query_no_dedupe
+  description: Query without metrics using a saved query and no group by
+  model: SIMPLE_MODEL
+  saved_query_name: dimensions_only
+  dedupe: false
+  where_filter: "{{ render_dimension_template('listing__country_latest') }} = 'us'"
+  check_query: |
+    SELECT
+      {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS metric_time__month
+      , l.capacity AS listing__capacity_latest
+    FROM {{ source_schema }}.dim_listings_latest l
+    CROSS JOIN {{ source_schema }}.mf_time_spine ts
+    WHERE l.country = 'us'

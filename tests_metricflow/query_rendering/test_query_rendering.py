@@ -23,6 +23,7 @@ from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.query_param_implementations import (
     MetricParameter,
     OrderByParameter,
+    SavedQueryParameter,
 )
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
@@ -744,5 +745,63 @@ def test_scd_group_by_and_coarser_grain(  # noqa: D103
         dataflow_to_sql_converter=scd_dataflow_to_sql_converter,
         sql_client=sql_client,
         dataflow_plan_builder=scd_dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_no_dedupe(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    scd_query_parser: MetricFlowQueryParser,
+    scd_dataflow_plan_builder: DataflowPlanBuilder,
+    scd_dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    query_spec = scd_query_parser.parse_and_validate_query(
+        group_by_names=("listing__capacity", "metric_time__month"),
+        dedupe=False,
+        where_constraints=[
+            PydanticWhereFilter(
+                where_sql_template="{{ Dimension('user__home_state_latest') }} = 'CA'",
+            )
+        ],
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=scd_dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=scd_dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_no_dedupe_saved_query(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    query_parser: MetricFlowQueryParser,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    query_spec = query_parser.parse_and_validate_saved_query(
+        saved_query_parameter=SavedQueryParameter(name="dimensions_only"),
+        dedupe=False,
+        where_filters=[
+            PydanticWhereFilter(
+                where_sql_template="{{ Dimension('user__home_state_latest') }} = 'CA'",
+            )
+        ],
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
     )
