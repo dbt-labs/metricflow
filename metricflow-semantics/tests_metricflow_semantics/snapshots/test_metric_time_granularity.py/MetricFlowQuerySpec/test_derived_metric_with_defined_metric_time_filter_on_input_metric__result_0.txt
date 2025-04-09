@@ -169,4 +169,5 @@ MetricFlowQuerySpec(
     ),
   ),
   min_max_only=False,
+  dedupe=True,
 )

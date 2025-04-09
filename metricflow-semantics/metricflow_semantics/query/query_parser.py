@@ -93,12 +93,12 @@ class MetricFlowQueryParser:
     def parse_and_validate_saved_query(
         self,
         saved_query_parameter: SavedQueryParameter,
-        where_filters: Optional[Sequence[WhereFilter]],
-        limit: Optional[int],
-        time_constraint_start: Optional[datetime.datetime],
-        time_constraint_end: Optional[datetime.datetime],
-        order_by_names: Optional[Sequence[str]],
-        order_by_parameters: Optional[Sequence[OrderByQueryParameter]],
+        where_filters: Optional[Sequence[WhereFilter]] = None,
+        limit: Optional[int] = None,
+        time_constraint_start: Optional[datetime.datetime] = None,
+        time_constraint_end: Optional[datetime.datetime] = None,
+        order_by_names: Optional[Sequence[str]] = None,
+        order_by_parameters: Optional[Sequence[OrderByQueryParameter]] = None,
         dedupe: bool = True,
     ) -> ParseQueryResult:
         """Parse and validate a query using parameters from a pre-defined / saved query.

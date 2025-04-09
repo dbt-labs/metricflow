@@ -40,3 +40,12 @@ saved_query:
     where:
       - "{{ Dimension('listing__is_lux_latest') }}"
       - "{{ TimeDimension('metric_time', 'day') }} >= '2020-01-02'"
+---
+saved_query:
+  name: dimensions_only
+  description: Query without metrics
+  query_params:
+    group_by:
+      - Dimension('listing__capacity_latest')
+      - TimeDimension('metric_time', 'month')
+    metrics: []

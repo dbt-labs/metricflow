@@ -22,6 +22,7 @@ ParseQueryResult(
     filter_intersection=PydanticWhereFilterIntersection(),
     filter_spec_resolution_lookup=FilterSpecResolutionLookUp(),
     min_max_only=False,
+    dedupe=True,
   ),
   queried_semantic_models=(
     SemanticModelReference(semantic_model_name='bookings_source'),
