@@ -34,6 +34,7 @@ class MetricFlowQuerySpec(SerializableDataclass):
     filter_intersection: Optional[WhereFilterIntersection] = None
     filter_spec_resolution_lookup: FilterSpecResolutionLookUp = FilterSpecResolutionLookUp.empty_instance()
     min_max_only: bool = False
+    dedupe: bool = True
 
     @property
     def linkable_specs(self) -> LinkableSpecSet:  # noqa: D102

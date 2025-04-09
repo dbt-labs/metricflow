@@ -826,7 +826,7 @@ class DataflowPlanBuilder:
             custom_granularity_specs=required_linkable_specs.time_dimension_specs_with_custom_grain,
             where_filter_specs=query_level_filter_specs,
             time_range_constraint=query_spec.time_range_constraint,
-            distinct=True,
+            distinct=query_spec.dedupe,
         )
 
         if query_spec.min_max_only:
