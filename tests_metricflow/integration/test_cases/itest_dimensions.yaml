@@ -400,7 +400,7 @@ integration_test:
   description: Query without dedupe
   model: SIMPLE_MODEL
   group_bys: ["user__home_state", "metric_time__month"]
-  dedupe: false
+  apply_group_by: false
   where_filter: "{{ render_dimension_template('listing__country_latest') }} = 'us'"
   check_query: |
     SELECT
@@ -416,7 +416,7 @@ integration_test:
   description: Query without metrics using a saved query and no group by
   model: SIMPLE_MODEL
   saved_query_name: dimensions_only
-  dedupe: false
+  apply_group_by: false
   where_filter: "{{ render_dimension_template('listing__country_latest') }} = 'us'"
   check_query: |
     SELECT

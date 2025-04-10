@@ -35,6 +35,7 @@ from metricflow_semantics.query.issues.issues_base import (
     MetricFlowQueryResolutionIssueSet,
 )
 from metricflow_semantics.query.issues.parsing.duplicate_metric_alias import DuplicateMetricAliasIssue
+from metricflow_semantics.query.issues.parsing.invalid_apply_group_by import InvalidApplyGroupByIssue
 from metricflow_semantics.query.issues.parsing.invalid_limit import InvalidLimitIssue
 from metricflow_semantics.query.issues.parsing.invalid_metric import InvalidMetricIssue
 from metricflow_semantics.query.issues.parsing.invalid_min_max_only import InvalidMinMaxOnlyIssue
@@ -46,7 +47,7 @@ from metricflow_semantics.query.query_resolution import (
     MetricFlowQueryResolution,
 )
 from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import (
-    ResolverInputForDedupe,
+    ResolverInputForApplyGroupBy,
     ResolverInputForGroupByItem,
     ResolverInputForLimit,
     ResolverInputForMetric,
@@ -103,10 +104,10 @@ class ResolveMinMaxOnlyResult:
 
 
 @dataclass(frozen=True)
-class ResolveDedupeResult:
-    """Result of resolving a dedupe input."""
+class ResolveApplyGroupByResult:
+    """Result of resolving a apply group by input."""
 
-    dedupe: bool
+    apply_group_by: bool
     input_to_issue_set_mapping: InputToIssueSetMapping
 
 
@@ -376,9 +377,28 @@ class MetricFlowQueryResolver:
         )
 
     @staticmethod
-    def _resolve_dedupe_input(dedupe_input: ResolverInputForDedupe) -> ResolveDedupeResult:
-        return ResolveDedupeResult(
-            dedupe=dedupe_input.dedupe, input_to_issue_set_mapping=InputToIssueSetMapping.empty_instance()
+    def _resolve_apply_group_by_input(
+        apply_group_by_input: ResolverInputForApplyGroupBy,
+        metric_inputs: Tuple[ResolverInputForMetric, ...],
+        query_resolution_path: MetricFlowQueryResolutionPath,
+    ) -> ResolveApplyGroupByResult:
+        if metric_inputs and not apply_group_by_input.apply_group_by:
+            return ResolveApplyGroupByResult(
+                apply_group_by=apply_group_by_input.apply_group_by,
+                input_to_issue_set_mapping=InputToIssueSetMapping.from_one_item(
+                    resolver_input=apply_group_by_input,
+                    issue_set=MetricFlowQueryResolutionIssueSet.from_issue(
+                        InvalidApplyGroupByIssue.from_parameters(
+                            apply_group_by=apply_group_by_input.apply_group_by,
+                            metric_inputs=metric_inputs,
+                            query_resolution_path=query_resolution_path,
+                        ),
+                    ),
+                ),
+            )
+        return ResolveApplyGroupByResult(
+            apply_group_by=apply_group_by_input.apply_group_by,
+            input_to_issue_set_mapping=InputToIssueSetMapping.empty_instance(),
         )
 
     def _build_filter_spec_lookup(
@@ -407,7 +427,7 @@ class MetricFlowQueryResolver:
         limit_input = resolver_input_for_query.limit_input
         query_level_filter_input = resolver_input_for_query.filter_input
         min_max_only_input = resolver_input_for_query.min_max_only
-        dedupe_input = resolver_input_for_query.dedupe
+        apply_group_by_input = resolver_input_for_query.apply_group_by
 
         # Define a resolution path for issues where the input is considered to be the whole query.
         query_resolution_path = MetricFlowQueryResolutionPath.from_path_item(
@@ -452,9 +472,13 @@ class MetricFlowQueryResolver:
         )
         mappings_to_merge.append(resolve_min_max_only_result.input_to_issue_set_mapping)
 
-        # Resolve dedupe
-        resolve_dedupe_result = self._resolve_dedupe_input(dedupe_input=dedupe_input)
-        mappings_to_merge.append(resolve_dedupe_result.input_to_issue_set_mapping)
+        # Resolve apply group by
+        resolve_apply_group_by_result = self._resolve_apply_group_by_input(
+            apply_group_by_input=apply_group_by_input,
+            metric_inputs=metric_inputs,
+            query_resolution_path=query_resolution_path,
+        )
+        mappings_to_merge.append(resolve_apply_group_by_result.input_to_issue_set_mapping)
 
         # Early stop before resolving further as with invalid metrics, the errors won't be as useful.
         issue_set_mapping_so_far = InputToIssueSetMapping.merge_iterable(mappings_to_merge)
@@ -623,7 +647,7 @@ class MetricFlowQueryResolver:
                 filter_intersection=query_level_filter_input.where_filter_intersection,
                 filter_spec_resolution_lookup=filter_spec_lookup,
                 min_max_only=min_max_only_input.min_max_only,
-                dedupe=dedupe_input.dedupe,
+                apply_group_by=apply_group_by_input.apply_group_by,
             ),
             resolution_dag=resolution_dag,
             filter_spec_lookup=filter_spec_lookup,

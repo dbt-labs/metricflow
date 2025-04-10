@@ -760,7 +760,7 @@ def test_no_dedupe(  # noqa: D103
 ) -> None:
     query_spec = scd_query_parser.parse_and_validate_query(
         group_by_names=("listing__capacity", "metric_time__month"),
-        dedupe=False,
+        apply_group_by=False,
         where_constraints=[
             PydanticWhereFilter(
                 where_sql_template="{{ Dimension('user__home_state_latest') }} = 'CA'",
@@ -789,7 +789,7 @@ def test_no_dedupe_saved_query(  # noqa: D103
 ) -> None:
     query_spec = query_parser.parse_and_validate_saved_query(
         saved_query_parameter=SavedQueryParameter(name="dimensions_only"),
-        dedupe=False,
+        apply_group_by=False,
         where_filters=[
             PydanticWhereFilter(
                 where_sql_template="{{ Dimension('user__home_state_latest') }} = 'CA'",

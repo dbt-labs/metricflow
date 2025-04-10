@@ -326,7 +326,7 @@ def test_case(
             ),
             order_by_names=case.order_bys,
             min_max_only=case.min_max_only,
-            dedupe=case.dedupe,
+            apply_group_by=case.apply_group_by,
         )
     )
 

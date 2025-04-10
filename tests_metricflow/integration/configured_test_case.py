@@ -66,7 +66,7 @@ class ConfiguredIntegrationTestCase(FrozenBaseModel):
     limit: Optional[int] = None
     description: Optional[str] = None
     min_max_only: bool = False
-    dedupe: bool = True
+    apply_group_by: bool = True
 
 
 class TestCaseParseException(Exception):

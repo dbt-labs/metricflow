@@ -136,15 +136,15 @@ class ResolverInputForMinMaxOnly(MetricFlowQueryResolverInput):
 
 
 @dataclass(frozen=True)
-class ResolverInputForDedupe(MetricFlowQueryResolverInput):
-    """An input that describes if the query will dedupe group by items (only applicable to no-metric queries)."""
+class ResolverInputForApplyGroupBy(MetricFlowQueryResolverInput):
+    """An input that describes if the query will apply a group by. Can only be false for no-metric queries."""
 
-    dedupe: bool = True
+    apply_group_by: bool = True
 
     @property
     @override
     def ui_description(self) -> str:
-        return str(self.dedupe)
+        return str(self.apply_group_by)
 
 
 @dataclass(frozen=True)
@@ -210,7 +210,7 @@ class ResolverInputForQuery(MetricFlowQueryResolverInput):
     order_by_item_inputs: Tuple[ResolverInputForOrderByItem, ...]
     limit_input: ResolverInputForLimit
     min_max_only: ResolverInputForMinMaxOnly
-    dedupe: ResolverInputForDedupe
+    apply_group_by: ResolverInputForApplyGroupBy
 
     @property
     @override
