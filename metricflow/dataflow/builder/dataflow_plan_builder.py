@@ -782,10 +782,10 @@ class DataflowPlanBuilder:
         """
         # Workaround for a Pycharm type inspection issue with decorators.
         # noinspection PyArgumentList
-        return self._build_plan_for_distinct_values(query_spec, optimizations=optimizations)
+        return self._build_plan_for_no_metrics_query(query_spec, optimizations=optimizations)
 
     @log_runtime()
-    def _build_plan_for_distinct_values(
+    def _build_plan_for_no_metrics_query(
         self, query_spec: MetricFlowQuerySpec, optimizations: FrozenSet[DataflowPlanOptimization]
     ) -> DataflowPlan:
         assert not query_spec.metric_specs, "Can't build distinct values plan with metrics."
@@ -826,7 +826,7 @@ class DataflowPlanBuilder:
             custom_granularity_specs=required_linkable_specs.time_dimension_specs_with_custom_grain,
             where_filter_specs=query_level_filter_specs,
             time_range_constraint=query_spec.time_range_constraint,
-            distinct=True,
+            distinct=query_spec.apply_group_by,
         )
 
         if query_spec.min_max_only:

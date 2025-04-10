@@ -292,6 +292,7 @@ def test_case(
             metric_names=case.metrics,
             group_by_names=case.group_bys if len(case.group_bys) > 0 else None,
             group_by=tuple(group_by) if len(group_by) > 0 else None,
+            saved_query_name=case.saved_query_name,
             limit=case.limit,
             time_constraint_start=parser.parse(case.time_constraint[0]) if case.time_constraint else None,
             time_constraint_end=parser.parse(case.time_constraint[1]) if case.time_constraint else None,
@@ -325,6 +326,7 @@ def test_case(
             ),
             order_by_names=case.order_bys,
             min_max_only=case.min_max_only,
+            apply_group_by=case.apply_group_by,
         )
     )
 

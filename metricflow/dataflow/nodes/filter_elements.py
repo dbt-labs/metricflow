@@ -21,7 +21,7 @@ class FilterElementsNode(DataflowPlanNode):
     Attributes:
         include_specs: The specs for the elements that it should pass.
         replace_description: Replace the default description with this.
-        distinct: If you only want the distinct values for the selected specs..
+        distinct: If you only want the distinct values for the selected specs.
     """
 
     include_specs: InstanceSpecSet

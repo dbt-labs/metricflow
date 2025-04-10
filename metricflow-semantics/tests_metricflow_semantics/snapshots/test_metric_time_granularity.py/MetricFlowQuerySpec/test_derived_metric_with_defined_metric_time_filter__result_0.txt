@@ -90,4 +90,5 @@ MetricFlowQuerySpec(
     ),
   ),
   min_max_only=False,
+  apply_group_by=True,
 )

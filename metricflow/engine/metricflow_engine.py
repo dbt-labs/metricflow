@@ -112,6 +112,7 @@ class MetricFlowQueryRequest:
     order_by_names: Optional[Sequence[str]]
     order_by: Optional[Sequence[OrderByQueryParameter]]
     min_max_only: bool
+    apply_group_by: bool
     sql_optimization_level: SqlOptimizationLevel
     dataflow_plan_optimizations: FrozenSet[DataflowPlanOptimization]
     query_type: MetricFlowQueryType
@@ -135,6 +136,7 @@ class MetricFlowQueryRequest:
         ] = DataflowPlanOptimization.enabled_optimizations(),
         query_type: MetricFlowQueryType = MetricFlowQueryType.METRIC,
         min_max_only: bool = False,
+        apply_group_by: bool = True,
     ) -> MetricFlowQueryRequest:
         return MetricFlowQueryRequest(
             request_id=MetricFlowRequestId(mf_rid=f"{random_id()}"),
@@ -153,6 +155,7 @@ class MetricFlowQueryRequest:
             dataflow_plan_optimizations=dataflow_plan_optimizations,
             query_type=query_type,
             min_max_only=min_max_only,
+            apply_group_by=apply_group_by,
         )
 
 
@@ -474,6 +477,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 time_constraint_end=mf_query_request.time_constraint_end,
                 order_by_names=mf_query_request.order_by_names,
                 order_by_parameters=mf_query_request.order_by,
+                apply_group_by=mf_query_request.apply_group_by,
             ).query_spec
         else:
             query_spec = self._query_parser.parse_and_validate_query(
@@ -488,6 +492,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 order_by_names=mf_query_request.order_by_names,
                 order_by=mf_query_request.order_by,
                 min_max_only=mf_query_request.min_max_only,
+                apply_group_by=mf_query_request.apply_group_by,
             ).query_spec
         logger.debug(LazyFormat("Parsed query", query_spec=query_spec))
 

@@ -111,6 +111,7 @@ ParseQueryResult(
       ),
     ),
     min_max_only=False,
+    apply_group_by=True,
   ),
   queried_semantic_models=(SemanticModelReference(semantic_model_name='bookings_source'),),
 )

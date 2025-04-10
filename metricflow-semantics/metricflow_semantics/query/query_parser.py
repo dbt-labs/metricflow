@@ -44,6 +44,7 @@ from metricflow_semantics.query.query_resolver import MetricFlowQueryResolver
 from metricflow_semantics.query.resolver_inputs.base_resolver_inputs import MetricFlowQueryResolverInput
 from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import (
     InvalidStringInput,
+    ResolverInputForApplyGroupBy,
     ResolverInputForGroupByItem,
     ResolverInputForLimit,
     ResolverInputForMetric,
@@ -92,12 +93,13 @@ class MetricFlowQueryParser:
     def parse_and_validate_saved_query(
         self,
         saved_query_parameter: SavedQueryParameter,
-        where_filters: Optional[Sequence[WhereFilter]],
-        limit: Optional[int],
-        time_constraint_start: Optional[datetime.datetime],
-        time_constraint_end: Optional[datetime.datetime],
-        order_by_names: Optional[Sequence[str]],
-        order_by_parameters: Optional[Sequence[OrderByQueryParameter]],
+        where_filters: Optional[Sequence[WhereFilter]] = None,
+        limit: Optional[int] = None,
+        time_constraint_start: Optional[datetime.datetime] = None,
+        time_constraint_end: Optional[datetime.datetime] = None,
+        order_by_names: Optional[Sequence[str]] = None,
+        order_by_parameters: Optional[Sequence[OrderByQueryParameter]] = None,
+        apply_group_by: bool = True,
     ) -> ParseQueryResult:
         """Parse and validate a query using parameters from a pre-defined / saved query.
 
@@ -125,6 +127,7 @@ class MetricFlowQueryParser:
             order_by_names=order_by_names,
             order_by=order_by_parameters,
             min_max_only=False,
+            apply_group_by=apply_group_by,
         )
 
     def _get_saved_query(self, saved_query_parameter: SavedQueryParameter) -> SavedQuery:
@@ -317,6 +320,7 @@ class MetricFlowQueryParser:
         order_by_names: Optional[Sequence[str]] = None,
         order_by: Optional[Sequence[OrderByQueryParameter]] = None,
         min_max_only: bool = False,
+        apply_group_by: bool = True,
     ) -> ParseQueryResult:
         """Parse the query into spec objects, validating them in the process.
 
@@ -337,6 +341,7 @@ class MetricFlowQueryParser:
             order_by_names=order_by_names,
             order_by=order_by,
             min_max_only=min_max_only,
+            apply_group_by=apply_group_by,
         )
 
     @log_runtime()
@@ -354,6 +359,7 @@ class MetricFlowQueryParser:
         order_by_names: Optional[Sequence[str]],
         order_by: Optional[Sequence[OrderByQueryParameter]],
         min_max_only: bool,
+        apply_group_by: bool,
     ) -> ParseQueryResult:
         if min_max_only and (metric_names or metrics):
             raise InvalidQueryException("Cannot use min_max_only param for queries with metrics.")
@@ -495,6 +501,7 @@ class MetricFlowQueryParser:
 
         resolver_input_for_limit = ResolverInputForLimit(limit=limit)
         resolver_input_for_min_max_only = ResolverInputForMinMaxOnly(min_max_only=min_max_only)
+        resolver_input_for_apply_group_by = ResolverInputForApplyGroupBy(apply_group_by=apply_group_by)
 
         resolver_input_for_query = ResolverInputForQuery(
             metric_inputs=tuple(resolver_inputs_for_metrics),
@@ -503,6 +510,7 @@ class MetricFlowQueryParser:
             limit_input=resolver_input_for_limit,
             filter_input=resolver_input_for_filter,
             min_max_only=resolver_input_for_min_max_only,
+            apply_group_by=resolver_input_for_apply_group_by,
         )
 
         logger.debug(

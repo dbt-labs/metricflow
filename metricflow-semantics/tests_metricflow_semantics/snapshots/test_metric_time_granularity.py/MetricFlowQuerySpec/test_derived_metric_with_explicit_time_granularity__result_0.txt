@@ -14,4 +14,5 @@ MetricFlowQuerySpec(
   filter_intersection=PydanticWhereFilterIntersection(),
   filter_spec_resolution_lookup=FilterSpecResolutionLookUp(),
   min_max_only=False,
+  apply_group_by=True,
 )
