@@ -6,6 +6,8 @@ from dataclasses import fields, is_dataclass
 from enum import Enum
 from typing import Any, Dict, List, Mapping, Optional, Sized, Tuple, Union
 
+import msgspec
+
 from metricflow_semantics.mf_logging.formatting import indent
 from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
 
@@ -332,6 +334,16 @@ class MetricFlowPrettyFormatter:
         if isinstance(obj, MetricFlowPrettyFormattable):
             if obj.pretty_format is not None:
                 return obj.pretty_format
+
+        if isinstance(obj, msgspec.Struct):
+            return self._handle_mapping_like_obj(
+                msgspec.structs.asdict(obj),
+                left_enclose_str=type(obj).__name__ + "(",
+                key_value_seperator="=",
+                right_enclose_str=")",
+                is_dataclass_like_object=True,
+                remaining_line_width=remaining_line_width,
+            )
 
         if is_dataclass(obj):
             # dataclasses.asdict() seems to exclude None fields, so doing this instead.
