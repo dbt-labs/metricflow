@@ -48,9 +48,9 @@ class NoOpExecutionPlanTask(ExecutionPlanTask):
         return StaticIdPrefix.EXEC_NODE_NOOP
 
     def execute(self) -> TaskExecutionResult:  # noqa: D102
-        start_time = time.time()
+        start_time = time.perf_counter()
         time.sleep(0.01)
-        end_time = time.time()
+        end_time = time.perf_counter()
         return TaskExecutionResult(
             start_time=start_time, end_time=end_time, errors=(self.EXAMPLE_ERROR,) if self.should_error else ()
         )

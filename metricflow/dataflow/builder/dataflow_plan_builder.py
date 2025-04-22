@@ -1048,7 +1048,7 @@ class DataflowPlanBuilder:
                 f"of the join."
             )
         )
-        start_time = time.time()
+        start_time = time.perf_counter()
 
         node_processor = PreJoinNodeProcessor(
             semantic_model_lookup=self._semantic_model_lookup,
@@ -1116,7 +1116,7 @@ class DataflowPlanBuilder:
             for group_by_metric_spec in linkable_specs_to_satisfy.group_by_metric_specs
         ]
 
-        logger.debug(LazyFormat(lambda: f"Processing nodes took: {time.time()-start_time:.2f}s"))
+        logger.debug(LazyFormat(lambda: f"Processing nodes took: {time.perf_counter()-start_time:.2f}s"))
 
         node_evaluator = NodeEvaluatorForLinkableInstances(
             semantic_model_lookup=self._semantic_model_lookup,
@@ -1153,13 +1153,13 @@ class DataflowPlanBuilder:
                 )
             )
 
-            start_time = time.time()
+            start_time = time.perf_counter()
             evaluation = node_evaluator.evaluate_node(
                 left_node=node,
                 required_linkable_specs=list(linkable_specs_to_satisfy_tuple),
                 default_join_type=default_join_type,
             )
-            logger.debug(LazyFormat(lambda: f"Evaluation of {node} took {time.time() - start_time:.2f}s"))
+            logger.debug(LazyFormat(lambda: f"Evaluation of {node} took {time.perf_counter() - start_time:.2f}s"))
 
             logger.debug(
                 LazyFormat(
@@ -1737,7 +1737,7 @@ class DataflowPlanBuilder:
                     predicate_pushdown_state, time_range_constraint=measure_time_constraint
                 )
 
-            find_recipe_start_time = time.time()
+            find_recipe_start_time = time.perf_counter()
             measure_recipe = self._find_source_node_recipe(
                 FindSourceNodeRecipeParameterSet(
                     measure_spec_properties=measure_properties,
@@ -1748,7 +1748,7 @@ class DataflowPlanBuilder:
             logger.debug(
                 LazyFormat(
                     lambda: f"With {len(self._source_node_set.source_nodes_for_metric_queries)} source nodes, finding a recipe "
-                    f"took {time.time() - find_recipe_start_time:.2f}s"
+                    f"took {time.perf_counter() - find_recipe_start_time:.2f}s"
                 )
             )
 

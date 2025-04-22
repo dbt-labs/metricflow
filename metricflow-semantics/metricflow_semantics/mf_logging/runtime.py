@@ -30,13 +30,13 @@ def log_runtime(
         def _inner(*args: ParametersType.args, **kwargs: ParametersType.kwargs) -> ReturnType:
             # __qualname__ includes the path like MyClass.my_function
             function_name = f"{wrapped_function.__qualname__}()"
-            start_time = time.time()
+            start_time = time.perf_counter()
             logger.info(LazyFormat(lambda: f"Starting {function_name}"))
 
             try:
                 result = wrapped_function(*args, **kwargs)
             finally:
-                runtime = time.time() - start_time
+                runtime = time.perf_counter() - start_time
                 logger.info(LazyFormat(lambda: f"Finished {function_name} in {runtime:.1f}s"))
                 if runtime > runtime_warning_threshold:
                     logger.warning(LazyFormat(lambda: f"{function_name} is slow with a runtime of {runtime:.1f}s"))
@@ -51,13 +51,12 @@ def log_runtime(
 @contextmanager
 def log_block_runtime(code_block_name: str, runtime_warning_threshold: float = 5.0) -> Iterator[None]:
     """Logs the runtime of the enclosed code block."""
-    start_time = time.time()
-    description = f"code_block_name={repr(code_block_name)}"
-    logger.info(LazyFormat(lambda: f"Starting {description}"))
+    start_time = time.perf_counter()
+    logger.info(LazyFormat(lambda: f"Starting {code_block_name!r}"))
 
     yield
 
-    runtime = time.time() - start_time
-    logger.info(LazyFormat(lambda: f"Finished {description} in {runtime:.1f}s"))
+    runtime = time.perf_counter() - start_time
+    logger.info(LazyFormat(lambda: f"Finished {code_block_name!r} in {runtime:.1f}s"))
     if runtime > runtime_warning_threshold:
-        logger.warning(LazyFormat(lambda: f"{description} is slow with a runtime of {runtime:.1f}s"))
+        logger.warning(LazyFormat(lambda: f"{code_block_name!r} is slow with a runtime of {runtime:.1f}s"))

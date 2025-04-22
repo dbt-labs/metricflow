@@ -136,7 +136,7 @@ class AdapterBackedSqlClient:
             sql_bind_parameter_set: The parameter replacement mapping for filling in concrete values for SQL query
             parameters.
         """
-        start = time.time()
+        start = time.perf_counter()
         request_id = SqlRequestId(f"mf_rid__{random_id()}")
         if sql_bind_parameter_set.param_dict:
             raise SqlBindParametersNotSupportedError(
@@ -157,7 +157,7 @@ class AdapterBackedSqlClient:
             column_names=agate_data.column_names,
             rows=rows,
         )
-        stop = time.time()
+        stop = time.perf_counter()
 
         logger.info(
             LazyFormat(
@@ -183,7 +183,7 @@ class AdapterBackedSqlClient:
                 f"Invalid execute statement - we do not support execute commands with bind parameters through dbt "
                 f"adapters! Bind params: {SqlBindParameterSet.param_dict}"
             )
-        start = time.time()
+        start = time.perf_counter()
         request_id = SqlRequestId(f"mf_rid__{random_id()}")
         logger.info(
             LazyFormat("Running execute() statement", statement=stmt, param_dict=sql_bind_parameter_set.param_dict)
@@ -193,7 +193,7 @@ class AdapterBackedSqlClient:
             # Calls to execute often involve some amount of DDL so we commit here
             self._adapter.commit_if_has_connection()
             logger.debug(LazyFormat(lambda: f"execute() returned from dbt Adapter with response  {result[0]}"))
-        stop = time.time()
+        stop = time.perf_counter()
         logger.info(LazyFormat("Finished execute()", runtime=f"{stop - start:.2f}s"))
 
         return None
@@ -212,7 +212,7 @@ class AdapterBackedSqlClient:
             sql_bind_parameter_set: The parameter replacement mapping for filling in
                 concrete values for SQL query parameters.
         """
-        start = time.time()
+        start = time.perf_counter()
         logger.info(LazyFormat("Running dry run", statement=stmt, param_dict=sql_bind_parameter_set.param_dict))
         request_id = SqlRequestId(f"mf_rid__{random_id()}")
         connection_name = f"MetricFlow_dry_run_request_{request_id}"
@@ -248,7 +248,7 @@ class AdapterBackedSqlClient:
                 if has_error:
                     raise DbtDatabaseError(f"Encountered error in Databricks dry run. Full output: {plan_output_str}")
 
-        stop = time.time()
+        stop = time.perf_counter()
         logger.info(LazyFormat("Finished running the dry run", runtime=f"{stop - start:.2f}s"))
         return
 

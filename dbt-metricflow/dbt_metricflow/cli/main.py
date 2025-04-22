@@ -201,7 +201,7 @@ def query(
         click.echo(f"❌ The `decimals` option was set to {decimals!r}, but it should be a non-negative integer.")
         exit(1)
 
-    start = time.time()
+    start = time.perf_counter()
     spinner: Optional[Halo] = None
     if not quiet:
         spinner = Halo(text="Initiating query…", spinner="dots")
@@ -227,7 +227,7 @@ def query(
         query_result = cfg.mf.query(mf_request=mf_request)
 
     if spinner is not None:
-        spinner.succeed(f"Success 🦄 - query completed after {time.time() - start:.2f} seconds")
+        spinner.succeed(f"Success 🦄 - query completed after {time.perf_counter() - start:.2f} seconds")
 
     if explain:
         assert explain_result
