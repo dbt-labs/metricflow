@@ -15,20 +15,26 @@ def assert_performance_factor(
     fast_code_setup: str,
     fast_code_statement: str,
     min_performance_factor: float,
-    iteration_count: int = 100,
-    repeat_count: int = 100,
+    statement_executions_per_run: int = 100,
+    run_repeat_count: int = 100,
 ) -> None:
     """Using `timeit`, check that the fast code is faster than the slow code by the given factor.
 
-    The given statements are run `repeat_count` times, and the minimum is returned for better consistency.
+    See `timeit` for definitions of `setup` and `statement`.
+
+    For each run, the given statement is executed `statement_executions_per_run` times and the total time to execute
+    those statements is stored.
+
+    The run is repeated `run_repeat_count` times, and the performance factor is computed from the fastest run to
+    reduce variations caused by other processes.
     """
     try:
         slow_code_runtime = min(
             timeit.repeat(
                 setup=slow_code_setup,
                 stmt=slow_code_statement,
-                number=iteration_count,
-                repeat=repeat_count,
+                number=statement_executions_per_run,
+                repeat=run_repeat_count,
             )
         )
 
@@ -36,8 +42,8 @@ def assert_performance_factor(
             timeit.repeat(
                 setup=fast_code_setup,
                 stmt=fast_code_statement,
-                number=iteration_count,
-                repeat=repeat_count,
+                number=statement_executions_per_run,
+                repeat=run_repeat_count,
             )
         )
         performance_factor = slow_code_runtime / fast_code_runtime
