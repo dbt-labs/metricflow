@@ -5,7 +5,7 @@ from typing import Tuple
 
 from typing_extensions import override
 
-from metricflow_semantics.mf_logging.formatting import mf_indent
+from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.query.group_by_item.path_prefixable import PathPrefixable
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.base_node import GroupByItemResolutionNode
 

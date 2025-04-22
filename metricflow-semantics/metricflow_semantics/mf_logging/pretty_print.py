@@ -6,7 +6,7 @@ from dataclasses import fields, is_dataclass
 from enum import Enum
 from typing import Any, Dict, List, Mapping, Optional, Sized, Tuple, Union
 
-from metricflow_semantics.mf_logging.formatting import mf_indent
+from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
 
 logger = logging.getLogger(__name__)

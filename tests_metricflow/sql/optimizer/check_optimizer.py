@@ -4,7 +4,7 @@ import logging
 from typing import Optional
 
 from _pytest.fixtures import FixtureRequest
-from metricflow_semantics.mf_logging.formatting import mf_indent
+from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_str_snapshot_equal

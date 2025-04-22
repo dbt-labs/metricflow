@@ -11,7 +11,7 @@ from decimal import Decimal
 from typing import Iterable, Iterator, List, Optional, Sequence, Tuple, Type
 
 import tabulate
-from metricflow_semantics.mf_logging.formatting import mf_indent
+from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat, mf_pformat_dict
 from typing_extensions import Self
 

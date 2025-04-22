@@ -4,7 +4,7 @@ import logging
 from typing import FrozenSet, Optional, Sequence, Set
 
 from metricflow_semantics.dag.mf_dag import DagId
-from metricflow_semantics.mf_logging.formatting import mf_indent
+from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver

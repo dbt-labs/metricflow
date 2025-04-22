@@ -4,7 +4,7 @@ import logging
 from typing import FrozenSet, Mapping
 
 from _pytest.fixtures import FixtureRequest
-from metricflow_semantics.mf_logging.formatting import mf_indent
+from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.measure_spec import MeasureSpec

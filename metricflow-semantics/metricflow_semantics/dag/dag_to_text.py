@@ -8,7 +8,7 @@ import typing
 from contextlib import contextmanager
 from typing import Iterator, Optional
 
-from metricflow_semantics.mf_logging.formatting import mf_indent
+from metricflow_semantics.helpers.string_helpers import mf_indent
 
 if typing.TYPE_CHECKING:
     from metricflow_semantics.dag.mf_dag import DagNode, DagNodeT, DisplayedProperty, MetricFlowDag
