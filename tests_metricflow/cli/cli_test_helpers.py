@@ -38,14 +38,12 @@ def run_and_check_cli_command(
     )
 
     if result.exit_code != expected_exit_code:
-        assert False, str(
-            LazyFormat(
-                "Command exit code mismatch",
-                expected_exit_code=expected_exit_code,
-                actual_exit_code=result.exit_code,
-                result=result,
-            )
-        )
+        assert False, LazyFormat(
+            "Command exit code mismatch",
+            expected_exit_code=expected_exit_code,
+            actual_exit_code=result.exit_code,
+            result=result,
+        ).evaluated_value
 
     # Replace incomparable values in snapshots with `***`.
     snapshot_str = result.stdout

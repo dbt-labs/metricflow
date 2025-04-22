@@ -185,22 +185,18 @@ class MetricFlowExplainResult:
         execution_plan = self.execution_plan
         if len(execution_plan.tasks) != 1:
             raise NotImplementedError(
-                str(
-                    LazyFormat(
-                        "Multiple tasks in the execution plan not yet supported.",
-                        tasks=[task.task_id for task in execution_plan.tasks],
-                    )
+                LazyFormat(
+                    "Multiple tasks in the execution plan not yet supported.",
+                    tasks=[task.task_id for task in execution_plan.tasks],
                 )
             )
 
         sql_statement = execution_plan.tasks[0].sql_statement
         if not sql_statement:
             raise NotImplementedError(
-                str(
-                    LazyFormat(
-                        "Execution plan tasks without a SQL statement are not yet supported.",
-                        tasks=[task.task_id for task in execution_plan.tasks],
-                    )
+                LazyFormat(
+                    "Execution plan tasks without a SQL statement are not yet supported.",
+                    tasks=[task.task_id for task in execution_plan.tasks],
                 )
             )
 

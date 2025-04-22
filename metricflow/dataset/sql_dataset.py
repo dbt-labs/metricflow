@@ -69,11 +69,9 @@ class SqlDataSet(DataSet):
         """
         if self._sql_select_node is None:
             raise RuntimeError(
-                str(
-                    LazyFormat(
-                        f"{self.__class__.__name__} was created with a SQL node that is not a {SqlSelectStatementNode.__name__}",
-                        sql_node=self.sql_node.structure_text(),
-                    )
+                LazyFormat(
+                    f"{self.__class__.__name__} was created with a SQL node that is not a {SqlSelectStatementNode.__name__}",
+                    sql_node=self.sql_node.structure_text(),
                 )
             )
         return self._sql_select_node
@@ -172,7 +170,7 @@ class SqlDataSet(DataSet):
             if instance.spec == spec:
                 return instance
         raise RuntimeError(
-            str(LazyFormat("Did not find instance matching spec in dataset.", spec=spec, instances=instances))
+            LazyFormat("Did not find instance matching spec in dataset.", spec=spec, instances=instances)
         )
 
     def instance_for_column_name(self, column_name: str) -> MdoInstance:
@@ -182,12 +180,10 @@ class SqlDataSet(DataSet):
             if instance.associated_column.column_name == column_name:
                 return instance
         raise RuntimeError(
-            str(
-                LazyFormat(
-                    "Did not find instance matching column name in dataset.",
-                    column_name=column_name,
-                    instances=instances,
-                )
+            LazyFormat(
+                "Did not find instance matching column name in dataset.",
+                column_name=column_name,
+                instances=instances,
             )
         )
 
@@ -204,13 +200,11 @@ class SqlDataSet(DataSet):
                 return time_dimension_instance
 
         raise RuntimeError(
-            str(
-                LazyFormat(
-                    "Did not find a time dimension instance with grain and date part in dataset.",
-                    time_granularity_name=time_granularity_name,
-                    date_part=date_part,
-                    instances_available=self.instance_set.time_dimension_instances,
-                )
+            LazyFormat(
+                "Did not find a time dimension instance with grain and date part in dataset.",
+                time_granularity_name=time_granularity_name,
+                date_part=date_part,
+                instances_available=self.instance_set.time_dimension_instances,
             )
         )
 

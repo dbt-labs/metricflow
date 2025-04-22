@@ -33,16 +33,14 @@ class DimensionLookup:
                 existing_invariant = self._dimension_reference_to_invariant.get(dimension_reference)
                 if existing_invariant is not None and existing_invariant != invariant:
                     raise ValueError(
-                        str(
-                            LazyFormat(
-                                "Dimensions with the same name have been defined with conflicting values that "
-                                "should have been the same in a given semantic manifest. This should have been caught "
-                                "during validation.",
-                                dimension_reference=dimension_reference,
-                                existing_invariant=existing_invariant,
-                                conflicting_invariant=invariant,
-                                semantic_model_reference=semantic_model.reference,
-                            )
+                        LazyFormat(
+                            "Dimensions with the same name have been defined with conflicting values that "
+                            "should have been the same in a given semantic manifest. This should have been caught "
+                            "during validation.",
+                            dimension_reference=dimension_reference,
+                            existing_invariant=existing_invariant,
+                            conflicting_invariant=invariant,
+                            semantic_model_reference=semantic_model.reference,
                         )
                     )
 
@@ -55,12 +53,10 @@ class DimensionLookup:
         invariant = self._dimension_reference_to_invariant[dimension_reference]
         if invariant is None:
             raise ValueError(
-                str(
-                    LazyFormat(
-                        "Unknown dimension reference",
-                        dimension_reference=dimension_reference,
-                        known_dimension_references=list(self._dimension_reference_to_invariant.keys()),
-                    )
+                LazyFormat(
+                    "Unknown dimension reference",
+                    dimension_reference=dimension_reference,
+                    known_dimension_references=list(self._dimension_reference_to_invariant.keys()),
                 )
             )
 

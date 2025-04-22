@@ -85,12 +85,10 @@ class MeasureLookup:
         property_set = self._measure_reference_to_property_set.get(measure_reference)
         if property_set is None:
             raise ValueError(
-                str(
-                    LazyFormat(
-                        "Unable to get properties as the given measure reference is unknown",
-                        measure_reference=measure_reference,
-                        known_measures=list(self._measure_reference_to_property_set.keys()),
-                    )
+                LazyFormat(
+                    "Unable to get properties as the given measure reference is unknown",
+                    measure_reference=measure_reference,
+                    known_measures=list(self._measure_reference_to_property_set.keys()),
                 )
             )
 
@@ -101,12 +99,10 @@ class MeasureLookup:
         measure = self._measure_reference_to_measure.get(measure_reference)
         if measure is None:
             raise ValueError(
-                str(
-                    LazyFormat(
-                        "Unable to get the measure as the given reference is unknown",
-                        measure_reference=measure_reference,
-                        known_measures=self._measure_reference_to_property_set.keys(),
-                    )
+                LazyFormat(
+                    "Unable to get the measure as the given reference is unknown",
+                    measure_reference=measure_reference,
+                    known_measures=self._measure_reference_to_property_set.keys(),
                 )
             )
 

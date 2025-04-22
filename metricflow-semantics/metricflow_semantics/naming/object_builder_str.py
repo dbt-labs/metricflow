@@ -140,7 +140,7 @@ class ObjectBuilderNameConverter:
         if len(names) == 0:
             return None
         elif len(names) > 1:
-            raise RuntimeError(str(LazyFormat("Expected at most one name", instance_spec=instance_spec, names=names)))
+            raise RuntimeError(LazyFormat("Expected at most one name", instance_spec=instance_spec, names=names))
 
         return names[0]
 
