@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from dbt_semantic_interfaces.protocols import WhereFilter
 from typing_extensions import override
 
-from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.mf_logging.formatting import mf_indent
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow_semantics.query.issues.issues_base import (
     MetricFlowQueryIssueType,
@@ -40,9 +40,9 @@ class WhereFilterParsingIssue(MetricFlowQueryResolutionIssue):
     def ui_description(self, associated_input: MetricFlowQueryResolverInput) -> str:
         return (
             f"Error parsing where filter:\n\n"
-            f"{indent(repr(self.where_filter.where_sql_template))}\n\n"
+            f"{mf_indent(repr(self.where_filter.where_sql_template))}\n\n"
             f"Got exception:\n\n"
-            f"{indent(''.join(traceback.TracebackException.from_exception(self.parse_exception).format()))}"
+            f"{mf_indent(''.join(traceback.TracebackException.from_exception(self.parse_exception).format()))}"
         )
 
     @override

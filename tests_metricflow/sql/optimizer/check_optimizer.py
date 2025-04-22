@@ -4,7 +4,7 @@ import logging
 from typing import Optional
 
 from _pytest.fixtures import FixtureRequest
-from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.mf_logging.formatting import mf_indent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_str_snapshot_equal
@@ -47,13 +47,13 @@ def assert_optimizer_result_snapshot_equal(
     snapshot_str = "\n".join(
         [
             "optimizer:",
-            indent(optimizer.__class__.__name__),
+            mf_indent(optimizer.__class__.__name__),
             "",
             "sql_before_optimizing:",
-            indent(sql_before_optimizing),
+            mf_indent(sql_before_optimizing),
             "",
             "sql_after_optimizing:",
-            indent(sql_after_optimizing),
+            mf_indent(sql_after_optimizing),
         ]
     )
     assert_str_snapshot_equal(

@@ -13,7 +13,7 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
 
 from metricflow_semantics.errors.custom_grain_not_supported import error_if_not_standard_grain
-from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.mf_logging.formatting import mf_indent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat, mf_pformat_dict
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
@@ -206,12 +206,12 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
                 logger.debug(
                     LazyFormat(
                         lambda: f"For {node.ui_description}:\n"
-                        + indent(
+                        + mf_indent(
                             "After applying patterns:\n"
-                            + indent(mf_pformat(patterns_to_apply + self._source_spec_patterns))
+                            + mf_indent(mf_pformat(patterns_to_apply + self._source_spec_patterns))
                             + "\n"
                             + "to inputs, matches are:\n"
-                            + indent(mf_pformat(matching_items.specs))
+                            + mf_indent(mf_pformat(matching_items.specs))
                         )
                     )
                 )
@@ -330,7 +330,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
                 logger.debug(
                     LazyFormat(
                         lambda: "Candidates from parents:\n"
-                        + indent(mf_pformat(merged_result_from_parents.candidate_set.specs))
+                        + mf_indent(mf_pformat(merged_result_from_parents.candidate_set.specs))
                     )
                 )
             if merged_result_from_parents.candidate_set.is_empty:
@@ -366,12 +366,12 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
                 logger.debug(
                     LazyFormat(
                         lambda: f"For {node.ui_description}:\n"
-                        + indent(
+                        + mf_indent(
                             "After applying patterns:\n"
-                            + indent(mf_pformat(patterns_to_apply))
+                            + mf_indent(mf_pformat(patterns_to_apply))
                             + "\n"
                             + "to inputs, outputs are:\n"
-                            + indent(mf_pformat(matched_specs))
+                            + mf_indent(mf_pformat(matched_specs))
                         )
                     )
                 )
@@ -449,7 +449,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
                 logger.debug(
                     LazyFormat(
                         lambda: "Candidates from parents:\n"
-                        + indent(mf_pformat(merged_result_from_parents.candidate_set.specs))
+                        + mf_indent(mf_pformat(merged_result_from_parents.candidate_set.specs))
                     )
                 )
 

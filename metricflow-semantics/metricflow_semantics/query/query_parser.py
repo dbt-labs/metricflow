@@ -16,7 +16,7 @@ from dbt_semantic_interfaces.type_enums import TimeGranularity
 
 from metricflow_semantics.assert_one_arg import assert_at_most_one_arg_set
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
-from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.mf_logging.formatting import mf_indent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.mf_logging.runtime import log_runtime
@@ -280,20 +280,20 @@ class MetricFlowQueryParser:
                 lines.append(f"\nError #{issue_counter}:")
                 issue_set_lines: List[str] = [
                     "Message:\n",
-                    indent(error_issue.ui_description(resolver_input)),
+                    mf_indent(error_issue.ui_description(resolver_input)),
                     "\nQuery Input:\n",
-                    indent(resolver_input.ui_description),
+                    mf_indent(resolver_input.ui_description),
                 ]
 
                 if len(error_issue.query_resolution_path.resolution_path_nodes) > 0:
                     issue_set_lines.extend(
                         [
                             "\nIssue Location:\n",
-                            indent(error_issue.query_resolution_path.ui_description),
+                            mf_indent(error_issue.query_resolution_path.ui_description),
                         ]
                     )
 
-                lines.extend(indent(issue_set_line) for issue_set_line in issue_set_lines)
+                lines.extend(mf_indent(issue_set_line) for issue_set_line in issue_set_lines)
 
         return "\n".join(lines)
 
@@ -446,9 +446,9 @@ class MetricFlowQueryParser:
             logger.debug(
                 LazyFormat(
                     lambda: "Converted group-by-item input:\n"
-                    + indent(f"Input: {repr(group_by_name)}")
+                    + mf_indent(f"Input: {repr(group_by_name)}")
                     + "\n"
-                    + indent(f"Resolver Input: {mf_pformat(resolver_input_for_group_by_item)}")
+                    + mf_indent(f"Resolver Input: {mf_pformat(resolver_input_for_group_by_item)}")
                 )
             )
 
@@ -460,9 +460,9 @@ class MetricFlowQueryParser:
             logger.debug(
                 LazyFormat(
                     lambda: "Converted group-by-item input:\n"
-                    + indent(f"Input: {repr(group_by_parameter)}")
+                    + mf_indent(f"Input: {repr(group_by_parameter)}")
                     + "\n"
-                    + indent(f"Resolver Input: {mf_pformat(resolver_input_for_group_by_parameter)}")
+                    + mf_indent(f"Resolver Input: {mf_pformat(resolver_input_for_group_by_parameter)}")
                 )
             )
 
@@ -514,7 +514,7 @@ class MetricFlowQueryParser:
         )
 
         logger.debug(
-            LazyFormat(lambda: "Resolver input for query is:\n" + indent(mf_pformat(resolver_input_for_query)))
+            LazyFormat(lambda: "Resolver input for query is:\n" + mf_indent(mf_pformat(resolver_input_for_query)))
         )
 
         query_resolution = query_resolver.resolve_query(resolver_input_for_query)

@@ -11,7 +11,7 @@ from decimal import Decimal
 from typing import Iterable, Iterator, List, Optional, Sequence, Tuple, Type
 
 import tabulate
-from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.mf_logging.formatting import mf_indent
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat, mf_pformat_dict
 from typing_extensions import Self
 
@@ -49,7 +49,7 @@ class MetricFlowDataTable:
             assert row_column_count == expected_column_count, (
                 f"Row at index {row_index} has {row_column_count} columns instead of {expected_column_count}. "
                 f"Row is:"
-                f"\n{indent(mf_pformat(row))}"
+                f"\n{mf_indent(mf_pformat(row))}"
             )
             # Check that the type of the object in the rows match.
             for column_index, cell_value in enumerate(row):
@@ -90,7 +90,7 @@ class MetricFlowDataTable:
                 return i
         raise ValueError(
             f"Unknown column name {repr(column_name)}. Known column names are:"
-            f"\n{indent(mf_pformat([column_name for column_name in self.column_descriptions]))}"
+            f"\n{mf_indent(mf_pformat([column_name for column_name in self.column_descriptions]))}"
         )
 
     @property
@@ -287,7 +287,7 @@ class _MetricFlowDataTableBuilder:
         if actual_column_count != expected_column_count:
             raise ValueError(
                 f"Input row has {actual_column_count} columns, but expected {expected_column_count} columns. Row is:"
-                f"\n{indent(mf_pformat(row))}"
+                f"\n{mf_indent(mf_pformat(row))}"
             )
         self._rows.append(tuple(self._convert_row_to_supported_types(row)))
         return self

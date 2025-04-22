@@ -8,7 +8,7 @@ from typing import List
 
 from metricflow_semantics.dag.dag_to_text import MetricFlowDagTextFormatter
 from metricflow_semantics.dag.mf_dag import DagId
-from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.mf_logging.formatting import mf_indent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.sql.sql_exprs import (
     SqlStringExpression,
@@ -54,7 +54,7 @@ def test_multithread_dag_to_text() -> None:
         time.sleep(0.5)
         try:
             output = dag_to_text_formatter.dag_to_text(dag)
-            logger.debug(LazyFormat(lambda: f"in {current_thread} - Output is:\n{indent(output)}"))
+            logger.debug(LazyFormat(lambda: f"in {current_thread} - Output is:\n{mf_indent(output)}"))
             thread_outputs.append(output)
             logger.debug(LazyFormat(lambda: f"In {current_thread} - Successfully finished .dag_to_text()"))
         except Exception:

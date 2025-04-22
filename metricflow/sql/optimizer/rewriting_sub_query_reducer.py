@@ -4,7 +4,7 @@ import logging
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple
 
-from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.mf_logging.formatting import mf_indent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.sql.sql_exprs import (
     SqlColumnAliasReferenceExpression,
@@ -807,7 +807,7 @@ class SqlGroupByRewritingVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
             else:
                 logger.debug(
                     LazyFormat(
-                        lambda: f"Did not find matching select for {group_by} in:\n{indent(node.structure_text())}"
+                        lambda: f"Did not find matching select for {group_by} in:\n{mf_indent(node.structure_text())}"
                     )
                 )
                 new_group_bys.append(group_by)
