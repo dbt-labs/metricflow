@@ -282,3 +282,15 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
             if base_grain_spec not in base_grain_specs:
                 base_grain_specs += (base_grain_spec,)
         return base_grain_specs
+
+    @override
+    def with_alias(self, alias: Optional[str]) -> TimeDimensionSpec:  # noqa: D102
+        return TimeDimensionSpec(
+            element_name=self.element_name,
+            entity_links=self.entity_links,
+            time_granularity=self.time_granularity,
+            date_part=self.date_part,
+            aggregation_state=self.aggregation_state,
+            window_functions=self.window_functions,
+            alias=alias,
+        )

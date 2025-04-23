@@ -45,6 +45,7 @@ def test_classes() -> None:  # noqa: D103
             TimeDimensionSpec(
               element_name='metric_time',
               entity_links=(),
+              alias=None,
               time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY),
               date_part=None,
               aggregation_state=None,

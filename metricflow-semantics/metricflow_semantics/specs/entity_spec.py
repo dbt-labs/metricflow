@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Tuple
+from typing import Any, Optional, Tuple
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.references import EntityReference
@@ -55,6 +55,10 @@ class EntitySpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D101
 
     def with_entity_prefix(self, entity_prefix: EntityReference) -> EntitySpec:  # noqa: D102
         return EntitySpec(element_name=self.element_name, entity_links=(entity_prefix,) + self.entity_links)
+
+    @override
+    def with_alias(self, alias: Optional[str]) -> EntitySpec:  # noqa: D102
+        return EntitySpec(element_name=self.element_name, entity_links=self.entity_links, alias=alias)
 
 
 @dataclass(frozen=True)

@@ -3,7 +3,7 @@ from __future__ import annotations
 import typing
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Generic, List, Sequence, Tuple, TypeVar
+from typing import Generic, List, Optional, Sequence, Tuple, TypeVar
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.references import EntityReference, LinkableElementReference
@@ -100,6 +100,7 @@ class LinkableInstanceSpec(InstanceSpec, ABC):
 
     """A list representing the join path of entities to get to this element."""
     entity_links: Tuple[EntityReference, ...]
+    alias: Optional[str] = None
 
     @property
     @abstractmethod
@@ -143,6 +144,11 @@ class LinkableInstanceSpec(InstanceSpec, ABC):
     @abstractmethod
     def with_entity_prefix(self, entity_prefix: EntityReference) -> LinkableInstanceSpec:
         """Add the selected entity prefix to the start of the entity links."""
+        raise NotImplementedError()
+
+    @abstractmethod
+    def with_alias(self, alias: Optional[str]) -> LinkableInstanceSpec:
+        """Return the same instance spec with the alias field replaced."""
         raise NotImplementedError()
 
 

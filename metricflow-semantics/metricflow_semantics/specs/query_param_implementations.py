@@ -43,6 +43,7 @@ class TimeDimensionParameter(ProtocolHint[TimeDimensionQueryParameter]):
     name: str
     grain: Optional[str] = None
     date_part: Optional[DatePart] = None
+    alias: Optional[str] = None
 
     def query_resolver_input(  # noqa: D102
         self,
@@ -67,6 +68,7 @@ class TimeDimensionParameter(ProtocolHint[TimeDimensionQueryParameter]):
                     date_part=self.date_part,
                 )
             ),
+            alias=self.alias,
         )
 
 
@@ -78,6 +80,7 @@ class DimensionOrEntityParameter(ProtocolHint[DimensionOrEntityQueryParameter]):
     """
 
     name: str
+    alias: Optional[str] = None
 
     @override
     def _implements_protocol(self) -> DimensionOrEntityQueryParameter:
@@ -114,6 +117,7 @@ class DimensionOrEntityParameter(ProtocolHint[DimensionOrEntityQueryParameter]):
                     date_part=None,
                 )
             ),
+            alias=self.alias,
         )
 
 

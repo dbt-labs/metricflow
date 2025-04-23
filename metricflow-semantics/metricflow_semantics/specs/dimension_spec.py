@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Tuple
+from typing import Optional
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.references import DimensionReference, EntityReference
@@ -14,9 +14,6 @@ from metricflow_semantics.visitor import VisitorOutputT
 
 @dataclass(frozen=True)
 class DimensionSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D101
-    element_name: str
-    entity_links: Tuple[EntityReference, ...]
-
     @property
     def without_first_entity_link(self) -> DimensionSpec:  # noqa: D102
         assert len(self.entity_links) > 0, f"Spec does not have any entity links: {self}"
@@ -46,3 +43,7 @@ class DimensionSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D101
 
     def with_entity_prefix(self, entity_prefix: EntityReference) -> DimensionSpec:  # noqa: D102
         return DimensionSpec(element_name=self.element_name, entity_links=(entity_prefix,) + self.entity_links)
+
+    @override
+    def with_alias(self, alias: Optional[str]) -> DimensionSpec:  # noqa: D102
+        return DimensionSpec(element_name=self.element_name, entity_links=self.entity_links, alias=alias)
