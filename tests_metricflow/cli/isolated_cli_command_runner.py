@@ -153,7 +153,7 @@ class IsolatedCliCommandRunner:
                 "Executor process is not alive when it is expected to be - check logs to see why it is not."
             )
 
-        start_time = time.time()
+        start_time = time.perf_counter()
 
         delete_temporary_directory = True
         temporary_directory_path: Optional[Path] = None
@@ -181,7 +181,7 @@ class IsolatedCliCommandRunner:
             result = self._running_executor_process_context.send_command_and_get_result(command_parameter_set)
             logger.debug("Got result from output queue")
 
-            runtime = f"{time.time() - start_time:.2f}s"
+            runtime = f"{time.perf_counter() - start_time:.2f}s"
             if result.exit_code == 0:
                 logger.debug(
                     LazyFormat(

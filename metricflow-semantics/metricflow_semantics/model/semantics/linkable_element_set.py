@@ -386,7 +386,7 @@ class LinkableElementSet(SemanticModelDerivation):
         Returns a new set consisting of the elements in the `LinkableElementSet` that have a corresponding spec that
         match all the given spec patterns.
         """
-        start_time = time.time()
+        start_time = time.perf_counter()
 
         # Spec patterns need all specs to match properly e.g. `MinimumTimeGrainPattern`.
         matching_specs: Sequence[InstanceSpec] = self.specs
@@ -416,7 +416,9 @@ class LinkableElementSet(SemanticModelDerivation):
             path_key_to_linkable_entities=path_key_to_linkable_entities,
             path_key_to_linkable_metrics=path_key_to_linkable_metrics,
         )
-        logger.debug(LazyFormat(lambda: f"Filtering valid linkable elements took: {time.time() - start_time:.2f}s"))
+        logger.debug(
+            LazyFormat(lambda: f"Filtering valid linkable elements took: {time.perf_counter() - start_time:.2f}s")
+        )
         return filtered_elements
 
     def filter_by_left_semantic_model(

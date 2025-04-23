@@ -37,7 +37,7 @@ class AdapterBackedDDLSqlClient(AdapterBackedSqlClient):
         logger.debug(
             LazyFormat(lambda: f"Creating table '{sql_table.sql}' from a DataTable with {df.row_count} row(s)")
         )
-        start_time = time.time()
+        start_time = time.perf_counter()
 
         with self._adapter.connection_named("MetricFlow_create_from_dataframe"):
             # Create table
@@ -90,7 +90,7 @@ class AdapterBackedDDLSqlClient(AdapterBackedSqlClient):
 
         logger.debug(
             LazyFormat(
-                lambda: f"Created SQL table '{sql_table.sql}' from an in-memory table in {time.time() - start_time:.2f}s"
+                lambda: f"Created SQL table '{sql_table.sql}' from an in-memory table in {time.perf_counter() - start_time:.2f}s"
             )
         )
 

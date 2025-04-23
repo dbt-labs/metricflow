@@ -89,7 +89,7 @@ def _time_mf_engine_init(
     semantic_manifest: SemanticManifest,
     linkable_spec_index: Optional[LinkableSpecIndex],
 ) -> float:
-    start_time = time.time()
+    start_time = time.perf_counter()
 
     if linkable_spec_index is None:
         semantic_manifest_lookup = SemanticManifestLookup(semantic_manifest)
@@ -105,4 +105,4 @@ def _time_mf_engine_init(
         column_association_resolver=column_association_resolver,
     )
 
-    return time.time() - start_time
+    return time.perf_counter() - start_time

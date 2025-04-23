@@ -127,7 +127,7 @@ class MetricLookup:
         element_filter: LinkableElementFilter = LinkableElementFilter(),
     ) -> LinkableElementSet:
         """Return the set of linkable elements reachable from a given measure."""
-        start_time = time.time()
+        start_time = time.perf_counter()
 
         # Cache the result when group-by-metrics are selected in an LRU cache as there can be many of them and may
         # significantly increase memory usage.
@@ -164,7 +164,7 @@ class MetricLookup:
                 "Finished getting linkable elements",
                 measure_reference=measure_reference,
                 element_filter=element_filter,
-                runtime=time.time() - start_time,
+                runtime=time.perf_counter() - start_time,
             )
         )
         return result.filter(element_filter)

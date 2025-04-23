@@ -126,7 +126,7 @@ class SelectSqlQueryToDataTableTask(ExecutionPlanTask):
         return tuple(super().displayed_properties) + (DisplayedProperty(key="sql", value=self.sql_statement.sql),)
 
     def execute(self) -> TaskExecutionResult:  # noqa: D102
-        start_time = time.time()
+        start_time = time.perf_counter()
         sql_statement = self.sql_statement
         assert sql_statement is not None, f"{self.sql_statement=} should have been set during creation."
 
@@ -135,7 +135,7 @@ class SelectSqlQueryToDataTableTask(ExecutionPlanTask):
             sql_bind_parameter_set=sql_statement.bind_parameter_set,
         )
 
-        end_time = time.time()
+        end_time = time.perf_counter()
         return TaskExecutionResult(
             start_time=start_time,
             end_time=end_time,
@@ -198,7 +198,7 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
     def execute(self) -> TaskExecutionResult:  # noqa: D102
         sql_statement = self.sql_statement
         assert sql_statement is not None, f"{self.sql_statement=} should have been set during creation."
-        start_time = time.time()
+        start_time = time.perf_counter()
         logger.debug(LazyFormat(lambda: f"Dropping table {self.output_table} in case it already exists"))
         self.sql_client.execute(f"DROP TABLE IF EXISTS {self.output_table.sql}")
         logger.debug(LazyFormat(lambda: f"Creating table {self.output_table} using a query"))
@@ -207,7 +207,7 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
             sql_bind_parameter_set=sql_statement.bind_parameter_set,
         )
 
-        end_time = time.time()
+        end_time = time.perf_counter()
         return TaskExecutionResult(start_time=start_time, end_time=end_time, sql=sql_statement.sql)
 
     def __repr__(self) -> str:  # noqa: D105

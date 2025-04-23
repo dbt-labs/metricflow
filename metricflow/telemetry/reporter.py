@@ -141,7 +141,7 @@ def log_call(telemetry_reporter: TelemetryReporter, module_name: str) -> Callabl
             # Not every Callable has a __name__
             function_name = getattr(func, "__name__", repr(func))
             invocation_id = f"call_{random_id()}"
-            start_time = time.time()
+            start_time = time.perf_counter()
             telemetry_reporter.log_function_start(
                 invocation_id=invocation_id, module_name=module_name, function_name=function_name
             )
@@ -156,7 +156,7 @@ def log_call(telemetry_reporter: TelemetryReporter, module_name: str) -> Callabl
                     invocation_id=invocation_id,
                     module_name=module_name,
                     function_name=function_name,
-                    runtime=time.time() - start_time,
+                    runtime=time.perf_counter() - start_time,
                     exception_trace=exception_trace,
                 )
 

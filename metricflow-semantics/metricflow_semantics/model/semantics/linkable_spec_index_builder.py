@@ -93,7 +93,7 @@ class LinkableSpecIndexBuilder:
         )
 
     def build_index(self) -> LinkableSpecIndex:  # noqa: D102
-        start_time = time.time()
+        start_time = time.perf_counter()
         for metric in self._semantic_manifest.metrics:
             # self._metric_references_to_metrics[MetricReference(metric.name)] = metric
             linkable_sets_for_measure = []
@@ -128,7 +128,7 @@ class LinkableSpecIndexBuilder:
 
         # Populate storage dicts with linkable metrics. This loop must happen after the one above so that
         # _metric_to_linkable_element_sets is populated with entities and dimensions.
-        linkable_metrics_start_time = time.time()
+        linkable_metrics_start_time = time.perf_counter()
         for metric in self._semantic_manifest.metrics:
             # Cumulative metrics and time offset metrics require grouping by metric_time, which is not yet available for
             # linkable metrics. So skip those.
@@ -178,7 +178,7 @@ class LinkableSpecIndexBuilder:
             )
         logger.debug(
             LazyFormat(
-                lambda: f"Building valid linkable metrics took: {time.time() - linkable_metrics_start_time:.2f}s"
+                lambda: f"Building valid linkable metrics took: {time.perf_counter() - linkable_metrics_start_time:.2f}s"
             )
         )
 
@@ -190,7 +190,9 @@ class LinkableSpecIndexBuilder:
             linkable_element_sets_for_no_metrics_queries + [metric_time_elements_for_no_metrics]
         )
 
-        logger.debug(LazyFormat(lambda: f"Building valid group-by-item indexes took: {time.time() - start_time:.2f}s"))
+        logger.debug(
+            LazyFormat(lambda: f"Building valid group-by-item indexes took: {time.perf_counter() - start_time:.2f}s")
+        )
 
         return self._linkable_spec_index
 
