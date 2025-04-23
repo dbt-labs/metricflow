@@ -58,13 +58,11 @@ class SqlCteAliasMappingLookup:
         """
         if select_node in self._select_node_to_cte_alias_mapping:
             raise RuntimeError(
-                str(
-                    LazyFormat(
-                        "`select_node` node has already been added,",
-                        # child_select_node=child_select_node,
-                        select_node=select_node,
-                        current_mapping=self._select_node_to_cte_alias_mapping,
-                    )
+                LazyFormat(
+                    "`select_node` node has already been added,",
+                    # child_select_node=child_select_node,
+                    select_node=select_node,
+                    current_mapping=self._select_node_to_cte_alias_mapping,
                 )
             )
 
@@ -78,6 +76,7 @@ class SqlCteAliasMappingLookup:
         cte_alias_mapping = self._select_node_to_cte_alias_mapping.get(select_node)
         if cte_alias_mapping is None:
             raise RuntimeError(
-                str(LazyFormat("CTE alias mapping does not exist for the given `select_node`", select_node=select_node))
+                LazyFormat("CTE alias mapping does not exist for the given `select_node`", select_node=select_node)
             )
+
         return cte_alias_mapping

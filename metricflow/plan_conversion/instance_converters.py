@@ -458,12 +458,10 @@ class FilterElements(InstanceSetTransform[InstanceSet]):
                     include_specs_not_found.append(include_spec)
             if include_specs_not_found:
                 raise RuntimeError(
-                    str(
-                        LazyFormat(
-                            "Include specs are not in the spec set - check if this node was constructed correctly.",
-                            include_specs_not_found=include_specs_not_found,
-                            available_specs=available_specs,
-                        )
+                    LazyFormat(
+                        "Include specs are not in the spec set - check if this node was constructed correctly.",
+                        include_specs_not_found=include_specs_not_found,
+                        available_specs=available_specs,
                     )
                 )
         elif self._exclude_specs:
@@ -474,12 +472,10 @@ class FilterElements(InstanceSetTransform[InstanceSet]):
                     exclude_specs_not_found.append(exclude_spec)
             if exclude_specs_not_found:
                 raise RuntimeError(
-                    str(
-                        LazyFormat(
-                            "Exclude specs are not in the spec set - check if this node was constructed correctly.",
-                            exclude_specs_not_found=exclude_specs_not_found,
-                            available_specs=available_specs,
-                        )
+                    LazyFormat(
+                        "Exclude specs are not in the spec set - check if this node was constructed correctly.",
+                        exclude_specs_not_found=exclude_specs_not_found,
+                        available_specs=available_specs,
                     )
                 )
         else:

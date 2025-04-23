@@ -44,10 +44,8 @@ def test_manifest_generator(  # noqa: D103
     validation_result = validator.validate_semantic_manifest(manifest)
     logger.debug(LazyFormat("Generated manifest", manifest=manifest))
 
-    assert not validation_result.has_blocking_issues, str(
-        LazyFormat(
-            "Found validation issues with the generated manifest",
-            validation_result=validation_result,
-            manifest=manifest,
-        )
-    )
+    assert not validation_result.has_blocking_issues, LazyFormat(
+        "Found validation issues with the generated manifest",
+        validation_result=validation_result,
+        manifest=manifest,
+    ).evaluated_value

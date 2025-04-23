@@ -223,11 +223,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         )
         if len(time_spine_sources) != 1:
             raise RuntimeError(
-                str(
-                    LazyFormat(
-                        "Unexpected number of time spine sources required for query - cumulative metrics should require exactly one.",
-                        time_spine_sources=time_spine_sources,
-                    )
+                LazyFormat(
+                    "Unexpected number of time spine sources required for query - cumulative metrics should require exactly one.",
+                    time_spine_sources=time_spine_sources,
                 )
             )
         time_spine_source = time_spine_sources[0]

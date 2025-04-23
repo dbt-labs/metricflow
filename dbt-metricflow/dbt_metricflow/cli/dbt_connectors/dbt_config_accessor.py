@@ -64,14 +64,13 @@ class dbtProjectMetadata:
 
         logger.debug(LazyFormat("Ran validation", validation_result=validation_result))
         if validation_result.exception is not None:
-            exception_message = str(
+            raise RuntimeError(
                 LazyFormat(
                     "Error validating the dbt project",
                     profiles_path=profiles_path_str,
                     project_path=project_path_str,
                 )
-            )
-            raise RuntimeError(exception_message) from validation_result.exception
+            ) from validation_result.exception
 
         profile = load_profile(project_root=project_path_str, cli_vars={})
         logger.debug(LazyFormat("Loaded profile", profile=profile))
