@@ -68,6 +68,7 @@ class ResolverInputForGroupByItem(MetricFlowQueryResolverInput):
     input_obj: Union[GroupByParameter, str]
     input_obj_naming_scheme: QueryItemNamingScheme
     spec_pattern: SpecPattern
+    alias: Optional[str] = None
 
     @property
     @override

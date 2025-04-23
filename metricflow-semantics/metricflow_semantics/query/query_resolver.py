@@ -168,10 +168,13 @@ class MetricFlowQueryResolver:
             input_str=str(group_by_item_input.input_obj),
             candidate_filters=QueryItemSuggestionGenerator.GROUP_BY_ITEM_CANDIDATE_FILTERS,
         )
-        return group_by_item_resolver.resolve_matching_item_for_querying(
+        resolution = group_by_item_resolver.resolve_matching_item_for_querying(
             spec_pattern=group_by_item_input.spec_pattern,
             suggestion_generator=suggestion_generator,
         )
+        if group_by_item_input.alias:
+            resolution = resolution.with_alias(group_by_item_input.alias)
+        return resolution
 
     def _resolve_metric_inputs(
         self,
@@ -217,6 +220,7 @@ class MetricFlowQueryResolver:
                     )
                 )
 
+        # TODO: new validation to ensure that all output column names will be unique
         # Find any duplicate aliases
         for alias, metrics in alias_to_metrics.items():
             if len(metrics) > 1:

@@ -24,7 +24,7 @@ class MetricQueryParameter(Protocol):
 
     @property
     def alias(self) -> Optional[str]:
-        """The alias of the metric."""
+        """What to name the metric's output column."""
         raise NotImplementedError
 
     def query_resolver_input(  # noqa: D102
@@ -40,6 +40,11 @@ class DimensionOrEntityQueryParameter(Protocol):
     @property
     def name(self) -> str:
         """The name of the metric."""
+        raise NotImplementedError
+
+    @property
+    def alias(self) -> Optional[str]:
+        """What to name the dimension or entity's output column."""
         raise NotImplementedError
 
     def query_resolver_input(  # noqa: D102
@@ -67,6 +72,11 @@ class TimeDimensionQueryParameter(Protocol):  # noqa: D101
     @property
     def date_part(self) -> Optional[DatePart]:
         """Date part to extract from the dimension."""
+        raise NotImplementedError
+
+    @property
+    def alias(self) -> Optional[str]:
+        """What to name the dimension or entity's output column."""
         raise NotImplementedError
 
     def query_resolver_input(  # noqa: D102
