@@ -5,6 +5,7 @@ from dataclasses import fields, is_dataclass
 from enum import Enum
 from typing import Any, List, Mapping, Optional, Sized, Union
 
+from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
 
@@ -14,20 +15,15 @@ class MetricFlowPrettyFormatter:
 
     def __init__(
         self,
-        indent_prefix: str,
-        max_line_length: int,
-        include_object_field_names: bool,
-        include_none_object_fields: bool,
-        include_empty_object_fields: bool,
+        format_option: PrettyFormatOption,
     ) -> None:
         """See mf_pformat() for argument descriptions."""
-        self._indent_prefix = indent_prefix
-        if not max_line_length > 0:
-            raise ValueError(f"max_line_length must be > 0 as required by pprint.pformat(). Got {max_line_length}")
-        self._max_line_width = max_line_length
-        self._include_object_field_names = include_object_field_names
-        self._include_none_object_fields = include_none_object_fields
-        self._include_empty_object_fields = include_empty_object_fields
+        self._format_option = format_option
+        max_line_length = format_option.max_line_length
+        if max_line_length is not None and max_line_length <= 0:
+            raise ValueError(
+                f"max_line_length must be > 0 as required by pprint.pformat(). Got {format_option.max_line_length}"
+            )
 
     def _handle_sequence_obj(
         self, list_like_obj: Union[list, tuple, set, frozenset], remaining_line_width: Optional[int]
@@ -82,7 +78,7 @@ class MetricFlowPrettyFormatter:
         # Convert each item to a pretty string.
         items_as_str = tuple(
             self._handle_any_obj(
-                list_item, remaining_line_width=max(1, remaining_line_width - len(self._indent_prefix))
+                list_item, remaining_line_width=max(1, remaining_line_width - len(self._format_option.indent_prefix))
             )
             for list_item in list_like_obj
         )
@@ -98,7 +94,7 @@ class MetricFlowPrettyFormatter:
         item_block = ",\n".join(items_as_str) + ","
         # Indent the item_block
         if len(item_block) > 0:
-            lines.append(mf_indent(item_block, indent_prefix=self._indent_prefix))
+            lines.append(mf_indent(item_block, indent_prefix=self._format_option.indent_prefix))
         lines.append(right_enclose_str)
         return "\n".join(lines)
 
@@ -135,14 +131,16 @@ class MetricFlowPrettyFormatter:
         # See if the string representation can fit on one line. e.g. "'a': [1, 2]"
         if remaining_line_width is None or remaining_line_width > 0:
             result_items_without_limit: List[str] = []
-            if is_dataclass_like_object and self._include_object_field_names:
+            if is_dataclass_like_object and self._format_option.include_object_field_names:
                 result_items_without_limit.append(str(key))
             else:
                 result_items_without_limit.append(self._handle_any_obj(key, remaining_line_width=None))
             result_items_without_limit.append(key_value_seperator)
             result_items_without_limit.append(self._handle_any_obj(value, remaining_line_width=None))
 
-            result_without_limit = mf_indent("".join(result_items_without_limit), indent_prefix=self._indent_prefix)
+            result_without_limit = mf_indent(
+                "".join(result_items_without_limit), indent_prefix=self._format_option.indent_prefix
+            )
             if remaining_line_width is None or len(result_without_limit) <= remaining_line_width:
                 return result_without_limit
 
@@ -154,7 +152,7 @@ class MetricFlowPrettyFormatter:
 
         # Create the string for the key.
         result_lines: List[str] = []
-        if is_dataclass_like_object and self._include_object_field_names:
+        if is_dataclass_like_object and self._format_option.include_object_field_names:
             result_lines.append(str(key) + key_value_seperator)
         else:
             # See if the key can be printed on one line. This depends on the length of the value as the key and the
@@ -218,7 +216,7 @@ class MetricFlowPrettyFormatter:
             result_lines[-1] = result_lines[-1] + value_lines[0]
             result_lines.extend(value_lines[1:])
 
-        return mf_indent("\n".join(result_lines), indent_prefix=self._indent_prefix)
+        return mf_indent("\n".join(result_lines), indent_prefix=self._format_option.indent_prefix)
 
     def _handle_mapping_like_obj(
         self,
@@ -250,10 +248,10 @@ class MetricFlowPrettyFormatter:
             A string representation of the mapping. e.g. "{'a'=[1, 2]}" or "Foo(a=[1, 2])".
         """
         # Skip key / values depending on the pretty-print configuration.
-        if is_dataclass_like_object and not self._include_none_object_fields:
+        if is_dataclass_like_object and not self._format_option.include_none_object_fields:
             mapping = {key: value for key, value in mapping.items() if value is not None}
 
-        if is_dataclass_like_object and not self._include_empty_object_fields:
+        if is_dataclass_like_object and not self._format_option.include_empty_object_fields:
             mapping = {
                 key: value
                 for key, value in mapping.items()
@@ -270,7 +268,7 @@ class MetricFlowPrettyFormatter:
                 key_value_str_items: List[str] = []
 
                 if is_dataclass_like_object:
-                    if self._include_object_field_names:
+                    if self._format_option.include_object_field_names:
                         key_value_str_items.append(str(key))
                         key_value_str_items.append(key_value_seperator)
                 else:
@@ -292,7 +290,7 @@ class MetricFlowPrettyFormatter:
                     value=value,
                     key_value_seperator=key_value_seperator,
                     is_dataclass_like_object=is_dataclass_like_object,
-                    remaining_line_width=(remaining_line_width - len(self._indent_prefix)),
+                    remaining_line_width=(remaining_line_width - len(self._format_option.indent_prefix)),
                 )
             )
         lines = [left_enclose_str, ",\n".join(mapping_items_as_str) + ",", right_enclose_str]
@@ -366,8 +364,39 @@ class MetricFlowPrettyFormatter:
                 pass
 
         # Any other object that's not handled.
-        return pprint.pformat(obj, width=self._max_line_width, sort_dicts=False)
+        if remaining_line_width is not None:
+            return pprint.pformat(obj, width=remaining_line_width, sort_dicts=False)
+        else:
+            return pprint.pformat(obj, sort_dicts=False)
 
     def pretty_format(self, obj: Any) -> str:  # type: ignore[misc]
         """Return a pretty string representation of the object that's suitable for logging."""
-        return self._handle_any_obj(obj, remaining_line_width=self._max_line_width)
+        return self._handle_any_obj(obj, remaining_line_width=self._format_option.max_line_length)
+
+
+@fast_frozen_dataclass()
+class PrettyFormatOption:
+    """Options for `mf_pformat`.
+
+    max_line_length: If the string representation is going to be longer than this, split into multiple lines.
+    indent_prefix: The prefix to use for hierarchical indents.
+    include_object_field_names: Include field names when printing objects - e.g. Foo(bar='baz') vs Foo('baz')
+    include_none_object_fields: Include fields with a None value - e.g. Foo(bar=None) vs Foo()
+    include_empty_object_fields: Include fields that are empty - e.g. Foo(bar=()) vs Foo()
+    """
+
+    max_line_length: Optional[int] = 120
+    indent_prefix: str = "  "
+    include_object_field_names: bool = True
+    include_none_object_fields: bool = False
+    include_empty_object_fields: bool = False
+
+    def with_max_line_length(self, max_line_length: Optional[int]) -> PrettyFormatOption:
+        """Return a copy of self but with a new value for `max_line_length`."""
+        return PrettyFormatOption(
+            max_line_length=max_line_length,
+            indent_prefix=self.indent_prefix,
+            include_object_field_names=self.include_object_field_names,
+            include_none_object_fields=self.include_none_object_fields,
+            include_empty_object_fields=self.include_empty_object_fields,
+        )
