@@ -19,7 +19,7 @@ from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSe
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.references import MetricReference
 from dbt_semantic_interfaces.transformations.transform_rule import SemanticManifestTransformRule
-from metricflow_semantics.mf_logging.pretty_print import mf_pformat
+from metricflow_semantics.mf_logging.pretty_print import PrettyFormatDictOption, mf_pformat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_pattern_factory import (
     DefaultWhereFilterPatternFactory,
@@ -49,7 +49,7 @@ def assert_spec_lookup_snapshot_equal(  # noqa: D103
         request=request,
         mf_test_configuration=mf_test_configuration,
         snapshot_id="result",
-        snapshot_str=mf_pformat(spec_lookup, include_none_object_fields=False),
+        snapshot_str=mf_pformat(spec_lookup, format_option=PrettyFormatDictOption(include_none_object_fields=False)),
     )
 
 

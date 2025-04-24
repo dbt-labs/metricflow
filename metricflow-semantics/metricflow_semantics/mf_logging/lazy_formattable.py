@@ -6,7 +6,7 @@ from typing import Any, Callable, Mapping, Union
 
 from typing_extensions import override
 
-from metricflow_semantics.mf_logging.pretty_print import mf_pformat_dict
+from metricflow_semantics.mf_logging.pretty_print import PrettyFormatDictOption, mf_pformat_dict
 
 logger = logging.getLogger(__name__)
 
@@ -62,7 +62,11 @@ class LazyFormat:
     @cached_property
     def evaluated_value(self) -> str:
         """Cache the result as `__str__` can be called multiple times for multiple log handlers."""
-        return mf_pformat_dict(self.evaluated_message_title, self.evaluated_kwargs, preserve_raw_strings=True)
+        return mf_pformat_dict(
+            self.evaluated_message_title,
+            self.evaluated_kwargs,
+            format_option=PrettyFormatDictOption(preserve_raw_strings=True),
+        )
 
     @override
     def __str__(self) -> str:

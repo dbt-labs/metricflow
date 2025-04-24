@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 
 from _pytest.fixtures import FixtureRequest
-from metricflow_semantics.mf_logging.pretty_print import mf_pformat_dict
+from metricflow_semantics.mf_logging.pretty_print import PrettyFormatDictOption, mf_pformat_dict
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
@@ -49,7 +49,9 @@ def test_shared_metric_query(
         snapshot_id="result",
         snapshot_str=mf_pformat_dict(
             obj_dict=obj_dict,
-            preserve_raw_strings=True,
-            pad_items_with_newlines=True,
+            format_option=PrettyFormatDictOption(
+                preserve_raw_strings=True,
+                pad_items_with_newlines=True,
+            ),
         ),
     )

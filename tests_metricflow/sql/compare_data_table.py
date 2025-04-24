@@ -6,7 +6,7 @@ import math
 from dataclasses import dataclass
 from typing import Dict, Optional, SupportsFloat
 
-from metricflow_semantics.mf_logging.pretty_print import mf_pformat_dict
+from metricflow_semantics.mf_logging.pretty_print import PrettyFormatDictOption, mf_pformat_dict
 
 from metricflow.data_table.column_types import CellValue
 from metricflow.data_table.mf_table import MetricFlowDataTable
@@ -126,7 +126,7 @@ def check_data_tables_are_equal(
                     },
                     **_generate_table_diff_fields(expected_table=expected_table, actual_table=actual_table),
                 ),
-                preserve_raw_strings=True,
+                format_option=PrettyFormatDictOption(preserve_raw_strings=True),
             )
         )
 
@@ -135,7 +135,7 @@ def check_data_tables_are_equal(
             mf_pformat_dict(
                 f"Expected table is empty and {allow_empty=}. This may indicate an error in configuring the test.",
                 _generate_table_diff_fields(expected_table=expected_table, actual_table=actual_table),
-                preserve_raw_strings=True,
+                format_option=PrettyFormatDictOption(preserve_raw_strings=True),
             )
         )
 
@@ -154,7 +154,7 @@ def check_data_tables_are_equal(
                     },
                     **_generate_table_diff_fields(expected_table=expected_table, actual_table=actual_table),
                 ),
-                preserve_raw_strings=True,
+                format_option=PrettyFormatDictOption(preserve_raw_strings=True),
             )
         )
 

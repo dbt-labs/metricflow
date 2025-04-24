@@ -9,7 +9,7 @@ from dbt_semantic_interfaces.implementations.elements.dimension import PydanticD
 from dbt_semantic_interfaces.type_enums import DimensionType
 from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
-from metricflow_semantics.mf_logging.pretty_print import mf_pformat
+from metricflow_semantics.mf_logging.pretty_print import PrettyFormatDictOption, mf_pformat
 from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_DAY
 from typing_extensions import override
 
@@ -32,9 +32,11 @@ def test_containers() -> None:  # noqa: D103
 def test_classes() -> None:  # noqa: D103
     assert "TimeDimensionSpec('metric_time', ExpandedTimeGranularity('day', DAY))" == mf_pformat(
         MTD_SPEC_DAY,
-        include_object_field_names=False,
-        include_none_object_fields=False,
-        include_empty_object_fields=False,
+        format_option=PrettyFormatDictOption(
+            include_object_field_names=False,
+            include_none_object_fields=False,
+            include_empty_object_fields=False,
+        ),
     )
 
     assert (
@@ -52,9 +54,11 @@ def test_classes() -> None:  # noqa: D103
         ).rstrip()
         == mf_pformat(
             MTD_SPEC_DAY,
-            include_object_field_names=True,
-            include_none_object_fields=True,
-            include_empty_object_fields=True,
+            format_option=PrettyFormatDictOption(
+                include_object_field_names=True,
+                include_none_object_fields=True,
+                include_empty_object_fields=True,
+            ),
         )
     )
 
@@ -76,7 +80,9 @@ def test_multi_line_key_value_dict() -> None:
     output_lines = []
     previous_result = None
     for max_line_length in range(1, 18):
-        result = mf_pformat(obj={(1,): (4, 5, 6)}, max_line_length=max_line_length)
+        result = mf_pformat(
+            obj={(1,): (4, 5, 6)}, format_option=PrettyFormatDictOption(max_line_length=max_line_length)
+        )
         if result != previous_result:
             output_lines.append(f"max_line_length={max_line_length}:")
             output_lines.append(mf_indent(result))
@@ -116,7 +122,7 @@ def test_multi_line_key_value_dict_short_value() -> None:
     output_lines = []
     previous_result = None
     for max_line_length in range(1, 18):
-        result = mf_pformat(obj={(1,): 2}, max_line_length=max_line_length)
+        result = mf_pformat(obj={(1,): 2}, format_option=PrettyFormatDictOption(max_line_length=max_line_length))
         if result != previous_result:
             output_lines.append(f"max_line_length={max_line_length}:")
             output_lines.append(mf_indent(result))
