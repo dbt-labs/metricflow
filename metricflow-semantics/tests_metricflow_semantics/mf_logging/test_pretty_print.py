@@ -9,6 +9,7 @@ from dbt_semantic_interfaces.implementations.elements.dimension import PydanticD
 from dbt_semantic_interfaces.type_enums import DimensionType
 from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
+from metricflow_semantics.mf_logging.pretty_formatter import PrettyFormatContext
 from metricflow_semantics.mf_logging.pretty_print import PrettyFormatDictOption, mf_pformat
 from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_DAY
 from typing_extensions import override
@@ -158,10 +159,9 @@ def test_custom_pretty_print() -> None:
     class _ExampleDataclass(MetricFlowPrettyFormattable):
         field_0: float
 
-        @property
         @override
-        def pretty_format(self) -> Optional[str]:
-            """Only show 2 decimal points when pretty printing."""
-            return f"{self.__class__.__name__}({self.field_0:.2f})"
+        def pretty_format(self, format_context: PrettyFormatContext) -> Optional[str]:
+            """Print this like a dictionary instead field as a string to 2 decimal places."""
+            return format_context.formatter.pretty_format({"field_0": f"{self.field_0:.2f}"})
 
-    assert mf_pformat(_ExampleDataclass(1.2345)) == f"{_ExampleDataclass.__name__}(1.23)"
+    assert mf_pformat(_ExampleDataclass(1.2345)) == "{'field_0': '1.23'}"

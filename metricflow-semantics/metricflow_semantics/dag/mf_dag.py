@@ -16,6 +16,7 @@ from metricflow_semantics.dag.dag_to_text import MetricFlowDagTextFormatter
 from metricflow_semantics.dag.id_prefix import IdPrefix
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
 from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
+from metricflow_semantics.mf_logging.pretty_formatter import PrettyFormatContext
 from metricflow_semantics.visitor import VisitorOutputT
 
 logger = logging.getLogger(__name__)
@@ -128,9 +129,8 @@ class DagNode(MetricFlowPrettyFormattable, Generic[DagNodeT], ABC):
         """Return a text representation that shows the structure of the DAG component starting from this node."""
         return formatter.dag_component_to_text(self)
 
-    @property
     @override
-    def pretty_format(self) -> Optional[str]:
+    def pretty_format(self, format_context: PrettyFormatContext) -> Optional[str]:
         return f"{self.__class__.__name__}(node_id={self.node_id.id_str})"
 
 

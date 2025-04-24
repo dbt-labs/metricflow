@@ -19,6 +19,7 @@ from typing_extensions import override
 from metricflow_semantics.collection_helpers.merger import Mergeable
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagNode, DisplayedProperty
+from metricflow_semantics.mf_logging.pretty_formatter import PrettyFormatContext
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.visitor import Visitable, VisitorOutputT
 
@@ -316,8 +317,7 @@ class SqlStringExpression(SqlExpressionNode):
         return tuple(super().displayed_properties) + (DisplayedProperty("sql_expr", self.sql_expr),)
 
     @override
-    @property
-    def pretty_format(self) -> str:
+    def pretty_format(self, format_context: PrettyFormatContext) -> Optional[str]:
         return f"{self.__class__.__name__}(node_id={self.node_id} sql_expr={self.sql_expr})"
 
     def rewrite(  # noqa: D102
@@ -873,9 +873,8 @@ class SqlAggregateFunctionExpression(SqlFunctionExpression):
             + tuple(DisplayedProperty("argument", x) for x in self.sql_function_args)
         )
 
-    @property
     @override
-    def pretty_format(self) -> str:  # noqa: D105
+    def pretty_format(self, format_context: PrettyFormatContext) -> Optional[str]:
         return f"{self.__class__.__name__}(node_id={self.node_id}, sql_function={self.sql_function.name})"
 
     def rewrite(  # noqa: D102
@@ -1168,9 +1167,8 @@ class SqlWindowFunctionExpression(SqlFunctionExpression):
     def is_aggregate_function(self) -> bool:  # noqa: D102
         return False
 
-    @property
     @override
-    def pretty_format(self) -> str:  # noqa: D105
+    def pretty_format(self, format_context: PrettyFormatContext) -> Optional[str]:
         return f"{self.__class__.__name__}(node_id={self.node_id}, sql_function={self.sql_function.name})"
 
     def rewrite(  # noqa: D102
