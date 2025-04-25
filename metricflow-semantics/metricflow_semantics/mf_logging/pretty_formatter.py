@@ -266,6 +266,9 @@ class MetricFlowPrettyFormatter:
                 if (isinstance(value, Sized) and len(value) > 0) or (not isinstance(value, Sized))
             }
 
+        if is_dataclass_like_object and not self._format_option.include_underscore_prefix_fields:
+            mapping = {key: value for key, value in mapping.items() if not key.startswith("_")}
+
         if len(mapping) == 0:
             return f"{left_enclose_str}{right_enclose_str}"
 
@@ -412,6 +415,7 @@ class PrettyFormatOption:
     include_object_field_names: bool = True
     include_none_object_fields: bool = False
     include_empty_object_fields: bool = False
+    include_underscore_prefix_fields: bool = False
 
     def with_max_line_length(self, max_line_length: Optional[int]) -> PrettyFormatOption:
         """Return a copy of self but with a new value for `max_line_length`."""
