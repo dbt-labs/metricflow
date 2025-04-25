@@ -225,6 +225,17 @@ class MetricFlowPrettyFormatter:
 
         return mf_indent("\n".join(result_lines), indent_prefix=self._format_option.indent_prefix)
 
+    def pretty_format_object_by_parts(self, class_name: str, field_mapping: Mapping) -> str:
+        """Return the string representation given class name and a mapping of the field names to field values."""
+        return self._handle_mapping_like_obj(
+            mapping=field_mapping,
+            left_enclose_str=class_name + "(",
+            key_value_seperator="=",
+            right_enclose_str=")",
+            is_dataclass_like_object=True,
+            remaining_line_length=self._format_option.max_line_length,
+        )
+
     def _handle_mapping_like_obj(
         self,
         mapping: Mapping,

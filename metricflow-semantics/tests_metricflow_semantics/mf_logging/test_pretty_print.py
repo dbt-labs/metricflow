@@ -9,7 +9,11 @@ from dbt_semantic_interfaces.implementations.elements.dimension import PydanticD
 from dbt_semantic_interfaces.type_enums import DimensionType
 from metricflow_semantics.helpers.string_helpers import mf_dedent, mf_indent
 from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
-from metricflow_semantics.mf_logging.pretty_formatter import PrettyFormatContext, PrettyFormatOption
+from metricflow_semantics.mf_logging.pretty_formatter import (
+    MetricFlowPrettyFormatter,
+    PrettyFormatContext,
+    PrettyFormatOption,
+)
 from metricflow_semantics.mf_logging.pretty_print import PrettyFormatDictOption, mf_pformat
 from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_DAY
 from typing_extensions import override
@@ -196,4 +200,11 @@ def test_include_underscore_prefix_option() -> None:  # noqa: D103
             format_option=PrettyFormatOption(include_underscore_prefix_fields=True),
         )
         == "_ExampleDataclass(field_0=1, _hidden_field=2)"
+    )
+
+
+def test_format_object_by_parts() -> None:  # noqa: D103
+    formatter = MetricFlowPrettyFormatter(PrettyFormatOption())
+    assert "_ExampleDataclass(field_0=1)" == formatter.pretty_format_object_by_parts(
+        class_name="_ExampleDataclass", field_mapping={"field_0": 1}
     )
