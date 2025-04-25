@@ -38,31 +38,34 @@ class DunderColumnAssociationResolverVisitor(InstanceSpecVisitor[ColumnAssociati
     """Visitor helper class for DefaultColumnAssociationResolver2."""
 
     def visit_metric_spec(self, metric_spec: MetricSpec) -> ColumnAssociation:  # noqa: D102
-        return ColumnAssociation(metric_spec.element_name if metric_spec.alias is None else metric_spec.alias)
+        return ColumnAssociation(metric_spec.alias or metric_spec.element_name)
 
     def visit_measure_spec(self, measure_spec: MeasureSpec) -> ColumnAssociation:  # noqa: D102
         return ColumnAssociation(measure_spec.element_name)
 
     def visit_dimension_spec(self, dimension_spec: DimensionSpec) -> ColumnAssociation:  # noqa: D102
-        return ColumnAssociation(dimension_spec.qualified_name)
+        return ColumnAssociation(dimension_spec.alias or dimension_spec.qualified_name)
 
     def visit_time_dimension_spec(self, time_dimension_spec: TimeDimensionSpec) -> ColumnAssociation:  # noqa: D102
         return ColumnAssociation(
-            time_dimension_spec.qualified_name
-            + (
-                f"{DUNDER}{time_dimension_spec.aggregation_state.value.lower()}"
-                if time_dimension_spec.aggregation_state
-                else ""
-            )
-            + (
-                f"{DUNDER}{DUNDER.join([window_function.value.lower() for window_function in time_dimension_spec.window_functions])}"
-                if time_dimension_spec.window_functions
-                else ""
+            time_dimension_spec.alias
+            or (
+                time_dimension_spec.qualified_name
+                + (
+                    f"{DUNDER}{time_dimension_spec.aggregation_state.value.lower()}"
+                    if time_dimension_spec.aggregation_state
+                    else ""
+                )
+                + (
+                    f"{DUNDER}{DUNDER.join([window_function.value.lower() for window_function in time_dimension_spec.window_functions])}"
+                    if time_dimension_spec.window_functions
+                    else ""
+                )
             )
         )
 
     def visit_entity_spec(self, entity_spec: EntitySpec) -> ColumnAssociation:  # noqa: D102
-        return ColumnAssociation(entity_spec.qualified_name)
+        return ColumnAssociation(entity_spec.alias or entity_spec.qualified_name)
 
     def visit_group_by_metric_spec(self, group_by_metric_spec: GroupByMetricSpec) -> ColumnAssociation:  # noqa: D102
         return ColumnAssociation(group_by_metric_spec.qualified_name)
