@@ -256,18 +256,17 @@ class MetricFlowPrettyFormatter:
             A string representation of the mapping. e.g. "{'a'=[1, 2]}" or "Foo(a=[1, 2])".
         """
         # Skip key / values depending on the pretty-print configuration.
-        if is_dataclass_like_object and not self._format_option.include_none_object_fields:
-            mapping = {key: value for key, value in mapping.items() if value is not None}
-
-        if is_dataclass_like_object and not self._format_option.include_empty_object_fields:
-            mapping = {
-                key: value
-                for key, value in mapping.items()
-                if (isinstance(value, Sized) and len(value) > 0) or (not isinstance(value, Sized))
-            }
-
-        if is_dataclass_like_object and not self._format_option.include_underscore_prefix_fields:
-            mapping = {key: value for key, value in mapping.items() if not key.startswith("_")}
+        if is_dataclass_like_object:
+            new_mapping = {}
+            for key, value in mapping.items():
+                if not self._format_option.include_none_object_fields and value is None:
+                    continue
+                if not self._format_option.include_empty_object_fields and isinstance(value, Sized) and len(value) == 0:
+                    continue
+                if not self._format_option.include_underscore_prefix_fields and key.startswith("_"):
+                    continue
+                new_mapping[key] = value
+            mapping = new_mapping
 
         if len(mapping) == 0:
             return f"{left_enclose_str}{right_enclose_str}"
