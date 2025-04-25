@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Use option object for `mf_pformat`
+time: 2025-04-25T16:05:22.25764-07:00
+custom:
+  Author: plypaul
+  Issue: "1731"
