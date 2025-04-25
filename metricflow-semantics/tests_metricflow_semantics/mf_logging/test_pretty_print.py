@@ -28,6 +28,8 @@ def test_containers() -> None:  # noqa: D103
     assert mf_pformat(((1, 2), 3)) == "((1, 2), 3)"
     assert mf_pformat([[1, 2], 3]) == "[[1, 2], 3]"
     assert mf_pformat({"a": ((1, 2), 3), (1, 2): 3}) == "{'a': ((1, 2), 3), (1, 2): 3}"
+    assert mf_pformat({1, 2, 3}) == "{1, 2, 3}"
+    assert mf_pformat(frozenset({1, 2, 3})) == "{1, 2, 3}"
 
 
 def test_classes() -> None:  # noqa: D103
