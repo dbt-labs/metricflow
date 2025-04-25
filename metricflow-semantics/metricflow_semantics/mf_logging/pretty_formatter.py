@@ -161,11 +161,14 @@ class MetricFlowPrettyFormatter:
             # "foo"=[
             #   ...
             # ]
-            min_length_of_first_value_line = len(self._handle_any_obj(value, remaining_line_width=0).splitlines()[0])
+            min_length_of_first_value_line = len(self._handle_any_obj(value, remaining_line_width=1).splitlines()[0])
 
             key_lines = self._handle_any_obj(
                 key,
-                remaining_line_width=remaining_line_width - len(key_value_seperator) - min_length_of_first_value_line,
+                remaining_line_width=max(
+                    1,
+                    remaining_line_width - len(key_value_seperator) - min_length_of_first_value_line,
+                ),
             ).splitlines()
             # key_lines would be something like:
             # [
