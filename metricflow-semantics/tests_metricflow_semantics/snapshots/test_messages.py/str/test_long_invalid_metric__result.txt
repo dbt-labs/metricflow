@@ -19,4 +19,4 @@ Error #1:
 
   Issue Location:
 
-    [Resolve Query(['bookings', 'long_invalid_metric_name__________________________________________________'])]
+    [Resolve Query(['bookings', 'long_invalid_metric_name______________________...)]

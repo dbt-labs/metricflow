@@ -10,10 +10,6 @@ Error #1:
 
     There are no metrics or group by items requested in the query.
 
-  Query Input:
-
-    Query([], []
-
   Issue Location:
 
-    [Resolve Query([])]
+    [Resolve Query()]
