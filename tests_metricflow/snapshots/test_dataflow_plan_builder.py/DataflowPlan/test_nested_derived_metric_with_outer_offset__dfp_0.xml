@@ -85,7 +85,7 @@ test_filename: test_dataflow_plan_builder.py
                                         </ReadSqlSourceNode>
                                     </MetricTimeDimensionTransformNode>
                                     <FilterElementsNode>
-                                        <!-- description = "Pass Only Elements: ['metric_time__day',]" -->
+                                        <!-- description = "Pass Only Elements: ['metric_time__day']" -->
                                         <!-- node_id = NodeId(id_str='pfe_0') -->
                                         <!-- include_spec =                                -->
                                         <!--   TimeDimensionSpec(                          -->
@@ -131,7 +131,7 @@ test_filename: test_dataflow_plan_builder.py
                     </ComputeMetricsNode>
                 </ComputeMetricsNode>
                 <FilterElementsNode>
-                    <!-- description = "Pass Only Elements: ['metric_time__day',]" -->
+                    <!-- description = "Pass Only Elements: ['metric_time__day']" -->
                     <!-- node_id = NodeId(id_str='pfe_2') -->
                     <!-- include_spec =                                                                  -->
                     <!--   TimeDimensionSpec(                                                            -->

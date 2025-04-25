@@ -16,7 +16,7 @@ Error #1:
     However, the given input does not match to a common item that is available to those parents:
 
       {
-        "Matching items for: Metric('entity_0_metric')": ['entity_0__country',],
+        "Matching items for: Metric('entity_0_metric')": ['entity_0__country'],
         "Matching items for: Metric('entity_1_metric')": [
           'entity_1__entity_0__country',
         ],

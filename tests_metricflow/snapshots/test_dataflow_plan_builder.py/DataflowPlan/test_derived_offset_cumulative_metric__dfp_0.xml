@@ -73,7 +73,7 @@ test_filename: test_dataflow_plan_builder.py
                                 </MetricTimeDimensionTransformNode>
                             </JoinOverTimeRangeNode>
                             <FilterElementsNode>
-                                <!-- description = "Pass Only Elements: ['metric_time__day',]" -->
+                                <!-- description = "Pass Only Elements: ['metric_time__day']" -->
                                 <!-- node_id = NodeId(id_str='pfe_0') -->
                                 <!-- include_spec =                                                                  -->
                                 <!--   TimeDimensionSpec(                                                            -->

@@ -32,7 +32,7 @@ test_filename: test_dataflow_plan_builder.py
                         <!-- data_set = SemanticModelDataSet('listings_latest') -->
                     </ReadSqlSourceNode>
                     <FilterElementsNode>
-                        <!-- description = "Pass Only Elements: ['metric_time__month',]" -->
+                        <!-- description = "Pass Only Elements: ['metric_time__month']" -->
                         <!-- node_id = NodeId(id_str='pfe_0') -->
                         <!-- include_spec =                                                                      -->
                         <!--   TimeDimensionSpec(                                                                -->

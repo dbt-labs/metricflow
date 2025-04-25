@@ -17,7 +17,7 @@ FROM (
       subq_9.metric_time__hour AS metric_time__hour
       , subq_5.archived_users AS archived_users
     FROM (
-      -- Pass Only Elements: ['metric_time__hour',]
+      -- Pass Only Elements: ['metric_time__hour']
       SELECT
         subq_8.metric_time__hour
       FROM (

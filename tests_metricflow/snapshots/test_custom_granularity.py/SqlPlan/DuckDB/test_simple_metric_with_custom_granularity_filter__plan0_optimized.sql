@@ -5,7 +5,7 @@ docstring:
 sql_engine: DuckDB
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['bookings',]
+-- Pass Only Elements: ['bookings']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT

@@ -9,7 +9,7 @@ SELECT
   , subq_14.archived_users AS archived_users_join_to_time_spine
 FROM (
   -- Constrain Output with WHERE
-  -- Pass Only Elements: ['metric_time__day',]
+  -- Pass Only Elements: ['metric_time__day']
   SELECT
     metric_time__day
   FROM (

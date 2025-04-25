@@ -380,7 +380,7 @@ FROM (
     FROM ***************************.dim_users users_ds_source_src_28000
   ) subq_0
   CROSS JOIN (
-    -- Pass Only Elements: ['metric_time__day',]
+    -- Pass Only Elements: ['metric_time__day']
     SELECT
       subq_2.metric_time__day
     FROM (

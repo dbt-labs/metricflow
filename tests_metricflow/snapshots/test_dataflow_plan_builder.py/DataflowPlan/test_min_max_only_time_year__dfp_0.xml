@@ -11,7 +11,7 @@ docstring:
             <!-- description = 'Calculate min and max' -->
             <!-- node_id = NodeId(id_str='mm_0') -->
             <FilterElementsNode>
-                <!-- description = "Pass Only Elements: ['booking__paid_at__year',]" -->
+                <!-- description = "Pass Only Elements: ['booking__paid_at__year']" -->
                 <!-- node_id = NodeId(id_str='pfe_0') -->
                 <!-- include_spec =                                                                    -->
                 <!--   TimeDimensionSpec(                                                              -->

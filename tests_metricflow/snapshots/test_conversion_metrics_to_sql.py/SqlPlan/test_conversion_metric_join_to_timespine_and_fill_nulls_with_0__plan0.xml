@@ -66,7 +66,7 @@ docstring:
                 <!-- where = None -->
                 <!-- distinct = False -->
                 <SqlSelectStatementNode>
-                    <!-- description = "Pass Only Elements: ['metric_time__day',]" -->
+                    <!-- description = "Pass Only Elements: ['metric_time__day']" -->
                     <!-- node_id = NodeId(id_str='ss_200') -->
                     <!-- col0 =                                                -->
                     <!--   SqlSelectColumn(                                    -->
@@ -623,7 +623,7 @@ docstring:
                 <!-- where = None -->
                 <!-- distinct = False -->
                 <SqlSelectStatementNode>
-                    <!-- description = "Pass Only Elements: ['metric_time__day',]" -->
+                    <!-- description = "Pass Only Elements: ['metric_time__day']" -->
                     <!-- node_id = NodeId(id_str='ss_214') -->
                     <!-- col0 =                                                 -->
                     <!--   SqlSelectColumn(                                     -->

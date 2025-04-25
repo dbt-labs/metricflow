@@ -4,7 +4,7 @@ docstring:
   Group by items only queried with a filter on a custom grain, where that grain is also used in the group by.
 sql_engine: DuckDB
 ---
--- Pass Only Elements: ['listing__ds__alien_day',]
+-- Pass Only Elements: ['listing__ds__alien_day']
 SELECT
   subq_2.listing__ds__alien_day
 FROM (

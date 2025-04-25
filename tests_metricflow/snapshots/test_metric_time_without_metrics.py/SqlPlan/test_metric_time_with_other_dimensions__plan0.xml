@@ -432,7 +432,7 @@ test_filename: test_metric_time_without_metrics.py
                 </SqlTableNode>
             </SqlSelectStatementNode>
             <SqlSelectStatementNode>
-                <!-- description = "Pass Only Elements: ['metric_time__day',]" -->
+                <!-- description = "Pass Only Elements: ['metric_time__day']" -->
                 <!-- node_id = NodeId(id_str='ss_97') -->
                 <!-- col0 =                                                                                               -->
                 <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_24), column_alias='metric_time__day') -->
