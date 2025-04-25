@@ -49,7 +49,11 @@ ParseQueryResult(
           where_filter_intersection=PydanticWhereFilterIntersection(
             where_filters=[
               PydanticWhereFilter(
-                where_sql_template="{{ Dimension('booking__is_instant') }} = '1'",
+                where_sql_template=('{{ '
+                 "Dimension('booking__is_instant') "
+                 '}} '
+                 '= '
+                 "'1'"),
               ),
             ],
           ),
