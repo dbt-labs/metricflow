@@ -9,7 +9,7 @@ from typing import Dict
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from metricflow_semantics.mf_logging.pretty_print import mf_pformat_dict
+from metricflow_semantics.mf_logging.pretty_print import PrettyFormatDictOption, mf_pformat_dict
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from dbt_metricflow.cli.cli_configuration import CLIConfiguration
@@ -101,7 +101,9 @@ def test_multiple_queries(
             request=request,
             mf_test_configuration=mf_test_configuration,
             snapshot_id="result",
-            snapshot_str=mf_pformat_dict(obj_dict=result_dict, preserve_raw_strings=True),
+            snapshot_str=mf_pformat_dict(
+                obj_dict=result_dict, format_option=PrettyFormatDictOption(preserve_raw_strings=True)
+            ),
             expectation_description="2 results showing the`transactions` and `quick_buy_transactions` metrics.",
         )
 

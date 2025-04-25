@@ -6,7 +6,7 @@ from typing import Mapping, Sequence
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from metricflow_semantics.mf_logging.pretty_print import mf_pformat_dict
+from metricflow_semantics.mf_logging.pretty_print import PrettyFormatDictOption, mf_pformat_dict
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
@@ -71,7 +71,9 @@ def test_optimization_level(
         mf_test_configuration=mf_test_configuration,
         snapshot_id="result",
         snapshot_str=mf_pformat_dict(
-            description=None, obj_dict=results, preserve_raw_strings=True, pad_items_with_newlines=True
+            description=None,
+            obj_dict=results,
+            format_option=PrettyFormatDictOption(preserve_raw_strings=True, pad_items_with_newlines=True),
         ),
         expectation_description=f"The result for {SqlOptimizationLevel.O5} should be SQL uses a CTE.",
     )

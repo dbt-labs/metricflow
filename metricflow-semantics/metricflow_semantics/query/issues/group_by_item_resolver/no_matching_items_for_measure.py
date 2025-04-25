@@ -7,7 +7,7 @@ from typing import Sequence, Tuple
 from typing_extensions import override
 
 from metricflow_semantics.helpers.string_helpers import mf_indent
-from metricflow_semantics.mf_logging.pretty_print import mf_pformat
+from metricflow_semantics.mf_logging.pretty_print import PrettyFormatDictOption, mf_pformat
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow_semantics.query.issues.issues_base import (
     MetricFlowQueryIssueType,
@@ -55,7 +55,9 @@ class NoMatchingItemsForMeasure(MetricFlowQueryResolutionIssue):
         ]
 
         if len(self.suggestions) > 0:
-            lines.append(f"\nSuggestions:\n{mf_indent(mf_pformat(list(self.suggestions), max_line_length=80))}")
+            lines.append(
+                f"\nSuggestions:\n{mf_indent(mf_pformat(list(self.suggestions), format_option=PrettyFormatDictOption(max_line_length=80)))}"
+            )
         return "\n".join(lines)
 
     @override
