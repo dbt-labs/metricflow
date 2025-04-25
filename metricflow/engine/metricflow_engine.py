@@ -22,7 +22,11 @@ from metricflow_semantics.model.semantics.element_filter import LinkableElementF
 from metricflow_semantics.model.semantics.linkable_element import LinkableDimension
 from metricflow_semantics.model.semantics.semantic_model_helper import SemanticModelHelper
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
-from metricflow_semantics.protocols.query_parameter import GroupByParameter, MetricQueryParameter, OrderByQueryParameter
+from metricflow_semantics.protocols.query_parameter import (
+    GroupByQueryParameter,
+    MetricQueryParameter,
+    OrderByQueryParameter,
+)
 from metricflow_semantics.query.query_exceptions import InvalidQueryException
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.random_id import random_id
@@ -104,7 +108,7 @@ class MetricFlowQueryRequest:
     metric_names: Optional[Sequence[str]]
     metrics: Optional[Sequence[MetricQueryParameter]]
     group_by_names: Optional[Sequence[str]]
-    group_by: Optional[Tuple[GroupByParameter, ...]]
+    group_by: Optional[Tuple[GroupByQueryParameter, ...]]
     limit: Optional[int]
     time_constraint_start: Optional[datetime.datetime]
     time_constraint_end: Optional[datetime.datetime]
@@ -123,7 +127,7 @@ class MetricFlowQueryRequest:
         metric_names: Optional[Sequence[str]] = None,
         metrics: Optional[Sequence[MetricQueryParameter]] = None,
         group_by_names: Optional[Sequence[str]] = None,
-        group_by: Optional[Tuple[GroupByParameter, ...]] = None,
+        group_by: Optional[Tuple[GroupByQueryParameter, ...]] = None,
         limit: Optional[int] = None,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
@@ -292,7 +296,7 @@ class AbstractMetricFlowEngine(ABC):
         metric_names: Optional[List[str]] = None,
         metrics: Optional[Sequence[MetricQueryParameter]] = None,
         get_group_by_values: Optional[str] = None,
-        group_by: Optional[GroupByParameter] = None,
+        group_by: Optional[GroupByQueryParameter] = None,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
     ) -> MetricFlowExplainResult:
@@ -762,7 +766,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         metric_names: Optional[List[str]] = None,
         metrics: Optional[Sequence[MetricQueryParameter]] = None,
         get_group_by_values: Optional[str] = None,
-        group_by: Optional[GroupByParameter] = None,
+        group_by: Optional[GroupByQueryParameter] = None,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
         min_max_only: bool = False,

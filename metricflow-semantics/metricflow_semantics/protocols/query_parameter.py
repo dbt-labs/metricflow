@@ -85,15 +85,15 @@ class TimeDimensionQueryParameter(Protocol):  # noqa: D101
         raise NotImplementedError
 
 
-GroupByParameter = Union[DimensionOrEntityQueryParameter, TimeDimensionQueryParameter]
-InputOrderByParameter = Union[MetricQueryParameter, GroupByParameter]
+GroupByQueryParameter = Union[DimensionOrEntityQueryParameter, TimeDimensionQueryParameter]
+InputOrderByQueryParameter = Union[MetricQueryParameter, GroupByQueryParameter]
 
 
 class OrderByQueryParameter(Protocol):
     """Parameter to order by, specifying ascending or descending."""
 
     @property
-    def order_by(self) -> InputOrderByParameter:
+    def order_by(self) -> InputOrderByQueryParameter:
         """Parameter to order results by."""
         raise NotImplementedError
 

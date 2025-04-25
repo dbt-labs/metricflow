@@ -25,7 +25,7 @@ from metricflow_semantics.naming.dunder_scheme import DunderNamingScheme
 from metricflow_semantics.naming.metric_scheme import MetricNamingScheme
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow_semantics.protocols.query_parameter import (
-    GroupByParameter,
+    GroupByQueryParameter,
     MetricQueryParameter,
     OrderByQueryParameter,
     SavedQueryParameter,
@@ -311,7 +311,7 @@ class MetricFlowQueryParser:
         metric_names: Optional[Sequence[str]] = None,
         metrics: Optional[Sequence[MetricQueryParameter]] = None,
         group_by_names: Optional[Sequence[str]] = None,
-        group_by: Optional[Tuple[GroupByParameter, ...]] = None,
+        group_by: Optional[Tuple[GroupByQueryParameter, ...]] = None,
         limit: Optional[int] = None,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
@@ -350,7 +350,7 @@ class MetricFlowQueryParser:
         metric_names: Optional[Sequence[str]],
         metrics: Optional[Sequence[MetricQueryParameter]],
         group_by_names: Optional[Sequence[str]],
-        group_by: Optional[Tuple[GroupByParameter, ...]],
+        group_by: Optional[Tuple[GroupByQueryParameter, ...]],
         limit: Optional[int],
         time_constraint_start: Optional[datetime.datetime],
         time_constraint_end: Optional[datetime.datetime],
@@ -492,11 +492,7 @@ class MetricFlowQueryParser:
         )
 
         resolver_inputs_for_order_by: List[ResolverInputForOrderByItem] = []
-        resolver_inputs_for_order_by.extend(
-            self._parse_order_by_names(
-                order_by_names=order_by_names,
-            )
-        )
+        resolver_inputs_for_order_by.extend(self._parse_order_by_names(order_by_names=order_by_names))
         resolver_inputs_for_order_by.extend(self._parse_order_by(order_by=order_by))
 
         resolver_input_for_limit = ResolverInputForLimit(limit=limit)

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Union
 
 from dbt_semantic_interfaces.protocols import ProtocolHint
 from dbt_semantic_interfaces.references import EntityReference
@@ -14,7 +14,6 @@ from metricflow_semantics.naming.metric_scheme import MetricNamingScheme
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow_semantics.protocols.query_parameter import (
     DimensionOrEntityQueryParameter,
-    InputOrderByParameter,
     MetricQueryParameter,
     OrderByQueryParameter,
     TimeDimensionQueryParameter,
@@ -137,11 +136,14 @@ class MetricParameter(ProtocolHint[MetricQueryParameter]):
     ) -> ResolverInputForMetric:
         naming_scheme = MetricNamingScheme()
         return ResolverInputForMetric(
-            input_obj=self,
+            input_obj=self.with_alias(None),
             naming_scheme=naming_scheme,
             spec_pattern=naming_scheme.spec_pattern(self.name, semantic_manifest_lookup=semantic_manifest_lookup),
             alias=self.alias,
         )
+
+
+InputOrderByParameter = Union[MetricParameter, DimensionOrEntityParameter, TimeDimensionParameter]
 
 
 @dataclass(frozen=True)
