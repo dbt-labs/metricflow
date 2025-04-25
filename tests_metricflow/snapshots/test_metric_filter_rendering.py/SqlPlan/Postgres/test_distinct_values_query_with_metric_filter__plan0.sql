@@ -4,7 +4,7 @@ docstring:
   Tests a distinct values query with a metric in the query-level where filter.
 sql_engine: Postgres
 ---
--- Pass Only Elements: ['listing',]
+-- Pass Only Elements: ['listing']
 SELECT
   subq_11.listing
 FROM (

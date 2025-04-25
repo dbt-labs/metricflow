@@ -9,7 +9,7 @@ SELECT
   , subq_14.bookings AS bookings_join_to_time_spine_with_tiered_filters
 FROM (
   -- Constrain Output with WHERE
-  -- Pass Only Elements: ['booking__ds__day',]
+  -- Pass Only Elements: ['booking__ds__day']
   SELECT
     booking__ds__day
   FROM (

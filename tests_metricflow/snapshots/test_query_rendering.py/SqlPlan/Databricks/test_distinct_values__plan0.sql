@@ -8,7 +8,7 @@ sql_engine: Databricks
 SELECT
   subq_2.listing__country_latest
 FROM (
-  -- Pass Only Elements: ['listing__country_latest',]
+  -- Pass Only Elements: ['listing__country_latest']
   SELECT
     subq_1.listing__country_latest
   FROM (

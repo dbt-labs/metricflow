@@ -5,7 +5,7 @@ docstring:
 sql_engine: BigQuery
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['bookers',]
+-- Pass Only Elements: ['bookers']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 WITH sma_28009_cte AS (

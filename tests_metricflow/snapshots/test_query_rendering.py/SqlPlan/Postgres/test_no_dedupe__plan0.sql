@@ -181,7 +181,7 @@ FROM (
       FROM ***************************.dim_listings listings_src_26000
     ) subq_0
     CROSS JOIN (
-      -- Pass Only Elements: ['metric_time__month',]
+      -- Pass Only Elements: ['metric_time__month']
       SELECT
         subq_2.metric_time__month
       FROM (

@@ -12,7 +12,7 @@ FROM (
   SELECT
     SUM(subq_21.listings) AS listings
   FROM (
-    -- Pass Only Elements: ['listings',]
+    -- Pass Only Elements: ['listings']
     SELECT
       subq_20.listings
     FROM (

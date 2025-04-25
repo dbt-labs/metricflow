@@ -2,7 +2,7 @@ test_name: test_no_metric_custom_granularity_non_metric_time
 test_filename: test_custom_granularity.py
 sql_engine: BigQuery
 ---
--- Pass Only Elements: ['booking__ds__alien_day',]
+-- Pass Only Elements: ['booking__ds__alien_day']
 SELECT
   subq_1.booking__ds__alien_day
 FROM (

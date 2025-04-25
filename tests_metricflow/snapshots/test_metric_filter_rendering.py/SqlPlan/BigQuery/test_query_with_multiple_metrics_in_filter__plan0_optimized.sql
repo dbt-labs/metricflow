@@ -5,7 +5,7 @@ docstring:
 sql_engine: BigQuery
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['listings',]
+-- Pass Only Elements: ['listings']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 WITH sma_28009_cte AS (

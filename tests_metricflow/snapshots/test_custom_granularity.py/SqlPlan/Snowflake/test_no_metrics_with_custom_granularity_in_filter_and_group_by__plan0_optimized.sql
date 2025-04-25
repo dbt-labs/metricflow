@@ -5,7 +5,7 @@ docstring:
 sql_engine: Snowflake
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['listing__ds__alien_day',]
+-- Pass Only Elements: ['listing__ds__alien_day']
 SELECT
   listing__ds__alien_day
 FROM (

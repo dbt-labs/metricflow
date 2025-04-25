@@ -20,7 +20,7 @@ SELECT
   CAST(MAX(subq_26.buys_month) AS DOUBLE PRECISION) / CAST(NULLIF(MAX(subq_17.visits), 0) AS DOUBLE PRECISION) AS visit_buy_conversion_rate_with_monthly_conversion
 FROM (
   -- Read From CTE For node_id=sma_28019
-  -- Pass Only Elements: ['visits',]
+  -- Pass Only Elements: ['visits']
   -- Aggregate Measures
   SELECT
     SUM(visits) AS visits
@@ -28,7 +28,7 @@ FROM (
 ) subq_17
 CROSS JOIN (
   -- Find conversions for user within the range of 1 month
-  -- Pass Only Elements: ['buys_month',]
+  -- Pass Only Elements: ['buys_month']
   -- Aggregate Measures
   SELECT
     SUM(buys_month) AS buys_month

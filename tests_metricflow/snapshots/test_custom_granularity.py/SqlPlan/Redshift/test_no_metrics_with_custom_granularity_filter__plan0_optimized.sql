@@ -5,7 +5,7 @@ docstring:
 sql_engine: Redshift
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['listing__ds__day',]
+-- Pass Only Elements: ['listing__ds__day']
 SELECT
   listing__ds__day
 FROM (

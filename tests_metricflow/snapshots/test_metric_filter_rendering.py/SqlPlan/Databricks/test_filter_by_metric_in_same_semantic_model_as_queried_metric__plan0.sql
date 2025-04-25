@@ -12,7 +12,7 @@ FROM (
   SELECT
     COUNT(DISTINCT subq_12.bookers) AS bookers
   FROM (
-    -- Pass Only Elements: ['bookers',]
+    -- Pass Only Elements: ['bookers']
     SELECT
       subq_11.bookers
     FROM (

@@ -20,7 +20,7 @@ SELECT
   CAST(MAX(subq_30.buys) AS DOUBLE PRECISION) / CAST(NULLIF(MAX(subq_20.visits), 0) AS DOUBLE PRECISION) AS visit_buy_conversion_rate
 FROM (
   -- Constrain Output with WHERE
-  -- Pass Only Elements: ['visits',]
+  -- Pass Only Elements: ['visits']
   -- Aggregate Measures
   SELECT
     SUM(visits) AS visits
@@ -35,7 +35,7 @@ FROM (
 ) subq_20
 CROSS JOIN (
   -- Find conversions for user within the range of INF
-  -- Pass Only Elements: ['buys',]
+  -- Pass Only Elements: ['buys']
   -- Aggregate Measures
   SELECT
     SUM(buys) AS buys

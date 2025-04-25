@@ -12,7 +12,7 @@ FROM (
     subq_9.metric_time__alien_day AS metric_time__alien_day
     , subq_5.bookings AS bookings
   FROM (
-    -- Pass Only Elements: ['metric_time__alien_day',]
+    -- Pass Only Elements: ['metric_time__alien_day']
     SELECT
       subq_8.metric_time__alien_day
     FROM (

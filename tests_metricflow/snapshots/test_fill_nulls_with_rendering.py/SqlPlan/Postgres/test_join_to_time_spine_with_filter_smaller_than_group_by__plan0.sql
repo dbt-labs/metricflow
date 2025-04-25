@@ -12,7 +12,7 @@ FROM (
     subq_8.metric_time__day AS metric_time__day
     , subq_4.archived_users AS archived_users
   FROM (
-    -- Pass Only Elements: ['metric_time__day',]
+    -- Pass Only Elements: ['metric_time__day']
     SELECT
       subq_7.metric_time__day
     FROM (

@@ -5,7 +5,7 @@ docstring:
 sql_engine: Redshift
 ---
 -- Join on MIN(ds_month) and [] grouping by None
--- Pass Only Elements: ['total_account_balance_first_day_of_month',]
+-- Pass Only Elements: ['total_account_balance_first_day_of_month']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT

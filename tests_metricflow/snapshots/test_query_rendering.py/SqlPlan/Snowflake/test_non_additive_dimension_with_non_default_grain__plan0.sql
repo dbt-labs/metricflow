@@ -12,7 +12,7 @@ FROM (
   SELECT
     SUM(subq_5.total_account_balance_first_day_of_month) AS total_account_balance_first_day_of_month
   FROM (
-    -- Pass Only Elements: ['total_account_balance_first_day_of_month',]
+    -- Pass Only Elements: ['total_account_balance_first_day_of_month']
     SELECT
       subq_4.total_account_balance_first_day_of_month
     FROM (

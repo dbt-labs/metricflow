@@ -3,7 +3,7 @@ test_filename: test_metric_filter_rendering.py
 sql_engine: Redshift
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['listings',]
+-- Pass Only Elements: ['listings']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 WITH sma_28019_cte AS (

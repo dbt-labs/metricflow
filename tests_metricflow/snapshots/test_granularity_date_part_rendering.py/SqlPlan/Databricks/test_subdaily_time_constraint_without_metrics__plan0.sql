@@ -2,7 +2,7 @@ test_name: test_subdaily_time_constraint_without_metrics
 test_filename: test_granularity_date_part_rendering.py
 sql_engine: Databricks
 ---
--- Pass Only Elements: ['metric_time__second',]
+-- Pass Only Elements: ['metric_time__second']
 SELECT
   subq_2.metric_time__second
 FROM (

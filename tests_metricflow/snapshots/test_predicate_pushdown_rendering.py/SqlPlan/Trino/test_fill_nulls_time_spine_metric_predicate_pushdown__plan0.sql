@@ -31,7 +31,7 @@ FROM (
         , subq_8.listing__country_latest AS listing__country_latest
         , subq_8.bookings AS bookings
       FROM (
-        -- Pass Only Elements: ['metric_time__day',]
+        -- Pass Only Elements: ['metric_time__day']
         SELECT
           subq_10.metric_time__day
         FROM (
@@ -644,7 +644,7 @@ FROM (
         , subq_24.listing__country_latest AS listing__country_latest
         , subq_24.bookings AS bookings
       FROM (
-        -- Pass Only Elements: ['metric_time__day',]
+        -- Pass Only Elements: ['metric_time__day']
         SELECT
           subq_26.metric_time__day
         FROM (
@@ -999,7 +999,7 @@ FROM (
                   , subq_14.approximate_continuous_booking_value_p99 AS approximate_continuous_booking_value_p99
                   , subq_14.approximate_discrete_booking_value_p99 AS approximate_discrete_booking_value_p99
                 FROM (
-                  -- Pass Only Elements: ['metric_time__day',]
+                  -- Pass Only Elements: ['metric_time__day']
                   SELECT
                     subq_16.metric_time__day
                   FROM (

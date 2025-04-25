@@ -4,7 +4,7 @@ sql_engine: Snowflake
 ---
 -- Read Elements From Semantic Model 'bookings_source'
 -- Join to Custom Granularity Dataset
--- Pass Only Elements: ['booking__ds__alien_day',]
+-- Pass Only Elements: ['booking__ds__alien_day']
 SELECT
   subq_2.alien_day AS booking__ds__alien_day
 FROM ***************************.fct_bookings bookings_source_src_28000

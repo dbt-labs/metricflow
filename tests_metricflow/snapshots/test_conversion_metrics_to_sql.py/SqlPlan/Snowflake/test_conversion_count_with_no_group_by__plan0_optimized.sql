@@ -20,7 +20,7 @@ SELECT
   COALESCE(MAX(subq_26.buys), 0) AS visit_buy_conversions
 FROM (
   -- Read From CTE For node_id=sma_28019
-  -- Pass Only Elements: ['visits',]
+  -- Pass Only Elements: ['visits']
   -- Aggregate Measures
   SELECT
     SUM(visits) AS visits
@@ -28,7 +28,7 @@ FROM (
 ) subq_17
 CROSS JOIN (
   -- Find conversions for user within the range of 7 day
-  -- Pass Only Elements: ['buys',]
+  -- Pass Only Elements: ['buys']
   -- Aggregate Measures
   SELECT
     SUM(buys) AS buys

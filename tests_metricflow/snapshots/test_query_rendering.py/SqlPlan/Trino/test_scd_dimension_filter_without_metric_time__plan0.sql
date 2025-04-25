@@ -10,7 +10,7 @@ FROM (
   SELECT
     SUM(subq_6.bookings) AS bookings
   FROM (
-    -- Pass Only Elements: ['bookings',]
+    -- Pass Only Elements: ['bookings']
     SELECT
       subq_5.bookings
     FROM (

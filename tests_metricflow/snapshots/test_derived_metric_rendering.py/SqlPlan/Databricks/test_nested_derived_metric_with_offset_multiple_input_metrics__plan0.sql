@@ -18,7 +18,7 @@ FROM (
       subq_8.metric_time__day AS metric_time__day
       , subq_5.booking_fees_start_of_month AS booking_fees_start_of_month
     FROM (
-      -- Pass Only Elements: ['metric_time__day',]
+      -- Pass Only Elements: ['metric_time__day']
       SELECT
         subq_7.metric_time__day
       FROM (

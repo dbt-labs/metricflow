@@ -4,7 +4,7 @@ docstring:
   Tests querying only metric time.
 sql_engine: Databricks
 ---
--- Pass Only Elements: ['metric_time__day',]
+-- Pass Only Elements: ['metric_time__day']
 SELECT
   subq_1.metric_time__day
 FROM (
