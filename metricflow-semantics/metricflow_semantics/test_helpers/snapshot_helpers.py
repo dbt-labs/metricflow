@@ -14,7 +14,7 @@ import tabulate
 from _pytest.fixtures import FixtureRequest
 
 from metricflow_semantics.dag.mf_dag import MetricFlowDag
-from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
@@ -56,7 +56,7 @@ def assert_snapshot_text_equal(
     expectation_description: Optional[str] = None,
 ) -> None:
     """Similar to assert_plan_snapshot_text_equal(), but with more controls on how the snapshot paths are generated."""
-    logger.debug(LazyFormat(lambda: "Generated snapshot text:\n" + indent(snapshot_text)))
+    logger.debug(LazyFormat(lambda: "Generated snapshot text:\n" + mf_indent(snapshot_text)))
     file_path = (
         str(
             snapshot_path_prefix(
@@ -82,13 +82,13 @@ def assert_snapshot_text_equal(
     ]
     if test_doc_string is not None:
         header_lines.append("docstring:")
-        header_lines.append(indent(test_doc_string.rstrip()))
+        header_lines.append(mf_indent(test_doc_string.rstrip()))
     if additional_header_fields is not None:
         for header_field_name, header_field_value in additional_header_fields.items():
             header_lines.append(f"{header_field_name}: {header_field_value}")
     if expectation_description is not None:
         header_lines.append(f"{SNAPSHOT_EXPECTATION_DESCRIPTION}:")
-        header_lines.append(indent(expectation_description))
+        header_lines.append(mf_indent(expectation_description))
     header_lines.append("---")
 
     snapshot_text = "\n".join(header_lines) + "\n" + snapshot_text

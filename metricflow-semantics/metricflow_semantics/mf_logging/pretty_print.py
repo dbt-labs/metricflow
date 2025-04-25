@@ -6,7 +6,7 @@ from dataclasses import fields, is_dataclass
 from enum import Enum
 from typing import Any, Dict, List, Mapping, Optional, Sized, Tuple, Union
 
-from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
 
 logger = logging.getLogger(__name__)
@@ -101,7 +101,7 @@ class MetricFlowPrettyFormatter:
         item_block = ",\n".join(items_as_str) + ","
         # Indent the item_block
         if len(item_block) > 0:
-            lines.append(indent(item_block, indent_prefix=self._indent_prefix))
+            lines.append(mf_indent(item_block, indent_prefix=self._indent_prefix))
         lines.append(right_enclose_str)
         return "\n".join(lines)
 
@@ -145,7 +145,7 @@ class MetricFlowPrettyFormatter:
             result_items_without_limit.append(key_value_seperator)
             result_items_without_limit.append(self._handle_any_obj(value, remaining_line_width=None))
 
-            result_without_limit = indent("".join(result_items_without_limit), indent_prefix=self._indent_prefix)
+            result_without_limit = mf_indent("".join(result_items_without_limit), indent_prefix=self._indent_prefix)
             if remaining_line_width is None or len(result_without_limit) <= remaining_line_width:
                 return result_without_limit
 
@@ -221,7 +221,7 @@ class MetricFlowPrettyFormatter:
             result_lines[-1] = result_lines[-1] + value_lines[0]
             result_lines.extend(value_lines[1:])
 
-        return indent("\n".join(result_lines), indent_prefix=self._indent_prefix)
+        return mf_indent("\n".join(result_lines), indent_prefix=self._indent_prefix)
 
     def _handle_mapping_like_obj(
         self,
@@ -474,7 +474,7 @@ def mf_pformat_dict(  # type: ignore
         if "\n" in value_str:
             item_section_lines = (
                 f"{key}:",
-                indent(
+                mf_indent(
                     value_str,
                     indent_prefix=indent_prefix,
                 ),
@@ -486,7 +486,7 @@ def mf_pformat_dict(  # type: ignore
         if description is None:
             item_sections.append(item_section)
         else:
-            item_sections.append(indent(item_section))
+            item_sections.append(mf_indent(item_section))
 
     result_as_one_line = _as_one_line(
         description=description, str_converted_dict=str_converted_dict, max_line_length=max_line_length

@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, Collection, List, Optional
 import jinja2
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.sql.sql_exprs import (
     SqlAddTimeExpression,
@@ -404,7 +404,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         elif len(partition_by_args_rendered) > 1:
             window_string_lines.append("PARTITION BY")
             window_string_lines.append(
-                indent(
+                mf_indent(
                     "\n, ".join([x.sql for x in partition_by_args_rendered]),
                     indent_prefix=SqlRenderingConstants.INDENT,
                 )
@@ -417,7 +417,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         elif len(order_by_args_rendered) > 1:
             window_string_lines.append("ORDER BY")
             window_string_lines.append(
-                indent(
+                mf_indent(
                     "\n, ".join(
                         [
                             rendered_result.sql + (f" {order_by_arg.suffix}" if order_by_arg.suffix else "")
@@ -439,7 +439,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
                 bind_parameter_set=combined_params,
             )
         else:
-            indented_window_string = indent(window_string, indent_prefix=SqlRenderingConstants.INDENT)
+            indented_window_string = mf_indent(window_string, indent_prefix=SqlRenderingConstants.INDENT)
             return SqlExpressionRenderResult(
                 sql=f"{node.sql_function.value}({sql_function_args_string}) OVER (\n{indented_window_string}\n)",
                 bind_parameter_set=combined_params,
@@ -454,14 +454,14 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
     def visit_case_expr(self, node: SqlCaseExpression) -> SqlExpressionRenderResult:  # noqa: D102
         sql = "CASE\n"
         for when, then in node.when_to_then_exprs.items():
-            sql += indent(
+            sql += mf_indent(
                 f"WHEN {self.render_sql_expr(when).sql}\n", indent_prefix=SqlRenderingConstants.INDENT
-            ) + indent(
+            ) + mf_indent(
                 f"THEN {self.render_sql_expr(then).sql}\n",
                 indent_prefix=SqlRenderingConstants.INDENT * 2,
             )
         if node.else_expr:
-            sql += indent(
+            sql += mf_indent(
                 f"ELSE {self.render_sql_expr(node.else_expr).sql}\n",
                 indent_prefix=SqlRenderingConstants.INDENT,
             )

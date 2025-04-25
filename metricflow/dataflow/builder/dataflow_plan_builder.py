@@ -22,7 +22,7 @@ from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.errors.custom_grain_not_supported import error_if_not_standard_grain
 from metricflow_semantics.errors.error_classes import UnableToSatisfyQueryError
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
-from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.mf_logging.runtime import log_runtime
@@ -236,7 +236,7 @@ class DataflowPlanBuilder:
                 logger.debug(
                     LazyFormat(
                         lambda: f"After applying optimizer {optimizer.__class__.__name__}, the dataflow plan is:\n"
-                        f"{indent(plan.structure_text())}"
+                        f"{mf_indent(plan.structure_text())}"
                     )
                 )
             except Exception:
@@ -551,9 +551,9 @@ class DataflowPlanBuilder:
         )
         logger.debug(
             LazyFormat(
-                lambda: f"For\n{indent(mf_pformat(metric_spec))}"
+                lambda: f"For\n{mf_indent(mf_pformat(metric_spec))}"
                 f"\nneeded measure is:"
-                f"\n{indent(mf_pformat(metric_input_measure_spec))}"
+                f"\n{mf_indent(mf_pformat(metric_input_measure_spec))}"
             )
         )
 
@@ -751,7 +751,9 @@ class DataflowPlanBuilder:
         output_nodes: List[DataflowPlanNode] = []
 
         for metric_spec in metric_specs:
-            logger.debug(LazyFormat(lambda: f"Generating compute metrics node for:\n{indent(mf_pformat(metric_spec))}"))
+            logger.debug(
+                LazyFormat(lambda: f"Generating compute metrics node for:\n{mf_indent(mf_pformat(metric_spec))}")
+            )
             self._metric_lookup.get_metric(metric_spec.reference)
 
             output_nodes.append(
@@ -1160,16 +1162,16 @@ class DataflowPlanBuilder:
                     logger.debug(
                         LazyFormat(
                             lambda: f"Skipping evaluation for:\n"
-                            f"{indent(node.structure_text())}"
+                            f"{mf_indent(node.structure_text())}"
                             f"since it does not have all of the measure specs:\n"
-                            f"{indent(mf_pformat(missing_specs))}"
+                            f"{mf_indent(mf_pformat(missing_specs))}"
                         )
                     )
                     continue
 
             logger.debug(
                 LazyFormat(
-                    lambda: f"Evaluating candidate node for the left side of the join:\n{indent(mf_pformat(node.structure_text()))}"
+                    lambda: f"Evaluating candidate node for the left side of the join:\n{mf_indent(mf_pformat(node.structure_text()))}"
                 )
             )
 
@@ -1184,8 +1186,8 @@ class DataflowPlanBuilder:
             logger.debug(
                 LazyFormat(
                     lambda: "Evaluation for source node:"
-                    + indent(f"\nnode:\n{indent(node.structure_text())}")
-                    + indent(f"\nevaluation:\n{indent(mf_pformat(evaluation))}")
+                    + mf_indent(f"\nnode:\n{mf_indent(node.structure_text())}")
+                    + mf_indent(f"\nevaluation:\n{mf_indent(mf_pformat(evaluation))}")
                 )
             )
 
@@ -1227,9 +1229,9 @@ class DataflowPlanBuilder:
             logger.debug(
                 LazyFormat(
                     lambda: "Lowest cost plan is:"
-                    + indent(f"\nnode:\n{indent(node_with_lowest_cost_plan.structure_text())}")
-                    + indent(f"\nevaluation:\n{indent(mf_pformat(evaluation))}")
-                    + indent(f"\njoins: {len(node_to_evaluation[node_with_lowest_cost_plan].join_recipes)}")
+                    + mf_indent(f"\nnode:\n{mf_indent(node_with_lowest_cost_plan.structure_text())}")
+                    + mf_indent(f"\nevaluation:\n{mf_indent(mf_pformat(evaluation))}")
+                    + mf_indent(f"\njoins: {len(node_to_evaluation[node_with_lowest_cost_plan].join_recipes)}")
                 )
             )
 
@@ -1740,8 +1742,8 @@ class DataflowPlanBuilder:
             logger.debug(
                 LazyFormat(
                     lambda: "Looking for a recipe to get:"
-                    + indent(f"\nmeasure_specs:\n{mf_pformat([measure_spec])}")
-                    + indent(f"\nevaluation:\n{mf_pformat(required_linkable_specs)}")
+                    + mf_indent(f"\nmeasure_specs:\n{mf_pformat([measure_spec])}")
+                    + mf_indent(f"\nevaluation:\n{mf_pformat(required_linkable_specs)}")
                 )
             )
             measure_time_constraint = (
@@ -1772,7 +1774,7 @@ class DataflowPlanBuilder:
                 )
             )
 
-        logger.debug(LazyFormat(lambda: f"Using recipe:\n{indent(mf_pformat(measure_recipe))}"))
+        logger.debug(LazyFormat(lambda: f"Using recipe:\n{mf_indent(mf_pformat(measure_recipe))}"))
 
         if measure_recipe is None:
             raise UnableToSatisfyQueryError(

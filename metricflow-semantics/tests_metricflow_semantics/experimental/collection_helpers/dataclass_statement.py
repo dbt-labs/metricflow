@@ -5,8 +5,7 @@ from dataclasses import dataclass
 from enum import Enum
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from metricflow_semantics.formatting.formatting_helpers import mf_dedent
-from metricflow_semantics.helpers.string_helpers import mf_newline_join
+from metricflow_semantics.helpers.string_helpers import mf_dedent, mf_newline_join
 
 
 class DataclassType(Enum):

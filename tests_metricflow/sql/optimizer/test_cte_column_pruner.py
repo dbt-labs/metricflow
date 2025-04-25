@@ -4,7 +4,7 @@ import logging
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from metricflow_semantics.formatting.formatting_helpers import mf_dedent
+from metricflow_semantics.helpers.string_helpers import mf_dedent
 from metricflow_semantics.sql.sql_exprs import (
     SqlColumnReference,
     SqlColumnReferenceExpression,

@@ -10,7 +10,7 @@ from dbt_semantic_interfaces.references import SemanticModelReference, TimeDimen
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from typing_extensions import override
 
-from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
@@ -115,9 +115,9 @@ class GroupByItemResolver:
         logger.debug(
             LazyFormat(
                 lambda: f"Spec pattern:\n"
-                f"{indent(mf_pformat(spec_pattern))}\n"
+                f"{mf_indent(mf_pformat(spec_pattern))}\n"
                 f"was resolved to:\n"
-                f"{indent(mf_pformat(push_down_result.candidate_set.specs))}"
+                f"{mf_indent(mf_pformat(push_down_result.candidate_set.specs))}"
             )
         )
         if push_down_result.candidate_set.num_candidates > 1:
@@ -255,6 +255,6 @@ class GroupByItemResolver:
             raise RuntimeError(
                 f"The grain for {repr(METRIC_TIME_ELEMENT_NAME)} could not be resolved. Got spec "
                 f"{metric_time_grain_resolution.spec} and issues:\n\n"
-                f"{indent(mf_pformat(metric_time_grain_resolution.issue_set))}"
+                f"{mf_indent(mf_pformat(metric_time_grain_resolution.issue_set))}"
             )
         return metric_time_spec_set.time_dimension_specs[0].time_granularity.base_granularity

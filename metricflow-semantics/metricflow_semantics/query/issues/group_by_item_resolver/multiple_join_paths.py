@@ -5,7 +5,7 @@ from typing import Sequence
 
 from typing_extensions import override
 
-from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow_semantics.query.group_by_item.candidate_push_down.group_by_item_candidate import GroupByItemCandidateSet
@@ -55,7 +55,7 @@ class MultipleMatchIssue(MetricFlowQueryResolutionIssue):
 
         return (
             f"The given input matches multiple group-by-items for {last_path_item.ui_description}:\n\n"
-            f"{indent(mf_pformat(specs_as_strs))}\n\n"
+            f"{mf_indent(mf_pformat(specs_as_strs))}\n\n"
             f"Please use a more specific input to resolve the ambiguity."
         )
 

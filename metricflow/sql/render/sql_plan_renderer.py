@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from string import Template
 from typing import List, Optional, Sequence
 
-from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.sql.sql_exprs import SqlExpressionNode
 from typing_extensions import override
@@ -91,7 +91,7 @@ class DefaultSqlPlanRenderer(SqlPlanRenderer):
         collected_bind_parameters = []
         lines.append(f"{node.cte_alias} AS (")
         select_statement_render_result = node.select_statement.accept(self)
-        lines.append(indent(select_statement_render_result.sql, indent_prefix=SqlRenderingConstants.INDENT))
+        lines.append(mf_indent(select_statement_render_result.sql, indent_prefix=SqlRenderingConstants.INDENT))
         collected_bind_parameters.append(select_statement_render_result.bind_parameter_set)
         lines.append(")")
 
@@ -165,10 +165,10 @@ class DefaultSqlPlanRenderer(SqlPlanRenderer):
 
             if first_column:
                 first_column = False
-                select_section_lines.append(indent(column_select_str, indent_prefix=SqlRenderingConstants.INDENT))
+                select_section_lines.append(mf_indent(column_select_str, indent_prefix=SqlRenderingConstants.INDENT))
             else:
                 select_section_lines.append(
-                    indent(", " + column_select_str, indent_prefix=SqlRenderingConstants.INDENT)
+                    mf_indent(", " + column_select_str, indent_prefix=SqlRenderingConstants.INDENT)
                 )
 
         return SqlPlanRenderResult("\n".join(select_section_lines), params)
@@ -192,7 +192,7 @@ class DefaultSqlPlanRenderer(SqlPlanRenderer):
             from_section_lines.append(f"FROM {from_render_result.sql} {from_source_alias}")
         else:
             from_section_lines.append("FROM (")
-            from_section_lines.append(indent(from_render_result.sql, indent_prefix=SqlRenderingConstants.INDENT))
+            from_section_lines.append(mf_indent(from_render_result.sql, indent_prefix=SqlRenderingConstants.INDENT))
             from_section_lines.append(f") {from_source_alias}")
         from_section = "\n".join(from_section_lines)
 
@@ -366,7 +366,7 @@ class DefaultSqlPlanRenderer(SqlPlanRenderer):
                 )
                 """
             ).rstrip()
-        ).substitute({"inner_sql": indent(inner_sql, indent_prefix=SqlRenderingConstants.INDENT)})
+        ).substitute({"inner_sql": mf_indent(inner_sql, indent_prefix=SqlRenderingConstants.INDENT)})
 
         return SqlPlanRenderResult(
             sql=sql,

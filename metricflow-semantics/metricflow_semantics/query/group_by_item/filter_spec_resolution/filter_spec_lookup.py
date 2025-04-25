@@ -14,7 +14,7 @@ from dbt_semantic_interfaces.protocols import WhereFilterIntersection
 from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.merger import Mergeable
-from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantics.linkable_element import LinkableElement
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
@@ -70,9 +70,9 @@ class FilterSpecResolutionLookUp(Mergeable):
             raise RuntimeError(
                 f"Unable to find a resolved spec.\n\n"
                 f"Expected 1 resolution for:\n\n"
-                f"{indent(mf_pformat(resolved_spec_lookup_key))}\n\n"
+                f"{mf_indent(mf_pformat(resolved_spec_lookup_key))}\n\n"
                 f"but did not find any. All resolutions are:\n\n"
-                f"{indent(mf_pformat(self.spec_resolutions))}"
+                f"{mf_indent(mf_pformat(self.spec_resolutions))}"
             )
 
         # There may be multiple resolutions that match a given key because it's possible the same metric / filter is

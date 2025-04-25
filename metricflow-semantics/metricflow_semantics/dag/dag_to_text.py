@@ -8,7 +8,7 @@ import typing
 from contextlib import contextmanager
 from typing import Iterator, Optional
 
-from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.helpers.string_helpers import mf_indent
 
 if typing.TYPE_CHECKING:
     from metricflow_semantics.dag.mf_dag import DagNode, DagNodeT, DisplayedProperty, MetricFlowDag
@@ -139,9 +139,9 @@ class MetricFlowDagTextFormatter:
 
         lines = [f"<{node_class}>"]
         for line in node_fields:
-            lines.append(indent(line, indent_prefix=self._node_parent_indent_prefix))
+            lines.append(mf_indent(line, indent_prefix=self._node_parent_indent_prefix))
         if inner_contents:
-            lines.append(indent(inner_contents, indent_prefix=self._node_parent_indent_prefix))
+            lines.append(mf_indent(inner_contents, indent_prefix=self._node_parent_indent_prefix))
         lines.append(f"</{node_class}>")
         return "\n".join(lines)
 
@@ -179,7 +179,7 @@ class MetricFlowDagTextFormatter:
 
             lines = [f"<{node_class}>"]
             for line in component_from_sink_nodes_as_text:
-                lines.append(indent(line, indent_prefix=self._node_parent_indent_prefix))
+                lines.append(mf_indent(line, indent_prefix=self._node_parent_indent_prefix))
             lines.append(f"</{node_class}>")
 
             return "\n".join(lines)
