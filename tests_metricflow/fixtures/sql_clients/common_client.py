@@ -1,11 +1,10 @@
 from __future__ import annotations
 
+from enum import Enum
 from typing import Optional, TypeVar
 
-from dbt_semantic_interfaces.enum_extension import ExtendedEnum
 
-
-class SqlDialect(ExtendedEnum):
+class SqlDialect(Enum):
     """All SQL dialects that MQL currently supports. Value of enum is used in URLs as the dialect."""
 
     DUCKDB = "duckdb"

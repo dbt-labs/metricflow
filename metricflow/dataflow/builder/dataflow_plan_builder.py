@@ -790,7 +790,7 @@ class DataflowPlanBuilder:
     ) -> DataflowPlan:
         assert not query_spec.metric_specs, "Can't build distinct values plan with metrics."
         query_level_filter_specs: Sequence[WhereFilterSpec] = ()
-        if query_spec.filter_intersection is not None and len(query_spec.filter_intersection.where_filters) > 0:
+        if len(query_spec.filter_intersection.where_filters) > 0:
             filter_spec_factory = WhereSpecFactory(
                 column_association_resolver=self._column_association_resolver,
                 spec_resolution_lookup=query_spec.filter_spec_resolution_lookup
