@@ -56,6 +56,10 @@ class InstanceSpec(SerializableDataclass):
         """Return the instance spec without any filtering (for comparison purposes)."""
         return self
 
+    def with_alias(self, alias: Optional[str]) -> InstanceSpec:
+        """Return the instance spec without any aliases."""
+        return self
+
 
 class InstanceSpecVisitor(Generic[VisitorOutputT], ABC):
     """Visitor for the InstanceSpec classes."""

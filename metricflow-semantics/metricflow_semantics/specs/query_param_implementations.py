@@ -54,7 +54,7 @@ class TimeDimensionParameter(ProtocolHint[TimeDimensionQueryParameter]):
         )
 
         return ResolverInputForGroupByItem(
-            input_obj=self,
+            input_obj=self.with_alias(None),
             input_obj_naming_scheme=ObjectBuilderNamingScheme(),
             spec_pattern=EntityLinkPattern(
                 SpecPatternParameterSet.from_parameters(
@@ -69,6 +69,10 @@ class TimeDimensionParameter(ProtocolHint[TimeDimensionQueryParameter]):
             ),
             alias=self.alias,
         )
+
+    def with_alias(self, alias: Optional[str]) -> TimeDimensionParameter:
+        """Returns a new TimeDimensionParameter with the alias replaced."""
+        return TimeDimensionParameter(name=self.name, grain=self.grain, date_part=self.date_part, alias=alias)
 
 
 @dataclass(frozen=True)
@@ -101,7 +105,7 @@ class DimensionOrEntityParameter(ProtocolHint[DimensionOrEntityQueryParameter]):
         )
 
         return ResolverInputForGroupByItem(
-            input_obj=self,
+            input_obj=self.with_alias(None),
             input_obj_naming_scheme=ObjectBuilderNamingScheme(),
             spec_pattern=EntityLinkPattern(
                 SpecPatternParameterSet.from_parameters(
@@ -118,6 +122,10 @@ class DimensionOrEntityParameter(ProtocolHint[DimensionOrEntityQueryParameter]):
             ),
             alias=self.alias,
         )
+
+    def with_alias(self, alias: Optional[str]) -> DimensionOrEntityParameter:
+        """Returns a new DimensionOrEntityParameter with the alias replaced."""
+        return DimensionOrEntityParameter(name=self.name, alias=alias)
 
 
 @dataclass(frozen=True)
@@ -142,6 +150,10 @@ class MetricParameter(ProtocolHint[MetricQueryParameter]):
             alias=self.alias,
         )
 
+    def with_alias(self, alias: Optional[str]) -> MetricParameter:
+        """Returns a new MetricParameter with the alias replaced."""
+        return MetricParameter(name=self.name, alias=alias)
+
 
 InputOrderByParameter = Union[MetricParameter, DimensionOrEntityParameter, TimeDimensionParameter]
 
@@ -161,10 +173,14 @@ class OrderByParameter(ProtocolHint[OrderByQueryParameter]):
         self, semantic_manifest_lookup: SemanticManifestLookup
     ) -> ResolverInputForOrderByItem:
         return ResolverInputForOrderByItem(
-            input_obj=self,
+            input_obj=self.with_alias(None),
             possible_inputs=(self.order_by.query_resolver_input(semantic_manifest_lookup=semantic_manifest_lookup),),
             descending=self.descending,
         )
+
+    def with_alias(self, alias: Optional[str]) -> OrderByParameter:
+        """Returns a new OrderByParameter with the alias replaced."""
+        return OrderByParameter(order_by=self.order_by.with_alias(alias), descending=self.descending)
 
 
 @dataclass(frozen=True)
