@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from hashlib import sha1
-from typing import Any, Sequence, Tuple
+from typing import Sequence, Tuple
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.type_enums import AggregationType, TimeGranularity
@@ -71,8 +71,3 @@ class NonAdditiveDimensionSpec(SerializableDataclass):
                 time_granularity=ExpandedTimeGranularity.from_time_granularity(non_additive_dimension_grain),
             ),
         ) + tuple(LinklessEntitySpec.from_element_name(entity_name) for entity_name in self.window_groupings)
-
-    def __eq__(self, other: Any) -> bool:  # type: ignore[misc]  # noqa: D105
-        if not isinstance(other, NonAdditiveDimensionSpec):
-            return False
-        return self.bucket_hash == other.bucket_hash

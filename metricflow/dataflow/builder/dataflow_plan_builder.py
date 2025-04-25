@@ -977,14 +977,34 @@ class DataflowPlanBuilder:
         agg_time_dimension_grain = measure_properties.agg_time_granularity
 
         non_additive_dimension_spec = measure_specs[0].non_additive_dimension_spec
+
+        expected_bucket_hash = (
+            non_additive_dimension_spec.bucket_hash if non_additive_dimension_spec is not None else None
+        )
+
         for measure_spec in measure_specs:
-            if non_additive_dimension_spec != measure_spec.non_additive_dimension_spec:
-                raise ValueError(f"measure_specs {measure_specs} do not have the same non_additive_dimension_spec.")
+            bucket_hash_for_measure_spec = (
+                measure_spec.non_additive_dimension_spec.bucket_hash
+                if measure_spec.non_additive_dimension_spec is not None
+                else None
+            )
+            if expected_bucket_hash != bucket_hash_for_measure_spec:
+                raise ValueError(
+                    LazyFormat(
+                        "`measure_spec` does not have the expected bucket hash.",
+                        non_additive_dimension_spec=non_additive_dimension_spec,
+                        expected_bucket_hash=expected_bucket_hash,
+                        measure_spec=measure_spec,
+                        bucket_hash_for_measure_spec=bucket_hash_for_measure_spec,
+                    )
+                )
             measure_agg_time_dimension = self._semantic_model_lookup.measure_lookup.get_properties(
                 measure_spec.reference
             ).agg_time_dimension_reference
             if measure_agg_time_dimension != agg_time_dimension:
-                raise ValueError(f"measure_specs {measure_specs} do not have the same agg_time_dimension.")
+                raise ValueError(
+                    LazyFormat("`measure_specs` do not have the same agg_time_dimension.", measure_specs=measure_specs)
+                )
         return MeasureSpecProperties(
             measure_specs=tuple(measure_specs),
             semantic_model_name=semantic_model_name,
