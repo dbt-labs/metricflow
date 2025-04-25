@@ -34,7 +34,6 @@ from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQ
 from metricflow_semantics.query.issues.issues_base import (
     MetricFlowQueryResolutionIssueSet,
 )
-from metricflow_semantics.query.issues.parsing.duplicate_metric_alias import DuplicateMetricAliasIssue
 from metricflow_semantics.query.issues.parsing.invalid_apply_group_by import InvalidApplyGroupByIssue
 from metricflow_semantics.query.issues.parsing.invalid_limit import InvalidLimitIssue
 from metricflow_semantics.query.issues.parsing.invalid_metric import InvalidMetricIssue
@@ -61,6 +60,7 @@ from metricflow_semantics.query.suggestion_generator import QueryItemSuggestionG
 from metricflow_semantics.query.validation_rules.duplicate_metric import DuplicateMetricValidationRule
 from metricflow_semantics.query.validation_rules.metric_time_requirements import MetricTimeQueryValidationRule
 from metricflow_semantics.query.validation_rules.query_validator import PostResolutionQueryValidator
+from metricflow_semantics.query.validation_rules.unique_column_names import UniqueOutputColumnValidationRule
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.order_by_spec import OrderBySpec
@@ -214,24 +214,6 @@ class MetricFlowQueryResolver:
                         issue_set=MetricFlowQueryResolutionIssueSet.from_issue(
                             InvalidMetricIssue.from_parameters(
                                 metric_suggestions=metric_suggestions,
-                                query_resolution_path=query_resolution_path,
-                            )
-                        ),
-                    )
-                )
-
-        # TODO: new validation to ensure that all output column names will be unique
-        # Find any duplicate aliases
-        for alias, metrics in alias_to_metrics.items():
-            if len(metrics) > 1:
-                metric_inputs = [m[0] for m in metrics]
-                metric_references = [m[1] for m in metrics]
-                input_to_issue_set_mapping_items.append(
-                    InputToIssueSetMappingItem(
-                        resolver_input=metric_inputs[0],
-                        issue_set=MetricFlowQueryResolutionIssueSet.from_issue(
-                            DuplicateMetricAliasIssue.from_parameters(
-                                duplicate_metric_references=metric_references,
                                 query_resolution_path=query_resolution_path,
                             )
                         ),
@@ -567,10 +549,22 @@ class MetricFlowQueryResolver:
             resolver_input_for_query=resolver_input_for_query,
             validation_rules=(
                 MetricTimeQueryValidationRule(
-                    self._manifest_lookup, resolver_input_for_query, resolve_group_by_item_result
+                    manifest_lookup=self._manifest_lookup,
+                    resolver_input_for_query=resolver_input_for_query,
+                    resolve_group_by_item_result=resolve_group_by_item_result,
+                    resolve_metric_result=resolve_metrics_result,
                 ),
                 DuplicateMetricValidationRule(
-                    self._manifest_lookup, resolver_input_for_query, resolve_group_by_item_result
+                    manifest_lookup=self._manifest_lookup,
+                    resolver_input_for_query=resolver_input_for_query,
+                    resolve_group_by_item_result=resolve_group_by_item_result,
+                    resolve_metric_result=resolve_metrics_result,
+                ),
+                UniqueOutputColumnValidationRule(
+                    manifest_lookup=self._manifest_lookup,
+                    resolver_input_for_query=resolver_input_for_query,
+                    resolve_group_by_item_result=resolve_group_by_item_result,
+                    resolve_metric_result=resolve_metrics_result,
                 ),
             ),
         )

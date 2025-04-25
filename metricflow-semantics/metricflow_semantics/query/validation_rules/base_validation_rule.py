@@ -13,7 +13,7 @@ from metricflow_semantics.query.issues.issues_base import MetricFlowQueryResolut
 from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import ResolverInputForQuery
 
 if typing.TYPE_CHECKING:
-    from metricflow_semantics.query.query_resolver import ResolveGroupByItemsResult
+    from metricflow_semantics.query.query_resolver import ResolveGroupByItemsResult, ResolveMetricsResult
 
 
 class PostResolutionQueryValidationRule(ABC):
@@ -24,10 +24,12 @@ class PostResolutionQueryValidationRule(ABC):
         manifest_lookup: SemanticManifestLookup,
         resolver_input_for_query: ResolverInputForQuery,
         resolve_group_by_item_result: ResolveGroupByItemsResult,
+        resolve_metric_result: ResolveMetricsResult,
     ) -> None:
         self._manifest_lookup = manifest_lookup
         self._resolver_input_for_query = resolver_input_for_query
         self._resolve_group_by_item_result = resolve_group_by_item_result
+        self._resolve_metric_result = resolve_metric_result
 
     @abstractmethod
     def validate_measure_in_resolution_dag(
