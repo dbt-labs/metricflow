@@ -175,3 +175,25 @@ def test_custom_pretty_print() -> None:
             return format_context.formatter.pretty_format({"field_0": f"{self.field_0:.2f}"})
 
     assert mf_pformat(_ExampleDataclass(1.2345)) == "{'field_0': '1.23'}"
+
+
+def test_include_underscore_prefix_option() -> None:  # noqa: D103
+    @dataclass(frozen=True)
+    class _ExampleDataclass:
+        field_0: int
+        _hidden_field: int
+
+    assert (
+        mf_pformat(
+            _ExampleDataclass(field_0=1, _hidden_field=2),
+            format_option=PrettyFormatOption(include_underscore_prefix_fields=False),
+        )
+        == "_ExampleDataclass(field_0=1)"
+    )
+    assert (
+        mf_pformat(
+            _ExampleDataclass(field_0=1, _hidden_field=2),
+            format_option=PrettyFormatOption(include_underscore_prefix_fields=True),
+        )
+        == "_ExampleDataclass(field_0=1, _hidden_field=2)"
+    )
