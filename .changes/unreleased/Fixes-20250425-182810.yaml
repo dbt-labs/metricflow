@@ -1,0 +1,6 @@
+kind: Fixes
+body: Remove trailing comma when pretty-formatting `list`
+time: 2025-04-25T18:28:10.828256-07:00
+custom:
+  Author: plypaul
+  Issue: "1735"
