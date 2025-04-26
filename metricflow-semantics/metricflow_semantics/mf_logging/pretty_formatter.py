@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pprint
+from collections.abc import Sequence, Set
 from dataclasses import fields, is_dataclass
 from enum import Enum
 from typing import Any, List, Mapping, Optional, Sized, Union
@@ -25,36 +26,37 @@ class MetricFlowPrettyFormatter:
                 f"max_line_length must be > 0 as required by pprint.pformat(). Got {format_option.max_line_length}"
             )
 
-    def _handle_sequence_obj(
-        self, list_like_obj: Union[list, tuple, set, frozenset], remaining_line_width: Optional[int]
+    def _handle_sequence_like_obj(
+        self, sequence_like_obj: Union[Sequence, Set], remaining_line_width: Optional[int]
     ) -> str:
         """Pretty prints a sequence object i.e. list or tuple.
 
         Args:
-            list_like_obj: A list, tuple, set, or frozenset.
+            sequence_like_obj: A sequence-like object, including `Set`.
             remaining_line_width: If specified, try to make the string representation <= this many columns wide.
 
         Returns:
-            A string representation of the sequence like (1,) or [1, 2].
+            A string representation of the sequence. e.g. `(1, 2), [1, 2], {1, 2}`
         """
-        if isinstance(list_like_obj, list):
-            left_enclose_str = "["
-            right_enclose_str = "]"
-        elif isinstance(list_like_obj, tuple):
+        if isinstance(sequence_like_obj, tuple):
             left_enclose_str = "("
             right_enclose_str = ")"
-        elif isinstance(list_like_obj, set) or isinstance(list_like_obj, frozenset):
-            left_enclose_str = f"{type(list_like_obj).__name__}("
-            right_enclose_str = ")"
-            list_like_obj = sorted(self._handle_any_obj(obj, None) for obj in list_like_obj)
+        elif isinstance(sequence_like_obj, Sequence):
+            left_enclose_str = "["
+            right_enclose_str = "]"
+        elif isinstance(sequence_like_obj, Set):
+            left_enclose_str = "{"
+            right_enclose_str = "}"
         else:
-            raise RuntimeError(f"Unhandled type: {type(list_like_obj)}")
+            raise RuntimeError(f"Unhandled type: {type(sequence_like_obj)}")
 
-        if len(list_like_obj) == 0:
+        if len(sequence_like_obj) == 0:
             return f"{left_enclose_str}{right_enclose_str}"
 
         # See if this object can be printed in one line.
-        items_as_str = tuple(self._handle_any_obj(list_item, remaining_line_width=None) for list_item in list_like_obj)
+        items_as_str = tuple(
+            self._handle_any_obj(sequence_item, remaining_line_width=None) for sequence_item in sequence_like_obj
+        )
         line_items = [left_enclose_str]
         if len(items_as_str) > 0:
             line_items.extend([", ".join(items_as_str)])
@@ -78,9 +80,10 @@ class MetricFlowPrettyFormatter:
         # Convert each item to a pretty string.
         items_as_str = tuple(
             self._handle_any_obj(
-                list_item, remaining_line_width=max(1, remaining_line_width - len(self._format_option.indent_prefix))
+                sequence_item,
+                remaining_line_width=max(1, remaining_line_width - len(self._format_option.indent_prefix)),
             )
-            for list_item in list_like_obj
+            for sequence_item in sequence_like_obj
         )
         lines = [left_enclose_str]
 
@@ -314,8 +317,12 @@ class MetricFlowPrettyFormatter:
         if isinstance(obj, Enum):
             return obj.name
 
-        if isinstance(obj, (list, tuple, set, frozenset)):
-            return self._handle_sequence_obj(obj, remaining_line_width=remaining_line_width)
+        # Check for strings first as they are also sequences.
+        if isinstance(obj, str):
+            return self._handle_using_pprint(obj, remaining_line_width=remaining_line_width)
+
+        if isinstance(obj, (Sequence, Set)):
+            return self._handle_sequence_like_obj(obj, remaining_line_width=remaining_line_width)
 
         if isinstance(obj, dict):
             return self._handle_mapping_like_obj(
@@ -374,6 +381,9 @@ class MetricFlowPrettyFormatter:
                 pass
 
         # Any other object that's not handled.
+        return self._handle_using_pprint(obj, remaining_line_width=remaining_line_width)
+
+    def _handle_using_pprint(self, obj: Any, remaining_line_width: Optional[int]) -> str:  # type: ignore[misc]
         if remaining_line_width is not None:
             return pprint.pformat(obj, width=remaining_line_width, sort_dicts=False)
         else:
