@@ -148,7 +148,7 @@ class MetricFlowPrettyFormatter:
         if remaining_line_length is None or len(result_without_limit) <= remaining_line_length:
             return result_without_limit
 
-        # The string representation can't fit on one line - use multiple. e.g.
+        # The string representation can't fit on one line - use multiple lines. e.g.
         """
         'key':
           [1, 2, 3, 4]
