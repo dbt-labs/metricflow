@@ -27,13 +27,13 @@ class MetricFlowPrettyFormatter:
             )
 
     def _handle_sequence_like_obj(
-        self, sequence_like_obj: Union[Sequence, Set], remaining_line_width: Optional[int]
+        self, sequence_like_obj: Union[Sequence, Set], remaining_line_length: Optional[int]
     ) -> str:
         """Pretty prints a sequence object i.e. list or tuple.
 
         Args:
             sequence_like_obj: A sequence-like object, including `Set`.
-            remaining_line_width: If specified, try to make the string representation <= this many columns wide.
+            remaining_line_length: If specified, try to make the string representation <= this many columns wide.
 
         Returns:
             A string representation of the sequence. e.g. `(1, 2), [1, 2], {1, 2}`
@@ -57,7 +57,7 @@ class MetricFlowPrettyFormatter:
 
         # See if this object can be printed in one line.
         items_as_str = tuple(
-            self._handle_any_obj(sequence_item, remaining_line_width=None) for sequence_item in sequence_like_obj
+            self._handle_any_obj(sequence_item, remaining_line_length=None) for sequence_item in sequence_like_obj
         )
         line_items = [left_enclose_str]
         if len(items_as_str) > 0:
@@ -67,7 +67,7 @@ class MetricFlowPrettyFormatter:
         line_items.append(right_enclose_str)
         result_without_width_limit = "".join(line_items)
 
-        if remaining_line_width is None or len(result_without_width_limit) <= remaining_line_width:
+        if remaining_line_length is None or len(result_without_width_limit) <= remaining_line_length:
             return result_without_width_limit
 
         # The item can't be printed on one line, so do an indented style like:
@@ -83,7 +83,7 @@ class MetricFlowPrettyFormatter:
         items_as_str = tuple(
             self._handle_any_obj(
                 sequence_item,
-                remaining_line_width=max(1, remaining_line_width - len(self._format_option.indent_prefix)),
+                remaining_line_length=max(1, remaining_line_length - len(self._format_option.indent_prefix)),
             )
             for sequence_item in sequence_like_obj
         )
@@ -109,7 +109,7 @@ class MetricFlowPrettyFormatter:
         value: Any,
         key_value_seperator: str,
         is_dataclass_like_object: bool,
-        remaining_line_width: Optional[int],
+        remaining_line_length: Optional[int],
     ) -> str:
         """Convert a key / value for a mapping-like object to a string that should be placed in an indented block.
 
@@ -127,26 +127,26 @@ class MetricFlowPrettyFormatter:
             dataclasses.
             is_dataclass_like_object: Set this to True if the given value object is a dataclass to handle some printing
             options specific to dataclasses.
-            remaining_line_width: If specified, try to make the string representation <= this many columns wide.
+            remaining_line_length: If specified, try to make the string representation <= this many columns wide.
 
         Returns:
             The block that represents the key / value item and goes in between "[" / "]" in the string representation
             of the mapping-like object.
         """
         # See if the string representation can fit on one line. e.g. "'a': [1, 2]"
-        if remaining_line_width is None or remaining_line_width > 0:
+        if remaining_line_length is None or remaining_line_length > 0:
             result_items_without_limit: List[str] = []
             if is_dataclass_like_object and self._format_option.include_object_field_names:
                 result_items_without_limit.append(str(key))
             else:
-                result_items_without_limit.append(self._handle_any_obj(key, remaining_line_width=None))
+                result_items_without_limit.append(self._handle_any_obj(key, remaining_line_length=None))
             result_items_without_limit.append(key_value_seperator)
-            result_items_without_limit.append(self._handle_any_obj(value, remaining_line_width=None))
+            result_items_without_limit.append(self._handle_any_obj(value, remaining_line_length=None))
 
             result_without_limit = mf_indent(
                 "".join(result_items_without_limit), indent_prefix=self._format_option.indent_prefix
             )
-            if remaining_line_width is None or len(result_without_limit) <= remaining_line_width:
+            if remaining_line_length is None or len(result_without_limit) <= remaining_line_length:
                 return result_without_limit
 
         # The string representation can't fit on one line - use multiple. e.g.
@@ -166,13 +166,13 @@ class MetricFlowPrettyFormatter:
             # "foo"=[
             #   ...
             # ]
-            min_length_of_first_value_line = len(self._handle_any_obj(value, remaining_line_width=1).splitlines()[0])
+            min_length_of_first_value_line = len(self._handle_any_obj(value, remaining_line_length=1).splitlines()[0])
 
             key_lines = self._handle_any_obj(
                 key,
-                remaining_line_width=max(
+                remaining_line_length=max(
                     1,
-                    remaining_line_width - len(key_value_seperator) - min_length_of_first_value_line,
+                    remaining_line_length - len(key_value_seperator) - min_length_of_first_value_line,
                 ),
             ).splitlines()
             # key_lines would be something like:
@@ -211,8 +211,8 @@ class MetricFlowPrettyFormatter:
         # ]
 
         # See if the value fits in the previous line.
-        remaining_width_for_value = max(1, remaining_line_width - len(result_lines[-1]))
-        value_str = self._handle_any_obj(value, remaining_line_width=remaining_width_for_value)
+        remaining_width_for_value = max(1, remaining_line_length - len(result_lines[-1]))
+        value_str = self._handle_any_obj(value, remaining_line_length=remaining_width_for_value)
         value_lines = value_str.splitlines()
 
         if len(value_lines) <= 1:
@@ -233,7 +233,7 @@ class MetricFlowPrettyFormatter:
         key_value_seperator: str,
         right_enclose_str: str,
         is_dataclass_like_object: bool,
-        remaining_line_width: Optional[int],
+        remaining_line_length: Optional[int],
     ) -> str:
         """Convert a mapping-like object to a pretty string.
 
@@ -250,7 +250,7 @@ class MetricFlowPrettyFormatter:
             dataclasses.
             is_dataclass_like_object: Flag to indicate whether this is a dataclass as there are some differences in
             formatting those.
-            remaining_line_width: If specified, try to make the string representation <= this many columns wide.
+            remaining_line_length: If specified, try to make the string representation <= this many columns wide.
 
         Returns:
             A string representation of the mapping. e.g. "{'a'=[1, 2]}" or "Foo(a=[1, 2])".
@@ -272,7 +272,7 @@ class MetricFlowPrettyFormatter:
             return f"{left_enclose_str}{right_enclose_str}"
 
         # Handle case if the string representation fits on one line.
-        if remaining_line_width is None or remaining_line_width > 0:
+        if remaining_line_length is None or remaining_line_length > 0:
             comma_separated_items: List[str] = []
             for key, value in mapping.items():
                 key_value_str_items: List[str] = []
@@ -282,13 +282,13 @@ class MetricFlowPrettyFormatter:
                         key_value_str_items.append(str(key))
                         key_value_str_items.append(key_value_seperator)
                 else:
-                    key_value_str_items.append(self._handle_any_obj(key, remaining_line_width=None))
+                    key_value_str_items.append(self._handle_any_obj(key, remaining_line_length=None))
                     key_value_str_items.append(key_value_seperator)
-                key_value_str_items.append(self._handle_any_obj(value, remaining_line_width=None))
+                key_value_str_items.append(self._handle_any_obj(value, remaining_line_length=None))
                 comma_separated_items.append("".join(key_value_str_items))
             result_without_limit = "".join((left_enclose_str, ", ".join(comma_separated_items), right_enclose_str))
 
-            if remaining_line_width is None or len(result_without_limit) <= remaining_line_width:
+            if remaining_line_length is None or len(result_without_limit) <= remaining_line_length:
                 return result_without_limit
 
         # Handle multi-line case.
@@ -300,20 +300,20 @@ class MetricFlowPrettyFormatter:
                     value=value,
                     key_value_seperator=key_value_seperator,
                     is_dataclass_like_object=is_dataclass_like_object,
-                    remaining_line_width=(remaining_line_width - len(self._format_option.indent_prefix)),
+                    remaining_line_length=(remaining_line_length - len(self._format_option.indent_prefix)),
                 )
             )
         lines = [left_enclose_str, ",\n".join(mapping_items_as_str) + ",", right_enclose_str]
         return "\n".join(lines)
 
-    def _handle_any_obj(self, obj: Any, remaining_line_width: Optional[int]) -> str:  # type: ignore
+    def _handle_any_obj(self, obj: Any, remaining_line_length: Optional[int]) -> str:  # type: ignore
         """Convert any object into a pretty string-representation.
 
         This is called recursively as sequences and mappings have constituent objects of any type.
 
         Args:
             obj: The object to convert.
-            remaining_line_width: If specified, try to make the string representation <= this many columns wide.
+            remaining_line_length: If specified, try to make the string representation <= this many columns wide.
 
         Returns:
             A pretty string-representation of the object.
@@ -323,10 +323,10 @@ class MetricFlowPrettyFormatter:
 
         # Check for strings first as they are also sequences.
         if isinstance(obj, str):
-            return self._handle_using_pprint(obj, remaining_line_width=remaining_line_width)
+            return self._handle_using_pprint(obj, remaining_line_length=remaining_line_length)
 
         if isinstance(obj, (Sequence, Set)):
-            return self._handle_sequence_like_obj(obj, remaining_line_width=remaining_line_width)
+            return self._handle_sequence_like_obj(obj, remaining_line_length=remaining_line_length)
 
         if isinstance(obj, dict):
             return self._handle_mapping_like_obj(
@@ -335,14 +335,14 @@ class MetricFlowPrettyFormatter:
                 key_value_seperator=": ",
                 right_enclose_str="}",
                 is_dataclass_like_object=False,
-                remaining_line_width=remaining_line_width,
+                remaining_line_length=remaining_line_length,
             )
 
         if isinstance(obj, MetricFlowPrettyFormattable):
             result = obj.pretty_format(
                 PrettyFormatContext(
                     formatter=MetricFlowPrettyFormatter(
-                        format_option=self._format_option.with_max_line_length(remaining_line_width)
+                        format_option=self._format_option.with_max_line_length(remaining_line_length)
                     )
                 )
             )
@@ -358,7 +358,7 @@ class MetricFlowPrettyFormatter:
                 key_value_seperator="=",
                 right_enclose_str=")",
                 is_dataclass_like_object=True,
-                remaining_line_width=remaining_line_width,
+                remaining_line_length=remaining_line_length,
             )
 
         # For Pydantic-like objects with a `dict`-like method that returns field keys / values.
@@ -377,7 +377,7 @@ class MetricFlowPrettyFormatter:
                     key_value_seperator="=",
                     right_enclose_str=")",
                     is_dataclass_like_object=True,
-                    remaining_line_width=remaining_line_width,
+                    remaining_line_length=remaining_line_length,
                 )
             except Exception:
                 # Fall back to built-in pretty-print in case the dict method can't be called. e.g. requires arguments.
@@ -385,17 +385,17 @@ class MetricFlowPrettyFormatter:
                 pass
 
         # Any other object that's not handled.
-        return self._handle_using_pprint(obj, remaining_line_width=remaining_line_width)
+        return self._handle_using_pprint(obj, remaining_line_length=remaining_line_length)
 
-    def _handle_using_pprint(self, obj: Any, remaining_line_width: Optional[int]) -> str:  # type: ignore[misc]
-        if remaining_line_width is not None:
-            return pprint.pformat(obj, width=remaining_line_width, sort_dicts=False)
+    def _handle_using_pprint(self, obj: Any, remaining_line_length: Optional[int]) -> str:  # type: ignore[misc]
+        if remaining_line_length is not None:
+            return pprint.pformat(obj, width=remaining_line_length, sort_dicts=False)
         else:
             return pprint.pformat(obj, sort_dicts=False)
 
     def pretty_format(self, obj: Any) -> str:  # type: ignore[misc]
         """Return a pretty string representation of the object that's suitable for logging."""
-        return self._handle_any_obj(obj, remaining_line_width=self._format_option.max_line_length)
+        return self._handle_any_obj(obj, remaining_line_length=self._format_option.max_line_length)
 
 
 @fast_frozen_dataclass()
