@@ -4,7 +4,7 @@ docstring:
   Tests converting a dataflow plan to a SQL query plan where there is a leaf pass filter node.
 sql_engine: Redshift
 ---
--- Pass Only Elements: ['bookings',]
+-- Pass Only Elements: ['bookings']
 SELECT
   subq_0.bookings
 FROM (

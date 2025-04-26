@@ -18,7 +18,7 @@ SELECT
   CAST(MAX(subq_34.buys) AS FLOAT64) / CAST(NULLIF(MAX(subq_23.visits), 0) AS FLOAT64) AS visit_buy_conversion_rate_7days
 FROM (
   -- Constrain Output with WHERE
-  -- Pass Only Elements: ['visits',]
+  -- Pass Only Elements: ['visits']
   -- Aggregate Measures
   SELECT
     SUM(visits) AS visits
@@ -38,7 +38,7 @@ FROM (
 ) subq_23
 CROSS JOIN (
   -- Find conversions for user within the range of 7 day
-  -- Pass Only Elements: ['buys',]
+  -- Pass Only Elements: ['buys']
   -- Aggregate Measures
   SELECT
     SUM(buys) AS buys

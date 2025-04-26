@@ -20,7 +20,7 @@ docstring:
             <!--   )                                                            -->
             <!-- limit = '100' -->
             <FilterElementsNode>
-                <!-- description = "Pass Only Elements: ['listing__country_latest',]" -->
+                <!-- description = "Pass Only Elements: ['listing__country_latest']" -->
                 <!-- node_id = NodeId(id_str='pfe_0') -->
                 <!-- include_spec =                                               -->
                 <!--   DimensionSpec(                                             -->

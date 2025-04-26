@@ -19,7 +19,7 @@ FROM (
       SELECT
         SUM(subq_2.bookings) AS bookings
       FROM (
-        -- Pass Only Elements: ['bookings',]
+        -- Pass Only Elements: ['bookings']
         SELECT
           subq_1.bookings
         FROM (
@@ -229,7 +229,7 @@ FROM (
       SELECT
         SUM(subq_7.listings) AS listings
       FROM (
-        -- Pass Only Elements: ['listings',]
+        -- Pass Only Elements: ['listings']
         SELECT
           subq_6.listings
         FROM (

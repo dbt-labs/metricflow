@@ -10,7 +10,7 @@ SELECT
 FROM (
   -- Read From Time Spine 'mf_time_spine'
   -- Change Column Aliases
-  -- Pass Only Elements: ['metric_time__alien_day',]
+  -- Pass Only Elements: ['metric_time__alien_day']
   SELECT
     alien_day AS metric_time__alien_day
   FROM ***************************.mf_time_spine time_spine_src_28006

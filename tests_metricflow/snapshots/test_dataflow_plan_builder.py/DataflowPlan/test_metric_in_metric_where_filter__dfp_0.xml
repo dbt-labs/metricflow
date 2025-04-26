@@ -15,7 +15,7 @@ docstring:
                 <!-- description = 'Aggregate Measures' -->
                 <!-- node_id = NodeId(id_str='am_1') -->
                 <FilterElementsNode>
-                    <!-- description = "Pass Only Elements: ['listings',]" -->
+                    <!-- description = "Pass Only Elements: ['listings']" -->
                     <!-- node_id = NodeId(id_str='pfe_2') -->
                     <!-- include_spec = MeasureSpec(element_name='listings') -->
                     <!-- distinct = False -->

@@ -20,7 +20,7 @@ FROM (
       subq_6.metric_time__day AS metric_time__day
       , subq_3.visits AS visits
     FROM (
-      -- Pass Only Elements: ['metric_time__day',]
+      -- Pass Only Elements: ['metric_time__day']
       SELECT
         subq_5.metric_time__day
       FROM (
@@ -160,7 +160,7 @@ FROM (
       subq_19.metric_time__day AS metric_time__day
       , subq_16.buys AS buys
     FROM (
-      -- Pass Only Elements: ['metric_time__day',]
+      -- Pass Only Elements: ['metric_time__day']
       SELECT
         subq_18.metric_time__day
       FROM (

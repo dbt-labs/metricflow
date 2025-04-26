@@ -9,7 +9,7 @@ SELECT
   , subq_16.bookings AS bookings_join_to_time_spine
 FROM (
   -- Constrain Output with WHERE
-  -- Pass Only Elements: ['metric_time__alien_day',]
+  -- Pass Only Elements: ['metric_time__alien_day']
   SELECT
     metric_time__alien_day
   FROM (

@@ -30,7 +30,7 @@ Error #1:
   Query Input:
 
     WhereFilter(
-      ["{{ TimeDimension('booking__paid_at') }} > '2020-01-01'",]
+      ["{{ TimeDimension('booking__paid_at') }} > '2020-01-01'"]
     )
     Filter Path:
       [Resolve Query(['bookings', 'listings'])]

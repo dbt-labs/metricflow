@@ -2,7 +2,7 @@ test_name: test_no_metric_custom_granularity_metric_time
 test_filename: test_custom_granularity.py
 sql_engine: Trino
 ---
--- Pass Only Elements: ['metric_time__alien_day',]
+-- Pass Only Elements: ['metric_time__alien_day']
 SELECT
   subq_2.metric_time__alien_day
 FROM (

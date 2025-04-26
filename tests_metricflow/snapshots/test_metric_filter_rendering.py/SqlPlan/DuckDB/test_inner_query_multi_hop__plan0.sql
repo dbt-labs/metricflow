@@ -12,7 +12,7 @@ FROM (
   SELECT
     COUNT(DISTINCT subq_27.third_hop_count) AS third_hop_count
   FROM (
-    -- Pass Only Elements: ['third_hop_count',]
+    -- Pass Only Elements: ['third_hop_count']
     SELECT
       subq_26.third_hop_count
     FROM (

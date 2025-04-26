@@ -24,7 +24,7 @@ FROM (
       , subq_4.booking__is_instant AS booking__is_instant
       , subq_4.bookings AS bookings
     FROM (
-      -- Pass Only Elements: ['metric_time__day',]
+      -- Pass Only Elements: ['metric_time__day']
       SELECT
         subq_6.metric_time__day
       FROM (

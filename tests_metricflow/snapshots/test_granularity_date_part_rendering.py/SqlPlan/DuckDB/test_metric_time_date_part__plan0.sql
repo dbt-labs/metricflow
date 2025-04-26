@@ -2,7 +2,7 @@ test_name: test_metric_time_date_part
 test_filename: test_granularity_date_part_rendering.py
 sql_engine: DuckDB
 ---
--- Pass Only Elements: ['metric_time__extract_year',]
+-- Pass Only Elements: ['metric_time__extract_year']
 SELECT
   subq_1.metric_time__extract_year
 FROM (

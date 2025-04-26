@@ -51,7 +51,7 @@ FROM (
     ) subq_34
     CROSS JOIN (
       -- Constrain Output with WHERE
-      -- Pass Only Elements: ['booking_value',]
+      -- Pass Only Elements: ['booking_value']
       -- Aggregate Measures
       -- Compute Metrics via Expressions
       SELECT

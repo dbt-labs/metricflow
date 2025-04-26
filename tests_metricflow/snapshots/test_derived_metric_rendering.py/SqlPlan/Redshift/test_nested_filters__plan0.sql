@@ -26,7 +26,7 @@ FROM (
         SELECT
           AVG(subq_7.average_booking_value) AS average_booking_value
         FROM (
-          -- Pass Only Elements: ['average_booking_value',]
+          -- Pass Only Elements: ['average_booking_value']
           SELECT
             subq_6.average_booking_value
           FROM (
@@ -583,7 +583,7 @@ FROM (
         SELECT
           SUM(subq_15.bookings) AS bookings
         FROM (
-          -- Pass Only Elements: ['bookings',]
+          -- Pass Only Elements: ['bookings']
           SELECT
             subq_14.bookings
           FROM (
@@ -1140,7 +1140,7 @@ FROM (
         SELECT
           SUM(subq_20.booking_value) AS booking_value
         FROM (
-          -- Pass Only Elements: ['booking_value',]
+          -- Pass Only Elements: ['booking_value']
           SELECT
             subq_19.booking_value
           FROM (

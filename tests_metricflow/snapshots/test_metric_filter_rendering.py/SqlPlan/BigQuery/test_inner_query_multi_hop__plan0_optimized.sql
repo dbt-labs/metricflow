@@ -5,7 +5,7 @@ docstring:
 sql_engine: BigQuery
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['third_hop_count',]
+-- Pass Only Elements: ['third_hop_count']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT

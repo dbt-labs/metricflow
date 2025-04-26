@@ -4,7 +4,7 @@ docstring:
   Tests querying 2 dimensions that require a join.
 sql_engine: DuckDB
 ---
--- Pass Only Elements: ['user__home_state_latest',]
+-- Pass Only Elements: ['user__home_state_latest']
 SELECT
   subq_4.user__home_state_latest
 FROM (

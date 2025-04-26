@@ -17,7 +17,7 @@ FROM (
     SELECT
       SUM(subq_3.visits) AS visits
     FROM (
-      -- Pass Only Elements: ['visits',]
+      -- Pass Only Elements: ['visits']
       SELECT
         subq_2.visits
       FROM (
@@ -153,7 +153,7 @@ FROM (
     SELECT
       SUM(subq_13.buys) AS buys
     FROM (
-      -- Pass Only Elements: ['buys',]
+      -- Pass Only Elements: ['buys']
       SELECT
         subq_12.buys
       FROM (

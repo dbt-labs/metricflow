@@ -5,7 +5,7 @@ docstring:
 sql_engine: Databricks
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['listing',]
+-- Pass Only Elements: ['listing']
 SELECT
   listing
 FROM (

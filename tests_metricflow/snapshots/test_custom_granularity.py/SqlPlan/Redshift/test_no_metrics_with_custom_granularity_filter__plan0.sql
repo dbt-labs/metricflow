@@ -4,7 +4,7 @@ docstring:
   Group by items only queried with a filter on a custom grain, where that grain is not used in the group by.
 sql_engine: Redshift
 ---
--- Pass Only Elements: ['listing__ds__day',]
+-- Pass Only Elements: ['listing__ds__day']
 SELECT
   subq_2.listing__ds__day
 FROM (

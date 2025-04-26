@@ -17,7 +17,7 @@ FROM (
       subq_11.metric_time__day AS metric_time__day
       , subq_6.bookings AS bookings
     FROM (
-      -- Pass Only Elements: ['metric_time__day',]
+      -- Pass Only Elements: ['metric_time__day']
       SELECT
         subq_10.metric_time__day
       FROM (

@@ -14,7 +14,7 @@ SELECT
   , subq_14.bookings AS instant_bookings_with_measure_filter
 FROM (
   -- Constrain Output with WHERE
-  -- Pass Only Elements: ['metric_time__day',]
+  -- Pass Only Elements: ['metric_time__day']
   SELECT
     metric_time__day
   FROM (

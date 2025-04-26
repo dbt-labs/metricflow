@@ -2,7 +2,7 @@ test_name: test_sub_daily_dimension
 test_filename: test_granularity_date_part_rendering.py
 sql_engine: BigQuery
 ---
--- Pass Only Elements: ['user__bio_added_ts__second',]
+-- Pass Only Elements: ['user__bio_added_ts__second']
 SELECT
   subq_0.user__bio_added_ts__second
 FROM (

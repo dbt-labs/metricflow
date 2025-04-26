@@ -23,7 +23,7 @@ FROM (
         subq_6.metric_time__day AS metric_time__day
         , subq_3.bookings AS bookings
       FROM (
-        -- Pass Only Elements: ['metric_time__day',]
+        -- Pass Only Elements: ['metric_time__day']
         SELECT
           subq_5.metric_time__day
         FROM (
@@ -390,7 +390,7 @@ FROM (
             , subq_9.approximate_continuous_booking_value_p99 AS approximate_continuous_booking_value_p99
             , subq_9.approximate_discrete_booking_value_p99 AS approximate_discrete_booking_value_p99
           FROM (
-            -- Pass Only Elements: ['metric_time__day',]
+            -- Pass Only Elements: ['metric_time__day']
             SELECT
               subq_11.metric_time__day
             FROM (

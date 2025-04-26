@@ -12,7 +12,7 @@ FROM (
     subq_9.metric_time__day AS metric_time__day
     , subq_6.bookers AS bookers
   FROM (
-    -- Pass Only Elements: ['metric_time__day',]
+    -- Pass Only Elements: ['metric_time__day']
     SELECT
       subq_8.metric_time__day
     FROM (

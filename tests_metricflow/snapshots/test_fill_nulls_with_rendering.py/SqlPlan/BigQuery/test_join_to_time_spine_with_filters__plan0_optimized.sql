@@ -15,7 +15,7 @@ FROM (
   FROM (
     -- Constrain Output with WHERE
     -- Constrain Time Range to [2020-01-03T00:00:00, 2020-01-05T00:00:00]
-    -- Pass Only Elements: ['metric_time__day',]
+    -- Pass Only Elements: ['metric_time__day']
     SELECT
       metric_time__day
     FROM (

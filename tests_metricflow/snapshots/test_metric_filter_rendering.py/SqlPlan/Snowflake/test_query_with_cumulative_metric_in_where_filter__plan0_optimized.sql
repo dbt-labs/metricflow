@@ -7,7 +7,7 @@ docstring:
 sql_engine: Snowflake
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['listings',]
+-- Pass Only Elements: ['listings']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT

@@ -38,9 +38,11 @@ class MetricFlowPrettyFormatter:
         Returns:
             A string representation of the sequence. e.g. `(1, 2), [1, 2], {1, 2}`
         """
+        include_trailing_comma_for_single_item_in_one_line = False
         if isinstance(sequence_like_obj, tuple):
             left_enclose_str = "("
             right_enclose_str = ")"
+            include_trailing_comma_for_single_item_in_one_line = True
         elif isinstance(sequence_like_obj, Sequence):
             left_enclose_str = "["
             right_enclose_str = "]"
@@ -60,7 +62,7 @@ class MetricFlowPrettyFormatter:
         line_items = [left_enclose_str]
         if len(items_as_str) > 0:
             line_items.extend([", ".join(items_as_str)])
-            if len(items_as_str) == 1:
+            if include_trailing_comma_for_single_item_in_one_line and len(items_as_str) == 1:
                 line_items.append(",")
         line_items.append(right_enclose_str)
         result_without_width_limit = "".join(line_items)

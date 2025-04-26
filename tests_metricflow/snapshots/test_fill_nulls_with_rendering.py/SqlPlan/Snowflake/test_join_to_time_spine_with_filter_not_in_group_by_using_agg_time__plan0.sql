@@ -12,7 +12,7 @@ FROM (
     subq_8.booking__ds__day AS booking__ds__day
     , subq_4.bookings AS bookings
   FROM (
-    -- Pass Only Elements: ['booking__ds__day',]
+    -- Pass Only Elements: ['booking__ds__day']
     SELECT
       subq_7.booking__ds__day
     FROM (

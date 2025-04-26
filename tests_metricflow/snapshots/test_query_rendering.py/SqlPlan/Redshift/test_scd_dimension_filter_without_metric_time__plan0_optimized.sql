@@ -3,7 +3,7 @@ test_filename: test_query_rendering.py
 sql_engine: Redshift
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['bookings',]
+-- Pass Only Elements: ['bookings']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT

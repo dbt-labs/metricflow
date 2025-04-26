@@ -5,7 +5,7 @@ docstring:
 ---
 <SqlPlan>
     <SqlSelectStatementNode>
-        <!-- description = "Pass Only Elements: ['user__home_state_latest',]" -->
+        <!-- description = "Pass Only Elements: ['user__home_state_latest']" -->
         <!-- node_id = NodeId(id_str='ss_71') -->
         <!-- col0 =                                                                                                       -->
         <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_118), column_alias='user__home_state_latest') -->

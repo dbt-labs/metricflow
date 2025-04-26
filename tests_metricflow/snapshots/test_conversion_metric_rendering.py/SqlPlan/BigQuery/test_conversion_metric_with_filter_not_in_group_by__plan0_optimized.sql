@@ -21,7 +21,7 @@ SELECT
   COALESCE(MAX(subq_30.buys), 0) AS visit_buy_conversions
 FROM (
   -- Constrain Output with WHERE
-  -- Pass Only Elements: ['visits',]
+  -- Pass Only Elements: ['visits']
   -- Aggregate Measures
   SELECT
     SUM(visits) AS visits
@@ -36,7 +36,7 @@ FROM (
 ) subq_20
 CROSS JOIN (
   -- Find conversions for user within the range of 7 day
-  -- Pass Only Elements: ['buys',]
+  -- Pass Only Elements: ['buys']
   -- Aggregate Measures
   SELECT
     SUM(buys) AS buys

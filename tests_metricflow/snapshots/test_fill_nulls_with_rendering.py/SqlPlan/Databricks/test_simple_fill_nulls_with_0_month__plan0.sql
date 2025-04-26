@@ -12,7 +12,7 @@ FROM (
     subq_6.metric_time__month AS metric_time__month
     , subq_3.bookings AS bookings
   FROM (
-    -- Pass Only Elements: ['metric_time__month',]
+    -- Pass Only Elements: ['metric_time__month']
     SELECT
       subq_5.metric_time__month
     FROM (

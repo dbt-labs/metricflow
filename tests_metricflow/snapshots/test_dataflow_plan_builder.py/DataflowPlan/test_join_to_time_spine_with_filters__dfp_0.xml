@@ -151,7 +151,7 @@ docstring:
                         </FilterElementsNode>
                     </AggregateMeasuresNode>
                     <FilterElementsNode>
-                        <!-- description = "Pass Only Elements: ['metric_time__day',]" -->
+                        <!-- description = "Pass Only Elements: ['metric_time__day']" -->
                         <!-- node_id = NodeId(id_str='pfe_1') -->
                         <!-- include_spec =                                                                  -->
                         <!--   TimeDimensionSpec(                                                            -->

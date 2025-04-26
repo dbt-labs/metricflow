@@ -7,9 +7,9 @@ from typing import Optional
 
 from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimension
 from dbt_semantic_interfaces.type_enums import DimensionType
-from metricflow_semantics.helpers.string_helpers import mf_indent
+from metricflow_semantics.helpers.string_helpers import mf_dedent, mf_indent
 from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
-from metricflow_semantics.mf_logging.pretty_formatter import PrettyFormatContext
+from metricflow_semantics.mf_logging.pretty_formatter import PrettyFormatContext, PrettyFormatOption
 from metricflow_semantics.mf_logging.pretty_print import PrettyFormatDictOption, mf_pformat
 from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_DAY
 from typing_extensions import override
@@ -25,6 +25,14 @@ def test_literals() -> None:  # noqa: D103
 
 def test_containers() -> None:  # noqa: D103
     assert mf_pformat((1,)) == "(1,)"
+    assert mf_pformat([1]) == "[1]"
+    assert mf_pformat([1], format_option=PrettyFormatOption(max_line_length=1)) == mf_dedent(
+        """
+        [
+          1,
+        ]
+        """
+    )
     assert mf_pformat(((1, 2), 3)) == "((1, 2), 3)"
     assert mf_pformat([[1, 2], 3]) == "[[1, 2], 3]"
     assert mf_pformat({"a": ((1, 2), 3), (1, 2): 3}) == "{'a': ((1, 2), 3), (1, 2): 3}"
