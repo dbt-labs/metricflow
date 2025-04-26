@@ -1,20 +1,23 @@
 from __future__ import annotations
 
-import dataclasses
 import logging
-import threading
 from contextlib import contextmanager
-from dataclasses import dataclass
-from typing import Dict, Generator
+from contextvars import ContextVar
+from functools import cached_property
+from typing import Generator, Mapping, Optional
 
 from typing_extensions import override
 
+from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple, MappingItem
 from metricflow_semantics.dag.id_prefix import IdPrefix
+from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
+from metricflow_semantics.helpers.mapping_helpers import mf_items_to_dict, mf_mapping_to_items
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 
 logger = logging.getLogger(__name__)
 
 
-@dataclass(frozen=True)
+@fast_frozen_dataclass()
 class SequentialId:
     """Returns a sequentially numbered ID based on a prefix."""
 
@@ -30,69 +33,106 @@ class SequentialId:
         return self.str_value
 
 
-@dataclass
+@fast_frozen_dataclass()
 class _IdGenerationState:
-    """A thread-local class that keeps track of the next IDs to return for a given prefix."""
+    """Keeps track of the next IDs to return for a given prefix.
+
+    Since this is used in a context variable, it can't be mutable or else mutations will be visible between contexts.
+    """
 
     default_start_value: int
-    prefix_to_next_value: Dict[IdPrefix, int] = dataclasses.field(default_factory=dict)
+    prefix_to_next_value_items: AnyLengthTuple[MappingItem[IdPrefix, int]]
+
+    @cached_property
+    def prefix_to_next_value(self) -> Mapping[IdPrefix, int]:
+        return mf_items_to_dict(self.prefix_to_next_value_items)
+
+    @staticmethod
+    def create(
+        default_start_value: int, prefix_to_next_value: Optional[Mapping[IdPrefix, int]] = None
+    ) -> _IdGenerationState:
+        return _IdGenerationState(
+            default_start_value=default_start_value,
+            prefix_to_next_value_items=mf_mapping_to_items(prefix_to_next_value or {}),
+        )
 
 
-class _IdGenerationStateStack(threading.local):
-    """A thread-local stack that keeps track of the state of ID generation.
+class _IdGenerationStateStack:
+    """A stack that keeps track of the state of ID generation.
 
     The stack allows the use of context managers to enter sections where ID generation starts at a configured value.
     When entering the section, a new `_IdGenerationState` is pushed on to the stack, and the state at the top of the
     stack is used to generate IDs. When exiting a section, the state is popped off so that ID generation resumes from
     the previous values.
 
-    This stack is thread-local so that ID generation is consistent for a given thread.
+    The bottom of the stack is the one at the lowest index in `_state_stack_items`, and the top of the stack is the highest.
+
+    The "current state" is the state at the top of the stack.
     """
 
-    def __init__(self, initial_default_start_value: int = 0) -> None:  # noqa: D107
-        self._state_stack = [_IdGenerationState(initial_default_start_value)]
+    _state_stack_items: ContextVar[AnyLengthTuple[_IdGenerationState]] = ContextVar(
+        "_IdGenerationStateStack__state_stack_items"
+    )
 
-    def push_state(self, id_generation_state: _IdGenerationState) -> None:
-        self._state_stack.append(id_generation_state)
+    @classmethod
+    def _get_stack_items(cls) -> AnyLengthTuple[_IdGenerationState]:
+        if cls._state_stack_items.get(None) is None:
+            cls._state_stack_items.set((_IdGenerationState.create(default_start_value=0),))
+        return cls._state_stack_items.get()
 
-    def pop_state(self) -> None:
-        state_stack_size = len(self._state_stack)
+    @classmethod
+    def push_state(cls, id_generation_state: _IdGenerationState) -> None:
+        cls._state_stack_items.set(cls._get_stack_items() + (id_generation_state,))
+
+    @classmethod
+    def pop_state(cls) -> None:
+        initial_items = cls._get_stack_items()
+        state_stack_size = len(initial_items)
         if state_stack_size <= 1:
             logger.error(
-                f"Attempted to pop the stack when {state_stack_size=}. Since sequential ID generation may not "
-                f"be absolutely critical for resolving queries, logging this as an error but it should be "
-                f"investigated.",
+                LazyFormat(
+                    "Attempted to pop the last element in the state stack. Since sequential ID generation may not "
+                    "be absolutely critical for resolving queries, logging this as an error but it should be "
+                    "investigated.",
+                    state_stack_size=state_stack_size,
+                ),
                 stack_info=True,
             )
             return
 
-        self._state_stack.pop(-1)
+        cls._state_stack_items.set(initial_items[:-1])
 
-    @property
-    def current_state(self) -> _IdGenerationState:
-        return self._state_stack[-1]
+    @classmethod
+    def get_current_state(cls) -> _IdGenerationState:
+        return cls._get_stack_items()[-1]
+
+    @classmethod
+    def replace_current_state(cls, updated_state: _IdGenerationState) -> None:
+        """Remove the current state and replace it the new state."""
+        cls._state_stack_items.set(cls._get_stack_items()[:-1] + (updated_state,))
 
 
 class SequentialIdGenerator:
     """Generates sequential ID values based on a prefix."""
 
-    _THREAD_LOCAL_ID_GENERATION_STATE_STACK = _IdGenerationStateStack()
-
     @classmethod
     def create_next_id(cls, id_prefix: IdPrefix) -> SequentialId:  # noqa: D102
-        id_generation_state = cls._THREAD_LOCAL_ID_GENERATION_STATE_STACK.current_state
-        if id_prefix not in id_generation_state.prefix_to_next_value:
-            id_generation_state.prefix_to_next_value[id_prefix] = id_generation_state.default_start_value
-        index = id_generation_state.prefix_to_next_value[id_prefix]
-        id_generation_state.prefix_to_next_value[id_prefix] = index + 1
-        return SequentialId(id_prefix, index)
+        id_generation_state = _IdGenerationStateStack.get_current_state()
+        next_index = id_generation_state.prefix_to_next_value.get(id_prefix) or id_generation_state.default_start_value
+        updated_state = _IdGenerationState.create(
+            default_start_value=id_generation_state.default_start_value,
+            prefix_to_next_value={**id_generation_state.prefix_to_next_value, **{id_prefix: next_index + 1}},
+        )
+        _IdGenerationStateStack.replace_current_state(updated_state)
+
+        return SequentialId(id_prefix=id_prefix, index=next_index)
 
     @classmethod
     def reset(cls, default_start_value: int = 0) -> None:
         """Resets the numbering of the generated IDs so that it starts at the given value."""
-        id_generation_state = cls._THREAD_LOCAL_ID_GENERATION_STATE_STACK.current_state
-        id_generation_state.prefix_to_next_value = {}
-        id_generation_state.default_start_value = default_start_value
+        _IdGenerationStateStack.replace_current_state(
+            _IdGenerationState.create(default_start_value=default_start_value)
+        )
 
     @classmethod
     @contextmanager
@@ -101,6 +141,6 @@ class SequentialIdGenerator:
 
         On exit, resume ID numbering from prior to entering the context.
         """
-        SequentialIdGenerator._THREAD_LOCAL_ID_GENERATION_STATE_STACK.push_state(_IdGenerationState(start_value))
+        _IdGenerationStateStack.push_state(_IdGenerationState.create(default_start_value=start_value))
         yield None
-        SequentialIdGenerator._THREAD_LOCAL_ID_GENERATION_STATE_STACK.pop_state()
+        _IdGenerationStateStack.pop_state()
