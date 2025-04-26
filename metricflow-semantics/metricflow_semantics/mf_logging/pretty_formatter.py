@@ -328,8 +328,15 @@ class MetricFlowPrettyFormatter:
             )
 
         if isinstance(obj, MetricFlowPrettyFormattable):
-            if obj.pretty_format is not None:
-                return obj.pretty_format
+            result = obj.pretty_format(
+                PrettyFormatContext(
+                    formatter=MetricFlowPrettyFormatter(
+                        format_option=self._format_option.with_max_line_length(remaining_line_width)
+                    )
+                )
+            )
+            if result is not None:
+                return result
 
         if is_dataclass(obj):
             # dataclasses.asdict() seems to exclude None fields, so doing this instead.
@@ -403,3 +410,10 @@ class PrettyFormatOption:
             include_none_object_fields=self.include_none_object_fields,
             include_empty_object_fields=self.include_empty_object_fields,
         )
+
+
+@fast_frozen_dataclass()
+class PrettyFormatContext:
+    """The context to use for pretty-formatting an object."""
+
+    formatter: MetricFlowPrettyFormatter
