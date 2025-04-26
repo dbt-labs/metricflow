@@ -134,20 +134,19 @@ class MetricFlowPrettyFormatter:
             of the mapping-like object.
         """
         # See if the string representation can fit on one line. e.g. "'a': [1, 2]"
-        if remaining_line_length is None or remaining_line_length > 0:
-            result_items_without_limit: List[str] = []
-            if is_dataclass_like_object and self._format_option.include_object_field_names:
-                result_items_without_limit.append(str(key))
-            else:
-                result_items_without_limit.append(self._handle_any_obj(key, remaining_line_length=None))
-            result_items_without_limit.append(key_value_seperator)
-            result_items_without_limit.append(self._handle_any_obj(value, remaining_line_length=None))
+        result_items_without_limit: List[str] = []
+        if is_dataclass_like_object and self._format_option.include_object_field_names:
+            result_items_without_limit.append(str(key))
+        else:
+            result_items_without_limit.append(self._handle_any_obj(key, remaining_line_length=None))
+        result_items_without_limit.append(key_value_seperator)
+        result_items_without_limit.append(self._handle_any_obj(value, remaining_line_length=None))
 
-            result_without_limit = mf_indent(
-                "".join(result_items_without_limit), indent_prefix=self._format_option.indent_prefix
-            )
-            if remaining_line_length is None or len(result_without_limit) <= remaining_line_length:
-                return result_without_limit
+        result_without_limit = mf_indent(
+            "".join(result_items_without_limit), indent_prefix=self._format_option.indent_prefix
+        )
+        if remaining_line_length is None or len(result_without_limit) <= remaining_line_length:
+            return result_without_limit
 
         # The string representation can't fit on one line - use multiple. e.g.
         """
