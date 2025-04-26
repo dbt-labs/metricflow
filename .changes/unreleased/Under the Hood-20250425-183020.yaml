@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Add `include_underscore_prefix_fields` option to `mf_pformat`
+time: 2025-04-25T18:30:20.541633-07:00
+custom:
+  Author: plypaul
+  Issue: "1736"
