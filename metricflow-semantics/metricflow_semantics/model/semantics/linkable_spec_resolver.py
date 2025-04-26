@@ -63,10 +63,6 @@ class ValidLinkableSpecResolver:
         self._linkable_spec_index = linkable_spec_index
         self._manifest_object_lookup = manifest_object_lookup
 
-    def _is_semantic_model_scd(self, semantic_model: SemanticModel) -> bool:
-        """Whether the semantic model's underlying table is an SCD."""
-        return any(dim.validity_params is not None for dim in semantic_model.dimensions)
-
     def _generate_linkable_time_dimensions(
         self,
         semantic_model_origin: SemanticModelReference,
@@ -157,8 +153,6 @@ class ValidLinkableSpecResolver:
             necessary.
         """
         properties = frozenset({LinkableElementProperty.METRIC, LinkableElementProperty.JOINED})
-        if self._is_semantic_model_scd(semantic_model):
-            properties = properties.union({LinkableElementProperty.SCD_HOP})
 
         join_path_has_path_links = len(using_join_path.path_elements) > 0
         if join_path_has_path_links:
@@ -321,17 +315,6 @@ class ValidLinkableSpecResolver:
         properties = frozenset({LinkableElementProperty.JOINED})
         if len(join_path.path_elements) > 1:
             properties = properties.union({LinkableElementProperty.MULTI_HOP})
-
-        # If any of the semantic models in the join path is an SCD, add SCD_HOP
-        for reference_to_derived_model in join_path.derived_from_semantic_models:
-            derived_model = self._semantic_model_lookup.get_by_reference(reference_to_derived_model)
-            assert (
-                derived_model
-            ), f"Semantic model {reference_to_derived_model.semantic_model_name} is in join path but does not exist in SemanticModelLookup"
-
-            if self._is_semantic_model_scd(derived_model):
-                properties = properties.union({LinkableElementProperty.SCD_HOP})
-                break
 
         linkable_dimensions: List[LinkableDimension] = []
         linkable_entities: List[LinkableEntity] = []

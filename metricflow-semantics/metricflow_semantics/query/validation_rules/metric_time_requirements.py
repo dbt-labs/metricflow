@@ -61,10 +61,6 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
             > 0
         )
 
-        self._scd_linkable_element_set = self._resolve_group_by_item_result.linkable_element_set.filter(
-            LinkableElementFilter(with_any_of=frozenset({LinkableElementProperty.SCD_HOP}))
-        )
-
     def _query_includes_agg_time_dimension_of_metric(self, metric_reference: MetricReference) -> bool:
         valid_agg_time_dimensions = self._manifest_lookup.metric_lookup.get_valid_agg_time_dimensions_for_metric(
             metric_reference

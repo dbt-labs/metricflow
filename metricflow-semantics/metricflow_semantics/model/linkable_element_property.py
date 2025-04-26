@@ -29,8 +29,6 @@ class LinkableElementProperty(Enum):
     METRIC = "metric"
     # A time dimension with a DatePart.
     DATE_PART = "date_part"
-    # A linkable element that is itself part of an SCD model, or a linkable element that gets joined through another SCD model.
-    SCD_HOP = "scd_hop"
 
     @staticmethod
     def all_properties() -> FrozenSet[LinkableElementProperty]:  # noqa: D102
