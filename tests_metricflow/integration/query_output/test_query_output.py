@@ -2,7 +2,12 @@ from __future__ import annotations
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from metricflow_semantics.specs.query_param_implementations import MetricParameter
+from metricflow_semantics.specs.query_param_implementations import (
+    DimensionOrEntityParameter,
+    MetricParameter,
+    OrderByParameter,
+    TimeDimensionParameter,
+)
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest
@@ -13,18 +18,60 @@ from tests_metricflow.snapshot_utils import assert_str_snapshot_equal
 
 @pytest.mark.sql_engine_snapshot
 @pytest.mark.duckdb_only
-def test_metric_alias(  # noqa: D103
+def test_aliases_with_metrics(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
     it_helpers: IntegrationTestHelpers,
 ) -> None:
+    metric_param = MetricParameter(name="bookings", alias="bookings_alias")
+    time_dimension_param = TimeDimensionParameter(name="metric_time__day", alias="booking_day")
+    dimension_param = DimensionOrEntityParameter(name="listing__capacity_latest", alias="listing_capacity")
+    entity_param = DimensionOrEntityParameter(name="listing", alias="listing_id")
     query_result = it_helpers.mf_engine.query(
         MetricFlowQueryRequest.create_with_random_request_id(
-            metrics=(MetricParameter(name="bookings", alias="bookings_alias"),),
-            group_by_names=["metric_time__day"],
-            order_by_names=["metric_time__day", "bookings"],
+            metrics=(metric_param,),
+            group_by=(time_dimension_param, dimension_param, entity_param),
+            order_by=(
+                OrderByParameter(time_dimension_param),
+                OrderByParameter(dimension_param),
+                OrderByParameter(entity_param),
+                OrderByParameter(metric_param),
+            ),
             where_constraints=("{{ Metric('bookings', ['listing']) }} > 2",),
+        )
+    )
+    assert query_result.result_df is not None, "Unexpected empty result."
+
+    assert_str_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.text_format(),
+        sql_engine=sql_client.sql_engine_type,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
+def test_aliases_without_metrics(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+    it_helpers: IntegrationTestHelpers,
+) -> None:
+    time_dimension_param = TimeDimensionParameter(name="metric_time__day", alias="booking_day")
+    dimension_param = DimensionOrEntityParameter(name="listing__capacity_latest", alias="listing_capacity")
+    entity_param = DimensionOrEntityParameter(name="listing", alias="listing_id")
+    query_result = it_helpers.mf_engine.query(
+        MetricFlowQueryRequest.create_with_random_request_id(
+            group_by=(time_dimension_param, dimension_param, entity_param),
+            order_by=(
+                OrderByParameter(time_dimension_param),
+                OrderByParameter(dimension_param),
+                OrderByParameter(entity_param),
+            ),
+            where_constraints=("{{ Dimension('listing__capacity_latest') }} > 2",),
         )
     )
     assert query_result.result_df is not None, "Unexpected empty result."

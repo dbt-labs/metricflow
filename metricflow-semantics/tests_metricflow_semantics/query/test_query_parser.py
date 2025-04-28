@@ -634,18 +634,14 @@ def test_parse_and_validate_metric_with_duplicate_metric_alias(
         [EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, bookings_yaml_file, revenue_yaml_file, metrics_yaml_file]
     )
 
-    with pytest.raises(InvalidQueryException, match="Query contains duplicate metric aliases"):
+    with pytest.raises(InvalidQueryException, match="Query contains duplicate output column names"):
         query_parser.parse_and_validate_query(
             metrics=(
-                MetricParameter(name="revenue_cumulative", alias="revenue_alias"),
-                MetricParameter(name="revenue_sub_10", alias="revenue_alias"),
+                MetricParameter(name="revenue", alias="alias1"),
+                MetricParameter(name="revenue"),
             ),
-        )
-
-    with pytest.raises(InvalidQueryException, match="Query contains duplicate metric aliases"):
-        query_parser.parse_and_validate_query(
-            metrics=(
-                MetricParameter(name="revenue_cumulative"),
-                MetricParameter(name="revenue_sub_10", alias="revenue_cumulative"),
+            group_by=(
+                DimensionOrEntityParameter(name="user", alias="alias1"),
+                DimensionOrEntityParameter(name="revenue_instance__country", alias="revenue"),
             ),
         )

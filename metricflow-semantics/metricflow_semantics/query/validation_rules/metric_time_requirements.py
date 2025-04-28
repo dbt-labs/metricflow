@@ -30,7 +30,7 @@ from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import Res
 from metricflow_semantics.query.validation_rules.base_validation_rule import PostResolutionQueryValidationRule
 
 if typing.TYPE_CHECKING:
-    from metricflow_semantics.query.query_resolver import ResolveGroupByItemsResult
+    from metricflow_semantics.query.query_resolver import ResolveGroupByItemsResult, ResolveMetricsResult
 
 
 class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
@@ -47,11 +47,13 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
         manifest_lookup: SemanticManifestLookup,
         resolver_input_for_query: ResolverInputForQuery,
         resolve_group_by_item_result: ResolveGroupByItemsResult,
+        resolve_metric_result: ResolveMetricsResult,
     ) -> None:
         super().__init__(
             manifest_lookup=manifest_lookup,
             resolver_input_for_query=resolver_input_for_query,
             resolve_group_by_item_result=resolve_group_by_item_result,
+            resolve_metric_result=resolve_metric_result,
         )
 
         self._query_includes_metric_time = (

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Union
 
 from dbt_semantic_interfaces.protocols import ProtocolHint
 from dbt_semantic_interfaces.references import EntityReference
@@ -14,7 +14,6 @@ from metricflow_semantics.naming.metric_scheme import MetricNamingScheme
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow_semantics.protocols.query_parameter import (
     DimensionOrEntityQueryParameter,
-    InputOrderByParameter,
     MetricQueryParameter,
     OrderByQueryParameter,
     TimeDimensionQueryParameter,
@@ -43,6 +42,7 @@ class TimeDimensionParameter(ProtocolHint[TimeDimensionQueryParameter]):
     name: str
     grain: Optional[str] = None
     date_part: Optional[DatePart] = None
+    alias: Optional[str] = None
 
     def query_resolver_input(  # noqa: D102
         self,
@@ -67,7 +67,12 @@ class TimeDimensionParameter(ProtocolHint[TimeDimensionQueryParameter]):
                     date_part=self.date_part,
                 )
             ),
+            alias=self.alias,
         )
+
+    def with_alias(self, alias: Optional[str]) -> TimeDimensionParameter:
+        """Returns a new TimeDimensionParameter with the alias replaced."""
+        return TimeDimensionParameter(name=self.name, grain=self.grain, date_part=self.date_part, alias=alias)
 
 
 @dataclass(frozen=True)
@@ -78,6 +83,7 @@ class DimensionOrEntityParameter(ProtocolHint[DimensionOrEntityQueryParameter]):
     """
 
     name: str
+    alias: Optional[str] = None
 
     @override
     def _implements_protocol(self) -> DimensionOrEntityQueryParameter:
@@ -114,7 +120,12 @@ class DimensionOrEntityParameter(ProtocolHint[DimensionOrEntityQueryParameter]):
                     date_part=None,
                 )
             ),
+            alias=self.alias,
         )
+
+    def with_alias(self, alias: Optional[str]) -> DimensionOrEntityParameter:
+        """Returns a new DimensionOrEntityParameter with the alias replaced."""
+        return DimensionOrEntityParameter(name=self.name, alias=alias)
 
 
 @dataclass(frozen=True)
@@ -139,6 +150,13 @@ class MetricParameter(ProtocolHint[MetricQueryParameter]):
             alias=self.alias,
         )
 
+    def with_alias(self, alias: Optional[str]) -> MetricParameter:
+        """Returns a new MetricParameter with the alias replaced."""
+        return MetricParameter(name=self.name, alias=alias)
+
+
+InputOrderByParameter = Union[MetricParameter, DimensionOrEntityParameter, TimeDimensionParameter]
+
 
 @dataclass(frozen=True)
 class OrderByParameter(ProtocolHint[OrderByQueryParameter]):
@@ -159,6 +177,10 @@ class OrderByParameter(ProtocolHint[OrderByQueryParameter]):
             possible_inputs=(self.order_by.query_resolver_input(semantic_manifest_lookup=semantic_manifest_lookup),),
             descending=self.descending,
         )
+
+    def with_alias(self, alias: Optional[str]) -> OrderByParameter:
+        """Returns a new OrderByParameter with the alias replaced."""
+        return OrderByParameter(order_by=self.order_by.with_alias(alias), descending=self.descending)
 
 
 @dataclass(frozen=True)

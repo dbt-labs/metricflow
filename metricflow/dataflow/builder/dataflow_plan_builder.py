@@ -34,6 +34,7 @@ from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec
 )
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.constant_property_spec import ConstantPropertySpec
+from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec, LinklessEntitySpec
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
@@ -157,18 +158,17 @@ class DataflowPlanBuilder:
         self, query_spec: MetricFlowQuerySpec, for_group_by_source_node: bool = False
     ) -> DataflowPlanNode:
         """Build SQL output node from query inputs. May be used to build query DFP or source node."""
-        metric_specs: Tuple[MetricSpec, ...] = ()
         for metric_spec in query_spec.metric_specs:
             if (
                 len(metric_spec.filter_spec_set.all_filter_specs) > 0
                 or metric_spec.offset_to_grain is not None
                 or metric_spec.offset_window is not None
             ):
-                # Remove aliases here. They will be added back at the very end of the query.
-                metric_specs += (metric_spec.with_alias(None),) if metric_spec.alias else (metric_spec,)
                 raise ValueError(
                     f"The metric specs in the query spec should not contain any metric modifiers. Got: {metric_spec}"
                 )
+
+        query_spec = query_spec.without_aliases()
 
         filter_spec_factory = WhereSpecFactory(
             column_association_resolver=self._column_association_resolver,
@@ -221,6 +221,9 @@ class DataflowPlanBuilder:
             output_sql_table=output_sql_table,
             limit=query_spec.limit,
             output_selection_specs=output_selection_specs,
+            dimension_specs=query_spec.dimension_specs,
+            time_dimension_specs=query_spec.time_dimension_specs,
+            entity_specs=query_spec.entity_specs,
         )
 
         plan_id = DagId.from_id_prefix(StaticIdPrefix.DATAFLOW_PLAN_PREFIX)
@@ -791,25 +794,31 @@ class DataflowPlanBuilder:
         self, query_spec: MetricFlowQuerySpec, optimizations: FrozenSet[DataflowPlanOptimization]
     ) -> DataflowPlan:
         assert not query_spec.metric_specs, "Can't build distinct values plan with metrics."
+
+        # Remove aliases for easier spec-matching. Will be added back in sink node.
+        base_query_spec = query_spec.without_aliases()
+        final_query_spec = query_spec
+
         query_level_filter_specs: Sequence[WhereFilterSpec] = ()
-        if len(query_spec.filter_intersection.where_filters) > 0:
+        if len(base_query_spec.filter_intersection.where_filters) > 0:
             filter_spec_factory = WhereSpecFactory(
                 column_association_resolver=self._column_association_resolver,
-                spec_resolution_lookup=query_spec.filter_spec_resolution_lookup
+                spec_resolution_lookup=base_query_spec.filter_spec_resolution_lookup
                 or FilterSpecResolutionLookUp.empty_instance(),
                 semantic_model_lookup=self._semantic_model_lookup,
             )
 
             query_level_filter_specs = filter_spec_factory.create_from_where_filter_intersection(
                 filter_location=WhereFilterLocation.for_query(metric_references=tuple()),
-                filter_intersection=query_spec.filter_intersection,
+                filter_intersection=base_query_spec.filter_intersection,
             )
 
         required_linkable_specs = self.__get_required_linkable_specs(
-            queried_linkable_specs=query_spec.linkable_specs, filter_specs=query_level_filter_specs
+            queried_linkable_specs=base_query_spec.linkable_specs, filter_specs=query_level_filter_specs
         )
         predicate_pushdown_state = PredicatePushdownState(
-            time_range_constraint=query_spec.time_range_constraint, where_filter_specs=tuple(query_level_filter_specs)
+            time_range_constraint=base_query_spec.time_range_constraint,
+            where_filter_specs=tuple(query_level_filter_specs),
         )
         dataflow_recipe = self._find_source_node_recipe(
             FindSourceNodeRecipeParameterSet(
@@ -824,21 +833,24 @@ class DataflowPlanBuilder:
         output_node = self._build_pre_aggregation_plan(
             source_node=dataflow_recipe.source_node,
             join_targets=dataflow_recipe.join_targets,
-            filter_to_specs=InstanceSpecSet.create_from_specs(query_spec.linkable_specs.as_tuple),
+            filter_to_specs=InstanceSpecSet.create_from_specs(base_query_spec.linkable_specs.as_tuple),
             custom_granularity_specs=required_linkable_specs.time_dimension_specs_with_custom_grain,
             where_filter_specs=query_level_filter_specs,
-            time_range_constraint=query_spec.time_range_constraint,
-            distinct=query_spec.apply_group_by,
+            time_range_constraint=base_query_spec.time_range_constraint,
+            distinct=base_query_spec.apply_group_by,
         )
 
-        if query_spec.min_max_only:
+        if base_query_spec.min_max_only:
             output_node = MinMaxNode.create(parent_node=output_node)
 
         sink_node = self.build_sink_node(
             parent_node=output_node,
-            metric_specs=query_spec.metric_specs,
-            order_by_specs=query_spec.order_by_specs,
-            limit=query_spec.limit,
+            metric_specs=final_query_spec.metric_specs,
+            order_by_specs=final_query_spec.order_by_specs,
+            limit=final_query_spec.limit,
+            dimension_specs=final_query_spec.dimension_specs,
+            entity_specs=final_query_spec.entity_specs,
+            time_dimension_specs=final_query_spec.time_dimension_specs,
         )
 
         plan = DataflowPlan(sink_nodes=[sink_node])
@@ -849,6 +861,9 @@ class DataflowPlanBuilder:
         parent_node: DataflowPlanNode,
         metric_specs: Sequence[MetricSpec],
         order_by_specs: Sequence[OrderBySpec],
+        dimension_specs: Tuple[DimensionSpec, ...],
+        entity_specs: Tuple[EntitySpec, ...],
+        time_dimension_specs: Tuple[TimeDimensionSpec, ...],
         output_sql_table: Optional[SqlTable] = None,
         limit: Optional[int] = None,
         output_selection_specs: Optional[InstanceSpecSet] = None,
@@ -866,11 +881,15 @@ class DataflowPlanBuilder:
                 parent_node=pre_result_node or parent_node, include_specs=output_selection_specs
             )
 
-        alias_specs = tuple(
-            SpecToAlias(MetricSpec(metric.element_name), MetricSpec(metric.element_name, alias=metric.alias))
-            for metric in metric_specs
-            if metric.alias is not None
+        # Recreate metric_specs to remove auxiliary fields that will interfere with AliasSpecsNode
+        output_metric_specs = tuple(
+            MetricSpec(metric_spec.element_name, alias=metric_spec.alias) for metric_spec in metric_specs
         )
+        alias_specs: Tuple[SpecToAlias, ...] = ()
+        for spec in output_metric_specs + dimension_specs + entity_specs + time_dimension_specs:
+            if spec.alias is not None:
+                alias_specs += (SpecToAlias(spec.with_alias(None), spec),)
+
         if len(alias_specs) > 0:
             pre_result_node = AliasSpecsNode.create(
                 parent_node=pre_result_node or parent_node, change_specs=alias_specs

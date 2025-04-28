@@ -16,7 +16,11 @@ from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.naming.metric_scheme import MetricNamingScheme
 from metricflow_semantics.naming.naming_scheme import QueryItemNamingScheme
-from metricflow_semantics.protocols.query_parameter import GroupByParameter, MetricQueryParameter, OrderByQueryParameter
+from metricflow_semantics.protocols.query_parameter import (
+    GroupByQueryParameter,
+    MetricQueryParameter,
+    OrderByQueryParameter,
+)
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow_semantics.query.resolver_inputs.base_resolver_inputs import (
     InputPatternDescription,
@@ -65,9 +69,10 @@ class ResolverInputForMetric(MetricFlowQueryResolverInput):
 class ResolverInputForGroupByItem(MetricFlowQueryResolverInput):
     """An input that describes a group-by item in the query."""
 
-    input_obj: Union[GroupByParameter, str]
+    input_obj: Union[GroupByQueryParameter, str]
     input_obj_naming_scheme: QueryItemNamingScheme
     spec_pattern: SpecPattern
+    alias: Optional[str] = None
 
     @property
     @override

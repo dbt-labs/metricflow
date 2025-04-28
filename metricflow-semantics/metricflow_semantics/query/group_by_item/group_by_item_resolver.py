@@ -59,6 +59,14 @@ class GroupByItemResolution(SemanticModelDerivation):
     def derived_from_semantic_models(self) -> Sequence[SemanticModelReference]:
         return self.linkable_element_set.derived_from_semantic_models
 
+    def with_alias(self, alias: Optional[str]) -> GroupByItemResolution:
+        """Return a new GroupByItemResolution with the spec's alias field replaced, if a spec is present."""
+        return GroupByItemResolution(
+            spec=self.spec.with_alias(alias) if self.spec else None,
+            linkable_element_set=self.linkable_element_set,
+            issue_set=self.issue_set,
+        )
+
 
 @dataclass(frozen=True)
 class AvailableGroupByItemsResolution:
