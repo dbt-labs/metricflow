@@ -38,7 +38,7 @@ def test_suggestions_for_group_by_item(  # noqa: D103
 
     assert_str_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         snapshot_id="result_0",
         snapshot_str=str(e.value),
     )
@@ -54,7 +54,7 @@ def test_suggestions_for_metric(  # noqa: D103
 
     assert_str_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         snapshot_id="result_0",
         snapshot_str=str(e.value),
     )
@@ -70,7 +70,7 @@ def test_suggestions_for_multiple_metrics(  # noqa: D103
 
     assert_str_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         snapshot_id="result_0",
         snapshot_str=str(e.value),
     )
@@ -105,7 +105,7 @@ def test_suggestions_for_defined_where_filter(  # noqa: D103
 
     assert_str_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         snapshot_id="result_0",
         snapshot_str=str(e.value),
     )
@@ -157,7 +157,7 @@ def test_suggestions_for_defined_filters_in_multi_metric_query(
 
     assert_str_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         snapshot_id="result_0",
         snapshot_str=str(e.value),
     )

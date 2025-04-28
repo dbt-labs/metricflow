@@ -45,7 +45,7 @@ def test_shared_metric_query(
 
     assert_str_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         snapshot_id="result",
         snapshot_str=mf_pformat_dict(
             obj_dict=obj_dict,

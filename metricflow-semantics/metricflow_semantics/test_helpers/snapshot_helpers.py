@@ -44,7 +44,7 @@ class SnapshotConfiguration:
 
 def assert_snapshot_text_equal(
     request: _pytest.fixtures.FixtureRequest,
-    mf_test_configuration: SnapshotConfiguration,
+    snapshot_configuration: SnapshotConfiguration,
     group_id: str,
     snapshot_id: str,
     snapshot_text: str,
@@ -61,7 +61,7 @@ def assert_snapshot_text_equal(
         str(
             snapshot_path_prefix(
                 request=request,
-                snapshot_configuration=mf_test_configuration,
+                snapshot_configuration=snapshot_configuration,
                 snapshot_group=group_id,
                 snapshot_id=snapshot_id,
                 additional_sub_directories=additional_sub_directories_for_snapshots,
@@ -98,7 +98,7 @@ def assert_snapshot_text_equal(
         snapshot_text = snapshot_text + "\n"
 
     # If we are in overwrite mode, create / overwrite the snapshot file.:
-    if mf_test_configuration.overwrite_snapshots:
+    if snapshot_configuration.overwrite_snapshots:
         # Create parent directory for the plan text files.
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         with open(file_path, "w") as snapshot_text_file:
@@ -111,8 +111,8 @@ def assert_snapshot_text_equal(
             f"to see what's new."
         )
 
-    if mf_test_configuration.display_snapshots:
-        if not mf_test_configuration.overwrite_snapshots:
+    if snapshot_configuration.display_snapshots:
+        if not snapshot_configuration.overwrite_snapshots:
             logger.warning(
                 LazyFormat(lambda: f"Not overwriting snapshots, so displaying existing snapshot at {file_path}")
             )
@@ -251,7 +251,7 @@ PlanT = TypeVar("PlanT", bound=MetricFlowDag)
 
 def assert_plan_snapshot_text_equal(
     request: FixtureRequest,
-    mf_test_configuration: SnapshotConfiguration,
+    snapshot_configuration: SnapshotConfiguration,
     plan: PlanT,
     plan_snapshot_text: str,
     plan_snapshot_file_extension: str = ".xml",
@@ -273,7 +273,7 @@ def assert_plan_snapshot_text_equal(
     """
     assert_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=snapshot_configuration,
         group_id=plan.__class__.__name__,
         snapshot_id=str(plan.dag_id),
         snapshot_text=plan_snapshot_text,
@@ -287,7 +287,7 @@ def assert_plan_snapshot_text_equal(
 
 def assert_linkable_element_set_snapshot_equal(  # noqa: D103
     request: FixtureRequest,
-    mf_test_configuration: SnapshotConfiguration,
+    snapshot_configuration: SnapshotConfiguration,
     set_id: str,
     linkable_element_set: LinkableElementSet,
     expectation_description: Optional[str] = None,
@@ -358,7 +358,7 @@ def assert_linkable_element_set_snapshot_equal(  # noqa: D103
 
     assert_str_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=snapshot_configuration,
         snapshot_id=set_id,
         snapshot_str=tabulate.tabulate(headers=headers, tabular_data=sorted(rows)),
         expectation_description=expectation_description,
@@ -367,14 +367,14 @@ def assert_linkable_element_set_snapshot_equal(  # noqa: D103
 
 def assert_spec_set_snapshot_equal(  # noqa: D103
     request: FixtureRequest,
-    mf_test_configuration: SnapshotConfiguration,
+    snapshot_configuration: SnapshotConfiguration,
     set_id: str,
     spec_set: InstanceSpecSet,
     expectation_description: Optional[str] = None,
 ) -> None:
     assert_object_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=snapshot_configuration,
         obj_id=set_id,
         obj=sorted(spec.qualified_name for spec in spec_set.all_specs),
         expectation_description=expectation_description,
@@ -383,7 +383,7 @@ def assert_spec_set_snapshot_equal(  # noqa: D103
 
 def assert_linkable_spec_set_snapshot_equal(  # noqa: D103
     request: FixtureRequest,
-    mf_test_configuration: SnapshotConfiguration,
+    snapshot_configuration: SnapshotConfiguration,
     set_id: str,
     spec_set: LinkableSpecSet,
     expectation_description: Optional[str] = None,
@@ -391,7 +391,7 @@ def assert_linkable_spec_set_snapshot_equal(  # noqa: D103
     naming_scheme = ObjectBuilderNamingScheme()
     assert_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=snapshot_configuration,
         group_id=spec_set.__class__.__name__,
         snapshot_id=set_id,
         snapshot_text=mf_pformat(sorted(naming_scheme.input_str(spec) for spec in spec_set.as_tuple)),
@@ -403,7 +403,7 @@ def assert_linkable_spec_set_snapshot_equal(  # noqa: D103
 
 def assert_object_snapshot_equal(  # type: ignore[misc]
     request: FixtureRequest,
-    mf_test_configuration: SnapshotConfiguration,
+    snapshot_configuration: SnapshotConfiguration,
     obj: Any,
     obj_id: str = "result",
     expectation_description: Optional[str] = None,
@@ -411,7 +411,7 @@ def assert_object_snapshot_equal(  # type: ignore[misc]
     """For tests to compare large objects, this can be used to snapshot a text representation of the object."""
     assert_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=snapshot_configuration,
         group_id=obj.__class__.__name__,
         snapshot_id=obj_id,
         snapshot_text=mf_pformat(obj),
@@ -422,7 +422,7 @@ def assert_object_snapshot_equal(  # type: ignore[misc]
 
 def assert_str_snapshot_equal(  # noqa: D103
     request: FixtureRequest,
-    mf_test_configuration: SnapshotConfiguration,
+    snapshot_configuration: SnapshotConfiguration,
     snapshot_id: str,
     snapshot_str: str,
     expectation_description: Optional[str] = None,
@@ -431,7 +431,7 @@ def assert_str_snapshot_equal(  # noqa: D103
     """Write / compare a string snapshot."""
     assert_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=snapshot_configuration,
         group_id=snapshot_str.__class__.__name__,
         snapshot_id=snapshot_id,
         snapshot_text=snapshot_str,
