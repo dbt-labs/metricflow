@@ -49,7 +49,7 @@ def test_read_sql_source_combination(
     dataflow_plan = make_dataflow_plan(result.combined_branch)
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -87,7 +87,7 @@ def test_filter_combination(
     dataflow_plan = make_dataflow_plan(result.combined_branch)
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )

@@ -71,7 +71,7 @@ def convert_and_check(
 
     assert_str_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         snapshot_id="result",
         snapshot_str="\n".join(lines),
         incomparable_strings_replacement_function=make_schema_replacement_function(

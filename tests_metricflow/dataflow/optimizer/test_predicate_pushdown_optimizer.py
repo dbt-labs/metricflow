@@ -184,7 +184,7 @@ def _check_optimization(
     for plan in (dataflow_plan, optimized_plan):
         assert_plan_snapshot_text_equal(
             request=request,
-            mf_test_configuration=mf_test_configuration,
+            snapshot_configuration=mf_test_configuration,
             plan=plan,
             plan_snapshot_text=plan.structure_text(),
         )
