@@ -33,7 +33,7 @@ def test_simple_metric_with_explicit_time_granularity(  # noqa: D103
 
     assert_object_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         obj_id="result_0",
         obj=query_spec,
     )
@@ -52,7 +52,7 @@ def test_simple_metric_without_explicit_time_granularity(
 
     assert_object_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         obj_id="result_0",
         obj=query_spec,
     )
@@ -71,7 +71,7 @@ def test_derived_metric_with_explicit_time_granularity(
 
     assert_object_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         obj_id="result_0",
         obj=query_spec,
     )
@@ -93,7 +93,7 @@ def test_derived_metric_without_explicit_time_granularity(
 
     assert_object_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         obj_id="result_0",
         obj=query_spec,
     )
@@ -110,7 +110,7 @@ def test_non_metric_time_ignores_default_granularity(  # noqa: D103
 
     assert_object_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         obj_id="result_0",
         obj=query_spec,
     )
@@ -128,7 +128,7 @@ def test_simple_metric_with_defined_metric_time_filter(
 
     assert_object_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         obj_id="result_0",
         obj=query_spec,
     )
@@ -146,7 +146,7 @@ def test_derived_metric_with_defined_metric_time_filter(
 
     assert_object_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         obj_id="result_0",
         obj=query_spec,
     )
@@ -168,7 +168,7 @@ def test_derived_metric_with_defined_metric_time_filter_on_input_metric(
 
     assert_object_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         obj_id="result_0",
         obj=query_spec,
     )

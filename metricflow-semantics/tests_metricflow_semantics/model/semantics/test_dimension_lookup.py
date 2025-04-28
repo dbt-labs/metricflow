@@ -36,5 +36,5 @@ def test_get_invariant(
         for dimension_reference in sorted_dimension_references
     }
     assert_object_snapshot_equal(
-        request=request, mf_test_configuration=mf_test_configuration, obj_id="obj_0", obj=result
+        request=request, snapshot_configuration=mf_test_configuration, obj_id="obj_0", obj=result
     )

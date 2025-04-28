@@ -35,7 +35,7 @@ def test_manifest_generator(  # noqa: D103
     manifest = generator.generate_manifest()
     assert_object_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         obj=manifest,
     )
 

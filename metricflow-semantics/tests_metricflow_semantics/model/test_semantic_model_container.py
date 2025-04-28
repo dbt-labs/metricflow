@@ -67,7 +67,7 @@ def test_get_names(  # noqa: D103
 ) -> None:
     assert_object_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         obj_id="result0",
         obj={
             "dimension_references": sorted([d.element_name for d in semantic_model_lookup.get_dimension_references()]),
@@ -90,7 +90,7 @@ def test_local_linked_elements_for_metric(  # noqa: D103
     sorted_specs = sorted(linkable_elements.specs, key=lambda x: x.qualified_name)
     assert_object_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         obj_id="result0",
         obj=tuple(spec.qualified_name for spec in sorted_specs),
     )
@@ -107,7 +107,7 @@ def test_linkable_elements_for_metrics(  # noqa: D103
 ) -> None:
     assert_linkable_element_set_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         set_id="result0",
         linkable_element_set=metric_lookup.linkable_elements_for_metrics(
             (MetricReference(element_name="views"),),
@@ -131,7 +131,7 @@ def test_linkable_elements_for_measure(
     """Tests extracting linkable elements for a given measure input."""
     assert_linkable_element_set_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         set_id="result0",
         linkable_element_set=metric_lookup.linkable_elements_for_measure(
             measure_reference=MeasureReference(element_name="listings"),
@@ -147,7 +147,7 @@ def test_linkable_elements_for_measure_multi_hop_model(
     """Tests extracting linkable elements for a given measure input."""
     assert_linkable_element_set_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         set_id="result0",
         linkable_element_set=multi_hop_metric_lookup.linkable_elements_for_measure(
             measure_reference=MeasureReference(element_name="txn_count"),
@@ -167,7 +167,7 @@ def test_linkable_elements_for_no_metrics_query(
     sorted_specs = sorted(linkable_elements.specs, key=lambda x: x.qualified_name)
     assert_object_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         obj_id="result0",
         obj=tuple(spec.qualified_name for spec in sorted_specs),
     )
@@ -182,7 +182,7 @@ def test_linkable_set_for_common_dimensions_in_different_models(
     """
     assert_linkable_element_set_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         set_id="result0",
         linkable_element_set=metric_lookup.linkable_elements_for_metrics(
             (MetricReference(element_name="bookings_per_view"),),

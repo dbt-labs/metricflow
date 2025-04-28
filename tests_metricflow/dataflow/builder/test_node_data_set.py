@@ -120,7 +120,7 @@ def test_joined_node_data_set(
 
     assert_spec_set_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         set_id="result0",
         spec_set=join_node_output_data_set.instance_set.spec_set,
     )
