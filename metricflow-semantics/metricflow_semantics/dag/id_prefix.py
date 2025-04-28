@@ -111,6 +111,19 @@ class StaticIdPrefix(IdPrefix, Enum, metaclass=EnumMetaClassHelper):
     CTE = "cte"
     NODE_RESOLVER_SUB_QUERY = "nr_subq"
 
+    METRIC_NODE = "mta"
+    MEASURE_ATTRIBUTE_NODE = "msa"
+    DIMENSION_ATTRIBUTE_NODE = "dma"
+    ENTITY_NODE = "ett"
+    ASSOCIATIVE_ENTITY_NODE = "aet"
+    ATTRIBUTE_NODE = "atb"
+
+    ELEMENT_ENTITY_NODE = "ele"
+    TIME_DIMENSION_ENTITY_NODE = "tdm"
+    COMPOSITE_ENTITY_NODE = "cen"
+    QUERY_ENTITY_NODE = "qet"
+    SEMANTIC_GRAPH = "sg"
+
     @property
     @override
     def str_value(self) -> str:

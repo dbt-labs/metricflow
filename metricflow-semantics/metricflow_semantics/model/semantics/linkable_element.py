@@ -450,6 +450,14 @@ class SemanticModelJoinPath(SemanticModelDerivation, SerializableDataclass):
 
         return sorted_semantic_model_references(semantic_model_references)
 
+    def with_additional_join_path_element(
+        self, join_path_element: SemanticModelJoinPathElement
+    ) -> SemanticModelJoinPath:
+        return SemanticModelJoinPath(
+            left_semantic_model_reference=self.left_semantic_model_reference,
+            path_elements=self.path_elements + (join_path_element,),
+        )
+
 
 @dataclass(frozen=True)
 class MetricSubqueryJoinPathElement(SerializableDataclass):
