@@ -184,9 +184,9 @@ class LinkableSpecIndexBuilder:
         for semantic_model in self._semantic_manifest.semantic_models:
             linkable_element_sets_for_no_metrics_queries.append(self._get_elements_in_semantic_model(semantic_model))
 
-        metric_time_elements_for_no_metrics = self._get_metric_time_elements(measure_reference=None)
+        self._linkable_spec_index.metric_time_elements = self._get_metric_time_elements()
         self._linkable_spec_index.no_metric_linkable_element_set = LinkableElementSet.merge_by_path_key(
-            linkable_element_sets_for_no_metrics_queries + [metric_time_elements_for_no_metrics]
+            linkable_element_sets_for_no_metrics_queries + [self._linkable_spec_index.metric_time_elements]
         )
 
         logger.debug(
@@ -474,7 +474,9 @@ class LinkableSpecIndexBuilder:
 
         return type_params.time_granularity
 
-    def _get_metric_time_elements(self, measure_reference: Optional[MeasureReference] = None) -> LinkableElementSet:
+    def _get_metric_time_elements_for_measure(
+        self, measure_reference: Optional[MeasureReference] = None
+    ) -> LinkableElementSet:
         """Create elements for metric_time for a given measure in a semantic model.
 
         metric_time is a virtual dimension that is the same as aggregation time dimension for a measure, but with a
@@ -486,7 +488,7 @@ class LinkableSpecIndexBuilder:
             return result
 
         measure_semantic_model: Optional[SemanticModel] = None
-        defined_granularity: Optional[ExpandedTimeGranularity] = None
+        defined_granularity: Optional[TimeGranularity] = None
         if measure_reference:
             measure_semantic_model = self._manifest_object_lookup.get_semantic_model_containing_measure(
                 measure_reference
@@ -494,15 +496,26 @@ class LinkableSpecIndexBuilder:
             measure_agg_time_dimension_reference = measure_semantic_model.checked_agg_time_dimension_for_measure(
                 measure_reference=measure_reference
             )
-            min_granularity = self._get_time_granularity_for_dimension(
+            defined_granularity = self._get_time_granularity_for_dimension(
                 semantic_model=measure_semantic_model,
                 time_dimension_reference=measure_agg_time_dimension_reference,
             )
-            defined_granularity = ExpandedTimeGranularity.from_time_granularity(min_granularity)
-        else:
-            # If querying metric_time without metrics, will query from time spines.
-            # Defaults to DAY granularity if available in time spines, else smallest available granularity.
-            min_granularity = min(self._time_spine_sources.keys())
+
+        metric_time_elements = self._get_metric_time_elements()
+        for path_key in metric_time_elements.path_key_to_linkable_dimensions:
+            pass  # TODO: filter out any where granularity / date part is not compatible with defined_granularity
+
+        self._linkable_spec_index.measure_to_metric_time_elements[measure_reference] = metric_time_elements
+        return metric_time_elements
+
+    def _get_metric_time_elements(self) -> LinkableElementSet:
+        result = self._linkable_spec_index.metric_time_elements
+        if result is not None:
+            return result
+
+        # If querying metric_time without metrics, will query from time spines.
+        # Defaults to DAY granularity if available in time spines, else smallest available granularity.
+        min_granularity = min(self._time_spine_sources.keys())
         possible_metric_time_granularities = tuple(
             ExpandedTimeGranularity.from_time_granularity(time_granularity)
             for time_granularity in TimeGranularity
@@ -520,19 +533,15 @@ class LinkableSpecIndexBuilder:
         path_key_to_linkable_dimensions: Dict[ElementPathKey, List[LinkableDimension]] = defaultdict(list)
         for time_granularity in possible_metric_time_granularities:
             properties = {LinkableElementProperty.METRIC_TIME}
-            if time_granularity != defined_granularity:
+            if time_granularity != min_granularity:
                 properties.add(LinkableElementProperty.DERIVED_TIME_GRANULARITY)
             linkable_dimension = LinkableDimension.create(
-                defined_in_semantic_model=measure_semantic_model.reference if measure_semantic_model else None,
+                defined_in_semantic_model=None,
                 element_name=MetricFlowReservedKeywords.METRIC_TIME.value,
                 dimension_type=DimensionType.TIME,
                 entity_links=(),
                 join_path=SemanticModelJoinPath(
-                    left_semantic_model_reference=(
-                        measure_semantic_model.reference
-                        if measure_semantic_model
-                        else SemanticModelDerivation.VIRTUAL_SEMANTIC_MODEL_REFERENCE
-                    ),
+                    left_semantic_model_reference=SemanticModelDerivation.VIRTUAL_SEMANTIC_MODEL_REFERENCE,
                 ),
                 properties=frozenset(properties),
                 time_granularity=time_granularity,
@@ -544,16 +553,12 @@ class LinkableSpecIndexBuilder:
                 continue
             properties = {LinkableElementProperty.METRIC_TIME, LinkableElementProperty.DATE_PART}
             linkable_dimension = LinkableDimension.create(
-                defined_in_semantic_model=measure_semantic_model.reference if measure_semantic_model else None,
+                defined_in_semantic_model=None,
                 element_name=MetricFlowReservedKeywords.METRIC_TIME.value,
                 dimension_type=DimensionType.TIME,
                 entity_links=(),
                 join_path=SemanticModelJoinPath(
-                    left_semantic_model_reference=(
-                        measure_semantic_model.reference
-                        if measure_semantic_model
-                        else SemanticModelDerivation.VIRTUAL_SEMANTIC_MODEL_REFERENCE
-                    ),
+                    left_semantic_model_reference=SemanticModelDerivation.VIRTUAL_SEMANTIC_MODEL_REFERENCE,
                 ),
                 properties=frozenset(properties),
                 date_part=date_part,
@@ -566,7 +571,7 @@ class LinkableSpecIndexBuilder:
                 for path_key, linkable_dimensions in path_key_to_linkable_dimensions.items()
             }
         )
-        self._linkable_spec_index.measure_to_metric_time_elements[measure_reference] = result
+        self._linkable_spec_index.metric_time_elements = result
         return result
 
     def _get_joined_elements(self, measure_semantic_model_reference: SemanticModelReference) -> LinkableElementSet:
@@ -653,15 +658,14 @@ class LinkableSpecIndexBuilder:
         linkable_elements = self._get_linkable_elements_accessible_from_semantic_model(semantic_model)
 
         # Filter out group-by metrics if not specified by the property as there can be a large number of them.
+        metrics_linked_to_semantic_model = LinkableElementSet()
         if LinkableElementProperty.METRIC not in element_filter.without_any_of:
             metrics_linked_to_semantic_model = self.get_joinable_metrics_for_semantic_model(
                 semantic_model=semantic_model,
                 using_join_path=SemanticModelJoinPath(left_semantic_model_reference=semantic_model.reference),
             )
-        else:
-            metrics_linked_to_semantic_model = LinkableElementSet()
 
-        metric_time_elements = self._get_metric_time_elements(measure_reference)
+        metric_time_elements = self._get_metric_time_elements_for_measure(measure_reference)
 
         return LinkableElementSet.merge_by_path_key(
             (linkable_elements, metrics_linked_to_semantic_model, metric_time_elements)

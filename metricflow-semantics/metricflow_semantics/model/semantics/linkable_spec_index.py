@@ -34,3 +34,4 @@ class LinkableSpecIndex:
     semantic_model_reference_to_joined_elements: Dict[SemanticModelReference, LinkableElementSet]
     semantic_model_reference_to_local_elements: Dict[SemanticModelReference, LinkableElementSet]
     measure_to_metric_time_elements: Dict[Optional[MeasureReference], LinkableElementSet]
+    metric_time_elements: LinkableElementSet

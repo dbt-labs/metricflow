@@ -18,31 +18,11 @@ GroupByItemResolution(
       ): (
         LinkableDimension(
           properties=(DERIVED_TIME_GRANULARITY, METRIC_TIME),
-          defined_in_semantic_model=SemanticModelReference(
-            semantic_model_name='monthly_measures_source',
-          ),
           element_name='metric_time',
           dimension_type=TIME,
           join_path=SemanticModelJoinPath(
             left_semantic_model_reference=SemanticModelReference(
-              semantic_model_name='monthly_measures_source',
-            ),
-          ),
-          time_granularity=ExpandedTimeGranularity(
-            name='year',
-            base_granularity=YEAR,
-          ),
-        ),
-        LinkableDimension(
-          properties=(METRIC_TIME,),
-          defined_in_semantic_model=SemanticModelReference(
-            semantic_model_name='yearly_measure_source',
-          ),
-          element_name='metric_time',
-          dimension_type=TIME,
-          join_path=SemanticModelJoinPath(
-            left_semantic_model_reference=SemanticModelReference(
-              semantic_model_name='yearly_measure_source',
+              semantic_model_name='__VIRTUAL__',
             ),
           ),
           time_granularity=ExpandedTimeGranularity(

@@ -3,9 +3,9 @@ test_filename: test_linkable_spec_resolver.py
 ---
 Model Join-Path    Entity Links    Name         Time Granularity    Date Part    Properties
 -----------------  --------------  -----------  ------------------  -----------  -------------------------------------------
-('revenue',)       ()              metric_time  alien_day                        ['DERIVED_TIME_GRANULARITY', 'METRIC_TIME']
-('revenue',)       ()              metric_time  day                              ['METRIC_TIME']
-('revenue',)       ()              metric_time  month                            ['DERIVED_TIME_GRANULARITY', 'METRIC_TIME']
-('revenue',)       ()              metric_time  quarter                          ['DERIVED_TIME_GRANULARITY', 'METRIC_TIME']
-('revenue',)       ()              metric_time  week                             ['DERIVED_TIME_GRANULARITY', 'METRIC_TIME']
-('revenue',)       ()              metric_time  year                             ['DERIVED_TIME_GRANULARITY', 'METRIC_TIME']
+('__VIRTUAL__',)   ()              metric_time  alien_day                        ['DERIVED_TIME_GRANULARITY', 'METRIC_TIME']
+('__VIRTUAL__',)   ()              metric_time  day                              ['DERIVED_TIME_GRANULARITY', 'METRIC_TIME']
+('__VIRTUAL__',)   ()              metric_time  month                            ['DERIVED_TIME_GRANULARITY', 'METRIC_TIME']
+('__VIRTUAL__',)   ()              metric_time  quarter                          ['DERIVED_TIME_GRANULARITY', 'METRIC_TIME']
+('__VIRTUAL__',)   ()              metric_time  week                             ['DERIVED_TIME_GRANULARITY', 'METRIC_TIME']
+('__VIRTUAL__',)   ()              metric_time  year                             ['DERIVED_TIME_GRANULARITY', 'METRIC_TIME']
