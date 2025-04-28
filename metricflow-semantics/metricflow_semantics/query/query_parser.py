@@ -281,9 +281,15 @@ class MetricFlowQueryParser:
                 issue_set_lines: List[str] = [
                     "Message:\n",
                     mf_indent(error_issue.ui_description(resolver_input)),
-                    "\nQuery Input:\n",
-                    mf_indent(resolver_input.ui_description),
                 ]
+                resolver_input_description = resolver_input.ui_description
+                if len(resolver_input_description) > 0:
+                    issue_set_lines.extend(
+                        (
+                            "\nQuery Input:\n",
+                            mf_indent(resolver_input.ui_description),
+                        )
+                    )
 
                 if len(error_issue.query_resolution_path.resolution_path_nodes) > 0:
                     issue_set_lines.extend(

@@ -220,7 +220,6 @@ class ResolverInputForQuery(MetricFlowQueryResolverInput):
     @property
     @override
     def ui_description(self) -> str:
-        return (
-            f"Query({repr([metric_input.ui_description for metric_input in self.metric_inputs])}, "
-            f"{repr([group_by_item_input.input_obj for group_by_item_input in self.group_by_item_inputs])}"
-        )
+        # Since the error message shows the query in the resolution path and there's only ever 1 query for an error
+        # message, there's no need for a query-specific description.
+        return ""

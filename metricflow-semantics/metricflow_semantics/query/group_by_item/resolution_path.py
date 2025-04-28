@@ -5,7 +5,6 @@ from typing import Tuple
 
 from typing_extensions import override
 
-from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.query.group_by_item.path_prefixable import PathPrefixable
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.base_node import GroupByItemResolutionNode
 
@@ -31,14 +30,30 @@ class MetricFlowQueryResolutionPath(PathPrefixable):
     def ui_description(self) -> str:  # noqa: D102
         if len(self.resolution_path_nodes) == 0:
             return "[Empty Path]"
-        descriptions = tuple(f"[Resolve {path_node.ui_description}]" for path_node in self.resolution_path_nodes)
-        output = descriptions[0]
+        # TODO: Centralize handling of error message formatting.
+        max_line_length = 80
+        lines = []
+        for i, path_node in enumerate(self.resolution_path_nodes):
+            if i == 0:
+                indent = ""
+            else:
+                indent = "  " * i + "-> "
+            path_node_description = path_node.ui_description
+            untruncated_line = indent + f"[Resolve {path_node_description}]"
+            untruncated_line_length = len(untruncated_line)
 
-        for i, description in enumerate(descriptions[1:]):
-            output += "\n"
-            output += mf_indent("-> " + description, indent_level=i + 1)
+            if untruncated_line_length > max_line_length:
+                ellipsis_str = "...)"
+                shorten_description_amount = untruncated_line_length - max_line_length + len(ellipsis_str)
+                # Using `max()` in case of edge cases.
+                shortened_description = path_node_description[
+                    : max(1, len(path_node_description) - shorten_description_amount)
+                ]
+                lines.append(indent + f"[Resolve {shortened_description + ellipsis_str}]")
+            else:
+                lines.append(untruncated_line)
 
-        return output
+        return "\n".join(lines)
 
     @override
     def with_path_prefix(self, path_prefix: MetricFlowQueryResolutionPath) -> MetricFlowQueryResolutionPath:
