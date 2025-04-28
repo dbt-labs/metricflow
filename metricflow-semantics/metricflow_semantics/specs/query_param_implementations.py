@@ -54,7 +54,7 @@ class TimeDimensionParameter(ProtocolHint[TimeDimensionQueryParameter]):
         )
 
         return ResolverInputForGroupByItem(
-            input_obj=self.with_alias(None),
+            input_obj=self,
             input_obj_naming_scheme=ObjectBuilderNamingScheme(),
             spec_pattern=EntityLinkPattern(
                 SpecPatternParameterSet.from_parameters(
@@ -105,7 +105,7 @@ class DimensionOrEntityParameter(ProtocolHint[DimensionOrEntityQueryParameter]):
         )
 
         return ResolverInputForGroupByItem(
-            input_obj=self.with_alias(None),
+            input_obj=self,
             input_obj_naming_scheme=ObjectBuilderNamingScheme(),
             spec_pattern=EntityLinkPattern(
                 SpecPatternParameterSet.from_parameters(
@@ -144,7 +144,7 @@ class MetricParameter(ProtocolHint[MetricQueryParameter]):
     ) -> ResolverInputForMetric:
         naming_scheme = MetricNamingScheme()
         return ResolverInputForMetric(
-            input_obj=self.with_alias(None),
+            input_obj=self,
             naming_scheme=naming_scheme,
             spec_pattern=naming_scheme.spec_pattern(self.name, semantic_manifest_lookup=semantic_manifest_lookup),
             alias=self.alias,
@@ -173,7 +173,7 @@ class OrderByParameter(ProtocolHint[OrderByQueryParameter]):
         self, semantic_manifest_lookup: SemanticManifestLookup
     ) -> ResolverInputForOrderByItem:
         return ResolverInputForOrderByItem(
-            input_obj=self.with_alias(None),
+            input_obj=self,
             possible_inputs=(self.order_by.query_resolver_input(semantic_manifest_lookup=semantic_manifest_lookup),),
             descending=self.descending,
         )

@@ -303,6 +303,7 @@ class MetricFlowQueryResolver:
             else:
                 order_by_specs.append(
                     OrderBySpec(
+                        # Ignore aliases in the order by since we'll render the expression instead of the alias.
                         instance_spec=matching_specs[0].with_alias(None),
                         descending=resolver_input_for_order_by.descending,
                     )
