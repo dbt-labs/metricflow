@@ -54,9 +54,11 @@ def assert_snapshot_text_equal(
     additional_sub_directories_for_snapshots: Tuple[str, ...] = (),
     additional_header_fields: Optional[Mapping[str, str]] = None,
     expectation_description: Optional[str] = None,
+    include_headers: bool = True,
 ) -> None:
     """Similar to assert_plan_snapshot_text_equal(), but with more controls on how the snapshot paths are generated."""
     logger.debug(LazyFormat(lambda: "Generated snapshot text:\n" + mf_indent(snapshot_text)))
+
     file_path = (
         str(
             snapshot_path_prefix(
@@ -73,25 +75,28 @@ def assert_snapshot_text_equal(
     if incomparable_strings_replacement_function is not None:
         snapshot_text = incomparable_strings_replacement_function(snapshot_text)
 
-    # Add a header with context about the snapshot.
-    path_to_test_file = pathlib.Path(request.node.fspath)
-    test_doc_string = request.function.__doc__
-    header_lines = [
-        f"test_name: {request.node.name}",
-        f"test_filename: {path_to_test_file.name}",
-    ]
-    if test_doc_string is not None:
-        header_lines.append("docstring:")
-        header_lines.append(mf_indent(test_doc_string.rstrip()))
-    if additional_header_fields is not None:
-        for header_field_name, header_field_value in additional_header_fields.items():
-            header_lines.append(f"{header_field_name}: {header_field_value}")
-    if expectation_description is not None:
-        header_lines.append(f"{SNAPSHOT_EXPECTATION_DESCRIPTION}:")
-        header_lines.append(mf_indent(expectation_description))
-    header_lines.append("---")
+    logger.debug(LazyFormat("Generated snapshot text", snapshot_text=snapshot_text, file_path=file_path))
 
-    snapshot_text = "\n".join(header_lines) + "\n" + snapshot_text
+    # Add a header with context about the snapshot.
+    if include_headers:
+        path_to_test_file = pathlib.Path(request.node.fspath)
+        test_doc_string = request.function.__doc__
+        header_lines = [
+            f"test_name: {request.node.name}",
+            f"test_filename: {path_to_test_file.name}",
+        ]
+        if test_doc_string is not None:
+            header_lines.append("docstring:")
+            header_lines.append(mf_indent(test_doc_string.rstrip()))
+        if additional_header_fields is not None:
+            for header_field_name, header_field_value in additional_header_fields.items():
+                header_lines.append(f"{header_field_name}: {header_field_value}")
+        if expectation_description is not None:
+            header_lines.append(f"{SNAPSHOT_EXPECTATION_DESCRIPTION}:")
+            header_lines.append(mf_indent(expectation_description))
+        header_lines.append("---")
+
+        snapshot_text = "\n".join(header_lines) + "\n" + snapshot_text
 
     # Add a new line at the end of the file so that PRs don't show the "no newline" symbol on Github.
     if len(snapshot_text) > 1 and snapshot_text[-1] != "\n":
@@ -423,8 +428,8 @@ def assert_object_snapshot_equal(  # type: ignore[misc]
 def assert_str_snapshot_equal(  # noqa: D103
     request: FixtureRequest,
     snapshot_configuration: SnapshotConfiguration,
-    snapshot_id: str,
     snapshot_str: str,
+    snapshot_id: str = "result",
     expectation_description: Optional[str] = None,
     incomparable_strings_replacement_function: Optional[Callable[[str], str]] = None,
 ) -> None:
