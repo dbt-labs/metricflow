@@ -75,7 +75,7 @@ def test_all_properties(  # noqa: D103
 ) -> None:
     assert_linkable_element_set_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         set_id="result0",
         linkable_element_set=simple_model_spec_resolver.get_linkable_elements_for_metrics(
             metric_references=[MetricReference(element_name="bookings"), MetricReference(element_name="views")],
@@ -93,7 +93,7 @@ def test_one_property(  # noqa: D103
 ) -> None:
     assert_linkable_element_set_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         set_id="result0",
         linkable_element_set=simple_model_spec_resolver.get_linkable_elements_for_metrics(
             metric_references=[MetricReference(element_name="bookings"), MetricReference(element_name="views")],
@@ -111,7 +111,7 @@ def test_metric_time_property_for_cumulative_metric(  # noqa: D103
 ) -> None:
     assert_linkable_element_set_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         set_id="result0",
         linkable_element_set=simple_model_spec_resolver.get_linkable_elements_for_metrics(
             metric_references=[MetricReference(element_name="trailing_2_months_revenue")],
@@ -129,7 +129,7 @@ def test_metric_time_property_for_derived_metrics(  # noqa: D103
 ) -> None:
     assert_linkable_element_set_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         set_id="result0",
         linkable_element_set=simple_model_spec_resolver.get_linkable_elements_for_metrics(
             metric_references=[MetricReference(element_name="bookings_per_view")],
@@ -147,7 +147,7 @@ def test_cyclic_join_manifest(  # noqa: D103
 ) -> None:
     assert_linkable_element_set_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         set_id="result0",
         linkable_element_set=cyclic_join_manifest_spec_resolver.get_linkable_elements_for_metrics(
             metric_references=[MetricReference(element_name="listings")],
@@ -166,7 +166,7 @@ def test_create_linkable_element_set_from_join_path(  # noqa: D103
 ) -> None:
     assert_linkable_element_set_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         set_id="result0",
         linkable_element_set=simple_model_spec_resolver.create_linkable_element_set_from_join_path(
             join_path=SemanticModelJoinPath.from_single_element(
@@ -185,7 +185,7 @@ def test_create_linkable_element_set_from_join_path_multi_hop(  # noqa: D103
 ) -> None:
     assert_linkable_element_set_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         set_id="result0",
         linkable_element_set=simple_model_spec_resolver.create_linkable_element_set_from_join_path(
             SemanticModelJoinPath(
@@ -227,7 +227,7 @@ def test_linkable_element_set_as_spec_set(
     )
     assert_spec_set_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         set_id="set0",
         spec_set=linkable_spec_set,
     )

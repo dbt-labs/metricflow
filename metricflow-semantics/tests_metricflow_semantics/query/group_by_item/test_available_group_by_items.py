@@ -34,7 +34,7 @@ def test_available_group_by_items(  # noqa: D103
     result = group_by_item_resolver.resolve_available_items()
     assert_linkable_spec_set_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         set_id="set0",
         spec_set=LinkableSpecSet.create_from_specs(result.specs),
     )

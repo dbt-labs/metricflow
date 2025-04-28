@@ -37,7 +37,7 @@ def assert_execution_plan_text_equal(  # noqa: D103
 ) -> None:
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=execution_plan,
         plan_snapshot_text=execution_plan.structure_text(),
         incomparable_strings_replacement_function=make_schema_replacement_function(
@@ -58,7 +58,7 @@ def assert_dataflow_plan_text_equal(  # noqa: D103
 ) -> None:
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
         incomparable_strings_replacement_function=replace_dataset_id_hash,
@@ -81,7 +81,7 @@ def assert_object_snapshot_equal(  # type: ignore[misc]
 
     assert_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         group_id=obj.__class__.__name__,
         snapshot_id=obj_id,
         snapshot_text=mf_pformat(obj),
@@ -105,7 +105,7 @@ def assert_sql_snapshot_equal(
 
     assert_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         group_id=sql.__class__.__name__,
         snapshot_id=snapshot_id,
         snapshot_text=sql,
@@ -134,7 +134,7 @@ def assert_str_snapshot_equal(  # type: ignore[misc]
 
     assert_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         group_id=snapshot_str.__class__.__name__,
         snapshot_id=snapshot_id,
         snapshot_text=snapshot_str,

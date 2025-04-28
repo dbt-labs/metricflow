@@ -32,5 +32,5 @@ def test_measure_properties(
         measure_name: measure_lookup.get_properties(MeasureReference(measure_name)) for measure_name in measure_names
     }
     assert_object_snapshot_equal(
-        request=request, mf_test_configuration=mf_test_configuration, obj_id="obj_0", obj=result
+        request=request, snapshot_configuration=mf_test_configuration, obj_id="obj_0", obj=result
     )

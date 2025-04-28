@@ -52,7 +52,7 @@ def test_ambiguous_metric_time_in_query_filter(  # noqa: D103
 
     assert_object_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         obj_id="result",
         obj=result,
     )

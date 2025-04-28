@@ -30,7 +30,7 @@ def test_convert_table_semantic_model_without_measures(
 
     assert_spec_set_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         set_id="result0",
         spec_set=users_data_set.instance_set.spec_set,
     )
@@ -62,7 +62,7 @@ def test_convert_table_semantic_model_with_measures(
 
     assert_spec_set_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         set_id="result0",
         spec_set=id_verifications_data_set.instance_set.spec_set,
     )

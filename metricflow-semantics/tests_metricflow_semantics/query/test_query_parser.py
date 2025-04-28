@@ -162,7 +162,7 @@ def test_query_parser(  # noqa: D103
         group_by_names=["booking__is_instant", "listing", MTD],
         order_by_names=[MTD, "-bookings"],
     )
-    assert_object_snapshot_equal(request=request, mf_test_configuration=mf_test_configuration, obj=result)
+    assert_object_snapshot_equal(request=request, snapshot_configuration=mf_test_configuration, obj=result)
 
 
 def test_query_parser_case_insensitivity_with_names(  # noqa: D103
@@ -175,7 +175,7 @@ def test_query_parser_case_insensitivity_with_names(  # noqa: D103
         group_by_names=["BOOKING__IS_INSTANT", "LISTING", MTD.upper()],
         order_by_names=[MTD.upper(), "-BOOKINGS"],
     )
-    assert_object_snapshot_equal(request=request, mf_test_configuration=mf_test_configuration, obj=result)
+    assert_object_snapshot_equal(request=request, snapshot_configuration=mf_test_configuration, obj=result)
 
 
 def test_query_parser_case_insensitivity_with_parameter_objects(  # noqa: D103
@@ -194,7 +194,7 @@ def test_query_parser_case_insensitivity_with_parameter_objects(  # noqa: D103
         OrderByParameter(order_by=MetricParameter("BOOKINGS"), descending=True),
     )
     result = bookings_query_parser.parse_and_validate_query(metrics=[metric], group_by=group_by, order_by=order_by)
-    assert_object_snapshot_equal(request=request, mf_test_configuration=mf_test_configuration, obj=result)
+    assert_object_snapshot_equal(request=request, snapshot_configuration=mf_test_configuration, obj=result)
 
 
 def test_query_parser_invalid_group_by(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D103
@@ -218,7 +218,7 @@ def test_query_parser_with_object_params(  # noqa: D103
         OrderByParameter(order_by=MetricParameter("bookings"), descending=True),
     )
     result = bookings_query_parser.parse_and_validate_query(metrics=[metric], group_by=group_by, order_by=order_by)
-    assert_object_snapshot_equal(request=request, mf_test_configuration=mf_test_configuration, obj=result)
+    assert_object_snapshot_equal(request=request, snapshot_configuration=mf_test_configuration, obj=result)
 
 
 def test_order_by_granularity_conversion(
@@ -240,7 +240,7 @@ def test_order_by_granularity_conversion(
     result = query_parser.parse_and_validate_query(
         metric_names=["bookings", "revenue"], group_by_names=[MTD], order_by_names=[f"-{MTD}"]
     )
-    assert_object_snapshot_equal(request=request, mf_test_configuration=mf_test_configuration, obj=result)
+    assert_object_snapshot_equal(request=request, snapshot_configuration=mf_test_configuration, obj=result)
 
 
 def test_order_by_granularity_no_conversion(  # noqa: D103
@@ -251,7 +251,7 @@ def test_order_by_granularity_no_conversion(  # noqa: D103
     result = bookings_query_parser.parse_and_validate_query(
         metric_names=["bookings"], group_by_names=[MTD], order_by_names=[MTD]
     )
-    assert_object_snapshot_equal(request=request, mf_test_configuration=mf_test_configuration, obj=result)
+    assert_object_snapshot_equal(request=request, snapshot_configuration=mf_test_configuration, obj=result)
 
 
 def test_time_range_constraint_conversion(
@@ -273,7 +273,7 @@ def test_time_range_constraint_conversion(
         time_constraint_start=as_datetime("2020-01-15"),
         time_constraint_end=as_datetime("2020-02-15"),
     )
-    assert_object_snapshot_equal(request=request, mf_test_configuration=mf_test_configuration, obj=result)
+    assert_object_snapshot_equal(request=request, snapshot_configuration=mf_test_configuration, obj=result)
 
 
 def test_parse_and_validate_where_constraint_dims(
@@ -308,7 +308,7 @@ def test_parse_and_validate_where_constraint_dims(
         time_constraint_end=as_datetime("2020-02-15"),
         where_constraint_strs=["{{ Dimension('booking__is_instant') }} = '1'"],
     )
-    assert_object_snapshot_equal(request=request, mf_test_configuration=mf_test_configuration, obj=result)
+    assert_object_snapshot_equal(request=request, snapshot_configuration=mf_test_configuration, obj=result)
     assert (
         DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),))
         not in result.query_spec.dimension_specs
@@ -417,7 +417,7 @@ def test_cumulative_metric_agg_time_dimension_name_validation(
     result = query_parser.parse_and_validate_query(
         metric_names=["revenue_cumulative"], group_by_names=["revenue_instance__ds"]
     )
-    assert_object_snapshot_equal(request=request, mf_test_configuration=mf_test_configuration, obj=result)
+    assert_object_snapshot_equal(request=request, snapshot_configuration=mf_test_configuration, obj=result)
 
 
 def test_derived_metric_query_parsing(
@@ -481,7 +481,7 @@ def test_derived_metric_with_offset_parsing(
         metric_names=["revenue_growth_2_weeks"],
         group_by_names=[MTD],
     )
-    assert_object_snapshot_equal(request=request, mf_test_configuration=mf_test_configuration, obj=result)
+    assert_object_snapshot_equal(request=request, snapshot_configuration=mf_test_configuration, obj=result)
 
 
 def test_date_part_parsing(

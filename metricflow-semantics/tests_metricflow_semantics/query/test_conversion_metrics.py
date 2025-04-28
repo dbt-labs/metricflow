@@ -26,6 +26,6 @@ def test_conversion_rate_with_constant_properties(  # noqa: D103
 
     assert_object_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         obj=result,
     )

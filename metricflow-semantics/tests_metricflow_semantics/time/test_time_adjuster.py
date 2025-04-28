@@ -68,7 +68,7 @@ def test_start_and_end_periods(  # noqa: D103
             )
     assert_str_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         snapshot_id="results",
         snapshot_str=tabulate.tabulate(rows, headers=["Date", "Grain", "Period Start", "Period End"]),
     )

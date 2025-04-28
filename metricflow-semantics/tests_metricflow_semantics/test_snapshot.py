@@ -12,7 +12,7 @@ def test_expectation_description(
     """Tests having a description of the expectation in a snapshot."""
     assert_str_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         snapshot_id="result",
         snapshot_str="1 + 1 = 2",
         expectation_description="The snapshot should show the 2 as the result.",

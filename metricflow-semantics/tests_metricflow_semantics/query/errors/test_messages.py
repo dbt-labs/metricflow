@@ -29,7 +29,7 @@ def _check_error_message(
         )
     assert_str_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         snapshot_id="result",
         snapshot_str=str(e.value),
     )

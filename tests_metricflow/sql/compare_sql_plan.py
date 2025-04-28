@@ -31,7 +31,7 @@ def assert_default_rendered_sql_equal(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=sql_query_plan,
         plan_snapshot_text=rendered_sql,
         plan_snapshot_file_extension=".sql",
@@ -73,7 +73,7 @@ def assert_rendered_sql_from_plan_equal(
     sql_engine = sql_client.sql_engine_type
     assert_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         group_id=sql_query_plan.__class__.__name__,
         snapshot_id=sql_query_plan.dag_id.id_str,
         snapshot_text=rendered_sql,
@@ -94,7 +94,7 @@ def assert_sql_plan_text_equal(  # noqa: D103
 ) -> None:
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=sql_query_plan,
         plan_snapshot_text=sql_query_plan.structure_text(),
         incomparable_strings_replacement_function=make_schema_replacement_function(
