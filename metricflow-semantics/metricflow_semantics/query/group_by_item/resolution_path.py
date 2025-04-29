@@ -5,6 +5,7 @@ from typing import Tuple
 
 from typing_extensions import override
 
+from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.query.group_by_item.path_prefixable import PathPrefixable
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.base_node import GroupByItemResolutionNode
 
@@ -33,13 +34,21 @@ class MetricFlowQueryResolutionPath(PathPrefixable):
         # TODO: Centralize handling of error message formatting.
         max_line_length = 80
         lines = []
+
+        # Generate text that shows where the error occurred using indents to show the nested structure.
+        # e.g.
+        #
+        #     [Resolve Query(['bookings'])]
+        #       -> [Resolve Metric('bookings')]
+        #         -> [Resolve Measure('bookings')]
+
         for i, path_node in enumerate(self.resolution_path_nodes):
             if i == 0:
-                indent = ""
+                indent_prefix = ""
             else:
-                indent = "  " * i + "-> "
+                indent_prefix = mf_indent("-> ", indent_level=i)
             path_node_description = path_node.ui_description
-            untruncated_line = indent + f"[Resolve {path_node_description}]"
+            untruncated_line = indent_prefix + f"[Resolve {path_node_description}]"
             untruncated_line_length = len(untruncated_line)
 
             if untruncated_line_length > max_line_length:
@@ -49,7 +58,7 @@ class MetricFlowQueryResolutionPath(PathPrefixable):
                 shortened_description = path_node_description[
                     : max(1, len(path_node_description) - shorten_description_amount)
                 ]
-                lines.append(indent + f"[Resolve {shortened_description + ellipsis_str}]")
+                lines.append(indent_prefix + f"[Resolve {shortened_description + ellipsis_str}]")
             else:
                 lines.append(untruncated_line)
 
