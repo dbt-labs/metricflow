@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Add test to check the error message for empty queries
+time: 2025-04-29T14:49:32.258539-07:00
+custom:
+  Author: plypaul
+  Issue: "1739"
