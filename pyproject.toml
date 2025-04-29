@@ -32,8 +32,8 @@ path = "metricflow/__about__.py"
 
 [tool.hatch.metadata.hooks.requirements_txt]
 files = [
-  "metricflow-semantics/extra-hatch-configuration/requirements.txt",
-  "extra-hatch-configuration/requirements.txt",
+  "metricflow-semantics/requirements-files/requirements.txt",
+  "requirements-files/requirements.txt",
 ]
 
 
