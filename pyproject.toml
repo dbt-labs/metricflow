@@ -41,6 +41,7 @@ files = [
 
 [tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
 dev-env-requirements = [
+  "metricflow-semantics/requirements-files/dev-env-requirements.txt",
   "requirements-files/dev-env-requirements.txt",
 ]
 
