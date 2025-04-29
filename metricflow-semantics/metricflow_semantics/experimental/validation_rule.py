@@ -12,5 +12,5 @@
 #
 # class SemanticGraphValidationRule(ABC):
 #     @abstractmethod
-#     def validate(self, semantic_graph: SemanticGraph) -> SemanticGraphValidationResult:
+#     def validate(self, semantic_graph_old: SemanticGraph) -> SemanticGraphValidationResult:
 #         raise NotImplementedError

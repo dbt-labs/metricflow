@@ -209,9 +209,4 @@ def test_dot_notation(
 def test_graph_snapshot(
     request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, flow_graph: FlowGraph
 ) -> None:
-
-    assert_graph_snapshot_equal(
-        request=request,
-        snapshot_configuration=mf_test_configuration,
-        graph=flow_graph
-    )
+    assert_graph_snapshot_equal(request=request, snapshot_configuration=mf_test_configuration, graph=flow_graph)

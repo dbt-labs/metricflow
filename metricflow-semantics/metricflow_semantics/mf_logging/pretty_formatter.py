@@ -4,6 +4,7 @@ import pprint
 from collections.abc import Sequence, Set
 from dataclasses import fields, is_dataclass
 from enum import Enum
+from pathlib import Path
 from typing import Any, List, Mapping, Optional, Sized, Union
 
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
@@ -393,6 +394,9 @@ class MetricFlowPrettyFormatter:
                 # Fall back to built-in pretty-print in case the dict method can't be called. e.g. requires arguments.
                 # Consider logging a warning.
                 pass
+
+        if isinstance(obj, Path):
+            return str(obj)
 
         # Any other object that's not handled.
         return self._handle_using_pprint(obj, remaining_line_length=remaining_line_length)

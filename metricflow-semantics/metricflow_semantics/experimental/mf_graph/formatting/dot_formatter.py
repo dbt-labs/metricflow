@@ -20,11 +20,6 @@ class DotNotationFormatter(GraphFormatter[str]):
     def _dot_edge_section(self, edges: Iterable[MetricflowGraphEdge]) -> str:
         lines = []
         for edge in edges:
-            # if "\n" in edge_label:
-            #     lines.append(f'{edge.tail_node.dot_label} -> {edge.head_node.dot_label} [label="')
-            #     lines.append(mf_indent(edge_label))
-            #     lines.append('"]')
-            # else:
             lines.append(f"{edge.tail_node.dot_label} -> {edge.head_node.dot_label} [label={edge.dot_label!r}]")
         return "\n".join(lines)
 

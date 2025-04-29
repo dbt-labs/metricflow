@@ -1,20 +1,15 @@
 from __future__ import annotations
 
 import logging
-import os
 from pathlib import Path
 from typing import TypeVar
 
 import graphviz
-from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.dag.mf_dag import DagNode
-from metricflow_semantics.experimental.mf_graph.formatting.graph_formatter import GraphFormatter, OutputT
+from metricflow_semantics.experimental.mf_graph.formatting.graph_formatter import GraphFormatter
 from metricflow_semantics.experimental.mf_graph.mf_graph import MetricflowGraph
 from metricflow_semantics.helpers.string_helpers import mf_dedent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.random_id import random_id
-from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
-from metricflow_semantics.test_helpers.snapshot_helpers import snapshot_path_prefix
 from typing_extensions import override
 
 logger = logging.getLogger(__name__)
@@ -31,21 +26,21 @@ DagNodeT = TypeVar("DagNodeT", bound=DagNode)
 #         dot.edge(tail_name=parent_node.node_id.id_str, head_name=node.node_id.id_str)
 #
 #
-# def display_graph_as_svg(semantic_graph: MetricflowGraph[], directory_path: str) -> str:
+# def display_graph_as_svg(semantic_graph_old: MetricflowGraph[], directory_path: str) -> str:
 #     """Create and display the plan as an SVG in the browser.
 #
 #     Returns the path where the SVG file was created within "mf_config_dir".
 #     """
 #     svg_dir = os.path.join(directory_path, "generated_svg")
 #     random_file_path = os.path.join(svg_dir, f"dag_{random_id()}")
-#     render_via_graphviz(semantic_graph=semantic_graph, file_path_without_svg_suffix=random_file_path)
+#     render_via_graphviz(semantic_graph_old=semantic_graph_old, file_path_without_svg_suffix=random_file_path)
 #     return random_file_path + ".svg"
 #
 #
-# def render_via_graphviz(semantic_graph: MetricflowGraph, file_path_without_svg_suffix: str) -> None:
+# def render_via_graphviz(semantic_graph_old: MetricflowGraph, file_path_without_svg_suffix: str) -> None:
 #     """Render the DAG using graphviz."""
 #     dot = graphviz.Digraph(
-#         comment=semantic_graph.graph_id.str_value,
+#         comment=semantic_graph_old.graph_id.str_value,
 #         graph_attr={
 #             "splines": "true",
 #             # "concentrate": "true",
@@ -58,9 +53,9 @@ DagNodeT = TypeVar("DagNodeT", bound=DagNode)
 #         format="svg",
 #     )
 #     # Not quite correct if there are shared nodes.
-#     for node in semantic_graph.nodes:
+#     for node in semantic_graph_old.nodes:
 #         dot.node(name=node.dot_label, label=node.graphviz_label)
-#     for edge in semantic_graph.edges:
+#     for edge in semantic_graph_old.edges:
 #         dot.edge(
 #             tail_name=edge.tail_node.dot_label,
 #             head_name=edge.head_node.dot_label,
@@ -71,7 +66,7 @@ DagNodeT = TypeVar("DagNodeT", bound=DagNode)
 #
 #
 # def display_graph_if_requested(
-#     mf_test_configuration: MetricFlowTestConfiguration, request: FixtureRequest, semantic_graph: SemanticGraph
+#     mf_test_configuration: MetricFlowTestConfiguration, request: FixtureRequest, semantic_graph_old: SemanticGraph
 # ) -> None:
 #     """Create and display the plan as an SVG, if requested to do so."""
 #     if not mf_test_configuration.display_graphs:
@@ -84,14 +79,14 @@ DagNodeT = TypeVar("DagNodeT", bound=DagNode)
 #         snapshot_path_prefix(
 #             request=request,
 #             snapshot_configuration=mf_test_configuration,
-#             snapshot_group=semantic_graph.__class__.__name__,
-#             snapshot_id=semantic_graph.graph_id.str_value,
+#             snapshot_group=semantic_graph_old.__class__.__name__,
+#             snapshot_id=semantic_graph_old.graph_id.str_value,
 #         )
 #     )
 #
 #     # Create parent directory since it might not exist
 #     os.makedirs(os.path.dirname(plan_svg_output_path_prefix), exist_ok=True)
-#     render_via_graphviz(semantic_graph=semantic_graph, file_path_without_svg_suffix=plan_svg_output_path_prefix)
+#     render_via_graphviz(semantic_graph_old=semantic_graph_old, file_path_without_svg_suffix=plan_svg_output_path_prefix)
 
 
 class SvgFileFormatter(GraphFormatter[None]):
@@ -144,6 +139,9 @@ class SvgFileFormatter(GraphFormatter[None]):
                 ),
             )
 
-        logger.debug(LazyFormat("Writing SVG file", svg_file=self._output_svg_file_path))
-        dot.render(self._output_file_path_without_suffix, format="svg", cleanup=False)
-        logger.info(LazyFormat("Wrote SVG file", svg_file=self._output_svg_file_path))
+        logger.debug(LazyFormat("Writing SVG file of the graph to a file", svg_file=self._output_svg_file_path))
+        with open(self._output_svg_file_path, "w") as output_file:
+            output_file.write(dot.pipe(format="svg").decode("utf-8"))
+        logger.info(
+            LazyFormat("Wrote SVG file of the graph", dot_label=graph.dot_label, svg_file=self._output_svg_file_path)
+        )
