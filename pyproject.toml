@@ -27,6 +27,9 @@ classifiers = [
 # Dependencies are specified through the `hatch-requirements-txt` plug-in.
 dynamic = ["version", "dependencies", "optional-dependencies"]
 
+[tool.hatch.metadata]
+allow-direct-references = true
+
 [tool.hatch.version]
 path = "metricflow/__about__.py"
 
@@ -34,6 +37,11 @@ path = "metricflow/__about__.py"
 files = [
   "metricflow-semantics/requirements-files/requirements.txt",
   "requirements-files/requirements.txt",
+]
+
+[tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
+dev-env-requirements = [
+  "requirements-files/dev-env-requirements.txt",
 ]
 
 
@@ -63,30 +71,7 @@ packages = ["metricflow", "metricflow-semantics/metricflow_semantics"]
 description = "Environment for development. Includes a DuckDB-backed client."
 run = "run-coverage --no-cov"
 
-dependencies = [
-  # Developer tools
-  "mypy>=1.7.0, <1.8.0",
-  "pre-commit>=3.2.2, <3.3.0",
-  "Pympler >=1.1, <=2.0",
-  "pytest-mock>=3.14.0, <3.15.0",
-  "pytest-xdist>=3.6.0, <3.7.0",
-  "pytest>=8.0.0, < 9.0.0",
-  "PyYAML>=6.0, <7.0.0",
-  "tabulate>=0.8.9",
-  "types-PyYAML",
-  "types-python-dateutil",
-  "types-tabulate",
-  # CLI-related
-  "halo>=0.0.31, <0.1.0",
-  "update-checker>=0.18.0, <0.19.0",
-  # Bug with mypy: https://github.com/pallets/click/issues/2558#issuecomment-1656546003
-  "click>=8.1.6",
-  "dbt-core @ git+https://github.com/dbt-labs/dbt-core@ff6745c79532d50139d553f3b088c5d783b4f2dd#subdirectory=core",
-  "dbt-duckdb>=1.8.0, <1.9.0",
-  # Excluding 1.2.1 due to window functions returning incorrect results:
-  # https://github.com/duckdb/duckdb/issues/16617
-  "duckdb !=1.2.1"
-]
+features = ["dev-env-requirements"]
 
 
 [tool.hatch.envs.dev-env.env-vars]
