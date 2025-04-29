@@ -9,6 +9,7 @@ from typing_extensions import override
 
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
+from metricflow_semantics.mf_logging.pretty_formatter import MetricFlowPrettyFormatter, PrettyFormatOption
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.base_node import (
     GroupByItemResolutionNode,
     GroupByItemResolutionNodeSet,
@@ -91,7 +92,15 @@ class QueryGroupByItemResolutionNode(GroupByItemResolutionNode):
     @property
     @override
     def ui_description(self) -> str:
-        return f"Query({repr([metric_reference.element_name for metric_reference in self.metrics_in_query])})"
+        # TODO: Remove trailing comma.
+        pretty_formatter = MetricFlowPrettyFormatter(
+            PrettyFormatOption(include_object_field_names=False, max_line_length=None)
+        )
+        metric_descriptions = [metric_reference.element_name for metric_reference in self.metrics_in_query]
+        return pretty_formatter.pretty_format_object_by_parts(
+            class_name="Query",
+            field_mapping={"metrics": metric_descriptions},
+        )
 
     @override
     def _self_set(self) -> GroupByItemResolutionNodeSet:

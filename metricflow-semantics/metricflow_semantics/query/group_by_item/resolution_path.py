@@ -31,14 +31,38 @@ class MetricFlowQueryResolutionPath(PathPrefixable):
     def ui_description(self) -> str:  # noqa: D102
         if len(self.resolution_path_nodes) == 0:
             return "[Empty Path]"
-        descriptions = tuple(f"[Resolve {path_node.ui_description}]" for path_node in self.resolution_path_nodes)
-        output = descriptions[0]
+        # TODO: Centralize handling of error message formatting.
+        max_line_length = 80
+        lines = []
 
-        for i, description in enumerate(descriptions[1:]):
-            output += "\n"
-            output += mf_indent("-> " + description, indent_level=i + 1)
+        # Generate text that shows where the error occurred using indents to show the nested structure.
+        # e.g.
+        #
+        #     [Resolve Query(['bookings'])]
+        #       -> [Resolve Metric('bookings')]
+        #         -> [Resolve Measure('bookings')]
 
-        return output
+        for i, path_node in enumerate(self.resolution_path_nodes):
+            if i == 0:
+                indent_prefix = ""
+            else:
+                indent_prefix = mf_indent("-> ", indent_level=i)
+            path_node_description = path_node.ui_description
+            untruncated_line = indent_prefix + f"[Resolve {path_node_description}]"
+            untruncated_line_length = len(untruncated_line)
+
+            if untruncated_line_length > max_line_length:
+                ellipsis_str = "...)"
+                shorten_description_amount = untruncated_line_length - max_line_length + len(ellipsis_str)
+                # Using `max()` in case of edge cases.
+                shortened_description = path_node_description[
+                    : max(1, len(path_node_description) - shorten_description_amount)
+                ]
+                lines.append(indent_prefix + f"[Resolve {shortened_description + ellipsis_str}]")
+            else:
+                lines.append(untruncated_line)
+
+        return "\n".join(lines)
 
     @override
     def with_path_prefix(self, path_prefix: MetricFlowQueryResolutionPath) -> MetricFlowQueryResolutionPath:
