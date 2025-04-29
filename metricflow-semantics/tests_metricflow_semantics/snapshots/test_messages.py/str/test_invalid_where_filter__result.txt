@@ -1,0 +1,44 @@
+test_name: test_invalid_where_filter
+test_filename: test_messages.py
+docstring:
+  Test the error message for an invalid where-filter.
+---
+Got error(s) during query resolution.
+
+Error #1:
+  Message:
+
+    The given input does not match any of the available group-by-items for
+    Measure('bookings'). Common issues are:
+
+      * Incorrect names.
+      * No valid join paths exist from the measure to the group-by-item.
+        (fan-out join support is pending).
+      * There are multiple matching join paths.
+        (disambiguation support is pending).
+
+    Suggestions:
+      [
+        "Dimension('booking__is_instant')",
+        "TimeDimension('booking__ds', 'day')",
+        "Entity('booking__listing')",
+        "TimeDimension('metric_time', 'day')",
+        "Metric('bookings', group_by=['listing'])",
+        "Entity('listing')",
+      ]
+
+  Query Input:
+
+    WhereFilter(
+      ["{{ Dimension('booking__invalid_dim') }} = '1'"]
+    )
+    Filter Path:
+      [Resolve Query(['bookings'])]
+    Object Builder Input:
+      Dimension('booking__invalid_dim')
+
+  Issue Location:
+
+    [Resolve Query(['bookings'])]
+      -> [Resolve Metric('bookings')]
+        -> [Resolve Measure('bookings')]

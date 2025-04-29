@@ -1,0 +1,22 @@
+test_name: test_long_invalid_metric
+test_filename: test_messages.py
+docstring:
+  Test the error message for an empty query.
+---
+Got error(s) during query resolution.
+
+Error #1:
+  Message:
+
+    The given input does not exactly match any known metrics.
+
+    Suggestions:
+      ['bookings']
+
+  Query Input:
+
+    long_invalid_metric_name__________________________________________________
+
+  Issue Location:
+
+    [Resolve Query(['bookings', 'long_invalid_metric_name__________________________________________________'])]

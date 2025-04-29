@@ -1,0 +1,19 @@
+test_name: test_empty_query
+test_filename: test_messages.py
+docstring:
+  Test the error message for an empty query.
+---
+Got error(s) during query resolution.
+
+Error #1:
+  Message:
+
+    There are no metrics or group by items requested in the query.
+
+  Query Input:
+
+    Query([], []
+
+  Issue Location:
+
+    [Resolve Query([])]
