@@ -16,6 +16,16 @@ ParseQueryResult(
     filter_spec_resolution_lookup=FilterSpecResolutionLookUp(),
     min_max_only=False,
     apply_group_by=True,
+    spec_output_order=(
+      TimeDimensionSpec(
+        element_name='metric_time',
+        time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH),
+      ),
+      MetricSpec(
+        element_name='revenue_growth_2_weeks',
+        filter_spec_set=WhereFilterSpecSet(),
+      ),
+    ),
   ),
   queried_semantic_models=(SemanticModelReference(semantic_model_name='revenue_source'),),
 )

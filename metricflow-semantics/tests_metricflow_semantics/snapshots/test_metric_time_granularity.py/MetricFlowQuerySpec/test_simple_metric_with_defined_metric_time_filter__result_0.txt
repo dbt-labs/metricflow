@@ -95,4 +95,10 @@ MetricFlowQuerySpec(
   ),
   min_max_only=False,
   apply_group_by=True,
+  spec_output_order=(
+    MetricSpec(
+      element_name='simple_metric_with_default_time_granularity_and_metric_time_filter',
+      filter_spec_set=WhereFilterSpecSet(),
+    ),
+  ),
 )

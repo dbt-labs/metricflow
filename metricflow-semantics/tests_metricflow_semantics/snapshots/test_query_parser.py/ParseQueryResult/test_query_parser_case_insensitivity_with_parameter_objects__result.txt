@@ -40,6 +40,18 @@ ParseQueryResult(
     filter_spec_resolution_lookup=FilterSpecResolutionLookUp(),
     min_max_only=False,
     apply_group_by=True,
+    spec_output_order=(
+      DimensionSpec(
+        element_name='is_instant',
+        entity_links=(EntityReference(element_name='booking'),),
+      ),
+      EntitySpec(element_name='listing'),
+      TimeDimensionSpec(
+        element_name='metric_time',
+        time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY),
+      ),
+      MetricSpec(element_name='bookings', filter_spec_set=WhereFilterSpecSet()),
+    ),
   ),
   queried_semantic_models=(SemanticModelReference(semantic_model_name='bookings_source'),),
 )
