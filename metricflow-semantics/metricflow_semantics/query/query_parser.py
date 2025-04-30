@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import itertools
 import logging
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple, Union
@@ -223,6 +224,7 @@ class MetricFlowQueryParser:
                             spec_pattern=group_by_item_naming_scheme.spec_pattern(
                                 order_by_name_without_prefix, semantic_manifest_lookup=self._manifest_lookup
                             ),
+                            output_column_order_key=None,
                         )
                     )
                     break
@@ -238,6 +240,7 @@ class MetricFlowQueryParser:
                             spec_pattern=metric_naming_scheme.spec_pattern(
                                 order_by_name_without_prefix, semantic_manifest_lookup=self._manifest_lookup
                             ),
+                            output_column_order_key=None,
                         )
                     )
 
@@ -377,8 +380,11 @@ class MetricFlowQueryParser:
         metric_names = metric_names or ()
         metrics = metrics or ()
 
+        metric_output_column_index_counter = itertools.count()
+
         group_by_names = group_by_names or ()
         group_by = group_by or ()
+        group_by_output_column_index_counter = itertools.count()
 
         order_by_names = order_by_names or ()
         order_by = order_by or ()
@@ -398,6 +404,7 @@ class MetricFlowQueryParser:
                         spec_pattern=metric_naming_scheme.spec_pattern(
                             metric_name, semantic_manifest_lookup=self._manifest_lookup
                         ),
+                        output_column_order_key=next(metric_output_column_index_counter),
                     )
                     resolver_inputs_for_metrics.append(resolver_input_for_metric)
                     break
@@ -416,7 +423,10 @@ class MetricFlowQueryParser:
 
         for metric_query_parameter in metrics:
             resolver_inputs_for_metrics.append(
-                metric_query_parameter.query_resolver_input(semantic_manifest_lookup=self._manifest_lookup)
+                metric_query_parameter.query_resolver_input(
+                    semantic_manifest_lookup=self._manifest_lookup,
+                    output_column_order_key=next(metric_output_column_index_counter),
+                )
             )
 
         resolver_inputs_for_group_by_items: List[ResolverInputForGroupByItem] = []
@@ -433,6 +443,7 @@ class MetricFlowQueryParser:
                         input_obj=group_by_name,
                         input_obj_naming_scheme=group_by_item_naming_scheme,
                         spec_pattern=spec_pattern,
+                        output_column_order_key=next(group_by_output_column_index_counter),
                     )
                     resolver_inputs_for_group_by_items.append(resolver_input_for_group_by_item)
                     break
@@ -451,24 +462,23 @@ class MetricFlowQueryParser:
 
             logger.debug(
                 LazyFormat(
-                    lambda: "Converted group-by-item input:\n"
-                    + mf_indent(f"Input: {repr(group_by_name)}")
-                    + "\n"
-                    + mf_indent(f"Resolver Input: {mf_pformat(resolver_input_for_group_by_item)}")
+                    "Converted group-by-item input",
+                    group_by_parameter=group_by_name,
+                    resolver_input_for_group_by_item=resolver_input_for_group_by_item,
                 )
             )
 
         for group_by_parameter in group_by:
             resolver_input_for_group_by_parameter = group_by_parameter.query_resolver_input(
-                semantic_manifest_lookup=self._manifest_lookup
+                semantic_manifest_lookup=self._manifest_lookup,
+                output_column_order_key=next(group_by_output_column_index_counter),
             )
             resolver_inputs_for_group_by_items.append(resolver_input_for_group_by_parameter)
             logger.debug(
                 LazyFormat(
-                    lambda: "Converted group-by-item input:\n"
-                    + mf_indent(f"Input: {repr(group_by_parameter)}")
-                    + "\n"
-                    + mf_indent(f"Resolver Input: {mf_pformat(resolver_input_for_group_by_parameter)}")
+                    "Converted group-by-item input",
+                    group_by_parameter=group_by_parameter,
+                    resolver_input_for_group_by_item=resolver_input_for_group_by_parameter,
                 )
             )
 

@@ -7,6 +7,7 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 if TYPE_CHECKING:
     from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
     from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import (
+        OutputColumnOrderKey,
         ResolverInputForGroupByItem,
         ResolverInputForMetric,
         ResolverInputForOrderByItem,
@@ -28,7 +29,9 @@ class MetricQueryParameter(Protocol):
         raise NotImplementedError
 
     def query_resolver_input(  # noqa: D102
-        self, semantic_manifest_lookup: SemanticManifestLookup
+        self,
+        semantic_manifest_lookup: SemanticManifestLookup,
+        output_column_order_key: int,
     ) -> ResolverInputForMetric:
         raise NotImplementedError
 
@@ -48,7 +51,9 @@ class DimensionOrEntityQueryParameter(Protocol):
         raise NotImplementedError
 
     def query_resolver_input(  # noqa: D102
-        self, semantic_manifest_lookup: SemanticManifestLookup
+        self,
+        semantic_manifest_lookup: SemanticManifestLookup,
+        output_column_order_key: Optional[OutputColumnOrderKey],
     ) -> ResolverInputForGroupByItem:
         raise NotImplementedError
 
@@ -79,9 +84,17 @@ class TimeDimensionQueryParameter(Protocol):  # noqa: D101
         """What to name the dimension or entity's output column."""
         raise NotImplementedError
 
-    def query_resolver_input(  # noqa: D102
-        self, semantic_manifest_lookup: SemanticManifestLookup
+    def query_resolver_input(
+        self,
+        semantic_manifest_lookup: SemanticManifestLookup,
+        output_column_order_key: Optional[OutputColumnOrderKey],
     ) -> ResolverInputForGroupByItem:
+        """Return the corresponding input to the query resolver for this parameter.
+
+        Args:
+            semantic_manifest_lookup: The semantic manifest lookup associated with the query.
+            output_column_order_key: A key that can be used to sort the output columns associated with this input.
+        """
         raise NotImplementedError
 
 

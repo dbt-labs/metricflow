@@ -42,6 +42,9 @@ class InvalidStringInput(MetricFlowQueryResolverInput):
         return self.input_obj
 
 
+OutputColumnOrderKey = int
+
+
 @dataclass(frozen=True)
 class ResolverInputForMetric(MetricFlowQueryResolverInput):
     """An input that describes the metrics in the query."""
@@ -49,6 +52,8 @@ class ResolverInputForMetric(MetricFlowQueryResolverInput):
     input_obj: Union[MetricQueryParameter, str]
     naming_scheme: MetricNamingScheme
     spec_pattern: MetricSpecPattern
+    output_column_order_key: Optional[OutputColumnOrderKey]
+
     alias: Optional[str] = None
 
     @property
@@ -72,6 +77,7 @@ class ResolverInputForGroupByItem(MetricFlowQueryResolverInput):
     input_obj: Union[GroupByQueryParameter, str]
     input_obj_naming_scheme: QueryItemNamingScheme
     spec_pattern: SpecPattern
+    output_column_order_key: Optional[OutputColumnOrderKey]
     alias: Optional[str] = None
 
     @property

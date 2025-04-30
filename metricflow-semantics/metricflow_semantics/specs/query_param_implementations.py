@@ -20,6 +20,7 @@ from metricflow_semantics.protocols.query_parameter import (
 )
 from metricflow_semantics.protocols.query_parameter import SavedQueryParameter as SavedQueryParameterProtocol
 from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import (
+    OutputColumnOrderKey,
     ResolverInputForGroupByItem,
     ResolverInputForMetric,
     ResolverInputForOrderByItem,
@@ -47,6 +48,7 @@ class TimeDimensionParameter(ProtocolHint[TimeDimensionQueryParameter]):
     def query_resolver_input(  # noqa: D102
         self,
         semantic_manifest_lookup: SemanticManifestLookup,
+        output_column_order_key: Optional[OutputColumnOrderKey],
     ) -> ResolverInputForGroupByItem:
         name_structure = StructuredLinkableSpecName.from_name(
             qualified_name=self.name.lower(),
@@ -68,6 +70,7 @@ class TimeDimensionParameter(ProtocolHint[TimeDimensionQueryParameter]):
                 )
             ),
             alias=self.alias,
+            output_column_order_key=output_column_order_key,
         )
 
     def with_alias(self, alias: Optional[str]) -> TimeDimensionParameter:
@@ -89,7 +92,11 @@ class DimensionOrEntityParameter(ProtocolHint[DimensionOrEntityQueryParameter]):
     def _implements_protocol(self) -> DimensionOrEntityQueryParameter:
         return self
 
-    def query_resolver_input(self, semantic_manifest_lookup: SemanticManifestLookup) -> ResolverInputForGroupByItem:
+    def query_resolver_input(
+        self,
+        semantic_manifest_lookup: SemanticManifestLookup,
+        output_column_order_key: Optional[OutputColumnOrderKey],
+    ) -> ResolverInputForGroupByItem:
         """Produces resolver input from a query parameter representing a dimension or entity.
 
         Note these parameters do not currently have a direct need for the semantic_manifest_lookup, but since these
@@ -121,6 +128,7 @@ class DimensionOrEntityParameter(ProtocolHint[DimensionOrEntityQueryParameter]):
                 )
             ),
             alias=self.alias,
+            output_column_order_key=output_column_order_key,
         )
 
     def with_alias(self, alias: Optional[str]) -> DimensionOrEntityParameter:
@@ -140,7 +148,9 @@ class MetricParameter(ProtocolHint[MetricQueryParameter]):
         return self
 
     def query_resolver_input(  # noqa: D102
-        self, semantic_manifest_lookup: SemanticManifestLookup
+        self,
+        semantic_manifest_lookup: SemanticManifestLookup,
+        output_column_order_key: Optional[OutputColumnOrderKey],
     ) -> ResolverInputForMetric:
         naming_scheme = MetricNamingScheme()
         return ResolverInputForMetric(
@@ -148,6 +158,7 @@ class MetricParameter(ProtocolHint[MetricQueryParameter]):
             naming_scheme=naming_scheme,
             spec_pattern=naming_scheme.spec_pattern(self.name, semantic_manifest_lookup=semantic_manifest_lookup),
             alias=self.alias,
+            output_column_order_key=output_column_order_key,
         )
 
     def with_alias(self, alias: Optional[str]) -> MetricParameter:
@@ -174,7 +185,12 @@ class OrderByParameter(ProtocolHint[OrderByQueryParameter]):
     ) -> ResolverInputForOrderByItem:
         return ResolverInputForOrderByItem(
             input_obj=self,
-            possible_inputs=(self.order_by.query_resolver_input(semantic_manifest_lookup=semantic_manifest_lookup),),
+            possible_inputs=(
+                self.order_by.query_resolver_input(
+                    semantic_manifest_lookup=semantic_manifest_lookup,
+                    output_column_order_key=None,
+                ),
+            ),
             descending=self.descending,
         )
 
