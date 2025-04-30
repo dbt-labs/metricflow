@@ -7,6 +7,7 @@ from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclas
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
 from dbt_semantic_interfaces.protocols import WhereFilterIntersection
 
+from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
     FilterSpecResolutionLookUp,
@@ -14,6 +15,7 @@ from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
+from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.order_by_spec import OrderBySpec
@@ -38,6 +40,12 @@ class MetricFlowQuerySpec(SerializableDataclass):
     filter_spec_resolution_lookup: FilterSpecResolutionLookUp = FilterSpecResolutionLookUp.empty_instance()
     min_max_only: bool = False
     apply_group_by: bool = True
+
+    # Use the following to order the sequence of columns in the output. If a spec is not present in the list,
+    # it will appear after the columns for specs that are in this field. Note that in the current implementation,
+    # the ordering only applies within a group of specs of the same type. i.e. all group-by-item columns will still be
+    # listed before metric columns.
+    spec_output_order: AnyLengthTuple[InstanceSpec] = ()
 
     @property
     def linkable_specs(self) -> LinkableSpecSet:  # noqa: D102

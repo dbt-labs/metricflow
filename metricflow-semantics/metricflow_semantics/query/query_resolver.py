@@ -181,6 +181,10 @@ class MetricFlowQueryResolver:
         metric_inputs: Sequence[ResolverInputForMetric],
         query_resolution_path: MetricFlowQueryResolutionPath,
     ) -> ResolveMetricsResult:
+        """Resolve the metric specs associated with the given inputs.
+
+        The order of outputs should be the same as the order of inputs.
+        """
         # Build a list of metrics that are available from the manifest.
         available_metric_specs = tuple(
             MetricSpec.from_reference(metric_reference)
@@ -231,6 +235,10 @@ class MetricFlowQueryResolver:
         group_by_item_inputs: Sequence[ResolverInputForGroupByItem],
         filter_input: ResolverInputForQueryLevelWhereFilterIntersection,
     ) -> ResolveGroupByItemsResult:
+        """Resolve the group-by-item specs associated with the given inputs.
+
+        The order of items in the result should be the same as the order of inputs.
+        """
         resolution_dag_builder = GroupByItemResolutionDagBuilder(
             manifest_lookup=self._manifest_lookup,
         )
@@ -248,6 +256,7 @@ class MetricFlowQueryResolver:
         input_to_issue_set_mapping_items: List[InputToIssueSetMappingItem] = []
         group_by_item_specs: List[LinkableInstanceSpec] = []
         linkable_element_sets: List[LinkableElementSet] = []
+
         for group_by_item_input in group_by_item_inputs:
             resolution = MetricFlowQueryResolver._resolve_group_by_item_input(
                 group_by_item_resolver=group_by_item_resolver,
@@ -647,6 +656,7 @@ class MetricFlowQueryResolver:
                 filter_spec_resolution_lookup=filter_spec_lookup,
                 min_max_only=min_max_only_input.min_max_only,
                 apply_group_by=apply_group_by_input.apply_group_by,
+                spec_output_order=group_by_item_specs + metric_specs,
             ),
             resolution_dag=resolution_dag,
             filter_spec_lookup=filter_spec_lookup,
