@@ -13,4 +13,14 @@ MetricFlowQuerySpec(
   filter_spec_resolution_lookup=FilterSpecResolutionLookUp(),
   min_max_only=False,
   apply_group_by=True,
+  spec_output_order=(
+    DimensionSpec(
+      element_name='country',
+      entity_links=(
+        EntityReference(element_name='entity_1'),
+        EntityReference(element_name='entity_0'),
+      ),
+    ),
+    MetricSpec(element_name='entity_1_metric', filter_spec_set=WhereFilterSpecSet()),
+  ),
 )

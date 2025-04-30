@@ -178,4 +178,10 @@ MetricFlowQuerySpec(
   ),
   min_max_only=False,
   apply_group_by=True,
+  spec_output_order=(
+    MetricSpec(
+      element_name='derived_metric_with_time_granularity_and_inner_metric_time_filter',
+      filter_spec_set=WhereFilterSpecSet(),
+    ),
+  ),
 )

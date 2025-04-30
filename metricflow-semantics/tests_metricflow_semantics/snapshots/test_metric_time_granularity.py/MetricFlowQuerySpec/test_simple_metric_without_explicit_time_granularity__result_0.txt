@@ -15,4 +15,11 @@ MetricFlowQuerySpec(
   filter_spec_resolution_lookup=FilterSpecResolutionLookUp(),
   min_max_only=False,
   apply_group_by=True,
+  spec_output_order=(
+    TimeDimensionSpec(
+      element_name='metric_time',
+      time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH),
+    ),
+    MetricSpec(element_name='monthly_metric_0', filter_spec_set=WhereFilterSpecSet()),
+  ),
 )
