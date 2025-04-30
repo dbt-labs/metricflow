@@ -83,16 +83,16 @@ class CreateSelectColumnsForInstances(InstanceSetTransform[SelectColumnSet]):
         self._table_alias = table_alias
         self._column_resolver = column_resolver
         self._output_to_input_column_mapping = output_to_input_column_mapping or OrderedDict()
-        # Map the instance spec to a key that can be used for sorting.
-        self._spec_to_sort_key = {spec: i for i, spec in enumerate(spec_output_order)}
+        # Map the instance spec to a key that can be used to sort the order of output columns.
+        self._spec_to_output_column_sort_key = {spec: i for i, spec in enumerate(spec_output_order)}
 
     def _sort_instances_by_output_order(self, instances: Sequence[InstanceT]) -> Sequence[InstanceT]:
-        """Sort instances in the same order as `spec_output_order` / `_spec_to_sort_key`."""
-        if len(self._spec_to_sort_key) == 0:
+        """Sort instances in the same order as `spec_output_order` / `_spec_to_output_column_sort_key`."""
+        if len(self._spec_to_output_column_sort_key) == 0:
             return instances
 
         def _sort_key_function(instance: InstanceT) -> Union[int, float]:
-            key = self._spec_to_sort_key.get(instance.spec)
+            key = self._spec_to_output_column_sort_key.get(instance.spec)
             if key is None:
                 logger.error(
                     LazyFormat(
@@ -100,7 +100,7 @@ class CreateSelectColumnsForInstances(InstanceSetTransform[SelectColumnSet]):
                         " end. This should result in a query that still runs, but the output columns may not be in the"
                         " expected order.",
                         instance=instance,
-                        spec_to_sort_key=self._spec_to_sort_key,
+                        spec_to_sort_key=self._spec_to_output_column_sort_key,
                     )
                 )
                 return float("inf")
@@ -133,7 +133,7 @@ class CreateSelectColumnsForInstances(InstanceSetTransform[SelectColumnSet]):
         )
         columns_in_order: Optional[AnyLengthTuple[SqlSelectColumn]] = None
 
-        if len(self._spec_to_sort_key) > 0:
+        if len(self._spec_to_output_column_sort_key) > 0:
             group_by_item_columns = tuple(
                 chain.from_iterable(
                     [
@@ -151,7 +151,7 @@ class CreateSelectColumnsForInstances(InstanceSetTransform[SelectColumnSet]):
             logger.debug(
                 LazyFormat(
                     "Generated columns using the specified order",
-                    spec_to_sort_key=self._spec_to_sort_key,
+                    spec_to_sort_key=self._spec_to_output_column_sort_key,
                     columns_in_order=columns_in_order,
                 )
             )

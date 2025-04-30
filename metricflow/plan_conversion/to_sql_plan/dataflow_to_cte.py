@@ -10,6 +10,7 @@ from metricflow_semantics.instances import InstanceSet
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.sql.sql_table import SqlTable
 from typing_extensions import override
 
@@ -91,9 +92,12 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
         column_association_resolver: ColumnAssociationResolver,
         semantic_manifest_lookup: SemanticManifestLookup,
         nodes_to_convert_to_cte: FrozenSet[DataflowPlanNode],
+        spec_output_order: Sequence[InstanceSpec],
     ) -> None:
         super().__init__(
-            column_association_resolver=column_association_resolver, semantic_manifest_lookup=semantic_manifest_lookup
+            column_association_resolver=column_association_resolver,
+            semantic_manifest_lookup=semantic_manifest_lookup,
+            spec_output_order=spec_output_order,
         )
         self._nodes_to_convert_to_cte = nodes_to_convert_to_cte
 
@@ -105,7 +109,10 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
         return tuple(result.cte_node for result in self._node_to_cte_generation_result.values())
 
     def _default_handler(
-        self, node: DataflowNodeT, node_to_select_subquery_function: Callable[[DataflowNodeT], SqlDataSet]
+        self,
+        node: DataflowNodeT,
+        node_to_select_subquery_function: Callable[[DataflowNodeT], SqlDataSet],
+        use_spec_output_order: bool,
     ) -> SqlDataSet:
         """Default handler that is called for each node as the dataflow plan is traversed.
 
@@ -150,6 +157,7 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
             select_columns=CreateSelectColumnsForInstances(
                 table_alias=cte_alias,
                 column_resolver=self._column_association_resolver,
+                spec_output_order=self._spec_output_order if use_spec_output_order else (),
             )
             .transform(select_from_subquery_dataset.instance_set)
             .columns_in_order,
@@ -160,118 +168,170 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
 
     @override
     def visit_source_node(self, node: ReadSqlSourceNode) -> SqlDataSet:
-        return self._default_handler(node=node, node_to_select_subquery_function=super().visit_source_node)
+        return self._default_handler(
+            node=node, node_to_select_subquery_function=super().visit_source_node, use_spec_output_order=False
+        )
 
     @override
     def visit_join_on_entities_node(self, node: JoinOnEntitiesNode) -> SqlDataSet:
-        return self._default_handler(node=node, node_to_select_subquery_function=super().visit_join_on_entities_node)
+        return self._default_handler(
+            node=node, node_to_select_subquery_function=super().visit_join_on_entities_node, use_spec_output_order=False
+        )
 
     @override
     def visit_aggregate_measures_node(self, node: AggregateMeasuresNode) -> SqlDataSet:
-        return self._default_handler(node=node, node_to_select_subquery_function=super().visit_aggregate_measures_node)
+        return self._default_handler(
+            node=node,
+            node_to_select_subquery_function=super().visit_aggregate_measures_node,
+            use_spec_output_order=False,
+        )
 
     @override
     def visit_compute_metrics_node(self, node: ComputeMetricsNode) -> SqlDataSet:
-        return self._default_handler(node=node, node_to_select_subquery_function=super().visit_compute_metrics_node)
+        return self._default_handler(
+            node=node, node_to_select_subquery_function=super().visit_compute_metrics_node, use_spec_output_order=False
+        )
 
     @override
     def visit_window_reaggregation_node(self, node: WindowReaggregationNode) -> SqlDataSet:
         return self._default_handler(
-            node=node, node_to_select_subquery_function=super().visit_window_reaggregation_node
+            node=node,
+            node_to_select_subquery_function=super().visit_window_reaggregation_node,
+            use_spec_output_order=False,
         )
 
     @override
     def visit_order_by_limit_node(self, node: OrderByLimitNode) -> SqlDataSet:
-        return self._default_handler(node=node, node_to_select_subquery_function=super().visit_order_by_limit_node)
+        return self._default_handler(
+            node=node, node_to_select_subquery_function=super().visit_order_by_limit_node, use_spec_output_order=False
+        )
 
     @override
     def visit_where_constraint_node(self, node: WhereConstraintNode) -> SqlDataSet:
-        return self._default_handler(node=node, node_to_select_subquery_function=super().visit_where_constraint_node)
+        return self._default_handler(
+            node=node, node_to_select_subquery_function=super().visit_where_constraint_node, use_spec_output_order=False
+        )
 
     @override
     def visit_write_to_result_data_table_node(self, node: WriteToResultDataTableNode) -> SqlDataSet:
         return self._default_handler(
-            node=node, node_to_select_subquery_function=super().visit_write_to_result_data_table_node
+            node=node,
+            node_to_select_subquery_function=super().visit_write_to_result_data_table_node,
+            use_spec_output_order=True,
         )
 
     @override
     def visit_write_to_result_table_node(self, node: WriteToResultTableNode) -> SqlDataSet:
         return self._default_handler(
-            node=node, node_to_select_subquery_function=super().visit_write_to_result_table_node
+            node=node,
+            node_to_select_subquery_function=super().visit_write_to_result_table_node,
+            use_spec_output_order=True,
         )
 
     @override
     def visit_filter_elements_node(self, node: FilterElementsNode) -> SqlDataSet:
-        return self._default_handler(node=node, node_to_select_subquery_function=super().visit_filter_elements_node)
+        return self._default_handler(
+            node=node, node_to_select_subquery_function=super().visit_filter_elements_node, use_spec_output_order=False
+        )
 
     @override
     def visit_combine_aggregated_outputs_node(self, node: CombineAggregatedOutputsNode) -> SqlDataSet:
         return self._default_handler(
-            node=node, node_to_select_subquery_function=super().visit_combine_aggregated_outputs_node
+            node=node,
+            node_to_select_subquery_function=super().visit_combine_aggregated_outputs_node,
+            use_spec_output_order=False,
         )
 
     @override
     def visit_constrain_time_range_node(self, node: ConstrainTimeRangeNode) -> SqlDataSet:
         return self._default_handler(
-            node=node, node_to_select_subquery_function=super().visit_constrain_time_range_node
+            node=node,
+            node_to_select_subquery_function=super().visit_constrain_time_range_node,
+            use_spec_output_order=False,
         )
 
     @override
     def visit_join_over_time_range_node(self, node: JoinOverTimeRangeNode) -> SqlDataSet:
         return self._default_handler(
-            node=node, node_to_select_subquery_function=super().visit_join_over_time_range_node
+            node=node,
+            node_to_select_subquery_function=super().visit_join_over_time_range_node,
+            use_spec_output_order=False,
         )
 
     @override
     def visit_semi_additive_join_node(self, node: SemiAdditiveJoinNode) -> SqlDataSet:
-        return self._default_handler(node=node, node_to_select_subquery_function=super().visit_semi_additive_join_node)
+        return self._default_handler(
+            node=node,
+            node_to_select_subquery_function=super().visit_semi_additive_join_node,
+            use_spec_output_order=False,
+        )
 
     @override
     def visit_metric_time_dimension_transform_node(self, node: MetricTimeDimensionTransformNode) -> SqlDataSet:
         return self._default_handler(
-            node=node, node_to_select_subquery_function=super().visit_metric_time_dimension_transform_node
+            node=node,
+            node_to_select_subquery_function=super().visit_metric_time_dimension_transform_node,
+            use_spec_output_order=False,
         )
 
     @override
     def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode) -> SqlDataSet:
-        return self._default_handler(node=node, node_to_select_subquery_function=super().visit_join_to_time_spine_node)
+        return self._default_handler(
+            node=node,
+            node_to_select_subquery_function=super().visit_join_to_time_spine_node,
+            use_spec_output_order=False,
+        )
 
     @override
     def visit_min_max_node(self, node: MinMaxNode) -> SqlDataSet:
-        return self._default_handler(node=node, node_to_select_subquery_function=super().visit_min_max_node)
+        return self._default_handler(
+            node=node, node_to_select_subquery_function=super().visit_min_max_node, use_spec_output_order=False
+        )
 
     @override
     def visit_add_generated_uuid_column_node(self, node: AddGeneratedUuidColumnNode) -> SqlDataSet:
         return self._default_handler(
-            node=node, node_to_select_subquery_function=super().visit_add_generated_uuid_column_node
+            node=node,
+            node_to_select_subquery_function=super().visit_add_generated_uuid_column_node,
+            use_spec_output_order=False,
         )
 
     @override
     def visit_join_conversion_events_node(self, node: JoinConversionEventsNode) -> SqlDataSet:
         return self._default_handler(
-            node=node, node_to_select_subquery_function=super().visit_join_conversion_events_node
+            node=node,
+            node_to_select_subquery_function=super().visit_join_conversion_events_node,
+            use_spec_output_order=False,
         )
 
     @override
     def visit_join_to_custom_granularity_node(self, node: JoinToCustomGranularityNode) -> SqlDataSet:
         return self._default_handler(
-            node=node, node_to_select_subquery_function=super().visit_join_to_custom_granularity_node
+            node=node,
+            node_to_select_subquery_function=super().visit_join_to_custom_granularity_node,
+            use_spec_output_order=False,
         )
 
     @override
     def visit_alias_specs_node(self, node: AliasSpecsNode) -> SqlDataSet:  # noqa: D102
-        return self._default_handler(node=node, node_to_select_subquery_function=super().visit_alias_specs_node)
+        return self._default_handler(
+            node=node, node_to_select_subquery_function=super().visit_alias_specs_node, use_spec_output_order=False
+        )
 
     @override
     def visit_offset_base_grain_by_custom_grain_node(
         self, node: OffsetBaseGrainByCustomGrainNode
     ) -> SqlDataSet:  # noqa: D102
         return self._default_handler(
-            node=node, node_to_select_subquery_function=super().visit_offset_base_grain_by_custom_grain_node
+            node=node,
+            node_to_select_subquery_function=super().visit_offset_base_grain_by_custom_grain_node,
+            use_spec_output_order=False,
         )
 
     @override
     def visit_offset_custom_granularity_node(self, node: OffsetCustomGranularityNode) -> SqlDataSet:  # noqa: D102
         return self._default_handler(
-            node=node, node_to_select_subquery_function=super().visit_offset_custom_granularity_node
+            node=node,
+            node_to_select_subquery_function=super().visit_offset_custom_granularity_node,
+            use_spec_output_order=False,
         )

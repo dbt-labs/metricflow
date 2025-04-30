@@ -140,6 +140,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         self,
         column_association_resolver: ColumnAssociationResolver,
         semantic_manifest_lookup: SemanticManifestLookup,
+        spec_output_order: Sequence[InstanceSpec] = (),
         _node_to_output_data_set: Optional[Dict[DataflowPlanNode, SqlDataSet]] = None,
     ) -> None:
         """Initializer.
@@ -160,6 +161,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             tuple(self._time_spine_sources.values())
         )
         self._node_to_output_data_set: Dict[DataflowPlanNode, SqlDataSet] = _node_to_output_data_set or {}
+        self._spec_output_order = spec_output_order
 
     def _next_unique_table_alias(self) -> str:
         """Return the next unique table alias to use in generating queries."""
@@ -582,6 +584,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             CreateSelectColumnsForInstances(
                 table_alias=from_data_set_alias,
                 column_resolver=self._column_association_resolver,
+                spec_output_order=self._spec_output_order,
             )
         )
 
@@ -798,7 +801,11 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         input_data_set: SqlDataSet = self.get_output_data_set(node.parent_node)
         input_data_set_alias = self._next_unique_table_alias()
         output_column_set = input_data_set.instance_set.transform(
-            CreateSelectColumnsForInstances(input_data_set_alias, self._column_association_resolver)
+            CreateSelectColumnsForInstances(
+                table_alias=input_data_set_alias,
+                column_resolver=self._column_association_resolver,
+                spec_output_order=self._spec_output_order,
+            )
         )
         return SqlDataSet(
             instance_set=input_data_set.instance_set,
@@ -814,7 +821,11 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         input_data_set: SqlDataSet = self.get_output_data_set(node.parent_node)
         input_data_set_alias = self._next_unique_table_alias()
         output_column_set = input_data_set.instance_set.transform(
-            CreateSelectColumnsForInstances(input_data_set_alias, self._column_association_resolver)
+            CreateSelectColumnsForInstances(
+                table_alias=input_data_set_alias,
+                column_resolver=self._column_association_resolver,
+                spec_output_order=self._spec_output_order,
+            )
         )
 
         return SqlDataSet(
