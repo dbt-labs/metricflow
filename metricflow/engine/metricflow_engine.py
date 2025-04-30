@@ -101,6 +101,9 @@ class MetricFlowQueryRequest:
     output_table: If specified, output the result data to this table instead of a result data_table.
     sql_optimization_level: The level of optimization for the generated SQL.
     query_type: Type of MetricFlow query.
+    order_output_columns_by_input_order: The columns in the output are arranged in groups as described in
+    `CreateSelectColumnsForInstances`. If this is set to True, the order of the columns in each group follows the order
+    as described by inputs (e.g. `metric_names`).
     """
 
     request_id: MetricFlowRequestId
@@ -120,6 +123,7 @@ class MetricFlowQueryRequest:
     sql_optimization_level: SqlOptimizationLevel
     dataflow_plan_optimizations: FrozenSet[DataflowPlanOptimization]
     query_type: MetricFlowQueryType
+    order_output_columns_by_input_order: bool
 
     @staticmethod
     def create_with_random_request_id(  # noqa: D102
@@ -141,6 +145,7 @@ class MetricFlowQueryRequest:
         query_type: MetricFlowQueryType = MetricFlowQueryType.METRIC,
         min_max_only: bool = False,
         apply_group_by: bool = True,
+        order_output_columns_by_input_order: bool = False,
     ) -> MetricFlowQueryRequest:
         return MetricFlowQueryRequest(
             request_id=MetricFlowRequestId(mf_rid=f"{random_id()}"),
@@ -160,6 +165,7 @@ class MetricFlowQueryRequest:
             query_type=query_type,
             min_max_only=min_max_only,
             apply_group_by=apply_group_by,
+            order_output_columns_by_input_order=order_output_columns_by_input_order,
         )
 
 
@@ -407,7 +413,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             semantic_manifest_lookup=self._semantic_manifest_lookup,
         )
         self._executor = SequentialPlanExecutor()
-
         self._query_parser = query_parser or MetricFlowQueryParser(
             semantic_manifest_lookup=self._semantic_manifest_lookup,
         )
@@ -541,7 +546,12 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             sql_client=self._sql_client,
             sql_optimization_level=mf_query_request.sql_optimization_level,
         )
-        convert_to_execution_plan_result = _to_execution_plan_converter.convert_to_execution_plan(dataflow_plan)
+        convert_to_execution_plan_result = _to_execution_plan_converter.convert_to_execution_plan(
+            dataflow_plan=dataflow_plan,
+            spec_output_order=query_spec.spec_output_order
+            if mf_query_request.order_output_columns_by_input_order
+            else (),
+        )
         return MetricFlowExplainResult(
             query_spec=query_spec,
             dataflow_plan=dataflow_plan,

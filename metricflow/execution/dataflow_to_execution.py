@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import logging
+from typing import Sequence
 
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.specs.instance_spec import InstanceSpec
 from typing_extensions import override
 
 from metricflow.dataflow.dataflow_plan import (
@@ -59,7 +61,7 @@ class DataflowToExecutionPlanConverter(DataflowPlanNodeVisitor[ConvertToExecutio
         sql_client: SqlClient,
         sql_optimization_level: SqlOptimizationLevel,
     ) -> None:
-        """Constructor.
+        """Initializer.
 
         Args:
             sql_plan_converter: Converts a dataflow plan node to a SQL query plan
@@ -71,15 +73,17 @@ class DataflowToExecutionPlanConverter(DataflowPlanNodeVisitor[ConvertToExecutio
         self._sql_plan_renderer = sql_plan_renderer
         self._sql_client = sql_client
         self._optimization_level = sql_optimization_level
+        self._spec_output_order: Sequence[InstanceSpec] = ()
 
     def _convert_to_sql_plan(self, node: DataflowPlanNode) -> ConvertToSqlPlanResult:
-        logger.debug(LazyFormat(lambda: f"Generating SQL query plan from {node.node_id}"))
+        logger.debug(LazyFormat("Generating SQL plan", node_id=node.node_id))
         result = self._sql_plan_converter.convert_to_sql_plan(
             sql_engine_type=self._sql_client.sql_engine_type,
             optimization_level=self._optimization_level,
             dataflow_plan_node=node,
+            spec_output_order=self._spec_output_order,
         )
-        logger.debug(LazyFormat(lambda: f"Generated SQL query plan is:\n{result.sql_plan.structure_text()}"))
+        logger.debug(LazyFormat("Generated SQL plan", sql_plan=lambda: result.sql_plan.structure_text()))
         return result
 
     def _render_sql(self, convert_to_sql_plan_result: ConvertToSqlPlanResult) -> SqlPlanRenderResult:
@@ -125,10 +129,17 @@ class DataflowToExecutionPlanConverter(DataflowPlanNodeVisitor[ConvertToExecutio
             execution_plan=execution_plan,
         )
 
-    def convert_to_execution_plan(self, dataflow_plan: DataflowPlan) -> ConvertToExecutionPlanResult:
-        """Convert the dataflow plan to an execution plan."""
-        assert len(dataflow_plan.sink_nodes) == 1, "Only 1 sink node in the plan is currently supported."
-        return dataflow_plan.sink_nodes[0].accept(self)
+    def convert_to_execution_plan(
+        self,
+        dataflow_plan: DataflowPlan,
+        spec_output_order: Sequence[InstanceSpec] = (),
+    ) -> ConvertToExecutionPlanResult:
+        """Convert the dataflow plan to an execution plan.
+
+        See `MetricflowQueryParser` for details on `spec_output_order`.
+        """
+        self._spec_output_order = tuple(spec_output_order)
+        return dataflow_plan.sink_node.accept(self)
 
     @override
     def visit_source_node(self, node: ReadSqlSourceNode) -> ConvertToExecutionPlanResult:
