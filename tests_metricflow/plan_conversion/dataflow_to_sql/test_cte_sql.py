@@ -46,6 +46,7 @@ def convert_and_check(
         sql_query_plan_id=None,
         optimizers=optimizers,
         nodes_to_convert_to_cte=frozenset(),
+        spec_output_order=(),
     )
     sql_plan_without_cte = conversion_result.sql_plan
 
@@ -55,6 +56,7 @@ def convert_and_check(
         sql_query_plan_id=None,
         optimizers=optimizers,
         nodes_to_convert_to_cte=nodes_to_convert_to_cte,
+        spec_output_order=(),
     )
     sql_plan_with_cte = conversion_result.sql_plan
     renderer = DefaultSqlPlanRenderer()

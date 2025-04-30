@@ -140,6 +140,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         self,
         column_association_resolver: ColumnAssociationResolver,
         semantic_manifest_lookup: SemanticManifestLookup,
+        spec_output_order: Sequence[InstanceSpec] = (),
         _node_to_output_data_set: Optional[Dict[DataflowPlanNode, SqlDataSet]] = None,
     ) -> None:
         """Initializer.
@@ -160,6 +161,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             tuple(self._time_spine_sources.values())
         )
         self._node_to_output_data_set: Dict[DataflowPlanNode, SqlDataSet] = _node_to_output_data_set or {}
+        self._spec_output_order = spec_output_order
 
     def _next_unique_table_alias(self) -> str:
         """Return the next unique table alias to use in generating queries."""
@@ -582,6 +584,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             CreateSelectColumnsForInstances(
                 table_alias=from_data_set_alias,
                 column_resolver=self._column_association_resolver,
+                spec_output_order=self._spec_output_order,
             )
         )
 
@@ -806,7 +809,11 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
                 select_columns=output_instance_set.transform(
-                    CreateSelectColumnsForInstances(input_data_set_alias, self._column_association_resolver)
+                    CreateSelectColumnsForInstances(
+                        table_alias=input_data_set_alias,
+                        column_resolver=self._column_association_resolver,
+                        spec_output_order=self._spec_output_order,
+                    )
                 ).columns_in_order,
                 from_source=input_data_set.checked_sql_select_node,
                 from_source_alias=input_data_set_alias,
@@ -827,7 +834,11 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                 parent_node=SqlSelectStatementNode.create(
                     description=node.description,
                     select_columns=output_instance_set.transform(
-                        CreateSelectColumnsForInstances(input_data_set_alias, self._column_association_resolver)
+                        CreateSelectColumnsForInstances(
+                            table_alias=input_data_set_alias,
+                            column_resolver=self._column_association_resolver,
+                            spec_output_order=self._spec_output_order,
+                        )
                     ).columns_in_order,
                     from_source=input_data_set.checked_sql_select_node,
                     from_source_alias=input_data_set_alias,
