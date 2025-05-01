@@ -10,6 +10,7 @@ sql_engine: DuckDB
 -- Compute Metrics via Expressions
 -- Order By ['bookings', 'metric_time__day', 'listing__capacity_latest', 'listing']
 -- Change Column Aliases
+-- Write to DataTable
 WITH sma_28009_cte AS (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
@@ -22,14 +23,14 @@ WITH sma_28009_cte AS (
 )
 
 SELECT
-  listing__capacity_latest AS listing_capacity
-  , metric_time__day AS booking_day
+  metric_time__day AS booking_day
   , listing AS listing_id
+  , listing__capacity_latest AS listing_capacity
   , SUM(bookings) AS bookings_alias
 FROM (
   -- Join Standard Outputs
   SELECT
-    subq_28.listing__booking_fees AS listing__booking_fees
+    subq_29.listing__booking_fees AS listing__booking_fees
     , listings_latest_src_28000.capacity AS listing__capacity_latest
     , sma_28009_cte.metric_time__day AS metric_time__day
     , sma_28009_cte.listing AS listing
@@ -52,15 +53,15 @@ FROM (
       FROM sma_28009_cte sma_28009_cte
       GROUP BY
         listing
-    ) subq_26
-  ) subq_28
+    ) subq_27
+  ) subq_29
   ON
-    sma_28009_cte.listing = subq_28.listing
+    sma_28009_cte.listing = subq_29.listing
   LEFT OUTER JOIN
     ***************************.dim_listings_latest listings_latest_src_28000
   ON
     sma_28009_cte.listing = listings_latest_src_28000.listing_id
-) subq_32
+) subq_33
 WHERE listing__booking_fees > 2
 GROUP BY
   metric_time__day

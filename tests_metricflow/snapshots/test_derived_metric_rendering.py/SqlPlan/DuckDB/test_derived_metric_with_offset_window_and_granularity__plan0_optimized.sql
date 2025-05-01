@@ -3,6 +3,7 @@ test_filename: test_derived_metric_rendering.py
 sql_engine: DuckDB
 ---
 -- Compute Metrics via Expressions
+-- Write to DataTable
 WITH sma_28009_cte AS (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
@@ -19,9 +20,9 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_18.metric_time__quarter, subq_26.metric_time__quarter) AS metric_time__quarter
-    , MAX(subq_18.bookings) AS bookings
-    , MAX(subq_26.bookings_2_weeks_ago) AS bookings_2_weeks_ago
+    COALESCE(subq_19.metric_time__quarter, subq_27.metric_time__quarter) AS metric_time__quarter
+    , MAX(subq_19.bookings) AS bookings
+    , MAX(subq_27.bookings_2_weeks_ago) AS bookings_2_weeks_ago
   FROM (
     -- Read From CTE For node_id=sma_28009
     -- Pass Only Elements: ['bookings', 'metric_time__quarter']
@@ -33,7 +34,7 @@ FROM (
     FROM sma_28009_cte sma_28009_cte
     GROUP BY
       metric_time__quarter
-  ) subq_18
+  ) subq_19
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
     -- Pass Only Elements: ['bookings', 'metric_time__quarter']
@@ -49,9 +50,9 @@ FROM (
       time_spine_src_28006.ds - INTERVAL 14 day = sma_28009_cte.metric_time__day
     GROUP BY
       DATE_TRUNC('quarter', time_spine_src_28006.ds)
-  ) subq_26
+  ) subq_27
   ON
-    subq_18.metric_time__quarter = subq_26.metric_time__quarter
+    subq_19.metric_time__quarter = subq_27.metric_time__quarter
   GROUP BY
-    COALESCE(subq_18.metric_time__quarter, subq_26.metric_time__quarter)
-) subq_27
+    COALESCE(subq_19.metric_time__quarter, subq_27.metric_time__quarter)
+) subq_28

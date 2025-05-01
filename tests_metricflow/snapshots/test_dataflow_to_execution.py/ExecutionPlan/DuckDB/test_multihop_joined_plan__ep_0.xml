@@ -12,6 +12,7 @@ docstring:
         <!--    "-- Pass Only Elements: ['txn_count', 'account_id__customer_id__customer_name']\n"                   -->
         <!--    '-- Aggregate Measures\n'                                                                            -->
         <!--    '-- Compute Metrics via Expressions\n'                                                               -->
+        <!--    '-- Write to DataTable\n'                                                                            -->
         <!--    'SELECT\n'                                                                                           -->
         <!--    '  subq_11.customer_id__customer_name AS account_id__customer_id__customer_name\n'                   -->
         <!--    '  , SUM(account_month_txns_src_22000.txn_count) AS txn_count\n'                                     -->

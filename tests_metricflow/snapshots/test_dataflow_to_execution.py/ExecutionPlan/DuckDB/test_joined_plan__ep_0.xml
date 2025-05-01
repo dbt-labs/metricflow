@@ -10,6 +10,7 @@ test_filename: test_dataflow_to_execution.py
         <!--    "-- Pass Only Elements: ['bookings', 'is_instant', 'listing__country_latest']\n" -->
         <!--    '-- Aggregate Measures\n'                                                        -->
         <!--    '-- Compute Metrics via Expressions\n'                                           -->
+        <!--    '-- Write to DataTable\n'                                                        -->
         <!--    'SELECT\n'                                                                       -->
         <!--    '  subq_1.is_instant AS is_instant\n'                                            -->
         <!--    '  , listings_latest_src_28000.country AS listing__country_latest\n'             -->

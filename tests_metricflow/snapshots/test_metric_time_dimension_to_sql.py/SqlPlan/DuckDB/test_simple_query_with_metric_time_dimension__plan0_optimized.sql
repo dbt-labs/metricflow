@@ -5,6 +5,7 @@ docstring:
 sql_engine: DuckDB
 ---
 -- Combine Aggregated Outputs
+-- Write to DataTable
 WITH rss_28020_cte AS (
   -- Read Elements From Semantic Model 'bookings_source'
   SELECT
@@ -16,9 +17,9 @@ WITH rss_28020_cte AS (
 )
 
 SELECT
-  COALESCE(subq_14.metric_time__day, subq_19.metric_time__day) AS metric_time__day
-  , MAX(subq_14.bookings) AS bookings
-  , MAX(subq_19.booking_payments) AS booking_payments
+  COALESCE(subq_15.metric_time__day, subq_20.metric_time__day) AS metric_time__day
+  , MAX(subq_15.bookings) AS bookings
+  , MAX(subq_20.booking_payments) AS booking_payments
 FROM (
   -- Read From CTE For node_id=rss_28020
   -- Metric Time Dimension 'ds'
@@ -31,7 +32,7 @@ FROM (
   FROM rss_28020_cte rss_28020_cte
   GROUP BY
     ds__day
-) subq_14
+) subq_15
 FULL OUTER JOIN (
   -- Read From CTE For node_id=rss_28020
   -- Metric Time Dimension 'paid_at'
@@ -44,8 +45,8 @@ FULL OUTER JOIN (
   FROM rss_28020_cte rss_28020_cte
   GROUP BY
     paid_at__day
-) subq_19
+) subq_20
 ON
-  subq_14.metric_time__day = subq_19.metric_time__day
+  subq_15.metric_time__day = subq_20.metric_time__day
 GROUP BY
-  COALESCE(subq_14.metric_time__day, subq_19.metric_time__day)
+  COALESCE(subq_15.metric_time__day, subq_20.metric_time__day)
