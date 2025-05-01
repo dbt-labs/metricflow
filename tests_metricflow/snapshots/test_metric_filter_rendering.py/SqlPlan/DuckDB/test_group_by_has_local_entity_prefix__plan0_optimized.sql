@@ -6,6 +6,7 @@ sql_engine: DuckDB
 -- Pass Only Elements: ['listings']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
+-- Write to DataTable
 WITH sma_28014_cte AS (
   -- Read Elements From Semantic Model 'listings_latest'
   -- Metric Time Dimension 'ds'
@@ -21,7 +22,7 @@ SELECT
 FROM (
   -- Join Standard Outputs
   SELECT
-    subq_31.listing__user__average_booking_value AS user__listing__user__average_booking_value
+    subq_32.listing__user__average_booking_value AS user__listing__user__average_booking_value
     , sma_28014_cte.listings AS listings
   FROM sma_28014_cte sma_28014_cte
   LEFT OUTER JOIN (
@@ -40,8 +41,8 @@ FROM (
       bookings_source_src_28000.listing_id = sma_28014_cte.listing
     GROUP BY
       sma_28014_cte.user
-  ) subq_31
+  ) subq_32
   ON
-    sma_28014_cte.user = subq_31.listing__user
-) subq_32
+    sma_28014_cte.user = subq_32.listing__user
+) subq_33
 WHERE user__listing__user__average_booking_value > 1

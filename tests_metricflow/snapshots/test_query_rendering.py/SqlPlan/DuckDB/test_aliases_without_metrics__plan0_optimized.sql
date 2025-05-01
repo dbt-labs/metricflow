@@ -8,16 +8,17 @@ sql_engine: DuckDB
 -- Pass Only Elements: ['listing__capacity_latest', 'listing']
 -- Order By ['listing__capacity_latest', 'listing']
 -- Change Column Aliases
+-- Write to DataTable
 SELECT
-  listing__capacity_latest AS listing_capacity
-  , listing AS listing_id
+  listing AS listing_id
+  , listing__capacity_latest AS listing_capacity
 FROM (
   -- Read Elements From Semantic Model 'listings_latest'
   SELECT
     capacity AS listing__capacity_latest
     , listing_id AS listing
   FROM ***************************.dim_listings_latest listings_latest_src_28000
-) subq_4
+) subq_5
 WHERE listing__capacity_latest > 2
 GROUP BY
   listing

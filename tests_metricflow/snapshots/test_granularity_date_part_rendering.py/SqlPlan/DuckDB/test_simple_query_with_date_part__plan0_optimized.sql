@@ -4,6 +4,7 @@ sql_engine: DuckDB
 ---
 -- Aggregate Measures
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
   metric_time__extract_dow
   , SUM(bookings) AS bookings
@@ -15,6 +16,6 @@ FROM (
     EXTRACT(isodow FROM ds) AS metric_time__extract_dow
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-) subq_6
+) subq_7
 GROUP BY
   metric_time__extract_dow

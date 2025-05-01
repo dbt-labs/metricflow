@@ -12,24 +12,25 @@ sql_engine: DuckDB
 -- Pass Only Elements: ['bookers', 'metric_time__day']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
   metric_time__day
   , COUNT(DISTINCT bookers) AS every_two_days_bookers
 FROM (
   -- Join Self Over Time Range
   SELECT
-    subq_11.ds AS metric_time__day
+    subq_12.ds AS metric_time__day
     , bookings_source_src_28000.guest_id AS bookers
-  FROM ***************************.mf_time_spine subq_11
+  FROM ***************************.mf_time_spine subq_12
   INNER JOIN
     ***************************.fct_bookings bookings_source_src_28000
   ON
     (
-      DATE_TRUNC('day', bookings_source_src_28000.ds) <= subq_11.ds
+      DATE_TRUNC('day', bookings_source_src_28000.ds) <= subq_12.ds
     ) AND (
-      DATE_TRUNC('day', bookings_source_src_28000.ds) > subq_11.ds - INTERVAL 2 day
+      DATE_TRUNC('day', bookings_source_src_28000.ds) > subq_12.ds - INTERVAL 2 day
     )
-) subq_12
+) subq_13
 WHERE metric_time__day = '2020-01-03' or metric_time__day = '2020-01-07'
 GROUP BY
   metric_time__day
