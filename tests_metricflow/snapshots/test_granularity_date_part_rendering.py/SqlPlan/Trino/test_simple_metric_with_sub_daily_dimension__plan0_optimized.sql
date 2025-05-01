@@ -4,6 +4,7 @@ sql_engine: Trino
 ---
 -- Aggregate Measures
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
   user__archived_at__hour
   , SUM(new_users) AS new_users
@@ -15,6 +16,6 @@ FROM (
     DATE_TRUNC('hour', archived_at) AS user__archived_at__hour
     , 1 AS new_users
   FROM ***************************.dim_users users_ds_source_src_28000
-) subq_6
+) subq_7
 GROUP BY
   user__archived_at__hour

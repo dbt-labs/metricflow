@@ -4,6 +4,7 @@ sql_engine: Redshift
 ---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['listing__capacity_latest', 'metric_time__month']
+-- Write to DataTable
 SELECT
   metric_time__month
   , listing__capacity_latest
@@ -20,5 +21,5 @@ FROM (
     ***************************.dim_users_latest users_latest_src_28000
   ON
     listings_latest_src_28000.user_id = users_latest_src_28000.user_id
-) subq_14
+) subq_15
 WHERE user__home_state_latest = 'CA'

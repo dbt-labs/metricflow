@@ -3,6 +3,7 @@ test_filename: test_custom_granularity.py
 sql_engine: Postgres
 ---
 -- Re-aggregate Metric via Group By
+-- Write to DataTable
 SELECT
   metric_time__alien_day
   , trailing_2_months_revenue
@@ -18,27 +19,27 @@ FROM (
     -- Pass Only Elements: ['txn_revenue', 'metric_time__alien_day', 'metric_time__day']
     -- Aggregate Measures
     SELECT
-      subq_14.alien_day AS metric_time__alien_day
-      , subq_13.ds AS metric_time__day
+      subq_15.alien_day AS metric_time__alien_day
+      , subq_14.ds AS metric_time__day
       , SUM(revenue_src_28000.revenue) AS txn_revenue
-    FROM ***************************.mf_time_spine subq_13
+    FROM ***************************.mf_time_spine subq_14
     INNER JOIN
       ***************************.fct_revenue revenue_src_28000
     ON
       (
-        DATE_TRUNC('day', revenue_src_28000.created_at) <= subq_13.ds
+        DATE_TRUNC('day', revenue_src_28000.created_at) <= subq_14.ds
       ) AND (
-        DATE_TRUNC('day', revenue_src_28000.created_at) > subq_13.ds - MAKE_INTERVAL(months => 2)
+        DATE_TRUNC('day', revenue_src_28000.created_at) > subq_14.ds - MAKE_INTERVAL(months => 2)
       )
     LEFT OUTER JOIN
-      ***************************.mf_time_spine subq_14
+      ***************************.mf_time_spine subq_15
     ON
-      subq_13.ds = subq_14.ds
+      subq_14.ds = subq_15.ds
     GROUP BY
-      subq_14.alien_day
-      , subq_13.ds
-  ) subq_17
-) subq_19
+      subq_15.alien_day
+      , subq_14.ds
+  ) subq_18
+) subq_20
 GROUP BY
   metric_time__alien_day
   , trailing_2_months_revenue

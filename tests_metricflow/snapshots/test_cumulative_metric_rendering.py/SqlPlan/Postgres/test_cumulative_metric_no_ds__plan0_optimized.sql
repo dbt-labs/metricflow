@@ -9,6 +9,7 @@ sql_engine: Postgres
 -- Pass Only Elements: ['txn_revenue']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
   SUM(revenue) AS trailing_2_months_revenue
 FROM ***************************.fct_revenue revenue_src_28000

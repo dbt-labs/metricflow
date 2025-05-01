@@ -9,9 +9,10 @@ sql_engine: Postgres
 -- Pass Only Elements: ['bookings', 'listing__user__ds__alien_day']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
-  subq_46.alien_day AS listing__user__ds__alien_day
-  , SUM(subq_38.bookings) AS bookings
+  subq_47.alien_day AS listing__user__ds__alien_day
+  , SUM(subq_39.bookings) AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
@@ -20,7 +21,7 @@ FROM (
     , listing_id AS listing
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-) subq_38
+) subq_39
 LEFT OUTER JOIN (
   -- Join Standard Outputs
   -- Pass Only Elements: ['user__ds_partitioned__day', 'user__ds__day', 'listing']
@@ -33,16 +34,16 @@ LEFT OUTER JOIN (
     ***************************.dim_users users_ds_source_src_28000
   ON
     listings_latest_src_28000.user_id = users_ds_source_src_28000.user_id
-) subq_45
+) subq_46
 ON
   (
-    subq_38.listing = subq_45.listing
+    subq_39.listing = subq_46.listing
   ) AND (
-    subq_38.ds_partitioned__day = subq_45.user__ds_partitioned__day
+    subq_39.ds_partitioned__day = subq_46.user__ds_partitioned__day
   )
 LEFT OUTER JOIN
-  ***************************.mf_time_spine subq_46
+  ***************************.mf_time_spine subq_47
 ON
-  subq_45.user__ds__day = subq_46.ds
+  subq_46.user__ds__day = subq_47.ds
 GROUP BY
-  subq_46.alien_day
+  subq_47.alien_day

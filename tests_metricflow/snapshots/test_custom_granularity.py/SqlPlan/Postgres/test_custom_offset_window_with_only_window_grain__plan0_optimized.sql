@@ -3,6 +3,7 @@ test_filename: test_custom_granularity.py
 sql_engine: Postgres
 ---
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
   booking__ds__alien_day
   , metric_time__alien_day
@@ -13,9 +14,9 @@ FROM (
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
-    subq_14.booking__ds__alien_day AS booking__ds__alien_day
-    , subq_14.metric_time__alien_day AS metric_time__alien_day
-    , SUM(subq_12.bookings) AS bookings
+    subq_15.booking__ds__alien_day AS booking__ds__alien_day
+    , subq_15.metric_time__alien_day AS metric_time__alien_day
+    , SUM(subq_13.bookings) AS bookings
   FROM (
     -- Join Offset Custom Granularity to Base Granularity
     WITH cte_6 AS (
@@ -28,8 +29,8 @@ FROM (
 
     SELECT
       cte_6.ds__day AS ds__day
-      , subq_13.ds__alien_day__lead AS booking__ds__alien_day
-      , subq_13.ds__alien_day__lead AS metric_time__alien_day
+      , subq_14.ds__alien_day__lead AS booking__ds__alien_day
+      , subq_14.ds__alien_day__lead AS metric_time__alien_day
     FROM cte_6 cte_6
     INNER JOIN (
       -- Offset Custom Granularity
@@ -39,10 +40,10 @@ FROM (
       FROM cte_6 cte_6
       GROUP BY
         ds__alien_day
-    ) subq_13
+    ) subq_14
     ON
-      cte_6.ds__alien_day = subq_13.ds__alien_day
-  ) subq_14
+      cte_6.ds__alien_day = subq_14.ds__alien_day
+  ) subq_15
   INNER JOIN (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
@@ -50,10 +51,10 @@ FROM (
       DATE_TRUNC('day', ds) AS metric_time__day
       , 1 AS bookings
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_12
+  ) subq_13
   ON
-    subq_14.ds__day = subq_12.metric_time__day
+    subq_15.ds__day = subq_13.metric_time__day
   GROUP BY
-    subq_14.booking__ds__alien_day
-    , subq_14.metric_time__alien_day
-) subq_19
+    subq_15.booking__ds__alien_day
+    , subq_15.metric_time__alien_day
+) subq_20

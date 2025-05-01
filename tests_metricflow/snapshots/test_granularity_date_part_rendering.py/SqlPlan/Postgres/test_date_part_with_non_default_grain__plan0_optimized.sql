@@ -6,6 +6,7 @@ sql_engine: Postgres
 -- Pass Only Elements: ['archived_users', 'metric_time__extract_year']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
   metric_time__extract_year
   , SUM(archived_users) AS archived_users
@@ -17,7 +18,7 @@ FROM (
     , EXTRACT(day FROM archived_at) AS metric_time__extract_day
     , 1 AS archived_users
   FROM ***************************.dim_users users_ds_source_src_28000
-) subq_6
+) subq_7
 WHERE metric_time__extract_day = '2020-01-01'
 GROUP BY
   metric_time__extract_year

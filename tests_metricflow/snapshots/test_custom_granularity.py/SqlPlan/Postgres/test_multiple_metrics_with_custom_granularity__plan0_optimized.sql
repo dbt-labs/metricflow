@@ -3,10 +3,11 @@ test_filename: test_custom_granularity.py
 sql_engine: Postgres
 ---
 -- Combine Aggregated Outputs
+-- Write to DataTable
 SELECT
-  COALESCE(subq_17.metric_time__alien_day, subq_23.metric_time__alien_day) AS metric_time__alien_day
-  , MAX(subq_17.bookings) AS bookings
-  , MAX(subq_23.listings) AS listings
+  COALESCE(subq_18.metric_time__alien_day, subq_24.metric_time__alien_day) AS metric_time__alien_day
+  , MAX(subq_18.bookings) AS bookings
+  , MAX(subq_24.listings) AS listings
 FROM (
   -- Metric Time Dimension 'ds'
   -- Join to Custom Granularity Dataset
@@ -14,22 +15,22 @@ FROM (
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
-    subq_13.alien_day AS metric_time__alien_day
-    , SUM(subq_12.bookings) AS bookings
+    subq_14.alien_day AS metric_time__alien_day
+    , SUM(subq_13.bookings) AS bookings
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     SELECT
       1 AS bookings
       , DATE_TRUNC('day', ds) AS ds__day
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_12
+  ) subq_13
   LEFT OUTER JOIN
-    ***************************.mf_time_spine subq_13
+    ***************************.mf_time_spine subq_14
   ON
-    subq_12.ds__day = subq_13.ds
+    subq_13.ds__day = subq_14.ds
   GROUP BY
-    subq_13.alien_day
-) subq_17
+    subq_14.alien_day
+) subq_18
 FULL OUTER JOIN (
   -- Metric Time Dimension 'ds'
   -- Join to Custom Granularity Dataset
@@ -37,23 +38,23 @@ FULL OUTER JOIN (
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
-    subq_19.alien_day AS metric_time__alien_day
-    , SUM(subq_18.listings) AS listings
+    subq_20.alien_day AS metric_time__alien_day
+    , SUM(subq_19.listings) AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     SELECT
       1 AS listings
       , DATE_TRUNC('day', created_at) AS ds__day
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_18
+  ) subq_19
   LEFT OUTER JOIN
-    ***************************.mf_time_spine subq_19
+    ***************************.mf_time_spine subq_20
   ON
-    subq_18.ds__day = subq_19.ds
+    subq_19.ds__day = subq_20.ds
   GROUP BY
-    subq_19.alien_day
-) subq_23
+    subq_20.alien_day
+) subq_24
 ON
-  subq_17.metric_time__alien_day = subq_23.metric_time__alien_day
+  subq_18.metric_time__alien_day = subq_24.metric_time__alien_day
 GROUP BY
-  COALESCE(subq_17.metric_time__alien_day, subq_23.metric_time__alien_day)
+  COALESCE(subq_18.metric_time__alien_day, subq_24.metric_time__alien_day)

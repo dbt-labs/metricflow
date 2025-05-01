@@ -3,6 +3,7 @@ test_filename: test_derived_metric_rendering.py
 sql_engine: Trino
 ---
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
   metric_time__day
   , every_2_days_bookers_2_days_ago AS every_2_days_bookers_2_days_ago
@@ -13,25 +14,25 @@ FROM (
   -- Compute Metrics via Expressions
   SELECT
     time_spine_src_28006.ds AS metric_time__day
-    , COUNT(DISTINCT subq_16.bookers) AS every_2_days_bookers_2_days_ago
+    , COUNT(DISTINCT subq_17.bookers) AS every_2_days_bookers_2_days_ago
   FROM ***************************.mf_time_spine time_spine_src_28006
   INNER JOIN (
     -- Join Self Over Time Range
     SELECT
-      subq_15.ds AS metric_time__day
+      subq_16.ds AS metric_time__day
       , bookings_source_src_28000.guest_id AS bookers
-    FROM ***************************.mf_time_spine subq_15
+    FROM ***************************.mf_time_spine subq_16
     INNER JOIN
       ***************************.fct_bookings bookings_source_src_28000
     ON
       (
-        DATE_TRUNC('day', bookings_source_src_28000.ds) <= subq_15.ds
+        DATE_TRUNC('day', bookings_source_src_28000.ds) <= subq_16.ds
       ) AND (
-        DATE_TRUNC('day', bookings_source_src_28000.ds) > DATE_ADD('day', -2, subq_15.ds)
+        DATE_TRUNC('day', bookings_source_src_28000.ds) > DATE_ADD('day', -2, subq_16.ds)
       )
-  ) subq_16
+  ) subq_17
   ON
-    DATE_ADD('day', -2, time_spine_src_28006.ds) = subq_16.metric_time__day
+    DATE_ADD('day', -2, time_spine_src_28006.ds) = subq_17.metric_time__day
   GROUP BY
     time_spine_src_28006.ds
-) subq_23
+) subq_24

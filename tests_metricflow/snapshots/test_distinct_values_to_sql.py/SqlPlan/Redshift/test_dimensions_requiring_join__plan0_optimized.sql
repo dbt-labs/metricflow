@@ -6,6 +6,7 @@ sql_engine: Redshift
 ---
 -- Join Standard Outputs
 -- Pass Only Elements: ['user__home_state_latest', 'listing__is_lux_latest']
+-- Write to DataTable
 SELECT
   listings_latest_src_28000.is_lux AS listing__is_lux_latest
   , users_latest_src_28000.home_state_latest AS user__home_state_latest

@@ -7,6 +7,7 @@ docstring:
 sql_engine: BigQuery
 ---
 -- Re-aggregate Metric via Group By
+-- Write to DataTable
 SELECT
   revenue_instance__ds__quarter
   , revenue_instance__ds__year
@@ -29,25 +30,25 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      DATETIME_TRUNC(subq_12.ds, quarter) AS revenue_instance__ds__quarter
-      , DATETIME_TRUNC(subq_12.ds, year) AS revenue_instance__ds__year
-      , subq_12.ds AS metric_time__day
+      DATETIME_TRUNC(subq_13.ds, quarter) AS revenue_instance__ds__quarter
+      , DATETIME_TRUNC(subq_13.ds, year) AS revenue_instance__ds__year
+      , subq_13.ds AS metric_time__day
       , SUM(revenue_src_28000.revenue) AS revenue_mtd
-    FROM ***************************.mf_time_spine subq_12
+    FROM ***************************.mf_time_spine subq_13
     INNER JOIN
       ***************************.fct_revenue revenue_src_28000
     ON
       (
-        DATETIME_TRUNC(revenue_src_28000.created_at, day) <= subq_12.ds
+        DATETIME_TRUNC(revenue_src_28000.created_at, day) <= subq_13.ds
       ) AND (
-        DATETIME_TRUNC(revenue_src_28000.created_at, day) >= DATETIME_TRUNC(subq_12.ds, month)
+        DATETIME_TRUNC(revenue_src_28000.created_at, day) >= DATETIME_TRUNC(subq_13.ds, month)
       )
     GROUP BY
       revenue_instance__ds__quarter
       , revenue_instance__ds__year
       , metric_time__day
-  ) subq_16
-) subq_17
+  ) subq_17
+) subq_18
 GROUP BY
   revenue_instance__ds__quarter
   , revenue_instance__ds__year

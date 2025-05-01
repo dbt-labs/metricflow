@@ -4,6 +4,7 @@ sql_engine: BigQuery
 ---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['listing__capacity', 'metric_time__month']
+-- Write to DataTable
 SELECT
   metric_time__month
   , listing__capacity
@@ -20,5 +21,5 @@ FROM (
     ***************************.dim_users_latest users_latest_src_26000
   ON
     listings_src_26000.user_id = users_latest_src_26000.user_id
-) subq_14
+) subq_15
 WHERE user__home_state_latest = 'CA'

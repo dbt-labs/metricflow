@@ -6,6 +6,7 @@ sql_engine: BigQuery
 ---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['user__home_state_latest', 'listing__is_lux_latest']
+-- Write to DataTable
 SELECT
   listing__is_lux_latest
   , user__home_state_latest
@@ -19,7 +20,7 @@ FROM (
     ***************************.dim_users_latest users_latest_src_28000
   ON
     listings_latest_src_28000.user_id = users_latest_src_28000.user_id
-) subq_8
+) subq_9
 WHERE user__home_state_latest = 'us'
 GROUP BY
   listing__is_lux_latest
