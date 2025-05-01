@@ -725,7 +725,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         output_instance_set = output_instance_set.transform(transform_func)
 
         combined_select_column_set = non_metric_select_column_set.merge(
-            SelectColumnSet(metric_columns=metric_select_columns)
+            SelectColumnSet.create(metric_columns=metric_select_columns)
         )
 
         return SqlDataSet(
@@ -980,7 +980,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         output_instance_set = InstanceSet.merge([x.data_set.instance_set for x in parent_data_sets])
         output_instance_set = output_instance_set.transform(ChangeAssociatedColumns(self._column_association_resolver))
 
-        aggregated_select_columns = SelectColumnSet()
+        aggregated_select_columns = SelectColumnSet.create()
         for table_alias, instance_set in table_alias_to_instance_set.items():
             aggregated_select_columns = aggregated_select_columns.merge(
                 instance_set.transform(

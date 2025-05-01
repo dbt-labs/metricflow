@@ -64,7 +64,7 @@ class CreateSelectCoalescedColumnsForLinkableSpecs(InstanceSpecSetTransform[Sele
                 )
             )
 
-        return SelectColumnSet(
+        return SelectColumnSet.create(
             dimension_columns=dimension_columns,
             time_dimension_columns=time_dimension_columns,
             entity_columns=entity_columns,
