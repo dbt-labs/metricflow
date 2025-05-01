@@ -3,6 +3,7 @@ test_filename: test_derived_metric_rendering.py
 sql_engine: Databricks
 ---
 -- Compute Metrics via Expressions
+-- Write to DataTable
 WITH sma_28009_cte AS (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
@@ -25,9 +26,9 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_26.metric_time__day, subq_34.metric_time__day) AS metric_time__day
-    , MAX(subq_26.month_start_bookings) AS month_start_bookings
-    , MAX(subq_34.bookings_1_month_ago) AS bookings_1_month_ago
+    COALESCE(subq_27.metric_time__day, subq_35.metric_time__day) AS metric_time__day
+    , MAX(subq_27.month_start_bookings) AS month_start_bookings
+    , MAX(subq_35.bookings_1_month_ago) AS bookings_1_month_ago
   FROM (
     -- Join to Time Spine Dataset
     -- Pass Only Elements: ['bookings', 'metric_time__day']
@@ -43,7 +44,7 @@ FROM (
       DATE_TRUNC('month', rss_28018_cte.ds__day) = sma_28009_cte.metric_time__day
     GROUP BY
       rss_28018_cte.ds__day
-  ) subq_26
+  ) subq_27
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
     -- Pass Only Elements: ['bookings', 'metric_time__day']
@@ -59,9 +60,9 @@ FROM (
       DATEADD(month, -1, rss_28018_cte.ds__day) = sma_28009_cte.metric_time__day
     GROUP BY
       rss_28018_cte.ds__day
-  ) subq_34
+  ) subq_35
   ON
-    subq_26.metric_time__day = subq_34.metric_time__day
+    subq_27.metric_time__day = subq_35.metric_time__day
   GROUP BY
-    COALESCE(subq_26.metric_time__day, subq_34.metric_time__day)
-) subq_35
+    COALESCE(subq_27.metric_time__day, subq_35.metric_time__day)
+) subq_36

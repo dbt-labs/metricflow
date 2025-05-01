@@ -6,9 +6,10 @@ sql_engine: Trino
 -- Pass Only Elements: ['bookings', 'listing__user__bio_added_ts__minute']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
-  subq_32.user__bio_added_ts__minute AS listing__user__bio_added_ts__minute
-  , SUM(subq_25.bookings) AS bookings
+  subq_33.user__bio_added_ts__minute AS listing__user__bio_added_ts__minute
+  , SUM(subq_26.bookings) AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
@@ -17,7 +18,7 @@ FROM (
     , listing_id AS listing
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-) subq_25
+) subq_26
 LEFT OUTER JOIN (
   -- Join Standard Outputs
   -- Pass Only Elements: ['user__ds_partitioned__day', 'user__bio_added_ts__minute', 'listing']
@@ -30,12 +31,12 @@ LEFT OUTER JOIN (
     ***************************.dim_users users_ds_source_src_28000
   ON
     listings_latest_src_28000.user_id = users_ds_source_src_28000.user_id
-) subq_32
+) subq_33
 ON
   (
-    subq_25.listing = subq_32.listing
+    subq_26.listing = subq_33.listing
   ) AND (
-    subq_25.ds_partitioned__day = subq_32.user__ds_partitioned__day
+    subq_26.ds_partitioned__day = subq_33.user__ds_partitioned__day
   )
 GROUP BY
-  subq_32.user__bio_added_ts__minute
+  subq_33.user__bio_added_ts__minute

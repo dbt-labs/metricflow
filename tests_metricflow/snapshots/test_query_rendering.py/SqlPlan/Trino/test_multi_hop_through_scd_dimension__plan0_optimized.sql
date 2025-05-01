@@ -8,10 +8,11 @@ sql_engine: Trino
 -- Pass Only Elements: ['bookings', 'listing__user__home_state_latest', 'metric_time__day']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
-  subq_20.metric_time__day AS metric_time__day
-  , subq_25.user__home_state_latest AS listing__user__home_state_latest
-  , SUM(subq_20.bookings) AS bookings
+  subq_21.metric_time__day AS metric_time__day
+  , subq_26.user__home_state_latest AS listing__user__home_state_latest
+  , SUM(subq_21.bookings) AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
@@ -20,7 +21,7 @@ FROM (
     , listing_id AS listing
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_26000
-) subq_20
+) subq_21
 LEFT OUTER JOIN (
   -- Join Standard Outputs
   -- Pass Only Elements: ['user__home_state_latest', 'window_start__day', 'window_end__day', 'listing']
@@ -34,21 +35,21 @@ LEFT OUTER JOIN (
     ***************************.dim_users_latest users_latest_src_26000
   ON
     listings_src_26000.user_id = users_latest_src_26000.user_id
-) subq_25
+) subq_26
 ON
   (
-    subq_20.listing = subq_25.listing
+    subq_21.listing = subq_26.listing
   ) AND (
     (
-      subq_20.metric_time__day >= subq_25.window_start__day
+      subq_21.metric_time__day >= subq_26.window_start__day
     ) AND (
       (
-        subq_20.metric_time__day < subq_25.window_end__day
+        subq_21.metric_time__day < subq_26.window_end__day
       ) OR (
-        subq_25.window_end__day IS NULL
+        subq_26.window_end__day IS NULL
       )
     )
   )
 GROUP BY
-  subq_20.metric_time__day
-  , subq_25.user__home_state_latest
+  subq_21.metric_time__day
+  , subq_26.user__home_state_latest

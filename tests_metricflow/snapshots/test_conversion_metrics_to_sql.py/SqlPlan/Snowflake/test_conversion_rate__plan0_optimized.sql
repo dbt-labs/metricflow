@@ -5,6 +5,7 @@ docstring:
 sql_engine: Snowflake
 ---
 -- Compute Metrics via Expressions
+-- Write to DataTable
 WITH sma_28019_cte AS (
   -- Read Elements From Semantic Model 'visits_source'
   -- Metric Time Dimension 'ds'
@@ -22,9 +23,9 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_17.visit__referrer_id, subq_26.visit__referrer_id) AS visit__referrer_id
-    , MAX(subq_17.visits) AS visits
-    , MAX(subq_26.buys) AS buys
+    COALESCE(subq_18.visit__referrer_id, subq_27.visit__referrer_id) AS visit__referrer_id
+    , MAX(subq_18.visits) AS visits
+    , MAX(subq_27.buys) AS buys
   FROM (
     -- Read From CTE For node_id=sma_28019
     -- Pass Only Elements: ['visits', 'visit__referrer_id']
@@ -35,7 +36,7 @@ FROM (
     FROM sma_28019_cte sma_28019_cte
     GROUP BY
       visit__referrer_id
-  ) subq_17
+  ) subq_18
   FULL OUTER JOIN (
     -- Find conversions for user within the range of INF
     -- Pass Only Elements: ['buys', 'visit__referrer_id']
@@ -48,38 +49,38 @@ FROM (
       SELECT DISTINCT
         FIRST_VALUE(sma_28019_cte.visits) OVER (
           PARTITION BY
-            subq_22.user
-            , subq_22.metric_time__day
-            , subq_22.mf_internal_uuid
+            subq_23.user
+            , subq_23.metric_time__day
+            , subq_23.mf_internal_uuid
           ORDER BY sma_28019_cte.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS visits
         , FIRST_VALUE(sma_28019_cte.visit__referrer_id) OVER (
           PARTITION BY
-            subq_22.user
-            , subq_22.metric_time__day
-            , subq_22.mf_internal_uuid
+            subq_23.user
+            , subq_23.metric_time__day
+            , subq_23.mf_internal_uuid
           ORDER BY sma_28019_cte.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS visit__referrer_id
         , FIRST_VALUE(sma_28019_cte.metric_time__day) OVER (
           PARTITION BY
-            subq_22.user
-            , subq_22.metric_time__day
-            , subq_22.mf_internal_uuid
+            subq_23.user
+            , subq_23.metric_time__day
+            , subq_23.mf_internal_uuid
           ORDER BY sma_28019_cte.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS metric_time__day
         , FIRST_VALUE(sma_28019_cte.user) OVER (
           PARTITION BY
-            subq_22.user
-            , subq_22.metric_time__day
-            , subq_22.mf_internal_uuid
+            subq_23.user
+            , subq_23.metric_time__day
+            , subq_23.mf_internal_uuid
           ORDER BY sma_28019_cte.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS user
-        , subq_22.mf_internal_uuid AS mf_internal_uuid
-        , subq_22.buys AS buys
+        , subq_23.mf_internal_uuid AS mf_internal_uuid
+        , subq_23.buys AS buys
       FROM sma_28019_cte sma_28019_cte
       INNER JOIN (
         -- Read Elements From Semantic Model 'buys_source'
@@ -91,19 +92,19 @@ FROM (
           , 1 AS buys
           , UUID_STRING() AS mf_internal_uuid
         FROM ***************************.fct_buys buys_source_src_28000
-      ) subq_22
+      ) subq_23
       ON
         (
-          sma_28019_cte.user = subq_22.user
+          sma_28019_cte.user = subq_23.user
         ) AND (
-          (sma_28019_cte.metric_time__day <= subq_22.metric_time__day)
+          (sma_28019_cte.metric_time__day <= subq_23.metric_time__day)
         )
-    ) subq_23
+    ) subq_24
     GROUP BY
       visit__referrer_id
-  ) subq_26
+  ) subq_27
   ON
-    subq_17.visit__referrer_id = subq_26.visit__referrer_id
+    subq_18.visit__referrer_id = subq_27.visit__referrer_id
   GROUP BY
-    COALESCE(subq_17.visit__referrer_id, subq_26.visit__referrer_id)
-) subq_27
+    COALESCE(subq_18.visit__referrer_id, subq_27.visit__referrer_id)
+) subq_28

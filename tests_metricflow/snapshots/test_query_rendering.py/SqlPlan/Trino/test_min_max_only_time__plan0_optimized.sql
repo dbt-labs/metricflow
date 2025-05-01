@@ -5,6 +5,7 @@ docstring:
 sql_engine: Trino
 ---
 -- Calculate min and max
+-- Write to DataTable
 SELECT
   MIN(booking__paid_at__day) AS booking__paid_at__day__min
   , MAX(booking__paid_at__day) AS booking__paid_at__day__max
@@ -16,4 +17,4 @@ FROM (
   FROM ***************************.fct_bookings bookings_source_src_28000
   GROUP BY
     DATE_TRUNC('day', paid_at)
-) subq_3
+) subq_4

@@ -3,6 +3,7 @@ test_filename: test_derived_metric_rendering.py
 sql_engine: Redshift
 ---
 -- Compute Metrics via Expressions
+-- Write to DataTable
 WITH sma_28009_cte AS (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
@@ -18,9 +19,9 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_21.metric_time__day, subq_30.metric_time__day) AS metric_time__day
-    , MAX(subq_21.bookings) AS bookings
-    , MAX(subq_30.bookings_2_weeks_ago) AS bookings_2_weeks_ago
+    COALESCE(subq_22.metric_time__day, subq_31.metric_time__day) AS metric_time__day
+    , MAX(subq_22.bookings) AS bookings
+    , MAX(subq_31.bookings_2_weeks_ago) AS bookings_2_weeks_ago
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['bookings', 'metric_time__day']
@@ -35,11 +36,11 @@ FROM (
         metric_time__day
         , bookings
       FROM sma_28009_cte sma_28009_cte
-    ) subq_17
+    ) subq_18
     WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'
     GROUP BY
       metric_time__day
-  ) subq_21
+  ) subq_22
   FULL OUTER JOIN (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['bookings', 'metric_time__day']
@@ -58,13 +59,13 @@ FROM (
         sma_28009_cte sma_28009_cte
       ON
         DATEADD(day, -14, time_spine_src_28006.ds) = sma_28009_cte.metric_time__day
-    ) subq_26
+    ) subq_27
     WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'
     GROUP BY
       metric_time__day
-  ) subq_30
+  ) subq_31
   ON
-    subq_21.metric_time__day = subq_30.metric_time__day
+    subq_22.metric_time__day = subq_31.metric_time__day
   GROUP BY
-    COALESCE(subq_21.metric_time__day, subq_30.metric_time__day)
-) subq_31
+    COALESCE(subq_22.metric_time__day, subq_31.metric_time__day)
+) subq_32

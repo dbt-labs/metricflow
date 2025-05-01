@@ -4,9 +4,10 @@ sql_engine: Postgres
 ---
 -- Join to Time Spine Dataset
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
-  subq_20.metric_time__day AS metric_time__day
-  , subq_16.bookings AS bookings_join_to_time_spine
+  subq_21.metric_time__day AS metric_time__day
+  , subq_17.bookings AS bookings_join_to_time_spine
 FROM (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['metric_time__day']
@@ -19,9 +20,9 @@ FROM (
       ds AS metric_time__day
       , alien_day AS metric_time__alien_day
     FROM ***************************.mf_time_spine time_spine_src_28006
-  ) subq_18
+  ) subq_19
   WHERE metric_time__alien_day = '2020-01-02'
-) subq_20
+) subq_21
 LEFT OUTER JOIN (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['bookings', 'metric_time__day']
@@ -33,24 +34,24 @@ LEFT OUTER JOIN (
     -- Metric Time Dimension 'ds'
     -- Join to Custom Granularity Dataset
     SELECT
-      subq_11.ds__day AS metric_time__day
-      , subq_11.bookings AS bookings
-      , subq_12.alien_day AS metric_time__alien_day
+      subq_12.ds__day AS metric_time__day
+      , subq_12.bookings AS bookings
+      , subq_13.alien_day AS metric_time__alien_day
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       SELECT
         1 AS bookings
         , DATE_TRUNC('day', ds) AS ds__day
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_11
+    ) subq_12
     LEFT OUTER JOIN
-      ***************************.mf_time_spine subq_12
+      ***************************.mf_time_spine subq_13
     ON
-      subq_11.ds__day = subq_12.ds
-  ) subq_13
+      subq_12.ds__day = subq_13.ds
+  ) subq_14
   WHERE metric_time__alien_day = '2020-01-02'
   GROUP BY
     metric_time__day
-) subq_16
+) subq_17
 ON
-  subq_20.metric_time__day = subq_16.metric_time__day
+  subq_21.metric_time__day = subq_17.metric_time__day

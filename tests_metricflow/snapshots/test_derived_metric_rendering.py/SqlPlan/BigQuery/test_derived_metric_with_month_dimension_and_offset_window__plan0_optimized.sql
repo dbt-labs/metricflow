@@ -3,6 +3,7 @@ test_filename: test_derived_metric_rendering.py
 sql_engine: BigQuery
 ---
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
   metric_time__month
   , bookings_last_month AS bookings_last_month
@@ -12,7 +13,7 @@ FROM (
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
-    subq_13.metric_time__month AS metric_time__month
+    subq_14.metric_time__month AS metric_time__month
     , SUM(monthly_bookings_source_src_16000.bookings_monthly) AS bookings_last_month
   FROM (
     -- Read From Time Spine 'mf_time_spine'
@@ -23,11 +24,11 @@ FROM (
     FROM ***************************.mf_time_spine time_spine_src_16006
     GROUP BY
       metric_time__month
-  ) subq_13
+  ) subq_14
   INNER JOIN
     ***************************.fct_bookings_extended_monthly monthly_bookings_source_src_16000
   ON
-    DATE_SUB(CAST(subq_13.metric_time__month AS DATETIME), INTERVAL 1 month) = DATETIME_TRUNC(monthly_bookings_source_src_16000.ds, month)
+    DATE_SUB(CAST(subq_14.metric_time__month AS DATETIME), INTERVAL 1 month) = DATETIME_TRUNC(monthly_bookings_source_src_16000.ds, month)
   GROUP BY
     metric_time__month
-) subq_17
+) subq_18

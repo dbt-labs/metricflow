@@ -5,6 +5,7 @@ docstring:
 sql_engine: Redshift
 ---
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
   metric_time__week
   , t2mr - 10 AS trailing_2_months_revenue_sub_10
@@ -24,24 +25,24 @@ FROM (
       -- Pass Only Elements: ['txn_revenue', 'metric_time__week', 'metric_time__day']
       -- Aggregate Measures
       SELECT
-        subq_13.ds AS metric_time__day
-        , DATE_TRUNC('week', subq_13.ds) AS metric_time__week
+        subq_14.ds AS metric_time__day
+        , DATE_TRUNC('week', subq_14.ds) AS metric_time__week
         , SUM(revenue_src_28000.revenue) AS txn_revenue
-      FROM ***************************.mf_time_spine subq_13
+      FROM ***************************.mf_time_spine subq_14
       INNER JOIN
         ***************************.fct_revenue revenue_src_28000
       ON
         (
-          DATE_TRUNC('day', revenue_src_28000.created_at) <= subq_13.ds
+          DATE_TRUNC('day', revenue_src_28000.created_at) <= subq_14.ds
         ) AND (
-          DATE_TRUNC('day', revenue_src_28000.created_at) > DATEADD(month, -2, subq_13.ds)
+          DATE_TRUNC('day', revenue_src_28000.created_at) > DATEADD(month, -2, subq_14.ds)
         )
       GROUP BY
-        subq_13.ds
-        , DATE_TRUNC('week', subq_13.ds)
-    ) subq_16
-  ) subq_18
+        subq_14.ds
+        , DATE_TRUNC('week', subq_14.ds)
+    ) subq_17
+  ) subq_19
   GROUP BY
     metric_time__week
     , t2mr
-) subq_19
+) subq_20

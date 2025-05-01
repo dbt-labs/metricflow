@@ -5,6 +5,7 @@ docstring:
 sql_engine: Databricks
 ---
 -- Calculate min and max
+-- Write to DataTable
 SELECT
   MIN(booking__paid_at__quarter) AS booking__paid_at__quarter__min
   , MAX(booking__paid_at__quarter) AS booking__paid_at__quarter__max
@@ -16,4 +17,4 @@ FROM (
   FROM ***************************.fct_bookings bookings_source_src_28000
   GROUP BY
     DATE_TRUNC('quarter', paid_at)
-) subq_3
+) subq_4

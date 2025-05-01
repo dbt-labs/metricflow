@@ -5,6 +5,7 @@ docstring:
 sql_engine: Snowflake
 ---
 -- Calculate min and max
+-- Write to DataTable
 SELECT
   MIN(listing__country_latest) AS listing__country_latest__min
   , MAX(listing__country_latest) AS listing__country_latest__max
@@ -16,4 +17,4 @@ FROM (
   FROM ***************************.dim_listings_latest listings_latest_src_28000
   GROUP BY
     country
-) subq_3
+) subq_4

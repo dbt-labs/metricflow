@@ -8,13 +8,14 @@ sql_engine: Redshift
 -- Pass Only Elements: ['listings']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
   SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
   SELECT
-    subq_42.listing__views_times_booking_value AS listing__views_times_booking_value
-    , subq_29.listings AS listings
+    subq_43.listing__views_times_booking_value AS listing__views_times_booking_value
+    , subq_30.listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
@@ -22,7 +23,7 @@ FROM (
       listing_id AS listing
       , 1 AS listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_29
+  ) subq_30
   LEFT OUTER JOIN (
     -- Compute Metrics via Expressions
     -- Pass Only Elements: ['listing', 'listing__views_times_booking_value']
@@ -32,9 +33,9 @@ FROM (
     FROM (
       -- Combine Aggregated Outputs
       SELECT
-        COALESCE(subq_34.listing, subq_39.listing) AS listing
-        , MAX(subq_34.booking_value) AS booking_value
-        , MAX(subq_39.views) AS views
+        COALESCE(subq_35.listing, subq_40.listing) AS listing
+        , MAX(subq_35.booking_value) AS booking_value
+        , MAX(subq_40.views) AS views
       FROM (
         -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
@@ -47,7 +48,7 @@ FROM (
         FROM ***************************.fct_bookings bookings_source_src_28000
         GROUP BY
           listing_id
-      ) subq_34
+      ) subq_35
       FULL OUTER JOIN (
         -- Aggregate Measures
         -- Compute Metrics via Expressions
@@ -62,17 +63,17 @@ FROM (
             listing_id AS listing
             , 1 AS views
           FROM ***************************.fct_views views_source_src_28000
-        ) subq_37
+        ) subq_38
         GROUP BY
           listing
-      ) subq_39
+      ) subq_40
       ON
-        subq_34.listing = subq_39.listing
+        subq_35.listing = subq_40.listing
       GROUP BY
-        COALESCE(subq_34.listing, subq_39.listing)
-    ) subq_40
-  ) subq_42
+        COALESCE(subq_35.listing, subq_40.listing)
+    ) subq_41
+  ) subq_43
   ON
-    subq_29.listing = subq_42.listing
-) subq_43
+    subq_30.listing = subq_43.listing
+) subq_44
 WHERE listing__views_times_booking_value > 1

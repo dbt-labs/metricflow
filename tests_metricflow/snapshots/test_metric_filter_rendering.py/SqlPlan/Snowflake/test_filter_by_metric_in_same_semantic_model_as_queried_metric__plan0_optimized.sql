@@ -8,6 +8,7 @@ sql_engine: Snowflake
 -- Pass Only Elements: ['bookers']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
+-- Write to DataTable
 WITH sma_28009_cte AS (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
@@ -23,15 +24,15 @@ SELECT
 FROM (
   -- Join Standard Outputs
   SELECT
-    subq_20.guest__booking_value AS guest__booking_value
-    , subq_15.bookers AS bookers
+    subq_21.guest__booking_value AS guest__booking_value
+    , subq_16.bookers AS bookers
   FROM (
     -- Read From CTE For node_id=sma_28009
     SELECT
       guest
       , bookers
     FROM sma_28009_cte sma_28009_cte
-  ) subq_15
+  ) subq_16
   LEFT OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
     -- Pass Only Elements: ['booking_value', 'guest']
@@ -44,8 +45,8 @@ FROM (
     FROM sma_28009_cte sma_28009_cte
     GROUP BY
       guest
-  ) subq_20
+  ) subq_21
   ON
-    subq_15.guest = subq_20.guest
-) subq_21
+    subq_16.guest = subq_21.guest
+) subq_22
 WHERE guest__booking_value > 1.00

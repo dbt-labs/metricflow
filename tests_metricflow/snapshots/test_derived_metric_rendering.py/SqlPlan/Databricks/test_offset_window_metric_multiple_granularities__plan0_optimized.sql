@@ -5,6 +5,7 @@ docstring:
 sql_engine: Databricks
 ---
 -- Compute Metrics via Expressions
+-- Write to DataTable
 WITH sma_28009_cte AS (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
@@ -25,11 +26,11 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_22.metric_time__day, subq_26.metric_time__day) AS metric_time__day
-    , COALESCE(subq_22.metric_time__month, subq_26.metric_time__month) AS metric_time__month
-    , COALESCE(subq_22.metric_time__year, subq_26.metric_time__year) AS metric_time__year
-    , MAX(subq_22.booking_value) AS booking_value
-    , MAX(subq_26.bookers) AS bookers
+    COALESCE(subq_23.metric_time__day, subq_27.metric_time__day) AS metric_time__day
+    , COALESCE(subq_23.metric_time__month, subq_27.metric_time__month) AS metric_time__month
+    , COALESCE(subq_23.metric_time__year, subq_27.metric_time__year) AS metric_time__year
+    , MAX(subq_23.booking_value) AS booking_value
+    , MAX(subq_27.bookers) AS bookers
   FROM (
     -- Join to Time Spine Dataset
     -- Pass Only Elements: ['booking_value', 'metric_time__day', 'metric_time__month', 'metric_time__year']
@@ -49,7 +50,7 @@ FROM (
       time_spine_src_28006.ds
       , DATE_TRUNC('month', time_spine_src_28006.ds)
       , DATE_TRUNC('year', time_spine_src_28006.ds)
-  ) subq_22
+  ) subq_23
   FULL OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
     -- Pass Only Elements: ['bookers', 'metric_time__day', 'metric_time__month', 'metric_time__year']
@@ -65,17 +66,17 @@ FROM (
       metric_time__day
       , metric_time__month
       , metric_time__year
-  ) subq_26
+  ) subq_27
   ON
     (
-      subq_22.metric_time__day = subq_26.metric_time__day
+      subq_23.metric_time__day = subq_27.metric_time__day
     ) AND (
-      subq_22.metric_time__month = subq_26.metric_time__month
+      subq_23.metric_time__month = subq_27.metric_time__month
     ) AND (
-      subq_22.metric_time__year = subq_26.metric_time__year
+      subq_23.metric_time__year = subq_27.metric_time__year
     )
   GROUP BY
-    COALESCE(subq_22.metric_time__day, subq_26.metric_time__day)
-    , COALESCE(subq_22.metric_time__month, subq_26.metric_time__month)
-    , COALESCE(subq_22.metric_time__year, subq_26.metric_time__year)
-) subq_27
+    COALESCE(subq_23.metric_time__day, subq_27.metric_time__day)
+    , COALESCE(subq_23.metric_time__month, subq_27.metric_time__month)
+    , COALESCE(subq_23.metric_time__year, subq_27.metric_time__year)
+) subq_28

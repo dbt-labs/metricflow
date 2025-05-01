@@ -6,6 +6,7 @@ sql_engine: Databricks
 ---
 -- Combine Aggregated Outputs
 -- Compute Metrics via Expressions
+-- Write to DataTable
 WITH sma_28019_cte AS (
   -- Read Elements From Semantic Model 'visits_source'
   -- Metric Time Dimension 'ds'
@@ -17,7 +18,7 @@ WITH sma_28019_cte AS (
 )
 
 SELECT
-  COALESCE(MAX(subq_26.buys), 0) AS visit_buy_conversions
+  COALESCE(MAX(subq_27.buys), 0) AS visit_buy_conversions
 FROM (
   -- Read From CTE For node_id=sma_28019
   -- Pass Only Elements: ['visits']
@@ -25,7 +26,7 @@ FROM (
   SELECT
     SUM(visits) AS visits
   FROM sma_28019_cte sma_28019_cte
-) subq_17
+) subq_18
 CROSS JOIN (
   -- Find conversions for user within the range of 7 day
   -- Pass Only Elements: ['buys']
@@ -37,30 +38,30 @@ CROSS JOIN (
     SELECT DISTINCT
       FIRST_VALUE(sma_28019_cte.visits) OVER (
         PARTITION BY
-          subq_22.user
-          , subq_22.metric_time__day
-          , subq_22.mf_internal_uuid
+          subq_23.user
+          , subq_23.metric_time__day
+          , subq_23.mf_internal_uuid
         ORDER BY sma_28019_cte.metric_time__day DESC
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
       ) AS visits
       , FIRST_VALUE(sma_28019_cte.metric_time__day) OVER (
         PARTITION BY
-          subq_22.user
-          , subq_22.metric_time__day
-          , subq_22.mf_internal_uuid
+          subq_23.user
+          , subq_23.metric_time__day
+          , subq_23.mf_internal_uuid
         ORDER BY sma_28019_cte.metric_time__day DESC
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
       ) AS metric_time__day
       , FIRST_VALUE(sma_28019_cte.user) OVER (
         PARTITION BY
-          subq_22.user
-          , subq_22.metric_time__day
-          , subq_22.mf_internal_uuid
+          subq_23.user
+          , subq_23.metric_time__day
+          , subq_23.mf_internal_uuid
         ORDER BY sma_28019_cte.metric_time__day DESC
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
       ) AS user
-      , subq_22.mf_internal_uuid AS mf_internal_uuid
-      , subq_22.buys AS buys
+      , subq_23.mf_internal_uuid AS mf_internal_uuid
+      , subq_23.buys AS buys
     FROM sma_28019_cte sma_28019_cte
     INNER JOIN (
       -- Read Elements From Semantic Model 'buys_source'
@@ -72,16 +73,16 @@ CROSS JOIN (
         , 1 AS buys
         , UUID() AS mf_internal_uuid
       FROM ***************************.fct_buys buys_source_src_28000
-    ) subq_22
+    ) subq_23
     ON
       (
-        sma_28019_cte.user = subq_22.user
+        sma_28019_cte.user = subq_23.user
       ) AND (
         (
-          sma_28019_cte.metric_time__day <= subq_22.metric_time__day
+          sma_28019_cte.metric_time__day <= subq_23.metric_time__day
         ) AND (
-          sma_28019_cte.metric_time__day > DATEADD(day, -7, subq_22.metric_time__day)
+          sma_28019_cte.metric_time__day > DATEADD(day, -7, subq_23.metric_time__day)
         )
       )
-  ) subq_23
-) subq_26
+  ) subq_24
+) subq_27

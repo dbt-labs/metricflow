@@ -5,6 +5,7 @@ sql_engine: Redshift
 -- Join Standard Outputs
 -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-03T00:00:00]
 -- Pass Only Elements: ['user__home_state_latest', 'listing__is_lux_latest', 'metric_time__day']
+-- Write to DataTable
 SELECT
   time_spine_src_28006.ds AS metric_time__day
   , listings_latest_src_28000.is_lux AS listing__is_lux_latest

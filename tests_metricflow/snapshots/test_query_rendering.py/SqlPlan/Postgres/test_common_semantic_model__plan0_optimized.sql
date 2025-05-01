@@ -4,6 +4,7 @@ sql_engine: Postgres
 ---
 -- Aggregate Measures
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
   metric_time__day
   , SUM(bookings) AS bookings
@@ -17,6 +18,6 @@ FROM (
     , 1 AS bookings
     , booking_value
   FROM ***************************.fct_bookings bookings_source_src_28000
-) subq_11
+) subq_12
 GROUP BY
   metric_time__day

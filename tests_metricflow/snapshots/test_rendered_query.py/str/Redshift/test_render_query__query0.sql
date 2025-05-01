@@ -4,6 +4,7 @@ sql_engine: Redshift
 ---
 -- Aggregate Measures
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
   metric_time__day
   , SUM(bookings) AS bookings

@@ -3,6 +3,7 @@ test_filename: test_query_rendering.py
 sql_engine: Redshift
 ---
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
   metric_time__day
   , delayed_bookings * 2 AS double_counted_delayed_bookings
@@ -22,8 +23,8 @@ FROM (
       , is_instant AS booking__is_instant
       , 1 AS bookings
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_7
+  ) subq_8
   WHERE NOT booking__is_instant
   GROUP BY
     metric_time__day
-) subq_11
+) subq_12

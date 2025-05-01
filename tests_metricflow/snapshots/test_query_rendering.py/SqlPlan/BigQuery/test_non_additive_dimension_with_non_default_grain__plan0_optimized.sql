@@ -8,8 +8,9 @@ sql_engine: BigQuery
 -- Pass Only Elements: ['total_account_balance_first_day_of_month']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
-  SUM(subq_8.total_account_balance_first_day_of_month) AS total_account_balance_first_day_of_month
+  SUM(subq_9.total_account_balance_first_day_of_month) AS total_account_balance_first_day_of_month
 FROM (
   -- Read Elements From Semantic Model 'accounts_source'
   -- Metric Time Dimension 'ds_month'
@@ -17,7 +18,7 @@ FROM (
     DATETIME_TRUNC(ds_month, month) AS ds_month__month
     , account_balance AS total_account_balance_first_day_of_month
   FROM ***************************.fct_accounts accounts_source_src_28000
-) subq_8
+) subq_9
 INNER JOIN (
   -- Read Elements From Semantic Model 'accounts_source'
   -- Metric Time Dimension 'ds_month'
@@ -25,6 +26,6 @@ INNER JOIN (
   SELECT
     MIN(DATETIME_TRUNC(ds_month, month)) AS ds_month__month__complete
   FROM ***************************.fct_accounts accounts_source_src_28000
-) subq_10
+) subq_11
 ON
-  subq_8.ds_month__month = subq_10.ds_month__month__complete
+  subq_9.ds_month__month = subq_11.ds_month__month__complete

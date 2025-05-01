@@ -7,6 +7,7 @@ sql_engine: Trino
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 -- Order By [] Limit 1
+-- Write to DataTable
 SELECT
   ds__day
   , SUM(bookings) AS bookings
@@ -18,7 +19,7 @@ FROM (
     DATE_TRUNC('day', ds) AS ds__day
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-) subq_7
+) subq_8
 GROUP BY
   ds__day
 LIMIT 1

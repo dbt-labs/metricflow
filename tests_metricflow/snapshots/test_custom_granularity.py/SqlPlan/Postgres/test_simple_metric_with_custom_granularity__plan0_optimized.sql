@@ -7,19 +7,20 @@ sql_engine: Postgres
 -- Pass Only Elements: ['bookings', 'booking__ds__alien_day']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
-  subq_6.alien_day AS booking__ds__alien_day
-  , SUM(subq_5.bookings) AS bookings
+  subq_7.alien_day AS booking__ds__alien_day
+  , SUM(subq_6.bookings) AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   SELECT
     1 AS bookings
     , DATE_TRUNC('day', ds) AS booking__ds__day
   FROM ***************************.fct_bookings bookings_source_src_28000
-) subq_5
+) subq_6
 LEFT OUTER JOIN
-  ***************************.mf_time_spine subq_6
+  ***************************.mf_time_spine subq_7
 ON
-  subq_5.booking__ds__day = subq_6.ds
+  subq_6.booking__ds__day = subq_7.ds
 GROUP BY
-  subq_6.alien_day
+  subq_7.alien_day

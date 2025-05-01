@@ -3,16 +3,17 @@ test_filename: test_derived_metric_rendering.py
 sql_engine: Trino
 ---
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
   metric_time__day
   , non_referred + (instant * 1.0 / bookings) AS instant_plus_non_referred_bookings_pct
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_22.metric_time__day, subq_27.metric_time__day) AS metric_time__day
-    , MAX(subq_22.non_referred) AS non_referred
-    , MAX(subq_27.instant) AS instant
-    , MAX(subq_27.bookings) AS bookings
+    COALESCE(subq_23.metric_time__day, subq_28.metric_time__day) AS metric_time__day
+    , MAX(subq_23.non_referred) AS non_referred
+    , MAX(subq_28.instant) AS instant
+    , MAX(subq_28.bookings) AS bookings
   FROM (
     -- Compute Metrics via Expressions
     SELECT
@@ -34,11 +35,11 @@ FROM (
           , 1 AS bookings
           , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
         FROM ***************************.fct_bookings bookings_source_src_28000
-      ) subq_19
+      ) subq_20
       GROUP BY
         metric_time__day
-    ) subq_21
-  ) subq_22
+    ) subq_22
+  ) subq_23
   FULL OUTER JOIN (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
@@ -55,12 +56,12 @@ FROM (
         , 1 AS bookings
         , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_25
+    ) subq_26
     GROUP BY
       metric_time__day
-  ) subq_27
+  ) subq_28
   ON
-    subq_22.metric_time__day = subq_27.metric_time__day
+    subq_23.metric_time__day = subq_28.metric_time__day
   GROUP BY
-    COALESCE(subq_22.metric_time__day, subq_27.metric_time__day)
-) subq_28
+    COALESCE(subq_23.metric_time__day, subq_28.metric_time__day)
+) subq_29

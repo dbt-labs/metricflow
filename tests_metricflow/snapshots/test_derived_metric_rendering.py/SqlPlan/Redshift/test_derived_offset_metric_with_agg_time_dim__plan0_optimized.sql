@@ -3,6 +3,7 @@ test_filename: test_derived_metric_rendering.py
 sql_engine: Redshift
 ---
 -- Compute Metrics via Expressions
+-- Write to DataTable
 WITH sma_28009_cte AS (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
@@ -19,9 +20,9 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_22.booking__ds__day, subq_26.booking__ds__day) AS booking__ds__day
-    , MAX(subq_22.booking_value) AS booking_value
-    , MAX(subq_26.bookers) AS bookers
+    COALESCE(subq_23.booking__ds__day, subq_27.booking__ds__day) AS booking__ds__day
+    , MAX(subq_23.booking_value) AS booking_value
+    , MAX(subq_27.bookers) AS bookers
   FROM (
     -- Join to Time Spine Dataset
     -- Pass Only Elements: ['booking_value', 'booking__ds__day']
@@ -37,7 +38,7 @@ FROM (
       DATEADD(week, -1, time_spine_src_28006.ds) = sma_28009_cte.booking__ds__day
     GROUP BY
       time_spine_src_28006.ds
-  ) subq_22
+  ) subq_23
   FULL OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
     -- Pass Only Elements: ['bookers', 'booking__ds__day']
@@ -49,9 +50,9 @@ FROM (
     FROM sma_28009_cte sma_28009_cte
     GROUP BY
       booking__ds__day
-  ) subq_26
+  ) subq_27
   ON
-    subq_22.booking__ds__day = subq_26.booking__ds__day
+    subq_23.booking__ds__day = subq_27.booking__ds__day
   GROUP BY
-    COALESCE(subq_22.booking__ds__day, subq_26.booking__ds__day)
-) subq_27
+    COALESCE(subq_23.booking__ds__day, subq_27.booking__ds__day)
+) subq_28

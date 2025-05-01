@@ -5,6 +5,7 @@ docstring:
 sql_engine: Snowflake
 ---
 -- Compute Metrics via Expressions
+-- Write to DataTable
 WITH sma_28019_cte AS (
   -- Read Elements From Semantic Model 'visits_source'
   -- Metric Time Dimension 'ds'
@@ -28,14 +29,14 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_29.metric_time__day, subq_42.metric_time__day) AS metric_time__day
-    , COALESCE(MAX(subq_29.visits), 0) AS visits
-    , COALESCE(MAX(subq_42.buys), 0) AS buys
+    COALESCE(subq_30.metric_time__day, subq_43.metric_time__day) AS metric_time__day
+    , COALESCE(MAX(subq_30.visits), 0) AS visits
+    , COALESCE(MAX(subq_43.buys), 0) AS buys
   FROM (
     -- Join to Time Spine Dataset
     SELECT
       rss_28018_cte.ds__day AS metric_time__day
-      , subq_25.visits AS visits
+      , subq_26.visits AS visits
     FROM rss_28018_cte rss_28018_cte
     LEFT OUTER JOIN (
       -- Read From CTE For node_id=sma_28019
@@ -47,15 +48,15 @@ FROM (
       FROM sma_28019_cte sma_28019_cte
       GROUP BY
         metric_time__day
-    ) subq_25
+    ) subq_26
     ON
-      rss_28018_cte.ds__day = subq_25.metric_time__day
-  ) subq_29
+      rss_28018_cte.ds__day = subq_26.metric_time__day
+  ) subq_30
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
     SELECT
       rss_28018_cte.ds__day AS metric_time__day
-      , subq_38.buys AS buys
+      , subq_39.buys AS buys
     FROM rss_28018_cte rss_28018_cte
     LEFT OUTER JOIN (
       -- Find conversions for user within the range of 7 day
@@ -69,30 +70,30 @@ FROM (
         SELECT DISTINCT
           FIRST_VALUE(sma_28019_cte.visits) OVER (
             PARTITION BY
-              subq_34.user
-              , subq_34.metric_time__day
-              , subq_34.mf_internal_uuid
+              subq_35.user
+              , subq_35.metric_time__day
+              , subq_35.mf_internal_uuid
             ORDER BY sma_28019_cte.metric_time__day DESC
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
           ) AS visits
           , FIRST_VALUE(sma_28019_cte.metric_time__day) OVER (
             PARTITION BY
-              subq_34.user
-              , subq_34.metric_time__day
-              , subq_34.mf_internal_uuid
+              subq_35.user
+              , subq_35.metric_time__day
+              , subq_35.mf_internal_uuid
             ORDER BY sma_28019_cte.metric_time__day DESC
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
           ) AS metric_time__day
           , FIRST_VALUE(sma_28019_cte.user) OVER (
             PARTITION BY
-              subq_34.user
-              , subq_34.metric_time__day
-              , subq_34.mf_internal_uuid
+              subq_35.user
+              , subq_35.metric_time__day
+              , subq_35.mf_internal_uuid
             ORDER BY sma_28019_cte.metric_time__day DESC
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
           ) AS user
-          , subq_34.mf_internal_uuid AS mf_internal_uuid
-          , subq_34.buys AS buys
+          , subq_35.mf_internal_uuid AS mf_internal_uuid
+          , subq_35.buys AS buys
         FROM sma_28019_cte sma_28019_cte
         INNER JOIN (
           -- Read Elements From Semantic Model 'buys_source'
@@ -104,26 +105,26 @@ FROM (
             , 1 AS buys
             , UUID_STRING() AS mf_internal_uuid
           FROM ***************************.fct_buys buys_source_src_28000
-        ) subq_34
+        ) subq_35
         ON
           (
-            sma_28019_cte.user = subq_34.user
+            sma_28019_cte.user = subq_35.user
           ) AND (
             (
-              sma_28019_cte.metric_time__day <= subq_34.metric_time__day
+              sma_28019_cte.metric_time__day <= subq_35.metric_time__day
             ) AND (
-              sma_28019_cte.metric_time__day > DATEADD(day, -7, subq_34.metric_time__day)
+              sma_28019_cte.metric_time__day > DATEADD(day, -7, subq_35.metric_time__day)
             )
           )
-      ) subq_35
+      ) subq_36
       GROUP BY
         metric_time__day
-    ) subq_38
+    ) subq_39
     ON
-      rss_28018_cte.ds__day = subq_38.metric_time__day
-  ) subq_42
+      rss_28018_cte.ds__day = subq_39.metric_time__day
+  ) subq_43
   ON
-    subq_29.metric_time__day = subq_42.metric_time__day
+    subq_30.metric_time__day = subq_43.metric_time__day
   GROUP BY
-    COALESCE(subq_29.metric_time__day, subq_42.metric_time__day)
-) subq_43
+    COALESCE(subq_30.metric_time__day, subq_43.metric_time__day)
+) subq_44

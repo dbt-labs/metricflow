@@ -7,6 +7,7 @@ docstring:
 sql_engine: Postgres
 ---
 -- Re-aggregate Metric via Group By
+-- Write to DataTable
 SELECT
   revenue_instance__ds__quarter
   , revenue_instance__ds__year
@@ -29,25 +30,25 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      DATE_TRUNC('quarter', subq_12.ds) AS revenue_instance__ds__quarter
-      , DATE_TRUNC('year', subq_12.ds) AS revenue_instance__ds__year
-      , subq_12.ds AS metric_time__day
+      DATE_TRUNC('quarter', subq_13.ds) AS revenue_instance__ds__quarter
+      , DATE_TRUNC('year', subq_13.ds) AS revenue_instance__ds__year
+      , subq_13.ds AS metric_time__day
       , SUM(revenue_src_28000.revenue) AS revenue_mtd
-    FROM ***************************.mf_time_spine subq_12
+    FROM ***************************.mf_time_spine subq_13
     INNER JOIN
       ***************************.fct_revenue revenue_src_28000
     ON
       (
-        DATE_TRUNC('day', revenue_src_28000.created_at) <= subq_12.ds
+        DATE_TRUNC('day', revenue_src_28000.created_at) <= subq_13.ds
       ) AND (
-        DATE_TRUNC('day', revenue_src_28000.created_at) >= DATE_TRUNC('month', subq_12.ds)
+        DATE_TRUNC('day', revenue_src_28000.created_at) >= DATE_TRUNC('month', subq_13.ds)
       )
     GROUP BY
-      DATE_TRUNC('quarter', subq_12.ds)
-      , DATE_TRUNC('year', subq_12.ds)
-      , subq_12.ds
-  ) subq_16
-) subq_17
+      DATE_TRUNC('quarter', subq_13.ds)
+      , DATE_TRUNC('year', subq_13.ds)
+      , subq_13.ds
+  ) subq_17
+) subq_18
 GROUP BY
   revenue_instance__ds__quarter
   , revenue_instance__ds__year

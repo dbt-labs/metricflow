@@ -6,12 +6,13 @@ sql_engine: Databricks
 ---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['listing']
+-- Write to DataTable
 SELECT
   listing
 FROM (
   -- Join Standard Outputs
   SELECT
-    subq_18.listing__bookings AS listing__bookings
+    subq_19.listing__bookings AS listing__bookings
     , lux_listing_mapping_src_28000.listing_id AS listing
   FROM ***************************.dim_lux_listing_id_mapping lux_listing_mapping_src_28000
   FULL OUTER JOIN (
@@ -29,13 +30,13 @@ FROM (
         listing_id AS listing
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_15
+    ) subq_16
     GROUP BY
       listing
-  ) subq_18
+  ) subq_19
   ON
-    lux_listing_mapping_src_28000.listing_id = subq_18.listing
-) subq_19
+    lux_listing_mapping_src_28000.listing_id = subq_19.listing
+) subq_20
 WHERE listing__bookings > 2
 GROUP BY
   listing

@@ -5,6 +5,7 @@ docstring:
 sql_engine: Postgres
 ---
 -- Re-aggregate Metric via Group By
+-- Write to DataTable
 SELECT
   metric_time__year
   , trailing_2_months_revenue
@@ -19,23 +20,23 @@ FROM (
     -- Pass Only Elements: ['txn_revenue', 'metric_time__year', 'metric_time__day']
     -- Aggregate Measures
     SELECT
-      subq_12.ds AS metric_time__day
-      , DATE_TRUNC('year', subq_12.ds) AS metric_time__year
+      subq_13.ds AS metric_time__day
+      , DATE_TRUNC('year', subq_13.ds) AS metric_time__year
       , SUM(revenue_src_28000.revenue) AS txn_revenue
-    FROM ***************************.mf_time_spine subq_12
+    FROM ***************************.mf_time_spine subq_13
     INNER JOIN
       ***************************.fct_revenue revenue_src_28000
     ON
       (
-        DATE_TRUNC('day', revenue_src_28000.created_at) <= subq_12.ds
+        DATE_TRUNC('day', revenue_src_28000.created_at) <= subq_13.ds
       ) AND (
-        DATE_TRUNC('day', revenue_src_28000.created_at) > subq_12.ds - MAKE_INTERVAL(months => 2)
+        DATE_TRUNC('day', revenue_src_28000.created_at) > subq_13.ds - MAKE_INTERVAL(months => 2)
       )
     GROUP BY
-      subq_12.ds
-      , DATE_TRUNC('year', subq_12.ds)
-  ) subq_15
-) subq_17
+      subq_13.ds
+      , DATE_TRUNC('year', subq_13.ds)
+  ) subq_16
+) subq_18
 GROUP BY
   metric_time__year
   , trailing_2_months_revenue

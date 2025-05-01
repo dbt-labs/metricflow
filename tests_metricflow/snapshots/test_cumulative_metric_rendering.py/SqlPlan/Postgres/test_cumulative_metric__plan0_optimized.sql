@@ -9,6 +9,7 @@ sql_engine: Postgres
 -- Pass Only Elements: ['txn_revenue', 'ds__day']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
   DATE_TRUNC('day', created_at) AS ds__day
   , SUM(revenue) AS trailing_2_months_revenue

@@ -3,6 +3,7 @@ test_filename: test_fill_nulls_with_rendering.py
 sql_engine: Trino
 ---
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
   metric_time__day
   , COALESCE(bookings, 0) AS bookings_fill_nulls_with_0
@@ -10,8 +11,8 @@ FROM (
   -- Join to Time Spine Dataset
   -- Constrain Time Range to [2020-01-03T00:00:00, 2020-01-05T00:00:00]
   SELECT
-    subq_24.metric_time__day AS metric_time__day
-    , subq_19.bookings AS bookings
+    subq_25.metric_time__day AS metric_time__day
+    , subq_20.bookings AS bookings
   FROM (
     -- Constrain Output with WHERE
     -- Constrain Time Range to [2020-01-03T00:00:00, 2020-01-05T00:00:00]
@@ -25,13 +26,13 @@ FROM (
         ds AS metric_time__day
         , DATE_TRUNC('week', ds) AS metric_time__week
       FROM ***************************.mf_time_spine time_spine_src_28006
-    ) subq_21
+    ) subq_22
     WHERE (
       metric_time__day BETWEEN timestamp '2020-01-03' AND timestamp '2020-01-05'
     ) AND (
       metric_time__week > '2020-01-01'
     )
-  ) subq_24
+  ) subq_25
   LEFT OUTER JOIN (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['bookings', 'metric_time__day']
@@ -49,12 +50,12 @@ FROM (
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
       WHERE DATE_TRUNC('day', ds) BETWEEN timestamp '2020-01-03' AND timestamp '2020-01-05'
-    ) subq_16
+    ) subq_17
     WHERE metric_time__week > '2020-01-01'
     GROUP BY
       metric_time__day
-  ) subq_19
+  ) subq_20
   ON
-    subq_24.metric_time__day = subq_19.metric_time__day
-  WHERE subq_24.metric_time__day BETWEEN timestamp '2020-01-03' AND timestamp '2020-01-05'
-) subq_26
+    subq_25.metric_time__day = subq_20.metric_time__day
+  WHERE subq_25.metric_time__day BETWEEN timestamp '2020-01-03' AND timestamp '2020-01-05'
+) subq_27

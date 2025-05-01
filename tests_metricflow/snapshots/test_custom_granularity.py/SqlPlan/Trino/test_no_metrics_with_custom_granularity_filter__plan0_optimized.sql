@@ -6,6 +6,7 @@ sql_engine: Trino
 ---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['listing__ds__day']
+-- Write to DataTable
 SELECT
   listing__ds__day
 FROM (
@@ -13,13 +14,13 @@ FROM (
   -- Join to Custom Granularity Dataset
   SELECT
     DATE_TRUNC('day', listings_latest_src_28000.created_at) AS listing__ds__day
-    , subq_3.alien_day AS listing__ds__alien_day
+    , subq_4.alien_day AS listing__ds__alien_day
   FROM ***************************.dim_listings_latest listings_latest_src_28000
   LEFT OUTER JOIN
-    ***************************.mf_time_spine subq_3
+    ***************************.mf_time_spine subq_4
   ON
-    DATE_TRUNC('day', listings_latest_src_28000.created_at) = subq_3.ds
-) subq_4
+    DATE_TRUNC('day', listings_latest_src_28000.created_at) = subq_4.ds
+) subq_5
 WHERE listing__ds__alien_day = '2020-01-01'
 GROUP BY
   listing__ds__day
