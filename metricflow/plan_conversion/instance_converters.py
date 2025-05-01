@@ -6,7 +6,7 @@ import logging
 from collections import OrderedDict
 from dataclasses import dataclass
 from itertools import chain
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 from dbt_semantic_interfaces.references import EntityReference, MetricReference, SemanticModelReference
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
@@ -14,6 +14,7 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.aggregation_properties import AggregationState
 from metricflow_semantics.assert_one_arg import assert_exactly_one_arg_set
+from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.instances import (
     DimensionInstance,
     EntityInstance,
@@ -43,6 +44,7 @@ from metricflow_semantics.sql.sql_exprs import (
     SqlStringExpression,
 )
 from more_itertools import bucket
+from typing_extensions import TypeVar
 
 from metricflow.dataflow.nodes.join_to_base import ValidityWindowJoinDescription
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
@@ -51,6 +53,8 @@ from metricflow.sql.sql_plan import (
 )
 
 logger = logging.getLogger(__name__)
+
+InstanceT = TypeVar("InstanceT", bound=MdoInstance)
 
 
 class CreateSelectColumnsForInstances(InstanceSetTransform[SelectColumnSet]):
@@ -64,6 +68,7 @@ class CreateSelectColumnsForInstances(InstanceSetTransform[SelectColumnSet]):
         self,
         table_alias: str,
         column_resolver: ColumnAssociationResolver,
+        spec_output_order: Sequence[InstanceSpec] = (),
         output_to_input_column_mapping: Optional[OrderedDict[str, str]] = None,
     ) -> None:
         """Initializer.
@@ -71,34 +76,86 @@ class CreateSelectColumnsForInstances(InstanceSetTransform[SelectColumnSet]):
         Args:
             table_alias: the table alias to select columns from
             column_resolver: resolver to name columns.
+            spec_output_order: If specified, order the output columns for instances according to the given order of the
+            instances' specs.
             output_to_input_column_mapping: if specified, use these columns in the input for the given output columns.
         """
         self._table_alias = table_alias
         self._column_resolver = column_resolver
         self._output_to_input_column_mapping = output_to_input_column_mapping or OrderedDict()
+        # Map the instance spec to a key that can be used for sorting.
+        self._spec_to_sort_key = {spec: i for i, spec in enumerate(spec_output_order)}
+
+    def _sort_instances_by_output_order(self, instances: Sequence[InstanceT]) -> Sequence[InstanceT]:
+        """Sort instances in the same order as `spec_output_order` / `_spec_to_sort_key`."""
+        if len(self._spec_to_sort_key) == 0:
+            return instances
+
+        def _sort_key_function(instance: InstanceT) -> Union[int, float]:
+            key = self._spec_to_sort_key.get(instance.spec)
+            if key is None:
+                logger.error(
+                    LazyFormat(
+                        "Bug: Missing sort key for an instance so returning a sentinel value to put the instance at the"
+                        " end. This should result in a query that still runs, but the output columns may not be in the"
+                        " expected order.",
+                        instance=instance,
+                        spec_to_sort_key=self._spec_to_sort_key,
+                    )
+                )
+                return float("inf")
+
+            return key
+
+        return sorted(instances, key=_sort_key_function)
 
     def transform(self, instance_set: InstanceSet) -> SelectColumnSet:  # noqa: D102
-        metric_cols = list(
+        metric_cols = tuple(
             chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.metric_instances])
         )
-        measure_cols = list(
+        measure_cols = tuple(
             chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.measure_instances])
         )
-        dimension_cols = list(
+        dimension_cols = tuple(
             chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.dimension_instances])
         )
-        time_dimension_cols = list(
+        time_dimension_cols = tuple(
             chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.time_dimension_instances])
         )
-        entity_cols = list(
+        entity_cols = tuple(
             chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.entity_instances])
         )
-        metadata_cols = list(
+        metadata_cols = tuple(
             chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.metadata_instances])
         )
-        group_by_metric_cols = list(
+        group_by_metric_cols = tuple(
             chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.group_by_metric_instances])
         )
+        columns_in_order: Optional[AnyLengthTuple[SqlSelectColumn]] = None
+
+        if len(self._spec_to_sort_key) > 0:
+            group_by_item_columns = tuple(
+                chain.from_iterable(
+                    [
+                        self._make_sql_column_expression(instance)
+                        for instance in self._sort_instances_by_output_order(
+                            instance_set.time_dimension_instances
+                            + instance_set.entity_instances
+                            + instance_set.dimension_instances
+                            + instance_set.group_by_metric_instances
+                        )
+                    ]
+                )
+            )
+            columns_in_order = group_by_item_columns + metric_cols + measure_cols + metadata_cols
+            logger.debug(
+                LazyFormat(
+                    "Generated columns using the specified order",
+                    spec_to_sort_key=self._spec_to_sort_key,
+                    columns_in_order=columns_in_order,
+                )
+            )
+
         return SelectColumnSet.create(
             metric_columns=metric_cols,
             measure_columns=measure_cols,
@@ -107,6 +164,7 @@ class CreateSelectColumnsForInstances(InstanceSetTransform[SelectColumnSet]):
             entity_columns=entity_cols,
             group_by_metric_columns=group_by_metric_cols,
             metadata_columns=metadata_cols,
+            columns_in_order=columns_in_order,
         )
 
     def _make_sql_column_expression(
@@ -961,7 +1019,7 @@ def create_simple_select_columns_for_instance_sets(
             )
         )
 
-    return column_set.as_tuple()
+    return column_set.columns_in_order
 
 
 class AddMetadata(InstanceSetTransform[InstanceSet]):

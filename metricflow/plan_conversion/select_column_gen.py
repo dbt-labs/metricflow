@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Iterable, Tuple
+from typing import Iterable, Optional
 
 from metricflow_semantics.collection_helpers.merger import Mergeable
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
@@ -27,6 +27,7 @@ class SelectColumnSet(Mergeable):
     entity_columns: AnyLengthTuple[SqlSelectColumn]
     group_by_metric_columns: AnyLengthTuple[SqlSelectColumn]
     metadata_columns: AnyLengthTuple[SqlSelectColumn]
+    columns_in_order: AnyLengthTuple[SqlSelectColumn]
 
     @staticmethod
     def create(  # noqa: D102
@@ -37,15 +38,39 @@ class SelectColumnSet(Mergeable):
         entity_columns: Iterable[SqlSelectColumn] = (),
         group_by_metric_columns: Iterable[SqlSelectColumn] = (),
         metadata_columns: Iterable[SqlSelectColumn] = (),
+        columns_in_order: Optional[Iterable[SqlSelectColumn]] = None,
     ) -> SelectColumnSet:
+        metric_columns = tuple(metric_columns)
+        measure_columns = tuple(measure_columns)
+        dimension_columns = tuple(dimension_columns)
+        time_dimension_columns = tuple(time_dimension_columns)
+        entity_columns = tuple(entity_columns)
+        group_by_metric_columns = tuple(group_by_metric_columns)
+        metadata_columns = tuple(metadata_columns)
+
+        if columns_in_order is None:
+            columns_in_order_argument_value = (
+                # This order was chosen to match the column sequence data consumers typically prefer.
+                time_dimension_columns
+                + entity_columns
+                + dimension_columns
+                + group_by_metric_columns
+                + metric_columns
+                + measure_columns
+                + metadata_columns
+            )
+        else:
+            columns_in_order_argument_value = tuple(columns_in_order)
+
         return SelectColumnSet(
-            metric_columns=tuple(metric_columns),
-            measure_columns=tuple(measure_columns),
-            dimension_columns=tuple(dimension_columns),
-            time_dimension_columns=tuple(time_dimension_columns),
-            entity_columns=tuple(entity_columns),
-            group_by_metric_columns=tuple(group_by_metric_columns),
-            metadata_columns=tuple(metadata_columns),
+            metric_columns=metric_columns,
+            measure_columns=measure_columns,
+            dimension_columns=dimension_columns,
+            time_dimension_columns=time_dimension_columns,
+            entity_columns=entity_columns,
+            group_by_metric_columns=group_by_metric_columns,
+            metadata_columns=metadata_columns,
+            columns_in_order=columns_in_order_argument_value,
         )
 
     @override
@@ -65,19 +90,6 @@ class SelectColumnSet(Mergeable):
     @override
     def empty_instance(cls) -> SelectColumnSet:
         return SelectColumnSet.create()
-
-    def as_tuple(self) -> Tuple[SqlSelectColumn, ...]:
-        """Return all select columns as a tuple."""
-        return tuple(
-            # This order was chosen to match the column sequence data consumers typically prefer.
-            self.time_dimension_columns
-            + self.entity_columns
-            + self.dimension_columns
-            + self.group_by_metric_columns
-            + self.metric_columns
-            + self.measure_columns
-            + self.metadata_columns
-        )
 
     def without_measure_columns(self) -> SelectColumnSet:
         """Returns this but with the measure columns removed."""

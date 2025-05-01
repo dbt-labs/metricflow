@@ -552,11 +552,11 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
                 # This will generate expressions with the appropriate aggregation functions e.g. SUM()
-                select_columns=select_column_set.as_tuple(),
+                select_columns=select_column_set.columns_in_order,
                 from_source=from_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
                 # This will generate expressions to group by the columns that don't correspond to a measure instance.
-                group_bys=select_column_set.without_measure_columns().as_tuple(),
+                group_bys=select_column_set.without_measure_columns().columns_in_order,
             ),
         )
 
@@ -732,7 +732,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             instance_set=output_instance_set,
             sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
-                select_columns=combined_select_column_set.as_tuple(),
+                select_columns=combined_select_column_set.columns_in_order,
                 from_source=from_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
             ),
@@ -784,7 +784,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                 # This creates select expressions for all columns referenced in the instance set.
                 select_columns=output_instance_set.transform(
                     CreateSelectColumnsForInstances(from_data_set_alias, self._column_association_resolver)
-                ).as_tuple(),
+                ).columns_in_order,
                 from_source=from_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
                 order_bys=tuple(order_by_descriptions),
@@ -804,7 +804,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             instance_set=input_data_set.instance_set,
             sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
-                select_columns=output_column_set.as_tuple(),
+                select_columns=output_column_set.columns_in_order,
                 from_source=input_data_set.checked_sql_select_node,
                 from_source_alias=input_data_set_alias,
             ),
@@ -823,7 +823,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                 sql_table=node.output_sql_table,
                 parent_node=SqlSelectStatementNode.create(
                     description=node.description,
-                    select_columns=output_column_set.as_tuple(),
+                    select_columns=output_column_set.columns_in_order,
                     from_source=input_data_set.checked_sql_select_node,
                     from_source_alias=input_data_set_alias,
                 ),
@@ -842,7 +842,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         # This creates select expressions for all columns referenced in the instance set.
         select_columns = output_instance_set.transform(
             CreateSelectColumnsForInstances(from_data_set_alias, self._column_association_resolver)
-        ).as_tuple()
+        ).columns_in_order
 
         # If distinct values requested, group by all select columns.
         group_bys = select_columns if node.distinct else ()
@@ -874,7 +874,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                 # This creates select expressions for all columns referenced in the instance set.
                 select_columns=output_instance_set.transform(
                     CreateSelectColumnsForInstances(from_data_set_alias, self._column_association_resolver)
-                ).as_tuple(),
+                ).columns_in_order,
                 from_source=parent_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
                 where=self._render_where_constraint_expr(node.where),
@@ -1003,11 +1003,11 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             instance_set=output_instance_set,
             sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
-                select_columns=combined_select_column_set.as_tuple(),
+                select_columns=combined_select_column_set.columns_in_order,
                 from_source=from_data_set.data_set.checked_sql_select_node,
                 from_source_alias=from_data_set.alias,
                 join_descs=tuple(joins_descriptions),
-                group_bys=linkable_select_column_set.as_tuple(),
+                group_bys=linkable_select_column_set.columns_in_order,
             ),
         )
 
@@ -1060,7 +1060,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                 # This creates select expressions for all columns referenced in the instance set.
                 select_columns=output_instance_set.transform(
                     CreateSelectColumnsForInstances(from_data_set_alias, self._column_association_resolver)
-                ).as_tuple(),
+                ).columns_in_order,
                 from_source=from_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
                 where=constrain_metric_time_column_condition,
@@ -1150,7 +1150,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                     output_to_input_column_mapping=output_column_to_input_column,
                 )
                 .transform(output_instance_set)
-                .as_tuple(),
+                .columns_in_order,
                 from_source=input_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
             ),
@@ -1266,7 +1266,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                 description=node.description,
                 select_columns=output_instance_set.transform(
                     CreateSelectColumnsForInstances(from_data_set_alias, self._column_association_resolver)
-                ).as_tuple(),
+                ).columns_in_order,
                 from_source=from_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
                 join_descs=(sql_join_desc,),
@@ -1607,7 +1607,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                 description="Add column with generated UUID",
                 select_columns=input_data_set.instance_set.transform(
                     CreateSelectColumnsForInstances(input_data_set_alias, self._column_association_resolver)
-                ).as_tuple()
+                ).columns_in_order
                 + (gen_uuid_sql_select_column,),
                 from_source=input_data_set.checked_sql_select_node,
                 from_source_alias=input_data_set_alias,
@@ -1746,7 +1746,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         )
         additional_conversion_select_columns = conversion_data_set_output_instance_set.transform(
             CreateSelectColumnsForInstances(conversion_data_set_alias, self._column_association_resolver)
-        ).as_tuple()
+        ).columns_in_order
         deduped_sql_select_node = SqlSelectStatementNode.create(
             description=f"Dedupe the fanout with {','.join(spec.qualified_name for spec in node.unique_identifier_keys)} in the conversion data set",
             select_columns=base_sql_select_columns
@@ -1769,7 +1769,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                 description=node.description,
                 select_columns=output_instance_set.transform(
                     CreateSelectColumnsForInstances(output_data_set_alias, self._column_association_resolver)
-                ).as_tuple(),
+                ).columns_in_order,
                 from_source=deduped_sql_select_node,
                 from_source_alias=output_data_set_alias,
             ),
@@ -1844,7 +1844,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             FilterElements(exclude_specs=InstanceSpecSet(metric_specs=(metric_instance.spec,)))
         ).transform(
             CreateSelectColumnsForInstances(parent_data_set_alias, self._column_association_resolver)
-        ).as_tuple() + (
+        ).columns_in_order + (
             metric_select_column,
         )
         subquery = SqlSelectStatementNode.create(
@@ -1857,7 +1857,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
         outer_query_select_columns = output_instance_set.transform(
             CreateSelectColumnsForInstances(subquery_alias, self._column_association_resolver)
-        ).as_tuple()
+        ).columns_in_order
         return SqlDataSet(
             instance_set=output_instance_set,
             sql_select_node=SqlSelectStatementNode.create(
