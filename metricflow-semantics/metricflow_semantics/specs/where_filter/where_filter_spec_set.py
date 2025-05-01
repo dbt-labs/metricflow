@@ -1,15 +1,17 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Tuple
+from typing import Sized, Tuple
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
+from typing_extensions import override
 
+from metricflow_semantics.collection_helpers.merger import Mergeable
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 
 
 @dataclass(frozen=True)
-class WhereFilterSpecSet(SerializableDataclass):
+class WhereFilterSpecSet(SerializableDataclass, Mergeable, Sized):
     """Class to encapsulate filters needed at a certain point of the queried metric.
 
     This class splits up the filters based on where it was defined at, which can then be used to
@@ -43,4 +45,20 @@ class WhereFilterSpecSet(SerializableDataclass):
             measure_level_filter_specs=self.measure_level_filter_specs + other.measure_level_filter_specs,
             metric_level_filter_specs=self.metric_level_filter_specs + other.metric_level_filter_specs,
             query_level_filter_specs=self.query_level_filter_specs + other.query_level_filter_specs,
+        )
+
+    @classmethod
+    @override
+    def empty_instance(cls) -> WhereFilterSpecSet:
+        return WhereFilterSpecSet()
+
+    @override
+    def __len__(self) -> int:
+        return sum(
+            len(specs)
+            for specs in (
+                self.measure_level_filter_specs,
+                self.metric_level_filter_specs,
+                self.query_level_filter_specs,
+            )
         )
