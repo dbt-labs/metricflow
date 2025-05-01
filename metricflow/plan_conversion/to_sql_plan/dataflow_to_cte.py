@@ -152,7 +152,7 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
                 column_resolver=self._column_association_resolver,
             )
             .transform(select_from_subquery_dataset.instance_set)
-            .as_tuple(),
+            .columns_in_order,
             instance_set=select_from_subquery_dataset.instance_set,
         )
         self._node_to_cte_generation_result[node] = cte_generation_result

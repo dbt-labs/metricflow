@@ -961,7 +961,7 @@ def create_simple_select_columns_for_instance_sets(
             )
         )
 
-    return column_set.as_tuple()
+    return column_set.columns_in_order
 
 
 class AddMetadata(InstanceSetTransform[InstanceSet]):

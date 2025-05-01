@@ -27,6 +27,7 @@ class SelectColumnSet(Mergeable):
     entity_columns: AnyLengthTuple[SqlSelectColumn]
     group_by_metric_columns: AnyLengthTuple[SqlSelectColumn]
     metadata_columns: AnyLengthTuple[SqlSelectColumn]
+    columns_in_order: AnyLengthTuple[SqlSelectColumn]
 
     @staticmethod
     def create(  # noqa: D102
@@ -38,14 +39,32 @@ class SelectColumnSet(Mergeable):
         group_by_metric_columns: Iterable[SqlSelectColumn] = (),
         metadata_columns: Iterable[SqlSelectColumn] = (),
     ) -> SelectColumnSet:
+        metric_columns = tuple(metric_columns)
+        measure_columns = tuple(measure_columns)
+        dimension_columns = tuple(dimension_columns)
+        time_dimension_columns = tuple(time_dimension_columns)
+        entity_columns = tuple(entity_columns)
+        group_by_metric_columns = tuple(group_by_metric_columns)
+        metadata_columns = tuple(metadata_columns)
+
         return SelectColumnSet(
-            metric_columns=tuple(metric_columns),
-            measure_columns=tuple(measure_columns),
-            dimension_columns=tuple(dimension_columns),
-            time_dimension_columns=tuple(time_dimension_columns),
-            entity_columns=tuple(entity_columns),
-            group_by_metric_columns=tuple(group_by_metric_columns),
-            metadata_columns=tuple(metadata_columns),
+            metric_columns=metric_columns,
+            measure_columns=measure_columns,
+            dimension_columns=dimension_columns,
+            time_dimension_columns=time_dimension_columns,
+            entity_columns=entity_columns,
+            group_by_metric_columns=group_by_metric_columns,
+            metadata_columns=metadata_columns,
+            columns_in_order=(
+                # This order was chosen to match the column sequence data consumers typically prefer.
+                time_dimension_columns
+                + entity_columns
+                + dimension_columns
+                + group_by_metric_columns
+                + metric_columns
+                + measure_columns
+                + metadata_columns
+            ),
         )
 
     @override
