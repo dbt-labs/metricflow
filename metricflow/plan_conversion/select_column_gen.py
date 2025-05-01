@@ -4,13 +4,16 @@ import logging
 from dataclasses import dataclass, field
 from typing import List, Tuple
 
+from metricflow_semantics.collection_helpers.merger import Mergeable
+from typing_extensions import override
+
 from metricflow.sql.sql_plan import SqlSelectColumn
 
 logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
-class SelectColumnSet:
+class SelectColumnSet(Mergeable):
     """A set of SQL select columns that represent the different instance types in a data set."""
 
     metric_columns: List[SqlSelectColumn] = field(default_factory=list)
@@ -21,6 +24,7 @@ class SelectColumnSet:
     group_by_metric_columns: List[SqlSelectColumn] = field(default_factory=list)
     metadata_columns: List[SqlSelectColumn] = field(default_factory=list)
 
+    @override
     def merge(self, other_set: SelectColumnSet) -> SelectColumnSet:
         """Combine the select columns by type."""
         return SelectColumnSet(
@@ -32,6 +36,11 @@ class SelectColumnSet:
             group_by_metric_columns=self.group_by_metric_columns + other_set.group_by_metric_columns,
             metadata_columns=self.metadata_columns + other_set.metadata_columns,
         )
+
+    @classmethod
+    @override
+    def empty_instance(cls) -> SelectColumnSet:
+        return SelectColumnSet()
 
     def as_tuple(self) -> Tuple[SqlSelectColumn, ...]:
         """Return all select columns as a tuple."""
