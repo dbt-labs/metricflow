@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, field
-from typing import Iterable, List, Tuple
+from dataclasses import dataclass
+from typing import Iterable, Tuple
 
 from metricflow_semantics.collection_helpers.merger import Mergeable
+from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from typing_extensions import override
 
 from metricflow.sql.sql_plan import SqlSelectColumn
@@ -14,15 +15,18 @@ logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True)
 class SelectColumnSet(Mergeable):
-    """A set of SQL select columns that represent the different instance types in a data set."""
+    """A set of SQL select columns that represent the different instance types in a data set.
 
-    metric_columns: List[SqlSelectColumn] = field(default_factory=list)
-    measure_columns: List[SqlSelectColumn] = field(default_factory=list)
-    dimension_columns: List[SqlSelectColumn] = field(default_factory=list)
-    time_dimension_columns: List[SqlSelectColumn] = field(default_factory=list)
-    entity_columns: List[SqlSelectColumn] = field(default_factory=list)
-    group_by_metric_columns: List[SqlSelectColumn] = field(default_factory=list)
-    metadata_columns: List[SqlSelectColumn] = field(default_factory=list)
+    TODO: Evaluate using a single field instead of one for every instance type.
+    """
+
+    metric_columns: AnyLengthTuple[SqlSelectColumn]
+    measure_columns: AnyLengthTuple[SqlSelectColumn]
+    dimension_columns: AnyLengthTuple[SqlSelectColumn]
+    time_dimension_columns: AnyLengthTuple[SqlSelectColumn]
+    entity_columns: AnyLengthTuple[SqlSelectColumn]
+    group_by_metric_columns: AnyLengthTuple[SqlSelectColumn]
+    metadata_columns: AnyLengthTuple[SqlSelectColumn]
 
     @staticmethod
     def create(  # noqa: D102
@@ -35,13 +39,13 @@ class SelectColumnSet(Mergeable):
         metadata_columns: Iterable[SqlSelectColumn] = (),
     ) -> SelectColumnSet:
         return SelectColumnSet(
-            metric_columns=list(metric_columns),
-            measure_columns=list(measure_columns),
-            dimension_columns=list(dimension_columns),
-            time_dimension_columns=list(time_dimension_columns),
-            entity_columns=list(entity_columns),
-            group_by_metric_columns=list(group_by_metric_columns),
-            metadata_columns=list(metadata_columns),
+            metric_columns=tuple(metric_columns),
+            measure_columns=tuple(measure_columns),
+            dimension_columns=tuple(dimension_columns),
+            time_dimension_columns=tuple(time_dimension_columns),
+            entity_columns=tuple(entity_columns),
+            group_by_metric_columns=tuple(group_by_metric_columns),
+            metadata_columns=tuple(metadata_columns),
         )
 
     @override
@@ -60,7 +64,7 @@ class SelectColumnSet(Mergeable):
     @classmethod
     @override
     def empty_instance(cls) -> SelectColumnSet:
-        return SelectColumnSet()
+        return SelectColumnSet.create()
 
     def as_tuple(self) -> Tuple[SqlSelectColumn, ...]:
         """Return all select columns as a tuple."""
