@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from typing import List, Tuple
+from typing import Iterable, List, Tuple
 
 from metricflow_semantics.collection_helpers.merger import Mergeable
 from typing_extensions import override
@@ -24,10 +24,30 @@ class SelectColumnSet(Mergeable):
     group_by_metric_columns: List[SqlSelectColumn] = field(default_factory=list)
     metadata_columns: List[SqlSelectColumn] = field(default_factory=list)
 
+    @staticmethod
+    def create(  # noqa: D102
+        metric_columns: Iterable[SqlSelectColumn] = (),
+        measure_columns: Iterable[SqlSelectColumn] = (),
+        dimension_columns: Iterable[SqlSelectColumn] = (),
+        time_dimension_columns: Iterable[SqlSelectColumn] = (),
+        entity_columns: Iterable[SqlSelectColumn] = (),
+        group_by_metric_columns: Iterable[SqlSelectColumn] = (),
+        metadata_columns: Iterable[SqlSelectColumn] = (),
+    ) -> SelectColumnSet:
+        return SelectColumnSet(
+            metric_columns=list(metric_columns),
+            measure_columns=list(measure_columns),
+            dimension_columns=list(dimension_columns),
+            time_dimension_columns=list(time_dimension_columns),
+            entity_columns=list(entity_columns),
+            group_by_metric_columns=list(group_by_metric_columns),
+            metadata_columns=list(metadata_columns),
+        )
+
     @override
     def merge(self, other_set: SelectColumnSet) -> SelectColumnSet:
         """Combine the select columns by type."""
-        return SelectColumnSet(
+        return SelectColumnSet.create(
             metric_columns=self.metric_columns + other_set.metric_columns,
             measure_columns=self.measure_columns + other_set.measure_columns,
             dimension_columns=self.dimension_columns + other_set.dimension_columns,
@@ -57,7 +77,7 @@ class SelectColumnSet(Mergeable):
 
     def without_measure_columns(self) -> SelectColumnSet:
         """Returns this but with the measure columns removed."""
-        return SelectColumnSet(
+        return SelectColumnSet.create(
             metric_columns=self.metric_columns,
             dimension_columns=self.dimension_columns,
             time_dimension_columns=self.time_dimension_columns,
