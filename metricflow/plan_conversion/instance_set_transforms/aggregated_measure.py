@@ -9,7 +9,7 @@ from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.measure_spec import MeasureSpec, MetricInputMeasureSpec
 from metricflow_semantics.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression, SqlFunctionExpression
 
-from metricflow.plan_conversion.instance_set_transforms.instance_converters import CreateSelectColumnsForInstances
+from metricflow.plan_conversion.instance_set_transforms.select_columns import CreateSelectColumnsForInstances
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.sql.sql_plan import SqlSelectColumn
 

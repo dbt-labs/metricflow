@@ -107,13 +107,15 @@ from metricflow.plan_conversion.instance_set_transforms.instance_converters impo
     ChangeMeasureAggregationState,
     ConvertToMetadata,
     CreateSelectColumnForCombineOutputNode,
-    CreateSelectColumnsForInstances,
     CreateSqlColumnReferencesForInstances,
     FilterElements,
     FilterLinkableInstancesWithLeadingLink,
     RemoveMeasures,
     RemoveMetrics,
     UpdateMeasureFillNullsWith,
+)
+from metricflow.plan_conversion.instance_set_transforms.select_columns import (
+    CreateSelectColumnsForInstances,
     create_simple_select_columns_for_instance_sets,
 )
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
