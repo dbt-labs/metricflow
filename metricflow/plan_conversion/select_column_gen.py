@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Iterable, Optional
+from typing import Iterable
 
 from metricflow_semantics.collection_helpers.merger import Mergeable
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
@@ -38,7 +38,6 @@ class SelectColumnSet(Mergeable):
         entity_columns: Iterable[SqlSelectColumn] = (),
         group_by_metric_columns: Iterable[SqlSelectColumn] = (),
         metadata_columns: Iterable[SqlSelectColumn] = (),
-        columns_in_order: Optional[Iterable[SqlSelectColumn]] = None,
     ) -> SelectColumnSet:
         metric_columns = tuple(metric_columns)
         measure_columns = tuple(measure_columns)
@@ -48,19 +47,16 @@ class SelectColumnSet(Mergeable):
         group_by_metric_columns = tuple(group_by_metric_columns)
         metadata_columns = tuple(metadata_columns)
 
-        if columns_in_order is None:
-            columns_in_order_argument_value = (
-                # This order was chosen to match the column sequence data consumers typically prefer.
-                time_dimension_columns
-                + entity_columns
-                + dimension_columns
-                + group_by_metric_columns
-                + metric_columns
-                + measure_columns
-                + metadata_columns
-            )
-        else:
-            columns_in_order_argument_value = tuple(columns_in_order)
+        columns_in_order_argument_value = (
+            # This order was chosen to match the column sequence data consumers typically prefer.
+            time_dimension_columns
+            + entity_columns
+            + dimension_columns
+            + group_by_metric_columns
+            + metric_columns
+            + measure_columns
+            + metadata_columns
+        )
 
         return SelectColumnSet(
             metric_columns=metric_columns,

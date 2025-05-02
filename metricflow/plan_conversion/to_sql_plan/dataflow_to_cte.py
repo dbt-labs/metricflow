@@ -157,10 +157,9 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
             select_columns=CreateSelectColumnsForInstances(
                 table_alias=cte_alias,
                 column_resolver=self._column_association_resolver,
-                spec_output_order=self._spec_output_order if use_spec_output_order else (),
             )
             .transform(select_from_subquery_dataset.instance_set)
-            .columns_in_order,
+            .get_columns(self._spec_output_order if use_spec_output_order else ()),
             instance_set=select_from_subquery_dataset.instance_set,
         )
         self._node_to_cte_generation_result[node] = cte_generation_result

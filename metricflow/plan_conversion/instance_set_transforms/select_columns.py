@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+import logging
 from collections import OrderedDict
 from dataclasses import dataclass
-from itertools import chain
-from typing import Dict, List, Optional, Sequence, Tuple, Union
+from functools import cached_property
+from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
 from metricflow_semantics.collection_helpers.merger import Mergeable
-from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
+from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple, MappingItemsTuple
+from metricflow_semantics.helpers.mapping_helpers import mf_items_to_dict
 from metricflow_semantics.instances import InstanceSet, InstanceSetTransform, MdoInstance
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
@@ -14,9 +16,10 @@ from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression
 from typing_extensions import override
 
-from metricflow.plan_conversion.instance_set_transforms.instance_converters import InstanceT, logger
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.sql.sql_plan import SqlSelectColumn
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -25,20 +28,77 @@ class CreateSelectColumnsResult(Mergeable):
 
     # Columns that should be in the `SELECT` clause.
     select_column_set: SelectColumnSet
+    spec_to_associated_columns_mapping_items: MappingItemsTuple[InstanceSpec, AnyLengthTuple[SqlSelectColumn]]
+
+    @staticmethod
+    def create(  # noqa: D102
+        select_column_set: SelectColumnSet,
+        spec_to_associated_columns_mapping: Mapping[InstanceSpec, Sequence[SqlSelectColumn]],
+    ) -> CreateSelectColumnsResult:
+        return CreateSelectColumnsResult(
+            select_column_set=select_column_set,
+            spec_to_associated_columns_mapping_items=tuple(
+                (spec, tuple(columns)) for spec, columns in spec_to_associated_columns_mapping.items()
+            ),
+        )
+
+    @cached_property
+    def spec_to_columns_mapping(self) -> Mapping[InstanceSpec, Sequence[SqlSelectColumn]]:  # noqa: D102
+        return mf_items_to_dict(self.spec_to_associated_columns_mapping_items)
 
     @override
     def merge(self, other: CreateSelectColumnsResult) -> CreateSelectColumnsResult:
-        return CreateSelectColumnsResult(select_column_set=self.select_column_set.merge(other.select_column_set))
+        return CreateSelectColumnsResult(
+            select_column_set=self.select_column_set.merge(other.select_column_set),
+            spec_to_associated_columns_mapping_items=self.spec_to_associated_columns_mapping_items
+            + other.spec_to_associated_columns_mapping_items,
+        )
 
     @classmethod
     @override
     def empty_instance(cls) -> CreateSelectColumnsResult:
-        return CreateSelectColumnsResult(select_column_set=SelectColumnSet.empty_instance())
+        return CreateSelectColumnsResult(
+            select_column_set=SelectColumnSet.empty_instance(), spec_to_associated_columns_mapping_items=()
+        )
 
-    @property
-    def columns_in_order(self) -> AnyLengthTuple[SqlSelectColumn]:
-        """Pass-though convenience property."""
-        return self.select_column_set.columns_in_order
+    def get_columns(self, spec_output_order: Sequence[InstanceSpec] = ()) -> AnyLengthTuple[SqlSelectColumn]:
+        """Returns the generated columns.
+
+        If `spec_output_order` is specified, use the relative ordering described to determine the column order.
+        """
+        if len(spec_output_order) > 0:
+            accounted_specs: set[InstanceSpec] = set()
+            unknown_specs: set[InstanceSpec] = set()
+            output_columns: list[SqlSelectColumn] = []
+            for spec in spec_output_order:
+                columns = self.spec_to_columns_mapping.get(spec)
+                if columns is None:
+                    unknown_specs.add(spec)
+                    continue
+                output_columns.extend(columns)
+                accounted_specs.add(spec)
+
+            if len(accounted_specs) != len(spec_output_order):
+                unaccounted_specs = set()
+                for spec, columns in self.spec_to_columns_mapping.items():
+                    if spec not in accounted_specs:
+                        unaccounted_specs.add(spec)
+                logger.error(
+                    LazyFormat(
+                        "Mismatch between `spec_output_order` and created specs. This is a bug and should be"
+                        " investigated, but returning the default ordering to reduce user-facing errors.",
+                        accounted_specs=accounted_specs,
+                        unaccounted_specs=unaccounted_specs,
+                        unknown_specs=unknown_specs,
+                        spec_output_order=spec_output_order,
+                        spec_to_columns_mapping=self.spec_to_columns_mapping,
+                    )
+                )
+                return self.select_column_set.columns_in_default_order
+
+            return tuple(output_columns)
+        else:
+            return self.select_column_set.columns_in_order
 
 
 class CreateSelectColumnsForInstances(InstanceSetTransform[CreateSelectColumnsResult]):
@@ -52,7 +112,6 @@ class CreateSelectColumnsForInstances(InstanceSetTransform[CreateSelectColumnsRe
         self,
         table_alias: str,
         column_resolver: ColumnAssociationResolver,
-        spec_output_order: Sequence[InstanceSpec] = (),
         output_to_input_column_mapping: Optional[OrderedDict[str, str]] = None,
     ) -> None:
         """Initializer.
@@ -60,87 +119,65 @@ class CreateSelectColumnsForInstances(InstanceSetTransform[CreateSelectColumnsRe
         Args:
             table_alias: the table alias to select columns from
             column_resolver: resolver to name columns.
-            spec_output_order: If specified, order the output columns for instances according to the given order of the
-            instances' specs.
             output_to_input_column_mapping: if specified, use these columns in the input for the given output columns.
         """
         self._table_alias = table_alias
         self._column_resolver = column_resolver
         self._output_to_input_column_mapping = output_to_input_column_mapping or OrderedDict()
-        # Map the instance spec to a key that can be used to sort the order of output columns.
-        self._spec_to_output_column_sort_key = {spec: i for i, spec in enumerate(spec_output_order)}
-
-    def _sort_instances_by_output_order(self, instances: Sequence[InstanceT]) -> Sequence[InstanceT]:
-        """Sort instances in the same order as `spec_output_order` / `_spec_to_output_column_sort_key`."""
-        if len(self._spec_to_output_column_sort_key) == 0:
-            return instances
-
-        def _sort_key_function(instance: InstanceT) -> Union[int, float]:
-            key = self._spec_to_output_column_sort_key.get(instance.spec)
-            if key is None:
-                logger.error(
-                    LazyFormat(
-                        "Bug: Missing sort key for an instance so returning a sentinel value to put the instance at the"
-                        " end. This should result in a query that still runs, but the output columns may not be in the"
-                        " expected order.",
-                        instance=instance,
-                        spec_to_sort_key=self._spec_to_output_column_sort_key,
-                    )
-                )
-                return float("inf")
-
-            return key
-
-        return sorted(instances, key=_sort_key_function)
 
     def transform(self, instance_set: InstanceSet) -> CreateSelectColumnsResult:  # noqa: D102
-        metric_cols = tuple(
-            chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.metric_instances])
-        )
-        measure_cols = tuple(
-            chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.measure_instances])
-        )
-        dimension_cols = tuple(
-            chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.dimension_instances])
-        )
-        time_dimension_cols = tuple(
-            chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.time_dimension_instances])
-        )
-        entity_cols = tuple(
-            chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.entity_instances])
-        )
-        metadata_cols = tuple(
-            chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.metadata_instances])
-        )
-        group_by_metric_cols = tuple(
-            chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.group_by_metric_instances])
-        )
-        columns_in_order: Optional[AnyLengthTuple[SqlSelectColumn]] = None
+        spec_to_associated_columns: dict[InstanceSpec, AnyLengthTuple[SqlSelectColumn]] = {}
 
-        if len(self._spec_to_output_column_sort_key) > 0:
-            group_by_item_columns = tuple(
-                chain.from_iterable(
-                    [
-                        self._make_sql_column_expression(instance)
-                        for instance in self._sort_instances_by_output_order(
-                            instance_set.time_dimension_instances
-                            + instance_set.entity_instances
-                            + instance_set.dimension_instances
-                            + instance_set.group_by_metric_instances
-                        )
-                    ]
-                )
-            )
-            columns_in_order = group_by_item_columns + metric_cols + measure_cols + metadata_cols
-            logger.debug(
-                LazyFormat(
-                    "Generated columns using the specified order",
-                    spec_to_sort_key=self._spec_to_output_column_sort_key,
-                    columns_in_order=columns_in_order,
-                )
-            )
+        metric_cols = []
+        for metric_instance in instance_set.metric_instances:
+            columns = self._make_sql_column_expression(metric_instance)
+            for column in columns:
+                metric_cols.append(column)
+                spec_to_associated_columns[metric_instance.spec] = columns
 
-        return CreateSelectColumnsResult(
+        measure_cols = []
+        for measure_instance in instance_set.measure_instances:
+            columns = self._make_sql_column_expression(measure_instance)
+            for column in columns:
+                measure_cols.append(column)
+                spec_to_associated_columns[measure_instance.spec] = columns
+
+        dimension_cols = []
+        for dimension_instance in instance_set.dimension_instances:
+            columns = self._make_sql_column_expression(dimension_instance)
+            for column in columns:
+                dimension_cols.append(column)
+                spec_to_associated_columns[dimension_instance.spec] = columns
+
+        time_dimension_cols = []
+        for time_dimension_instance in instance_set.time_dimension_instances:
+            columns = self._make_sql_column_expression(time_dimension_instance)
+            for column in columns:
+                time_dimension_cols.append(column)
+                spec_to_associated_columns[time_dimension_instance.spec] = columns
+
+        entity_cols = []
+        for entity_instance in instance_set.entity_instances:
+            columns = self._make_sql_column_expression(entity_instance)
+            for column in columns:
+                entity_cols.append(column)
+                spec_to_associated_columns[entity_instance.spec] = columns
+
+        metadata_cols = []
+        for metadata_instance in instance_set.metadata_instances:
+            columns = self._make_sql_column_expression(metadata_instance)
+            for column in columns:
+                metadata_cols.append(column)
+                spec_to_associated_columns[metadata_instance.spec] = columns
+
+        group_by_metric_cols = []
+        for group_metric_instance in instance_set.group_by_metric_instances:
+            columns = self._make_sql_column_expression(group_metric_instance)
+            for column in columns:
+                group_by_metric_cols.append(column)
+                spec_to_associated_columns[group_metric_instance.spec] = columns
+
+        return CreateSelectColumnsResult.create(
             SelectColumnSet.create(
                 metric_columns=metric_cols,
                 measure_columns=measure_cols,
@@ -149,14 +186,14 @@ class CreateSelectColumnsForInstances(InstanceSetTransform[CreateSelectColumnsRe
                 entity_columns=entity_cols,
                 group_by_metric_columns=group_by_metric_cols,
                 metadata_columns=metadata_cols,
-                columns_in_order=columns_in_order,
-            )
+            ),
+            spec_to_associated_columns_mapping=spec_to_associated_columns,
         )
 
     def _make_sql_column_expression(
         self,
         element_instance: MdoInstance,
-    ) -> List[SqlSelectColumn]:
+    ) -> AnyLengthTuple[SqlSelectColumn]:
         """Convert one element instance into a SQL column."""
         # Do a sanity check to make sure that there's a 1:1 mapping between the columns associations generated by the
         # column resolver based on the spec, and the columns that are already associated with the instance.
@@ -201,7 +238,7 @@ class CreateSelectColumnsForInstances(InstanceSetTransform[CreateSelectColumnsRe
                     column_alias=output_column_name,
                 )
             )
-        return select_columns
+        return tuple(select_columns)
 
 
 def create_simple_select_columns_for_instance_sets(
