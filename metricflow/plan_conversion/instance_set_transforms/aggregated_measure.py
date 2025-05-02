@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from itertools import chain
+from dataclasses import dataclass
 from typing import List, Sequence, Tuple
 
-from metricflow_semantics.instances import InstanceSet, MeasureInstance
+from metricflow_semantics.instances import InstanceSet, InstanceSetTransform, MeasureInstance
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.measure_spec import MeasureSpec, MetricInputMeasureSpec
@@ -14,7 +14,17 @@ from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.sql.sql_plan import SqlSelectColumn
 
 
-class CreateAggregatedMeasureColumnSet(CreateSelectColumnsForInstances):
+@dataclass(frozen=True)
+class CreateAggregatedMeasuresResult:
+    """Result class for `CreateAggregatedMeasuresTransform`."""
+
+    # Columns that should be in the `SELECT` clause.
+    select_column_set: SelectColumnSet
+    # Columns that should be in the `GROUP BY` clause.
+    group_by_column_set: SelectColumnSet
+
+
+class CreateAggregatedMeasuresTransform(InstanceSetTransform[CreateAggregatedMeasuresResult]):
     """Create select columns of the form "fct_bookings.bookings AS bookings" for all the instances.
 
     However, for measure columns, convert them into expressions like "SUM(fct_bookings.bookings) AS bookings" so that
@@ -30,13 +40,18 @@ class CreateAggregatedMeasureColumnSet(CreateSelectColumnsForInstances):
         semantic_model_lookup: SemanticModelLookup,
         metric_input_measure_specs: Sequence[MetricInputMeasureSpec],
     ) -> None:
+        self._table_alias = table_alias
+        self._column_resolver = column_resolver
         self._semantic_model_lookup = semantic_model_lookup
         self.metric_input_measure_specs = metric_input_measure_specs
-        super().__init__(table_alias=table_alias, column_resolver=column_resolver)
+        self._create_select_column_transform = CreateSelectColumnsForInstances(
+            table_alias=table_alias,
+            column_resolver=column_resolver,
+        )
 
     def _make_sql_column_expression_to_aggregate_measures(
         self, measure_instances: Tuple[MeasureInstance, ...]
-    ) -> List[SqlSelectColumn]:
+    ) -> SelectColumnSet:
         output_columns: List[SqlSelectColumn] = []
         aliased_input_specs = [spec for spec in self.metric_input_measure_specs if spec.alias]
         for instance in measure_instances:
@@ -54,7 +69,7 @@ class CreateAggregatedMeasureColumnSet(CreateSelectColumnsForInstances):
                 )
             )
 
-        return output_columns
+        return SelectColumnSet.create(measure_columns=output_columns)
 
     def _make_sql_column_expression_to_aggregate_measure(
         self, measure_instance: MeasureInstance, output_measure_spec: MeasureSpec
@@ -88,33 +103,13 @@ class CreateAggregatedMeasureColumnSet(CreateSelectColumnsForInstances):
             column_alias=new_column_name_for_aggregated_measure,
         )
 
-    def transform(self, instance_set: InstanceSet) -> SelectColumnSet:  # noqa: D102
-        metric_cols = list(
-            chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.metric_instances])
-        )
+    def transform(self, instance_set: InstanceSet) -> CreateAggregatedMeasuresResult:  # noqa: D102
+        instance_set_without_measures = instance_set.without_measures()
+        column_set_without_measures = self._create_select_column_transform.transform(instance_set_without_measures)
+        group_by_column_set = self._create_select_column_transform.transform(instance_set_without_measures)
+        measure_column_set = self._make_sql_column_expression_to_aggregate_measures(instance_set.measure_instances)
 
-        measure_cols = self._make_sql_column_expression_to_aggregate_measures(instance_set.measure_instances)
-        dimension_cols = list(
-            chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.dimension_instances])
-        )
-        time_dimension_cols = list(
-            chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.time_dimension_instances])
-        )
-        entity_cols = list(
-            chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.entity_instances])
-        )
-        metadata_cols = list(
-            chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.metadata_instances])
-        )
-        group_by_metric_cols = list(
-            chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.group_by_metric_instances])
-        )
-        return SelectColumnSet.create(
-            metric_columns=metric_cols,
-            measure_columns=measure_cols,
-            dimension_columns=dimension_cols,
-            time_dimension_columns=time_dimension_cols,
-            entity_columns=entity_cols,
-            group_by_metric_columns=group_by_metric_cols,
-            metadata_columns=metadata_cols,
+        return CreateAggregatedMeasuresResult(
+            select_column_set=column_set_without_measures.merge(measure_column_set),
+            group_by_column_set=group_by_column_set,
         )

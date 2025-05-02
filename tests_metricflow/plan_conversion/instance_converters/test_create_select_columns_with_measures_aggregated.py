@@ -14,7 +14,7 @@ from metricflow_semantics.sql.sql_exprs import (
 )
 
 from metricflow.plan_conversion.instance_set_transforms.aggregated_measure import (
-    CreateAggregatedMeasureColumnSet,
+    CreateAggregatedMeasuresTransform,
 )
 from metricflow.plan_conversion.instance_set_transforms.instance_converters import (
     FilterElements,
@@ -49,12 +49,16 @@ def test_sum_aggregation(
     measure_name = "booking_value"
     instance_set = __get_filtered_measure_instance_set("bookings_source", measure_name, mf_engine_test_fixture_mapping)
 
-    select_column_set: SelectColumnSet = CreateAggregatedMeasureColumnSet(
-        __SOURCE_TABLE_ALIAS,
-        DunderColumnAssociationResolver(),
-        simple_semantic_manifest_lookup.semantic_model_lookup,
-        (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="booking_value")),),
-    ).transform(instance_set=instance_set)
+    select_column_set: SelectColumnSet = (
+        CreateAggregatedMeasuresTransform(
+            __SOURCE_TABLE_ALIAS,
+            DunderColumnAssociationResolver(),
+            simple_semantic_manifest_lookup.semantic_model_lookup,
+            (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="booking_value")),),
+        )
+        .transform(instance_set=instance_set)
+        .select_column_set
+    )
 
     assert len(select_column_set.measure_columns) == 1
     measure_column = select_column_set.measure_columns[0]
@@ -71,12 +75,16 @@ def test_sum_boolean_aggregation(
     measure_name = "instant_bookings"
     instance_set = __get_filtered_measure_instance_set("bookings_source", measure_name, mf_engine_test_fixture_mapping)
 
-    select_column_set: SelectColumnSet = CreateAggregatedMeasureColumnSet(
-        __SOURCE_TABLE_ALIAS,
-        DunderColumnAssociationResolver(),
-        simple_semantic_manifest_lookup.semantic_model_lookup,
-        (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="instant_bookings")),),
-    ).transform(instance_set=instance_set)
+    select_column_set: SelectColumnSet = (
+        CreateAggregatedMeasuresTransform(
+            __SOURCE_TABLE_ALIAS,
+            DunderColumnAssociationResolver(),
+            simple_semantic_manifest_lookup.semantic_model_lookup,
+            (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="instant_bookings")),),
+        )
+        .transform(instance_set=instance_set)
+        .select_column_set
+    )
 
     assert len(select_column_set.measure_columns) == 1
     measure_column = select_column_set.measure_columns[0]
@@ -94,12 +102,16 @@ def test_avg_aggregation(
     measure_name = "average_booking_value"
     instance_set = __get_filtered_measure_instance_set("bookings_source", measure_name, mf_engine_test_fixture_mapping)
 
-    select_column_set: SelectColumnSet = CreateAggregatedMeasureColumnSet(
-        __SOURCE_TABLE_ALIAS,
-        DunderColumnAssociationResolver(),
-        simple_semantic_manifest_lookup.semantic_model_lookup,
-        (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="average_booking_value")),),
-    ).transform(instance_set=instance_set)
+    select_column_set: SelectColumnSet = (
+        CreateAggregatedMeasuresTransform(
+            __SOURCE_TABLE_ALIAS,
+            DunderColumnAssociationResolver(),
+            simple_semantic_manifest_lookup.semantic_model_lookup,
+            (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="average_booking_value")),),
+        )
+        .transform(instance_set=instance_set)
+        .select_column_set
+    )
 
     assert len(select_column_set.measure_columns) == 1
     measure_column = select_column_set.measure_columns[0]
@@ -116,12 +128,16 @@ def test_count_distinct_aggregation(
     measure_name = "bookers"
     instance_set = __get_filtered_measure_instance_set("bookings_source", measure_name, mf_engine_test_fixture_mapping)
 
-    select_column_set: SelectColumnSet = CreateAggregatedMeasureColumnSet(
-        __SOURCE_TABLE_ALIAS,
-        DunderColumnAssociationResolver(),
-        simple_semantic_manifest_lookup.semantic_model_lookup,
-        (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="bookers")),),
-    ).transform(instance_set=instance_set)
+    select_column_set: SelectColumnSet = (
+        CreateAggregatedMeasuresTransform(
+            __SOURCE_TABLE_ALIAS,
+            DunderColumnAssociationResolver(),
+            simple_semantic_manifest_lookup.semantic_model_lookup,
+            (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="bookers")),),
+        )
+        .transform(instance_set=instance_set)
+        .select_column_set
+    )
 
     assert len(select_column_set.measure_columns) == 1
     measure_column = select_column_set.measure_columns[0]
@@ -138,12 +154,16 @@ def test_max_aggregation(
     measure_name = "largest_listing"
     instance_set = __get_filtered_measure_instance_set("listings_latest", measure_name, mf_engine_test_fixture_mapping)
 
-    select_column_set: SelectColumnSet = CreateAggregatedMeasureColumnSet(
-        __SOURCE_TABLE_ALIAS,
-        DunderColumnAssociationResolver(),
-        simple_semantic_manifest_lookup.semantic_model_lookup,
-        (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="largest_listing")),),
-    ).transform(instance_set=instance_set)
+    select_column_set: SelectColumnSet = (
+        CreateAggregatedMeasuresTransform(
+            __SOURCE_TABLE_ALIAS,
+            DunderColumnAssociationResolver(),
+            simple_semantic_manifest_lookup.semantic_model_lookup,
+            (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="largest_listing")),),
+        )
+        .transform(instance_set=instance_set)
+        .select_column_set
+    )
 
     assert len(select_column_set.measure_columns) == 1
     measure_column = select_column_set.measure_columns[0]
@@ -160,12 +180,16 @@ def test_min_aggregation(
     measure_name = "smallest_listing"
     instance_set = __get_filtered_measure_instance_set("listings_latest", measure_name, mf_engine_test_fixture_mapping)
 
-    select_column_set: SelectColumnSet = CreateAggregatedMeasureColumnSet(
-        __SOURCE_TABLE_ALIAS,
-        DunderColumnAssociationResolver(),
-        simple_semantic_manifest_lookup.semantic_model_lookup,
-        (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="smallest_listing")),),
-    ).transform(instance_set=instance_set)
+    select_column_set: SelectColumnSet = (
+        CreateAggregatedMeasuresTransform(
+            __SOURCE_TABLE_ALIAS,
+            DunderColumnAssociationResolver(),
+            simple_semantic_manifest_lookup.semantic_model_lookup,
+            (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="smallest_listing")),),
+        )
+        .transform(instance_set=instance_set)
+        .select_column_set
+    )
 
     assert len(select_column_set.measure_columns) == 1
     measure_column = select_column_set.measure_columns[0]
@@ -182,12 +206,16 @@ def test_aliased_sum(
     measure_name = "booking_value"
     instance_set = __get_filtered_measure_instance_set("bookings_source", measure_name, mf_engine_test_fixture_mapping)
 
-    select_column_set: SelectColumnSet = CreateAggregatedMeasureColumnSet(
-        __SOURCE_TABLE_ALIAS,
-        DunderColumnAssociationResolver(),
-        simple_semantic_manifest_lookup.semantic_model_lookup,
-        (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="booking_value"), alias="bvalue"),),
-    ).transform(instance_set=instance_set)
+    select_column_set: SelectColumnSet = (
+        CreateAggregatedMeasuresTransform(
+            __SOURCE_TABLE_ALIAS,
+            DunderColumnAssociationResolver(),
+            simple_semantic_manifest_lookup.semantic_model_lookup,
+            (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="booking_value"), alias="bvalue"),),
+        )
+        .transform(instance_set=instance_set)
+        .select_column_set
+    )
 
     assert len(select_column_set.measure_columns) == 1
     measure_column = select_column_set.measure_columns[0]
@@ -205,12 +233,16 @@ def test_percentile_aggregation(
     measure_name = "booking_value_p99"
     instance_set = __get_filtered_measure_instance_set("bookings_source", measure_name, mf_engine_test_fixture_mapping)
 
-    select_column_set: SelectColumnSet = CreateAggregatedMeasureColumnSet(
-        __SOURCE_TABLE_ALIAS,
-        DunderColumnAssociationResolver(),
-        simple_semantic_manifest_lookup.semantic_model_lookup,
-        (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="booking_value_p99")),),
-    ).transform(instance_set=instance_set)
+    select_column_set: SelectColumnSet = (
+        CreateAggregatedMeasuresTransform(
+            __SOURCE_TABLE_ALIAS,
+            DunderColumnAssociationResolver(),
+            simple_semantic_manifest_lookup.semantic_model_lookup,
+            (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="booking_value_p99")),),
+        )
+        .transform(instance_set=instance_set)
+        .select_column_set
+    )
 
     assert len(select_column_set.measure_columns) == 1
     measure_column = select_column_set.measure_columns[0]

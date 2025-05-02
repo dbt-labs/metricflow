@@ -90,14 +90,3 @@ class SelectColumnSet(Mergeable):
     @override
     def empty_instance(cls) -> SelectColumnSet:
         return SelectColumnSet.create()
-
-    def without_measure_columns(self) -> SelectColumnSet:
-        """Returns this but with the measure columns removed."""
-        return SelectColumnSet.create(
-            metric_columns=self.metric_columns,
-            dimension_columns=self.dimension_columns,
-            time_dimension_columns=self.time_dimension_columns,
-            entity_columns=self.entity_columns,
-            group_by_metric_columns=self.group_by_metric_columns,
-            metadata_columns=self.metadata_columns,
-        )

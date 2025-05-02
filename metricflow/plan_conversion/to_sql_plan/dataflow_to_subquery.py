@@ -96,7 +96,7 @@ from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.dataset.sql_dataset import AnnotatedSqlDataSet, SqlDataSet
 from metricflow.plan_conversion.instance_set_transforms.aggregated_measure import (
-    CreateAggregatedMeasureColumnSet,
+    CreateAggregatedMeasuresTransform,
 )
 from metricflow.plan_conversion.instance_set_transforms.instance_converters import (
     AddGroupByMetric,
@@ -532,8 +532,8 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         # Note any measure with an alias requirement will be recast at this point, and
         # downstream consumers of the resulting node must therefore request aggregated measures
         # by their appropriate aliases
-        select_column_set: SelectColumnSet = aggregated_instance_set.transform(
-            CreateAggregatedMeasureColumnSet(
+        create_columns_result = aggregated_instance_set.transform(
+            CreateAggregatedMeasuresTransform(
                 table_alias=from_data_set_alias,
                 column_resolver=self._column_association_resolver,
                 semantic_model_lookup=self._semantic_model_lookup,
@@ -558,11 +558,11 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
                 # This will generate expressions with the appropriate aggregation functions e.g. SUM()
-                select_columns=select_column_set.columns_in_order,
+                select_columns=create_columns_result.select_column_set.columns_in_order,
                 from_source=from_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
                 # This will generate expressions to group by the columns that don't correspond to a measure instance.
-                group_bys=select_column_set.without_measure_columns().columns_in_order,
+                group_bys=create_columns_result.group_by_column_set.columns_in_order,
             ),
         )
 

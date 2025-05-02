@@ -397,6 +397,18 @@ class InstanceSet(SerializableDataclass):
             + self.group_by_metric_instances
         )
 
+    def without_measures(self) -> InstanceSet:
+        """Return a copy of this without the measure instances."""
+        return InstanceSet(
+            measure_instances=(),
+            dimension_instances=self.dimension_instances,
+            time_dimension_instances=self.time_dimension_instances,
+            entity_instances=self.entity_instances,
+            group_by_metric_instances=self.group_by_metric_instances,
+            metric_instances=self.metric_instances,
+            metadata_instances=self.metadata_instances,
+        )
+
 
 class InstanceVisitor(Generic[VisitorOutputT], ABC):
     """Visitor for the Instance classes."""
