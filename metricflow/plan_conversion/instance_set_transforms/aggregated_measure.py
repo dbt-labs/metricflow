@@ -14,7 +14,7 @@ from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.sql.sql_plan import SqlSelectColumn
 
 
-class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances):
+class CreateAggregatedMeasureColumnSet(CreateSelectColumnsForInstances):
     """Create select columns of the form "fct_bookings.bookings AS bookings" for all the instances.
 
     However, for measure columns, convert them into expressions like "SUM(fct_bookings.bookings) AS bookings" so that

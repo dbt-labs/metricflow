@@ -96,7 +96,7 @@ from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.dataset.sql_dataset import AnnotatedSqlDataSet, SqlDataSet
 from metricflow.plan_conversion.instance_set_transforms.aggregated_measure import (
-    CreateSelectColumnsWithMeasuresAggregated,
+    CreateAggregatedMeasureColumnSet,
 )
 from metricflow.plan_conversion.instance_set_transforms.instance_converters import (
     AddGroupByMetric,
@@ -533,7 +533,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         # downstream consumers of the resulting node must therefore request aggregated measures
         # by their appropriate aliases
         select_column_set: SelectColumnSet = aggregated_instance_set.transform(
-            CreateSelectColumnsWithMeasuresAggregated(
+            CreateAggregatedMeasureColumnSet(
                 table_alias=from_data_set_alias,
                 column_resolver=self._column_association_resolver,
                 semantic_model_lookup=self._semantic_model_lookup,
