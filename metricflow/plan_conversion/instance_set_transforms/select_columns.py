@@ -98,7 +98,7 @@ class CreateSelectColumnsResult(Mergeable):
 
             return tuple(output_columns)
         else:
-            return self.select_column_set.columns_in_order
+            return self.select_column_set.columns_in_default_order
 
 
 class CreateSelectColumnsForInstances(InstanceSetTransform[CreateSelectColumnsResult]):
@@ -260,4 +260,4 @@ def create_simple_select_columns_for_instance_sets(
             ).select_column_set
         )
 
-    return column_set.columns_in_order
+    return column_set.columns_in_default_order

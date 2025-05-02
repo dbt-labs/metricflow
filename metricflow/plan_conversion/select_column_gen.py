@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
+from functools import cached_property
 from typing import Iterable
 
 from metricflow_semantics.collection_helpers.merger import Mergeable
@@ -27,7 +28,6 @@ class SelectColumnSet(Mergeable):
     entity_columns: AnyLengthTuple[SqlSelectColumn]
     group_by_metric_columns: AnyLengthTuple[SqlSelectColumn]
     metadata_columns: AnyLengthTuple[SqlSelectColumn]
-    columns_in_order: AnyLengthTuple[SqlSelectColumn]
 
     @staticmethod
     def create(  # noqa: D102
@@ -47,26 +47,27 @@ class SelectColumnSet(Mergeable):
         group_by_metric_columns = tuple(group_by_metric_columns)
         metadata_columns = tuple(metadata_columns)
 
-        columns_in_order_argument_value = (
-            # This order was chosen to match the column sequence data consumers typically prefer.
-            time_dimension_columns
-            + entity_columns
-            + dimension_columns
-            + group_by_metric_columns
-            + metric_columns
-            + measure_columns
-            + metadata_columns
+        return SelectColumnSet(
+            metric_columns=tuple(metric_columns),
+            measure_columns=tuple(measure_columns),
+            dimension_columns=tuple(dimension_columns),
+            time_dimension_columns=tuple(time_dimension_columns),
+            entity_columns=tuple(entity_columns),
+            group_by_metric_columns=tuple(group_by_metric_columns),
+            metadata_columns=tuple(metadata_columns),
         )
 
-        return SelectColumnSet(
-            metric_columns=metric_columns,
-            measure_columns=measure_columns,
-            dimension_columns=dimension_columns,
-            time_dimension_columns=time_dimension_columns,
-            entity_columns=entity_columns,
-            group_by_metric_columns=group_by_metric_columns,
-            metadata_columns=metadata_columns,
-            columns_in_order=columns_in_order_argument_value,
+    @cached_property
+    def columns_in_default_order(self) -> AnyLengthTuple[SqlSelectColumn]:  # noqa: D102
+        return (
+            # This order was chosen to match the column sequence data consumers typically prefer.
+            self.time_dimension_columns
+            + self.entity_columns
+            + self.dimension_columns
+            + self.group_by_metric_columns
+            + self.metric_columns
+            + self.measure_columns
+            + self.metadata_columns
         )
 
     @override

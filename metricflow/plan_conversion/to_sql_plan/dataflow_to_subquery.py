@@ -558,11 +558,11 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
                 # This will generate expressions with the appropriate aggregation functions e.g. SUM()
-                select_columns=create_columns_result.select_column_set.columns_in_order,
+                select_columns=create_columns_result.select_column_set.columns_in_default_order,
                 from_source=from_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
                 # This will generate expressions to group by the columns that don't correspond to a measure instance.
-                group_bys=create_columns_result.group_by_column_set.columns_in_order,
+                group_bys=create_columns_result.group_by_column_set.columns_in_default_order,
             ),
         )
 
@@ -738,7 +738,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             instance_set=output_instance_set,
             sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
-                select_columns=combined_select_column_set.columns_in_order,
+                select_columns=combined_select_column_set.columns_in_default_order,
                 from_source=from_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
             ),
@@ -1017,11 +1017,11 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             instance_set=output_instance_set,
             sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
-                select_columns=combined_select_column_set.columns_in_order,
+                select_columns=combined_select_column_set.columns_in_default_order,
                 from_source=from_data_set.data_set.checked_sql_select_node,
                 from_source_alias=from_data_set.alias,
                 join_descs=tuple(joins_descriptions),
-                group_bys=linkable_select_column_set.columns_in_order,
+                group_bys=linkable_select_column_set.columns_in_default_order,
             ),
         )
 
