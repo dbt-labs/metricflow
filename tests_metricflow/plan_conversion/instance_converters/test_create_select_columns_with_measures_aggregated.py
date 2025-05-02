@@ -13,8 +13,10 @@ from metricflow_semantics.sql.sql_exprs import (
     SqlPercentileExpression,
 )
 
-from metricflow.plan_conversion.instance_set_transforms.instance_converters import (
+from metricflow.plan_conversion.instance_set_transforms.aggregated_measure import (
     CreateSelectColumnsWithMeasuresAggregated,
+)
+from metricflow.plan_conversion.instance_set_transforms.instance_converters import (
     FilterElements,
 )
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet

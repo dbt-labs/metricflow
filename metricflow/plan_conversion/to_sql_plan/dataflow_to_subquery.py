@@ -95,6 +95,9 @@ from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTable
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.dataset.sql_dataset import AnnotatedSqlDataSet, SqlDataSet
+from metricflow.plan_conversion.instance_set_transforms.aggregated_measure import (
+    CreateSelectColumnsWithMeasuresAggregated,
+)
 from metricflow.plan_conversion.instance_set_transforms.instance_converters import (
     AddGroupByMetric,
     AddMetadata,
@@ -105,7 +108,6 @@ from metricflow.plan_conversion.instance_set_transforms.instance_converters impo
     ConvertToMetadata,
     CreateSelectColumnForCombineOutputNode,
     CreateSelectColumnsForInstances,
-    CreateSelectColumnsWithMeasuresAggregated,
     CreateSqlColumnReferencesForInstances,
     FilterElements,
     FilterLinkableInstancesWithLeadingLink,
