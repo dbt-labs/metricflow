@@ -133,7 +133,7 @@ class DataflowToSqlPlanConverter:
                 return result
 
             except Exception as e:
-                if optimization_level is optimization_levels_to_attempt[-1]:
+                if attempted_optimization_level is optimization_levels_to_attempt[-1]:
                     logger.error(
                         "Exhausted attempts to generate the SQL without exceptions."
                         " Propagating the most recent exception."
