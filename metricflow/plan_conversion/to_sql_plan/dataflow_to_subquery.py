@@ -590,7 +590,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                 column_resolver=self._column_association_resolver,
                 spec_output_order=self._spec_output_order,
             )
-        )
+        ).select_column_set
 
         # Add select columns that would compute the metrics to the select columns.
         metric_select_columns = []

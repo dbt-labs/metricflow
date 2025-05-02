@@ -1,22 +1,47 @@
 from __future__ import annotations
 
 from collections import OrderedDict
+from dataclasses import dataclass
 from itertools import chain
 from typing import Dict, List, Optional, Sequence, Tuple, Union
 
+from metricflow_semantics.collection_helpers.merger import Mergeable
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.instances import InstanceSet, InstanceSetTransform, MdoInstance
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression
+from typing_extensions import override
 
 from metricflow.plan_conversion.instance_set_transforms.instance_converters import InstanceT, logger
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.sql.sql_plan import SqlSelectColumn
 
 
-class CreateSelectColumnsForInstances(InstanceSetTransform[SelectColumnSet]):
+@dataclass(frozen=True)
+class CreateSelectColumnsResult(Mergeable):
+    """Result class for `CreateSelectColumnsForInstances`."""
+
+    # Columns that should be in the `SELECT` clause.
+    select_column_set: SelectColumnSet
+
+    @override
+    def merge(self, other: CreateSelectColumnsResult) -> CreateSelectColumnsResult:
+        return CreateSelectColumnsResult(select_column_set=self.select_column_set.merge(other.select_column_set))
+
+    @classmethod
+    @override
+    def empty_instance(cls) -> CreateSelectColumnsResult:
+        return CreateSelectColumnsResult(select_column_set=SelectColumnSet.empty_instance())
+
+    @property
+    def columns_in_order(self) -> AnyLengthTuple[SqlSelectColumn]:
+        """Pass-though convenience property."""
+        return self.select_column_set.columns_in_order
+
+
+class CreateSelectColumnsForInstances(InstanceSetTransform[CreateSelectColumnsResult]):
     """Create select column expressions that will express all instances in the set.
 
     It assumes that the column names of the instances are represented by the supplied column association resolver and
@@ -68,7 +93,7 @@ class CreateSelectColumnsForInstances(InstanceSetTransform[SelectColumnSet]):
 
         return sorted(instances, key=_sort_key_function)
 
-    def transform(self, instance_set: InstanceSet) -> SelectColumnSet:  # noqa: D102
+    def transform(self, instance_set: InstanceSet) -> CreateSelectColumnsResult:  # noqa: D102
         metric_cols = tuple(
             chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.metric_instances])
         )
@@ -115,15 +140,17 @@ class CreateSelectColumnsForInstances(InstanceSetTransform[SelectColumnSet]):
                 )
             )
 
-        return SelectColumnSet.create(
-            metric_columns=metric_cols,
-            measure_columns=measure_cols,
-            dimension_columns=dimension_cols,
-            time_dimension_columns=time_dimension_cols,
-            entity_columns=entity_cols,
-            group_by_metric_columns=group_by_metric_cols,
-            metadata_columns=metadata_cols,
-            columns_in_order=columns_in_order,
+        return CreateSelectColumnsResult(
+            SelectColumnSet.create(
+                metric_columns=metric_cols,
+                measure_columns=measure_cols,
+                dimension_columns=dimension_cols,
+                time_dimension_columns=time_dimension_cols,
+                entity_columns=entity_cols,
+                group_by_metric_columns=group_by_metric_cols,
+                metadata_columns=metadata_cols,
+                columns_in_order=columns_in_order,
+            )
         )
 
     def _make_sql_column_expression(
@@ -193,7 +220,7 @@ def create_simple_select_columns_for_instance_sets(
                     table_alias=table_alias,
                     column_resolver=column_resolver,
                 )
-            )
+            ).select_column_set
         )
 
     return column_set.columns_in_order

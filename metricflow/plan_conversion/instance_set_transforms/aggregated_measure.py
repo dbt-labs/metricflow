@@ -105,8 +105,12 @@ class CreateAggregatedMeasuresTransform(InstanceSetTransform[CreateAggregatedMea
 
     def transform(self, instance_set: InstanceSet) -> CreateAggregatedMeasuresResult:  # noqa: D102
         instance_set_without_measures = instance_set.without_measures()
-        column_set_without_measures = self._create_select_column_transform.transform(instance_set_without_measures)
-        group_by_column_set = self._create_select_column_transform.transform(instance_set_without_measures)
+        column_set_without_measures = self._create_select_column_transform.transform(
+            instance_set_without_measures
+        ).select_column_set
+        group_by_column_set = self._create_select_column_transform.transform(
+            instance_set_without_measures
+        ).select_column_set
         measure_column_set = self._make_sql_column_expression_to_aggregate_measures(instance_set.measure_instances)
 
         return CreateAggregatedMeasuresResult(
