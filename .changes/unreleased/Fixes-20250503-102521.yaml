@@ -1,0 +1,6 @@
+kind: Fixes
+body: Fix exception propagation in SQL generation
+time: 2025-05-03T10:25:21.517493-07:00
+custom:
+  Author: plypaul
+  Issue: "1747"
