@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Generate a `SELECT` statement for sink nodes in a dataflow plan
+time: 2025-05-05T15:51:53.042832-07:00
+custom:
+  Author: plypaul
+  Issue: "1743"
