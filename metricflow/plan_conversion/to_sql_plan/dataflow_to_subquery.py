@@ -797,17 +797,14 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         # to support specific column ordering.
         input_data_set: SqlDataSet = self.get_output_data_set(node.parent_node)
         input_data_set_alias = self._next_unique_table_alias()
-        output_instance_set = input_data_set.instance_set.transform(
-            ChangeAssociatedColumns(self._column_association_resolver)
+        output_column_set = input_data_set.instance_set.transform(
+            CreateSelectColumnsForInstances(input_data_set_alias, self._column_association_resolver)
         )
-
         return SqlDataSet(
-            instance_set=output_instance_set,
+            instance_set=input_data_set.instance_set,
             sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
-                select_columns=output_instance_set.transform(
-                    CreateSelectColumnsForInstances(input_data_set_alias, self._column_association_resolver)
-                ).as_tuple(),
+                select_columns=output_column_set.as_tuple(),
                 from_source=input_data_set.checked_sql_select_node,
                 from_source_alias=input_data_set_alias,
             ),
@@ -816,19 +813,17 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
     def visit_write_to_result_table_node(self, node: WriteToResultTableNode) -> SqlDataSet:  # noqa: D102
         input_data_set: SqlDataSet = self.get_output_data_set(node.parent_node)
         input_data_set_alias = self._next_unique_table_alias()
-        output_instance_set = input_data_set.instance_set.transform(
-            ChangeAssociatedColumns(self._column_association_resolver)
+        output_column_set = input_data_set.instance_set.transform(
+            CreateSelectColumnsForInstances(input_data_set_alias, self._column_association_resolver)
         )
 
         return SqlDataSet(
-            instance_set=output_instance_set,
+            instance_set=input_data_set.instance_set,
             sql_node=SqlCreateTableAsNode.create(
                 sql_table=node.output_sql_table,
                 parent_node=SqlSelectStatementNode.create(
                     description=node.description,
-                    select_columns=output_instance_set.transform(
-                        CreateSelectColumnsForInstances(input_data_set_alias, self._column_association_resolver)
-                    ).as_tuple(),
+                    select_columns=output_column_set.as_tuple(),
                     from_source=input_data_set.checked_sql_select_node,
                     from_source_alias=input_data_set_alias,
                 ),
