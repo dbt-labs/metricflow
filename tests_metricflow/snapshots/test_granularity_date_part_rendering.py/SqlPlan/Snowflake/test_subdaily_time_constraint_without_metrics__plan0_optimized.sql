@@ -6,6 +6,7 @@ sql_engine: Snowflake
 -- Metric Time Dimension 'ts'
 -- Constrain Time Range to [2020-01-01T00:00:02, 2020-01-01T00:00:08]
 -- Pass Only Elements: ['metric_time__second']
+-- Write to DataTable
 SELECT
   ts AS metric_time__second
 FROM ***************************.mf_time_spine_second time_spine_src_28003

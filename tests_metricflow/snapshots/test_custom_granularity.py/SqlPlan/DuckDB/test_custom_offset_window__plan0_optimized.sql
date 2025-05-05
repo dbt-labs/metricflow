@@ -3,6 +3,7 @@ test_filename: test_custom_granularity.py
 sql_engine: DuckDB
 ---
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
   metric_time__day
   , bookings AS bookings_offset_one_alien_day
@@ -12,8 +13,8 @@ FROM (
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
-    subq_25.ds__day__lead AS metric_time__day
-    , SUM(subq_21.bookings) AS bookings
+    subq_26.ds__day__lead AS metric_time__day
+    , SUM(subq_22.bookings) AS bookings
   FROM (
     -- Offset Base Granularity By Custom Granularity Period(s)
     WITH cte_6 AS (
@@ -42,8 +43,8 @@ FROM (
     SELECT
       cte_6.ds__day AS ds__day
       , CASE
-        WHEN subq_24.ds__alien_day__first_value__lead + INTERVAL (cte_6.ds__day__row_number - 1) day <= subq_24.ds__alien_day__last_value__lead
-          THEN subq_24.ds__alien_day__first_value__lead + INTERVAL (cte_6.ds__day__row_number - 1) day
+        WHEN subq_25.ds__alien_day__first_value__lead + INTERVAL (cte_6.ds__day__row_number - 1) day <= subq_25.ds__alien_day__last_value__lead
+          THEN subq_25.ds__alien_day__first_value__lead + INTERVAL (cte_6.ds__day__row_number - 1) day
         ELSE NULL
       END AS ds__day__lead
     FROM cte_6 cte_6
@@ -64,11 +65,11 @@ FROM (
           ds__alien_day
           , ds__alien_day__first_value
           , ds__alien_day__last_value
-      ) subq_23
-    ) subq_24
+      ) subq_24
+    ) subq_25
     ON
-      cte_6.ds__alien_day = subq_24.ds__alien_day
-  ) subq_25
+      cte_6.ds__alien_day = subq_25.ds__alien_day
+  ) subq_26
   INNER JOIN (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
@@ -76,9 +77,9 @@ FROM (
       DATE_TRUNC('day', ds) AS metric_time__day
       , 1 AS bookings
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_21
+  ) subq_22
   ON
-    subq_25.ds__day = subq_21.metric_time__day
+    subq_26.ds__day = subq_22.metric_time__day
   GROUP BY
-    subq_25.ds__day__lead
-) subq_31
+    subq_26.ds__day__lead
+) subq_32

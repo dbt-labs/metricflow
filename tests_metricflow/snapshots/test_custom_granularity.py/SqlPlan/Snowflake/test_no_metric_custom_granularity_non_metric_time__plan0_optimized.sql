@@ -5,12 +5,13 @@ sql_engine: Snowflake
 -- Read Elements From Semantic Model 'bookings_source'
 -- Join to Custom Granularity Dataset
 -- Pass Only Elements: ['booking__ds__alien_day']
+-- Write to DataTable
 SELECT
-  subq_2.alien_day AS booking__ds__alien_day
+  subq_3.alien_day AS booking__ds__alien_day
 FROM ***************************.fct_bookings bookings_source_src_28000
 LEFT OUTER JOIN
-  ***************************.mf_time_spine subq_2
+  ***************************.mf_time_spine subq_3
 ON
-  DATE_TRUNC('day', bookings_source_src_28000.ds) = subq_2.ds
+  DATE_TRUNC('day', bookings_source_src_28000.ds) = subq_3.ds
 GROUP BY
-  subq_2.alien_day
+  subq_3.alien_day

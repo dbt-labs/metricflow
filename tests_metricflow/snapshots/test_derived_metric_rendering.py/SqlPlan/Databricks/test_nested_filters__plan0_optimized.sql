@@ -5,6 +5,7 @@ docstring:
 sql_engine: Databricks
 ---
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
   instant_lux_booking_value_rate AS instant_lux_booking_value_rate
 FROM (
@@ -14,9 +15,9 @@ FROM (
   FROM (
     -- Combine Aggregated Outputs
     SELECT
-      MAX(subq_34.average_booking_value) AS average_booking_value
-      , MAX(subq_34.bookings) AS bookings
-      , MAX(subq_40.booking_value) AS booking_value
+      MAX(subq_35.average_booking_value) AS average_booking_value
+      , MAX(subq_35.bookings) AS bookings
+      , MAX(subq_41.booking_value) AS booking_value
     FROM (
       -- Constrain Output with WHERE
       -- Pass Only Elements: ['average_booking_value', 'bookings']
@@ -29,9 +30,9 @@ FROM (
         -- Join Standard Outputs
         SELECT
           listings_latest_src_28000.is_lux AS listing__is_lux_latest
-          , subq_26.booking__is_instant AS booking__is_instant
-          , subq_26.bookings AS bookings
-          , subq_26.average_booking_value AS average_booking_value
+          , subq_27.booking__is_instant AS booking__is_instant
+          , subq_27.bookings AS bookings
+          , subq_27.average_booking_value AS average_booking_value
         FROM (
           -- Read Elements From Semantic Model 'bookings_source'
           -- Metric Time Dimension 'ds'
@@ -41,14 +42,14 @@ FROM (
             , 1 AS bookings
             , booking_value AS average_booking_value
           FROM ***************************.fct_bookings bookings_source_src_28000
-        ) subq_26
+        ) subq_27
         LEFT OUTER JOIN
           ***************************.dim_listings_latest listings_latest_src_28000
         ON
-          subq_26.listing = listings_latest_src_28000.listing_id
-      ) subq_30
+          subq_27.listing = listings_latest_src_28000.listing_id
+      ) subq_31
       WHERE (listing__is_lux_latest) AND (booking__is_instant)
-    ) subq_34
+    ) subq_35
     CROSS JOIN (
       -- Constrain Output with WHERE
       -- Pass Only Elements: ['booking_value']
@@ -63,8 +64,8 @@ FROM (
           is_instant AS booking__is_instant
           , booking_value
         FROM ***************************.fct_bookings bookings_source_src_28000
-      ) subq_36
+      ) subq_37
       WHERE booking__is_instant
-    ) subq_40
-  ) subq_41
-) subq_42
+    ) subq_41
+  ) subq_42
+) subq_43

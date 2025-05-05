@@ -5,6 +5,7 @@ docstring:
 sql_engine: Trino
 ---
 -- Compute Metrics via Expressions
+-- Write to DataTable
 WITH sma_28019_cte AS (
   -- Read Elements From Semantic Model 'visits_source'
   -- Metric Time Dimension 'ds'
@@ -21,9 +22,9 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_20.metric_time__day, subq_30.metric_time__day) AS metric_time__day
-    , MAX(subq_20.visits) AS visits
-    , MAX(subq_30.buys) AS buys
+    COALESCE(subq_21.metric_time__day, subq_31.metric_time__day) AS metric_time__day
+    , MAX(subq_21.visits) AS visits
+    , MAX(subq_31.buys) AS buys
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['visits', 'metric_time__day']
@@ -37,11 +38,11 @@ FROM (
         metric_time__day
         , visits
       FROM sma_28019_cte sma_28019_cte
-    ) subq_17
+    ) subq_18
     WHERE metric_time__day = '2020-01-01'
     GROUP BY
       metric_time__day
-  ) subq_20
+  ) subq_21
   FULL OUTER JOIN (
     -- Find conversions for user within the range of 7 day
     -- Pass Only Elements: ['buys', 'metric_time__day']
@@ -52,38 +53,38 @@ FROM (
     FROM (
       -- Dedupe the fanout with mf_internal_uuid in the conversion data set
       SELECT DISTINCT
-        FIRST_VALUE(subq_23.visits) OVER (
+        FIRST_VALUE(subq_24.visits) OVER (
           PARTITION BY
-            subq_26.user
-            , subq_26.metric_time__day
-            , subq_26.mf_internal_uuid
-          ORDER BY subq_23.metric_time__day DESC
+            subq_27.user
+            , subq_27.metric_time__day
+            , subq_27.mf_internal_uuid
+          ORDER BY subq_24.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS visits
-        , FIRST_VALUE(subq_23.metric_time__day) OVER (
+        , FIRST_VALUE(subq_24.metric_time__day) OVER (
           PARTITION BY
-            subq_26.user
-            , subq_26.metric_time__day
-            , subq_26.mf_internal_uuid
-          ORDER BY subq_23.metric_time__day DESC
+            subq_27.user
+            , subq_27.metric_time__day
+            , subq_27.mf_internal_uuid
+          ORDER BY subq_24.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS metric_time__day
-        , FIRST_VALUE(subq_23.user) OVER (
+        , FIRST_VALUE(subq_24.user) OVER (
           PARTITION BY
-            subq_26.user
-            , subq_26.metric_time__day
-            , subq_26.mf_internal_uuid
-          ORDER BY subq_23.metric_time__day DESC
+            subq_27.user
+            , subq_27.metric_time__day
+            , subq_27.mf_internal_uuid
+          ORDER BY subq_24.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS user
-        , subq_26.mf_internal_uuid AS mf_internal_uuid
-        , subq_26.buys AS buys
+        , subq_27.mf_internal_uuid AS mf_internal_uuid
+        , subq_27.buys AS buys
       FROM (
         -- Constrain Output with WHERE
         -- Pass Only Elements: ['visits', 'metric_time__day', 'user']
         SELECT
           metric_time__day
-          , subq_21.user
+          , subq_22.user
           , visits
         FROM (
           -- Read From CTE For node_id=sma_28019
@@ -92,9 +93,9 @@ FROM (
             , sma_28019_cte.user
             , visits
           FROM sma_28019_cte sma_28019_cte
-        ) subq_21
+        ) subq_22
         WHERE metric_time__day = '2020-01-01'
-      ) subq_23
+      ) subq_24
       INNER JOIN (
         -- Read Elements From Semantic Model 'buys_source'
         -- Metric Time Dimension 'ds'
@@ -105,23 +106,23 @@ FROM (
           , 1 AS buys
           , uuid() AS mf_internal_uuid
         FROM ***************************.fct_buys buys_source_src_28000
-      ) subq_26
+      ) subq_27
       ON
         (
-          subq_23.user = subq_26.user
+          subq_24.user = subq_27.user
         ) AND (
           (
-            subq_23.metric_time__day <= subq_26.metric_time__day
+            subq_24.metric_time__day <= subq_27.metric_time__day
           ) AND (
-            subq_23.metric_time__day > DATE_ADD('day', -7, subq_26.metric_time__day)
+            subq_24.metric_time__day > DATE_ADD('day', -7, subq_27.metric_time__day)
           )
         )
-    ) subq_27
+    ) subq_28
     GROUP BY
       metric_time__day
-  ) subq_30
+  ) subq_31
   ON
-    subq_20.metric_time__day = subq_30.metric_time__day
+    subq_21.metric_time__day = subq_31.metric_time__day
   GROUP BY
-    COALESCE(subq_20.metric_time__day, subq_30.metric_time__day)
-) subq_31
+    COALESCE(subq_21.metric_time__day, subq_31.metric_time__day)
+) subq_32

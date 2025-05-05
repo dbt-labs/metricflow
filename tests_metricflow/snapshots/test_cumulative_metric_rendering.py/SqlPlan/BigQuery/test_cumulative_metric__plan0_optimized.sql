@@ -9,6 +9,7 @@ sql_engine: BigQuery
 -- Pass Only Elements: ['txn_revenue', 'ds__day']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
   DATETIME_TRUNC(created_at, day) AS ds__day
   , SUM(revenue) AS trailing_2_months_revenue

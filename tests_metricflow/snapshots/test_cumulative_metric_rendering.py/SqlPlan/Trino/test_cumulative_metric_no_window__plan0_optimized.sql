@@ -9,6 +9,7 @@ sql_engine: Trino
 -- Pass Only Elements: ['txn_revenue', 'ds__month']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
   DATE_TRUNC('month', created_at) AS ds__month
   , SUM(revenue) AS revenue_all_time

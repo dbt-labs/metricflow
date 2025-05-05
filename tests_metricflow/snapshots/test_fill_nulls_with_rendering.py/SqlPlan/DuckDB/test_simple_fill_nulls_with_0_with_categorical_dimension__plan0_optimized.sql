@@ -3,6 +3,7 @@ test_filename: test_fill_nulls_with_rendering.py
 sql_engine: DuckDB
 ---
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
   booking__is_instant
   , COALESCE(bookings, 0) AS bookings_fill_nulls_with_0
@@ -19,7 +20,7 @@ FROM (
       is_instant AS booking__is_instant
       , 1 AS bookings
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_6
+  ) subq_7
   GROUP BY
     booking__is_instant
-) subq_7
+) subq_8

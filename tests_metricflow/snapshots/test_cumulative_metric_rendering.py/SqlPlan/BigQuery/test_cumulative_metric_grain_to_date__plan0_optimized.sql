@@ -9,6 +9,7 @@ sql_engine: BigQuery
 -- Pass Only Elements: ['txn_revenue', 'ds__month']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
   DATETIME_TRUNC(created_at, month) AS ds__month
   , SUM(revenue) AS revenue_mtd

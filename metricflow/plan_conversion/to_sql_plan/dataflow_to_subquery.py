@@ -793,17 +793,40 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         )
 
     def visit_write_to_result_data_table_node(self, node: WriteToResultDataTableNode) -> SqlDataSet:  # noqa: D102
-        # Returning the parent-node SQL as an approximation since you can't write to a data_table via SQL.
-        return self.get_output_data_set(node.parent_node)
+        # Currently, this is a SELECT statement that passes all columns through. This will be updated in a later PR
+        # to support specific column ordering.
+        input_data_set: SqlDataSet = self.get_output_data_set(node.parent_node)
+        input_data_set_alias = self._next_unique_table_alias()
+        output_column_set = input_data_set.instance_set.transform(
+            CreateSelectColumnsForInstances(input_data_set_alias, self._column_association_resolver)
+        )
+        return SqlDataSet(
+            instance_set=input_data_set.instance_set,
+            sql_select_node=SqlSelectStatementNode.create(
+                description=node.description,
+                select_columns=output_column_set.as_tuple(),
+                from_source=input_data_set.checked_sql_select_node,
+                from_source_alias=input_data_set_alias,
+            ),
+        )
 
     def visit_write_to_result_table_node(self, node: WriteToResultTableNode) -> SqlDataSet:  # noqa: D102
         input_data_set: SqlDataSet = self.get_output_data_set(node.parent_node)
-        input_instance_set: InstanceSet = input_data_set.instance_set
+        input_data_set_alias = self._next_unique_table_alias()
+        output_column_set = input_data_set.instance_set.transform(
+            CreateSelectColumnsForInstances(input_data_set_alias, self._column_association_resolver)
+        )
+
         return SqlDataSet(
-            instance_set=input_instance_set,
+            instance_set=input_data_set.instance_set,
             sql_node=SqlCreateTableAsNode.create(
                 sql_table=node.output_sql_table,
-                parent_node=input_data_set.checked_sql_select_node,
+                parent_node=SqlSelectStatementNode.create(
+                    description=node.description,
+                    select_columns=output_column_set.as_tuple(),
+                    from_source=input_data_set.checked_sql_select_node,
+                    from_source_alias=input_data_set_alias,
+                ),
             ),
         )
 

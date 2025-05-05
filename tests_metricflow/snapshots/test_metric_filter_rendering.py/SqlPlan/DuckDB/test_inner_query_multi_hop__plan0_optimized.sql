@@ -8,12 +8,13 @@ sql_engine: DuckDB
 -- Pass Only Elements: ['third_hop_count']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
   COUNT(DISTINCT third_hop_count) AS third_hop_count
 FROM (
   -- Join Standard Outputs
   SELECT
-    subq_44.account_id__customer_id__customer_third_hop_id__txn_count AS customer_third_hop_id__account_id__customer_id__customer_third_hop_id__txn_count
+    subq_45.account_id__customer_id__customer_third_hop_id__txn_count AS customer_third_hop_id__account_id__customer_id__customer_third_hop_id__txn_count
     , third_hop_table_src_22000.customer_third_hop_id AS third_hop_count
   FROM ***************************.third_hop_table third_hop_table_src_22000
   LEFT OUTER JOIN (
@@ -23,7 +24,7 @@ FROM (
     -- Compute Metrics via Expressions
     -- Pass Only Elements: ['account_id__customer_id__customer_third_hop_id', 'account_id__customer_id__customer_third_hop_id__txn_count']
     SELECT
-      subq_39.customer_id__customer_third_hop_id AS account_id__customer_id__customer_third_hop_id
+      subq_40.customer_id__customer_third_hop_id AS account_id__customer_id__customer_third_hop_id
       , SUM(account_month_txns_src_22000.txn_count) AS account_id__customer_id__customer_third_hop_id__txn_count
     FROM ***************************.account_month_txns account_month_txns_src_22000
     LEFT OUTER JOIN (
@@ -38,17 +39,17 @@ FROM (
         ***************************.customer_other_data customer_other_data_src_22000
       ON
         bridge_table_src_22000.customer_id = customer_other_data_src_22000.customer_id
-    ) subq_39
+    ) subq_40
     ON
       (
-        account_month_txns_src_22000.account_id = subq_39.account_id
+        account_month_txns_src_22000.account_id = subq_40.account_id
       ) AND (
-        DATE_TRUNC('day', account_month_txns_src_22000.ds_partitioned) = subq_39.ds_partitioned__day
+        DATE_TRUNC('day', account_month_txns_src_22000.ds_partitioned) = subq_40.ds_partitioned__day
       )
     GROUP BY
-      subq_39.customer_id__customer_third_hop_id
-  ) subq_44
+      subq_40.customer_id__customer_third_hop_id
+  ) subq_45
   ON
-    third_hop_table_src_22000.customer_third_hop_id = subq_44.account_id__customer_id__customer_third_hop_id
-) subq_45
+    third_hop_table_src_22000.customer_third_hop_id = subq_45.account_id__customer_id__customer_third_hop_id
+) subq_46
 WHERE customer_third_hop_id__account_id__customer_id__customer_third_hop_id__txn_count > 2

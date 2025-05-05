@@ -4,32 +4,33 @@ sql_engine: BigQuery
 ---
 -- Join to Time Spine Dataset
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
-  subq_18.metric_time__alien_day AS metric_time__alien_day
-  , subq_18.metric_time__hour AS metric_time__hour
-  , subq_14.archived_users AS subdaily_join_to_time_spine_metric
+  subq_19.metric_time__alien_day AS metric_time__alien_day
+  , subq_19.metric_time__hour AS metric_time__hour
+  , subq_15.archived_users AS subdaily_join_to_time_spine_metric
 FROM (
   -- Change Column Aliases
   -- Join to Custom Granularity Dataset
   -- Pass Only Elements: ['metric_time__alien_day', 'metric_time__hour']
   SELECT
-    subq_16.alien_day AS metric_time__alien_day
+    subq_17.alien_day AS metric_time__alien_day
     , time_spine_src_28005.ts AS metric_time__hour
   FROM ***************************.mf_time_spine_hour time_spine_src_28005
   LEFT OUTER JOIN
-    ***************************.mf_time_spine subq_16
+    ***************************.mf_time_spine subq_17
   ON
-    DATETIME_TRUNC(time_spine_src_28005.ts, day) = subq_16.ds
-) subq_18
+    DATETIME_TRUNC(time_spine_src_28005.ts, day) = subq_17.ds
+) subq_19
 LEFT OUTER JOIN (
   -- Metric Time Dimension 'archived_at'
   -- Join to Custom Granularity Dataset
   -- Pass Only Elements: ['archived_users', 'metric_time__alien_day', 'metric_time__hour']
   -- Aggregate Measures
   SELECT
-    subq_11.alien_day AS metric_time__alien_day
-    , subq_10.archived_at__hour AS metric_time__hour
-    , SUM(subq_10.archived_users) AS archived_users
+    subq_12.alien_day AS metric_time__alien_day
+    , subq_11.archived_at__hour AS metric_time__hour
+    , SUM(subq_11.archived_users) AS archived_users
   FROM (
     -- Read Elements From Semantic Model 'users_ds_source'
     SELECT
@@ -37,14 +38,14 @@ LEFT OUTER JOIN (
       , DATETIME_TRUNC(archived_at, hour) AS archived_at__hour
       , DATETIME_TRUNC(archived_at, day) AS archived_at__day
     FROM ***************************.dim_users users_ds_source_src_28000
-  ) subq_10
+  ) subq_11
   LEFT OUTER JOIN
-    ***************************.mf_time_spine subq_11
+    ***************************.mf_time_spine subq_12
   ON
-    subq_10.archived_at__day = subq_11.ds
+    subq_11.archived_at__day = subq_12.ds
   GROUP BY
     metric_time__alien_day
     , metric_time__hour
-) subq_14
+) subq_15
 ON
-  subq_18.metric_time__hour = subq_14.metric_time__hour
+  subq_19.metric_time__hour = subq_15.metric_time__hour

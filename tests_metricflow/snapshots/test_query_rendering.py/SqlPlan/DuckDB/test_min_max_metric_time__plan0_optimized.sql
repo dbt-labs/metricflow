@@ -5,6 +5,7 @@ docstring:
 sql_engine: DuckDB
 ---
 -- Calculate min and max
+-- Write to DataTable
 SELECT
   MIN(metric_time__day) AS metric_time__day__min
   , MAX(metric_time__day) AS metric_time__day__max
@@ -17,4 +18,4 @@ FROM (
   FROM ***************************.mf_time_spine time_spine_src_28006
   GROUP BY
     ds
-) subq_5
+) subq_6

@@ -3,14 +3,15 @@ test_filename: test_fill_nulls_with_rendering.py
 sql_engine: Redshift
 ---
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
   metric_time__month
   , COALESCE(bookings, 0) AS bookings_fill_nulls_with_0
 FROM (
   -- Join to Time Spine Dataset
   SELECT
-    subq_14.metric_time__month AS metric_time__month
-    , subq_11.bookings AS bookings
+    subq_15.metric_time__month AS metric_time__month
+    , subq_12.bookings AS bookings
   FROM (
     -- Read From Time Spine 'mf_time_spine'
     -- Change Column Aliases
@@ -20,7 +21,7 @@ FROM (
     FROM ***************************.mf_time_spine time_spine_src_28006
     GROUP BY
       DATE_TRUNC('month', ds)
-  ) subq_14
+  ) subq_15
   LEFT OUTER JOIN (
     -- Aggregate Measures
     SELECT
@@ -34,10 +35,10 @@ FROM (
         DATE_TRUNC('month', ds) AS metric_time__month
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_10
+    ) subq_11
     GROUP BY
       metric_time__month
-  ) subq_11
+  ) subq_12
   ON
-    subq_14.metric_time__month = subq_11.metric_time__month
-) subq_15
+    subq_15.metric_time__month = subq_12.metric_time__month
+) subq_16

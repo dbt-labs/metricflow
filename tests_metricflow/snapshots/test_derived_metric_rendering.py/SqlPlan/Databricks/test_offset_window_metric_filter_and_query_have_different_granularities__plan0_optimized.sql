@@ -5,6 +5,7 @@ docstring:
 sql_engine: Databricks
 ---
 -- Compute Metrics via Expressions
+-- Write to DataTable
 WITH sma_28009_cte AS (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
@@ -22,9 +23,9 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_25.metric_time__month, subq_30.metric_time__month) AS metric_time__month
-    , MAX(subq_25.booking_value) AS booking_value
-    , MAX(subq_30.bookers) AS bookers
+    COALESCE(subq_26.metric_time__month, subq_31.metric_time__month) AS metric_time__month
+    , MAX(subq_26.booking_value) AS booking_value
+    , MAX(subq_31.bookers) AS bookers
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['booking_value', 'metric_time__month']
@@ -44,11 +45,11 @@ FROM (
         sma_28009_cte sma_28009_cte
       ON
         DATEADD(week, -1, time_spine_src_28006.ds) = sma_28009_cte.metric_time__day
-    ) subq_21
+    ) subq_22
     WHERE metric_time__day = '2020-01-01'
     GROUP BY
       metric_time__month
-  ) subq_25
+  ) subq_26
   FULL OUTER JOIN (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['bookers', 'metric_time__month']
@@ -64,13 +65,13 @@ FROM (
         , metric_time__month
         , bookers
       FROM sma_28009_cte sma_28009_cte
-    ) subq_26
+    ) subq_27
     WHERE metric_time__day = '2020-01-01'
     GROUP BY
       metric_time__month
-  ) subq_30
+  ) subq_31
   ON
-    subq_25.metric_time__month = subq_30.metric_time__month
+    subq_26.metric_time__month = subq_31.metric_time__month
   GROUP BY
-    COALESCE(subq_25.metric_time__month, subq_30.metric_time__month)
-) subq_31
+    COALESCE(subq_26.metric_time__month, subq_31.metric_time__month)
+) subq_32

@@ -5,6 +5,7 @@ docstring:
 sql_engine: BigQuery
 ---
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
   metric_time__month
   , bookings_start_of_month AS bookings_at_start_of_month
@@ -21,7 +22,7 @@ FROM (
     SELECT
       time_spine_src_28006.ds AS metric_time__day
       , DATETIME_TRUNC(time_spine_src_28006.ds, month) AS metric_time__month
-      , subq_11.bookings AS bookings
+      , subq_12.bookings AS bookings
     FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN (
       -- Read Elements From Semantic Model 'bookings_source'
@@ -30,12 +31,12 @@ FROM (
         DATETIME_TRUNC(ds, day) AS metric_time__day
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_11
+    ) subq_12
     ON
-      DATETIME_TRUNC(time_spine_src_28006.ds, month) = subq_11.metric_time__day
+      DATETIME_TRUNC(time_spine_src_28006.ds, month) = subq_12.metric_time__day
     WHERE DATETIME_TRUNC(time_spine_src_28006.ds, month) = time_spine_src_28006.ds
-  ) subq_15
+  ) subq_16
   WHERE metric_time__day = '2020-01-01'
   GROUP BY
     metric_time__month
-) subq_19
+) subq_20

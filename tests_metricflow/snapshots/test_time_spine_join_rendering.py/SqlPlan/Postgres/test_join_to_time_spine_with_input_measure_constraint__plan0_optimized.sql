@@ -8,10 +8,11 @@ sql_engine: Postgres
 ---
 -- Join to Time Spine Dataset
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
-  subq_18.metric_time__day AS metric_time__day
-  , subq_14.booking__is_instant AS booking__is_instant
-  , subq_14.bookings AS instant_bookings_with_measure_filter
+  subq_19.metric_time__day AS metric_time__day
+  , subq_15.booking__is_instant AS booking__is_instant
+  , subq_15.bookings AS instant_bookings_with_measure_filter
 FROM (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['metric_time__day']
@@ -23,9 +24,9 @@ FROM (
     SELECT
       ds AS metric_time__day
     FROM ***************************.mf_time_spine time_spine_src_28006
-  ) subq_16
+  ) subq_17
   WHERE metric_time__day > '2020-01-01'
-) subq_18
+) subq_19
 LEFT OUTER JOIN (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['bookings', 'booking__is_instant', 'metric_time__day']
@@ -43,11 +44,11 @@ LEFT OUTER JOIN (
       , is_instant AS booking__is_instant
       , 1 AS bookings
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_11
+  ) subq_12
   WHERE ((booking__is_instant) AND (listing IS NOT NULL)) AND (metric_time__day > '2020-01-01')
   GROUP BY
     metric_time__day
     , booking__is_instant
-) subq_14
+) subq_15
 ON
-  subq_18.metric_time__day = subq_14.metric_time__day
+  subq_19.metric_time__day = subq_15.metric_time__day

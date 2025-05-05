@@ -13,16 +13,17 @@ sql_engine: Snowflake
 -- Pass Only Elements: ['txn_revenue', 'metric_time__day']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
-  subq_13.metric_time__day AS metric_time__day
-  , SUM(subq_12.txn_revenue) AS trailing_2_months_revenue
+  subq_14.metric_time__day AS metric_time__day
+  , SUM(subq_13.txn_revenue) AS trailing_2_months_revenue
 FROM (
   -- Read From Time Spine 'mf_time_spine'
   SELECT
     ds AS metric_time__day
-  FROM ***************************.mf_time_spine subq_14
+  FROM ***************************.mf_time_spine subq_15
   WHERE ds BETWEEN '2020-01-01' AND '2020-01-01'
-) subq_13
+) subq_14
 INNER JOIN (
   -- Read Elements From Semantic Model 'revenue'
   -- Metric Time Dimension 'ds'
@@ -32,13 +33,13 @@ INNER JOIN (
     , revenue AS txn_revenue
   FROM ***************************.fct_revenue revenue_src_28000
   WHERE DATE_TRUNC('day', created_at) BETWEEN '2019-11-01' AND '2020-01-01'
-) subq_12
+) subq_13
 ON
   (
-    subq_12.metric_time__day <= subq_13.metric_time__day
+    subq_13.metric_time__day <= subq_14.metric_time__day
   ) AND (
-    subq_12.metric_time__day > DATEADD(month, -2, subq_13.metric_time__day)
+    subq_13.metric_time__day > DATEADD(month, -2, subq_14.metric_time__day)
   )
-WHERE subq_13.metric_time__day BETWEEN '2020-01-01' AND '2020-01-01'
+WHERE subq_14.metric_time__day BETWEEN '2020-01-01' AND '2020-01-01'
 GROUP BY
-  subq_13.metric_time__day
+  subq_14.metric_time__day

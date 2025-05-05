@@ -3,6 +3,7 @@ test_filename: test_derived_metric_rendering.py
 sql_engine: BigQuery
 ---
 -- Compute Metrics via Expressions
+-- Write to DataTable
 WITH sma_28009_cte AS (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
@@ -18,9 +19,9 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_18.booking__ds__day, subq_26.booking__ds__day) AS booking__ds__day
-    , MAX(subq_18.bookings) AS bookings
-    , MAX(subq_26.bookings_2_weeks_ago) AS bookings_2_weeks_ago
+    COALESCE(subq_19.booking__ds__day, subq_27.booking__ds__day) AS booking__ds__day
+    , MAX(subq_19.bookings) AS bookings
+    , MAX(subq_27.bookings_2_weeks_ago) AS bookings_2_weeks_ago
   FROM (
     -- Read From CTE For node_id=sma_28009
     -- Pass Only Elements: ['bookings', 'booking__ds__day']
@@ -32,7 +33,7 @@ FROM (
     FROM sma_28009_cte sma_28009_cte
     GROUP BY
       booking__ds__day
-  ) subq_18
+  ) subq_19
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
     -- Pass Only Elements: ['bookings', 'booking__ds__day']
@@ -48,9 +49,9 @@ FROM (
       DATE_SUB(CAST(time_spine_src_28006.ds AS DATETIME), INTERVAL 14 day) = sma_28009_cte.booking__ds__day
     GROUP BY
       booking__ds__day
-  ) subq_26
+  ) subq_27
   ON
-    subq_18.booking__ds__day = subq_26.booking__ds__day
+    subq_19.booking__ds__day = subq_27.booking__ds__day
   GROUP BY
     booking__ds__day
-) subq_27
+) subq_28

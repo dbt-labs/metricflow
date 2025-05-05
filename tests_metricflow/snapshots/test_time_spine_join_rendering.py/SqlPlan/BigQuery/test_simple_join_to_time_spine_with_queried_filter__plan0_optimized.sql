@@ -5,6 +5,7 @@ docstring:
 sql_engine: BigQuery
 ---
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
   metric_time__day
   , booking__is_instant
@@ -19,8 +20,8 @@ FROM (
     -- Join to Time Spine Dataset
     SELECT
       time_spine_src_28006.ds AS metric_time__day
-      , subq_14.booking__is_instant AS booking__is_instant
-      , subq_14.bookings AS bookings
+      , subq_15.booking__is_instant AS booking__is_instant
+      , subq_15.bookings AS bookings
     FROM ***************************.mf_time_spine time_spine_src_28006
     LEFT OUTER JOIN (
       -- Constrain Output with WHERE
@@ -38,14 +39,14 @@ FROM (
           , is_instant AS booking__is_instant
           , 1 AS bookings
         FROM ***************************.fct_bookings bookings_source_src_28000
-      ) subq_11
+      ) subq_12
       WHERE booking__is_instant
       GROUP BY
         metric_time__day
         , booking__is_instant
-    ) subq_14
+    ) subq_15
     ON
-      time_spine_src_28006.ds = subq_14.metric_time__day
-  ) subq_18
+      time_spine_src_28006.ds = subq_15.metric_time__day
+  ) subq_19
   WHERE booking__is_instant
-) subq_19
+) subq_20

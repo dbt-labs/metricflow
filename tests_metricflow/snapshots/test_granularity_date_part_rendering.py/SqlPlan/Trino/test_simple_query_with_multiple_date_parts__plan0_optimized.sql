@@ -4,6 +4,7 @@ sql_engine: Trino
 ---
 -- Aggregate Measures
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
   metric_time__extract_year
   , metric_time__extract_quarter
@@ -33,7 +34,7 @@ FROM (
     , EXTRACT(doy FROM ds) AS metric_time__extract_doy
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-) subq_6
+) subq_7
 GROUP BY
   metric_time__extract_year
   , metric_time__extract_quarter

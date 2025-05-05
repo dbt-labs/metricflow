@@ -8,13 +8,14 @@ sql_engine: DuckDB
 -- Pass Only Elements: ['listings']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
+-- Write to DataTable
 SELECT
   SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
   SELECT
-    CAST(subq_33.bookings AS DOUBLE) / CAST(NULLIF(subq_33.bookers, 0) AS DOUBLE) AS listing__bookings_per_booker
-    , subq_28.listings AS listings
+    CAST(subq_34.bookings AS DOUBLE) / CAST(NULLIF(subq_34.bookers, 0) AS DOUBLE) AS listing__bookings_per_booker
+    , subq_29.listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
@@ -22,7 +23,7 @@ FROM (
       listing_id AS listing
       , 1 AS listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_28
+  ) subq_29
   LEFT OUTER JOIN (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
@@ -39,11 +40,11 @@ FROM (
         , 1 AS bookings
         , guest_id AS bookers
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_31
+    ) subq_32
     GROUP BY
       listing
-  ) subq_33
+  ) subq_34
   ON
-    subq_28.listing = subq_33.listing
-) subq_36
+    subq_29.listing = subq_34.listing
+) subq_37
 WHERE listing__bookings_per_booker > 1

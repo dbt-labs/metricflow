@@ -6,6 +6,7 @@ sql_engine: Snowflake
 ---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['user__home_state_latest']
+-- Write to DataTable
 SELECT
   user__home_state_latest
 FROM (
@@ -18,7 +19,7 @@ FROM (
     ***************************.dim_users_latest users_latest_src_28000
   ON
     listings_latest_src_28000.user_id = users_latest_src_28000.user_id
-) subq_8
+) subq_9
 WHERE listing__country_latest = 'us'
 GROUP BY
   user__home_state_latest

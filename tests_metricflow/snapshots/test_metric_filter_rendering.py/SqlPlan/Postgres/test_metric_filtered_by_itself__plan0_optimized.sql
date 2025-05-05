@@ -8,6 +8,7 @@ sql_engine: Postgres
 -- Pass Only Elements: ['bookers']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
+-- Write to DataTable
 WITH sma_28009_cte AS (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
@@ -22,15 +23,15 @@ SELECT
 FROM (
   -- Join Standard Outputs
   SELECT
-    subq_20.listing__bookers AS listing__bookers
-    , subq_15.bookers AS bookers
+    subq_21.listing__bookers AS listing__bookers
+    , subq_16.bookers AS bookers
   FROM (
     -- Read From CTE For node_id=sma_28009
     SELECT
       listing
       , bookers
     FROM sma_28009_cte sma_28009_cte
-  ) subq_15
+  ) subq_16
   LEFT OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
     -- Pass Only Elements: ['bookers', 'listing']
@@ -43,8 +44,8 @@ FROM (
     FROM sma_28009_cte sma_28009_cte
     GROUP BY
       listing
-  ) subq_20
+  ) subq_21
   ON
-    subq_15.listing = subq_20.listing
-) subq_21
+    subq_16.listing = subq_21.listing
+) subq_22
 WHERE listing__bookers > 1.00

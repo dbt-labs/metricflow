@@ -7,6 +7,7 @@ sql_engine: Trino
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['listing__country_latest']
 -- Order By ['listing__country_latest'] Limit 100
+-- Write to DataTable
 SELECT
   listing__country_latest
 FROM (
@@ -14,7 +15,7 @@ FROM (
   SELECT
     country AS listing__country_latest
   FROM ***************************.dim_listings_latest listings_latest_src_28000
-) subq_3
+) subq_4
 WHERE listing__country_latest = 'us'
 GROUP BY
   listing__country_latest

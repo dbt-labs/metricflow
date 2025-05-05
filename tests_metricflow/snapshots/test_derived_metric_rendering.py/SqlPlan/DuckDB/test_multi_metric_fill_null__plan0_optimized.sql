@@ -3,10 +3,11 @@ test_filename: test_derived_metric_rendering.py
 sql_engine: DuckDB
 ---
 -- Combine Aggregated Outputs
+-- Write to DataTable
 SELECT
-  COALESCE(subq_16.metric_time__day, subq_21.metric_time__day) AS metric_time__day
-  , MAX(subq_16.twice_bookings_fill_nulls_with_0_without_time_spine) AS twice_bookings_fill_nulls_with_0_without_time_spine
-  , MAX(subq_21.listings) AS listings
+  COALESCE(subq_17.metric_time__day, subq_22.metric_time__day) AS metric_time__day
+  , MAX(subq_17.twice_bookings_fill_nulls_with_0_without_time_spine) AS twice_bookings_fill_nulls_with_0_without_time_spine
+  , MAX(subq_22.listings) AS listings
 FROM (
   -- Compute Metrics via Expressions
   SELECT
@@ -30,12 +31,12 @@ FROM (
           DATE_TRUNC('day', ds) AS metric_time__day
           , 1 AS bookings
         FROM ***************************.fct_bookings bookings_source_src_28000
-      ) subq_13
+      ) subq_14
       GROUP BY
         metric_time__day
-    ) subq_14
-  ) subq_15
-) subq_16
+    ) subq_15
+  ) subq_16
+) subq_17
 FULL OUTER JOIN (
   -- Aggregate Measures
   -- Compute Metrics via Expressions
@@ -50,11 +51,11 @@ FULL OUTER JOIN (
       DATE_TRUNC('day', created_at) AS metric_time__day
       , 1 AS listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_19
+  ) subq_20
   GROUP BY
     metric_time__day
-) subq_21
+) subq_22
 ON
-  subq_16.metric_time__day = subq_21.metric_time__day
+  subq_17.metric_time__day = subq_22.metric_time__day
 GROUP BY
-  COALESCE(subq_16.metric_time__day, subq_21.metric_time__day)
+  COALESCE(subq_17.metric_time__day, subq_22.metric_time__day)
