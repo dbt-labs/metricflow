@@ -10,7 +10,7 @@ from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 from metricflow.dataflow.nodes.join_to_base import ValidityWindowJoinDescription
-from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
+from metricflow.plan_conversion.instance_set_transforms.instance_converters import CreateValidityWindowJoinDescription
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 
 

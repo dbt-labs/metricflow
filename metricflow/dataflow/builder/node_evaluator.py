@@ -43,7 +43,7 @@ from metricflow.dataflow.nodes.join_to_base import JoinDescription, ValidityWind
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.dataset.sql_dataset import SqlDataSet
-from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
+from metricflow.plan_conversion.instance_set_transforms.instance_converters import CreateValidityWindowJoinDescription
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
 
 logger = logging.getLogger(__name__)

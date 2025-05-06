@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Iterable, Tuple
+from functools import cached_property
+from typing import Iterable
 
 from metricflow_semantics.collection_helpers.merger import Mergeable
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
@@ -38,6 +39,14 @@ class SelectColumnSet(Mergeable):
         group_by_metric_columns: Iterable[SqlSelectColumn] = (),
         metadata_columns: Iterable[SqlSelectColumn] = (),
     ) -> SelectColumnSet:
+        metric_columns = tuple(metric_columns)
+        measure_columns = tuple(measure_columns)
+        dimension_columns = tuple(dimension_columns)
+        time_dimension_columns = tuple(time_dimension_columns)
+        entity_columns = tuple(entity_columns)
+        group_by_metric_columns = tuple(group_by_metric_columns)
+        metadata_columns = tuple(metadata_columns)
+
         return SelectColumnSet(
             metric_columns=tuple(metric_columns),
             measure_columns=tuple(measure_columns),
@@ -46,6 +55,19 @@ class SelectColumnSet(Mergeable):
             entity_columns=tuple(entity_columns),
             group_by_metric_columns=tuple(group_by_metric_columns),
             metadata_columns=tuple(metadata_columns),
+        )
+
+    @cached_property
+    def columns_in_default_order(self) -> AnyLengthTuple[SqlSelectColumn]:  # noqa: D102
+        return (
+            # This order was chosen to match the column sequence data consumers typically prefer.
+            self.time_dimension_columns
+            + self.entity_columns
+            + self.dimension_columns
+            + self.group_by_metric_columns
+            + self.metric_columns
+            + self.measure_columns
+            + self.metadata_columns
         )
 
     @override
@@ -65,27 +87,3 @@ class SelectColumnSet(Mergeable):
     @override
     def empty_instance(cls) -> SelectColumnSet:
         return SelectColumnSet.create()
-
-    def as_tuple(self) -> Tuple[SqlSelectColumn, ...]:
-        """Return all select columns as a tuple."""
-        return tuple(
-            # This order was chosen to match the column sequence data consumers typically prefer.
-            self.time_dimension_columns
-            + self.entity_columns
-            + self.dimension_columns
-            + self.group_by_metric_columns
-            + self.metric_columns
-            + self.measure_columns
-            + self.metadata_columns
-        )
-
-    def without_measure_columns(self) -> SelectColumnSet:
-        """Returns this but with the measure columns removed."""
-        return SelectColumnSet.create(
-            metric_columns=self.metric_columns,
-            dimension_columns=self.dimension_columns,
-            time_dimension_columns=self.time_dimension_columns,
-            entity_columns=self.entity_columns,
-            group_by_metric_columns=self.group_by_metric_columns,
-            metadata_columns=self.metadata_columns,
-        )

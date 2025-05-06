@@ -45,7 +45,7 @@ docstring:
         <SqlSelectStatementNode>
             <!-- description = 'Aggregate Measures' -->
             <!-- node_id = NodeId(id_str='ss_2') -->
-            <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_3), column_alias='is_instant') -->
+            <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_2), column_alias='is_instant') -->
             <!-- col1 =                                                                    -->
             <!--   SqlSelectColumn(                                                        -->
             <!--     expr=SqlAggregateFunctionExpression(node_id=fnc_0, sql_function=SUM), -->
@@ -454,7 +454,7 @@ docstring:
         <SqlSelectStatementNode>
             <!-- description = 'Aggregate Measures' -->
             <!-- node_id = NodeId(id_str='ss_5') -->
-            <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_9), column_alias='is_instant') -->
+            <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_8), column_alias='is_instant') -->
             <!-- col1 =                                                                    -->
             <!--   SqlSelectColumn(                                                        -->
             <!--     expr=SqlAggregateFunctionExpression(node_id=fnc_1, sql_function=SUM), -->
@@ -472,10 +472,10 @@ docstring:
             <SqlSelectStatementNode>
                 <!-- description = "Pass Only Elements: ['instant_bookings', 'bookers', 'is_instant']" -->
                 <!-- node_id = NodeId(id_str='ss_4') -->
-                <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_6), column_alias='is_instant') -->
+                <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_7), column_alias='is_instant') -->
                 <!-- col1 =                                                                                              -->
-                <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_4), column_alias='instant_bookings') -->
-                <!-- col2 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_5), column_alias='bookers') -->
+                <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_5), column_alias='instant_bookings') -->
+                <!-- col2 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_6), column_alias='bookers') -->
                 <!-- from_source = SqlSelectStatementNode(node_id=ss_3) -->
                 <!-- where = None -->
                 <!-- distinct = False -->

@@ -8,6 +8,7 @@ from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
 
 from metricflow.dataflow.dataflow_plan import (
@@ -69,6 +70,7 @@ class DataflowToSqlPlanConverter:
         dataflow_plan_node: DataflowPlanNode,
         optimization_level: SqlOptimizationLevel = SqlOptimizationLevel.default_level(),
         sql_query_plan_id: Optional[DagId] = None,
+        spec_output_order: Sequence[InstanceSpec] = (),
     ) -> ConvertToSqlPlanResult:
         """Create an SQL query plan that represents the computation up to the given dataflow plan node."""
         # In case there are bugs that raise exceptions at higher optimization levels, retry generation at a lower
@@ -117,6 +119,7 @@ class DataflowToSqlPlanConverter:
                     sql_query_plan_id=sql_query_plan_id,
                     nodes_to_convert_to_cte=nodes_to_convert_to_cte,
                     optimizers=option_set.optimizers,
+                    spec_output_order=spec_output_order,
                 )
 
                 if retried_at_lower_optimization_level:
@@ -157,6 +160,7 @@ class DataflowToSqlPlanConverter:
         sql_query_plan_id: Optional[DagId],
         nodes_to_convert_to_cte: FrozenSet[DataflowPlanNode],
         optimizers: Sequence[SqlPlanOptimizer],
+        spec_output_order: Sequence[InstanceSpec],
     ) -> ConvertToSqlPlanResult:
         """Helper method to convert using specific options. Main use case are tests."""
         logger.debug(
@@ -170,6 +174,7 @@ class DataflowToSqlPlanConverter:
             to_sql_subquery_visitor = DataflowNodeToSqlSubqueryVisitor(
                 column_association_resolver=self.column_association_resolver,
                 semantic_manifest_lookup=self._semantic_manifest_lookup,
+                spec_output_order=spec_output_order,
             )
             data_set = to_sql_subquery_visitor.get_output_data_set(dataflow_plan_node)
         else:
@@ -177,6 +182,7 @@ class DataflowToSqlPlanConverter:
                 column_association_resolver=self.column_association_resolver,
                 semantic_manifest_lookup=self._semantic_manifest_lookup,
                 nodes_to_convert_to_cte=nodes_to_convert_to_cte,
+                spec_output_order=spec_output_order,
             )
             data_set = dataflow_plan_node.accept(to_sql_cte_visitor)
             select_statement = data_set.checked_sql_select_node
