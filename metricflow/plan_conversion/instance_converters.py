@@ -99,7 +99,7 @@ class CreateSelectColumnsForInstances(InstanceSetTransform[SelectColumnSet]):
         group_by_metric_cols = list(
             chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.group_by_metric_instances])
         )
-        return SelectColumnSet(
+        return SelectColumnSet.create(
             metric_columns=metric_cols,
             measure_columns=measure_cols,
             dimension_columns=dimension_cols,
@@ -255,7 +255,7 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
         group_by_metric_cols = list(
             chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.group_by_metric_instances])
         )
-        return SelectColumnSet(
+        return SelectColumnSet.create(
             metric_columns=metric_cols,
             measure_columns=measure_cols,
             dimension_columns=dimension_cols,
@@ -805,7 +805,7 @@ class CreateSelectColumnForCombineOutputNode(InstanceSetTransform[SelectColumnSe
         return select_columns
 
     def transform(self, instance_set: InstanceSet) -> SelectColumnSet:  # noqa: D102
-        return SelectColumnSet(
+        return SelectColumnSet.create(
             metric_columns=self._create_select_columns_for_metrics(instance_set.metric_instances),
             measure_columns=self._create_select_columns_for_measures(instance_set.measure_instances),
         )
@@ -950,7 +950,7 @@ def create_simple_select_columns_for_instance_sets(
 
     Used in cases where you join multiple tables and need to render select columns to access all of those.
     """
-    column_set = SelectColumnSet()
+    column_set = SelectColumnSet.create()
     for table_alias, instance_set in table_alias_to_instance_set.items():
         column_set = column_set.merge(
             instance_set.transform(

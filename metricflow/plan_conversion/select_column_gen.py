@@ -1,8 +1,12 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, field
-from typing import List, Tuple
+from dataclasses import dataclass
+from typing import Iterable, Tuple
+
+from metricflow_semantics.collection_helpers.merger import Mergeable
+from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
+from typing_extensions import override
 
 from metricflow.sql.sql_plan import SqlSelectColumn
 
@@ -10,20 +14,44 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
-class SelectColumnSet:
-    """A set of SQL select columns that represent the different instance types in a data set."""
+class SelectColumnSet(Mergeable):
+    """A set of SQL select columns that represent the different instance types in a data set.
 
-    metric_columns: List[SqlSelectColumn] = field(default_factory=list)
-    measure_columns: List[SqlSelectColumn] = field(default_factory=list)
-    dimension_columns: List[SqlSelectColumn] = field(default_factory=list)
-    time_dimension_columns: List[SqlSelectColumn] = field(default_factory=list)
-    entity_columns: List[SqlSelectColumn] = field(default_factory=list)
-    group_by_metric_columns: List[SqlSelectColumn] = field(default_factory=list)
-    metadata_columns: List[SqlSelectColumn] = field(default_factory=list)
+    TODO: Evaluate using a single field instead of one for every instance type.
+    """
 
+    metric_columns: AnyLengthTuple[SqlSelectColumn]
+    measure_columns: AnyLengthTuple[SqlSelectColumn]
+    dimension_columns: AnyLengthTuple[SqlSelectColumn]
+    time_dimension_columns: AnyLengthTuple[SqlSelectColumn]
+    entity_columns: AnyLengthTuple[SqlSelectColumn]
+    group_by_metric_columns: AnyLengthTuple[SqlSelectColumn]
+    metadata_columns: AnyLengthTuple[SqlSelectColumn]
+
+    @staticmethod
+    def create(  # noqa: D102
+        metric_columns: Iterable[SqlSelectColumn] = (),
+        measure_columns: Iterable[SqlSelectColumn] = (),
+        dimension_columns: Iterable[SqlSelectColumn] = (),
+        time_dimension_columns: Iterable[SqlSelectColumn] = (),
+        entity_columns: Iterable[SqlSelectColumn] = (),
+        group_by_metric_columns: Iterable[SqlSelectColumn] = (),
+        metadata_columns: Iterable[SqlSelectColumn] = (),
+    ) -> SelectColumnSet:
+        return SelectColumnSet(
+            metric_columns=tuple(metric_columns),
+            measure_columns=tuple(measure_columns),
+            dimension_columns=tuple(dimension_columns),
+            time_dimension_columns=tuple(time_dimension_columns),
+            entity_columns=tuple(entity_columns),
+            group_by_metric_columns=tuple(group_by_metric_columns),
+            metadata_columns=tuple(metadata_columns),
+        )
+
+    @override
     def merge(self, other_set: SelectColumnSet) -> SelectColumnSet:
         """Combine the select columns by type."""
-        return SelectColumnSet(
+        return SelectColumnSet.create(
             metric_columns=self.metric_columns + other_set.metric_columns,
             measure_columns=self.measure_columns + other_set.measure_columns,
             dimension_columns=self.dimension_columns + other_set.dimension_columns,
@@ -32,6 +60,11 @@ class SelectColumnSet:
             group_by_metric_columns=self.group_by_metric_columns + other_set.group_by_metric_columns,
             metadata_columns=self.metadata_columns + other_set.metadata_columns,
         )
+
+    @classmethod
+    @override
+    def empty_instance(cls) -> SelectColumnSet:
+        return SelectColumnSet.create()
 
     def as_tuple(self) -> Tuple[SqlSelectColumn, ...]:
         """Return all select columns as a tuple."""
@@ -48,7 +81,7 @@ class SelectColumnSet:
 
     def without_measure_columns(self) -> SelectColumnSet:
         """Returns this but with the measure columns removed."""
-        return SelectColumnSet(
+        return SelectColumnSet.create(
             metric_columns=self.metric_columns,
             dimension_columns=self.dimension_columns,
             time_dimension_columns=self.time_dimension_columns,
