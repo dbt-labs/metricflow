@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Add `MetricQuerySpec.spec_output_order`
+time: 2025-05-05T15:53:29.594429-07:00
+custom:
+  Author: plypaul
+  Issue: "1745"
