@@ -238,7 +238,7 @@ class ExecutorProcessMainFunction:
     def _run_mf_cli_command(
         self,
         parameter_set: CommandParameterSet,
-        click_command: click.BaseCommand,
+        click_command: click.Command,
     ) -> IsolatedCliCommandResult:
         """Runs a MF CLI command."""
         click_result = self._mf_cli_runner.invoke(
