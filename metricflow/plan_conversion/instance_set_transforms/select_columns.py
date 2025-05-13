@@ -13,6 +13,7 @@ from metricflow_semantics.instances import InstanceSet, InstanceSetTransform, Md
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.instance_spec import InstanceSpec
+from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression
 from typing_extensions import override
 
@@ -133,7 +134,12 @@ class CreateSelectColumnsForInstances(InstanceSetTransform[CreateSelectColumnsRe
             columns = self._make_sql_column_expression(metric_instance)
             for column in columns:
                 metric_cols.append(column)
-                spec_to_associated_columns[metric_instance.spec] = columns
+                metric_spec = metric_instance.spec
+                # The metric spec used in the dataflow plan contains additional attributes that are different from
+                # the metric spec provided in the query spec (e.g. includes filters), so the mapping should use the
+                # simplified form.
+                simplified_metric_spec = MetricSpec(element_name=metric_spec.element_name, alias=metric_spec.alias)
+                spec_to_associated_columns[simplified_metric_spec] = columns
 
         measure_cols = []
         for measure_instance in instance_set.measure_instances:

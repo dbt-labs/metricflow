@@ -546,11 +546,12 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             sql_client=self._sql_client,
             sql_optimization_level=mf_query_request.sql_optimization_level,
         )
+
         convert_to_execution_plan_result = _to_execution_plan_converter.convert_to_execution_plan(
             dataflow_plan=dataflow_plan,
             spec_output_order=query_spec.spec_output_order
-            if mf_query_request.order_output_columns_by_input_order
-            else (),
+            # Need to check on how the min/max case should be handled.
+            if mf_query_request.order_output_columns_by_input_order and not query_spec.min_max_only else (),
         )
         return MetricFlowExplainResult(
             query_spec=query_spec,
