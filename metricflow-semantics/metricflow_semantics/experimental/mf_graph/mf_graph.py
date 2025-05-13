@@ -9,27 +9,28 @@ from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 
 from tests_metricflow_semantics.experimental.mf_graph.formatting.svg_formatter import SvgFormatter
-from typing_extensions import Self
 
-from metricflow_semantics.experimental.ordered_set import OrderedSet
 from metricflow_semantics.experimental.mf_graph.comparable import Comparable
-from metricflow_semantics.experimental.mf_graph.displayable_graph_element import DisplayableGraphElement
+from metricflow_semantics.experimental.mf_graph.displayable_graph_element import (
+    MetricflowGraphElement,
+    MetricflowGraphProperty,
+)
 from metricflow_semantics.experimental.mf_graph.formatting.dot_formatter import DotNotationFormatter
+from metricflow_semantics.experimental.ordered_set import OrderedSet
 
 logger = logging.getLogger(__name__)
 
 
-class MetricflowGraphNode(DisplayableGraphElement, Comparable, ABC):
+class MetricflowGraphNode(MetricflowGraphElement, Comparable, ABC):
     """Base class for nodes in a graph."""
 
     pass
 
 
 NodeT = TypeVar("NodeT", bound=MetricflowGraphNode)
-EdgeT = TypeVar("EdgeT", bound="MetricflowGraphEdge")
 
 
-class MetricflowGraphEdge(DisplayableGraphElement, Comparable, Generic[NodeT], ABC):
+class MetricflowGraphEdge(MetricflowGraphElement, Comparable, Generic[NodeT], ABC):
     """Base class for edges in a graph.
 
     An edge can be visualized as an arrow that points from the tail node to the head node.
@@ -52,10 +53,10 @@ class MetricflowGraphEdge(DisplayableGraphElement, Comparable, Generic[NodeT], A
         raise NotImplementedError()
 
 
-GraphT = TypeVar("GraphT", bound="MetricflowGraph")
+EdgeT = TypeVar("EdgeT", bound=MetricflowGraphEdge)
 
 
-class MetricflowGraph(DisplayableGraphElement, Generic[NodeT, EdgeT], ABC):
+class MetricflowGraph(MetricflowGraphElement, Generic[NodeT, EdgeT], ABC):
     """Base class for a graph."""
 
     @abstractmethod
@@ -64,14 +65,16 @@ class MetricflowGraph(DisplayableGraphElement, Generic[NodeT, EdgeT], ABC):
         raise NotImplementedError()
 
     @abstractmethod
+    def nodes_with_property(self, graph_property: MetricflowGraphProperty) -> OrderedSet[NodeT]:
+        raise NotImplementedError()
+
+    @abstractmethod
     def edges(self) -> OrderedSet[EdgeT]:
         """Return the set of edges in a graph."""
         raise NotImplementedError()
 
     @abstractmethod
-    @property
-    def inverse(self) -> Self:
-        """Return the inverse graph (i.e. edges reversed)."""
+    def edges_with_tail_node(self, tail_node: NodeT) -> OrderedSet[EdgeT]:
         raise NotImplementedError()
 
     def format_svg(self) -> str:

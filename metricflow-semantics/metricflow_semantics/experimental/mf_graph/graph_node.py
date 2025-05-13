@@ -14,7 +14,7 @@ import jinja2
 from metricflow_semantics.dag.id_prefix import IdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
-from metricflow_semantics.experimental.mf_graph.displayable_graph_element import DisplayableGraphElement
+from metricflow_semantics.experimental.mf_graph.displayable_graph_element import MetricflowGraphElement
 from metricflow_semantics.experimental.mf_graph.graph_element_id import GraphElementId
 
 logger = logging.getLogger(__name__)
@@ -23,7 +23,7 @@ DisplayableGraphNodeT = TypeVar("DisplayableGraphNodeT", bound="DisplayableGraph
 
 
 @dataclass(frozen=True)
-class DisplayableGraphNode(DisplayableGraphElement, Generic[DisplayableGraphNodeT], ABC):
+class DisplayableGraphNode(MetricflowGraphElement, Generic[DisplayableGraphNodeT], ABC):
     """A node in a graph that can be displayed."""
 
     @property

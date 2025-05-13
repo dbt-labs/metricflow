@@ -2,8 +2,14 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
+from metricflow_semantics.experimental.ordered_set import OrderedSet
 
-class DisplayableGraphElement(ABC):
+
+class MetricflowGraphProperty(ABC):
+    pass
+
+
+class MetricflowGraphElement(ABC):
     """An element in a graph (e.g. node) that can be displayed."""
 
     @property
@@ -16,4 +22,9 @@ class DisplayableGraphElement(ABC):
     @abstractmethod
     def graphviz_label(self) -> str:
         """The label to use when rendering this element using `graphviz`."""
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def properties(self) -> OrderedSet[MetricflowGraphProperty]:
         raise NotImplementedError

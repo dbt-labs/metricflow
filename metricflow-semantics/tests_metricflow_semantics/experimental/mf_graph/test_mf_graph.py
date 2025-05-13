@@ -7,7 +7,6 @@ from typing import Optional
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.mf_graph.comparable import ComparisonKey
 from metricflow_semantics.experimental.mf_graph.mf_graph import (
@@ -15,6 +14,7 @@ from metricflow_semantics.experimental.mf_graph.mf_graph import (
     MetricflowGraphEdge,
     MetricflowGraphNode,
 )
+from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.experimental.singleton import Singleton
 from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
 from metricflow_semantics.mf_logging.pretty_formatter import PrettyFormatContext
@@ -84,11 +84,6 @@ class FlowEdge(MetricflowGraphEdge, Singleton):  # noqa: D101
     @override
     def head_node(self) -> FlowNode:
         return self._head_node
-
-    @cached_property
-    @override
-    def inverse(self) -> FlowEdge:
-        return FlowEdge.get_instance(edge_name=self.edge_name, tail_node=self._head_node, head_node=self._tail_node)
 
     @property
     @override

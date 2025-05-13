@@ -24,9 +24,12 @@ class OrderedSet(MetricFlowPrettyFormattable, Generic[T], Set[T], ABC):
     sorting.
     """
 
-    def __init__(self, item_mapping: Mapping[T, None]) -> None:
+    def __init__(self, item_mapping: Optional[Mapping[T, None]] = None) -> None:
         """Initializer."""
-        self._set_as_dict = dict(item_mapping)
+        if item_mapping is None:
+            self._set_as_dict = {}
+        else:
+            self._set_as_dict = dict(item_mapping)
 
     @classmethod
     def create_from_args(cls: type[OrderedSetT], *args: T) -> OrderedSetT:
