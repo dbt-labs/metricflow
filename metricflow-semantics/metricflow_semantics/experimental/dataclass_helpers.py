@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 if sys.version_info >= (3, 10):
 
     @dataclass_transform(kw_only_default=True, order_default=True, frozen_default=True)
-    def fast_frozen_dataclass() -> Callable[[Type[_T]], Type[_T]]:
+    def fast_frozen_dataclass(order: bool = True) -> Callable[[Type[_T]], Type[_T]]:
         """Decorator for creating an immutable dataclass that is faster than `@dataclass(frozen=True)`.
 
         * Calling `hash()` on a frozen dataclass always computes the hash from the fields.
@@ -33,7 +33,7 @@ if sys.version_info >= (3, 10):
         def _make_dataclass_function(inner_cls: Type[_T]) -> Type[_T]:
             # noinspection PyArgumentList
             cls_to_return = dataclass(  # type: ignore[call-overload]
-                inner_cls, kw_only=True, order=True, unsafe_hash=True
+                inner_cls, kw_only=True, order=order, unsafe_hash=True
             )
             cls_to_return.__mf_previous_hash_method = cls_to_return.__hash__
 
@@ -57,12 +57,12 @@ if sys.version_info >= (3, 10):
 else:
 
     @dataclass_transform(order_default=True, frozen_default=True)
-    def fast_frozen_dataclass() -> Callable[[Type[_T]], Type[_T]]:
+    def fast_frozen_dataclass(order: bool = True) -> Callable[[Type[_T]], Type[_T]]:
         """Similar to above but without `kw_args` as it was added in Python 3.10."""
 
         def _make_dataclass_function(inner_cls: Type[_T]) -> Type[_T]:
             # noinspection PyArgumentList
-            cls_to_return = dataclass(inner_cls, order=True, unsafe_hash=True)  # type: ignore[call-overload]
+            cls_to_return = dataclass(inner_cls, order=order, unsafe_hash=True)  # type: ignore[call-overload]
             cls_to_return.__mf_previous_hash_method = cls_to_return.__hash__
 
             def _new_hash_method(self) -> int:  # type: ignore[no-untyped-def]
