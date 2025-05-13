@@ -1,0 +1,24 @@
+---
+metric:
+  name: bookings
+  description: bookings metric
+  type: simple
+  type_params:
+    measure: bookings
+---
+metric:
+  name: listings
+  description: listings metric
+  type: simple
+  type_params:
+    measure: listings
+---
+metric:
+  name: bookings_per_listing
+  description: Bookings divided by listings - ratio with primary identifier test
+  type: ratio
+  type_params:
+    numerator:
+      name: bookings
+    denominator:
+      name: listings
