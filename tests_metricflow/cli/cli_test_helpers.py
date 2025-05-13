@@ -46,7 +46,7 @@ def run_and_check_cli_command(
         ).evaluated_value
 
     # Replace incomparable values in snapshots with `***`.
-    snapshot_str = result.stdout
+    snapshot_str = result.output
     for prefix in (
         CLIString.LOG_FILE_PREFIX,
         CLIString.ARTIFACT_PATH,

@@ -54,7 +54,7 @@ def test_isolated_query(
             request=request,
             mf_test_configuration=mf_test_configuration,
             snapshot_id="result",
-            snapshot_str=result.stdout,
+            snapshot_str=result.output,
             expectation_description="A table showing the `transactions` metric.",
         )
 
@@ -86,7 +86,7 @@ def test_multiple_queries(
                 ],
             )
             result.raise_exception_on_failure()
-            result_dict["transactions_query"] = result.stdout
+            result_dict["transactions_query"] = result.output
             result = cli_runner.run_command(
                 command_enum=command_enum,
                 command_args=[
@@ -95,7 +95,7 @@ def test_multiple_queries(
                 ],
             )
             result.raise_exception_on_failure()
-            result_dict["quick_buy_transactions_query"] = result.stdout
+            result_dict["quick_buy_transactions_query"] = result.output
 
         assert_str_snapshot_equal(
             request=request,
@@ -153,6 +153,6 @@ def test_environment_variables(
             request=request,
             mf_test_configuration=mf_test_configuration,
             snapshot_id="result",
-            snapshot_str=result.stdout,
+            snapshot_str=result.output,
             expectation_description="A table showing the `transactions` metric.",
         )
