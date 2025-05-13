@@ -56,7 +56,7 @@ runs:
         files_hash: "${{
           hashFiles(
             'pyproject.toml'
-            , '**/extra-hatch-configuration/*'
+            , '**/requirements-files/*'
             , '.pre-commit-config.yaml'
             , 'hatch-environment-cache-config.json'
           )
