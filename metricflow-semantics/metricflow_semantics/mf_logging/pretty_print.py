@@ -70,7 +70,7 @@ class PrettyFormatDictOption(PrettyFormatOption):
 def mf_pformat_dict(  # type: ignore
     description: Optional[str] = None,
     obj_dict: Optional[Mapping[str, Any]] = None,
-    format_option: PrettyFormatDictOption = PrettyFormatDictOption(),
+    format_option: PrettyFormatDictOption = PrettyFormatDictOption(preserve_raw_strings=True),
 ) -> str:
     """Prints many objects in an indented form."""
     description_lines: List[str] = [description] if description is not None else []
