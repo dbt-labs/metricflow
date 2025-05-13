@@ -44,7 +44,7 @@ class IsolatedCliCommandResult:
     """
 
     exit_code: int
-    stdout: str
+    output: str
     # Pass as the formatted version as it's unclear if there would be problems pickling some exception types.
     formatted_exception: Optional[str]
     executor_process_log_path: Path
@@ -55,7 +55,7 @@ class IsolatedCliCommandResult:
             LazyFormat(
                 "Isolated CLI command failed",
                 exit_code=self.exit_code,
-                stdout=self.stdout,
+                output=self.output,
                 formatted_exception=self.formatted_exception,
                 executor_process_log_path=str(self.executor_process_log_path),
             )
