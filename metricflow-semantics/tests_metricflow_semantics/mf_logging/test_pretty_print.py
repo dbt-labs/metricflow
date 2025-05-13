@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import textwrap
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Optional
 
 from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimension
@@ -209,3 +210,11 @@ def test_format_object_by_parts() -> None:  # noqa: D103
     assert "_ExampleDataclass(field_0=1)" == formatter.pretty_format_object_by_parts(
         class_name="_ExampleDataclass", field_mapping={"field_0": 1}
     )
+
+
+def test_path() -> None:
+    """Test formatting of `Path` objects.
+
+    It should be represented as `/a/b/c` instead of  `PosixPath("/a/b/c")`.
+    """
+    assert mf_pformat(Path("/a/b/c")) == "/a/b/c"
