@@ -252,7 +252,7 @@ class ExecutorProcessMainFunction:
         )
         return IsolatedCliCommandResult(
             exit_code=click_result.exit_code,
-            stdout=click_result.stdout,
+            stdout=click_result.output,
             formatted_exception=formatted_exception,
             executor_process_log_path=self._starting_parameter_set.log_file_path,
         )
