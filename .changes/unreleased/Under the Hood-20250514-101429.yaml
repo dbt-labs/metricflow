@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Add handling of `Path` objects in `mf_pformat()`
+time: 2025-05-14T10:14:29.168893-07:00
+custom:
+  Author: plypaul
+  Issue: "1752"
