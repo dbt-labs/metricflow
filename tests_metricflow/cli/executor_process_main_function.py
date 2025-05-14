@@ -101,7 +101,7 @@ class ExecutorProcessMainFunction:
             output_queue.put(
                 IsolatedCliCommandResult(
                     exit_code=1,
-                    stdout=log_file_contents,
+                    output=log_file_contents,
                     formatted_exception=formatted_exception,
                     executor_process_log_path=self._starting_parameter_set.log_file_path,
                 )
@@ -109,7 +109,7 @@ class ExecutorProcessMainFunction:
 
     @contextmanager
     def _redirect_output_to_file(self, log_file_path: Path) -> Iterator[TextIO]:
-        """Provides a context manager the redirects stdout, stderr, and logging output to the given file.
+        """Provides a context manager the redirects output, stderr, and logging output to the given file.
 
         Useful for debugging as without the log file, the output is invisible. This method is not thread safe due to
         mutation of global state (i.e. logging configuration, `redirect_*`).
@@ -128,7 +128,7 @@ class ExecutorProcessMainFunction:
             try:
                 root_logger.addHandler(logging_handler)
                 if self._output_logging_check_lines:
-                    print("Capturing `stdout` into this file.")
+                    print("Capturing `output` into this file.")
                     print("Capturing `stderr` into this file.", file=sys.stderr)
                     logger.log(
                         level=self._log_level,
@@ -183,7 +183,7 @@ class ExecutorProcessMainFunction:
             )
             return IsolatedCliCommandResult(
                 exit_code=0 if dbt_build_result.success else 1,
-                stdout="",
+                output="",
                 formatted_exception=formatted_exception,
                 executor_process_log_path=self._starting_parameter_set.log_file_path,
             )
@@ -252,7 +252,7 @@ class ExecutorProcessMainFunction:
         )
         return IsolatedCliCommandResult(
             exit_code=click_result.exit_code,
-            stdout=click_result.stdout,
+            output=click_result.output,
             formatted_exception=formatted_exception,
             executor_process_log_path=self._starting_parameter_set.log_file_path,
         )

@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Use `output` from the `click` invocation to check test results
+time: 2025-05-13T22:07:50.460496-07:00
+custom:
+  Author: plypaul
+  Issue: "1749"
