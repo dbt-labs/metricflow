@@ -27,7 +27,7 @@ def test_snapshot(
     resolution_dag = resolution_dags[AmbiguousResolutionQueryId(dag_case_id)]
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=resolution_dag,
         plan_snapshot_text=resolution_dag.structure_text(),
     )

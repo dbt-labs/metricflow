@@ -90,7 +90,7 @@ def test_unavailable_group_by_item_in_derived_metric_parent(
 
     assert_object_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         obj_id="result",
         obj=result,
     )
@@ -119,7 +119,7 @@ def test_invalid_group_by_item(  # noqa: D103
 
     assert_object_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         obj_id="result",
         obj=result,
     )
@@ -149,5 +149,5 @@ def test_missing_parent_for_metric(
     result = group_by_item_resolver.resolve_available_items(metric_node)
 
     assert_object_snapshot_equal(
-        request=request, mf_test_configuration=mf_test_configuration, obj_id="result", obj=result
+        request=request, snapshot_configuration=mf_test_configuration, obj_id="result", obj=result
     )

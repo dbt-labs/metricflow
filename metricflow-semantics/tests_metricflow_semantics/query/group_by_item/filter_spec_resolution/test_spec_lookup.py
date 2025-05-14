@@ -47,7 +47,7 @@ def assert_spec_lookup_snapshot_equal(  # noqa: D103
 ) -> None:
     assert_str_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         snapshot_id="result",
         snapshot_str=mf_pformat(spec_lookup, format_option=PrettyFormatDictOption(include_none_object_fields=False)),
     )

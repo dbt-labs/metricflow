@@ -138,7 +138,7 @@ def check_optimization(  # noqa: D103
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -157,7 +157,7 @@ def check_optimization(  # noqa: D103
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=optimized_dataflow_plan,
         plan_snapshot_text=optimized_dataflow_plan.structure_text(),
     )

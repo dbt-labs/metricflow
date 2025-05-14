@@ -58,7 +58,7 @@ def test_simple_plan(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -91,7 +91,7 @@ def test_primary_entity_dimension(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -128,7 +128,7 @@ def test_joined_plan(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -166,7 +166,7 @@ def test_order_by_plan(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -195,7 +195,7 @@ def test_limit_rows_plan(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -229,7 +229,7 @@ def test_multiple_metrics_plan(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -263,7 +263,7 @@ def test_single_semantic_model_ratio_metrics_plan(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -297,7 +297,7 @@ def test_multi_semantic_model_ratio_metrics_plan(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -333,7 +333,7 @@ def test_multihop_join_plan(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -363,7 +363,7 @@ def test_where_constrained_plan(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -392,7 +392,7 @@ def test_where_constrained_plan_time_dimension(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -422,7 +422,7 @@ def test_where_constrained_with_common_linkable_plan(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -474,7 +474,7 @@ def test_cumulative_metric_with_window(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -502,7 +502,7 @@ def test_cumulative_metric_no_window_or_grain_with_metric_time(  # noqa: D103
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -530,7 +530,7 @@ def test_cumulative_metric_no_window_or_grain_without_metric_time(  # noqa: D103
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -561,7 +561,7 @@ def test_distinct_values_plan(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -591,7 +591,7 @@ def test_distinct_values_plan_with_join(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -619,7 +619,7 @@ def test_measure_constraint_plan(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -647,7 +647,7 @@ def test_measure_constraint_with_reused_measure_plan(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -678,7 +678,7 @@ def test_common_semantic_model(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -706,7 +706,7 @@ def test_derived_metric_offset_window(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -734,7 +734,7 @@ def test_derived_metric_offset_to_grain(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -760,7 +760,7 @@ def test_derived_metric_offset_with_granularity(  # noqa: D103
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -787,7 +787,7 @@ def test_derived_offset_cumulative_metric(  # noqa: D103
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -813,7 +813,7 @@ def test_join_to_time_spine_with_metric_time(  # noqa: D103
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -839,7 +839,7 @@ def test_join_to_time_spine_derived_metric(  # noqa: D103
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -871,7 +871,7 @@ def test_join_to_time_spine_with_non_metric_time(  # noqa: D103
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -894,7 +894,7 @@ def test_dont_join_to_time_spine_if_no_time_dimension_requested(  # noqa: D103
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -920,7 +920,7 @@ def test_nested_derived_metric_with_outer_offset(  # noqa: D103
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -949,7 +949,7 @@ def test_min_max_only_categorical(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -982,7 +982,7 @@ def test_min_max_only_time(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -1005,7 +1005,7 @@ def test_metric_time_only(  # noqa: D103
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -1028,7 +1028,7 @@ def test_metric_time_quarter(  # noqa: D103
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -1057,7 +1057,7 @@ def test_metric_time_with_other_dimensions(  # noqa: D103
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -1086,7 +1086,7 @@ def test_dimensions_with_time_constraint(  # noqa: D103
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -1119,7 +1119,7 @@ def test_min_max_only_time_year(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -1146,7 +1146,7 @@ def test_min_max_metric_time(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -1173,7 +1173,7 @@ def test_min_max_metric_time_week(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -1206,7 +1206,7 @@ def test_join_to_time_spine_with_filters(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -1237,7 +1237,7 @@ def test_offset_window_metric_filter_and_query_have_different_granularities(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -1268,7 +1268,7 @@ def test_offset_to_grain_metric_filter_and_query_have_different_granularities(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -1295,7 +1295,7 @@ def test_metric_in_query_where_filter(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -1322,7 +1322,7 @@ def test_metric_in_metric_where_filter(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -1374,7 +1374,7 @@ def test_cumulative_metric_with_non_default_grain(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
@@ -1401,7 +1401,7 @@ def test_derived_cumulative_metric_with_non_default_grain(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )

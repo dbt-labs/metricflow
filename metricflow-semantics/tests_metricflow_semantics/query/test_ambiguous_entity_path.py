@@ -32,7 +32,7 @@ def test_resolvable_ambiguous_entity_path(  # noqa: D103
 
     assert_object_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         obj_id="result_0",
         obj=query_spec,
     )
@@ -51,7 +51,7 @@ def test_ambiguous_entity_path_resolves_to_shortest_entity_path_item(
 
     assert_object_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         obj_id="result_0",
         obj=query_spec,
     )
@@ -74,7 +74,7 @@ def test_non_resolvable_ambiguous_entity_path_due_to_multiple_matches(
 
     assert_str_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         snapshot_id="result_0",
         snapshot_str=str(e.value),
     )
@@ -97,7 +97,7 @@ def test_non_resolvable_ambiguous_entity_path_due_to_mismatch(
 
     assert_str_snapshot_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
         snapshot_id="result_0",
         snapshot_str=str(e.value),
     )
