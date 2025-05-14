@@ -34,8 +34,8 @@ allow-direct-references = true
 
 [tool.hatch.metadata.hooks.requirements_txt]
 files = [
-  "extra-hatch-configuration/requirements-cli.txt",
-  "extra-hatch-configuration/requirements-metricflow.txt",
+  "requirements-files/requirements-cli.txt",
+  "requirements-files/requirements-metricflow.txt",
 ]
 
 [project.urls]
@@ -46,25 +46,25 @@ mf = 'dbt_metricflow.cli.main:cli'
 
 [tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
 dbt-bigquery = [
-  "extra-hatch-configuration/requirements-dbt-bigquery.txt"
+  "requirements-files/requirements-dbt-bigquery.txt"
 ]
 dbt-databricks = [
-  "extra-hatch-configuration/requirements-dbt-databricks.txt"
+  "requirements-files/requirements-dbt-databricks.txt"
 ]
 dbt-duckdb = [
-  "extra-hatch-configuration/requirements-dbt-duckdb.txt"
+  "requirements-files/requirements-dbt-duckdb.txt"
 ]
 dbt-postgres = [
-  "extra-hatch-configuration/requirements-dbt-postgres.txt"
+  "requirements-files/requirements-dbt-postgres.txt"
 ]
 dbt-redshift = [
-  "extra-hatch-configuration/requirements-dbt-redshift.txt"
+  "requirements-files/requirements-dbt-redshift.txt"
 ]
 dbt-snowflake = [
-  "extra-hatch-configuration/requirements-dbt-snowflake.txt"
+  "requirements-files/requirements-dbt-snowflake.txt"
 ]
 dbt-trino = [
-  "extra-hatch-configuration/requirements-dbt-trino.txt"
+  "requirements-files/requirements-dbt-trino.txt"
 ]
 
 [tool.hatch.build.targets.sdist]

@@ -1,0 +1,10 @@
+# CLI-related
+halo>=0.0.31, <0.1.0
+update-checker>=0.18.0, <0.19.0
+# Bug with mypy: https://github.com/pallets/click/issues/2558#issuecomment-1656546003
+click>=8.1.6
+dbt-core @ git+https://github.com/dbt-labs/dbt-core@ff6745c79532d50139d553f3b088c5d783b4f2dd#subdirectory=core
+dbt-duckdb>=1.8.0, <1.9.0
+# Excluding 1.2.1 due to window functions returning incorrect results:
+# https://github.com/duckdb/duckdb/issues/16617
+duckdb !=1.2.1

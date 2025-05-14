@@ -57,6 +57,8 @@ jobs:
             }
 
   metricflow-unit-tests:
+    # This step is used to simplify setup for branch protection. Branch protection is configured to check if this step
+    # fails vs. checking all test steps.
     name: MetricFlow Unit Tests
     runs-on: ubuntu-latest
     if: ${{ always() }}

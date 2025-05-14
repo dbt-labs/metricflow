@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Consolidate dev dependencies of `metricflow-semantics` and `metricflow`
+time: 2025-05-14T10:13:31.039838-07:00
+custom:
+  Author: plypaul
+  Issue: "1751"
