@@ -113,7 +113,7 @@ class MetricFlowCliRunner(CliRunner):
         self.project_path = project_path
         super().__init__()
 
-    def run(self, cli: click.BaseCommand, args: Optional[Sequence[str]] = None) -> Result:  # noqa: D102
+    def run(self, cli: click.Command, args: Optional[Sequence[str]] = None) -> Result:  # noqa: D102
         current_dir = os.getcwd()
         os.chdir(self.project_path)
         result = super().invoke(cli, args, obj=self.cli_context)
