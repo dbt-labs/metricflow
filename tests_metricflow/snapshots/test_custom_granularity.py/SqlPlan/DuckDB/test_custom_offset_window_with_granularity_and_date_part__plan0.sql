@@ -210,7 +210,7 @@ FROM (
                       THEN subq_8.ds__alien_day__first_value__lead + INTERVAL (cte_2.ds__day__row_number - 1) day
                     ELSE NULL
                   END AS ds__day__lead
-                FROM cte_2 cte_2
+                FROM cte_2
                 INNER JOIN (
                   -- Offset Custom Granularity Bounds
                   SELECT
@@ -223,7 +223,7 @@ FROM (
                       cte_2.ds__alien_day
                       , cte_2.ds__alien_day__first_value
                       , cte_2.ds__alien_day__last_value
-                    FROM cte_2 cte_2
+                    FROM cte_2
                     GROUP BY
                       cte_2.ds__alien_day
                       , cte_2.ds__alien_day__first_value
