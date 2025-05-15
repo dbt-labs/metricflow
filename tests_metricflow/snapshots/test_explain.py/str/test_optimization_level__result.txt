@@ -87,7 +87,7 @@ O5:
       FROM ***************************.fct_bookings bookings_source_src_10000
     ) subq_1
     LEFT OUTER JOIN
-      sma_10014_cte sma_10014_cte
+      sma_10014_cte
     ON
       subq_1.listing = sma_10014_cte.listing
     GROUP BY
@@ -107,7 +107,7 @@ O5:
       FROM ***************************.fct_views views_source_src_10000
     ) subq_10
     LEFT OUTER JOIN
-      sma_10014_cte sma_10014_cte
+      sma_10014_cte
     ON
       subq_10.listing = sma_10014_cte.listing
     GROUP BY

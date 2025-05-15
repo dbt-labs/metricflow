@@ -30,7 +30,7 @@ test_filename: test_dataflow_to_execution.py
         <!--    '  SELECT\n'                                                                  -->
         <!--    '    is_instant\n'                                                            -->
         <!--    '    , SUM(bookings) AS bookings\n'                                           -->
-        <!--    '  FROM sma_28009_cte sma_28009_cte\n'                                        -->
+        <!--    '  FROM sma_28009_cte\n'                                                      -->
         <!--    '  GROUP BY\n'                                                                -->
         <!--    '    is_instant\n'                                                            -->
         <!--    ') subq_4\n'                                                                  -->
@@ -42,7 +42,7 @@ test_filename: test_dataflow_to_execution.py
         <!--    '  SELECT\n'                                                                  -->
         <!--    '    is_instant\n'                                                            -->
         <!--    '    , SUM(booking_value) AS booking_value\n'                                 -->
-        <!--    '  FROM sma_28009_cte sma_28009_cte\n'                                        -->
+        <!--    '  FROM sma_28009_cte\n'                                                      -->
         <!--    '  GROUP BY\n'                                                                -->
         <!--    '    is_instant\n'                                                            -->
         <!--    ') subq_8\n'                                                                  -->
