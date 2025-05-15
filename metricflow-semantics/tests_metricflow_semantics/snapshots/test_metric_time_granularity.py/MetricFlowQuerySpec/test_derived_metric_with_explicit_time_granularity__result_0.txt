@@ -4,7 +4,7 @@ docstring:
   Tests that a derived metric with default granularity ignores the default granularities set on its input metrics.
 ---
 MetricFlowQuerySpec(
-  metric_specs=(MetricSpec(element_name='derived_metric_with_time_granularity', filter_spec_set=WhereFilterSpecSet()),),
+  metric_specs=(MetricSpec(element_name='derived_metric_with_time_granularity'),),
   time_dimension_specs=(
     TimeDimensionSpec(
       element_name='metric_time',
@@ -20,9 +20,6 @@ MetricFlowQuerySpec(
       element_name='metric_time',
       time_granularity=ExpandedTimeGranularity(name='year', base_granularity=YEAR),
     ),
-    MetricSpec(
-      element_name='derived_metric_with_time_granularity',
-      filter_spec_set=WhereFilterSpecSet(),
-    ),
+    MetricSpec(element_name='derived_metric_with_time_granularity'),
   ),
 )

@@ -4,7 +4,7 @@ docstring:
   Tests that 'entity_1__country' resolves to 'entity_1__country' not 'entity_1__entity_0__country'.
 ---
 MetricFlowQuerySpec(
-  metric_specs=(MetricSpec(element_name='all_entity_metric', filter_spec_set=WhereFilterSpecSet()),),
+  metric_specs=(MetricSpec(element_name='all_entity_metric'),),
   dimension_specs=(DimensionSpec(element_name='country', entity_links=(EntityReference(element_name='entity_1'),)),),
   filter_intersection=PydanticWhereFilterIntersection(),
   filter_spec_resolution_lookup=FilterSpecResolutionLookUp(),
@@ -12,6 +12,6 @@ MetricFlowQuerySpec(
   apply_group_by=True,
   spec_output_order=(
     DimensionSpec(element_name='country', entity_links=(EntityReference(element_name='entity_1'),)),
-    MetricSpec(element_name='all_entity_metric', filter_spec_set=WhereFilterSpecSet()),
+    MetricSpec(element_name='all_entity_metric'),
   ),
 )

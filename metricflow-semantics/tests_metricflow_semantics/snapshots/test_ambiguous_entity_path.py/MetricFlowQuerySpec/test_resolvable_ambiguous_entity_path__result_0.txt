@@ -2,7 +2,7 @@ test_name: test_resolvable_ambiguous_entity_path
 test_filename: test_ambiguous_entity_path.py
 ---
 MetricFlowQuerySpec(
-  metric_specs=(MetricSpec(element_name='entity_1_metric', filter_spec_set=WhereFilterSpecSet()),),
+  metric_specs=(MetricSpec(element_name='entity_1_metric'),),
   dimension_specs=(
     DimensionSpec(
       element_name='country',
@@ -21,6 +21,6 @@ MetricFlowQuerySpec(
         EntityReference(element_name='entity_0'),
       ),
     ),
-    MetricSpec(element_name='entity_1_metric', filter_spec_set=WhereFilterSpecSet()),
+    MetricSpec(element_name='entity_1_metric'),
   ),
 )
