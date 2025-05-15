@@ -14,13 +14,13 @@ WITH cte_2 AS (
 SELECT
   cte_2.ds__day AS ds__day
   , subq_1.ds__alien_day__lead AS metric_time__alien_day
-FROM cte_2 cte_2
+FROM cte_2
 INNER JOIN (
   -- Offset Custom Granularity
   SELECT
     ds__alien_day
     , LEAD(ds__alien_day, 3) OVER (ORDER BY ds__alien_day) AS ds__alien_day__lead
-  FROM cte_2 cte_2
+  FROM cte_2
   GROUP BY
     ds__alien_day
 ) subq_1

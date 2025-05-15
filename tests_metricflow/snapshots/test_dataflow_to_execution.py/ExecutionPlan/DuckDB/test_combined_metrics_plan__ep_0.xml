@@ -35,7 +35,7 @@ test_filename: test_dataflow_to_execution.py
         <!--    '    ds__day\n'                                                                          -->
         <!--    '    , is_instant\n'                                                                     -->
         <!--    '    , SUM(bookings) AS bookings\n'                                                      -->
-        <!--    '  FROM sma_28009_cte sma_28009_cte\n'                                                   -->
+        <!--    '  FROM sma_28009_cte\n'                                                                 -->
         <!--    '  GROUP BY\n'                                                                           -->
         <!--    '    ds__day\n'                                                                          -->
         <!--    '    , is_instant\n'                                                                     -->
@@ -49,7 +49,7 @@ test_filename: test_dataflow_to_execution.py
         <!--    '    ds__day\n'                                                                          -->
         <!--    '    , is_instant\n'                                                                     -->
         <!--    '    , SUM(instant_bookings) AS instant_bookings\n'                                      -->
-        <!--    '  FROM sma_28009_cte sma_28009_cte\n'                                                   -->
+        <!--    '  FROM sma_28009_cte\n'                                                                 -->
         <!--    '  GROUP BY\n'                                                                           -->
         <!--    '    ds__day\n'                                                                          -->
         <!--    '    , is_instant\n'                                                                     -->
@@ -69,7 +69,7 @@ test_filename: test_dataflow_to_execution.py
         <!--    '    ds__day\n'                                                                          -->
         <!--    '    , is_instant\n'                                                                     -->
         <!--    '    , SUM(booking_value) AS booking_value\n'                                            -->
-        <!--    '  FROM sma_28009_cte sma_28009_cte\n'                                                   -->
+        <!--    '  FROM sma_28009_cte\n'                                                                 -->
         <!--    '  GROUP BY\n'                                                                           -->
         <!--    '    ds__day\n'                                                                          -->
         <!--    '    , is_instant\n'                                                                     -->
