@@ -4,7 +4,6 @@ import collections
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from enum import Enum
 from functools import cached_property
 from typing import FrozenSet, Iterable, Optional, Sequence, Tuple
 
@@ -22,6 +21,7 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from typing_extensions import override
 
 from metricflow_semantics.assert_one_arg import assert_exactly_one_arg_set
+from metricflow_semantics.experimental.orderd_enum import OrderedEnum
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
@@ -30,7 +30,7 @@ from metricflow_semantics.workarounds.reference import sorted_semantic_model_ref
 logger = logging.getLogger(__name__)
 
 
-class LinkableElementType(Enum):
+class LinkableElementType(OrderedEnum):
     """Enumeration of the possible types of linkable element we are encountering or expecting.
 
     LinkableElements effectively map on to LinkableSpecs and queryable semantic manifest elements such

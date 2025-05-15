@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from abc import ABC
+from abc import ABC, abstractmethod
 from collections.abc import Hashable, MutableSet, Set
 from functools import cached_property
 from typing import Generic, Iterable, Iterator, Optional, TypeVar
@@ -67,6 +67,14 @@ class OrderedSet(Generic[T], Set[T], ABC):
     def __str__(self) -> str:
         return "{" + ", ".join(str(item) for item in self) + "}"
 
+    @abstractmethod
+    def as_mutable(self) -> MutableOrderedSet[T]:  # noqa: D102
+        raise NotImplementedError
+
+    @abstractmethod
+    def as_frozen(self) -> FrozenOrderedSet[T]:  # noqa: D102
+        raise NotImplementedError
+
 
 class FrozenOrderedSet(Generic[T], OrderedSet[T], Hashable):
     """A frozen version of `OrderedSet` that can be hashed."""
@@ -78,6 +86,14 @@ class FrozenOrderedSet(Generic[T], OrderedSet[T], Hashable):
     @override
     def __hash__(self) -> int:
         return self._cached_hash_value
+
+    @override
+    def as_mutable(self) -> MutableOrderedSet[T]:
+        return MutableOrderedSet(self)
+
+    @override
+    def as_frozen(self) -> FrozenOrderedSet[T]:
+        return self
 
 
 class MutableOrderedSet(Generic[T], OrderedSet[T], MutableSet[T]):
@@ -95,3 +111,11 @@ class MutableOrderedSet(Generic[T], OrderedSet[T], MutableSet[T]):
     @override
     def discard(self, value: T) -> None:
         self._set_as_dict.pop(value, None)
+
+    @override
+    def as_mutable(self) -> MutableOrderedSet[T]:
+        return self
+
+    @override
+    def as_frozen(self) -> FrozenOrderedSet[T]:
+        return FrozenOrderedSet(self)
