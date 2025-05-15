@@ -5,7 +5,7 @@ docstring:
 ---
 ParseQueryResult(
   query_spec=MetricFlowQuerySpec(
-    metric_specs=(MetricSpec(element_name='revenue_growth_2_weeks', filter_spec_set=WhereFilterSpecSet()),),
+    metric_specs=(MetricSpec(element_name='revenue_growth_2_weeks'),),
     time_dimension_specs=(
       TimeDimensionSpec(
         element_name='metric_time',
@@ -21,10 +21,7 @@ ParseQueryResult(
         element_name='metric_time',
         time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH),
       ),
-      MetricSpec(
-        element_name='revenue_growth_2_weeks',
-        filter_spec_set=WhereFilterSpecSet(),
-      ),
+      MetricSpec(element_name='revenue_growth_2_weeks'),
     ),
   ),
   queried_semantic_models=(SemanticModelReference(semantic_model_name='revenue_source'),),

@@ -6,12 +6,7 @@ docstring:
       Should ignore the default granularities set on its input metrics.
 ---
 MetricFlowQuerySpec(
-  metric_specs=(
-    MetricSpec(
-      element_name='derived_metric_without_time_granularity',
-      filter_spec_set=WhereFilterSpecSet(),
-    ),
-  ),
+  metric_specs=(MetricSpec(element_name='derived_metric_without_time_granularity'),),
   time_dimension_specs=(
     TimeDimensionSpec(
       element_name='metric_time',
@@ -27,9 +22,6 @@ MetricFlowQuerySpec(
       element_name='metric_time',
       time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH),
     ),
-    MetricSpec(
-      element_name='derived_metric_without_time_granularity',
-      filter_spec_set=WhereFilterSpecSet(),
-    ),
+    MetricSpec(element_name='derived_metric_without_time_granularity'),
   ),
 )
