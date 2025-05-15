@@ -8,7 +8,7 @@ test_filename: test_dataflow_plan_builder.py
         <ComputeMetricsNode>
             <!-- description = 'Compute Metrics via Expressions' -->
             <!-- node_id = NodeId(id_str='cm_2') -->
-            <!-- metric_spec = MetricSpec(element_name='bookings_offset_twice', filter_spec_set=WhereFilterSpecSet()) -->
+            <!-- metric_spec = MetricSpec(element_name='bookings_offset_twice') -->
             <JoinToTimeSpineNode>
                 <!-- description = 'Join to Time Spine Dataset' -->
                 <!-- node_id = NodeId(id_str='jts_1') -->
@@ -32,7 +32,6 @@ test_filename: test_dataflow_plan_builder.py
                     <!-- metric_spec =                                                           -->
                     <!--   MetricSpec(                                                           -->
                     <!--     element_name='bookings_offset_once',                                -->
-                    <!--     filter_spec_set=WhereFilterSpecSet(),                               -->
                     <!--     offset_window=PydanticMetricTimeWindow(count=2, granularity='day'), -->
                     <!--   )                                                                     -->
                     <ComputeMetricsNode>
@@ -41,7 +40,6 @@ test_filename: test_dataflow_plan_builder.py
                         <!-- metric_spec =                                                           -->
                         <!--   MetricSpec(                                                           -->
                         <!--     element_name='bookings',                                            -->
-                        <!--     filter_spec_set=WhereFilterSpecSet(),                               -->
                         <!--     offset_window=PydanticMetricTimeWindow(count=5, granularity='day'), -->
                         <!--   )                                                                     -->
                         <AggregateMeasuresNode>

@@ -12,8 +12,8 @@ docstring:
         <ComputeMetricsNode>
             <!-- description = 'Compute Metrics via Expressions' -->
             <!-- node_id = NodeId(id_str='cm_4') -->
-            <!-- metric_spec = MetricSpec(element_name='bookings', filter_spec_set=WhereFilterSpecSet()) -->
-            <!-- metric_spec = MetricSpec(element_name='booking_value', filter_spec_set=WhereFilterSpecSet()) -->
+            <!-- metric_spec = MetricSpec(element_name='bookings') -->
+            <!-- metric_spec = MetricSpec(element_name='booking_value') -->
             <AggregateMeasuresNode>
                 <!-- description = 'Aggregate Measures' -->
                 <!-- node_id = NodeId(id_str='am_2') -->

@@ -5,10 +5,7 @@ docstring:
 ---
 ParseQueryResult(
   query_spec=MetricFlowQuerySpec(
-    metric_specs=(
-      MetricSpec(element_name='bookings', filter_spec_set=WhereFilterSpecSet()),
-      MetricSpec(element_name='revenue', filter_spec_set=WhereFilterSpecSet()),
-    ),
+    metric_specs=(MetricSpec(element_name='bookings'), MetricSpec(element_name='revenue')),
     time_dimension_specs=(
       TimeDimensionSpec(
         element_name='metric_time',

@@ -17,7 +17,7 @@ dataflow_plan:
               <ComputeMetricsNode>
                   <!-- description = 'Compute Metrics via Expressions' -->
                   <!-- node_id = NodeId(id_str='cm_0') -->
-                  <!-- metric_spec = MetricSpec(element_name='bookings', filter_spec_set=WhereFilterSpecSet()) -->
+                  <!-- metric_spec = MetricSpec(element_name='bookings') -->
                   <AggregateMeasuresNode>
                       <!-- description = 'Aggregate Measures' -->
                       <!-- node_id = NodeId(id_str='am_0') -->
@@ -47,14 +47,14 @@ dataflow_plan:
               <ComputeMetricsNode>
                   <!-- description = 'Compute Metrics via Expressions' -->
                   <!-- node_id = NodeId(id_str='cm_2') -->
-                  <!-- metric_spec = MetricSpec(element_name='bookings_per_booker', filter_spec_set=WhereFilterSpecSet()) -->
+                  <!-- metric_spec = MetricSpec(element_name='bookings_per_booker') -->
                   <CombineAggregatedOutputsNode>
                       <!-- description = 'Combine Aggregated Outputs' -->
                       <!-- node_id = NodeId(id_str='cao_0') -->
                       <ComputeMetricsNode>
                           <!-- description = 'Compute Metrics via Expressions' -->
                           <!-- node_id = NodeId(id_str='cm_0') -->
-                          <!-- metric_spec = MetricSpec(element_name='bookings', filter_spec_set=WhereFilterSpecSet()) -->
+                          <!-- metric_spec = MetricSpec(element_name='bookings') -->
                           <AggregateMeasuresNode>
                               <!-- description = 'Aggregate Measures' -->
                               <!-- node_id = NodeId(id_str='am_0') -->
@@ -84,7 +84,7 @@ dataflow_plan:
                       <ComputeMetricsNode>
                           <!-- description = 'Compute Metrics via Expressions' -->
                           <!-- node_id = NodeId(id_str='cm_1') -->
-                          <!-- metric_spec = MetricSpec(element_name='bookers', filter_spec_set=WhereFilterSpecSet()) -->
+                          <!-- metric_spec = MetricSpec(element_name='bookers') -->
                           <AggregateMeasuresNode>
                               <!-- description = 'Aggregate Measures' -->
                               <!-- node_id = NodeId(id_str='am_1') -->
@@ -121,7 +121,7 @@ common_branch_0:
   <ComputeMetricsNode>
       <!-- description = 'Compute Metrics via Expressions' -->
       <!-- node_id = NodeId(id_str='cm_0') -->
-      <!-- metric_spec = MetricSpec(element_name='bookings', filter_spec_set=WhereFilterSpecSet()) -->
+      <!-- metric_spec = MetricSpec(element_name='bookings') -->
       <AggregateMeasuresNode>
           <!-- description = 'Aggregate Measures' -->
           <!-- node_id = NodeId(id_str='am_0') -->

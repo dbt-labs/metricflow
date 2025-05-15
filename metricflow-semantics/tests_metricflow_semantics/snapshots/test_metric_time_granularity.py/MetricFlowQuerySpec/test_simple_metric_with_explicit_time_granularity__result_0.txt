@@ -2,7 +2,7 @@ test_name: test_simple_metric_with_explicit_time_granularity
 test_filename: test_metric_time_granularity.py
 ---
 MetricFlowQuerySpec(
-  metric_specs=(MetricSpec(element_name='largest_listing', filter_spec_set=WhereFilterSpecSet()),),
+  metric_specs=(MetricSpec(element_name='largest_listing'),),
   time_dimension_specs=(
     TimeDimensionSpec(
       element_name='metric_time',
@@ -18,6 +18,6 @@ MetricFlowQuerySpec(
       element_name='metric_time',
       time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH),
     ),
-    MetricSpec(element_name='largest_listing', filter_spec_set=WhereFilterSpecSet()),
+    MetricSpec(element_name='largest_listing'),
   ),
 )

@@ -2,7 +2,7 @@ test_name: test_non_metric_time_ignores_default_granularity
 test_filename: test_metric_time_granularity.py
 ---
 MetricFlowQuerySpec(
-  metric_specs=(MetricSpec(element_name='largest_listing', filter_spec_set=WhereFilterSpecSet()),),
+  metric_specs=(MetricSpec(element_name='largest_listing'),),
   time_dimension_specs=(
     TimeDimensionSpec(
       element_name='ds',
@@ -20,6 +20,6 @@ MetricFlowQuerySpec(
       entity_links=(EntityReference(element_name='listing'),),
       time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY),
     ),
-    MetricSpec(element_name='largest_listing', filter_spec_set=WhereFilterSpecSet()),
+    MetricSpec(element_name='largest_listing'),
   ),
 )
