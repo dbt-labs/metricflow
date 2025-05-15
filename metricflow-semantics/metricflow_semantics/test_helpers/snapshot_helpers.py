@@ -21,6 +21,7 @@ from metricflow_semantics.model.semantics.linkable_element_set import LinkableEl
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
+from metricflow_semantics.test_helpers.terminal_helpers import mf_colored_link_text
 
 logger = logging.getLogger(__name__)
 
@@ -57,25 +58,27 @@ def assert_snapshot_text_equal(
     include_headers: bool = True,
 ) -> None:
     """Similar to assert_plan_snapshot_text_equal(), but with more controls on how the snapshot paths are generated."""
-    logger.debug(LazyFormat(lambda: "Generated snapshot text:\n" + mf_indent(snapshot_text)))
-
-    file_path = (
-        str(
-            snapshot_path_prefix(
-                request=request,
-                snapshot_configuration=snapshot_configuration,
-                snapshot_group=group_id,
-                snapshot_id=snapshot_id,
-                additional_sub_directories=additional_sub_directories_for_snapshots,
-            )
-        )
-        + snapshot_file_extension
-    )
+    file_path = snapshot_path_prefix(
+        request=request,
+        snapshot_configuration=snapshot_configuration,
+        snapshot_group=group_id,
+        snapshot_id=snapshot_id,
+        additional_sub_directories=additional_sub_directories_for_snapshots,
+    ).with_suffix(snapshot_file_extension)
 
     if incomparable_strings_replacement_function is not None:
         snapshot_text = incomparable_strings_replacement_function(snapshot_text)
 
-    logger.debug(LazyFormat("Generated snapshot text", snapshot_text=snapshot_text, file_path=file_path))
+    open_snapshot_uri = file_path.resolve().as_uri()
+    logger.debug(
+        LazyFormat(
+            "Generated snapshot text",
+            snapshot_text=snapshot_text,
+            file_path=file_path,
+            open_link=mf_colored_link_text(open_snapshot_uri),
+            iterm_hint="Link may be opened with <Command> + <Left Click>",
+        )
+    )
 
     # Add a header with context about the snapshot.
     if include_headers:
@@ -124,7 +127,7 @@ def assert_snapshot_text_equal(
 
         if len(request.session.items) > 1:
             raise ValueError("Displaying snapshots is only supported when there's a single item in a testing session.")
-        webbrowser.open("file://" + file_path)
+        webbrowser.open(file_path.resolve().as_uri())
 
     # Read the existing plan from the file and compare with the actual plan
     with open(file_path, "r") as snapshot_text_file:
