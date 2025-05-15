@@ -1,0 +1,25 @@
+test_name: test_graph_snapshot
+test_filename: test_mf_graph.py
+---
+mf_pformat:
+  FlowGraph(
+    nodes={FlowNode(node_name='source'), FlowNode(node_name='a'), FlowNode(node_name='b'), FlowNode(node_name='sink')},
+    edges={
+      FlowEdge(edge_name='source_to_a'),
+      FlowEdge(edge_name='source_to_b'),
+      FlowEdge(edge_name='a_to_sink'),
+      FlowEdge(edge_name='b_to_sink'),
+    },
+  )
+dot_notation:
+  graph {
+    label='example_flow'
+    a
+    b
+    sink
+    source
+    a -> sink [label='a_to_sink']
+    b -> sink [label='b_to_sink']
+    source -> a [label='source_to_a']
+    source -> b [label='source_to_b']
+  }
