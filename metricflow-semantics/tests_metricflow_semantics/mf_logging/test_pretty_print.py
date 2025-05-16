@@ -8,6 +8,7 @@ from typing import Optional
 
 from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimension
 from dbt_semantic_interfaces.type_enums import DimensionType
+from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.helpers.string_helpers import mf_dedent, mf_indent
 from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
 from metricflow_semantics.mf_logging.pretty_formatter import (
@@ -218,3 +219,8 @@ def test_path() -> None:
     It should be represented as `/a/b/c` instead of  `PosixPath("/a/b/c")`.
     """
     assert mf_pformat(Path("/a/b/c")) == "/a/b/c"
+
+
+def test_ordered_set() -> None:  # noqa: D103
+    ordered_set = FrozenOrderedSet.create_from_items(3, 2, 1)
+    assert mf_pformat(ordered_set) == "{3, 2, 1}"
