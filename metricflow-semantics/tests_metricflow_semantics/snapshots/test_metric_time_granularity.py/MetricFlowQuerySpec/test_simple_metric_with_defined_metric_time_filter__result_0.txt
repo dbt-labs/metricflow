@@ -4,12 +4,7 @@ docstring:
   Tests that a simple metric's metric_time filter defined in its YAML uses metric's default granularity.
 ---
 MetricFlowQuerySpec(
-  metric_specs=(
-    MetricSpec(
-      element_name='simple_metric_with_default_time_granularity_and_metric_time_filter',
-      filter_spec_set=WhereFilterSpecSet(),
-    ),
-  ),
+  metric_specs=(MetricSpec(element_name='simple_metric_with_default_time_granularity_and_metric_time_filter'),),
   filter_intersection=PydanticWhereFilterIntersection(),
   filter_spec_resolution_lookup=FilterSpecResolutionLookUp(
     spec_resolutions=(
@@ -95,10 +90,5 @@ MetricFlowQuerySpec(
   ),
   min_max_only=False,
   apply_group_by=True,
-  spec_output_order=(
-    MetricSpec(
-      element_name='simple_metric_with_default_time_granularity_and_metric_time_filter',
-      filter_spec_set=WhereFilterSpecSet(),
-    ),
-  ),
+  spec_output_order=(MetricSpec(element_name='simple_metric_with_default_time_granularity_and_metric_time_filter'),),
 )

@@ -4,7 +4,7 @@ docstring:
   Tests that a metric without default granularity uses the min granualrity for its agg_time_dim.
 ---
 MetricFlowQuerySpec(
-  metric_specs=(MetricSpec(element_name='monthly_metric_0', filter_spec_set=WhereFilterSpecSet()),),
+  metric_specs=(MetricSpec(element_name='monthly_metric_0'),),
   time_dimension_specs=(
     TimeDimensionSpec(
       element_name='metric_time',
@@ -20,6 +20,6 @@ MetricFlowQuerySpec(
       element_name='metric_time',
       time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH),
     ),
-    MetricSpec(element_name='monthly_metric_0', filter_spec_set=WhereFilterSpecSet()),
+    MetricSpec(element_name='monthly_metric_0'),
   ),
 )

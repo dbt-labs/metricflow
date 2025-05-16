@@ -104,8 +104,7 @@ docstring:
                                 <ComputeMetricsNode>
                                     <!-- description = 'Compute Metrics via Expressions' -->
                                     <!-- node_id = NodeId(id_str='cm_0') -->
-                                    <!-- metric_spec =                                                               -->
-                                    <!--   MetricSpec(element_name='bookings', filter_spec_set=WhereFilterSpecSet()) -->
+                                    <!-- metric_spec = MetricSpec(element_name='bookings') -->
                                     <!-- for_group_by_source_node = True -->
                                     <AggregateMeasuresNode>
                                         <!-- description = 'Aggregate Measures' -->
