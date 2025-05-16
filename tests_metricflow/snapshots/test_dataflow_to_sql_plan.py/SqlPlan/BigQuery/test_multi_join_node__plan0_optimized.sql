@@ -32,7 +32,7 @@ LEFT OUTER JOIN (
   SELECT
     listing
     , country_latest
-  FROM pfe_1_cte pfe_1_cte
+  FROM pfe_1_cte
 ) subq_8
 ON
   subq_6.listing = subq_8.listing
@@ -41,7 +41,7 @@ LEFT OUTER JOIN (
   SELECT
     listing
     , country_latest
-  FROM pfe_1_cte pfe_1_cte
+  FROM pfe_1_cte
 ) subq_9
 ON
   subq_6.listing = subq_9.listing

@@ -47,7 +47,7 @@ FROM (
           THEN DATEADD(day, (cte_6.ds__day__row_number - 1), subq_25.ds__alien_day__first_value__lead)
         ELSE NULL
       END AS ds__day__lead
-    FROM cte_6 cte_6
+    FROM cte_6
     INNER JOIN (
       -- Offset Custom Granularity Bounds
       SELECT
@@ -60,7 +60,7 @@ FROM (
           ds__alien_day
           , ds__alien_day__first_value
           , ds__alien_day__last_value
-        FROM cte_6 cte_6
+        FROM cte_6
         GROUP BY
           ds__alien_day
           , ds__alien_day__first_value
