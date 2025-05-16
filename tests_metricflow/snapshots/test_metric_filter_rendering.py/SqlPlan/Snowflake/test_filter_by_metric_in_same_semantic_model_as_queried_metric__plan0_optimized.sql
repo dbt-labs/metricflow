@@ -31,7 +31,7 @@ FROM (
     SELECT
       guest
       , bookers
-    FROM sma_28009_cte sma_28009_cte
+    FROM sma_28009_cte
   ) subq_16
   LEFT OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
@@ -42,7 +42,7 @@ FROM (
     SELECT
       guest
       , SUM(booking_value) AS guest__booking_value
-    FROM sma_28009_cte sma_28009_cte
+    FROM sma_28009_cte
     GROUP BY
       guest
   ) subq_21

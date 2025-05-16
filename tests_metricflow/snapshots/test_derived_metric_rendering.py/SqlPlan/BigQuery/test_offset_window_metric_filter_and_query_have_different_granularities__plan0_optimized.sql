@@ -42,7 +42,7 @@ FROM (
         , sma_28009_cte.booking_value AS booking_value
       FROM ***************************.mf_time_spine time_spine_src_28006
       INNER JOIN
-        sma_28009_cte sma_28009_cte
+        sma_28009_cte
       ON
         DATE_SUB(CAST(time_spine_src_28006.ds AS DATETIME), INTERVAL 1 week) = sma_28009_cte.metric_time__day
     ) subq_22
@@ -64,7 +64,7 @@ FROM (
         metric_time__day
         , metric_time__month
         , bookers
-      FROM sma_28009_cte sma_28009_cte
+      FROM sma_28009_cte
     ) subq_27
     WHERE metric_time__day = '2020-01-01'
     GROUP BY

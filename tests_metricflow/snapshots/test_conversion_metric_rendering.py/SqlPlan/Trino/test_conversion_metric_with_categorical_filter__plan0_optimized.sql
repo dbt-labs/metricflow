@@ -42,7 +42,7 @@ FROM (
         metric_time__day
         , visit__referrer_id
         , visits
-      FROM sma_28019_cte sma_28019_cte
+      FROM sma_28019_cte
     ) subq_18
     WHERE visit__referrer_id = 'ref_id_01'
     GROUP BY
@@ -109,7 +109,7 @@ FROM (
             , sma_28019_cte.user
             , visit__referrer_id
             , visits
-          FROM sma_28019_cte sma_28019_cte
+          FROM sma_28019_cte
         ) subq_22
         WHERE visit__referrer_id = 'ref_id_01'
       ) subq_24

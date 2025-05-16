@@ -81,9 +81,9 @@ SELECT
   , MAX(cm_6_cte.bookings) AS bookings
   , MAX(cm_7_cte.views) AS views
   , MAX(CAST(subq_45.bookings AS DOUBLE PRECISION) / CAST(NULLIF(subq_45.views, 0) AS DOUBLE PRECISION)) AS bookings_per_view
-FROM cm_6_cte cm_6_cte
+FROM cm_6_cte
 FULL OUTER JOIN
-  cm_7_cte cm_7_cte
+  cm_7_cte
 ON
   cm_6_cte.listing__capacity_latest = cm_7_cte.listing__capacity_latest
 FULL OUTER JOIN (
@@ -92,9 +92,9 @@ FULL OUTER JOIN (
     COALESCE(cm_6_cte.listing__capacity_latest, cm_7_cte.listing__capacity_latest) AS listing__capacity_latest
     , MAX(cm_6_cte.bookings) AS bookings
     , MAX(cm_7_cte.views) AS views
-  FROM cm_6_cte cm_6_cte
+  FROM cm_6_cte
   FULL OUTER JOIN
-    cm_7_cte cm_7_cte
+    cm_7_cte
   ON
     cm_6_cte.listing__capacity_latest = cm_7_cte.listing__capacity_latest
   GROUP BY

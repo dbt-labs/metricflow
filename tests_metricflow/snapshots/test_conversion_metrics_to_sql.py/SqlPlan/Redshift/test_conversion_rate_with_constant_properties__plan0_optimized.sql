@@ -37,7 +37,7 @@ FROM (
       metric_time__day
       , visit__referrer_id
       , SUM(visits) AS visits
-    FROM sma_28019_cte sma_28019_cte
+    FROM sma_28019_cte
     GROUP BY
       metric_time__day
       , visit__referrer_id
@@ -100,7 +100,7 @@ FROM (
         ) AS session
         , subq_23.mf_internal_uuid AS mf_internal_uuid
         , subq_23.buys AS buys
-      FROM sma_28019_cte sma_28019_cte
+      FROM sma_28019_cte
       INNER JOIN (
         -- Read Elements From Semantic Model 'buys_source'
         -- Metric Time Dimension 'ds'

@@ -31,7 +31,7 @@ FROM (
     SELECT
       subq_18.alien_day AS metric_time__alien_day
       , SUM(sma_28019_cte.visits) AS visits
-    FROM sma_28019_cte sma_28019_cte
+    FROM sma_28019_cte
     LEFT OUTER JOIN
       ***************************.mf_time_spine subq_18
     ON
@@ -92,7 +92,7 @@ FROM (
           , sma_28019_cte.metric_time__day AS metric_time__day
           , sma_28019_cte.user AS user
           , sma_28019_cte.visits AS visits
-        FROM sma_28019_cte sma_28019_cte
+        FROM sma_28019_cte
         LEFT OUTER JOIN
           ***************************.mf_time_spine subq_22
         ON

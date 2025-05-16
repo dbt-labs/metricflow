@@ -51,9 +51,9 @@ FROM (
         , sma_28019_cte.metric_time__day AS metric_time__day
         , sma_28019_cte.visit__referrer_id AS visit__referrer_id
         , sma_28019_cte.visits AS visits
-      FROM sma_28019_cte sma_28019_cte
+      FROM sma_28019_cte
       LEFT OUTER JOIN
-        rss_28028_cte rss_28028_cte
+        rss_28028_cte
       ON
         sma_28019_cte.user = rss_28028_cte.user
     ) subq_27
@@ -132,9 +132,9 @@ FROM (
             , sma_28019_cte.user AS user
             , sma_28019_cte.visit__referrer_id AS visit__referrer_id
             , sma_28019_cte.visits AS visits
-          FROM sma_28019_cte sma_28019_cte
+          FROM sma_28019_cte
           LEFT OUTER JOIN
-            rss_28028_cte rss_28028_cte
+            rss_28028_cte
           ON
             sma_28019_cte.user = rss_28028_cte.user
         ) subq_34

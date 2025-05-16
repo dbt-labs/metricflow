@@ -39,7 +39,7 @@ FROM (
       SELECT
         rss_28018_cte.ds__day AS metric_time__day
         , subq_22.bookings AS bookings
-      FROM rss_28018_cte rss_28018_cte
+      FROM rss_28018_cte
       LEFT OUTER JOIN (
         -- Read From CTE For node_id=sma_28009
         -- Pass Only Elements: ['bookings', 'metric_time__day']
@@ -47,7 +47,7 @@ FROM (
         SELECT
           metric_time__day
           , SUM(bookings) AS bookings
-        FROM sma_28009_cte sma_28009_cte
+        FROM sma_28009_cte
         GROUP BY
           metric_time__day
       ) subq_22
@@ -63,9 +63,9 @@ FROM (
     SELECT
       rss_28018_cte.ds__day AS metric_time__day
       , SUM(sma_28009_cte.bookings) AS bookings_2_weeks_ago
-    FROM rss_28018_cte rss_28018_cte
+    FROM rss_28018_cte
     INNER JOIN
-      sma_28009_cte sma_28009_cte
+      sma_28009_cte
     ON
       DATEADD(day, -14, rss_28018_cte.ds__day) = sma_28009_cte.metric_time__day
     GROUP BY
