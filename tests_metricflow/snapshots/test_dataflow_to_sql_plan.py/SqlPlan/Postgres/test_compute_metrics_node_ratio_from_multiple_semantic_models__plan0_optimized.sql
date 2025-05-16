@@ -45,7 +45,7 @@ FROM (
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_20
     LEFT OUTER JOIN
-      sma_28014_cte sma_28014_cte
+      sma_28014_cte
     ON
       subq_20.listing = sma_28014_cte.listing
     GROUP BY
@@ -71,7 +71,7 @@ FROM (
       FROM ***************************.fct_views views_source_src_28000
     ) subq_29
     LEFT OUTER JOIN
-      sma_28014_cte sma_28014_cte
+      sma_28014_cte
     ON
       subq_29.listing = sma_28014_cte.listing
     GROUP BY

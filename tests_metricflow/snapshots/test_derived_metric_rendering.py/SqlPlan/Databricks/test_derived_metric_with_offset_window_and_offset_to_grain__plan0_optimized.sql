@@ -37,9 +37,9 @@ FROM (
     SELECT
       rss_28018_cte.ds__day AS metric_time__day
       , SUM(sma_28009_cte.bookings) AS month_start_bookings
-    FROM rss_28018_cte rss_28018_cte
+    FROM rss_28018_cte
     INNER JOIN
-      sma_28009_cte sma_28009_cte
+      sma_28009_cte
     ON
       DATE_TRUNC('month', rss_28018_cte.ds__day) = sma_28009_cte.metric_time__day
     GROUP BY
@@ -53,9 +53,9 @@ FROM (
     SELECT
       rss_28018_cte.ds__day AS metric_time__day
       , SUM(sma_28009_cte.bookings) AS bookings_1_month_ago
-    FROM rss_28018_cte rss_28018_cte
+    FROM rss_28018_cte
     INNER JOIN
-      sma_28009_cte sma_28009_cte
+      sma_28009_cte
     ON
       DATEADD(month, -1, rss_28018_cte.ds__day) = sma_28009_cte.metric_time__day
     GROUP BY

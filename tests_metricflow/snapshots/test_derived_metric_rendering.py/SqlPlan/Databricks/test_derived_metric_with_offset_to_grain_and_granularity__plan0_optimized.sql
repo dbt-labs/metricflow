@@ -31,7 +31,7 @@ FROM (
     SELECT
       metric_time__week
       , SUM(bookings) AS bookings
-    FROM sma_28009_cte sma_28009_cte
+    FROM sma_28009_cte
     GROUP BY
       metric_time__week
   ) subq_19
@@ -45,7 +45,7 @@ FROM (
       , SUM(sma_28009_cte.bookings) AS bookings_at_start_of_month
     FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN
-      sma_28009_cte sma_28009_cte
+      sma_28009_cte
     ON
       DATE_TRUNC('month', time_spine_src_28006.ds) = sma_28009_cte.metric_time__day
     WHERE DATE_TRUNC('week', time_spine_src_28006.ds) = time_spine_src_28006.ds

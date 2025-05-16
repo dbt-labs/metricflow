@@ -29,7 +29,7 @@ FROM (
   SELECT
     ds__day AS metric_time__day
     , SUM(bookings) AS bookings
-  FROM rss_28020_cte rss_28020_cte
+  FROM rss_28020_cte
   GROUP BY
     metric_time__day
 ) subq_15
@@ -42,7 +42,7 @@ FULL OUTER JOIN (
   SELECT
     paid_at__day AS metric_time__day
     , SUM(booking_payments) AS booking_payments
-  FROM rss_28020_cte rss_28020_cte
+  FROM rss_28020_cte
   GROUP BY
     metric_time__day
 ) subq_20

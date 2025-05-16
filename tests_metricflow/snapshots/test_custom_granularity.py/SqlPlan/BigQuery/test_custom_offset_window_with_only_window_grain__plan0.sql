@@ -166,13 +166,13 @@ FROM (
                 , subq_3.ds__alien_day__lead AS metric_time__day
                 , subq_3.ds__alien_day__lead AS booking__ds__alien_day
                 , subq_3.ds__alien_day__lead AS metric_time__alien_day
-              FROM cte_2 cte_2
+              FROM cte_2
               INNER JOIN (
                 -- Offset Custom Granularity
                 SELECT
                   cte_2.ds__alien_day
                   , LEAD(cte_2.ds__alien_day, 1) OVER (ORDER BY cte_2.ds__alien_day) AS ds__alien_day__lead
-                FROM cte_2 cte_2
+                FROM cte_2
                 GROUP BY
                   ds__alien_day
               ) subq_3

@@ -23,4 +23,4 @@ sql_with_cte:
 
   SELECT
     bookings AS bookings
-  FROM rss_28001_cte rss_28001_cte
+  FROM rss_28001_cte

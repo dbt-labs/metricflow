@@ -19,7 +19,7 @@ FROM (
   SELECT
     rss_28018_cte.ds__day AS metric_time__day
     , subq_24.bookings_offset_once AS bookings_offset_once
-  FROM rss_28018_cte rss_28018_cte
+  FROM rss_28018_cte
   INNER JOIN (
     -- Compute Metrics via Expressions
     SELECT
@@ -33,7 +33,7 @@ FROM (
       SELECT
         rss_28018_cte.ds__day AS metric_time__day
         , SUM(subq_16.bookings) AS bookings
-      FROM rss_28018_cte rss_28018_cte
+      FROM rss_28018_cte
       INNER JOIN (
         -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'

@@ -35,7 +35,7 @@ FROM (
       SELECT
         metric_time__day
         , bookings
-      FROM sma_28009_cte sma_28009_cte
+      FROM sma_28009_cte
     ) subq_18
     WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'
     GROUP BY
@@ -56,7 +56,7 @@ FROM (
         , sma_28009_cte.bookings AS bookings
       FROM ***************************.mf_time_spine time_spine_src_28006
       INNER JOIN
-        sma_28009_cte sma_28009_cte
+        sma_28009_cte
       ON
         DATE_SUB(CAST(time_spine_src_28006.ds AS DATETIME), INTERVAL 14 day) = sma_28009_cte.metric_time__day
     ) subq_27

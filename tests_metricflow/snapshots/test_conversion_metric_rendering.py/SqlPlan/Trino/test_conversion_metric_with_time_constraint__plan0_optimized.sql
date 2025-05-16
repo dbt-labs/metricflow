@@ -40,7 +40,7 @@ FROM (
       SELECT
         visit__referrer_id
         , visits
-      FROM ctr_0_cte ctr_0_cte
+      FROM ctr_0_cte
     ) subq_21
     WHERE visit__referrer_id = 'ref_id_01'
     GROUP BY
@@ -105,7 +105,7 @@ FROM (
             , ctr_0_cte.user
             , visit__referrer_id
             , visits
-          FROM ctr_0_cte ctr_0_cte
+          FROM ctr_0_cte
         ) subq_25
         WHERE visit__referrer_id = 'ref_id_01'
       ) subq_27

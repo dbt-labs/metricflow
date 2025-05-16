@@ -27,7 +27,7 @@ FROM (
   SELECT
     is_instant
     , SUM(bookings) AS bookings
-  FROM rss_28001_cte rss_28001_cte
+  FROM rss_28001_cte
   GROUP BY
     is_instant
 ) subq_8
@@ -39,7 +39,7 @@ FULL OUTER JOIN (
     is_instant
     , SUM(instant_bookings) AS instant_bookings
     , COUNT(DISTINCT bookers) AS bookers
-  FROM rss_28001_cte rss_28001_cte
+  FROM rss_28001_cte
   GROUP BY
     is_instant
 ) subq_11

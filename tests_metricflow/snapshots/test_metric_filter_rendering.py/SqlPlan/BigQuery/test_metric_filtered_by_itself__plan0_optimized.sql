@@ -30,7 +30,7 @@ FROM (
     SELECT
       listing
       , bookers
-    FROM sma_28009_cte sma_28009_cte
+    FROM sma_28009_cte
   ) subq_16
   LEFT OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
@@ -41,7 +41,7 @@ FROM (
     SELECT
       listing
       , COUNT(DISTINCT bookers) AS listing__bookers
-    FROM sma_28009_cte sma_28009_cte
+    FROM sma_28009_cte
     GROUP BY
       listing
   ) subq_21

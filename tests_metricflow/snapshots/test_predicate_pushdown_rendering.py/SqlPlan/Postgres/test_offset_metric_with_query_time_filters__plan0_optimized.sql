@@ -55,9 +55,9 @@ FROM (
         , sma_28009_cte.metric_time__day AS metric_time__day
         , sma_28009_cte.booking__is_instant AS booking__is_instant
         , sma_28009_cte.bookings AS bookings
-      FROM sma_28009_cte sma_28009_cte
+      FROM sma_28009_cte
       LEFT OUTER JOIN
-        sma_28014_cte sma_28014_cte
+        sma_28014_cte
       ON
         sma_28009_cte.listing = sma_28014_cte.listing
     ) subq_29
@@ -91,12 +91,12 @@ FROM (
           , sma_28009_cte.bookings AS bookings
         FROM ***************************.mf_time_spine time_spine_src_28006
         INNER JOIN
-          sma_28009_cte sma_28009_cte
+          sma_28009_cte
         ON
           time_spine_src_28006.ds - MAKE_INTERVAL(days => 14) = sma_28009_cte.metric_time__day
       ) subq_38
       LEFT OUTER JOIN
-        sma_28014_cte sma_28014_cte
+        sma_28014_cte
       ON
         subq_38.listing = sma_28014_cte.listing
     ) subq_41

@@ -37,7 +37,7 @@ FROM (
         metric_time__day
         , booking__is_instant
         , booking_value
-      FROM sma_28009_cte sma_28009_cte
+      FROM sma_28009_cte
     ) subq_13
     WHERE booking__is_instant
     GROUP BY
@@ -51,7 +51,7 @@ FROM (
     SELECT
       metric_time__day
       , SUM(booking_value) AS booking_value
-    FROM sma_28009_cte sma_28009_cte
+    FROM sma_28009_cte
     GROUP BY
       metric_time__day
   ) subq_21

@@ -33,7 +33,7 @@ FROM (
       , SUM(sma_28009_cte.booking_value) AS booking_value
     FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN
-      sma_28009_cte sma_28009_cte
+      sma_28009_cte
     ON
       time_spine_src_28006.ds - INTERVAL 1 week = sma_28009_cte.booking__ds__day
     GROUP BY
@@ -47,7 +47,7 @@ FROM (
     SELECT
       booking__ds__day
       , COUNT(DISTINCT bookers) AS bookers
-    FROM sma_28009_cte sma_28009_cte
+    FROM sma_28009_cte
     GROUP BY
       booking__ds__day
   ) subq_27

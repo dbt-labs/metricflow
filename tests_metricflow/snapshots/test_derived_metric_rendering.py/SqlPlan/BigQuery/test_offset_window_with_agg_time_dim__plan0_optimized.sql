@@ -30,7 +30,7 @@ FROM (
     SELECT
       booking__ds__day
       , SUM(bookings) AS bookings
-    FROM sma_28009_cte sma_28009_cte
+    FROM sma_28009_cte
     GROUP BY
       booking__ds__day
   ) subq_19
@@ -44,7 +44,7 @@ FROM (
       , SUM(sma_28009_cte.bookings) AS bookings_2_weeks_ago
     FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN
-      sma_28009_cte sma_28009_cte
+      sma_28009_cte
     ON
       DATE_SUB(CAST(time_spine_src_28006.ds AS DATETIME), INTERVAL 14 day) = sma_28009_cte.booking__ds__day
     GROUP BY

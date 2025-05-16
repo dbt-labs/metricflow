@@ -43,7 +43,7 @@ FROM (
       , SUM(sma_28009_cte.booking_value) AS booking_value
     FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN
-      sma_28009_cte sma_28009_cte
+      sma_28009_cte
     ON
       DATE_ADD('week', -1, time_spine_src_28006.ds) = sma_28009_cte.metric_time__day
     GROUP BY
@@ -61,7 +61,7 @@ FROM (
       , metric_time__month
       , metric_time__year
       , COUNT(DISTINCT bookers) AS bookers
-    FROM sma_28009_cte sma_28009_cte
+    FROM sma_28009_cte
     GROUP BY
       metric_time__day
       , metric_time__month

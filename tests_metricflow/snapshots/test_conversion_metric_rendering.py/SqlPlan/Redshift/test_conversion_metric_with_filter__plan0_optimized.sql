@@ -30,7 +30,7 @@ FROM (
     SELECT
       metric_time__day
       , visits
-    FROM sma_28019_cte sma_28019_cte
+    FROM sma_28019_cte
   ) subq_18
   WHERE metric_time__day = '2020-01-01'
 ) subq_21
@@ -82,7 +82,7 @@ CROSS JOIN (
           metric_time__day
           , sma_28019_cte.user
           , visits
-        FROM sma_28019_cte sma_28019_cte
+        FROM sma_28019_cte
       ) subq_22
       WHERE metric_time__day = '2020-01-01'
     ) subq_24

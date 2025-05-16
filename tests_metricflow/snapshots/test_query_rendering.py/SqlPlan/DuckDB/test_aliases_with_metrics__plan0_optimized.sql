@@ -35,7 +35,7 @@ FROM (
     , sma_28009_cte.metric_time__day AS metric_time__day
     , sma_28009_cte.listing AS listing
     , sma_28009_cte.bookings AS bookings
-  FROM sma_28009_cte sma_28009_cte
+  FROM sma_28009_cte
   LEFT OUTER JOIN (
     -- Compute Metrics via Expressions
     -- Pass Only Elements: ['listing', 'listing__booking_fees']
@@ -50,7 +50,7 @@ FROM (
       SELECT
         listing
         , SUM(booking_value) AS booking_value
-      FROM sma_28009_cte sma_28009_cte
+      FROM sma_28009_cte
       GROUP BY
         listing
     ) subq_27

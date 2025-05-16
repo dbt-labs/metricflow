@@ -44,7 +44,7 @@ FROM (
     SELECT
       listing
       , SUM(bookings) AS listing__bookings
-    FROM sma_28009_cte sma_28009_cte
+    FROM sma_28009_cte
     GROUP BY
       listing
   ) subq_31
@@ -59,7 +59,7 @@ FROM (
     SELECT
       listing
       , COUNT(DISTINCT bookers) AS listing__bookers
-    FROM sma_28009_cte sma_28009_cte
+    FROM sma_28009_cte
     GROUP BY
       listing
   ) subq_36

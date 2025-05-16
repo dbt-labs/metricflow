@@ -37,7 +37,7 @@ FROM (
     SELECT
       rss_28018_cte.ds__day AS metric_time__day
       , subq_26.visits AS visits
-    FROM rss_28018_cte rss_28018_cte
+    FROM rss_28018_cte
     LEFT OUTER JOIN (
       -- Read From CTE For node_id=sma_28019
       -- Pass Only Elements: ['visits', 'metric_time__day']
@@ -45,7 +45,7 @@ FROM (
       SELECT
         metric_time__day
         , SUM(visits) AS visits
-      FROM sma_28019_cte sma_28019_cte
+      FROM sma_28019_cte
       GROUP BY
         metric_time__day
     ) subq_26
@@ -57,7 +57,7 @@ FROM (
     SELECT
       rss_28018_cte.ds__day AS metric_time__day
       , subq_39.buys AS buys
-    FROM rss_28018_cte rss_28018_cte
+    FROM rss_28018_cte
     LEFT OUTER JOIN (
       -- Find conversions for user within the range of 7 day
       -- Pass Only Elements: ['buys', 'metric_time__day']
@@ -94,7 +94,7 @@ FROM (
           ) AS user
           , subq_35.mf_internal_uuid AS mf_internal_uuid
           , subq_35.buys AS buys
-        FROM sma_28019_cte sma_28019_cte
+        FROM sma_28019_cte
         INNER JOIN (
           -- Read Elements From Semantic Model 'buys_source'
           -- Metric Time Dimension 'ds'
