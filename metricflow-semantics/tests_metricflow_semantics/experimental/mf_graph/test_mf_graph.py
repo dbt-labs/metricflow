@@ -5,26 +5,28 @@ from abc import ABC
 from collections import defaultdict
 from dataclasses import dataclass
 from functools import cached_property
-from typing import Iterable, Optional
+from typing import Iterable
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.mf_graph.comparable import ComparisonKey
 from metricflow_semantics.experimental.mf_graph.mf_graph import (
+    MetricflowGraph,
     MetricflowGraphEdge,
     MetricflowGraphNode,
 )
 from metricflow_semantics.experimental.mf_graph.mutable_graph import MutableGraph
-from metricflow_semantics.experimental.ordered_set import MutableOrderedSet, OrderedSet
-from metricflow_semantics.experimental.singleton import Singleton
+from metricflow_semantics.experimental.mf_graph.node_descriptor import MetricflowGraphNodeDescriptor
+from metricflow_semantics.experimental.ordered_set import MutableOrderedSet
+from metricflow_semantics.experimental.singleton_decorator import singleton_dataclass
 from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
-from metricflow_semantics.mf_logging.pretty_formatter import PrettyFormatContext
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
-from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_snapshot_equal, assert_str_snapshot_equal
+from metricflow_semantics.test_helpers.snapshot_helpers import assert_str_snapshot_equal
 from typing_extensions import override
 
 from tests_metricflow_semantics.experimental.graph_helpers import assert_graph_snapshot_equal
+from tests_metricflow_semantics.experimental.mf_graph.formatting.dot_formatter import DotNotationFormatter
+from tests_metricflow_semantics.experimental.mf_graph.formatting.svg_formatter import SvgFormatter
 
 logger = logging.getLogger(__name__)
 
@@ -32,50 +34,48 @@ logger = logging.getLogger(__name__)
 # The `Flow*` classes are an example implementation of the graph classes used for tests in this module.
 
 
-@fast_frozen_dataclass(order=False)
-class FlowNode(MetricflowGraphNode, Singleton, ABC):  # noqa: D101
+@singleton_dataclass(order=False)
+class FlowNode(MetricflowGraphNode, ABC):  # noqa: D101
     node_name: str
 
-    @property
     @override
-    def dot_label(self) -> str:
-        return self.node_name
-
     @property
-    @override
-    def graphviz_label(self) -> str:
-        return self.node_name
-
-    @property
-    @override
     def comparison_key(self) -> ComparisonKey:
         return (self.node_name,)
 
-    @classmethod
-    def get_instance(cls, node_name: str) -> FlowNode:  # noqa: D102
-        return cls._get_singleton_by_kwargs(node_name=node_name)
+    @override
+    @property
+    def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
+        return MetricflowGraphNodeDescriptor.get_instance(node_name=self.node_name, cluster_name=None)
 
 
-@fast_frozen_dataclass(order=False)
+@singleton_dataclass(order=False)
 class SourceNode(FlowNode):  # noqa: D101
     pass
 
 
-@fast_frozen_dataclass(order=False)
+@singleton_dataclass(order=False)
 class SinkNode(FlowNode):  # noqa: D101
     pass
 
 
-@fast_frozen_dataclass(order=False)
+@singleton_dataclass(order=False)
 class IntermediateNode(FlowNode):  # noqa: D101
-    pass
+    @override
+    @property
+    def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
+        return MetricflowGraphNodeDescriptor.get_instance(node_name=self.node_name, cluster_name="intermediate_nodes")
 
 
-@fast_frozen_dataclass(order=False)
-class FlowEdge(MetricflowGraphEdge, Singleton):  # noqa: D101
-    edge_name: str
-    _tail_node: FlowNode
-    _head_node: FlowNode
+@singleton_dataclass(order=False)
+class FlowEdge(MetricflowGraphEdge):  # noqa: D101
+    @staticmethod
+    def get_instance(tail_node: FlowNode, head_node: FlowNode) -> FlowEdge:
+        return FlowEdge(
+            _tail_node=tail_node,
+            _head_node=head_node,
+            _weight=1,
+        )
 
     @property
     @override
@@ -87,61 +87,31 @@ class FlowEdge(MetricflowGraphEdge, Singleton):  # noqa: D101
     def head_node(self) -> FlowNode:
         return self._head_node
 
-    @property
-    @override
-    def dot_label(self) -> str:
-        return self.edge_name
-
-    @property
-    @override
-    def graphviz_label(self) -> str:
-        return self.edge_name
-
     @cached_property
     @override
     def comparison_key(self) -> ComparisonKey:
-        return self.edge_name, self._tail_node, self._head_node
+        return self._tail_node, self._head_node
 
-    @classmethod
-    def get_instance(cls, edge_name: str, tail_node: FlowNode, head_node: FlowNode) -> FlowEdge:  # noqa: D102
-        return cls._get_singleton_by_kwargs(
-            edge_name=edge_name,
-            _tail_node=tail_node,
-            _head_node=head_node,
+    @override
+    @property
+    def inverse(self) -> FlowEdge:
+        return FlowEdge.get_instance(
+            tail_node=self._head_node,
+            head_node=self._tail_node,
         )
 
 
 @dataclass
 class FlowGraph(MutableGraph[FlowNode, FlowEdge], MetricFlowPrettyFormattable):  # noqa: D101
-    flow_name: str
-    # _nodes: OrderedSet[FlowNode]
-    # _edges: OrderedSet[FlowEdge]
-
-    # @staticmethod
-    # def create(flow_name: str, nodes: OrderedSet[FlowNode], edges: OrderedSet[FlowEdge]) -> FlowGraph:  # noqa: D102
-    #     return FlowGraph(
-    #         flow_name=flow_name,
-    #         _nodes=nodes,
-    #         _edges=edges,
-    #     )
-    #
-    # @override
-    # def nodes(self) -> OrderedSet[FlowNode]:
-    #     return self._nodes
-    #
-    # @override
-    # def edges(self) -> OrderedSet[FlowEdge]:
-    #     return self._edges
-
     @staticmethod
-    def create(flow_name: str, nodes: Iterable[FlowNode] = (), edges: Iterable[FlowEdge] = ()) -> FlowGraph:
+    def create(nodes: Iterable[FlowNode] = (), edges: Iterable[FlowEdge] = ()) -> FlowGraph:
         graph = FlowGraph(
             _nodes=MutableOrderedSet(),
             _edges=MutableOrderedSet(),
-            _node_property_to_nodes=defaultdict(MutableOrderedSet),
+            _label_to_nodes=defaultdict(MutableOrderedSet),
             _tail_node_to_edges=defaultdict(MutableOrderedSet),
             _head_node_to_edges=defaultdict(MutableOrderedSet),
-            flow_name=flow_name,
+            _label_to_edges=defaultdict(MutableOrderedSet),
         )
         for node in nodes:
             graph.add_node(node)
@@ -149,81 +119,67 @@ class FlowGraph(MutableGraph[FlowNode, FlowEdge], MetricFlowPrettyFormattable): 
             graph.add_edge(edge)
         return graph
 
-    @property
     @override
-    def dot_label(self) -> str:
-        return self.flow_name
+    def intersection(self, other: MetricflowGraph[FlowNode, FlowEdge]) -> FlowGraph:
+        intersection_graph = FlowGraph.create()
+        self.add_edges(self._intersect_edges(other))
+        return intersection_graph
 
-    @property
-    @override
-    def graphviz_label(self) -> str:
-        return self.flow_name
-
-    @override
-    def pretty_format(self, format_context: PrettyFormatContext) -> Optional[str]:
-        formatter = format_context.formatter
-        return formatter.pretty_format_object_by_parts(
-            class_name=self.__class__.__name__,
-            field_mapping={"nodes": self.nodes, "edges": self.edges},
-        )
+    def inverse(self) -> FlowGraph:
+        return FlowGraph.create(edges=(edge.inverse for edge in self.edges))
 
 
 @pytest.fixture(scope="session")
 def flow_graph() -> FlowGraph:
     """Example instance of a graph used in test cases."""
-    source_node = FlowNode.get_instance("source")
-    a_node = FlowNode.get_instance("a")
-    b_node = FlowNode.get_instance("b")
-    sink_node = FlowNode.get_instance("sink")
+    source_node = SourceNode(node_name="source")
+    a_node = IntermediateNode(node_name="a")
+    b_node = IntermediateNode(node_name="b")
+    sink_node = SinkNode(node_name="sink")
 
     return FlowGraph.create(
-        flow_name="example_flow",
-        nodes=OrderedSet.create_from_items(source_node, a_node, b_node, sink_node),
-        edges=OrderedSet.create_from_items(
-            FlowEdge.get_instance("source_to_a", tail_node=source_node, head_node=a_node),
-            FlowEdge.get_instance("source_to_b", tail_node=source_node, head_node=b_node),
-            FlowEdge.get_instance("a_to_sink", tail_node=a_node, head_node=sink_node),
-            FlowEdge.get_instance("b_to_sink", tail_node=b_node, head_node=sink_node),
+        nodes=MutableOrderedSet((source_node, a_node, b_node, sink_node)),
+        edges=MutableOrderedSet(
+            (
+                FlowEdge.get_instance(tail_node=source_node, head_node=a_node),
+                FlowEdge.get_instance(tail_node=source_node, head_node=b_node),
+                FlowEdge.get_instance(tail_node=a_node, head_node=sink_node),
+                FlowEdge.get_instance(tail_node=b_node, head_node=sink_node),
+            )
         ),
     )
 
 
-def test_pretty_format_graph(
+def test_default_format(
     request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, flow_graph: FlowGraph
 ) -> None:
     """Check formatting of the graph using `pretty_format`."""
-    source_node = FlowNode.get_instance("source")
-    a_node = FlowNode.get_instance("a")
-    b_node = FlowNode.get_instance("b")
-    sink_node = FlowNode.get_instance("sink")
-
-    graph = FlowGraph.create(
-        flow_name="example_flow",
-        nodes=OrderedSet.create_from_items(source_node, a_node, b_node, sink_node),
-        edges=OrderedSet.create_from_items(
-            FlowEdge.get_instance("source_to_a", tail_node=source_node, head_node=a_node),
-            FlowEdge.get_instance("source_to_b", tail_node=source_node, head_node=b_node),
-            FlowEdge.get_instance("a_to_sink", tail_node=a_node, head_node=sink_node),
-            FlowEdge.get_instance("b_to_sink", tail_node=b_node, head_node=sink_node),
-        ),
-    )
-
-    assert_object_snapshot_equal(
+    assert_str_snapshot_equal(
         request=request,
         snapshot_configuration=mf_test_configuration,
-        obj=graph,
+        snapshot_str=flow_graph.format(),
     )
 
 
-def test_dot_notation(
+def test_dot_notation_format(
     request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, flow_graph: FlowGraph
 ) -> None:
     """Check formatting of the graph using `dot_notation`."""
     assert_str_snapshot_equal(
         request=request,
         snapshot_configuration=mf_test_configuration,
-        snapshot_str=flow_graph.format_dot(),
-        snapshot_id="result",
+        snapshot_str=flow_graph.format(DotNotationFormatter()),
+    )
+
+
+def test_svg_format(
+    request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, flow_graph: FlowGraph
+) -> None:
+    """Check formatting of the graph using `dot_notation`."""
+    assert_str_snapshot_equal(
+        request=request,
+        snapshot_configuration=mf_test_configuration,
+        snapshot_str=flow_graph.format(SvgFormatter()),
     )
 
 

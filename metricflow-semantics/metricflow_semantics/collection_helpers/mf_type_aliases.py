@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TypeVar
 
+T = TypeVar("T")
 T1 = TypeVar("T1")
 T2 = TypeVar("T2")
 

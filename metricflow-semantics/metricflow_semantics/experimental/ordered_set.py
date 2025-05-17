@@ -4,7 +4,7 @@ import logging
 from abc import ABC, abstractmethod
 from collections.abc import Hashable, MutableSet, Set
 from functools import cached_property
-from typing import Generic, Iterable, Iterator, Optional, TypeVar
+from typing import Generic, Iterable, Iterator, Optional, Self, TypeVar
 
 from typing_extensions import override
 
@@ -13,10 +13,12 @@ from metricflow_semantics.experimental.comparison_helpers import ComparisonOther
 logger = logging.getLogger(__name__)
 
 T = TypeVar("T", bound=Hashable)
-OrderedSetT = TypeVar("OrderedSetT", bound="OrderedSet")
+T_co = TypeVar("T_co", bound=Hashable, covariant=True)
+
+OrderedSetT = TypeVar("OrderedSetT", bound="OrderedSet", covariant=True)
 
 
-class OrderedSet(Generic[T], Set[T], ABC):
+class OrderedSet(Generic[T_co], Set[T_co], ABC):
     """Set where the iteration order is the insertion order.
 
     * Having a consistent iteration order is helpful for ensuring consistency in tests and snapshot generation without
@@ -26,29 +28,20 @@ class OrderedSet(Generic[T], Set[T], ABC):
       short.
     """
 
-    def __init__(self, iterable: Optional[Iterable[T]] = None) -> None:  # noqa: D107
-        if iterable is None:
-            self._set_as_dict = {}
-        else:
-            self._set_as_dict = {item: None for item in iterable}
+    def __init__(
+        self,
+        iterable: Optional[Iterable[T_co]] = None,
+        _set_as_dict: Optional[dict[T_co, None]] = None,
+    ) -> None:  # noqa: D107
+        self._set_as_dict = _set_as_dict.copy() if _set_as_dict is not None else {}
+        if iterable is not None:
+            self._set_as_dict.update({item: None for item in iterable})
 
-    @classmethod
-    def create_from_items(cls: type[OrderedSetT], *items: T) -> OrderedSetT:
-        """Create a set with the arguments as set items.
-
-        e.g. `create_from_items(1, 2, 3) -> {1, 2, 3}`
-        """
-        return cls(items)
-
-    @classmethod
-    def create_from_iterables(cls: type[OrderedSetT], *iterables: Iterable[T]) -> OrderedSetT:  # noqa: D102
-        return cls(item for iterable in iterables for item in iterable)
-
-    def intersection(self: OrderedSetT, other: Iterable[T]) -> OrderedSetT:  # noqa: D102
-        other_set = frozenset(other)
+    def intersection(self, other: Iterable[T_co]) -> Self:  # noqa: D102
+        other_set = set(other)
         return self.__class__(item for item in self if item in other_set)
 
-    def union(self: OrderedSetT, other: Iterable[T]) -> OrderedSetT:  # noqa: D102
+    def union(self, other: Iterable[T_co]) -> Self:  # noqa: D102
         return self.__class__(tuple(self._set_as_dict.keys()) + tuple(other))
 
     @override
@@ -60,7 +53,7 @@ class OrderedSet(Generic[T], Set[T], ABC):
         return len(self._set_as_dict)
 
     @override
-    def __iter__(self) -> Iterator[T]:
+    def __iter__(self) -> Iterator[T_co]:
         return iter(self._set_as_dict)
 
     @override
@@ -68,15 +61,15 @@ class OrderedSet(Generic[T], Set[T], ABC):
         return "{" + ", ".join(str(item) for item in self) + "}"
 
     @abstractmethod
-    def as_mutable(self) -> MutableOrderedSet[T]:  # noqa: D102
+    def as_mutable(self) -> MutableOrderedSet[T_co]:  # noqa: D102
         raise NotImplementedError
 
     @abstractmethod
-    def as_frozen(self) -> FrozenOrderedSet[T]:  # noqa: D102
+    def as_frozen(self) -> FrozenOrderedSet[T_co]:  # noqa: D102
         raise NotImplementedError
 
 
-class FrozenOrderedSet(Generic[T], OrderedSet[T], Hashable):
+class FrozenOrderedSet(Generic[T_co], OrderedSet[T_co], Hashable):
     """A frozen version of `OrderedSet` that can be hashed."""
 
     @cached_property
@@ -88,12 +81,16 @@ class FrozenOrderedSet(Generic[T], OrderedSet[T], Hashable):
         return self._cached_hash_value
 
     @override
-    def as_mutable(self) -> MutableOrderedSet[T]:
+    def as_mutable(self) -> MutableOrderedSet[T_co]:
         return MutableOrderedSet(self)
 
     @override
-    def as_frozen(self) -> FrozenOrderedSet[T]:
+    def as_frozen(self) -> FrozenOrderedSet[T_co]:
         return self
+
+    @override
+    def union(self, other: Iterable[T_co]) -> Self:  # noqa: D102
+        return super().union(other)
 
 
 class MutableOrderedSet(Generic[T], OrderedSet[T], MutableSet[T]):
@@ -119,3 +116,10 @@ class MutableOrderedSet(Generic[T], OrderedSet[T], MutableSet[T]):
     @override
     def as_frozen(self) -> FrozenOrderedSet[T]:
         return FrozenOrderedSet(self)
+
+    @override
+    def union(self, other: Iterable[T]) -> Self:  # noqa: D102
+        return super().union(other)
+
+    def copy(self) -> MutableOrderedSet[T]:
+        return MutableOrderedSet(iterable=None, _set_as_dict=self._set_as_dict.copy())

@@ -1,40 +1,70 @@
 from __future__ import annotations
 
 import logging
+from functools import cached_property
+from typing import Optional
 
-from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
+from typing_extensions import override
+
+from metricflow_semantics.experimental.mf_graph.comparable import ComparisonKey
 from metricflow_semantics.experimental.orderd_enum import OrderedEnum
-from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, OrderedSet
-from metricflow_semantics.experimental.semantic_graph.edges.semantic_graph_edge import SemanticGraphEdge
-from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import SemanticGraphNode
-from metricflow_semantics.experimental.singleton import Singleton
+from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
+from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
+    SemanticGraphEdge,
+    SemanticGraphNode,
+)
+from metricflow_semantics.experimental.singleton_decorator import singleton_dataclass
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 
 logger = logging.getLogger(__name__)
 
 
 class EntityRelationship(OrderedEnum):
-    ONE_TO_ONE = "one_to_one"
-    MANY_TO_ONE = "many_to_one"
-    MANY_TO_MANY = "many_to_many"
+    LEFT_CARDINALITY_ONE = "left_cardinality_one"
+    LEFT_CARDINALITY_MANY = "left_cardinality_many"
+    RIGHT_CARDINALITY_ONE = "right_cardinality_one"
+    RIGHT_CARDINALITY_MANY = "right_cardinality_many"
+    VALID = "valid"
+
+    @cached_property
+    def inverse(self) -> EntityRelationship:
+        # TODO: See if we need the different cardinality types.
+        return self
 
 
-@fast_frozen_dataclass(order=False)
-class EntityRelationshipEdge(SemanticGraphEdge, Singleton):
+@singleton_dataclass(order=False)
+class EntityRelationshipEdge(SemanticGraphEdge):
     relationship: EntityRelationship
     linkable_element_properties: FrozenOrderedSet[LinkableElementProperty]
 
-    @classmethod
+    @staticmethod
     def get_instance(
-        cls,
         tail_node: SemanticGraphNode,
-        head_node: SemanticGraphNode,
         relationship: EntityRelationship,
-        linkable_element_properties: OrderedSet[LinkableElementProperty],
+        head_node: SemanticGraphNode,
+        weight: Optional[int],
+        linkable_element_properties: FrozenOrderedSet[LinkableElementProperty] = FrozenOrderedSet(),
     ) -> EntityRelationshipEdge:
-        return cls._get_singleton_by_kwargs(
-            tail_node=tail_node,
-            head_node=head_node,
+        return EntityRelationshipEdge(
+            _tail_node=tail_node,
+            _head_node=head_node,
+            _weight=weight,
             relationship=relationship,
-            linkable_element_properties=linkable_element_properties.as_frozen(),
+            linkable_element_properties=linkable_element_properties,
+        )
+
+    @override
+    @cached_property
+    def comparison_key(self) -> ComparisonKey:
+        return (self._tail_node, self._head_node, self.relationship, tuple(self.linkable_element_properties))
+
+    @override
+    @cached_property
+    def inverse(self) -> EntityRelationshipEdge:
+        return EntityRelationshipEdge.get_instance(
+            tail_node=self._head_node,
+            relationship=self.relationship.inverse,
+            head_node=self._tail_node,
+            linkable_element_properties=self.linkable_element_properties,
+            weight=self._weight,
         )

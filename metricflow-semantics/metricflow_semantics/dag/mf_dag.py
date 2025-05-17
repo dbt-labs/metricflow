@@ -101,7 +101,7 @@ class DagNode(MetricFlowPrettyFormattable, Generic[DagNodeT], ABC):
 
     @property
     def graphviz_label(self) -> str:
-        """When using graphviz to render this node, the label that should be used in the construction."""
+        """When using graphviz to render this node, the name that should be used in the construction."""
         return make_graphviz_label(
             title=self.__class__.__name__,
             properties=self.displayed_properties,
@@ -137,7 +137,7 @@ class DagNode(MetricFlowPrettyFormattable, Generic[DagNodeT], ABC):
 def make_graphviz_label(
     title: str, properties: Sequence[DisplayedProperty], title_font_size: int = 12, property_font_size: int = 6
 ) -> str:
-    """Make a graphviz label that can be used for rendering to an image.
+    """Make a graphviz name that can be used for rendering to an image.
 
     The title will be in a large font, while the properties will be listed in a table in a smaller font.
     """

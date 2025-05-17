@@ -5,12 +5,15 @@ from typing import Callable, Optional
 
 from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.experimental.mf_graph.mf_graph import MetricflowGraph
-from metricflow_semantics.mf_logging.pretty_print import PrettyFormatDictOption, mf_pformat, mf_pformat_dict
+from metricflow_semantics.mf_logging.pretty_print import PrettyFormatDictOption, mf_pformat_dict
 from metricflow_semantics.test_helpers.snapshot_helpers import (
     SnapshotConfiguration,
     assert_snapshot_text_equal,
     assert_str_snapshot_equal,
 )
+
+from tests_metricflow_semantics.experimental.mf_graph.formatting.dot_formatter import DotNotationFormatter
+from tests_metricflow_semantics.experimental.mf_graph.formatting.svg_formatter import SvgFormatter
 
 logger = logging.getLogger(__name__)
 
@@ -24,11 +27,12 @@ def assert_graph_snapshot_equal(
     incomparable_strings_replacement_function: Optional[Callable[[str], str]] = None,
 ) -> None:
     """Generate / compare a snapshot of the graph in different formats."""
+    sorted_graph = graph.as_sorted()
     assert_str_snapshot_equal(
         request=request,
         snapshot_configuration=snapshot_configuration,
         snapshot_str=mf_pformat_dict(
-            obj_dict={"mf_pformat": mf_pformat(graph), "dot_notation": graph.format_dot()},
+            obj_dict={"default": sorted_graph.format(), "dot_notation": sorted_graph.format(DotNotationFormatter())},
             format_option=PrettyFormatDictOption(preserve_raw_strings=True),
         ),
         snapshot_id=snapshot_id,
@@ -41,9 +45,10 @@ def assert_graph_snapshot_equal(
         snapshot_configuration=snapshot_configuration,
         group_id="svg",
         snapshot_id=snapshot_id,
-        snapshot_text=graph.format_svg(),
+        snapshot_text=sorted_graph.format(SvgFormatter()),
         snapshot_file_extension=".svg",
         expectation_description=expectation_description,
         incomparable_strings_replacement_function=incomparable_strings_replacement_function,
         include_headers=False,
+        log_snapshot_text=False,
     )

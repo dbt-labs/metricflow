@@ -9,7 +9,7 @@ from typing_extensions import override
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.experimental.comparison_helpers import ComparisonOtherType, SupportsLessThan
 
-ComparisonKey = AnyLengthTuple[Union[str, int, float, SupportsLessThan]]
+ComparisonKey = AnyLengthTuple[Union[None, str, int, float, SupportsLessThan]]
 
 
 @functools.total_ordering
@@ -17,16 +17,13 @@ class Comparable(SupportsLessThan, ABC):
     """Mixin class that allows classes of any type to be compared.
 
     This is useful sorting nodes and edges where the nodes and edges may be different classes.
+    Implementing classes should ensure that the `comparison_key` aligns with how `__eq__` is defined.
     """
 
     @property
     @abstractmethod
     def comparison_key(self) -> ComparisonKey:
-        """Return a tuple that can be used for comparing this with any other `Comparable`.
-
-        The tuple consists of the implementing class name followed by the items that should be used for comparing
-        instances of the implementing classes.
-        """
+        """Return a tuple that can be used for comparing different instances of this class."""
         raise NotImplementedError
 
     @override
@@ -34,5 +31,7 @@ class Comparable(SupportsLessThan, ABC):
         if not isinstance(other, Comparable):
             return NotImplemented
 
-        # Consider adding the module name to handle cases where two classes implementing this have the same name.
-        return (self.__class__.__name__,) + self.comparison_key < ((other.__class__.__name__,) + other.comparison_key)
+        self_comparison_key = (self.__class__.__module__, self.__class__.__qualname__, *self.comparison_key)
+        other_comparison_key = (other.__class__.__module__, other.__class__.__qualname__, *other.comparison_key)
+
+        return self_comparison_key < other_comparison_key

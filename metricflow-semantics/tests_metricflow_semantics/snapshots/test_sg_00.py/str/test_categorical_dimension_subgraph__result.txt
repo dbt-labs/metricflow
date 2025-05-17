@@ -1,0 +1,8 @@
+test_name: test_categorical_dimension_subgraph
+test_filename: test_sg_00.py
+---
+mf_pformat: MutableSemanticGraph()
+dot_notation:
+  graph {
+    label='semantic_graph'
+  }

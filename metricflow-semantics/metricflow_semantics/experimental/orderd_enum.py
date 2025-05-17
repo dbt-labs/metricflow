@@ -16,6 +16,7 @@ class OrderedEnum(Enum):
 
     @classmethod
     @functools.lru_cache(maxsize=None)
+    @functools.cache
     def _enum_to_index(cls) -> dict[OrderedEnum, int]:
         return {member: i for i, member in enumerate(cls)}
 

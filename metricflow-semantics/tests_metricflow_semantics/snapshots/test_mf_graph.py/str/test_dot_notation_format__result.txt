@@ -1,0 +1,15 @@
+test_name: test_dot_notation_format
+test_filename: test_mf_graph.py
+docstring:
+  Check formatting of the graph using `dot_notation`.
+---
+digraph {
+	a
+	b
+	sink
+	source
+	a -> sink
+	b -> sink
+	source -> a
+	source -> b
+}

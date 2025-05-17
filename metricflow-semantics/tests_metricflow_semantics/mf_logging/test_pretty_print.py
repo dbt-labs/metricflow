@@ -222,5 +222,5 @@ def test_path() -> None:
 
 
 def test_ordered_set() -> None:  # noqa: D103
-    ordered_set = FrozenOrderedSet.create_from_items(3, 2, 1)
+    ordered_set = FrozenOrderedSet((3, 2, 1))
     assert mf_pformat(ordered_set) == "{3, 2, 1}"

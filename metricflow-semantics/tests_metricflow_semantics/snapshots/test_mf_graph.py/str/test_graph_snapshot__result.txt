@@ -1,9 +1,16 @@
 test_name: test_graph_snapshot
 test_filename: test_mf_graph.py
+docstring:
+  Check the graph snapshot.
 ---
-mf_pformat:
+default:
   FlowGraph(
-    nodes={FlowNode(node_name='source'), FlowNode(node_name='a'), FlowNode(node_name='b'), FlowNode(node_name='sink')},
+    nodes={
+      SourceNode(node_name='source'),
+      IntermediateNode(node_name='a'),
+      IntermediateNode(node_name='b'),
+      SinkNode(node_name='sink'),
+    },
     edges={
       FlowEdge(edge_name='source_to_a'),
       FlowEdge(edge_name='source_to_b'),
@@ -12,14 +19,15 @@ mf_pformat:
     },
   )
 dot_notation:
-  graph {
-    label='example_flow'
-    a
-    b
-    sink
-    source
-    a -> sink [label='a_to_sink']
-    b -> sink [label='b_to_sink']
-    source -> a [label='source_to_a']
-    source -> b [label='source_to_b']
+  digraph FlowGraph {
+  	subgraph cluster_intermediate_nodes {
+  		a
+  		b
+  	}
+  	sink
+  	source
+  	a -> sink
+  	b -> sink
+  	source -> a
+  	source -> b
   }

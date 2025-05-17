@@ -1,0 +1,41 @@
+test_name: test_measure_subgraph
+test_filename: test_sg_00.py
+---
+default:
+  MutableSemanticGraph(
+    nodes={
+      AggregationNode(model_id=SemanticModelId(model_name='sm_0'), aggregation_time_dimension_name='ds'),
+      MetricTimeBaseNode(time_grain_name='QUARTER'),
+      JoinFromModelNode(model_id=SemanticModelId(model_name='sm_0')),
+      ModelEntityNode(entity_name='sm_0_primary_entity'),
+      JoinToModelNode(model_id=SemanticModelId(model_name='sm_0')),
+      MeasureAttributeNode(attribute_name='sm_0_measure_0', model_id=SemanticModelId(model_name='sm_0')),
+    },
+    edges={
+      EntityRelationshipEdge(relationship=LEFT_CARDINALITY_ONE),
+      EntityRelationshipEdge(relationship=LEFT_CARDINALITY_ONE),
+      EntityRelationshipEdge(relationship=LEFT_CARDINALITY_ONE),
+      EntityRelationshipEdge(relationship=LEFT_CARDINALITY_ONE),
+      EntityAttributeEdge(attribute_edge_type=SOURCE),
+    },
+  )
+dot_notation:
+  digraph MutableSemanticGraph {
+  	subgraph cluster_sm_0 {
+  		"AggregationNode(sm_0, ds)"
+  		"JoinFromModelNode(sm_0)"
+  		"JoinToModelNode(sm_0)"
+  		"MeasureAttributeNode(sm_0_measure_0)"
+  	}
+  	subgraph cluster_metric_time_base {
+  		"MetricTimeBaseNode(QUARTER)"
+  	}
+  	subgraph cluster_model_entity {
+  		"ModelEntityNode(sm_0_primary_entity)"
+  	}
+  	"AggregationNode(sm_0, ds)" -> "JoinFromModelNode(sm_0)"
+  	"AggregationNode(sm_0, ds)" -> "MetricTimeBaseNode(QUARTER)"
+  	"AggregationNode(sm_0, ds)" -> "ModelEntityNode(sm_0_primary_entity)"
+  	"ModelEntityNode(sm_0_primary_entity)" -> "JoinToModelNode(sm_0)"
+  	"MeasureAttributeNode(sm_0_measure_0)" -> "AggregationNode(sm_0, ds)"
+  }
