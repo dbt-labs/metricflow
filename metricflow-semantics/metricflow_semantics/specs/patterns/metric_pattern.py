@@ -21,6 +21,7 @@ class MetricSpecPattern(SpecPattern):
     @override
     def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[MetricSpec]:
         spec_set = group_specs_by_type(candidate_specs)
+        print("metric_reference::", self.metric_reference)
         return tuple(
             metric_name for metric_name in spec_set.metric_specs if metric_name.reference == self.metric_reference
         )

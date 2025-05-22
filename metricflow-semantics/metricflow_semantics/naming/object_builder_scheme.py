@@ -10,6 +10,7 @@ from dbt_semantic_interfaces.call_parameter_sets import (
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 from dbt_semantic_interfaces.parsing.where_filter.where_filter_parser import WhereFilterParser
 from dbt_semantic_interfaces.references import EntityReference
+from metricflow_semantics.specs.patterns.metric_pattern import MetricSpecPattern
 from typing_extensions import override
 
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
@@ -100,19 +101,22 @@ class ObjectBuilderNamingScheme(QueryItemNamingScheme):
             )
 
         for metric_call_parameter_set in call_parameter_sets.metric_call_parameter_sets:
-            return EntityLinkPattern(
-                SpecPatternParameterSet.from_parameters(
-                    element_name=metric_call_parameter_set.metric_reference.element_name,
-                    entity_links=tuple(
-                        EntityReference(element_name=group_by_ref.element_name)
-                        for group_by_ref in metric_call_parameter_set.group_by
-                    ),
-                    fields_to_compare=(
-                        ParameterSetField.ELEMENT_NAME,
-                        ParameterSetField.ENTITY_LINKS,
-                    ),
+            if metric_call_parameter_set.group_by:
+                return EntityLinkPattern(
+                    SpecPatternParameterSet.from_parameters(
+                        element_name=metric_call_parameter_set.metric_reference.element_name,
+                        entity_links=tuple(
+                            EntityReference(element_name=group_by_ref.element_name)
+                            for group_by_ref in metric_call_parameter_set.group_by
+                        ),
+                        fields_to_compare=(
+                            ParameterSetField.ELEMENT_NAME,
+                            ParameterSetField.ENTITY_LINKS,
+                        ),
+                    )
                 )
-            )
+            else:
+                return MetricSpecPattern(metric_reference=metric_call_parameter_set.metric_reference)
 
         raise RuntimeError("There should have been a return associated with one of the CallParameterSets.")
 
@@ -132,7 +136,8 @@ class ObjectBuilderNamingScheme(QueryItemNamingScheme):
                 + len(call_parameter_sets.metric_call_parameter_sets)
             ) == 1
             return return_value
-        except ParseWhereFilterException:
+        except ParseWhereFilterException as e:
+            print("hitting exception::", e)
             return False
 
     @override
