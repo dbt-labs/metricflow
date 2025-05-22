@@ -294,6 +294,7 @@ class MetricFlowQueryResolver:
             matching_specs: List[InstanceSpec] = []
             for possible_input in resolver_input_for_order_by.possible_inputs:
                 spec_pattern = possible_input.spec_pattern
+                print("spec_pattern::", spec_pattern)
                 matching_specs.extend(spec_pattern.match(metric_specs))
                 matching_specs.extend(spec_pattern.match(group_by_item_specs))
 
