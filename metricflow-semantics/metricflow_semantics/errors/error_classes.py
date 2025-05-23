@@ -80,3 +80,9 @@ class InvalidQueryException(InformativeError):
     """Exception thrown when there is an error with the parameters to a MF query."""
 
     pass
+
+
+class RenderSqlTemplateException(InformativeError):
+    """Exception thrown when there is an error rendering a SQL template."""
+
+    pass
