@@ -30,7 +30,7 @@ from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node impor
 from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import (
     JoinToModelNode,
     SemanticModelId,
-    TimeDimensionNode,
+    TimeDimensionNode, JoinFromModelNode,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.named_node import SemanticGraphNodeFactory
 from metricflow_semantics.experimental.semantic_graph.semantic_graph import MutableSemanticGraph
@@ -56,6 +56,7 @@ class TimeDimensionSubgraphGenerator(SemanticSubgraphGenerator):
 
         model_id = SemanticModelId(model_name=lookup.semantic_model.name)
         join_to_semantic_model_node = JoinToModelNode(model_id=model_id)
+        join_from_semantic_model_node = JoinFromModelNode(model_id=model_id)
 
         for dimension in lookup.semantic_model.dimensions:
             if dimension.type is DimensionType.TIME:
@@ -88,6 +89,13 @@ class TimeDimensionSubgraphGenerator(SemanticSubgraphGenerator):
                         relationship=EntityRelationship.RIGHT_CARDINALITY_ONE,
                         head_node=time_dimension_node,
                         weight=1,
+                    )
+                )
+                current_subgraph.add_edge(
+                    EntityAttributeEdge.get_instance(
+                        tail_node=join_from_semantic_model_node,
+                        head_node=time_dimension_node,
+                        attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
                     )
                 )
             elif dimension.type is DimensionType.CATEGORICAL:

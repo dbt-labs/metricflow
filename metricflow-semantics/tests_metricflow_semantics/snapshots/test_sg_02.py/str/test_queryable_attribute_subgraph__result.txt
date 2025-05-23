@@ -12,7 +12,6 @@ default:
       GroupByAttributeRootNode(),
       JoinToModelNode(model_id=sm_0),
       JoinToModelNode(model_id=sm_1),
-      MetricTimeDimensionNode(dimension_name='metric_time', time_grain_name='YEAR'),
       TimeAttributeNode(attribute_name='custom_year'),
       TimeAttributeNode(attribute_name='extract_year'),
       TimeAttributeNode(attribute_name='year'),
@@ -34,6 +33,14 @@ default:
       ),
       EntityRelationshipEdge(
         tail_node=GroupByAttributeRootNode(),
+        head_node=DsiEntityKeyAttributeNode(attribute_name='sm_0_primary_entity'),
+      ),
+      EntityRelationshipEdge(
+        tail_node=GroupByAttributeRootNode(),
+        head_node=DsiEntityKeyAttributeNode(attribute_name='sm_1_primary_entity'),
+      ),
+      EntityRelationshipEdge(
+        tail_node=GroupByAttributeRootNode(),
         head_node=DsiEntityNode(entity_name='sm_0_primary_entity'),
       ),
       EntityRelationshipEdge(
@@ -42,7 +49,7 @@ default:
       ),
       EntityRelationshipEdge(
         tail_node=GroupByAttributeRootNode(),
-        head_node=MetricTimeDimensionNode(dimension_name='metric_time', time_grain_name='YEAR'),
+        head_node=TimeDimensionNode(dimension_name='ds', time_grain_name='year'),
       ),
       EntityRelationshipEdge(
         tail_node=JoinToModelNode(model_id=sm_0),
@@ -67,18 +74,6 @@ default:
       EntityAttributeEdge(
         tail_node=JoinToModelNode(model_id=sm_1),
         head_node=DsiEntityKeyAttributeNode(attribute_name='sm_1_primary_entity'),
-      ),
-      EntityAttributeEdge(
-        tail_node=MetricTimeDimensionNode(dimension_name='metric_time', time_grain_name='YEAR'),
-        head_node=TimeAttributeNode(attribute_name='custom_year'),
-      ),
-      EntityAttributeEdge(
-        tail_node=MetricTimeDimensionNode(dimension_name='metric_time', time_grain_name='YEAR'),
-        head_node=TimeAttributeNode(attribute_name='extract_year'),
-      ),
-      EntityAttributeEdge(
-        tail_node=MetricTimeDimensionNode(dimension_name='metric_time', time_grain_name='YEAR'),
-        head_node=TimeAttributeNode(attribute_name='year'),
       ),
       EntityAttributeEdge(
         tail_node=TimeBaseNode(time_grain_name='YEAR'),
@@ -112,9 +107,6 @@ dot_notation:
   	subgraph cluster_sm_1 {
   		"JoinTo(sm_1)"
   	}
-  	subgraph cluster_metric_time_base {
-  		"MetricTimeDim(YEAR)"
-  	}
   	subgraph cluster_time_attribute {
   		"Time(custom_year)"
   		"Time(extract_year)"
@@ -129,18 +121,17 @@ dot_notation:
   	"Entity(sm_0_primary_entity)" -> "Entity(sm_1_primary_entity)"
   	"Entity(sm_0_primary_entity)" -> "JoinTo(sm_0)"
   	"Entity(sm_1_primary_entity)" -> "JoinTo(sm_1)"
+  	GroupByAttributeRoot -> "DsiEntityKey(sm_0_primary_entity)"
+  	GroupByAttributeRoot -> "DsiEntityKey(sm_1_primary_entity)"
   	GroupByAttributeRoot -> "Entity(sm_0_primary_entity)"
   	GroupByAttributeRoot -> "Entity(sm_1_primary_entity)"
-  	GroupByAttributeRoot -> "MetricTimeDim(YEAR)"
+  	GroupByAttributeRoot -> "TimeDim(ds)"
   	"JoinTo(sm_0)" -> "TimeDim(ds)"
   	"TimeDim(ds)" -> "TimeBase(YEAR)"
   	"JoinTo(sm_0)" -> "DsiEntityKey(sm_0_primary_entity)"
   	"JoinTo(sm_0)" -> "DsiEntityKey(sm_1_primary_entity)"
   	"JoinTo(sm_1)" -> "Dim(dim_0)"
   	"JoinTo(sm_1)" -> "DsiEntityKey(sm_1_primary_entity)"
-  	"MetricTimeDim(YEAR)" -> "Time(custom_year)"
-  	"MetricTimeDim(YEAR)" -> "Time(extract_year)"
-  	"MetricTimeDim(YEAR)" -> "Time(year)"
   	"TimeBase(YEAR)" -> "Time(custom_year)"
   	"TimeBase(YEAR)" -> "Time(extract_year)"
   	"TimeBase(YEAR)" -> "Time(year)"

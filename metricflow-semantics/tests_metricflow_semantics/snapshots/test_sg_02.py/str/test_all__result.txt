@@ -68,6 +68,26 @@ default:
         head_node=TimeBaseNode(time_grain_name='YEAR'),
       ),
       EntityAttributeEdge(
+        tail_node=JoinFromModelNode(model_id=sm_0),
+        head_node=DsiEntityKeyAttributeNode(attribute_name='sm_0_primary_entity'),
+      ),
+      EntityAttributeEdge(
+        tail_node=JoinFromModelNode(model_id=sm_0),
+        head_node=DsiEntityKeyAttributeNode(attribute_name='sm_1_primary_entity'),
+      ),
+      EntityAttributeEdge(
+        tail_node=JoinFromModelNode(model_id=sm_0),
+        head_node=TimeDimensionNode(dimension_name='ds', time_grain_name='year'),
+      ),
+      EntityAttributeEdge(
+        tail_node=JoinFromModelNode(model_id=sm_1),
+        head_node=CategoricalDimensionAttributeNode(attribute_name='dim_0'),
+      ),
+      EntityAttributeEdge(
+        tail_node=JoinFromModelNode(model_id=sm_1),
+        head_node=DsiEntityKeyAttributeNode(attribute_name='sm_1_primary_entity'),
+      ),
+      EntityAttributeEdge(
         tail_node=JoinToModelNode(model_id=sm_0),
         head_node=DsiEntityKeyAttributeNode(attribute_name='sm_0_primary_entity'),
       ),
@@ -159,6 +179,11 @@ dot_notation:
   	"JoinFrom(sm_1)" -> "Entity(sm_1_primary_entity)"
   	"JoinTo(sm_0)" -> "TimeDim(ds)"
   	"TimeDim(ds)" -> "TimeBase(YEAR)"
+  	"JoinFrom(sm_0)" -> "DsiEntityKey(sm_0_primary_entity)"
+  	"JoinFrom(sm_0)" -> "DsiEntityKey(sm_1_primary_entity)"
+  	"JoinFrom(sm_0)" -> "TimeDim(ds)"
+  	"JoinFrom(sm_1)" -> "Dim(dim_0)"
+  	"JoinFrom(sm_1)" -> "DsiEntityKey(sm_1_primary_entity)"
   	"JoinTo(sm_0)" -> "DsiEntityKey(sm_0_primary_entity)"
   	"JoinTo(sm_0)" -> "DsiEntityKey(sm_1_primary_entity)"
   	"JoinTo(sm_1)" -> "Dim(dim_0)"

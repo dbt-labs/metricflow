@@ -21,7 +21,7 @@ from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node impor
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import (
     JoinToModelNode,
-    SemanticModelId,
+    SemanticModelId, JoinFromModelNode,
 )
 from metricflow_semantics.experimental.semantic_graph.semantic_graph import MutableSemanticGraph
 
@@ -45,11 +45,18 @@ class EntityAttributeSubgraphGenerator(SemanticSubgraphGenerator):
 
         model_id = SemanticModelId(model_name=lookup.semantic_model.name)
         join_to_semantic_model_node = JoinToModelNode(model_id=model_id)
-
+        join_from_semantic_model_node = JoinFromModelNode(model_id=model_id)
         for attribute_node in self._get_attribute_nodes_for_entities(lookup):
             current_subgraph.add_edge(
                 EntityAttributeEdge.get_instance(
                     tail_node=join_to_semantic_model_node,
+                    head_node=attribute_node,
+                    attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
+                )
+            )
+            current_subgraph.add_edge(
+                EntityAttributeEdge.get_instance(
+                    tail_node=join_from_semantic_model_node,
                     head_node=attribute_node,
                     attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
                 )
@@ -60,7 +67,7 @@ class EntityAttributeSubgraphGenerator(SemanticSubgraphGenerator):
     @override
     def generate_subgraph(self) -> MutableSemanticGraph:
         current_subgraph = MutableSemanticGraph.create()
-        for lookup in self._manifest_object_lookup.non_measure_containing_model_lookups:
+        for lookup in self._manifest_object_lookup.model_object_lookups:
             current_subgraph.update(self._get_subgraph_for_model(lookup))
 
         return current_subgraph

@@ -51,7 +51,7 @@ class EntityAttributeEdge(SemanticGraphEdge):
             _head_node=head_node,
             attribute_edge_type=attribute_edge_type,
             linkable_element_properties=linkable_element_properties,
-            _weight=0,
+            _weight=weight,
         )
 
     # @override

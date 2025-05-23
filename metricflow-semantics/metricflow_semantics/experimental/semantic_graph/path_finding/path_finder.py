@@ -78,8 +78,7 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT], ABC):
     #     raise NotImplementedError()
 
     def _pop_node_visit_context(self) -> None:
-        popped_visit_context = self._node_visit_contexts.pop(-1)
-        self._current_path_weight -= popped_visit_context.weight_added_by_edge_to_this_node
+        self._node_visit_contexts.pop(-1)
         self._current_path.pop_end()
 
     def find_all_simple_paths(
@@ -117,11 +116,12 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT], ABC):
             current_node_visit_context = self._node_visit_contexts[-1]
             current_node = current_node_visit_context.node
 
-            # logger.debug(LazyFormat("Start visit", current_node=current_node, current_node_visit_context=current_node_visit_context))
+            logger.debug(LazyFormat("Start visit", current_node=current_node, current_node_visit_context=current_node_visit_context))
 
             # If we've hit one of the target nodes, so return the path to the node and stop visiting
             # descendants of the current node.
             if current_node in target_nodes:
+                logger.debug(LazyFormat("Reached target node, so returning current path", current_node=current_node))
                 yield self._current_path
                 self._pop_node_visit_context()
                 continue
@@ -129,6 +129,8 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT], ABC):
             # If the current node has no descendants, then go to the next visit context.
             edges_to_process_in_current_node = current_node_visit_context.edges_to_process_from_this_node
             if len(edges_to_process_in_current_node) == 0:
+                logger.debug(LazyFormat("No more edges remaining for current context, so popping it off."))
+
                 self._finished_visiting_nodes.add(current_node)
                 self._pop_node_visit_context()
                 continue
@@ -139,18 +141,28 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT], ABC):
 
             # If we can't go to the next node, then restart the loop so that we can check the next edge.
             if next_node in self._finished_visiting_nodes:
+                logger.debug(LazyFormat("Skipping node as it has already been visited.", next_node=next_node))
                 continue
 
             # Avoid cycles
             if next_node in self._current_path.node_set:
+                logger.debug(LazyFormat("Skipping node as would produce a cycle.", next_node=next_node))
                 continue
 
             next_edge_weight = weight_function.weight(next_edge_to_take)
 
             if next_edge_weight is None:
+                logger.debug(LazyFormat("Skipping edge as the weight is not set", next_edge_to_take=next_edge_to_take))
                 continue
 
             if next_edge_weight + self._current_path.weight > max_path_weight:
+                logger.debug(
+                    LazyFormat(
+                        "Skipping edge as the weight would exceed cutoff",
+                        next_edge_to_take=next_edge_to_take,
+                        next_edge_weight=next_edge_weight,
+                    )
+                )
                 continue
 
             # Take the next edge.
