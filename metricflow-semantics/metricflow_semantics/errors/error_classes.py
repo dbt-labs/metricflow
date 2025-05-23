@@ -4,7 +4,13 @@ import textwrap
 from typing import Dict, Optional
 
 
-class CustomerFacingSemanticException(Exception):
+class InformativeError(Exception):
+    """Raised when the error is actionable by the user or is informational."""
+
+    pass
+
+
+class CustomerFacingSemanticException(InformativeError):
     """Class of Exceptions that make it to the customer's eyeballs."""
 
     pass
@@ -25,7 +31,7 @@ class UnableToSatisfyQueryError(CustomerFacingSemanticException):  # noqa: D101
         return "\n".join(error_lines)
 
 
-class SemanticException(Exception):  # noqa: D101
+class SemanticException(InformativeError):  # noqa: D101
     pass
 
 
@@ -51,23 +57,19 @@ class ExecutionException(Exception):
     pass
 
 
-class InferenceError(Exception):
-    """Exception to represent errors related to inference."""
-
-
-class UnsupportedEngineFeatureError(RuntimeError):
+class UnsupportedEngineFeatureError(InformativeError, RuntimeError):
     """Raised when the user attempts to use a feature that isn't supported by the data platform."""
 
 
-class SqlBindParametersNotSupportedError(Exception):
+class SqlBindParametersNotSupportedError(InformativeError):
     """Raised when a SqlClient that does not have support for bind parameters receives a non-empty set of params."""
 
 
-class UnknownMetricLinkingError(ValueError):
+class UnknownMetricLinkingError(InformativeError):
     """Raised during linking when a user attempts to use a metric that isn't specified."""
 
 
-class InvalidQuerySyntax(Exception):
+class InvalidQuerySyntax(InformativeError):
     """Raised when query syntax is invalid. Primarily used in the where clause."""
 
     def __init__(self, msg: str) -> None:  # noqa: D107
