@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import logging
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.type_enums import DimensionType
 from typing_extensions import override
 
 from metricflow_semantics.experimental.semantic_graph.builder.graph_change_rule import (
@@ -20,12 +18,8 @@ from metricflow_semantics.experimental.semantic_graph.edges.entity_relationship 
 )
 from metricflow_semantics.experimental.semantic_graph.model_object_lookup import (
     MeasureContainingModelObjectLookup,
-    SemanticModelObjectLookup,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import (
-    AttributeNode,
-    CategoricalDimensionAttributeNode,
-    DsiEntityKeyAttributeNode,
     MeasureAttributeNode,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import (

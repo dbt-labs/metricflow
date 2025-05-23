@@ -25,9 +25,9 @@ EdgeWeightFunctionT = TypeVar("EdgeWeightFunctionT", bound="EdgeWeightFunction")
 
 
 @dataclass
-class ReachableDescendantResult(Generic[NodeT, EdgeT]):
-    matching_descendants: MutableOrderedSet[NodeT]
-    required_edges: MutableOrderedSet[EdgeT]
+class DescendantResult(Generic[NodeT, EdgeT]):
+    descendant_nodes: MutableOrderedSet[NodeT]
+    found_target_nodes: MutableOrderedSet[NodeT]
 
 
 class MetricflowGraphPathFinder(Generic[NodeT, EdgeT], ABC):
@@ -48,7 +48,7 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT], ABC):
         candidate_target_nodes: Set[NodeT],
         weight_function: EdgeWeightFunction[NodeT, EdgeT],
         max_path_weight: int,
-    ) -> ReachableDescendantResult:
+    ) -> DescendantResult:
         matching_descendants = MutableOrderedSet[NodeT]()
         required_edges = MutableOrderedSet[EdgeT]()
 
@@ -63,9 +63,9 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT], ABC):
             # TODO: This can be improved as it adds a lot of edges repeatedly.
             required_edges.update(path.edges)
 
-        return ReachableDescendantResult(
-            matching_descendants=matching_descendants,
-            required_edges=required_edges,
+        return DescendantResult(
+            descendant_nodes=matching_descendants,
+            found_target_nodes=required_edges,
         )
 
     # @abstractmethod
@@ -88,6 +88,47 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT], ABC):
         weight_function: EdgeWeightFunction[NodeT, EdgeT],
         max_path_weight: int,
     ) -> Generator[MetricflowGraphPath[NodeT, EdgeT], None, None]:
+        for path in self._traverse_dfs(
+            source_node=source_node,
+            target_nodes=target_nodes,
+            weight_function=weight_function,
+            max_path_weight=max_path_weight,
+            allow_revisits_from_a_different_source=True,
+        ):
+            yield path
+
+    def find_descendant_nodes(
+        self,
+        source_node: NodeT,
+        candidate_target_nodes: Set[NodeT],
+        weight_function: EdgeWeightFunction[NodeT, EdgeT],
+        max_path_weight: int,
+    ) -> DescendantResult[NodeT, EdgeT]:
+        descendant_nodes = MutableOrderedSet[NodeT]()
+        found_target_nodes = MutableOrderedSet[NodeT]()
+        for path in self._traverse_dfs(
+            source_node=source_node,
+            target_nodes=candidate_target_nodes,
+            weight_function=weight_function,
+            max_path_weight=max_path_weight,
+            allow_revisits_from_a_different_source=False,
+        ):
+            descendant_nodes.update(path.node_set)
+            found_target_nodes.add(path.nodes[-1])
+
+        return DescendantResult(
+            descendant_nodes=descendant_nodes,
+            found_target_nodes=found_target_nodes,
+        )
+
+    def _traverse_dfs(
+        self,
+        source_node: NodeT,
+        target_nodes: Set[NodeT],
+        weight_function: EdgeWeightFunction[NodeT, EdgeT],
+        max_path_weight: int,
+        allow_revisits_from_a_different_source: bool,
+    ) -> Generator[MutableMetricflowGraphPath[NodeT, EdgeT], None, None]:
         # Visit the descendants in DFS, starting from the source node.
         self._finished_visiting_nodes = MutableOrderedSet()
         self._current_path = MutableMetricflowGraphPath.create(
@@ -116,7 +157,11 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT], ABC):
             current_node_visit_context = self._node_visit_contexts[-1]
             current_node = current_node_visit_context.node
 
-            logger.debug(LazyFormat("Start visit", current_node=current_node, current_node_visit_context=current_node_visit_context))
+            logger.debug(
+                LazyFormat(
+                    "Start visit", current_node=current_node, current_node_visit_context=current_node_visit_context
+                )
+            )
 
             # If we've hit one of the target nodes, so return the path to the node and stop visiting
             # descendants of the current node.
@@ -140,7 +185,7 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT], ABC):
             next_node = next_edge_to_take.head_node
 
             # If we can't go to the next node, then restart the loop so that we can check the next edge.
-            if next_node in self._finished_visiting_nodes:
+            if not allow_revisits_from_a_different_source and next_node in self._finished_visiting_nodes:
                 logger.debug(LazyFormat("Skipping node as it has already been visited.", next_node=next_node))
                 continue
 
@@ -297,6 +342,11 @@ class MetricflowGraphPath(MetricFlowPrettyFormattable, Generic[NodeT, EdgeT], AB
             },
         )
 
+    @property
+    @abstractmethod
+    def node_set(self) -> MutableOrderedSet[NodeT]:
+        raise NotImplementedError()
+
 
 @dataclass
 class MutableMetricflowGraphPath(MetricflowGraphPath[NodeT, EdgeT]):
@@ -304,7 +354,7 @@ class MutableMetricflowGraphPath(MetricflowGraphPath[NodeT, EdgeT]):
     _edges: list[EdgeT]
     _weight_addition_order: list[int]
     _current_weight: int
-    _current_node_set: set[NodeT]
+    _current_node_set: MutableOrderedSet[NodeT]
     _node_set_addition_order: list[Optional[NodeT]]
 
     @staticmethod
@@ -314,7 +364,7 @@ class MutableMetricflowGraphPath(MetricflowGraphPath[NodeT, EdgeT]):
             _edges=[],
             _weight_addition_order=[],
             _current_weight=0,
-            _current_node_set=set(),
+            _current_node_set=MutableOrderedSet(),
             _node_set_addition_order=[],
         )
 
@@ -376,7 +426,7 @@ class MutableMetricflowGraphPath(MetricflowGraphPath[NodeT, EdgeT]):
         return
 
     @property
-    def node_set(self) -> Set[NodeT]:
+    def node_set(self) -> MutableOrderedSet[NodeT]:
         return self._current_node_set
 
 

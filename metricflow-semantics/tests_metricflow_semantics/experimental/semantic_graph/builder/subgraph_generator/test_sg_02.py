@@ -88,7 +88,7 @@ def test_descendants(  # noqa: D103
         snapshot_configuration=mf_test_configuration,
         snapshot_str=LazyFormat(
             "Computed descendants",
-            descendants=sorted(descendants.matching_descendants),
+            descendants=sorted(descendants.descendant_nodes),
         ).evaluated_value,
     )
 

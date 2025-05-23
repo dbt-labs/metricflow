@@ -113,3 +113,14 @@ class MutableGraph(Generic[NodeT, EdgeT], MetricflowGraph[NodeT, EdgeT], ABC):
             updated_graph.add_edge(edge)
 
         return updated_graph
+
+    def subgraph_edges(self, selected_nodes: OrderedSet[NodeT]) -> MutableOrderedSet[EdgeT]:
+        subgraph_edges = MutableOrderedSet[EdgeT]()
+        for node in selected_nodes:
+            for edge in self.edges_with_tail_node(node):
+                if edge.head_node in selected_nodes:
+                    subgraph_edges.add(edge)
+            for edge in self.edges_with_head_node(node):
+                if edge.tail_node in selected_nodes:
+                    subgraph_edges.add(edge)
+        return subgraph_edges

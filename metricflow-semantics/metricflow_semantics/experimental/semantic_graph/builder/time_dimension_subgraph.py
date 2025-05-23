@@ -28,9 +28,10 @@ from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node impor
     DsiEntityKeyAttributeNode,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import (
+    JoinFromModelNode,
     JoinToModelNode,
     SemanticModelId,
-    TimeDimensionNode, JoinFromModelNode,
+    TimeDimensionNode,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.named_node import SemanticGraphNodeFactory
 from metricflow_semantics.experimental.semantic_graph.semantic_graph import MutableSemanticGraph

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import logging
+from typing import Iterable
 
+from metricflow_semantics.experimental.metricflow_exception import MetricflowAssertionError
 from metricflow_semantics.experimental.ordered_set import MutableOrderedSet
 from metricflow_semantics.experimental.semantic_graph.edges.entity_relationship import (
     EntityRelationship,
@@ -10,9 +12,8 @@ from metricflow_semantics.experimental.semantic_graph.edges.entity_relationship 
 from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import MeasureAttributeNode
 from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import GroupByAttributeRootNode
 from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
-    DsiEntityLabel,
     GroupByAttributeLabel,
-    MetricTimeLabel, TimeDimensionLabel, JoinFromLabel,
+    JoinFromLabel,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
     SemanticGraphEdge,
@@ -44,47 +45,53 @@ class GroupByAttributeSubgraphGenerator:
         #     semantic_graph.nodes_with_label(TimeDimensionLabel())
         # )
 
-        target_nodes = MutableOrderedSet[SemanticGraphNode]()
-        # target_nodes.update(semantic_graph.nodes_with_label(GroupByAttributeLabel()))
-        # target_nodes.update(semantic_graph.nodes_with_label(MetricTimeLabel()))
-        # target_nodes.update(semantic_graph.nodes_with_label(DsiEntityLabel()))
-        target_nodes.update(semantic_graph.nodes_with_label(JoinFromLabel()))
-        target_nodes_result = path_finder.find_reachable_descendants(
+        label = JoinFromLabel()
+        join_from_nodes = MutableOrderedSet[SemanticGraphNode](semantic_graph.nodes_with_label(label))
+        find_nearest_join_from_node_result = path_finder.find_descendant_nodes(
             source_node=measure_attribute_node,
-            candidate_target_nodes=target_nodes,
+            candidate_target_nodes=join_from_nodes,
             max_path_weight=0,
             weight_function=DefaultWeightFunction(graph=semantic_graph),
         )
-
-        logger.debug(LazyFormat(
-            "Got target nodes result",
-            target_nodes=target_nodes,
-            target_nodes_result=target_nodes_result))
-
-        result_graph = MutableSemanticGraph.create()
-        sentinel_node = GroupByAttributeRootNode()
-        for matching_descendant in target_nodes_result.matching_descendants:
-            result = path_finder.find_reachable_descendants(
-                source_node=matching_descendant,
-                candidate_target_nodes=semantic_graph.nodes_with_label(GroupByAttributeLabel()),
-                max_path_weight=3,
-                weight_function=DefaultWeightFunction(graph=semantic_graph),
+        found_target_nodes = tuple(find_nearest_join_from_node_result.found_target_nodes)
+        logger.debug(
+            LazyFormat(
+                "Found nearest nodes with label",
+                label=label,
+                candidate_target_nodes=join_from_nodes,
+                found_target_nodes=found_target_nodes,
             )
-            logger.info(LazyFormat("Got descendants", source_node=matching_descendant, edges=result.required_edges))
-            for edge in result.required_edges:
-                if edge.tail_node is matching_descendant:
-                    result_graph.add_edge(
-                        EntityRelationshipEdge.get_instance(
-                            tail_node=sentinel_node,
-                            relationship=EntityRelationship.VALID,
-                            head_node=edge.head_node,
-                            weight=0,
-                        )
-                    )
-                else:
-                    result_graph.add_edge(edge)
+        )
 
+        if len(found_target_nodes) != 1:
+            raise MetricflowAssertionError(
+                LazyFormat(
+                    "Expected to find exactly one a join-from node as a descendant of the measure node. "
+                    "This might be due to incorrect graph construction.",
+                    measure_attribute_node=measure_attribute_node,
+                    join_from_nodes=join_from_nodes,
+                )
+            )
+        join_from_node = found_target_nodes[0]
 
+        nodes_in_path_to_group_by_attribute_nodes = path_finder.find_descendant_nodes(
+            source_node=join_from_node,
+            candidate_target_nodes=semantic_graph.nodes_with_label(GroupByAttributeLabel()),
+            max_path_weight=3,
+            weight_function=DefaultWeightFunction(graph=semantic_graph),
+        ).descendant_nodes
+        nodes_in_path_to_group_by_attribute_nodes.add(join_from_node)
+
+        logger.debug(LazyFormat("Found nodes in path to attribute nodes", nodes_in_path_to_group_by_attribute_nodes=nodes_in_path_to_group_by_attribute_nodes))
+
+        subgraph_edges = semantic_graph.subgraph_edges(nodes_in_path_to_group_by_attribute_nodes)
+        subgraph_edges = self._replace_join_to_node_with_group_by_attribute_root_node(
+            join_from_node=join_from_node,
+            edges=subgraph_edges,
+        )
+        subgraph = MutableSemanticGraph.create()
+        subgraph.add_edges(subgraph_edges)
+        return subgraph
         # for matching_descendant in target_nodes_result.matching_descendants:
         #     result_graph.add_edge(
         #         EntityRelationshipEdge.get_instance(
@@ -95,4 +102,21 @@ class GroupByAttributeSubgraphGenerator:
         #         )
         #     )
 
-        return result_graph
+    def _replace_join_to_node_with_group_by_attribute_root_node(
+        self, join_from_node: SemanticGraphNode, edges: Iterable[SemanticGraphEdge]
+    ) -> MutableOrderedSet[SemanticGraphEdge]:
+        updated_edges = MutableOrderedSet[SemanticGraphEdge]()
+        root_node = GroupByAttributeRootNode()
+        for edge in edges:
+            if edge.tail_node is join_from_node:
+                updated_edges.add(
+                    EntityRelationshipEdge.get_instance(
+                        tail_node=root_node,
+                        relationship=EntityRelationship.VALID,
+                        head_node=edge.head_node,
+                        weight=0,
+                    )
+                )
+            else:
+                updated_edges.add(edge)
+        return updated_edges

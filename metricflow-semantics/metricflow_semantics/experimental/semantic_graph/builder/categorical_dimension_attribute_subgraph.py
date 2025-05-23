@@ -22,8 +22,9 @@ from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node impor
     CategoricalDimensionAttributeNode,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import (
+    JoinFromModelNode,
     JoinToModelNode,
-    SemanticModelId, JoinFromModelNode,
+    SemanticModelId,
 )
 from metricflow_semantics.experimental.semantic_graph.semantic_graph import MutableSemanticGraph
 
@@ -54,7 +55,9 @@ class CategoricalDimensionAttributeSubgraphGenerator(SemanticSubgraphGenerator):
     def _get_subgraph_for_model(self, lookup: SemanticModelObjectLookup) -> MutableSemanticGraph:
         current_subgraph = MutableSemanticGraph.create()
         model_id = SemanticModelId(model_name=lookup.semantic_model.name)
-        join_to_semantic_model_node = JoinToModelNode(model_id=model_id,)
+        join_to_semantic_model_node = JoinToModelNode(
+            model_id=model_id,
+        )
         join_from_semantic_model_node = JoinFromModelNode(model_id=model_id)
         for attribute_node in self._get_attribute_nodes_for_categorical_dimensions(lookup):
             current_subgraph.add_edge(

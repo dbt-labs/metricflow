@@ -256,3 +256,7 @@ class MetricflowGraph(MetricFlowPrettyFormattable, Generic[NodeT, EdgeT], ABC):
     @abstractmethod
     def inverse(self) -> Self:
         raise NotImplementedError()
+
+    @abstractmethod
+    def subgraph_edges(self, selected_nodes: OrderedSet[NodeT]) -> OrderedSet[EdgeT]:
+        raise NotImplementedError()
