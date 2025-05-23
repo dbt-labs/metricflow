@@ -4,8 +4,8 @@ import logging
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+from metricflow_semantics.errors.error_classes import InvalidQueryException
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow_semantics.query.query_exceptions import InvalidQueryException
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_snapshot_equal, assert_str_snapshot_equal

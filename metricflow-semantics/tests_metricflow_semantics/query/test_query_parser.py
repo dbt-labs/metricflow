@@ -10,8 +10,8 @@ from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
+from metricflow_semantics.errors.error_classes import InvalidQueryException
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow_semantics.query.query_exceptions import InvalidQueryException
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.query_param_implementations import (

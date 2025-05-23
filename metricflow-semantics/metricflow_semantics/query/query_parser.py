@@ -15,6 +15,7 @@ from dbt_semantic_interfaces.references import SemanticModelReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 
 from metricflow_semantics.assert_one_arg import assert_at_most_one_arg_set
+from metricflow_semantics.errors.error_classes import InvalidQueryException
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
@@ -38,7 +39,6 @@ from metricflow_semantics.query.group_by_item.group_by_item_resolver import Grou
 from metricflow_semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
 from metricflow_semantics.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
 from metricflow_semantics.query.issues.parsing.string_input_parsing_issue import StringInputParsingIssue
-from metricflow_semantics.query.query_exceptions import InvalidQueryException
 from metricflow_semantics.query.query_resolution import InputToIssueSetMapping, InputToIssueSetMappingItem
 from metricflow_semantics.query.query_resolver import MetricFlowQueryResolver
 from metricflow_semantics.query.resolver_inputs.base_resolver_inputs import MetricFlowQueryResolverInput

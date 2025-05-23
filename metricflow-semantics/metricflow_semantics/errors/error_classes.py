@@ -74,3 +74,9 @@ class InvalidQuerySyntax(InformativeError):
 
     def __init__(self, msg: str) -> None:  # noqa: D107
         super().__init__(msg)
+
+
+class InvalidQueryException(InformativeError):
+    """Exception thrown when there is an error with the parameters to a MF query."""
+
+    pass
