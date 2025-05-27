@@ -1,0 +1,13 @@
+test_name: test_time_dimension_subgraph
+test_filename: test_subgraph_generator.py
+---
+mf_pformat: MutableSemanticGraph()
+dot_notation:
+  graph {
+    label='semantic_graph'
+    sm_0
+    ds
+    _base_quarter
+    sm_0 -> ds [label='sm_0->ds']
+    ds -> _base_quarter [label='ds->_base_quarter']
+  }

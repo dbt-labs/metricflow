@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import logging
 from abc import ABC
-from collections import defaultdict
 from dataclasses import dataclass
 from typing import DefaultDict, Generic, Iterable, TypeVar
 
-from typing_extensions import Self, override
+from typing_extensions import override
 
+from metricflow_semantics.experimental.mf_graph.graph_id import MetricflowGraphId, UniqueGraphId
 from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
 from metricflow_semantics.experimental.mf_graph.mf_graph import (
     MetricflowGraph,
@@ -26,8 +26,12 @@ NodeT = TypeVar("NodeT", bound=MetricflowGraphNode)
 
 @dataclass
 class MutableGraph(Generic[NodeT, EdgeT], MetricflowGraph[NodeT, EdgeT], ABC):
-    """Base class for mutable graphs."""
+    """Base class for mutable graphs.
 
+    The graph ID is changed to a new value whenever this changes for easier cache management.
+    """
+
+    _graph_id: MetricflowGraphId
     _nodes: MutableOrderedSet[NodeT]
     _edges: MutableOrderedSet[EdgeT]
 
@@ -40,6 +44,7 @@ class MutableGraph(Generic[NodeT, EdgeT], MetricflowGraph[NodeT, EdgeT], ABC):
         self._nodes.add(node)
         for node_property in node.labels:
             self._label_to_nodes[node_property].add(node)
+        self._graph_id = UniqueGraphId.create()
 
     def add_nodes(self, nodes: Iterable[NodeT]) -> None:  # noqa: D102
         for node in nodes:
@@ -51,13 +56,20 @@ class MutableGraph(Generic[NodeT, EdgeT], MetricflowGraph[NodeT, EdgeT], ABC):
         self._tail_node_to_edges[edge.tail_node].add(edge)
         self._head_node_to_edges[edge.head_node].add(edge)
         self._edges.add(edge)
+        self._graph_id = UniqueGraphId.create()
 
     def add_edges(self, edges: Iterable[EdgeT]) -> None:  # noqa: D102
         for edge in edges:
             self.add_edge(edge)
 
-    def update(self, other: MetricflowGraph[NodeT, EdgeT]) -> None:  # noqa: D102
+    def update(self, other: MetricflowGraph[NodeT, EdgeT]) -> None:
+        """Add the nodes and edges to this graph."""
+        if len(other.nodes) == 0 and len(other.edges) == 0:
+            return
+
+        self.add_nodes(other.nodes)
         self.add_edges(other.edges)
+        self._graph_id = UniqueGraphId.create()
 
     @override
     @property
@@ -93,33 +105,7 @@ class MutableGraph(Generic[NodeT, EdgeT], MetricflowGraph[NodeT, EdgeT], ABC):
     def predecessors(self, node: MetricflowGraphNode) -> OrderedSet[NodeT]:
         return FrozenOrderedSet(edge.tail_node for edge in self.edges_with_head_node(node))
 
-    def as_sorted(self) -> Self:
-        """Return this graph but with nodes and edges sorted."""
-        # noinspection PyArgumentList
-        updated_graph = self.__class__(
-            _nodes=MutableOrderedSet(),
-            _edges=MutableOrderedSet(),
-            _tail_node_to_edges=defaultdict(MutableOrderedSet),
-            _head_node_to_edges=defaultdict(MutableOrderedSet),
-            _label_to_nodes=defaultdict(MutableOrderedSet),
-            _label_to_edges=defaultdict(MutableOrderedSet),
-        )
-        for node in sorted(self._nodes):
-            updated_graph.add_node(node)
-
-        for edge in sorted(self._edges):
-            updated_graph.add_edge(edge)
-
-        return updated_graph
-
     @override
-    def adjacent_edges(self, selected_nodes: OrderedSet[NodeT]) -> MutableOrderedSet[EdgeT]:
-        subgraph_edges = MutableOrderedSet[EdgeT]()
-        for node in selected_nodes:
-            for edge in self.edges_with_tail_node(node):
-                if edge.head_node in selected_nodes:
-                    subgraph_edges.add(edge)
-            for edge in self.edges_with_head_node(node):
-                if edge.tail_node in selected_nodes:
-                    subgraph_edges.add(edge)
-        return subgraph_edges
+    @property
+    def graph_id(self) -> MetricflowGraphId:
+        return self._graph_id

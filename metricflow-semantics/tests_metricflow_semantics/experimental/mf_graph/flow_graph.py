@@ -11,6 +11,7 @@ from typing import Iterable
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.experimental.mf_graph.comparable import ComparisonKey
+from metricflow_semantics.experimental.mf_graph.graph_id import UniqueGraphId
 from metricflow_semantics.experimental.mf_graph.mf_graph import (
     MetricflowGraph,
     MetricflowGraphEdge,
@@ -109,9 +110,10 @@ class FlowEdge(MetricflowGraphEdge):
 class FlowGraph(MutableGraph[FlowNode, FlowEdge], MetricFlowPrettyFormattable):
     """Example graph."""
 
-    @staticmethod
-    def create(nodes: Iterable[FlowNode] = (), edges: Iterable[FlowEdge] = ()) -> FlowGraph:  # noqa: D102
+    @classmethod
+    def create(cls, nodes: Iterable[FlowNode] = (), edges: Iterable[FlowEdge] = ()) -> FlowGraph:  # noqa: D102
         graph = FlowGraph(
+            _graph_id=UniqueGraphId.create(),
             _nodes=MutableOrderedSet(),
             _edges=MutableOrderedSet(),
             _label_to_nodes=defaultdict(MutableOrderedSet),
@@ -134,3 +136,16 @@ class FlowGraph(MutableGraph[FlowNode, FlowEdge], MetricFlowPrettyFormattable):
     @override
     def inverse(self) -> FlowGraph:
         return FlowGraph.create(edges=(edge.inverse for edge in self.edges))
+
+    @override
+    def as_sorted(self) -> FlowGraph:
+        """Return this graph but with nodes and edges sorted."""
+        # noinspection PyArgumentList
+        updated_graph = FlowGraph.create()
+        for node in sorted(self._nodes):
+            updated_graph.add_node(node)
+
+        for edge in sorted(self._edges):
+            updated_graph.add_edge(edge)
+
+        return updated_graph

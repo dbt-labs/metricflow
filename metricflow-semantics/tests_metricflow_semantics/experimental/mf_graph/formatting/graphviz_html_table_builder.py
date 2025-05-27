@@ -4,12 +4,15 @@ import html
 from contextlib import contextmanager
 from typing import Iterator, Optional
 
-from typing_extensions import Self
-
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
-from tests_metricflow_semantics.experimental.mf_graph.formatting.graphviz_html import GraphvizHtmlAlignment, GraphvizHtmlText
 from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from typing_extensions import Self
+
+from tests_metricflow_semantics.experimental.mf_graph.formatting.graphviz_html import (
+    GraphvizHtmlAlignment,
+    GraphvizHtmlText,
+)
 
 
 class GraphvizHtmlTableBuilder:

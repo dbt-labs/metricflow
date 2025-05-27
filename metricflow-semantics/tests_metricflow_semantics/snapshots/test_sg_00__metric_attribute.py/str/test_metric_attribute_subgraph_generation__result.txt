@@ -1,0 +1,68 @@
+test_name: test_metric_attribute_subgraph_generation
+test_filename: test_sg_00__metric_attribute.py
+---
+default:
+  MutableSemanticGraph(
+    nodes={
+      Agg(sm_0, ds),
+      Entity(sm_0_primary_entity),
+      JoinFrom(sm_0),
+      JoinTo(sm_0),
+      Measure(sm_0_measure_0),
+      Metric(sm_0_measure_0_metric),
+      MetricTimeDimension(YEAR),
+      Time(custom_year),
+      Time(year),
+      Time(year),
+    },
+    edges={
+      EntityAttributeEdge(tail_node=Entity(sm_0_primary_entity), head_node=Metric(sm_0_measure_0_metric)),
+      EntityAttributeEdge(tail_node=Measure(sm_0_measure_0), head_node=Agg(sm_0, ds)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(YEAR), head_node=Time(custom_year)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(YEAR), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(YEAR), head_node=Time(year)),
+      EntityRelationshipEdge(tail_node=Agg(sm_0, ds), head_node=JoinFrom(sm_0)),
+      EntityRelationshipEdge(tail_node=Agg(sm_0, ds), head_node=JoinTo(sm_0)),
+      EntityRelationshipEdge(tail_node=Agg(sm_0, ds), head_node=MetricTimeDimension(YEAR)),
+      EntityRelationshipEdge(tail_node=Entity(sm_0_primary_entity), head_node=JoinTo(sm_0)),
+      EntityRelationshipEdge(tail_node=JoinFrom(sm_0), head_node=Entity(sm_0_primary_entity)),
+    },
+  )
+dot_notation:
+  digraph {
+  	graph [name=MutableSemanticGraph]
+  	subgraph cluster_sm_0 {
+  		label=sm_0
+  		"JoinFrom(sm_0)"
+  		"JoinTo(sm_0)"
+  		"Measure(sm_0_measure_0)"
+  	}
+  	subgraph cluster_model_entity {
+  		label=model_entity
+  		"Entity(sm_0_primary_entity)"
+  	}
+  	subgraph cluster_other_attribute {
+  		label=other_attribute
+  		"Metric(sm_0_measure_0_metric)"
+  	}
+  	subgraph cluster_time_dimension {
+  		label=time_dimension
+  		"MetricTimeDimension(YEAR)"
+  	}
+  	subgraph cluster_time_attribute {
+  		label=time_attribute
+  		"Time(custom_year)"
+  		"Time(year)"
+  		"Time(year)"
+  	}
+  	"Entity(sm_0_primary_entity)" -> "Metric(sm_0_measure_0_metric)"
+  	"Measure(sm_0_measure_0)" -> "Agg(sm_0, ds)"
+  	"MetricTimeDimension(YEAR)" -> "Time(custom_year)"
+  	"MetricTimeDimension(YEAR)" -> "Time(year)"
+  	"MetricTimeDimension(YEAR)" -> "Time(year)"
+  	"Agg(sm_0, ds)" -> "JoinFrom(sm_0)"
+  	"Agg(sm_0, ds)" -> "JoinTo(sm_0)"
+  	"Agg(sm_0, ds)" -> "MetricTimeDimension(YEAR)"
+  	"Entity(sm_0_primary_entity)" -> "JoinTo(sm_0)"
+  	"JoinFrom(sm_0)" -> "Entity(sm_0_primary_entity)"
+  }

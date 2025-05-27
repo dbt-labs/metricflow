@@ -1,0 +1,67 @@
+test_name: test_descendants
+test_filename: test_sg_02.py
+---
+{
+  'graph': ('digraph MutableSemanticGraph {\n'
+   '\tsubgraph cluster_sm_0 {\n'
+   '\t\t"Agg(sm_0, ds)"\n'
+   '\t\t"JoinFrom(sm_0)"\n'
+   '\t\t"JoinTo(sm_0)"\n'
+   '\t\t"Measure(sm_0_measure_0)"\n'
+   '\t\t"TimeDim(sm_0, ds)"\n'
+   '\t}\n'
+   '\tsubgraph cluster_other_attribute {\n'
+   '\t\t"Dim(dim_0)"\n'
+   '\t\t"DsiEntityKey(sm_0_primary_entity)"\n'
+   '\t\t"DsiEntityKey(sm_1_primary_entity)"\n'
+   '\t}\n'
+   '\tsubgraph cluster_model_entity {\n'
+   '\t\t"Entity(sm_0_primary_entity)"\n'
+   '\t\t"Entity(sm_1_primary_entity)"\n'
+   '\t}\n'
+   '\tsubgraph cluster_sm_1 {\n'
+   '\t\t"JoinFrom(sm_1)"\n'
+   '\t\t"JoinTo(sm_1)"\n'
+   '\t}\n'
+   '\tsubgraph cluster_metric_time_base {\n'
+   '\t\t"MetricTimeBase(YEAR)"\n'
+   '\t}\n'
+   '\tsubgraph cluster_time_attribute {\n'
+   '\t\t"Time(custom_year)"\n'
+   '\t\t"Time(extract_year)"\n'
+   '\t\t"Time(year)"\n'
+   '\t}\n'
+   '\tsubgraph cluster_time_base {\n'
+   '\t\t"TimeBase(YEAR)"\n'
+   '\t}\n'
+   '\t"Agg(sm_0, ds)" -> "JoinFrom(sm_0)"\n'
+   '\t"Agg(sm_0, ds)" -> "JoinTo(sm_0)"\n'
+   '\t"Agg(sm_0, ds)" -> "MetricTimeBase(YEAR)"\n'
+   '\t"Entity(sm_0_primary_entity)" -> "JoinTo(sm_0)"\n'
+   '\t"Entity(sm_1_primary_entity)" -> "JoinTo(sm_1)"\n'
+   '\t"JoinFrom(sm_0)" -> "Entity(sm_0_primary_entity)"\n'
+   '\t"JoinFrom(sm_0)" -> "Entity(sm_1_primary_entity)"\n'
+   '\t"JoinFrom(sm_1)" -> "Entity(sm_1_primary_entity)"\n'
+   '\t"JoinTo(sm_0)" -> "TimeDim(sm_0, ds)"\n'
+   '\t"TimeDim(sm_0, ds)" -> "TimeBase(YEAR)"\n'
+   '\t"JoinTo(sm_0)" -> "DsiEntityKey(sm_0_primary_entity)"\n'
+   '\t"JoinTo(sm_0)" -> "DsiEntityKey(sm_1_primary_entity)"\n'
+   '\t"JoinTo(sm_1)" -> "Dim(dim_0)"\n'
+   '\t"JoinTo(sm_1)" -> "DsiEntityKey(sm_1_primary_entity)"\n'
+   '\t"Measure(sm_0_measure_0)" -> "Agg(sm_0, ds)"\n'
+   '\t"MetricTimeBase(YEAR)" -> "Time(custom_year)"\n'
+   '\t"MetricTimeBase(YEAR)" -> "Time(extract_year)"\n'
+   '\t"MetricTimeBase(YEAR)" -> "Time(year)"\n'
+   '\t"TimeBase(YEAR)" -> "Time(custom_year)"\n'
+   '\t"TimeBase(YEAR)" -> "Time(extract_year)"\n'
+   '\t"TimeBase(YEAR)" -> "Time(year)"\n'
+   '}\n'),
+  'descendants': [
+    CategoricalDimensionAttributeNode(attribute_name='dim_0'),
+    DsiEntityKeyAttributeNode(attribute_name='sm_0_primary_entity'),
+    DsiEntityKeyAttributeNode(attribute_name='sm_1_primary_entity'),
+    TimeAttributeNode(attribute_name='custom_year'),
+    TimeAttributeNode(attribute_name='extract_year'),
+    TimeAttributeNode(attribute_name='year'),
+  ],
+}

@@ -22,9 +22,10 @@ from metricflow_semantics.experimental.mf_graph.formatting.pretty_graph_formatte
 from metricflow_semantics.experimental.mf_graph.graph_element import (
     MetricflowGraphElement,
 )
+from metricflow_semantics.experimental.mf_graph.graph_id import MetricflowGraphId
 from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
 from metricflow_semantics.experimental.mf_graph.node_descriptor import MetricflowGraphNodeDescriptor
-from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, OrderedSet
+from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
 from metricflow_semantics.experimental.singleton_decorator import singleton_dataclass
 from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
 from metricflow_semantics.mf_logging.pretty_formatter import (
@@ -223,10 +224,17 @@ class MetricflowGraph(MetricFlowPrettyFormattable, Generic[NodeT, EdgeT], ABC):
     def inverse(self) -> Self:  # noqa: D102
         raise NotImplementedError()
 
-    @abstractmethod
     def adjacent_edges(self, selected_nodes: OrderedSet[NodeT]) -> OrderedSet[EdgeT]:
         """Return the edges that have an end point in the selected nodes."""
-        raise NotImplementedError()
+        subgraph_edges = MutableOrderedSet[EdgeT]()
+        for node in selected_nodes:
+            for edge in self.edges_with_tail_node(node):
+                if edge.head_node in selected_nodes:
+                    subgraph_edges.add(edge)
+            for edge in self.edges_with_head_node(node):
+                if edge.tail_node in selected_nodes:
+                    subgraph_edges.add(edge)
+        return subgraph_edges
 
     def as_dot_graph(self, include_graphical_attributes: bool) -> DotGraphAttributeSet:
         """Return the attributes that should be used when creating a representation of this graph in DOT.
@@ -236,3 +244,12 @@ class MetricflowGraph(MetricFlowPrettyFormattable, Generic[NodeT, EdgeT], ABC):
         return DotGraphAttributeSet.create(
             name=self.__class__.__name__,
         )
+
+    @property
+    @abstractmethod
+    def graph_id(self) -> MetricflowGraphId:
+        """Return a graph ID.
+
+        This ID will be used for caching cases.
+        """
+        raise NotImplementedError()

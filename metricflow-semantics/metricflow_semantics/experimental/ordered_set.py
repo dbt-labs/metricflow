@@ -128,3 +128,7 @@ class MutableOrderedSet(Generic[HashableT], OrderedSet[HashableT], MutableSet[Ha
     def copy(self) -> MutableOrderedSet[HashableT]:
         """Return a copy of this set."""
         return MutableOrderedSet(iterable=None, _set_as_dict=self._set_as_dict.copy())
+
+    def clear(self) -> None:
+        """Remove all items from this set."""
+        self._set_as_dict.clear()

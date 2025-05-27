@@ -1,0 +1,31 @@
+test_name: test_time_subgraph
+test_filename: test_sg_00.py
+---
+mf_pformat: MutableSemanticGraph()
+dot_notation:
+  graph {
+    label='semantic_graph'
+    custom_year
+    extract_quarter
+    extract_year
+    quarter
+    year
+    _base_quarter
+    _base_year
+    metric_time_base_quarter
+    metric_time_base_year
+    _base_quarter -> extract_quarter [label='_base_quarter->extract_quarter']
+    _base_quarter -> extract_year [label='_base_quarter->extract_year']
+    _base_quarter -> quarter [label='_base_quarter->quarter']
+    _base_quarter -> year [label='_base_quarter->year']
+    _base_year -> custom_year [label='_base_year->custom_year']
+    _base_year -> extract_year [label='_base_year->extract_year']
+    _base_year -> year [label='_base_year->year']
+    metric_time_base_quarter -> extract_quarter [label='metric_time_base_quarter->extract_quarter']
+    metric_time_base_quarter -> extract_year [label='metric_time_base_quarter->extract_year']
+    metric_time_base_quarter -> quarter [label='metric_time_base_quarter->quarter']
+    metric_time_base_quarter -> year [label='metric_time_base_quarter->year']
+    metric_time_base_year -> custom_year [label='metric_time_base_year->custom_year']
+    metric_time_base_year -> extract_year [label='metric_time_base_year->extract_year']
+    metric_time_base_year -> year [label='metric_time_base_year->year']
+  }

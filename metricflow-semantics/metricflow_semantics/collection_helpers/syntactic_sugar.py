@@ -1,4 +1,7 @@
-"""Short functions that act as syntactic sugar / allow for easier auto-completion."""
+"""Short functions that act as syntactic sugar / allow for easier auto-completion.
+
+In the process of evaluating whether to keep these.
+"""
 from __future__ import annotations
 
 import itertools
@@ -19,6 +22,9 @@ def mf_first_non_none(*args: Optional[T]) -> Optional[T]:
 
     This is helpful because using `a or b` to handle optional items does not work properly for false-like values
     (e.g. 0 or empty string).
+
+    An issue with this method is that all args are evaluated, so it shouldn't be used with expensive expressions
+    as arguments. Arguments could be replaced with lambdas.
     """
     return next((arg for arg in args if arg is not None), None)
 
