@@ -2,8 +2,13 @@ from __future__ import annotations
 
 from typing import TypeVar
 
+T = TypeVar("T")
+T_co = TypeVar("T_co", covariant=True)
 T1 = TypeVar("T1")
 T2 = TypeVar("T2")
+
+T1_co = TypeVar("T1_co", covariant=True)
+T2_co = TypeVar("T2_co", covariant=True)
 
 # A pair of objects.
 Pair = tuple[T1, T2]
