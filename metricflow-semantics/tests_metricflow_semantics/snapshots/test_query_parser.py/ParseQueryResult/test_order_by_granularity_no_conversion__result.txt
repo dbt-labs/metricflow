@@ -3,7 +3,7 @@ test_filename: test_query_parser.py
 ---
 ParseQueryResult(
   query_spec=MetricFlowQuerySpec(
-    metric_specs=(MetricSpec(element_name='bookings', filter_spec_set=WhereFilterSpecSet()),),
+    metric_specs=(MetricSpec(element_name='bookings'),),
     time_dimension_specs=(
       TimeDimensionSpec(
         element_name='metric_time',
@@ -31,7 +31,7 @@ ParseQueryResult(
         element_name='metric_time',
         time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY),
       ),
-      MetricSpec(element_name='bookings', filter_spec_set=WhereFilterSpecSet()),
+      MetricSpec(element_name='bookings'),
     ),
   ),
   queried_semantic_models=(SemanticModelReference(semantic_model_name='bookings_source'),),

@@ -10,14 +10,14 @@ docstring:
         <ComputeMetricsNode>
             <!-- description = 'Compute Metrics via Expressions' -->
             <!-- node_id = NodeId(id_str='cm_2') -->
-            <!-- metric_spec = MetricSpec(element_name='bookings_per_view', filter_spec_set=WhereFilterSpecSet()) -->
+            <!-- metric_spec = MetricSpec(element_name='bookings_per_view') -->
             <CombineAggregatedOutputsNode>
                 <!-- description = 'Combine Aggregated Outputs' -->
                 <!-- node_id = NodeId(id_str='cao_0') -->
                 <ComputeMetricsNode>
                     <!-- description = 'Compute Metrics via Expressions' -->
                     <!-- node_id = NodeId(id_str='cm_0') -->
-                    <!-- metric_spec = MetricSpec(element_name='bookings', filter_spec_set=WhereFilterSpecSet()) -->
+                    <!-- metric_spec = MetricSpec(element_name='bookings') -->
                     <AggregateMeasuresNode>
                         <!-- description = 'Aggregate Measures' -->
                         <!-- node_id = NodeId(id_str='am_0') -->
@@ -80,7 +80,7 @@ docstring:
                 <ComputeMetricsNode>
                     <!-- description = 'Compute Metrics via Expressions' -->
                     <!-- node_id = NodeId(id_str='cm_1') -->
-                    <!-- metric_spec = MetricSpec(element_name='views', filter_spec_set=WhereFilterSpecSet()) -->
+                    <!-- metric_spec = MetricSpec(element_name='views') -->
                     <AggregateMeasuresNode>
                         <!-- description = 'Aggregate Measures' -->
                         <!-- node_id = NodeId(id_str='am_1') -->

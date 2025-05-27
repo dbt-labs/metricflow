@@ -8,19 +8,14 @@ test_filename: test_dataflow_plan_builder.py
         <ComputeMetricsNode>
             <!-- description = 'Compute Metrics via Expressions' -->
             <!-- node_id = NodeId(id_str='cm_2') -->
-            <!-- metric_spec =                                                 -->
-            <!--   MetricSpec(                                                 -->
-            <!--     element_name='bookings_growth_2_weeks_fill_nulls_with_0', -->
-            <!--     filter_spec_set=WhereFilterSpecSet(),                     -->
-            <!--   )                                                           -->
+            <!-- metric_spec = MetricSpec(element_name='bookings_growth_2_weeks_fill_nulls_with_0') -->
             <CombineAggregatedOutputsNode>
                 <!-- description = 'Combine Aggregated Outputs' -->
                 <!-- node_id = NodeId(id_str='cao_0') -->
                 <ComputeMetricsNode>
                     <!-- description = 'Compute Metrics via Expressions' -->
                     <!-- node_id = NodeId(id_str='cm_0') -->
-                    <!-- metric_spec =                                                                                 -->
-                    <!--   MetricSpec(element_name='bookings_fill_nulls_with_0', filter_spec_set=WhereFilterSpecSet()) -->
+                    <!-- metric_spec = MetricSpec(element_name='bookings_fill_nulls_with_0') -->
                     <JoinToTimeSpineNode>
                         <!-- description = 'Join to Time Spine Dataset' -->
                         <!-- node_id = NodeId(id_str='jts_0') -->
@@ -108,7 +103,6 @@ test_filename: test_dataflow_plan_builder.py
                     <!-- metric_spec =                                                            -->
                     <!--   MetricSpec(                                                            -->
                     <!--     element_name='bookings_fill_nulls_with_0',                           -->
-                    <!--     filter_spec_set=WhereFilterSpecSet(),                                -->
                     <!--     alias='bookings_2_weeks_ago',                                        -->
                     <!--     offset_window=PydanticMetricTimeWindow(count=14, granularity='day'), -->
                     <!--   )                                                                      -->

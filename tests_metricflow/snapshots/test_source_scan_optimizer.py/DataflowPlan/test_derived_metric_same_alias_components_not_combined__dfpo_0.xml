@@ -16,13 +16,11 @@ docstring:
             <ComputeMetricsNode>
                 <!-- description = 'Compute Metrics via Expressions' -->
                 <!-- node_id = NodeId(id_str='cm_5') -->
-                <!-- metric_spec =                                                                              -->
-                <!--   MetricSpec(element_name='derived_shared_alias_1a', filter_spec_set=WhereFilterSpecSet()) -->
+                <!-- metric_spec = MetricSpec(element_name='derived_shared_alias_1a') -->
                 <ComputeMetricsNode>
                     <!-- description = 'Compute Metrics via Expressions' -->
                     <!-- node_id = NodeId(id_str='cm_4') -->
-                    <!-- metric_spec =                                                                                     -->
-                    <!--   MetricSpec(element_name='bookings', filter_spec_set=WhereFilterSpecSet(), alias='shared_alias') -->
+                    <!-- metric_spec = MetricSpec(element_name='bookings', alias='shared_alias') -->
                     <AggregateMeasuresNode>
                         <!-- description = 'Aggregate Measures' -->
                         <!-- node_id = NodeId(id_str='am_0') -->
@@ -53,17 +51,11 @@ docstring:
             <ComputeMetricsNode>
                 <!-- description = 'Compute Metrics via Expressions' -->
                 <!-- node_id = NodeId(id_str='cm_7') -->
-                <!-- metric_spec =                                                                             -->
-                <!--   MetricSpec(element_name='derived_shared_alias_2', filter_spec_set=WhereFilterSpecSet()) -->
+                <!-- metric_spec = MetricSpec(element_name='derived_shared_alias_2') -->
                 <ComputeMetricsNode>
                     <!-- description = 'Compute Metrics via Expressions' -->
                     <!-- node_id = NodeId(id_str='cm_6') -->
-                    <!-- metric_spec =                             -->
-                    <!--   MetricSpec(                             -->
-                    <!--     element_name='instant_bookings',      -->
-                    <!--     filter_spec_set=WhereFilterSpecSet(), -->
-                    <!--     alias='shared_alias',                 -->
-                    <!--   )                                       -->
+                    <!-- metric_spec = MetricSpec(element_name='instant_bookings', alias='shared_alias') -->
                     <AggregateMeasuresNode>
                         <!-- description = 'Aggregate Measures' -->
                         <!-- node_id = NodeId(id_str='am_1') -->

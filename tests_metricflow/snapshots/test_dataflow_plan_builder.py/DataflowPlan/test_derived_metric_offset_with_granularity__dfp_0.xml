@@ -8,14 +8,13 @@ test_filename: test_dataflow_plan_builder.py
         <ComputeMetricsNode>
             <!-- description = 'Compute Metrics via Expressions' -->
             <!-- node_id = NodeId(id_str='cm_1') -->
-            <!-- metric_spec = MetricSpec(element_name='bookings_5_day_lag', filter_spec_set=WhereFilterSpecSet()) -->
+            <!-- metric_spec = MetricSpec(element_name='bookings_5_day_lag') -->
             <ComputeMetricsNode>
                 <!-- description = 'Compute Metrics via Expressions' -->
                 <!-- node_id = NodeId(id_str='cm_0') -->
                 <!-- metric_spec =                                                           -->
                 <!--   MetricSpec(                                                           -->
                 <!--     element_name='bookings',                                            -->
-                <!--     filter_spec_set=WhereFilterSpecSet(),                               -->
                 <!--     alias='bookings_5_days_ago',                                        -->
                 <!--     offset_window=PydanticMetricTimeWindow(count=5, granularity='day'), -->
                 <!--   )                                                                     -->

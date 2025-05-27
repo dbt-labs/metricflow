@@ -3,12 +3,7 @@ test_filename: test_conversion_metrics.py
 ---
 ParseQueryResult(
   query_spec=MetricFlowQuerySpec(
-    metric_specs=(
-      MetricSpec(
-        element_name='visit_buy_conversion_rate_by_session',
-        filter_spec_set=WhereFilterSpecSet(),
-      ),
-    ),
+    metric_specs=(MetricSpec(element_name='visit_buy_conversion_rate_by_session'),),
     dimension_specs=(
       DimensionSpec(
         element_name='referrer_id',
@@ -42,10 +37,7 @@ ParseQueryResult(
         element_name='metric_time',
         time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY),
       ),
-      MetricSpec(
-        element_name='visit_buy_conversion_rate_by_session',
-        filter_spec_set=WhereFilterSpecSet(),
-      ),
+      MetricSpec(element_name='visit_buy_conversion_rate_by_session'),
     ),
   ),
   queried_semantic_models=(
