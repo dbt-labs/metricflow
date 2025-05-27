@@ -31,7 +31,7 @@ class UnableToSatisfyQueryError(CustomerFacingSemanticException):  # noqa: D101
         return "\n".join(error_lines)
 
 
-class SemanticException(InformativeError):  # noqa: D101
+class SemanticException(Exception):  # noqa: D101
     pass
 
 
@@ -84,5 +84,17 @@ class InvalidQueryException(InformativeError):
 
 class RenderSqlTemplateException(InformativeError):
     """Exception thrown when there is an error rendering a SQL template."""
+
+    pass
+
+
+class FeatureNotSupportedError(InformativeError):
+    """Exception thrown when a feature is not implemented."""
+
+    pass
+
+
+class SemanticManifestConfigurationError(InformativeError):
+    """Exception thrown when the semantic manifest is not configured correctly."""
 
     pass

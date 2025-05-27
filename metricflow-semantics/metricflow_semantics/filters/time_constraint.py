@@ -6,6 +6,7 @@ from dataclasses import dataclass
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 
+from metricflow_semantics.errors.error_classes import UnableToSatisfyQueryError
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 
 logger = logging.getLogger(__name__)
@@ -34,7 +35,9 @@ class TimeRangeConstraint(SerializableDataclass):
             )
 
         if self.end_time > TimeRangeConstraint.ALL_TIME_END():
-            raise RuntimeError(f"end_time={self.end_time} exceeds the limits of {TimeRangeConstraint.ALL_TIME_END()}")
+            raise UnableToSatisfyQueryError(
+                f"end_time={self.end_time} exceeds the limits of {TimeRangeConstraint.ALL_TIME_END()}"
+            )
 
     @staticmethod
     def ALL_TIME_BEGIN() -> datetime.datetime:  # noqa: D102
