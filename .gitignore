@@ -141,3 +141,6 @@ dmypy.json
 # Performance reports
 performance-report.json
 performance-comparison.md
+
+# Local directory for excluded files.
+git_excluded
