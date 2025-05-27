@@ -1,0 +1,33 @@
+test_name: test_graph_snapshot
+test_filename: test_graph_snapshot.py
+docstring:
+  Check the graph snapshot.
+---
+dot_notation:
+  digraph {
+  	graph [name=FlowGraph]
+  	subgraph cluster_intermediate_nodes {
+  		label=intermediate_nodes
+  		a
+  		b
+  	}
+  	sink
+  	source
+  	a -> b
+  	a -> sink
+  	b -> sink
+  	source -> a
+  	source -> b
+  }
+
+pretty_format:
+  FlowGraph(
+    nodes={IntermediateNode('a'), IntermediateNode('b'), SinkNode('sink'), SourceNode('source')},
+    edges={
+      FlowEdge('a -> b'),
+      FlowEdge('a -> sink'),
+      FlowEdge('b -> sink'),
+      FlowEdge('source -> a'),
+      FlowEdge('source -> b'),
+    },
+  )
