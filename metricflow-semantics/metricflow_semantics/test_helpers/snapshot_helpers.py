@@ -56,6 +56,7 @@ def assert_snapshot_text_equal(
     additional_header_fields: Optional[Mapping[str, str]] = None,
     expectation_description: Optional[str] = None,
     include_headers: bool = True,
+    log_snapshot_text: bool = True,
 ) -> None:
     """Similar to assert_plan_snapshot_text_equal(), but with more controls on how the snapshot paths are generated."""
     file_path = snapshot_path_prefix(
@@ -73,7 +74,7 @@ def assert_snapshot_text_equal(
     logger.debug(
         LazyFormat(
             "Generated snapshot text",
-            snapshot_text=snapshot_text,
+            snapshot_text=snapshot_text if log_snapshot_text else "<hidden in log output>",
             file_path=file_path,
             open_link=mf_colored_link_text(open_snapshot_uri),
             iterm_hint="Link may be opened with <Command> + <Left Click>",
