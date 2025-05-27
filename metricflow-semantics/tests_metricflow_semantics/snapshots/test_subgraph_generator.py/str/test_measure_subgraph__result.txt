@@ -1,0 +1,19 @@
+test_name: test_measure_subgraph
+test_filename: test_subgraph_generator.py
+---
+mf_pformat: MutableSemanticGraph()
+dot_notation:
+  graph {
+    label='semantic_graph'
+    sm_0_measure_0
+    aggregate_sm_0_by_ds
+    join_from_sm_0
+    join_to_sm_0
+    sm_0_primary_entity
+    metric_time_base_quarter
+    aggregate_sm_0_by_ds -> join_from_sm_0 [label='aggregate_sm_0_by_ds->join_from_sm_0']
+    aggregate_sm_0_by_ds -> sm_0_primary_entity [label='aggregate_sm_0_by_ds->sm_0_primary_entity']
+    aggregate_sm_0_by_ds -> metric_time_base_quarter [label='aggregate_sm_0_by_ds->metric_time_base_quarter']
+    sm_0_primary_entity -> join_to_sm_0 [label='sm_0_primary_entity->join_to_sm_0']
+    sm_0_measure_0 -> aggregate_sm_0_by_ds [label='sm_0_measure_0->aggregate_sm_0_by_ds']
+  }

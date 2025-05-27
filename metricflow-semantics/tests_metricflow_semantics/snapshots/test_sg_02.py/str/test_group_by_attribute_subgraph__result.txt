@@ -1,0 +1,129 @@
+test_name: test_group_by_attribute_subgraph
+test_filename: test_sg_02.py
+---
+default:
+  MutableSemanticGraph(
+    nodes={
+      CategoricalDimensionAttributeNode(attribute_name='dim_0'),
+      DsiEntityKeyAttributeNode(attribute_name='sm_0_primary_entity'),
+      DsiEntityKeyAttributeNode(attribute_name='sm_1_primary_entity'),
+      DsiEntityNode(entity_name='sm_0_primary_entity'),
+      DsiEntityNode(entity_name='sm_1_primary_entity'),
+      GroupByAttributeRootNode(),
+      JoinToModelNode(model_id=sm_0),
+      JoinToModelNode(model_id=sm_1),
+      TimeAttributeNode(attribute_name='custom_year'),
+      TimeAttributeNode(attribute_name='extract_year'),
+      TimeAttributeNode(attribute_name='year'),
+      TimeDimensionNode(dimension_name='ds', time_grain_name='year'),
+    },
+    edges={
+      EntityAttributeEdge(
+        tail_node=JoinToModelNode(model_id=sm_0),
+        head_node=DsiEntityKeyAttributeNode(attribute_name='sm_0_primary_entity'),
+      ),
+      EntityAttributeEdge(
+        tail_node=JoinToModelNode(model_id=sm_0),
+        head_node=DsiEntityKeyAttributeNode(attribute_name='sm_1_primary_entity'),
+      ),
+      EntityAttributeEdge(
+        tail_node=JoinToModelNode(model_id=sm_1),
+        head_node=CategoricalDimensionAttributeNode(attribute_name='dim_0'),
+      ),
+      EntityAttributeEdge(
+        tail_node=JoinToModelNode(model_id=sm_1),
+        head_node=DsiEntityKeyAttributeNode(attribute_name='sm_1_primary_entity'),
+      ),
+      EntityAttributeEdge(
+        tail_node=TimeDimensionNode(dimension_name='ds', time_grain_name='year'),
+        head_node=TimeAttributeNode(attribute_name='custom_year'),
+      ),
+      EntityAttributeEdge(
+        tail_node=TimeDimensionNode(dimension_name='ds', time_grain_name='year'),
+        head_node=TimeAttributeNode(attribute_name='extract_year'),
+      ),
+      EntityAttributeEdge(
+        tail_node=TimeDimensionNode(dimension_name='ds', time_grain_name='year'),
+        head_node=TimeAttributeNode(attribute_name='year'),
+      ),
+      EntityRelationshipEdge(
+        tail_node=DsiEntityNode(entity_name='sm_0_primary_entity'),
+        head_node=JoinToModelNode(model_id=sm_0),
+      ),
+      EntityRelationshipEdge(
+        tail_node=DsiEntityNode(entity_name='sm_1_primary_entity'),
+        head_node=JoinToModelNode(model_id=sm_1),
+      ),
+      EntityRelationshipEdge(
+        tail_node=GroupByAttributeRootNode(),
+        head_node=DsiEntityKeyAttributeNode(attribute_name='sm_0_primary_entity'),
+      ),
+      EntityRelationshipEdge(
+        tail_node=GroupByAttributeRootNode(),
+        head_node=DsiEntityKeyAttributeNode(attribute_name='sm_1_primary_entity'),
+      ),
+      EntityRelationshipEdge(
+        tail_node=GroupByAttributeRootNode(),
+        head_node=DsiEntityNode(entity_name='sm_0_primary_entity'),
+      ),
+      EntityRelationshipEdge(
+        tail_node=GroupByAttributeRootNode(),
+        head_node=DsiEntityNode(entity_name='sm_1_primary_entity'),
+      ),
+      EntityRelationshipEdge(
+        tail_node=GroupByAttributeRootNode(),
+        head_node=TimeDimensionNode(dimension_name='ds', time_grain_name='year'),
+      ),
+      EntityRelationshipEdge(
+        tail_node=JoinToModelNode(model_id=sm_0),
+        head_node=TimeDimensionNode(dimension_name='ds', time_grain_name='year'),
+      ),
+      JoinedDsiEntityEdge(
+        tail_node=DsiEntityNode(entity_name='sm_0_primary_entity'),
+        head_node=DsiEntityNode(entity_name='sm_1_primary_entity'),
+      ),
+    },
+  )
+dot_notation:
+  digraph MutableSemanticGraph {
+  	subgraph cluster_other_attribute {
+  		"Dim(dim_0)"
+  		"DsiEntityKey(sm_0_primary_entity)"
+  		"DsiEntityKey(sm_1_primary_entity)"
+  	}
+  	subgraph cluster_model_entity {
+  		"Entity(sm_0_primary_entity)"
+  		"Entity(sm_1_primary_entity)"
+  	}
+  	GroupByAttributeRoot
+  	subgraph cluster_sm_0 {
+  		"JoinTo(sm_0)"
+  	}
+  	subgraph cluster_sm_1 {
+  		"JoinTo(sm_1)"
+  	}
+  	subgraph cluster_time_attribute {
+  		"Time(custom_year)"
+  		"Time(extract_year)"
+  		"Time(year)"
+  	}
+  	subgraph cluster_time_dimension {
+  		"TimeDim(ds, year)"
+  	}
+  	"JoinTo(sm_0)" -> "DsiEntityKey(sm_0_primary_entity)"
+  	"JoinTo(sm_0)" -> "DsiEntityKey(sm_1_primary_entity)"
+  	"JoinTo(sm_1)" -> "Dim(dim_0)"
+  	"JoinTo(sm_1)" -> "DsiEntityKey(sm_1_primary_entity)"
+  	"TimeDim(ds, year)" -> "Time(custom_year)"
+  	"TimeDim(ds, year)" -> "Time(extract_year)"
+  	"TimeDim(ds, year)" -> "Time(year)"
+  	"Entity(sm_0_primary_entity)" -> "JoinTo(sm_0)"
+  	"Entity(sm_1_primary_entity)" -> "JoinTo(sm_1)"
+  	GroupByAttributeRoot -> "DsiEntityKey(sm_0_primary_entity)"
+  	GroupByAttributeRoot -> "DsiEntityKey(sm_1_primary_entity)"
+  	GroupByAttributeRoot -> "Entity(sm_0_primary_entity)"
+  	GroupByAttributeRoot -> "Entity(sm_1_primary_entity)"
+  	GroupByAttributeRoot -> "TimeDim(ds, year)"
+  	"JoinTo(sm_0)" -> "TimeDim(ds, year)"
+  	"Entity(sm_0_primary_entity)" -> "Entity(sm_1_primary_entity)"
+  }

@@ -1,0 +1,13 @@
+test_name: test_descendants
+test_filename: test_sg_02.py
+---
+Computed descendants
+  descendants:
+    [
+      CategoricalDimensionAttributeNode(attribute_name='dim_0'),
+      DsiEntityKeyAttributeNode(attribute_name='sm_0_primary_entity'),
+      DsiEntityKeyAttributeNode(attribute_name='sm_1_primary_entity'),
+      TimeAttributeNode(attribute_name='custom_year'),
+      TimeAttributeNode(attribute_name='extract_year'),
+      TimeAttributeNode(attribute_name='year'),
+    ]

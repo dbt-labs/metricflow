@@ -1,0 +1,31 @@
+test_name: test_add_time_rule
+test_filename: test_builder.py
+---
+mf_pformat: MutableSemanticGraph()
+dot_notation:
+  graph {
+    label='semantic_graph'
+    custom_year
+    extract_quarter
+    extract_year
+    quarter
+    year
+    metric_time[base=quarter]
+    metric_time[base=year]
+    time[base=quarter]
+    time[base=year]
+    metric_time[base=quarter] -> extract_quarter [label='metric_time[base=quarter]->extract_quarter']
+    metric_time[base=quarter] -> extract_year [label='metric_time[base=quarter]->extract_year']
+    metric_time[base=quarter] -> quarter [label='metric_time[base=quarter]->quarter']
+    metric_time[base=quarter] -> year [label='metric_time[base=quarter]->year']
+    metric_time[base=year] -> custom_year [label='metric_time[base=year]->custom_year']
+    metric_time[base=year] -> extract_year [label='metric_time[base=year]->extract_year']
+    metric_time[base=year] -> year [label='metric_time[base=year]->year']
+    time[base=quarter] -> extract_quarter [label='time[base=quarter]->extract_quarter']
+    time[base=quarter] -> extract_year [label='time[base=quarter]->extract_year']
+    time[base=quarter] -> quarter [label='time[base=quarter]->quarter']
+    time[base=quarter] -> year [label='time[base=quarter]->year']
+    time[base=year] -> custom_year [label='time[base=year]->custom_year']
+    time[base=year] -> extract_year [label='time[base=year]->extract_year']
+    time[base=year] -> year [label='time[base=year]->year']
+  }
