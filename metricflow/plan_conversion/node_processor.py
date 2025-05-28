@@ -7,6 +7,7 @@ from typing import Dict, FrozenSet, List, Optional, Sequence, Set, Tuple
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.references import EntityReference, SemanticModelReference, TimeDimensionReference
+from metricflow_semantics.errors.error_classes import FeatureNotSupportedError
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
@@ -197,7 +198,7 @@ class PredicatePushdownState:
                 eligible_types.append(LinkableElementType.DIMENSION)
             elif enabled_type is PredicateInputType.TIME_DIMENSION or enabled_type is PredicateInputType.ENTITY:
                 # TODO: Remove as support for time dimensions and entities becomes available
-                raise NotImplementedError(
+                raise FeatureNotSupportedError(
                     "Predicate pushdown is not currently supported for where filter predicates with time dimension or "
                     f"entity references, but this pushdown state is enabled for {enabled_type}."
                 )
@@ -468,7 +469,7 @@ class PreJoinNodeProcessor:
     ) -> Sequence[MultiHopJoinCandidate]:
         """Assemble nodes representing all possible one-hop joins."""
         if len(desired_linkable_spec.entity_links) > MAX_JOIN_HOPS:
-            raise NotImplementedError(
+            raise FeatureNotSupportedError(
                 f"Multi-hop joins with more than {MAX_JOIN_HOPS} entity links not yet supported. "
                 f"Got: {desired_linkable_spec}"
             )

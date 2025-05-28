@@ -12,6 +12,7 @@ from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowRese
 from metricflow_semantics.aggregation_properties import AggregationState
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
+from metricflow_semantics.errors.error_classes import SemanticManifestConfigurationError
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.instances import (
     GroupByMetricInstance,
@@ -653,9 +654,10 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                     column_name=expr, input_measure=input_measure, from_data_set_alias=from_data_set_alias
                 )
             elif metric.type is MetricType.DERIVED:
-                assert (
-                    metric.type_params.expr
-                ), "Derived metrics are required to have an `expr` in their YAML definition."
+                if metric.type_params.expr is None:
+                    raise SemanticManifestConfigurationError(
+                        "Derived metrics are required to have an `expr` in their YAML definition."
+                    )
                 metric_expr = SqlStringExpression.create(sql_expr=metric.type_params.expr)
             elif metric.type == MetricType.CONVERSION:
                 conversion_type_params = metric.type_params.conversion_type_params

@@ -8,6 +8,7 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow_semantics.collection_helpers.lru_cache import typed_lru_cache
+from metricflow_semantics.errors.error_classes import FeatureNotSupportedError
 
 DUNDER = "__"
 
@@ -48,7 +49,7 @@ class StructuredLinkableSpecName:
 
         for date_part in DatePart:
             if name_parts[-1] == StructuredLinkableSpecName.date_part_suffix(date_part=date_part):
-                raise ValueError(
+                raise FeatureNotSupportedError(
                     "Dunder syntax not supported for querying date_part. Use `group_by` object syntax instead."
                 )
 

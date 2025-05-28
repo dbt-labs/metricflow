@@ -7,6 +7,7 @@ from dbt_semantic_interfaces.naming.keywords import DUNDER
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from typing_extensions import override
 
+from metricflow_semantics.errors.error_classes import InvalidQuerySyntax
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.naming.naming_scheme import QueryItemNamingScheme
@@ -52,7 +53,7 @@ class DunderNamingScheme(QueryItemNamingScheme):
     @override
     def spec_pattern(self, input_str: str, semantic_manifest_lookup: SemanticManifestLookup) -> EntityLinkPattern:
         if not self.input_str_follows_scheme(input_str, semantic_manifest_lookup=semantic_manifest_lookup):
-            raise ValueError(f"{repr(input_str)} does not follow this scheme.")
+            raise InvalidQuerySyntax(f"{repr(input_str)} does not follow this scheme.")
 
         input_str = input_str.lower()
         structured_name = StructuredLinkableSpecName.from_name(

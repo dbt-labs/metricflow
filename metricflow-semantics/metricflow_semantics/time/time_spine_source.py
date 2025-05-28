@@ -9,6 +9,7 @@ from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow_semantics.collection_helpers.lru_cache import typed_lru_cache
+from metricflow_semantics.errors.error_classes import SemanticManifestConfigurationError
 from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY, TimeDimensionSpec
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
@@ -77,7 +78,7 @@ class TimeSpineSource:
 
         # Sanity check: this should have been validated during manifest parsing.
         if not time_spine_sources:
-            raise RuntimeError(
+            raise SemanticManifestConfigurationError(
                 "At least one time spine must be configured to use the semantic layer, but none were found."
             )
 
@@ -143,7 +144,7 @@ class TimeSpineSource:
             if grain.to_int() <= smallest_required_standard_grain.to_int()
         }
         if len(compatible_time_spines_for_standard_grains) == 0:
-            raise RuntimeError(
+            raise SemanticManifestConfigurationError(
                 f"This query requires a time spine with granularity {smallest_required_standard_grain.name} or smaller, which is not configured. "
                 f"The smallest available time spine granularity is {min(time_spine_sources).name}, which is too large."
                 "See documentation for how to configure a new time spine: https://docs.getdbt.com/docs/build/metricflow-time-spine"

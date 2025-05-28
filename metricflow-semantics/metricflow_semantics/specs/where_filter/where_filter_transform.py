@@ -8,6 +8,7 @@ import jinja2
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
 from dbt_semantic_interfaces.protocols import WhereFilter, WhereFilterIntersection
 
+from metricflow_semantics.errors.error_classes import RenderSqlTemplateException
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
@@ -24,10 +25,6 @@ from metricflow_semantics.specs.where_filter.where_filter_time_dimension import 
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 
 logger = logging.getLogger(__name__)
-
-
-class RenderSqlTemplateException(Exception):  # noqa: D101
-    pass
 
 
 class WhereSpecFactory:
