@@ -7,6 +7,10 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, List, Mapping, Optional, Sized, Union
 
+from typing_extensions import Self, override
+
+from metricflow_semantics.collection_helpers.merger import Mergeable
+from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_non_none, mf_first_non_none_or_raise
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
@@ -411,9 +415,14 @@ class MetricFlowPrettyFormatter:
         """Return a pretty string representation of the object that's suitable for logging."""
         return self._handle_any_obj(obj, remaining_line_length=self._format_option.max_line_length)
 
+    @property
+    def format_option(self) -> PrettyFormatOption:
+        """Return the formatting option used to create this."""
+        return self._format_option
+
 
 @fast_frozen_dataclass()
-class PrettyFormatOption:
+class PrettyFormatOption(Mergeable):
     """Options for `mf_pformat`.
 
     max_line_length: If the string representation is going to be longer than this, split into multiple lines.
@@ -439,6 +448,34 @@ class PrettyFormatOption:
             include_none_object_fields=self.include_none_object_fields,
             include_empty_object_fields=self.include_empty_object_fields,
         )
+
+    @override
+    def merge(self: Self, other: PrettyFormatOption) -> PrettyFormatOption:
+        return PrettyFormatOption(
+            max_line_length=mf_first_non_none(other.max_line_length, self.max_line_length),
+            indent_prefix=mf_first_non_none_or_raise(other.indent_prefix, self.indent_prefix),
+            include_object_field_names=mf_first_non_none_or_raise(
+                other.include_object_field_names,
+                self.include_object_field_names,
+            ),
+            include_none_object_fields=mf_first_non_none_or_raise(
+                other.include_none_object_fields,
+                self.include_none_object_fields,
+            ),
+            include_empty_object_fields=mf_first_non_none_or_raise(
+                other.include_empty_object_fields,
+                self.include_empty_object_fields,
+            ),
+            include_underscore_prefix_fields=mf_first_non_none_or_raise(
+                other.include_underscore_prefix_fields,
+                self.include_underscore_prefix_fields,
+            ),
+        )
+
+    @classmethod
+    @override
+    def empty_instance(cls) -> PrettyFormatOption:
+        return cls()
 
 
 @fast_frozen_dataclass()
