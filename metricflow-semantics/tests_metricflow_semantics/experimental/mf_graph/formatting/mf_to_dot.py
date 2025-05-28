@@ -18,15 +18,18 @@ from metricflow_semantics.experimental.mf_graph.formatting.dot_attributes import
     DotEdgeAttributeSet,
     DotNodeAttributeSet,
 )
+from metricflow_semantics.experimental.mf_graph.graph_converter import MetricflowGraphConverter
+from metricflow_semantics.experimental.mf_graph.mf_graph import MetricflowGraphEdge, MetricflowGraphNode
+from metricflow_semantics.helpers.string_helpers import mf_indent
+
 from tests_metricflow_semantics.experimental.mf_graph.formatting.graphviz_html import (
     GraphvizHtmlAlignment,
     GraphvizHtmlText,
     GraphvizHtmlTextStyle,
 )
-from tests_metricflow_semantics.experimental.mf_graph.formatting.graphviz_html_table_builder import GraphvizHtmlTableBuilder
-from metricflow_semantics.experimental.mf_graph.graph_converter import MetricflowGraphConverter
-from metricflow_semantics.experimental.mf_graph.mf_graph import MetricflowGraphEdge, MetricflowGraphNode
-from metricflow_semantics.helpers.string_helpers import mf_indent
+from tests_metricflow_semantics.experimental.mf_graph.formatting.graphviz_html_table_builder import (
+    GraphvizHtmlTableBuilder,
+)
 
 if typing.TYPE_CHECKING:
     from metricflow_semantics.experimental.mf_graph.mf_graph import MetricflowGraph

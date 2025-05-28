@@ -15,14 +15,16 @@ from metricflow_semantics.experimental.mf_graph.formatting.dot_attributes import
     DotNodeAttributeSet,
     DotNodeShape,
 )
+from metricflow_semantics.experimental.mf_graph.mf_graph import MetricflowGraphEdge, MetricflowGraphNode, NodeT
+
 from tests_metricflow_semantics.experimental.mf_graph.formatting.graphviz_html import (
     GraphvizHtmlAlignment,
     GraphvizHtmlText,
     GraphvizHtmlTextStyle,
 )
-from tests_metricflow_semantics.experimental.mf_graph.formatting.graphviz_html_table_builder import GraphvizHtmlTableBuilder
-from metricflow_semantics.experimental.mf_graph.mf_graph import MetricflowGraphEdge, MetricflowGraphNode, NodeT
-
+from tests_metricflow_semantics.experimental.mf_graph.formatting.graphviz_html_table_builder import (
+    GraphvizHtmlTableBuilder,
+)
 from tests_metricflow_semantics.experimental.mf_graph.formatting.mf_to_dot import (
     DotGraphElementSet,
     MetricflowGraphToDotConverter,

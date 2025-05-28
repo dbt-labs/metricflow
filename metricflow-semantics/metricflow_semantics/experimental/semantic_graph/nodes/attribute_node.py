@@ -7,11 +7,11 @@ from dbt_semantic_interfaces.type_enums import DatePart, TimeGranularity
 from typing_extensions import override
 
 from metricflow_semantics.experimental.mf_graph.comparable import ComparisonKey
-from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
 from metricflow_semantics.experimental.mf_graph.formatting.dot_attributes import (
     DotColor,
     DotNodeAttributeSet,
 )
+from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
 from metricflow_semantics.experimental.mf_graph.node_descriptor import MetricflowGraphNodeDescriptor
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_computation import (
