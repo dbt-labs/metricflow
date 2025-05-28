@@ -35,7 +35,8 @@ class MetricNamingScheme(QueryItemNamingScheme):
     @override
     def input_str_follows_scheme(self, input_str: str, semantic_manifest_lookup: SemanticManifestLookup) -> bool:
         # TODO: Use regex.
-        return True
+        print("input_str::", input_str)
+        return "(" not in input_str
 
     @override
     def __repr__(self) -> str:
