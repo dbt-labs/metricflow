@@ -21,8 +21,8 @@ FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
     SELECT
-      DATETIME_TRUNC(ds, day) AS metric_time__day
-      , DATETIME_TRUNC(ds, month) AS metric_time__month
+      TIMESTAMP_TRUNC(ds, day) AS metric_time__day
+      , TIMESTAMP_TRUNC(ds, month) AS metric_time__month
       , listing_id AS listing
       , 1 AS bookings
     FROM ***************************.fct_bookings bookings_source_src_26000

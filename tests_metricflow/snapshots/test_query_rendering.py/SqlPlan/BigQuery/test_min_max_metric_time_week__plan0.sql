@@ -48,10 +48,10 @@ FROM (
         -- Read From Time Spine 'mf_time_spine'
         SELECT
           time_spine_src_28006.ds AS ds__day
-          , DATETIME_TRUNC(time_spine_src_28006.ds, isoweek) AS ds__week
-          , DATETIME_TRUNC(time_spine_src_28006.ds, month) AS ds__month
-          , DATETIME_TRUNC(time_spine_src_28006.ds, quarter) AS ds__quarter
-          , DATETIME_TRUNC(time_spine_src_28006.ds, year) AS ds__year
+          , TIMESTAMP_TRUNC(time_spine_src_28006.ds, isoweek) AS ds__week
+          , TIMESTAMP_TRUNC(time_spine_src_28006.ds, month) AS ds__month
+          , TIMESTAMP_TRUNC(time_spine_src_28006.ds, quarter) AS ds__quarter
+          , TIMESTAMP_TRUNC(time_spine_src_28006.ds, year) AS ds__year
           , EXTRACT(year FROM time_spine_src_28006.ds) AS ds__extract_year
           , EXTRACT(quarter FROM time_spine_src_28006.ds) AS ds__extract_quarter
           , EXTRACT(month FROM time_spine_src_28006.ds) AS ds__extract_month

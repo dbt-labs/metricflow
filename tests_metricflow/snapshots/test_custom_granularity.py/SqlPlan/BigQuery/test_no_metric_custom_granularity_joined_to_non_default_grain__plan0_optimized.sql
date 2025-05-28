@@ -10,7 +10,7 @@ sql_engine: BigQuery
 SELECT
   subq_13.alien_day AS user__bio_added_ts__alien_day
   , subq_12.alien_day AS metric_time__alien_day
-  , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, month) AS user__bio_added_ts__month
+  , TIMESTAMP_TRUNC(users_ds_source_src_28000.bio_added_ts, month) AS user__bio_added_ts__month
   , time_spine_src_28006.ds AS metric_time__day
 FROM ***************************.dim_users users_ds_source_src_28000
 CROSS JOIN
@@ -22,7 +22,7 @@ ON
 LEFT OUTER JOIN
   ***************************.mf_time_spine subq_13
 ON
-  DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, day) = subq_13.ds
+  TIMESTAMP_TRUNC(users_ds_source_src_28000.bio_added_ts, day) = subq_13.ds
 GROUP BY
   user__bio_added_ts__alien_day
   , metric_time__alien_day

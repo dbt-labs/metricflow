@@ -8,7 +8,7 @@ WITH sma_28019_cte AS (
   -- Read Elements From Semantic Model 'visits_source'
   -- Metric Time Dimension 'ds'
   SELECT
-    DATETIME_TRUNC(ds, day) AS metric_time__day
+    TIMESTAMP_TRUNC(ds, day) AS metric_time__day
     , user_id AS user
     , 1 AS visits
   FROM ***************************.fct_visits visits_source_src_28000
@@ -103,7 +103,7 @@ FROM (
         -- Metric Time Dimension 'ds'
         -- Add column with generated UUID
         SELECT
-          DATETIME_TRUNC(ds, day) AS metric_time__day
+          TIMESTAMP_TRUNC(ds, day) AS metric_time__day
           , user_id AS user
           , 1 AS buys
           , GENERATE_UUID() AS mf_internal_uuid

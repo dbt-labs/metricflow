@@ -46,14 +46,14 @@ FROM (
       -- Read From Time Spine 'mf_time_spine_millisecond'
       SELECT
         time_spine_src_28002.ts AS ts__millisecond
-        , DATETIME_TRUNC(time_spine_src_28002.ts, second) AS ts__second
-        , DATETIME_TRUNC(time_spine_src_28002.ts, minute) AS ts__minute
-        , DATETIME_TRUNC(time_spine_src_28002.ts, hour) AS ts__hour
-        , DATETIME_TRUNC(time_spine_src_28002.ts, day) AS ts__day
-        , DATETIME_TRUNC(time_spine_src_28002.ts, isoweek) AS ts__week
-        , DATETIME_TRUNC(time_spine_src_28002.ts, month) AS ts__month
-        , DATETIME_TRUNC(time_spine_src_28002.ts, quarter) AS ts__quarter
-        , DATETIME_TRUNC(time_spine_src_28002.ts, year) AS ts__year
+        , TIMESTAMP_TRUNC(time_spine_src_28002.ts, second) AS ts__second
+        , TIMESTAMP_TRUNC(time_spine_src_28002.ts, minute) AS ts__minute
+        , TIMESTAMP_TRUNC(time_spine_src_28002.ts, hour) AS ts__hour
+        , TIMESTAMP_TRUNC(time_spine_src_28002.ts, day) AS ts__day
+        , TIMESTAMP_TRUNC(time_spine_src_28002.ts, isoweek) AS ts__week
+        , TIMESTAMP_TRUNC(time_spine_src_28002.ts, month) AS ts__month
+        , TIMESTAMP_TRUNC(time_spine_src_28002.ts, quarter) AS ts__quarter
+        , TIMESTAMP_TRUNC(time_spine_src_28002.ts, year) AS ts__year
         , EXTRACT(year FROM time_spine_src_28002.ts) AS ts__extract_year
         , EXTRACT(quarter FROM time_spine_src_28002.ts) AS ts__extract_quarter
         , EXTRACT(month FROM time_spine_src_28002.ts) AS ts__extract_month

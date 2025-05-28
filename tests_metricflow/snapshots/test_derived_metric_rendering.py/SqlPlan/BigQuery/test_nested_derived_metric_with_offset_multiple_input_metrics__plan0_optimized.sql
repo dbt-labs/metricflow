@@ -8,7 +8,7 @@ WITH sma_28009_cte AS (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
   SELECT
-    DATETIME_TRUNC(ds, day) AS metric_time__day
+    TIMESTAMP_TRUNC(ds, day) AS metric_time__day
     , booking_value
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
@@ -47,7 +47,7 @@ FROM (
       ) subq_21
     ) subq_22
     ON
-      DATETIME_TRUNC(time_spine_src_28006.ds, month) = subq_22.metric_time__day
+      TIMESTAMP_TRUNC(time_spine_src_28006.ds, month) = subq_22.metric_time__day
   ) subq_26
   FULL OUTER JOIN (
     -- Compute Metrics via Expressions

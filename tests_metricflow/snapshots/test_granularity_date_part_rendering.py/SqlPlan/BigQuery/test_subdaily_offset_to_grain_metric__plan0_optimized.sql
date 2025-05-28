@@ -20,12 +20,12 @@ FROM (
     -- Read Elements From Semantic Model 'users_ds_source'
     -- Metric Time Dimension 'archived_at'
     SELECT
-      DATETIME_TRUNC(archived_at, hour) AS metric_time__hour
+      TIMESTAMP_TRUNC(archived_at, hour) AS metric_time__hour
       , 1 AS archived_users
     FROM ***************************.dim_users users_ds_source_src_28000
   ) subq_11
   ON
-    DATETIME_TRUNC(time_spine_src_28005.ts, hour) = subq_11.metric_time__hour
+    TIMESTAMP_TRUNC(time_spine_src_28005.ts, hour) = subq_11.metric_time__hour
   GROUP BY
     metric_time__hour
 ) subq_18

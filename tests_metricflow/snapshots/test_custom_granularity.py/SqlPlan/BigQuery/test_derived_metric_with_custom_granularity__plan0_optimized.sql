@@ -21,7 +21,7 @@ FROM (
   LEFT OUTER JOIN
     ***************************.mf_time_spine subq_14
   ON
-    DATETIME_TRUNC(bookings_source_src_28000.ds, day) = subq_14.ds
+    TIMESTAMP_TRUNC(bookings_source_src_28000.ds, day) = subq_14.ds
   GROUP BY
     booking__ds__alien_day
 ) subq_18

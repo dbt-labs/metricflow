@@ -11,7 +11,7 @@ WITH sma_28019_cte AS (
   -- Read Elements From Semantic Model 'visits_source'
   -- Metric Time Dimension 'ds'
   SELECT
-    DATETIME_TRUNC(ds, month) AS metric_time__month
+    TIMESTAMP_TRUNC(ds, month) AS metric_time__month
     , user_id AS user
     , 1 AS visits
   FROM ***************************.fct_visits visits_source_src_28000
@@ -68,7 +68,7 @@ CROSS JOIN (
       -- Metric Time Dimension 'ds_month'
       -- Add column with generated UUID
       SELECT
-        DATETIME_TRUNC(ds_month, month) AS metric_time__month
+        TIMESTAMP_TRUNC(ds_month, month) AS metric_time__month
         , user_id AS user
         , 1 AS buys_month
         , GENERATE_UUID() AS mf_internal_uuid

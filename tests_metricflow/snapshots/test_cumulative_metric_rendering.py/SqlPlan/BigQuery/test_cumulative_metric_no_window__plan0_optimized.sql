@@ -11,7 +11,7 @@ sql_engine: BigQuery
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  DATETIME_TRUNC(created_at, month) AS ds__month
+  TIMESTAMP_TRUNC(created_at, month) AS ds__month
   , SUM(revenue) AS revenue_all_time
 FROM ***************************.fct_revenue revenue_src_28000
 GROUP BY

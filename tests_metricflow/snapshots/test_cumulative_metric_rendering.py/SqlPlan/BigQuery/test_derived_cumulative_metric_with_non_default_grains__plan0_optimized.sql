@@ -26,16 +26,16 @@ FROM (
       -- Aggregate Measures
       SELECT
         subq_14.ds AS metric_time__day
-        , DATETIME_TRUNC(subq_14.ds, isoweek) AS metric_time__week
+        , TIMESTAMP_TRUNC(subq_14.ds, isoweek) AS metric_time__week
         , SUM(revenue_src_28000.revenue) AS txn_revenue
       FROM ***************************.mf_time_spine subq_14
       INNER JOIN
         ***************************.fct_revenue revenue_src_28000
       ON
         (
-          DATETIME_TRUNC(revenue_src_28000.created_at, day) <= subq_14.ds
+          TIMESTAMP_TRUNC(revenue_src_28000.created_at, day) <= subq_14.ds
         ) AND (
-          DATETIME_TRUNC(revenue_src_28000.created_at, day) > DATE_SUB(CAST(subq_14.ds AS DATETIME), INTERVAL 2 month)
+          TIMESTAMP_TRUNC(revenue_src_28000.created_at, day) > DATE_SUB(CAST(subq_14.ds AS DATETIME), INTERVAL 2 month)
         )
       GROUP BY
         metric_time__day

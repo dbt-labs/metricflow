@@ -17,7 +17,7 @@ FROM (
     -- Change Column Aliases
     -- Pass Only Elements: ['metric_time__month']
     SELECT
-      DATETIME_TRUNC(ds, month) AS metric_time__month
+      TIMESTAMP_TRUNC(ds, month) AS metric_time__month
     FROM ***************************.mf_time_spine time_spine_src_28006
     GROUP BY
       metric_time__month
@@ -32,7 +32,7 @@ FROM (
       -- Metric Time Dimension 'ds'
       -- Pass Only Elements: ['bookings', 'metric_time__month']
       SELECT
-        DATETIME_TRUNC(ds, month) AS metric_time__month
+        TIMESTAMP_TRUNC(ds, month) AS metric_time__month
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_11

@@ -22,7 +22,7 @@ FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
     SELECT
-      DATETIME_TRUNC(created_at, day) AS metric_time__day
+      TIMESTAMP_TRUNC(created_at, day) AS metric_time__day
       , listing_id AS listing
       , 1 AS listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
