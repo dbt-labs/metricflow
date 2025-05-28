@@ -36,7 +36,7 @@ FROM (
       SELECT
         sma_28019_cte.visits AS visits
         , subq_20.alien_day AS metric_time__alien_day
-      FROM sma_28019_cte sma_28019_cte
+      FROM sma_28019_cte
       LEFT OUTER JOIN
         ***************************.mf_time_spine subq_20
       ON
@@ -106,7 +106,7 @@ FROM (
             , sma_28019_cte.user AS user
             , sma_28019_cte.visits AS visits
             , subq_25.alien_day AS metric_time__alien_day
-          FROM sma_28019_cte sma_28019_cte
+          FROM sma_28019_cte
           LEFT OUTER JOIN
             ***************************.mf_time_spine subq_25
           ON

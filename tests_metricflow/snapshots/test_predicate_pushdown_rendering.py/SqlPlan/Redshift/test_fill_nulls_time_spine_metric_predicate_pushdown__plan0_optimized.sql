@@ -58,7 +58,7 @@ FROM (
         rss_28018_cte.ds__day AS metric_time__day
         , subq_40.listing__country_latest AS listing__country_latest
         , subq_40.bookings AS bookings
-      FROM rss_28018_cte rss_28018_cte
+      FROM rss_28018_cte
       LEFT OUTER JOIN (
         -- Constrain Output with WHERE
         -- Pass Only Elements: ['bookings', 'listing__country_latest', 'metric_time__day']
@@ -74,9 +74,9 @@ FROM (
             , sma_28009_cte.metric_time__day AS metric_time__day
             , sma_28009_cte.booking__is_instant AS booking__is_instant
             , sma_28009_cte.bookings AS bookings
-          FROM sma_28009_cte sma_28009_cte
+          FROM sma_28009_cte
           LEFT OUTER JOIN
-            sma_28014_cte sma_28014_cte
+            sma_28014_cte
           ON
             sma_28009_cte.listing = sma_28014_cte.listing
         ) subq_37
@@ -101,7 +101,7 @@ FROM (
         rss_28018_cte.ds__day AS metric_time__day
         , subq_56.listing__country_latest AS listing__country_latest
         , subq_56.bookings AS bookings
-      FROM rss_28018_cte rss_28018_cte
+      FROM rss_28018_cte
       LEFT OUTER JOIN (
         -- Constrain Output with WHERE
         -- Pass Only Elements: ['bookings', 'listing__country_latest', 'metric_time__day']
@@ -124,14 +124,14 @@ FROM (
               , sma_28009_cte.listing AS listing
               , sma_28009_cte.booking__is_instant AS booking__is_instant
               , sma_28009_cte.bookings AS bookings
-            FROM rss_28018_cte rss_28018_cte
+            FROM rss_28018_cte
             INNER JOIN
-              sma_28009_cte sma_28009_cte
+              sma_28009_cte
             ON
               DATEADD(day, -14, rss_28018_cte.ds__day) = sma_28009_cte.metric_time__day
           ) subq_50
           LEFT OUTER JOIN
-            sma_28014_cte sma_28014_cte
+            sma_28014_cte
           ON
             subq_50.listing = sma_28014_cte.listing
         ) subq_53

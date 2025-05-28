@@ -25,7 +25,7 @@ FROM (
   -- Aggregate Measures
   SELECT
     SUM(visits) AS visits
-  FROM sma_28019_cte sma_28019_cte
+  FROM sma_28019_cte
 ) subq_18
 CROSS JOIN (
   -- Find conversions for user within the range of 1 month
@@ -62,7 +62,7 @@ CROSS JOIN (
       ) AS user
       , subq_23.mf_internal_uuid AS mf_internal_uuid
       , subq_23.buys_month AS buys_month
-    FROM sma_28019_cte sma_28019_cte
+    FROM sma_28019_cte
     INNER JOIN (
       -- Read Elements From Semantic Model 'buys_source'
       -- Metric Time Dimension 'ds_month'

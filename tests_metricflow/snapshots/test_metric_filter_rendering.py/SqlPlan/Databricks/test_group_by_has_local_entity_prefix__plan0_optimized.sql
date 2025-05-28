@@ -24,7 +24,7 @@ FROM (
   SELECT
     subq_32.listing__user__average_booking_value AS user__listing__user__average_booking_value
     , sma_28014_cte.listings AS listings
-  FROM sma_28014_cte sma_28014_cte
+  FROM sma_28014_cte
   LEFT OUTER JOIN (
     -- Join Standard Outputs
     -- Pass Only Elements: ['average_booking_value', 'listing__user']
@@ -36,7 +36,7 @@ FROM (
       , AVG(bookings_source_src_28000.booking_value) AS listing__user__average_booking_value
     FROM ***************************.fct_bookings bookings_source_src_28000
     LEFT OUTER JOIN
-      sma_28014_cte sma_28014_cte
+      sma_28014_cte
     ON
       bookings_source_src_28000.listing_id = sma_28014_cte.listing
     GROUP BY

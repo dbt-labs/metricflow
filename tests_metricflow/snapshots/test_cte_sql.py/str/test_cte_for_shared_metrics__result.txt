@@ -213,9 +213,9 @@ sql_with_cte:
     , MAX(cm_0_cte.bookings) AS bookings
     , MAX(cm_1_cte.views) AS views
     , MAX(CAST(subq_41.bookings AS DOUBLE) / CAST(NULLIF(subq_41.views, 0) AS DOUBLE)) AS bookings_per_view
-  FROM cm_0_cte cm_0_cte
+  FROM cm_0_cte
   FULL OUTER JOIN
-    cm_1_cte cm_1_cte
+    cm_1_cte
   ON
     (
       cm_0_cte.listing__country_latest = cm_1_cte.listing__country_latest
@@ -229,9 +229,9 @@ sql_with_cte:
       , COALESCE(cm_0_cte.listing__country_latest, cm_1_cte.listing__country_latest) AS listing__country_latest
       , MAX(cm_0_cte.bookings) AS bookings
       , MAX(cm_1_cte.views) AS views
-    FROM cm_0_cte cm_0_cte
+    FROM cm_0_cte
     FULL OUTER JOIN
-      cm_1_cte cm_1_cte
+      cm_1_cte
     ON
       (
         cm_0_cte.listing__country_latest = cm_1_cte.listing__country_latest

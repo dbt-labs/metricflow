@@ -34,7 +34,7 @@ FROM (
     SELECT
       booking__is_instant
       , SUM(bookings) AS shared_alias
-    FROM sma_28009_cte sma_28009_cte
+    FROM sma_28009_cte
     GROUP BY
       booking__is_instant
   ) subq_17
@@ -52,7 +52,7 @@ FULL OUTER JOIN (
     SELECT
       booking__is_instant
       , SUM(instant_bookings) AS shared_alias
-    FROM sma_28009_cte sma_28009_cte
+    FROM sma_28009_cte
     GROUP BY
       booking__is_instant
   ) subq_22
