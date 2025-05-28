@@ -1,0 +1,6 @@
+kind: Fixes
+body: Use TIMESTAMP_TRUNC instead of DATETIME_TRUNC for BigQuery
+time: 2025-05-28T12:09:39.003884-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1765"
