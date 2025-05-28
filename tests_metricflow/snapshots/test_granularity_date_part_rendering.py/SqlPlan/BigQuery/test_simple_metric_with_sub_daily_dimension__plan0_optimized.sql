@@ -13,7 +13,7 @@ FROM (
   -- Metric Time Dimension 'created_at'
   -- Pass Only Elements: ['new_users', 'user__archived_at__hour']
   SELECT
-    DATETIME_TRUNC(archived_at, hour) AS user__archived_at__hour
+    TIMESTAMP_TRUNC(archived_at, hour) AS user__archived_at__hour
     , 1 AS new_users
   FROM ***************************.dim_users users_ds_source_src_28000
 ) subq_7
