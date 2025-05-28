@@ -112,3 +112,17 @@ def test_size() -> None:
     logger.debug(LazyFormat("Computed size comparisons", left_size=left_size, right_size=right_size))
     assert left_size == 288
     assert right_size == 288
+
+
+def test_hash_equal() -> None:
+    """Test hash and equals follows conventions."""
+    left = FastItem(item_field_0="same")
+    right = FastItem(item_field_0="same")
+    other = FastItem(item_field_0="other")
+
+    assert hash(left) == hash(right)
+    assert hash(left) != hash(other)
+
+    assert left == right
+    assert left != other
+    assert right != other
