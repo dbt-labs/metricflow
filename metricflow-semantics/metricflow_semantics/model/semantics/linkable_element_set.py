@@ -11,8 +11,10 @@ from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.references import SemanticModelReference
 from typing_extensions import override
 
+from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
+from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
+from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 from metricflow_semantics.model.semantics.linkable_element import (
     ElementPathKey,
@@ -22,6 +24,7 @@ from metricflow_semantics.model.semantics.linkable_element import (
     LinkableEntity,
     LinkableMetric,
 )
+from metricflow_semantics.model.semantics.linkable_element_set_base import AnnotatedSpec, BaseLinkableElementSet
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
@@ -33,7 +36,7 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
-class LinkableElementSet(SemanticModelDerivation):
+class LinkableElementSet(BaseLinkableElementSet):
     """Container class for storing all linkable elements for a metric.
 
     TODO: There are similarities with LinkableSpecSet - consider consolidation.
@@ -347,6 +350,32 @@ class LinkableElementSet(SemanticModelDerivation):
 
         return specs
 
+    @override
+    @cached_property
+    def annotated_specs(self) -> Sequence[AnnotatedSpec]:
+        unique_element_set = self.only_unique_path_keys
+        path_key_to_linkable_elements: dict[ElementPathKey, AnyLengthTuple[LinkableElement]] = {
+            **unique_element_set.path_key_to_linkable_dimensions,
+            **unique_element_set.path_key_to_linkable_entities,
+            **unique_element_set.path_key_to_linkable_metrics,
+        }
+
+        annotated_specs = []
+
+        for path_key, linkable_elements in path_key_to_linkable_elements.items():
+            assert len(linkable_elements) == 1
+            linkable_element = linkable_elements[0]
+            annotated_specs.append(
+                AnnotatedSpec.create(
+                    element_type=LinkableElementType.DIMENSION,
+                    spec=LinkableElementSet._path_key_to_spec(path_key),
+                    properties=FrozenOrderedSet(linkable_element.properties),
+                    origin_model=SemanticModelId(model_name=linkable_element.semantic_model_origin.semantic_model_name),
+                    derived_from_semantic_models=FrozenOrderedSet(linkable_element.derived_from_semantic_models),
+                )
+            )
+        return tuple(annotated_specs)
+
     @staticmethod
     def _path_key_to_spec(path_key: ElementPathKey) -> LinkableInstanceSpec:
         """Helper method to convert ElementPathKey instances to LinkableInstanceSpecs.
@@ -456,3 +485,17 @@ class LinkableElementSet(SemanticModelDerivation):
             path_key_to_linkable_entities=path_key_to_linkable_entities,
             path_key_to_linkable_metrics=path_key_to_linkable_metrics,
         )
+
+    @override
+    @property
+    def is_empty(self) -> bool:
+        return len(self.specs) == 0
+
+    @override
+    def merge(self, other: LinkableElementSet) -> LinkableElementSet:
+        return LinkableElementSet.merge_by_path_key((self, other))
+
+    @classmethod
+    @override
+    def empty_instance(cls) -> LinkableElementSet:
+        return LinkableElementSet()
