@@ -10,7 +10,6 @@ from dbt_semantic_interfaces.call_parameter_sets import (
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 from dbt_semantic_interfaces.parsing.where_filter.where_filter_parser import WhereFilterParser
 from dbt_semantic_interfaces.references import EntityReference
-from metricflow_semantics.specs.patterns.metric_pattern import MetricSpecPattern
 from typing_extensions import override
 
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
@@ -22,6 +21,7 @@ from metricflow_semantics.specs.patterns.entity_link_pattern import (
     ParameterSetField,
     SpecPatternParameterSet,
 )
+from metricflow_semantics.specs.patterns.metric_pattern import MetricSpecPattern
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.specs.patterns.typed_patterns import DimensionPattern, TimeDimensionPattern
 
