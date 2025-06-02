@@ -1,0 +1,62 @@
+test_name: test_all
+test_filename: test_sg_02.py
+---
+default: MutableSemanticGraph(_graph_id=UniqueGraphId(_str_value='SingletonMeta_433'), _nodes=<metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040d1880>, _edges=<metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x103fc86e0>, _label_to_nodes=defaultdict(<class 'metricflow_semantics.experimental.ordered_set.MutableOrderedSet'>, {AggregationLabel(): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x10409c1a0>, GroupByAttributeLabel(): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x103fadeb0>, DunderNameElementLabel(element_name='sm_0_primary_entity'): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040904a0>, DsiEntityLabel(): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e4620>, DunderNameElementLabel(element_name='sm_1_primary_entity'): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e5790>, JoinFromLabel(): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e4650>, MeasureAttributeLabel(measure_name=None): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e6f00>, MeasureAttributeLabel(measure_name='sm_0_measure_0'): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e6c90>, DunderNameElementLabel(element_name='metric_time'): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e6fc0>, TimeDimensionLabel(): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e6e10>, MetricTimeLabel(): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e6ed0>, DunderNameElementLabel(element_name='ds'): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e71d0>}), _tail_node_to_edges=defaultdict(<class 'metricflow_semantics.experimental.ordered_set.MutableOrderedSet'>, {JoinFromModelNode(model_id=SemanticModelId(model_name='sm_0')): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040906e0>, JoinFromModelNode(model_id=SemanticModelId(model_name='sm_1')): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e76e0>, JoinToModelNode(model_id=SemanticModelId(model_name='sm_0')): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e7980>, JoinToModelNode(model_id=SemanticModelId(model_name='sm_1')): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e7bf0>, MeasureNode(attribute_name='sm_0_measure_0', model_id=SemanticModelId(model_name='sm_0'), _labels=<metricflow_semantics.experimental.ordered_set.FrozenOrderedSet object at 0x1040d2d50>): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e7e60>, MetricTimeDimensionNode(dimension_name='metric_time', time_grain_name='YEAR'): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e7fe0>, TimeDimensionNode(dimension_name='ds', time_grain_name='year'): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e0440>, AggregationNode(model_id=SemanticModelId(model_name='sm_0'), aggregation_time_dimension_name='ds'): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e07d0>, DsiEntityNode(entity_name='sm_0_primary_entity'): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e10d0>, DsiEntityNode(entity_name='sm_1_primary_entity'): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e1220>}), _head_node_to_edges=defaultdict(<class 'metricflow_semantics.experimental.ordered_set.MutableOrderedSet'>, {DsiEntityKeyAttributeNode(attribute_name='sm_0_primary_entity'): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e7260>, DsiEntityKeyAttributeNode(attribute_name='sm_1_primary_entity'): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e7440>, TimeDimensionNode(dimension_name='ds', time_grain_name='year'): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e7590>, CategoricalDimensionAttributeNode(attribute_name='dim_0'): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e7560>, AggregationNode(model_id=SemanticModelId(model_name='sm_0'), aggregation_time_dimension_name='ds'): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e7d10>, TimeAttributeNode(attribute_name='custom_year', linkable_element_property_additions=<metricflow_semantics.experimental.ordered_set.FrozenOrderedSet object at 0x1040917f0>): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e7e30>, TimeAttributeNode(attribute_name='year', linkable_element_property_additions=<metricflow_semantics.experimental.ordered_set.FrozenOrderedSet object at 0x1040d2060>): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e7f50>, TimeAttributeNode(attribute_name='year', linkable_element_property_additions=<metricflow_semantics.experimental.ordered_set.FrozenOrderedSet object at 0x1040d2180>): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e02f0>, JoinFromModelNode(model_id=SemanticModelId(model_name='sm_0')): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e0680>, JoinToModelNode(model_id=SemanticModelId(model_name='sm_0')): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e0950>, MetricTimeDimensionNode(dimension_name='metric_time', time_grain_name='YEAR'): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e0aa0>, DsiEntityNode(entity_name='sm_0_primary_entity'): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e0d10>, DsiEntityNode(entity_name='sm_1_primary_entity'): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e0e60>, JoinToModelNode(model_id=SemanticModelId(model_name='sm_1')): <metricflow_semantics.experimental.ordered_set.MutableOrderedSet object at 0x1040e10a0>}), _label_to_edges=defaultdict(<class 'metricflow_semantics.experimental.ordered_set.MutableOrderedSet'>, {}))
+dot_notation:
+  digraph {
+  	graph [name=MutableSemanticGraph]
+  	subgraph cluster_sm_0 {
+  		label=sm_0
+  		"Measure(sm_0_measure_0)"
+  	}
+  	subgraph cluster_other_attribute {
+  		label=other_attribute
+  		"Dim(dim_0)"
+  		"DsiEntityKey(sm_0_primary_entity)"
+  		"DsiEntityKey(sm_1_primary_entity)"
+  	}
+  	subgraph cluster_model_entity {
+  		label=model_entity
+  		"Entity(sm_0_primary_entity)"
+  		"Entity(sm_1_primary_entity)"
+  	}
+  	subgraph cluster_sm_1 {
+  		label=sm_1
+  		"JoinTo(sm_1)"
+  	}
+  	subgraph cluster_time_dimension {
+  		label=time_dimension
+  		"TimeDim(ds, year)"
+  	}
+  	subgraph cluster_time_attribute {
+  		label=time_attribute
+  		"Time(custom_year)"
+  		"Time(year)"
+  		"Time(year)"
+  	}
+  	"JoinFrom(sm_0)" -> "DsiEntityKey(sm_0_primary_entity)"
+  	"JoinFrom(sm_0)" -> "DsiEntityKey(sm_1_primary_entity)"
+  	"JoinFrom(sm_0)" -> "TimeDim(ds, year)"
+  	"JoinFrom(sm_1)" -> "Dim(dim_0)"
+  	"JoinFrom(sm_1)" -> "DsiEntityKey(sm_1_primary_entity)"
+  	"JoinTo(sm_0)" -> "DsiEntityKey(sm_0_primary_entity)"
+  	"JoinTo(sm_0)" -> "DsiEntityKey(sm_1_primary_entity)"
+  	"JoinTo(sm_1)" -> "Dim(dim_0)"
+  	"JoinTo(sm_1)" -> "DsiEntityKey(sm_1_primary_entity)"
+  	"Measure(sm_0_measure_0)" -> "Agg(sm_0, ds)"
+  	"MetricTimeDimension(YEAR)" -> "Time(custom_year)"
+  	"MetricTimeDimension(YEAR)" -> "Time(year)"
+  	"MetricTimeDimension(YEAR)" -> "Time(year)"
+  	"TimeDim(ds, year)" -> "Time(custom_year)"
+  	"TimeDim(ds, year)" -> "Time(year)"
+  	"TimeDim(ds, year)" -> "Time(year)"
+  	"Agg(sm_0, ds)" -> "JoinFrom(sm_0)"
+  	"Agg(sm_0, ds)" -> "JoinTo(sm_0)"
+  	"Agg(sm_0, ds)" -> "MetricTimeDimension(YEAR)"
+  	"JoinTo(sm_0)" -> "TimeDim(ds, year)"
+  	"JoinFrom(sm_0)" -> "Entity(sm_0_primary_entity)"
+  	"JoinFrom(sm_0)" -> "Entity(sm_1_primary_entity)"
+  	"JoinFrom(sm_1)" -> "Entity(sm_1_primary_entity)"
+  	"Entity(sm_0_primary_entity)" -> "JoinTo(sm_0)"
+  	"Entity(sm_1_primary_entity)" -> "JoinTo(sm_1)"
+  }

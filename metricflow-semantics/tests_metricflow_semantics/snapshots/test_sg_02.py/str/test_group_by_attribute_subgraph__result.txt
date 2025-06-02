@@ -1,0 +1,90 @@
+test_name: test_group_by_attribute_subgraph
+test_filename: test_sg_02.py
+---
+default:
+  MutableSemanticGraph(
+    nodes={
+      Dim(dim_0),
+      DsiEntityKey(sm_0_primary_entity),
+      DsiEntityKey(sm_1_primary_entity),
+      Entity(sm_0_primary_entity),
+      Entity(sm_1_primary_entity),
+      GroupByAttributeRoot,
+      JoinTo(sm_0),
+      JoinTo(sm_1),
+      Time(custom_year),
+      Time(year),
+      Time(year),
+      TimeDim(ds, year),
+    },
+    edges={
+      EntityAttributeEdge(tail_node=JoinTo(sm_0), head_node=DsiEntityKey(sm_0_primary_entity)),
+      EntityAttributeEdge(tail_node=JoinTo(sm_0), head_node=DsiEntityKey(sm_1_primary_entity)),
+      EntityAttributeEdge(tail_node=JoinTo(sm_1), head_node=Dim(dim_0)),
+      EntityAttributeEdge(tail_node=JoinTo(sm_1), head_node=DsiEntityKey(sm_1_primary_entity)),
+      EntityAttributeEdge(tail_node=TimeDim(ds, year), head_node=Time(custom_year)),
+      EntityAttributeEdge(tail_node=TimeDim(ds, year), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDim(ds, year), head_node=Time(year)),
+      EntityRelationshipEdge(tail_node=Entity(sm_0_primary_entity), head_node=JoinTo(sm_0)),
+      EntityRelationshipEdge(tail_node=Entity(sm_1_primary_entity), head_node=JoinTo(sm_1)),
+      EntityRelationshipEdge(tail_node=GroupByAttributeRoot, head_node=DsiEntityKey(sm_0_primary_entity)),
+      EntityRelationshipEdge(tail_node=GroupByAttributeRoot, head_node=DsiEntityKey(sm_1_primary_entity)),
+      EntityRelationshipEdge(tail_node=GroupByAttributeRoot, head_node=Entity(sm_0_primary_entity)),
+      EntityRelationshipEdge(tail_node=GroupByAttributeRoot, head_node=Entity(sm_1_primary_entity)),
+      EntityRelationshipEdge(tail_node=GroupByAttributeRoot, head_node=TimeDim(ds, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(sm_0), head_node=TimeDim(ds, year)),
+      JoinToModelEdge(tail_node=Entity(sm_0_primary_entity), head_node=JoinTo(sm_0)),
+      JoinToModelEdge(tail_node=Entity(sm_1_primary_entity), head_node=JoinTo(sm_1)),
+    },
+  )
+dot_notation:
+  digraph {
+  	graph [name=MutableSemanticGraph rankdir=LR]
+  	subgraph cluster_other_attribute {
+  		label=other_attribute
+  		"Dim(dim_0)" [color="#FFA07A"]
+  		"DsiEntityKey(sm_0_primary_entity)" [color="#FFA07A"]
+  		"DsiEntityKey(sm_1_primary_entity)" [color="#FFA07A"]
+  	}
+  	subgraph cluster_model_entity {
+  		label=model_entity
+  		"Entity(sm_0_primary_entity)" [color="#87CEFA"]
+  		"Entity(sm_1_primary_entity)" [color="#87CEFA"]
+  	}
+  	GroupByAttributeRoot [color="#FFD700"]
+  	subgraph cluster_sm_0 {
+  		label=sm_0
+  		"JoinTo(sm_0)"
+  	}
+  	subgraph cluster_sm_1 {
+  		label=sm_1
+  		"JoinTo(sm_1)"
+  	}
+  	subgraph cluster_time_attribute {
+  		label=time_attribute
+  		"Time(custom_year)" [color="#FFA07A"]
+  		"Time(year)" [color="#FFA07A"]
+  		"Time(year)" [color="#FFA07A"]
+  	}
+  	subgraph cluster_time_dimension {
+  		label=time_dimension
+  		"TimeDim(ds, year)"
+  	}
+  	"JoinTo(sm_0)" -> "DsiEntityKey(sm_0_primary_entity)"
+  	"JoinTo(sm_0)" -> "DsiEntityKey(sm_1_primary_entity)"
+  	"JoinTo(sm_1)" -> "Dim(dim_0)"
+  	"JoinTo(sm_1)" -> "DsiEntityKey(sm_1_primary_entity)"
+  	"TimeDim(ds, year)" -> "Time(custom_year)"
+  	"TimeDim(ds, year)" -> "Time(year)"
+  	"TimeDim(ds, year)" -> "Time(year)"
+  	"Entity(sm_0_primary_entity)" -> "JoinTo(sm_0)"
+  	"Entity(sm_1_primary_entity)" -> "JoinTo(sm_1)"
+  	GroupByAttributeRoot -> "DsiEntityKey(sm_0_primary_entity)"
+  	GroupByAttributeRoot -> "DsiEntityKey(sm_1_primary_entity)"
+  	GroupByAttributeRoot -> "Entity(sm_0_primary_entity)"
+  	GroupByAttributeRoot -> "Entity(sm_1_primary_entity)"
+  	GroupByAttributeRoot -> "TimeDim(ds, year)"
+  	"JoinTo(sm_0)" -> "TimeDim(ds, year)"
+  	"Entity(sm_0_primary_entity)" -> "JoinTo(sm_0)"
+  	"Entity(sm_1_primary_entity)" -> "JoinTo(sm_1)"
+  }

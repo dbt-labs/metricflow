@@ -1,0 +1,107 @@
+from __future__ import annotations
+
+import logging
+
+from dbt_semantic_interfaces.protocols import Metric
+from typing_extensions import override
+
+from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item
+from metricflow_semantics.experimental.ordered_set import MutableOrderedSet
+from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
+    AttributeComputationPath,
+)
+from metricflow_semantics.experimental.semantic_graph.builder.dunder_name_weight import DunderNameWeightFunction
+from metricflow_semantics.experimental.semantic_graph.builder.graph_change_rule import (
+    SemanticSubgraphGenerator,
+    SubgraphGeneratorArgumentSet,
+)
+from metricflow_semantics.experimental.semantic_graph.edges.entity_attribute import (
+    AttributeEdgeType,
+    EntityAttributeEdge,
+)
+from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import (
+    MetricAttributeNode,
+)
+from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
+    DsiEntityLabel,
+    MeasureAttributeLabel,
+    MetricAttributeLabel,
+)
+from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
+    SemanticGraphNode,
+)
+from metricflow_semantics.experimental.semantic_graph.semantic_graph import MutableSemanticGraph, SemanticGraph
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+
+logger = logging.getLogger(__name__)
+
+
+class MetricAttributeSubgraph(SemanticSubgraphGenerator):
+    def __init__(self, argument_set: SubgraphGeneratorArgumentSet) -> None:
+        super().__init__(argument_set)
+        self._mutable_path = AttributeComputationPath.create()
+        self._verbose_debug_logs = False
+
+    def _generate_subgraph_for_any_metric(
+        self, current_graph: SemanticGraph, subgraph: MutableSemanticGraph, metric: Metric
+    ) -> None:
+        if len(subgraph.nodes_with_label(MetricAttributeLabel(metric_name=metric.name))) > 0:
+            return
+
+        parent_metric_inputs = metric.type_params.metrics
+        if parent_metric_inputs is None:
+            self._generate_subgraph_for_base_metric(current_graph, subgraph, metric)
+            return
+
+        for parent_metric_input in parent_metric_inputs:
+            parent_metric = self._manifest_object_lookup.get_metric(parent_metric_input.name)
+            self._generate_subgraph_for_any_metric(current_graph, subgraph, parent_metric)
+
+    def _generate_subgraph_for_base_metric(
+        self, current_graph: SemanticGraph, subgraph: MutableSemanticGraph, metric: Metric
+    ) -> None:
+        required_measure_nodes = MutableOrderedSet[SemanticGraphNode]()
+        for measure in metric.input_measures:
+            measure_node = mf_first_item(
+                current_graph.nodes_with_label(MeasureAttributeLabel(measure_name=measure.name))
+            )
+            required_measure_nodes.add(measure_node)
+
+        source_nodes = required_measure_nodes.as_frozen()
+        candidate_target_nodes = current_graph.nodes_with_label(DsiEntityLabel()).as_frozen()
+        common_reachable_targets_result = self._path_finder.find_common_reachable_targets(
+            graph=current_graph,
+            mutable_path=self._mutable_path,
+            source_nodes=source_nodes,
+            candidate_target_nodes=candidate_target_nodes,
+            weight_function=DunderNameWeightFunction(),
+            max_path_weight=1,
+        )
+
+        if self._verbose_debug_logs:
+            logger.debug(
+                LazyFormat(
+                    "Found reachable targets",
+                    result=common_reachable_targets_result,
+                )
+            )
+
+        metric_attribute_node = MetricAttributeNode(attribute_name=metric.name)
+        for reachable_dsi_entity_node in common_reachable_targets_result.reachable_targets:
+            subgraph.add_edge(
+                EntityAttributeEdge.get_instance(
+                    tail_node=reachable_dsi_entity_node,
+                    head_node=metric_attribute_node,
+                    attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
+                )
+            )
+
+    @override
+    def generate_subgraph(self, current_graph: SemanticGraph) -> MutableSemanticGraph:
+        current_subgraph = MutableSemanticGraph.create()
+        if self._verbose_debug_logs:
+            logger.debug(LazyFormat("Starting with graph", current_graph=current_graph))
+        for metric in self._manifest_object_lookup.get_metrics():
+            self._generate_subgraph_for_any_metric(current_graph, current_subgraph, metric)
+
+        return current_subgraph
