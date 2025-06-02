@@ -4,6 +4,7 @@ from typing import Collection
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from metricflow_semantics.errors.error_classes import UnsupportedEngineFeatureError
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.sql.sql_exprs import (
     SqlAddTimeExpression,
@@ -104,8 +105,8 @@ class DuckDbSqlExpressionRenderer(DefaultSqlExpressionRenderer):
                 bind_parameter_set=params,
             )
         elif node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_DISCRETE:
-            raise RuntimeError(
-                "Approximate discrete percentile aggregatew not supported for DuckDB. Set "
+            raise UnsupportedEngineFeatureError(
+                "Approximate discrete percentile aggregate not supported for DuckDB. Set "
                 + "use_discrete_percentile and/or use_approximate_percentile to false in all percentile measures."
             )
         else:

@@ -12,7 +12,7 @@ from dbt_semantic_interfaces.implementations.filters.where_filter import Pydanti
 from dbt_semantic_interfaces.references import EntityReference, MeasureReference, MetricReference
 from dbt_semantic_interfaces.type_enums import DimensionType
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
-from metricflow_semantics.errors.error_classes import ExecutionException
+from metricflow_semantics.errors.error_classes import ExecutionException, InvalidQueryException
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.runtime import log_block_runtime
@@ -27,7 +27,6 @@ from metricflow_semantics.protocols.query_parameter import (
     MetricQueryParameter,
     OrderByQueryParameter,
 )
-from metricflow_semantics.query.query_exceptions import InvalidQueryException
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.random_id import random_id
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver

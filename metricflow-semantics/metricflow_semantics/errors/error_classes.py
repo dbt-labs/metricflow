@@ -4,7 +4,17 @@ import textwrap
 from typing import Dict, Optional
 
 
-class CustomerFacingSemanticException(Exception):
+class InformativeUserError(Exception):
+    """Raised for user errors.
+
+    The error is actionable by the user or provides user userful information
+    as to why it's unactionable (eg., Feature isn't supported)
+    """
+
+    pass
+
+
+class CustomerFacingSemanticException(InformativeUserError):
     """Class of Exceptions that make it to the customer's eyeballs."""
 
     pass
@@ -51,11 +61,7 @@ class ExecutionException(Exception):
     pass
 
 
-class InferenceError(Exception):
-    """Exception to represent errors related to inference."""
-
-
-class UnsupportedEngineFeatureError(RuntimeError):
+class UnsupportedEngineFeatureError(InformativeUserError, RuntimeError):
     """Raised when the user attempts to use a feature that isn't supported by the data platform."""
 
 
@@ -63,12 +69,36 @@ class SqlBindParametersNotSupportedError(Exception):
     """Raised when a SqlClient that does not have support for bind parameters receives a non-empty set of params."""
 
 
-class UnknownMetricLinkingError(ValueError):
+class UnknownMetricLinkingError(InformativeUserError):
     """Raised during linking when a user attempts to use a metric that isn't specified."""
 
 
-class InvalidQuerySyntax(Exception):
+class InvalidQuerySyntax(InformativeUserError):
     """Raised when query syntax is invalid. Primarily used in the where clause."""
 
     def __init__(self, msg: str) -> None:  # noqa: D107
         super().__init__(msg)
+
+
+class InvalidQueryException(InformativeUserError):
+    """Exception thrown when there is an error with the parameters to a MF query."""
+
+    pass
+
+
+class RenderSqlTemplateException(InformativeUserError):
+    """Exception thrown when there is an error rendering a SQL template."""
+
+    pass
+
+
+class FeatureNotSupportedError(InformativeUserError):
+    """Exception thrown when a feature is not implemented."""
+
+    pass
+
+
+class SemanticManifestConfigurationError(InformativeUserError):
+    """Exception thrown when the semantic manifest is not configured correctly."""
+
+    pass

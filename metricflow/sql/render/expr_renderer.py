@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING, Collection, List, Optional
 import jinja2
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from metricflow_semantics.errors.error_classes import UnsupportedEngineFeatureError
 from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.sql.sql_exprs import (
@@ -278,7 +279,9 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
 
     def _validate_granularity_for_engine(self, time_granularity: TimeGranularity) -> None:
         if self.sql_engine and time_granularity in self.sql_engine.unsupported_granularities:
-            raise RuntimeError(f"{self.sql_engine.name} does not support time granularity {time_granularity.name}.")
+            raise UnsupportedEngineFeatureError(
+                f"{self.sql_engine.name} does not support time granularity {time_granularity.name}."
+            )
 
     def visit_date_trunc_expr(self, node: SqlDateTruncExpression) -> SqlExpressionRenderResult:  # noqa: D102
         self._validate_granularity_for_engine(node.time_granularity)
