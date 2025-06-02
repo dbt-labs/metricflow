@@ -125,6 +125,7 @@ def assert_str_snapshot_equal(  # type: ignore[misc]
     mf_test_configuration: MetricFlowTestConfiguration,
     snapshot_id: str,
     snapshot_str: str,
+    snapshot_file_extension: str = ".txt",
     sql_engine: Optional[SqlEngine] = None,
     expectation_description: Optional[str] = None,
 ) -> None:
@@ -138,7 +139,7 @@ def assert_str_snapshot_equal(  # type: ignore[misc]
         group_id=snapshot_str.__class__.__name__,
         snapshot_id=snapshot_id,
         snapshot_text=snapshot_str,
-        snapshot_file_extension=".txt",
+        snapshot_file_extension=snapshot_file_extension,
         additional_sub_directories_for_snapshots=(sql_engine.value,) if sql_engine is not None else (),
         expectation_description=expectation_description,
         incomparable_strings_replacement_function=make_schema_replacement_function(
