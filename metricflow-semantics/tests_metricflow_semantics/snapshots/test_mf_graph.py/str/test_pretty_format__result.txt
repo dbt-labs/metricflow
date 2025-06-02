@@ -1,0 +1,15 @@
+test_name: test_pretty_format
+test_filename: test_mf_graph.py
+docstring:
+  Check formatting of the graph using `PrettyFormatGraphFormatter`.
+---
+FlowGraph(
+  nodes={SourceNode('source'), IntermediateNode('a'), IntermediateNode('b'), SinkNode('sink')},
+  edges={
+    FlowEdge('source -> a'),
+    FlowEdge('source -> b'),
+    FlowEdge('a -> b'),
+    FlowEdge('a -> sink'),
+    FlowEdge('b -> sink'),
+  },
+)
