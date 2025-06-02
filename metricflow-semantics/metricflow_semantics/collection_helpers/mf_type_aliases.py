@@ -23,7 +23,7 @@ AnyLengthTuple = tuple[T1, ...]
 
 # A tuple of items in a mapping. Each item is a tuple of the form `(key, value)`
 # These are useful for type-annotating immutable dataclasses where a mapping is stored as a tuple.
-KeyT = TypeVar("KeyT")
+KeyT = TypeVar("KeyT", bound=Hashable)
 ValueT = TypeVar("ValueT")
 MappingItem = tuple[KeyT, ValueT]
 MappingItemsTuple = tuple[tuple[KeyT, ValueT], ...]
