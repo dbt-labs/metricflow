@@ -15,7 +15,7 @@ INNER JOIN (
   -- Read Elements From Semantic Model 'users_ds_source'
   -- Metric Time Dimension 'archived_at'
   SELECT
-    DATETIME_TRUNC(archived_at, hour) AS metric_time__hour
+    TIMESTAMP_TRUNC(archived_at, hour) AS metric_time__hour
     , 1 AS archived_users
   FROM ***************************.dim_users users_ds_source_src_28000
 ) subq_9
@@ -23,7 +23,7 @@ ON
   (
     subq_9.metric_time__hour <= subq_11.ts
   ) AND (
-    subq_9.metric_time__hour >= DATETIME_TRUNC(subq_11.ts, hour)
+    subq_9.metric_time__hour >= TIMESTAMP_TRUNC(subq_11.ts, hour)
   )
 GROUP BY
   metric_time__hour

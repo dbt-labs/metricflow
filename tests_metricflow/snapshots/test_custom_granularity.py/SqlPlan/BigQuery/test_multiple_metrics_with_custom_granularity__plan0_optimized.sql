@@ -21,7 +21,7 @@ FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     SELECT
       1 AS bookings
-      , DATETIME_TRUNC(ds, day) AS ds__day
+      , TIMESTAMP_TRUNC(ds, day) AS ds__day
     FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_13
   LEFT OUTER JOIN
@@ -44,7 +44,7 @@ FULL OUTER JOIN (
     -- Read Elements From Semantic Model 'listings_latest'
     SELECT
       1 AS listings
-      , DATETIME_TRUNC(created_at, day) AS ds__day
+      , TIMESTAMP_TRUNC(created_at, day) AS ds__day
     FROM ***************************.dim_listings_latest listings_latest_src_28000
   ) subq_19
   LEFT OUTER JOIN
