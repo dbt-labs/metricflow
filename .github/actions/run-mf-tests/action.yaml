@@ -44,6 +44,17 @@ runs:
     with:
       python-version: "${{ inputs.python-version }}"
       hatch-environment-cache-config-json: "${{ inputs.hatch-environment-cache-config-json }}"
+
+  - name: Cache APT Packages
+    uses: awalsh128/cache-apt-pkgs-action@v1.4.3
+    with:
+      packages: graphviz
+      version: "@latest"
+
+  - name: Register `graphviz` plug-ins
+    shell: bash
+    run: "sudo dot -c"
+
   - name: Run Tests w/ Python ${{ inputs.python-version }}
     shell: bash
     run: >
