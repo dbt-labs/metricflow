@@ -30,6 +30,7 @@ from metricflow_semantics.model.semantics.linkable_element import (
     SemanticModelToMetricSubqueryJoinPath,
 )
 from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
+from metricflow_semantics.model.semantics.linkable_element_set_base import BaseLinkableElementSet
 from metricflow_semantics.model.semantics.linkable_spec_index import LinkableSpecIndex
 from metricflow_semantics.model.semantics.manifest_object_lookup import SemanticManifestObjectLookup
 from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY
@@ -284,7 +285,7 @@ class ValidLinkableSpecResolver:
         self,
         metric_references: Sequence[MetricReference],
         element_filter: LinkableElementFilter = LinkableElementFilter(),
-    ) -> LinkableElementSet:
+    ) -> BaseLinkableElementSet:
         """Gets the valid linkable elements that are common to all requested metrics."""
         linkable_element_sets = []
         for metric_reference in metric_references:
