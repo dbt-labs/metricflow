@@ -21,9 +21,11 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from typing_extensions import override
 
 from metricflow_semantics.assert_one_arg import assert_exactly_one_arg_set
+from metricflow_semantics.experimental.mf_graph.comparable import Comparable, ComparisonKey
 from metricflow_semantics.experimental.orderd_enum import OrderedEnum
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
+from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.workarounds.reference import sorted_semantic_model_references
 
@@ -58,7 +60,7 @@ class LinkableElementType(OrderedEnum):
 
 
 @dataclass(frozen=True)
-class ElementPathKey:
+class ElementPathKey(Comparable):
     """A key that can uniquely identify an element and the joins used to realize the element."""
 
     element_name: str
@@ -73,6 +75,28 @@ class ElementPathKey:
         assert len(set(self.entity_links)) == len(
             self.entity_links
         ), f"Duplicate found in `entity_links`: {self.entity_links}."
+
+    @override
+    @property
+    def comparison_key(self) -> ComparisonKey:
+        return (
+            self.element_name,
+            self.element_type,
+            self.entity_links,
+            self.time_granularity if self.time_granularity is not None else None,
+            self.date_part.to_int() if self.date_part is not None else None,
+            self.metric_subquery_entity_links,
+            self.metric_subquery_entity_links,
+        )
+
+    @cached_property
+    def dunder_name(self) -> str:  # noqa: D102
+        return StructuredLinkableSpecName(
+            entity_link_names=tuple(entity_link.element_name for entity_link in self.entity_links),
+            element_name=self.element_name,
+            time_granularity_name=self.time_granularity.name if self.time_granularity is not None else None,
+            date_part=self.date_part,
+        ).qualified_name
 
 
 @dataclass(frozen=True)
