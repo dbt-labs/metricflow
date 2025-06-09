@@ -17,6 +17,7 @@ from metricflow_semantics.collection_helpers.merger import Mergeable
 from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantics.linkable_element import LinkableElement
+from metricflow_semantics.model.semantics.linkable_element_set_base import BaseLinkableElementSet
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow_semantics.query.group_by_item.path_prefixable import PathPrefixable
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
@@ -24,7 +25,6 @@ from metricflow_semantics.query.issues.issues_base import MetricFlowQueryResolut
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 
 if TYPE_CHECKING:
-    from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
     from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 
 logger = logging.getLogger(__name__)
@@ -177,7 +177,7 @@ class FilterSpecResolution:
 
     lookup_key: ResolvedSpecLookUpKey
     where_filter_intersection: WhereFilterIntersection
-    resolved_linkable_element_set: LinkableElementSet
+    resolved_linkable_element_set: BaseLinkableElementSet
     spec_pattern: SpecPattern
     issue_set: MetricFlowQueryResolutionIssueSet
     # Used for error messages.
@@ -217,9 +217,9 @@ class FilterSpecResolution:
         """Returns the resolved linkable elements, if any, for this resolution result."""
         resolved_spec = self.resolved_spec
         if resolved_spec is None:
-            return tuple()
+            return ()
 
-        return self.resolved_linkable_element_set.linkable_elements_for_path_key(resolved_spec.element_path_key)
+        return self.resolved_linkable_element_set.linkable_elements
 
 
 CallParameterSet = Union[
