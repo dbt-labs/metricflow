@@ -30,6 +30,7 @@ from metricflow_semantics.model.semantics.linkable_element import (
     SemanticModelToMetricSubqueryJoinPath,
 )
 from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
+from metricflow_semantics.model.semantics.linkable_element_set_base import BaseLinkableElementSet
 from metricflow_semantics.model.semantics.linkable_spec_index import LinkableSpecIndex
 from metricflow_semantics.model.semantics.manifest_object_lookup import SemanticManifestObjectLookup
 from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY
@@ -262,7 +263,7 @@ class ValidLinkableSpecResolver:
         self,
         measure_reference: MeasureReference,
         element_filter: LinkableElementFilter,
-    ) -> LinkableElementSet:
+    ) -> BaseLinkableElementSet:
         """Get the valid linkable elements for the given measure."""
         return self._get_linkable_element_set_for_measure(
             measure_reference=measure_reference,
@@ -272,7 +273,7 @@ class ValidLinkableSpecResolver:
     def get_linkable_elements_for_distinct_values_query(
         self,
         element_filter: LinkableElementFilter,
-    ) -> LinkableElementSet:
+    ) -> BaseLinkableElementSet:
         """Returns queryable items for a distinct group-by-item values query.
 
         A distinct group-by-item values query does not include any metrics.
@@ -284,7 +285,7 @@ class ValidLinkableSpecResolver:
         self,
         metric_references: Sequence[MetricReference],
         element_filter: LinkableElementFilter = LinkableElementFilter(),
-    ) -> LinkableElementSet:
+    ) -> BaseLinkableElementSet:
         """Gets the valid linkable elements that are common to all requested metrics."""
         linkable_element_sets = []
         for metric_reference in metric_references:
