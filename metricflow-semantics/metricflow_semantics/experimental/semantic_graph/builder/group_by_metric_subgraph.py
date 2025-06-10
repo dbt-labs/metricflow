@@ -36,11 +36,11 @@ from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 logger = logging.getLogger(__name__)
 
 
-class MetricAttributeSubgraph(SemanticSubgraphGenerator):
+class GroupByMetricSubgraph(SemanticSubgraphGenerator):
     def __init__(self, argument_set: SubgraphGeneratorArgumentSet) -> None:
         super().__init__(argument_set)
         self._mutable_path = AttributeComputationPath.create()
-        self._verbose_debug_logs = False
+        self._verbose_debug_logs = True
 
     def _generate_subgraph_for_any_metric(
         self, current_graph: SemanticGraph, subgraph: MutableSemanticGraph, metric: Metric
@@ -81,7 +81,8 @@ class MetricAttributeSubgraph(SemanticSubgraphGenerator):
         if self._verbose_debug_logs:
             logger.debug(
                 LazyFormat(
-                    "Found reachable targets",
+                    "Completed search for reachable targets",
+                    reachable_target_count=len(common_reachable_targets_result.reachable_targets),
                     result=common_reachable_targets_result,
                 )
             )

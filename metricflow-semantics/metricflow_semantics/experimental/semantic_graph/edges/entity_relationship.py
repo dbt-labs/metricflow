@@ -64,3 +64,32 @@ class EntityRelationshipEdge(SemanticGraphEdge):
             head_node=self._tail_node,
             linkable_element_properties=self.linkable_element_properties,
         )
+
+
+@singleton_dataclass(order=False)
+class DerivativeAttributeEdge(SemanticGraphEdge):
+    @staticmethod
+    def get_instance(
+        tail_node: SemanticGraphNode,
+        head_node: SemanticGraphNode,
+    ) -> DerivativeAttributeEdge:
+        return DerivativeAttributeEdge(
+            _tail_node=tail_node,
+            _head_node=head_node,
+        )
+
+    @override
+    @cached_property
+    def comparison_key(self) -> ComparisonKey:
+        return (
+            self._tail_node,
+            self._head_node,
+        )
+
+    @override
+    @cached_property
+    def inverse(self) -> DerivativeAttributeEdge:
+        return DerivativeAttributeEdge.get_instance(
+            tail_node=self._head_node,
+            head_node=self._tail_node,
+        )

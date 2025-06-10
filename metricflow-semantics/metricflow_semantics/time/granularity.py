@@ -6,12 +6,14 @@ from typing import FrozenSet
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.lru_cache import typed_lru_cache
+from metricflow_semantics.experimental.mf_graph.comparable import Comparable, ComparisonKey
 
 
 @dataclass(frozen=True)
-class ExpandedTimeGranularity(SerializableDataclass):
+class ExpandedTimeGranularity(Comparable, SerializableDataclass):
     """Dataclass container for custom granularity extensions to the base TimeGranularity enumeration.
 
     This includes the granularity name, which is either the custom granularity or the TimeGranularity string value,
@@ -59,3 +61,8 @@ class ExpandedTimeGranularity(SerializableDataclass):
     def is_standard_granularity_name(cls, time_granularity_name: str) -> bool:
         """Helper for checking if a given time granularity name is part of the standard TimeGranularity enumeration."""
         return time_granularity_name in cls._standard_time_granularity_names()
+
+    @override
+    @cached_property
+    def comparison_key(self) -> ComparisonKey:
+        return (self.name, self.base_granularity.to_int())

@@ -41,7 +41,7 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
         self._mutable_path: Optional[PathT] = None
         self._cumulative_stat = MutablePathFinderStat()
 
-        self._verbose_debug_logs = False
+        self._verbose_debug_logs = True
 
     def _current_mutable_path(self) -> PathT:
         return mf_first_non_none_or_raise(self._mutable_path)

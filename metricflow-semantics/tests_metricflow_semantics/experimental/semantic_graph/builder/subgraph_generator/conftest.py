@@ -20,8 +20,10 @@ from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder i
 from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_cache import PathFinderCache
 from metricflow_semantics.experimental.semantic_graph.semantic_graph import MutableSemanticGraph
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.test_helpers.svg_snapshot import write_svg_snapshot_for_review
 
 from tests_metricflow_semantics.experimental.graph_helpers import assert_graph_snapshot_equal
+from tests_metricflow_semantics.experimental.mf_graph.formatting.svg_formatter import SvgFormatter
 
 logger = logging.getLogger(__name__)
 
@@ -45,3 +47,8 @@ def check_subgraph_generation(
         subgraph_generators=subgraph_generators,
     )
     assert_graph_snapshot_equal(request=request, snapshot_configuration=mf_test_configuration, graph=semantic_graph)
+    write_svg_snapshot_for_review(
+        request=request,
+        snapshot_configuration=mf_test_configuration,
+        svg_file_contents=semantic_graph.format(SvgFormatter()),
+    )

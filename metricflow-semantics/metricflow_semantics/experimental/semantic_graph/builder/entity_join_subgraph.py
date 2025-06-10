@@ -84,6 +84,18 @@ class EntityJoinSubgraphGenerator(SemanticSubgraphGenerator):
                         right_model_id=right_model_id,
                     )
                 )
+        # Handle case when the primary entity field in the semantic model is set and there isn't an entity element in
+        # the model with `EntityType.PRIMARY`.
+        primary_entity_name_field = lookup.primary_entity_name
+        if primary_entity_name_field is not None:
+            current_subgraph.add_edge(
+                JoinFromModelEdge.get_instance(
+                    tail_node=join_from_semantic_model_node,
+                    head_node=DsiEntityNode.get_instance(entity_name=primary_entity_name_field),
+                    right_model_id=model_id,
+                )
+            )
+
         entity_link_edges: MutableOrderedSet[JoinedDsiEntityEdge] = MutableOrderedSet()
 
         # for source_entity_node in valid_target_dsi_entity_nodes_for_joins_to_this_model:
