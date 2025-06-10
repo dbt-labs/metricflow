@@ -5,6 +5,7 @@ from typing import Optional
 
 from typing_extensions import override
 
+from metricflow_semantics.experimental.semantic_graph.edges.edge_labels import MetricDefinitionLabel
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
     SemanticGraphEdge,
     SemanticGraphNode,
@@ -19,15 +20,24 @@ from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attri
 
 
 class DunderNameWeightFunction(WeightFunction[SemanticGraphNode, SemanticGraphEdge, AttributeComputationPath]):
+    _METRIC_DEFINITION_LABEL = MetricDefinitionLabel()
+
     @override
     def incremental_weight(
         self, path_to_node: AttributeComputationPath, edge_from_node: SemanticGraphEdge
     ) -> Optional[int]:
+        # Don't allow traversal of the metric definition edges unless the previous edge in the path was also a metric
+        # definition edge. This prevents unnecessary traversal when searching for group-by items as it prevents
+        # traversal from the metric node (which is a successor of the `JoinToModelNode` and represents a group-by
+        # metric).
+        path_edges = path_to_node.edges
+        if len(path_edges) > 0 and DunderNameWeightFunction._METRIC_DEFINITION_LABEL in edge_from_node.labels:
+            last_edge = path_edges[-1]
+            if DunderNameWeightFunction._METRIC_DEFINITION_LABEL not in last_edge.labels:
+                return None
+
+
         current_attribute_computation = path_to_node.attribute_computation
-        dundered_name_element_additions = (
-            edge_from_node.attribute_computation_update.dundered_name_element_additions
-            + edge_from_node.head_node.attribute_computation_update.dundered_name_element_additions
-        )
         dundered_name_elements = (
             current_attribute_computation.attribute_descriptor.dundered_name_elements + dundered_name_element_additions
         )
@@ -36,4 +46,16 @@ class DunderNameWeightFunction(WeightFunction[SemanticGraphNode, SemanticGraphEd
         if len(dundered_name_elements) >= 2:
             if dundered_name_elements[-1] == dundered_name_elements[-2]:
                 return None
-        return len(dundered_name_element_additions)
+
+        # dundered_name_element_additions = (
+        #     edge_from_node.attribute_computation_update.dundered_name_element_additions
+        #     + edge_from_node.head_node.attribute_computation_update.dundered_name_element_additions
+        # )
+        # # return len(dundered_name_element_additions)
+
+        dsi_entity_name_additions = (
+            edge_from_node.attribute_computation_update.dsi_entity_additions
+            + edge_from_node.head_node.attribute_computation_update.dsi_entity_additions
+        )
+
+        return len(dsi_entity_name_additions)

@@ -40,6 +40,7 @@ class AttributeComputationUpdate(HasDisplayedProperty):
     linkable_element_property_additions: AnyLengthTuple[LinkableElementProperty] = ()
     derived_from_model_id_additions: AnyLengthTuple[SemanticModelId] = ()
     element_type_additions: AnyLengthTuple[LinkableElementType] = ()
+    dsi_entity_additions: AnyLengthTuple[str] = ()
 
     @override
     @cached_property
@@ -57,7 +58,8 @@ class AttributeComputationUpdate(HasDisplayedProperty):
             properties.append(DisplayedProperty("add_model", derived_from_model_id_addition.model_name))
         for element_type_addition in self.element_type_additions:
             properties.append(DisplayedProperty("add_type", element_type_addition.name))
-
+        for dsi_entity_addition in self.dsi_entity_additions:
+            properties.append(DisplayedProperty("add_dsi_entity", dsi_entity_addition))
         return tuple(properties)
 
 
@@ -67,6 +69,7 @@ class AttributeDescriptor:
     model_ids: FrozenOrderedSet[SemanticModelId] = FrozenOrderedSet()
     properties: FrozenOrderedSet[LinkableElementProperty] = FrozenOrderedSet()
     element_types: FrozenOrderedSet[LinkableElementType] = FrozenOrderedSet()
+    dsi_entity_names: FrozenOrderedSet[str] = FrozenOrderedSet()
 
 
 @dataclass
@@ -104,6 +107,7 @@ class MutableAttributeComputation(AttributeComputation):
                     model_ids=FrozenOrderedSet(update.derived_from_model_id_additions),
                     properties=FrozenOrderedSet(update.linkable_element_property_additions),
                     element_types=FrozenOrderedSet(update.element_type_additions),
+                    dsi_entity_names=FrozenOrderedSet(update.dsi_entity_additions),
                 )
             )
             return
@@ -116,6 +120,7 @@ class MutableAttributeComputation(AttributeComputation):
                 model_ids=previous_attribute_descriptor.model_ids.union(update.derived_from_model_id_additions),
                 properties=previous_attribute_descriptor.properties.union(update.linkable_element_property_additions),
                 element_types=previous_attribute_descriptor.element_types.union(update.element_type_additions),
+                dsi_entity_names=previous_attribute_descriptor.dsi_entity_names.union(update.dsi_entity_additions),
             )
         )
         return
@@ -143,7 +148,3 @@ class AttributeComputationUpdater(HasDisplayedProperty, ABC):
     def attribute_computation_update(self) -> AttributeComputationUpdate:
         return AttributeComputationUpdate()
 
-
-class RightAttributeType(Enum):
-    DIMENSION = "dimension"
-    TIME_DIMENSION = "time dimension"

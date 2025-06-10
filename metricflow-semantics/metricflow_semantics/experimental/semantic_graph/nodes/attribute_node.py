@@ -198,7 +198,7 @@ class CategoricalDimensionAttributeNode(AttributeNode):
 
 
 @singleton_dataclass(order=False)
-class MetricAttributeNode(AttributeNode):
+class MetricNode(AttributeNode):
     @property
     @override
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
@@ -214,7 +214,7 @@ class MetricAttributeNode(AttributeNode):
     @override
     @cached_property
     def labels(self) -> FrozenOrderedSet[MetricflowGraphLabel]:
-        return super(MetricAttributeNode, self).labels.union(
+        return super(MetricNode, self).labels.union(
             (
                 MetricAttributeLabel(metric_name=self.attribute_name),
                 MetricAttributeLabel(metric_name=None),

@@ -3,11 +3,15 @@ from __future__ import annotations
 import logging
 
 from _pytest.fixtures import FixtureRequest
+from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item
+from metricflow_semantics.experimental.metricflow_exception import MetricflowAssertionError
+from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
     AttributeComputationPath,
 )
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_resolver import (
     AttributeResolver,
+    AttributeResolverCache,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.graph_builder import SemanticGraphBuilder
 from metricflow_semantics.experimental.semantic_graph.builder.group_by_attribute_subgraph import (
@@ -15,7 +19,7 @@ from metricflow_semantics.experimental.semantic_graph.builder.group_by_attribute
 )
 from metricflow_semantics.experimental.semantic_graph.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
-from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import MeasureNode, MetricAttributeNode
+from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import MeasureNode, MetricNode
 from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
     DsiEntityLabel,
     GroupByAttributeLabel,
@@ -132,14 +136,14 @@ def test_group_by_attribute_subgraph(  # noqa: D103
         path_finder=path_finder,
     )
     graph = builder.build()
-    metric_attribute_node = MetricAttributeNode(attribute_name="sm_0_measure_0_metric")
+    metric_node = MetricNode(attribute_name="sm_0_measure_0_metric")
 
     subgraph_generator = GroupByAttributeSubgraphGenerator(
         semantic_graph=graph,
         path_finder=MetricflowGraphPathFinder(path_finder_cache=path_finder_cache),
     )
 
-    subgraph = subgraph_generator.generate_subgraph_for_one_metric(metric_attribute_node)
+    subgraph = subgraph_generator.generate_subgraph(FrozenOrderedSet((metric_node,)))
 
     write_svg_snapshot_for_review(
         request=request, snapshot_configuration=mf_test_configuration, svg_file_contents=subgraph.format(SvgFormatter())
@@ -161,6 +165,25 @@ def test_resolver(  # noqa: D103
         path_finder=path_finder,
     )
     semantic_graph = builder.build()
-    spec_resolver = AttributeResolver(manifest_object_lookup=sg_02_single_join_lookup, semantic_graph=semantic_graph)
-    attribute_descriptors = spec_resolver.resolve_attribute_descriptors("sm_0_measure_0_metric")
+    attribute_resolver_cache = AttributeResolverCache()
+    spec_resolver = AttributeResolver(
+        manifest_object_lookup=sg_02_single_join_lookup,
+        semantic_graph=semantic_graph,
+        attribute_resolver_cache=attribute_resolver_cache,
+    )
+
+    measure_name = "sm_0_measure_0"
+    matching_nodes = semantic_graph.nodes_with_label(MeasureAttributeLabel(measure_name=measure_name))
+    measure_node = mf_first_item(
+        matching_nodes,
+        lambda: MetricflowAssertionError(
+            LazyFormat(
+                "Did not find exactly 1 node in the semantic graph with the given metric name",
+                metric_name=measure_name,
+                matching_nodes=matching_nodes,
+            )
+        ),
+    )
+
+    attribute_descriptors = spec_resolver.resolve_descriptors_for_measure_node(measure_node)
     logger.debug(LazyFormat("Resolved attributes", specs=attribute_descriptors))

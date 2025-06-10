@@ -14,9 +14,9 @@ from metricflow_semantics.experimental.semantic_graph.builder.graph_change_rule 
     SemanticSubgraphGenerator,
     SubgraphGeneratorArgumentSet,
 )
-from metricflow_semantics.experimental.semantic_graph.edges.entity_relationship import DerivativeAttributeEdge
+from metricflow_semantics.experimental.semantic_graph.edges.entity_relationship import MetricDefinitionEdge
 from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import (
-    MetricAttributeNode,
+    MetricNode,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
     MeasureAttributeLabel,
@@ -52,9 +52,9 @@ class MetricAttributeSubgraphGenerator(SemanticSubgraphGenerator):
             parent_metric = self._manifest_object_lookup.get_metric(parent_metric_input.name)
             self._generate_subgraph_for_any_metric(current_graph, subgraph, parent_metric)
             subgraph.add_edge(
-                DerivativeAttributeEdge.get_instance(
-                    tail_node=MetricAttributeNode(attribute_name=metric.name),
-                    head_node=MetricAttributeNode(attribute_name=parent_metric_input.name),
+                MetricDefinitionEdge.get_instance(
+                    tail_node=MetricNode(attribute_name=metric.name),
+                    head_node=MetricNode(attribute_name=parent_metric_input.name),
                 )
             )
 
@@ -70,8 +70,8 @@ class MetricAttributeSubgraphGenerator(SemanticSubgraphGenerator):
 
         for measure_node in required_measure_nodes:
             subgraph.add_edge(
-                DerivativeAttributeEdge.get_instance(
-                    tail_node=MetricAttributeNode(attribute_name=metric.name), head_node=measure_node
+                MetricDefinitionEdge.get_instance(
+                    tail_node=MetricNode(attribute_name=metric.name), head_node=measure_node
                 )
             )
 

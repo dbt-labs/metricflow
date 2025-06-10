@@ -64,7 +64,7 @@ class DsiEntityNode(SemanticGraphNode):
     @property
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
         return MetricflowGraphNodeDescriptor.get_instance(
-            node_name=f"Entity({self.entity_name})", cluster_name="model_entity"
+            node_name=f"DsiEntity({self.entity_name})", cluster_name="model_entity"
         )
 
     @override
@@ -79,7 +79,9 @@ class DsiEntityNode(SemanticGraphNode):
     @override
     @property
     def attribute_computation_update(self) -> AttributeComputationUpdate:
-        return AttributeComputationUpdate(dundered_name_element_additions=(self.entity_name,))
+        return AttributeComputationUpdate(
+            dundered_name_element_additions=(self.entity_name,)
+        )
 
 
 @singleton_dataclass(order=False)

@@ -15,8 +15,8 @@
 </g>
 <g id="clust2" class="cluster">
 <title>cluster_model_entity</title>
-<polygon fill="#181818" stroke="#000000" stroke-width="3" points="361.75,-119 361.75,-250 604.25,-250 604.25,-119 361.75,-119"/>
-<text text-anchor="middle" x="483" y="-236.5" font-family="Courier New" font-size="10.00" fill="#d3d3d3">model_entity</text>
+<polygon fill="#181818" stroke="#000000" stroke-width="3" points="361.75,-146 361.75,-277 604.25,-277 604.25,-146 361.75,-146"/>
+<text text-anchor="middle" x="483" y="-263.5" font-family="Courier New" font-size="10.00" fill="#d3d3d3">model_entity</text>
 </g>
 <g id="clust3" class="cluster">
 <title>cluster_time_entity</title>
@@ -40,14 +40,14 @@
 </g>
 <g id="clust7" class="cluster">
 <title>cluster_metric_attribute</title>
-<polygon fill="#181818" stroke="#000000" stroke-width="3" points="791.5,-22 791.5,-111 1049,-111 1049,-22 791.5,-22"/>
+<polygon fill="#181818" stroke="#000000" stroke-width="3" points="791.5,-38 791.5,-111 1049,-111 1049,-38 791.5,-38"/>
 <text text-anchor="middle" x="920.25" y="-97.5" font-family="Courier New" font-size="10.00" fill="#d3d3d3">metric_attribute</text>
 </g>
 <!-- GroupByAttributeRoot -->
 <g id="node1" class="node">
 <title>GroupByAttributeRoot</title>
-<polygon fill="#303030" stroke="#ffd700" points="174,-220 0,-220 0,-184 174,-184 174,-220"/>
-<text text-anchor="start" x="12" y="-197.72" font-family="Courier New" font-size="12.00" fill="#d3d3d3">GroupByAttributeRoot</text>
+<polygon fill="#303030" stroke="#ffd700" points="174,-247 0,-247 0,-211 174,-211 174,-247"/>
+<text text-anchor="start" x="12" y="-224.72" font-family="Courier New" font-size="12.00" fill="#d3d3d3">GroupByAttributeRoot</text>
 </g>
 <!-- edge_as_node_0 -->
 <g id="node2" class="node">
@@ -60,7 +60,7 @@
 <!-- GroupByAttributeRoot&#45;&gt;edge_as_node_0 -->
 <g id="edge1" class="edge">
 <title>GroupByAttributeRoot&#45;&gt;edge_as_node_0</title>
-<path fill="none" stroke="#d3d3d3" d="M174.44,-213.91C380.42,-241.96 892.64,-311.7 1077.02,-336.81"/>
+<path fill="none" stroke="#d3d3d3" d="M174.44,-238.67C380.42,-261.46 892.64,-318.13 1077.02,-338.53"/>
 </g>
 <!-- edge_as_node_1 -->
 <g id="node3" class="node">
@@ -73,46 +73,46 @@
 <!-- GroupByAttributeRoot&#45;&gt;edge_as_node_1 -->
 <g id="edge3" class="edge">
 <title>GroupByAttributeRoot&#45;&gt;edge_as_node_1</title>
-<path fill="none" stroke="#d3d3d3" d="M174.44,-203.74C380.42,-207.83 892.64,-218 1077.02,-221.66"/>
+<path fill="none" stroke="#d3d3d3" d="M174.44,-228.5C380.42,-227.34 892.64,-224.43 1077.02,-223.38"/>
 </g>
 <!-- edge_as_node_2 -->
 <g id="node4" class="node">
 <title>edge_as_node_2</title>
-<polygon fill="none" stroke="none" points="333.75,-164.25 210,-164.25 210,-141.75 333.75,-141.75 333.75,-164.25"/>
-<text text-anchor="start" x="210" y="-158.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">type: EntityRelationshipEdge</text>
-<text text-anchor="start" x="210" y="-151.05" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: GroupByAttributeRoot</text>
-<text text-anchor="start" x="210" y="-143.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">head: Entity(sm_0_primary_entity)</text>
+<polygon fill="none" stroke="none" points="333.75,-191.25 210,-191.25 210,-168.75 333.75,-168.75 333.75,-191.25"/>
+<text text-anchor="start" x="210" y="-185.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">type: EntityRelationshipEdge</text>
+<text text-anchor="start" x="210" y="-178.05" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: GroupByAttributeRoot</text>
+<text text-anchor="start" x="210" y="-170.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">head: Entity(sm_0_primary_entity)</text>
 </g>
 <!-- GroupByAttributeRoot&#45;&gt;edge_as_node_2 -->
 <g id="edge5" class="edge">
 <title>GroupByAttributeRoot&#45;&gt;edge_as_node_2</title>
-<path fill="none" stroke="#d3d3d3" d="M156.88,-183.55C181.18,-177.03 207.74,-169.92 229.11,-164.19"/>
+<path fill="none" stroke="#d3d3d3" d="M156.88,-210.55C181.18,-204.03 207.74,-196.92 229.11,-191.19"/>
 </g>
 <!-- edge_as_node_3 -->
 <g id="node5" class="node">
 <title>edge_as_node_3</title>
-<polygon fill="none" stroke="none" points="333.75,-213.25 210,-213.25 210,-190.75 333.75,-190.75 333.75,-213.25"/>
-<text text-anchor="start" x="210" y="-207.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">type: EntityRelationshipEdge</text>
-<text text-anchor="start" x="210" y="-200.05" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: GroupByAttributeRoot</text>
-<text text-anchor="start" x="210" y="-192.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">head: Entity(sm_1_primary_entity)</text>
+<polygon fill="none" stroke="none" points="333.75,-240.25 210,-240.25 210,-217.75 333.75,-217.75 333.75,-240.25"/>
+<text text-anchor="start" x="210" y="-234.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">type: EntityRelationshipEdge</text>
+<text text-anchor="start" x="210" y="-227.05" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: GroupByAttributeRoot</text>
+<text text-anchor="start" x="210" y="-219.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">head: Entity(sm_1_primary_entity)</text>
 </g>
 <!-- GroupByAttributeRoot&#45;&gt;edge_as_node_3 -->
 <g id="edge7" class="edge">
 <title>GroupByAttributeRoot&#45;&gt;edge_as_node_3</title>
-<path fill="none" stroke="#d3d3d3" d="M174.35,-202C186.47,-202 198.7,-202 210.2,-202"/>
+<path fill="none" stroke="#d3d3d3" d="M174.35,-229C186.47,-229 198.7,-229 210.2,-229"/>
 </g>
 <!-- edge_as_node_4 -->
 <g id="node6" class="node">
 <title>edge_as_node_4</title>
-<polygon fill="none" stroke="none" points="1198.88,-42.25 1090.12,-42.25 1090.12,-19.75 1198.88,-19.75 1198.88,-42.25"/>
-<text text-anchor="start" x="1090.12" y="-36.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">type: EntityRelationshipEdge</text>
-<text text-anchor="start" x="1090.12" y="-29.05" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: GroupByAttributeRoot</text>
-<text text-anchor="start" x="1090.12" y="-21.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">head: TimeDimension(ds, year)</text>
+<polygon fill="none" stroke="none" points="1198.88,-49.25 1090.12,-49.25 1090.12,-26.75 1198.88,-26.75 1198.88,-49.25"/>
+<text text-anchor="start" x="1090.12" y="-43.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">type: EntityRelationshipEdge</text>
+<text text-anchor="start" x="1090.12" y="-36.05" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: GroupByAttributeRoot</text>
+<text text-anchor="start" x="1090.12" y="-28.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">head: TimeDimension(ds, year)</text>
 </g>
 <!-- GroupByAttributeRoot&#45;&gt;edge_as_node_4 -->
 <g id="edge9" class="edge">
 <title>GroupByAttributeRoot&#45;&gt;edge_as_node_4</title>
-<path fill="none" stroke="#d3d3d3" d="M174.44,-187.86C385.62,-153.71 918.68,-67.52 1090.34,-39.76"/>
+<path fill="none" stroke="#d3d3d3" d="M174.44,-213.21C385.62,-175.07 918.68,-78.79 1090.34,-47.78"/>
 </g>
 <!-- EntityKey(sm_0_primary_entity) -->
 <g id="node19" class="node">
@@ -147,28 +147,28 @@
 <!-- Entity(sm_0_primary_entity) -->
 <g id="node22" class="node">
 <title>Entity(sm_0_primary_entity)</title>
-<polygon fill="#303030" stroke="#87cefa" points="596.25,-164.88 369.75,-164.88 369.75,-127.12 596.25,-127.12 596.25,-164.88"/>
-<text text-anchor="start" x="381.75" y="-145.47" font-family="Courier New" font-size="12.00" fill="#d3d3d3">Entity(sm_0_primary_entity)</text>
-<text text-anchor="start" x="377.75" y="-132.93" font-family="Courier New" font-size="6.00" fill="#d3d3d3">add_name: sm_0_primary_entity</text>
+<polygon fill="#303030" stroke="#87cefa" points="596.25,-191.88 369.75,-191.88 369.75,-154.12 596.25,-154.12 596.25,-191.88"/>
+<text text-anchor="start" x="381.75" y="-172.47" font-family="Courier New" font-size="12.00" fill="#d3d3d3">Entity(sm_0_primary_entity)</text>
+<text text-anchor="start" x="377.75" y="-159.93" font-family="Courier New" font-size="6.00" fill="#d3d3d3">add_name: sm_0_primary_entity</text>
 </g>
 <!-- edge_as_node_2&#45;&gt;Entity(sm_0_primary_entity) -->
 <g id="edge6" class="edge">
 <title>edge_as_node_2&#45;&gt;Entity(sm_0_primary_entity)</title>
-<path fill="none" stroke="#d3d3d3" d="M333.64,-150.97C341.44,-150.71 349.63,-150.43 357.99,-150.15"/>
-<polygon fill="#303030" stroke="#d3d3d3" points="358.09,-153.65 367.96,-149.82 357.85,-146.65 358.09,-153.65"/>
+<path fill="none" stroke="#d3d3d3" d="M333.64,-177.97C341.44,-177.71 349.63,-177.43 357.99,-177.15"/>
+<polygon fill="#303030" stroke="#d3d3d3" points="358.09,-180.65 367.96,-176.82 357.85,-173.65 358.09,-180.65"/>
 </g>
 <!-- Entity(sm_1_primary_entity) -->
 <g id="node23" class="node">
 <title>Entity(sm_1_primary_entity)</title>
-<polygon fill="#303030" stroke="#87cefa" points="596.25,-220.88 369.75,-220.88 369.75,-183.12 596.25,-183.12 596.25,-220.88"/>
-<text text-anchor="start" x="381.75" y="-201.47" font-family="Courier New" font-size="12.00" fill="#d3d3d3">Entity(sm_1_primary_entity)</text>
-<text text-anchor="start" x="377.75" y="-188.93" font-family="Courier New" font-size="6.00" fill="#d3d3d3">add_name: sm_1_primary_entity</text>
+<polygon fill="#303030" stroke="#87cefa" points="596.25,-247.88 369.75,-247.88 369.75,-210.12 596.25,-210.12 596.25,-247.88"/>
+<text text-anchor="start" x="381.75" y="-228.47" font-family="Courier New" font-size="12.00" fill="#d3d3d3">Entity(sm_1_primary_entity)</text>
+<text text-anchor="start" x="377.75" y="-215.93" font-family="Courier New" font-size="6.00" fill="#d3d3d3">add_name: sm_1_primary_entity</text>
 </g>
 <!-- edge_as_node_3&#45;&gt;Entity(sm_1_primary_entity) -->
 <g id="edge8" class="edge">
 <title>edge_as_node_3&#45;&gt;Entity(sm_1_primary_entity)</title>
-<path fill="none" stroke="#d3d3d3" d="M333.64,-202C341.44,-202 349.63,-202 357.99,-202"/>
-<polygon fill="#303030" stroke="#d3d3d3" points="357.96,-205.5 367.96,-202 357.96,-198.5 357.96,-205.5"/>
+<path fill="none" stroke="#d3d3d3" d="M333.64,-229C341.44,-229 349.63,-229 357.99,-229"/>
+<polygon fill="#303030" stroke="#d3d3d3" points="357.96,-232.5 367.96,-229 357.96,-225.5 357.96,-232.5"/>
 </g>
 <!-- TimeDimension(ds, year) -->
 <g id="node24" class="node">
@@ -181,8 +181,8 @@
 <!-- edge_as_node_4&#45;&gt;TimeDimension(ds, year) -->
 <g id="edge10" class="edge">
 <title>edge_as_node_4&#45;&gt;TimeDimension(ds, year)</title>
-<path fill="none" stroke="#d3d3d3" d="M1187.74,-42.22C1211.98,-48.65 1243.48,-57.01 1273.54,-64.99"/>
-<polygon fill="#303030" stroke="#d3d3d3" points="1272.51,-68.34 1283.07,-67.52 1274.3,-61.57 1272.51,-68.34"/>
+<path fill="none" stroke="#d3d3d3" d="M1193.43,-49.24C1213.77,-54.01 1238.37,-59.78 1262.71,-65.49"/>
+<polygon fill="#303030" stroke="#d3d3d3" points="1261.85,-68.88 1272.39,-67.76 1263.45,-62.07 1261.85,-68.88"/>
 </g>
 <!-- edge_as_node_5 -->
 <g id="node7" class="node">
@@ -266,10 +266,10 @@
 <!-- edge_as_node_9 -->
 <g id="node11" class="node">
 <title>edge_as_node_9</title>
-<polygon fill="none" stroke="none" points="759.75,-227.25 636,-227.25 636,-204.75 759.75,-204.75 759.75,-227.25"/>
-<text text-anchor="start" x="636" y="-221.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">type: JoinToModelEdge</text>
-<text text-anchor="start" x="636" y="-214.05" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: Entity(sm_1_primary_entity)</text>
-<text text-anchor="start" x="636" y="-206.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">head: JoinTo(sm_1)</text>
+<polygon fill="none" stroke="none" points="759.75,-240.25 636,-240.25 636,-217.75 759.75,-217.75 759.75,-240.25"/>
+<text text-anchor="start" x="636" y="-234.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">type: JoinToModelEdge</text>
+<text text-anchor="start" x="636" y="-227.05" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: Entity(sm_1_primary_entity)</text>
+<text text-anchor="start" x="636" y="-219.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">head: JoinTo(sm_1)</text>
 </g>
 <!-- JoinTo(sm_1) -->
 <g id="node29" class="node">
@@ -281,45 +281,48 @@
 <!-- edge_as_node_9&#45;&gt;JoinTo(sm_1) -->
 <g id="edge20" class="edge">
 <title>edge_as_node_9&#45;&gt;JoinTo(sm_1)</title>
-<path fill="none" stroke="#d3d3d3" d="M759.68,-219.59C788.13,-221.27 822.13,-223.27 851.42,-225"/>
-<polygon fill="#303030" stroke="#d3d3d3" points="851.11,-228.49 861.29,-225.58 851.52,-221.5 851.11,-228.49"/>
+<path fill="none" stroke="#d3d3d3" d="M759.68,-229C788.13,-229 822.13,-229 851.42,-229"/>
+<polygon fill="#303030" stroke="#d3d3d3" points="851.29,-232.5 861.29,-229 851.29,-225.5 851.29,-232.5"/>
 </g>
 <!-- edge_as_node_10 -->
 <g id="node12" class="node">
 <title>edge_as_node_10</title>
-<polygon fill="none" stroke="none" points="763.5,-112.25 632.25,-112.25 632.25,-89.75 763.5,-89.75 763.5,-112.25"/>
-<text text-anchor="start" x="632.25" y="-106.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">type: EntityAttributeEdge</text>
-<text text-anchor="start" x="632.25" y="-99.05" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: Entity(sm_1_primary_entity)</text>
-<text text-anchor="start" x="632.25" y="-91.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">head: Metric(sm_0_measure_0_metric)</text>
+<polygon fill="none" stroke="none" points="763.5,-152.5 632.25,-152.5 632.25,-107.5 763.5,-107.5 763.5,-152.5"/>
+<text text-anchor="start" x="632.25" y="-146.8" font-family="Courier New" font-size="6.00" fill="#d3d3d3">add_name: sm_0_measure_0_metric</text>
+<text text-anchor="start" x="632.25" y="-139.3" font-family="Courier New" font-size="6.00" fill="#d3d3d3">add_prop: METRIC</text>
+<text text-anchor="start" x="632.25" y="-131.8" font-family="Courier New" font-size="6.00" fill="#d3d3d3">add_type: METRIC</text>
+<text text-anchor="start" x="632.25" y="-124.3" font-family="Courier New" font-size="6.00" fill="#d3d3d3">type: EntityAttributeEdge</text>
+<text text-anchor="start" x="632.25" y="-116.8" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: Entity(sm_1_primary_entity)</text>
+<text text-anchor="start" x="632.25" y="-109.3" font-family="Courier New" font-size="6.00" fill="#d3d3d3">head: Metric(sm_0_measure_0_metric)</text>
 </g>
 <!-- Metric(sm_0_measure_0_metric) -->
 <g id="node30" class="node">
 <title>Metric(sm_0_measure_0_metric)</title>
-<polygon fill="#303030" stroke="#ffa07a" points="1041,-82.38 799.5,-82.38 799.5,-29.62 1041,-29.62 1041,-82.38"/>
-<text text-anchor="start" x="811.5" y="-62.98" font-family="Courier New" font-size="12.00" fill="#d3d3d3">Metric(sm_0_measure_0_metric)</text>
-<text text-anchor="start" x="807.5" y="-50.42" font-family="Courier New" font-size="6.00" fill="#d3d3d3">add_name: sm_0_measure_0_metric</text>
-<text text-anchor="start" x="807.5" y="-42.92" font-family="Courier New" font-size="6.00" fill="#d3d3d3">add_prop: METRIC</text>
-<text text-anchor="start" x="807.5" y="-35.42" font-family="Courier New" font-size="6.00" fill="#d3d3d3">add_type: METRIC</text>
+<polygon fill="#303030" stroke="#ffa07a" points="1041,-82 799.5,-82 799.5,-46 1041,-46 1041,-82"/>
+<text text-anchor="start" x="811.5" y="-59.73" font-family="Courier New" font-size="12.00" fill="#d3d3d3">Metric(sm_0_measure_0_metric)</text>
 </g>
 <!-- edge_as_node_10&#45;&gt;Metric(sm_0_measure_0_metric) -->
 <g id="edge22" class="edge">
 <title>edge_as_node_10&#45;&gt;Metric(sm_0_measure_0_metric)</title>
-<path fill="none" stroke="#d3d3d3" d="M753.92,-89.76C764.56,-87.59 776.12,-85.23 788.02,-82.8"/>
-<polygon fill="#303030" stroke="#d3d3d3" points="788.45,-86.28 797.55,-80.85 787.05,-79.42 788.45,-86.28"/>
+<path fill="none" stroke="#d3d3d3" d="M763.21,-110.73C789.34,-102.91 819.65,-93.83 846.58,-85.77"/>
+<polygon fill="#303030" stroke="#d3d3d3" points="847.46,-89.15 856.04,-82.93 845.46,-82.45 847.46,-89.15"/>
 </g>
 <!-- edge_as_node_11 -->
 <g id="node13" class="node">
 <title>edge_as_node_11</title>
-<polygon fill="none" stroke="none" points="763.5,-69.25 632.25,-69.25 632.25,-46.75 763.5,-46.75 763.5,-69.25"/>
-<text text-anchor="start" x="632.25" y="-63.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">type: EntityAttributeEdge</text>
-<text text-anchor="start" x="632.25" y="-56.05" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: Entity(sm_0_primary_entity)</text>
-<text text-anchor="start" x="632.25" y="-48.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">head: Metric(sm_0_measure_0_metric)</text>
+<polygon fill="none" stroke="none" points="763.5,-89.5 632.25,-89.5 632.25,-44.5 763.5,-44.5 763.5,-89.5"/>
+<text text-anchor="start" x="632.25" y="-83.8" font-family="Courier New" font-size="6.00" fill="#d3d3d3">add_name: sm_0_measure_0_metric</text>
+<text text-anchor="start" x="632.25" y="-76.3" font-family="Courier New" font-size="6.00" fill="#d3d3d3">add_prop: METRIC</text>
+<text text-anchor="start" x="632.25" y="-68.8" font-family="Courier New" font-size="6.00" fill="#d3d3d3">add_type: METRIC</text>
+<text text-anchor="start" x="632.25" y="-61.3" font-family="Courier New" font-size="6.00" fill="#d3d3d3">type: EntityAttributeEdge</text>
+<text text-anchor="start" x="632.25" y="-53.8" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: Entity(sm_0_primary_entity)</text>
+<text text-anchor="start" x="632.25" y="-46.3" font-family="Courier New" font-size="6.00" fill="#d3d3d3">head: Metric(sm_0_measure_0_metric)</text>
 </g>
 <!-- edge_as_node_11&#45;&gt;Metric(sm_0_measure_0_metric) -->
 <g id="edge24" class="edge">
 <title>edge_as_node_11&#45;&gt;Metric(sm_0_measure_0_metric)</title>
-<path fill="none" stroke="#d3d3d3" d="M763.21,-57.42C771.16,-57.34 779.5,-57.27 788.01,-57.19"/>
-<polygon fill="#303030" stroke="#d3d3d3" points="787.8,-60.69 797.77,-57.1 787.74,-53.69 787.8,-60.69"/>
+<path fill="none" stroke="#d3d3d3" d="M763.21,-66.12C771.16,-66.02 779.5,-65.9 788.01,-65.79"/>
+<polygon fill="#303030" stroke="#d3d3d3" points="787.82,-69.29 797.77,-65.65 787.72,-62.29 787.82,-69.29"/>
 </g>
 <!-- edge_as_node_12 -->
 <g id="node14" class="node">
@@ -374,10 +377,10 @@
 <!-- edge_as_node_15 -->
 <g id="node17" class="node">
 <title>edge_as_node_15</title>
-<polygon fill="none" stroke="none" points="759.75,-157.25 636,-157.25 636,-134.75 759.75,-134.75 759.75,-157.25"/>
-<text text-anchor="start" x="636" y="-151.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">type: JoinToModelEdge</text>
-<text text-anchor="start" x="636" y="-144.05" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: Entity(sm_0_primary_entity)</text>
-<text text-anchor="start" x="636" y="-136.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">head: JoinTo(sm_0)</text>
+<polygon fill="none" stroke="none" points="759.75,-193.25 636,-193.25 636,-170.75 759.75,-170.75 759.75,-193.25"/>
+<text text-anchor="start" x="636" y="-187.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">type: JoinToModelEdge</text>
+<text text-anchor="start" x="636" y="-180.05" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: Entity(sm_0_primary_entity)</text>
+<text text-anchor="start" x="636" y="-172.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">head: JoinTo(sm_0)</text>
 </g>
 <!-- JoinTo(sm_0) -->
 <g id="node28" class="node">
@@ -389,8 +392,8 @@
 <!-- edge_as_node_15&#45;&gt;JoinTo(sm_0) -->
 <g id="edge32" class="edge">
 <title>edge_as_node_15&#45;&gt;JoinTo(sm_0)</title>
-<path fill="none" stroke="#d3d3d3" d="M759.68,-146C788.13,-146 822.13,-146 851.42,-146"/>
-<polygon fill="#303030" stroke="#d3d3d3" points="851.29,-149.5 861.29,-146 851.29,-142.5 851.29,-149.5"/>
+<path fill="none" stroke="#d3d3d3" d="M759.68,-172.07C788.26,-167.4 822.43,-161.82 851.8,-157.02"/>
+<polygon fill="#303030" stroke="#d3d3d3" points="852.01,-160.53 861.31,-155.46 850.88,-153.62 852.01,-160.53"/>
 </g>
 <!-- edge_as_node_16 -->
 <g id="node18" class="node">
@@ -409,22 +412,22 @@
 <!-- Entity(sm_0_primary_entity)&#45;&gt;edge_as_node_11 -->
 <g id="edge23" class="edge">
 <title>Entity(sm_0_primary_entity)&#45;&gt;edge_as_node_11</title>
-<path fill="none" stroke="#d3d3d3" d="M530.72,-126.69C573.31,-109.08 634.76,-83.68 669.76,-69.21"/>
+<path fill="none" stroke="#d3d3d3" d="M522.55,-153.8C558.97,-135.67 613.6,-108.47 651.97,-89.36"/>
 </g>
 <!-- Entity(sm_0_primary_entity)&#45;&gt;edge_as_node_15 -->
 <g id="edge31" class="edge">
 <title>Entity(sm_0_primary_entity)&#45;&gt;edge_as_node_15</title>
-<path fill="none" stroke="#d3d3d3" d="M596.67,-146C610.23,-146 623.66,-146 636.07,-146"/>
+<path fill="none" stroke="#d3d3d3" d="M596.67,-177.76C610.23,-178.34 623.66,-178.9 636.07,-179.43"/>
 </g>
 <!-- Entity(sm_1_primary_entity)&#45;&gt;edge_as_node_9 -->
 <g id="edge19" class="edge">
 <title>Entity(sm_1_primary_entity)&#45;&gt;edge_as_node_9</title>
-<path fill="none" stroke="#d3d3d3" d="M596.67,-209.41C610.23,-210.3 623.66,-211.19 636.07,-212"/>
+<path fill="none" stroke="#d3d3d3" d="M596.67,-229C610.23,-229 623.66,-229 636.07,-229"/>
 </g>
 <!-- Entity(sm_1_primary_entity)&#45;&gt;edge_as_node_10 -->
 <g id="edge21" class="edge">
 <title>Entity(sm_1_primary_entity)&#45;&gt;edge_as_node_10</title>
-<path fill="none" stroke="#d3d3d3" d="M524.79,-182.65C568.86,-161.74 637.55,-129.15 673.36,-112.16"/>
+<path fill="none" stroke="#d3d3d3" d="M525.55,-209.68C560.88,-193.25 611.64,-169.64 648.73,-152.39"/>
 </g>
 <!-- TimeDimension(ds, year)&#45;&gt;edge_as_node_5 -->
 <g id="edge11" class="edge">

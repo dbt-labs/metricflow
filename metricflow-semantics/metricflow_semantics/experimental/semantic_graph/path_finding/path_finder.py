@@ -17,7 +17,10 @@ from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_c
     FindCommonReachableTargetsCacheKey,
     PathFinderCache,
 )
-from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_result import FindReachableTargetsResult
+from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_result import (
+    FindReachableTargetsResult,
+    FindReachableTargetsSimpleResult,
+)
 from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_stat import MutablePathFinderStat
 from metricflow_semantics.experimental.semantic_graph.path_finding.weight_function import WeightFunction
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
@@ -96,6 +99,34 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
             path_finder_stat=self._cumulative_stat.difference(start_stat),
             descendant_nodes=descendant_nodes,
             reachable_targets=found_target_nodes,
+        )
+
+    def find_reachable_targets_simple(
+        self,
+        graph: MetricflowGraph[NodeT, EdgeT],
+        mutable_path: PathT,
+        source_node: NodeT,
+        candidate_target_nodes: Set[NodeT],
+        weight_function: WeightFunction[NodeT, EdgeT, PathT],
+        max_path_weight: int,
+    ) -> FindReachableTargetsSimpleResult:
+        start_stat = self._cumulative_stat.copy()
+        found_target_nodes = MutableOrderedSet[NodeT]()
+
+        for mutable_path in self.traverse_dfs(
+            graph=graph,
+            mutable_path=mutable_path,
+            source_node=source_node,
+            target_nodes=candidate_target_nodes,
+            weight_function=weight_function,
+            max_path_weight=max_path_weight,
+            allow_node_revisits=False,
+        ):
+            found_target_nodes.add(mutable_path.nodes[-1])
+
+        return FindReachableTargetsSimpleResult(
+            path_finder_stat=self._cumulative_stat.difference(start_stat),
+            reachable_targets=found_target_nodes.as_frozen(),
         )
 
     def traverse_dfs(

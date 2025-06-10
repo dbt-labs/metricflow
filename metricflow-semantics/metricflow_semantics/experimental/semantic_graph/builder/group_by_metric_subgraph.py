@@ -21,7 +21,7 @@ from metricflow_semantics.experimental.semantic_graph.edges.entity_attribute imp
     EntityAttributeEdge,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import (
-    MetricAttributeNode,
+    MetricNode,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
     DsiEntityLabel,
@@ -91,7 +91,7 @@ class GroupByMetricSubgraph(SemanticSubgraphGenerator):
             )
 
         metric_name = metric.name
-        metric_attribute_node = MetricAttributeNode(attribute_name=metric_name)
+        metric_attribute_node = MetricNode(attribute_name=metric_name)
         for reachable_dsi_entity_node in common_reachable_targets_result.reachable_targets:
             subgraph.add_edge(
                 EntityAttributeEdge.get_instance(

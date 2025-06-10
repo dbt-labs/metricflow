@@ -6,8 +6,10 @@ from functools import cached_property
 from typing_extensions import override
 
 from metricflow_semantics.experimental.mf_graph.comparable import ComparisonKey
+from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
 from metricflow_semantics.experimental.orderd_enum import OrderedEnum
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
+from metricflow_semantics.experimental.semantic_graph.edges.edge_labels import MetricDefinitionLabel
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
     SemanticGraphEdge,
     SemanticGraphNode,
@@ -67,13 +69,13 @@ class EntityRelationshipEdge(SemanticGraphEdge):
 
 
 @singleton_dataclass(order=False)
-class DerivativeAttributeEdge(SemanticGraphEdge):
+class MetricDefinitionEdge(SemanticGraphEdge):
     @staticmethod
     def get_instance(
         tail_node: SemanticGraphNode,
         head_node: SemanticGraphNode,
-    ) -> DerivativeAttributeEdge:
-        return DerivativeAttributeEdge(
+    ) -> MetricDefinitionEdge:
+        return MetricDefinitionEdge(
             _tail_node=tail_node,
             _head_node=head_node,
         )
@@ -88,8 +90,13 @@ class DerivativeAttributeEdge(SemanticGraphEdge):
 
     @override
     @cached_property
-    def inverse(self) -> DerivativeAttributeEdge:
-        return DerivativeAttributeEdge.get_instance(
+    def inverse(self) -> MetricDefinitionEdge:
+        return MetricDefinitionEdge.get_instance(
             tail_node=self._head_node,
             head_node=self._tail_node,
         )
+
+    @override
+    @cached_property
+    def labels(self) -> FrozenOrderedSet[MetricflowGraphLabel]:
+        return FrozenOrderedSet((MetricDefinitionLabel(),))
