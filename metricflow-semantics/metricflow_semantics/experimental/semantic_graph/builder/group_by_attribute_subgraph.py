@@ -12,7 +12,7 @@ from metricflow_semantics.experimental.semantic_graph.edges.entity_relationship 
     EntityRelationship,
     EntityRelationshipEdge,
 )
-from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import MeasureNode
+from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import MetricAttributeNode
 from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import GroupByAttributeRootNode
 from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
     GroupByAttributeLabel,
@@ -33,6 +33,9 @@ logger = logging.getLogger(__name__)
 
 
 class GroupByAttributeSubgraphGenerator:
+    # TODO: Replace this value with something more appropriate.
+    _MAX_SEARCH_DEPTH = 10
+
     def __init__(
         self,
         semantic_graph: SemanticGraph,
@@ -42,7 +45,9 @@ class GroupByAttributeSubgraphGenerator:
         self._path_finder = path_finder
         self._mutable_path = AttributeComputationPath.create()
 
-    def generate_subgraph_for_one_measure(self, measure_attribute_node: MeasureNode) -> MutableSemanticGraph:
+    
+
+    def generate_subgraph_for_one_metric(self, metric_attribute_node: MetricAttributeNode) -> MutableSemanticGraph:
         path_finder = self._path_finder
         semantic_graph = self._semantic_graph
 
@@ -51,9 +56,9 @@ class GroupByAttributeSubgraphGenerator:
         find_nearest_join_from_node_result = path_finder.find_reachable_targets(
             graph=self._semantic_graph,
             mutable_path=self._mutable_path,
-            source_node=measure_attribute_node,
+            source_node=metric_attribute_node,
             candidate_target_nodes=join_from_nodes,
-            max_path_weight=2,
+            max_path_weight=GroupByAttributeSubgraphGenerator._MAX_SEARCH_DEPTH,
             weight_function=EdgeCountWeightFunction(),
         )
         found_target_nodes = tuple(find_nearest_join_from_node_result.reachable_targets)
@@ -71,9 +76,10 @@ class GroupByAttributeSubgraphGenerator:
                 LazyFormat(
                     "Expected to find exactly one a join-from node as a descendant of the measure node. "
                     "This might be due to incorrect graph construction.",
-                    measure_attribute_node=measure_attribute_node,
-                    target_nodes=join_from_nodes,
+                    found_target_node_count=len(found_target_nodes),
                     found_target_nodes=found_target_nodes,
+                    metric_attribute_node=metric_attribute_node,
+                    target_nodes=join_from_nodes,
                 )
             )
         join_from_node = found_target_nodes[0]
@@ -83,7 +89,7 @@ class GroupByAttributeSubgraphGenerator:
             mutable_path=self._mutable_path,
             source_node=join_from_node,
             candidate_target_nodes=semantic_graph.nodes_with_label(GroupByAttributeLabel()),
-            max_path_weight=3,
+            max_path_weight=GroupByAttributeSubgraphGenerator._MAX_SEARCH_DEPTH,
             weight_function=EdgeCountWeightFunction(),
         ).descendant_nodes
         nodes_in_path_to_group_by_attribute_nodes.add(join_from_node)

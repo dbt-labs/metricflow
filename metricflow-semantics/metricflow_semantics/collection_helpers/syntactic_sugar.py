@@ -26,18 +26,30 @@ def mf_first_non_none(*args: Optional[T]) -> Optional[T]:
     An issue with this method is that all args are evaluated, so it shouldn't be used with expensive expressions
     as arguments. Arguments could be replaced with lambdas.
     """
-    return next((arg for arg in args if arg is not None), None)
+    for arg in args:
+        if arg is not None:
+            return arg
+    return None
 
 
 def mf_first_non_none_or_raise(*args: Optional[T], error_supplier: Optional[Callable[[], Exception]] = None) -> T:
     """Similar to `mf_first_non_none` but raises an exception if no values are present."""
-    try:
-        return next(args for args in args if args is not None)
-    except StopIteration:
-        if error_supplier is not None:
-            raise error_supplier()
+    for arg in args:
+        if arg is not None:
+            return arg
 
-        raise ValueError("Expected at least one non-`None` argument")
+    if error_supplier is not None:
+        raise error_supplier()
+
+    raise ValueError("Expected at least one non-`None` argument")
+
+
+def mf_first_non_none_or_default(*args: Optional[T], default_factory: Callable[[], T]) -> T:
+    """Similar to `mf_first_non_none` but returns the value created by the factory if no values are present."""
+    for arg in args:
+        if arg is not None:
+            return arg
+    return default_factory()
 
 
 def mf_ensure_mapping(optional_mapping: Optional[Mapping[KeyT, ValueT]]) -> Mapping[KeyT, ValueT]:

@@ -4,7 +4,7 @@ import logging
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import ClassVar, Generic, Optional, Sequence, TypeVar, override
+from typing import ClassVar, Generic, Optional, Sequence, Sized, TypeVar, override
 
 from typing_extensions import override
 
@@ -21,7 +21,7 @@ NodeT = TypeVar("NodeT", bound=MetricflowGraphNode)
 EdgeT = TypeVar("EdgeT", bound=MetricflowGraphEdge)
 
 
-class MetricflowGraphPath(MetricFlowPrettyFormattable, Generic[NodeT, EdgeT], ABC):
+class MetricflowGraphPath(MetricFlowPrettyFormattable, Sized, Generic[NodeT, EdgeT], ABC):
     @property
     @abstractmethod
     def edges(self) -> Sequence[EdgeT]:
@@ -52,6 +52,10 @@ class MetricflowGraphPath(MetricFlowPrettyFormattable, Generic[NodeT, EdgeT], AB
     @abstractmethod
     def node_set(self) -> OrderedSet[NodeT]:
         raise NotImplementedError()
+
+    @override
+    def __len__(self) -> int:
+        return len(self.nodes)
 
 
 @dataclass

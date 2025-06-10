@@ -31,7 +31,7 @@ from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 logger = logging.getLogger(__name__)
 
 
-class MetricAttributeSubgraph(SemanticSubgraphGenerator):
+class MetricAttributeSubgraphGenerator(SemanticSubgraphGenerator):
     def __init__(self, argument_set: SubgraphGeneratorArgumentSet) -> None:
         super().__init__(argument_set)
         self._mutable_path = AttributeComputationPath.create()

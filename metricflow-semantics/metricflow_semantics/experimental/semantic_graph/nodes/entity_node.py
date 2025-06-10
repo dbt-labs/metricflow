@@ -184,8 +184,8 @@ class TimeDimensionNode(SemanticGraphNode):
     @cached_property
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
         return MetricflowGraphNodeDescriptor.get_instance(
-            node_name=f"TimeDim({self.dimension_name}, {self.time_grain_name})",
-            cluster_name="time_dimension",
+            node_name=f"TimeDimension({self.dimension_name}, {self.time_grain_name})",
+            cluster_name="time_entity",
         )
 
     @property

@@ -18,7 +18,6 @@ from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node 
 )
 from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder import MetricflowGraphPathFinder
 from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_cache import PathFinderCache
-from metricflow_semantics.experimental.semantic_graph.semantic_graph import MutableSemanticGraph
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.svg_snapshot import write_svg_snapshot_for_review
 
@@ -34,7 +33,6 @@ def check_subgraph_generation(
     manifest_object_lookup: ManifestObjectLookup,
     subgraph_generators: Iterable[Type[SemanticSubgraphGenerator]],
 ) -> None:
-    current_graph = MutableSemanticGraph.create()
     path_finder_cache = PathFinderCache[SemanticGraphNode, SemanticGraphEdge, AttributeComputationPath]()
     path_finder = MetricflowGraphPathFinder[SemanticGraphNode, SemanticGraphEdge, AttributeComputationPath](
         path_finder_cache=path_finder_cache,

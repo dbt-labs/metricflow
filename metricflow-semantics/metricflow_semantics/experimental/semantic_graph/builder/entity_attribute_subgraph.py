@@ -18,7 +18,7 @@ from metricflow_semantics.experimental.semantic_graph.model_object_lookup import
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import (
     AttributeNode,
-    DsiEntityKeyAttributeNode,
+    EntityKeyAttributeNode,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import (
     JoinFromModelNode,
@@ -35,7 +35,7 @@ class EntityAttributeSubgraphGenerator(SemanticSubgraphGenerator):
 
     def _get_attribute_nodes_for_entities(self, lookup: SemanticModelObjectLookup) -> list[AttributeNode]:
         return [
-            DsiEntityKeyAttributeNode(
+            EntityKeyAttributeNode(
                 attribute_name=entity.name,
             )
             for entity in lookup.semantic_model.entities

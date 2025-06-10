@@ -7,6 +7,7 @@ from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item
 from metricflow_semantics.experimental.ordered_set import MutableOrderedSet
+from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeComputationUpdate
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
     AttributeComputationPath,
 )
@@ -32,6 +33,8 @@ from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node 
 )
 from metricflow_semantics.experimental.semantic_graph.semantic_graph import MutableSemanticGraph, SemanticGraph
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
+from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
 
 logger = logging.getLogger(__name__)
 
@@ -87,13 +90,19 @@ class GroupByMetricSubgraph(SemanticSubgraphGenerator):
                 )
             )
 
-        metric_attribute_node = MetricAttributeNode(attribute_name=metric.name)
+        metric_name = metric.name
+        metric_attribute_node = MetricAttributeNode(attribute_name=metric_name)
         for reachable_dsi_entity_node in common_reachable_targets_result.reachable_targets:
             subgraph.add_edge(
                 EntityAttributeEdge.get_instance(
                     tail_node=reachable_dsi_entity_node,
                     head_node=metric_attribute_node,
                     attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
+                    attribute_computation_update=AttributeComputationUpdate(
+                        dundered_name_element_additions=(metric_name,),
+                        linkable_element_property_additions=(LinkableElementProperty.METRIC,),
+                        element_type_additions=(LinkableElementType.METRIC,),
+                    ),
                 )
             )
 

@@ -12,7 +12,7 @@ from typing_extensions import override
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_non_none_or_raise
 from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException
-from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
+from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeComputationUpdate
 from metricflow_semantics.experimental.semantic_graph.builder.graph_change_rule import (
     SemanticSubgraphGenerator,
     SubgraphGeneratorArgumentSet,
@@ -31,7 +31,7 @@ from metricflow_semantics.experimental.semantic_graph.model_object_lookup import
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import (
     AttributeNode,
-    DsiEntityKeyAttributeNode,
+    EntityKeyAttributeNode,
     TimeAttributeNode,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import (
@@ -53,7 +53,7 @@ class TimeDimensionSubgraphGenerator(SemanticSubgraphGenerator):
 
     def _get_attribute_nodes_for_entities(self, lookup: SemanticModelObjectLookup) -> list[AttributeNode]:
         return [
-            DsiEntityKeyAttributeNode(
+            EntityKeyAttributeNode(
                 attribute_name=entity.name,
             )
             for entity in lookup.semantic_model.entities
@@ -125,10 +125,11 @@ class TimeDimensionSubgraphGenerator(SemanticSubgraphGenerator):
         self, time_dimension_node: TimeDimensionNode, node_time_grain: TimeGranularity
     ) -> Sequence[SemanticGraphEdge]:
         edges_to_add = []
-        empty_property_set = FrozenOrderedSet[LinkableElementProperty]()
-        derived_time_grain_property_set = FrozenOrderedSet((LinkableElementProperty.DERIVED_TIME_GRANULARITY,))
         # Add attribute edges from the time dimension node to the queryable time grains.
         # e.g. TimeDimensionNode(`day`) should have edges to {`day`, `month`, `quarter`, `year`}
+        derived_time_grain_update = AttributeComputationUpdate(
+            linkable_element_property_additions=(LinkableElementProperty.DERIVED_TIME_GRANULARITY,)
+        )
         for time_grain in self._time_grain_to_queryable_time_grains[node_time_grain]:
             attribute_node = TimeAttributeNode.get_instance_for_time_grain(time_grain)
             edges_to_add.append(
@@ -136,9 +137,7 @@ class TimeDimensionSubgraphGenerator(SemanticSubgraphGenerator):
                     tail_node=time_dimension_node,
                     head_node=attribute_node,
                     attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
-                    linkable_element_properties=derived_time_grain_property_set
-                    if time_grain != node_time_grain
-                    else empty_property_set,
+                    attribute_computation_update=derived_time_grain_update if time_grain != node_time_grain else None,
                 )
             )
         # Add similar edges for the date part.
@@ -150,11 +149,10 @@ class TimeDimensionSubgraphGenerator(SemanticSubgraphGenerator):
                     tail_node=time_dimension_node,
                     head_node=attribute_node,
                     attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
-                    linkable_element_properties=derived_time_grain_property_set,
+                    attribute_computation_update=derived_time_grain_update,
                 )
             )
         # Add similar edges for expanded time grain.
-
         for expanded_time_grain in self._manifest_object_lookup.expanded_time_grains:
             if expanded_time_grain.base_granularity.to_int() >= node_time_grain.to_int():
                 attribute_node = TimeAttributeNode.get_instance_for_expanded_time_grain(expanded_time_grain)
@@ -163,7 +161,7 @@ class TimeDimensionSubgraphGenerator(SemanticSubgraphGenerator):
                         tail_node=time_dimension_node,
                         head_node=attribute_node,
                         attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
-                        linkable_element_properties=derived_time_grain_property_set,
+                        attribute_computation_update=derived_time_grain_update,
                     )
                 )
         return edges_to_add

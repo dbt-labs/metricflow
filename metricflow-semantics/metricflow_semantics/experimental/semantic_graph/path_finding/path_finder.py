@@ -162,10 +162,14 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
 
             # If we've hit one of the target nodes, so return the path to the node and stop visiting
             # descendants of the current node.
-            if current_node in target_nodes:
+            if current_node in target_nodes and len(self._current_mutable_path()) != 1:
                 if self._verbose_debug_logs:
                     logger.debug(
-                        LazyFormat("Reached target node, so returning current path", current_node=current_node)
+                        LazyFormat(
+                            "Reached target node, so returning current path",
+                            current_node=current_node,
+                            current_path=self._current_mutable_path(),
+                        )
                     )
                 self._cumulative_stat.increment_generated_paths_count()
                 yield self._current_mutable_path()
@@ -200,7 +204,13 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
             # If we can't go to the next node, then restart the loop so that we can check the next edge.
             if not allow_node_revisits and next_node in self._finished_visiting_nodes:
                 if self._verbose_debug_logs:
-                    logger.debug(LazyFormat("Skipping node as it has already been visited.", skipped_node=next_node))
+                    logger.debug(
+                        LazyFormat(
+                            "Skipping node as it has already been visited.",
+                            skipped_node=next_node,
+                            finished_visiting_nodes=self._finished_visiting_nodes,
+                        )
+                    )
                 continue
 
             # Avoid cycles
@@ -213,7 +223,13 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
 
             if next_edge_weight is None:
                 if self._verbose_debug_logs:
-                    logger.debug(LazyFormat("Skipping edge as the weight is not set", edge=next_edge_to_take))
+                    logger.debug(
+                        LazyFormat(
+                            "Skipping edge as the weight is not set",
+                            edge=next_edge_to_take,
+                            current_path=self._current_mutable_path(),
+                        )
+                    )
                 continue
 
             current_path_weight = self._current_mutable_path().weight
@@ -231,6 +247,12 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
                 continue
 
             # Take the next edge.
+            if self._verbose_debug_logs:
+                logger.debug(
+                    LazyFormat(
+                        "Taking edge", next_edge_to_take=next_edge_to_take, current_path=self._current_mutable_path()
+                    )
+                )
             self._traverse_dfs__enter_node_via_edge(
                 edge_to_take=next_edge_to_take,
                 weight_added_by_edge=next_edge_weight,

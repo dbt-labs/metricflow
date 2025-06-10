@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import logging
 from functools import cached_property
+from typing import Optional
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from typing_extensions import override
 
 from metricflow_semantics.experimental.mf_graph.comparable import ComparisonKey
 from metricflow_semantics.experimental.orderd_enum import OrderedEnum
-from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_computation import (
     AttributeComputationUpdate,
 )
@@ -17,7 +17,6 @@ from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node 
     SemanticGraphNode,
 )
 from metricflow_semantics.experimental.singleton_decorator import singleton_dataclass
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 
 logger = logging.getLogger(__name__)
 
@@ -39,26 +38,26 @@ class AttributeEdgeType(OrderedEnum):
 @singleton_dataclass(order=False)
 class EntityAttributeEdge(SemanticGraphEdge):
     attribute_edge_type: AttributeEdgeType
-    linkable_element_properties: FrozenOrderedSet[LinkableElementProperty]
+    _attribute_computation_update: AttributeComputationUpdate
 
     @staticmethod
     def get_instance(
         tail_node: SemanticGraphNode,
         head_node: SemanticGraphNode,
         attribute_edge_type: AttributeEdgeType,
-        linkable_element_properties: FrozenOrderedSet[LinkableElementProperty] = FrozenOrderedSet(),
+        attribute_computation_update: Optional[AttributeComputationUpdate] = None,
     ) -> EntityAttributeEdge:
         return EntityAttributeEdge(
             _tail_node=tail_node,
             _head_node=head_node,
             attribute_edge_type=attribute_edge_type,
-            linkable_element_properties=linkable_element_properties,
+            _attribute_computation_update=attribute_computation_update or AttributeComputationUpdate(),
         )
 
     @override
     @cached_property
     def comparison_key(self) -> ComparisonKey:
-        return (self._tail_node, self._head_node, self.attribute_edge_type, tuple(self.linkable_element_properties))
+        return (self._tail_node, self._head_node, self.attribute_edge_type, self._attribute_computation_update)
 
     @override
     @cached_property
@@ -66,13 +65,11 @@ class EntityAttributeEdge(SemanticGraphEdge):
         return EntityAttributeEdge.get_instance(
             tail_node=self._head_node,
             head_node=self._tail_node,
-            linkable_element_properties=self.linkable_element_properties,
+            attribute_computation_update=self._attribute_computation_update,
             attribute_edge_type=self.attribute_edge_type.inverse,
         )
 
     @override
-    @cached_property
+    @property
     def attribute_computation_update(self) -> AttributeComputationUpdate:
-        return AttributeComputationUpdate(
-            linkable_element_property_additions=tuple(self.linkable_element_properties),
-        )
+        return self._attribute_computation_update

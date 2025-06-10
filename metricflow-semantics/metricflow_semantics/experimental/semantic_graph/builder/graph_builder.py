@@ -21,6 +21,7 @@ from metricflow_semantics.experimental.semantic_graph.builder.group_by_metric_su
 from metricflow_semantics.experimental.semantic_graph.builder.measure_attribute_subgraph import (
     MeasureAttributeSubgraphGenerator,
 )
+from metricflow_semantics.experimental.semantic_graph.builder.metric_subgraph import MetricAttributeSubgraphGenerator
 from metricflow_semantics.experimental.semantic_graph.builder.time_dimension_subgraph import (
     TimeDimensionSubgraphGenerator,
 )
@@ -42,8 +43,9 @@ class SemanticGraphBuilder:
         EntityAttributeSubgraphGenerator,
         EntityJoinSubgraphGenerator,
         MeasureAttributeSubgraphGenerator,
-        GroupByMetricSubgraph,
         TimeDimensionSubgraphGenerator,
+        MetricAttributeSubgraphGenerator,
+        GroupByMetricSubgraph,
     )
 
     def __init__(

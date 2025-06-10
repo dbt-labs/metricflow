@@ -38,7 +38,6 @@ class SemanticGraphNode(MetricflowGraphNode, AttributeComputationUpdater, Metric
     @override
     def pretty_format(self, format_context: PrettyFormatContext) -> Optional[str]:
         return self.node_descriptor.node_name
-        # return None
 
     @override
     @cached_property

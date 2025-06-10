@@ -15,7 +15,7 @@ from metricflow_semantics.experimental.semantic_graph.builder.group_by_attribute
 )
 from metricflow_semantics.experimental.semantic_graph.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
-from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import MeasureNode
+from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import MeasureNode, MetricAttributeNode
 from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
     DsiEntityLabel,
     GroupByAttributeLabel,
@@ -33,8 +33,9 @@ from metricflow_semantics.experimental.semantic_graph.path_finding.weight_functi
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_snapshot_equal, assert_str_snapshot_equal
+from metricflow_semantics.test_helpers.svg_snapshot import write_svg_snapshot_for_review
 
-from tests_metricflow_semantics.experimental.graph_helpers import assert_graph_snapshot_equal
+from tests_metricflow_semantics.experimental.mf_graph.formatting.svg_formatter import SvgFormatter
 from tests_metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator.conftest import (
     check_subgraph_generation,
 )
@@ -131,20 +132,18 @@ def test_group_by_attribute_subgraph(  # noqa: D103
         path_finder=path_finder,
     )
     graph = builder.build()
+    metric_attribute_node = MetricAttributeNode(attribute_name="sm_0_measure_0_metric")
 
-    measure_attribute_node = MeasureNode.get_instance(
-        measure_name="sm_0_measure_0", model_id=SemanticModelId(model_name="sm_0")
-    )
     subgraph_generator = GroupByAttributeSubgraphGenerator(
         semantic_graph=graph,
         path_finder=MetricflowGraphPathFinder(path_finder_cache=path_finder_cache),
     )
 
-    subgraph = subgraph_generator.generate_subgraph_for_one_measure(
-        measure_attribute_node,
-    )
+    subgraph = subgraph_generator.generate_subgraph_for_one_metric(metric_attribute_node)
 
-    assert_graph_snapshot_equal(request=request, snapshot_configuration=mf_test_configuration, graph=subgraph)
+    write_svg_snapshot_for_review(
+        request=request, snapshot_configuration=mf_test_configuration, svg_file_contents=subgraph.format(SvgFormatter())
+    )
 
 
 def test_resolver(  # noqa: D103
@@ -163,5 +162,5 @@ def test_resolver(  # noqa: D103
     )
     semantic_graph = builder.build()
     spec_resolver = AttributeResolver(manifest_object_lookup=sg_02_single_join_lookup, semantic_graph=semantic_graph)
-    attribute_descriptors = spec_resolver.resolve_attribute_descriptors("sm_0_measure_0")
+    attribute_descriptors = spec_resolver.resolve_attribute_descriptors("sm_0_measure_0_metric")
     logger.debug(LazyFormat("Resolved attributes", specs=attribute_descriptors))

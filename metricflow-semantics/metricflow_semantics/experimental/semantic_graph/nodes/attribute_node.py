@@ -22,6 +22,7 @@ from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
     DunderNameElementLabel,
     GroupByAttributeLabel,
     MeasureAttributeLabel,
+    MetricAttributeLabel,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
     SemanticGraphNode,
@@ -29,6 +30,7 @@ from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node 
 from metricflow_semantics.experimental.singleton_decorator import singleton_dataclass
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
+from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 
@@ -63,7 +65,7 @@ class AttributeNode(SemanticGraphNode, ABC):
         return super(SemanticGraphNode, self).labels.union((GroupByAttributeLabel(),))
 
     @override
-    @property
+    @cached_property
     def attribute_computation_update(self) -> AttributeComputationUpdate:
         return AttributeComputationUpdate(
             dundered_name_element_additions=(self.attribute_name,),
@@ -84,7 +86,7 @@ class TimeAttributeNode(AttributeNode):
     @staticmethod
     def get_instance_for_date_part(date_part: DatePart) -> TimeAttributeNode:
         return TimeAttributeNode(
-            attribute_name=date_part.value,
+            attribute_name=StructuredLinkableSpecName.date_part_suffix(date_part),
             linkable_element_property_additions=FrozenOrderedSet((LinkableElementProperty.DATE_PART,)),
         )
 
@@ -138,7 +140,7 @@ class MeasureNode(AttributeNode):
         return self._labels
 
     @override
-    @property
+    @cached_property
     def attribute_computation_update(self) -> AttributeComputationUpdate:
         return AttributeComputationUpdate(
             derived_from_model_id_additions=(self.model_id,),
@@ -158,12 +160,12 @@ class MeasureNode(AttributeNode):
 
 
 @singleton_dataclass(order=False)
-class DsiEntityKeyAttributeNode(AttributeNode):
+class EntityKeyAttributeNode(AttributeNode):
     @property
     @override
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
         return MetricflowGraphNodeDescriptor.get_instance(
-            node_name=f"DsiEntityKey({self.attribute_name})",
+            node_name=f"EntityKey({self.attribute_name})",
             cluster_name="other_attribute",
         )
 
@@ -183,7 +185,7 @@ class CategoricalDimensionAttributeNode(AttributeNode):
     @override
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
         return MetricflowGraphNodeDescriptor.get_instance(
-            node_name=f"Dim({self.attribute_name})", cluster_name="other_attribute"
+            node_name=f"Dimension({self.attribute_name})", cluster_name="other_attribute"
         )
 
     @override
@@ -201,14 +203,20 @@ class MetricAttributeNode(AttributeNode):
     @override
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
         return MetricflowGraphNodeDescriptor.get_instance(
-            node_name=f"Metric({self.attribute_name})", cluster_name="other_attribute"
+            node_name=f"Metric({self.attribute_name})", cluster_name="metric_attribute"
         )
 
     @override
-    @property
+    @cached_property
     def attribute_computation_update(self) -> AttributeComputationUpdate:
-        return AttributeComputationUpdate(
-            dundered_name_element_additions=(self.attribute_name,),
-            linkable_element_property_additions=(LinkableElementProperty.METRIC,),
-            element_type_additions=(LinkableElementType.METRIC,),
+        return AttributeComputationUpdate()
+
+    @override
+    @cached_property
+    def labels(self) -> FrozenOrderedSet[MetricflowGraphLabel]:
+        return super(MetricAttributeNode, self).labels.union(
+            (
+                MetricAttributeLabel(metric_name=self.attribute_name),
+                MetricAttributeLabel(metric_name=None),
+            )
         )
