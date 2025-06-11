@@ -3,11 +3,11 @@ from __future__ import annotations
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from enum import Enum
 from functools import cached_property
 from typing import Optional, override
 
 from dbt_semantic_interfaces.references import SemanticModelReference
+from dbt_semantic_interfaces.type_enums import DatePart
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
@@ -18,6 +18,7 @@ from metricflow_semantics.experimental.semantic_graph.model_id import SemanticMo
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -39,8 +40,11 @@ class AttributeComputationUpdate(HasDisplayedProperty):
     dundered_name_element_additions: AnyLengthTuple[str] = ()
     linkable_element_property_additions: AnyLengthTuple[LinkableElementProperty] = ()
     derived_from_model_id_additions: AnyLengthTuple[SemanticModelId] = ()
+    # The fields below should be removable after migration
     element_type_additions: AnyLengthTuple[LinkableElementType] = ()
     dsi_entity_additions: AnyLengthTuple[str] = ()
+    time_grain_additions: AnyLengthTuple[ExpandedTimeGranularity] = ()
+    date_part_additions: AnyLengthTuple[DatePart] = ()
 
     @override
     @cached_property
@@ -60,6 +64,8 @@ class AttributeComputationUpdate(HasDisplayedProperty):
             properties.append(DisplayedProperty("add_type", element_type_addition.name))
         for dsi_entity_addition in self.dsi_entity_additions:
             properties.append(DisplayedProperty("add_dsi_entity", dsi_entity_addition))
+        for time_grain_addition in self.time_grain_additions:
+            properties.append(DisplayedProperty("add_time_grain", time_grain_addition.name))
         return tuple(properties)
 
 
@@ -69,7 +75,9 @@ class AttributeDescriptor:
     model_ids: FrozenOrderedSet[SemanticModelId] = FrozenOrderedSet()
     properties: FrozenOrderedSet[LinkableElementProperty] = FrozenOrderedSet()
     element_types: FrozenOrderedSet[LinkableElementType] = FrozenOrderedSet()
-    dsi_entity_names: FrozenOrderedSet[str] = FrozenOrderedSet()
+    dsi_entity_names: AnyLengthTuple[str] = ()
+    time_grains: FrozenOrderedSet[ExpandedTimeGranularity] = FrozenOrderedSet()
+    date_parts: FrozenOrderedSet[DatePart] = FrozenOrderedSet()
 
 
 @dataclass
@@ -107,7 +115,9 @@ class MutableAttributeComputation(AttributeComputation):
                     model_ids=FrozenOrderedSet(update.derived_from_model_id_additions),
                     properties=FrozenOrderedSet(update.linkable_element_property_additions),
                     element_types=FrozenOrderedSet(update.element_type_additions),
-                    dsi_entity_names=FrozenOrderedSet(update.dsi_entity_additions),
+                    dsi_entity_names=update.dsi_entity_additions,
+                    time_grains=FrozenOrderedSet(update.time_grain_additions),
+                    date_parts=FrozenOrderedSet(update.date_part_additions),
                 )
             )
             return
@@ -120,7 +130,9 @@ class MutableAttributeComputation(AttributeComputation):
                 model_ids=previous_attribute_descriptor.model_ids.union(update.derived_from_model_id_additions),
                 properties=previous_attribute_descriptor.properties.union(update.linkable_element_property_additions),
                 element_types=previous_attribute_descriptor.element_types.union(update.element_type_additions),
-                dsi_entity_names=previous_attribute_descriptor.dsi_entity_names.union(update.dsi_entity_additions),
+                dsi_entity_names=previous_attribute_descriptor.dsi_entity_names + update.dsi_entity_additions,
+                time_grains=previous_attribute_descriptor.time_grains.union(update.time_grain_additions),
+                date_parts=previous_attribute_descriptor.date_parts.union(update.date_part_additions),
             )
         )
         return
@@ -147,4 +159,3 @@ class AttributeComputationUpdater(HasDisplayedProperty, ABC):
     @cached_property
     def attribute_computation_update(self) -> AttributeComputationUpdate:
         return AttributeComputationUpdate()
-

@@ -43,6 +43,7 @@ from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node 
 from metricflow_semantics.experimental.semantic_graph.semantic_graph import MutableSemanticGraph, SemanticGraph
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -130,14 +131,22 @@ class TimeDimensionSubgraphGenerator(SemanticSubgraphGenerator):
         derived_time_grain_update = AttributeComputationUpdate(
             linkable_element_property_additions=(LinkableElementProperty.DERIVED_TIME_GRANULARITY,)
         )
+
+        # TODO: This seems like it could be consolidated with custom grains.
         for time_grain in self._time_grain_to_queryable_time_grains[node_time_grain]:
             attribute_node = TimeAttributeNode.get_instance_for_time_grain(time_grain)
+
+            attribute_computation_update = AttributeComputationUpdate(
+                linkable_element_property_additions=(LinkableElementProperty.DERIVED_TIME_GRANULARITY,) if time_grain != node_time_grain else (),
+                time_grain_additions=(ExpandedTimeGranularity(name=time_grain.value, base_granularity=time_grain),),
+            )
+
             edges_to_add.append(
                 EntityAttributeEdge.get_instance(
                     tail_node=time_dimension_node,
                     head_node=attribute_node,
                     attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
-                    attribute_computation_update=derived_time_grain_update if time_grain != node_time_grain else None,
+                    attribute_computation_update=attribute_computation_update,
                 )
             )
         # Add similar edges for the date part.
@@ -149,7 +158,10 @@ class TimeDimensionSubgraphGenerator(SemanticSubgraphGenerator):
                     tail_node=time_dimension_node,
                     head_node=attribute_node,
                     attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
-                    attribute_computation_update=derived_time_grain_update,
+                    attribute_computation_update=AttributeComputationUpdate(
+                        linkable_element_property_additions=(LinkableElementProperty.DERIVED_TIME_GRANULARITY,),
+                        date_part_additions=(queryable_date_part,)
+                    ),
                 )
             )
         # Add similar edges for expanded time grain.
@@ -161,7 +173,10 @@ class TimeDimensionSubgraphGenerator(SemanticSubgraphGenerator):
                         tail_node=time_dimension_node,
                         head_node=attribute_node,
                         attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
-                        attribute_computation_update=derived_time_grain_update,
+                        attribute_computation_update=AttributeComputationUpdate(
+                            linkable_element_property_additions=(LinkableElementProperty.DERIVED_TIME_GRANULARITY,),
+                            time_grain_additions=(expanded_time_grain,),
+                        ),
                     )
                 )
         return edges_to_add

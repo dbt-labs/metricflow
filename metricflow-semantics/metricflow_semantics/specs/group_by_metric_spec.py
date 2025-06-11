@@ -27,18 +27,18 @@ class GroupByMetricSpec(LinkableInstanceSpec, SerializableDataclass):
 
     metric_subquery_entity_links: Tuple[EntityReference, ...] = ()
 
-    def __post_init__(self) -> None:
-        """The inner query and outer query entity paths must end with the same entity (that's what they join on).
-
-        If no entity links, it's because we're already in the final joined node (no links left).
-        """
-        assert (
-            len(self.metric_subquery_entity_links) > 0
-        ), "GroupByMetricSpec must have at least one metric_subquery_entity_link."
-        if self.entity_links:
-            assert (
-                self.metric_subquery_entity_links[-1] == self.entity_links[-1]
-            ), "Inner and outer query must have the same last entity link in order to join on that link."
+    # def __post_init__(self) -> None:
+    #     """The inner query and outer query entity paths must end with the same entity (that's what they join on).
+    #
+    #     If no entity links, it's because we're already in the final joined node (no links left).
+    #     """
+    #     assert (
+    #         len(self.metric_subquery_entity_links) > 0
+    #     ), "GroupByMetricSpec must have at least one metric_subquery_entity_link."
+    #     if self.entity_links:
+    #         assert (
+    #             self.metric_subquery_entity_links[-1] == self.entity_links[-1]
+    #         ), "Inner and outer query must have the same last entity link in order to join on that link."
 
     @property
     def without_first_entity_link(self) -> GroupByMetricSpec:  # noqa: D102

@@ -15,7 +15,7 @@ from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
-from metricflow_semantics.model.semantics.linkable_element import ElementPathKey, LinkableElement
+from metricflow_semantics.model.semantics.linkable_element import LinkableElement
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 
@@ -66,30 +66,30 @@ class BaseLinkableElementSet(SemanticModelDerivation, Mergeable, ABC):
 
     @property
     def linkable_elements(self) -> Sequence[LinkableElement]:
-        return tuple(mf_flatten(annotated_spec.linkable_elements for annotated_spec in self.annotated_specs))
+        return tuple(mf_flatten(annotated_spec.linkable_element for annotated_spec in self.annotated_specs))
 
 
 @fast_frozen_dataclass()
 class AnnotatedSpec(SemanticModelDerivation):
     spec: LinkableInstanceSpec
     properties: FrozenOrderedSet[LinkableElementProperty]
-    path_key: ElementPathKey
-    linkable_elements: FrozenOrderedSet[LinkableElement]
+    # path_key: ElementPathKey
+    # linkable_element: Optional[LinkableElement]
     _derived_from_semantic_models: FrozenOrderedSet[SemanticModelReference]
 
     @staticmethod
     def create(
         spec: LinkableInstanceSpec,
         properties: FrozenOrderedSet[LinkableElementProperty],
-        path_key: ElementPathKey,
-        linkable_elements: FrozenOrderedSet[LinkableElement],
+        # path_key: ElementPathKey,
+        # linkable_element: Optional[LinkableElement],
         derived_from_semantic_models: FrozenOrderedSet[SemanticModelReference],
     ) -> AnnotatedSpec:
         return AnnotatedSpec(
             spec=spec,
             properties=properties,
-            path_key=path_key,
-            linkable_elements=linkable_elements,
+            # path_key=path_key,
+            # linkable_element=linkable_element,
             _derived_from_semantic_models=derived_from_semantic_models,
         )
 

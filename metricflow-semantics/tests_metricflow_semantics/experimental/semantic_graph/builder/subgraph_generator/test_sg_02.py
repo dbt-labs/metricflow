@@ -3,8 +3,6 @@ from __future__ import annotations
 import logging
 
 from _pytest.fixtures import FixtureRequest
-from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item
-from metricflow_semantics.experimental.metricflow_exception import MetricflowAssertionError
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
     AttributeComputationPath,
@@ -172,18 +170,23 @@ def test_resolver(  # noqa: D103
         attribute_resolver_cache=attribute_resolver_cache,
     )
 
-    measure_name = "sm_0_measure_0"
-    matching_nodes = semantic_graph.nodes_with_label(MeasureAttributeLabel(measure_name=measure_name))
-    measure_node = mf_first_item(
-        matching_nodes,
-        lambda: MetricflowAssertionError(
-            LazyFormat(
-                "Did not find exactly 1 node in the semantic graph with the given metric name",
-                metric_name=measure_name,
-                matching_nodes=matching_nodes,
-            )
-        ),
-    )
-
-    attribute_descriptors = spec_resolver.resolve_descriptors_for_measure_node(measure_node)
-    logger.debug(LazyFormat("Resolved attributes", specs=attribute_descriptors))
+    # measure_name = "sm_0_measure_0"
+    # matching_nodes = semantic_graph.nodes_with_label(MeasureAttributeLabel(measure_name=measure_name))
+    # measure_node = mf_first_item(
+    #     matching_nodes,
+    #     lambda: MetricflowAssertionError(
+    #         LazyFormat(
+    #             "Did not find exactly 1 node in the semantic graph with the given metric name",
+    #             metric_name=measure_name,
+    #             matching_nodes=matching_nodes,
+    #         )
+    #     ),
+    # )
+    #
+    # attribute_descriptors = spec_resolver.resolve_descriptors_for_measure_node(measure_node)
+    # logger.debug(LazyFormat("Resolved attributes", specs=attribute_descriptors))
+    metric_name = "sm_0_measure_0_metric"
+    attribute_descriptors = spec_resolver.resolve_descriptors_for_metric(metric_name=metric_name)
+    logger.debug(LazyFormat("Resolved attributes", attribute_descriptors=attribute_descriptors))
+    annotated_specs = spec_resolver.resolve_specs_for_metric(metric_name=metric_name)
+    logger.debug(LazyFormat("Resolved specs", annotated_specs=[annotated_spec.spec.qualified_name for annotated_spec in annotated_specs]))

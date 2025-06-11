@@ -65,7 +65,7 @@ class MeasureAttributeSubgraphGenerator(TimeDimensionSubgraphGenerator):
 
                 current_subgraph.add_edge(
                     EntityRelationshipEdge.get_instance(
-                        tail_node=aggregation_entity_node,
+                        tail_node=join_from_semantic_model_node,
                         relationship=EntityRelationship.LEFT_CARDINALITY_ONE,
                         head_node=metric_time_node,
                     )

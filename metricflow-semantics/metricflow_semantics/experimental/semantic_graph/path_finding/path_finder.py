@@ -188,6 +188,7 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
                         "Starting visit",
                         current_node=current_node.node_descriptor.node_name,
                         current_node_visit_context=current_node_visit_context,
+                        current_path=self._current_mutable_path(),
                     )
                 )
 

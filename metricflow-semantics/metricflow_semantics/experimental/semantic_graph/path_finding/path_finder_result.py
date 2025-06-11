@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Generic
 
 from metricflow_semantics.experimental.mf_graph.mutable_graph import NodeT
-from metricflow_semantics.experimental.ordered_set import MutableOrderedSet, FrozenOrderedSet
+from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet
 from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_stat import PathFinderStat
 
 logger = logging.getLogger(__name__)

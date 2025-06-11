@@ -11,6 +11,7 @@ from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node 
     SemanticGraphNode,
 )
 from metricflow_semantics.experimental.semantic_graph.path_finding.weight_function import WeightFunction
+from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +21,8 @@ from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attri
 
 
 class DunderNameWeightFunction(WeightFunction[SemanticGraphNode, SemanticGraphEdge, AttributeComputationPath]):
+    MAX_ENTITY_LINKS = MAX_JOIN_HOPS
+
     _METRIC_DEFINITION_LABEL = MetricDefinitionLabel()
 
     @override
@@ -36,10 +39,11 @@ class DunderNameWeightFunction(WeightFunction[SemanticGraphNode, SemanticGraphEd
             if DunderNameWeightFunction._METRIC_DEFINITION_LABEL not in last_edge.labels:
                 return None
 
-
         current_attribute_computation = path_to_node.attribute_computation
         dundered_name_elements = (
-            current_attribute_computation.attribute_descriptor.dundered_name_elements + dundered_name_element_additions
+            current_attribute_computation.attribute_descriptor.dundered_name_elements
+            + edge_from_node.attribute_computation_update.dundered_name_element_additions
+            + edge_from_node.head_node.attribute_computation_update.dundered_name_element_additions
         )
         # We do not allow repeated element names in the dundered name (e.g. `listing__listing`),
         # so return `None` to indicate a blocked edge.

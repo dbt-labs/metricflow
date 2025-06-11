@@ -4,7 +4,7 @@ import logging
 from typing import Iterable
 
 from metricflow_semantics.experimental.metricflow_exception import MetricflowAssertionError
-from metricflow_semantics.experimental.ordered_set import MutableOrderedSet, OrderedSet, FrozenOrderedSet
+from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
     AttributeComputationPath,
 )
@@ -65,8 +65,7 @@ class GroupByAttributeSubgraphGenerator:
             if i == 0:
                 common_join_from_nodes = result.reachable_targets
             else:
-                common_join_from_nodes = common_join_from_nodes.intersection(
-                    result.reachable_targets)
+                common_join_from_nodes = common_join_from_nodes.intersection(result.reachable_targets)
 
         subgraph = MutableSemanticGraph.create()
         if len(common_join_from_nodes) == 0:
@@ -83,8 +82,8 @@ class GroupByAttributeSubgraphGenerator:
         return subgraph
 
     def _generate_subgraph_from_join_from_node(
-            self,
-            join_from_node: SemanticGraphNode,
+        self,
+        join_from_node: SemanticGraphNode,
     ) -> MutableSemanticGraph:
         path_finder = self._path_finder
         semantic_graph = self._semantic_graph

@@ -15,8 +15,8 @@ dot_notation:
   	}
   	subgraph cluster_model_entity {
   		label=model_entity
-  		"Entity(sm_0_primary_entity)"
-  		"Entity(sm_1_primary_entity)"
+  		"DsiEntity(sm_0_primary_entity)"
+  		"DsiEntity(sm_1_primary_entity)"
   	}
   	subgraph cluster_sm_1 {
   		label=sm_1
@@ -40,9 +40,8 @@ dot_notation:
   		label=time_entity
   		"TimeDimension(ds, year)"
   	}
-  	"Metric(sm_0_measure_0_metric)" -> "Measure(sm_0_measure_0)"
-  	"Entity(sm_0_primary_entity)" -> "Metric(sm_0_measure_0_metric)"
-  	"Entity(sm_1_primary_entity)" -> "Metric(sm_0_measure_0_metric)"
+  	"DsiEntity(sm_0_primary_entity)" -> "Metric(sm_0_measure_0_metric)"
+  	"DsiEntity(sm_1_primary_entity)" -> "Metric(sm_0_measure_0_metric)"
   	"JoinFrom(sm_0)" -> "EntityKey(sm_0_primary_entity)"
   	"JoinFrom(sm_0)" -> "EntityKey(sm_1_primary_entity)"
   	"JoinFrom(sm_0)" -> "TimeDimension(ds, year)"
@@ -61,13 +60,14 @@ dot_notation:
   	"TimeDimension(ds, year)" -> "Time(year)"
   	"Agg(sm_0, ds)" -> "JoinFrom(sm_0)"
   	"Agg(sm_0, ds)" -> "JoinTo(sm_0)"
-  	"Agg(sm_0, ds)" -> "MetricTimeDimension(YEAR)"
+  	"JoinFrom(sm_0)" -> "MetricTimeDimension(YEAR)"
   	"JoinTo(sm_0)" -> "TimeDimension(ds, year)"
-  	"JoinFrom(sm_0)" -> "Entity(sm_0_primary_entity)"
-  	"JoinFrom(sm_0)" -> "Entity(sm_1_primary_entity)"
-  	"JoinFrom(sm_1)" -> "Entity(sm_1_primary_entity)"
-  	"Entity(sm_0_primary_entity)" -> "JoinTo(sm_0)"
-  	"Entity(sm_1_primary_entity)" -> "JoinTo(sm_1)"
+  	"JoinFrom(sm_0)" -> "DsiEntity(sm_0_primary_entity)"
+  	"JoinFrom(sm_0)" -> "DsiEntity(sm_1_primary_entity)"
+  	"JoinFrom(sm_1)" -> "DsiEntity(sm_1_primary_entity)"
+  	"DsiEntity(sm_0_primary_entity)" -> "JoinTo(sm_0)"
+  	"DsiEntity(sm_1_primary_entity)" -> "JoinTo(sm_1)"
+  	"Metric(sm_0_measure_0_metric)" -> "Measure(sm_0_measure_0)"
   }
 
 pretty_format:
@@ -75,8 +75,8 @@ pretty_format:
     nodes={
       Agg(sm_0, ds),
       Dimension(dim_0),
-      Entity(sm_0_primary_entity),
-      Entity(sm_1_primary_entity),
+      DsiEntity(sm_0_primary_entity),
+      DsiEntity(sm_1_primary_entity),
       EntityKey(sm_0_primary_entity),
       EntityKey(sm_1_primary_entity),
       JoinFrom(sm_0),
@@ -92,9 +92,8 @@ pretty_format:
       TimeDimension(ds, year),
     },
     edges={
-      DerivativeAttributeEdge(tail_node=Metric(sm_0_measure_0_metric), head_node=Measure(sm_0_measure_0)),
-      EntityAttributeEdge(tail_node=Entity(sm_0_primary_entity), head_node=Metric(sm_0_measure_0_metric)),
-      EntityAttributeEdge(tail_node=Entity(sm_1_primary_entity), head_node=Metric(sm_0_measure_0_metric)),
+      EntityAttributeEdge(tail_node=DsiEntity(sm_0_primary_entity), head_node=Metric(sm_0_measure_0_metric)),
+      EntityAttributeEdge(tail_node=DsiEntity(sm_1_primary_entity), head_node=Metric(sm_0_measure_0_metric)),
       EntityAttributeEdge(tail_node=JoinFrom(sm_0), head_node=EntityKey(sm_0_primary_entity)),
       EntityAttributeEdge(tail_node=JoinFrom(sm_0), head_node=EntityKey(sm_1_primary_entity)),
       EntityAttributeEdge(tail_node=JoinFrom(sm_0), head_node=TimeDimension(ds, year)),
@@ -113,12 +112,13 @@ pretty_format:
       EntityAttributeEdge(tail_node=TimeDimension(ds, year), head_node=Time(year)),
       EntityRelationshipEdge(tail_node=Agg(sm_0, ds), head_node=JoinFrom(sm_0)),
       EntityRelationshipEdge(tail_node=Agg(sm_0, ds), head_node=JoinTo(sm_0)),
-      EntityRelationshipEdge(tail_node=Agg(sm_0, ds), head_node=MetricTimeDimension(YEAR)),
+      EntityRelationshipEdge(tail_node=JoinFrom(sm_0), head_node=MetricTimeDimension(YEAR)),
       EntityRelationshipEdge(tail_node=JoinTo(sm_0), head_node=TimeDimension(ds, year)),
-      JoinFromModelEdge(tail_node=JoinFrom(sm_0), head_node=Entity(sm_0_primary_entity)),
-      JoinFromModelEdge(tail_node=JoinFrom(sm_0), head_node=Entity(sm_1_primary_entity)),
-      JoinFromModelEdge(tail_node=JoinFrom(sm_1), head_node=Entity(sm_1_primary_entity)),
-      JoinToModelEdge(tail_node=Entity(sm_0_primary_entity), head_node=JoinTo(sm_0)),
-      JoinToModelEdge(tail_node=Entity(sm_1_primary_entity), head_node=JoinTo(sm_1)),
+      JoinFromModelEdge(tail_node=JoinFrom(sm_0), head_node=DsiEntity(sm_0_primary_entity)),
+      JoinFromModelEdge(tail_node=JoinFrom(sm_0), head_node=DsiEntity(sm_1_primary_entity)),
+      JoinFromModelEdge(tail_node=JoinFrom(sm_1), head_node=DsiEntity(sm_1_primary_entity)),
+      JoinToModelEdge(tail_node=DsiEntity(sm_0_primary_entity), head_node=JoinTo(sm_0)),
+      JoinToModelEdge(tail_node=DsiEntity(sm_1_primary_entity), head_node=JoinTo(sm_1)),
+      MetricDefinitionEdge(tail_node=Metric(sm_0_measure_0_metric), head_node=Measure(sm_0_measure_0)),
     },
   )

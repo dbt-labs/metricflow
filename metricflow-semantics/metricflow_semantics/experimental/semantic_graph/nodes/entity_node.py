@@ -79,9 +79,7 @@ class DsiEntityNode(SemanticGraphNode):
     @override
     @property
     def attribute_computation_update(self) -> AttributeComputationUpdate:
-        return AttributeComputationUpdate(
-            dundered_name_element_additions=(self.entity_name,)
-        )
+        return AttributeComputationUpdate(dundered_name_element_additions=(self.entity_name,))
 
 
 @singleton_dataclass(order=False)
