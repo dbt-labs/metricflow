@@ -88,14 +88,16 @@ class GroupByAttributeSubgraphGenerator:
         path_finder = self._path_finder
         semantic_graph = self._semantic_graph
 
-        nodes_in_path_to_group_by_attribute_nodes = path_finder.find_reachable_targets(
+        result = path_finder.find_descendant_nodes(
             graph=self._semantic_graph,
             mutable_path=self._mutable_path,
             source_node=join_from_node,
             candidate_target_nodes=semantic_graph.nodes_with_label(GroupByAttributeLabel()),
             max_path_weight=GroupByAttributeSubgraphGenerator._MAX_SEARCH_DEPTH,
             weight_function=EdgeCountWeightFunction(),
-        ).descendant_nodes
+        )
+
+        nodes_in_path_to_group_by_attribute_nodes = result.descendant_nodes
         nodes_in_path_to_group_by_attribute_nodes.add(join_from_node)
 
         logger.debug(
@@ -120,7 +122,7 @@ class GroupByAttributeSubgraphGenerator:
 
         label = JoinFromLabel()
         join_from_nodes = MutableOrderedSet[SemanticGraphNode](semantic_graph.nodes_with_label(label))
-        find_nearest_join_from_node_result = path_finder.find_reachable_targets(
+        find_nearest_join_from_node_result = path_finder.find_descendant_nodes(
             graph=self._semantic_graph,
             mutable_path=self._mutable_path,
             source_node=metric_attribute_node,
@@ -128,7 +130,7 @@ class GroupByAttributeSubgraphGenerator:
             max_path_weight=GroupByAttributeSubgraphGenerator._MAX_SEARCH_DEPTH,
             weight_function=EdgeCountWeightFunction(),
         )
-        found_target_nodes = tuple(find_nearest_join_from_node_result.reachable_targets)
+        found_target_nodes = tuple(join_from_nodes.intersection(find_nearest_join_from_node_result.descendant_nodes))
         logger.debug(
             LazyFormat(
                 "Found nearest nodes with label",
@@ -151,7 +153,7 @@ class GroupByAttributeSubgraphGenerator:
             )
         join_from_node = found_target_nodes[0]
 
-        nodes_in_path_to_group_by_attribute_nodes = path_finder.find_reachable_targets(
+        nodes_in_path_to_group_by_attribute_nodes = path_finder.find_descendant_nodes(
             graph=self._semantic_graph,
             mutable_path=self._mutable_path,
             source_node=join_from_node,

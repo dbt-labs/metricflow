@@ -31,3 +31,8 @@ class FindReachableTargetsSimpleResult(Generic[NodeT], PathFinderResult):
 @dataclass
 class FindCommonReachableTargetsResult(Generic[NodeT]):
     common_reachable_targets: MutableOrderedSet[NodeT]
+
+
+@dataclass
+class FindDescendantsResult(Generic[NodeT], PathFinderResult):
+    descendant_nodes: MutableOrderedSet[NodeT]

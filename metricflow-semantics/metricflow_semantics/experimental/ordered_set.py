@@ -132,3 +132,8 @@ class MutableOrderedSet(Generic[HashableT], OrderedSet[HashableT], MutableSet[Ha
     def clear(self) -> None:
         """Remove all items from this set."""
         self._set_as_dict.clear()
+
+    @override
+    def intersection(self, other: Iterable[HashableT_co]) -> MutableOrderedSet:  # noqa: D102
+        other_set = set(other)
+        return self.__class__(item for item in self if item in other_set)

@@ -137,7 +137,9 @@ class TimeDimensionSubgraphGenerator(SemanticSubgraphGenerator):
             attribute_node = TimeAttributeNode.get_instance_for_time_grain(time_grain)
 
             attribute_computation_update = AttributeComputationUpdate(
-                linkable_element_property_additions=(LinkableElementProperty.DERIVED_TIME_GRANULARITY,) if time_grain != node_time_grain else (),
+                linkable_element_property_additions=(LinkableElementProperty.DERIVED_TIME_GRANULARITY,)
+                if time_grain != node_time_grain
+                else (),
                 time_grain_additions=(ExpandedTimeGranularity(name=time_grain.value, base_granularity=time_grain),),
             )
 
@@ -160,7 +162,7 @@ class TimeDimensionSubgraphGenerator(SemanticSubgraphGenerator):
                     attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
                     attribute_computation_update=AttributeComputationUpdate(
                         linkable_element_property_additions=(LinkableElementProperty.DERIVED_TIME_GRANULARITY,),
-                        date_part_additions=(queryable_date_part,)
+                        date_part_additions=(queryable_date_part,),
                     ),
                 )
             )

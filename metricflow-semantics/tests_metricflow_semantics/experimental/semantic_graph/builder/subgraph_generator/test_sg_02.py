@@ -100,7 +100,7 @@ def test_descendants(  # noqa: D103
 
     logger.info("Start path finding")
 
-    descendants = path_finder.find_reachable_targets(
+    result = path_finder.find_descendant_nodes(
         graph=graph,
         mutable_path=mutable_path,
         source_node=source_node,
@@ -114,7 +114,7 @@ def test_descendants(  # noqa: D103
         snapshot_configuration=mf_test_configuration,
         snapshot_str=LazyFormat(
             "Computed descendants",
-            descendants=sorted(descendants.descendant_nodes),
+            descendants=sorted(result.descendant_nodes),
         ).evaluated_value,
     )
 
@@ -186,7 +186,11 @@ def test_resolver(  # noqa: D103
     # attribute_descriptors = spec_resolver.resolve_descriptors_for_measure_node(measure_node)
     # logger.debug(LazyFormat("Resolved attributes", specs=attribute_descriptors))
     metric_name = "sm_0_measure_0_metric"
-    attribute_descriptors = spec_resolver.resolve_descriptors_for_metric(metric_name=metric_name)
-    logger.debug(LazyFormat("Resolved attributes", attribute_descriptors=attribute_descriptors))
+    # attribute_descriptors = spec_resolver.resolve_descriptors_for_metric(metric_name=metric_name)
+    # logger.debug(LazyFormat("Resolved attributes", attribute_descriptors=attribute_descriptors))
     annotated_specs = spec_resolver.resolve_specs_for_metric(metric_name=metric_name)
-    logger.debug(LazyFormat("Resolved specs", annotated_specs=[annotated_spec.spec.qualified_name for annotated_spec in annotated_specs]))
+    logger.debug(
+        LazyFormat(
+            "Resolved specs", annotated_specs=[annotated_spec.spec.qualified_name for annotated_spec in annotated_specs]
+        )
+    )

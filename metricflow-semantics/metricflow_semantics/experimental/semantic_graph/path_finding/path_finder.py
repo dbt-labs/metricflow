@@ -6,7 +6,6 @@ from collections.abc import Generator, Set
 from dataclasses import dataclass
 from typing import Generic, Optional, TypeVar
 
-from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_non_none_or_raise
 from metricflow_semantics.experimental.mf_graph.mf_graph import (
     MetricflowGraph,
 )
@@ -18,10 +17,15 @@ from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_c
     PathFinderCache,
 )
 from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_result import (
+    FindDescendantsResult,
     FindReachableTargetsResult,
     FindReachableTargetsSimpleResult,
 )
 from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_stat import MutablePathFinderStat
+from metricflow_semantics.experimental.semantic_graph.path_finding.traversal_event import (
+    StopPathExplorationEvent,
+    StopPathExplorationReason,
+)
 from metricflow_semantics.experimental.semantic_graph.path_finding.weight_function import WeightFunction
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 
@@ -47,14 +51,19 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
         self._verbose_debug_logs = True
 
     def _current_mutable_path(self) -> PathT:
-        return mf_first_non_none_or_raise(self._mutable_path)
+        if self._mutable_path is None:
+            raise RuntimeError("`_mutable_path` should have been set before calling this method.")
+        return self._mutable_path
 
-    def _traverse_dfs__exit_node(self) -> None:
+    def _current_mutable_path_length(self) -> int:
+        return len(self._current_mutable_path())
+
+    def _traverse_dfs__walk_to_previous_node(self) -> None:
         self._node_visit_contexts.pop()
         self._finished_visiting_nodes.add(self._current_mutable_path().nodes[-1])
         self._current_mutable_path().pop()
 
-    def _traverse_dfs__enter_node_via_edge(
+    def _traverse_dfs__walk_via_edge(
         self,
         edge_to_take: EdgeT,
         weight_added_by_edge: int,
@@ -70,7 +79,7 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
         self._current_mutable_path().append_edge(edge_to_take, weight_added_by_edge)
         self._cumulative_stat.increment_node_visit_count()
 
-    def find_reachable_targets(
+    def find_descendant_nodes(
         self,
         graph: MetricflowGraph[NodeT, EdgeT],
         mutable_path: PathT,
@@ -78,12 +87,11 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
         candidate_target_nodes: Set[NodeT],
         weight_function: WeightFunction[NodeT, EdgeT, PathT],
         max_path_weight: int,
-    ) -> FindReachableTargetsResult[NodeT]:
+    ) -> FindDescendantsResult[NodeT]:
         start_stat = self._cumulative_stat.copy()
         descendant_nodes = MutableOrderedSet[NodeT]()
-        found_target_nodes = MutableOrderedSet[NodeT]()
 
-        for mutable_path in self.traverse_dfs(
+        for stop_exploration_event in self.traverse_dfs(
             graph=graph,
             mutable_path=mutable_path,
             source_node=source_node,
@@ -92,13 +100,12 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
             max_path_weight=max_path_weight,
             allow_node_revisits=False,
         ):
-            descendant_nodes.update(mutable_path.node_set)
-            found_target_nodes.add(mutable_path.nodes[-1])
+            current_path = stop_exploration_event.current_path
+            descendant_nodes.update(current_path.node_set)
 
-        return FindReachableTargetsResult(
+        return FindDescendantsResult(
             path_finder_stat=self._cumulative_stat.difference(start_stat),
             descendant_nodes=descendant_nodes,
-            reachable_targets=found_target_nodes,
         )
 
     def find_reachable_targets_simple(
@@ -113,7 +120,7 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
         start_stat = self._cumulative_stat.copy()
         found_target_nodes = MutableOrderedSet[NodeT]()
 
-        for mutable_path in self.traverse_dfs(
+        for stop_event in self.traverse_dfs(
             graph=graph,
             mutable_path=mutable_path,
             source_node=source_node,
@@ -122,7 +129,9 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
             max_path_weight=max_path_weight,
             allow_node_revisits=False,
         ):
-            found_target_nodes.add(mutable_path.nodes[-1])
+            last_node_in_path = stop_event.current_path.nodes[-1]
+            if last_node_in_path in candidate_target_nodes:
+                found_target_nodes.add(last_node_in_path)
 
         return FindReachableTargetsSimpleResult(
             path_finder_stat=self._cumulative_stat.difference(start_stat),
@@ -138,7 +147,8 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
         weight_function: WeightFunction[NodeT, EdgeT, PathT],
         max_path_weight: int,
         allow_node_revisits: bool,
-    ) -> Generator[PathT, None, None]:
+        # allow_simple_cycle: bool,
+    ) -> Generator[StopPathExplorationEvent, None, None]:
         # Visit the descendants in DFS, starting from the source node.
         mutable_path.reset_to_start_node(source_node)
         self._mutable_path = mutable_path
@@ -181,33 +191,39 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
 
             current_node_visit_context = self._node_visit_contexts[-1]
             current_node = current_node_visit_context.node
+            current_path = self._current_mutable_path()
 
             if self._verbose_debug_logs:
                 logger.debug(
                     LazyFormat(
-                        "Starting visit",
+                        "Evaluating next node in traversal",
                         current_node=current_node.node_descriptor.node_name,
                         current_node_visit_context=current_node_visit_context,
-                        current_path=self._current_mutable_path(),
+                        current_path=current_path,
                     )
                 )
 
             # If we've hit one of the target nodes, so return the path to the node and stop visiting
             # descendants of the current node.
-            if current_node in target_nodes and len(self._current_mutable_path()) != 1:
+            # The path length check is to allow for simple cycles.
+            # TODO: Allowing simple cycles should be an option.
+            if current_node in target_nodes and len(current_path.nodes) != 1:
                 if self._verbose_debug_logs:
                     logger.debug(
                         LazyFormat(
                             "Reached target node, so returning current path",
                             current_node=current_node,
-                            current_path=self._current_mutable_path(),
+                            current_path=current_path,
                         )
                     )
                 self._cumulative_stat.increment_generated_paths_count()
-                yield self._current_mutable_path()
+                yield StopPathExplorationEvent(
+                    stop_reason=StopPathExplorationReason.VISIT_TARGET_NODE,
+                    current_path=current_path,
+                )
                 found_target_nodes.add(current_node)
 
-                # Early stop case.
+                # Stop traversal if we've found all target nodes.
                 if not allow_node_revisits and len(found_target_nodes) == len(target_nodes):
                     if self._verbose_debug_logs:
                         logger.debug(
@@ -217,7 +233,37 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
                             )
                         )
                     return
-                self._traverse_dfs__exit_node()
+                self._traverse_dfs__walk_to_previous_node()
+                continue
+
+            # If we can't go to the next node, then restart the loop so that we can check the next edge.
+            if not allow_node_revisits and current_node in self._finished_visiting_nodes:
+                if self._verbose_debug_logs:
+                    logger.debug(
+                        LazyFormat(
+                            "Not exploring descendant edges as we've previously finished" " visiting the current node",
+                            current_node=current_node,
+                            finished_visiting_nodes=self._finished_visiting_nodes,
+                        )
+                    )
+                yield StopPathExplorationEvent(
+                    stop_reason=StopPathExplorationReason.VISIT_FINISHED_NODE,
+                    current_path=current_path,
+                )
+                self._traverse_dfs__walk_to_previous_node()
+                continue
+
+            # Handle cycles
+            if current_node in current_path.node_set and current_path.nodes[-1] != current_node:
+                if self._verbose_debug_logs:
+                    logger.debug(
+                        LazyFormat(
+                            "Skipping node as it would produce a cycle.",
+                            skipped_node=current_node,
+                            current_path=self._current_mutable_path(),
+                        )
+                    )
+                self._traverse_dfs__walk_to_previous_node()
                 continue
 
             # If the current node has no descendants, then go to the next visit context.
@@ -225,31 +271,12 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
             if len(edges_to_process_in_current_node) == 0:
                 if self._verbose_debug_logs:
                     logger.debug(LazyFormat("No more edges remaining for current context, so popping it off."))
-                self._traverse_dfs__exit_node()
+                self._traverse_dfs__walk_to_previous_node()
                 continue
 
             # See if we can go from the current node to the next descendant node.
             next_edge_to_take = edges_to_process_in_current_node.pop()
             self._cumulative_stat.increment_edge_examined_count()
-            next_node = next_edge_to_take.head_node
-
-            # If we can't go to the next node, then restart the loop so that we can check the next edge.
-            if not allow_node_revisits and next_node in self._finished_visiting_nodes:
-                if self._verbose_debug_logs:
-                    logger.debug(
-                        LazyFormat(
-                            "Skipping node as it has already been visited.",
-                            skipped_node=next_node,
-                            finished_visiting_nodes=self._finished_visiting_nodes,
-                        )
-                    )
-                continue
-
-            # Avoid cycles
-            if next_node in self._current_mutable_path().node_set:
-                if self._verbose_debug_logs:
-                    logger.debug(LazyFormat("Skipping node as would produce a cycle.", skipped_node=next_node))
-                continue
 
             next_edge_weight = weight_function.incremental_weight(self._current_mutable_path(), next_edge_to_take)
 
@@ -285,7 +312,7 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
                         "Taking edge", next_edge_to_take=next_edge_to_take, current_path=self._current_mutable_path()
                     )
                 )
-            self._traverse_dfs__enter_node_via_edge(
+            self._traverse_dfs__walk_via_edge(
                 edge_to_take=next_edge_to_take,
                 weight_added_by_edge=next_edge_weight,
                 edges_to_visit=list(
@@ -343,7 +370,7 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
         descendant_nodes = MutableOrderedSet[NodeT]()
         start_stat = self._cumulative_stat.copy()
         for i, source_node in enumerate(source_nodes):
-            find_reachable_targets_result = self.find_reachable_targets(
+            find_descendant_nodes_result = self.find_descendant_nodes(
                 graph=graph,
                 mutable_path=mutable_path,
                 source_node=source_node,
@@ -351,8 +378,8 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
                 weight_function=weight_function,
                 max_path_weight=max_path_weight,
             )
-            reachable_targets = find_reachable_targets_result.reachable_targets
-            descendant_nodes.update(find_reachable_targets_result.descendant_nodes)
+            reachable_targets = find_descendant_nodes_result.descendant_nodes.intersection(candidate_target_nodes)
+            descendant_nodes.update(find_descendant_nodes_result.descendant_nodes)
             if i == 0:
                 common_reachable_targets = reachable_targets.copy()
 

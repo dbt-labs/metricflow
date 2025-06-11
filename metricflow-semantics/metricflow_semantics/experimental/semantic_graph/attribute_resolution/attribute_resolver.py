@@ -116,7 +116,7 @@ class AttributeResolver:
         mutable_path = AttributeComputationPath.create()
         attribute_descriptors = []
 
-        for path in self._path_finder.traverse_dfs(
+        for stop_exploration_event in self._path_finder.traverse_dfs(
             graph=group_by_attribute_subgraph,
             mutable_path=mutable_path,
             source_node=GroupByAttributeRootNode(),
@@ -125,6 +125,7 @@ class AttributeResolver:
             max_path_weight=DunderNameWeightFunction.MAX_ENTITY_LINKS,
             allow_node_revisits=True,
         ):
+            path = stop_exploration_event.current_path
             attribute_descriptor = mutable_path.attribute_computation.attribute_descriptor
             logger.debug(LazyFormat("Got path", path_nodes=path.nodes, descriptor=attribute_descriptor))
             if attribute_descriptor is not None:
@@ -226,7 +227,9 @@ class AttributeResolver:
                         spec=TimeDimensionSpec(
                             element_name=element_name,
                             entity_links=entity_links,
-                            time_granularity=mf_first_item(descriptor.time_grains) if len(descriptor.time_grains) > 0 else None,
+                            time_granularity=mf_first_item(descriptor.time_grains)
+                            if len(descriptor.time_grains) > 0
+                            else None,
                             date_part=mf_first_item(descriptor.date_parts) if len(descriptor.date_parts) > 0 else None,
                         ),
                         properties=properties,
