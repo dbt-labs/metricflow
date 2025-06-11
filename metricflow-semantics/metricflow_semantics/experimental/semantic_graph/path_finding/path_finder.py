@@ -23,8 +23,8 @@ from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_r
 )
 from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_stat import MutablePathFinderStat
 from metricflow_semantics.experimental.semantic_graph.path_finding.traversal_event import (
-    StopPathExplorationEvent,
-    StopPathExplorationReason,
+    WalkStopEvent,
+    WalkStopReason,
 )
 from metricflow_semantics.experimental.semantic_graph.path_finding.weight_function import WeightFunction
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
@@ -148,7 +148,7 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
         max_path_weight: int,
         allow_node_revisits: bool,
         # allow_simple_cycle: bool,
-    ) -> Generator[StopPathExplorationEvent, None, None]:
+    ) -> Generator[WalkStopEvent, None, None]:
         # Visit the descendants in DFS, starting from the source node.
         mutable_path.reset_to_start_node(source_node)
         self._mutable_path = mutable_path
@@ -217,8 +217,8 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
                         )
                     )
                 self._cumulative_stat.increment_generated_paths_count()
-                yield StopPathExplorationEvent(
-                    stop_reason=StopPathExplorationReason.VISIT_TARGET_NODE,
+                yield WalkStopEvent(
+                    stop_reason=WalkStopReason.VISIT_TARGET_NODE,
                     current_path=current_path,
                 )
                 found_target_nodes.add(current_node)
@@ -246,8 +246,8 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
                             finished_visiting_nodes=self._finished_visiting_nodes,
                         )
                     )
-                yield StopPathExplorationEvent(
-                    stop_reason=StopPathExplorationReason.VISIT_FINISHED_NODE,
+                yield WalkStopEvent(
+                    stop_reason=WalkStopReason.VISIT_FINISHED_NODE,
                     current_path=current_path,
                 )
                 self._traverse_dfs__walk_to_previous_node()

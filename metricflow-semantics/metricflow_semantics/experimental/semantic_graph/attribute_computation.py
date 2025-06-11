@@ -37,7 +37,7 @@ class AttributeComputation(SemanticModelDerivation, ABC):
 
 @fast_frozen_dataclass()
 class AttributeComputationUpdate(HasDisplayedProperty):
-    dundered_name_element_additions: AnyLengthTuple[str] = ()
+    dundered_name_element_addition: AnyLengthTuple[str] = ()
     linkable_element_property_additions: AnyLengthTuple[LinkableElementProperty] = ()
     derived_from_model_id_additions: AnyLengthTuple[SemanticModelId] = ()
     # The fields below should be removable after migration
@@ -51,7 +51,7 @@ class AttributeComputationUpdate(HasDisplayedProperty):
     def displayed_properties(self) -> AnyLengthTuple[DisplayedProperty]:
         properties = list(super().displayed_properties)
 
-        for dundered_name_element_addition in self.dundered_name_element_additions:
+        for dundered_name_element_addition in self.dundered_name_element_addition:
             properties.append(
                 DisplayedProperty("add_name", dundered_name_element_addition),
             )
@@ -111,7 +111,7 @@ class MutableAttributeComputation(AttributeComputation):
         if len(self.ordered_attribute_descriptors) == 0:
             self.ordered_attribute_descriptors.append(
                 AttributeDescriptor(
-                    dundered_name_elements=update.dundered_name_element_additions,
+                    dundered_name_elements=update.dundered_name_element_addition,
                     model_ids=FrozenOrderedSet(update.derived_from_model_id_additions),
                     properties=FrozenOrderedSet(update.linkable_element_property_additions),
                     element_types=FrozenOrderedSet(update.element_type_additions),
@@ -126,7 +126,7 @@ class MutableAttributeComputation(AttributeComputation):
         self.ordered_attribute_descriptors.append(
             AttributeDescriptor(
                 dundered_name_elements=previous_attribute_descriptor.dundered_name_elements
-                + update.dundered_name_element_additions,
+                + update.dundered_name_element_addition,
                 model_ids=previous_attribute_descriptor.model_ids.union(update.derived_from_model_id_additions),
                 properties=previous_attribute_descriptor.properties.union(update.linkable_element_property_additions),
                 element_types=previous_attribute_descriptor.element_types.union(update.element_type_additions),

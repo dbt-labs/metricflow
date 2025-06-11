@@ -68,7 +68,7 @@ class AttributeNode(SemanticGraphNode, ABC):
     @cached_property
     def attribute_computation_update(self) -> AttributeComputationUpdate:
         return AttributeComputationUpdate(
-            dundered_name_element_additions=(self.attribute_name,),
+            dundered_name_element_addition=(self.attribute_name,),
         )
 
 
@@ -173,7 +173,7 @@ class EntityKeyAttributeNode(AttributeNode):
     @property
     def attribute_computation_update(self) -> AttributeComputationUpdate:
         return AttributeComputationUpdate(
-            dundered_name_element_additions=(self.attribute_name,),
+            dundered_name_element_addition=(self.attribute_name,),
             linkable_element_property_additions=(LinkableElementProperty.ENTITY,),
             element_type_additions=(LinkableElementType.ENTITY,),
         )
@@ -192,7 +192,7 @@ class CategoricalDimensionAttributeNode(AttributeNode):
     @property
     def attribute_computation_update(self) -> AttributeComputationUpdate:
         return AttributeComputationUpdate(
-            dundered_name_element_additions=(self.attribute_name,),
+            dundered_name_element_addition=(self.attribute_name,),
             element_type_additions=(LinkableElementType.DIMENSION,),
         )
 

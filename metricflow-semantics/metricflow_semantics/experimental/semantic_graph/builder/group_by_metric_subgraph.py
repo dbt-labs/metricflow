@@ -99,7 +99,7 @@ class GroupByMetricSubgraph(SemanticSubgraphGenerator):
                     head_node=metric_attribute_node,
                     attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
                     attribute_computation_update=AttributeComputationUpdate(
-                        dundered_name_element_additions=(metric_name,),
+                        dundered_name_element_addition=(metric_name,),
                         linkable_element_property_additions=(LinkableElementProperty.METRIC,),
                         element_type_additions=(LinkableElementType.METRIC,),
                     ),

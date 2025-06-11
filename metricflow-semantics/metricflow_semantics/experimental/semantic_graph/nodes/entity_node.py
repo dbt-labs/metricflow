@@ -79,7 +79,7 @@ class DsiEntityNode(SemanticGraphNode):
     @override
     @property
     def attribute_computation_update(self) -> AttributeComputationUpdate:
-        return AttributeComputationUpdate(dundered_name_element_additions=(self.entity_name,))
+        return AttributeComputationUpdate(dundered_name_element_addition=(self.entity_name,))
 
 
 @singleton_dataclass(order=False)
@@ -206,7 +206,7 @@ class TimeDimensionNode(SemanticGraphNode):
     @property
     def attribute_computation_update(self) -> AttributeComputationUpdate:
         return AttributeComputationUpdate(
-            dundered_name_element_additions=(self.dimension_name,),
+            dundered_name_element_addition=(self.dimension_name,),
             element_type_additions=(LinkableElementType.TIME_DIMENSION,),
         )
 
@@ -240,7 +240,7 @@ class MetricTimeDimensionNode(TimeDimensionNode):
     @property
     def attribute_computation_update(self) -> AttributeComputationUpdate:
         return AttributeComputationUpdate(
-            dundered_name_element_additions=(self.dimension_name,),
+            dundered_name_element_addition=(self.dimension_name,),
             linkable_element_property_additions=(LinkableElementProperty.METRIC_TIME,),
             element_type_additions=(LinkableElementType.TIME_DIMENSION,),
         )

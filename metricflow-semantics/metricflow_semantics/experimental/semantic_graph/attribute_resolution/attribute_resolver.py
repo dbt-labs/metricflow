@@ -28,7 +28,7 @@ from metricflow_semantics.experimental.semantic_graph.manifest_object_lookup imp
 from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import GroupByAttributeRootNode
 from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
     GroupByAttributeLabel,
-    MetricAttributeLabel,
+    MetricAttributeLabel, DsiEntityLabel,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
     SemanticGraphEdge,
@@ -181,6 +181,7 @@ class AttributeResolver:
             )
             default_element_name = dundered_name_elements[-1]
             if element_type is LinkableElementType.METRIC:
+
                 annotated_specs.append(
                     AnnotatedSpec.create(
                         spec=GroupByMetricSpec(
@@ -303,6 +304,10 @@ class AttributeResolver:
                 assert_values_exhausted(element_type)
 
             raise NotImplementedError
+
+    def _generate_metric_subquery_entity_links(self, last_entity_name: str) -> AnyLengthTuple[str]
+        entity_nodes = self._semantic_graph.nodes_with_label(DsiEntityLabel())
+        target_entity_nodes = FrozenOrderedSet(node for node in entity_nodes if node.attribute_computation_update.dundered_name_element_addition)
 
     # def _resolve_metric_subquery_links_cached(
     #     self, metric_subquery_pattern: MetricSubqueryPattern
