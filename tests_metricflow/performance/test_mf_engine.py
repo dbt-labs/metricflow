@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import cProfile
 import logging
 import time
 from typing import Optional
@@ -8,14 +9,22 @@ import pytest
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.transformations.semantic_manifest_transformer import PydanticSemanticManifestTransformer
-
-from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import \
-    AttributeComputationPath
+from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
+from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
+from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
+    AttributeComputationPath,
+)
 from metricflow_semantics.experimental.semantic_graph.builder.graph_builder import SemanticGraphBuilder
-from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import SemanticGraphNode, \
-    SemanticGraphEdge
+from metricflow_semantics.experimental.semantic_graph.manifest_object_lookup import (
+    ManifestObjectLookup as NewManifestObjectLookup,
+)
+from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
+    SemanticGraphEdge,
+    SemanticGraphNode,
+)
 from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder import MetricflowGraphPathFinder
 from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_cache import PathFinderCache
+from metricflow_semantics.experimental.singleton_decorator import singleton_dataclass
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.linkable_spec_index import LinkableSpecIndex
@@ -29,13 +38,14 @@ from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
 from metricflow_semantics.test_helpers.time_helpers import ConfigurableTimeSource
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
+from run_pstats import CPROFILE_OUTPUT_FILE_NAME
 from tests_metricflow_semantics.model.test_semantic_model_container import build_semantic_model_lookup_from_manifest
 
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.protocols.sql_client import SqlClient
 from tests_metricflow.performance.semantic_manifest_generator import SyntheticManifestGenerator
 from tests_metricflow.performance.synthetic_manifest_parameter_set import SyntheticManifestParameterSet
-from metricflow_semantics.experimental.semantic_graph.manifest_object_lookup import ManifestObjectLookup as NewManifestObjectLookup
+
 logger = logging.getLogger(__name__)
 
 
@@ -177,6 +187,60 @@ def test_semantic_graph_init_time() -> None:
     semantic_manifest = PydanticSemanticManifestTransformer.transform(semantic_manifest)
 
     # original_init_time = _time_original_init(semantic_manifest)
-    new_init_time = _time_new_init(semantic_manifest)
+    # new_init_time = _time_new_init(semantic_manifest)
     # ratio = original_init_time / new_init_time
     # logger.info(LazyFormat("Compared init times", original_init_time=original_init_time, new_init_time=new_init_time, ratio=f"{ratio:.2f}"))
+
+    cProfile.runctx(
+        statement="_time_new_init(semantic_manifest)",
+        filename=CPROFILE_OUTPUT_FILE_NAME,
+        locals=locals(),
+        globals=globals(),
+    )
+
+
+@fast_frozen_dataclass()
+class DataclassId:
+    int_value: int
+
+
+@singleton_dataclass()
+class SingletonId:
+    int_value: int
+
+
+class SingletonFactory:
+    _instance_dict: dict[AnyLengthTuple[int], DataclassId] = {}
+
+    def get_instance(self, int_value: int) -> DataclassId:
+        key = (int_value,)
+        instance = self._instance_dict.get(key)
+        if instance is None:
+            instance = DataclassId(int_value=int_value)
+            self._instance_dict[key] = instance
+        return instance
+
+
+REPEAT_COUNT = 2
+ID_COUNT = 200_000
+
+
+def _test_singleton_dataclass() -> None:
+    for _ in range(REPEAT_COUNT):
+        for int_value in range(ID_COUNT):
+            SingletonId(int_value=int_value)
+
+
+def _test_factory() -> None:
+    for _ in range(REPEAT_COUNT):
+        for int_value in range(ID_COUNT):
+            DataclassId(int_value=int_value)
+
+
+def test_singleton_approach() -> None:
+    cProfile.runctx(
+        statement="_test_factory()",
+        filename=CPROFILE_OUTPUT_FILE_NAME,
+        locals=locals(),
+        globals=globals(),
+    )
