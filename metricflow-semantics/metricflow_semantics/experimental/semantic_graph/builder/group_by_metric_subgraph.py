@@ -43,7 +43,7 @@ class GroupByMetricSubgraph(SemanticSubgraphGenerator):
     def __init__(self, argument_set: SubgraphGeneratorArgumentSet) -> None:
         super().__init__(argument_set)
         self._mutable_path = AttributeComputationPath.create()
-        self._verbose_debug_logs = True
+        self._verbose_debug_logs = False
 
     def _generate_subgraph_for_any_metric(
         self, current_graph: SemanticGraph, subgraph: MutableSemanticGraph, metric: Metric

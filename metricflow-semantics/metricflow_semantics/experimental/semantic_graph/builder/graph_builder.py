@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import time
 from typing import Iterable, Optional, Type
 
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
@@ -21,7 +22,7 @@ from metricflow_semantics.experimental.semantic_graph.builder.group_by_metric_su
 from metricflow_semantics.experimental.semantic_graph.builder.measure_attribute_subgraph import (
     MeasureAttributeSubgraphGenerator,
 )
-from metricflow_semantics.experimental.semantic_graph.builder.metric_subgraph import MetricAttributeSubgraphGenerator
+from metricflow_semantics.experimental.semantic_graph.builder.metric_subgraph import MetricSubgraphGenerator
 from metricflow_semantics.experimental.semantic_graph.builder.time_dimension_subgraph import (
     TimeDimensionSubgraphGenerator,
 )
@@ -44,7 +45,7 @@ class SemanticGraphBuilder:
         EntityJoinSubgraphGenerator,
         MeasureAttributeSubgraphGenerator,
         TimeDimensionSubgraphGenerator,
-        MetricAttributeSubgraphGenerator,
+        MetricSubgraphGenerator,
         GroupByMetricSubgraph,
     )
 
@@ -69,17 +70,29 @@ class SemanticGraphBuilder:
 
         current_graph = MutableSemanticGraph.create()
         for generator in subgraph_generators:
+            start_time = time.perf_counter()
             generator_instance = generator(self._generator_argument_set)
 
             subgraph = generator_instance.generate_subgraph(current_graph)
+            runtime = time.perf_counter() - start_time
             if self._verbose_debug_logs:
                 logger.debug(
                     LazyFormat(
                         "Generated subgraph from a generator",
                         generator=generator.__name__,
                         subgraph=subgraph,
+                        runtime=f"{runtime:.2fs}",
                     )
                 )
+            logger.info(
+                LazyFormat(
+                    "Generated subgraph from a generator",
+                    generator=generator.__name__,
+                    runtime=f"{runtime:.2f}s",
+                    added_node_count=len(subgraph.nodes),
+                    added_edge_count=len(subgraph.edges),
+                )
+            )
             current_graph.add_nodes(subgraph.nodes)
             current_graph.add_edges(subgraph.edges)
 

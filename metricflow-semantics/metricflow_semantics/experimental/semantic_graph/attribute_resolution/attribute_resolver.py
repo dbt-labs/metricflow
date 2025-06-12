@@ -42,6 +42,7 @@ from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_c
 from metricflow_semantics.experimental.semantic_graph.semantic_graph import SemanticGraph
 from metricflow_semantics.experimental.singleton_decorator import singleton_dataclass
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantics.linkable_element import (
     LinkableElementType,
 )
@@ -74,37 +75,6 @@ class AttributeResolver:
         )
         self._verbose_debug_logs = True
 
-    # def _resolve_attribute_descriptors(
-    #     self,
-    #     metric_names: Sequence[str],
-    #     group_by_attribute_node_label: MetricflowGraphLabel = GroupByAttributeLabel(),
-    # ) -> Sequence[AttributeDescriptor]:
-    #     raise NotImplementedError()
-
-    # def resolve_descriptors_for_metric(
-    #     self,
-    #     metric_name: str,
-    #     group_by_attribute_node_label: MetricflowGraphLabel = GroupByAttributeLabel(),
-    # ) -> Sequence[AttributeDescriptor]:
-    #     matching_nodes = self._semantic_graph.nodes_with_label(MetricAttributeLabel(metric_name=metric_name))
-    #
-    #     metric_node = mf_first_item(
-    #         matching_nodes,
-    #         lambda: MetricflowAssertionError(
-    #             LazyFormat(
-    #                 "Did not find exactly 1 node in the semantic graph with the given metric name",
-    #                 metric_name=metric_name,
-    #                 matching_nodes=matching_nodes,
-    #             )
-    #         ),
-    #     )
-    #
-    #     group_by_attribute_nodes = self._semantic_graph.nodes_with_label(group_by_attribute_node_label)
-    #     return self._resolve_descriptors_to_nodes(
-    #         source_node=metric_node,
-    #         target_nodes=group_by_attribute_nodes,
-    #     )
-
     def _resolve_descriptors_for_metric_nodes(
         self,
         metric_nodes: OrderedSet[SemanticGraphNode],
@@ -133,17 +103,6 @@ class AttributeResolver:
                 attribute_descriptors.append(attribute_descriptor)
 
         return tuple(attribute_descriptors)
-
-    # def resolve_descriptors_for_measure_node(
-    #     self,
-    #     measure_node: SemanticGraphNode,
-    # ) -> Sequence[AttributeDescriptor]:
-    #     group_by_attribute_nodes = self._semantic_graph.nodes_with_label(GroupByAttributeLabel())
-    #
-    #     return self._resolve_descriptors_to_nodes(
-    #         source_node=measure_node,
-    #         target_nodes=group_by_attribute_nodes,
-    #     )
 
     def resolve_descriptors_for_metric(self, metric_name: str) -> Sequence[AttributeDescriptor]:
         matching_nodes = self._semantic_graph.nodes_with_label(MetricAttributeLabel(metric_name=metric_name))
@@ -182,21 +141,11 @@ class AttributeResolver:
             )
             default_element_name = dundered_name_elements[-1]
             if element_type is LinkableElementType.METRIC:
-                annotated_specs.append(
-                    AnnotatedSpec.create(
-                        spec=GroupByMetricSpec(
-                            element_name=default_element_name,
-                            entity_links=default_entity_links,
-                            metric_subquery_entity_links=(),
-                        ),
+                annotated_specs.extend(
+                    self._generate_group_by_metric_specs(
+                        metric_name=default_element_name,
+                        entity_links=default_entity_links,
                         properties=properties,
-                        # path_key=ElementPathKey(
-                        #     element_name=default_element_name,
-                        #     element_type=element_type,
-                        #     entity_links=default_entity_links,
-                        # ),
-                        # linkable_element=None,
-                        derived_from_semantic_models=FrozenOrderedSet(),
                     )
                 )
             elif element_type is LinkableElementType.ENTITY:
@@ -207,12 +156,6 @@ class AttributeResolver:
                             entity_links=default_entity_links,
                         ),
                         properties=properties,
-                        # path_key=ElementPathKey(
-                        #     element_name=default_element_name,
-                        #     element_type=element_type,
-                        #     entity_links=default_entity_links,
-                        # ),
-                        # linkable_element=None,
                         derived_from_semantic_models=FrozenOrderedSet(),
                     )
                 )
@@ -234,12 +177,6 @@ class AttributeResolver:
                             date_part=mf_first_item(descriptor.date_parts) if len(descriptor.date_parts) > 0 else None,
                         ),
                         properties=properties,
-                        # path_key=ElementPathKey(
-                        #     element_name=element_name,
-                        #     element_type=element_type,
-                        #     entity_links=entity_links,
-                        # ),
-                        # linkable_element=None,
                         derived_from_semantic_models=FrozenOrderedSet(),
                     )
                 )
@@ -251,12 +188,6 @@ class AttributeResolver:
                             entity_links=default_entity_links,
                         ),
                         properties=properties,
-                        # path_key=ElementPathKey(
-                        #     element_name=default_element_name,
-                        #     element_type=element_type,
-                        #     entity_links=default_entity_links,
-                        # ),
-                        # linkable_element=None,
                         derived_from_semantic_models=FrozenOrderedSet(),
                     )
                 )
@@ -264,79 +195,34 @@ class AttributeResolver:
                 assert_values_exhausted(element_type)
         return annotated_specs
 
-    # def _resolve_descriptors_to_nodes(
-    #     self,
-    #     source_node: SemanticGraphNode,
-    #     target_nodes: OrderedSet[SemanticGraphNode],
-    # ) -> Sequence[AttributeDescriptor]:
-    #     mutable_path = AttributeComputationPath.create()
-    #     attribute_descriptors = []
-    #
-    #     for path in self._path_finder.traverse_dfs(
-    #         graph=self._semantic_graph,
-    #         mutable_path=mutable_path,
-    #         source_node=source_node,
-    #         target_nodes=target_nodes,
-    #         weight_function=DunderNameWeightFunction(),
-    #         max_path_weight=3,
-    #         allow_node_revisits=True,
-    #     ):
-    #         attribute_descriptor = mutable_path.attribute_computation.attribute_descriptor
-    #         logger.debug(LazyFormat("Got path", path_nodes=path.nodes, descriptor=attribute_descriptor))
-    #         if attribute_descriptor is not None:
-    #             attribute_descriptors.append(attribute_descriptor)
-    #
-    #     return attribute_descriptors
-
-    # def _generate_metric_subquery_entity_links(self, attribute_descriptors: Sequence[AttributeDescriptor]) -> None:
-    #     for attribute_descriptor in attribute_descriptors:
-    #         element_type = mf_first_item(attribute_descriptor.element_types)
-    #
-    #         if element_type is LinkableElementType.DIMENSION:
-    #             pass
-    #         elif element_type is LinkableElementType.ENTITY:
-    #             pass
-    #         elif element_type is LinkableElementType.METRIC:
-    #             pass
-    #         elif element_type is LinkableElementType.TIME_DIMENSION:
-    #             pass
-    #         else:
-    #             assert_values_exhausted(element_type)
-    # 
-    #         raise NotImplementedError
-
-    def _generate_metric_subquery_entity_links(self, metric_name: str, last_entity_name: str) -> AnyLengthTuple[AnyLengthTuple[str]]:
+    def _generate_group_by_metric_specs(
+            self,
+            metric_name: str,
+            entity_links: Sequence[EntityReference],
+            properties: FrozenOrderedSet[LinkableElementProperty]
+    ) -> AnyLengthTuple[AnnotatedSpec]:
+        group_by_metric_specs: list[AnnotatedSpec] = []
         metric_node = MetricNode(attribute_name=metric_name)
-        entity_value_node = EntityKeyAttributeNode(attribute_name=last_entity_name)
+        entity_value_node = EntityKeyAttributeNode(attribute_name=entity_links[-1].element_name)
 
         descriptors = self._resolve_descriptors_for_metric_nodes(
             metric_nodes=FrozenOrderedSet((metric_node,)),
             target_attribute_nodes=FrozenOrderedSet((entity_value_node,)),
         )
 
-        return tuple(descriptor.dsi_entity_names for descriptor in descriptors)
-
-    # def _resolve_metric_subquery_links_cached(
-    #     self, metric_subquery_pattern: MetricSubqueryPattern
-    # ) -> AnyLengthTuple[AnyLengthTuple[str]]:
-    #     return self._attribute_resolver_cache.metric_subquery_to_subquery_entity_links.get_or_create(
-    #         metric_subquery_pattern,
-    #         factory=lambda: self._resolve_metric_subquery_links_uncached(metric_subquery_pattern),
-    #     )
-    #
-    # def _resolve_metric_subquery_links_uncached(
-    #     self, metric_subquery_pattern: MetricSubqueryPattern
-    # ) -> AnyLengthTuple[AnyLengthTuple[str]]:
-    #     descriptors = self._resolve_descriptors_to_nodes(
-    #         source_node=MetricNode(attribute_name=metric_subquery_pattern.metric_name),
-    #         target_nodes=FrozenOrderedSet(
-    #             (EntityKeyAttributeNode(attribute_name=metric_subquery_pattern.last_entity_link),)
-    #         ),
-    #     )
-    #
-    #     results = tuple(descriptor.dundered_name_elements for descriptor in descriptors)
-    #
-    #     return results
+        for descriptor in descriptors:
+            group_by_metric_specs.append(
+                AnnotatedSpec.create(
+                    spec=GroupByMetricSpec(
+                        element_name=metric_name,
+                        entity_links=tuple(entity_links),
+                        metric_subquery_entity_links=tuple(EntityReference(element_name=element) for element in descriptor.dundered_name_elements),
+                    ),
+                    properties=properties,
+                    derived_from_semantic_models=FrozenOrderedSet(),
+                )
+            )
+        return tuple(group_by_metric_specs)
 
 
 @singleton_dataclass()

@@ -191,6 +191,7 @@ def test_resolver(  # noqa: D103
     annotated_specs = spec_resolver.resolve_specs_for_metric(metric_name=metric_name)
     logger.debug(
         LazyFormat(
-            "Resolved specs", annotated_specs=[annotated_spec.spec.qualified_name for annotated_spec in annotated_specs]
+            "Resolved specs",
+            annotated_specs=[annotated_spec.spec.qualified_name for annotated_spec in annotated_specs]
         )
     )
