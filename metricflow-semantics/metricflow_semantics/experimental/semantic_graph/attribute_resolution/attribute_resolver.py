@@ -25,7 +25,7 @@ from metricflow_semantics.experimental.semantic_graph.builder.group_by_attribute
     GroupByAttributeSubgraphGenerator,
 )
 from metricflow_semantics.experimental.semantic_graph.manifest_object_lookup import ManifestObjectLookup
-from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import MetricNode, EntityKeyAttributeNode
+from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import EntityKeyAttributeNode, MetricNode
 from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import GroupByAttributeRootNode
 from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
     GroupByAttributeLabel,
@@ -196,10 +196,10 @@ class AttributeResolver:
         return annotated_specs
 
     def _generate_group_by_metric_specs(
-            self,
-            metric_name: str,
-            entity_links: Sequence[EntityReference],
-            properties: FrozenOrderedSet[LinkableElementProperty]
+        self,
+        metric_name: str,
+        entity_links: Sequence[EntityReference],
+        properties: FrozenOrderedSet[LinkableElementProperty],
     ) -> AnyLengthTuple[AnnotatedSpec]:
         group_by_metric_specs: list[AnnotatedSpec] = []
         metric_node = MetricNode(attribute_name=metric_name)
@@ -216,7 +216,9 @@ class AttributeResolver:
                     spec=GroupByMetricSpec(
                         element_name=metric_name,
                         entity_links=tuple(entity_links),
-                        metric_subquery_entity_links=tuple(EntityReference(element_name=element) for element in descriptor.dundered_name_elements),
+                        metric_subquery_entity_links=tuple(
+                            EntityReference(element_name=element) for element in descriptor.dundered_name_elements
+                        ),
                     ),
                     properties=properties,
                     derived_from_semantic_models=FrozenOrderedSet(),
