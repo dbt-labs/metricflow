@@ -45,10 +45,19 @@ class GroupByMetricSubgraph(SemanticSubgraphGenerator):
         self._mutable_path = AttributeComputationPath.create()
         self._verbose_debug_logs = False
 
+    def _metric_processed(self, current_subgraph: MutableSemanticGraph, metric_name: str) -> bool:
+        """Returns true if this metric has been processed and recursive calls don't need to be made on the parents.
+
+        This check is called before the generate method is called to reduce the number of recursive calls that show up
+        in profiling results.
+        """
+        return len(current_subgraph.nodes_with_label(MetricAttributeLabel(metric_name=metric_name))) > 0
+
     def _generate_subgraph_for_any_metric(
         self, current_graph: SemanticGraph, subgraph: MutableSemanticGraph, metric: Metric
     ) -> None:
-        if len(subgraph.nodes_with_label(MetricAttributeLabel(metric_name=metric.name))) > 0:
+        metric_name = metric.name
+        if self._metric_processed(subgraph, metric_name):
             return
 
         parent_metric_inputs = metric.type_params.metrics
@@ -58,11 +67,21 @@ class GroupByMetricSubgraph(SemanticSubgraphGenerator):
 
         for parent_metric_input in parent_metric_inputs:
             parent_metric = self._manifest_object_lookup.get_metric(parent_metric_input.name)
-            self._generate_subgraph_for_any_metric(current_graph, subgraph, parent_metric)
+            if self._metric_processed(subgraph, parent_metric.name):
+                continue
+
+            if parent_metric.type_params.metrics is None:
+                self._generate_subgraph_for_base_metric(current_graph, subgraph, parent_metric)
+            else:
+                self._generate_subgraph_for_any_metric(current_graph, subgraph, parent_metric)
 
     def _generate_subgraph_for_base_metric(
         self, current_graph: SemanticGraph, subgraph: MutableSemanticGraph, metric: Metric
     ) -> None:
+        # This shouldn't be needed since we make this check before all calls to this method, but just in case.
+        if self._metric_processed(subgraph, metric.name):
+            return
+
         required_measure_nodes = MutableOrderedSet[SemanticGraphNode]()
         for measure in metric.input_measures:
             measure_node = mf_first_item(
@@ -112,6 +131,7 @@ class GroupByMetricSubgraph(SemanticSubgraphGenerator):
         if self._verbose_debug_logs:
             logger.debug(LazyFormat("Starting with graph", current_graph=current_graph))
         for metric in self._manifest_object_lookup.get_metrics():
-            self._generate_subgraph_for_any_metric(current_graph, current_subgraph, metric)
+            if not self._metric_processed(current_subgraph, metric.name):
+                self._generate_subgraph_for_any_metric(current_graph, current_subgraph, metric)
 
         return current_subgraph
