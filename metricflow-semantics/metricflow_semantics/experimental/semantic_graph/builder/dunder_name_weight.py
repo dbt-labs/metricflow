@@ -5,6 +5,7 @@ from typing import Optional
 
 from typing_extensions import override
 
+from metricflow_semantics.collection_helpers.syntactic_sugar import mf_tuple_from_optional
 from metricflow_semantics.experimental.semantic_graph.edges.edge_labels import MetricDefinitionLabel
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
     SemanticGraphEdge,
@@ -42,8 +43,10 @@ class DunderNameWeightFunction(WeightFunction[SemanticGraphNode, SemanticGraphEd
         current_attribute_computation = path_to_node.attribute_computation
         dundered_name_elements = (
             current_attribute_computation.attribute_descriptor.dundered_name_elements
-            + edge_from_node.attribute_computation_update.dundered_name_element_addition
-            + edge_from_node.head_node.attribute_computation_update.dundered_name_element_addition
+            + mf_tuple_from_optional(edge_from_node.attribute_computation_update.dundered_name_element_addition)
+            + mf_tuple_from_optional(
+                edge_from_node.head_node.attribute_computation_update.dundered_name_element_addition
+            )
         )
         # We do not allow repeated element names in the dundered name (e.g. `listing__listing`),
         # so return `None` to indicate a blocked edge.
@@ -58,8 +61,9 @@ class DunderNameWeightFunction(WeightFunction[SemanticGraphNode, SemanticGraphEd
         # # return len(dundered_name_element_additions)
 
         dsi_entity_name_additions = (
-            edge_from_node.attribute_computation_update.dsi_entity_additions
-            + edge_from_node.head_node.attribute_computation_update.dsi_entity_additions
+            current_attribute_computation.attribute_descriptor.dsi_entity_names
+            + mf_tuple_from_optional(edge_from_node.attribute_computation_update.dsi_entity_addition)
+            + mf_tuple_from_optional(edge_from_node.head_node.attribute_computation_update.dsi_entity_addition)
         )
 
         return len(dsi_entity_name_additions)

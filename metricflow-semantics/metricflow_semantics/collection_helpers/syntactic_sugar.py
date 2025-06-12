@@ -8,7 +8,7 @@ import itertools
 import logging
 from typing import Callable, Iterable, Mapping, Optional
 
-from metricflow_semantics.collection_helpers.mf_type_aliases import KeyT, T, ValueT
+from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple, KeyT, T, ValueT
 
 logger = logging.getLogger(__name__)
 
@@ -58,6 +58,10 @@ def mf_ensure_mapping(optional_mapping: Optional[Mapping[KeyT, ValueT]]) -> Mapp
     Useful for default argument handling.
     """
     return optional_mapping if optional_mapping is not None else {}
+
+
+def mf_tuple_from_optional(item: Optional[T]) -> AnyLengthTuple[T]:
+    return (item,) if item is not None else ()
 
 
 def mf_first_item(iterable: Iterable[T], error_supplier: Optional[Callable[[], Exception]] = None) -> T:

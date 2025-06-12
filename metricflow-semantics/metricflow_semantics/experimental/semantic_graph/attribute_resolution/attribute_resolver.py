@@ -25,10 +25,11 @@ from metricflow_semantics.experimental.semantic_graph.builder.group_by_attribute
     GroupByAttributeSubgraphGenerator,
 )
 from metricflow_semantics.experimental.semantic_graph.manifest_object_lookup import ManifestObjectLookup
+from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import MetricNode, EntityKeyAttributeNode
 from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import GroupByAttributeRootNode
 from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
     GroupByAttributeLabel,
-    MetricAttributeLabel, DsiEntityLabel,
+    MetricAttributeLabel,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
     SemanticGraphEdge,
@@ -181,7 +182,6 @@ class AttributeResolver:
             )
             default_element_name = dundered_name_elements[-1]
             if element_type is LinkableElementType.METRIC:
-
                 annotated_specs.append(
                     AnnotatedSpec.create(
                         spec=GroupByMetricSpec(
@@ -288,26 +288,33 @@ class AttributeResolver:
     #
     #     return attribute_descriptors
 
-    def _generate_metric_subquery_entity_links(self, attribute_descriptors: Sequence[AttributeDescriptor]) -> None:
-        for attribute_descriptor in attribute_descriptors:
-            element_type = mf_first_item(attribute_descriptor.element_types)
+    # def _generate_metric_subquery_entity_links(self, attribute_descriptors: Sequence[AttributeDescriptor]) -> None:
+    #     for attribute_descriptor in attribute_descriptors:
+    #         element_type = mf_first_item(attribute_descriptor.element_types)
+    #
+    #         if element_type is LinkableElementType.DIMENSION:
+    #             pass
+    #         elif element_type is LinkableElementType.ENTITY:
+    #             pass
+    #         elif element_type is LinkableElementType.METRIC:
+    #             pass
+    #         elif element_type is LinkableElementType.TIME_DIMENSION:
+    #             pass
+    #         else:
+    #             assert_values_exhausted(element_type)
+    # 
+    #         raise NotImplementedError
 
-            if element_type is LinkableElementType.DIMENSION:
-                pass
-            elif element_type is LinkableElementType.ENTITY:
-                pass
-            elif element_type is LinkableElementType.METRIC:
-                pass
-            elif element_type is LinkableElementType.TIME_DIMENSION:
-                pass
-            else:
-                assert_values_exhausted(element_type)
+    def _generate_metric_subquery_entity_links(self, metric_name: str, last_entity_name: str) -> AnyLengthTuple[AnyLengthTuple[str]]:
+        metric_node = MetricNode(attribute_name=metric_name)
+        entity_value_node = EntityKeyAttributeNode(attribute_name=last_entity_name)
 
-            raise NotImplementedError
+        descriptors = self._resolve_descriptors_for_metric_nodes(
+            metric_nodes=FrozenOrderedSet((metric_node,)),
+            target_attribute_nodes=FrozenOrderedSet((entity_value_node,)),
+        )
 
-    def _generate_metric_subquery_entity_links(self, last_entity_name: str) -> AnyLengthTuple[str]
-        entity_nodes = self._semantic_graph.nodes_with_label(DsiEntityLabel())
-        target_entity_nodes = FrozenOrderedSet(node for node in entity_nodes if node.attribute_computation_update.dundered_name_element_addition)
+        return tuple(descriptor.dsi_entity_names for descriptor in descriptors)
 
     # def _resolve_metric_subquery_links_cached(
     #     self, metric_subquery_pattern: MetricSubqueryPattern

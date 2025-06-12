@@ -61,7 +61,7 @@ class DsiEntityNode(SemanticGraphNode):
         return dot_node
 
     @override
-    @property
+    @cached_property
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
         return MetricflowGraphNodeDescriptor.get_instance(
             node_name=f"DsiEntity({self.entity_name})", cluster_name="model_entity"
@@ -77,9 +77,9 @@ class DsiEntityNode(SemanticGraphNode):
         return FrozenOrderedSet((self.dunder_name_element_label, DsiEntityLabel()))
 
     @override
-    @property
+    @cached_property
     def attribute_computation_update(self) -> AttributeComputationUpdate:
-        return AttributeComputationUpdate(dundered_name_element_addition=(self.entity_name,))
+        return AttributeComputationUpdate(dundered_name_element_addition=self.entity_name)
 
 
 @singleton_dataclass(order=False)
@@ -206,8 +206,8 @@ class TimeDimensionNode(SemanticGraphNode):
     @property
     def attribute_computation_update(self) -> AttributeComputationUpdate:
         return AttributeComputationUpdate(
-            dundered_name_element_addition=(self.dimension_name,),
-            element_type_additions=(LinkableElementType.TIME_DIMENSION,),
+            dundered_name_element_addition=self.dimension_name,
+            element_type_addition=LinkableElementType.TIME_DIMENSION,
         )
 
 
@@ -240,9 +240,9 @@ class MetricTimeDimensionNode(TimeDimensionNode):
     @property
     def attribute_computation_update(self) -> AttributeComputationUpdate:
         return AttributeComputationUpdate(
-            dundered_name_element_addition=(self.dimension_name,),
+            dundered_name_element_addition=self.dimension_name,
             linkable_element_property_additions=(LinkableElementProperty.METRIC_TIME,),
-            element_type_additions=(LinkableElementType.TIME_DIMENSION,),
+            element_type_addition=LinkableElementType.TIME_DIMENSION,
         )
 
 
