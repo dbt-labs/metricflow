@@ -1,14 +1,12 @@
 from __future__ import annotations
 
+import itertools
 import logging
 from abc import ABC, abstractmethod
 from typing import Optional
 
 from typing_extensions import override
 
-from metricflow_semantics.dag.id_prefix import DynamicIdPrefix
-from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
-from metricflow_semantics.experimental.singleton_decorator import singleton_dataclass
 from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
 from metricflow_semantics.mf_logging.pretty_formatter import PrettyFormatContext
 
@@ -25,19 +23,18 @@ class MetricflowGraphId(ABC):
         raise NotImplementedError
 
 
-@singleton_dataclass()
 class SequentialGraphId(MetricflowGraphId, MetricFlowPrettyFormattable):
     """Graph IDs that are generated sequentially."""
 
-    _str_value: str
+    # `itertools.count()` returns an iterable that is thread-safe.
+    _ID_COUNTER = itertools.count()
+
+    def __init__(self) -> None:
+        self._str_value = "id_" + str(next(SequentialGraphId._ID_COUNTER))
 
     @staticmethod
     def create() -> SequentialGraphId:  # noqa: D102
-        return SequentialGraphId(
-            _str_value=SequentialIdGenerator.create_next_id(
-                DynamicIdPrefix(SequentialGraphId.__class__.__name__)
-            ).str_value
-        )
+        return SequentialGraphId()
 
     @override
     @property
