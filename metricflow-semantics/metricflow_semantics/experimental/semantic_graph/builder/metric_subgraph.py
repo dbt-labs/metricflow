@@ -7,9 +7,6 @@ from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item
 from metricflow_semantics.experimental.ordered_set import MutableOrderedSet
-from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
-    AttributeComputationPath,
-)
 from metricflow_semantics.experimental.semantic_graph.builder.graph_change_rule import (
     SemanticSubgraphGenerator,
     SubgraphGeneratorArgumentSet,
@@ -35,7 +32,6 @@ class MetricSubgraphGenerator(SemanticSubgraphGenerator):
     def __init__(self, argument_set: SubgraphGeneratorArgumentSet) -> None:
         super().__init__(argument_set)
         self._verbose_debug_logs = False
-        
 
     def _generate_subgraph_for_any_metric(
         self, current_graph: SemanticGraph, current_subgraph: MutableSemanticGraph, metric: Metric
@@ -50,7 +46,10 @@ class MetricSubgraphGenerator(SemanticSubgraphGenerator):
 
         for parent_metric_input in parent_metric_inputs:
             parent_metric = self._manifest_object_lookup.get_metric(parent_metric_input.name)
-            self._generate_subgraph_for_any_metric(current_graph, current_subgraph, parent_metric)
+            if parent_metric.type_params.metrics is None:
+                self._generate_subgraph_for_base_metric(current_graph, current_subgraph, parent_metric)
+            else:
+                self._generate_subgraph_for_any_metric(current_graph, current_subgraph, parent_metric)
             current_subgraph.add_edge(
                 MetricDefinitionEdge.get_instance(
                     tail_node=MetricNode(attribute_name=metric.name),
