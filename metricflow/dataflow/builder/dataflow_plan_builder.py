@@ -1047,7 +1047,6 @@ class DataflowPlanBuilder:
         self, parameter_set: FindSourceNodeRecipeParameterSet
     ) -> Optional[SourceNodeRecipe]:
         linkable_spec_set = parameter_set.linkable_spec_set
-        predicate_pushdown_state = parameter_set.predicate_pushdown_state
         measure_spec_properties = parameter_set.measure_spec_properties
 
         candidate_nodes_for_left_side_of_join: List[DataflowPlanNode] = []
@@ -1095,22 +1094,6 @@ class DataflowPlanBuilder:
             semantic_model_lookup=self._semantic_model_lookup,
             node_data_set_resolver=self._node_data_set_resolver,
         )
-
-        if predicate_pushdown_state.has_pushdown_potential and default_join_type is not SqlJoinType.FULL_OUTER:
-            # TODO: encapsulate join type and distinct values state and eventually move this to a DataflowPlanOptimizer
-            # This works today because all of our subsequent join configuration operations preserve the join type
-            # as-is, or else switch it to a CROSS JOIN or INNER JOIN type, both of which are safe for predicate
-            # pushdown. However, there is currently no way to enforce that invariant, so we will need to move
-            # to a model where we evaluate the join nodes themselves and decide on whether or not to push down
-            # the predicate. This will be much more straightforward once we finish encapsulating our existing
-            # time range constraint pushdown controls into this mechanism.
-            candidate_nodes_for_left_side_of_join = list(
-                node_processor.apply_matching_filter_predicates(
-                    source_nodes=candidate_nodes_for_left_side_of_join,
-                    predicate_pushdown_state=predicate_pushdown_state,
-                    metric_time_dimension_reference=self._metric_time_dimension_reference,
-                )
-            )
 
         candidate_nodes_for_right_side_of_join = node_processor.remove_unnecessary_nodes(
             desired_linkable_specs=linkable_specs_to_satisfy_tuple,

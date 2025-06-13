@@ -6,7 +6,6 @@ from typing import FrozenSet, List, Sequence
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 
 from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOptimizer
-from metricflow.dataflow.optimizer.predicate_pushdown_optimizer import PredicatePushdownOptimizer
 from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import SourceScanOptimizer
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
 
@@ -22,12 +21,11 @@ class DataflowPlanOptimization(Enum):
     """
 
     SOURCE_SCAN = 0
-    PREDICATE_PUSHDOWN = 1
 
     @staticmethod
     def all_optimizations() -> FrozenSet[DataflowPlanOptimization]:
         """Convenience method for getting a set of all available optimizations."""
-        return frozenset((DataflowPlanOptimization.SOURCE_SCAN, DataflowPlanOptimization.PREDICATE_PUSHDOWN))
+        return frozenset((DataflowPlanOptimization.SOURCE_SCAN,))
 
     @staticmethod
     def enabled_optimizations() -> FrozenSet[DataflowPlanOptimization]:
@@ -58,8 +56,6 @@ class DataflowPlanOptimizerFactory:
         for optimization in sorted(list(optimizations), key=lambda x: x.value):
             if optimization is DataflowPlanOptimization.SOURCE_SCAN:
                 optimizers.append(SourceScanOptimizer())
-            elif optimization is DataflowPlanOptimization.PREDICATE_PUSHDOWN:
-                optimizers.append(PredicatePushdownOptimizer(self._node_data_set_resolver))
             else:
                 assert_values_exhausted(optimization)
 

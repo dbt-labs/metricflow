@@ -3,10 +3,10 @@ from __future__ import annotations
 import dataclasses
 import logging
 from enum import Enum
-from typing import Dict, FrozenSet, List, Optional, Sequence, Set, Tuple
+from typing import FrozenSet, List, Optional, Sequence, Set, Tuple
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.references import EntityReference, SemanticModelReference, TimeDimensionReference
+from dbt_semantic_interfaces.references import EntityReference, TimeDimensionReference
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
@@ -28,7 +28,6 @@ from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinOnEntitiesNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
-from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
 from metricflow.validation.dataflow_join_validator import JoinDataflowOutputValidator
 
@@ -337,29 +336,6 @@ class PreJoinNodeProcessor:
         self._semantic_model_lookup = semantic_model_lookup
         self._join_evaluator = JoinDataflowOutputValidator(semantic_model_lookup)
 
-    def apply_matching_filter_predicates(
-        self,
-        source_nodes: Sequence[DataflowPlanNode],
-        predicate_pushdown_state: PredicatePushdownState,
-        metric_time_dimension_reference: TimeDimensionReference,
-    ) -> Sequence[DataflowPlanNode]:
-        """Adds filter predicate nodes to the input nodes as appropriate."""
-        if predicate_pushdown_state.has_time_range_constraint_to_push_down:
-            source_nodes = self._add_time_range_constraint(
-                source_nodes=source_nodes,
-                metric_time_dimension_reference=metric_time_dimension_reference,
-                time_range_constraint=predicate_pushdown_state.time_range_constraint,
-            )
-
-        if predicate_pushdown_state.has_where_filters_to_push_down:
-            source_nodes = self._add_where_constraint(
-                source_nodes=source_nodes,
-                where_filter_specs=predicate_pushdown_state.where_filter_specs,
-                enabled_element_types=predicate_pushdown_state.pushdown_eligible_element_types,
-            )
-
-        return source_nodes
-
     def _add_time_range_constraint(
         self,
         source_nodes: Sequence[DataflowPlanNode],
@@ -391,47 +367,6 @@ class PreJoinNodeProcessor:
             else:
                 processed_nodes.append(source_node)
         return processed_nodes
-
-    def _add_where_constraint(
-        self,
-        source_nodes: Sequence[DataflowPlanNode],
-        where_filter_specs: Sequence[WhereFilterSpec],
-        enabled_element_types: FrozenSet[LinkableElementType],
-    ) -> Sequence[DataflowPlanNode]:
-        """Processes where filter specs and evaluates their fitness for pushdown against the provided node set."""
-        eligible_filter_specs_by_model: Dict[SemanticModelReference, Sequence[WhereFilterSpec]] = {}
-        for spec in where_filter_specs:
-            semantic_models = set(element.semantic_model_origin for element in spec.linkable_elements)
-            invalid_element_types = [
-                element for element in spec.linkable_elements if element.element_type not in enabled_element_types
-            ]
-            if len(semantic_models) == 1 and len(invalid_element_types) == 0:
-                model = semantic_models.pop()
-                eligible_filter_specs_by_model[model] = tuple(eligible_filter_specs_by_model.get(model, tuple())) + (
-                    spec,
-                )
-
-        filtered_nodes: List[DataflowPlanNode] = []
-        for source_node in source_nodes:
-            node_semantic_models = tuple(source_node.as_plan().source_semantic_models)
-            if len(node_semantic_models) == 1 and node_semantic_models[0] in eligible_filter_specs_by_model:
-                eligible_filter_specs = eligible_filter_specs_by_model[node_semantic_models[0]]
-                source_node_specs = self._node_data_set_resolver.get_output_data_set(source_node).instance_set.spec_set
-                matching_filter_specs = [
-                    filter_spec
-                    for filter_spec in eligible_filter_specs
-                    if all([spec in source_node_specs.linkable_specs for spec in filter_spec.linkable_specs])
-                ]
-                if len(matching_filter_specs) == 0:
-                    filtered_nodes.append(source_node)
-                else:
-                    filtered_nodes.append(
-                        WhereConstraintNode.create(parent_node=source_node, where_specs=matching_filter_specs)
-                    )
-            else:
-                filtered_nodes.append(source_node)
-
-        return filtered_nodes
 
     def _node_contains_entity(
         self,
