@@ -225,7 +225,6 @@ def where_filter_spec_set() -> WhereFilterSpecSet:  # noqa: D103
             WhereFilterSpec(
                 where_sql="measure is true",
                 bind_parameters=SqlBindParameterSet(),
-                linkable_element_unions=(),
                 linkable_spec_set=LinkableSpecSet(),
             ),
         ),
@@ -233,7 +232,6 @@ def where_filter_spec_set() -> WhereFilterSpecSet:  # noqa: D103
             WhereFilterSpec(
                 where_sql="metric is true",
                 bind_parameters=SqlBindParameterSet(),
-                linkable_element_unions=(),
                 linkable_spec_set=LinkableSpecSet(),
             ),
         ),
@@ -241,7 +239,6 @@ def where_filter_spec_set() -> WhereFilterSpecSet:  # noqa: D103
             WhereFilterSpec(
                 where_sql="query is true",
                 bind_parameters=SqlBindParameterSet(),
-                linkable_element_unions=(),
                 linkable_spec_set=LinkableSpecSet(),
             ),
         ),
@@ -253,19 +250,16 @@ def test_where_filter_spec_set_all_specs(where_filter_spec_set: WhereFilterSpecS
         WhereFilterSpec(
             where_sql="measure is true",
             bind_parameters=SqlBindParameterSet(),
-            linkable_element_unions=(),
             linkable_spec_set=LinkableSpecSet(),
         ),
         WhereFilterSpec(
             where_sql="metric is true",
             bind_parameters=SqlBindParameterSet(),
-            linkable_element_unions=(),
             linkable_spec_set=LinkableSpecSet(),
         ),
         WhereFilterSpec(
             where_sql="query is true",
             bind_parameters=SqlBindParameterSet(),
-            linkable_element_unions=(),
             linkable_spec_set=LinkableSpecSet(),
         ),
     }
@@ -276,13 +270,11 @@ def test_where_filter_spec_set_post_aggregation_specs(where_filter_spec_set: Whe
         WhereFilterSpec(
             where_sql="metric is true",
             bind_parameters=SqlBindParameterSet(),
-            linkable_element_unions=(),
             linkable_spec_set=LinkableSpecSet(),
         ),
         WhereFilterSpec(
             where_sql="query is true",
             bind_parameters=SqlBindParameterSet(),
-            linkable_element_unions=(),
             linkable_spec_set=LinkableSpecSet(),
         ),
     }
@@ -294,7 +286,6 @@ def test_where_filter_spec_set_merge(where_filter_spec_set: WhereFilterSpecSet) 
             WhereFilterSpec(
                 where_sql="measure is true",
                 bind_parameters=SqlBindParameterSet(),
-                linkable_element_unions=(),
                 linkable_spec_set=LinkableSpecSet(),
             ),
         ),
@@ -304,7 +295,6 @@ def test_where_filter_spec_set_merge(where_filter_spec_set: WhereFilterSpecSet) 
             WhereFilterSpec(
                 where_sql="metric is true",
                 bind_parameters=SqlBindParameterSet(),
-                linkable_element_unions=(),
                 linkable_spec_set=LinkableSpecSet(),
             ),
         ),
@@ -315,7 +305,6 @@ def test_where_filter_spec_set_merge(where_filter_spec_set: WhereFilterSpecSet) 
             WhereFilterSpec(
                 where_sql="measure is true",
                 bind_parameters=SqlBindParameterSet(),
-                linkable_element_unions=(),
                 linkable_spec_set=LinkableSpecSet(),
             ),
         ),
@@ -323,7 +312,6 @@ def test_where_filter_spec_set_merge(where_filter_spec_set: WhereFilterSpecSet) 
             WhereFilterSpec(
                 where_sql="metric is true",
                 bind_parameters=SqlBindParameterSet(),
-                linkable_element_unions=(),
                 linkable_spec_set=LinkableSpecSet(),
             ),
         ),
