@@ -13,7 +13,6 @@ import _pytest.fixtures
 import tabulate
 from _pytest.fixtures import FixtureRequest
 
-from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item
 from metricflow_semantics.dag.mf_dag import MetricFlowDag
 from metricflow_semantics.helpers.string_helpers import mf_indent
@@ -22,7 +21,7 @@ from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseLinkableElementSet
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
-from metricflow_semantics.specs.spec_set import InstanceSpecSet
+from metricflow_semantics.specs.spec_set import InstanceSpecSet, group_spec_by_type
 from metricflow_semantics.test_helpers.terminal_helpers import mf_colored_link_text
 
 logger = logging.getLogger(__name__)
@@ -296,6 +295,9 @@ def assert_plan_snapshot_text_equal(
     )
 
 
+LinkableElementSetSnapshotRow = list[Union[str, list[str], None]]
+
+
 def assert_linkable_element_set_snapshot_equal(  # noqa: D103
     request: FixtureRequest,
     snapshot_configuration: SnapshotConfiguration,
@@ -304,18 +306,27 @@ def assert_linkable_element_set_snapshot_equal(  # noqa: D103
     expectation_description: Optional[str] = None,
 ) -> None:
     headers = ("Type", "Dunder Name", "Metric-Subquery Entity-Links", "Properties", "Derived-From Semantic Models")
-    rows: list[AnyLengthTuple[Union[str, list[str]]]] = []
+
+    rows: list[LinkableElementSetSnapshotRow] = []
 
     for annotated_spec in sorted(
         linkable_element_set.annotated_specs,
         key=lambda annotated_spec_in_lambda: annotated_spec_in_lambda.spec.qualified_name,
     ):
-        path_key = annotated_spec.path_key
-        rows.append(
+        row: LinkableElementSetSnapshotRow = [annotated_spec.spec.qualified_name]
+
+        spec_set = group_spec_by_type(annotated_spec.spec)
+
+        # Using loops to simplify handling even though there's only 1 element.
+        assert len(spec_set.all_specs) == 0
+        for group_by_metric_spec in spec_set.group_by_metric_specs:
+            row.append([entity_link.element_name for entity_link in group_by_metric_spec.metric_subquery_entity_links])
+        for spec in spec_set.all_specs:
+            if spec not in spec_set.group_by_metric_specs:
+                row.append(None)
+
+        row.extend(
             (
-                path_key.element_type.name,
-                path_key.dunder_name,
-                [entity_link.element_name for entity_link in path_key.metric_subquery_entity_links],
                 sorted(linkable_element_property.name for linkable_element_property in annotated_spec.properties),
                 sorted(
                     model_reference.semantic_model_name
@@ -323,6 +334,8 @@ def assert_linkable_element_set_snapshot_equal(  # noqa: D103
                 ),
             )
         )
+
+        rows.append(row)
 
     assert_str_snapshot_equal(
         request=request,
