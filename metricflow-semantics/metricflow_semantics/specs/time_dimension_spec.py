@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
+from functools import cached_property
 from typing import Any, List, Mapping, Optional, Sequence, Tuple, Union
 
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
@@ -148,14 +149,15 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
     def dimension_reference(self) -> DimensionReference:  # noqa: D102
         return DimensionReference(element_name=self.element_name)
 
-    @property
-    def qualified_name(self) -> str:  # noqa: D102
+    @override
+    @cached_property
+    def structured_name(self) -> StructuredLinkableSpecName:
         return StructuredLinkableSpecName(
             entity_link_names=tuple(x.element_name for x in self.entity_links),
             element_name=self.element_name,
             time_granularity_name=self.time_granularity_name,
             date_part=self.date_part,
-        ).qualified_name
+        )
 
     @property
     @override
