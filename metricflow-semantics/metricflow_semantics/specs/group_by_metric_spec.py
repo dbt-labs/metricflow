@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import cached_property
 from typing import Any, Optional, Tuple
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
@@ -73,8 +74,9 @@ class GroupByMetricSpec(LinkableInstanceSpec, SerializableDataclass):
             entity_links=self.metric_subquery_entity_links[:-1],
         )
 
-    @property
-    def qualified_name(self) -> str:
+    @override
+    @cached_property
+    def structured_name(self) -> StructuredLinkableSpecName:
         """Element name prefixed with entity links.
 
         If same entity links are used in inner & outer query, use standard qualified name (country__bookings).
@@ -88,7 +90,7 @@ class GroupByMetricSpec(LinkableInstanceSpec, SerializableDataclass):
         return StructuredLinkableSpecName(
             entity_link_names=tuple(entity_link.element_name for entity_link in entity_links),
             element_name=self.element_name,
-        ).qualified_name
+        )
 
     def __eq__(self, other: Any) -> bool:  # type: ignore[misc] # noqa: D105
         if not isinstance(other, GroupByMetricSpec):

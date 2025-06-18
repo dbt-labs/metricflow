@@ -3,10 +3,12 @@ from __future__ import annotations
 import typing
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from functools import cached_property
 from typing import Generic, List, Optional, Sequence, Tuple, TypeVar
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.references import EntityReference, LinkableElementReference
+from typing_extensions import override
 
 from metricflow_semantics.model.semantics.linkable_element import ElementPathKey
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
@@ -46,6 +48,11 @@ class InstanceSpec(SerializableDataclass):
     @property
     def qualified_name(self) -> str:
         """Return the qualified name of this spec. e.g. "user_id__country"."""
+        return self.structured_name.qualified_name
+
+    @property
+    def structured_name(self) -> StructuredLinkableSpecName:
+        """Return the name for this spec in a structured format."""
         raise NotImplementedError()
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:
@@ -126,12 +133,12 @@ class LinkableInstanceSpec(InstanceSpec, ABC):
             result.extend(spec)
         return result
 
-    @property
-    def qualified_name(self) -> str:
-        """Return the qualified name of this spec. e.g. "user_id__country"."""
+    @override
+    @cached_property
+    def structured_name(self) -> StructuredLinkableSpecName:
         return StructuredLinkableSpecName(
             entity_link_names=tuple(x.element_name for x in self.entity_links), element_name=self.element_name
-        ).qualified_name
+        )
 
     @property
     @abstractmethod
