@@ -1,0 +1,28 @@
+test_name: test_list_entities_basic
+test_filename: test_mf_engine.py
+docstring:
+  Test basic listing of all entities.
+---
+[
+  'company',
+  'guest',
+  'host',
+  'listing',
+  'listing',
+  'listing',
+  'listing',
+  'lux_listing',
+  'session',
+  'session_id',
+  'user',
+  'user',
+  'user',
+  'user',
+  'user',
+  'user',
+  'user',
+  'user',
+  'user',
+  'user',
+  'verification',
+]

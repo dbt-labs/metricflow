@@ -1,0 +1,6 @@
+test_name: test_list_dimensions_with_search
+test_filename: test_mf_engine.py
+docstring:
+  Test listing dimensions with search filter.
+---
+['listing__country_latest']
