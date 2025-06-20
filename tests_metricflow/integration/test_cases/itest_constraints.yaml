@@ -7,7 +7,7 @@ integration_test:
   group_bys: ["metric_time", "booking__is_instant"]
   where_filter: '{{ render_dimension_template("booking__is_instant") }}'
   check_query: |
-    SELECT  SUM(booking_value) AS booking_value
+    SELECT SUM(booking_value) AS booking_value
       , is_instant AS booking__is_instant
       , ds AS metric_time__day
     FROM  {{ source_schema }}.fct_bookings
@@ -286,3 +286,15 @@ integration_test:
     ) subq_4
     ON ts = subq_4.metric_time__hour
     WHERE {{ render_time_constraint("ts", "2020-01-01 02:00:00", "2020-01-03 05:59:59") }}
+---
+integration_test:
+  name: test_metric_time_in_dimension_jinja
+  description: Query a metric with metric_time in the Dimension object of the where filter
+  model: SIMPLE_MODEL
+  metrics: ["booking_value"]
+  where_filter: '{{ render_dimension_template("metric_time") }} = {{ cast_to_ts("2020-01-01") }}'
+  check_query: |
+    SELECT
+      SUM(booking_value) AS booking_value
+    FROM {{ source_schema }}.fct_bookings
+    WHERE ds = '2020-01-01'

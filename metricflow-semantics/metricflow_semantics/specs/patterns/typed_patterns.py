@@ -47,6 +47,7 @@ class DimensionPattern(EntityLinkPattern):
                 fields_to_compare=(
                     ParameterSetField.ELEMENT_NAME,
                     ParameterSetField.ENTITY_LINKS,
+                    ParameterSetField.DATE_PART,
                 ),
                 element_name=dimension_call_parameter_set.dimension_reference.element_name,
                 entity_links=dimension_call_parameter_set.entity_path,
