@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime
 import logging
 import string
+from collections.abc import Mapping
 
 import pytest
 from _pytest.fixtures import FixtureRequest
@@ -12,14 +13,15 @@ from dbt_semantic_interfaces.references import EntityReference, MeasureReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.errors.error_classes import UnableToSatisfyQueryError
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
-from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
+from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
+from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
-from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.order_by_spec import OrderBySpec
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
+from metricflow_semantics.specs.spec_set import group_specs_by_type
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.metric_time_dimension import (
@@ -33,6 +35,7 @@ from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from tests_metricflow.dataflow_plan_to_svg import display_graph_if_requested
+from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 
 logger = logging.getLogger(__name__)
 
@@ -1336,27 +1339,30 @@ def test_metric_in_metric_where_filter(
 
 @pytest.mark.slow
 def test_all_available_metric_filters(
-    dataflow_plan_builder: DataflowPlanBuilder, query_parser: MetricFlowQueryParser
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture]
 ) -> None:
     """Checks that all allowed metric filters do not error when used in dataflow plan."""
-    for linkable_metric_tuple in dataflow_plan_builder._metric_lookup.linkable_elements_for_measure(
-        MeasureReference("bookings")
-    ).path_key_to_linkable_metrics.values():
-        for linkable_metric in linkable_metric_tuple:
-            group_by_metric_spec = LinkableElementSet._path_key_to_spec(linkable_metric.path_key)
-            assert isinstance(group_by_metric_spec, GroupByMetricSpec)
-            entity_spec = group_by_metric_spec.metric_subquery_entity_spec
-            query_spec = query_parser.parse_and_validate_query(
-                metric_names=("bookings",),
-                where_constraints=[
-                    PydanticWhereFilter(
-                        where_sql_template=string.Template(
-                            "{{ Metric('$metric_name', ['$entity_name']) }} > 2"
-                        ).substitute(metric_name=linkable_metric.element_name, entity_name=entity_spec.qualified_name),
-                    )
-                ],
-            ).query_spec
-            dataflow_plan_builder.build_plan(query_spec)
+    mf_engine_test_fixture = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST]
+    query_parser = mf_engine_test_fixture.query_parser
+    dataflow_plan_builder = mf_engine_test_fixture.dataflow_plan_builder
+    metric_lookup = mf_engine_test_fixture.semantic_manifest_lookup.metric_lookup
+    bookings_linkable_element_set = metric_lookup.linkable_elements_for_measure(
+        measure_reference=MeasureReference("bookings"),
+        element_filter=LinkableElementFilter(with_any_of=frozenset((LinkableElementProperty.METRIC,))),
+    )
+    for group_by_metric_spec in group_specs_by_type(bookings_linkable_element_set.specs).group_by_metric_specs:
+        entity_spec = group_by_metric_spec.metric_subquery_entity_spec
+        query_spec = query_parser.parse_and_validate_query(
+            metric_names=("bookings",),
+            where_constraints=[
+                PydanticWhereFilter(
+                    where_sql_template=string.Template("{{ Metric('$metric_name', ['$entity_name']) }} > 2").substitute(
+                        metric_name=group_by_metric_spec.element_name, entity_name=entity_spec.qualified_name
+                    ),
+                )
+            ],
+        ).query_spec
+        dataflow_plan_builder.build_plan(query_spec)
 
 
 def test_cumulative_metric_with_non_default_grain(
