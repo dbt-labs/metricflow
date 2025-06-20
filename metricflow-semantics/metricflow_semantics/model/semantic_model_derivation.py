@@ -5,6 +5,8 @@ from typing import Sequence
 
 from dbt_semantic_interfaces.references import SemanticModelReference
 
+from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
+
 
 class SemanticModelDerivation(ABC):
     """Interface for an object that can be described as derived from a semantic model."""
@@ -13,6 +15,8 @@ class SemanticModelDerivation(ABC):
     # For example, when querying `metric_time` without any metrics. To avoid having an `Optional` field to handle those
     # cases, we're trying out a case where we use this reference.
     VIRTUAL_SEMANTIC_MODEL_REFERENCE = SemanticModelReference("__VIRTUAL__")
+    # In place for migration.
+    VIRTUAL_SEMANTIC_MODEL_ID = SemanticModelId(model_name="__VIRTUAL__")
 
     @property
     @abstractmethod
