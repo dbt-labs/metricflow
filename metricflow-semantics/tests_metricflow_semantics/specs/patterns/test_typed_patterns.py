@@ -85,11 +85,6 @@ def test_dimension_pattern(specs: Sequence[LinkableInstanceSpec]) -> None:  # no
             entity_links=(EntityReference("booking"), EntityReference("listing")),
             time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
         ),
-        TimeDimensionSpec(
-            element_name="common_name",
-            entity_links=(EntityReference("booking"), EntityReference("listing")),
-            date_part=DatePart.MONTH,
-        ),
     )
 
 
