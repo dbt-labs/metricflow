@@ -94,6 +94,7 @@ ParseQueryResult(
           spec_pattern=DimensionPattern(
             parameter_set=SpecPatternParameterSet(
               fields_to_compare=(
+                DATE_PART,
                 ELEMENT_NAME,
                 ENTITY_LINKS,
               ),
