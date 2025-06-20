@@ -5,12 +5,11 @@ import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from typing import FrozenSet, List, Optional, Sequence, Tuple
+from typing import FrozenSet, List, Optional, Sequence, Set, Tuple
 
 from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimensionTypeParams
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 from dbt_semantic_interfaces.references import (
-    EntityReference,
     MeasureReference,
     MetricReference,
     SemanticModelElementReference,
@@ -25,6 +24,7 @@ from metricflow_semantics.model.linkable_element_property import LinkableElement
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 from metricflow_semantics.model.semantics.linkable_element import LinkableDimension
+from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
 from metricflow_semantics.model.semantics.semantic_model_helper import SemanticModelHelper
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.protocols.query_parameter import (
@@ -70,6 +70,15 @@ from metricflow.telemetry.reporter import TelemetryReporter, log_call
 logger = logging.getLogger(__name__)
 _telemetry_reporter = TelemetryReporter(report_levels_higher_or_equal_to=TelemetryLevel.USAGE)
 _telemetry_reporter.add_python_log_handler()
+
+SIMPLE_DIMENSIONS_WITHOUT_ANY_PROPERTIES: Set[LinkableElementProperty] = {
+    LinkableElementProperty.ENTITY,
+    LinkableElementProperty.DERIVED_TIME_GRANULARITY,
+    LinkableElementProperty.DATE_PART,
+    LinkableElementProperty.LOCAL_LINKED,
+    LinkableElementProperty.METRIC,
+}
+ENTITY_WITH_ANY_PROPERTIES: Set[LinkableElementProperty] = {LinkableElementProperty.ENTITY}
 
 
 @dataclass(frozen=True)
@@ -221,6 +230,7 @@ class MetricFlowExplainResult:
         return self.convert_to_execution_plan_result.execution_plan
 
 
+# TODO: delete abstract class
 class AbstractMetricFlowEngine(ABC):
     """Query interface for clients."""
 
@@ -631,74 +641,73 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             items = items[page_num * page_size : (page_num + 1) * page_size]
         return items
 
+    def _build_metric_time_from_linkable_dimension(self, linkable_dimension: LinkableDimension) -> Dimension:
+        metric_time_name = DataSet.metric_time_dimension_name()
+        assert linkable_dimension.element_name == metric_time_name, (
+            f"{linkable_dimension} has the {LinkableElementProperty.METRIC_TIME}, but the name does not" f"match."
+        )
+
+        return Dimension(
+            name=metric_time_name,
+            qualified_name=StructuredLinkableSpecName(
+                element_name=metric_time_name,
+                entity_link_names=tuple(
+                    entity_reference.element_name for entity_reference in linkable_dimension.entity_links
+                ),
+                time_granularity_name=(
+                    linkable_dimension.time_granularity.name
+                    if linkable_dimension.time_granularity is not None
+                    else None
+                ),
+            ).qualified_name,
+            entity_links=(),
+            description="Event time for metrics.",
+            metadata=None,
+            type_params=PydanticDimensionTypeParams(
+                time_granularity=(
+                    linkable_dimension.time_granularity.base_granularity
+                    if linkable_dimension.time_granularity is not None
+                    else None
+                ),
+                validity_params=None,
+            ),
+            is_partition=False,
+            type=DimensionType.TIME,
+        )
+
     def simple_dimensions_for_metrics(  # noqa: D102
         self,
         metric_names: List[str],
-        without_any_property: Sequence[LinkableElementProperty] = (
-            LinkableElementProperty.ENTITY,
-            LinkableElementProperty.DERIVED_TIME_GRANULARITY,
-            LinkableElementProperty.DATE_PART,
-            LinkableElementProperty.LOCAL_LINKED,
-        ),
+        without_any_property: Sequence[LinkableElementProperty] = tuple(SIMPLE_DIMENSIONS_WITHOUT_ANY_PROPERTIES),
         search_str: Optional[str] = None,
         sort: bool = False,
         page_num: int = 1,
         page_size: Optional[int] = None,
     ) -> List[Dimension]:
-        path_key_to_linkable_dimensions = (
-            self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_metrics(
-                metric_references=tuple(MetricReference(element_name=mname) for mname in metric_names),
-                element_set_filter=LinkableElementFilter(
-                    without_any_of=frozenset(without_any_property),
-                ),
-            )
-        ).path_key_to_linkable_dimensions
+        linkable_element_set = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_metrics(
+            metric_references=tuple(MetricReference(element_name=mname) for mname in metric_names),
+            element_set_filter=LinkableElementFilter(
+                without_any_of=frozenset(without_any_property),
+            ),
+        )
+        dimensions = self._filter_linkable_dimensions(linkable_element_set=linkable_element_set, search_str=search_str)
 
+        return self._sort_and_paginate_metadata(
+            items=dimensions,
+            sort_by_attr="qualified_name",
+            sort=sort,
+            page_num=page_num,
+            page_size=page_size,
+        )
+
+    def _filter_linkable_dimensions(
+        self, linkable_element_set: LinkableElementSet, search_str: Optional[str] = None
+    ) -> List[Dimension]:
         dimensions: List[Dimension] = []
-        linkable_dimensions_tuple: Tuple[LinkableDimension, ...]
-        for (
-            path_key,
-            linkable_dimensions_tuple,
-        ) in path_key_to_linkable_dimensions.items():
+        for path_key, linkable_dimensions_tuple in linkable_element_set.path_key_to_linkable_dimensions.items():
             for linkable_dimension in linkable_dimensions_tuple:
-                # Simple dimensions shouldn't show date part items.
-                if linkable_dimension.date_part is not None:
-                    continue
-
                 if LinkableElementProperty.METRIC_TIME in linkable_dimension.properties:
-                    metric_time_name = DataSet.metric_time_dimension_name()
-                    assert linkable_dimension.element_name == metric_time_name, (
-                        f"{linkable_dimension} has the {LinkableElementProperty.METRIC_TIME}, but the name does not"
-                        f"match."
-                    )
-
-                    dimension = Dimension(
-                        name=metric_time_name,
-                        qualified_name=StructuredLinkableSpecName(
-                            element_name=metric_time_name,
-                            entity_link_names=tuple(
-                                entity_reference.element_name for entity_reference in linkable_dimension.entity_links
-                            ),
-                            time_granularity_name=(
-                                linkable_dimension.time_granularity.name
-                                if linkable_dimension.time_granularity is not None
-                                else None
-                            ),
-                        ).qualified_name,
-                        entity_links=(),
-                        description="Event time for metrics.",
-                        metadata=None,
-                        type_params=PydanticDimensionTypeParams(
-                            time_granularity=(
-                                linkable_dimension.time_granularity.base_granularity
-                                if linkable_dimension.time_granularity is not None
-                                else None
-                            ),
-                            validity_params=None,
-                        ),
-                        is_partition=False,
-                        type=DimensionType.TIME,
-                    )
+                    dimension = self._build_metric_time_from_linkable_dimension(linkable_dimension)
                 else:
                     assert (
                         linkable_dimension.defined_in_semantic_model
@@ -717,13 +726,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 if not search_str or search_str in dimension.qualified_name:
                     dimensions.append(dimension)
 
-        return self._sort_and_paginate_metadata(
-            items=dimensions,
-            sort_by_attr="qualified_name",
-            sort=sort,
-            page_num=page_num,
-            page_size=page_size,
-        )
+        return dimensions
 
     def list_dimensions(
         self,
@@ -758,61 +761,57 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def list_entities(  # noqa: D102
         self,
-        metric_names: List[str] = [],
+        metric_names: Optional[List[str]] = None,
         search_str: Optional[str] = None,
         sort: bool = False,
         page_num: int = 1,
         page_size: Optional[int] = None,
     ) -> List[Entity]:
-        semantic_model_lookup = self._semantic_manifest_lookup.semantic_model_lookup
         entities: List[Entity] = []
         if metric_names:
             entities = self.entities_for_metrics(metric_names=metric_names, search_str=search_str)
         else:
+            semantic_model_lookup = self._semantic_manifest_lookup.semantic_model_lookup
             for entity_reference, semantic_models in semantic_model_lookup.entity_index.items():
                 for semantic_model in semantic_models:
-                    element_ref = SemanticModelElementReference(
-                        semantic_model_name=semantic_model.name, element_name=entity_reference.element_name
+                    entity = self._get_entity(
+                        semantic_model_name=semantic_model.name, entity_name=entity_reference.element_name
                     )
-                    entity = semantic_model_lookup.get_entity_in_semantic_model(element_ref)
+                    # TODO: add search_attr on element
                     if entity and (not search_str or search_str in entity.name):
-                        entities.append(
-                            Entity.from_pydantic(pydantic_entity=entity, semantic_model_name=semantic_model.name)
-                        )
+                        entities.append(entity)
 
         return self._sort_and_paginate_metadata(items=entities, sort=sort, page_num=page_num, page_size=page_size)
+
+    def _get_entity(self, semantic_model_name: str, entity_name: str) -> Optional[Entity]:
+        semantic_model_lookup = self._semantic_manifest_lookup.semantic_model_lookup
+        element_ref = SemanticModelElementReference(semantic_model_name=semantic_model_name, element_name=entity_name)
+        entity = semantic_model_lookup.get_entity_in_semantic_model(element_ref)
+        return Entity.from_pydantic(entity, semantic_model_name=semantic_model_name) if entity else None
 
     def entities_for_metrics(  # noqa: D102
         self, metric_names: List[str], search_str: Optional[str] = None
     ) -> List[Entity]:
-        path_key_to_linkable_entities = (
-            self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_metrics(
-                metric_references=tuple(MetricReference(element_name=mname) for mname in metric_names),
-                element_set_filter=LinkableElementFilter(
-                    with_any_of=frozenset(
-                        {
-                            LinkableElementProperty.ENTITY,
-                        }
-                    ),
-                ),
-            )
-        ).path_key_to_linkable_entities
+        linkable_element_set = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_metrics(
+            metric_references=tuple(MetricReference(element_name=mname) for mname in metric_names),
+            element_set_filter=LinkableElementFilter(
+                with_any_of=frozenset(ENTITY_WITH_ANY_PROPERTIES),
+            ),
+        )
 
+        return self._filter_linkable_entities(linkable_element_set=linkable_element_set, search_str=search_str)
+
+    def _filter_linkable_entities(
+        self, linkable_element_set: LinkableElementSet, search_str: Optional[str] = None
+    ) -> Entity:
         entities: List[Entity] = []
-        for linkable_entity_tuple in path_key_to_linkable_entities.values():
+        for linkable_entity_tuple in linkable_element_set.path_key_to_linkable_entities.values():
             for linkable_entity in linkable_entity_tuple:
-                semantic_model = self._semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
-                    linkable_entity.defined_in_semantic_model
+                entity = self._get_entity(
+                    semantic_model_name=linkable_entity.defined_in_semantic_model.semantic_model_name,
+                    entity_name=linkable_entity.element_name,
                 )
-                assert semantic_model
-                entity = Entity.from_pydantic(
-                    pydantic_entity=SemanticModelHelper.get_entity_from_semantic_model(
-                        semantic_model=semantic_model,
-                        entity_reference=EntityReference(element_name=linkable_entity.element_name),
-                    ),
-                    semantic_model_name=semantic_model.name,
-                )
-                if not search_str or search_str in entity.name:
+                if entity and (not search_str or search_str in entity.name):
                     entities.append(entity)
 
         return entities
@@ -902,3 +901,30 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 query_type=MetricFlowQueryType.DIMENSION_VALUES,
             )
         )
+
+    def list_group_bys(  # noqa: D102
+        self,
+        metric_names: Optional[List[str]] = None,
+        search_str: Optional[str] = None,
+        sort: bool = False,
+        page_num: int = 1,
+        page_size: Optional[int] = None,
+    ) -> List[Entity | Dimension]:
+        # TODO: this calls list_elements_for_metrics twice. Dedupe that logic.
+        group_bys: List[Entity | Dimension] = self.list_entities(metric_names=metric_names, search_str=search_str) + (
+            self.simple_dimensions_for_metrics(metric_names=metric_names, search_str=search_str)
+            if metric_names
+            else self.list_dimensions(search_str=search_str)
+        )
+        if metric_names:
+            linkable_element_set = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_metrics(
+                metric_references=tuple(MetricReference(element_name=mname) for mname in metric_names),
+                element_set_filter=LinkableElementFilter(
+                    without_any_of=frozenset(SIMPLE_DIMENSIONS_WITHOUT_ANY_PROPERTIES - ENTITY_WITH_ANY_PROPERTIES),
+                ),
+            )
+            group_bys: Sequence[Entity | Dimension] = self._filter_linkable_entities(
+                linkable_element_set=linkable_element_set, search_str=search_str
+            ) + self._filter_linkable_dimensions(linkable_element_set=linkable_element_set, search_str=search_str)
+
+        return self._sort_and_paginate_metadata(items=group_bys, sort=sort, page_num=page_num, page_size=page_size)
