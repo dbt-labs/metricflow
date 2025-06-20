@@ -141,6 +141,7 @@ class Entity:
     """Dataclass representation of a Entity."""
 
     name: str
+    semantic_model_name: str
     description: Optional[str]
     type: EntityType
     role: Optional[str]
@@ -148,7 +149,7 @@ class Entity:
     expr: Optional[str] = None
 
     @classmethod
-    def from_pydantic(cls, pydantic_entity: SemanticManifestEntity) -> Entity:
+    def from_pydantic(cls, pydantic_entity: SemanticManifestEntity, semantic_model_name: str) -> Entity:
         """Build from pydantic Entity."""
         return cls(
             name=pydantic_entity.name,
@@ -157,6 +158,7 @@ class Entity:
             role=pydantic_entity.role,
             config=pydantic_entity.config,
             expr=pydantic_entity.expr,
+            semantic_model_name=semantic_model_name,
         )
 
 
