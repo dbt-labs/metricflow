@@ -1,0 +1,92 @@
+test_name: test_list_saved_queries_with_pagination
+test_filename: test_mf_engine.py
+docstring:
+  Test listing saved_queries with pagination.
+---
+MetadataResultPage(
+  items=[
+    SavedQuery(
+      name='saved_query_with_cumulative_metric',
+      description=('Saved query that includes a cumulative metric. Added as cumulative metrics have a branch in '
+       'the CLI for\n'
+       'adjusting the time constraint.\n'),
+      query_params=PydanticSavedQueryQueryParams(
+        metrics=['trailing_2_months_revenue'],
+        group_by=["TimeDimension('metric_time', 'day')"],
+      ),
+      metadata=PydanticMetadata(
+        repo_file_path='/Users/courtneyholcomb/metricflow/metricflow-semantics/metricflow_semantics/test_helpers/semantic_manifest_yamls/simple_manifest/saved_queries.yaml',
+        file_slice=PydanticFileSlice(
+          filename='saved_queries.yaml',
+          content=('name: saved_query_with_cumulative_metric\n'
+           'description: |\n'
+           '  Saved query that includes a cumulative metric. Added as cumulative '
+           'metrics have a branch in the CLI for\n'
+           '  adjusting the time constraint.\n'
+           'query_params:\n'
+           '  metrics:\n'
+           '  - trailing_2_months_revenue\n'
+           '  group_by:\n'
+           "  - TimeDimension('metric_time', 'day')\n"),
+          start_line_number=16,
+          end_line_number=24,
+        ),
+      ),
+    ),
+    SavedQuery(
+      name='saved_query_with_metric_joins_and_filter',
+      description=('Saved query that includes multiple metrics from different input sources requiring a metric '
+       'join and\n'
+       'a query-level filter on a mix of categorical and time dimension filters.\n'
+       'Note this will not run on Trino due to the invalid filter construction - Trino will not cast '
+       'string literals\n'
+       'to timestamp types the way other engines do.\n'),
+      query_params=PydanticSavedQueryQueryParams(
+        metrics=['bookings', 'views', 'bookings_per_view'],
+        group_by=["Dimension('listing__capacity_latest')"],
+        where=PydanticWhereFilterIntersection(
+          where_filters=[
+            PydanticWhereFilter(
+              where_sql_template="{{ Dimension('listing__is_lux_latest') }}",
+            ),
+            PydanticWhereFilter(
+              where_sql_template=("{{ TimeDimension('metric_time', 'day') }} >= "
+               "'2020-01-02'"),
+            ),
+          ],
+        ),
+      ),
+      metadata=PydanticMetadata(
+        repo_file_path='/Users/courtneyholcomb/metricflow/metricflow-semantics/metricflow_semantics/test_helpers/semantic_manifest_yamls/simple_manifest/saved_queries.yaml',
+        file_slice=PydanticFileSlice(
+          filename='saved_queries.yaml',
+          content=('name: saved_query_with_metric_joins_and_filter\n'
+           'description: |\n'
+           '  Saved query that includes multiple metrics from different input '
+           'sources requiring a metric join and\n'
+           '  a query-level filter on a mix of categorical and time dimension '
+           'filters.\n'
+           '  Note this will not run on Trino due to the invalid filter construction '
+           '- Trino will not cast string literals\n'
+           '  to timestamp types the way other engines do.\n'
+           'query_params:\n'
+           '  metrics:\n'
+           '  - bookings\n'
+           '  - views\n'
+           '  - bookings_per_view\n'
+           '  group_by:\n'
+           "  - Dimension('listing__capacity_latest')\n"
+           '  where:\n'
+           '  - "{{ Dimension(\'listing__is_lux_latest\') }}"\n'
+           '  - "{{ TimeDimension(\'metric_time\', \'day\') }} >= \'2020-01-02\'"\n'),
+          start_line_number=27,
+          end_line_number=42,
+        ),
+      ),
+    ),
+  ],
+  page_num=2,
+  page_size=2,
+  total_pages=2,
+  total_items=4,
+)

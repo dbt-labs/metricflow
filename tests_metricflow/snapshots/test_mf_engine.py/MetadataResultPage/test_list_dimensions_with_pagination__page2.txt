@@ -1,0 +1,52 @@
+test_name: test_list_dimensions_with_pagination
+test_filename: test_mf_engine.py
+docstring:
+  Test listing dimensions with sorting and pagination.
+---
+MetadataResultPage(
+  items=[
+    Dimension(
+      name='ds_month',
+      qualified_name='account__ds_month',
+      type=TIME,
+      entity_links=(EntityReference(element_name='account'),),
+      type_params=PydanticDimensionTypeParams(time_granularity=MONTH),
+      metadata=PydanticMetadata(
+        repo_file_path='/Users/courtneyholcomb/metricflow/metricflow-semantics/metricflow_semantics/test_helpers/semantic_manifest_yamls/simple_manifest/semantic_models/accounts_source.yaml',
+        file_slice=PydanticFileSlice(
+          filename='accounts_source.yaml',
+          content=('name: ds_month\n'
+           'type: time\n'
+           'expr: ds_month\n'
+           'type_params:\n'
+           '  time_granularity: month\n'),
+          start_line_number=47,
+          end_line_number=51,
+        ),
+      ),
+      is_partition=False,
+      expr='ds_month',
+    ),
+    Dimension(
+      name='ds',
+      qualified_name='booking__ds',
+      type=TIME,
+      entity_links=(EntityReference(element_name='booking'),),
+      type_params=PydanticDimensionTypeParams(time_granularity=DAY),
+      metadata=PydanticMetadata(
+        repo_file_path='/Users/courtneyholcomb/metricflow/metricflow-semantics/metricflow_semantics/test_helpers/semantic_manifest_yamls/simple_manifest/semantic_models/bookings_source.yaml',
+        file_slice=PydanticFileSlice(
+          filename='bookings_source.yaml',
+          content='name: ds\ntype: time\ntype_params:\n  time_granularity: day\n',
+          start_line_number=73,
+          end_line_number=76,
+        ),
+      ),
+      is_partition=False,
+    ),
+  ],
+  page_num=2,
+  page_size=2,
+  total_pages=17,
+  total_items=33,
+)
