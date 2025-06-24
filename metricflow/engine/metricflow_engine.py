@@ -12,22 +12,26 @@ from dbt_semantic_interfaces.implementations.elements.dimension import PydanticD
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.references import (
+    DimensionReference,
     EntityReference,
     MeasureReference,
     MetricReference,
     SemanticModelElementReference,
 )
 from dbt_semantic_interfaces.type_enums import DimensionType
+from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
 from metricflow_semantics.errors.error_classes import ExecutionException, InvalidQueryException
+from metricflow_semantics.experimental.metricflow_exception import MetricflowInternalError
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.runtime import log_block_runtime
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
-from metricflow_semantics.model.semantics.linkable_element import LinkableDimension
-from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
+from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
+from metricflow_semantics.model.semantics.linkable_element_set_base import AnnotatedSpec, BaseLinkableElementSet
 from metricflow_semantics.model.semantics.semantic_model_helper import SemanticModelHelper
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.protocols.query_parameter import (
@@ -43,6 +47,7 @@ from metricflow_semantics.specs.query_param_implementations import SavedQueryPar
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.sql.sql_table import SqlTable
+from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.time.time_source import TimeSource
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
 from typing_extensions import TypeVar
@@ -636,34 +641,21 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 )
         return list(measures)
 
-    def _build_metric_time_from_linkable_dimension(self, linkable_dimension: LinkableDimension) -> Dimension:
+    def _build_metric_time_dimension(self, time_grain: Optional[ExpandedTimeGranularity]) -> Dimension:
         metric_time_name = DataSet.metric_time_dimension_name()
-        assert linkable_dimension.element_name == metric_time_name, (
-            f"{linkable_dimension} has the {LinkableElementProperty.METRIC_TIME}, but the name does not" f"match."
-        )
 
         return Dimension(
             name=metric_time_name,
             qualified_name=StructuredLinkableSpecName(
                 element_name=metric_time_name,
-                entity_link_names=tuple(
-                    entity_reference.element_name for entity_reference in linkable_dimension.entity_links
-                ),
-                time_granularity_name=(
-                    linkable_dimension.time_granularity.name
-                    if linkable_dimension.time_granularity is not None
-                    else None
-                ),
+                entity_link_names=(),
+                time_granularity_name=(time_grain.name if time_grain is not None else None),
             ).qualified_name,
             entity_links=(),
             description="Event time for metrics.",
             metadata=None,
             type_params=PydanticDimensionTypeParams(
-                time_granularity=(
-                    linkable_dimension.time_granularity.base_granularity
-                    if linkable_dimension.time_granularity is not None
-                    else None
-                ),
+                time_granularity=(time_grain.base_granularity if time_grain is not None else None),
                 validity_params=None,
             ),
             is_partition=False,
@@ -684,31 +676,58 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         )
         return self._filter_linkable_dimensions(linkable_element_set=linkable_element_set)
 
-    def _filter_linkable_dimensions(self, linkable_element_set: LinkableElementSet) -> List[Dimension]:
+    def _filter_linkable_dimensions(self, linkable_element_set: BaseLinkableElementSet) -> List[Dimension]:
         dimensions: List[Dimension] = []
-        for path_key, linkable_dimensions_tuple in linkable_element_set.path_key_to_linkable_dimensions.items():
-            for linkable_dimension in linkable_dimensions_tuple:
-                if LinkableElementProperty.METRIC_TIME in linkable_dimension.properties:
-                    dimension = self._build_metric_time_from_linkable_dimension(linkable_dimension)
+
+        for annotated_spec in linkable_element_set.annotated_specs:
+            properties = annotated_spec.properties
+            element_type = annotated_spec.element_type
+            if element_type is LinkableElementType.TIME_DIMENSION:
+                # Simple dimensions shouldn't show date part items.
+                if LinkableElementProperty.DATE_PART in properties:
+                    continue
+                if LinkableElementProperty.METRIC_TIME in properties:
+                    dimensions.append(self._build_metric_time_dimension(time_grain=annotated_spec.time_grain))
                 else:
-                    assert (
-                        linkable_dimension.defined_in_semantic_model
-                    ), "Only metric_time can have no semantic_model_origin."
-                    semantic_model = self._semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
-                        linkable_dimension.defined_in_semantic_model
-                    )
-                    assert semantic_model
-                    dimension = Dimension.from_pydantic(
-                        pydantic_dimension=SemanticModelHelper.get_dimension_from_semantic_model(
-                            semantic_model=semantic_model,
-                            dimension_reference=linkable_dimension.reference,
-                        ),
-                        entity_links=path_key.entity_links,
-                        semantic_model_reference=linkable_dimension.defined_in_semantic_model,
-                    )
-                dimensions.append(dimension)
+                    dimensions.extend(self._create_dimension_from_spec(annotated_spec))
+            elif element_type is LinkableElementType.DIMENSION:
+                dimensions.extend(self._create_dimension_from_spec(annotated_spec))
+            elif element_type is LinkableElementType.ENTITY or element_type is LinkableElementType.METRIC:
+                pass
+            else:
+                assert_values_exhausted(element_type)
 
         return sorted(set(dimensions), key=lambda x: x.default_search_and_sort_attribute)
+
+    def _create_dimension_from_spec(self, annotated_spec: AnnotatedSpec) -> Sequence[Dimension]:
+        dimensions: list[Dimension] = []
+        for origin_semantic_model_reference in annotated_spec.origin_semantic_model_references:
+            assert (
+                origin_semantic_model_reference != SemanticModelDerivation.VIRTUAL_SEMANTIC_MODEL_REFERENCE
+            ), "Only metric_time can a virtual model ID."
+            semantic_model = self._semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
+                origin_semantic_model_reference
+            )
+            if semantic_model is None:
+                raise MetricflowInternalError(
+                    LazyFormat(
+                        "Unable to find the semantic model associated with a spec",
+                        spec=annotated_spec.spec,
+                        origin_semantic_model_reference=origin_semantic_model_reference,
+                    )
+                )
+
+            dimensions.append(
+                Dimension.from_pydantic(
+                    pydantic_dimension=SemanticModelHelper.get_dimension_from_semantic_model(
+                        semantic_model=semantic_model,
+                        dimension_reference=DimensionReference(annotated_spec.element_name),
+                    ),
+                    entity_links=annotated_spec.spec.entity_links,
+                    semantic_model_reference=origin_semantic_model_reference,
+                )
+            )
+        return dimensions
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def list_dimensions(
@@ -761,14 +780,22 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         entities = self._filter_linkable_entities(linkable_element_set=linkable_element_set)
         return sorted(set(entities), key=lambda x: x.default_search_and_sort_attribute)
 
-    def _filter_linkable_entities(self, linkable_element_set: LinkableElementSet) -> List[Entity]:
+    def _filter_linkable_entities(self, linkable_element_set: BaseLinkableElementSet) -> List[Entity]:
         entities: List[Entity] = []
-        for linkable_entity_tuple in linkable_element_set.path_key_to_linkable_entities.values():
-            for linkable_entity in linkable_entity_tuple:
+
+        for annotated_spec in linkable_element_set.annotated_specs:
+            element_type = annotated_spec.element_type
+            if element_type is LinkableElementType.ENTITY:
+                semantic_model = self._semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
+                    mf_first_item(annotated_spec.origin_model_ids).semantic_model_reference
+                )
+                assert semantic_model
                 pydantic_entity = self._semantic_manifest_lookup.semantic_model_lookup.get_entity_in_semantic_model(
                     SemanticModelElementReference(
-                        semantic_model_name=linkable_entity.defined_in_semantic_model.semantic_model_name,
-                        element_name=linkable_entity.element_name,
+                        semantic_model_name=mf_first_item(
+                            annotated_spec.origin_semantic_model_references
+                        ).semantic_model_name,
+                        element_name=annotated_spec.spec.element_name,
                     )
                 )
                 if pydantic_entity:
@@ -776,7 +803,14 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                     # Dedupe. Duplicates currently show up because of local linked entities.
                     if entity not in entities:
                         entities.append(entity)
-
+            elif (
+                element_type is LinkableElementType.DIMENSION
+                or element_type is LinkableElementType.METRIC
+                or element_type is LinkableElementType.TIME_DIMENSION
+            ):
+                pass
+            else:
+                assert_values_exhausted(element_type)
         return entities
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
