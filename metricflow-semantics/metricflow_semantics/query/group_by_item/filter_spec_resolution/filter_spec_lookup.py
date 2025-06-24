@@ -16,7 +16,6 @@ from typing_extensions import override
 from metricflow_semantics.collection_helpers.merger import Mergeable
 from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
-from metricflow_semantics.model.semantics.linkable_element import LinkableElement
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseLinkableElementSet
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow_semantics.query.group_by_item.path_prefixable import PathPrefixable
@@ -101,17 +100,6 @@ class FilterSpecResolutionLookUp(Mergeable):
             resolved_spec is not None
         ), f"Typechecker hint. Expected a resolution with a resolved spec, but got:\n{mf_pformat(resolution)}"
         return resolved_spec
-
-    def checked_resolved_linkable_elements(
-        self, resolved_spec_lookup_key: ResolvedSpecLookUpKey
-    ) -> Sequence[LinkableElement]:
-        """Returns the sequence of LinkableElements for the given spec lookup key.
-
-        These are the LinkableElements bound to the singular spec/path_key for a given resolved filter item. They are
-        useful for propagating metadata about the origin semantic model across the boundary between the filter resolver
-        and the DataflowPlanBuilder.
-        """
-        return self._checked_resolution(resolved_spec_lookup_key=resolved_spec_lookup_key).resolved_linkable_elements
 
     @override
     def merge(self, other: FilterSpecResolutionLookUp) -> FilterSpecResolutionLookUp:
@@ -211,15 +199,6 @@ class FilterSpecResolution:
             raise ValueError(
                 f"Found {len(specs)} in {self.resolved_linkable_element_set}, this should not be possible!"
             )
-
-    @property
-    def resolved_linkable_elements(self) -> Sequence[LinkableElement]:
-        """Returns the resolved linkable elements, if any, for this resolution result."""
-        resolved_spec = self.resolved_spec
-        if resolved_spec is None:
-            return ()
-
-        return self.resolved_linkable_element_set.linkable_elements
 
 
 CallParameterSet = Union[
