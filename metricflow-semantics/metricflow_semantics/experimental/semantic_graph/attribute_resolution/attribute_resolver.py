@@ -45,6 +45,7 @@ from metricflow_semantics.experimental.semantic_graph.semantic_graph import Sema
 from metricflow_semantics.experimental.singleton_decorator import singleton_dataclass
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
+from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
 from metricflow_semantics.model.semantics.linkable_element import (
     LinkableElementType,
 )
@@ -105,7 +106,7 @@ class AttributeResolver:
                 attribute_descriptors.append(attribute_descriptor)
 
         return AttributeDescriptorResult(
-            additional_derivative_model_ids=subgraph_generator_result.additional_derivative_model_ids,
+            measure_model_ids=subgraph_generator_result.additional_derivative_model_ids,
             attribute_descriptors=tuple(attribute_descriptors),
         )
 
@@ -146,7 +147,7 @@ class AttributeResolver:
                 EntityReference(element_name=element_name) for element_name in descriptor.dundered_name_elements[:-1]
             )
             default_element_name = dundered_name_elements[-1]
-            model_ids = descriptor_result.additional_derivative_model_ids.union(descriptor.model_ids)
+            model_ids = descriptor_result.measure_model_ids.union(descriptor.model_ids)
             derived_from_semantic_models = FrozenOrderedSet(
                 SemanticModelReference(semantic_model_name=model_id.model_name) for model_id in model_ids
             )
@@ -168,6 +169,7 @@ class AttributeResolver:
                             entity_links=default_entity_links,
                         ),
                         properties=properties,
+                        origin_model=descriptor.last_model_id,
                         derived_from_semantic_models=derived_from_semantic_models,
                     )
                 )
@@ -190,6 +192,7 @@ class AttributeResolver:
                             date_part=mf_first_item(descriptor.date_parts) if len(descriptor.date_parts) > 0 else None,
                         ),
                         properties=properties,
+                        origin_model=descriptor.last_model_id,
                         derived_from_semantic_models=derived_from_semantic_models,
                     )
                 )
@@ -202,6 +205,7 @@ class AttributeResolver:
                             entity_links=default_entity_links,
                         ),
                         properties=properties,
+                        origin_model=descriptor.last_model_id,
                         derived_from_semantic_models=derived_from_semantic_models,
                     )
                 )
@@ -237,6 +241,9 @@ class AttributeResolver:
                         ),
                     ),
                     properties=properties,
+                    origin_model=SemanticModelId(
+                        model_name=SemanticModelDerivation.VIRTUAL_SEMANTIC_MODEL_REFERENCE.semantic_model_name
+                    ),
                     derived_from_semantic_models=derived_from_semantic_models,
                 )
             )
@@ -264,5 +271,5 @@ class AttributeResolverCache(MetricflowCache):
 
 @fast_frozen_dataclass()
 class AttributeDescriptorResult:
-    additional_derivative_model_ids: FrozenOrderedSet[SemanticModelId]
+    measure_model_ids: FrozenOrderedSet[SemanticModelId]
     attribute_descriptors: AnyLengthTuple[AttributeDescriptor]
