@@ -9,7 +9,6 @@ from typing import ClassVar, DefaultDict, Iterable, Optional
 
 from metricflow_semantics.collection_helpers.syntactic_sugar import (
     mf_ensure_mapping,
-    mf_first_non_none,
     mf_group_by,
 )
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
@@ -27,6 +26,10 @@ from metricflow_semantics.experimental.mf_graph.mf_graph import (
     MetricflowGraphNode,
 )
 from metricflow_semantics.helpers.string_helpers import mf_indent
+from metricflow_semantics.mf_logging.pretty_formatter import PrettyFormatOption
+from metricflow_semantics.mf_logging.pretty_print import mf_pformat
+from typing_extensions import override
+
 from tests_metricflow_semantics.experimental.mf_graph.formatting.graphviz_html import (
     GraphvizHtmlAlignment,
     GraphvizHtmlText,
@@ -41,7 +44,6 @@ from tests_metricflow_semantics.experimental.mf_graph.formatting.mf_to_dot impor
     DotGraphConversionResult,
     MetricflowGraphToDotConverter,
 )
-from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 
@@ -82,6 +84,7 @@ class GraphicalDotConversionArgumentSet(DotConversionArgumentSet):
         "fillcolor": DotColor.EXTRA_DIM_GRAY.value,
         "fontname": "Courier New",
         "shape": "box",
+        "fontsize": "14",
     }
 
     # Default attributes for DOT edges.
@@ -126,7 +129,7 @@ class GraphicalDotConversionArgumentSet(DotConversionArgumentSet):
         node_attributes: Optional[Mapping[str, str]] = DEFAULT_NODE_ATTRIBUTES,
         edge_attributes: Optional[Mapping[str, str]] = DEFAULT_EDGE_ATTRIBUTES,
         default_edge_as_node_attributes: Optional[Mapping[str, str]] = DEFAULT_EDGE_AS_NODE_ATTRIBUTES,
-        include_edge_ends_as_properties: bool = False,
+        include_edge_ends_as_properties: bool = True,
         display_properties_line_wrap_limit: int = 40,
     ) -> GraphicalDotConversionArgumentSet:
         return GraphicalDotConversionArgumentSet(
@@ -251,14 +254,23 @@ class MetricflowGraphToGraphicalDotConverter(MetricflowGraphConverter[DotGraphCo
         """
         table_builder = GraphvizHtmlTableBuilder(table_border=0)
 
+        node_name = node.node_descriptor.node_name
         with table_builder.new_row_builder() as row_builder:
             row_builder.add_column(
-                GraphvizHtmlText(node.node_descriptor.node_name, style=GraphvizHtmlTextStyle.TITLE),
+                GraphvizHtmlText(node_name, style=GraphvizHtmlTextStyle.TITLE),
                 alignment=GraphvizHtmlAlignment.CENTER,
                 cell_padding=4,
             )
 
-        self._add_displayed_properties_to_label_table(table_builder, node.displayed_properties)
+        node_displayed_properties = node.displayed_properties
+        if len(node_displayed_properties) > 0:
+            # max_key_length = max(len(displayed_property.key) for displayed_property in node_displayed_properties)
+            self._add_displayed_properties_to_label_table(
+                table_builder,
+                node_displayed_properties,
+                # TODO: Tweak this for better appearance.
+                line_wrap_width=len(node_name) * 2,
+            )
 
         result = table_builder.build()
         return result
@@ -275,12 +287,26 @@ class MetricflowGraphToGraphicalDotConverter(MetricflowGraphConverter[DotGraphCo
         displayed_properties: Iterable[DisplayedProperty],
         line_wrap_width: int = 40,
     ) -> None:
+        max_key_length: Optional[int] = None
+        for displayed_property in displayed_properties:
+            max_key_length = max((max_key_length or 0), len(displayed_property.key))
+        if max_key_length is None:
+            return
+
         for displayed_property in displayed_properties:
             key = displayed_property.key
 
             wrapped_lines = []
             if displayed_property.value is not None:
-                for value_line in str(mf_first_non_none(displayed_property.value)).split("\n"):
+                value = displayed_property.value
+                if isinstance(value, str):
+                    value_str = value
+                else:
+                    value_str = mf_pformat(
+                        displayed_property.value,
+                        PrettyFormatOption(max_line_length=max(1, line_wrap_width - max_key_length)),
+                    )
+                for value_line in value_str.split("\n"):
                     wrapped_lines.extend(textwrap.wrap(value_line, width=line_wrap_width))
 
             # <BR> seems to have odd formatting issues, so using multiple rows to display mult-line text.

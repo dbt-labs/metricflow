@@ -5,6 +5,7 @@ import logging
 from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.svg_snapshot import write_svg_snapshot_for_review
+
 from tests_metricflow_semantics.experimental.mf_graph.flow_graph import FlowGraph
 from tests_metricflow_semantics.experimental.mf_graph.formatting.svg_formatter import SvgFormatter
 
