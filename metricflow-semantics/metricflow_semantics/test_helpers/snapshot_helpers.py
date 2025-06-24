@@ -7,17 +7,19 @@ import pathlib
 import re
 import webbrowser
 from dataclasses import dataclass
-from typing import Any, Callable, Mapping, Optional, Tuple, TypeVar
+from typing import Any, Callable, Mapping, Optional, Tuple, TypeVar, Union
 
 import _pytest.fixtures
 import tabulate
 from _pytest.fixtures import FixtureRequest
 
+from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
+from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item
 from metricflow_semantics.dag.mf_dag import MetricFlowDag
 from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
-from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
+from metricflow_semantics.model.semantics.linkable_element_set_base import BaseLinkableElementSet
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
@@ -298,78 +300,35 @@ def assert_linkable_element_set_snapshot_equal(  # noqa: D103
     request: FixtureRequest,
     snapshot_configuration: SnapshotConfiguration,
     set_id: str,
-    linkable_element_set: LinkableElementSet,
+    linkable_element_set: BaseLinkableElementSet,
     expectation_description: Optional[str] = None,
 ) -> None:
-    headers = ("Model Join-Path", "Entity Links", "Name", "Time Granularity", "Date Part", "Properties")
-    rows = []
-    for linkable_dimension_iterable in linkable_element_set.path_key_to_linkable_dimensions.values():
-        for linkable_dimension in linkable_dimension_iterable:
-            row_to_add = (
-                # Checking a limited set of fields as the result is large due to the paths in the object.
-                (linkable_dimension.join_path.left_semantic_model_reference.semantic_model_name,)
-                + tuple(
-                    path_element.semantic_model_reference.semantic_model_name
-                    for path_element in linkable_dimension.join_path.path_elements
-                ),
-                tuple(entity_link.element_name for entity_link in linkable_dimension.entity_links),
-                linkable_dimension.element_name,
-                linkable_dimension.time_granularity.name if linkable_dimension.time_granularity is not None else "",
-                linkable_dimension.date_part.name if linkable_dimension.date_part is not None else "",
-                sorted(linkable_element_property.name for linkable_element_property in linkable_dimension.properties),
-            )
-            if row_to_add not in rows:
-                rows.append(row_to_add)
+    headers = ("Type", "Dunder Name", "Metric-Subquery Entity-Links", "Properties", "Derived-From Semantic Models")
+    rows: list[AnyLengthTuple[Union[str, list[str]]]] = []
 
-    for linkable_entity_iterable in linkable_element_set.path_key_to_linkable_entities.values():
-        for linkable_entity in linkable_entity_iterable:
-            row_to_add = (
-                # Checking a limited set of fields as the result is large due to the paths in the object.
-                (linkable_entity.join_path.left_semantic_model_reference.semantic_model_name,)
-                + tuple(
-                    path_element.semantic_model_reference.semantic_model_name
-                    for path_element in linkable_entity.join_path.path_elements
+    for annotated_spec in sorted(
+        linkable_element_set.annotated_specs,
+        key=lambda annotated_spec_in_lambda: annotated_spec_in_lambda.spec.qualified_name,
+    ):
+        path_key = annotated_spec.path_key
+        rows.append(
+            (
+                path_key.element_type.name,
+                path_key.dunder_name,
+                [entity_link.element_name for entity_link in path_key.metric_subquery_entity_links],
+                sorted(linkable_element_property.name for linkable_element_property in annotated_spec.properties),
+                sorted(
+                    model_reference.semantic_model_name
+                    for model_reference in annotated_spec.derived_from_semantic_models
                 ),
-                tuple(entity_link.element_name for entity_link in linkable_entity.entity_links),
-                linkable_entity.element_name,
-                "",
-                "",
-                sorted(linkable_element_property.name for linkable_element_property in linkable_entity.properties),
             )
-            if row_to_add not in rows:
-                rows.append(row_to_add)
-
-    for linkable_metric_iterable in linkable_element_set.path_key_to_linkable_metrics.values():
-        for linkable_metric in linkable_metric_iterable:
-            semantic_model_join_path = linkable_metric.join_path.semantic_model_join_path
-            rows.append(
-                (
-                    # Checking a limited set of fields as the result is large due to the paths in the object.
-                    (semantic_model_join_path.left_semantic_model_reference.semantic_model_name,)
-                    + tuple(
-                        path_element.semantic_model_reference.semantic_model_name
-                        for path_element in semantic_model_join_path.path_elements
-                    ),
-                    (
-                        str(tuple(entity_link.element_name for entity_link in linkable_metric.join_path.entity_links)),
-                        str(
-                            tuple(
-                                entity_link.element_name for entity_link in linkable_metric.metric_subquery_entity_links
-                            )
-                        ),
-                    ),
-                    linkable_metric.element_name,
-                    "",
-                    "",
-                    sorted(linkable_element_property.name for linkable_element_property in linkable_metric.properties),
-                )
-            )
+        )
 
     assert_str_snapshot_equal(
         request=request,
         snapshot_configuration=snapshot_configuration,
         snapshot_id=set_id,
-        snapshot_str=tabulate.tabulate(headers=headers, tabular_data=sorted(rows)),
+        snapshot_str=tabulate.tabulate(headers=headers, tabular_data=sorted(rows, key=lambda row: mf_first_item(row))),
         expectation_description=expectation_description,
     )
 
