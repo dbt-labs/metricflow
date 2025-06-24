@@ -27,6 +27,8 @@ from metricflow_semantics.experimental.mf_graph.mf_graph import (
     MetricflowGraphNode,
 )
 from metricflow_semantics.helpers.string_helpers import mf_indent
+from typing_extensions import override
+
 from tests_metricflow_semantics.experimental.mf_graph.formatting.graphviz_html import (
     GraphvizHtmlAlignment,
     GraphvizHtmlText,
@@ -41,7 +43,6 @@ from tests_metricflow_semantics.experimental.mf_graph.formatting.mf_to_dot impor
     DotGraphConversionResult,
     MetricflowGraphToDotConverter,
 )
-from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 
@@ -126,7 +127,7 @@ class GraphicalDotConversionArgumentSet(DotConversionArgumentSet):
         node_attributes: Optional[Mapping[str, str]] = DEFAULT_NODE_ATTRIBUTES,
         edge_attributes: Optional[Mapping[str, str]] = DEFAULT_EDGE_ATTRIBUTES,
         default_edge_as_node_attributes: Optional[Mapping[str, str]] = DEFAULT_EDGE_AS_NODE_ATTRIBUTES,
-        include_edge_ends_as_properties: bool = False,
+        include_edge_ends_as_properties: bool = True,
         display_properties_line_wrap_limit: int = 40,
     ) -> GraphicalDotConversionArgumentSet:
         return GraphicalDotConversionArgumentSet(

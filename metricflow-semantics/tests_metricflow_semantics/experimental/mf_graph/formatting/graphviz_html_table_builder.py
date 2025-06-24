@@ -7,11 +7,12 @@ from typing import Iterator, Optional
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from typing_extensions import Self
+
 from tests_metricflow_semantics.experimental.mf_graph.formatting.graphviz_html import (
     GraphvizHtmlAlignment,
     GraphvizHtmlText,
 )
-from typing_extensions import Self
 
 
 class GraphvizHtmlTableBuilder:
