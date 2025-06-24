@@ -124,6 +124,8 @@ class SemanticModelLookup:
         for measure in semantic_model.measures:
             self._measure_index[measure.reference] = semantic_model
             agg_time_dimension_reference = semantic_model.checked_agg_time_dimension_for_measure(measure.reference)
+            # Ensure agg_time_dimension is lowercased - this transformation was not enforced on earlier manifests
+            agg_time_dimension_reference = TimeDimensionReference(agg_time_dimension_reference.element_name.lower())
 
             matching_dimensions = tuple(
                 dimension
