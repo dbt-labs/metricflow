@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import threading
 from abc import ABC
 
 logger = logging.getLogger(__name__)
@@ -15,4 +16,4 @@ class SingletonFactory(ABC):
     the factory is used vs. using default initializer.
     """
 
-    pass
+    _instance_lock = threading.Lock()
