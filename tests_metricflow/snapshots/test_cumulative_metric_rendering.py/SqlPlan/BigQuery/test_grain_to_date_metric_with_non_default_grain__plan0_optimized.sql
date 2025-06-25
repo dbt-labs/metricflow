@@ -25,16 +25,16 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       subq_13.ds AS metric_time__day
-      , DATETIME_TRUNC(subq_13.ds, month) AS metric_time__month
+      , TIMESTAMP_TRUNC(subq_13.ds, month) AS metric_time__month
       , SUM(revenue_src_28000.revenue) AS revenue_mtd
     FROM ***************************.mf_time_spine subq_13
     INNER JOIN
       ***************************.fct_revenue revenue_src_28000
     ON
       (
-        DATETIME_TRUNC(revenue_src_28000.created_at, day) <= subq_13.ds
+        TIMESTAMP_TRUNC(revenue_src_28000.created_at, day) <= subq_13.ds
       ) AND (
-        DATETIME_TRUNC(revenue_src_28000.created_at, day) >= DATETIME_TRUNC(subq_13.ds, month)
+        TIMESTAMP_TRUNC(revenue_src_28000.created_at, day) >= TIMESTAMP_TRUNC(subq_13.ds, month)
       )
     GROUP BY
       metric_time__day
