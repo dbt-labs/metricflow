@@ -1,0 +1,19 @@
+test_name: test_list_dimensions_for_metrics_for_multiple_metrics
+test_filename: test_mf_engine.py
+docstring:
+  Test getting common dimensions for multiple metrics.
+---
+[
+  'listing__capacity_latest',
+  'listing__capacity_latest',
+  'listing__country_latest',
+  'listing__country_latest',
+  'listing__created_at',
+  'listing__created_at',
+  'listing__ds',
+  'listing__ds',
+  'listing__is_lux_latest',
+  'listing__is_lux_latest',
+  'metric_time__day',
+  'metric_time__day',
+]

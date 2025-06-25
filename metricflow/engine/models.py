@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple
 
@@ -37,8 +38,18 @@ from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpe
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 
 
+class SearchableElement(ABC):
+    """Base class for searchable elements."""
+
+    @property
+    @abstractmethod
+    def default_search_and_sort_attribute(self) -> str:  # noqa: D102
+        """The default attribute to use when filtering elements by a search string."""
+        raise NotImplementedError
+
+
 @dataclass(frozen=True)
-class Metric:
+class Metric(SearchableElement):
     """Dataclass representation of a Metric."""
 
     name: str
@@ -75,9 +86,13 @@ class Metric:
         )
         return self.type_params.input_measures
 
+    @property
+    def default_search_and_sort_attribute(self) -> str:  # noqa: D102
+        return self.name
+
 
 @dataclass(frozen=True)
-class Dimension:
+class Dimension(SearchableElement):
     """Dataclass representation of a Dimension."""
 
     name: str
@@ -121,6 +136,10 @@ class Dimension:
         )
 
     @property
+    def default_search_and_sort_attribute(self) -> str:  # noqa: D102
+        return self.qualified_name
+
+    @property
     def granularity_free_qualified_name(self) -> str:
         """Renders the qualified name without the granularity suffix.
 
@@ -137,7 +156,7 @@ class Dimension:
 
 
 @dataclass(frozen=True)
-class Entity:
+class Entity(SearchableElement):
     """Dataclass representation of a Entity."""
 
     name: str
@@ -159,6 +178,10 @@ class Entity:
             expr=pydantic_entity.expr,
         )
 
+    @property
+    def default_search_and_sort_attribute(self) -> str:  # noqa: D102
+        return self.name
+
 
 @dataclass(frozen=True)
 class Measure:
@@ -174,7 +197,7 @@ class Measure:
 
 
 @dataclass(frozen=True)
-class SavedQuery:
+class SavedQuery(SearchableElement):
     """Dataclass representation of a SavedQuery."""
 
     name: str
@@ -197,3 +220,7 @@ class SavedQuery:
             exports=pydantic_saved_query.exports,
             tags=pydantic_saved_query.tags,
         )
+
+    @property
+    def default_search_and_sort_attribute(self) -> str:  # noqa: D102
+        return self.name

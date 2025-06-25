@@ -1,0 +1,28 @@
+test_name: test_list_dimensions_for_metrics_for_single_metric
+test_filename: test_mf_engine.py
+docstring:
+  Test getting dimensions for a single metric.
+---
+[
+  'booking__ds',
+  'booking__ds_partitioned',
+  'booking__is_instant',
+  'booking__paid_at',
+  'listing__capacity_latest',
+  'listing__country_latest',
+  'listing__created_at',
+  'listing__ds',
+  'listing__is_lux_latest',
+  'listing__user__archived_at',
+  'listing__user__bio_added_ts',
+  'listing__user__company_name',
+  'listing__user__created_at',
+  'listing__user__ds',
+  'listing__user__ds_latest',
+  'listing__user__ds_partitioned',
+  'listing__user__home_state',
+  'listing__user__home_state_latest',
+  'listing__user__last_login_ts',
+  'listing__user__last_profile_edit_ts',
+  'metric_time__day',
+]

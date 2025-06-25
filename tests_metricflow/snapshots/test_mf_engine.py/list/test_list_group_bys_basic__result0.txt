@@ -1,0 +1,40 @@
+test_name: test_list_group_bys_basic
+test_filename: test_mf_engine.py
+docstring:
+  Test basic listing of all group bys.
+---
+[
+  'account__account_type',
+  'account__ds',
+  'account__ds_month',
+  'booking__ds',
+  'booking__ds_partitioned',
+  'booking__is_instant',
+  'booking__paid_at',
+  'buy__ds',
+  'buy__ds_month',
+  'company__company_name',
+  'listing__capacity_latest',
+  'listing__country_latest',
+  'listing__created_at',
+  'listing__ds',
+  'listing__is_lux_latest',
+  'revenue_instance__ds',
+  'user__archived_at',
+  'user__bio_added_ts',
+  'user__created_at',
+  'user__ds',
+  'user__ds_latest',
+  'user__ds_partitioned',
+  'user__home_state',
+  'user__home_state_latest',
+  'user__last_login_ts',
+  'user__last_profile_edit_ts',
+  'verification__ds',
+  'verification__ds_partitioned',
+  'verification__verification_type',
+  'view__ds',
+  'view__ds_partitioned',
+  'visit__ds',
+  'visit__referrer_id',
+]

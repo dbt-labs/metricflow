@@ -1,0 +1,17 @@
+test_name: test_list_group_bys_with_search
+test_filename: test_mf_engine.py
+docstring:
+  Test listing group bys with search filter.
+---
+[
+  'user__archived_at',
+  'user__bio_added_ts',
+  'user__created_at',
+  'user__ds',
+  'user__ds_latest',
+  'user__ds_partitioned',
+  'user__home_state',
+  'user__home_state_latest',
+  'user__last_login_ts',
+  'user__last_profile_edit_ts',
+]

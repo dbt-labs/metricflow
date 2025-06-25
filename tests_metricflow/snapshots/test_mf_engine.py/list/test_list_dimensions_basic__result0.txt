@@ -1,5 +1,7 @@
-test_name: test_list_dimensions
+test_name: test_list_dimensions_basic
 test_filename: test_mf_engine.py
+docstring:
+  Test basic listing of all dimensions.
 ---
 [
   'account__account_type',
