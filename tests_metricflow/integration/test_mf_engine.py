@@ -53,7 +53,7 @@ def test_list_dimensions_with_pagination(  # noqa: D103
         request=request,
         mf_test_configuration=mf_test_configuration,
         obj_id="page1",
-        obj=page_1,
+        obj=[dim.qualified_name for dim in page_1.items],
     )
     all_dimensions = it_helpers.mf_engine.list_dimensions_paginated()
     assert page_1.page_num == 1
@@ -67,7 +67,7 @@ def test_list_dimensions_with_pagination(  # noqa: D103
         request=request,
         mf_test_configuration=mf_test_configuration,
         obj_id="page2",
-        obj=page_2,
+        obj=[dim.qualified_name for dim in page_2.items],
     )
     assert page_2.page_num == 2
     assert page_2.page_size == 2
@@ -125,7 +125,7 @@ def test_list_metrics_with_pagination(  # noqa: D103
         request=request,
         mf_test_configuration=mf_test_configuration,
         obj_id="page1",
-        obj=page_1,
+        obj=[metric.name for metric in page_1.items],
     )
     all_metrics = it_helpers.mf_engine.list_metrics_paginated()
     assert page_1.page_num == 1
@@ -139,7 +139,7 @@ def test_list_metrics_with_pagination(  # noqa: D103
         request=request,
         mf_test_configuration=mf_test_configuration,
         obj_id="page2",
-        obj=page_2,
+        obj=[metric.name for metric in page_2.items],
     )
     assert page_2.page_num == 2
     assert page_2.page_size == 2
@@ -285,7 +285,7 @@ def test_list_saved_queries_with_pagination(  # noqa: D103
         request=request,
         mf_test_configuration=mf_test_configuration,
         obj_id="page1",
-        obj=page_1,
+        obj=[saved_query.name for saved_query in page_1.items],
     )
     all_saved_queries = it_helpers.mf_engine.list_saved_queries_paginated()
     assert page_1.page_num == 1
@@ -299,7 +299,7 @@ def test_list_saved_queries_with_pagination(  # noqa: D103
         request=request,
         mf_test_configuration=mf_test_configuration,
         obj_id="page2",
-        obj=page_2,
+        obj=[saved_query.name for saved_query in page_2.items],
     )
     assert page_2.page_num == 2
     assert page_2.page_size == 2
