@@ -691,7 +691,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         if page_size and page_size < 1:
             raise InvalidQueryException("Page size must be at least 1")
 
-        output_items = sorted(items, key=lambda x: x.default_search_and_sort_attribute)
+        output_items = list(items)
         if page_size:
             output_items = output_items[(page_num - 1) * page_size : page_num * page_size]
         total_items = len(items)
@@ -791,7 +791,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 if not search_str or search_str in dimension.default_search_and_sort_attribute:
                     dimensions.append(dimension)
 
-        return dimensions
+        return sorted(dimensions, key=lambda x: x.default_search_and_sort_attribute)
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def list_dimensions(self, search_str: Optional[str] = None) -> List[Dimension]:
@@ -810,7 +810,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 if not search_str or search_str in dimension.default_search_and_sort_attribute:
                     dimensions.append(dimension)
 
-        return dimensions
+        return sorted(dimensions, key=lambda x: x.default_search_and_sort_attribute)
 
     def entities_for_metrics(  # noqa: D102
         self,
@@ -862,7 +862,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                     ) and entity not in entities:
                         entities.append(entity)
 
-        return entities
+        return sorted(entities, key=lambda x: x.default_search_and_sort_attribute)
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def list_metrics(self, include_dimensions: bool = True, search_str: Optional[str] = None) -> List[Metric]:
@@ -899,7 +899,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             saved_query = SavedQuery.from_pydantic(pydantic_saved_query)
             if not search_str or search_str in saved_query.default_search_and_sort_attribute:
                 saved_queries.append(saved_query)
-        return saved_queries
+        return sorted(saved_queries, key=lambda x: x.default_search_and_sort_attribute)
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def list_saved_queries_paginated(  # noqa: D102
@@ -981,7 +981,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         else:
             # TODO: better support for querying entities without metrics; include entities here at that time
             group_bys = self.list_dimensions(search_str=search_str)
-        return group_bys
+        return sorted(group_bys, key=lambda x: x.default_search_and_sort_attribute)
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def list_group_bys_paginated(  # noqa: D102

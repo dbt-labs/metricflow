@@ -36,7 +36,7 @@ test:
 	cd metricflow-semantics && hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW_SEMANTICS)/
 	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) -m "not slow" $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW)/
 
-.PHONY: test-slow
+.PHONY: test-include-slow
 test-include-slow:
 	cd metricflow-semantics && hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW_SEMANTICS)/
 	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW)/
