@@ -52,7 +52,7 @@ class GroupByAttributeSubgraphGenerator:
         self._mutable_path = AttributeComputationPath.create()
         self._verbose_debug_logs = True
 
-    def generate_subgraph(self, metric_nodes: OrderedSet[SemanticGraphNode]) -> AttributeSubgraphResult:
+    def generate_subgraph(self, source_nodes: OrderedSet[SemanticGraphNode]) -> AttributeSubgraphResult:
         path_finder = self._path_finder
         semantic_graph = self._semantic_graph
         label = JoinFromLabel()
@@ -60,7 +60,7 @@ class GroupByAttributeSubgraphGenerator:
         # search space by narrowing the set of target nodes to the current set of reachable nodes.
         current_common_join_from_nodes = MutableOrderedSet[SemanticGraphNode](semantic_graph.nodes_with_label(label))
 
-        for i, metric_node in enumerate(metric_nodes):
+        for i, metric_node in enumerate(source_nodes):
             result = path_finder.find_descendant_nodes(
                 graph=self._semantic_graph,
                 mutable_path=self._mutable_path,
@@ -75,7 +75,7 @@ class GroupByAttributeSubgraphGenerator:
             logger.debug(
                 LazyFormat(
                     "Found common join-from nodes",
-                    metric_nodes=metric_nodes,
+                    metric_nodes=source_nodes,
                     current_common_join_from_nodes=current_common_join_from_nodes,
                 )
             )

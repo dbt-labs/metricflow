@@ -3,6 +3,8 @@ from __future__ import annotations
 import logging
 from typing import Optional
 
+from dbt_semantic_interfaces.references import MeasureReference
+
 from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
 from metricflow_semantics.experimental.singleton_decorator import singleton_dataclass
 
@@ -18,6 +20,12 @@ class MeasureAttributeLabel(MetricflowGraphLabel):
     """The name of the measure or `None` for any measure."""
 
     measure_name: Optional[str]
+
+    def get_instance(self, measure_name: str) -> MeasureAttributeLabel:  # noqa: D102
+        return MeasureAttributeLabel(measure_name=measure_name)
+
+    def get_instance_from_reference(self, measure_reference: MeasureReference) -> MeasureAttributeLabel:  # noqa: D102
+        return MeasureAttributeLabel(measure_name=measure_reference.element_name)
 
 
 @singleton_dataclass()
