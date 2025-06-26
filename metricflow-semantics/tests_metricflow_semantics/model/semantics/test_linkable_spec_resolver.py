@@ -15,7 +15,7 @@ from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifest
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 from metricflow_semantics.model.semantics.linkable_element import SemanticModelJoinPath, SemanticModelJoinPathElement
 from metricflow_semantics.model.semantics.linkable_spec_index_builder import LinkableSpecIndexBuilder
-from metricflow_semantics.model.semantics.linkable_spec_resolver import ValidLinkableSpecResolver
+from metricflow_semantics.model.semantics.linkable_spec_resolver import LegacyLinkableSpecResolver
 from metricflow_semantics.model.semantics.manifest_object_lookup import SemanticManifestObjectLookup
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 @pytest.fixture
 def simple_model_spec_resolver(  # noqa: D103
     simple_semantic_manifest_lookup: SemanticManifestLookup,
-) -> ValidLinkableSpecResolver:
+) -> LegacyLinkableSpecResolver:
     manifest_object_lookup = SemanticManifestObjectLookup(simple_semantic_manifest_lookup.semantic_manifest)
     index_builder = LinkableSpecIndexBuilder(
         semantic_manifest=simple_semantic_manifest_lookup.semantic_manifest,
@@ -40,7 +40,7 @@ def simple_model_spec_resolver(  # noqa: D103
         max_entity_links=MAX_JOIN_HOPS,
     )
     linkable_spec_index = index_builder.build_index()
-    return ValidLinkableSpecResolver(
+    return LegacyLinkableSpecResolver(
         semantic_manifest=simple_semantic_manifest_lookup.semantic_manifest,
         semantic_model_lookup=simple_semantic_manifest_lookup.semantic_model_lookup,
         manifest_object_lookup=manifest_object_lookup,
@@ -51,7 +51,7 @@ def simple_model_spec_resolver(  # noqa: D103
 @pytest.fixture
 def cyclic_join_manifest_spec_resolver(  # noqa: D103
     cyclic_join_semantic_manifest_lookup: SemanticManifestLookup,
-) -> ValidLinkableSpecResolver:
+) -> LegacyLinkableSpecResolver:
     manifest_object_lookup = SemanticManifestObjectLookup(cyclic_join_semantic_manifest_lookup.semantic_manifest)
     index_builder = LinkableSpecIndexBuilder(
         semantic_manifest=cyclic_join_semantic_manifest_lookup.semantic_manifest,
@@ -60,7 +60,7 @@ def cyclic_join_manifest_spec_resolver(  # noqa: D103
         max_entity_links=MAX_JOIN_HOPS,
     )
     linkable_spec_index = index_builder.build_index()
-    return ValidLinkableSpecResolver(
+    return LegacyLinkableSpecResolver(
         semantic_manifest=cyclic_join_semantic_manifest_lookup.semantic_manifest,
         semantic_model_lookup=cyclic_join_semantic_manifest_lookup.semantic_model_lookup,
         manifest_object_lookup=manifest_object_lookup,
@@ -71,7 +71,7 @@ def cyclic_join_manifest_spec_resolver(  # noqa: D103
 def test_all_properties(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    simple_model_spec_resolver: ValidLinkableSpecResolver,
+    simple_model_spec_resolver: LegacyLinkableSpecResolver,
 ) -> None:
     assert_linkable_element_set_snapshot_equal(
         request=request,
@@ -89,7 +89,7 @@ def test_all_properties(  # noqa: D103
 def test_one_property(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    simple_model_spec_resolver: ValidLinkableSpecResolver,
+    simple_model_spec_resolver: LegacyLinkableSpecResolver,
 ) -> None:
     assert_linkable_element_set_snapshot_equal(
         request=request,
@@ -107,7 +107,7 @@ def test_one_property(  # noqa: D103
 def test_metric_time_property_for_cumulative_metric(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    simple_model_spec_resolver: ValidLinkableSpecResolver,
+    simple_model_spec_resolver: LegacyLinkableSpecResolver,
 ) -> None:
     assert_linkable_element_set_snapshot_equal(
         request=request,
@@ -125,7 +125,7 @@ def test_metric_time_property_for_cumulative_metric(  # noqa: D103
 def test_metric_time_property_for_derived_metrics(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    simple_model_spec_resolver: ValidLinkableSpecResolver,
+    simple_model_spec_resolver: LegacyLinkableSpecResolver,
 ) -> None:
     assert_linkable_element_set_snapshot_equal(
         request=request,
@@ -143,7 +143,7 @@ def test_metric_time_property_for_derived_metrics(  # noqa: D103
 def test_cyclic_join_manifest(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    cyclic_join_manifest_spec_resolver: ValidLinkableSpecResolver,
+    cyclic_join_manifest_spec_resolver: LegacyLinkableSpecResolver,
 ) -> None:
     assert_linkable_element_set_snapshot_equal(
         request=request,
@@ -162,7 +162,7 @@ def test_cyclic_join_manifest(  # noqa: D103
 def test_create_linkable_element_set_from_join_path(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    simple_model_spec_resolver: ValidLinkableSpecResolver,
+    simple_model_spec_resolver: LegacyLinkableSpecResolver,
 ) -> None:
     assert_linkable_element_set_snapshot_equal(
         request=request,
@@ -181,7 +181,7 @@ def test_create_linkable_element_set_from_join_path(  # noqa: D103
 def test_create_linkable_element_set_from_join_path_multi_hop(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    simple_model_spec_resolver: ValidLinkableSpecResolver,
+    simple_model_spec_resolver: LegacyLinkableSpecResolver,
 ) -> None:
     assert_linkable_element_set_snapshot_equal(
         request=request,
@@ -208,7 +208,7 @@ def test_create_linkable_element_set_from_join_path_multi_hop(  # noqa: D103
 def test_linkable_element_set_as_spec_set(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    simple_model_spec_resolver: ValidLinkableSpecResolver,
+    simple_model_spec_resolver: LegacyLinkableSpecResolver,
 ) -> None:
     """Tests extracting linkable elements for a given measure input and converting them into a spec set.
 

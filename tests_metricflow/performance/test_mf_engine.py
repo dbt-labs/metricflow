@@ -29,7 +29,7 @@ from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.linkable_spec_index import LinkableSpecIndex
 from metricflow_semantics.model.semantics.linkable_spec_index_builder import LinkableSpecIndexBuilder
-from metricflow_semantics.model.semantics.linkable_spec_resolver import ValidLinkableSpecResolver
+from metricflow_semantics.model.semantics.linkable_spec_resolver import LegacyLinkableSpecResolver
 from metricflow_semantics.model.semantics.manifest_object_lookup import SemanticManifestObjectLookup
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
@@ -143,7 +143,7 @@ def _time_original_init(semantic_manifest: SemanticManifest) -> float:
         max_entity_links=MAX_JOIN_HOPS,
     )
     linkable_spec_index = linkable_spec_index_builder.build_index()
-    resolver = ValidLinkableSpecResolver(
+    resolver = LegacyLinkableSpecResolver(
         semantic_manifest=semantic_manifest,
         semantic_model_lookup=semantic_model_lookup,
         manifest_object_lookup=manifest_object_lookup,
