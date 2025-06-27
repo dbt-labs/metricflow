@@ -142,6 +142,16 @@ class AttributeResolver:
             source_nodes=FrozenOrderedSet((source_node,)),
             target_attribute_nodes=attribute_nodes,
         )
+
+        if self._verbose_debug_logs:
+            logger.debug(
+                LazyFormat(
+                    "Resolved descriptors",
+                    source_node=source_node,
+                    descriptor_result=descriptor_result,
+                )
+            )
+
         for descriptor in descriptor_result.attribute_descriptors:
             if len(descriptor.element_types) != 1:
                 raise ValueError(
@@ -158,10 +168,15 @@ class AttributeResolver:
                 EntityReference(element_name=element_name) for element_name in descriptor.dundered_name_elements[:-1]
             )
             default_element_name = dundered_name_elements[-1]
-            model_ids = descriptor_result.measure_model_ids.union(descriptor.model_ids)
+            measure_model_ids = descriptor_result.measure_model_ids
+            model_ids = measure_model_ids.union(descriptor.model_ids)
             derived_from_semantic_models = FrozenOrderedSet(
                 SemanticModelReference(semantic_model_name=model_id.model_name) for model_id in model_ids
             )
+            last_model_id = descriptor.last_model_id
+            # `last_model_id` may be `None` if the descriptor is for a `metric_time` attribute since the path from
+            # the `GroupByAttributeRoot` purposefully excludes that to retain similar structure.
+            origin_model_ids = FrozenOrderedSet((last_model_id,)) if last_model_id is not None else measure_model_ids
             if element_type is LinkableElementType.METRIC:
                 annotated_specs.extend(
                     self._generate_group_by_metric_specs(
@@ -180,7 +195,7 @@ class AttributeResolver:
                             entity_links=default_entity_links,
                         ),
                         properties=properties,
-                        origin_model=descriptor.last_model_id,
+                        origin_model_ids=origin_model_ids,
                         derived_from_semantic_models=derived_from_semantic_models,
                     )
                 )
@@ -203,7 +218,7 @@ class AttributeResolver:
                             date_part=mf_first_item(descriptor.date_parts) if len(descriptor.date_parts) > 0 else None,
                         ),
                         properties=properties,
-                        origin_model=descriptor.last_model_id,
+                        origin_model_ids=origin_model_ids,
                         derived_from_semantic_models=derived_from_semantic_models,
                     )
                 )
@@ -216,98 +231,13 @@ class AttributeResolver:
                             entity_links=default_entity_links,
                         ),
                         properties=properties,
-                        origin_model=descriptor.last_model_id,
+                        origin_model_ids=origin_model_ids,
                         derived_from_semantic_models=derived_from_semantic_models,
                     )
                 )
             else:
                 assert_values_exhausted(element_type)
         return FrozenOrderedSet(annotated_specs)
-
-    def resolve_specs_for_metric(self, metric_name: str) -> Sequence[AnnotatedSpec]:
-        annotated_specs = list[AnnotatedSpec]()
-        descriptor_result = self.resolve_descriptors_for_metric(metric_name=metric_name)
-        for descriptor in descriptor_result.attribute_descriptors:
-            if len(descriptor.element_types) != 1:
-                raise ValueError(
-                    LazyFormat(
-                        "Expected exactly one element type",
-                        element_types=descriptor.element_types,
-                        descriptor=descriptor,
-                    )
-                )
-            element_type = mf_first_item(descriptor.element_types)
-            dundered_name_elements = descriptor.dundered_name_elements
-            properties = descriptor.properties
-            default_entity_links = tuple(
-                EntityReference(element_name=element_name) for element_name in descriptor.dundered_name_elements[:-1]
-            )
-            default_element_name = dundered_name_elements[-1]
-            model_ids = descriptor_result.measure_model_ids.union(descriptor.model_ids)
-            derived_from_semantic_models = FrozenOrderedSet(
-                SemanticModelReference(semantic_model_name=model_id.model_name) for model_id in model_ids
-            )
-            if element_type is LinkableElementType.METRIC:
-                annotated_specs.extend(
-                    self._generate_group_by_metric_specs(
-                        metric_name=default_element_name,
-                        entity_links=default_entity_links,
-                        properties=properties,
-                        derived_from_semantic_models=derived_from_semantic_models,
-                    )
-                )
-            elif element_type is LinkableElementType.ENTITY:
-                annotated_specs.append(
-                    AnnotatedSpec.create(
-                        element_type=element_type,
-                        spec=EntitySpec(
-                            element_name=default_element_name,
-                            entity_links=default_entity_links,
-                        ),
-                        properties=properties,
-                        origin_model=descriptor.last_model_id,
-                        derived_from_semantic_models=derived_from_semantic_models,
-                    )
-                )
-            elif element_type is LinkableElementType.TIME_DIMENSION:
-                element_name = dundered_name_elements[-2]
-                entity_links = tuple(
-                    EntityReference(element_name=element_name)
-                    for element_name in descriptor.dundered_name_elements[:-2]
-                )
-                time_grain: Optional[ExpandedTimeGranularity]
-                annotated_specs.append(
-                    AnnotatedSpec.create(
-                        element_type=element_type,
-                        spec=TimeDimensionSpec(
-                            element_name=element_name,
-                            entity_links=entity_links,
-                            time_granularity=mf_first_item(descriptor.time_grains)
-                            if len(descriptor.time_grains) > 0
-                            else None,
-                            date_part=mf_first_item(descriptor.date_parts) if len(descriptor.date_parts) > 0 else None,
-                        ),
-                        properties=properties,
-                        origin_model=descriptor.last_model_id,
-                        derived_from_semantic_models=derived_from_semantic_models,
-                    )
-                )
-            elif element_type is LinkableElementType.DIMENSION:
-                annotated_specs.append(
-                    AnnotatedSpec.create(
-                        element_type=element_type,
-                        spec=DimensionSpec(
-                            element_name=default_element_name,
-                            entity_links=default_entity_links,
-                        ),
-                        properties=properties,
-                        origin_model=descriptor.last_model_id,
-                        derived_from_semantic_models=derived_from_semantic_models,
-                    )
-                )
-            else:
-                assert_values_exhausted(element_type)
-        return annotated_specs
 
     def _generate_group_by_metric_specs(
         self,
@@ -337,8 +267,10 @@ class AttributeResolver:
                         ),
                     ),
                     properties=properties,
-                    origin_model=SemanticModelId(
-                        model_name=SemanticModelDerivation.VIRTUAL_SEMANTIC_MODEL_REFERENCE.semantic_model_name
+                    origin_model_ids=(
+                        SemanticModelId(
+                            model_name=SemanticModelDerivation.VIRTUAL_SEMANTIC_MODEL_REFERENCE.semantic_model_name
+                        ),
                     ),
                     derived_from_semantic_models=derived_from_semantic_models,
                 )

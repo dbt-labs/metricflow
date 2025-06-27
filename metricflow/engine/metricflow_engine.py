@@ -17,6 +17,7 @@ from dbt_semantic_interfaces.references import (
     MetricReference,
 )
 from dbt_semantic_interfaces.type_enums import DimensionType
+from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
 from metricflow_semantics.errors.error_classes import ExecutionException
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
@@ -621,7 +622,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             spec = annotated_spec.spec
             spec_set = group_spec_by_type(spec)
             properties = annotated_spec.properties
-            origin_model_id = annotated_spec.origin_model_id
+            origin_model_id = mf_first_item(annotated_spec.origin_model_ids)
 
             time_dimension_specs = spec_set.time_dimension_specs
             # Handle time dimensions.
@@ -783,7 +784,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             element_type = annotated_spec.element_type
             if element_type is LinkableElementType.ENTITY:
                 semantic_model = self._semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
-                    annotated_spec.origin_model_id.semantic_model_reference
+                    mf_first_item(annotated_spec.origin_model_ids).semantic_model_reference
                 )
                 assert semantic_model
                 entities.append(

@@ -8,6 +8,7 @@ from typing_extensions import override
 
 from metricflow_semantics.experimental.mf_graph.comparable import ComparisonKey
 from metricflow_semantics.experimental.orderd_enum import OrderedEnum
+from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeComputationUpdate
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
     SemanticGraphEdge,
@@ -66,17 +67,19 @@ class JoinToModelEdge(SemanticGraphEdge):
 @singleton_dataclass(order=False)
 class JoinFromModelEdge(SemanticGraphEdge):
     right_model_id: SemanticModelId
-
+    _attribute_computation_update: AttributeComputationUpdate
     @staticmethod
     def get_instance(
         tail_node: SemanticGraphNode,
         head_node: SemanticGraphNode,
         right_model_id: SemanticModelId,
+        attribute_computation_update: AttributeComputationUpdate,
     ) -> JoinFromModelEdge:
         return JoinFromModelEdge(
             _tail_node=tail_node,
             _head_node=head_node,
             right_model_id=right_model_id,
+            _attribute_computation_update=attribute_computation_update,
         )
 
     @override

@@ -8,6 +8,7 @@ from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import Pair
 from metricflow_semantics.experimental.ordered_set import MutableOrderedSet, OrderedSet
+from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeComputationUpdate
 from metricflow_semantics.experimental.semantic_graph.builder.graph_change_rule import (
     SemanticSubgraphGenerator,
     SubgraphGeneratorArgumentSet,
@@ -82,6 +83,7 @@ class EntityJoinSubgraphGenerator(SemanticSubgraphGenerator):
                         tail_node=join_from_semantic_model_node,
                         head_node=entity_node,
                         right_model_id=right_model_id,
+                        attribute_computation_update=AttributeComputationUpdate(),
                     )
                 )
         # Handle case when the primary entity field in the semantic model is set and there isn't an entity element in
