@@ -3,6 +3,8 @@ from __future__ import annotations
 import logging
 
 from _pytest.fixtures import FixtureRequest
+from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
+from dbt_semantic_interfaces.references import MeasureReference
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
     AttributeComputationPath,
@@ -10,6 +12,9 @@ from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attri
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_resolver import (
     AttributeResolver,
     AttributeResolverCache,
+)
+from metricflow_semantics.experimental.semantic_graph.attribute_resolution.sg_linkable_spec_resolver import (
+    SemanticGraphLinkableSpecResolver,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.graph_builder import SemanticGraphBuilder
 from metricflow_semantics.experimental.semantic_graph.builder.group_by_attribute_subgraph import (
@@ -33,8 +38,19 @@ from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder i
 from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_cache import PathFinderCache
 from metricflow_semantics.experimental.semantic_graph.path_finding.weight_function import EdgeCountWeightFunction
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
+from metricflow_semantics.model.semantics.linkable_spec_index_builder import LinkableSpecIndexBuilder
+from metricflow_semantics.model.semantics.linkable_spec_resolver import LegacyLinkableSpecResolver
+from metricflow_semantics.model.semantics.manifest_object_lookup import SemanticManifestObjectLookup
+from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
-from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_snapshot_equal, assert_str_snapshot_equal
+from metricflow_semantics.test_helpers.snapshot_helpers import (
+    assert_linkable_element_set_snapshot_equal,
+    assert_object_snapshot_equal,
+    assert_str_snapshot_equal,
+    convert_linkable_element_set_to_rows,
+)
 from metricflow_semantics.test_helpers.svg_snapshot import write_svg_snapshot_for_review
 
 from tests_metricflow_semantics.experimental.mf_graph.formatting.svg_formatter import SvgFormatter
@@ -170,28 +186,81 @@ def test_resolver(  # noqa: D103
         attribute_resolver_cache=attribute_resolver_cache,
     )
 
-    # measure_name = "sm_0_measure_0"
-    # matching_nodes = semantic_graph.nodes_with_label(MeasureAttributeLabel(measure_name=measure_name))
-    # measure_node = mf_first_item(
-    #     matching_nodes,
-    #     lambda: MetricflowAssertionError(
-    #         LazyFormat(
-    #             "Did not find exactly 1 node in the semantic graph with the given metric name",
-    #             metric_name=measure_name,
-    #             matching_nodes=matching_nodes,
-    #         )
-    #     ),
-    # )
-    #
-    # attribute_descriptors = spec_resolver.resolve_descriptors_for_measure_node(measure_node)
-    # logger.debug(LazyFormat("Resolved attributes", specs=attribute_descriptors))
     metric_name = "sm_0_measure_0_metric"
 
     attribute_descriptors = spec_resolver.resolve_descriptors_for_metric(metric_name=metric_name)
     logger.debug(LazyFormat("Resolved attributes", attribute_descriptors=attribute_descriptors))
-    # annotated_specs = spec_resolver.resolve_specs_for_metric(metric_name=metric_name)
+
+
+def test_linkable_spec_resolvers(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sg_02_single_join_manifest: PydanticSemanticManifest,
+    sg_02_single_join_lookup: ManifestObjectLookup,
+) -> None:
+    path_finder_cache = PathFinderCache[SemanticGraphNode, SemanticGraphEdge, AttributeComputationPath]()
+
+    path_finder = MetricflowGraphPathFinder[SemanticGraphNode, SemanticGraphEdge, AttributeComputationPath](
+        path_finder_cache
+    )
+    builder = SemanticGraphBuilder(
+        manifest_object_lookup=sg_02_single_join_lookup,
+        path_finder=path_finder,
+    )
+    semantic_graph = builder.build()
+    attribute_resolver_cache = AttributeResolverCache()
+    attribute_resolver = AttributeResolver(
+        manifest_object_lookup=sg_02_single_join_lookup,
+        semantic_graph=semantic_graph,
+        attribute_resolver_cache=attribute_resolver_cache,
+    )
+
+    sg_linkable_spec_resolver = SemanticGraphLinkableSpecResolver(attribute_resolver=attribute_resolver)
+    measure_reference = MeasureReference(element_name="sm_0_measure_0")
+    element_filter = LinkableElementFilter()
+    sg_linkable_element_set = sg_linkable_spec_resolver.get_linkable_element_set_for_measure(
+        measure_reference, element_filter
+    )
+
+    semantic_manifest_lookup = SemanticManifestLookup(sg_02_single_join_manifest)
+    manifest_object_lookup = SemanticManifestObjectLookup(sg_02_single_join_manifest)
+    linkable_spec_index_builder = LinkableSpecIndexBuilder(
+        semantic_manifest=sg_02_single_join_manifest,
+        semantic_model_lookup=semantic_manifest_lookup.semantic_model_lookup,
+        manifest_object_lookup=manifest_object_lookup,
+        max_entity_links=MAX_JOIN_HOPS,
+    )
+    linkable_spec_index = linkable_spec_index_builder.build_index()
+    legacy_linkable_spec_resolver = LegacyLinkableSpecResolver(
+        semantic_manifest=sg_02_single_join_manifest,
+        semantic_model_lookup=semantic_manifest_lookup.semantic_model_lookup,
+        manifest_object_lookup=SemanticManifestObjectLookup(sg_02_single_join_manifest),
+        linkable_spec_index=linkable_spec_index,
+    )
+    legacy_linkable_element_set = legacy_linkable_spec_resolver.get_linkable_element_set_for_measure(
+        measure_reference, element_filter
+    )
+
+    legacy_rows = convert_linkable_element_set_to_rows(legacy_linkable_element_set)
+    sg_rows = convert_linkable_element_set_to_rows(sg_linkable_element_set)
+
+    # for row_index, (legacy_row, sg_row) in enumerate(itertools.zip_longest(legacy_rows, sg_rows)):
+    #     assert legacy_row is not None, LazyFormat("Missing row from `legacy_rows`", row_index=row_index, legacy_row=legacy_row, sg_row=sg_row)
+    #     assert sg_row is not None, LazyFormat("Missing row from `sg_rows`", row_index=row_index, legacy_row=legacy_row, sg_row=sg_row)
+    #     assert legacy_row == sg_row, LazyFormat("Row mismatch", legacy_row=legacy_row, sg_row=sg_row)
+    # logger.debug(LazyFormat("Got annotated specs", annotated_specs=sg_linkable_element_set.annotated_specs))
+
     # logger.debug(
     #     LazyFormat(
-    #         "Resolved specs", annotated_specs=[annotated_spec.spec.qualified_name for annotated_spec in annotated_specs]
+    #         "Got linkable element set",
+    #         sg_linkable_element_set=convert_linkable_element_set_to_rows(sg_linkable_element_set),
     #     )
     # )
+
+    assert_linkable_element_set_snapshot_equal(
+        request=request,
+        snapshot_configuration=mf_test_configuration,
+        linkable_element_set=legacy_linkable_element_set,
+    )
+
+    # assert legacy_linkable_element_set.annotated_specs == sg_linkable_element_set.annotated_specs

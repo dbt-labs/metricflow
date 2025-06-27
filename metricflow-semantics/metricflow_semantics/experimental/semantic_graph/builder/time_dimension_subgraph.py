@@ -101,13 +101,13 @@ class TimeDimensionSubgraphGenerator(SemanticSubgraphGenerator):
                         head_node=time_dimension_node,
                     )
                 )
-                current_subgraph.add_edge(
-                    EntityAttributeEdge.get_instance(
-                        tail_node=join_from_semantic_model_node,
-                        head_node=time_dimension_node,
-                        attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
-                    )
-                )
+                # current_subgraph.add_edge(
+                #     EntityAttributeEdge.get_instance(
+                #         tail_node=join_from_semantic_model_node,
+                #         head_node=time_dimension_node,
+                #         attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
+                #     )
+                # )
                 # Add attribute edges.
                 current_subgraph.add_edges(self._generate_attribute_edges(time_dimension_node, queryable_time_grain))
 
@@ -128,9 +128,6 @@ class TimeDimensionSubgraphGenerator(SemanticSubgraphGenerator):
         edges_to_add = []
         # Add attribute edges from the time dimension node to the queryable time grains.
         # e.g. TimeDimensionNode(`day`) should have edges to {`day`, `month`, `quarter`, `year`}
-        derived_time_grain_update = AttributeComputationUpdate(
-            linkable_element_property_additions=(LinkableElementProperty.DERIVED_TIME_GRANULARITY,)
-        )
 
         # TODO: This seems like it could be consolidated with custom grains.
         for time_grain in self._time_grain_to_queryable_time_grains[node_time_grain]:
@@ -161,7 +158,7 @@ class TimeDimensionSubgraphGenerator(SemanticSubgraphGenerator):
                     head_node=attribute_node,
                     attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
                     attribute_computation_update=AttributeComputationUpdate(
-                        linkable_element_property_additions=(LinkableElementProperty.DERIVED_TIME_GRANULARITY,),
+                        linkable_element_property_additions=(LinkableElementProperty.DATE_PART,),
                         date_part_addition=queryable_date_part,
                     ),
                 )

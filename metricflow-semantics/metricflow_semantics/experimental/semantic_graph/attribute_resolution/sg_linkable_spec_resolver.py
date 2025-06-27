@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 class SemanticGraphLinkableSpecResolver(LinkableSpecResolver):
     """An implementation of `LinkableSpecResolver` using the semantic graph."""
 
-    def __init(self, attribute_resolver: AttributeResolver) -> None:  # noqa: D107
+    def __init__(self, attribute_resolver: AttributeResolver) -> None:  # noqa: D107
         self._attribute_resolver = attribute_resolver
         self._semantic_graph = attribute_resolver.semantic_graph
 
@@ -49,11 +49,11 @@ class SemanticGraphLinkableSpecResolver(LinkableSpecResolver):
     def get_linkable_elements_for_distinct_values_query(
         self, element_filter: LinkableElementFilter
     ) -> BaseLinkableElementSet:
-        pass
+        raise NotImplementedError
 
     def get_linkable_elements_for_metrics(
         self,
         metric_references: Sequence[MetricReference],
         element_filter: LinkableElementFilter = LinkableElementFilter(),
     ) -> BaseLinkableElementSet:
-        pass
+        raise NotImplementedError

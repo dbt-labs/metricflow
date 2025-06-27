@@ -5,9 +5,11 @@ from typing import Iterable, Optional
 
 from typing_extensions import override
 
+from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_flatten
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
+from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeComputationUpdate
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
     AttributeComputationPath,
 )
@@ -99,7 +101,11 @@ class GroupByAttributeSubgraphGenerator:
             )
         )
         return AttributeSubgraphResult(
-            additional_derivative_model_ids=additional_derivative_model_ids, subgraph=subgraph
+            additional_derivative_model_ids=additional_derivative_model_ids,
+            attribute_computation_updates=tuple(
+                node.attribute_computation_update for node in current_common_join_from_nodes
+            ),
+            subgraph=subgraph,
         )
 
     def _generate_subgraph_from_join_from_node(
@@ -159,6 +165,7 @@ class GroupByAttributeSubgraphGenerator:
 @fast_frozen_dataclass()
 class AttributeSubgraphResult:
     additional_derivative_model_ids: FrozenOrderedSet[SemanticModelId]
+    attribute_computation_updates: AnyLengthTuple[AttributeComputationUpdate]
     subgraph: MutableSemanticGraph
 
 

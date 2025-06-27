@@ -367,10 +367,12 @@ class LinkableElementSet(BaseLinkableElementSet):
             linkable_element = linkable_elements[0]
             annotated_specs.append(
                 AnnotatedSpec.create(
-                    element_type=LinkableElementType.DIMENSION,
+                    element_type=path_key.element_type,
                     spec=LinkableElementSet._path_key_to_spec(path_key),
                     properties=FrozenOrderedSet(linkable_element.properties),
-                    origin_model=SemanticModelId(model_name=linkable_element.semantic_model_origin.semantic_model_name),
+                    origin_model_ids=FrozenOrderedSet(
+                        (SemanticModelId(model_name=linkable_element.semantic_model_origin.semantic_model_name),)
+                    ),
                     derived_from_semantic_models=FrozenOrderedSet(linkable_element.derived_from_semantic_models),
                 )
             )

@@ -8,6 +8,7 @@ from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import Pair
 from metricflow_semantics.experimental.ordered_set import MutableOrderedSet, OrderedSet
+from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeComputationUpdate
 from metricflow_semantics.experimental.semantic_graph.builder.graph_change_rule import (
     SemanticSubgraphGenerator,
     SubgraphGeneratorArgumentSet,
@@ -24,6 +25,7 @@ from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import (
     JoinToModelNode,
 )
 from metricflow_semantics.experimental.semantic_graph.semantic_graph import MutableSemanticGraph, SemanticGraph
+from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 
 logger = logging.getLogger(__name__)
 
@@ -72,7 +74,7 @@ class EntityJoinSubgraphGenerator(SemanticSubgraphGenerator):
                     left_model_id=model_id,
                 )
             )
-
+        primary_entity_name = lookup.primary_entity_name
         for entity_node in valid_target_dsi_entity_nodes_for_joins_from_this_model:
             for right_model_id in self._manifest_object_lookup.entity_name_to_joinable_semantic_model_id[
                 entity_node.entity_name
@@ -82,17 +84,26 @@ class EntityJoinSubgraphGenerator(SemanticSubgraphGenerator):
                         tail_node=join_from_semantic_model_node,
                         head_node=entity_node,
                         right_model_id=right_model_id,
+                        attribute_computation_update=AttributeComputationUpdate(
+                            linkable_element_property_additions=(
+                                (LinkableElementProperty.LOCAL_LINKED,)
+                                if entity_node.entity_name == primary_entity_name
+                                else ()
+                            )
+                        ),
                     )
                 )
         # Handle case when the primary entity field in the semantic model is set and there isn't an entity element in
         # the model with `EntityType.PRIMARY`.
-        primary_entity_name_field = lookup.primary_entity_name
-        if primary_entity_name_field is not None:
+        if primary_entity_name is not None:
             current_subgraph.add_edge(
                 JoinFromModelEdge.get_instance(
                     tail_node=join_from_semantic_model_node,
-                    head_node=DsiEntityNode.get_instance(entity_name=primary_entity_name_field),
+                    head_node=DsiEntityNode.get_instance(entity_name=primary_entity_name),
                     right_model_id=model_id,
+                    attribute_computation_update=AttributeComputationUpdate(
+                        linkable_element_property_additions=(LinkableElementProperty.LOCAL_LINKED,),
+                    ),
                 )
             )
 

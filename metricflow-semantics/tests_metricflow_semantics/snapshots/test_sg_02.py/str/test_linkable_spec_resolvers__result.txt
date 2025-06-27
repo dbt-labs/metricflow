@@ -1,0 +1,18 @@
+test_name: test_linkable_spec_resolvers
+test_filename: test_sg_02.py
+---
+--------------  ------------------------------------------------------------------------------------  ----------------------------------------------  ----------------------------------------------------  ----------------
+DIMENSION       sm_1_primary_entity__dim_0                                                                                                            ['JOINED']                                            ['sm_0', 'sm_1']
+ENTITY          sm_0_primary_entity                                                                                                                   ['ENTITY', 'LOCAL']                                   ['sm_0']
+ENTITY          sm_0_primary_entity__sm_1_primary_entity                                                                                              ['ENTITY', 'LOCAL']                                   ['sm_0']
+ENTITY          sm_1_primary_entity                                                                                                                   ['ENTITY', 'LOCAL']                                   ['sm_0']
+METRIC          sm_0_primary_entity__sm_0_measure_0_metric                                            ['sm_0_primary_entity']                         ['JOINED', 'METRIC']                                  ['sm_0']
+METRIC          sm_1_primary_entity__sm_0_measure_0_metric                                            ['sm_1_primary_entity']                         ['JOINED', 'METRIC']                                  ['sm_0']
+METRIC          sm_1_primary_entity__sm_0_primary_entity__sm_1_primary_entity__sm_0_measure_0_metric  ['sm_0_primary_entity', 'sm_1_primary_entity']  ['JOINED', 'METRIC']                                  ['sm_0']
+TIME_DIMENSION  metric_time__custom_year                                                                                                              ['DERIVED_TIME_GRANULARITY', 'LOCAL', 'METRIC_TIME']  ['sm_0']
+TIME_DIMENSION  metric_time__extract_year                                                                                                             ['DATE_PART', 'METRIC_TIME']                          ['sm_0']
+TIME_DIMENSION  metric_time__year                                                                                                                     ['LOCAL', 'METRIC_TIME']                              ['sm_0']
+TIME_DIMENSION  sm_0_primary_entity__ds__custom_year                                                                                                  ['DERIVED_TIME_GRANULARITY', 'LOCAL']                 ['sm_0']
+TIME_DIMENSION  sm_0_primary_entity__ds__extract_year                                                                                                 ['DATE_PART', 'LOCAL']                                ['sm_0']
+TIME_DIMENSION  sm_0_primary_entity__ds__year                                                                                                         ['LOCAL']                                             ['sm_0']
+--------------  ------------------------------------------------------------------------------------  ----------------------------------------------  ----------------------------------------------------  ----------------

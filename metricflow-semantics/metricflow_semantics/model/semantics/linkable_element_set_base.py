@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from abc import ABC, abstractmethod
 from functools import cached_property
-from typing import Sequence
+from typing import Iterable, Sequence
 
 from dbt_semantic_interfaces.references import SemanticModelReference
 from typing_extensions import Self, override
@@ -74,23 +74,23 @@ class AnnotatedSpec(SemanticModelDerivation):
     # There can be multiple models if it's a metric / derived metric that references multiple measures, and the join
     # path from the measure to the dimension is different, but using a singular item during migration to align with the
     # existing code.
-    origin_model_id: SemanticModelId
+    origin_model_ids: FrozenOrderedSet[SemanticModelId]
     _derived_from_semantic_models: FrozenOrderedSet[SemanticModelReference]
 
     @staticmethod
     def create(
         element_type: LinkableElementType,
         spec: LinkableInstanceSpec,
-        properties: FrozenOrderedSet[LinkableElementProperty],
-        origin_model: SemanticModelId,
-        derived_from_semantic_models: FrozenOrderedSet[SemanticModelReference],
+        properties: Iterable[LinkableElementProperty],
+        origin_model_ids: Iterable[SemanticModelId],
+        derived_from_semantic_models: Iterable[SemanticModelReference],
     ) -> AnnotatedSpec:
         return AnnotatedSpec(
             element_type=element_type,
             spec=spec,
-            properties=properties,
-            origin_model_id=origin_model,
-            _derived_from_semantic_models=derived_from_semantic_models,
+            properties=FrozenOrderedSet(properties),
+            origin_model_ids=FrozenOrderedSet(origin_model_ids),
+            _derived_from_semantic_models=FrozenOrderedSet(derived_from_semantic_models),
         )
 
     @override

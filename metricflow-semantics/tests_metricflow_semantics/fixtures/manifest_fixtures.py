@@ -178,6 +178,11 @@ def sg_01_primary_entity_defined_lookup(
 
 
 @pytest.fixture(scope="session")
+def sg_02_single_join_manifest(template_mapping: Dict[str, str]) -> PydanticSemanticManifest:  # noqa: D103
+    return load_semantic_manifest(SG_02_SINGLE_JOIN.directory, template_mapping)
+
+
+@pytest.fixture(scope="session")
 def sg_02_single_join_lookup(template_mapping: Dict[str, str]) -> ManifestObjectLookup:  # noqa: D103
     manifest = load_semantic_manifest(SG_02_SINGLE_JOIN.directory, template_mapping)
     return ManifestObjectLookup(manifest)
