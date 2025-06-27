@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from _pytest.fixtures import FixtureRequest
+from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from tests_metricflow.integration.conftest import IntegrationTestHelpers
@@ -110,4 +111,32 @@ def test_list_group_bys_with_metric_names(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         obj_id="result0",
         obj=[group_by.default_search_and_sort_attribute for group_by in group_bys],
+    )
+
+
+def test_group_by_exists(  # noqa: D103
+    request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, it_helpers: IntegrationTestHelpers
+) -> None:
+    """Test checking if group by elements exist in the semantic manifest."""
+    # Test a dimension that should exist
+    assert it_helpers.mf_engine.group_by_exists(
+        StructuredLinkableSpecName(element_name="ds", entity_link_names=("booking",))
+    )
+    assert it_helpers.mf_engine.group_by_exists(
+        StructuredLinkableSpecName(element_name="metric_time", entity_link_names=())
+    )
+
+    # Test an entity that should exist
+    assert it_helpers.mf_engine.group_by_exists(
+        StructuredLinkableSpecName(element_name="listing", entity_link_names=("listing",))
+    )
+
+    # Test a non-existent element
+    assert not it_helpers.mf_engine.group_by_exists(
+        StructuredLinkableSpecName(element_name="non_existent_element", entity_link_names=())
+    )
+
+    # Test with incorrect primary entity
+    assert not it_helpers.mf_engine.group_by_exists(
+        StructuredLinkableSpecName(element_name="ds", entity_link_names=("not_real_entity",))
     )

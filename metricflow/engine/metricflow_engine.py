@@ -9,7 +9,9 @@ from typing import FrozenSet, List, Optional, Sequence, Set, Tuple
 
 from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimensionTypeParams
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
+from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.references import (
+    EntityReference,
     MeasureReference,
     MetricReference,
     SemanticModelElementReference,
@@ -831,3 +833,18 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             # TODO: better support for querying entities without metrics; include entities here at that time
             group_bys = self.list_dimensions()
         return sorted(group_bys, key=lambda x: x.default_search_and_sort_attribute)
+
+    def group_by_exists(self, structured_name: StructuredLinkableSpecName) -> bool:
+        """Check if a group by exists in the semantic manifest by its element name."""
+        qualified_name = structured_name.granularity_free_qualified_name
+        return (
+            qualified_name == METRIC_TIME_ELEMENT_NAME
+            or (
+                qualified_name
+                in self._semantic_manifest_lookup.semantic_model_lookup.dimension_lookup.dimensions_by_qualified_name
+            )
+            or (
+                EntityReference(structured_name.element_name)
+                in self._semantic_manifest_lookup.semantic_model_lookup.entity_index
+            )
+        )
