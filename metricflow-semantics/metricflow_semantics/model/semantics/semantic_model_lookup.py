@@ -48,7 +48,7 @@ class SemanticModelLookup:
         self._measure_index: Dict[MeasureReference, SemanticModel] = {}
         self._measure_non_additive_dimension_specs: Dict[MeasureReference, NonAdditiveDimensionSpec] = {}
         self._dimension_index: Dict[DimensionReference, List[SemanticModel]] = {}
-        self._entity_index: Dict[EntityReference, List[SemanticModel]] = {}
+        self.entity_index: Dict[EntityReference, List[SemanticModel]] = {}
 
         self._dimension_ref_to_spec: Dict[DimensionReference, DimensionSpec] = {}
         self._entity_ref_to_spec: Dict[EntityReference, EntitySpec] = {}
@@ -89,7 +89,7 @@ class SemanticModelLookup:
 
     def get_entity_references(self) -> Sequence[EntityReference]:
         """Retrieve all entity references from the collection of semantic models."""
-        return list(self._entity_index.keys())
+        return list(self.entity_index.keys())
 
     def get_entity_in_semantic_model(self, ref: SemanticModelElementReference) -> Optional[Entity]:
         """Retrieve the entity matching the element -> semantic model mapping, if any."""
@@ -187,8 +187,8 @@ class SemanticModelLookup:
                 self._dimension_ref_to_spec[dim.reference] = DimensionSpec(element_name=dim.name, entity_links=())
 
         for entity in semantic_model.entities:
-            semantic_models_for_entity = self._entity_index.get(entity.reference, []) + [semantic_model]
-            self._entity_index[entity.reference] = semantic_models_for_entity
+            semantic_models_for_entity = self.entity_index.get(entity.reference, []) + [semantic_model]
+            self.entity_index[entity.reference] = semantic_models_for_entity
 
             self._entity_ref_to_spec[entity.reference] = EntitySpec(element_name=entity.name, entity_links=())
 
@@ -205,7 +205,7 @@ class SemanticModelLookup:
 
     def get_semantic_models_for_entity(self, entity_reference: EntityReference) -> Set[SemanticModel]:
         """Return all semantic models associated with an entity reference."""
-        return set(self._entity_index.get(entity_reference, []))
+        return set(self.entity_index.get(entity_reference, []))
 
     def get_semantic_models_for_dimension(self, dimension_reference: DimensionReference) -> Set[SemanticModel]:
         """Return all semantic models associated with a dimension reference."""

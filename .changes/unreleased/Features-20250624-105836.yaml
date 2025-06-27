@@ -1,6 +1,0 @@
-kind: Features
-body: Enable sort, search, and pagination on metadata queries
-time: 2025-06-24T10:58:36.410353-07:00
-custom:
-  Author: courtneyholcomb
-  Issue: "1771"
