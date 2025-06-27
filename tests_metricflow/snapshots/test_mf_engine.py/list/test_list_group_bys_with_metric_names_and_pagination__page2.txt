@@ -1,6 +1,0 @@
-test_name: test_list_group_bys_with_metric_names_and_pagination
-test_filename: test_mf_engine.py
-docstring:
-  Test listing group bys for a metric with sorting and pagination.
----
-['booking__is_instant', 'booking__paid_at']

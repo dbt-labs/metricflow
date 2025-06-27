@@ -1,6 +1,0 @@
-test_name: test_list_saved_queries_with_search
-test_filename: test_mf_engine.py
-docstring:
-  Test listing saved_queries with search filter.
----
-['p0_booking']

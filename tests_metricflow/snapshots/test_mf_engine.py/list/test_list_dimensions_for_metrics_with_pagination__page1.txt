@@ -1,6 +1,0 @@
-test_name: test_list_dimensions_for_metrics_with_pagination
-test_filename: test_mf_engine.py
-docstring:
-  Test getting dimensions with sorting and pagination.
----
-['booking__ds', 'booking__ds_partitioned']

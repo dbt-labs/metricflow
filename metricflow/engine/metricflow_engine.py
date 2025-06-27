@@ -2,11 +2,10 @@ from __future__ import annotations
 
 import datetime
 import logging
-import math
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from typing import FrozenSet, Generic, List, Optional, Sequence, Set, Tuple
+from typing import FrozenSet, List, Optional, Sequence, Set, Tuple
 
 from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimensionTypeParams
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
@@ -82,7 +81,7 @@ SIMPLE_DIMENSIONS_WITHOUT_ANY_PROPERTIES: Set[LinkableElementProperty] = {
 }
 ENTITY_WITH_ANY_PROPERTIES: Set[LinkableElementProperty] = {LinkableElementProperty.ENTITY}
 
-T = TypeVar("T", bound=SearchableElement)
+SearchableElementGeneric = TypeVar("SearchableElementGeneric", bound=SearchableElement)
 
 
 @dataclass(frozen=True)
@@ -97,17 +96,6 @@ class MetricFlowQueryType(Enum):
 
     METRIC = "metric"
     DIMENSION_VALUES = "dimension_values"
-
-
-@dataclass(frozen=True)
-class MetadataResultPage(Generic[T]):
-    """A page of metadata results."""
-
-    items: List[T]
-    page_num: int
-    page_size: Optional[int]
-    total_pages: int
-    total_items: int
 
 
 @dataclass(frozen=True)
@@ -269,7 +257,6 @@ class AbstractMetricFlowEngine(ABC):
         self,
         metric_names: List[str],
         without_any_property: Sequence[LinkableElementProperty],
-        search_str: Optional[str] = None,
     ) -> List[Dimension]:
         """Retrieves a list of all common dimensions for metric_names.
 
@@ -286,7 +273,7 @@ class AbstractMetricFlowEngine(ABC):
         pass
 
     @abstractmethod
-    def entities_for_metrics(self, metric_names: List[str], search_str: Optional[str] = None) -> List[Entity]:
+    def entities_for_metrics(self, metric_names: List[str]) -> List[Entity]:
         """Retrieves a list of all entities for metric_names.
 
         Args:
@@ -298,7 +285,7 @@ class AbstractMetricFlowEngine(ABC):
         pass
 
     @abstractmethod
-    def list_metrics(self, include_dimensions: bool = True, search_str: Optional[str] = None) -> List[Metric]:
+    def list_metrics(self, include_dimensions: bool = True) -> List[Metric]:
         """Retrieves a list of metric names.
 
         Returns:
@@ -353,62 +340,18 @@ class AbstractMetricFlowEngine(ABC):
         pass
 
     @abstractmethod
-    def list_dimensions(self, search_str: Optional[str] = None) -> List[Dimension]:
-        """List all dimensions in the semantic manifest."""
+    def list_dimensions(self, metric_names: Optional[List[str]] = None) -> List[Dimension]:
+        """List all dimensions in the semantic manifest, with optional filters."""
         pass
 
     @abstractmethod
-    def list_dimensions_paginated(
-        self,
-        metric_names: Optional[List[str]] = None,
-        search_str: Optional[str] = None,
-        page_num: int = 1,
-        page_size: Optional[int] = None,
-    ) -> MetadataResultPage[Dimension]:
-        """List all dimensions in the semantic manifest, paginated and optionally filtered."""
+    def list_group_bys(self, metric_names: Optional[List[str]] = None) -> List[Entity | Dimension]:
+        """List all group bys in the semantic manifest, with optional filters."""
         pass
 
     @abstractmethod
-    def list_entities_paginated(
-        self,
-        metric_names: Optional[List[str]] = None,
-        search_str: Optional[str] = None,
-        page_num: int = 1,
-        page_size: Optional[int] = None,
-    ) -> MetadataResultPage[Entity]:
-        """List all entities in the semantic manifest, paginated and optionally filtered."""
-        pass
-
-    @abstractmethod
-    def list_metrics_paginated(
-        self,
-        search_str: Optional[str] = None,
-        include_dimensions: bool = True,
-        page_num: int = 1,
-        page_size: Optional[int] = None,
-    ) -> MetadataResultPage[Metric]:
-        """List all metrics in the semantic manifest, paginated and optionally filtered."""
-        pass
-
-    @abstractmethod
-    def list_saved_queries_paginated(
-        self,
-        search_str: Optional[str] = None,
-        page_num: int = 1,
-        page_size: Optional[int] = None,
-    ) -> MetadataResultPage[SavedQuery]:
-        """List all saved queries in the semantic manifest, paginated and optionally filtered."""
-        pass
-
-    @abstractmethod
-    def list_group_bys_paginated(
-        self,
-        metric_names: Optional[List[str]] = None,
-        search_str: Optional[str] = None,
-        page_num: int = 1,
-        page_size: Optional[int] = None,
-    ) -> MetadataResultPage[Entity | Dimension]:
-        """List all group bys in the semantic manifest, paginated and optionally filtered."""
+    def list_saved_queries(self) -> List[SavedQuery]:
+        """List all saved queries in the semantic manifest, with optional filters."""
         pass
 
 
@@ -679,30 +622,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 )
         return list(measures)
 
-    def paginate(
-        self,
-        items: Sequence[T],
-        page_num: int = 1,
-        page_size: Optional[int] = None,
-    ) -> MetadataResultPage[T]:
-        """Helper to sort and paginate a list of items. Pagination is 1-indexed."""
-        if page_num < 1:
-            raise InvalidQueryException("Page number must be at least 1")
-        if page_size and page_size < 1:
-            raise InvalidQueryException("Page size must be at least 1")
-
-        output_items = list(items)
-        if page_size:
-            output_items = output_items[(page_num - 1) * page_size : page_num * page_size]
-        total_items = len(items)
-        return MetadataResultPage(
-            items=output_items,
-            page_num=page_num,
-            page_size=page_size,
-            total_items=total_items,
-            total_pages=math.ceil(total_items / page_size) if page_size else 1,
-        )
-
     def _build_metric_time_from_linkable_dimension(self, linkable_dimension: LinkableDimension) -> Dimension:
         metric_time_name = DataSet.metric_time_dimension_name()
         assert linkable_dimension.element_name == metric_time_name, (
@@ -741,7 +660,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         self,
         metric_names: List[str],
         without_any_property: Sequence[LinkableElementProperty] = tuple(SIMPLE_DIMENSIONS_WITHOUT_ANY_PROPERTIES),
-        search_str: Optional[str] = None,
     ) -> List[Dimension]:
         linkable_element_set = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_metrics(
             metric_references=tuple(MetricReference(element_name=mname) for mname in metric_names),
@@ -749,25 +667,9 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 without_any_of=frozenset(without_any_property),
             ),
         )
-        return self._filter_linkable_dimensions(linkable_element_set=linkable_element_set, search_str=search_str)
+        return self._filter_linkable_dimensions(linkable_element_set=linkable_element_set)
 
-    @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-    def list_dimensions_paginated(  # noqa: D102
-        self,
-        metric_names: Optional[List[str]] = None,
-        search_str: Optional[str] = None,
-        page_num: int = 1,
-        page_size: Optional[int] = None,
-    ) -> MetadataResultPage[Dimension]:
-        if metric_names:
-            dimensions = self.simple_dimensions_for_metrics(metric_names=metric_names, search_str=search_str)
-        else:
-            dimensions = self.list_dimensions(search_str=search_str)
-        return self.paginate(items=dimensions, page_num=page_num, page_size=page_size)
-
-    def _filter_linkable_dimensions(
-        self, linkable_element_set: LinkableElementSet, search_str: Optional[str] = None
-    ) -> List[Dimension]:
+    def _filter_linkable_dimensions(self, linkable_element_set: LinkableElementSet) -> List[Dimension]:
         dimensions: List[Dimension] = []
         for path_key, linkable_dimensions_tuple in linkable_element_set.path_key_to_linkable_dimensions.items():
             for linkable_dimension in linkable_dimensions_tuple:
@@ -788,35 +690,31 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                         ),
                         entity_links=path_key.entity_links,
                     )
-                if not search_str or search_str in dimension.default_search_and_sort_attribute:
-                    dimensions.append(dimension)
+                dimensions.append(dimension)
 
         return sorted(dimensions, key=lambda x: x.default_search_and_sort_attribute)
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-    def list_dimensions(self, search_str: Optional[str] = None) -> List[Dimension]:
+    def list_dimensions(self, metric_names: Optional[List[str]] = None) -> List[Dimension]:
         """Get full dimension object for all dimensions in the semantic manifest."""
-        semantic_model_lookup = self._semantic_manifest_lookup.semantic_model_lookup
-
         dimensions: List[Dimension] = []
-        for dimension_reference in semantic_model_lookup.get_dimension_references():
-            for semantic_model in semantic_model_lookup.get_semantic_models_for_dimension(dimension_reference):
-                dimension = Dimension.from_pydantic(
-                    pydantic_dimension=SemanticModelHelper.get_dimension_from_semantic_model(
-                        semantic_model=semantic_model, dimension_reference=dimension_reference
-                    ),
-                    entity_links=(SemanticModelHelper.resolved_primary_entity(semantic_model),),
-                )
-                if not search_str or search_str in dimension.default_search_and_sort_attribute:
+        if metric_names:
+            dimensions = self.simple_dimensions_for_metrics(metric_names=metric_names)
+        else:
+            semantic_model_lookup = self._semantic_manifest_lookup.semantic_model_lookup
+            for dimension_reference in semantic_model_lookup.get_dimension_references():
+                for semantic_model in semantic_model_lookup.get_semantic_models_for_dimension(dimension_reference):
+                    dimension = Dimension.from_pydantic(
+                        pydantic_dimension=SemanticModelHelper.get_dimension_from_semantic_model(
+                            semantic_model=semantic_model, dimension_reference=dimension_reference
+                        ),
+                        entity_links=(SemanticModelHelper.resolved_primary_entity(semantic_model),),
+                    )
                     dimensions.append(dimension)
 
         return sorted(dimensions, key=lambda x: x.default_search_and_sort_attribute)
 
-    def entities_for_metrics(  # noqa: D102
-        self,
-        metric_names: List[str],
-        search_str: Optional[str] = None,
-    ) -> List[Entity]:
+    def entities_for_metrics(self, metric_names: List[str]) -> List[Entity]:  # noqa: D102
         linkable_element_set = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_metrics(
             metric_references=tuple(MetricReference(element_name=mname) for mname in metric_names),
             element_set_filter=LinkableElementFilter(
@@ -824,26 +722,10 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             ),
         )
 
-        entities = self._filter_linkable_entities(linkable_element_set=linkable_element_set, search_str=search_str)
-        return entities
+        entities = self._filter_linkable_entities(linkable_element_set=linkable_element_set)
+        return sorted(entities, key=lambda x: x.default_search_and_sort_attribute)
 
-    def list_entities_paginated(  # noqa: D102
-        self,
-        metric_names: Optional[List[str]] = None,
-        search_str: Optional[str] = None,
-        page_num: int = 1,
-        page_size: Optional[int] = None,
-    ) -> MetadataResultPage[Entity]:
-        if metric_names:
-            entities = self.entities_for_metrics(metric_names=metric_names, search_str=search_str)
-        else:
-            # TODO: better support for querying entities without metrics; include entities here at that time
-            entities = []
-        return self.paginate(items=entities, page_num=page_num, page_size=page_size)
-
-    def _filter_linkable_entities(
-        self, linkable_element_set: LinkableElementSet, search_str: Optional[str] = None
-    ) -> List[Entity]:
+    def _filter_linkable_entities(self, linkable_element_set: LinkableElementSet) -> List[Entity]:
         entities: List[Entity] = []
         for linkable_entity_tuple in linkable_element_set.path_key_to_linkable_entities.values():
             for linkable_entity in linkable_entity_tuple:
@@ -855,17 +737,14 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 )
                 if pydantic_entity:
                     entity = Entity.from_pydantic(pydantic_entity)
-                    if (
-                        not search_str
-                        or search_str in entity.default_search_and_sort_attribute
-                        # Dedupe. Duplicates currently show up because of local linked entities.
-                    ) and entity not in entities:
+                    # Dedupe. Duplicates currently show up because of local linked entities.
+                    if entity not in entities:
                         entities.append(entity)
 
-        return sorted(entities, key=lambda x: x.default_search_and_sort_attribute)
+        return entities
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-    def list_metrics(self, include_dimensions: bool = True, search_str: Optional[str] = None) -> List[Metric]:
+    def list_metrics(self, include_dimensions: bool = True) -> List[Metric]:
         """List all metrics in semantic manifest matching params. Sorted automatically."""
         metric_lookup = self._semantic_manifest_lookup.metric_lookup
         metrics: List[Metric] = []
@@ -874,42 +753,16 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 pydantic_metric=pydantic_metric,
                 dimensions=self.simple_dimensions_for_metrics([pydantic_metric.name]) if include_dimensions else [],
             )
-            if not search_str or search_str in metric.default_search_and_sort_attribute:
-                metrics.append(metric)
-        return metrics
+            metrics.append(metric)
+        return sorted(metrics, key=lambda x: x.default_search_and_sort_attribute)
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-    def list_metrics_paginated(  # noqa: D102
-        self,
-        search_str: Optional[str] = None,
-        include_dimensions: bool = True,
-        page_num: int = 1,
-        page_size: Optional[int] = None,
-    ) -> MetadataResultPage[Metric]:
-        metrics = self.list_metrics(search_str=search_str, include_dimensions=include_dimensions)
-        return self.paginate(items=metrics, page_num=page_num, page_size=page_size)
-
-    @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-    def list_saved_queries(  # noqa: D102
-        self,
-        search_str: Optional[str] = None,
-    ) -> List[SavedQuery]:
+    def list_saved_queries(self) -> List[SavedQuery]:  # noqa: D102
         saved_queries: List[SavedQuery] = []
         for pydantic_saved_query in self._semantic_manifest_lookup.semantic_manifest.saved_queries:
             saved_query = SavedQuery.from_pydantic(pydantic_saved_query)
-            if not search_str or search_str in saved_query.default_search_and_sort_attribute:
-                saved_queries.append(saved_query)
+            saved_queries.append(saved_query)
         return sorted(saved_queries, key=lambda x: x.default_search_and_sort_attribute)
-
-    @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-    def list_saved_queries_paginated(  # noqa: D102
-        self,
-        search_str: Optional[str] = None,
-        page_num: int = 1,
-        page_size: Optional[int] = None,
-    ) -> MetadataResultPage[SavedQuery]:
-        saved_queries = self.list_saved_queries(search_str=search_str)
-        return self.paginate(items=saved_queries, page_num=page_num, page_size=page_size)
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def get_dimension_values(  # noqa: D102
@@ -962,11 +815,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         )
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-    def list_group_bys(
-        self,
-        metric_names: Optional[List[str]] = None,
-        search_str: Optional[str] = None,
-    ) -> Sequence[Entity | Dimension]:
+    def list_group_bys(self, metric_names: Optional[List[str]] = None) -> List[Entity | Dimension]:
         """List all possible group bys, or all group bys allowed for the selected metrics."""
         if metric_names:
             linkable_element_set = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_metrics(
@@ -976,20 +825,9 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 ),
             )
             group_bys: Sequence = self._filter_linkable_entities(
-                linkable_element_set=linkable_element_set, search_str=search_str
-            ) + self._filter_linkable_dimensions(linkable_element_set=linkable_element_set, search_str=search_str)
+                linkable_element_set=linkable_element_set
+            ) + self._filter_linkable_dimensions(linkable_element_set=linkable_element_set)
         else:
             # TODO: better support for querying entities without metrics; include entities here at that time
-            group_bys = self.list_dimensions(search_str=search_str)
+            group_bys = self.list_dimensions()
         return sorted(group_bys, key=lambda x: x.default_search_and_sort_attribute)
-
-    @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-    def list_group_bys_paginated(  # noqa: D102
-        self,
-        metric_names: Optional[List[str]] = None,
-        search_str: Optional[str] = None,
-        page_num: int = 1,
-        page_size: Optional[int] = None,
-    ) -> MetadataResultPage[Entity | Dimension]:
-        group_bys = self.list_group_bys(metric_names=metric_names, search_str=search_str)
-        return self.paginate(items=group_bys, page_num=page_num, page_size=page_size)
