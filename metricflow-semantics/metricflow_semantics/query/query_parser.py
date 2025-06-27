@@ -82,11 +82,8 @@ class MetricFlowQueryParser:
         where_filter_pattern_factory: WhereFilterPatternFactory = DefaultWhereFilterPatternFactory(),
     ) -> None:
         self._manifest_lookup = semantic_manifest_lookup
-        self._metric_naming_schemes = (MetricNamingScheme(),)
-        self._group_by_item_naming_schemes = (
-            ObjectBuilderNamingScheme(),
-            DunderNamingScheme(),
-        )
+        self._metric_naming_schemes = (MetricNamingScheme(), ObjectBuilderNamingScheme())
+        self._group_by_item_naming_schemes = (ObjectBuilderNamingScheme(), DunderNamingScheme())
         self._where_filter_pattern_factory = where_filter_pattern_factory
         self._time_period_adjuster = DateutilTimePeriodAdjuster()
 
@@ -113,6 +110,12 @@ class MetricFlowQueryParser:
             parsed_where_filters.extend(saved_query.query_params.where.where_filters)
         if where_filters is not None:
             parsed_where_filters.extend(where_filters)
+
+        # Order by and limit passed into the query directly should override those in the YAML.
+        if order_by_names is None and order_by_parameters is None:
+            order_by_names = saved_query.query_params.order_by
+        if limit is None:
+            limit = saved_query.query_params.limit
 
         return self._parse_and_validate_query(
             metric_names=saved_query.query_params.metrics,
@@ -240,7 +243,7 @@ class MetricFlowQueryParser:
                             ),
                         )
                     )
-
+            print("possible_inputs::", possible_inputs)
             resolver_inputs.append(
                 ResolverInputForOrderByItem(
                     input_obj=order_by_name,
@@ -388,14 +391,14 @@ class MetricFlowQueryParser:
         resolver_inputs_for_metrics: List[ResolverInputForMetric] = []
         for metric_name in metric_names:
             resolver_input_for_metric: Optional[MetricFlowQueryResolverInput] = None
-            for metric_naming_scheme in self._metric_naming_schemes:
-                if metric_naming_scheme.input_str_follows_scheme(
-                    metric_name, semantic_manifest_lookup=self._manifest_lookup
-                ):
+            for naming_scheme in self._metric_naming_schemes:
+                print("naming_scheme::", naming_scheme)
+                if naming_scheme.input_str_follows_scheme(metric_name, semantic_manifest_lookup=self._manifest_lookup):
+                    print("using naming_scheme::", naming_scheme)
                     resolver_input_for_metric = ResolverInputForMetric(
                         input_obj=metric_name,
-                        naming_scheme=metric_naming_scheme,
-                        spec_pattern=metric_naming_scheme.spec_pattern(
+                        naming_scheme=naming_scheme,
+                        spec_pattern=naming_scheme.spec_pattern(
                             metric_name, semantic_manifest_lookup=self._manifest_lookup
                         ),
                     )

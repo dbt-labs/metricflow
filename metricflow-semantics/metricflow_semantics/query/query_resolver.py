@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import itertools
 import logging
+import time
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Set, Tuple
@@ -64,6 +65,7 @@ from metricflow_semantics.query.validation_rules.unique_column_names import Uniq
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.order_by_spec import OrderBySpec
+from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_set import group_specs_by_type
 from metricflow_semantics.workarounds.reference import sorted_semantic_model_references
@@ -176,6 +178,20 @@ class MetricFlowQueryResolver:
             resolution = resolution.with_alias(group_by_item_input.alias)
         return resolution
 
+    def _resolve_metric_input(
+        self, spec_pattern: SpecPattern, available_metric_specs: Sequence[MetricSpec]
+    ) -> List[MetricSpec]:
+        start_time = time.perf_counter()
+        matching_specs = set(spec_pattern.match(available_metric_specs))
+
+        filtered_metric_specs: List[MetricSpec] = []
+        for metric_spec in available_metric_specs:
+            if metric_spec in matching_specs:
+                filtered_metric_specs.append(metric_spec)
+
+        logger.debug(LazyFormat(lambda: f"Filtering valid metrics took: {time.perf_counter() - start_time:.2f}s"))
+        return filtered_metric_specs
+
     def _resolve_metric_inputs(
         self,
         metric_inputs: Sequence[ResolverInputForMetric],
@@ -196,7 +212,9 @@ class MetricFlowQueryResolver:
 
         # Find the metric that matches the metric pattern from the input.
         for metric_input in metric_inputs:
-            matching_specs = metric_input.spec_pattern.match(available_metric_specs)
+            matching_specs = self._resolve_metric_input(
+                spec_pattern=metric_input.spec_pattern, available_metric_specs=available_metric_specs
+            )
             if len(matching_specs) == 1:
                 matching_spec = matching_specs[0]
                 alias = metric_input.alias
@@ -294,6 +312,7 @@ class MetricFlowQueryResolver:
             matching_specs: List[InstanceSpec] = []
             for possible_input in resolver_input_for_order_by.possible_inputs:
                 spec_pattern = possible_input.spec_pattern
+                print("spec_pattern::", spec_pattern)
                 matching_specs.extend(spec_pattern.match(metric_specs))
                 matching_specs.extend(spec_pattern.match(group_by_item_specs))
 

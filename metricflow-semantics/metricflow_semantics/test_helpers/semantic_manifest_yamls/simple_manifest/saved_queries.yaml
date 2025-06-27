@@ -11,6 +11,12 @@ saved_query:
       - Dimension('listing__capacity_latest')
     where:
       - "{{ Dimension('listing__capacity_latest') }} > 3"
+    order_by:
+      # - TimeDimension('metric_time', 'day').descending(True)
+      # - Dimension('listing__capacity_latest')
+      # - Metric('bookings').descending(True)
+      - Metric('instant_bookings')
+    limit: 10
 ---
 saved_query:
   name: saved_query_with_cumulative_metric
