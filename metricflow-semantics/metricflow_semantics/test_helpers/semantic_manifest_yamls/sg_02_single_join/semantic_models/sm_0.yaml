@@ -22,7 +22,7 @@ semantic_model:
     - name: ds
       type: time
       type_params:
-        time_granularity: year
+        time_granularity: quarter
 
 
 ---

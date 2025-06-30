@@ -72,7 +72,13 @@ class MeasureAttributeSubgraphGenerator(TimeDimensionSubgraphGenerator):
                 )
 
                 # Add edges to the time attributes (e.g. `day`, `year`).
-                current_subgraph.add_edges(self._generate_attribute_edges(metric_time_node, queryable_time_grain))
+                current_subgraph.add_edges(
+                    self._generate_attribute_edges(
+                        time_dimension_node=metric_time_node,
+                        element_time_grain=aggregation_configuration.time_grain,
+                        node_time_grain=queryable_time_grain,
+                    )
+                )
 
                 # Add an edge from the aggregation entity node to the join-from node.
                 current_subgraph.add_edge(

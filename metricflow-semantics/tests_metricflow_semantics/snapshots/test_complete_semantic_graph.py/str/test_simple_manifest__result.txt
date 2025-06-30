@@ -223,63 +223,15 @@ dot_notation:
   	subgraph cluster_time_entity {
   		label=time_entity
   		"TimeDimension(archived_at, hour)"
-  		"TimeDimension(archived_at, day)"
-  		"TimeDimension(archived_at, week)"
-  		"TimeDimension(archived_at, month)"
-  		"TimeDimension(archived_at, quarter)"
-  		"TimeDimension(archived_at, year)"
   		"TimeDimension(bio_added_ts, second)"
-  		"TimeDimension(bio_added_ts, minute)"
-  		"TimeDimension(bio_added_ts, hour)"
-  		"TimeDimension(bio_added_ts, day)"
-  		"TimeDimension(bio_added_ts, week)"
-  		"TimeDimension(bio_added_ts, month)"
-  		"TimeDimension(bio_added_ts, quarter)"
-  		"TimeDimension(bio_added_ts, year)"
   		"TimeDimension(created_at, day)"
-  		"TimeDimension(created_at, week)"
-  		"TimeDimension(created_at, month)"
-  		"TimeDimension(created_at, quarter)"
-  		"TimeDimension(created_at, year)"
   		"TimeDimension(ds, day)"
-  		"TimeDimension(ds, week)"
-  		"TimeDimension(ds, month)"
-  		"TimeDimension(ds, quarter)"
-  		"TimeDimension(ds, year)"
   		"TimeDimension(ds_latest, day)"
-  		"TimeDimension(ds_latest, week)"
-  		"TimeDimension(ds_latest, month)"
-  		"TimeDimension(ds_latest, quarter)"
-  		"TimeDimension(ds_latest, year)"
   		"TimeDimension(ds_month, month)"
-  		"TimeDimension(ds_month, quarter)"
-  		"TimeDimension(ds_month, year)"
   		"TimeDimension(ds_partitioned, day)"
-  		"TimeDimension(ds_partitioned, week)"
-  		"TimeDimension(ds_partitioned, month)"
-  		"TimeDimension(ds_partitioned, quarter)"
-  		"TimeDimension(ds_partitioned, year)"
   		"TimeDimension(last_login_ts, minute)"
-  		"TimeDimension(last_login_ts, hour)"
-  		"TimeDimension(last_login_ts, day)"
-  		"TimeDimension(last_login_ts, week)"
-  		"TimeDimension(last_login_ts, month)"
-  		"TimeDimension(last_login_ts, quarter)"
-  		"TimeDimension(last_login_ts, year)"
   		"TimeDimension(last_profile_edit_ts, millisecond)"
-  		"TimeDimension(last_profile_edit_ts, second)"
-  		"TimeDimension(last_profile_edit_ts, minute)"
-  		"TimeDimension(last_profile_edit_ts, hour)"
-  		"TimeDimension(last_profile_edit_ts, day)"
-  		"TimeDimension(last_profile_edit_ts, week)"
-  		"TimeDimension(last_profile_edit_ts, month)"
-  		"TimeDimension(last_profile_edit_ts, quarter)"
-  		"TimeDimension(last_profile_edit_ts, year)"
   		"TimeDimension(paid_at, day)"
-  		"TimeDimension(paid_at, week)"
-  		"TimeDimension(paid_at, month)"
-  		"TimeDimension(paid_at, quarter)"
-  		"TimeDimension(paid_at, year)"
   	}
   	"DsiEntity(account)" -> "Metric(current_account_balance_by_user)"
   	"DsiEntity(account)" -> "Metric(regional_starting_balance_ratios)"
@@ -528,37 +480,6 @@ dot_notation:
   	"TimeDimension(archived_at, hour)" -> "Time(quarter)"
   	"TimeDimension(archived_at, hour)" -> "Time(week)"
   	"TimeDimension(archived_at, hour)" -> "Time(year)"
-  	"TimeDimension(archived_at, day)" -> "Time(alien_day)"
-  	"TimeDimension(archived_at, day)" -> "Time(day)"
-  	"TimeDimension(archived_at, day)" -> "Time(extract_day)"
-  	"TimeDimension(archived_at, day)" -> "Time(extract_dow)"
-  	"TimeDimension(archived_at, day)" -> "Time(extract_doy)"
-  	"TimeDimension(archived_at, day)" -> "Time(extract_month)"
-  	"TimeDimension(archived_at, day)" -> "Time(extract_quarter)"
-  	"TimeDimension(archived_at, day)" -> "Time(extract_year)"
-  	"TimeDimension(archived_at, day)" -> "Time(month)"
-  	"TimeDimension(archived_at, day)" -> "Time(quarter)"
-  	"TimeDimension(archived_at, day)" -> "Time(week)"
-  	"TimeDimension(archived_at, day)" -> "Time(year)"
-  	"TimeDimension(archived_at, week)" -> "Time(extract_month)"
-  	"TimeDimension(archived_at, week)" -> "Time(extract_quarter)"
-  	"TimeDimension(archived_at, week)" -> "Time(extract_year)"
-  	"TimeDimension(archived_at, week)" -> "Time(month)"
-  	"TimeDimension(archived_at, week)" -> "Time(quarter)"
-  	"TimeDimension(archived_at, week)" -> "Time(week)"
-  	"TimeDimension(archived_at, week)" -> "Time(year)"
-  	"TimeDimension(archived_at, month)" -> "Time(extract_month)"
-  	"TimeDimension(archived_at, month)" -> "Time(extract_quarter)"
-  	"TimeDimension(archived_at, month)" -> "Time(extract_year)"
-  	"TimeDimension(archived_at, month)" -> "Time(month)"
-  	"TimeDimension(archived_at, month)" -> "Time(quarter)"
-  	"TimeDimension(archived_at, month)" -> "Time(year)"
-  	"TimeDimension(archived_at, quarter)" -> "Time(extract_quarter)"
-  	"TimeDimension(archived_at, quarter)" -> "Time(extract_year)"
-  	"TimeDimension(archived_at, quarter)" -> "Time(quarter)"
-  	"TimeDimension(archived_at, quarter)" -> "Time(year)"
-  	"TimeDimension(archived_at, year)" -> "Time(extract_year)"
-  	"TimeDimension(archived_at, year)" -> "Time(year)"
   	"TimeDimension(bio_added_ts, second)" -> "Time(alien_day)"
   	"TimeDimension(bio_added_ts, second)" -> "Time(day)"
   	"TimeDimension(bio_added_ts, second)" -> "Time(extract_day)"
@@ -574,64 +495,6 @@ dot_notation:
   	"TimeDimension(bio_added_ts, second)" -> "Time(second)"
   	"TimeDimension(bio_added_ts, second)" -> "Time(week)"
   	"TimeDimension(bio_added_ts, second)" -> "Time(year)"
-  	"TimeDimension(bio_added_ts, minute)" -> "Time(alien_day)"
-  	"TimeDimension(bio_added_ts, minute)" -> "Time(day)"
-  	"TimeDimension(bio_added_ts, minute)" -> "Time(extract_day)"
-  	"TimeDimension(bio_added_ts, minute)" -> "Time(extract_dow)"
-  	"TimeDimension(bio_added_ts, minute)" -> "Time(extract_doy)"
-  	"TimeDimension(bio_added_ts, minute)" -> "Time(extract_month)"
-  	"TimeDimension(bio_added_ts, minute)" -> "Time(extract_quarter)"
-  	"TimeDimension(bio_added_ts, minute)" -> "Time(extract_year)"
-  	"TimeDimension(bio_added_ts, minute)" -> "Time(hour)"
-  	"TimeDimension(bio_added_ts, minute)" -> "Time(minute)"
-  	"TimeDimension(bio_added_ts, minute)" -> "Time(month)"
-  	"TimeDimension(bio_added_ts, minute)" -> "Time(quarter)"
-  	"TimeDimension(bio_added_ts, minute)" -> "Time(week)"
-  	"TimeDimension(bio_added_ts, minute)" -> "Time(year)"
-  	"TimeDimension(bio_added_ts, hour)" -> "Time(alien_day)"
-  	"TimeDimension(bio_added_ts, hour)" -> "Time(day)"
-  	"TimeDimension(bio_added_ts, hour)" -> "Time(extract_day)"
-  	"TimeDimension(bio_added_ts, hour)" -> "Time(extract_dow)"
-  	"TimeDimension(bio_added_ts, hour)" -> "Time(extract_doy)"
-  	"TimeDimension(bio_added_ts, hour)" -> "Time(extract_month)"
-  	"TimeDimension(bio_added_ts, hour)" -> "Time(extract_quarter)"
-  	"TimeDimension(bio_added_ts, hour)" -> "Time(extract_year)"
-  	"TimeDimension(bio_added_ts, hour)" -> "Time(hour)"
-  	"TimeDimension(bio_added_ts, hour)" -> "Time(month)"
-  	"TimeDimension(bio_added_ts, hour)" -> "Time(quarter)"
-  	"TimeDimension(bio_added_ts, hour)" -> "Time(week)"
-  	"TimeDimension(bio_added_ts, hour)" -> "Time(year)"
-  	"TimeDimension(bio_added_ts, day)" -> "Time(alien_day)"
-  	"TimeDimension(bio_added_ts, day)" -> "Time(day)"
-  	"TimeDimension(bio_added_ts, day)" -> "Time(extract_day)"
-  	"TimeDimension(bio_added_ts, day)" -> "Time(extract_dow)"
-  	"TimeDimension(bio_added_ts, day)" -> "Time(extract_doy)"
-  	"TimeDimension(bio_added_ts, day)" -> "Time(extract_month)"
-  	"TimeDimension(bio_added_ts, day)" -> "Time(extract_quarter)"
-  	"TimeDimension(bio_added_ts, day)" -> "Time(extract_year)"
-  	"TimeDimension(bio_added_ts, day)" -> "Time(month)"
-  	"TimeDimension(bio_added_ts, day)" -> "Time(quarter)"
-  	"TimeDimension(bio_added_ts, day)" -> "Time(week)"
-  	"TimeDimension(bio_added_ts, day)" -> "Time(year)"
-  	"TimeDimension(bio_added_ts, week)" -> "Time(extract_month)"
-  	"TimeDimension(bio_added_ts, week)" -> "Time(extract_quarter)"
-  	"TimeDimension(bio_added_ts, week)" -> "Time(extract_year)"
-  	"TimeDimension(bio_added_ts, week)" -> "Time(month)"
-  	"TimeDimension(bio_added_ts, week)" -> "Time(quarter)"
-  	"TimeDimension(bio_added_ts, week)" -> "Time(week)"
-  	"TimeDimension(bio_added_ts, week)" -> "Time(year)"
-  	"TimeDimension(bio_added_ts, month)" -> "Time(extract_month)"
-  	"TimeDimension(bio_added_ts, month)" -> "Time(extract_quarter)"
-  	"TimeDimension(bio_added_ts, month)" -> "Time(extract_year)"
-  	"TimeDimension(bio_added_ts, month)" -> "Time(month)"
-  	"TimeDimension(bio_added_ts, month)" -> "Time(quarter)"
-  	"TimeDimension(bio_added_ts, month)" -> "Time(year)"
-  	"TimeDimension(bio_added_ts, quarter)" -> "Time(extract_quarter)"
-  	"TimeDimension(bio_added_ts, quarter)" -> "Time(extract_year)"
-  	"TimeDimension(bio_added_ts, quarter)" -> "Time(quarter)"
-  	"TimeDimension(bio_added_ts, quarter)" -> "Time(year)"
-  	"TimeDimension(bio_added_ts, year)" -> "Time(extract_year)"
-  	"TimeDimension(bio_added_ts, year)" -> "Time(year)"
   	"TimeDimension(created_at, day)" -> "Time(alien_day)"
   	"TimeDimension(created_at, day)" -> "Time(day)"
   	"TimeDimension(created_at, day)" -> "Time(extract_day)"
@@ -644,25 +507,6 @@ dot_notation:
   	"TimeDimension(created_at, day)" -> "Time(quarter)"
   	"TimeDimension(created_at, day)" -> "Time(week)"
   	"TimeDimension(created_at, day)" -> "Time(year)"
-  	"TimeDimension(created_at, week)" -> "Time(extract_month)"
-  	"TimeDimension(created_at, week)" -> "Time(extract_quarter)"
-  	"TimeDimension(created_at, week)" -> "Time(extract_year)"
-  	"TimeDimension(created_at, week)" -> "Time(month)"
-  	"TimeDimension(created_at, week)" -> "Time(quarter)"
-  	"TimeDimension(created_at, week)" -> "Time(week)"
-  	"TimeDimension(created_at, week)" -> "Time(year)"
-  	"TimeDimension(created_at, month)" -> "Time(extract_month)"
-  	"TimeDimension(created_at, month)" -> "Time(extract_quarter)"
-  	"TimeDimension(created_at, month)" -> "Time(extract_year)"
-  	"TimeDimension(created_at, month)" -> "Time(month)"
-  	"TimeDimension(created_at, month)" -> "Time(quarter)"
-  	"TimeDimension(created_at, month)" -> "Time(year)"
-  	"TimeDimension(created_at, quarter)" -> "Time(extract_quarter)"
-  	"TimeDimension(created_at, quarter)" -> "Time(extract_year)"
-  	"TimeDimension(created_at, quarter)" -> "Time(quarter)"
-  	"TimeDimension(created_at, quarter)" -> "Time(year)"
-  	"TimeDimension(created_at, year)" -> "Time(extract_year)"
-  	"TimeDimension(created_at, year)" -> "Time(year)"
   	"TimeDimension(ds, day)" -> "Time(alien_day)"
   	"TimeDimension(ds, day)" -> "Time(day)"
   	"TimeDimension(ds, day)" -> "Time(extract_day)"
@@ -675,25 +519,6 @@ dot_notation:
   	"TimeDimension(ds, day)" -> "Time(quarter)"
   	"TimeDimension(ds, day)" -> "Time(week)"
   	"TimeDimension(ds, day)" -> "Time(year)"
-  	"TimeDimension(ds, week)" -> "Time(extract_month)"
-  	"TimeDimension(ds, week)" -> "Time(extract_quarter)"
-  	"TimeDimension(ds, week)" -> "Time(extract_year)"
-  	"TimeDimension(ds, week)" -> "Time(month)"
-  	"TimeDimension(ds, week)" -> "Time(quarter)"
-  	"TimeDimension(ds, week)" -> "Time(week)"
-  	"TimeDimension(ds, week)" -> "Time(year)"
-  	"TimeDimension(ds, month)" -> "Time(extract_month)"
-  	"TimeDimension(ds, month)" -> "Time(extract_quarter)"
-  	"TimeDimension(ds, month)" -> "Time(extract_year)"
-  	"TimeDimension(ds, month)" -> "Time(month)"
-  	"TimeDimension(ds, month)" -> "Time(quarter)"
-  	"TimeDimension(ds, month)" -> "Time(year)"
-  	"TimeDimension(ds, quarter)" -> "Time(extract_quarter)"
-  	"TimeDimension(ds, quarter)" -> "Time(extract_year)"
-  	"TimeDimension(ds, quarter)" -> "Time(quarter)"
-  	"TimeDimension(ds, quarter)" -> "Time(year)"
-  	"TimeDimension(ds, year)" -> "Time(extract_year)"
-  	"TimeDimension(ds, year)" -> "Time(year)"
   	"TimeDimension(ds_latest, day)" -> "Time(alien_day)"
   	"TimeDimension(ds_latest, day)" -> "Time(day)"
   	"TimeDimension(ds_latest, day)" -> "Time(extract_day)"
@@ -706,37 +531,12 @@ dot_notation:
   	"TimeDimension(ds_latest, day)" -> "Time(quarter)"
   	"TimeDimension(ds_latest, day)" -> "Time(week)"
   	"TimeDimension(ds_latest, day)" -> "Time(year)"
-  	"TimeDimension(ds_latest, week)" -> "Time(extract_month)"
-  	"TimeDimension(ds_latest, week)" -> "Time(extract_quarter)"
-  	"TimeDimension(ds_latest, week)" -> "Time(extract_year)"
-  	"TimeDimension(ds_latest, week)" -> "Time(month)"
-  	"TimeDimension(ds_latest, week)" -> "Time(quarter)"
-  	"TimeDimension(ds_latest, week)" -> "Time(week)"
-  	"TimeDimension(ds_latest, week)" -> "Time(year)"
-  	"TimeDimension(ds_latest, month)" -> "Time(extract_month)"
-  	"TimeDimension(ds_latest, month)" -> "Time(extract_quarter)"
-  	"TimeDimension(ds_latest, month)" -> "Time(extract_year)"
-  	"TimeDimension(ds_latest, month)" -> "Time(month)"
-  	"TimeDimension(ds_latest, month)" -> "Time(quarter)"
-  	"TimeDimension(ds_latest, month)" -> "Time(year)"
-  	"TimeDimension(ds_latest, quarter)" -> "Time(extract_quarter)"
-  	"TimeDimension(ds_latest, quarter)" -> "Time(extract_year)"
-  	"TimeDimension(ds_latest, quarter)" -> "Time(quarter)"
-  	"TimeDimension(ds_latest, quarter)" -> "Time(year)"
-  	"TimeDimension(ds_latest, year)" -> "Time(extract_year)"
-  	"TimeDimension(ds_latest, year)" -> "Time(year)"
   	"TimeDimension(ds_month, month)" -> "Time(extract_month)"
   	"TimeDimension(ds_month, month)" -> "Time(extract_quarter)"
   	"TimeDimension(ds_month, month)" -> "Time(extract_year)"
   	"TimeDimension(ds_month, month)" -> "Time(month)"
   	"TimeDimension(ds_month, month)" -> "Time(quarter)"
   	"TimeDimension(ds_month, month)" -> "Time(year)"
-  	"TimeDimension(ds_month, quarter)" -> "Time(extract_quarter)"
-  	"TimeDimension(ds_month, quarter)" -> "Time(extract_year)"
-  	"TimeDimension(ds_month, quarter)" -> "Time(quarter)"
-  	"TimeDimension(ds_month, quarter)" -> "Time(year)"
-  	"TimeDimension(ds_month, year)" -> "Time(extract_year)"
-  	"TimeDimension(ds_month, year)" -> "Time(year)"
   	"TimeDimension(ds_partitioned, day)" -> "Time(alien_day)"
   	"TimeDimension(ds_partitioned, day)" -> "Time(day)"
   	"TimeDimension(ds_partitioned, day)" -> "Time(extract_day)"
@@ -749,25 +549,6 @@ dot_notation:
   	"TimeDimension(ds_partitioned, day)" -> "Time(quarter)"
   	"TimeDimension(ds_partitioned, day)" -> "Time(week)"
   	"TimeDimension(ds_partitioned, day)" -> "Time(year)"
-  	"TimeDimension(ds_partitioned, week)" -> "Time(extract_month)"
-  	"TimeDimension(ds_partitioned, week)" -> "Time(extract_quarter)"
-  	"TimeDimension(ds_partitioned, week)" -> "Time(extract_year)"
-  	"TimeDimension(ds_partitioned, week)" -> "Time(month)"
-  	"TimeDimension(ds_partitioned, week)" -> "Time(quarter)"
-  	"TimeDimension(ds_partitioned, week)" -> "Time(week)"
-  	"TimeDimension(ds_partitioned, week)" -> "Time(year)"
-  	"TimeDimension(ds_partitioned, month)" -> "Time(extract_month)"
-  	"TimeDimension(ds_partitioned, month)" -> "Time(extract_quarter)"
-  	"TimeDimension(ds_partitioned, month)" -> "Time(extract_year)"
-  	"TimeDimension(ds_partitioned, month)" -> "Time(month)"
-  	"TimeDimension(ds_partitioned, month)" -> "Time(quarter)"
-  	"TimeDimension(ds_partitioned, month)" -> "Time(year)"
-  	"TimeDimension(ds_partitioned, quarter)" -> "Time(extract_quarter)"
-  	"TimeDimension(ds_partitioned, quarter)" -> "Time(extract_year)"
-  	"TimeDimension(ds_partitioned, quarter)" -> "Time(quarter)"
-  	"TimeDimension(ds_partitioned, quarter)" -> "Time(year)"
-  	"TimeDimension(ds_partitioned, year)" -> "Time(extract_year)"
-  	"TimeDimension(ds_partitioned, year)" -> "Time(year)"
   	"TimeDimension(last_login_ts, minute)" -> "Time(alien_day)"
   	"TimeDimension(last_login_ts, minute)" -> "Time(day)"
   	"TimeDimension(last_login_ts, minute)" -> "Time(extract_day)"
@@ -782,50 +563,6 @@ dot_notation:
   	"TimeDimension(last_login_ts, minute)" -> "Time(quarter)"
   	"TimeDimension(last_login_ts, minute)" -> "Time(week)"
   	"TimeDimension(last_login_ts, minute)" -> "Time(year)"
-  	"TimeDimension(last_login_ts, hour)" -> "Time(alien_day)"
-  	"TimeDimension(last_login_ts, hour)" -> "Time(day)"
-  	"TimeDimension(last_login_ts, hour)" -> "Time(extract_day)"
-  	"TimeDimension(last_login_ts, hour)" -> "Time(extract_dow)"
-  	"TimeDimension(last_login_ts, hour)" -> "Time(extract_doy)"
-  	"TimeDimension(last_login_ts, hour)" -> "Time(extract_month)"
-  	"TimeDimension(last_login_ts, hour)" -> "Time(extract_quarter)"
-  	"TimeDimension(last_login_ts, hour)" -> "Time(extract_year)"
-  	"TimeDimension(last_login_ts, hour)" -> "Time(hour)"
-  	"TimeDimension(last_login_ts, hour)" -> "Time(month)"
-  	"TimeDimension(last_login_ts, hour)" -> "Time(quarter)"
-  	"TimeDimension(last_login_ts, hour)" -> "Time(week)"
-  	"TimeDimension(last_login_ts, hour)" -> "Time(year)"
-  	"TimeDimension(last_login_ts, day)" -> "Time(alien_day)"
-  	"TimeDimension(last_login_ts, day)" -> "Time(day)"
-  	"TimeDimension(last_login_ts, day)" -> "Time(extract_day)"
-  	"TimeDimension(last_login_ts, day)" -> "Time(extract_dow)"
-  	"TimeDimension(last_login_ts, day)" -> "Time(extract_doy)"
-  	"TimeDimension(last_login_ts, day)" -> "Time(extract_month)"
-  	"TimeDimension(last_login_ts, day)" -> "Time(extract_quarter)"
-  	"TimeDimension(last_login_ts, day)" -> "Time(extract_year)"
-  	"TimeDimension(last_login_ts, day)" -> "Time(month)"
-  	"TimeDimension(last_login_ts, day)" -> "Time(quarter)"
-  	"TimeDimension(last_login_ts, day)" -> "Time(week)"
-  	"TimeDimension(last_login_ts, day)" -> "Time(year)"
-  	"TimeDimension(last_login_ts, week)" -> "Time(extract_month)"
-  	"TimeDimension(last_login_ts, week)" -> "Time(extract_quarter)"
-  	"TimeDimension(last_login_ts, week)" -> "Time(extract_year)"
-  	"TimeDimension(last_login_ts, week)" -> "Time(month)"
-  	"TimeDimension(last_login_ts, week)" -> "Time(quarter)"
-  	"TimeDimension(last_login_ts, week)" -> "Time(week)"
-  	"TimeDimension(last_login_ts, week)" -> "Time(year)"
-  	"TimeDimension(last_login_ts, month)" -> "Time(extract_month)"
-  	"TimeDimension(last_login_ts, month)" -> "Time(extract_quarter)"
-  	"TimeDimension(last_login_ts, month)" -> "Time(extract_year)"
-  	"TimeDimension(last_login_ts, month)" -> "Time(month)"
-  	"TimeDimension(last_login_ts, month)" -> "Time(quarter)"
-  	"TimeDimension(last_login_ts, month)" -> "Time(year)"
-  	"TimeDimension(last_login_ts, quarter)" -> "Time(extract_quarter)"
-  	"TimeDimension(last_login_ts, quarter)" -> "Time(extract_year)"
-  	"TimeDimension(last_login_ts, quarter)" -> "Time(quarter)"
-  	"TimeDimension(last_login_ts, quarter)" -> "Time(year)"
-  	"TimeDimension(last_login_ts, year)" -> "Time(extract_year)"
-  	"TimeDimension(last_login_ts, year)" -> "Time(year)"
   	"TimeDimension(last_profile_edit_ts, millisecond)" -> "Time(alien_day)"
   	"TimeDimension(last_profile_edit_ts, millisecond)" -> "Time(day)"
   	"TimeDimension(last_profile_edit_ts, millisecond)" -> "Time(extract_day)"
@@ -842,79 +579,6 @@ dot_notation:
   	"TimeDimension(last_profile_edit_ts, millisecond)" -> "Time(second)"
   	"TimeDimension(last_profile_edit_ts, millisecond)" -> "Time(week)"
   	"TimeDimension(last_profile_edit_ts, millisecond)" -> "Time(year)"
-  	"TimeDimension(last_profile_edit_ts, second)" -> "Time(alien_day)"
-  	"TimeDimension(last_profile_edit_ts, second)" -> "Time(day)"
-  	"TimeDimension(last_profile_edit_ts, second)" -> "Time(extract_day)"
-  	"TimeDimension(last_profile_edit_ts, second)" -> "Time(extract_dow)"
-  	"TimeDimension(last_profile_edit_ts, second)" -> "Time(extract_doy)"
-  	"TimeDimension(last_profile_edit_ts, second)" -> "Time(extract_month)"
-  	"TimeDimension(last_profile_edit_ts, second)" -> "Time(extract_quarter)"
-  	"TimeDimension(last_profile_edit_ts, second)" -> "Time(extract_year)"
-  	"TimeDimension(last_profile_edit_ts, second)" -> "Time(hour)"
-  	"TimeDimension(last_profile_edit_ts, second)" -> "Time(minute)"
-  	"TimeDimension(last_profile_edit_ts, second)" -> "Time(month)"
-  	"TimeDimension(last_profile_edit_ts, second)" -> "Time(quarter)"
-  	"TimeDimension(last_profile_edit_ts, second)" -> "Time(second)"
-  	"TimeDimension(last_profile_edit_ts, second)" -> "Time(week)"
-  	"TimeDimension(last_profile_edit_ts, second)" -> "Time(year)"
-  	"TimeDimension(last_profile_edit_ts, minute)" -> "Time(alien_day)"
-  	"TimeDimension(last_profile_edit_ts, minute)" -> "Time(day)"
-  	"TimeDimension(last_profile_edit_ts, minute)" -> "Time(extract_day)"
-  	"TimeDimension(last_profile_edit_ts, minute)" -> "Time(extract_dow)"
-  	"TimeDimension(last_profile_edit_ts, minute)" -> "Time(extract_doy)"
-  	"TimeDimension(last_profile_edit_ts, minute)" -> "Time(extract_month)"
-  	"TimeDimension(last_profile_edit_ts, minute)" -> "Time(extract_quarter)"
-  	"TimeDimension(last_profile_edit_ts, minute)" -> "Time(extract_year)"
-  	"TimeDimension(last_profile_edit_ts, minute)" -> "Time(hour)"
-  	"TimeDimension(last_profile_edit_ts, minute)" -> "Time(minute)"
-  	"TimeDimension(last_profile_edit_ts, minute)" -> "Time(month)"
-  	"TimeDimension(last_profile_edit_ts, minute)" -> "Time(quarter)"
-  	"TimeDimension(last_profile_edit_ts, minute)" -> "Time(week)"
-  	"TimeDimension(last_profile_edit_ts, minute)" -> "Time(year)"
-  	"TimeDimension(last_profile_edit_ts, hour)" -> "Time(alien_day)"
-  	"TimeDimension(last_profile_edit_ts, hour)" -> "Time(day)"
-  	"TimeDimension(last_profile_edit_ts, hour)" -> "Time(extract_day)"
-  	"TimeDimension(last_profile_edit_ts, hour)" -> "Time(extract_dow)"
-  	"TimeDimension(last_profile_edit_ts, hour)" -> "Time(extract_doy)"
-  	"TimeDimension(last_profile_edit_ts, hour)" -> "Time(extract_month)"
-  	"TimeDimension(last_profile_edit_ts, hour)" -> "Time(extract_quarter)"
-  	"TimeDimension(last_profile_edit_ts, hour)" -> "Time(extract_year)"
-  	"TimeDimension(last_profile_edit_ts, hour)" -> "Time(hour)"
-  	"TimeDimension(last_profile_edit_ts, hour)" -> "Time(month)"
-  	"TimeDimension(last_profile_edit_ts, hour)" -> "Time(quarter)"
-  	"TimeDimension(last_profile_edit_ts, hour)" -> "Time(week)"
-  	"TimeDimension(last_profile_edit_ts, hour)" -> "Time(year)"
-  	"TimeDimension(last_profile_edit_ts, day)" -> "Time(alien_day)"
-  	"TimeDimension(last_profile_edit_ts, day)" -> "Time(day)"
-  	"TimeDimension(last_profile_edit_ts, day)" -> "Time(extract_day)"
-  	"TimeDimension(last_profile_edit_ts, day)" -> "Time(extract_dow)"
-  	"TimeDimension(last_profile_edit_ts, day)" -> "Time(extract_doy)"
-  	"TimeDimension(last_profile_edit_ts, day)" -> "Time(extract_month)"
-  	"TimeDimension(last_profile_edit_ts, day)" -> "Time(extract_quarter)"
-  	"TimeDimension(last_profile_edit_ts, day)" -> "Time(extract_year)"
-  	"TimeDimension(last_profile_edit_ts, day)" -> "Time(month)"
-  	"TimeDimension(last_profile_edit_ts, day)" -> "Time(quarter)"
-  	"TimeDimension(last_profile_edit_ts, day)" -> "Time(week)"
-  	"TimeDimension(last_profile_edit_ts, day)" -> "Time(year)"
-  	"TimeDimension(last_profile_edit_ts, week)" -> "Time(extract_month)"
-  	"TimeDimension(last_profile_edit_ts, week)" -> "Time(extract_quarter)"
-  	"TimeDimension(last_profile_edit_ts, week)" -> "Time(extract_year)"
-  	"TimeDimension(last_profile_edit_ts, week)" -> "Time(month)"
-  	"TimeDimension(last_profile_edit_ts, week)" -> "Time(quarter)"
-  	"TimeDimension(last_profile_edit_ts, week)" -> "Time(week)"
-  	"TimeDimension(last_profile_edit_ts, week)" -> "Time(year)"
-  	"TimeDimension(last_profile_edit_ts, month)" -> "Time(extract_month)"
-  	"TimeDimension(last_profile_edit_ts, month)" -> "Time(extract_quarter)"
-  	"TimeDimension(last_profile_edit_ts, month)" -> "Time(extract_year)"
-  	"TimeDimension(last_profile_edit_ts, month)" -> "Time(month)"
-  	"TimeDimension(last_profile_edit_ts, month)" -> "Time(quarter)"
-  	"TimeDimension(last_profile_edit_ts, month)" -> "Time(year)"
-  	"TimeDimension(last_profile_edit_ts, quarter)" -> "Time(extract_quarter)"
-  	"TimeDimension(last_profile_edit_ts, quarter)" -> "Time(extract_year)"
-  	"TimeDimension(last_profile_edit_ts, quarter)" -> "Time(quarter)"
-  	"TimeDimension(last_profile_edit_ts, quarter)" -> "Time(year)"
-  	"TimeDimension(last_profile_edit_ts, year)" -> "Time(extract_year)"
-  	"TimeDimension(last_profile_edit_ts, year)" -> "Time(year)"
   	"TimeDimension(paid_at, day)" -> "Time(alien_day)"
   	"TimeDimension(paid_at, day)" -> "Time(day)"
   	"TimeDimension(paid_at, day)" -> "Time(extract_day)"
@@ -927,25 +591,6 @@ dot_notation:
   	"TimeDimension(paid_at, day)" -> "Time(quarter)"
   	"TimeDimension(paid_at, day)" -> "Time(week)"
   	"TimeDimension(paid_at, day)" -> "Time(year)"
-  	"TimeDimension(paid_at, week)" -> "Time(extract_month)"
-  	"TimeDimension(paid_at, week)" -> "Time(extract_quarter)"
-  	"TimeDimension(paid_at, week)" -> "Time(extract_year)"
-  	"TimeDimension(paid_at, week)" -> "Time(month)"
-  	"TimeDimension(paid_at, week)" -> "Time(quarter)"
-  	"TimeDimension(paid_at, week)" -> "Time(week)"
-  	"TimeDimension(paid_at, week)" -> "Time(year)"
-  	"TimeDimension(paid_at, month)" -> "Time(extract_month)"
-  	"TimeDimension(paid_at, month)" -> "Time(extract_quarter)"
-  	"TimeDimension(paid_at, month)" -> "Time(extract_year)"
-  	"TimeDimension(paid_at, month)" -> "Time(month)"
-  	"TimeDimension(paid_at, month)" -> "Time(quarter)"
-  	"TimeDimension(paid_at, month)" -> "Time(year)"
-  	"TimeDimension(paid_at, quarter)" -> "Time(extract_quarter)"
-  	"TimeDimension(paid_at, quarter)" -> "Time(extract_year)"
-  	"TimeDimension(paid_at, quarter)" -> "Time(quarter)"
-  	"TimeDimension(paid_at, quarter)" -> "Time(year)"
-  	"TimeDimension(paid_at, year)" -> "Time(extract_year)"
-  	"TimeDimension(paid_at, year)" -> "Time(year)"
   	"Agg(accounts_source, ds)" -> "JoinFrom(accounts_source)"
   	"Agg(accounts_source, ds)" -> "JoinTo(accounts_source)"
   	"Agg(accounts_source, ds_month)" -> "JoinFrom(accounts_source)"
@@ -1018,127 +663,41 @@ dot_notation:
   	"JoinFrom(visits_source)" -> "MetricTimeDimension(QUARTER)"
   	"JoinFrom(visits_source)" -> "MetricTimeDimension(WEEK)"
   	"JoinFrom(visits_source)" -> "MetricTimeDimension(YEAR)"
+  	"JoinTo(accounts_source)" -> "JoinFrom(accounts_source)"
   	"JoinTo(accounts_source)" -> "TimeDimension(ds, day)"
-  	"JoinTo(accounts_source)" -> "TimeDimension(ds, week)"
-  	"JoinTo(accounts_source)" -> "TimeDimension(ds, month)"
-  	"JoinTo(accounts_source)" -> "TimeDimension(ds, quarter)"
-  	"JoinTo(accounts_source)" -> "TimeDimension(ds, year)"
   	"JoinTo(accounts_source)" -> "TimeDimension(ds_month, month)"
-  	"JoinTo(accounts_source)" -> "TimeDimension(ds_month, quarter)"
-  	"JoinTo(accounts_source)" -> "TimeDimension(ds_month, year)"
+  	"JoinTo(bookings_source)" -> "JoinFrom(bookings_source)"
   	"JoinTo(bookings_source)" -> "TimeDimension(ds, day)"
-  	"JoinTo(bookings_source)" -> "TimeDimension(ds, week)"
-  	"JoinTo(bookings_source)" -> "TimeDimension(ds, month)"
-  	"JoinTo(bookings_source)" -> "TimeDimension(ds, quarter)"
-  	"JoinTo(bookings_source)" -> "TimeDimension(ds, year)"
   	"JoinTo(bookings_source)" -> "TimeDimension(ds_partitioned, day)"
-  	"JoinTo(bookings_source)" -> "TimeDimension(ds_partitioned, week)"
-  	"JoinTo(bookings_source)" -> "TimeDimension(ds_partitioned, month)"
-  	"JoinTo(bookings_source)" -> "TimeDimension(ds_partitioned, quarter)"
-  	"JoinTo(bookings_source)" -> "TimeDimension(ds_partitioned, year)"
   	"JoinTo(bookings_source)" -> "TimeDimension(paid_at, day)"
-  	"JoinTo(bookings_source)" -> "TimeDimension(paid_at, week)"
-  	"JoinTo(bookings_source)" -> "TimeDimension(paid_at, month)"
-  	"JoinTo(bookings_source)" -> "TimeDimension(paid_at, quarter)"
-  	"JoinTo(bookings_source)" -> "TimeDimension(paid_at, year)"
+  	"JoinTo(buys_source)" -> "JoinFrom(buys_source)"
   	"JoinTo(buys_source)" -> "TimeDimension(ds, day)"
-  	"JoinTo(buys_source)" -> "TimeDimension(ds, week)"
-  	"JoinTo(buys_source)" -> "TimeDimension(ds, month)"
-  	"JoinTo(buys_source)" -> "TimeDimension(ds, quarter)"
-  	"JoinTo(buys_source)" -> "TimeDimension(ds, year)"
   	"JoinTo(buys_source)" -> "TimeDimension(ds_month, month)"
-  	"JoinTo(buys_source)" -> "TimeDimension(ds_month, quarter)"
-  	"JoinTo(buys_source)" -> "TimeDimension(ds_month, year)"
+  	"JoinTo(companies)" -> "JoinFrom(companies)"
+  	"JoinTo(id_verifications)" -> "JoinFrom(id_verifications)"
   	"JoinTo(id_verifications)" -> "TimeDimension(ds, day)"
-  	"JoinTo(id_verifications)" -> "TimeDimension(ds, week)"
-  	"JoinTo(id_verifications)" -> "TimeDimension(ds, month)"
-  	"JoinTo(id_verifications)" -> "TimeDimension(ds, quarter)"
-  	"JoinTo(id_verifications)" -> "TimeDimension(ds, year)"
   	"JoinTo(id_verifications)" -> "TimeDimension(ds_partitioned, day)"
-  	"JoinTo(id_verifications)" -> "TimeDimension(ds_partitioned, week)"
-  	"JoinTo(id_verifications)" -> "TimeDimension(ds_partitioned, month)"
-  	"JoinTo(id_verifications)" -> "TimeDimension(ds_partitioned, quarter)"
-  	"JoinTo(id_verifications)" -> "TimeDimension(ds_partitioned, year)"
+  	"JoinTo(listings_latest)" -> "JoinFrom(listings_latest)"
   	"JoinTo(listings_latest)" -> "TimeDimension(created_at, day)"
-  	"JoinTo(listings_latest)" -> "TimeDimension(created_at, week)"
-  	"JoinTo(listings_latest)" -> "TimeDimension(created_at, month)"
-  	"JoinTo(listings_latest)" -> "TimeDimension(created_at, quarter)"
-  	"JoinTo(listings_latest)" -> "TimeDimension(created_at, year)"
   	"JoinTo(listings_latest)" -> "TimeDimension(ds, day)"
-  	"JoinTo(listings_latest)" -> "TimeDimension(ds, week)"
-  	"JoinTo(listings_latest)" -> "TimeDimension(ds, month)"
-  	"JoinTo(listings_latest)" -> "TimeDimension(ds, quarter)"
-  	"JoinTo(listings_latest)" -> "TimeDimension(ds, year)"
+  	"JoinTo(lux_listing_mapping)" -> "JoinFrom(lux_listing_mapping)"
+  	"JoinTo(revenue)" -> "JoinFrom(revenue)"
   	"JoinTo(revenue)" -> "TimeDimension(ds, day)"
-  	"JoinTo(revenue)" -> "TimeDimension(ds, week)"
-  	"JoinTo(revenue)" -> "TimeDimension(ds, month)"
-  	"JoinTo(revenue)" -> "TimeDimension(ds, quarter)"
-  	"JoinTo(revenue)" -> "TimeDimension(ds, year)"
+  	"JoinTo(users_ds_source)" -> "JoinFrom(users_ds_source)"
   	"JoinTo(users_ds_source)" -> "TimeDimension(archived_at, hour)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(archived_at, day)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(archived_at, week)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(archived_at, month)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(archived_at, quarter)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(archived_at, year)"
   	"JoinTo(users_ds_source)" -> "TimeDimension(bio_added_ts, second)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(bio_added_ts, minute)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(bio_added_ts, hour)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(bio_added_ts, day)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(bio_added_ts, week)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(bio_added_ts, month)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(bio_added_ts, quarter)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(bio_added_ts, year)"
   	"JoinTo(users_ds_source)" -> "TimeDimension(created_at, day)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(created_at, week)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(created_at, month)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(created_at, quarter)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(created_at, year)"
   	"JoinTo(users_ds_source)" -> "TimeDimension(ds, day)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(ds, week)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(ds, month)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(ds, quarter)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(ds, year)"
   	"JoinTo(users_ds_source)" -> "TimeDimension(ds_partitioned, day)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(ds_partitioned, week)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(ds_partitioned, month)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(ds_partitioned, quarter)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(ds_partitioned, year)"
   	"JoinTo(users_ds_source)" -> "TimeDimension(last_login_ts, minute)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(last_login_ts, hour)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(last_login_ts, day)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(last_login_ts, week)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(last_login_ts, month)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(last_login_ts, quarter)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(last_login_ts, year)"
   	"JoinTo(users_ds_source)" -> "TimeDimension(last_profile_edit_ts, millisecond)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(last_profile_edit_ts, second)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(last_profile_edit_ts, minute)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(last_profile_edit_ts, hour)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(last_profile_edit_ts, day)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(last_profile_edit_ts, week)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(last_profile_edit_ts, month)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(last_profile_edit_ts, quarter)"
-  	"JoinTo(users_ds_source)" -> "TimeDimension(last_profile_edit_ts, year)"
+  	"JoinTo(users_latest)" -> "JoinFrom(users_latest)"
   	"JoinTo(users_latest)" -> "TimeDimension(ds_latest, day)"
-  	"JoinTo(users_latest)" -> "TimeDimension(ds_latest, week)"
-  	"JoinTo(users_latest)" -> "TimeDimension(ds_latest, month)"
-  	"JoinTo(users_latest)" -> "TimeDimension(ds_latest, quarter)"
-  	"JoinTo(users_latest)" -> "TimeDimension(ds_latest, year)"
+  	"JoinTo(views_source)" -> "JoinFrom(views_source)"
   	"JoinTo(views_source)" -> "TimeDimension(ds, day)"
-  	"JoinTo(views_source)" -> "TimeDimension(ds, week)"
-  	"JoinTo(views_source)" -> "TimeDimension(ds, month)"
-  	"JoinTo(views_source)" -> "TimeDimension(ds, quarter)"
-  	"JoinTo(views_source)" -> "TimeDimension(ds, year)"
   	"JoinTo(views_source)" -> "TimeDimension(ds_partitioned, day)"
-  	"JoinTo(views_source)" -> "TimeDimension(ds_partitioned, week)"
-  	"JoinTo(views_source)" -> "TimeDimension(ds_partitioned, month)"
-  	"JoinTo(views_source)" -> "TimeDimension(ds_partitioned, quarter)"
-  	"JoinTo(views_source)" -> "TimeDimension(ds_partitioned, year)"
+  	"JoinTo(visits_source)" -> "JoinFrom(visits_source)"
   	"JoinTo(visits_source)" -> "TimeDimension(ds, day)"
-  	"JoinTo(visits_source)" -> "TimeDimension(ds, week)"
-  	"JoinTo(visits_source)" -> "TimeDimension(ds, month)"
-  	"JoinTo(visits_source)" -> "TimeDimension(ds, quarter)"
-  	"JoinTo(visits_source)" -> "TimeDimension(ds, year)"
   	"JoinFrom(accounts_source)" -> "DsiEntity(account)"
   	"JoinFrom(accounts_source)" -> "DsiEntity(user)"
   	"JoinFrom(accounts_source)" -> "DsiEntity(user)"
@@ -1185,13 +744,19 @@ dot_notation:
   	"JoinFrom(visits_source)" -> "DsiEntity(user)"
   	"JoinFrom(visits_source)" -> "DsiEntity(user)"
   	"JoinFrom(visits_source)" -> "DsiEntity(visit)"
+  	"DsiEntity(account)" -> "JoinTo(accounts_source)"
+  	"DsiEntity(booking)" -> "JoinTo(bookings_source)"
+  	"DsiEntity(buy)" -> "JoinTo(buys_source)"
   	"DsiEntity(company)" -> "JoinTo(companies)"
   	"DsiEntity(listing)" -> "JoinTo(listings_latest)"
   	"DsiEntity(listing)" -> "JoinTo(lux_listing_mapping)"
+  	"DsiEntity(revenue_instance)" -> "JoinTo(revenue)"
   	"DsiEntity(user)" -> "JoinTo(companies)"
   	"DsiEntity(user)" -> "JoinTo(users_ds_source)"
   	"DsiEntity(user)" -> "JoinTo(users_latest)"
   	"DsiEntity(verification)" -> "JoinTo(id_verifications)"
+  	"DsiEntity(view)" -> "JoinTo(views_source)"
+  	"DsiEntity(visit)" -> "JoinTo(visits_source)"
   	"Metric(active_listings)" -> "Measure(listings)"
   	"Metric(approximate_continuous_booking_value_p99)" -> "Measure(approximate_continuous_booking_value_p99)"
   	"Metric(approximate_discrete_booking_value_p99)" -> "Measure(approximate_discrete_booking_value_p99)"
@@ -1537,63 +1102,15 @@ pretty_format:
       Time(week),
       Time(year),
       TimeDimension(archived_at, hour),
-      TimeDimension(archived_at, day),
-      TimeDimension(archived_at, week),
-      TimeDimension(archived_at, month),
-      TimeDimension(archived_at, quarter),
-      TimeDimension(archived_at, year),
       TimeDimension(bio_added_ts, second),
-      TimeDimension(bio_added_ts, minute),
-      TimeDimension(bio_added_ts, hour),
-      TimeDimension(bio_added_ts, day),
-      TimeDimension(bio_added_ts, week),
-      TimeDimension(bio_added_ts, month),
-      TimeDimension(bio_added_ts, quarter),
-      TimeDimension(bio_added_ts, year),
       TimeDimension(created_at, day),
-      TimeDimension(created_at, week),
-      TimeDimension(created_at, month),
-      TimeDimension(created_at, quarter),
-      TimeDimension(created_at, year),
       TimeDimension(ds, day),
-      TimeDimension(ds, week),
-      TimeDimension(ds, month),
-      TimeDimension(ds, quarter),
-      TimeDimension(ds, year),
       TimeDimension(ds_latest, day),
-      TimeDimension(ds_latest, week),
-      TimeDimension(ds_latest, month),
-      TimeDimension(ds_latest, quarter),
-      TimeDimension(ds_latest, year),
       TimeDimension(ds_month, month),
-      TimeDimension(ds_month, quarter),
-      TimeDimension(ds_month, year),
       TimeDimension(ds_partitioned, day),
-      TimeDimension(ds_partitioned, week),
-      TimeDimension(ds_partitioned, month),
-      TimeDimension(ds_partitioned, quarter),
-      TimeDimension(ds_partitioned, year),
       TimeDimension(last_login_ts, minute),
-      TimeDimension(last_login_ts, hour),
-      TimeDimension(last_login_ts, day),
-      TimeDimension(last_login_ts, week),
-      TimeDimension(last_login_ts, month),
-      TimeDimension(last_login_ts, quarter),
-      TimeDimension(last_login_ts, year),
       TimeDimension(last_profile_edit_ts, millisecond),
-      TimeDimension(last_profile_edit_ts, second),
-      TimeDimension(last_profile_edit_ts, minute),
-      TimeDimension(last_profile_edit_ts, hour),
-      TimeDimension(last_profile_edit_ts, day),
-      TimeDimension(last_profile_edit_ts, week),
-      TimeDimension(last_profile_edit_ts, month),
-      TimeDimension(last_profile_edit_ts, quarter),
-      TimeDimension(last_profile_edit_ts, year),
       TimeDimension(paid_at, day),
-      TimeDimension(paid_at, week),
-      TimeDimension(paid_at, month),
-      TimeDimension(paid_at, quarter),
-      TimeDimension(paid_at, year),
     },
     edges={
       EntityAttributeEdge(tail_node=DsiEntity(account), head_node=Metric(current_account_balance_by_user)),
@@ -1870,37 +1387,6 @@ pretty_format:
       EntityAttributeEdge(tail_node=TimeDimension(archived_at, hour), head_node=Time(quarter)),
       EntityAttributeEdge(tail_node=TimeDimension(archived_at, hour), head_node=Time(week)),
       EntityAttributeEdge(tail_node=TimeDimension(archived_at, hour), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(archived_at, day), head_node=Time(alien_day)),
-      EntityAttributeEdge(tail_node=TimeDimension(archived_at, day), head_node=Time(day)),
-      EntityAttributeEdge(tail_node=TimeDimension(archived_at, day), head_node=Time(extract_day)),
-      EntityAttributeEdge(tail_node=TimeDimension(archived_at, day), head_node=Time(extract_dow)),
-      EntityAttributeEdge(tail_node=TimeDimension(archived_at, day), head_node=Time(extract_doy)),
-      EntityAttributeEdge(tail_node=TimeDimension(archived_at, day), head_node=Time(extract_month)),
-      EntityAttributeEdge(tail_node=TimeDimension(archived_at, day), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(archived_at, day), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(archived_at, day), head_node=Time(month)),
-      EntityAttributeEdge(tail_node=TimeDimension(archived_at, day), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(archived_at, day), head_node=Time(week)),
-      EntityAttributeEdge(tail_node=TimeDimension(archived_at, day), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(archived_at, week), head_node=Time(extract_month)),
-      EntityAttributeEdge(tail_node=TimeDimension(archived_at, week), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(archived_at, week), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(archived_at, week), head_node=Time(month)),
-      EntityAttributeEdge(tail_node=TimeDimension(archived_at, week), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(archived_at, week), head_node=Time(week)),
-      EntityAttributeEdge(tail_node=TimeDimension(archived_at, week), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(archived_at, month), head_node=Time(extract_month)),
-      EntityAttributeEdge(tail_node=TimeDimension(archived_at, month), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(archived_at, month), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(archived_at, month), head_node=Time(month)),
-      EntityAttributeEdge(tail_node=TimeDimension(archived_at, month), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(archived_at, month), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(archived_at, quarter), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(archived_at, quarter), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(archived_at, quarter), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(archived_at, quarter), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(archived_at, year), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(archived_at, year), head_node=Time(year)),
       EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, second), head_node=Time(alien_day)),
       EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, second), head_node=Time(day)),
       EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, second), head_node=Time(extract_day)),
@@ -1916,64 +1402,6 @@ pretty_format:
       EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, second), head_node=Time(second)),
       EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, second), head_node=Time(week)),
       EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, second), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, minute), head_node=Time(alien_day)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, minute), head_node=Time(day)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, minute), head_node=Time(extract_day)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, minute), head_node=Time(extract_dow)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, minute), head_node=Time(extract_doy)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, minute), head_node=Time(extract_month)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, minute), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, minute), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, minute), head_node=Time(hour)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, minute), head_node=Time(minute)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, minute), head_node=Time(month)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, minute), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, minute), head_node=Time(week)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, minute), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, hour), head_node=Time(alien_day)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, hour), head_node=Time(day)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, hour), head_node=Time(extract_day)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, hour), head_node=Time(extract_dow)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, hour), head_node=Time(extract_doy)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, hour), head_node=Time(extract_month)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, hour), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, hour), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, hour), head_node=Time(hour)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, hour), head_node=Time(month)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, hour), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, hour), head_node=Time(week)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, hour), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, day), head_node=Time(alien_day)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, day), head_node=Time(day)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, day), head_node=Time(extract_day)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, day), head_node=Time(extract_dow)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, day), head_node=Time(extract_doy)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, day), head_node=Time(extract_month)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, day), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, day), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, day), head_node=Time(month)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, day), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, day), head_node=Time(week)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, day), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, week), head_node=Time(extract_month)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, week), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, week), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, week), head_node=Time(month)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, week), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, week), head_node=Time(week)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, week), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, month), head_node=Time(extract_month)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, month), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, month), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, month), head_node=Time(month)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, month), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, month), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, quarter), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, quarter), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, quarter), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, quarter), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, year), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, year), head_node=Time(year)),
       EntityAttributeEdge(tail_node=TimeDimension(created_at, day), head_node=Time(alien_day)),
       EntityAttributeEdge(tail_node=TimeDimension(created_at, day), head_node=Time(day)),
       EntityAttributeEdge(tail_node=TimeDimension(created_at, day), head_node=Time(extract_day)),
@@ -1986,25 +1414,6 @@ pretty_format:
       EntityAttributeEdge(tail_node=TimeDimension(created_at, day), head_node=Time(quarter)),
       EntityAttributeEdge(tail_node=TimeDimension(created_at, day), head_node=Time(week)),
       EntityAttributeEdge(tail_node=TimeDimension(created_at, day), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(created_at, week), head_node=Time(extract_month)),
-      EntityAttributeEdge(tail_node=TimeDimension(created_at, week), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(created_at, week), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(created_at, week), head_node=Time(month)),
-      EntityAttributeEdge(tail_node=TimeDimension(created_at, week), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(created_at, week), head_node=Time(week)),
-      EntityAttributeEdge(tail_node=TimeDimension(created_at, week), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(created_at, month), head_node=Time(extract_month)),
-      EntityAttributeEdge(tail_node=TimeDimension(created_at, month), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(created_at, month), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(created_at, month), head_node=Time(month)),
-      EntityAttributeEdge(tail_node=TimeDimension(created_at, month), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(created_at, month), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(created_at, quarter), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(created_at, quarter), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(created_at, quarter), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(created_at, quarter), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(created_at, year), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(created_at, year), head_node=Time(year)),
       EntityAttributeEdge(tail_node=TimeDimension(ds, day), head_node=Time(alien_day)),
       EntityAttributeEdge(tail_node=TimeDimension(ds, day), head_node=Time(day)),
       EntityAttributeEdge(tail_node=TimeDimension(ds, day), head_node=Time(extract_day)),
@@ -2017,25 +1426,6 @@ pretty_format:
       EntityAttributeEdge(tail_node=TimeDimension(ds, day), head_node=Time(quarter)),
       EntityAttributeEdge(tail_node=TimeDimension(ds, day), head_node=Time(week)),
       EntityAttributeEdge(tail_node=TimeDimension(ds, day), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds, week), head_node=Time(extract_month)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds, week), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds, week), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds, week), head_node=Time(month)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds, week), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds, week), head_node=Time(week)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds, week), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds, month), head_node=Time(extract_month)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds, month), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds, month), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds, month), head_node=Time(month)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds, month), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds, month), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds, quarter), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds, quarter), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds, quarter), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds, quarter), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds, year), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds, year), head_node=Time(year)),
       EntityAttributeEdge(tail_node=TimeDimension(ds_latest, day), head_node=Time(alien_day)),
       EntityAttributeEdge(tail_node=TimeDimension(ds_latest, day), head_node=Time(day)),
       EntityAttributeEdge(tail_node=TimeDimension(ds_latest, day), head_node=Time(extract_day)),
@@ -2048,37 +1438,12 @@ pretty_format:
       EntityAttributeEdge(tail_node=TimeDimension(ds_latest, day), head_node=Time(quarter)),
       EntityAttributeEdge(tail_node=TimeDimension(ds_latest, day), head_node=Time(week)),
       EntityAttributeEdge(tail_node=TimeDimension(ds_latest, day), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, week), head_node=Time(extract_month)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, week), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, week), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, week), head_node=Time(month)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, week), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, week), head_node=Time(week)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, week), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, month), head_node=Time(extract_month)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, month), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, month), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, month), head_node=Time(month)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, month), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, month), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, quarter), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, quarter), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, quarter), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, quarter), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, year), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, year), head_node=Time(year)),
       EntityAttributeEdge(tail_node=TimeDimension(ds_month, month), head_node=Time(extract_month)),
       EntityAttributeEdge(tail_node=TimeDimension(ds_month, month), head_node=Time(extract_quarter)),
       EntityAttributeEdge(tail_node=TimeDimension(ds_month, month), head_node=Time(extract_year)),
       EntityAttributeEdge(tail_node=TimeDimension(ds_month, month), head_node=Time(month)),
       EntityAttributeEdge(tail_node=TimeDimension(ds_month, month), head_node=Time(quarter)),
       EntityAttributeEdge(tail_node=TimeDimension(ds_month, month), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_month, quarter), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_month, quarter), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_month, quarter), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_month, quarter), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_month, year), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_month, year), head_node=Time(year)),
       EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, day), head_node=Time(alien_day)),
       EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, day), head_node=Time(day)),
       EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, day), head_node=Time(extract_day)),
@@ -2091,25 +1456,6 @@ pretty_format:
       EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, day), head_node=Time(quarter)),
       EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, day), head_node=Time(week)),
       EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, day), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, week), head_node=Time(extract_month)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, week), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, week), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, week), head_node=Time(month)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, week), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, week), head_node=Time(week)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, week), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, month), head_node=Time(extract_month)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, month), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, month), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, month), head_node=Time(month)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, month), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, month), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, quarter), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, quarter), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, quarter), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, quarter), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, year), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, year), head_node=Time(year)),
       EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, minute), head_node=Time(alien_day)),
       EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, minute), head_node=Time(day)),
       EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, minute), head_node=Time(extract_day)),
@@ -2124,50 +1470,6 @@ pretty_format:
       EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, minute), head_node=Time(quarter)),
       EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, minute), head_node=Time(week)),
       EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, minute), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, hour), head_node=Time(alien_day)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, hour), head_node=Time(day)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, hour), head_node=Time(extract_day)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, hour), head_node=Time(extract_dow)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, hour), head_node=Time(extract_doy)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, hour), head_node=Time(extract_month)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, hour), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, hour), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, hour), head_node=Time(hour)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, hour), head_node=Time(month)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, hour), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, hour), head_node=Time(week)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, hour), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, day), head_node=Time(alien_day)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, day), head_node=Time(day)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, day), head_node=Time(extract_day)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, day), head_node=Time(extract_dow)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, day), head_node=Time(extract_doy)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, day), head_node=Time(extract_month)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, day), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, day), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, day), head_node=Time(month)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, day), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, day), head_node=Time(week)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, day), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, week), head_node=Time(extract_month)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, week), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, week), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, week), head_node=Time(month)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, week), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, week), head_node=Time(week)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, week), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, month), head_node=Time(extract_month)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, month), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, month), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, month), head_node=Time(month)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, month), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, month), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, quarter), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, quarter), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, quarter), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, quarter), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, year), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, year), head_node=Time(year)),
       EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, millisecond), head_node=Time(alien_day)),
       EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, millisecond), head_node=Time(day)),
       EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, millisecond), head_node=Time(extract_day)),
@@ -2187,79 +1489,6 @@ pretty_format:
       EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, millisecond), head_node=Time(second)),
       EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, millisecond), head_node=Time(week)),
       EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, millisecond), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, second), head_node=Time(alien_day)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, second), head_node=Time(day)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, second), head_node=Time(extract_day)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, second), head_node=Time(extract_dow)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, second), head_node=Time(extract_doy)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, second), head_node=Time(extract_month)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, second), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, second), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, second), head_node=Time(hour)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, second), head_node=Time(minute)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, second), head_node=Time(month)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, second), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, second), head_node=Time(second)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, second), head_node=Time(week)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, second), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, minute), head_node=Time(alien_day)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, minute), head_node=Time(day)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, minute), head_node=Time(extract_day)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, minute), head_node=Time(extract_dow)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, minute), head_node=Time(extract_doy)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, minute), head_node=Time(extract_month)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, minute), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, minute), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, minute), head_node=Time(hour)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, minute), head_node=Time(minute)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, minute), head_node=Time(month)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, minute), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, minute), head_node=Time(week)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, minute), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, hour), head_node=Time(alien_day)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, hour), head_node=Time(day)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, hour), head_node=Time(extract_day)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, hour), head_node=Time(extract_dow)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, hour), head_node=Time(extract_doy)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, hour), head_node=Time(extract_month)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, hour), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, hour), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, hour), head_node=Time(hour)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, hour), head_node=Time(month)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, hour), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, hour), head_node=Time(week)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, hour), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, day), head_node=Time(alien_day)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, day), head_node=Time(day)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, day), head_node=Time(extract_day)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, day), head_node=Time(extract_dow)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, day), head_node=Time(extract_doy)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, day), head_node=Time(extract_month)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, day), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, day), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, day), head_node=Time(month)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, day), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, day), head_node=Time(week)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, day), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, week), head_node=Time(extract_month)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, week), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, week), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, week), head_node=Time(month)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, week), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, week), head_node=Time(week)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, week), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, month), head_node=Time(extract_month)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, month), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, month), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, month), head_node=Time(month)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, month), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, month), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, quarter), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, quarter), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, quarter), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, quarter), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, year), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, year), head_node=Time(year)),
       EntityAttributeEdge(tail_node=TimeDimension(paid_at, day), head_node=Time(alien_day)),
       EntityAttributeEdge(tail_node=TimeDimension(paid_at, day), head_node=Time(day)),
       EntityAttributeEdge(tail_node=TimeDimension(paid_at, day), head_node=Time(extract_day)),
@@ -2272,25 +1501,6 @@ pretty_format:
       EntityAttributeEdge(tail_node=TimeDimension(paid_at, day), head_node=Time(quarter)),
       EntityAttributeEdge(tail_node=TimeDimension(paid_at, day), head_node=Time(week)),
       EntityAttributeEdge(tail_node=TimeDimension(paid_at, day), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(paid_at, week), head_node=Time(extract_month)),
-      EntityAttributeEdge(tail_node=TimeDimension(paid_at, week), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(paid_at, week), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(paid_at, week), head_node=Time(month)),
-      EntityAttributeEdge(tail_node=TimeDimension(paid_at, week), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(paid_at, week), head_node=Time(week)),
-      EntityAttributeEdge(tail_node=TimeDimension(paid_at, week), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(paid_at, month), head_node=Time(extract_month)),
-      EntityAttributeEdge(tail_node=TimeDimension(paid_at, month), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(paid_at, month), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(paid_at, month), head_node=Time(month)),
-      EntityAttributeEdge(tail_node=TimeDimension(paid_at, month), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(paid_at, month), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(paid_at, quarter), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(paid_at, quarter), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(paid_at, quarter), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=TimeDimension(paid_at, quarter), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=TimeDimension(paid_at, year), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=TimeDimension(paid_at, year), head_node=Time(year)),
       EntityRelationshipEdge(tail_node=Agg(accounts_source, ds), head_node=JoinFrom(accounts_source)),
       EntityRelationshipEdge(tail_node=Agg(accounts_source, ds), head_node=JoinTo(accounts_source)),
       EntityRelationshipEdge(tail_node=Agg(accounts_source, ds_month), head_node=JoinFrom(accounts_source)),
@@ -2363,142 +1573,44 @@ pretty_format:
       EntityRelationshipEdge(tail_node=JoinFrom(visits_source), head_node=MetricTimeDimension(QUARTER)),
       EntityRelationshipEdge(tail_node=JoinFrom(visits_source), head_node=MetricTimeDimension(WEEK)),
       EntityRelationshipEdge(tail_node=JoinFrom(visits_source), head_node=MetricTimeDimension(YEAR)),
+      EntityRelationshipEdge(tail_node=JoinTo(accounts_source), head_node=JoinFrom(accounts_source)),
       EntityRelationshipEdge(tail_node=JoinTo(accounts_source), head_node=TimeDimension(ds, day)),
-      EntityRelationshipEdge(tail_node=JoinTo(accounts_source), head_node=TimeDimension(ds, week)),
-      EntityRelationshipEdge(tail_node=JoinTo(accounts_source), head_node=TimeDimension(ds, month)),
-      EntityRelationshipEdge(tail_node=JoinTo(accounts_source), head_node=TimeDimension(ds, quarter)),
-      EntityRelationshipEdge(tail_node=JoinTo(accounts_source), head_node=TimeDimension(ds, year)),
       EntityRelationshipEdge(tail_node=JoinTo(accounts_source), head_node=TimeDimension(ds_month, month)),
-      EntityRelationshipEdge(tail_node=JoinTo(accounts_source), head_node=TimeDimension(ds_month, quarter)),
-      EntityRelationshipEdge(tail_node=JoinTo(accounts_source), head_node=TimeDimension(ds_month, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(bookings_source), head_node=JoinFrom(bookings_source)),
       EntityRelationshipEdge(tail_node=JoinTo(bookings_source), head_node=TimeDimension(ds, day)),
-      EntityRelationshipEdge(tail_node=JoinTo(bookings_source), head_node=TimeDimension(ds, week)),
-      EntityRelationshipEdge(tail_node=JoinTo(bookings_source), head_node=TimeDimension(ds, month)),
-      EntityRelationshipEdge(tail_node=JoinTo(bookings_source), head_node=TimeDimension(ds, quarter)),
-      EntityRelationshipEdge(tail_node=JoinTo(bookings_source), head_node=TimeDimension(ds, year)),
       EntityRelationshipEdge(tail_node=JoinTo(bookings_source), head_node=TimeDimension(ds_partitioned, day)),
-      EntityRelationshipEdge(tail_node=JoinTo(bookings_source), head_node=TimeDimension(ds_partitioned, week)),
-      EntityRelationshipEdge(tail_node=JoinTo(bookings_source), head_node=TimeDimension(ds_partitioned, month)),
-      EntityRelationshipEdge(tail_node=JoinTo(bookings_source), head_node=TimeDimension(ds_partitioned, quarter)),
-      EntityRelationshipEdge(tail_node=JoinTo(bookings_source), head_node=TimeDimension(ds_partitioned, year)),
       EntityRelationshipEdge(tail_node=JoinTo(bookings_source), head_node=TimeDimension(paid_at, day)),
-      EntityRelationshipEdge(tail_node=JoinTo(bookings_source), head_node=TimeDimension(paid_at, week)),
-      EntityRelationshipEdge(tail_node=JoinTo(bookings_source), head_node=TimeDimension(paid_at, month)),
-      EntityRelationshipEdge(tail_node=JoinTo(bookings_source), head_node=TimeDimension(paid_at, quarter)),
-      EntityRelationshipEdge(tail_node=JoinTo(bookings_source), head_node=TimeDimension(paid_at, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(buys_source), head_node=JoinFrom(buys_source)),
       EntityRelationshipEdge(tail_node=JoinTo(buys_source), head_node=TimeDimension(ds, day)),
-      EntityRelationshipEdge(tail_node=JoinTo(buys_source), head_node=TimeDimension(ds, week)),
-      EntityRelationshipEdge(tail_node=JoinTo(buys_source), head_node=TimeDimension(ds, month)),
-      EntityRelationshipEdge(tail_node=JoinTo(buys_source), head_node=TimeDimension(ds, quarter)),
-      EntityRelationshipEdge(tail_node=JoinTo(buys_source), head_node=TimeDimension(ds, year)),
       EntityRelationshipEdge(tail_node=JoinTo(buys_source), head_node=TimeDimension(ds_month, month)),
-      EntityRelationshipEdge(tail_node=JoinTo(buys_source), head_node=TimeDimension(ds_month, quarter)),
-      EntityRelationshipEdge(tail_node=JoinTo(buys_source), head_node=TimeDimension(ds_month, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(companies), head_node=JoinFrom(companies)),
+      EntityRelationshipEdge(tail_node=JoinTo(id_verifications), head_node=JoinFrom(id_verifications)),
       EntityRelationshipEdge(tail_node=JoinTo(id_verifications), head_node=TimeDimension(ds, day)),
-      EntityRelationshipEdge(tail_node=JoinTo(id_verifications), head_node=TimeDimension(ds, week)),
-      EntityRelationshipEdge(tail_node=JoinTo(id_verifications), head_node=TimeDimension(ds, month)),
-      EntityRelationshipEdge(tail_node=JoinTo(id_verifications), head_node=TimeDimension(ds, quarter)),
-      EntityRelationshipEdge(tail_node=JoinTo(id_verifications), head_node=TimeDimension(ds, year)),
       EntityRelationshipEdge(tail_node=JoinTo(id_verifications), head_node=TimeDimension(ds_partitioned, day)),
-      EntityRelationshipEdge(tail_node=JoinTo(id_verifications), head_node=TimeDimension(ds_partitioned, week)),
-      EntityRelationshipEdge(tail_node=JoinTo(id_verifications), head_node=TimeDimension(ds_partitioned, month)),
-      EntityRelationshipEdge(tail_node=JoinTo(id_verifications), head_node=TimeDimension(ds_partitioned, quarter)),
-      EntityRelationshipEdge(tail_node=JoinTo(id_verifications), head_node=TimeDimension(ds_partitioned, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(listings_latest), head_node=JoinFrom(listings_latest)),
       EntityRelationshipEdge(tail_node=JoinTo(listings_latest), head_node=TimeDimension(created_at, day)),
-      EntityRelationshipEdge(tail_node=JoinTo(listings_latest), head_node=TimeDimension(created_at, week)),
-      EntityRelationshipEdge(tail_node=JoinTo(listings_latest), head_node=TimeDimension(created_at, month)),
-      EntityRelationshipEdge(tail_node=JoinTo(listings_latest), head_node=TimeDimension(created_at, quarter)),
-      EntityRelationshipEdge(tail_node=JoinTo(listings_latest), head_node=TimeDimension(created_at, year)),
       EntityRelationshipEdge(tail_node=JoinTo(listings_latest), head_node=TimeDimension(ds, day)),
-      EntityRelationshipEdge(tail_node=JoinTo(listings_latest), head_node=TimeDimension(ds, week)),
-      EntityRelationshipEdge(tail_node=JoinTo(listings_latest), head_node=TimeDimension(ds, month)),
-      EntityRelationshipEdge(tail_node=JoinTo(listings_latest), head_node=TimeDimension(ds, quarter)),
-      EntityRelationshipEdge(tail_node=JoinTo(listings_latest), head_node=TimeDimension(ds, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(lux_listing_mapping), head_node=JoinFrom(lux_listing_mapping)),
+      EntityRelationshipEdge(tail_node=JoinTo(revenue), head_node=JoinFrom(revenue)),
       EntityRelationshipEdge(tail_node=JoinTo(revenue), head_node=TimeDimension(ds, day)),
-      EntityRelationshipEdge(tail_node=JoinTo(revenue), head_node=TimeDimension(ds, week)),
-      EntityRelationshipEdge(tail_node=JoinTo(revenue), head_node=TimeDimension(ds, month)),
-      EntityRelationshipEdge(tail_node=JoinTo(revenue), head_node=TimeDimension(ds, quarter)),
-      EntityRelationshipEdge(tail_node=JoinTo(revenue), head_node=TimeDimension(ds, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=JoinFrom(users_ds_source)),
       EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(archived_at, hour)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(archived_at, day)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(archived_at, week)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(archived_at, month)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(archived_at, quarter)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(archived_at, year)),
       EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(bio_added_ts, second)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(bio_added_ts, minute)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(bio_added_ts, hour)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(bio_added_ts, day)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(bio_added_ts, week)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(bio_added_ts, month)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(bio_added_ts, quarter)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(bio_added_ts, year)),
       EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(created_at, day)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(created_at, week)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(created_at, month)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(created_at, quarter)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(created_at, year)),
       EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(ds, day)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(ds, week)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(ds, month)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(ds, quarter)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(ds, year)),
       EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(ds_partitioned, day)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(ds_partitioned, week)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(ds_partitioned, month)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(ds_partitioned, quarter)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(ds_partitioned, year)),
       EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(last_login_ts, minute)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(last_login_ts, hour)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(last_login_ts, day)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(last_login_ts, week)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(last_login_ts, month)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(last_login_ts, quarter)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(last_login_ts, year)),
       EntityRelationshipEdge(
         tail_node=JoinTo(users_ds_source),
         head_node=TimeDimension(last_profile_edit_ts, millisecond),
       ),
-      EntityRelationshipEdge(
-        tail_node=JoinTo(users_ds_source),
-        head_node=TimeDimension(last_profile_edit_ts, second),
-      ),
-      EntityRelationshipEdge(
-        tail_node=JoinTo(users_ds_source),
-        head_node=TimeDimension(last_profile_edit_ts, minute),
-      ),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(last_profile_edit_ts, hour)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(last_profile_edit_ts, day)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(last_profile_edit_ts, week)),
-      EntityRelationshipEdge(
-        tail_node=JoinTo(users_ds_source),
-        head_node=TimeDimension(last_profile_edit_ts, month),
-      ),
-      EntityRelationshipEdge(
-        tail_node=JoinTo(users_ds_source),
-        head_node=TimeDimension(last_profile_edit_ts, quarter),
-      ),
-      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(last_profile_edit_ts, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_latest), head_node=JoinFrom(users_latest)),
       EntityRelationshipEdge(tail_node=JoinTo(users_latest), head_node=TimeDimension(ds_latest, day)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_latest), head_node=TimeDimension(ds_latest, week)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_latest), head_node=TimeDimension(ds_latest, month)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_latest), head_node=TimeDimension(ds_latest, quarter)),
-      EntityRelationshipEdge(tail_node=JoinTo(users_latest), head_node=TimeDimension(ds_latest, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(views_source), head_node=JoinFrom(views_source)),
       EntityRelationshipEdge(tail_node=JoinTo(views_source), head_node=TimeDimension(ds, day)),
-      EntityRelationshipEdge(tail_node=JoinTo(views_source), head_node=TimeDimension(ds, week)),
-      EntityRelationshipEdge(tail_node=JoinTo(views_source), head_node=TimeDimension(ds, month)),
-      EntityRelationshipEdge(tail_node=JoinTo(views_source), head_node=TimeDimension(ds, quarter)),
-      EntityRelationshipEdge(tail_node=JoinTo(views_source), head_node=TimeDimension(ds, year)),
       EntityRelationshipEdge(tail_node=JoinTo(views_source), head_node=TimeDimension(ds_partitioned, day)),
-      EntityRelationshipEdge(tail_node=JoinTo(views_source), head_node=TimeDimension(ds_partitioned, week)),
-      EntityRelationshipEdge(tail_node=JoinTo(views_source), head_node=TimeDimension(ds_partitioned, month)),
-      EntityRelationshipEdge(tail_node=JoinTo(views_source), head_node=TimeDimension(ds_partitioned, quarter)),
-      EntityRelationshipEdge(tail_node=JoinTo(views_source), head_node=TimeDimension(ds_partitioned, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(visits_source), head_node=JoinFrom(visits_source)),
       EntityRelationshipEdge(tail_node=JoinTo(visits_source), head_node=TimeDimension(ds, day)),
-      EntityRelationshipEdge(tail_node=JoinTo(visits_source), head_node=TimeDimension(ds, week)),
-      EntityRelationshipEdge(tail_node=JoinTo(visits_source), head_node=TimeDimension(ds, month)),
-      EntityRelationshipEdge(tail_node=JoinTo(visits_source), head_node=TimeDimension(ds, quarter)),
-      EntityRelationshipEdge(tail_node=JoinTo(visits_source), head_node=TimeDimension(ds, year)),
       JoinFromModelEdge(tail_node=JoinFrom(accounts_source), head_node=DsiEntity(account)),
       JoinFromModelEdge(tail_node=JoinFrom(accounts_source), head_node=DsiEntity(user)),
       JoinFromModelEdge(tail_node=JoinFrom(accounts_source), head_node=DsiEntity(user)),
@@ -2545,13 +1657,19 @@ pretty_format:
       JoinFromModelEdge(tail_node=JoinFrom(visits_source), head_node=DsiEntity(user)),
       JoinFromModelEdge(tail_node=JoinFrom(visits_source), head_node=DsiEntity(user)),
       JoinFromModelEdge(tail_node=JoinFrom(visits_source), head_node=DsiEntity(visit)),
+      JoinToModelEdge(tail_node=DsiEntity(account), head_node=JoinTo(accounts_source)),
+      JoinToModelEdge(tail_node=DsiEntity(booking), head_node=JoinTo(bookings_source)),
+      JoinToModelEdge(tail_node=DsiEntity(buy), head_node=JoinTo(buys_source)),
       JoinToModelEdge(tail_node=DsiEntity(company), head_node=JoinTo(companies)),
       JoinToModelEdge(tail_node=DsiEntity(listing), head_node=JoinTo(listings_latest)),
       JoinToModelEdge(tail_node=DsiEntity(listing), head_node=JoinTo(lux_listing_mapping)),
+      JoinToModelEdge(tail_node=DsiEntity(revenue_instance), head_node=JoinTo(revenue)),
       JoinToModelEdge(tail_node=DsiEntity(user), head_node=JoinTo(companies)),
       JoinToModelEdge(tail_node=DsiEntity(user), head_node=JoinTo(users_ds_source)),
       JoinToModelEdge(tail_node=DsiEntity(user), head_node=JoinTo(users_latest)),
       JoinToModelEdge(tail_node=DsiEntity(verification), head_node=JoinTo(id_verifications)),
+      JoinToModelEdge(tail_node=DsiEntity(view), head_node=JoinTo(views_source)),
+      JoinToModelEdge(tail_node=DsiEntity(visit), head_node=JoinTo(visits_source)),
       MetricDefinitionEdge(tail_node=Metric(active_listings), head_node=Measure(listings)),
       MetricDefinitionEdge(
         tail_node=Metric(approximate_continuous_booking_value_p99),

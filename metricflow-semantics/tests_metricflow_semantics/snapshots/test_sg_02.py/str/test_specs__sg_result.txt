@@ -1,4 +1,4 @@
-test_name: test_linkable_spec_resolvers
+test_name: test_specs
 test_filename: test_sg_02.py
 ---
 --------------  ------------------------------------------------------------------------------------  ----------------------------------------------  -------------------------------------------  ----------------
@@ -13,7 +13,7 @@ TIME_DIMENSION  metric_time__custom_year                                        
 TIME_DIMENSION  metric_time__extract_quarter                                                                                                          ['DATE_PART', 'METRIC_TIME']                 ['sm_0']
 TIME_DIMENSION  metric_time__extract_year                                                                                                             ['DATE_PART', 'METRIC_TIME']                 ['sm_0']
 TIME_DIMENSION  metric_time__quarter                                                                                                                  ['METRIC_TIME']                              ['sm_0']
-TIME_DIMENSION  metric_time__year                                                                                                                     ['DERIVED_TIME_GRANULARITY', 'METRIC_TIME']  ['sm_0']
+TIME_DIMENSION  metric_time__year                                                                                                                     ['METRIC_TIME']                              ['sm_0']
 TIME_DIMENSION  sm_0_primary_entity__ds__custom_year                                                                                                  ['DERIVED_TIME_GRANULARITY', 'LOCAL']        ['sm_0']
 TIME_DIMENSION  sm_0_primary_entity__ds__extract_quarter                                                                                              ['DATE_PART', 'LOCAL']                       ['sm_0']
 TIME_DIMENSION  sm_0_primary_entity__ds__extract_year                                                                                                 ['DATE_PART', 'LOCAL']                       ['sm_0']
