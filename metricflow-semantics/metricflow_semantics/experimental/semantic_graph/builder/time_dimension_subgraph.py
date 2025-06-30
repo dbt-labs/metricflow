@@ -12,6 +12,7 @@ from typing_extensions import override
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_non_none_or_raise
 from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException
+from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeComputationUpdate
 from metricflow_semantics.experimental.semantic_graph.builder.graph_change_rule import (
     SemanticSubgraphGenerator,
@@ -97,8 +98,11 @@ class TimeDimensionSubgraphGenerator(SemanticSubgraphGenerator):
                 current_subgraph.add_edge(
                     EntityRelationshipEdge.get_instance(
                         tail_node=join_to_semantic_model_node,
-                        relationship=EntityRelationship.RIGHT_CARDINALITY_ONE,
+                        relationship=EntityRelationship.VALID,
                         head_node=time_dimension_node,
+                        linkable_element_properties=FrozenOrderedSet()
+                        if queryable_time_grain is time_grain
+                        else FrozenOrderedSet((LinkableElementProperty.DERIVED_TIME_GRANULARITY,)),
                     )
                 )
                 # current_subgraph.add_edge(
@@ -130,24 +134,40 @@ class TimeDimensionSubgraphGenerator(SemanticSubgraphGenerator):
         # e.g. TimeDimensionNode(`day`) should have edges to {`day`, `month`, `quarter`, `year`}
 
         # TODO: This seems like it could be consolidated with custom grains.
-        for time_grain in self._time_grain_to_queryable_time_grains[node_time_grain]:
-            attribute_node = TimeAttributeNode.get_instance_for_time_grain(time_grain)
+        # for time_grain in self._time_grain_to_queryable_time_grains[node_time_grain]:
+        #     attribute_node = TimeAttributeNode.get_instance_for_time_grain(time_grain)
+        #
+        #     attribute_computation_update = AttributeComputationUpdate(
+        #         linkable_element_property_additions=(LinkableElementProperty.DERIVED_TIME_GRANULARITY,)
+        #         if time_grain != node_time_grain
+        #         else (),
+        #         time_grain_addition=ExpandedTimeGranularity(name=time_grain.value, base_granularity=time_grain),
+        #     )
+        #
+        #     edges_to_add.append(
+        #         EntityAttributeEdge.get_instance(
+        #             tail_node=time_dimension_node,
+        #             head_node=attribute_node,
+        #             attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
+        #             attribute_computation_update=attribute_computation_update,
+        #         )
+        #     )
 
-            attribute_computation_update = AttributeComputationUpdate(
-                linkable_element_property_additions=(LinkableElementProperty.DERIVED_TIME_GRANULARITY,)
-                if time_grain != node_time_grain
-                else (),
-                time_grain_addition=ExpandedTimeGranularity(name=time_grain.value, base_granularity=time_grain),
-            )
+        attribute_computation_update = AttributeComputationUpdate(
+            time_grain_addition=ExpandedTimeGranularity(name=node_time_grain.value, base_granularity=node_time_grain),
+        )
 
-            edges_to_add.append(
-                EntityAttributeEdge.get_instance(
-                    tail_node=time_dimension_node,
-                    head_node=attribute_node,
-                    attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
-                    attribute_computation_update=attribute_computation_update,
-                )
+        attribute_node = TimeAttributeNode.get_instance_for_time_grain(node_time_grain)
+
+        edges_to_add.append(
+            EntityAttributeEdge.get_instance(
+                tail_node=time_dimension_node,
+                head_node=attribute_node,
+                attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
+                attribute_computation_update=attribute_computation_update,
             )
+        )
+
         # Add similar edges for the date part.
         # e.g. `day` should have edges to {`day`, `dow`, `doy`, `month`, `quarter`, `year`}
         for queryable_date_part in self._time_grain_to_applicable_date_parts[node_time_grain]:

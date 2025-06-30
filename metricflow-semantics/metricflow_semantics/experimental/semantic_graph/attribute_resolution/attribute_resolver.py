@@ -204,10 +204,20 @@ class AttributeResolver:
                     )
                 )
             elif model_id_count == 1:
-                if LinkableElementProperty.METRIC_TIME not in properties:
+                if (
+                    LinkableElementProperty.METRIC_TIME not in properties
+                    and LinkableElementProperty.METRIC not in properties
+                ):
                     properties = properties.union((LinkableElementProperty.LOCAL,))
-            elif model_id_count > 1:
+            elif model_id_count == 2:
                 properties = properties.union((LinkableElementProperty.JOINED,))
+            elif model_id_count >= 3:
+                properties = properties.union(
+                    (
+                        LinkableElementProperty.JOINED,
+                        LinkableElementProperty.MULTI_HOP,
+                    )
+                )
             else:
                 raise RuntimeError(LazyFormat("Case not handled", model_id_count=model_id_count))
 

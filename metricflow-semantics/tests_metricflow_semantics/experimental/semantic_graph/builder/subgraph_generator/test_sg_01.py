@@ -3,9 +3,6 @@ from __future__ import annotations
 import logging
 
 from _pytest.fixtures import FixtureRequest
-from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
-    AttributeComputationPath,
-)
 from metricflow_semantics.experimental.semantic_graph.builder.categorical_dimension_attribute_subgraph import (
     CategoricalDimensionAttributeSubgraphGenerator,
 )
@@ -21,15 +18,8 @@ from metricflow_semantics.experimental.semantic_graph.builder.time_dimension_sub
     TimeDimensionSubgraphGenerator,
 )
 from metricflow_semantics.experimental.semantic_graph.manifest_object_lookup import ManifestObjectLookup
-from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
-    SemanticGraphEdge,
-    SemanticGraphNode,
-)
-from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder import MetricflowGraphPathFinder
-from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_cache import PathFinderCache
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
-from tests_metricflow_semantics.experimental.graph_helpers import assert_graph_snapshot_equal
 from tests_metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator.conftest import (
     check_subgraph_generation,
 )
@@ -107,14 +97,9 @@ def test_all(  # noqa: D103
     mf_test_configuration: MetricFlowTestConfiguration,
     sg_01_primary_entity_defined_lookup: ManifestObjectLookup,
 ) -> None:
-    path_finder_cache = PathFinderCache[SemanticGraphNode, SemanticGraphEdge, AttributeComputationPath]()
-
-    path_finder = MetricflowGraphPathFinder[SemanticGraphNode, SemanticGraphEdge, AttributeComputationPath](
-        path_finder_cache
-    )
-    builder = SemanticGraphBuilder(
+    check_subgraph_generation(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
         manifest_object_lookup=sg_01_primary_entity_defined_lookup,
-        path_finder=path_finder,
+        subgraph_generators=SemanticGraphBuilder._ALL_SUBGRAPH_GENERATORS,
     )
-    graph = builder.build()
-    assert_graph_snapshot_equal(request=request, snapshot_configuration=mf_test_configuration, graph=graph)

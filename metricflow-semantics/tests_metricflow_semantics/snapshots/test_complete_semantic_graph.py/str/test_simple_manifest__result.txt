@@ -1,0 +1,2777 @@
+test_name: test_simple_manifest
+test_filename: test_complete_semantic_graph.py
+---
+dot_notation:
+  digraph {
+  	graph [name=MutableSemanticGraph]
+  	subgraph cluster_accounts_source {
+  		label=accounts_source
+  		"Measure(total_account_balance_first_day)"
+  		"Measure(total_account_balance_first_day_of_month)"
+  	}
+  	subgraph cluster_bookings_source {
+  		label=bookings_source
+  		"Measure(referred_bookings)"
+  	}
+  	subgraph cluster_buys_source {
+  		label=buys_source
+  		"Measure(buyers)"
+  		"Measure(buys)"
+  		"Measure(buys_month)"
+  	}
+  	subgraph cluster_id_verifications {
+  		label=id_verifications
+  		"Measure(identity_verifications)"
+  	}
+  	subgraph cluster_listings_latest {
+  		label=listings_latest
+  		"Measure(smallest_listing)"
+  	}
+  	subgraph cluster_revenue {
+  		label=revenue
+  		"Measure(txn_revenue)"
+  	}
+  	subgraph cluster_users_ds_source {
+  		label=users_ds_source
+  		"Measure(new_users)"
+  	}
+  	subgraph cluster_views_source {
+  		label=views_source
+  		"Measure(views)"
+  	}
+  	subgraph cluster_visits_source {
+  		label=visits_source
+  		"Measure(visitors)"
+  		"Measure(visits)"
+  	}
+  	subgraph cluster_other_attribute {
+  		label=other_attribute
+  		"Dimension(account_type)"
+  		"Dimension(capacity_latest)"
+  		"Dimension(company_name)"
+  		"Dimension(country_latest)"
+  		"Dimension(home_state)"
+  		"Dimension(home_state_latest)"
+  		"Dimension(is_instant)"
+  		"Dimension(is_lux_latest)"
+  		"Dimension(referrer_id)"
+  		"Dimension(verification_type)"
+  		"DsiEntityKey(company)"
+  		"DsiEntityKey(guest)"
+  		"DsiEntityKey(host)"
+  		"DsiEntityKey(listing)"
+  		"DsiEntityKey(lux_listing)"
+  		"DsiEntityKey(session)"
+  		"DsiEntityKey(session_id)"
+  		"DsiEntityKey(user)"
+  		"DsiEntityKey(verification)"
+  	}
+  	subgraph cluster_dsi_entity {
+  		label=dsi_entity
+  		"DsiEntity(account)"
+  		"DsiEntity(booking)"
+  		"DsiEntity(buy)"
+  		"DsiEntity(company)"
+  		"DsiEntity(listing)"
+  		"DsiEntity(revenue_instance)"
+  		"DsiEntity(user)"
+  		"DsiEntity(verification)"
+  		"DsiEntity(view)"
+  		"DsiEntity(visit)"
+  	}
+  	subgraph cluster_companies {
+  		label=companies
+  		"JoinTo(companies)"
+  	}
+  	subgraph cluster_lux_listing_mapping {
+  		label=lux_listing_mapping
+  		"JoinTo(lux_listing_mapping)"
+  	}
+  	subgraph cluster_users_latest {
+  		label=users_latest
+  		"JoinTo(users_latest)"
+  	}
+  	subgraph cluster_metric_attribute {
+  		label=metric_attribute
+  		"Metric(active_listings)"
+  		"Metric(approximate_continuous_booking_value_p99)"
+  		"Metric(approximate_discrete_booking_value_p99)"
+  		"Metric(archived_users)"
+  		"Metric(archived_users_join_to_time_spine)"
+  		"Metric(average_booking_value)"
+  		"Metric(average_instant_booking_value)"
+  		"Metric(bookers)"
+  		"Metric(booking_fees)"
+  		"Metric(booking_fees_last_week_per_booker_this_week)"
+  		"Metric(booking_fees_per_booker)"
+  		"Metric(booking_fees_since_start_of_month)"
+  		"Metric(booking_payments)"
+  		"Metric(booking_value)"
+  		"Metric(booking_value_for_non_null_listing_id)"
+  		"Metric(booking_value_p99)"
+  		"Metric(booking_value_per_view)"
+  		"Metric(booking_value_sub_instant)"
+  		"Metric(booking_value_sub_instant_add_10)"
+  		"Metric(bookings)"
+  		"Metric(bookings_5_day_lag)"
+  		"Metric(bookings_alien_day_over_alien_day)"
+  		"Metric(bookings_at_start_of_month)"
+  		"Metric(bookings_fill_nulls_with_0)"
+  		"Metric(bookings_fill_nulls_with_0_without_time_spine)"
+  		"Metric(bookings_growth_2_weeks)"
+  		"Metric(bookings_growth_2_weeks_fill_nulls_with_0)"
+  		"Metric(bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset)"
+  		"Metric(bookings_growth_since_start_of_month)"
+  		"Metric(bookings_join_to_time_spine)"
+  		"Metric(bookings_join_to_time_spine_with_tiered_filters)"
+  		"Metric(bookings_month_start_compared_to_1_month_prior)"
+  		"Metric(bookings_offset_alien_day)"
+  		"Metric(bookings_offset_once)"
+  		"Metric(bookings_offset_one_alien_day)"
+  		"Metric(bookings_offset_twice)"
+  		"Metric(bookings_per_booker)"
+  		"Metric(bookings_per_dollar)"
+  		"Metric(bookings_per_listing)"
+  		"Metric(bookings_per_lux_listing_derived)"
+  		"Metric(bookings_per_view)"
+  		"Metric(current_account_balance_by_user)"
+  		"Metric(derived_bookings_0)"
+  		"Metric(derived_bookings_1)"
+  		"Metric(derived_shared_alias_1a)"
+  		"Metric(derived_shared_alias_1b)"
+  		"Metric(derived_shared_alias_2)"
+  		"Metric(discrete_booking_value_p99)"
+  		"Metric(double_counted_delayed_bookings)"
+  		"Metric(every_2_days_bookers_2_days_ago)"
+  		"Metric(every_two_days_bookers)"
+  		"Metric(every_two_days_bookers_fill_nulls_with_0)"
+  		"Metric(identity_verifications)"
+  		"Metric(instant_booking_fraction_of_max_value)"
+  		"Metric(instant_booking_value)"
+  		"Metric(instant_booking_value_ratio)"
+  		"Metric(instant_bookings)"
+  		"Metric(instant_bookings_with_measure_filter)"
+  		"Metric(instant_lux_booking_value_rate)"
+  		"Metric(instant_plus_non_referred_bookings_pct)"
+  		"Metric(largest_listing)"
+  		"Metric(listings)"
+  		"Metric(lux_booking_fraction_of_max_value)"
+  		"Metric(lux_booking_value_rate_expr)"
+  		"Metric(lux_listings)"
+  		"Metric(max_booking_value)"
+  		"Metric(median_booking_value)"
+  		"Metric(min_booking_value)"
+  		"Metric(nested_fill_nulls_without_time_spine)"
+  		"Metric(new_users)"
+  		"Metric(non_referred_bookings_pct)"
+  		"Metric(popular_listing_bookings_per_booker)"
+  		"Metric(referred_bookings)"
+  		"Metric(regional_starting_balance_ratios)"
+  		"Metric(revenue)"
+  		"Metric(revenue_all_time)"
+  		"Metric(revenue_mtd)"
+  		"Metric(simple_subdaily_metric_default_day)"
+  		"Metric(simple_subdaily_metric_default_hour)"
+  		"Metric(smallest_listing)"
+  		"Metric(subdaily_cumulative_grain_to_date_metric)"
+  		"Metric(subdaily_cumulative_window_metric)"
+  		"Metric(subdaily_join_to_time_spine_metric)"
+  		"Metric(subdaily_offset_grain_to_date_metric)"
+  		"Metric(subdaily_offset_window_metric)"
+  		"Metric(total_account_balance_first_day)"
+  		"Metric(total_account_balance_first_day_of_month)"
+  		"Metric(trailing_2_months_revenue)"
+  		"Metric(trailing_2_months_revenue_sub_10)"
+  		"Metric(twice_bookings_fill_nulls_with_0_without_time_spine)"
+  		"Metric(views)"
+  		"Metric(views_times_booking_value)"
+  		"Metric(visit_buy_conversion_rate)"
+  		"Metric(visit_buy_conversion_rate_7days)"
+  		"Metric(visit_buy_conversion_rate_7days_fill_nulls_with_0)"
+  		"Metric(visit_buy_conversion_rate_by_session)"
+  		"Metric(visit_buy_conversion_rate_with_monthly_conversion)"
+  		"Metric(visit_buy_conversions)"
+  	}
+  	subgraph cluster_time_dimension {
+  		label=time_dimension
+  		"MetricTimeDimension(DAY)"
+  		"MetricTimeDimension(HOUR)"
+  		"MetricTimeDimension(MONTH)"
+  		"MetricTimeDimension(QUARTER)"
+  		"MetricTimeDimension(WEEK)"
+  		"MetricTimeDimension(YEAR)"
+  	}
+  	subgraph cluster_time_attribute {
+  		label=time_attribute
+  		"Time(alien_day)"
+  		"Time(day)"
+  		"Time(extract_day)"
+  		"Time(extract_dow)"
+  		"Time(extract_doy)"
+  		"Time(extract_month)"
+  		"Time(extract_quarter)"
+  		"Time(extract_year)"
+  		"Time(hour)"
+  		"Time(millisecond)"
+  		"Time(minute)"
+  		"Time(month)"
+  		"Time(quarter)"
+  		"Time(second)"
+  		"Time(week)"
+  		"Time(year)"
+  	}
+  	subgraph cluster_time_entity {
+  		label=time_entity
+  		"TimeDimension(archived_at, hour)"
+  		"TimeDimension(archived_at, day)"
+  		"TimeDimension(archived_at, week)"
+  		"TimeDimension(archived_at, month)"
+  		"TimeDimension(archived_at, quarter)"
+  		"TimeDimension(archived_at, year)"
+  		"TimeDimension(bio_added_ts, second)"
+  		"TimeDimension(bio_added_ts, minute)"
+  		"TimeDimension(bio_added_ts, hour)"
+  		"TimeDimension(bio_added_ts, day)"
+  		"TimeDimension(bio_added_ts, week)"
+  		"TimeDimension(bio_added_ts, month)"
+  		"TimeDimension(bio_added_ts, quarter)"
+  		"TimeDimension(bio_added_ts, year)"
+  		"TimeDimension(created_at, day)"
+  		"TimeDimension(created_at, week)"
+  		"TimeDimension(created_at, month)"
+  		"TimeDimension(created_at, quarter)"
+  		"TimeDimension(created_at, year)"
+  		"TimeDimension(ds, day)"
+  		"TimeDimension(ds, week)"
+  		"TimeDimension(ds, month)"
+  		"TimeDimension(ds, quarter)"
+  		"TimeDimension(ds, year)"
+  		"TimeDimension(ds_latest, day)"
+  		"TimeDimension(ds_latest, week)"
+  		"TimeDimension(ds_latest, month)"
+  		"TimeDimension(ds_latest, quarter)"
+  		"TimeDimension(ds_latest, year)"
+  		"TimeDimension(ds_month, month)"
+  		"TimeDimension(ds_month, quarter)"
+  		"TimeDimension(ds_month, year)"
+  		"TimeDimension(ds_partitioned, day)"
+  		"TimeDimension(ds_partitioned, week)"
+  		"TimeDimension(ds_partitioned, month)"
+  		"TimeDimension(ds_partitioned, quarter)"
+  		"TimeDimension(ds_partitioned, year)"
+  		"TimeDimension(last_login_ts, minute)"
+  		"TimeDimension(last_login_ts, hour)"
+  		"TimeDimension(last_login_ts, day)"
+  		"TimeDimension(last_login_ts, week)"
+  		"TimeDimension(last_login_ts, month)"
+  		"TimeDimension(last_login_ts, quarter)"
+  		"TimeDimension(last_login_ts, year)"
+  		"TimeDimension(last_profile_edit_ts, millisecond)"
+  		"TimeDimension(last_profile_edit_ts, second)"
+  		"TimeDimension(last_profile_edit_ts, minute)"
+  		"TimeDimension(last_profile_edit_ts, hour)"
+  		"TimeDimension(last_profile_edit_ts, day)"
+  		"TimeDimension(last_profile_edit_ts, week)"
+  		"TimeDimension(last_profile_edit_ts, month)"
+  		"TimeDimension(last_profile_edit_ts, quarter)"
+  		"TimeDimension(last_profile_edit_ts, year)"
+  		"TimeDimension(paid_at, day)"
+  		"TimeDimension(paid_at, week)"
+  		"TimeDimension(paid_at, month)"
+  		"TimeDimension(paid_at, quarter)"
+  		"TimeDimension(paid_at, year)"
+  	}
+  	"DsiEntity(account)" -> "Metric(current_account_balance_by_user)"
+  	"DsiEntity(account)" -> "Metric(regional_starting_balance_ratios)"
+  	"DsiEntity(account)" -> "Metric(total_account_balance_first_day)"
+  	"DsiEntity(account)" -> "Metric(total_account_balance_first_day_of_month)"
+  	"DsiEntity(booking)" -> "Metric(approximate_continuous_booking_value_p99)"
+  	"DsiEntity(booking)" -> "Metric(approximate_discrete_booking_value_p99)"
+  	"DsiEntity(booking)" -> "Metric(average_booking_value)"
+  	"DsiEntity(booking)" -> "Metric(average_instant_booking_value)"
+  	"DsiEntity(booking)" -> "Metric(bookers)"
+  	"DsiEntity(booking)" -> "Metric(booking_payments)"
+  	"DsiEntity(booking)" -> "Metric(booking_value)"
+  	"DsiEntity(booking)" -> "Metric(booking_value_for_non_null_listing_id)"
+  	"DsiEntity(booking)" -> "Metric(booking_value_p99)"
+  	"DsiEntity(booking)" -> "Metric(bookings)"
+  	"DsiEntity(booking)" -> "Metric(bookings_fill_nulls_with_0)"
+  	"DsiEntity(booking)" -> "Metric(bookings_fill_nulls_with_0_without_time_spine)"
+  	"DsiEntity(booking)" -> "Metric(bookings_join_to_time_spine)"
+  	"DsiEntity(booking)" -> "Metric(bookings_join_to_time_spine_with_tiered_filters)"
+  	"DsiEntity(booking)" -> "Metric(bookings_per_booker)"
+  	"DsiEntity(booking)" -> "Metric(bookings_per_dollar)"
+  	"DsiEntity(booking)" -> "Metric(discrete_booking_value_p99)"
+  	"DsiEntity(booking)" -> "Metric(every_two_days_bookers)"
+  	"DsiEntity(booking)" -> "Metric(every_two_days_bookers_fill_nulls_with_0)"
+  	"DsiEntity(booking)" -> "Metric(instant_booking_fraction_of_max_value)"
+  	"DsiEntity(booking)" -> "Metric(instant_booking_value)"
+  	"DsiEntity(booking)" -> "Metric(instant_booking_value_ratio)"
+  	"DsiEntity(booking)" -> "Metric(instant_bookings)"
+  	"DsiEntity(booking)" -> "Metric(instant_bookings_with_measure_filter)"
+  	"DsiEntity(booking)" -> "Metric(lux_booking_fraction_of_max_value)"
+  	"DsiEntity(booking)" -> "Metric(max_booking_value)"
+  	"DsiEntity(booking)" -> "Metric(median_booking_value)"
+  	"DsiEntity(booking)" -> "Metric(min_booking_value)"
+  	"DsiEntity(booking)" -> "Metric(referred_bookings)"
+  	"DsiEntity(listing)" -> "Metric(active_listings)"
+  	"DsiEntity(listing)" -> "Metric(approximate_continuous_booking_value_p99)"
+  	"DsiEntity(listing)" -> "Metric(approximate_discrete_booking_value_p99)"
+  	"DsiEntity(listing)" -> "Metric(average_booking_value)"
+  	"DsiEntity(listing)" -> "Metric(average_instant_booking_value)"
+  	"DsiEntity(listing)" -> "Metric(bookers)"
+  	"DsiEntity(listing)" -> "Metric(booking_payments)"
+  	"DsiEntity(listing)" -> "Metric(booking_value)"
+  	"DsiEntity(listing)" -> "Metric(booking_value_for_non_null_listing_id)"
+  	"DsiEntity(listing)" -> "Metric(booking_value_p99)"
+  	"DsiEntity(listing)" -> "Metric(bookings)"
+  	"DsiEntity(listing)" -> "Metric(bookings_fill_nulls_with_0)"
+  	"DsiEntity(listing)" -> "Metric(bookings_fill_nulls_with_0_without_time_spine)"
+  	"DsiEntity(listing)" -> "Metric(bookings_join_to_time_spine)"
+  	"DsiEntity(listing)" -> "Metric(bookings_join_to_time_spine_with_tiered_filters)"
+  	"DsiEntity(listing)" -> "Metric(bookings_per_booker)"
+  	"DsiEntity(listing)" -> "Metric(bookings_per_dollar)"
+  	"DsiEntity(listing)" -> "Metric(bookings_per_listing)"
+  	"DsiEntity(listing)" -> "Metric(bookings_per_view)"
+  	"DsiEntity(listing)" -> "Metric(discrete_booking_value_p99)"
+  	"DsiEntity(listing)" -> "Metric(every_two_days_bookers)"
+  	"DsiEntity(listing)" -> "Metric(every_two_days_bookers_fill_nulls_with_0)"
+  	"DsiEntity(listing)" -> "Metric(instant_booking_fraction_of_max_value)"
+  	"DsiEntity(listing)" -> "Metric(instant_booking_value)"
+  	"DsiEntity(listing)" -> "Metric(instant_booking_value_ratio)"
+  	"DsiEntity(listing)" -> "Metric(instant_bookings)"
+  	"DsiEntity(listing)" -> "Metric(instant_bookings_with_measure_filter)"
+  	"DsiEntity(listing)" -> "Metric(largest_listing)"
+  	"DsiEntity(listing)" -> "Metric(listings)"
+  	"DsiEntity(listing)" -> "Metric(lux_booking_fraction_of_max_value)"
+  	"DsiEntity(listing)" -> "Metric(lux_listings)"
+  	"DsiEntity(listing)" -> "Metric(max_booking_value)"
+  	"DsiEntity(listing)" -> "Metric(median_booking_value)"
+  	"DsiEntity(listing)" -> "Metric(min_booking_value)"
+  	"DsiEntity(listing)" -> "Metric(popular_listing_bookings_per_booker)"
+  	"DsiEntity(listing)" -> "Metric(referred_bookings)"
+  	"DsiEntity(listing)" -> "Metric(smallest_listing)"
+  	"DsiEntity(listing)" -> "Metric(views)"
+  	"DsiEntity(revenue_instance)" -> "Metric(revenue)"
+  	"DsiEntity(revenue_instance)" -> "Metric(revenue_all_time)"
+  	"DsiEntity(revenue_instance)" -> "Metric(revenue_mtd)"
+  	"DsiEntity(revenue_instance)" -> "Metric(trailing_2_months_revenue)"
+  	"DsiEntity(user)" -> "Metric(active_listings)"
+  	"DsiEntity(user)" -> "Metric(archived_users)"
+  	"DsiEntity(user)" -> "Metric(archived_users_join_to_time_spine)"
+  	"DsiEntity(user)" -> "Metric(current_account_balance_by_user)"
+  	"DsiEntity(user)" -> "Metric(identity_verifications)"
+  	"DsiEntity(user)" -> "Metric(largest_listing)"
+  	"DsiEntity(user)" -> "Metric(listings)"
+  	"DsiEntity(user)" -> "Metric(lux_listings)"
+  	"DsiEntity(user)" -> "Metric(new_users)"
+  	"DsiEntity(user)" -> "Metric(popular_listing_bookings_per_booker)"
+  	"DsiEntity(user)" -> "Metric(regional_starting_balance_ratios)"
+  	"DsiEntity(user)" -> "Metric(revenue)"
+  	"DsiEntity(user)" -> "Metric(revenue_all_time)"
+  	"DsiEntity(user)" -> "Metric(revenue_mtd)"
+  	"DsiEntity(user)" -> "Metric(simple_subdaily_metric_default_day)"
+  	"DsiEntity(user)" -> "Metric(simple_subdaily_metric_default_hour)"
+  	"DsiEntity(user)" -> "Metric(smallest_listing)"
+  	"DsiEntity(user)" -> "Metric(subdaily_cumulative_grain_to_date_metric)"
+  	"DsiEntity(user)" -> "Metric(subdaily_cumulative_window_metric)"
+  	"DsiEntity(user)" -> "Metric(subdaily_join_to_time_spine_metric)"
+  	"DsiEntity(user)" -> "Metric(total_account_balance_first_day)"
+  	"DsiEntity(user)" -> "Metric(total_account_balance_first_day_of_month)"
+  	"DsiEntity(user)" -> "Metric(trailing_2_months_revenue)"
+  	"DsiEntity(user)" -> "Metric(views)"
+  	"DsiEntity(user)" -> "Metric(visit_buy_conversion_rate)"
+  	"DsiEntity(user)" -> "Metric(visit_buy_conversion_rate_7days)"
+  	"DsiEntity(user)" -> "Metric(visit_buy_conversion_rate_7days_fill_nulls_with_0)"
+  	"DsiEntity(user)" -> "Metric(visit_buy_conversion_rate_by_session)"
+  	"DsiEntity(user)" -> "Metric(visit_buy_conversion_rate_with_monthly_conversion)"
+  	"DsiEntity(user)" -> "Metric(visit_buy_conversions)"
+  	"DsiEntity(verification)" -> "Metric(identity_verifications)"
+  	"DsiEntity(view)" -> "Metric(views)"
+  	"JoinFrom(accounts_source)" -> "DsiEntityKey(user)"
+  	"JoinFrom(bookings_source)" -> "DsiEntityKey(guest)"
+  	"JoinFrom(bookings_source)" -> "DsiEntityKey(host)"
+  	"JoinFrom(bookings_source)" -> "DsiEntityKey(listing)"
+  	"JoinFrom(buys_source)" -> "DsiEntityKey(session_id)"
+  	"JoinFrom(buys_source)" -> "DsiEntityKey(user)"
+  	"JoinFrom(companies)" -> "DsiEntityKey(company)"
+  	"JoinFrom(companies)" -> "DsiEntityKey(user)"
+  	"JoinFrom(id_verifications)" -> "DsiEntityKey(user)"
+  	"JoinFrom(id_verifications)" -> "DsiEntityKey(verification)"
+  	"JoinFrom(listings_latest)" -> "DsiEntityKey(listing)"
+  	"JoinFrom(listings_latest)" -> "DsiEntityKey(user)"
+  	"JoinFrom(lux_listing_mapping)" -> "DsiEntityKey(listing)"
+  	"JoinFrom(lux_listing_mapping)" -> "DsiEntityKey(lux_listing)"
+  	"JoinFrom(revenue)" -> "DsiEntityKey(user)"
+  	"JoinFrom(users_ds_source)" -> "DsiEntityKey(user)"
+  	"JoinFrom(users_latest)" -> "DsiEntityKey(user)"
+  	"JoinFrom(views_source)" -> "DsiEntityKey(listing)"
+  	"JoinFrom(views_source)" -> "DsiEntityKey(user)"
+  	"JoinFrom(visits_source)" -> "DsiEntityKey(session)"
+  	"JoinFrom(visits_source)" -> "DsiEntityKey(user)"
+  	"JoinTo(accounts_source)" -> "Dimension(account_type)"
+  	"JoinTo(accounts_source)" -> "DsiEntityKey(user)"
+  	"JoinTo(bookings_source)" -> "Dimension(is_instant)"
+  	"JoinTo(bookings_source)" -> "DsiEntityKey(guest)"
+  	"JoinTo(bookings_source)" -> "DsiEntityKey(host)"
+  	"JoinTo(bookings_source)" -> "DsiEntityKey(listing)"
+  	"JoinTo(buys_source)" -> "DsiEntityKey(session_id)"
+  	"JoinTo(buys_source)" -> "DsiEntityKey(user)"
+  	"JoinTo(companies)" -> "Dimension(company_name)"
+  	"JoinTo(companies)" -> "DsiEntityKey(company)"
+  	"JoinTo(companies)" -> "DsiEntityKey(user)"
+  	"JoinTo(id_verifications)" -> "Dimension(verification_type)"
+  	"JoinTo(id_verifications)" -> "DsiEntityKey(user)"
+  	"JoinTo(id_verifications)" -> "DsiEntityKey(verification)"
+  	"JoinTo(listings_latest)" -> "Dimension(capacity_latest)"
+  	"JoinTo(listings_latest)" -> "Dimension(country_latest)"
+  	"JoinTo(listings_latest)" -> "Dimension(is_lux_latest)"
+  	"JoinTo(listings_latest)" -> "DsiEntityKey(listing)"
+  	"JoinTo(listings_latest)" -> "DsiEntityKey(user)"
+  	"JoinTo(lux_listing_mapping)" -> "DsiEntityKey(listing)"
+  	"JoinTo(lux_listing_mapping)" -> "DsiEntityKey(lux_listing)"
+  	"JoinTo(revenue)" -> "DsiEntityKey(user)"
+  	"JoinTo(users_ds_source)" -> "Dimension(home_state)"
+  	"JoinTo(users_ds_source)" -> "DsiEntityKey(user)"
+  	"JoinTo(users_latest)" -> "Dimension(home_state_latest)"
+  	"JoinTo(users_latest)" -> "DsiEntityKey(user)"
+  	"JoinTo(views_source)" -> "DsiEntityKey(listing)"
+  	"JoinTo(views_source)" -> "DsiEntityKey(user)"
+  	"JoinTo(visits_source)" -> "Dimension(referrer_id)"
+  	"JoinTo(visits_source)" -> "DsiEntityKey(session)"
+  	"JoinTo(visits_source)" -> "DsiEntityKey(user)"
+  	"Measure(account_balance)" -> "Agg(accounts_source, ds)"
+  	"Measure(approximate_continuous_booking_value_p99)" -> "Agg(bookings_source, ds)"
+  	"Measure(approximate_discrete_booking_value_p99)" -> "Agg(bookings_source, ds)"
+  	"Measure(archived_users)" -> "Agg(users_ds_source, archived_at)"
+  	"Measure(average_booking_value)" -> "Agg(bookings_source, ds)"
+  	"Measure(bookers)" -> "Agg(bookings_source, ds)"
+  	"Measure(booking_payments)" -> "Agg(bookings_source, paid_at)"
+  	"Measure(booking_value)" -> "Agg(bookings_source, ds)"
+  	"Measure(booking_value_p99)" -> "Agg(bookings_source, ds)"
+  	"Measure(bookings)" -> "Agg(bookings_source, ds)"
+  	"Measure(buyers)" -> "Agg(buys_source, ds)"
+  	"Measure(buys)" -> "Agg(buys_source, ds)"
+  	"Measure(buys_month)" -> "Agg(buys_source, ds_month)"
+  	"Measure(current_account_balance_by_user)" -> "Agg(accounts_source, ds)"
+  	"Measure(discrete_booking_value_p99)" -> "Agg(bookings_source, ds)"
+  	"Measure(identity_verifications)" -> "Agg(id_verifications, ds)"
+  	"Measure(instant_bookings)" -> "Agg(bookings_source, ds)"
+  	"Measure(largest_listing)" -> "Agg(listings_latest, ds)"
+  	"Measure(listings)" -> "Agg(listings_latest, ds)"
+  	"Measure(max_booking_value)" -> "Agg(bookings_source, ds)"
+  	"Measure(median_booking_value)" -> "Agg(bookings_source, ds)"
+  	"Measure(min_booking_value)" -> "Agg(bookings_source, ds)"
+  	"Measure(new_users)" -> "Agg(users_ds_source, created_at)"
+  	"Measure(referred_bookings)" -> "Agg(bookings_source, ds)"
+  	"Measure(smallest_listing)" -> "Agg(listings_latest, ds)"
+  	"Measure(total_account_balance_first_day)" -> "Agg(accounts_source, ds)"
+  	"Measure(total_account_balance_first_day_of_month)" -> "Agg(accounts_source, ds_month)"
+  	"Measure(txn_revenue)" -> "Agg(revenue, ds)"
+  	"Measure(views)" -> "Agg(views_source, ds)"
+  	"Measure(visitors)" -> "Agg(visits_source, ds)"
+  	"Measure(visits)" -> "Agg(visits_source, ds)"
+  	"MetricTimeDimension(DAY)" -> "Time(alien_day)"
+  	"MetricTimeDimension(DAY)" -> "Time(day)"
+  	"MetricTimeDimension(DAY)" -> "Time(extract_day)"
+  	"MetricTimeDimension(DAY)" -> "Time(extract_dow)"
+  	"MetricTimeDimension(DAY)" -> "Time(extract_doy)"
+  	"MetricTimeDimension(DAY)" -> "Time(extract_month)"
+  	"MetricTimeDimension(DAY)" -> "Time(extract_quarter)"
+  	"MetricTimeDimension(DAY)" -> "Time(extract_year)"
+  	"MetricTimeDimension(DAY)" -> "Time(month)"
+  	"MetricTimeDimension(DAY)" -> "Time(quarter)"
+  	"MetricTimeDimension(DAY)" -> "Time(week)"
+  	"MetricTimeDimension(DAY)" -> "Time(year)"
+  	"MetricTimeDimension(HOUR)" -> "Time(alien_day)"
+  	"MetricTimeDimension(HOUR)" -> "Time(day)"
+  	"MetricTimeDimension(HOUR)" -> "Time(extract_day)"
+  	"MetricTimeDimension(HOUR)" -> "Time(extract_dow)"
+  	"MetricTimeDimension(HOUR)" -> "Time(extract_doy)"
+  	"MetricTimeDimension(HOUR)" -> "Time(extract_month)"
+  	"MetricTimeDimension(HOUR)" -> "Time(extract_quarter)"
+  	"MetricTimeDimension(HOUR)" -> "Time(extract_year)"
+  	"MetricTimeDimension(HOUR)" -> "Time(hour)"
+  	"MetricTimeDimension(HOUR)" -> "Time(month)"
+  	"MetricTimeDimension(HOUR)" -> "Time(quarter)"
+  	"MetricTimeDimension(HOUR)" -> "Time(week)"
+  	"MetricTimeDimension(HOUR)" -> "Time(year)"
+  	"MetricTimeDimension(MONTH)" -> "Time(extract_month)"
+  	"MetricTimeDimension(MONTH)" -> "Time(extract_quarter)"
+  	"MetricTimeDimension(MONTH)" -> "Time(extract_year)"
+  	"MetricTimeDimension(MONTH)" -> "Time(month)"
+  	"MetricTimeDimension(MONTH)" -> "Time(quarter)"
+  	"MetricTimeDimension(MONTH)" -> "Time(year)"
+  	"MetricTimeDimension(QUARTER)" -> "Time(extract_quarter)"
+  	"MetricTimeDimension(QUARTER)" -> "Time(extract_year)"
+  	"MetricTimeDimension(QUARTER)" -> "Time(quarter)"
+  	"MetricTimeDimension(QUARTER)" -> "Time(year)"
+  	"MetricTimeDimension(WEEK)" -> "Time(extract_month)"
+  	"MetricTimeDimension(WEEK)" -> "Time(extract_quarter)"
+  	"MetricTimeDimension(WEEK)" -> "Time(extract_year)"
+  	"MetricTimeDimension(WEEK)" -> "Time(month)"
+  	"MetricTimeDimension(WEEK)" -> "Time(quarter)"
+  	"MetricTimeDimension(WEEK)" -> "Time(week)"
+  	"MetricTimeDimension(WEEK)" -> "Time(year)"
+  	"MetricTimeDimension(YEAR)" -> "Time(extract_year)"
+  	"MetricTimeDimension(YEAR)" -> "Time(year)"
+  	"TimeDimension(archived_at, hour)" -> "Time(alien_day)"
+  	"TimeDimension(archived_at, hour)" -> "Time(day)"
+  	"TimeDimension(archived_at, hour)" -> "Time(extract_day)"
+  	"TimeDimension(archived_at, hour)" -> "Time(extract_dow)"
+  	"TimeDimension(archived_at, hour)" -> "Time(extract_doy)"
+  	"TimeDimension(archived_at, hour)" -> "Time(extract_month)"
+  	"TimeDimension(archived_at, hour)" -> "Time(extract_quarter)"
+  	"TimeDimension(archived_at, hour)" -> "Time(extract_year)"
+  	"TimeDimension(archived_at, hour)" -> "Time(hour)"
+  	"TimeDimension(archived_at, hour)" -> "Time(month)"
+  	"TimeDimension(archived_at, hour)" -> "Time(quarter)"
+  	"TimeDimension(archived_at, hour)" -> "Time(week)"
+  	"TimeDimension(archived_at, hour)" -> "Time(year)"
+  	"TimeDimension(archived_at, day)" -> "Time(alien_day)"
+  	"TimeDimension(archived_at, day)" -> "Time(day)"
+  	"TimeDimension(archived_at, day)" -> "Time(extract_day)"
+  	"TimeDimension(archived_at, day)" -> "Time(extract_dow)"
+  	"TimeDimension(archived_at, day)" -> "Time(extract_doy)"
+  	"TimeDimension(archived_at, day)" -> "Time(extract_month)"
+  	"TimeDimension(archived_at, day)" -> "Time(extract_quarter)"
+  	"TimeDimension(archived_at, day)" -> "Time(extract_year)"
+  	"TimeDimension(archived_at, day)" -> "Time(month)"
+  	"TimeDimension(archived_at, day)" -> "Time(quarter)"
+  	"TimeDimension(archived_at, day)" -> "Time(week)"
+  	"TimeDimension(archived_at, day)" -> "Time(year)"
+  	"TimeDimension(archived_at, week)" -> "Time(extract_month)"
+  	"TimeDimension(archived_at, week)" -> "Time(extract_quarter)"
+  	"TimeDimension(archived_at, week)" -> "Time(extract_year)"
+  	"TimeDimension(archived_at, week)" -> "Time(month)"
+  	"TimeDimension(archived_at, week)" -> "Time(quarter)"
+  	"TimeDimension(archived_at, week)" -> "Time(week)"
+  	"TimeDimension(archived_at, week)" -> "Time(year)"
+  	"TimeDimension(archived_at, month)" -> "Time(extract_month)"
+  	"TimeDimension(archived_at, month)" -> "Time(extract_quarter)"
+  	"TimeDimension(archived_at, month)" -> "Time(extract_year)"
+  	"TimeDimension(archived_at, month)" -> "Time(month)"
+  	"TimeDimension(archived_at, month)" -> "Time(quarter)"
+  	"TimeDimension(archived_at, month)" -> "Time(year)"
+  	"TimeDimension(archived_at, quarter)" -> "Time(extract_quarter)"
+  	"TimeDimension(archived_at, quarter)" -> "Time(extract_year)"
+  	"TimeDimension(archived_at, quarter)" -> "Time(quarter)"
+  	"TimeDimension(archived_at, quarter)" -> "Time(year)"
+  	"TimeDimension(archived_at, year)" -> "Time(extract_year)"
+  	"TimeDimension(archived_at, year)" -> "Time(year)"
+  	"TimeDimension(bio_added_ts, second)" -> "Time(alien_day)"
+  	"TimeDimension(bio_added_ts, second)" -> "Time(day)"
+  	"TimeDimension(bio_added_ts, second)" -> "Time(extract_day)"
+  	"TimeDimension(bio_added_ts, second)" -> "Time(extract_dow)"
+  	"TimeDimension(bio_added_ts, second)" -> "Time(extract_doy)"
+  	"TimeDimension(bio_added_ts, second)" -> "Time(extract_month)"
+  	"TimeDimension(bio_added_ts, second)" -> "Time(extract_quarter)"
+  	"TimeDimension(bio_added_ts, second)" -> "Time(extract_year)"
+  	"TimeDimension(bio_added_ts, second)" -> "Time(hour)"
+  	"TimeDimension(bio_added_ts, second)" -> "Time(minute)"
+  	"TimeDimension(bio_added_ts, second)" -> "Time(month)"
+  	"TimeDimension(bio_added_ts, second)" -> "Time(quarter)"
+  	"TimeDimension(bio_added_ts, second)" -> "Time(second)"
+  	"TimeDimension(bio_added_ts, second)" -> "Time(week)"
+  	"TimeDimension(bio_added_ts, second)" -> "Time(year)"
+  	"TimeDimension(bio_added_ts, minute)" -> "Time(alien_day)"
+  	"TimeDimension(bio_added_ts, minute)" -> "Time(day)"
+  	"TimeDimension(bio_added_ts, minute)" -> "Time(extract_day)"
+  	"TimeDimension(bio_added_ts, minute)" -> "Time(extract_dow)"
+  	"TimeDimension(bio_added_ts, minute)" -> "Time(extract_doy)"
+  	"TimeDimension(bio_added_ts, minute)" -> "Time(extract_month)"
+  	"TimeDimension(bio_added_ts, minute)" -> "Time(extract_quarter)"
+  	"TimeDimension(bio_added_ts, minute)" -> "Time(extract_year)"
+  	"TimeDimension(bio_added_ts, minute)" -> "Time(hour)"
+  	"TimeDimension(bio_added_ts, minute)" -> "Time(minute)"
+  	"TimeDimension(bio_added_ts, minute)" -> "Time(month)"
+  	"TimeDimension(bio_added_ts, minute)" -> "Time(quarter)"
+  	"TimeDimension(bio_added_ts, minute)" -> "Time(week)"
+  	"TimeDimension(bio_added_ts, minute)" -> "Time(year)"
+  	"TimeDimension(bio_added_ts, hour)" -> "Time(alien_day)"
+  	"TimeDimension(bio_added_ts, hour)" -> "Time(day)"
+  	"TimeDimension(bio_added_ts, hour)" -> "Time(extract_day)"
+  	"TimeDimension(bio_added_ts, hour)" -> "Time(extract_dow)"
+  	"TimeDimension(bio_added_ts, hour)" -> "Time(extract_doy)"
+  	"TimeDimension(bio_added_ts, hour)" -> "Time(extract_month)"
+  	"TimeDimension(bio_added_ts, hour)" -> "Time(extract_quarter)"
+  	"TimeDimension(bio_added_ts, hour)" -> "Time(extract_year)"
+  	"TimeDimension(bio_added_ts, hour)" -> "Time(hour)"
+  	"TimeDimension(bio_added_ts, hour)" -> "Time(month)"
+  	"TimeDimension(bio_added_ts, hour)" -> "Time(quarter)"
+  	"TimeDimension(bio_added_ts, hour)" -> "Time(week)"
+  	"TimeDimension(bio_added_ts, hour)" -> "Time(year)"
+  	"TimeDimension(bio_added_ts, day)" -> "Time(alien_day)"
+  	"TimeDimension(bio_added_ts, day)" -> "Time(day)"
+  	"TimeDimension(bio_added_ts, day)" -> "Time(extract_day)"
+  	"TimeDimension(bio_added_ts, day)" -> "Time(extract_dow)"
+  	"TimeDimension(bio_added_ts, day)" -> "Time(extract_doy)"
+  	"TimeDimension(bio_added_ts, day)" -> "Time(extract_month)"
+  	"TimeDimension(bio_added_ts, day)" -> "Time(extract_quarter)"
+  	"TimeDimension(bio_added_ts, day)" -> "Time(extract_year)"
+  	"TimeDimension(bio_added_ts, day)" -> "Time(month)"
+  	"TimeDimension(bio_added_ts, day)" -> "Time(quarter)"
+  	"TimeDimension(bio_added_ts, day)" -> "Time(week)"
+  	"TimeDimension(bio_added_ts, day)" -> "Time(year)"
+  	"TimeDimension(bio_added_ts, week)" -> "Time(extract_month)"
+  	"TimeDimension(bio_added_ts, week)" -> "Time(extract_quarter)"
+  	"TimeDimension(bio_added_ts, week)" -> "Time(extract_year)"
+  	"TimeDimension(bio_added_ts, week)" -> "Time(month)"
+  	"TimeDimension(bio_added_ts, week)" -> "Time(quarter)"
+  	"TimeDimension(bio_added_ts, week)" -> "Time(week)"
+  	"TimeDimension(bio_added_ts, week)" -> "Time(year)"
+  	"TimeDimension(bio_added_ts, month)" -> "Time(extract_month)"
+  	"TimeDimension(bio_added_ts, month)" -> "Time(extract_quarter)"
+  	"TimeDimension(bio_added_ts, month)" -> "Time(extract_year)"
+  	"TimeDimension(bio_added_ts, month)" -> "Time(month)"
+  	"TimeDimension(bio_added_ts, month)" -> "Time(quarter)"
+  	"TimeDimension(bio_added_ts, month)" -> "Time(year)"
+  	"TimeDimension(bio_added_ts, quarter)" -> "Time(extract_quarter)"
+  	"TimeDimension(bio_added_ts, quarter)" -> "Time(extract_year)"
+  	"TimeDimension(bio_added_ts, quarter)" -> "Time(quarter)"
+  	"TimeDimension(bio_added_ts, quarter)" -> "Time(year)"
+  	"TimeDimension(bio_added_ts, year)" -> "Time(extract_year)"
+  	"TimeDimension(bio_added_ts, year)" -> "Time(year)"
+  	"TimeDimension(created_at, day)" -> "Time(alien_day)"
+  	"TimeDimension(created_at, day)" -> "Time(day)"
+  	"TimeDimension(created_at, day)" -> "Time(extract_day)"
+  	"TimeDimension(created_at, day)" -> "Time(extract_dow)"
+  	"TimeDimension(created_at, day)" -> "Time(extract_doy)"
+  	"TimeDimension(created_at, day)" -> "Time(extract_month)"
+  	"TimeDimension(created_at, day)" -> "Time(extract_quarter)"
+  	"TimeDimension(created_at, day)" -> "Time(extract_year)"
+  	"TimeDimension(created_at, day)" -> "Time(month)"
+  	"TimeDimension(created_at, day)" -> "Time(quarter)"
+  	"TimeDimension(created_at, day)" -> "Time(week)"
+  	"TimeDimension(created_at, day)" -> "Time(year)"
+  	"TimeDimension(created_at, week)" -> "Time(extract_month)"
+  	"TimeDimension(created_at, week)" -> "Time(extract_quarter)"
+  	"TimeDimension(created_at, week)" -> "Time(extract_year)"
+  	"TimeDimension(created_at, week)" -> "Time(month)"
+  	"TimeDimension(created_at, week)" -> "Time(quarter)"
+  	"TimeDimension(created_at, week)" -> "Time(week)"
+  	"TimeDimension(created_at, week)" -> "Time(year)"
+  	"TimeDimension(created_at, month)" -> "Time(extract_month)"
+  	"TimeDimension(created_at, month)" -> "Time(extract_quarter)"
+  	"TimeDimension(created_at, month)" -> "Time(extract_year)"
+  	"TimeDimension(created_at, month)" -> "Time(month)"
+  	"TimeDimension(created_at, month)" -> "Time(quarter)"
+  	"TimeDimension(created_at, month)" -> "Time(year)"
+  	"TimeDimension(created_at, quarter)" -> "Time(extract_quarter)"
+  	"TimeDimension(created_at, quarter)" -> "Time(extract_year)"
+  	"TimeDimension(created_at, quarter)" -> "Time(quarter)"
+  	"TimeDimension(created_at, quarter)" -> "Time(year)"
+  	"TimeDimension(created_at, year)" -> "Time(extract_year)"
+  	"TimeDimension(created_at, year)" -> "Time(year)"
+  	"TimeDimension(ds, day)" -> "Time(alien_day)"
+  	"TimeDimension(ds, day)" -> "Time(day)"
+  	"TimeDimension(ds, day)" -> "Time(extract_day)"
+  	"TimeDimension(ds, day)" -> "Time(extract_dow)"
+  	"TimeDimension(ds, day)" -> "Time(extract_doy)"
+  	"TimeDimension(ds, day)" -> "Time(extract_month)"
+  	"TimeDimension(ds, day)" -> "Time(extract_quarter)"
+  	"TimeDimension(ds, day)" -> "Time(extract_year)"
+  	"TimeDimension(ds, day)" -> "Time(month)"
+  	"TimeDimension(ds, day)" -> "Time(quarter)"
+  	"TimeDimension(ds, day)" -> "Time(week)"
+  	"TimeDimension(ds, day)" -> "Time(year)"
+  	"TimeDimension(ds, week)" -> "Time(extract_month)"
+  	"TimeDimension(ds, week)" -> "Time(extract_quarter)"
+  	"TimeDimension(ds, week)" -> "Time(extract_year)"
+  	"TimeDimension(ds, week)" -> "Time(month)"
+  	"TimeDimension(ds, week)" -> "Time(quarter)"
+  	"TimeDimension(ds, week)" -> "Time(week)"
+  	"TimeDimension(ds, week)" -> "Time(year)"
+  	"TimeDimension(ds, month)" -> "Time(extract_month)"
+  	"TimeDimension(ds, month)" -> "Time(extract_quarter)"
+  	"TimeDimension(ds, month)" -> "Time(extract_year)"
+  	"TimeDimension(ds, month)" -> "Time(month)"
+  	"TimeDimension(ds, month)" -> "Time(quarter)"
+  	"TimeDimension(ds, month)" -> "Time(year)"
+  	"TimeDimension(ds, quarter)" -> "Time(extract_quarter)"
+  	"TimeDimension(ds, quarter)" -> "Time(extract_year)"
+  	"TimeDimension(ds, quarter)" -> "Time(quarter)"
+  	"TimeDimension(ds, quarter)" -> "Time(year)"
+  	"TimeDimension(ds, year)" -> "Time(extract_year)"
+  	"TimeDimension(ds, year)" -> "Time(year)"
+  	"TimeDimension(ds_latest, day)" -> "Time(alien_day)"
+  	"TimeDimension(ds_latest, day)" -> "Time(day)"
+  	"TimeDimension(ds_latest, day)" -> "Time(extract_day)"
+  	"TimeDimension(ds_latest, day)" -> "Time(extract_dow)"
+  	"TimeDimension(ds_latest, day)" -> "Time(extract_doy)"
+  	"TimeDimension(ds_latest, day)" -> "Time(extract_month)"
+  	"TimeDimension(ds_latest, day)" -> "Time(extract_quarter)"
+  	"TimeDimension(ds_latest, day)" -> "Time(extract_year)"
+  	"TimeDimension(ds_latest, day)" -> "Time(month)"
+  	"TimeDimension(ds_latest, day)" -> "Time(quarter)"
+  	"TimeDimension(ds_latest, day)" -> "Time(week)"
+  	"TimeDimension(ds_latest, day)" -> "Time(year)"
+  	"TimeDimension(ds_latest, week)" -> "Time(extract_month)"
+  	"TimeDimension(ds_latest, week)" -> "Time(extract_quarter)"
+  	"TimeDimension(ds_latest, week)" -> "Time(extract_year)"
+  	"TimeDimension(ds_latest, week)" -> "Time(month)"
+  	"TimeDimension(ds_latest, week)" -> "Time(quarter)"
+  	"TimeDimension(ds_latest, week)" -> "Time(week)"
+  	"TimeDimension(ds_latest, week)" -> "Time(year)"
+  	"TimeDimension(ds_latest, month)" -> "Time(extract_month)"
+  	"TimeDimension(ds_latest, month)" -> "Time(extract_quarter)"
+  	"TimeDimension(ds_latest, month)" -> "Time(extract_year)"
+  	"TimeDimension(ds_latest, month)" -> "Time(month)"
+  	"TimeDimension(ds_latest, month)" -> "Time(quarter)"
+  	"TimeDimension(ds_latest, month)" -> "Time(year)"
+  	"TimeDimension(ds_latest, quarter)" -> "Time(extract_quarter)"
+  	"TimeDimension(ds_latest, quarter)" -> "Time(extract_year)"
+  	"TimeDimension(ds_latest, quarter)" -> "Time(quarter)"
+  	"TimeDimension(ds_latest, quarter)" -> "Time(year)"
+  	"TimeDimension(ds_latest, year)" -> "Time(extract_year)"
+  	"TimeDimension(ds_latest, year)" -> "Time(year)"
+  	"TimeDimension(ds_month, month)" -> "Time(extract_month)"
+  	"TimeDimension(ds_month, month)" -> "Time(extract_quarter)"
+  	"TimeDimension(ds_month, month)" -> "Time(extract_year)"
+  	"TimeDimension(ds_month, month)" -> "Time(month)"
+  	"TimeDimension(ds_month, month)" -> "Time(quarter)"
+  	"TimeDimension(ds_month, month)" -> "Time(year)"
+  	"TimeDimension(ds_month, quarter)" -> "Time(extract_quarter)"
+  	"TimeDimension(ds_month, quarter)" -> "Time(extract_year)"
+  	"TimeDimension(ds_month, quarter)" -> "Time(quarter)"
+  	"TimeDimension(ds_month, quarter)" -> "Time(year)"
+  	"TimeDimension(ds_month, year)" -> "Time(extract_year)"
+  	"TimeDimension(ds_month, year)" -> "Time(year)"
+  	"TimeDimension(ds_partitioned, day)" -> "Time(alien_day)"
+  	"TimeDimension(ds_partitioned, day)" -> "Time(day)"
+  	"TimeDimension(ds_partitioned, day)" -> "Time(extract_day)"
+  	"TimeDimension(ds_partitioned, day)" -> "Time(extract_dow)"
+  	"TimeDimension(ds_partitioned, day)" -> "Time(extract_doy)"
+  	"TimeDimension(ds_partitioned, day)" -> "Time(extract_month)"
+  	"TimeDimension(ds_partitioned, day)" -> "Time(extract_quarter)"
+  	"TimeDimension(ds_partitioned, day)" -> "Time(extract_year)"
+  	"TimeDimension(ds_partitioned, day)" -> "Time(month)"
+  	"TimeDimension(ds_partitioned, day)" -> "Time(quarter)"
+  	"TimeDimension(ds_partitioned, day)" -> "Time(week)"
+  	"TimeDimension(ds_partitioned, day)" -> "Time(year)"
+  	"TimeDimension(ds_partitioned, week)" -> "Time(extract_month)"
+  	"TimeDimension(ds_partitioned, week)" -> "Time(extract_quarter)"
+  	"TimeDimension(ds_partitioned, week)" -> "Time(extract_year)"
+  	"TimeDimension(ds_partitioned, week)" -> "Time(month)"
+  	"TimeDimension(ds_partitioned, week)" -> "Time(quarter)"
+  	"TimeDimension(ds_partitioned, week)" -> "Time(week)"
+  	"TimeDimension(ds_partitioned, week)" -> "Time(year)"
+  	"TimeDimension(ds_partitioned, month)" -> "Time(extract_month)"
+  	"TimeDimension(ds_partitioned, month)" -> "Time(extract_quarter)"
+  	"TimeDimension(ds_partitioned, month)" -> "Time(extract_year)"
+  	"TimeDimension(ds_partitioned, month)" -> "Time(month)"
+  	"TimeDimension(ds_partitioned, month)" -> "Time(quarter)"
+  	"TimeDimension(ds_partitioned, month)" -> "Time(year)"
+  	"TimeDimension(ds_partitioned, quarter)" -> "Time(extract_quarter)"
+  	"TimeDimension(ds_partitioned, quarter)" -> "Time(extract_year)"
+  	"TimeDimension(ds_partitioned, quarter)" -> "Time(quarter)"
+  	"TimeDimension(ds_partitioned, quarter)" -> "Time(year)"
+  	"TimeDimension(ds_partitioned, year)" -> "Time(extract_year)"
+  	"TimeDimension(ds_partitioned, year)" -> "Time(year)"
+  	"TimeDimension(last_login_ts, minute)" -> "Time(alien_day)"
+  	"TimeDimension(last_login_ts, minute)" -> "Time(day)"
+  	"TimeDimension(last_login_ts, minute)" -> "Time(extract_day)"
+  	"TimeDimension(last_login_ts, minute)" -> "Time(extract_dow)"
+  	"TimeDimension(last_login_ts, minute)" -> "Time(extract_doy)"
+  	"TimeDimension(last_login_ts, minute)" -> "Time(extract_month)"
+  	"TimeDimension(last_login_ts, minute)" -> "Time(extract_quarter)"
+  	"TimeDimension(last_login_ts, minute)" -> "Time(extract_year)"
+  	"TimeDimension(last_login_ts, minute)" -> "Time(hour)"
+  	"TimeDimension(last_login_ts, minute)" -> "Time(minute)"
+  	"TimeDimension(last_login_ts, minute)" -> "Time(month)"
+  	"TimeDimension(last_login_ts, minute)" -> "Time(quarter)"
+  	"TimeDimension(last_login_ts, minute)" -> "Time(week)"
+  	"TimeDimension(last_login_ts, minute)" -> "Time(year)"
+  	"TimeDimension(last_login_ts, hour)" -> "Time(alien_day)"
+  	"TimeDimension(last_login_ts, hour)" -> "Time(day)"
+  	"TimeDimension(last_login_ts, hour)" -> "Time(extract_day)"
+  	"TimeDimension(last_login_ts, hour)" -> "Time(extract_dow)"
+  	"TimeDimension(last_login_ts, hour)" -> "Time(extract_doy)"
+  	"TimeDimension(last_login_ts, hour)" -> "Time(extract_month)"
+  	"TimeDimension(last_login_ts, hour)" -> "Time(extract_quarter)"
+  	"TimeDimension(last_login_ts, hour)" -> "Time(extract_year)"
+  	"TimeDimension(last_login_ts, hour)" -> "Time(hour)"
+  	"TimeDimension(last_login_ts, hour)" -> "Time(month)"
+  	"TimeDimension(last_login_ts, hour)" -> "Time(quarter)"
+  	"TimeDimension(last_login_ts, hour)" -> "Time(week)"
+  	"TimeDimension(last_login_ts, hour)" -> "Time(year)"
+  	"TimeDimension(last_login_ts, day)" -> "Time(alien_day)"
+  	"TimeDimension(last_login_ts, day)" -> "Time(day)"
+  	"TimeDimension(last_login_ts, day)" -> "Time(extract_day)"
+  	"TimeDimension(last_login_ts, day)" -> "Time(extract_dow)"
+  	"TimeDimension(last_login_ts, day)" -> "Time(extract_doy)"
+  	"TimeDimension(last_login_ts, day)" -> "Time(extract_month)"
+  	"TimeDimension(last_login_ts, day)" -> "Time(extract_quarter)"
+  	"TimeDimension(last_login_ts, day)" -> "Time(extract_year)"
+  	"TimeDimension(last_login_ts, day)" -> "Time(month)"
+  	"TimeDimension(last_login_ts, day)" -> "Time(quarter)"
+  	"TimeDimension(last_login_ts, day)" -> "Time(week)"
+  	"TimeDimension(last_login_ts, day)" -> "Time(year)"
+  	"TimeDimension(last_login_ts, week)" -> "Time(extract_month)"
+  	"TimeDimension(last_login_ts, week)" -> "Time(extract_quarter)"
+  	"TimeDimension(last_login_ts, week)" -> "Time(extract_year)"
+  	"TimeDimension(last_login_ts, week)" -> "Time(month)"
+  	"TimeDimension(last_login_ts, week)" -> "Time(quarter)"
+  	"TimeDimension(last_login_ts, week)" -> "Time(week)"
+  	"TimeDimension(last_login_ts, week)" -> "Time(year)"
+  	"TimeDimension(last_login_ts, month)" -> "Time(extract_month)"
+  	"TimeDimension(last_login_ts, month)" -> "Time(extract_quarter)"
+  	"TimeDimension(last_login_ts, month)" -> "Time(extract_year)"
+  	"TimeDimension(last_login_ts, month)" -> "Time(month)"
+  	"TimeDimension(last_login_ts, month)" -> "Time(quarter)"
+  	"TimeDimension(last_login_ts, month)" -> "Time(year)"
+  	"TimeDimension(last_login_ts, quarter)" -> "Time(extract_quarter)"
+  	"TimeDimension(last_login_ts, quarter)" -> "Time(extract_year)"
+  	"TimeDimension(last_login_ts, quarter)" -> "Time(quarter)"
+  	"TimeDimension(last_login_ts, quarter)" -> "Time(year)"
+  	"TimeDimension(last_login_ts, year)" -> "Time(extract_year)"
+  	"TimeDimension(last_login_ts, year)" -> "Time(year)"
+  	"TimeDimension(last_profile_edit_ts, millisecond)" -> "Time(alien_day)"
+  	"TimeDimension(last_profile_edit_ts, millisecond)" -> "Time(day)"
+  	"TimeDimension(last_profile_edit_ts, millisecond)" -> "Time(extract_day)"
+  	"TimeDimension(last_profile_edit_ts, millisecond)" -> "Time(extract_dow)"
+  	"TimeDimension(last_profile_edit_ts, millisecond)" -> "Time(extract_doy)"
+  	"TimeDimension(last_profile_edit_ts, millisecond)" -> "Time(extract_month)"
+  	"TimeDimension(last_profile_edit_ts, millisecond)" -> "Time(extract_quarter)"
+  	"TimeDimension(last_profile_edit_ts, millisecond)" -> "Time(extract_year)"
+  	"TimeDimension(last_profile_edit_ts, millisecond)" -> "Time(hour)"
+  	"TimeDimension(last_profile_edit_ts, millisecond)" -> "Time(millisecond)"
+  	"TimeDimension(last_profile_edit_ts, millisecond)" -> "Time(minute)"
+  	"TimeDimension(last_profile_edit_ts, millisecond)" -> "Time(month)"
+  	"TimeDimension(last_profile_edit_ts, millisecond)" -> "Time(quarter)"
+  	"TimeDimension(last_profile_edit_ts, millisecond)" -> "Time(second)"
+  	"TimeDimension(last_profile_edit_ts, millisecond)" -> "Time(week)"
+  	"TimeDimension(last_profile_edit_ts, millisecond)" -> "Time(year)"
+  	"TimeDimension(last_profile_edit_ts, second)" -> "Time(alien_day)"
+  	"TimeDimension(last_profile_edit_ts, second)" -> "Time(day)"
+  	"TimeDimension(last_profile_edit_ts, second)" -> "Time(extract_day)"
+  	"TimeDimension(last_profile_edit_ts, second)" -> "Time(extract_dow)"
+  	"TimeDimension(last_profile_edit_ts, second)" -> "Time(extract_doy)"
+  	"TimeDimension(last_profile_edit_ts, second)" -> "Time(extract_month)"
+  	"TimeDimension(last_profile_edit_ts, second)" -> "Time(extract_quarter)"
+  	"TimeDimension(last_profile_edit_ts, second)" -> "Time(extract_year)"
+  	"TimeDimension(last_profile_edit_ts, second)" -> "Time(hour)"
+  	"TimeDimension(last_profile_edit_ts, second)" -> "Time(minute)"
+  	"TimeDimension(last_profile_edit_ts, second)" -> "Time(month)"
+  	"TimeDimension(last_profile_edit_ts, second)" -> "Time(quarter)"
+  	"TimeDimension(last_profile_edit_ts, second)" -> "Time(second)"
+  	"TimeDimension(last_profile_edit_ts, second)" -> "Time(week)"
+  	"TimeDimension(last_profile_edit_ts, second)" -> "Time(year)"
+  	"TimeDimension(last_profile_edit_ts, minute)" -> "Time(alien_day)"
+  	"TimeDimension(last_profile_edit_ts, minute)" -> "Time(day)"
+  	"TimeDimension(last_profile_edit_ts, minute)" -> "Time(extract_day)"
+  	"TimeDimension(last_profile_edit_ts, minute)" -> "Time(extract_dow)"
+  	"TimeDimension(last_profile_edit_ts, minute)" -> "Time(extract_doy)"
+  	"TimeDimension(last_profile_edit_ts, minute)" -> "Time(extract_month)"
+  	"TimeDimension(last_profile_edit_ts, minute)" -> "Time(extract_quarter)"
+  	"TimeDimension(last_profile_edit_ts, minute)" -> "Time(extract_year)"
+  	"TimeDimension(last_profile_edit_ts, minute)" -> "Time(hour)"
+  	"TimeDimension(last_profile_edit_ts, minute)" -> "Time(minute)"
+  	"TimeDimension(last_profile_edit_ts, minute)" -> "Time(month)"
+  	"TimeDimension(last_profile_edit_ts, minute)" -> "Time(quarter)"
+  	"TimeDimension(last_profile_edit_ts, minute)" -> "Time(week)"
+  	"TimeDimension(last_profile_edit_ts, minute)" -> "Time(year)"
+  	"TimeDimension(last_profile_edit_ts, hour)" -> "Time(alien_day)"
+  	"TimeDimension(last_profile_edit_ts, hour)" -> "Time(day)"
+  	"TimeDimension(last_profile_edit_ts, hour)" -> "Time(extract_day)"
+  	"TimeDimension(last_profile_edit_ts, hour)" -> "Time(extract_dow)"
+  	"TimeDimension(last_profile_edit_ts, hour)" -> "Time(extract_doy)"
+  	"TimeDimension(last_profile_edit_ts, hour)" -> "Time(extract_month)"
+  	"TimeDimension(last_profile_edit_ts, hour)" -> "Time(extract_quarter)"
+  	"TimeDimension(last_profile_edit_ts, hour)" -> "Time(extract_year)"
+  	"TimeDimension(last_profile_edit_ts, hour)" -> "Time(hour)"
+  	"TimeDimension(last_profile_edit_ts, hour)" -> "Time(month)"
+  	"TimeDimension(last_profile_edit_ts, hour)" -> "Time(quarter)"
+  	"TimeDimension(last_profile_edit_ts, hour)" -> "Time(week)"
+  	"TimeDimension(last_profile_edit_ts, hour)" -> "Time(year)"
+  	"TimeDimension(last_profile_edit_ts, day)" -> "Time(alien_day)"
+  	"TimeDimension(last_profile_edit_ts, day)" -> "Time(day)"
+  	"TimeDimension(last_profile_edit_ts, day)" -> "Time(extract_day)"
+  	"TimeDimension(last_profile_edit_ts, day)" -> "Time(extract_dow)"
+  	"TimeDimension(last_profile_edit_ts, day)" -> "Time(extract_doy)"
+  	"TimeDimension(last_profile_edit_ts, day)" -> "Time(extract_month)"
+  	"TimeDimension(last_profile_edit_ts, day)" -> "Time(extract_quarter)"
+  	"TimeDimension(last_profile_edit_ts, day)" -> "Time(extract_year)"
+  	"TimeDimension(last_profile_edit_ts, day)" -> "Time(month)"
+  	"TimeDimension(last_profile_edit_ts, day)" -> "Time(quarter)"
+  	"TimeDimension(last_profile_edit_ts, day)" -> "Time(week)"
+  	"TimeDimension(last_profile_edit_ts, day)" -> "Time(year)"
+  	"TimeDimension(last_profile_edit_ts, week)" -> "Time(extract_month)"
+  	"TimeDimension(last_profile_edit_ts, week)" -> "Time(extract_quarter)"
+  	"TimeDimension(last_profile_edit_ts, week)" -> "Time(extract_year)"
+  	"TimeDimension(last_profile_edit_ts, week)" -> "Time(month)"
+  	"TimeDimension(last_profile_edit_ts, week)" -> "Time(quarter)"
+  	"TimeDimension(last_profile_edit_ts, week)" -> "Time(week)"
+  	"TimeDimension(last_profile_edit_ts, week)" -> "Time(year)"
+  	"TimeDimension(last_profile_edit_ts, month)" -> "Time(extract_month)"
+  	"TimeDimension(last_profile_edit_ts, month)" -> "Time(extract_quarter)"
+  	"TimeDimension(last_profile_edit_ts, month)" -> "Time(extract_year)"
+  	"TimeDimension(last_profile_edit_ts, month)" -> "Time(month)"
+  	"TimeDimension(last_profile_edit_ts, month)" -> "Time(quarter)"
+  	"TimeDimension(last_profile_edit_ts, month)" -> "Time(year)"
+  	"TimeDimension(last_profile_edit_ts, quarter)" -> "Time(extract_quarter)"
+  	"TimeDimension(last_profile_edit_ts, quarter)" -> "Time(extract_year)"
+  	"TimeDimension(last_profile_edit_ts, quarter)" -> "Time(quarter)"
+  	"TimeDimension(last_profile_edit_ts, quarter)" -> "Time(year)"
+  	"TimeDimension(last_profile_edit_ts, year)" -> "Time(extract_year)"
+  	"TimeDimension(last_profile_edit_ts, year)" -> "Time(year)"
+  	"TimeDimension(paid_at, day)" -> "Time(alien_day)"
+  	"TimeDimension(paid_at, day)" -> "Time(day)"
+  	"TimeDimension(paid_at, day)" -> "Time(extract_day)"
+  	"TimeDimension(paid_at, day)" -> "Time(extract_dow)"
+  	"TimeDimension(paid_at, day)" -> "Time(extract_doy)"
+  	"TimeDimension(paid_at, day)" -> "Time(extract_month)"
+  	"TimeDimension(paid_at, day)" -> "Time(extract_quarter)"
+  	"TimeDimension(paid_at, day)" -> "Time(extract_year)"
+  	"TimeDimension(paid_at, day)" -> "Time(month)"
+  	"TimeDimension(paid_at, day)" -> "Time(quarter)"
+  	"TimeDimension(paid_at, day)" -> "Time(week)"
+  	"TimeDimension(paid_at, day)" -> "Time(year)"
+  	"TimeDimension(paid_at, week)" -> "Time(extract_month)"
+  	"TimeDimension(paid_at, week)" -> "Time(extract_quarter)"
+  	"TimeDimension(paid_at, week)" -> "Time(extract_year)"
+  	"TimeDimension(paid_at, week)" -> "Time(month)"
+  	"TimeDimension(paid_at, week)" -> "Time(quarter)"
+  	"TimeDimension(paid_at, week)" -> "Time(week)"
+  	"TimeDimension(paid_at, week)" -> "Time(year)"
+  	"TimeDimension(paid_at, month)" -> "Time(extract_month)"
+  	"TimeDimension(paid_at, month)" -> "Time(extract_quarter)"
+  	"TimeDimension(paid_at, month)" -> "Time(extract_year)"
+  	"TimeDimension(paid_at, month)" -> "Time(month)"
+  	"TimeDimension(paid_at, month)" -> "Time(quarter)"
+  	"TimeDimension(paid_at, month)" -> "Time(year)"
+  	"TimeDimension(paid_at, quarter)" -> "Time(extract_quarter)"
+  	"TimeDimension(paid_at, quarter)" -> "Time(extract_year)"
+  	"TimeDimension(paid_at, quarter)" -> "Time(quarter)"
+  	"TimeDimension(paid_at, quarter)" -> "Time(year)"
+  	"TimeDimension(paid_at, year)" -> "Time(extract_year)"
+  	"TimeDimension(paid_at, year)" -> "Time(year)"
+  	"Agg(accounts_source, ds)" -> "JoinFrom(accounts_source)"
+  	"Agg(accounts_source, ds)" -> "JoinTo(accounts_source)"
+  	"Agg(accounts_source, ds_month)" -> "JoinFrom(accounts_source)"
+  	"Agg(accounts_source, ds_month)" -> "JoinTo(accounts_source)"
+  	"Agg(bookings_source, ds)" -> "JoinFrom(bookings_source)"
+  	"Agg(bookings_source, ds)" -> "JoinTo(bookings_source)"
+  	"Agg(bookings_source, paid_at)" -> "JoinFrom(bookings_source)"
+  	"Agg(bookings_source, paid_at)" -> "JoinTo(bookings_source)"
+  	"Agg(buys_source, ds)" -> "JoinFrom(buys_source)"
+  	"Agg(buys_source, ds)" -> "JoinTo(buys_source)"
+  	"Agg(buys_source, ds_month)" -> "JoinFrom(buys_source)"
+  	"Agg(buys_source, ds_month)" -> "JoinTo(buys_source)"
+  	"Agg(id_verifications, ds)" -> "JoinFrom(id_verifications)"
+  	"Agg(id_verifications, ds)" -> "JoinTo(id_verifications)"
+  	"Agg(listings_latest, ds)" -> "JoinFrom(listings_latest)"
+  	"Agg(listings_latest, ds)" -> "JoinTo(listings_latest)"
+  	"Agg(revenue, ds)" -> "JoinFrom(revenue)"
+  	"Agg(revenue, ds)" -> "JoinTo(revenue)"
+  	"Agg(users_ds_source, archived_at)" -> "JoinFrom(users_ds_source)"
+  	"Agg(users_ds_source, archived_at)" -> "JoinTo(users_ds_source)"
+  	"Agg(users_ds_source, created_at)" -> "JoinFrom(users_ds_source)"
+  	"Agg(users_ds_source, created_at)" -> "JoinTo(users_ds_source)"
+  	"Agg(views_source, ds)" -> "JoinFrom(views_source)"
+  	"Agg(views_source, ds)" -> "JoinTo(views_source)"
+  	"Agg(visits_source, ds)" -> "JoinFrom(visits_source)"
+  	"Agg(visits_source, ds)" -> "JoinTo(visits_source)"
+  	"JoinFrom(accounts_source)" -> "MetricTimeDimension(DAY)"
+  	"JoinFrom(accounts_source)" -> "MetricTimeDimension(MONTH)"
+  	"JoinFrom(accounts_source)" -> "MetricTimeDimension(QUARTER)"
+  	"JoinFrom(accounts_source)" -> "MetricTimeDimension(WEEK)"
+  	"JoinFrom(accounts_source)" -> "MetricTimeDimension(YEAR)"
+  	"JoinFrom(bookings_source)" -> "MetricTimeDimension(DAY)"
+  	"JoinFrom(bookings_source)" -> "MetricTimeDimension(MONTH)"
+  	"JoinFrom(bookings_source)" -> "MetricTimeDimension(QUARTER)"
+  	"JoinFrom(bookings_source)" -> "MetricTimeDimension(WEEK)"
+  	"JoinFrom(bookings_source)" -> "MetricTimeDimension(YEAR)"
+  	"JoinFrom(buys_source)" -> "MetricTimeDimension(DAY)"
+  	"JoinFrom(buys_source)" -> "MetricTimeDimension(MONTH)"
+  	"JoinFrom(buys_source)" -> "MetricTimeDimension(QUARTER)"
+  	"JoinFrom(buys_source)" -> "MetricTimeDimension(WEEK)"
+  	"JoinFrom(buys_source)" -> "MetricTimeDimension(YEAR)"
+  	"JoinFrom(id_verifications)" -> "MetricTimeDimension(DAY)"
+  	"JoinFrom(id_verifications)" -> "MetricTimeDimension(MONTH)"
+  	"JoinFrom(id_verifications)" -> "MetricTimeDimension(QUARTER)"
+  	"JoinFrom(id_verifications)" -> "MetricTimeDimension(WEEK)"
+  	"JoinFrom(id_verifications)" -> "MetricTimeDimension(YEAR)"
+  	"JoinFrom(listings_latest)" -> "MetricTimeDimension(DAY)"
+  	"JoinFrom(listings_latest)" -> "MetricTimeDimension(MONTH)"
+  	"JoinFrom(listings_latest)" -> "MetricTimeDimension(QUARTER)"
+  	"JoinFrom(listings_latest)" -> "MetricTimeDimension(WEEK)"
+  	"JoinFrom(listings_latest)" -> "MetricTimeDimension(YEAR)"
+  	"JoinFrom(revenue)" -> "MetricTimeDimension(DAY)"
+  	"JoinFrom(revenue)" -> "MetricTimeDimension(MONTH)"
+  	"JoinFrom(revenue)" -> "MetricTimeDimension(QUARTER)"
+  	"JoinFrom(revenue)" -> "MetricTimeDimension(WEEK)"
+  	"JoinFrom(revenue)" -> "MetricTimeDimension(YEAR)"
+  	"JoinFrom(users_ds_source)" -> "MetricTimeDimension(DAY)"
+  	"JoinFrom(users_ds_source)" -> "MetricTimeDimension(HOUR)"
+  	"JoinFrom(users_ds_source)" -> "MetricTimeDimension(MONTH)"
+  	"JoinFrom(users_ds_source)" -> "MetricTimeDimension(QUARTER)"
+  	"JoinFrom(users_ds_source)" -> "MetricTimeDimension(WEEK)"
+  	"JoinFrom(users_ds_source)" -> "MetricTimeDimension(YEAR)"
+  	"JoinFrom(views_source)" -> "MetricTimeDimension(DAY)"
+  	"JoinFrom(views_source)" -> "MetricTimeDimension(MONTH)"
+  	"JoinFrom(views_source)" -> "MetricTimeDimension(QUARTER)"
+  	"JoinFrom(views_source)" -> "MetricTimeDimension(WEEK)"
+  	"JoinFrom(views_source)" -> "MetricTimeDimension(YEAR)"
+  	"JoinFrom(visits_source)" -> "MetricTimeDimension(DAY)"
+  	"JoinFrom(visits_source)" -> "MetricTimeDimension(MONTH)"
+  	"JoinFrom(visits_source)" -> "MetricTimeDimension(QUARTER)"
+  	"JoinFrom(visits_source)" -> "MetricTimeDimension(WEEK)"
+  	"JoinFrom(visits_source)" -> "MetricTimeDimension(YEAR)"
+  	"JoinTo(accounts_source)" -> "TimeDimension(ds, day)"
+  	"JoinTo(accounts_source)" -> "TimeDimension(ds, week)"
+  	"JoinTo(accounts_source)" -> "TimeDimension(ds, month)"
+  	"JoinTo(accounts_source)" -> "TimeDimension(ds, quarter)"
+  	"JoinTo(accounts_source)" -> "TimeDimension(ds, year)"
+  	"JoinTo(accounts_source)" -> "TimeDimension(ds_month, month)"
+  	"JoinTo(accounts_source)" -> "TimeDimension(ds_month, quarter)"
+  	"JoinTo(accounts_source)" -> "TimeDimension(ds_month, year)"
+  	"JoinTo(bookings_source)" -> "TimeDimension(ds, day)"
+  	"JoinTo(bookings_source)" -> "TimeDimension(ds, week)"
+  	"JoinTo(bookings_source)" -> "TimeDimension(ds, month)"
+  	"JoinTo(bookings_source)" -> "TimeDimension(ds, quarter)"
+  	"JoinTo(bookings_source)" -> "TimeDimension(ds, year)"
+  	"JoinTo(bookings_source)" -> "TimeDimension(ds_partitioned, day)"
+  	"JoinTo(bookings_source)" -> "TimeDimension(ds_partitioned, week)"
+  	"JoinTo(bookings_source)" -> "TimeDimension(ds_partitioned, month)"
+  	"JoinTo(bookings_source)" -> "TimeDimension(ds_partitioned, quarter)"
+  	"JoinTo(bookings_source)" -> "TimeDimension(ds_partitioned, year)"
+  	"JoinTo(bookings_source)" -> "TimeDimension(paid_at, day)"
+  	"JoinTo(bookings_source)" -> "TimeDimension(paid_at, week)"
+  	"JoinTo(bookings_source)" -> "TimeDimension(paid_at, month)"
+  	"JoinTo(bookings_source)" -> "TimeDimension(paid_at, quarter)"
+  	"JoinTo(bookings_source)" -> "TimeDimension(paid_at, year)"
+  	"JoinTo(buys_source)" -> "TimeDimension(ds, day)"
+  	"JoinTo(buys_source)" -> "TimeDimension(ds, week)"
+  	"JoinTo(buys_source)" -> "TimeDimension(ds, month)"
+  	"JoinTo(buys_source)" -> "TimeDimension(ds, quarter)"
+  	"JoinTo(buys_source)" -> "TimeDimension(ds, year)"
+  	"JoinTo(buys_source)" -> "TimeDimension(ds_month, month)"
+  	"JoinTo(buys_source)" -> "TimeDimension(ds_month, quarter)"
+  	"JoinTo(buys_source)" -> "TimeDimension(ds_month, year)"
+  	"JoinTo(id_verifications)" -> "TimeDimension(ds, day)"
+  	"JoinTo(id_verifications)" -> "TimeDimension(ds, week)"
+  	"JoinTo(id_verifications)" -> "TimeDimension(ds, month)"
+  	"JoinTo(id_verifications)" -> "TimeDimension(ds, quarter)"
+  	"JoinTo(id_verifications)" -> "TimeDimension(ds, year)"
+  	"JoinTo(id_verifications)" -> "TimeDimension(ds_partitioned, day)"
+  	"JoinTo(id_verifications)" -> "TimeDimension(ds_partitioned, week)"
+  	"JoinTo(id_verifications)" -> "TimeDimension(ds_partitioned, month)"
+  	"JoinTo(id_verifications)" -> "TimeDimension(ds_partitioned, quarter)"
+  	"JoinTo(id_verifications)" -> "TimeDimension(ds_partitioned, year)"
+  	"JoinTo(listings_latest)" -> "TimeDimension(created_at, day)"
+  	"JoinTo(listings_latest)" -> "TimeDimension(created_at, week)"
+  	"JoinTo(listings_latest)" -> "TimeDimension(created_at, month)"
+  	"JoinTo(listings_latest)" -> "TimeDimension(created_at, quarter)"
+  	"JoinTo(listings_latest)" -> "TimeDimension(created_at, year)"
+  	"JoinTo(listings_latest)" -> "TimeDimension(ds, day)"
+  	"JoinTo(listings_latest)" -> "TimeDimension(ds, week)"
+  	"JoinTo(listings_latest)" -> "TimeDimension(ds, month)"
+  	"JoinTo(listings_latest)" -> "TimeDimension(ds, quarter)"
+  	"JoinTo(listings_latest)" -> "TimeDimension(ds, year)"
+  	"JoinTo(revenue)" -> "TimeDimension(ds, day)"
+  	"JoinTo(revenue)" -> "TimeDimension(ds, week)"
+  	"JoinTo(revenue)" -> "TimeDimension(ds, month)"
+  	"JoinTo(revenue)" -> "TimeDimension(ds, quarter)"
+  	"JoinTo(revenue)" -> "TimeDimension(ds, year)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(archived_at, hour)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(archived_at, day)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(archived_at, week)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(archived_at, month)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(archived_at, quarter)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(archived_at, year)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(bio_added_ts, second)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(bio_added_ts, minute)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(bio_added_ts, hour)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(bio_added_ts, day)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(bio_added_ts, week)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(bio_added_ts, month)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(bio_added_ts, quarter)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(bio_added_ts, year)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(created_at, day)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(created_at, week)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(created_at, month)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(created_at, quarter)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(created_at, year)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(ds, day)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(ds, week)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(ds, month)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(ds, quarter)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(ds, year)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(ds_partitioned, day)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(ds_partitioned, week)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(ds_partitioned, month)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(ds_partitioned, quarter)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(ds_partitioned, year)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(last_login_ts, minute)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(last_login_ts, hour)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(last_login_ts, day)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(last_login_ts, week)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(last_login_ts, month)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(last_login_ts, quarter)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(last_login_ts, year)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(last_profile_edit_ts, millisecond)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(last_profile_edit_ts, second)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(last_profile_edit_ts, minute)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(last_profile_edit_ts, hour)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(last_profile_edit_ts, day)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(last_profile_edit_ts, week)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(last_profile_edit_ts, month)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(last_profile_edit_ts, quarter)"
+  	"JoinTo(users_ds_source)" -> "TimeDimension(last_profile_edit_ts, year)"
+  	"JoinTo(users_latest)" -> "TimeDimension(ds_latest, day)"
+  	"JoinTo(users_latest)" -> "TimeDimension(ds_latest, week)"
+  	"JoinTo(users_latest)" -> "TimeDimension(ds_latest, month)"
+  	"JoinTo(users_latest)" -> "TimeDimension(ds_latest, quarter)"
+  	"JoinTo(users_latest)" -> "TimeDimension(ds_latest, year)"
+  	"JoinTo(views_source)" -> "TimeDimension(ds, day)"
+  	"JoinTo(views_source)" -> "TimeDimension(ds, week)"
+  	"JoinTo(views_source)" -> "TimeDimension(ds, month)"
+  	"JoinTo(views_source)" -> "TimeDimension(ds, quarter)"
+  	"JoinTo(views_source)" -> "TimeDimension(ds, year)"
+  	"JoinTo(views_source)" -> "TimeDimension(ds_partitioned, day)"
+  	"JoinTo(views_source)" -> "TimeDimension(ds_partitioned, week)"
+  	"JoinTo(views_source)" -> "TimeDimension(ds_partitioned, month)"
+  	"JoinTo(views_source)" -> "TimeDimension(ds_partitioned, quarter)"
+  	"JoinTo(views_source)" -> "TimeDimension(ds_partitioned, year)"
+  	"JoinTo(visits_source)" -> "TimeDimension(ds, day)"
+  	"JoinTo(visits_source)" -> "TimeDimension(ds, week)"
+  	"JoinTo(visits_source)" -> "TimeDimension(ds, month)"
+  	"JoinTo(visits_source)" -> "TimeDimension(ds, quarter)"
+  	"JoinTo(visits_source)" -> "TimeDimension(ds, year)"
+  	"JoinFrom(accounts_source)" -> "DsiEntity(account)"
+  	"JoinFrom(accounts_source)" -> "DsiEntity(user)"
+  	"JoinFrom(accounts_source)" -> "DsiEntity(user)"
+  	"JoinFrom(accounts_source)" -> "DsiEntity(user)"
+  	"JoinFrom(bookings_source)" -> "DsiEntity(booking)"
+  	"JoinFrom(bookings_source)" -> "DsiEntity(listing)"
+  	"JoinFrom(bookings_source)" -> "DsiEntity(listing)"
+  	"JoinFrom(buys_source)" -> "DsiEntity(buy)"
+  	"JoinFrom(buys_source)" -> "DsiEntity(user)"
+  	"JoinFrom(buys_source)" -> "DsiEntity(user)"
+  	"JoinFrom(buys_source)" -> "DsiEntity(user)"
+  	"JoinFrom(companies)" -> "DsiEntity(company)"
+  	"JoinFrom(companies)" -> "DsiEntity(user)"
+  	"JoinFrom(companies)" -> "DsiEntity(user)"
+  	"JoinFrom(companies)" -> "DsiEntity(user)"
+  	"JoinFrom(id_verifications)" -> "DsiEntity(user)"
+  	"JoinFrom(id_verifications)" -> "DsiEntity(user)"
+  	"JoinFrom(id_verifications)" -> "DsiEntity(user)"
+  	"JoinFrom(id_verifications)" -> "DsiEntity(verification)"
+  	"JoinFrom(listings_latest)" -> "DsiEntity(listing)"
+  	"JoinFrom(listings_latest)" -> "DsiEntity(listing)"
+  	"JoinFrom(listings_latest)" -> "DsiEntity(user)"
+  	"JoinFrom(listings_latest)" -> "DsiEntity(user)"
+  	"JoinFrom(listings_latest)" -> "DsiEntity(user)"
+  	"JoinFrom(lux_listing_mapping)" -> "DsiEntity(listing)"
+  	"JoinFrom(lux_listing_mapping)" -> "DsiEntity(listing)"
+  	"JoinFrom(revenue)" -> "DsiEntity(revenue_instance)"
+  	"JoinFrom(revenue)" -> "DsiEntity(user)"
+  	"JoinFrom(revenue)" -> "DsiEntity(user)"
+  	"JoinFrom(revenue)" -> "DsiEntity(user)"
+  	"JoinFrom(users_ds_source)" -> "DsiEntity(user)"
+  	"JoinFrom(users_ds_source)" -> "DsiEntity(user)"
+  	"JoinFrom(users_ds_source)" -> "DsiEntity(user)"
+  	"JoinFrom(users_latest)" -> "DsiEntity(user)"
+  	"JoinFrom(users_latest)" -> "DsiEntity(user)"
+  	"JoinFrom(users_latest)" -> "DsiEntity(user)"
+  	"JoinFrom(views_source)" -> "DsiEntity(listing)"
+  	"JoinFrom(views_source)" -> "DsiEntity(listing)"
+  	"JoinFrom(views_source)" -> "DsiEntity(user)"
+  	"JoinFrom(views_source)" -> "DsiEntity(user)"
+  	"JoinFrom(views_source)" -> "DsiEntity(user)"
+  	"JoinFrom(views_source)" -> "DsiEntity(view)"
+  	"JoinFrom(visits_source)" -> "DsiEntity(user)"
+  	"JoinFrom(visits_source)" -> "DsiEntity(user)"
+  	"JoinFrom(visits_source)" -> "DsiEntity(user)"
+  	"JoinFrom(visits_source)" -> "DsiEntity(visit)"
+  	"DsiEntity(company)" -> "JoinTo(companies)"
+  	"DsiEntity(listing)" -> "JoinTo(listings_latest)"
+  	"DsiEntity(listing)" -> "JoinTo(lux_listing_mapping)"
+  	"DsiEntity(user)" -> "JoinTo(companies)"
+  	"DsiEntity(user)" -> "JoinTo(users_ds_source)"
+  	"DsiEntity(user)" -> "JoinTo(users_latest)"
+  	"DsiEntity(verification)" -> "JoinTo(id_verifications)"
+  	"Metric(active_listings)" -> "Measure(listings)"
+  	"Metric(approximate_continuous_booking_value_p99)" -> "Measure(approximate_continuous_booking_value_p99)"
+  	"Metric(approximate_discrete_booking_value_p99)" -> "Measure(approximate_discrete_booking_value_p99)"
+  	"Metric(archived_users)" -> "Measure(archived_users)"
+  	"Metric(archived_users_join_to_time_spine)" -> "Measure(archived_users)"
+  	"Metric(average_booking_value)" -> "Measure(average_booking_value)"
+  	"Metric(average_instant_booking_value)" -> "Measure(average_booking_value)"
+  	"Metric(bookers)" -> "Measure(bookers)"
+  	"Metric(booking_fees)" -> "Metric(booking_value)"
+  	"Metric(booking_fees_last_week_per_booker_this_week)" -> "Metric(bookers)"
+  	"Metric(booking_fees_last_week_per_booker_this_week)" -> "Metric(booking_value)"
+  	"Metric(booking_fees_per_booker)" -> "Metric(bookers)"
+  	"Metric(booking_fees_per_booker)" -> "Metric(booking_value)"
+  	"Metric(booking_fees_since_start_of_month)" -> "Metric(booking_fees)"
+  	"Metric(booking_payments)" -> "Measure(booking_payments)"
+  	"Metric(booking_value)" -> "Measure(booking_value)"
+  	"Metric(booking_value_for_non_null_listing_id)" -> "Measure(booking_value)"
+  	"Metric(booking_value_p99)" -> "Measure(booking_value_p99)"
+  	"Metric(booking_value_per_view)" -> "Metric(booking_value)"
+  	"Metric(booking_value_per_view)" -> "Metric(views)"
+  	"Metric(booking_value_sub_instant)" -> "Metric(booking_value)"
+  	"Metric(booking_value_sub_instant)" -> "Metric(instant_booking_value)"
+  	"Metric(booking_value_sub_instant_add_10)" -> "Metric(booking_value_sub_instant)"
+  	"Metric(bookings)" -> "Measure(bookings)"
+  	"Metric(bookings_5_day_lag)" -> "Metric(bookings)"
+  	"Metric(bookings_alien_day_over_alien_day)" -> "Metric(bookings)"
+  	"Metric(bookings_at_start_of_month)" -> "Metric(bookings)"
+  	"Metric(bookings_fill_nulls_with_0)" -> "Measure(bookings)"
+  	"Metric(bookings_fill_nulls_with_0_without_time_spine)" -> "Measure(bookings)"
+  	"Metric(bookings_growth_2_weeks)" -> "Metric(bookings)"
+  	"Metric(bookings_growth_2_weeks_fill_nulls_with_0)" -> "Metric(bookings_fill_nulls_with_0)"
+  	"Metric(bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset)" -> "Metric(bookings)"
+  	"Metric(bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset)" -> "Metric(bookings_fill_nulls_with_0)"
+  	"Metric(bookings_growth_since_start_of_month)" -> "Metric(bookings)"
+  	"Metric(bookings_join_to_time_spine)" -> "Measure(bookings)"
+  	"Metric(bookings_join_to_time_spine_with_tiered_filters)" -> "Measure(bookings)"
+  	"Metric(bookings_month_start_compared_to_1_month_prior)" -> "Metric(bookings)"
+  	"Metric(bookings_offset_alien_day)" -> "Metric(bookings)"
+  	"Metric(bookings_offset_once)" -> "Metric(bookings)"
+  	"Metric(bookings_offset_one_alien_day)" -> "Metric(bookings)"
+  	"Metric(bookings_offset_twice)" -> "Metric(bookings_offset_once)"
+  	"Metric(bookings_per_booker)" -> "Measure(bookers)"
+  	"Metric(bookings_per_booker)" -> "Measure(bookings)"
+  	"Metric(bookings_per_dollar)" -> "Measure(booking_value)"
+  	"Metric(bookings_per_dollar)" -> "Measure(bookings)"
+  	"Metric(bookings_per_listing)" -> "Measure(bookings)"
+  	"Metric(bookings_per_listing)" -> "Measure(listings)"
+  	"Metric(bookings_per_lux_listing_derived)" -> "Metric(bookings)"
+  	"Metric(bookings_per_lux_listing_derived)" -> "Metric(listings)"
+  	"Metric(bookings_per_view)" -> "Measure(bookings)"
+  	"Metric(bookings_per_view)" -> "Measure(views)"
+  	"Metric(current_account_balance_by_user)" -> "Measure(current_account_balance_by_user)"
+  	"Metric(derived_bookings_0)" -> "Metric(bookings)"
+  	"Metric(derived_bookings_1)" -> "Metric(bookings)"
+  	"Metric(derived_shared_alias_1a)" -> "Metric(bookings)"
+  	"Metric(derived_shared_alias_1b)" -> "Metric(bookings)"
+  	"Metric(derived_shared_alias_2)" -> "Metric(instant_bookings)"
+  	"Metric(discrete_booking_value_p99)" -> "Measure(discrete_booking_value_p99)"
+  	"Metric(double_counted_delayed_bookings)" -> "Metric(bookings)"
+  	"Metric(every_2_days_bookers_2_days_ago)" -> "Metric(every_two_days_bookers)"
+  	"Metric(every_two_days_bookers)" -> "Measure(bookers)"
+  	"Metric(every_two_days_bookers_fill_nulls_with_0)" -> "Measure(bookers)"
+  	"Metric(identity_verifications)" -> "Measure(identity_verifications)"
+  	"Metric(instant_booking_fraction_of_max_value)" -> "Measure(average_booking_value)"
+  	"Metric(instant_booking_fraction_of_max_value)" -> "Measure(max_booking_value)"
+  	"Metric(instant_booking_value)" -> "Measure(booking_value)"
+  	"Metric(instant_booking_value_ratio)" -> "Measure(booking_value)"
+  	"Metric(instant_bookings)" -> "Measure(instant_bookings)"
+  	"Metric(instant_bookings_with_measure_filter)" -> "Measure(bookings)"
+  	"Metric(instant_lux_booking_value_rate)" -> "Metric(lux_booking_value_rate_expr)"
+  	"Metric(instant_plus_non_referred_bookings_pct)" -> "Metric(bookings)"
+  	"Metric(instant_plus_non_referred_bookings_pct)" -> "Metric(instant_bookings)"
+  	"Metric(instant_plus_non_referred_bookings_pct)" -> "Metric(non_referred_bookings_pct)"
+  	"Metric(largest_listing)" -> "Measure(largest_listing)"
+  	"Metric(listings)" -> "Measure(listings)"
+  	"Metric(lux_booking_fraction_of_max_value)" -> "Measure(average_booking_value)"
+  	"Metric(lux_booking_fraction_of_max_value)" -> "Measure(max_booking_value)"
+  	"Metric(lux_booking_value_rate_expr)" -> "Metric(average_booking_value)"
+  	"Metric(lux_booking_value_rate_expr)" -> "Metric(booking_value)"
+  	"Metric(lux_booking_value_rate_expr)" -> "Metric(bookings)"
+  	"Metric(lux_listings)" -> "Measure(listings)"
+  	"Metric(max_booking_value)" -> "Measure(max_booking_value)"
+  	"Metric(median_booking_value)" -> "Measure(median_booking_value)"
+  	"Metric(min_booking_value)" -> "Measure(min_booking_value)"
+  	"Metric(nested_fill_nulls_without_time_spine)" -> "Metric(twice_bookings_fill_nulls_with_0_without_time_spine)"
+  	"Metric(new_users)" -> "Measure(new_users)"
+  	"Metric(non_referred_bookings_pct)" -> "Metric(bookings)"
+  	"Metric(non_referred_bookings_pct)" -> "Metric(referred_bookings)"
+  	"Metric(popular_listing_bookings_per_booker)" -> "Measure(listings)"
+  	"Metric(referred_bookings)" -> "Measure(referred_bookings)"
+  	"Metric(regional_starting_balance_ratios)" -> "Measure(total_account_balance_first_day)"
+  	"Metric(revenue)" -> "Measure(txn_revenue)"
+  	"Metric(revenue_all_time)" -> "Measure(txn_revenue)"
+  	"Metric(revenue_mtd)" -> "Measure(txn_revenue)"
+  	"Metric(simple_subdaily_metric_default_day)" -> "Measure(archived_users)"
+  	"Metric(simple_subdaily_metric_default_hour)" -> "Measure(archived_users)"
+  	"Metric(smallest_listing)" -> "Measure(smallest_listing)"
+  	"Metric(subdaily_cumulative_grain_to_date_metric)" -> "Measure(archived_users)"
+  	"Metric(subdaily_cumulative_window_metric)" -> "Measure(archived_users)"
+  	"Metric(subdaily_join_to_time_spine_metric)" -> "Measure(archived_users)"
+  	"Metric(subdaily_offset_grain_to_date_metric)" -> "Metric(archived_users)"
+  	"Metric(subdaily_offset_window_metric)" -> "Metric(archived_users)"
+  	"Metric(total_account_balance_first_day)" -> "Measure(total_account_balance_first_day)"
+  	"Metric(total_account_balance_first_day_of_month)" -> "Measure(total_account_balance_first_day_of_month)"
+  	"Metric(trailing_2_months_revenue)" -> "Measure(txn_revenue)"
+  	"Metric(trailing_2_months_revenue_sub_10)" -> "Metric(trailing_2_months_revenue)"
+  	"Metric(twice_bookings_fill_nulls_with_0_without_time_spine)" -> "Metric(bookings_fill_nulls_with_0_without_time_spine)"
+  	"Metric(views)" -> "Measure(views)"
+  	"Metric(views_times_booking_value)" -> "Metric(booking_value)"
+  	"Metric(views_times_booking_value)" -> "Metric(views)"
+  	"Metric(visit_buy_conversion_rate)" -> "Measure(buys)"
+  	"Metric(visit_buy_conversion_rate)" -> "Measure(visits)"
+  	"Metric(visit_buy_conversion_rate_7days)" -> "Measure(buys)"
+  	"Metric(visit_buy_conversion_rate_7days)" -> "Measure(visits)"
+  	"Metric(visit_buy_conversion_rate_7days_fill_nulls_with_0)" -> "Measure(buys)"
+  	"Metric(visit_buy_conversion_rate_7days_fill_nulls_with_0)" -> "Measure(visits)"
+  	"Metric(visit_buy_conversion_rate_by_session)" -> "Measure(buys)"
+  	"Metric(visit_buy_conversion_rate_by_session)" -> "Measure(visits)"
+  	"Metric(visit_buy_conversion_rate_with_monthly_conversion)" -> "Measure(buys_month)"
+  	"Metric(visit_buy_conversion_rate_with_monthly_conversion)" -> "Measure(visits)"
+  	"Metric(visit_buy_conversions)" -> "Measure(buys)"
+  	"Metric(visit_buy_conversions)" -> "Measure(visits)"
+  }
+
+pretty_format:
+  MutableSemanticGraph(
+    nodes={
+      Agg(accounts_source, ds),
+      Agg(accounts_source, ds_month),
+      Agg(bookings_source, ds),
+      Agg(bookings_source, paid_at),
+      Agg(buys_source, ds),
+      Agg(buys_source, ds_month),
+      Agg(id_verifications, ds),
+      Agg(listings_latest, ds),
+      Agg(revenue, ds),
+      Agg(users_ds_source, archived_at),
+      Agg(users_ds_source, created_at),
+      Agg(views_source, ds),
+      Agg(visits_source, ds),
+      Dimension(account_type),
+      Dimension(capacity_latest),
+      Dimension(company_name),
+      Dimension(country_latest),
+      Dimension(home_state),
+      Dimension(home_state_latest),
+      Dimension(is_instant),
+      Dimension(is_lux_latest),
+      Dimension(referrer_id),
+      Dimension(verification_type),
+      DsiEntityKey(company),
+      DsiEntityKey(guest),
+      DsiEntityKey(host),
+      DsiEntityKey(listing),
+      DsiEntityKey(lux_listing),
+      DsiEntityKey(session),
+      DsiEntityKey(session_id),
+      DsiEntityKey(user),
+      DsiEntityKey(verification),
+      DsiEntity(account),
+      DsiEntity(booking),
+      DsiEntity(buy),
+      DsiEntity(company),
+      DsiEntity(listing),
+      DsiEntity(revenue_instance),
+      DsiEntity(user),
+      DsiEntity(verification),
+      DsiEntity(view),
+      DsiEntity(visit),
+      JoinFrom(accounts_source),
+      JoinFrom(bookings_source),
+      JoinFrom(buys_source),
+      JoinFrom(companies),
+      JoinFrom(id_verifications),
+      JoinFrom(listings_latest),
+      JoinFrom(lux_listing_mapping),
+      JoinFrom(revenue),
+      JoinFrom(users_ds_source),
+      JoinFrom(users_latest),
+      JoinFrom(views_source),
+      JoinFrom(visits_source),
+      JoinTo(accounts_source),
+      JoinTo(bookings_source),
+      JoinTo(buys_source),
+      JoinTo(companies),
+      JoinTo(id_verifications),
+      JoinTo(listings_latest),
+      JoinTo(lux_listing_mapping),
+      JoinTo(revenue),
+      JoinTo(users_ds_source),
+      JoinTo(users_latest),
+      JoinTo(views_source),
+      JoinTo(visits_source),
+      Measure(account_balance),
+      Measure(approximate_continuous_booking_value_p99),
+      Measure(approximate_discrete_booking_value_p99),
+      Measure(archived_users),
+      Measure(average_booking_value),
+      Measure(bookers),
+      Measure(booking_payments),
+      Measure(booking_value),
+      Measure(booking_value_p99),
+      Measure(bookings),
+      Measure(buyers),
+      Measure(buys),
+      Measure(buys_month),
+      Measure(current_account_balance_by_user),
+      Measure(discrete_booking_value_p99),
+      Measure(identity_verifications),
+      Measure(instant_bookings),
+      Measure(largest_listing),
+      Measure(listings),
+      Measure(max_booking_value),
+      Measure(median_booking_value),
+      Measure(min_booking_value),
+      Measure(new_users),
+      Measure(referred_bookings),
+      Measure(smallest_listing),
+      Measure(total_account_balance_first_day),
+      Measure(total_account_balance_first_day_of_month),
+      Measure(txn_revenue),
+      Measure(views),
+      Measure(visitors),
+      Measure(visits),
+      Metric(active_listings),
+      Metric(approximate_continuous_booking_value_p99),
+      Metric(approximate_discrete_booking_value_p99),
+      Metric(archived_users),
+      Metric(archived_users_join_to_time_spine),
+      Metric(average_booking_value),
+      Metric(average_instant_booking_value),
+      Metric(bookers),
+      Metric(booking_fees),
+      Metric(booking_fees_last_week_per_booker_this_week),
+      Metric(booking_fees_per_booker),
+      Metric(booking_fees_since_start_of_month),
+      Metric(booking_payments),
+      Metric(booking_value),
+      Metric(booking_value_for_non_null_listing_id),
+      Metric(booking_value_p99),
+      Metric(booking_value_per_view),
+      Metric(booking_value_sub_instant),
+      Metric(booking_value_sub_instant_add_10),
+      Metric(bookings),
+      Metric(bookings_5_day_lag),
+      Metric(bookings_alien_day_over_alien_day),
+      Metric(bookings_at_start_of_month),
+      Metric(bookings_fill_nulls_with_0),
+      Metric(bookings_fill_nulls_with_0_without_time_spine),
+      Metric(bookings_growth_2_weeks),
+      Metric(bookings_growth_2_weeks_fill_nulls_with_0),
+      Metric(bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset),
+      Metric(bookings_growth_since_start_of_month),
+      Metric(bookings_join_to_time_spine),
+      Metric(bookings_join_to_time_spine_with_tiered_filters),
+      Metric(bookings_month_start_compared_to_1_month_prior),
+      Metric(bookings_offset_alien_day),
+      Metric(bookings_offset_once),
+      Metric(bookings_offset_one_alien_day),
+      Metric(bookings_offset_twice),
+      Metric(bookings_per_booker),
+      Metric(bookings_per_dollar),
+      Metric(bookings_per_listing),
+      Metric(bookings_per_lux_listing_derived),
+      Metric(bookings_per_view),
+      Metric(current_account_balance_by_user),
+      Metric(derived_bookings_0),
+      Metric(derived_bookings_1),
+      Metric(derived_shared_alias_1a),
+      Metric(derived_shared_alias_1b),
+      Metric(derived_shared_alias_2),
+      Metric(discrete_booking_value_p99),
+      Metric(double_counted_delayed_bookings),
+      Metric(every_2_days_bookers_2_days_ago),
+      Metric(every_two_days_bookers),
+      Metric(every_two_days_bookers_fill_nulls_with_0),
+      Metric(identity_verifications),
+      Metric(instant_booking_fraction_of_max_value),
+      Metric(instant_booking_value),
+      Metric(instant_booking_value_ratio),
+      Metric(instant_bookings),
+      Metric(instant_bookings_with_measure_filter),
+      Metric(instant_lux_booking_value_rate),
+      Metric(instant_plus_non_referred_bookings_pct),
+      Metric(largest_listing),
+      Metric(listings),
+      Metric(lux_booking_fraction_of_max_value),
+      Metric(lux_booking_value_rate_expr),
+      Metric(lux_listings),
+      Metric(max_booking_value),
+      Metric(median_booking_value),
+      Metric(min_booking_value),
+      Metric(nested_fill_nulls_without_time_spine),
+      Metric(new_users),
+      Metric(non_referred_bookings_pct),
+      Metric(popular_listing_bookings_per_booker),
+      Metric(referred_bookings),
+      Metric(regional_starting_balance_ratios),
+      Metric(revenue),
+      Metric(revenue_all_time),
+      Metric(revenue_mtd),
+      Metric(simple_subdaily_metric_default_day),
+      Metric(simple_subdaily_metric_default_hour),
+      Metric(smallest_listing),
+      Metric(subdaily_cumulative_grain_to_date_metric),
+      Metric(subdaily_cumulative_window_metric),
+      Metric(subdaily_join_to_time_spine_metric),
+      Metric(subdaily_offset_grain_to_date_metric),
+      Metric(subdaily_offset_window_metric),
+      Metric(total_account_balance_first_day),
+      Metric(total_account_balance_first_day_of_month),
+      Metric(trailing_2_months_revenue),
+      Metric(trailing_2_months_revenue_sub_10),
+      Metric(twice_bookings_fill_nulls_with_0_without_time_spine),
+      Metric(views),
+      Metric(views_times_booking_value),
+      Metric(visit_buy_conversion_rate),
+      Metric(visit_buy_conversion_rate_7days),
+      Metric(visit_buy_conversion_rate_7days_fill_nulls_with_0),
+      Metric(visit_buy_conversion_rate_by_session),
+      Metric(visit_buy_conversion_rate_with_monthly_conversion),
+      Metric(visit_buy_conversions),
+      MetricTimeDimension(DAY),
+      MetricTimeDimension(HOUR),
+      MetricTimeDimension(MONTH),
+      MetricTimeDimension(QUARTER),
+      MetricTimeDimension(WEEK),
+      MetricTimeDimension(YEAR),
+      Time(alien_day),
+      Time(day),
+      Time(extract_day),
+      Time(extract_dow),
+      Time(extract_doy),
+      Time(extract_month),
+      Time(extract_quarter),
+      Time(extract_year),
+      Time(hour),
+      Time(millisecond),
+      Time(minute),
+      Time(month),
+      Time(quarter),
+      Time(second),
+      Time(week),
+      Time(year),
+      TimeDimension(archived_at, hour),
+      TimeDimension(archived_at, day),
+      TimeDimension(archived_at, week),
+      TimeDimension(archived_at, month),
+      TimeDimension(archived_at, quarter),
+      TimeDimension(archived_at, year),
+      TimeDimension(bio_added_ts, second),
+      TimeDimension(bio_added_ts, minute),
+      TimeDimension(bio_added_ts, hour),
+      TimeDimension(bio_added_ts, day),
+      TimeDimension(bio_added_ts, week),
+      TimeDimension(bio_added_ts, month),
+      TimeDimension(bio_added_ts, quarter),
+      TimeDimension(bio_added_ts, year),
+      TimeDimension(created_at, day),
+      TimeDimension(created_at, week),
+      TimeDimension(created_at, month),
+      TimeDimension(created_at, quarter),
+      TimeDimension(created_at, year),
+      TimeDimension(ds, day),
+      TimeDimension(ds, week),
+      TimeDimension(ds, month),
+      TimeDimension(ds, quarter),
+      TimeDimension(ds, year),
+      TimeDimension(ds_latest, day),
+      TimeDimension(ds_latest, week),
+      TimeDimension(ds_latest, month),
+      TimeDimension(ds_latest, quarter),
+      TimeDimension(ds_latest, year),
+      TimeDimension(ds_month, month),
+      TimeDimension(ds_month, quarter),
+      TimeDimension(ds_month, year),
+      TimeDimension(ds_partitioned, day),
+      TimeDimension(ds_partitioned, week),
+      TimeDimension(ds_partitioned, month),
+      TimeDimension(ds_partitioned, quarter),
+      TimeDimension(ds_partitioned, year),
+      TimeDimension(last_login_ts, minute),
+      TimeDimension(last_login_ts, hour),
+      TimeDimension(last_login_ts, day),
+      TimeDimension(last_login_ts, week),
+      TimeDimension(last_login_ts, month),
+      TimeDimension(last_login_ts, quarter),
+      TimeDimension(last_login_ts, year),
+      TimeDimension(last_profile_edit_ts, millisecond),
+      TimeDimension(last_profile_edit_ts, second),
+      TimeDimension(last_profile_edit_ts, minute),
+      TimeDimension(last_profile_edit_ts, hour),
+      TimeDimension(last_profile_edit_ts, day),
+      TimeDimension(last_profile_edit_ts, week),
+      TimeDimension(last_profile_edit_ts, month),
+      TimeDimension(last_profile_edit_ts, quarter),
+      TimeDimension(last_profile_edit_ts, year),
+      TimeDimension(paid_at, day),
+      TimeDimension(paid_at, week),
+      TimeDimension(paid_at, month),
+      TimeDimension(paid_at, quarter),
+      TimeDimension(paid_at, year),
+    },
+    edges={
+      EntityAttributeEdge(tail_node=DsiEntity(account), head_node=Metric(current_account_balance_by_user)),
+      EntityAttributeEdge(tail_node=DsiEntity(account), head_node=Metric(regional_starting_balance_ratios)),
+      EntityAttributeEdge(tail_node=DsiEntity(account), head_node=Metric(total_account_balance_first_day)),
+      EntityAttributeEdge(tail_node=DsiEntity(account), head_node=Metric(total_account_balance_first_day_of_month)),
+      EntityAttributeEdge(tail_node=DsiEntity(booking), head_node=Metric(approximate_continuous_booking_value_p99)),
+      EntityAttributeEdge(tail_node=DsiEntity(booking), head_node=Metric(approximate_discrete_booking_value_p99)),
+      EntityAttributeEdge(tail_node=DsiEntity(booking), head_node=Metric(average_booking_value)),
+      EntityAttributeEdge(tail_node=DsiEntity(booking), head_node=Metric(average_instant_booking_value)),
+      EntityAttributeEdge(tail_node=DsiEntity(booking), head_node=Metric(bookers)),
+      EntityAttributeEdge(tail_node=DsiEntity(booking), head_node=Metric(booking_payments)),
+      EntityAttributeEdge(tail_node=DsiEntity(booking), head_node=Metric(booking_value)),
+      EntityAttributeEdge(tail_node=DsiEntity(booking), head_node=Metric(booking_value_for_non_null_listing_id)),
+      EntityAttributeEdge(tail_node=DsiEntity(booking), head_node=Metric(booking_value_p99)),
+      EntityAttributeEdge(tail_node=DsiEntity(booking), head_node=Metric(bookings)),
+      EntityAttributeEdge(tail_node=DsiEntity(booking), head_node=Metric(bookings_fill_nulls_with_0)),
+      EntityAttributeEdge(
+        tail_node=DsiEntity(booking),
+        head_node=Metric(bookings_fill_nulls_with_0_without_time_spine),
+      ),
+      EntityAttributeEdge(tail_node=DsiEntity(booking), head_node=Metric(bookings_join_to_time_spine)),
+      EntityAttributeEdge(
+        tail_node=DsiEntity(booking),
+        head_node=Metric(bookings_join_to_time_spine_with_tiered_filters),
+      ),
+      EntityAttributeEdge(tail_node=DsiEntity(booking), head_node=Metric(bookings_per_booker)),
+      EntityAttributeEdge(tail_node=DsiEntity(booking), head_node=Metric(bookings_per_dollar)),
+      EntityAttributeEdge(tail_node=DsiEntity(booking), head_node=Metric(discrete_booking_value_p99)),
+      EntityAttributeEdge(tail_node=DsiEntity(booking), head_node=Metric(every_two_days_bookers)),
+      EntityAttributeEdge(tail_node=DsiEntity(booking), head_node=Metric(every_two_days_bookers_fill_nulls_with_0)),
+      EntityAttributeEdge(tail_node=DsiEntity(booking), head_node=Metric(instant_booking_fraction_of_max_value)),
+      EntityAttributeEdge(tail_node=DsiEntity(booking), head_node=Metric(instant_booking_value)),
+      EntityAttributeEdge(tail_node=DsiEntity(booking), head_node=Metric(instant_booking_value_ratio)),
+      EntityAttributeEdge(tail_node=DsiEntity(booking), head_node=Metric(instant_bookings)),
+      EntityAttributeEdge(tail_node=DsiEntity(booking), head_node=Metric(instant_bookings_with_measure_filter)),
+      EntityAttributeEdge(tail_node=DsiEntity(booking), head_node=Metric(lux_booking_fraction_of_max_value)),
+      EntityAttributeEdge(tail_node=DsiEntity(booking), head_node=Metric(max_booking_value)),
+      EntityAttributeEdge(tail_node=DsiEntity(booking), head_node=Metric(median_booking_value)),
+      EntityAttributeEdge(tail_node=DsiEntity(booking), head_node=Metric(min_booking_value)),
+      EntityAttributeEdge(tail_node=DsiEntity(booking), head_node=Metric(referred_bookings)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(active_listings)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(approximate_continuous_booking_value_p99)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(approximate_discrete_booking_value_p99)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(average_booking_value)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(average_instant_booking_value)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(bookers)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(booking_payments)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(booking_value)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(booking_value_for_non_null_listing_id)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(booking_value_p99)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(bookings)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(bookings_fill_nulls_with_0)),
+      EntityAttributeEdge(
+        tail_node=DsiEntity(listing),
+        head_node=Metric(bookings_fill_nulls_with_0_without_time_spine),
+      ),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(bookings_join_to_time_spine)),
+      EntityAttributeEdge(
+        tail_node=DsiEntity(listing),
+        head_node=Metric(bookings_join_to_time_spine_with_tiered_filters),
+      ),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(bookings_per_booker)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(bookings_per_dollar)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(bookings_per_listing)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(bookings_per_view)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(discrete_booking_value_p99)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(every_two_days_bookers)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(every_two_days_bookers_fill_nulls_with_0)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(instant_booking_fraction_of_max_value)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(instant_booking_value)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(instant_booking_value_ratio)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(instant_bookings)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(instant_bookings_with_measure_filter)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(largest_listing)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(listings)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(lux_booking_fraction_of_max_value)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(lux_listings)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(max_booking_value)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(median_booking_value)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(min_booking_value)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(popular_listing_bookings_per_booker)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(referred_bookings)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(smallest_listing)),
+      EntityAttributeEdge(tail_node=DsiEntity(listing), head_node=Metric(views)),
+      EntityAttributeEdge(tail_node=DsiEntity(revenue_instance), head_node=Metric(revenue)),
+      EntityAttributeEdge(tail_node=DsiEntity(revenue_instance), head_node=Metric(revenue_all_time)),
+      EntityAttributeEdge(tail_node=DsiEntity(revenue_instance), head_node=Metric(revenue_mtd)),
+      EntityAttributeEdge(tail_node=DsiEntity(revenue_instance), head_node=Metric(trailing_2_months_revenue)),
+      EntityAttributeEdge(tail_node=DsiEntity(user), head_node=Metric(active_listings)),
+      EntityAttributeEdge(tail_node=DsiEntity(user), head_node=Metric(archived_users)),
+      EntityAttributeEdge(tail_node=DsiEntity(user), head_node=Metric(archived_users_join_to_time_spine)),
+      EntityAttributeEdge(tail_node=DsiEntity(user), head_node=Metric(current_account_balance_by_user)),
+      EntityAttributeEdge(tail_node=DsiEntity(user), head_node=Metric(identity_verifications)),
+      EntityAttributeEdge(tail_node=DsiEntity(user), head_node=Metric(largest_listing)),
+      EntityAttributeEdge(tail_node=DsiEntity(user), head_node=Metric(listings)),
+      EntityAttributeEdge(tail_node=DsiEntity(user), head_node=Metric(lux_listings)),
+      EntityAttributeEdge(tail_node=DsiEntity(user), head_node=Metric(new_users)),
+      EntityAttributeEdge(tail_node=DsiEntity(user), head_node=Metric(popular_listing_bookings_per_booker)),
+      EntityAttributeEdge(tail_node=DsiEntity(user), head_node=Metric(regional_starting_balance_ratios)),
+      EntityAttributeEdge(tail_node=DsiEntity(user), head_node=Metric(revenue)),
+      EntityAttributeEdge(tail_node=DsiEntity(user), head_node=Metric(revenue_all_time)),
+      EntityAttributeEdge(tail_node=DsiEntity(user), head_node=Metric(revenue_mtd)),
+      EntityAttributeEdge(tail_node=DsiEntity(user), head_node=Metric(simple_subdaily_metric_default_day)),
+      EntityAttributeEdge(tail_node=DsiEntity(user), head_node=Metric(simple_subdaily_metric_default_hour)),
+      EntityAttributeEdge(tail_node=DsiEntity(user), head_node=Metric(smallest_listing)),
+      EntityAttributeEdge(tail_node=DsiEntity(user), head_node=Metric(subdaily_cumulative_grain_to_date_metric)),
+      EntityAttributeEdge(tail_node=DsiEntity(user), head_node=Metric(subdaily_cumulative_window_metric)),
+      EntityAttributeEdge(tail_node=DsiEntity(user), head_node=Metric(subdaily_join_to_time_spine_metric)),
+      EntityAttributeEdge(tail_node=DsiEntity(user), head_node=Metric(total_account_balance_first_day)),
+      EntityAttributeEdge(tail_node=DsiEntity(user), head_node=Metric(total_account_balance_first_day_of_month)),
+      EntityAttributeEdge(tail_node=DsiEntity(user), head_node=Metric(trailing_2_months_revenue)),
+      EntityAttributeEdge(tail_node=DsiEntity(user), head_node=Metric(views)),
+      EntityAttributeEdge(tail_node=DsiEntity(user), head_node=Metric(visit_buy_conversion_rate)),
+      EntityAttributeEdge(tail_node=DsiEntity(user), head_node=Metric(visit_buy_conversion_rate_7days)),
+      EntityAttributeEdge(
+        tail_node=DsiEntity(user),
+        head_node=Metric(visit_buy_conversion_rate_7days_fill_nulls_with_0),
+      ),
+      EntityAttributeEdge(tail_node=DsiEntity(user), head_node=Metric(visit_buy_conversion_rate_by_session)),
+      EntityAttributeEdge(
+        tail_node=DsiEntity(user),
+        head_node=Metric(visit_buy_conversion_rate_with_monthly_conversion),
+      ),
+      EntityAttributeEdge(tail_node=DsiEntity(user), head_node=Metric(visit_buy_conversions)),
+      EntityAttributeEdge(tail_node=DsiEntity(verification), head_node=Metric(identity_verifications)),
+      EntityAttributeEdge(tail_node=DsiEntity(view), head_node=Metric(views)),
+      EntityAttributeEdge(tail_node=JoinFrom(accounts_source), head_node=DsiEntityKey(user)),
+      EntityAttributeEdge(tail_node=JoinFrom(bookings_source), head_node=DsiEntityKey(guest)),
+      EntityAttributeEdge(tail_node=JoinFrom(bookings_source), head_node=DsiEntityKey(host)),
+      EntityAttributeEdge(tail_node=JoinFrom(bookings_source), head_node=DsiEntityKey(listing)),
+      EntityAttributeEdge(tail_node=JoinFrom(buys_source), head_node=DsiEntityKey(session_id)),
+      EntityAttributeEdge(tail_node=JoinFrom(buys_source), head_node=DsiEntityKey(user)),
+      EntityAttributeEdge(tail_node=JoinFrom(companies), head_node=DsiEntityKey(company)),
+      EntityAttributeEdge(tail_node=JoinFrom(companies), head_node=DsiEntityKey(user)),
+      EntityAttributeEdge(tail_node=JoinFrom(id_verifications), head_node=DsiEntityKey(user)),
+      EntityAttributeEdge(tail_node=JoinFrom(id_verifications), head_node=DsiEntityKey(verification)),
+      EntityAttributeEdge(tail_node=JoinFrom(listings_latest), head_node=DsiEntityKey(listing)),
+      EntityAttributeEdge(tail_node=JoinFrom(listings_latest), head_node=DsiEntityKey(user)),
+      EntityAttributeEdge(tail_node=JoinFrom(lux_listing_mapping), head_node=DsiEntityKey(listing)),
+      EntityAttributeEdge(tail_node=JoinFrom(lux_listing_mapping), head_node=DsiEntityKey(lux_listing)),
+      EntityAttributeEdge(tail_node=JoinFrom(revenue), head_node=DsiEntityKey(user)),
+      EntityAttributeEdge(tail_node=JoinFrom(users_ds_source), head_node=DsiEntityKey(user)),
+      EntityAttributeEdge(tail_node=JoinFrom(users_latest), head_node=DsiEntityKey(user)),
+      EntityAttributeEdge(tail_node=JoinFrom(views_source), head_node=DsiEntityKey(listing)),
+      EntityAttributeEdge(tail_node=JoinFrom(views_source), head_node=DsiEntityKey(user)),
+      EntityAttributeEdge(tail_node=JoinFrom(visits_source), head_node=DsiEntityKey(session)),
+      EntityAttributeEdge(tail_node=JoinFrom(visits_source), head_node=DsiEntityKey(user)),
+      EntityAttributeEdge(tail_node=JoinTo(accounts_source), head_node=Dimension(account_type)),
+      EntityAttributeEdge(tail_node=JoinTo(accounts_source), head_node=DsiEntityKey(user)),
+      EntityAttributeEdge(tail_node=JoinTo(bookings_source), head_node=Dimension(is_instant)),
+      EntityAttributeEdge(tail_node=JoinTo(bookings_source), head_node=DsiEntityKey(guest)),
+      EntityAttributeEdge(tail_node=JoinTo(bookings_source), head_node=DsiEntityKey(host)),
+      EntityAttributeEdge(tail_node=JoinTo(bookings_source), head_node=DsiEntityKey(listing)),
+      EntityAttributeEdge(tail_node=JoinTo(buys_source), head_node=DsiEntityKey(session_id)),
+      EntityAttributeEdge(tail_node=JoinTo(buys_source), head_node=DsiEntityKey(user)),
+      EntityAttributeEdge(tail_node=JoinTo(companies), head_node=Dimension(company_name)),
+      EntityAttributeEdge(tail_node=JoinTo(companies), head_node=DsiEntityKey(company)),
+      EntityAttributeEdge(tail_node=JoinTo(companies), head_node=DsiEntityKey(user)),
+      EntityAttributeEdge(tail_node=JoinTo(id_verifications), head_node=Dimension(verification_type)),
+      EntityAttributeEdge(tail_node=JoinTo(id_verifications), head_node=DsiEntityKey(user)),
+      EntityAttributeEdge(tail_node=JoinTo(id_verifications), head_node=DsiEntityKey(verification)),
+      EntityAttributeEdge(tail_node=JoinTo(listings_latest), head_node=Dimension(capacity_latest)),
+      EntityAttributeEdge(tail_node=JoinTo(listings_latest), head_node=Dimension(country_latest)),
+      EntityAttributeEdge(tail_node=JoinTo(listings_latest), head_node=Dimension(is_lux_latest)),
+      EntityAttributeEdge(tail_node=JoinTo(listings_latest), head_node=DsiEntityKey(listing)),
+      EntityAttributeEdge(tail_node=JoinTo(listings_latest), head_node=DsiEntityKey(user)),
+      EntityAttributeEdge(tail_node=JoinTo(lux_listing_mapping), head_node=DsiEntityKey(listing)),
+      EntityAttributeEdge(tail_node=JoinTo(lux_listing_mapping), head_node=DsiEntityKey(lux_listing)),
+      EntityAttributeEdge(tail_node=JoinTo(revenue), head_node=DsiEntityKey(user)),
+      EntityAttributeEdge(tail_node=JoinTo(users_ds_source), head_node=Dimension(home_state)),
+      EntityAttributeEdge(tail_node=JoinTo(users_ds_source), head_node=DsiEntityKey(user)),
+      EntityAttributeEdge(tail_node=JoinTo(users_latest), head_node=Dimension(home_state_latest)),
+      EntityAttributeEdge(tail_node=JoinTo(users_latest), head_node=DsiEntityKey(user)),
+      EntityAttributeEdge(tail_node=JoinTo(views_source), head_node=DsiEntityKey(listing)),
+      EntityAttributeEdge(tail_node=JoinTo(views_source), head_node=DsiEntityKey(user)),
+      EntityAttributeEdge(tail_node=JoinTo(visits_source), head_node=Dimension(referrer_id)),
+      EntityAttributeEdge(tail_node=JoinTo(visits_source), head_node=DsiEntityKey(session)),
+      EntityAttributeEdge(tail_node=JoinTo(visits_source), head_node=DsiEntityKey(user)),
+      EntityAttributeEdge(tail_node=Measure(account_balance), head_node=Agg(accounts_source, ds)),
+      EntityAttributeEdge(
+        tail_node=Measure(approximate_continuous_booking_value_p99),
+        head_node=Agg(bookings_source, ds),
+      ),
+      EntityAttributeEdge(
+        tail_node=Measure(approximate_discrete_booking_value_p99),
+        head_node=Agg(bookings_source, ds),
+      ),
+      EntityAttributeEdge(tail_node=Measure(archived_users), head_node=Agg(users_ds_source, archived_at)),
+      EntityAttributeEdge(tail_node=Measure(average_booking_value), head_node=Agg(bookings_source, ds)),
+      EntityAttributeEdge(tail_node=Measure(bookers), head_node=Agg(bookings_source, ds)),
+      EntityAttributeEdge(tail_node=Measure(booking_payments), head_node=Agg(bookings_source, paid_at)),
+      EntityAttributeEdge(tail_node=Measure(booking_value), head_node=Agg(bookings_source, ds)),
+      EntityAttributeEdge(tail_node=Measure(booking_value_p99), head_node=Agg(bookings_source, ds)),
+      EntityAttributeEdge(tail_node=Measure(bookings), head_node=Agg(bookings_source, ds)),
+      EntityAttributeEdge(tail_node=Measure(buyers), head_node=Agg(buys_source, ds)),
+      EntityAttributeEdge(tail_node=Measure(buys), head_node=Agg(buys_source, ds)),
+      EntityAttributeEdge(tail_node=Measure(buys_month), head_node=Agg(buys_source, ds_month)),
+      EntityAttributeEdge(tail_node=Measure(current_account_balance_by_user), head_node=Agg(accounts_source, ds)),
+      EntityAttributeEdge(tail_node=Measure(discrete_booking_value_p99), head_node=Agg(bookings_source, ds)),
+      EntityAttributeEdge(tail_node=Measure(identity_verifications), head_node=Agg(id_verifications, ds)),
+      EntityAttributeEdge(tail_node=Measure(instant_bookings), head_node=Agg(bookings_source, ds)),
+      EntityAttributeEdge(tail_node=Measure(largest_listing), head_node=Agg(listings_latest, ds)),
+      EntityAttributeEdge(tail_node=Measure(listings), head_node=Agg(listings_latest, ds)),
+      EntityAttributeEdge(tail_node=Measure(max_booking_value), head_node=Agg(bookings_source, ds)),
+      EntityAttributeEdge(tail_node=Measure(median_booking_value), head_node=Agg(bookings_source, ds)),
+      EntityAttributeEdge(tail_node=Measure(min_booking_value), head_node=Agg(bookings_source, ds)),
+      EntityAttributeEdge(tail_node=Measure(new_users), head_node=Agg(users_ds_source, created_at)),
+      EntityAttributeEdge(tail_node=Measure(referred_bookings), head_node=Agg(bookings_source, ds)),
+      EntityAttributeEdge(tail_node=Measure(smallest_listing), head_node=Agg(listings_latest, ds)),
+      EntityAttributeEdge(tail_node=Measure(total_account_balance_first_day), head_node=Agg(accounts_source, ds)),
+      EntityAttributeEdge(
+        tail_node=Measure(total_account_balance_first_day_of_month),
+        head_node=Agg(accounts_source, ds_month),
+      ),
+      EntityAttributeEdge(tail_node=Measure(txn_revenue), head_node=Agg(revenue, ds)),
+      EntityAttributeEdge(tail_node=Measure(views), head_node=Agg(views_source, ds)),
+      EntityAttributeEdge(tail_node=Measure(visitors), head_node=Agg(visits_source, ds)),
+      EntityAttributeEdge(tail_node=Measure(visits), head_node=Agg(visits_source, ds)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(DAY), head_node=Time(alien_day)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(DAY), head_node=Time(day)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(DAY), head_node=Time(extract_day)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(DAY), head_node=Time(extract_dow)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(DAY), head_node=Time(extract_doy)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(DAY), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(DAY), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(DAY), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(DAY), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(DAY), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(DAY), head_node=Time(week)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(DAY), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(HOUR), head_node=Time(alien_day)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(HOUR), head_node=Time(day)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(HOUR), head_node=Time(extract_day)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(HOUR), head_node=Time(extract_dow)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(HOUR), head_node=Time(extract_doy)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(HOUR), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(HOUR), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(HOUR), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(HOUR), head_node=Time(hour)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(HOUR), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(HOUR), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(HOUR), head_node=Time(week)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(HOUR), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(MONTH), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(MONTH), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(MONTH), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(MONTH), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(MONTH), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(MONTH), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(QUARTER), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(QUARTER), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(QUARTER), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(QUARTER), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(WEEK), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(WEEK), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(WEEK), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(WEEK), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(WEEK), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(WEEK), head_node=Time(week)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(WEEK), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(YEAR), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(YEAR), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, hour), head_node=Time(alien_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, hour), head_node=Time(day)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, hour), head_node=Time(extract_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, hour), head_node=Time(extract_dow)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, hour), head_node=Time(extract_doy)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, hour), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, hour), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, hour), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, hour), head_node=Time(hour)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, hour), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, hour), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, hour), head_node=Time(week)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, hour), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, day), head_node=Time(alien_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, day), head_node=Time(day)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, day), head_node=Time(extract_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, day), head_node=Time(extract_dow)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, day), head_node=Time(extract_doy)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, day), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, day), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, day), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, day), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, day), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, day), head_node=Time(week)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, day), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, week), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, week), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, week), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, week), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, week), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, week), head_node=Time(week)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, week), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, month), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, month), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, month), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, month), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, month), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, month), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, quarter), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, quarter), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, quarter), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, quarter), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, year), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(archived_at, year), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, second), head_node=Time(alien_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, second), head_node=Time(day)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, second), head_node=Time(extract_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, second), head_node=Time(extract_dow)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, second), head_node=Time(extract_doy)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, second), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, second), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, second), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, second), head_node=Time(hour)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, second), head_node=Time(minute)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, second), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, second), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, second), head_node=Time(second)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, second), head_node=Time(week)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, second), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, minute), head_node=Time(alien_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, minute), head_node=Time(day)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, minute), head_node=Time(extract_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, minute), head_node=Time(extract_dow)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, minute), head_node=Time(extract_doy)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, minute), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, minute), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, minute), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, minute), head_node=Time(hour)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, minute), head_node=Time(minute)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, minute), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, minute), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, minute), head_node=Time(week)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, minute), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, hour), head_node=Time(alien_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, hour), head_node=Time(day)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, hour), head_node=Time(extract_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, hour), head_node=Time(extract_dow)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, hour), head_node=Time(extract_doy)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, hour), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, hour), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, hour), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, hour), head_node=Time(hour)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, hour), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, hour), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, hour), head_node=Time(week)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, hour), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, day), head_node=Time(alien_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, day), head_node=Time(day)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, day), head_node=Time(extract_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, day), head_node=Time(extract_dow)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, day), head_node=Time(extract_doy)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, day), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, day), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, day), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, day), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, day), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, day), head_node=Time(week)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, day), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, week), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, week), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, week), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, week), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, week), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, week), head_node=Time(week)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, week), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, month), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, month), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, month), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, month), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, month), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, month), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, quarter), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, quarter), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, quarter), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, quarter), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, year), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(bio_added_ts, year), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(created_at, day), head_node=Time(alien_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(created_at, day), head_node=Time(day)),
+      EntityAttributeEdge(tail_node=TimeDimension(created_at, day), head_node=Time(extract_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(created_at, day), head_node=Time(extract_dow)),
+      EntityAttributeEdge(tail_node=TimeDimension(created_at, day), head_node=Time(extract_doy)),
+      EntityAttributeEdge(tail_node=TimeDimension(created_at, day), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(created_at, day), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(created_at, day), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(created_at, day), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(created_at, day), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(created_at, day), head_node=Time(week)),
+      EntityAttributeEdge(tail_node=TimeDimension(created_at, day), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(created_at, week), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(created_at, week), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(created_at, week), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(created_at, week), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(created_at, week), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(created_at, week), head_node=Time(week)),
+      EntityAttributeEdge(tail_node=TimeDimension(created_at, week), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(created_at, month), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(created_at, month), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(created_at, month), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(created_at, month), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(created_at, month), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(created_at, month), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(created_at, quarter), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(created_at, quarter), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(created_at, quarter), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(created_at, quarter), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(created_at, year), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(created_at, year), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, day), head_node=Time(alien_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, day), head_node=Time(day)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, day), head_node=Time(extract_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, day), head_node=Time(extract_dow)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, day), head_node=Time(extract_doy)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, day), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, day), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, day), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, day), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, day), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, day), head_node=Time(week)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, day), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, week), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, week), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, week), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, week), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, week), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, week), head_node=Time(week)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, week), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, month), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, month), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, month), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, month), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, month), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, month), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, quarter), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, quarter), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, quarter), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, quarter), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, year), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, year), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, day), head_node=Time(alien_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, day), head_node=Time(day)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, day), head_node=Time(extract_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, day), head_node=Time(extract_dow)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, day), head_node=Time(extract_doy)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, day), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, day), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, day), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, day), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, day), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, day), head_node=Time(week)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, day), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, week), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, week), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, week), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, week), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, week), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, week), head_node=Time(week)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, week), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, month), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, month), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, month), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, month), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, month), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, month), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, quarter), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, quarter), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, quarter), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, quarter), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, year), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_latest, year), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_month, month), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_month, month), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_month, month), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_month, month), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_month, month), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_month, month), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_month, quarter), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_month, quarter), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_month, quarter), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_month, quarter), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_month, year), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_month, year), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, day), head_node=Time(alien_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, day), head_node=Time(day)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, day), head_node=Time(extract_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, day), head_node=Time(extract_dow)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, day), head_node=Time(extract_doy)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, day), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, day), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, day), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, day), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, day), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, day), head_node=Time(week)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, day), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, week), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, week), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, week), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, week), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, week), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, week), head_node=Time(week)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, week), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, month), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, month), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, month), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, month), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, month), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, month), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, quarter), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, quarter), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, quarter), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, quarter), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, year), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds_partitioned, year), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, minute), head_node=Time(alien_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, minute), head_node=Time(day)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, minute), head_node=Time(extract_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, minute), head_node=Time(extract_dow)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, minute), head_node=Time(extract_doy)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, minute), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, minute), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, minute), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, minute), head_node=Time(hour)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, minute), head_node=Time(minute)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, minute), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, minute), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, minute), head_node=Time(week)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, minute), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, hour), head_node=Time(alien_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, hour), head_node=Time(day)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, hour), head_node=Time(extract_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, hour), head_node=Time(extract_dow)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, hour), head_node=Time(extract_doy)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, hour), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, hour), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, hour), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, hour), head_node=Time(hour)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, hour), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, hour), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, hour), head_node=Time(week)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, hour), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, day), head_node=Time(alien_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, day), head_node=Time(day)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, day), head_node=Time(extract_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, day), head_node=Time(extract_dow)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, day), head_node=Time(extract_doy)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, day), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, day), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, day), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, day), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, day), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, day), head_node=Time(week)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, day), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, week), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, week), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, week), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, week), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, week), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, week), head_node=Time(week)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, week), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, month), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, month), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, month), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, month), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, month), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, month), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, quarter), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, quarter), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, quarter), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, quarter), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, year), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_login_ts, year), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, millisecond), head_node=Time(alien_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, millisecond), head_node=Time(day)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, millisecond), head_node=Time(extract_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, millisecond), head_node=Time(extract_dow)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, millisecond), head_node=Time(extract_doy)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, millisecond), head_node=Time(extract_month)),
+      EntityAttributeEdge(
+        tail_node=TimeDimension(last_profile_edit_ts, millisecond),
+        head_node=Time(extract_quarter),
+      ),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, millisecond), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, millisecond), head_node=Time(hour)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, millisecond), head_node=Time(millisecond)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, millisecond), head_node=Time(minute)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, millisecond), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, millisecond), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, millisecond), head_node=Time(second)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, millisecond), head_node=Time(week)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, millisecond), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, second), head_node=Time(alien_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, second), head_node=Time(day)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, second), head_node=Time(extract_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, second), head_node=Time(extract_dow)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, second), head_node=Time(extract_doy)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, second), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, second), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, second), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, second), head_node=Time(hour)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, second), head_node=Time(minute)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, second), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, second), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, second), head_node=Time(second)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, second), head_node=Time(week)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, second), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, minute), head_node=Time(alien_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, minute), head_node=Time(day)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, minute), head_node=Time(extract_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, minute), head_node=Time(extract_dow)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, minute), head_node=Time(extract_doy)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, minute), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, minute), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, minute), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, minute), head_node=Time(hour)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, minute), head_node=Time(minute)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, minute), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, minute), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, minute), head_node=Time(week)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, minute), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, hour), head_node=Time(alien_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, hour), head_node=Time(day)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, hour), head_node=Time(extract_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, hour), head_node=Time(extract_dow)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, hour), head_node=Time(extract_doy)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, hour), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, hour), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, hour), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, hour), head_node=Time(hour)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, hour), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, hour), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, hour), head_node=Time(week)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, hour), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, day), head_node=Time(alien_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, day), head_node=Time(day)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, day), head_node=Time(extract_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, day), head_node=Time(extract_dow)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, day), head_node=Time(extract_doy)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, day), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, day), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, day), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, day), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, day), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, day), head_node=Time(week)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, day), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, week), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, week), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, week), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, week), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, week), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, week), head_node=Time(week)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, week), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, month), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, month), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, month), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, month), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, month), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, month), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, quarter), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, quarter), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, quarter), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, quarter), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, year), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(last_profile_edit_ts, year), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(paid_at, day), head_node=Time(alien_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(paid_at, day), head_node=Time(day)),
+      EntityAttributeEdge(tail_node=TimeDimension(paid_at, day), head_node=Time(extract_day)),
+      EntityAttributeEdge(tail_node=TimeDimension(paid_at, day), head_node=Time(extract_dow)),
+      EntityAttributeEdge(tail_node=TimeDimension(paid_at, day), head_node=Time(extract_doy)),
+      EntityAttributeEdge(tail_node=TimeDimension(paid_at, day), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(paid_at, day), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(paid_at, day), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(paid_at, day), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(paid_at, day), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(paid_at, day), head_node=Time(week)),
+      EntityAttributeEdge(tail_node=TimeDimension(paid_at, day), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(paid_at, week), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(paid_at, week), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(paid_at, week), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(paid_at, week), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(paid_at, week), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(paid_at, week), head_node=Time(week)),
+      EntityAttributeEdge(tail_node=TimeDimension(paid_at, week), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(paid_at, month), head_node=Time(extract_month)),
+      EntityAttributeEdge(tail_node=TimeDimension(paid_at, month), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(paid_at, month), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(paid_at, month), head_node=Time(month)),
+      EntityAttributeEdge(tail_node=TimeDimension(paid_at, month), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(paid_at, month), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(paid_at, quarter), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(paid_at, quarter), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(paid_at, quarter), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(paid_at, quarter), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(paid_at, year), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(paid_at, year), head_node=Time(year)),
+      EntityRelationshipEdge(tail_node=Agg(accounts_source, ds), head_node=JoinFrom(accounts_source)),
+      EntityRelationshipEdge(tail_node=Agg(accounts_source, ds), head_node=JoinTo(accounts_source)),
+      EntityRelationshipEdge(tail_node=Agg(accounts_source, ds_month), head_node=JoinFrom(accounts_source)),
+      EntityRelationshipEdge(tail_node=Agg(accounts_source, ds_month), head_node=JoinTo(accounts_source)),
+      EntityRelationshipEdge(tail_node=Agg(bookings_source, ds), head_node=JoinFrom(bookings_source)),
+      EntityRelationshipEdge(tail_node=Agg(bookings_source, ds), head_node=JoinTo(bookings_source)),
+      EntityRelationshipEdge(tail_node=Agg(bookings_source, paid_at), head_node=JoinFrom(bookings_source)),
+      EntityRelationshipEdge(tail_node=Agg(bookings_source, paid_at), head_node=JoinTo(bookings_source)),
+      EntityRelationshipEdge(tail_node=Agg(buys_source, ds), head_node=JoinFrom(buys_source)),
+      EntityRelationshipEdge(tail_node=Agg(buys_source, ds), head_node=JoinTo(buys_source)),
+      EntityRelationshipEdge(tail_node=Agg(buys_source, ds_month), head_node=JoinFrom(buys_source)),
+      EntityRelationshipEdge(tail_node=Agg(buys_source, ds_month), head_node=JoinTo(buys_source)),
+      EntityRelationshipEdge(tail_node=Agg(id_verifications, ds), head_node=JoinFrom(id_verifications)),
+      EntityRelationshipEdge(tail_node=Agg(id_verifications, ds), head_node=JoinTo(id_verifications)),
+      EntityRelationshipEdge(tail_node=Agg(listings_latest, ds), head_node=JoinFrom(listings_latest)),
+      EntityRelationshipEdge(tail_node=Agg(listings_latest, ds), head_node=JoinTo(listings_latest)),
+      EntityRelationshipEdge(tail_node=Agg(revenue, ds), head_node=JoinFrom(revenue)),
+      EntityRelationshipEdge(tail_node=Agg(revenue, ds), head_node=JoinTo(revenue)),
+      EntityRelationshipEdge(tail_node=Agg(users_ds_source, archived_at), head_node=JoinFrom(users_ds_source)),
+      EntityRelationshipEdge(tail_node=Agg(users_ds_source, archived_at), head_node=JoinTo(users_ds_source)),
+      EntityRelationshipEdge(tail_node=Agg(users_ds_source, created_at), head_node=JoinFrom(users_ds_source)),
+      EntityRelationshipEdge(tail_node=Agg(users_ds_source, created_at), head_node=JoinTo(users_ds_source)),
+      EntityRelationshipEdge(tail_node=Agg(views_source, ds), head_node=JoinFrom(views_source)),
+      EntityRelationshipEdge(tail_node=Agg(views_source, ds), head_node=JoinTo(views_source)),
+      EntityRelationshipEdge(tail_node=Agg(visits_source, ds), head_node=JoinFrom(visits_source)),
+      EntityRelationshipEdge(tail_node=Agg(visits_source, ds), head_node=JoinTo(visits_source)),
+      EntityRelationshipEdge(tail_node=JoinFrom(accounts_source), head_node=MetricTimeDimension(DAY)),
+      EntityRelationshipEdge(tail_node=JoinFrom(accounts_source), head_node=MetricTimeDimension(MONTH)),
+      EntityRelationshipEdge(tail_node=JoinFrom(accounts_source), head_node=MetricTimeDimension(QUARTER)),
+      EntityRelationshipEdge(tail_node=JoinFrom(accounts_source), head_node=MetricTimeDimension(WEEK)),
+      EntityRelationshipEdge(tail_node=JoinFrom(accounts_source), head_node=MetricTimeDimension(YEAR)),
+      EntityRelationshipEdge(tail_node=JoinFrom(bookings_source), head_node=MetricTimeDimension(DAY)),
+      EntityRelationshipEdge(tail_node=JoinFrom(bookings_source), head_node=MetricTimeDimension(MONTH)),
+      EntityRelationshipEdge(tail_node=JoinFrom(bookings_source), head_node=MetricTimeDimension(QUARTER)),
+      EntityRelationshipEdge(tail_node=JoinFrom(bookings_source), head_node=MetricTimeDimension(WEEK)),
+      EntityRelationshipEdge(tail_node=JoinFrom(bookings_source), head_node=MetricTimeDimension(YEAR)),
+      EntityRelationshipEdge(tail_node=JoinFrom(buys_source), head_node=MetricTimeDimension(DAY)),
+      EntityRelationshipEdge(tail_node=JoinFrom(buys_source), head_node=MetricTimeDimension(MONTH)),
+      EntityRelationshipEdge(tail_node=JoinFrom(buys_source), head_node=MetricTimeDimension(QUARTER)),
+      EntityRelationshipEdge(tail_node=JoinFrom(buys_source), head_node=MetricTimeDimension(WEEK)),
+      EntityRelationshipEdge(tail_node=JoinFrom(buys_source), head_node=MetricTimeDimension(YEAR)),
+      EntityRelationshipEdge(tail_node=JoinFrom(id_verifications), head_node=MetricTimeDimension(DAY)),
+      EntityRelationshipEdge(tail_node=JoinFrom(id_verifications), head_node=MetricTimeDimension(MONTH)),
+      EntityRelationshipEdge(tail_node=JoinFrom(id_verifications), head_node=MetricTimeDimension(QUARTER)),
+      EntityRelationshipEdge(tail_node=JoinFrom(id_verifications), head_node=MetricTimeDimension(WEEK)),
+      EntityRelationshipEdge(tail_node=JoinFrom(id_verifications), head_node=MetricTimeDimension(YEAR)),
+      EntityRelationshipEdge(tail_node=JoinFrom(listings_latest), head_node=MetricTimeDimension(DAY)),
+      EntityRelationshipEdge(tail_node=JoinFrom(listings_latest), head_node=MetricTimeDimension(MONTH)),
+      EntityRelationshipEdge(tail_node=JoinFrom(listings_latest), head_node=MetricTimeDimension(QUARTER)),
+      EntityRelationshipEdge(tail_node=JoinFrom(listings_latest), head_node=MetricTimeDimension(WEEK)),
+      EntityRelationshipEdge(tail_node=JoinFrom(listings_latest), head_node=MetricTimeDimension(YEAR)),
+      EntityRelationshipEdge(tail_node=JoinFrom(revenue), head_node=MetricTimeDimension(DAY)),
+      EntityRelationshipEdge(tail_node=JoinFrom(revenue), head_node=MetricTimeDimension(MONTH)),
+      EntityRelationshipEdge(tail_node=JoinFrom(revenue), head_node=MetricTimeDimension(QUARTER)),
+      EntityRelationshipEdge(tail_node=JoinFrom(revenue), head_node=MetricTimeDimension(WEEK)),
+      EntityRelationshipEdge(tail_node=JoinFrom(revenue), head_node=MetricTimeDimension(YEAR)),
+      EntityRelationshipEdge(tail_node=JoinFrom(users_ds_source), head_node=MetricTimeDimension(DAY)),
+      EntityRelationshipEdge(tail_node=JoinFrom(users_ds_source), head_node=MetricTimeDimension(HOUR)),
+      EntityRelationshipEdge(tail_node=JoinFrom(users_ds_source), head_node=MetricTimeDimension(MONTH)),
+      EntityRelationshipEdge(tail_node=JoinFrom(users_ds_source), head_node=MetricTimeDimension(QUARTER)),
+      EntityRelationshipEdge(tail_node=JoinFrom(users_ds_source), head_node=MetricTimeDimension(WEEK)),
+      EntityRelationshipEdge(tail_node=JoinFrom(users_ds_source), head_node=MetricTimeDimension(YEAR)),
+      EntityRelationshipEdge(tail_node=JoinFrom(views_source), head_node=MetricTimeDimension(DAY)),
+      EntityRelationshipEdge(tail_node=JoinFrom(views_source), head_node=MetricTimeDimension(MONTH)),
+      EntityRelationshipEdge(tail_node=JoinFrom(views_source), head_node=MetricTimeDimension(QUARTER)),
+      EntityRelationshipEdge(tail_node=JoinFrom(views_source), head_node=MetricTimeDimension(WEEK)),
+      EntityRelationshipEdge(tail_node=JoinFrom(views_source), head_node=MetricTimeDimension(YEAR)),
+      EntityRelationshipEdge(tail_node=JoinFrom(visits_source), head_node=MetricTimeDimension(DAY)),
+      EntityRelationshipEdge(tail_node=JoinFrom(visits_source), head_node=MetricTimeDimension(MONTH)),
+      EntityRelationshipEdge(tail_node=JoinFrom(visits_source), head_node=MetricTimeDimension(QUARTER)),
+      EntityRelationshipEdge(tail_node=JoinFrom(visits_source), head_node=MetricTimeDimension(WEEK)),
+      EntityRelationshipEdge(tail_node=JoinFrom(visits_source), head_node=MetricTimeDimension(YEAR)),
+      EntityRelationshipEdge(tail_node=JoinTo(accounts_source), head_node=TimeDimension(ds, day)),
+      EntityRelationshipEdge(tail_node=JoinTo(accounts_source), head_node=TimeDimension(ds, week)),
+      EntityRelationshipEdge(tail_node=JoinTo(accounts_source), head_node=TimeDimension(ds, month)),
+      EntityRelationshipEdge(tail_node=JoinTo(accounts_source), head_node=TimeDimension(ds, quarter)),
+      EntityRelationshipEdge(tail_node=JoinTo(accounts_source), head_node=TimeDimension(ds, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(accounts_source), head_node=TimeDimension(ds_month, month)),
+      EntityRelationshipEdge(tail_node=JoinTo(accounts_source), head_node=TimeDimension(ds_month, quarter)),
+      EntityRelationshipEdge(tail_node=JoinTo(accounts_source), head_node=TimeDimension(ds_month, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(bookings_source), head_node=TimeDimension(ds, day)),
+      EntityRelationshipEdge(tail_node=JoinTo(bookings_source), head_node=TimeDimension(ds, week)),
+      EntityRelationshipEdge(tail_node=JoinTo(bookings_source), head_node=TimeDimension(ds, month)),
+      EntityRelationshipEdge(tail_node=JoinTo(bookings_source), head_node=TimeDimension(ds, quarter)),
+      EntityRelationshipEdge(tail_node=JoinTo(bookings_source), head_node=TimeDimension(ds, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(bookings_source), head_node=TimeDimension(ds_partitioned, day)),
+      EntityRelationshipEdge(tail_node=JoinTo(bookings_source), head_node=TimeDimension(ds_partitioned, week)),
+      EntityRelationshipEdge(tail_node=JoinTo(bookings_source), head_node=TimeDimension(ds_partitioned, month)),
+      EntityRelationshipEdge(tail_node=JoinTo(bookings_source), head_node=TimeDimension(ds_partitioned, quarter)),
+      EntityRelationshipEdge(tail_node=JoinTo(bookings_source), head_node=TimeDimension(ds_partitioned, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(bookings_source), head_node=TimeDimension(paid_at, day)),
+      EntityRelationshipEdge(tail_node=JoinTo(bookings_source), head_node=TimeDimension(paid_at, week)),
+      EntityRelationshipEdge(tail_node=JoinTo(bookings_source), head_node=TimeDimension(paid_at, month)),
+      EntityRelationshipEdge(tail_node=JoinTo(bookings_source), head_node=TimeDimension(paid_at, quarter)),
+      EntityRelationshipEdge(tail_node=JoinTo(bookings_source), head_node=TimeDimension(paid_at, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(buys_source), head_node=TimeDimension(ds, day)),
+      EntityRelationshipEdge(tail_node=JoinTo(buys_source), head_node=TimeDimension(ds, week)),
+      EntityRelationshipEdge(tail_node=JoinTo(buys_source), head_node=TimeDimension(ds, month)),
+      EntityRelationshipEdge(tail_node=JoinTo(buys_source), head_node=TimeDimension(ds, quarter)),
+      EntityRelationshipEdge(tail_node=JoinTo(buys_source), head_node=TimeDimension(ds, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(buys_source), head_node=TimeDimension(ds_month, month)),
+      EntityRelationshipEdge(tail_node=JoinTo(buys_source), head_node=TimeDimension(ds_month, quarter)),
+      EntityRelationshipEdge(tail_node=JoinTo(buys_source), head_node=TimeDimension(ds_month, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(id_verifications), head_node=TimeDimension(ds, day)),
+      EntityRelationshipEdge(tail_node=JoinTo(id_verifications), head_node=TimeDimension(ds, week)),
+      EntityRelationshipEdge(tail_node=JoinTo(id_verifications), head_node=TimeDimension(ds, month)),
+      EntityRelationshipEdge(tail_node=JoinTo(id_verifications), head_node=TimeDimension(ds, quarter)),
+      EntityRelationshipEdge(tail_node=JoinTo(id_verifications), head_node=TimeDimension(ds, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(id_verifications), head_node=TimeDimension(ds_partitioned, day)),
+      EntityRelationshipEdge(tail_node=JoinTo(id_verifications), head_node=TimeDimension(ds_partitioned, week)),
+      EntityRelationshipEdge(tail_node=JoinTo(id_verifications), head_node=TimeDimension(ds_partitioned, month)),
+      EntityRelationshipEdge(tail_node=JoinTo(id_verifications), head_node=TimeDimension(ds_partitioned, quarter)),
+      EntityRelationshipEdge(tail_node=JoinTo(id_verifications), head_node=TimeDimension(ds_partitioned, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(listings_latest), head_node=TimeDimension(created_at, day)),
+      EntityRelationshipEdge(tail_node=JoinTo(listings_latest), head_node=TimeDimension(created_at, week)),
+      EntityRelationshipEdge(tail_node=JoinTo(listings_latest), head_node=TimeDimension(created_at, month)),
+      EntityRelationshipEdge(tail_node=JoinTo(listings_latest), head_node=TimeDimension(created_at, quarter)),
+      EntityRelationshipEdge(tail_node=JoinTo(listings_latest), head_node=TimeDimension(created_at, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(listings_latest), head_node=TimeDimension(ds, day)),
+      EntityRelationshipEdge(tail_node=JoinTo(listings_latest), head_node=TimeDimension(ds, week)),
+      EntityRelationshipEdge(tail_node=JoinTo(listings_latest), head_node=TimeDimension(ds, month)),
+      EntityRelationshipEdge(tail_node=JoinTo(listings_latest), head_node=TimeDimension(ds, quarter)),
+      EntityRelationshipEdge(tail_node=JoinTo(listings_latest), head_node=TimeDimension(ds, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(revenue), head_node=TimeDimension(ds, day)),
+      EntityRelationshipEdge(tail_node=JoinTo(revenue), head_node=TimeDimension(ds, week)),
+      EntityRelationshipEdge(tail_node=JoinTo(revenue), head_node=TimeDimension(ds, month)),
+      EntityRelationshipEdge(tail_node=JoinTo(revenue), head_node=TimeDimension(ds, quarter)),
+      EntityRelationshipEdge(tail_node=JoinTo(revenue), head_node=TimeDimension(ds, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(archived_at, hour)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(archived_at, day)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(archived_at, week)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(archived_at, month)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(archived_at, quarter)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(archived_at, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(bio_added_ts, second)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(bio_added_ts, minute)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(bio_added_ts, hour)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(bio_added_ts, day)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(bio_added_ts, week)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(bio_added_ts, month)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(bio_added_ts, quarter)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(bio_added_ts, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(created_at, day)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(created_at, week)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(created_at, month)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(created_at, quarter)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(created_at, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(ds, day)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(ds, week)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(ds, month)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(ds, quarter)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(ds, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(ds_partitioned, day)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(ds_partitioned, week)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(ds_partitioned, month)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(ds_partitioned, quarter)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(ds_partitioned, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(last_login_ts, minute)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(last_login_ts, hour)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(last_login_ts, day)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(last_login_ts, week)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(last_login_ts, month)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(last_login_ts, quarter)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(last_login_ts, year)),
+      EntityRelationshipEdge(
+        tail_node=JoinTo(users_ds_source),
+        head_node=TimeDimension(last_profile_edit_ts, millisecond),
+      ),
+      EntityRelationshipEdge(
+        tail_node=JoinTo(users_ds_source),
+        head_node=TimeDimension(last_profile_edit_ts, second),
+      ),
+      EntityRelationshipEdge(
+        tail_node=JoinTo(users_ds_source),
+        head_node=TimeDimension(last_profile_edit_ts, minute),
+      ),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(last_profile_edit_ts, hour)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(last_profile_edit_ts, day)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(last_profile_edit_ts, week)),
+      EntityRelationshipEdge(
+        tail_node=JoinTo(users_ds_source),
+        head_node=TimeDimension(last_profile_edit_ts, month),
+      ),
+      EntityRelationshipEdge(
+        tail_node=JoinTo(users_ds_source),
+        head_node=TimeDimension(last_profile_edit_ts, quarter),
+      ),
+      EntityRelationshipEdge(tail_node=JoinTo(users_ds_source), head_node=TimeDimension(last_profile_edit_ts, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_latest), head_node=TimeDimension(ds_latest, day)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_latest), head_node=TimeDimension(ds_latest, week)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_latest), head_node=TimeDimension(ds_latest, month)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_latest), head_node=TimeDimension(ds_latest, quarter)),
+      EntityRelationshipEdge(tail_node=JoinTo(users_latest), head_node=TimeDimension(ds_latest, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(views_source), head_node=TimeDimension(ds, day)),
+      EntityRelationshipEdge(tail_node=JoinTo(views_source), head_node=TimeDimension(ds, week)),
+      EntityRelationshipEdge(tail_node=JoinTo(views_source), head_node=TimeDimension(ds, month)),
+      EntityRelationshipEdge(tail_node=JoinTo(views_source), head_node=TimeDimension(ds, quarter)),
+      EntityRelationshipEdge(tail_node=JoinTo(views_source), head_node=TimeDimension(ds, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(views_source), head_node=TimeDimension(ds_partitioned, day)),
+      EntityRelationshipEdge(tail_node=JoinTo(views_source), head_node=TimeDimension(ds_partitioned, week)),
+      EntityRelationshipEdge(tail_node=JoinTo(views_source), head_node=TimeDimension(ds_partitioned, month)),
+      EntityRelationshipEdge(tail_node=JoinTo(views_source), head_node=TimeDimension(ds_partitioned, quarter)),
+      EntityRelationshipEdge(tail_node=JoinTo(views_source), head_node=TimeDimension(ds_partitioned, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(visits_source), head_node=TimeDimension(ds, day)),
+      EntityRelationshipEdge(tail_node=JoinTo(visits_source), head_node=TimeDimension(ds, week)),
+      EntityRelationshipEdge(tail_node=JoinTo(visits_source), head_node=TimeDimension(ds, month)),
+      EntityRelationshipEdge(tail_node=JoinTo(visits_source), head_node=TimeDimension(ds, quarter)),
+      EntityRelationshipEdge(tail_node=JoinTo(visits_source), head_node=TimeDimension(ds, year)),
+      JoinFromModelEdge(tail_node=JoinFrom(accounts_source), head_node=DsiEntity(account)),
+      JoinFromModelEdge(tail_node=JoinFrom(accounts_source), head_node=DsiEntity(user)),
+      JoinFromModelEdge(tail_node=JoinFrom(accounts_source), head_node=DsiEntity(user)),
+      JoinFromModelEdge(tail_node=JoinFrom(accounts_source), head_node=DsiEntity(user)),
+      JoinFromModelEdge(tail_node=JoinFrom(bookings_source), head_node=DsiEntity(booking)),
+      JoinFromModelEdge(tail_node=JoinFrom(bookings_source), head_node=DsiEntity(listing)),
+      JoinFromModelEdge(tail_node=JoinFrom(bookings_source), head_node=DsiEntity(listing)),
+      JoinFromModelEdge(tail_node=JoinFrom(buys_source), head_node=DsiEntity(buy)),
+      JoinFromModelEdge(tail_node=JoinFrom(buys_source), head_node=DsiEntity(user)),
+      JoinFromModelEdge(tail_node=JoinFrom(buys_source), head_node=DsiEntity(user)),
+      JoinFromModelEdge(tail_node=JoinFrom(buys_source), head_node=DsiEntity(user)),
+      JoinFromModelEdge(tail_node=JoinFrom(companies), head_node=DsiEntity(company)),
+      JoinFromModelEdge(tail_node=JoinFrom(companies), head_node=DsiEntity(user)),
+      JoinFromModelEdge(tail_node=JoinFrom(companies), head_node=DsiEntity(user)),
+      JoinFromModelEdge(tail_node=JoinFrom(companies), head_node=DsiEntity(user)),
+      JoinFromModelEdge(tail_node=JoinFrom(id_verifications), head_node=DsiEntity(user)),
+      JoinFromModelEdge(tail_node=JoinFrom(id_verifications), head_node=DsiEntity(user)),
+      JoinFromModelEdge(tail_node=JoinFrom(id_verifications), head_node=DsiEntity(user)),
+      JoinFromModelEdge(tail_node=JoinFrom(id_verifications), head_node=DsiEntity(verification)),
+      JoinFromModelEdge(tail_node=JoinFrom(listings_latest), head_node=DsiEntity(listing)),
+      JoinFromModelEdge(tail_node=JoinFrom(listings_latest), head_node=DsiEntity(listing)),
+      JoinFromModelEdge(tail_node=JoinFrom(listings_latest), head_node=DsiEntity(user)),
+      JoinFromModelEdge(tail_node=JoinFrom(listings_latest), head_node=DsiEntity(user)),
+      JoinFromModelEdge(tail_node=JoinFrom(listings_latest), head_node=DsiEntity(user)),
+      JoinFromModelEdge(tail_node=JoinFrom(lux_listing_mapping), head_node=DsiEntity(listing)),
+      JoinFromModelEdge(tail_node=JoinFrom(lux_listing_mapping), head_node=DsiEntity(listing)),
+      JoinFromModelEdge(tail_node=JoinFrom(revenue), head_node=DsiEntity(revenue_instance)),
+      JoinFromModelEdge(tail_node=JoinFrom(revenue), head_node=DsiEntity(user)),
+      JoinFromModelEdge(tail_node=JoinFrom(revenue), head_node=DsiEntity(user)),
+      JoinFromModelEdge(tail_node=JoinFrom(revenue), head_node=DsiEntity(user)),
+      JoinFromModelEdge(tail_node=JoinFrom(users_ds_source), head_node=DsiEntity(user)),
+      JoinFromModelEdge(tail_node=JoinFrom(users_ds_source), head_node=DsiEntity(user)),
+      JoinFromModelEdge(tail_node=JoinFrom(users_ds_source), head_node=DsiEntity(user)),
+      JoinFromModelEdge(tail_node=JoinFrom(users_latest), head_node=DsiEntity(user)),
+      JoinFromModelEdge(tail_node=JoinFrom(users_latest), head_node=DsiEntity(user)),
+      JoinFromModelEdge(tail_node=JoinFrom(users_latest), head_node=DsiEntity(user)),
+      JoinFromModelEdge(tail_node=JoinFrom(views_source), head_node=DsiEntity(listing)),
+      JoinFromModelEdge(tail_node=JoinFrom(views_source), head_node=DsiEntity(listing)),
+      JoinFromModelEdge(tail_node=JoinFrom(views_source), head_node=DsiEntity(user)),
+      JoinFromModelEdge(tail_node=JoinFrom(views_source), head_node=DsiEntity(user)),
+      JoinFromModelEdge(tail_node=JoinFrom(views_source), head_node=DsiEntity(user)),
+      JoinFromModelEdge(tail_node=JoinFrom(views_source), head_node=DsiEntity(view)),
+      JoinFromModelEdge(tail_node=JoinFrom(visits_source), head_node=DsiEntity(user)),
+      JoinFromModelEdge(tail_node=JoinFrom(visits_source), head_node=DsiEntity(user)),
+      JoinFromModelEdge(tail_node=JoinFrom(visits_source), head_node=DsiEntity(user)),
+      JoinFromModelEdge(tail_node=JoinFrom(visits_source), head_node=DsiEntity(visit)),
+      JoinToModelEdge(tail_node=DsiEntity(company), head_node=JoinTo(companies)),
+      JoinToModelEdge(tail_node=DsiEntity(listing), head_node=JoinTo(listings_latest)),
+      JoinToModelEdge(tail_node=DsiEntity(listing), head_node=JoinTo(lux_listing_mapping)),
+      JoinToModelEdge(tail_node=DsiEntity(user), head_node=JoinTo(companies)),
+      JoinToModelEdge(tail_node=DsiEntity(user), head_node=JoinTo(users_ds_source)),
+      JoinToModelEdge(tail_node=DsiEntity(user), head_node=JoinTo(users_latest)),
+      JoinToModelEdge(tail_node=DsiEntity(verification), head_node=JoinTo(id_verifications)),
+      MetricDefinitionEdge(tail_node=Metric(active_listings), head_node=Measure(listings)),
+      MetricDefinitionEdge(
+        tail_node=Metric(approximate_continuous_booking_value_p99),
+        head_node=Measure(approximate_continuous_booking_value_p99),
+      ),
+      MetricDefinitionEdge(
+        tail_node=Metric(approximate_discrete_booking_value_p99),
+        head_node=Measure(approximate_discrete_booking_value_p99),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(archived_users), head_node=Measure(archived_users)),
+      MetricDefinitionEdge(tail_node=Metric(archived_users_join_to_time_spine), head_node=Measure(archived_users)),
+      MetricDefinitionEdge(tail_node=Metric(average_booking_value), head_node=Measure(average_booking_value)),
+      MetricDefinitionEdge(
+        tail_node=Metric(average_instant_booking_value),
+        head_node=Measure(average_booking_value),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(bookers), head_node=Measure(bookers)),
+      MetricDefinitionEdge(tail_node=Metric(booking_fees), head_node=Metric(booking_value)),
+      MetricDefinitionEdge(tail_node=Metric(booking_fees_last_week_per_booker_this_week), head_node=Metric(bookers)),
+      MetricDefinitionEdge(
+        tail_node=Metric(booking_fees_last_week_per_booker_this_week),
+        head_node=Metric(booking_value),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(booking_fees_per_booker), head_node=Metric(bookers)),
+      MetricDefinitionEdge(tail_node=Metric(booking_fees_per_booker), head_node=Metric(booking_value)),
+      MetricDefinitionEdge(tail_node=Metric(booking_fees_since_start_of_month), head_node=Metric(booking_fees)),
+      MetricDefinitionEdge(tail_node=Metric(booking_payments), head_node=Measure(booking_payments)),
+      MetricDefinitionEdge(tail_node=Metric(booking_value), head_node=Measure(booking_value)),
+      MetricDefinitionEdge(
+        tail_node=Metric(booking_value_for_non_null_listing_id),
+        head_node=Measure(booking_value),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(booking_value_p99), head_node=Measure(booking_value_p99)),
+      MetricDefinitionEdge(tail_node=Metric(booking_value_per_view), head_node=Metric(booking_value)),
+      MetricDefinitionEdge(tail_node=Metric(booking_value_per_view), head_node=Metric(views)),
+      MetricDefinitionEdge(tail_node=Metric(booking_value_sub_instant), head_node=Metric(booking_value)),
+      MetricDefinitionEdge(tail_node=Metric(booking_value_sub_instant), head_node=Metric(instant_booking_value)),
+      MetricDefinitionEdge(
+        tail_node=Metric(booking_value_sub_instant_add_10),
+        head_node=Metric(booking_value_sub_instant),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(bookings), head_node=Measure(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_5_day_lag), head_node=Metric(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_alien_day_over_alien_day), head_node=Metric(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_at_start_of_month), head_node=Metric(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_fill_nulls_with_0), head_node=Measure(bookings)),
+      MetricDefinitionEdge(
+        tail_node=Metric(bookings_fill_nulls_with_0_without_time_spine),
+        head_node=Measure(bookings),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(bookings_growth_2_weeks), head_node=Metric(bookings)),
+      MetricDefinitionEdge(
+        tail_node=Metric(bookings_growth_2_weeks_fill_nulls_with_0),
+        head_node=Metric(bookings_fill_nulls_with_0),
+      ),
+      MetricDefinitionEdge(
+        tail_node=Metric(bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset),
+        head_node=Metric(bookings),
+      ),
+      MetricDefinitionEdge(
+        tail_node=Metric(bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset),
+        head_node=Metric(bookings_fill_nulls_with_0),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(bookings_growth_since_start_of_month), head_node=Metric(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_join_to_time_spine), head_node=Measure(bookings)),
+      MetricDefinitionEdge(
+        tail_node=Metric(bookings_join_to_time_spine_with_tiered_filters),
+        head_node=Measure(bookings),
+      ),
+      MetricDefinitionEdge(
+        tail_node=Metric(bookings_month_start_compared_to_1_month_prior),
+        head_node=Metric(bookings),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(bookings_offset_alien_day), head_node=Metric(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_offset_once), head_node=Metric(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_offset_one_alien_day), head_node=Metric(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_offset_twice), head_node=Metric(bookings_offset_once)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_per_booker), head_node=Measure(bookers)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_per_booker), head_node=Measure(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_per_dollar), head_node=Measure(booking_value)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_per_dollar), head_node=Measure(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_per_listing), head_node=Measure(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_per_listing), head_node=Measure(listings)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_per_lux_listing_derived), head_node=Metric(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_per_lux_listing_derived), head_node=Metric(listings)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_per_view), head_node=Measure(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_per_view), head_node=Measure(views)),
+      MetricDefinitionEdge(
+        tail_node=Metric(current_account_balance_by_user),
+        head_node=Measure(current_account_balance_by_user),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(derived_bookings_0), head_node=Metric(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(derived_bookings_1), head_node=Metric(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(derived_shared_alias_1a), head_node=Metric(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(derived_shared_alias_1b), head_node=Metric(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(derived_shared_alias_2), head_node=Metric(instant_bookings)),
+      MetricDefinitionEdge(
+        tail_node=Metric(discrete_booking_value_p99),
+        head_node=Measure(discrete_booking_value_p99),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(double_counted_delayed_bookings), head_node=Metric(bookings)),
+      MetricDefinitionEdge(
+        tail_node=Metric(every_2_days_bookers_2_days_ago),
+        head_node=Metric(every_two_days_bookers),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(every_two_days_bookers), head_node=Measure(bookers)),
+      MetricDefinitionEdge(tail_node=Metric(every_two_days_bookers_fill_nulls_with_0), head_node=Measure(bookers)),
+      MetricDefinitionEdge(tail_node=Metric(identity_verifications), head_node=Measure(identity_verifications)),
+      MetricDefinitionEdge(
+        tail_node=Metric(instant_booking_fraction_of_max_value),
+        head_node=Measure(average_booking_value),
+      ),
+      MetricDefinitionEdge(
+        tail_node=Metric(instant_booking_fraction_of_max_value),
+        head_node=Measure(max_booking_value),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(instant_booking_value), head_node=Measure(booking_value)),
+      MetricDefinitionEdge(tail_node=Metric(instant_booking_value_ratio), head_node=Measure(booking_value)),
+      MetricDefinitionEdge(tail_node=Metric(instant_bookings), head_node=Measure(instant_bookings)),
+      MetricDefinitionEdge(tail_node=Metric(instant_bookings_with_measure_filter), head_node=Measure(bookings)),
+      MetricDefinitionEdge(
+        tail_node=Metric(instant_lux_booking_value_rate),
+        head_node=Metric(lux_booking_value_rate_expr),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(instant_plus_non_referred_bookings_pct), head_node=Metric(bookings)),
+      MetricDefinitionEdge(
+        tail_node=Metric(instant_plus_non_referred_bookings_pct),
+        head_node=Metric(instant_bookings),
+      ),
+      MetricDefinitionEdge(
+        tail_node=Metric(instant_plus_non_referred_bookings_pct),
+        head_node=Metric(non_referred_bookings_pct),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(largest_listing), head_node=Measure(largest_listing)),
+      MetricDefinitionEdge(tail_node=Metric(listings), head_node=Measure(listings)),
+      MetricDefinitionEdge(
+        tail_node=Metric(lux_booking_fraction_of_max_value),
+        head_node=Measure(average_booking_value),
+      ),
+      MetricDefinitionEdge(
+        tail_node=Metric(lux_booking_fraction_of_max_value),
+        head_node=Measure(max_booking_value),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(lux_booking_value_rate_expr), head_node=Metric(average_booking_value)),
+      MetricDefinitionEdge(tail_node=Metric(lux_booking_value_rate_expr), head_node=Metric(booking_value)),
+      MetricDefinitionEdge(tail_node=Metric(lux_booking_value_rate_expr), head_node=Metric(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(lux_listings), head_node=Measure(listings)),
+      MetricDefinitionEdge(tail_node=Metric(max_booking_value), head_node=Measure(max_booking_value)),
+      MetricDefinitionEdge(tail_node=Metric(median_booking_value), head_node=Measure(median_booking_value)),
+      MetricDefinitionEdge(tail_node=Metric(min_booking_value), head_node=Measure(min_booking_value)),
+      MetricDefinitionEdge(
+        tail_node=Metric(nested_fill_nulls_without_time_spine),
+        head_node=Metric(twice_bookings_fill_nulls_with_0_without_time_spine),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(new_users), head_node=Measure(new_users)),
+      MetricDefinitionEdge(tail_node=Metric(non_referred_bookings_pct), head_node=Metric(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(non_referred_bookings_pct), head_node=Metric(referred_bookings)),
+      MetricDefinitionEdge(tail_node=Metric(popular_listing_bookings_per_booker), head_node=Measure(listings)),
+      MetricDefinitionEdge(tail_node=Metric(referred_bookings), head_node=Measure(referred_bookings)),
+      MetricDefinitionEdge(
+        tail_node=Metric(regional_starting_balance_ratios),
+        head_node=Measure(total_account_balance_first_day),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(revenue), head_node=Measure(txn_revenue)),
+      MetricDefinitionEdge(tail_node=Metric(revenue_all_time), head_node=Measure(txn_revenue)),
+      MetricDefinitionEdge(tail_node=Metric(revenue_mtd), head_node=Measure(txn_revenue)),
+      MetricDefinitionEdge(tail_node=Metric(simple_subdaily_metric_default_day), head_node=Measure(archived_users)),
+      MetricDefinitionEdge(tail_node=Metric(simple_subdaily_metric_default_hour), head_node=Measure(archived_users)),
+      MetricDefinitionEdge(tail_node=Metric(smallest_listing), head_node=Measure(smallest_listing)),
+      MetricDefinitionEdge(
+        tail_node=Metric(subdaily_cumulative_grain_to_date_metric),
+        head_node=Measure(archived_users),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(subdaily_cumulative_window_metric), head_node=Measure(archived_users)),
+      MetricDefinitionEdge(tail_node=Metric(subdaily_join_to_time_spine_metric), head_node=Measure(archived_users)),
+      MetricDefinitionEdge(tail_node=Metric(subdaily_offset_grain_to_date_metric), head_node=Metric(archived_users)),
+      MetricDefinitionEdge(tail_node=Metric(subdaily_offset_window_metric), head_node=Metric(archived_users)),
+      MetricDefinitionEdge(
+        tail_node=Metric(total_account_balance_first_day),
+        head_node=Measure(total_account_balance_first_day),
+      ),
+      MetricDefinitionEdge(
+        tail_node=Metric(total_account_balance_first_day_of_month),
+        head_node=Measure(total_account_balance_first_day_of_month),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(trailing_2_months_revenue), head_node=Measure(txn_revenue)),
+      MetricDefinitionEdge(
+        tail_node=Metric(trailing_2_months_revenue_sub_10),
+        head_node=Metric(trailing_2_months_revenue),
+      ),
+      MetricDefinitionEdge(
+        tail_node=Metric(twice_bookings_fill_nulls_with_0_without_time_spine),
+        head_node=Metric(bookings_fill_nulls_with_0_without_time_spine),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(views), head_node=Measure(views)),
+      MetricDefinitionEdge(tail_node=Metric(views_times_booking_value), head_node=Metric(booking_value)),
+      MetricDefinitionEdge(tail_node=Metric(views_times_booking_value), head_node=Metric(views)),
+      MetricDefinitionEdge(tail_node=Metric(visit_buy_conversion_rate), head_node=Measure(buys)),
+      MetricDefinitionEdge(tail_node=Metric(visit_buy_conversion_rate), head_node=Measure(visits)),
+      MetricDefinitionEdge(tail_node=Metric(visit_buy_conversion_rate_7days), head_node=Measure(buys)),
+      MetricDefinitionEdge(tail_node=Metric(visit_buy_conversion_rate_7days), head_node=Measure(visits)),
+      MetricDefinitionEdge(
+        tail_node=Metric(visit_buy_conversion_rate_7days_fill_nulls_with_0),
+        head_node=Measure(buys),
+      ),
+      MetricDefinitionEdge(
+        tail_node=Metric(visit_buy_conversion_rate_7days_fill_nulls_with_0),
+        head_node=Measure(visits),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(visit_buy_conversion_rate_by_session), head_node=Measure(buys)),
+      MetricDefinitionEdge(tail_node=Metric(visit_buy_conversion_rate_by_session), head_node=Measure(visits)),
+      MetricDefinitionEdge(
+        tail_node=Metric(visit_buy_conversion_rate_with_monthly_conversion),
+        head_node=Measure(buys_month),
+      ),
+      MetricDefinitionEdge(
+        tail_node=Metric(visit_buy_conversion_rate_with_monthly_conversion),
+        head_node=Measure(visits),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(visit_buy_conversions), head_node=Measure(buys)),
+      MetricDefinitionEdge(tail_node=Metric(visit_buy_conversions), head_node=Measure(visits)),
+    },
+  )

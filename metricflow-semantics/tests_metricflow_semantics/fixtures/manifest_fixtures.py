@@ -30,6 +30,7 @@ from metricflow_semantics.test_helpers.semantic_manifest_yamls.sg_01_primary_ent
     SG_01_PRIMARY_ENTITY_DEFINED,
 )
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.sg_02_single_join import SG_02_SINGLE_JOIN
+from metricflow_semantics.test_helpers.semantic_manifest_yamls.sg_03_multi_entity_join import SG_03_MULTI_ENTITY_JOIN
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.simple_manifest import SIMPLE_MANIFEST_ANCHOR
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.simple_multi_hop_join_manifest import (
     SIMPLE_MULTI_HOP_JOIN_MANIFEST_ANCHOR,
@@ -186,3 +187,8 @@ def sg_02_single_join_manifest(template_mapping: Dict[str, str]) -> PydanticSema
 def sg_02_single_join_lookup(template_mapping: Dict[str, str]) -> ManifestObjectLookup:  # noqa: D103
     manifest = load_semantic_manifest(SG_02_SINGLE_JOIN.directory, template_mapping)
     return ManifestObjectLookup(manifest)
+
+
+@pytest.fixture(scope="session")
+def sg_03_multi_entity_join_manifest(template_mapping: Dict[str, str]) -> ManifestObjectLookup:  # noqa: D103
+    return load_semantic_manifest(SG_03_MULTI_ENTITY_JOIN.directory, template_mapping)

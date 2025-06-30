@@ -197,19 +197,17 @@ def test_resolver(  # noqa: D103
 def test_linkable_spec_resolvers(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    sg_02_single_join_manifest: PydanticSemanticManifest,
-    sg_02_single_join_lookup: ManifestObjectLookup,
-    simple_semantic_manifest: PydanticSemanticManifest,
+    sg_03_multi_entity_join_manifest: PydanticSemanticManifest,
 ) -> None:
     element_filter = LinkableElementFilter()
-    semantic_manifest = simple_semantic_manifest
+    semantic_manifest = sg_03_multi_entity_join_manifest
     legacy_linkable_spec_resolver = _create_legacy_resolver(semantic_manifest)
     sg_linkable_spec_resolver = _create_sg_resolver(semantic_manifest)
 
     manifest_lookup = SemanticManifestLookup(semantic_manifest)
 
     # for measure_reference in manifest_lookup.semantic_model_lookup.measure_references:
-    for measure_reference in (MeasureReference(element_name="bookings"),):
+    for measure_reference in (MeasureReference(element_name="sm_0_measure_0"),):
         logger.debug(
             LazyFormat(
                 "Comparing results from the legacy implementation and semantic-graph implementation",

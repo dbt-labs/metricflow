@@ -1,0 +1,16 @@
+test_name: test_labels
+test_filename: test_sg_03.py
+---
+{
+  DsiEntityLabel(): [DsiEntity(sm_0_primary_entity), DsiEntity(sm_1_primary_entity)],
+  MeasureAttributeLabel(): [Measure(sm_0_measure_0)],
+  GroupByAttributeLabel(): [
+    Dimension(dim_0),
+    DsiEntityKey(sm_0_primary_entity),
+    DsiEntityKey(sm_1_primary_entity),
+    Metric(sm_0_measure_0_metric),
+    Time(custom_year),
+    Time(extract_year),
+    Time(year),
+  ],
+}

@@ -1,11 +1,13 @@
 test_name: test_linkable_spec_resolvers
-test_filename: test_sg_02.py
+test_filename: test_sg_03.py
 ---
---------------  ------------------------------------------------------------------------------------  ----------------------------------------------  -------------------------------------------  ----------------
-DIMENSION       sm_1_primary_entity__dim_0                                                                                                            ['JOINED']                                   ['sm_0', 'sm_1']
+--------------  ------------------------------------------------------------------------------------  ----------------------------------------------  -------------------------------------------  ------------------------
+DIMENSION       sm_1_primary_entity__dim_1                                                                                                            ['JOINED']                                   ['sm_0', 'sm_1']
+DIMENSION       sm_1_primary_entity__sm_2_primary_entity__dim_2                                                                                       ['JOINED', 'MULTI_HOP']                      ['sm_0', 'sm_1', 'sm_2']
 ENTITY          sm_0_primary_entity                                                                                                                   ['ENTITY', 'LOCAL']                          ['sm_0']
 ENTITY          sm_0_primary_entity__sm_1_primary_entity                                                                                              ['ENTITY', 'LOCAL']                          ['sm_0']
 ENTITY          sm_1_primary_entity                                                                                                                   ['ENTITY', 'LOCAL']                          ['sm_0']
+ENTITY          sm_1_primary_entity__sm_2_primary_entity                                                                                              ['ENTITY', 'JOINED']                         ['sm_0', 'sm_1']
 METRIC          sm_0_primary_entity__sm_0_measure_0_metric                                            ['sm_0_primary_entity']                         ['JOINED', 'METRIC']                         ['sm_0']
 METRIC          sm_1_primary_entity__sm_0_measure_0_metric                                            ['sm_1_primary_entity']                         ['JOINED', 'METRIC']                         ['sm_0']
 METRIC          sm_1_primary_entity__sm_0_primary_entity__sm_1_primary_entity__sm_0_measure_0_metric  ['sm_0_primary_entity', 'sm_1_primary_entity']  ['JOINED', 'METRIC']                         ['sm_0']
@@ -15,4 +17,4 @@ TIME_DIMENSION  metric_time__year                                               
 TIME_DIMENSION  sm_0_primary_entity__ds__custom_year                                                                                                  ['DERIVED_TIME_GRANULARITY', 'LOCAL']        ['sm_0']
 TIME_DIMENSION  sm_0_primary_entity__ds__extract_year                                                                                                 ['DATE_PART', 'LOCAL']                       ['sm_0']
 TIME_DIMENSION  sm_0_primary_entity__ds__year                                                                                                         ['LOCAL']                                    ['sm_0']
---------------  ------------------------------------------------------------------------------------  ----------------------------------------------  -------------------------------------------  ----------------
+--------------  ------------------------------------------------------------------------------------  ----------------------------------------------  -------------------------------------------  ------------------------

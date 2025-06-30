@@ -1,0 +1,4 @@
+test_name: test_descendants
+test_filename: test_sg_03.py
+---
+Computed descendants (descendants=[])
