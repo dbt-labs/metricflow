@@ -12,7 +12,6 @@ from typing_extensions import override
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_non_none_or_raise
 from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException
-from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeComputationUpdate
 from metricflow_semantics.experimental.semantic_graph.builder.graph_change_rule import (
     SemanticSubgraphGenerator,
@@ -130,7 +129,7 @@ class TimeDimensionSubgraphGenerator(SemanticSubgraphGenerator):
                     self._generate_attribute_edges(
                         time_dimension_node=time_dimension_node,
                         element_time_grain=element_time_grain,
-                        node_time_grain=queryable_time_grain
+                        node_time_grain=queryable_time_grain,
                     )
                 )
 

@@ -34,8 +34,8 @@ dot_notation:
   	}
   	subgraph cluster_time_dimension {
   		label=time_dimension
-  		"MetricTimeDimension(QUARTER)"
-  		"MetricTimeDimension(YEAR)"
+  		"MetricTimeDimension(quarter)"
+  		"MetricTimeDimension(year)"
   	}
   	subgraph cluster_time_attribute {
   		label=time_attribute
@@ -63,14 +63,14 @@ dot_notation:
   	"JoinTo(sm_2)" -> "Dimension(sm_2_dim_0)"
   	"JoinTo(sm_2)" -> "DsiEntityKey(common_primary_entity)"
   	"Measure(sm_0_measure_0)" -> "Agg(sm_0, ds)"
-  	"MetricTimeDimension(QUARTER)" -> "Time(custom_year)"
-  	"MetricTimeDimension(QUARTER)" -> "Time(extract_quarter)"
-  	"MetricTimeDimension(QUARTER)" -> "Time(extract_year)"
-  	"MetricTimeDimension(QUARTER)" -> "Time(quarter)"
-  	"MetricTimeDimension(QUARTER)" -> "Time(year)"
-  	"MetricTimeDimension(YEAR)" -> "Time(custom_year)"
-  	"MetricTimeDimension(YEAR)" -> "Time(extract_year)"
-  	"MetricTimeDimension(YEAR)" -> "Time(year)"
+  	"MetricTimeDimension(quarter)" -> "Time(custom_year)"
+  	"MetricTimeDimension(quarter)" -> "Time(extract_quarter)"
+  	"MetricTimeDimension(quarter)" -> "Time(extract_year)"
+  	"MetricTimeDimension(quarter)" -> "Time(quarter)"
+  	"MetricTimeDimension(quarter)" -> "Time(year)"
+  	"MetricTimeDimension(year)" -> "Time(custom_year)"
+  	"MetricTimeDimension(year)" -> "Time(extract_year)"
+  	"MetricTimeDimension(year)" -> "Time(year)"
   	"TimeDimension(ds, quarter)" -> "Time(custom_year)"
   	"TimeDimension(ds, quarter)" -> "Time(extract_quarter)"
   	"TimeDimension(ds, quarter)" -> "Time(extract_year)"
@@ -81,8 +81,8 @@ dot_notation:
   	"TimeDimension(ds, year)" -> "Time(year)"
   	"Agg(sm_0, ds)" -> "JoinFrom(sm_0)"
   	"Agg(sm_0, ds)" -> "JoinTo(sm_0)"
-  	"JoinFrom(sm_0)" -> "MetricTimeDimension(QUARTER)"
-  	"JoinFrom(sm_0)" -> "MetricTimeDimension(YEAR)"
+  	"JoinFrom(sm_0)" -> "MetricTimeDimension(quarter)"
+  	"JoinFrom(sm_0)" -> "MetricTimeDimension(year)"
   	"JoinTo(sm_0)" -> "JoinFrom(sm_0)"
   	"JoinTo(sm_0)" -> "TimeDimension(ds, quarter)"
   	"JoinTo(sm_0)" -> "TimeDimension(ds, year)"
@@ -119,8 +119,8 @@ pretty_format:
       JoinTo(sm_2),
       Measure(sm_0_measure_0),
       Metric(sm_0_measure_0_metric),
-      MetricTimeDimension(QUARTER),
-      MetricTimeDimension(YEAR),
+      MetricTimeDimension(quarter),
+      MetricTimeDimension(year),
       Time(custom_year),
       Time(extract_quarter),
       Time(extract_year),
@@ -143,14 +143,14 @@ pretty_format:
       EntityAttributeEdge(tail_node=JoinTo(sm_2), head_node=Dimension(sm_2_dim_0)),
       EntityAttributeEdge(tail_node=JoinTo(sm_2), head_node=DsiEntityKey(common_primary_entity)),
       EntityAttributeEdge(tail_node=Measure(sm_0_measure_0), head_node=Agg(sm_0, ds)),
-      EntityAttributeEdge(tail_node=MetricTimeDimension(QUARTER), head_node=Time(custom_year)),
-      EntityAttributeEdge(tail_node=MetricTimeDimension(QUARTER), head_node=Time(extract_quarter)),
-      EntityAttributeEdge(tail_node=MetricTimeDimension(QUARTER), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=MetricTimeDimension(QUARTER), head_node=Time(quarter)),
-      EntityAttributeEdge(tail_node=MetricTimeDimension(QUARTER), head_node=Time(year)),
-      EntityAttributeEdge(tail_node=MetricTimeDimension(YEAR), head_node=Time(custom_year)),
-      EntityAttributeEdge(tail_node=MetricTimeDimension(YEAR), head_node=Time(extract_year)),
-      EntityAttributeEdge(tail_node=MetricTimeDimension(YEAR), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(quarter), head_node=Time(custom_year)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(quarter), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(quarter), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(quarter), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(quarter), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(year), head_node=Time(custom_year)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(year), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(year), head_node=Time(year)),
       EntityAttributeEdge(tail_node=TimeDimension(ds, quarter), head_node=Time(custom_year)),
       EntityAttributeEdge(tail_node=TimeDimension(ds, quarter), head_node=Time(extract_quarter)),
       EntityAttributeEdge(tail_node=TimeDimension(ds, quarter), head_node=Time(extract_year)),
@@ -161,8 +161,8 @@ pretty_format:
       EntityAttributeEdge(tail_node=TimeDimension(ds, year), head_node=Time(year)),
       EntityRelationshipEdge(tail_node=Agg(sm_0, ds), head_node=JoinFrom(sm_0)),
       EntityRelationshipEdge(tail_node=Agg(sm_0, ds), head_node=JoinTo(sm_0)),
-      EntityRelationshipEdge(tail_node=JoinFrom(sm_0), head_node=MetricTimeDimension(QUARTER)),
-      EntityRelationshipEdge(tail_node=JoinFrom(sm_0), head_node=MetricTimeDimension(YEAR)),
+      EntityRelationshipEdge(tail_node=JoinFrom(sm_0), head_node=MetricTimeDimension(quarter)),
+      EntityRelationshipEdge(tail_node=JoinFrom(sm_0), head_node=MetricTimeDimension(year)),
       EntityRelationshipEdge(tail_node=JoinTo(sm_0), head_node=JoinFrom(sm_0)),
       EntityRelationshipEdge(tail_node=JoinTo(sm_0), head_node=TimeDimension(ds, quarter)),
       EntityRelationshipEdge(tail_node=JoinTo(sm_0), head_node=TimeDimension(ds, year)),

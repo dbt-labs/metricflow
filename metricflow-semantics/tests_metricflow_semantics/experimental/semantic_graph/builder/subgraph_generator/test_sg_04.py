@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from __future__ import annotations
+
 import itertools
 import logging
 
@@ -59,6 +61,8 @@ from tests_metricflow_semantics.experimental.mf_graph.formatting.svg_formatter i
 from tests_metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator.conftest import (
     check_subgraph_generation,
 )
+from tests_metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator.test_sg_02 import \
+    _create_sg_resolver
 
 logger = logging.getLogger(__name__)
 
@@ -102,4 +106,25 @@ def test_group_by_attribute_subgraph(  # noqa: D103
     subgraph = result.subgraph
     write_svg_snapshot_for_review(
         request=request, snapshot_configuration=mf_test_configuration, svg_file_contents=subgraph.format(SvgFormatter())
+    )
+
+
+def test_specs(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sg_04_common_primary_entity_manifest: PydanticSemanticManifest,
+) -> None:
+    element_filter = LinkableElementFilter()
+    semantic_manifest = sg_04_common_primary_entity_manifest
+    sg_linkable_spec_resolver = _create_sg_resolver(semantic_manifest)
+
+    measure_reference = MeasureReference(element_name="sm_0_measure_0")
+    sg_linkable_element_set = sg_linkable_spec_resolver.get_linkable_element_set_for_measure(
+        measure_reference, element_filter
+    )
+    assert_linkable_element_set_snapshot_equal(
+        request=request,
+        snapshot_configuration=mf_test_configuration,
+        linkable_element_set=sg_linkable_element_set,
+        set_id="sg_result",
     )

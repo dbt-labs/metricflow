@@ -225,9 +225,9 @@ def test_linkable_spec_resolvers(
 ) -> None:
     element_filter = LinkableElementFilter()
 
-    # semantic_manifest = sg_02_single_join_manifest
+    semantic_manifest = sg_02_single_join_manifest
     # semantic_manifest = simple_semantic_manifest
-    semantic_manifest = sg_04_common_primary_entity_manifest
+    # semantic_manifest = sg_04_common_primary_entity_manifest
 
     manifest_lookup = SemanticManifestLookup(semantic_manifest)
 
@@ -236,7 +236,6 @@ def test_linkable_spec_resolvers(
 
     legacy_linkable_spec_resolver = _create_legacy_resolver(semantic_manifest)
     sg_linkable_spec_resolver = _create_sg_resolver(semantic_manifest)
-
 
     for measure_reference in measure_references:
         logger.debug(

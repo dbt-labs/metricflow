@@ -101,17 +101,17 @@ class EntityJoinSubgraphGenerator(SemanticSubgraphGenerator):
                 entity_node.entity_name
             ]:
                 edge = JoinFromModelEdge.get_instance(
-                        tail_node=join_from_semantic_model_node,
-                        head_node=entity_node,
-                        right_model_id=right_model_id,
-                        attribute_computation_update=AttributeComputationUpdate(
-                            linkable_element_property_additions=(
-                                (LinkableElementProperty.LOCAL_LINKED,)
-                                if entity_node.entity_name == primary_entity_name
-                                else ()
-                            )
-                        ),
-                    )
+                    tail_node=join_from_semantic_model_node,
+                    head_node=entity_node,
+                    right_model_id=right_model_id,
+                    attribute_computation_update=AttributeComputationUpdate(
+                        linkable_element_property_additions=(
+                            (LinkableElementProperty.LOCAL_LINKED,)
+                            if entity_node.entity_name == primary_entity_name
+                            else ()
+                        )
+                    ),
+                )
                 current_subgraph.add_edge(edge)
                 if self._verbose_debug_logs:
                     logger.debug(

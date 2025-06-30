@@ -48,7 +48,7 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
         self._mutable_path: Optional[PathT] = None
         self._cumulative_stat = MutablePathFinderStat()
 
-        self._verbose_debug_logs = True
+        self._verbose_debug_logs = False
 
     def _current_mutable_path(self) -> PathT:
         if self._mutable_path is None:
@@ -58,9 +58,10 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
     def _current_mutable_path_length(self) -> int:
         return len(self._current_mutable_path())
 
-    def _traverse_dfs__walk_to_previous_node(self) -> None:
+    def _traverse_dfs__walk_to_previous_node(self, mark_current_node_as_finished: bool) -> None:
         self._node_visit_contexts.pop()
-        self._finished_visiting_nodes.add(self._current_mutable_path().nodes[-1])
+        if mark_current_node_as_finished:
+            self._finished_visiting_nodes.add(self._current_mutable_path().nodes[-1])
         self._current_mutable_path().pop()
 
     def _traverse_dfs__walk_via_edge(
@@ -233,7 +234,7 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
                             )
                         )
                     return
-                self._traverse_dfs__walk_to_previous_node()
+                self._traverse_dfs__walk_to_previous_node(mark_current_node_as_finished=True)
                 continue
 
             # If we can't go to the next node, then restart the loop so that we can check the next edge.
@@ -250,11 +251,12 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
                     stop_reason=WalkStopReason.VISIT_FINISHED_NODE,
                     current_path=current_path,
                 )
-                self._traverse_dfs__walk_to_previous_node()
+                self._traverse_dfs__walk_to_previous_node(mark_current_node_as_finished=True)
                 continue
 
             # Handle cycles
-            if current_node in current_path.node_set and current_path.nodes[-1] != current_node:
+            # if current_node in current_path.node_set and current_path.nodes[-1] != current_node:
+            if current_node in set(current_path.nodes[:-1]):
                 if self._verbose_debug_logs:
                     logger.debug(
                         LazyFormat(
@@ -263,7 +265,7 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
                             current_path=self._current_mutable_path(),
                         )
                     )
-                self._traverse_dfs__walk_to_previous_node()
+                self._traverse_dfs__walk_to_previous_node(mark_current_node_as_finished=False)
                 continue
 
             # If the current node has no descendants, then go to the next visit context.
@@ -271,7 +273,7 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
             if len(edges_to_process_in_current_node) == 0:
                 if self._verbose_debug_logs:
                     logger.debug(LazyFormat("No more edges remaining for current context, so popping it off."))
-                self._traverse_dfs__walk_to_previous_node()
+                self._traverse_dfs__walk_to_previous_node(mark_current_node_as_finished=True)
                 continue
 
             # See if we can go from the current node to the next descendant node.

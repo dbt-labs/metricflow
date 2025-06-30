@@ -85,7 +85,11 @@ class GroupByAttributeSubgraphGenerator:
         subgraph = MutableSemanticGraph.create()
         if len(current_common_join_from_nodes) == 0:
             subgraph.add_node(GroupByAttributeRootNode())
-            return AttributeSubgraphResult(additional_derivative_model_ids=FrozenOrderedSet(), subgraph=subgraph)
+            return AttributeSubgraphResult(
+                additional_derivative_model_ids=FrozenOrderedSet(),
+                subgraph=subgraph,
+                attribute_computation_updates=(),
+            )
 
         for i, join_from_node in enumerate(current_common_join_from_nodes):
             subgraph_for_join_from_node = self._generate_subgraph_from_join_from_node(join_from_node)

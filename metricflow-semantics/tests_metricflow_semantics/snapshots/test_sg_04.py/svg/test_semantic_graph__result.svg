@@ -438,7 +438,7 @@
 <polygon fill="none" stroke="none" points="1525.88,-851.5 1398.38,-851.5 1398.38,-829 1525.88,-829 1525.88,-851.5"/>
 <text text-anchor="start" x="1398.38" y="-845.8" font-family="Courier New" font-size="6.00" fill="#d3d3d3">type: EntityRelationshipEdge</text>
 <text text-anchor="start" x="1398.38" y="-838.3" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: JoinFrom(sm_0)</text>
-<text text-anchor="start" x="1398.38" y="-830.8" font-family="Courier New" font-size="6.00" fill="#d3d3d3">head: MetricTimeDimension(QUARTER)</text>
+<text text-anchor="start" x="1398.38" y="-830.8" font-family="Courier New" font-size="6.00" fill="#d3d3d3">head: MetricTimeDimension(quarter)</text>
 </g>
 <!-- JoinFrom(sm_0)&#45;&gt;edge_as_node_23 -->
 <g id="edge47" class="edge">
@@ -451,7 +451,7 @@
 <polygon fill="none" stroke="none" points="1520.25,-795.5 1404,-795.5 1404,-773 1520.25,-773 1520.25,-795.5"/>
 <text text-anchor="start" x="1404" y="-789.8" font-family="Courier New" font-size="6.00" fill="#d3d3d3">type: EntityRelationshipEdge</text>
 <text text-anchor="start" x="1404" y="-782.3" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: JoinFrom(sm_0)</text>
-<text text-anchor="start" x="1404" y="-774.8" font-family="Courier New" font-size="6.00" fill="#d3d3d3">head: MetricTimeDimension(YEAR)</text>
+<text text-anchor="start" x="1404" y="-774.8" font-family="Courier New" font-size="6.00" fill="#d3d3d3">head: MetricTimeDimension(year)</text>
 </g>
 <!-- JoinFrom(sm_0)&#45;&gt;edge_as_node_31 -->
 <g id="edge63" class="edge">
@@ -621,11 +621,11 @@
 <title>DsiEntity(sm_0_primary_entity)&#45;&gt;edge_as_node_48</title>
 <path fill="none" stroke="#d3d3d3" d="M1843.14,-190.25C1863.2,-190.25 1883.27,-190.25 1901.26,-190.25"/>
 </g>
-<!-- MetricTimeDimension(QUARTER) -->
+<!-- MetricTimeDimension(quarter) -->
 <g id="node21" class="node">
-<title>MetricTimeDimension(QUARTER)</title>
+<title>MetricTimeDimension(quarter)</title>
 <polygon fill="#303030" stroke="#d3d3d3" points="1835.25,-881.62 1601.25,-881.62 1601.25,-828.88 1835.25,-828.88 1835.25,-881.62"/>
-<text text-anchor="start" x="1613.25" y="-862.23" font-family="Courier New" font-size="12.00" fill="#d3d3d3">MetricTimeDimension(QUARTER)</text>
+<text text-anchor="start" x="1613.25" y="-862.23" font-family="Courier New" font-size="12.00" fill="#d3d3d3">MetricTimeDimension(quarter)</text>
 <text text-anchor="start" x="1609.25" y="-849.67" font-family="Courier New" font-size="6.00" fill="#d3d3d3">add_name: metric_time</text>
 <text text-anchor="start" x="1609.25" y="-842.17" font-family="Courier New" font-size="6.00" fill="#d3d3d3">add_prop: METRIC_TIME</text>
 <text text-anchor="start" x="1609.25" y="-834.67" font-family="Courier New" font-size="6.00" fill="#d3d3d3">add_type: TIME_DIMENSION</text>
@@ -636,12 +636,12 @@
 <polygon fill="none" stroke="none" points="2032.5,-944.25 1905,-944.25 1905,-914.25 2032.5,-914.25 2032.5,-944.25"/>
 <text text-anchor="start" x="1905" y="-938.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">add_time_grain: quarter</text>
 <text text-anchor="start" x="1905" y="-931.05" font-family="Courier New" font-size="6.00" fill="#d3d3d3">type: EntityAttributeEdge</text>
-<text text-anchor="start" x="1905" y="-923.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: MetricTimeDimension(QUARTER)</text>
+<text text-anchor="start" x="1905" y="-923.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: MetricTimeDimension(quarter)</text>
 <text text-anchor="start" x="1905" y="-916.05" font-family="Courier New" font-size="6.00" fill="#d3d3d3">head: Time(quarter)</text>
 </g>
-<!-- MetricTimeDimension(QUARTER)&#45;&gt;edge_as_node_24 -->
+<!-- MetricTimeDimension(quarter)&#45;&gt;edge_as_node_24 -->
 <g id="edge49" class="edge">
-<title>MetricTimeDimension(QUARTER)&#45;&gt;edge_as_node_24</title>
+<title>MetricTimeDimension(quarter)&#45;&gt;edge_as_node_24</title>
 <path fill="none" stroke="#d3d3d3" d="M1809.32,-882.07C1845.85,-892.95 1886.65,-905.1 1917.7,-914.35"/>
 </g>
 <!-- edge_as_node_25 -->
@@ -651,12 +651,12 @@
 <text text-anchor="start" x="1905" y="-842.3" font-family="Courier New" font-size="6.00" fill="#d3d3d3">add_prop: DERIVED_TIME_GRANULARITY</text>
 <text text-anchor="start" x="1905" y="-834.8" font-family="Courier New" font-size="6.00" fill="#d3d3d3">add_time_grain: year</text>
 <text text-anchor="start" x="1905" y="-827.3" font-family="Courier New" font-size="6.00" fill="#d3d3d3">type: EntityAttributeEdge</text>
-<text text-anchor="start" x="1905" y="-819.8" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: MetricTimeDimension(QUARTER)</text>
+<text text-anchor="start" x="1905" y="-819.8" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: MetricTimeDimension(quarter)</text>
 <text text-anchor="start" x="1905" y="-812.3" font-family="Courier New" font-size="6.00" fill="#d3d3d3">head: Time(year)</text>
 </g>
-<!-- MetricTimeDimension(QUARTER)&#45;&gt;edge_as_node_25 -->
+<!-- MetricTimeDimension(quarter)&#45;&gt;edge_as_node_25 -->
 <g id="edge51" class="edge">
-<title>MetricTimeDimension(QUARTER)&#45;&gt;edge_as_node_25</title>
+<title>MetricTimeDimension(quarter)&#45;&gt;edge_as_node_25</title>
 <path fill="none" stroke="#d3d3d3" d="M1835.5,-843.09C1859.5,-840.58 1883.9,-838.02 1905.1,-835.81"/>
 </g>
 <!-- edge_as_node_26 -->
@@ -665,12 +665,12 @@
 <polygon fill="none" stroke="none" points="2032.5,-896.25 1905,-896.25 1905,-866.25 2032.5,-866.25 2032.5,-896.25"/>
 <text text-anchor="start" x="1905" y="-890.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">add_prop: DATE_PART</text>
 <text text-anchor="start" x="1905" y="-883.05" font-family="Courier New" font-size="6.00" fill="#d3d3d3">type: EntityAttributeEdge</text>
-<text text-anchor="start" x="1905" y="-875.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: MetricTimeDimension(QUARTER)</text>
+<text text-anchor="start" x="1905" y="-875.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: MetricTimeDimension(quarter)</text>
 <text text-anchor="start" x="1905" y="-868.05" font-family="Courier New" font-size="6.00" fill="#d3d3d3">head: Time(extract_year)</text>
 </g>
-<!-- MetricTimeDimension(QUARTER)&#45;&gt;edge_as_node_26 -->
+<!-- MetricTimeDimension(quarter)&#45;&gt;edge_as_node_26 -->
 <g id="edge53" class="edge">
-<title>MetricTimeDimension(QUARTER)&#45;&gt;edge_as_node_26</title>
+<title>MetricTimeDimension(quarter)&#45;&gt;edge_as_node_26</title>
 <path fill="none" stroke="#d3d3d3" d="M1835.5,-867.41C1859.5,-869.92 1883.9,-872.48 1905.1,-874.69"/>
 </g>
 <!-- edge_as_node_27 -->
@@ -679,12 +679,12 @@
 <polygon fill="none" stroke="none" points="2032.5,-992.25 1905,-992.25 1905,-962.25 2032.5,-962.25 2032.5,-992.25"/>
 <text text-anchor="start" x="1905" y="-986.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">add_prop: DATE_PART</text>
 <text text-anchor="start" x="1905" y="-979.05" font-family="Courier New" font-size="6.00" fill="#d3d3d3">type: EntityAttributeEdge</text>
-<text text-anchor="start" x="1905" y="-971.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: MetricTimeDimension(QUARTER)</text>
+<text text-anchor="start" x="1905" y="-971.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: MetricTimeDimension(quarter)</text>
 <text text-anchor="start" x="1905" y="-964.05" font-family="Courier New" font-size="6.00" fill="#d3d3d3">head: Time(extract_quarter)</text>
 </g>
-<!-- MetricTimeDimension(QUARTER)&#45;&gt;edge_as_node_27 -->
+<!-- MetricTimeDimension(quarter)&#45;&gt;edge_as_node_27 -->
 <g id="edge55" class="edge">
-<title>MetricTimeDimension(QUARTER)&#45;&gt;edge_as_node_27</title>
+<title>MetricTimeDimension(quarter)&#45;&gt;edge_as_node_27</title>
 <path fill="none" stroke="#d3d3d3" d="M1773.78,-882.02C1824.08,-906.71 1896.9,-942.46 1937.5,-962.4"/>
 </g>
 <!-- edge_as_node_28 -->
@@ -694,19 +694,19 @@
 <text text-anchor="start" x="1905" y="-786.3" font-family="Courier New" font-size="6.00" fill="#d3d3d3">add_prop: DERIVED_TIME_GRANULARITY</text>
 <text text-anchor="start" x="1905" y="-778.8" font-family="Courier New" font-size="6.00" fill="#d3d3d3">add_time_grain: custom_year</text>
 <text text-anchor="start" x="1905" y="-771.3" font-family="Courier New" font-size="6.00" fill="#d3d3d3">type: EntityAttributeEdge</text>
-<text text-anchor="start" x="1905" y="-763.8" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: MetricTimeDimension(QUARTER)</text>
+<text text-anchor="start" x="1905" y="-763.8" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: MetricTimeDimension(quarter)</text>
 <text text-anchor="start" x="1905" y="-756.3" font-family="Courier New" font-size="6.00" fill="#d3d3d3">head: Time(custom_year)</text>
 </g>
-<!-- MetricTimeDimension(QUARTER)&#45;&gt;edge_as_node_28 -->
+<!-- MetricTimeDimension(quarter)&#45;&gt;edge_as_node_28 -->
 <g id="edge57" class="edge">
-<title>MetricTimeDimension(QUARTER)&#45;&gt;edge_as_node_28</title>
+<title>MetricTimeDimension(quarter)&#45;&gt;edge_as_node_28</title>
 <path fill="none" stroke="#d3d3d3" d="M1800.62,-828.4C1836.71,-816.49 1878.31,-802.76 1910.98,-791.98"/>
 </g>
-<!-- MetricTimeDimension(YEAR) -->
+<!-- MetricTimeDimension(year) -->
 <g id="node22" class="node">
-<title>MetricTimeDimension(YEAR)</title>
+<title>MetricTimeDimension(year)</title>
 <polygon fill="#303030" stroke="#d3d3d3" points="1824,-810.62 1612.5,-810.62 1612.5,-757.88 1824,-757.88 1824,-810.62"/>
-<text text-anchor="start" x="1624.5" y="-791.23" font-family="Courier New" font-size="12.00" fill="#d3d3d3">MetricTimeDimension(YEAR)</text>
+<text text-anchor="start" x="1624.5" y="-791.23" font-family="Courier New" font-size="12.00" fill="#d3d3d3">MetricTimeDimension(year)</text>
 <text text-anchor="start" x="1620.5" y="-778.67" font-family="Courier New" font-size="6.00" fill="#d3d3d3">add_name: metric_time</text>
 <text text-anchor="start" x="1620.5" y="-771.17" font-family="Courier New" font-size="6.00" fill="#d3d3d3">add_prop: METRIC_TIME</text>
 <text text-anchor="start" x="1620.5" y="-763.67" font-family="Courier New" font-size="6.00" fill="#d3d3d3">add_type: TIME_DIMENSION</text>
@@ -718,12 +718,12 @@
 <text text-anchor="start" x="1905" y="-682.3" font-family="Courier New" font-size="6.00" fill="#d3d3d3">add_prop: DERIVED_TIME_GRANULARITY</text>
 <text text-anchor="start" x="1905" y="-674.8" font-family="Courier New" font-size="6.00" fill="#d3d3d3">add_time_grain: year</text>
 <text text-anchor="start" x="1905" y="-667.3" font-family="Courier New" font-size="6.00" fill="#d3d3d3">type: EntityAttributeEdge</text>
-<text text-anchor="start" x="1905" y="-659.8" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: MetricTimeDimension(YEAR)</text>
+<text text-anchor="start" x="1905" y="-659.8" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: MetricTimeDimension(year)</text>
 <text text-anchor="start" x="1905" y="-652.3" font-family="Courier New" font-size="6.00" fill="#d3d3d3">head: Time(year)</text>
 </g>
-<!-- MetricTimeDimension(YEAR)&#45;&gt;edge_as_node_32 -->
+<!-- MetricTimeDimension(year)&#45;&gt;edge_as_node_32 -->
 <g id="edge65" class="edge">
-<title>MetricTimeDimension(YEAR)&#45;&gt;edge_as_node_32</title>
+<title>MetricTimeDimension(year)&#45;&gt;edge_as_node_32</title>
 <path fill="none" stroke="#d3d3d3" d="M1777.2,-757.43C1823.38,-736.06 1886.84,-706.69 1927.58,-687.84"/>
 </g>
 <!-- edge_as_node_33 -->
@@ -732,12 +732,12 @@
 <polygon fill="none" stroke="none" points="2026.88,-736.25 1910.62,-736.25 1910.62,-706.25 2026.88,-706.25 2026.88,-736.25"/>
 <text text-anchor="start" x="1910.62" y="-730.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">add_prop: DATE_PART</text>
 <text text-anchor="start" x="1910.62" y="-723.05" font-family="Courier New" font-size="6.00" fill="#d3d3d3">type: EntityAttributeEdge</text>
-<text text-anchor="start" x="1910.62" y="-715.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: MetricTimeDimension(YEAR)</text>
+<text text-anchor="start" x="1910.62" y="-715.55" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: MetricTimeDimension(year)</text>
 <text text-anchor="start" x="1910.62" y="-708.05" font-family="Courier New" font-size="6.00" fill="#d3d3d3">head: Time(extract_year)</text>
 </g>
-<!-- MetricTimeDimension(YEAR)&#45;&gt;edge_as_node_33 -->
+<!-- MetricTimeDimension(year)&#45;&gt;edge_as_node_33 -->
 <g id="edge67" class="edge">
-<title>MetricTimeDimension(YEAR)&#45;&gt;edge_as_node_33</title>
+<title>MetricTimeDimension(year)&#45;&gt;edge_as_node_33</title>
 <path fill="none" stroke="#d3d3d3" d="M1824.28,-757.62C1853.95,-750.1 1885.12,-742.2 1910.8,-735.69"/>
 </g>
 <!-- edge_as_node_34 -->
@@ -747,12 +747,12 @@
 <text text-anchor="start" x="1905" y="-626.3" font-family="Courier New" font-size="6.00" fill="#d3d3d3">add_prop: DERIVED_TIME_GRANULARITY</text>
 <text text-anchor="start" x="1905" y="-618.8" font-family="Courier New" font-size="6.00" fill="#d3d3d3">add_time_grain: custom_year</text>
 <text text-anchor="start" x="1905" y="-611.3" font-family="Courier New" font-size="6.00" fill="#d3d3d3">type: EntityAttributeEdge</text>
-<text text-anchor="start" x="1905" y="-603.8" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: MetricTimeDimension(YEAR)</text>
+<text text-anchor="start" x="1905" y="-603.8" font-family="Courier New" font-size="6.00" fill="#d3d3d3">tail: MetricTimeDimension(year)</text>
 <text text-anchor="start" x="1905" y="-596.3" font-family="Courier New" font-size="6.00" fill="#d3d3d3">head: Time(custom_year)</text>
 </g>
-<!-- MetricTimeDimension(YEAR)&#45;&gt;edge_as_node_34 -->
+<!-- MetricTimeDimension(year)&#45;&gt;edge_as_node_34 -->
 <g id="edge69" class="edge">
-<title>MetricTimeDimension(YEAR)&#45;&gt;edge_as_node_34</title>
+<title>MetricTimeDimension(year)&#45;&gt;edge_as_node_34</title>
 <path fill="none" stroke="#d3d3d3" d="M1758.08,-757.53C1808.86,-722.59 1896.53,-662.26 1940.68,-631.88"/>
 </g>
 <!-- Time(custom_year) -->
@@ -1061,9 +1061,9 @@
 <path fill="none" stroke="#d3d3d3" d="M1533.24,-99.49C1555.15,-103.63 1579.91,-108.31 1604.01,-112.86"/>
 <polygon fill="#303030" stroke="#d3d3d3" points="1603.05,-116.24 1613.53,-114.66 1604.35,-109.36 1603.05,-116.24"/>
 </g>
-<!-- edge_as_node_23&#45;&gt;MetricTimeDimension(QUARTER) -->
+<!-- edge_as_node_23&#45;&gt;MetricTimeDimension(quarter) -->
 <g id="edge48" class="edge">
-<title>edge_as_node_23&#45;&gt;MetricTimeDimension(QUARTER)</title>
+<title>edge_as_node_23&#45;&gt;MetricTimeDimension(quarter)</title>
 <path fill="none" stroke="#d3d3d3" d="M1525.62,-843.94C1545.1,-845.09 1567.35,-846.4 1589.62,-847.72"/>
 <polygon fill="#303030" stroke="#d3d3d3" points="1589.2,-851.2 1599.38,-848.29 1589.61,-844.21 1589.2,-851.2"/>
 </g>
@@ -1097,9 +1097,9 @@
 <path fill="none" stroke="#d3d3d3" d="M2006.56,-791.98C2045.04,-811.56 2105.58,-842.37 2147.78,-863.84"/>
 <polygon fill="#303030" stroke="#d3d3d3" points="2145.97,-866.85 2156.47,-868.26 2149.15,-860.61 2145.97,-866.85"/>
 </g>
-<!-- edge_as_node_31&#45;&gt;MetricTimeDimension(YEAR) -->
+<!-- edge_as_node_31&#45;&gt;MetricTimeDimension(year) -->
 <g id="edge64" class="edge">
-<title>edge_as_node_31&#45;&gt;MetricTimeDimension(YEAR)</title>
+<title>edge_as_node_31&#45;&gt;MetricTimeDimension(year)</title>
 <path fill="none" stroke="#d3d3d3" d="M1520.16,-784.25C1544.01,-784.25 1572.66,-784.25 1600.63,-784.25"/>
 <polygon fill="#303030" stroke="#d3d3d3" points="1600.63,-787.75 1610.63,-784.25 1600.63,-780.75 1600.63,-787.75"/>
 </g>
