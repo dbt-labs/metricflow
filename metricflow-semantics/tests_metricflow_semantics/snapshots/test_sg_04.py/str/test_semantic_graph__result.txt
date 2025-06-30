@@ -1,0 +1,183 @@
+test_name: test_semantic_graph
+test_filename: test_sg_04.py
+---
+dot_notation:
+  digraph {
+  	graph [name=MutableSemanticGraph]
+  	subgraph cluster_sm_0 {
+  		label=sm_0
+  		"Measure(sm_0_measure_0)"
+  	}
+  	subgraph cluster_other_attribute {
+  		label=other_attribute
+  		"Dimension(sm_1_dim_0)"
+  		"Dimension(sm_2_dim_0)"
+  		"DsiEntityKey(common_primary_entity)"
+  		"DsiEntityKey(sm_0_primary_entity)"
+  	}
+  	subgraph cluster_dsi_entity {
+  		label=dsi_entity
+  		"DsiEntity(common_primary_entity)"
+  		"DsiEntity(sm_0_primary_entity)"
+  	}
+  	subgraph cluster_sm_1 {
+  		label=sm_1
+  		"JoinTo(sm_1)"
+  	}
+  	subgraph cluster_sm_2 {
+  		label=sm_2
+  		"JoinTo(sm_2)"
+  	}
+  	subgraph cluster_metric_attribute {
+  		label=metric_attribute
+  		"Metric(sm_0_measure_0_metric)"
+  	}
+  	subgraph cluster_time_dimension {
+  		label=time_dimension
+  		"MetricTimeDimension(QUARTER)"
+  		"MetricTimeDimension(YEAR)"
+  	}
+  	subgraph cluster_time_attribute {
+  		label=time_attribute
+  		"Time(custom_year)"
+  		"Time(extract_quarter)"
+  		"Time(extract_year)"
+  		"Time(quarter)"
+  		"Time(year)"
+  	}
+  	subgraph cluster_time_entity {
+  		label=time_entity
+  		"TimeDimension(ds, quarter)"
+  		"TimeDimension(ds, year)"
+  	}
+  	"DsiEntity(common_primary_entity)" -> "Metric(sm_0_measure_0_metric)"
+  	"DsiEntity(sm_0_primary_entity)" -> "Metric(sm_0_measure_0_metric)"
+  	"JoinFrom(sm_0)" -> "DsiEntityKey(common_primary_entity)"
+  	"JoinFrom(sm_0)" -> "DsiEntityKey(sm_0_primary_entity)"
+  	"JoinFrom(sm_1)" -> "DsiEntityKey(common_primary_entity)"
+  	"JoinFrom(sm_2)" -> "DsiEntityKey(common_primary_entity)"
+  	"JoinTo(sm_0)" -> "DsiEntityKey(common_primary_entity)"
+  	"JoinTo(sm_0)" -> "DsiEntityKey(sm_0_primary_entity)"
+  	"JoinTo(sm_1)" -> "Dimension(sm_1_dim_0)"
+  	"JoinTo(sm_1)" -> "DsiEntityKey(common_primary_entity)"
+  	"JoinTo(sm_2)" -> "Dimension(sm_2_dim_0)"
+  	"JoinTo(sm_2)" -> "DsiEntityKey(common_primary_entity)"
+  	"Measure(sm_0_measure_0)" -> "Agg(sm_0, ds)"
+  	"MetricTimeDimension(QUARTER)" -> "Time(custom_year)"
+  	"MetricTimeDimension(QUARTER)" -> "Time(extract_quarter)"
+  	"MetricTimeDimension(QUARTER)" -> "Time(extract_year)"
+  	"MetricTimeDimension(QUARTER)" -> "Time(quarter)"
+  	"MetricTimeDimension(QUARTER)" -> "Time(year)"
+  	"MetricTimeDimension(YEAR)" -> "Time(custom_year)"
+  	"MetricTimeDimension(YEAR)" -> "Time(extract_year)"
+  	"MetricTimeDimension(YEAR)" -> "Time(year)"
+  	"TimeDimension(ds, quarter)" -> "Time(custom_year)"
+  	"TimeDimension(ds, quarter)" -> "Time(extract_quarter)"
+  	"TimeDimension(ds, quarter)" -> "Time(extract_year)"
+  	"TimeDimension(ds, quarter)" -> "Time(quarter)"
+  	"TimeDimension(ds, quarter)" -> "Time(year)"
+  	"TimeDimension(ds, year)" -> "Time(custom_year)"
+  	"TimeDimension(ds, year)" -> "Time(extract_year)"
+  	"TimeDimension(ds, year)" -> "Time(year)"
+  	"Agg(sm_0, ds)" -> "JoinFrom(sm_0)"
+  	"Agg(sm_0, ds)" -> "JoinTo(sm_0)"
+  	"JoinFrom(sm_0)" -> "MetricTimeDimension(QUARTER)"
+  	"JoinFrom(sm_0)" -> "MetricTimeDimension(YEAR)"
+  	"JoinTo(sm_0)" -> "JoinFrom(sm_0)"
+  	"JoinTo(sm_0)" -> "TimeDimension(ds, quarter)"
+  	"JoinTo(sm_0)" -> "TimeDimension(ds, year)"
+  	"JoinTo(sm_1)" -> "JoinFrom(sm_1)"
+  	"JoinTo(sm_2)" -> "JoinFrom(sm_2)"
+  	"JoinFrom(sm_0)" -> "DsiEntity(common_primary_entity)"
+  	"JoinFrom(sm_0)" -> "DsiEntity(common_primary_entity)"
+  	"JoinFrom(sm_0)" -> "DsiEntity(sm_0_primary_entity)"
+  	"JoinFrom(sm_1)" -> "DsiEntity(common_primary_entity)"
+  	"JoinFrom(sm_1)" -> "DsiEntity(common_primary_entity)"
+  	"JoinFrom(sm_2)" -> "DsiEntity(common_primary_entity)"
+  	"JoinFrom(sm_2)" -> "DsiEntity(common_primary_entity)"
+  	"DsiEntity(common_primary_entity)" -> "JoinTo(sm_1)"
+  	"DsiEntity(common_primary_entity)" -> "JoinTo(sm_2)"
+  	"DsiEntity(sm_0_primary_entity)" -> "JoinTo(sm_0)"
+  	"Metric(sm_0_measure_0_metric)" -> "Measure(sm_0_measure_0)"
+  }
+
+pretty_format:
+  MutableSemanticGraph(
+    nodes={
+      Agg(sm_0, ds),
+      Dimension(sm_1_dim_0),
+      Dimension(sm_2_dim_0),
+      DsiEntityKey(common_primary_entity),
+      DsiEntityKey(sm_0_primary_entity),
+      DsiEntity(common_primary_entity),
+      DsiEntity(sm_0_primary_entity),
+      JoinFrom(sm_0),
+      JoinFrom(sm_1),
+      JoinFrom(sm_2),
+      JoinTo(sm_0),
+      JoinTo(sm_1),
+      JoinTo(sm_2),
+      Measure(sm_0_measure_0),
+      Metric(sm_0_measure_0_metric),
+      MetricTimeDimension(QUARTER),
+      MetricTimeDimension(YEAR),
+      Time(custom_year),
+      Time(extract_quarter),
+      Time(extract_year),
+      Time(quarter),
+      Time(year),
+      TimeDimension(ds, quarter),
+      TimeDimension(ds, year),
+    },
+    edges={
+      EntityAttributeEdge(tail_node=DsiEntity(common_primary_entity), head_node=Metric(sm_0_measure_0_metric)),
+      EntityAttributeEdge(tail_node=DsiEntity(sm_0_primary_entity), head_node=Metric(sm_0_measure_0_metric)),
+      EntityAttributeEdge(tail_node=JoinFrom(sm_0), head_node=DsiEntityKey(common_primary_entity)),
+      EntityAttributeEdge(tail_node=JoinFrom(sm_0), head_node=DsiEntityKey(sm_0_primary_entity)),
+      EntityAttributeEdge(tail_node=JoinFrom(sm_1), head_node=DsiEntityKey(common_primary_entity)),
+      EntityAttributeEdge(tail_node=JoinFrom(sm_2), head_node=DsiEntityKey(common_primary_entity)),
+      EntityAttributeEdge(tail_node=JoinTo(sm_0), head_node=DsiEntityKey(common_primary_entity)),
+      EntityAttributeEdge(tail_node=JoinTo(sm_0), head_node=DsiEntityKey(sm_0_primary_entity)),
+      EntityAttributeEdge(tail_node=JoinTo(sm_1), head_node=Dimension(sm_1_dim_0)),
+      EntityAttributeEdge(tail_node=JoinTo(sm_1), head_node=DsiEntityKey(common_primary_entity)),
+      EntityAttributeEdge(tail_node=JoinTo(sm_2), head_node=Dimension(sm_2_dim_0)),
+      EntityAttributeEdge(tail_node=JoinTo(sm_2), head_node=DsiEntityKey(common_primary_entity)),
+      EntityAttributeEdge(tail_node=Measure(sm_0_measure_0), head_node=Agg(sm_0, ds)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(QUARTER), head_node=Time(custom_year)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(QUARTER), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(QUARTER), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(QUARTER), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(QUARTER), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(YEAR), head_node=Time(custom_year)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(YEAR), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=MetricTimeDimension(YEAR), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, quarter), head_node=Time(custom_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, quarter), head_node=Time(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, quarter), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, quarter), head_node=Time(quarter)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, quarter), head_node=Time(year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, year), head_node=Time(custom_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, year), head_node=Time(extract_year)),
+      EntityAttributeEdge(tail_node=TimeDimension(ds, year), head_node=Time(year)),
+      EntityRelationshipEdge(tail_node=Agg(sm_0, ds), head_node=JoinFrom(sm_0)),
+      EntityRelationshipEdge(tail_node=Agg(sm_0, ds), head_node=JoinTo(sm_0)),
+      EntityRelationshipEdge(tail_node=JoinFrom(sm_0), head_node=MetricTimeDimension(QUARTER)),
+      EntityRelationshipEdge(tail_node=JoinFrom(sm_0), head_node=MetricTimeDimension(YEAR)),
+      EntityRelationshipEdge(tail_node=JoinTo(sm_0), head_node=JoinFrom(sm_0)),
+      EntityRelationshipEdge(tail_node=JoinTo(sm_0), head_node=TimeDimension(ds, quarter)),
+      EntityRelationshipEdge(tail_node=JoinTo(sm_0), head_node=TimeDimension(ds, year)),
+      EntityRelationshipEdge(tail_node=JoinTo(sm_1), head_node=JoinFrom(sm_1)),
+      EntityRelationshipEdge(tail_node=JoinTo(sm_2), head_node=JoinFrom(sm_2)),
+      JoinFromModelEdge(tail_node=JoinFrom(sm_0), head_node=DsiEntity(common_primary_entity)),
+      JoinFromModelEdge(tail_node=JoinFrom(sm_0), head_node=DsiEntity(common_primary_entity)),
+      JoinFromModelEdge(tail_node=JoinFrom(sm_0), head_node=DsiEntity(sm_0_primary_entity)),
+      JoinFromModelEdge(tail_node=JoinFrom(sm_1), head_node=DsiEntity(common_primary_entity)),
+      JoinFromModelEdge(tail_node=JoinFrom(sm_1), head_node=DsiEntity(common_primary_entity)),
+      JoinFromModelEdge(tail_node=JoinFrom(sm_2), head_node=DsiEntity(common_primary_entity)),
+      JoinFromModelEdge(tail_node=JoinFrom(sm_2), head_node=DsiEntity(common_primary_entity)),
+      JoinToModelEdge(tail_node=DsiEntity(common_primary_entity), head_node=JoinTo(sm_1)),
+      JoinToModelEdge(tail_node=DsiEntity(common_primary_entity), head_node=JoinTo(sm_2)),
+      JoinToModelEdge(tail_node=DsiEntity(sm_0_primary_entity), head_node=JoinTo(sm_0)),
+      MetricDefinitionEdge(tail_node=Metric(sm_0_measure_0_metric), head_node=Measure(sm_0_measure_0)),
+    },
+  )
