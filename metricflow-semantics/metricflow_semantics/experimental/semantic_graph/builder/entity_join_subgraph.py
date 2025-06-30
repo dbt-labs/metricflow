@@ -29,6 +29,7 @@ from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import (
     JoinToModelNode,
 )
 from metricflow_semantics.experimental.semantic_graph.semantic_graph import MutableSemanticGraph, SemanticGraph
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 
 logger = logging.getLogger(__name__)
@@ -37,6 +38,7 @@ logger = logging.getLogger(__name__)
 class EntityJoinSubgraphGenerator(SemanticSubgraphGenerator):
     def __init__(self, argument_set: SubgraphGeneratorArgumentSet) -> None:
         super().__init__(argument_set)
+        self._verbose_debug_logs = True
 
     def _get_subgraph_for_model(
         self, lookup: SemanticModelObjectLookup
@@ -98,8 +100,7 @@ class EntityJoinSubgraphGenerator(SemanticSubgraphGenerator):
             for right_model_id in self._manifest_object_lookup.entity_name_to_joinable_semantic_model_id[
                 entity_node.entity_name
             ]:
-                current_subgraph.add_edge(
-                    JoinFromModelEdge.get_instance(
+                edge = JoinFromModelEdge.get_instance(
                         tail_node=join_from_semantic_model_node,
                         head_node=entity_node,
                         right_model_id=right_model_id,
@@ -111,10 +112,18 @@ class EntityJoinSubgraphGenerator(SemanticSubgraphGenerator):
                             )
                         ),
                     )
-                )
+                current_subgraph.add_edge(edge)
+                if self._verbose_debug_logs:
+                    logger.debug(
+                        LazyFormat(
+                            "Added an edge for joining a model on the right",
+                            edge=edge,
+                            right_model_id=right_model_id,
+                        )
+                    )
         # Handle case when the primary entity field in the semantic model is set and there isn't an entity element in
         # the model with `EntityType.PRIMARY`.
-        if primary_entity_name is not None:
+        if lookup.primary_entity_element is None and primary_entity_name is not None:
             current_subgraph.add_edge(
                 JoinFromModelEdge.get_instance(
                     tail_node=join_from_semantic_model_node,
