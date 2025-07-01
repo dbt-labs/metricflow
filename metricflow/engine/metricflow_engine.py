@@ -347,7 +347,11 @@ class AbstractMetricFlowEngine(ABC):
         pass
 
     @abstractmethod
-    def list_group_bys(self, metric_names: Optional[List[str]] = None) -> List[Entity | Dimension]:
+    def list_group_bys(
+        self,
+        metric_names: Optional[List[str]] = None,
+        include_derived_time_granularities: bool = False,
+    ) -> List[Entity | Dimension]:
         """List all group bys in the semantic manifest, with optional filters."""
         pass
 
@@ -817,13 +821,20 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         )
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-    def list_group_bys(self, metric_names: Optional[List[str]] = None) -> List[Entity | Dimension]:
+    def list_group_bys(
+        self,
+        metric_names: Optional[List[str]] = None,
+        include_derived_time_granularities: bool = False,
+    ) -> List[Entity | Dimension]:
         """List all possible group bys, or all group bys allowed for the selected metrics."""
         if metric_names:
+            without_any_of = SIMPLE_DIMENSIONS_WITHOUT_ANY_PROPERTIES - ENTITY_WITH_ANY_PROPERTIES
+            if include_derived_time_granularities:
+                without_any_of = without_any_of - {LinkableElementProperty.DERIVED_TIME_GRANULARITY}
             linkable_element_set = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_metrics(
                 metric_references=tuple(MetricReference(element_name=mname) for mname in metric_names),
                 element_set_filter=LinkableElementFilter(
-                    without_any_of=frozenset(SIMPLE_DIMENSIONS_WITHOUT_ANY_PROPERTIES - ENTITY_WITH_ANY_PROPERTIES),
+                    without_any_of=frozenset(without_any_of),
                 ),
             )
             group_bys: Sequence = self._filter_linkable_entities(
