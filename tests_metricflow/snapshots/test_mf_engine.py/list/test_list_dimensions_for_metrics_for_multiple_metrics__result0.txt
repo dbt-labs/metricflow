@@ -5,15 +5,9 @@ docstring:
 ---
 [
   'listing__capacity_latest',
-  'listing__capacity_latest',
-  'listing__country_latest',
   'listing__country_latest',
   'listing__created_at',
-  'listing__created_at',
-  'listing__ds',
   'listing__ds',
   'listing__is_lux_latest',
-  'listing__is_lux_latest',
-  'metric_time__day',
   'metric_time__day',
 ]
