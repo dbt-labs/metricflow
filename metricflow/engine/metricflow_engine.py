@@ -698,7 +698,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                     )
                 dimensions.append(dimension)
 
-        return sorted(dimensions, key=lambda x: x.default_search_and_sort_attribute)
+        return sorted(set(dimensions), key=lambda x: x.default_search_and_sort_attribute)
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def list_dimensions(self, metric_names: Optional[List[str]] = None) -> List[Dimension]:
@@ -718,7 +718,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                     )
                     dimensions.append(dimension)
 
-        return sorted(dimensions, key=lambda x: x.default_search_and_sort_attribute)
+        return sorted(set(dimensions), key=lambda x: x.default_search_and_sort_attribute)
 
     def entities_for_metrics(self, metric_names: List[str]) -> List[Entity]:  # noqa: D102
         linkable_element_set = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_metrics(
@@ -729,7 +729,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         )
 
         entities = self._filter_linkable_entities(linkable_element_set=linkable_element_set)
-        return sorted(entities, key=lambda x: x.default_search_and_sort_attribute)
+        return sorted(set(entities), key=lambda x: x.default_search_and_sort_attribute)
 
     def _filter_linkable_entities(self, linkable_element_set: LinkableElementSet) -> List[Entity]:
         entities: List[Entity] = []
@@ -843,7 +843,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         else:
             # TODO: better support for querying entities without metrics; include entities here at that time
             group_bys = self.list_dimensions()
-        return sorted(group_bys, key=lambda x: x.default_search_and_sort_attribute)
+        return sorted(set(group_bys), key=lambda x: x.default_search_and_sort_attribute)
 
     def group_by_exists(self, structured_name: StructuredLinkableSpecName) -> bool:
         """Check if a group by exists in the semantic manifest by its element name."""
