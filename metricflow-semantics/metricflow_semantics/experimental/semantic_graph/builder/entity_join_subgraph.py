@@ -97,9 +97,10 @@ class EntityJoinSubgraphGenerator(SemanticSubgraphGenerator):
             )
         primary_entity_name = lookup.primary_entity_name
         for entity_node in valid_target_dsi_entity_nodes_for_joins_from_this_model:
-            for right_model_id in self._manifest_object_lookup.entity_name_to_joinable_semantic_model_id[
+            right_model_ids = self._manifest_object_lookup.entity_name_to_joinable_semantic_model_id[
                 entity_node.entity_name
-            ]:
+            ]
+            for right_model_id in right_model_ids:
                 edge = JoinFromModelEdge.get_instance(
                     tail_node=join_from_semantic_model_node,
                     head_node=entity_node,
@@ -121,6 +122,25 @@ class EntityJoinSubgraphGenerator(SemanticSubgraphGenerator):
                             right_model_id=right_model_id,
                         )
                     )
+            # Handle the case where a foreign entity is defined in a semantic model, but a corresponding
+            # primary / unique / ... entity is not defined in another semantic model.
+            if len(right_model_ids) == 0:
+                edge = JoinFromModelEdge.get_instance(
+                    tail_node=join_from_semantic_model_node,
+                    head_node=entity_node,
+                    right_model_id=model_id,
+                    attribute_computation_update=AttributeComputationUpdate(),
+                )
+                current_subgraph.add_edge(edge)
+                if self._verbose_debug_logs:
+                    logger.debug(
+                        LazyFormat(
+                            "Added an edge to handle an orphan entity",
+                            edge=edge,
+                            right_model_id=model_id,
+                        )
+                    )
+
         # Handle case when the primary entity field in the semantic model is set and there isn't an entity element in
         # the model with `EntityType.PRIMARY`.
         if lookup.primary_entity_element is None and primary_entity_name is not None:
