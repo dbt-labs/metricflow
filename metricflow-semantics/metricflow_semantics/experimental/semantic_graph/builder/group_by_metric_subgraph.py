@@ -6,7 +6,7 @@ from dbt_semantic_interfaces.protocols import Metric
 from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item
-from metricflow_semantics.experimental.ordered_set import MutableOrderedSet
+from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeComputationUpdate
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
     AttributeComputationPath,
@@ -27,7 +27,6 @@ from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node impor
 from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
     DsiEntityLabel,
     MeasureAttributeLabel,
-    MetricAttributeLabel,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
     SemanticGraphNode,
@@ -45,24 +44,24 @@ class GroupByMetricSubgraph(SemanticSubgraphGenerator):
         super().__init__(argument_set)
         self._mutable_path = AttributeComputationPath.create()
         self._verbose_debug_logs = False
-        self._metric_name_to_connected_dsi_entity_nodes: dict[str, MutableOrderedSet[SemanticGraphNode]] = {}
+        self._metric_name_to_connected_dsi_entity_nodes: dict[str, FrozenOrderedSet[SemanticGraphNode]] = {}
+        self._metric_name_to_derivative_semantic_model_ids: dict[str, FrozenOrderedSet[SemanticModelId]] = {}
 
-    def _metric_processed(self, current_subgraph: MutableSemanticGraph, metric_name: str) -> bool:
+    def _metric_processed(self, metric_name: str) -> bool:
         """Returns true if this metric has been processed and recursive calls don't need to be made on the parents.
 
         This check is called before the generate method is called to reduce the number of recursive calls that show up
         in profiling results.
         """
-        return len(current_subgraph.nodes_with_label(MetricAttributeLabel(metric_name=metric_name))) > 0
+        # return len(current_subgraph.nodes_with_label(MetricAttributeLabel(metric_name=metric_name))) > 0
+        return metric_name in self._metric_name_to_connected_dsi_entity_nodes
 
     def _generate_subgraph_for_any_metric(
         self, current_graph: SemanticGraph, subgraph: MutableSemanticGraph, metric: Metric
     ) -> None:
         metric_name = metric.name
-        # if self._metric_processed(subgraph, metric_name):
-        #     return
 
-        if metric_name in self._metric_name_to_connected_dsi_entity_nodes:
+        if self._metric_processed(metric_name):
             return
 
         parent_metric_inputs = metric.type_params.metrics
@@ -70,21 +69,37 @@ class GroupByMetricSubgraph(SemanticSubgraphGenerator):
             self._generate_subgraph_for_base_metric(current_graph, subgraph, metric)
             return
 
-        reachable_dsi_entity_nodes = MutableOrderedSet[SemanticGraphNode]()
+        reachable_dsi_entity_nodes = FrozenOrderedSet[SemanticGraphNode]()
+        derivative_semantic_model_ids = FrozenOrderedSet[SemanticModelId]()
+
         for i, parent_metric_input in enumerate(parent_metric_inputs):
             parent_metric = self._manifest_object_lookup.get_metric(parent_metric_input.name)
-            if metric_name not in self._metric_name_to_connected_dsi_entity_nodes:
+            parent_metric_name = parent_metric.name
+            if not self._metric_processed(parent_metric_name):
                 if parent_metric.type_params.metrics is None:
                     self._generate_subgraph_for_base_metric(current_graph, subgraph, parent_metric)
                 else:
                     self._generate_subgraph_for_any_metric(current_graph, subgraph, parent_metric)
 
-            reachable_dsi_entity_nodes_for_parent_metric = self._metric_name_to_connected_dsi_entity_nodes[parent_metric.name]
+            if self._metric_processed(metric_name):
+                return
 
+            reachable_dsi_entity_nodes_for_parent_metric = self._metric_name_to_connected_dsi_entity_nodes[
+                parent_metric_name
+            ]
+            derivative_semantic_model_ids_for_parent_metric = self._metric_name_to_derivative_semantic_model_ids[
+                parent_metric_name
+            ]
             if i == 0:
                 reachable_dsi_entity_nodes = reachable_dsi_entity_nodes_for_parent_metric
+                derivative_semantic_model_ids = derivative_semantic_model_ids_for_parent_metric
             else:
-                reachable_dsi_entity_nodes = reachable_dsi_entity_nodes.intersection(reachable_dsi_entity_nodes_for_parent_metric)
+                reachable_dsi_entity_nodes = reachable_dsi_entity_nodes.intersection(
+                    reachable_dsi_entity_nodes_for_parent_metric
+                )
+                derivative_semantic_model_ids = derivative_semantic_model_ids.union(
+                    derivative_semantic_model_ids_for_parent_metric
+                )
 
         metric_node = MetricNode.get_instance(metric_name)
         for reachable_dsi_entity_node in reachable_dsi_entity_nodes:
@@ -95,22 +110,21 @@ class GroupByMetricSubgraph(SemanticSubgraphGenerator):
                     attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
                     attribute_computation_update=AttributeComputationUpdate(
                         dundered_name_element_addition=metric_name,
-                        derived_from_model_id_additions=tuple(semantic_model_ids),
+                        derived_from_model_id_additions=tuple(derivative_semantic_model_ids),
                         linkable_element_property_additions=(LinkableElementProperty.METRIC,),
                         element_type_addition=LinkableElementType.METRIC,
                     ),
                 )
             )
 
+        self._metric_name_to_connected_dsi_entity_nodes[metric_name] = reachable_dsi_entity_nodes
+        self._metric_name_to_derivative_semantic_model_ids[metric_name] = derivative_semantic_model_ids
+
     def _generate_subgraph_for_base_metric(
         self, current_graph: SemanticGraph, subgraph: MutableSemanticGraph, metric: Metric
     ) -> None:
-
         metric_name = metric.name
-        # This shouldn't be needed since we make this check before all calls to this method, but just in case.
-        # if self._metric_processed(subgraph, metric.name):
-        #     return
-        if metric_name in self._metric_name_to_connected_dsi_entity_nodes:
+        if self._metric_processed(metric_name):
             return
 
         required_measure_nodes = MutableOrderedSet[SemanticGraphNode]()
@@ -158,7 +172,10 @@ class GroupByMetricSubgraph(SemanticSubgraphGenerator):
                 )
             )
 
-        self._metric_name_to_connected_dsi_entity_nodes[metric_name] = common_reachable_targets_result.reachable_targets
+        self._metric_name_to_connected_dsi_entity_nodes[
+            metric_name
+        ] = common_reachable_targets_result.reachable_targets.as_frozen()
+        self._metric_name_to_derivative_semantic_model_ids[metric_name] = semantic_model_ids.as_frozen()
 
     @override
     def generate_subgraph(self, current_graph: SemanticGraph) -> MutableSemanticGraph:
@@ -166,7 +183,7 @@ class GroupByMetricSubgraph(SemanticSubgraphGenerator):
         if self._verbose_debug_logs:
             logger.debug(LazyFormat("Starting with graph", current_graph=current_graph))
         for metric in self._manifest_object_lookup.get_metrics():
-            if not self._metric_processed(current_subgraph, metric.name):
+            if not self._metric_processed(metric.name):
                 self._generate_subgraph_for_any_metric(current_graph, current_subgraph, metric)
 
         return current_subgraph

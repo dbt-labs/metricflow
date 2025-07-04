@@ -66,12 +66,12 @@ logger = logging.getLogger(__name__)
 def test_all(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    sg_02_single_join_lookup: ManifestObjectLookup,
+    sg_06_ambiguous_join_manifest: ManifestObjectLookup,
 ) -> None:
     check_subgraph_generation(
         request=request,
         mf_test_configuration=mf_test_configuration,
-        manifest_object_lookup=sg_02_single_join_lookup,
+        manifest_object_lookup=sg_06_ambiguous_join_manifest,
         subgraph_generators=SemanticGraphBuilder._ALL_SUBGRAPH_GENERATORS,
     )
 
@@ -79,14 +79,14 @@ def test_all(  # noqa: D103
 def test_labels(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    sg_02_single_join_lookup: ManifestObjectLookup,
+    sg_06_ambiguous_join_manifest: ManifestObjectLookup,
 ) -> None:
     path_finder_cache = PathFinderCache[SemanticGraphNode, SemanticGraphEdge, AttributeComputationPath]()
     path_finder = MetricflowGraphPathFinder[SemanticGraphNode, SemanticGraphEdge, AttributeComputationPath](
         path_finder_cache
     )
     builder = SemanticGraphBuilder(
-        manifest_object_lookup=sg_02_single_join_lookup,
+        manifest_object_lookup=sg_06_ambiguous_join_manifest,
         path_finder=path_finder,
     )
     graph = builder.build()
@@ -101,14 +101,14 @@ def test_labels(  # noqa: D103
 def test_descendants(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    sg_02_single_join_lookup: ManifestObjectLookup,
+    sg_06_ambiguous_join_manifest: ManifestObjectLookup,
 ) -> None:
     path_finder_cache = PathFinderCache[SemanticGraphNode, SemanticGraphEdge, AttributeComputationPath]()
     path_finder = MetricflowGraphPathFinder[SemanticGraphNode, SemanticGraphEdge, AttributeComputationPath](
         path_finder_cache
     )
     builder = SemanticGraphBuilder(
-        manifest_object_lookup=sg_02_single_join_lookup,
+        manifest_object_lookup=sg_06_ambiguous_join_manifest,
         path_finder=path_finder,
     )
     graph = builder.build()
@@ -140,7 +140,7 @@ def test_descendants(  # noqa: D103
 def test_group_by_attribute_subgraph(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    sg_02_single_join_lookup: ManifestObjectLookup,
+    sg_06_ambiguous_join_manifest: ManifestObjectLookup,
 ) -> None:
     path_finder_cache = PathFinderCache[SemanticGraphNode, SemanticGraphEdge, AttributeComputationPath]()
 
@@ -148,7 +148,7 @@ def test_group_by_attribute_subgraph(  # noqa: D103
         path_finder_cache
     )
     builder = SemanticGraphBuilder(
-        manifest_object_lookup=sg_02_single_join_lookup,
+        manifest_object_lookup=sg_06_ambiguous_join_manifest,
         path_finder=path_finder,
     )
     graph = builder.build()
@@ -169,7 +169,7 @@ def test_group_by_attribute_subgraph(  # noqa: D103
 def test_resolver(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    sg_02_single_join_lookup: ManifestObjectLookup,
+    sg_06_ambiguous_join_manifest: ManifestObjectLookup,
 ) -> None:
     path_finder_cache = PathFinderCache[SemanticGraphNode, SemanticGraphEdge, AttributeComputationPath]()
 
@@ -177,13 +177,13 @@ def test_resolver(  # noqa: D103
         path_finder_cache
     )
     builder = SemanticGraphBuilder(
-        manifest_object_lookup=sg_02_single_join_lookup,
+        manifest_object_lookup=sg_06_ambiguous_join_manifest,
         path_finder=path_finder,
     )
     semantic_graph = builder.build()
     attribute_resolver_cache = AttributeResolverCache()
     spec_resolver = AttributeResolver(
-        manifest_object_lookup=sg_02_single_join_lookup,
+        manifest_object_lookup=sg_06_ambiguous_join_manifest,
         semantic_graph=semantic_graph,
         attribute_resolver_cache=attribute_resolver_cache,
     )
@@ -198,7 +198,7 @@ def test_specs(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     sg_02_single_join_manifest: PydanticSemanticManifest,
-    sg_02_single_join_lookup: ManifestObjectLookup,
+    sg_06_ambiguous_join_manifest: ManifestObjectLookup,
 ) -> None:
     element_filter = LinkableElementFilter()
     semantic_manifest = sg_02_single_join_manifest
@@ -219,20 +219,19 @@ def test_specs(
 def test_linkable_spec_resolvers(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    sg_02_single_join_manifest: PydanticSemanticManifest,
-    sg_04_common_primary_entity_manifest: PydanticSemanticManifest,
+    sg_06_ambiguous_join_manifest: PydanticSemanticManifest,
     simple_semantic_manifest: PydanticSemanticManifest,
 ) -> None:
     element_filter = LinkableElementFilter()
 
     # semantic_manifest = sg_02_single_join_manifest
-    semantic_manifest = simple_semantic_manifest
+    semantic_manifest = sg_06_ambiguous_join_manifest
     # semantic_manifest = sg_04_common_primary_entity_manifest
 
     manifest_lookup = SemanticManifestLookup(semantic_manifest)
 
-    # measure_references = manifest_lookup.semantic_model_lookup.measure_references
-    measure_references = (MeasureReference(element_name="bookings"),)
+    measure_references = manifest_lookup.semantic_model_lookup.measure_references
+    # measure_references = (MeasureReference(element_name="bookings"),)
 
     legacy_linkable_spec_resolver = _create_legacy_resolver(semantic_manifest)
     sg_linkable_spec_resolver = _create_sg_resolver(semantic_manifest)

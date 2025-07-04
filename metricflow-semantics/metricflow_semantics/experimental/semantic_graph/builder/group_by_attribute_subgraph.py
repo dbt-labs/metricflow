@@ -52,7 +52,7 @@ class GroupByAttributeSubgraphGenerator:
         self._semantic_graph = semantic_graph
         self._path_finder = path_finder
         self._mutable_path = AttributeComputationPath.create()
-        self._verbose_debug_logs = True
+        self._verbose_debug_logs = False
 
     def generate_subgraph(self, source_nodes: OrderedSet[SemanticGraphNode]) -> AttributeSubgraphResult:
         path_finder = self._path_finder
@@ -131,12 +131,13 @@ class GroupByAttributeSubgraphGenerator:
         nodes_in_path_to_group_by_attribute_nodes = result.descendant_nodes
         nodes_in_path_to_group_by_attribute_nodes.add(join_from_node)
 
-        logger.debug(
-            LazyFormat(
-                "Found nodes in path to attribute nodes",
-                nodes_in_path_to_group_by_attribute_nodes=nodes_in_path_to_group_by_attribute_nodes,
+        if self._verbose_debug_logs:
+            logger.debug(
+                LazyFormat(
+                    "Found nodes in path to attribute nodes",
+                    nodes_in_path_to_group_by_attribute_nodes=nodes_in_path_to_group_by_attribute_nodes,
+                )
             )
-        )
 
         subgraph_edges = semantic_graph.adjacent_edges(nodes_in_path_to_group_by_attribute_nodes)
         subgraph_edges = self._replace_join_to_node_with_group_by_attribute_root_node(

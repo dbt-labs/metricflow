@@ -37,6 +37,7 @@ dot_notation:
   		"TimeDimension(ds, quarter)"
   		"TimeDimension(ds, year)"
   	}
+  	"DsiEntity(sm_0_primary_entity)" -> "Metric(sm_0_measure_0_derived_metric)"
   	"DsiEntity(sm_0_primary_entity)" -> "Metric(sm_0_measure_0_metric)"
   	"Measure(sm_0_measure_0)" -> "Agg(sm_0, ds)"
   	"MetricTimeDimension(quarter)" -> "Time(custom_year)"
@@ -90,6 +91,7 @@ pretty_format:
       TimeDimension(ds, year),
     },
     edges={
+      EntityAttributeEdge(tail_node=DsiEntity(sm_0_primary_entity), head_node=Metric(sm_0_measure_0_derived_metric)),
       EntityAttributeEdge(tail_node=DsiEntity(sm_0_primary_entity), head_node=Metric(sm_0_measure_0_metric)),
       EntityAttributeEdge(tail_node=Measure(sm_0_measure_0), head_node=Agg(sm_0, ds)),
       EntityAttributeEdge(tail_node=MetricTimeDimension(quarter), head_node=Time(custom_year)),

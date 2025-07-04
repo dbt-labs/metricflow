@@ -1,37 +1,20 @@
 from __future__ import annotations
 
-from __future__ import annotations
-
-import itertools
 import logging
 
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
-from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.references import MeasureReference
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
     AttributeComputationPath,
-)
-from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_resolver import (
-    AttributeResolver,
-    AttributeResolverCache,
-)
-from metricflow_semantics.experimental.semantic_graph.attribute_resolution.sg_linkable_spec_resolver import (
-    SemanticGraphLinkableSpecResolver,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.graph_builder import SemanticGraphBuilder
 from metricflow_semantics.experimental.semantic_graph.builder.group_by_attribute_subgraph import (
     GroupByAttributeSubgraphGenerator,
 )
 from metricflow_semantics.experimental.semantic_graph.manifest_object_lookup import ManifestObjectLookup
-from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
-from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import MeasureNode, MetricNode
-from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
-    DsiEntityLabel,
-    GroupByAttributeLabel,
-    MeasureAttributeLabel,
-)
+from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import MetricNode
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
     SemanticGraphEdge,
     SemanticGraphNode,
@@ -40,20 +23,10 @@ from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder i
     MetricflowGraphPathFinder,
 )
 from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_cache import PathFinderCache
-from metricflow_semantics.experimental.semantic_graph.path_finding.weight_function import EdgeCountWeightFunction
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
-from metricflow_semantics.model.semantics.linkable_spec_index_builder import LinkableSpecIndexBuilder
-from metricflow_semantics.model.semantics.linkable_spec_resolver import LegacyLinkableSpecResolver
-from metricflow_semantics.model.semantics.manifest_object_lookup import SemanticManifestObjectLookup
-from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import (
     assert_linkable_element_set_snapshot_equal,
-    assert_object_snapshot_equal,
-    assert_str_snapshot_equal,
-    convert_linkable_element_set_to_rows,
 )
 from metricflow_semantics.test_helpers.svg_snapshot import write_svg_snapshot_for_review
 
@@ -61,8 +34,9 @@ from tests_metricflow_semantics.experimental.mf_graph.formatting.svg_formatter i
 from tests_metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator.conftest import (
     check_subgraph_generation,
 )
-from tests_metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator.test_sg_02 import \
-    _create_sg_resolver
+from tests_metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator.test_sg_02 import (
+    _create_sg_resolver,
+)
 
 logger = logging.getLogger(__name__)
 

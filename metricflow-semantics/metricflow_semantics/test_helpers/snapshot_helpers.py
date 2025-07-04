@@ -7,7 +7,7 @@ import pathlib
 import re
 import webbrowser
 from dataclasses import dataclass
-from typing import Any, Callable, Mapping, Optional, Tuple, TypeVar, Union
+from typing import Any, Callable, Mapping, Optional, Tuple, TypeVar
 
 import _pytest.fixtures
 import tabulate
@@ -294,13 +294,13 @@ def assert_plan_snapshot_text_equal(
     )
 
 
-LinkableElementSetSnapshotRowDict = dict[str, Union[str, list[str]]]
+LinkableElementSetSnapshotRowDict = dict[str, str]
 
 
 def convert_linkable_element_set_to_rows(
     linkable_element_set: BaseLinkableElementSet,
-) -> list[LinkableElementSetSnapshotRowDict]:
-    rows: list[LinkableElementSetSnapshotRowDict] = []
+) -> list[dict[str, str]]:
+    rows: list[dict[str, str]] = []
 
     # ("Type", "Dunder Name", "Metric-Subquery Entity-Links", "Properties", "Derived-From Semantic Models")
 
@@ -309,9 +309,9 @@ def convert_linkable_element_set_to_rows(
         key=lambda annotated_spec_in_lambda: annotated_spec_in_lambda.spec.qualified_name,
     ):
         # row: LinkableElementSetSnapshotRow = [annotated_spec.element_type.name, annotated_spec.spec.qualified_name]
-        row_dict: dict[str, Union[str, list[str]]] = {
-            "Type": annotated_spec.element_type.name,
-            "Dunder Name": annotated_spec.spec.qualified_name,
+        row_dict: dict[str, str] = {
+            "Type": annotated_spec.element_type.name.ljust(14),
+            "Dunder Name": annotated_spec.spec.qualified_name.ljust(78),
         }
         spec_set = group_spec_by_type(annotated_spec.spec)
 
@@ -321,9 +321,9 @@ def convert_linkable_element_set_to_rows(
         elif len(spec_set.group_by_metric_specs) == 1:
             group_by_metric_spec = spec_set.group_by_metric_specs[0]
             # row.append([entity_link.element_name for entity_link in group_by_metric_spec.metric_subquery_entity_links])
-            row_dict["Metric-Subquery Entity-Links"] = [
+            row_dict["Metric-Subquery Entity-Links"] = ",".join(
                 entity_link.element_name for entity_link in group_by_metric_spec.metric_subquery_entity_links
-            ]
+            )
         else:
             raise RuntimeError(LazyFormat("There should have been at most 1 group-by-metric spec", spec_set=spec_set))
 
@@ -337,11 +337,13 @@ def convert_linkable_element_set_to_rows(
         #     )
         # )
 
-        row_dict["Properties"] = sorted(
-            linkable_element_property.name for linkable_element_property in annotated_spec.properties
+        row_dict["Properties"] = ",".join(
+            sorted(linkable_element_property.name for linkable_element_property in annotated_spec.properties)
         )
-        row_dict["Derived-From Semantic Models"] = sorted(
-            model_reference.semantic_model_name for model_reference in annotated_spec.derived_from_semantic_models
+        row_dict["Derived-From Semantic Models"] = ",".join(
+            sorted(
+                model_reference.semantic_model_name for model_reference in annotated_spec.derived_from_semantic_models
+            )
         )
 
         rows.append(row_dict)
@@ -393,8 +395,7 @@ def assert_linkable_element_set_snapshot_equal(  # noqa: D103
         request=request,
         snapshot_configuration=snapshot_configuration,
         snapshot_id=set_id,
-        # snapshot_str=tabulate.tabulate(headers=headers, tabular_data=sorted(rows, key=lambda row: mf_first_item(row))),
-        snapshot_str=tabulate.tabulate(tabular_data=sorted(rows, key=lambda row_dict: tuple(row_dict.values()))),
+        snapshot_str=tabulate.tabulate(sorted(rows, key=lambda row: tuple(row.values()))),  # type: ignore[attr-defined]
         expectation_description=expectation_description,
     )
 

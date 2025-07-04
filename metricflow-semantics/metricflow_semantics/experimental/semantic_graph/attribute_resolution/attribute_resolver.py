@@ -48,6 +48,7 @@ from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_c
 from metricflow_semantics.experimental.semantic_graph.semantic_graph import SemanticGraph
 from metricflow_semantics.experimental.singleton_decorator import singleton_dataclass
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.mf_logging.runtime import log_runtime, log_block_runtime
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
 from metricflow_semantics.model.semantics.linkable_element import (
@@ -80,7 +81,7 @@ class AttributeResolver:
             semantic_graph=self._semantic_graph,
             path_finder=self._path_finder,
         )
-        self._verbose_debug_logs = True
+        self._verbose_debug_logs = False
 
     @property
     def semantic_graph(self) -> SemanticGraph:
@@ -109,7 +110,8 @@ class AttributeResolver:
         ):
             path = stop_event.current_path
             attribute_descriptor = mutable_path.attribute_computation.attribute_descriptor
-            logger.debug(LazyFormat("Got path", path_nodes=path.nodes, descriptor=attribute_descriptor))
+            if self._verbose_debug_logs:
+                logger.debug(LazyFormat("Got path", path_nodes=path.nodes, descriptor=attribute_descriptor))
             if attribute_descriptor is not None:
                 attribute_descriptors.append(attribute_descriptor)
 
@@ -147,20 +149,21 @@ class AttributeResolver:
             target_attribute_nodes=attribute_nodes,
         )
 
-        if self._verbose_debug_logs:
-            logger.debug(
-                LazyFormat(
-                    "Resolved descriptors",
-                    source_node=source_node,
-                    descriptor_result=descriptor_result,
-                )
+        logger.debug(
+            LazyFormat(
+                "Resolved descriptors",
+                source_node=source_node,
+                descriptor_count=len(descriptor_result.attribute_descriptors),
             )
+        )
 
         base_properties = FrozenOrderedSet(
             mf_flatten(
                 update.linkable_element_property_additions for update in descriptor_result.attribute_computation_updates
             )
         )
+
+        generate_group_by_metric_spec_count = 0
 
         for descriptor in descriptor_result.attribute_descriptors:
             if len(descriptor.element_types) != 1:
@@ -247,6 +250,7 @@ class AttributeResolver:
                         derived_from_semantic_models=derived_from_semantic_models,
                     )
                 )
+                generate_group_by_metric_spec_count += 1
             elif element_type is LinkableElementType.ENTITY:
                 # annotated_specs.append(
                 #     AnnotatedSpec.create(
@@ -341,6 +345,8 @@ class AttributeResolver:
                 )
             else:
                 assert_values_exhausted(element_type)
+
+        logger.debug(LazyFormat("Finished generating specs", generate_group_by_metric_spec_count=generate_group_by_metric_spec_count))
         return FrozenOrderedSet(dunder_name_to_annotated_spec.values())
 
     def _generate_group_by_metric_specs(
