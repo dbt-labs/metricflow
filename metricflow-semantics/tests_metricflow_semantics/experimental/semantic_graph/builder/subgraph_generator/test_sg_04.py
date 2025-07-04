@@ -5,7 +5,6 @@ import logging
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from dbt_semantic_interfaces.references import MeasureReference
-from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
     AttributeComputationPath,
 )
@@ -76,7 +75,7 @@ def test_group_by_attribute_subgraph(  # noqa: D103
         path_finder=MetricflowGraphPathFinder(path_finder_cache=path_finder_cache),
     )
 
-    result = subgraph_generator.generate_subgraph(FrozenOrderedSet((metric_node,)))
+    result = subgraph_generator.generate_subgraph(metric_node)
     subgraph = result.subgraph
     write_svg_snapshot_for_review(
         request=request, snapshot_configuration=mf_test_configuration, svg_file_contents=subgraph.format(SvgFormatter())

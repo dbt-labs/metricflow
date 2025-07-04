@@ -86,14 +86,12 @@ class AttributeResolver:
     def semantic_graph(self) -> SemanticGraph:
         return self._semantic_graph
 
-    def _resolve_descriptors_from_source_nodes(
+    def _resolve_descriptors_from_source_node(
         self,
-        source_nodes: OrderedSet[SemanticGraphNode],
+        source_node: SemanticGraphNode,
         target_attribute_nodes: OrderedSet[SemanticGraphNode],
     ) -> AttributeDescriptorResult:
-        subgraph_generator_result = self._group_by_attribute_subgraph_generator.generate_subgraph(
-            source_nodes=source_nodes,
-        )
+        subgraph_generator_result = self._group_by_attribute_subgraph_generator.generate_subgraph(source_node)
         group_by_attribute_subgraph = subgraph_generator_result.subgraph
         mutable_path = AttributeComputationPath.create()
         attribute_descriptors = []
@@ -133,8 +131,8 @@ class AttributeResolver:
             ),
         )
         attribute_nodes = self._semantic_graph.nodes_with_label(GroupByAttributeLabel())
-        return self._resolve_descriptors_from_source_nodes(
-            source_nodes=FrozenOrderedSet((metric_node,)),
+        return self._resolve_descriptors_from_source_node(
+            source_node=metric_node,
             target_attribute_nodes=attribute_nodes,
         )
 
@@ -164,8 +162,8 @@ class AttributeResolver:
         dunder_name_to_annotated_spec: dict[str, AnnotatedSpec] = {}
 
         attribute_nodes = self._semantic_graph.nodes_with_label(GroupByAttributeLabel())
-        descriptor_result = self._resolve_descriptors_from_source_nodes(
-            source_nodes=FrozenOrderedSet((source_node,)),
+        descriptor_result = self._resolve_descriptors_from_source_node(
+            source_node=source_node,
             target_attribute_nodes=attribute_nodes,
         )
 
@@ -392,8 +390,8 @@ class AttributeResolver:
         metric_node = MetricNode(attribute_name=metric_name)
         entity_value_node = DsiEntityKeyAttributeNode(attribute_name=entity_links[-1].element_name)
 
-        result = self._resolve_descriptors_from_source_nodes(
-            source_nodes=FrozenOrderedSet((metric_node,)),
+        result = self._resolve_descriptors_from_source_node(
+            source_node=metric_node,
             target_attribute_nodes=FrozenOrderedSet((entity_value_node,)),
         )
 

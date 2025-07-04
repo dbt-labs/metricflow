@@ -27,8 +27,7 @@ from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node impor
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import (
     AggregationNode,
-    JoinFromModelNode,
-    JoinToModelNode,
+    SemanticModelNode,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.named_node import SemanticGraphNodeFactory
 from metricflow_semantics.experimental.semantic_graph.semantic_graph import MutableSemanticGraph, SemanticGraph
@@ -45,11 +44,7 @@ class MeasureAttributeSubgraphGenerator(TimeDimensionSubgraphGenerator):
     ) -> MutableSemanticGraph:
         current_subgraph = MutableSemanticGraph.create()
         model_id = SemanticModelId(model_name=lookup.semantic_model.name)
-
-        # primary_entity_field_defined = lookup.semantic_model.primary_entity is not None
-
-        join_to_semantic_model_node = JoinToModelNode(model_id=model_id)
-        join_from_semantic_model_node = JoinFromModelNode(model_id=model_id)
+        semantic_model_node = SemanticModelNode.get_instance(model_id)
 
         for aggregation_configuration, measures in lookup.aggregation_configuration_to_measures.items():
             aggregation_entity_node = AggregationNode(
@@ -65,8 +60,8 @@ class MeasureAttributeSubgraphGenerator(TimeDimensionSubgraphGenerator):
 
                 current_subgraph.add_edge(
                     EntityRelationshipEdge.get_instance(
-                        tail_node=join_from_semantic_model_node,
-                        relationship=EntityRelationship.LEFT_CARDINALITY_ONE,
+                        tail_node=aggregation_entity_node,
+                        relationship=EntityRelationship.VALID,
                         head_node=metric_time_node,
                     )
                 )
@@ -80,21 +75,14 @@ class MeasureAttributeSubgraphGenerator(TimeDimensionSubgraphGenerator):
                     )
                 )
 
-                # Add an edge from the aggregation entity node to the join-from node.
-                current_subgraph.add_edge(
-                    EntityRelationshipEdge.get_instance(
-                        tail_node=aggregation_entity_node,
-                        relationship=EntityRelationship.LEFT_CARDINALITY_ONE,
-                        head_node=join_from_semantic_model_node,
-                    )
-                )
-                current_subgraph.add_edge(
-                    EntityRelationshipEdge.get_instance(
-                        tail_node=aggregation_entity_node,
-                        relationship=EntityRelationship.LEFT_CARDINALITY_ONE,
-                        head_node=join_to_semantic_model_node,
-                    )
-                )
+                # Add an edge from the aggregation entity node to the semantic-model node.
+                # current_subgraph.add_edge(
+                #     EntityRelationshipEdge.get_instance(
+                #         tail_node=aggregation_entity_node,
+                #         relationship=EntityRelationship.VALID,
+                #         head_node=semantic_model_node,
+                #     )
+                # )
 
                 # In the case that the primary entity is not an element in the semantic model, the primary
                 # entity node is only reachable from measure attribute nodes in the semantic model.
@@ -133,6 +121,14 @@ class MeasureAttributeSubgraphGenerator(TimeDimensionSubgraphGenerator):
                 measure_attribute_node = MeasureNode.get_instance(
                     measure_name=measure_name,
                     model_id=model_id,
+                )
+
+                current_subgraph.add_edge(
+                    EntityAttributeEdge.get_instance(
+                        tail_node=measure_attribute_node,
+                        head_node=semantic_model_node,
+                        attribute_edge_type=AttributeEdgeType.ATTRIBUTE_TO_ENTITY,
+                    )
                 )
 
                 current_subgraph.add_edge(
