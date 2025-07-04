@@ -114,6 +114,13 @@ class MutableAttributeComputation(AttributeComputation):
             for model_id in self.ordered_attribute_descriptors[-1].model_ids
         )
 
+    @property
+    def derivative_semantic_model_ids(self) -> FrozenOrderedSet[SemanticModelId]:
+        if len(self.ordered_attribute_descriptors) == 0:
+            return FrozenOrderedSet()
+
+        return self.ordered_attribute_descriptors[-1].model_ids
+
     def append_update(self, update: AttributeComputationUpdate) -> None:
         if len(self.ordered_attribute_descriptors) == 0:
             dundered_name_elements = (

@@ -50,9 +50,12 @@ class DunderNameWeightFunction(WeightFunction[SemanticGraphNode, SemanticGraphEd
         )
         # We do not allow repeated element names in the dundered name (e.g. `listing__listing`),
         # so return `None` to indicate a blocked edge.
-        if len(dundered_name_elements) >= 2:
-            if dundered_name_elements[-1] == dundered_name_elements[-2]:
-                return None
+        # if len(dundered_name_elements) >= 2:
+        #     if dundered_name_elements[-1] == dundered_name_elements[-2]:
+        #         return None
+        unique_dunder_name_element_count = len(set(dundered_name_elements))
+        if unique_dunder_name_element_count != len(dundered_name_elements) and len(dundered_name_elements) > 1:
+            return None
 
         # dundered_name_element_additions = (
         #     edge_from_node.attribute_computation_update.dundered_name_element_additions

@@ -66,12 +66,12 @@ logger = logging.getLogger(__name__)
 def test_all(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    sg_06_ambiguous_join_manifest: ManifestObjectLookup,
+    sg_06_ambiguous_join_manifest: PydanticSemanticManifest,
 ) -> None:
     check_subgraph_generation(
         request=request,
         mf_test_configuration=mf_test_configuration,
-        manifest_object_lookup=sg_06_ambiguous_join_manifest,
+        manifest_object_lookup=ManifestObjectLookup(sg_06_ambiguous_join_manifest),
         subgraph_generators=SemanticGraphBuilder._ALL_SUBGRAPH_GENERATORS,
     )
 

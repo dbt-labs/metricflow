@@ -48,7 +48,6 @@ from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_c
 from metricflow_semantics.experimental.semantic_graph.semantic_graph import SemanticGraph
 from metricflow_semantics.experimental.singleton_decorator import singleton_dataclass
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.mf_logging.runtime import log_runtime, log_block_runtime
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
 from metricflow_semantics.model.semantics.linkable_element import (
@@ -139,6 +138,27 @@ class AttributeResolver:
             target_attribute_nodes=attribute_nodes,
         )
 
+    def _remove_ambiguous_descriptors(
+        self, attribute_descriptors: AnyLengthTuple[AttributeDescriptor]
+    ) -> AnyLengthTuple[AttributeDescriptor]:
+        unique_dunder_names = set[AnyLengthTuple[str]]()
+        duplicate_dunder_names = set[AnyLengthTuple[str]]()
+        for attribute_descriptor in attribute_descriptors:
+            dundered_name_elements = attribute_descriptor.dundered_name_elements
+            if dundered_name_elements in duplicate_dunder_names:
+                continue
+            if dundered_name_elements in unique_dunder_names:
+                unique_dunder_names.remove(dundered_name_elements)
+                duplicate_dunder_names.add(dundered_name_elements)
+                continue
+            unique_dunder_names.add(dundered_name_elements)
+
+        return tuple(
+            attribute_descriptor
+            for attribute_descriptor in attribute_descriptors
+            if attribute_descriptor.dundered_name_elements in unique_dunder_names
+        )
+
     def resolve_specs_from_source_node(self, source_node: SemanticGraphNode) -> FrozenOrderedSet[AnnotatedSpec]:
         # annotated_specs = list[AnnotatedSpec]()
         dunder_name_to_annotated_spec: dict[str, AnnotatedSpec] = {}
@@ -154,6 +174,7 @@ class AttributeResolver:
                 "Resolved descriptors",
                 source_node=source_node,
                 descriptor_count=len(descriptor_result.attribute_descriptors),
+                descriptor_result=descriptor_result,
             )
         )
 
@@ -165,7 +186,9 @@ class AttributeResolver:
 
         generate_group_by_metric_spec_count = 0
 
-        for descriptor in descriptor_result.attribute_descriptors:
+        attribute_descriptors = self._remove_ambiguous_descriptors(descriptor_result.attribute_descriptors)
+
+        for descriptor in attribute_descriptors:
             if len(descriptor.element_types) != 1:
                 raise ValueError(
                     LazyFormat(
@@ -233,6 +256,7 @@ class AttributeResolver:
             # `last_model_id` may be `None` if the descriptor is for a `metric_time` attribute since the path from
             # the `GroupByAttributeRoot` purposefully excludes that to retain parallelism.
             origin_model_ids = FrozenOrderedSet((last_model_id,)) if last_model_id is not None else measure_model_ids
+
             if element_type is LinkableElementType.METRIC:
                 # annotated_specs.extend(
                 #     self._generate_group_by_metric_specs(
@@ -242,14 +266,16 @@ class AttributeResolver:
                 #         derived_from_semantic_models=derived_from_semantic_models,
                 #     )
                 # )
-                dunder_name_to_annotated_spec.update(
-                    self._generate_group_by_metric_specs(
-                        metric_name=default_element_name,
-                        entity_links=default_entity_links,
-                        properties=properties,
-                        derived_from_semantic_models=derived_from_semantic_models,
+                # For group-by metrics, only a single entity link is currently allowed.
+                if len(default_entity_links) <= 1:
+                    dunder_name_to_annotated_spec.update(
+                        self._generate_group_by_metric_specs(
+                            metric_name=default_element_name,
+                            entity_links=default_entity_links,
+                            properties=properties,
+                            derived_from_semantic_models=derived_from_semantic_models,
+                        )
                     )
-                )
                 generate_group_by_metric_spec_count += 1
             elif element_type is LinkableElementType.ENTITY:
                 # annotated_specs.append(
@@ -346,7 +372,11 @@ class AttributeResolver:
             else:
                 assert_values_exhausted(element_type)
 
-        logger.debug(LazyFormat("Finished generating specs", generate_group_by_metric_spec_count=generate_group_by_metric_spec_count))
+        logger.debug(
+            LazyFormat(
+                "Finished generating specs", generate_group_by_metric_spec_count=generate_group_by_metric_spec_count
+            )
+        )
         return FrozenOrderedSet(dunder_name_to_annotated_spec.values())
 
     def _generate_group_by_metric_specs(
