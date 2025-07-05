@@ -20,7 +20,7 @@ POPULATE_PERSISTENT_SOURCE_SCHEMA = $(TESTS_METRICFLOW)/source_schema_tools.py::
 # Install Hatch package / project manager
 .PHONY: install-hatch
 install-hatch:
-	pip3 install hatch
+	pip install hatch
 
 .PHONY: perf
 perf:
