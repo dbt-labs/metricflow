@@ -8,9 +8,14 @@ from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import Pair
 from metricflow_semantics.experimental.ordered_set import MutableOrderedSet, OrderedSet
+from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeComputationUpdate
 from metricflow_semantics.experimental.semantic_graph.builder.graph_change_rule import (
     SemanticSubgraphGenerator,
     SubgraphGeneratorArgumentSet,
+)
+from metricflow_semantics.experimental.semantic_graph.edges.entity_relationship import (
+    EntityRelationship,
+    EntityRelationshipEdge,
 )
 from metricflow_semantics.experimental.semantic_graph.edges.join_edge import JoinFromModelEdge, JoinToModelEdge
 from metricflow_semantics.experimental.semantic_graph.edges.joined_dsi_entity import JoinedDsiEntityEdge
@@ -24,6 +29,8 @@ from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import (
     JoinToModelNode,
 )
 from metricflow_semantics.experimental.semantic_graph.semantic_graph import MutableSemanticGraph, SemanticGraph
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +38,7 @@ logger = logging.getLogger(__name__)
 class EntityJoinSubgraphGenerator(SemanticSubgraphGenerator):
     def __init__(self, argument_set: SubgraphGeneratorArgumentSet) -> None:
         super().__init__(argument_set)
+        self._verbose_debug_logs = True
 
     def _get_subgraph_for_model(
         self, lookup: SemanticModelObjectLookup
@@ -42,12 +50,27 @@ class EntityJoinSubgraphGenerator(SemanticSubgraphGenerator):
         join_to_semantic_model_node = JoinToModelNode(model_id=model_id)
         join_from_semantic_model_node = JoinFromModelNode(model_id=model_id)
 
+        current_subgraph.add_edge(
+            EntityRelationshipEdge.get_instance(
+                tail_node=join_to_semantic_model_node,
+                relationship=EntityRelationship.VALID,
+                head_node=join_from_semantic_model_node,
+            )
+        )
+
         # List of `DsiEntityNode` that can be reached by joining to
         # this model (i.e. this model is on the right side of the join).
-        valid_target_dsi_entity_nodes_for_joins_to_this_model: list[DsiEntityNode] = []
+        valid_target_dsi_entity_nodes_for_joins_to_this_model = MutableOrderedSet[DsiEntityNode]()
         # List of `DsiEntityNode` that can be reached by joining from
         # this model (this model is on the left side of the join).
-        valid_target_dsi_entity_nodes_for_joins_from_this_model: list[DsiEntityNode] = []
+        valid_target_dsi_entity_nodes_for_joins_from_this_model = MutableOrderedSet[DsiEntityNode]()
+
+        primary_entity_name = lookup.primary_entity_name
+
+        if primary_entity_name is not None:
+            dsi_entity_node = DsiEntityNode.get_instance(entity_name=primary_entity_name)
+            valid_target_dsi_entity_nodes_for_joins_to_this_model.add(dsi_entity_node)
+            valid_target_dsi_entity_nodes_for_joins_from_this_model.add(dsi_entity_node)
 
         for entity in lookup.semantic_model.entities:
             dsi_entity_node = DsiEntityNode.get_instance(entity_name=entity.name)
@@ -57,10 +80,10 @@ class EntityJoinSubgraphGenerator(SemanticSubgraphGenerator):
                 or entity_type is EntityType.UNIQUE
                 or entity_type is EntityType.NATURAL
             ):
-                valid_target_dsi_entity_nodes_for_joins_to_this_model.append(dsi_entity_node)
-                valid_target_dsi_entity_nodes_for_joins_from_this_model.append(dsi_entity_node)
+                valid_target_dsi_entity_nodes_for_joins_to_this_model.add(dsi_entity_node)
+                valid_target_dsi_entity_nodes_for_joins_from_this_model.add(dsi_entity_node)
             elif entity_type is EntityType.FOREIGN:
-                valid_target_dsi_entity_nodes_for_joins_from_this_model.append(dsi_entity_node)
+                valid_target_dsi_entity_nodes_for_joins_from_this_model.add(dsi_entity_node)
             else:
                 assert_values_exhausted(entity_type)
 
@@ -72,27 +95,63 @@ class EntityJoinSubgraphGenerator(SemanticSubgraphGenerator):
                     left_model_id=model_id,
                 )
             )
-
+        primary_entity_name = lookup.primary_entity_name
         for entity_node in valid_target_dsi_entity_nodes_for_joins_from_this_model:
-            for right_model_id in self._manifest_object_lookup.entity_name_to_joinable_semantic_model_id[
+            right_model_ids = self._manifest_object_lookup.entity_name_to_joinable_semantic_model_id[
                 entity_node.entity_name
-            ]:
-                current_subgraph.add_edge(
-                    JoinFromModelEdge.get_instance(
-                        tail_node=join_from_semantic_model_node,
-                        head_node=entity_node,
-                        right_model_id=right_model_id,
-                    )
+            ]
+            for right_model_id in right_model_ids:
+                edge = JoinFromModelEdge.get_instance(
+                    tail_node=join_from_semantic_model_node,
+                    head_node=entity_node,
+                    right_model_id=right_model_id,
+                    attribute_computation_update=AttributeComputationUpdate(
+                        linkable_element_property_additions=(
+                            (LinkableElementProperty.LOCAL_LINKED,)
+                            if entity_node.entity_name == primary_entity_name
+                            else ()
+                        )
+                    ),
                 )
+                current_subgraph.add_edge(edge)
+                if self._verbose_debug_logs:
+                    logger.debug(
+                        LazyFormat(
+                            "Added an edge for joining a model on the right",
+                            edge=edge,
+                            right_model_id=right_model_id,
+                        )
+                    )
+            # Handle the case where a foreign entity is defined in a semantic model, but a corresponding
+            # primary / unique / ... entity is not defined in another semantic model.
+            if len(right_model_ids) == 0:
+                edge = JoinFromModelEdge.get_instance(
+                    tail_node=join_from_semantic_model_node,
+                    head_node=entity_node,
+                    right_model_id=model_id,
+                    attribute_computation_update=AttributeComputationUpdate(),
+                )
+                current_subgraph.add_edge(edge)
+                if self._verbose_debug_logs:
+                    logger.debug(
+                        LazyFormat(
+                            "Added an edge to handle an orphan entity",
+                            edge=edge,
+                            right_model_id=model_id,
+                        )
+                    )
+
         # Handle case when the primary entity field in the semantic model is set and there isn't an entity element in
         # the model with `EntityType.PRIMARY`.
-        primary_entity_name_field = lookup.primary_entity_name
-        if primary_entity_name_field is not None:
+        if lookup.primary_entity_element is None and primary_entity_name is not None:
             current_subgraph.add_edge(
                 JoinFromModelEdge.get_instance(
                     tail_node=join_from_semantic_model_node,
-                    head_node=DsiEntityNode.get_instance(entity_name=primary_entity_name_field),
+                    head_node=DsiEntityNode.get_instance(entity_name=primary_entity_name),
                     right_model_id=model_id,
+                    attribute_computation_update=AttributeComputationUpdate(
+                        linkable_element_property_additions=(LinkableElementProperty.LOCAL_LINKED,),
+                    ),
                 )
             )
 

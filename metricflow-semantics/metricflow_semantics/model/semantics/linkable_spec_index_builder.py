@@ -519,7 +519,9 @@ class LinkableSpecIndexBuilder:
         # TODO: group by resolution has different logic than source node builder for combining date part w/ grain. Fix.
         path_key_to_linkable_dimensions: Dict[ElementPathKey, List[LinkableDimension]] = defaultdict(list)
         for time_granularity in possible_metric_time_granularities:
-            properties = {LinkableElementProperty.METRIC_TIME}
+            properties = {
+                LinkableElementProperty.METRIC_TIME,
+            }
             if time_granularity != defined_granularity:
                 properties.add(LinkableElementProperty.DERIVED_TIME_GRANULARITY)
             linkable_dimension = LinkableDimension.create(

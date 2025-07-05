@@ -9,6 +9,7 @@ from metricflow_semantics.experimental.mf_graph.comparable import ComparisonKey
 from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
 from metricflow_semantics.experimental.orderd_enum import OrderedEnum
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
+from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeComputationUpdate
 from metricflow_semantics.experimental.semantic_graph.edges.edge_labels import MetricDefinitionLabel
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
     SemanticGraphEdge,
@@ -66,6 +67,11 @@ class EntityRelationshipEdge(SemanticGraphEdge):
             head_node=self._tail_node,
             linkable_element_properties=self.linkable_element_properties,
         )
+
+    @override
+    @cached_property
+    def attribute_computation_update(self) -> AttributeComputationUpdate:
+        return AttributeComputationUpdate(linkable_element_property_additions=tuple(self.linkable_element_properties))
 
 
 @singleton_dataclass(order=False)

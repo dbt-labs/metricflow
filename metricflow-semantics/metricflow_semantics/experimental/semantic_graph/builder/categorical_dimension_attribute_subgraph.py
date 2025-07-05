@@ -68,13 +68,13 @@ class CategoricalDimensionAttributeSubgraphGenerator(SemanticSubgraphGenerator):
                 )
             )
 
-            current_subgraph.add_edge(
-                EntityAttributeEdge.get_instance(
-                    tail_node=join_from_semantic_model_node,
-                    head_node=attribute_node,
-                    attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
-                )
-            )
+            # current_subgraph.add_edge(
+            #     EntityAttributeEdge.get_instance(
+            #         tail_node=join_from_semantic_model_node,
+            #         head_node=attribute_node,
+            #         attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
+            #     )
+            # )
 
         return current_subgraph
 

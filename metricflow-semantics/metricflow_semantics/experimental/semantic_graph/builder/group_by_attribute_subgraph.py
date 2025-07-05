@@ -5,9 +5,11 @@ from typing import Iterable, Optional
 
 from typing_extensions import override
 
+from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_flatten
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
+from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeComputationUpdate
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
     AttributeComputationPath,
 )
@@ -50,7 +52,7 @@ class GroupByAttributeSubgraphGenerator:
         self._semantic_graph = semantic_graph
         self._path_finder = path_finder
         self._mutable_path = AttributeComputationPath.create()
-        self._verbose_debug_logs = True
+        self._verbose_debug_logs = False
 
     def generate_subgraph(self, source_nodes: OrderedSet[SemanticGraphNode]) -> AttributeSubgraphResult:
         path_finder = self._path_finder
@@ -83,7 +85,11 @@ class GroupByAttributeSubgraphGenerator:
         subgraph = MutableSemanticGraph.create()
         if len(current_common_join_from_nodes) == 0:
             subgraph.add_node(GroupByAttributeRootNode())
-            return AttributeSubgraphResult(additional_derivative_model_ids=FrozenOrderedSet(), subgraph=subgraph)
+            return AttributeSubgraphResult(
+                additional_derivative_model_ids=FrozenOrderedSet(),
+                subgraph=subgraph,
+                attribute_computation_updates=(),
+            )
 
         for i, join_from_node in enumerate(current_common_join_from_nodes):
             subgraph_for_join_from_node = self._generate_subgraph_from_join_from_node(join_from_node)
@@ -99,7 +105,11 @@ class GroupByAttributeSubgraphGenerator:
             )
         )
         return AttributeSubgraphResult(
-            additional_derivative_model_ids=additional_derivative_model_ids, subgraph=subgraph
+            additional_derivative_model_ids=additional_derivative_model_ids,
+            attribute_computation_updates=tuple(
+                node.attribute_computation_update for node in current_common_join_from_nodes
+            ),
+            subgraph=subgraph,
         )
 
     def _generate_subgraph_from_join_from_node(
@@ -121,12 +131,13 @@ class GroupByAttributeSubgraphGenerator:
         nodes_in_path_to_group_by_attribute_nodes = result.descendant_nodes
         nodes_in_path_to_group_by_attribute_nodes.add(join_from_node)
 
-        logger.debug(
-            LazyFormat(
-                "Found nodes in path to attribute nodes",
-                nodes_in_path_to_group_by_attribute_nodes=nodes_in_path_to_group_by_attribute_nodes,
+        if self._verbose_debug_logs:
+            logger.debug(
+                LazyFormat(
+                    "Found nodes in path to attribute nodes",
+                    nodes_in_path_to_group_by_attribute_nodes=nodes_in_path_to_group_by_attribute_nodes,
+                )
             )
-        )
 
         subgraph_edges = semantic_graph.adjacent_edges(nodes_in_path_to_group_by_attribute_nodes)
         subgraph_edges = self._replace_join_to_node_with_group_by_attribute_root_node(
@@ -159,6 +170,7 @@ class GroupByAttributeSubgraphGenerator:
 @fast_frozen_dataclass()
 class AttributeSubgraphResult:
     additional_derivative_model_ids: FrozenOrderedSet[SemanticModelId]
+    attribute_computation_updates: AnyLengthTuple[AttributeComputationUpdate]
     subgraph: MutableSemanticGraph
 
 

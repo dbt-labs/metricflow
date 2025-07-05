@@ -7,13 +7,12 @@ import pathlib
 import re
 import webbrowser
 from dataclasses import dataclass
-from typing import Any, Callable, Mapping, Optional, Tuple, TypeVar, Union
+from typing import Any, Callable, Mapping, Optional, Tuple, TypeVar
 
 import _pytest.fixtures
 import tabulate
 from _pytest.fixtures import FixtureRequest
 
-from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item
 from metricflow_semantics.dag.mf_dag import MetricFlowDag
 from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
@@ -295,53 +294,108 @@ def assert_plan_snapshot_text_equal(
     )
 
 
-LinkableElementSetSnapshotRow = list[Union[str, list[str], None]]
+LinkableElementSetSnapshotRowDict = dict[str, str]
 
 
-def assert_linkable_element_set_snapshot_equal(  # noqa: D103
-    request: FixtureRequest,
-    snapshot_configuration: SnapshotConfiguration,
-    set_id: str,
+def convert_linkable_element_set_to_rows(
     linkable_element_set: BaseLinkableElementSet,
-    expectation_description: Optional[str] = None,
-) -> None:
-    headers = ("Type", "Dunder Name", "Metric-Subquery Entity-Links", "Properties", "Derived-From Semantic Models")
+) -> list[dict[str, str]]:
+    rows: list[dict[str, str]] = []
 
-    rows: list[LinkableElementSetSnapshotRow] = []
+    # ("Type", "Dunder Name", "Metric-Subquery Entity-Links", "Properties", "Derived-From Semantic Models")
 
     for annotated_spec in sorted(
         linkable_element_set.annotated_specs,
         key=lambda annotated_spec_in_lambda: annotated_spec_in_lambda.spec.qualified_name,
     ):
-        row: LinkableElementSetSnapshotRow = [annotated_spec.spec.qualified_name]
-
+        # row: LinkableElementSetSnapshotRow = [annotated_spec.element_type.name, annotated_spec.spec.qualified_name]
+        row_dict: dict[str, str] = {
+            "Type": annotated_spec.element_type.name.ljust(14),
+            "Dunder Name": annotated_spec.spec.qualified_name.ljust(78),
+        }
         spec_set = group_spec_by_type(annotated_spec.spec)
 
-        # Using loops to simplify handling even though there's only 1 element.
-        assert len(spec_set.all_specs) == 0
-        for group_by_metric_spec in spec_set.group_by_metric_specs:
-            row.append([entity_link.element_name for entity_link in group_by_metric_spec.metric_subquery_entity_links])
-        for spec in spec_set.all_specs:
-            if spec not in spec_set.group_by_metric_specs:
-                row.append(None)
+        if len(spec_set.group_by_metric_specs) == 0:
+            # row.append(None)
+            row_dict["Metric-Subquery Entity-Links"] = ""
+        elif len(spec_set.group_by_metric_specs) == 1:
+            group_by_metric_spec = spec_set.group_by_metric_specs[0]
+            # row.append([entity_link.element_name for entity_link in group_by_metric_spec.metric_subquery_entity_links])
+            row_dict["Metric-Subquery Entity-Links"] = ",".join(
+                entity_link.element_name for entity_link in group_by_metric_spec.metric_subquery_entity_links
+            )
+        else:
+            raise RuntimeError(LazyFormat("There should have been at most 1 group-by-metric spec", spec_set=spec_set))
 
-        row.extend(
-            (
-                sorted(linkable_element_property.name for linkable_element_property in annotated_spec.properties),
-                sorted(
-                    model_reference.semantic_model_name
-                    for model_reference in annotated_spec.derived_from_semantic_models
-                ),
+        # row.extend(
+        #     (
+        #         sorted(linkable_element_property.name for linkable_element_property in annotated_spec.properties),
+        #         sorted(
+        #             model_reference.semantic_model_name
+        #             for model_reference in annotated_spec.derived_from_semantic_models
+        #         ),
+        #     )
+        # )
+
+        row_dict["Properties"] = ",".join(
+            sorted(linkable_element_property.name for linkable_element_property in annotated_spec.properties)
+        )
+        row_dict["Derived-From Semantic Models"] = ",".join(
+            sorted(
+                model_reference.semantic_model_name for model_reference in annotated_spec.derived_from_semantic_models
             )
         )
 
-        rows.append(row)
+        rows.append(row_dict)
+
+    return rows
+
+
+def assert_linkable_element_set_snapshot_equal(  # noqa: D103
+    request: FixtureRequest,
+    snapshot_configuration: SnapshotConfiguration,
+    linkable_element_set: BaseLinkableElementSet,
+    set_id: str = "result",
+    expectation_description: Optional[str] = None,
+) -> None:
+    headers = ("Type", "Dunder Name", "Metric-Subquery Entity-Links", "Properties", "Derived-From Semantic Models")
+    rows = convert_linkable_element_set_to_rows(linkable_element_set)
+
+    # rows: list[LinkableElementSetSnapshotRow] = []
+    #
+    # for annotated_spec in sorted(
+    #     linkable_element_set.annotated_specs,
+    #     key=lambda annotated_spec_in_lambda: annotated_spec_in_lambda.spec.qualified_name,
+    # ):
+    #     row: LinkableElementSetSnapshotRow = [annotated_spec.spec.qualified_name]
+    #
+    #     spec_set = group_spec_by_type(annotated_spec.spec)
+    #
+    #     # Using loops to simplify handling even though there's only 1 element.
+    #     assert len(spec_set.all_specs) == 0
+    #     for group_by_metric_spec in spec_set.group_by_metric_specs:
+    #         row.append([entity_link.element_name for entity_link in group_by_metric_spec.metric_subquery_entity_links])
+    #     for spec in spec_set.all_specs:
+    #         if spec not in spec_set.group_by_metric_specs:
+    #             row.append(None)
+    #
+    #     row.extend(
+    #         (
+    #             sorted(linkable_element_property.name for linkable_element_property in annotated_spec.properties),
+    #             sorted(
+    #                 model_reference.semantic_model_name
+    #                 for model_reference in annotated_spec.derived_from_semantic_models
+    #             ),
+    #         )
+    #     )
+    #
+    #     rows.append(row)
 
     assert_str_snapshot_equal(
         request=request,
         snapshot_configuration=snapshot_configuration,
         snapshot_id=set_id,
-        snapshot_str=tabulate.tabulate(headers=headers, tabular_data=sorted(rows, key=lambda row: mf_first_item(row))),
+        snapshot_str=tabulate.tabulate(sorted(rows, key=lambda row: tuple(row.values()))),  # type: ignore[attr-defined]
         expectation_description=expectation_description,
     )
 

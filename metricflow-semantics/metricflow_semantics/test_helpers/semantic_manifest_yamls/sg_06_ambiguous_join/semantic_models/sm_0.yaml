@@ -9,6 +9,15 @@ semantic_model:
   defaults:
     agg_time_dimension: ds
 
+  entities:
+    - name: sm_0_primary_entity
+      type: primary
+    - name: sm_1_primary_entity
+      type: foreign
+    - name: sm_2_primary_entity
+      type: foreign
+    - name: common_unique_entity
+      type: foreign
   measures:
     - name: sm_0_measure_0
       expr: "1"
@@ -19,7 +28,6 @@ semantic_model:
       type_params:
         time_granularity: quarter
 
-  primary_entity: sm_0_primary_entity
 
 ---
 metric:

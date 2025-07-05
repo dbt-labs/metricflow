@@ -27,3 +27,11 @@ metric:
   type: simple
   type_params:
     measure: sm_0_measure_0
+---
+metric:
+  name: sm_0_measure_0_derived_metric
+  type: derived
+  type_params:
+    expr: "sm_0_measure_0_metric + 1"
+    metrics:
+      - name: sm_0_measure_0_metric

@@ -34,7 +34,7 @@ class SemanticModelObjectLookup:
 
     @cached_property
     def primary_entity_element(self) -> Optional[Entity]:
-        primary_entity_name_to_entity = {
+        primary_entity_name_to_entity: dict[str, Entity] = {
             entity_name: entity
             for entity_name, entity in self._entity_name_to_entity.items()
             if entity.type is EntityType.PRIMARY

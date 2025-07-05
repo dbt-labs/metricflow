@@ -194,61 +194,29 @@ def test_resolver(  # noqa: D103
     logger.debug(LazyFormat("Resolved attributes", attribute_descriptors=attribute_descriptors))
 
 
-def test_specs(
-    request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
-    sg_02_single_join_manifest: PydanticSemanticManifest,
-    sg_02_single_join_lookup: ManifestObjectLookup,
-) -> None:
-    element_filter = LinkableElementFilter()
-    semantic_manifest = sg_02_single_join_manifest
-    sg_linkable_spec_resolver = _create_sg_resolver(semantic_manifest)
-
-    measure_reference = MeasureReference(element_name="sm_0_measure_0")
-    sg_linkable_element_set = sg_linkable_spec_resolver.get_linkable_element_set_for_measure(
-        measure_reference, element_filter
-    )
-    assert_linkable_element_set_snapshot_equal(
-        request=request,
-        snapshot_configuration=mf_test_configuration,
-        linkable_element_set=sg_linkable_element_set,
-        set_id="sg_result",
-    )
-
-
 def test_linkable_spec_resolvers(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    sg_02_single_join_manifest: PydanticSemanticManifest,
-    sg_04_common_primary_entity_manifest: PydanticSemanticManifest,
-    simple_semantic_manifest: PydanticSemanticManifest,
+    sg_03_multi_entity_join_manifest: PydanticSemanticManifest,
 ) -> None:
     element_filter = LinkableElementFilter()
-
-    # semantic_manifest = sg_02_single_join_manifest
-    semantic_manifest = simple_semantic_manifest
-    # semantic_manifest = sg_04_common_primary_entity_manifest
-
-    manifest_lookup = SemanticManifestLookup(semantic_manifest)
-
-    # measure_references = manifest_lookup.semantic_model_lookup.measure_references
-    measure_references = (MeasureReference(element_name="bookings"),)
-
+    semantic_manifest = sg_03_multi_entity_join_manifest
     legacy_linkable_spec_resolver = _create_legacy_resolver(semantic_manifest)
     sg_linkable_spec_resolver = _create_sg_resolver(semantic_manifest)
 
-    for measure_reference in measure_references:
+    manifest_lookup = SemanticManifestLookup(semantic_manifest)
+
+    # for measure_reference in manifest_lookup.semantic_model_lookup.measure_references:
+    for measure_reference in (MeasureReference(element_name="sm_0_measure_0"),):
         logger.debug(
             LazyFormat(
                 "Comparing results from the legacy implementation and semantic-graph implementation",
                 measure_reference=measure_reference,
             )
         )
-        logger.debug("Generating using legacy implementation")
         legacy_linkable_element_set = legacy_linkable_spec_resolver.get_linkable_element_set_for_measure(
             measure_reference, element_filter
         )
-        logger.debug("Generating using semantic graph implementation")
         sg_linkable_element_set = sg_linkable_spec_resolver.get_linkable_element_set_for_measure(
             measure_reference, element_filter
         )

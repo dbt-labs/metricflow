@@ -15,7 +15,6 @@ from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_data
 from metricflow_semantics.experimental.mf_graph.graph_element import HasDisplayedProperty
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, OrderedSet
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
@@ -81,17 +80,11 @@ class AttributeDescriptor:
     date_parts: FrozenOrderedSet[DatePart] = FrozenOrderedSet()
 
     @cached_property
-    def last_model_id(self) -> SemanticModelId:
-        try:
-            return tuple(self.model_ids)[-1]
-        except IndexError:
-            raise RuntimeError(
-                LazyFormat(
-                    "Descriptor is missing model IDs. This indicates incorrect semantic graph construction or path"
-                    " traversal.",
-                    attribute_descriptor=self,
-                )
-            )
+    def last_model_id(self) -> Optional[SemanticModelId]:
+        if len(self.model_ids) == 0:
+            return None
+
+        return tuple(self.model_ids)[-1]
 
 
 @dataclass
@@ -120,6 +113,13 @@ class MutableAttributeComputation(AttributeComputation):
             SemanticModelReference(semantic_model_name=model_id.model_name)
             for model_id in self.ordered_attribute_descriptors[-1].model_ids
         )
+
+    @property
+    def derivative_semantic_model_ids(self) -> FrozenOrderedSet[SemanticModelId]:
+        if len(self.ordered_attribute_descriptors) == 0:
+            return FrozenOrderedSet()
+
+        return self.ordered_attribute_descriptors[-1].model_ids
 
     def append_update(self, update: AttributeComputationUpdate) -> None:
         if len(self.ordered_attribute_descriptors) == 0:

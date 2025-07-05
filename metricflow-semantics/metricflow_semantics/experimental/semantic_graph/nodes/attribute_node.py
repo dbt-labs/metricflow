@@ -205,6 +205,10 @@ class CategoricalDimensionAttributeNode(AttributeNode):
 
 @singleton_dataclass(order=False)
 class MetricNode(AttributeNode):
+    @staticmethod
+    def get_instance(metric_name: str) -> MetricNode:  # noqa: D102
+        return MetricNode(attribute_name=metric_name)
+
     @property
     @override
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
