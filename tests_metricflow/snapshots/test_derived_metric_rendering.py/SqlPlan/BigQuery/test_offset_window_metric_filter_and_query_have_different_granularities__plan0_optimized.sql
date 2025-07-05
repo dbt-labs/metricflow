@@ -10,8 +10,8 @@ WITH sma_28009_cte AS (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
   SELECT
-    DATETIME_TRUNC(ds, day) AS metric_time__day
-    , DATETIME_TRUNC(ds, month) AS metric_time__month
+    TIMESTAMP_TRUNC(ds, day) AS metric_time__day
+    , TIMESTAMP_TRUNC(ds, month) AS metric_time__month
     , booking_value
     , guest_id AS bookers
   FROM ***************************.fct_bookings bookings_source_src_28000
@@ -38,7 +38,7 @@ FROM (
       -- Join to Time Spine Dataset
       SELECT
         time_spine_src_28006.ds AS metric_time__day
-        , DATETIME_TRUNC(time_spine_src_28006.ds, month) AS metric_time__month
+        , TIMESTAMP_TRUNC(time_spine_src_28006.ds, month) AS metric_time__month
         , sma_28009_cte.booking_value AS booking_value
       FROM ***************************.mf_time_spine time_spine_src_28006
       INNER JOIN

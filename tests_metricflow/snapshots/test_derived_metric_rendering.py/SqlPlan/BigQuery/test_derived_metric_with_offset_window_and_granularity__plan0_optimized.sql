@@ -8,8 +8,8 @@ WITH sma_28009_cte AS (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
   SELECT
-    DATETIME_TRUNC(ds, day) AS metric_time__day
-    , DATETIME_TRUNC(ds, quarter) AS metric_time__quarter
+    TIMESTAMP_TRUNC(ds, day) AS metric_time__day
+    , TIMESTAMP_TRUNC(ds, quarter) AS metric_time__quarter
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
@@ -41,7 +41,7 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      DATETIME_TRUNC(time_spine_src_28006.ds, quarter) AS metric_time__quarter
+      TIMESTAMP_TRUNC(time_spine_src_28006.ds, quarter) AS metric_time__quarter
       , SUM(sma_28009_cte.bookings) AS bookings_2_weeks_ago
     FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN

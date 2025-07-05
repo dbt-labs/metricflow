@@ -55,38 +55,38 @@ FROM (
     , account_balance AS total_account_balance_first_day
     , account_balance AS current_account_balance_by_user
     , account_balance AS total_account_balance_first_day_of_month
-    , DATETIME_TRUNC(ds, day) AS ds__day
-    , DATETIME_TRUNC(ds, isoweek) AS ds__week
-    , DATETIME_TRUNC(ds, month) AS ds__month
-    , DATETIME_TRUNC(ds, quarter) AS ds__quarter
-    , DATETIME_TRUNC(ds, year) AS ds__year
+    , TIMESTAMP_TRUNC(ds, day) AS ds__day
+    , TIMESTAMP_TRUNC(ds, isoweek) AS ds__week
+    , TIMESTAMP_TRUNC(ds, month) AS ds__month
+    , TIMESTAMP_TRUNC(ds, quarter) AS ds__quarter
+    , TIMESTAMP_TRUNC(ds, year) AS ds__year
     , EXTRACT(year FROM ds) AS ds__extract_year
     , EXTRACT(quarter FROM ds) AS ds__extract_quarter
     , EXTRACT(month FROM ds) AS ds__extract_month
     , EXTRACT(day FROM ds) AS ds__extract_day
     , IF(EXTRACT(dayofweek FROM ds) = 1, 7, EXTRACT(dayofweek FROM ds) - 1) AS ds__extract_dow
     , EXTRACT(dayofyear FROM ds) AS ds__extract_doy
-    , DATETIME_TRUNC(ds_month, month) AS ds_month__month
-    , DATETIME_TRUNC(ds_month, quarter) AS ds_month__quarter
-    , DATETIME_TRUNC(ds_month, year) AS ds_month__year
+    , TIMESTAMP_TRUNC(ds_month, month) AS ds_month__month
+    , TIMESTAMP_TRUNC(ds_month, quarter) AS ds_month__quarter
+    , TIMESTAMP_TRUNC(ds_month, year) AS ds_month__year
     , EXTRACT(year FROM ds_month) AS ds_month__extract_year
     , EXTRACT(quarter FROM ds_month) AS ds_month__extract_quarter
     , EXTRACT(month FROM ds_month) AS ds_month__extract_month
     , account_type
-    , DATETIME_TRUNC(ds, day) AS account__ds__day
-    , DATETIME_TRUNC(ds, isoweek) AS account__ds__week
-    , DATETIME_TRUNC(ds, month) AS account__ds__month
-    , DATETIME_TRUNC(ds, quarter) AS account__ds__quarter
-    , DATETIME_TRUNC(ds, year) AS account__ds__year
+    , TIMESTAMP_TRUNC(ds, day) AS account__ds__day
+    , TIMESTAMP_TRUNC(ds, isoweek) AS account__ds__week
+    , TIMESTAMP_TRUNC(ds, month) AS account__ds__month
+    , TIMESTAMP_TRUNC(ds, quarter) AS account__ds__quarter
+    , TIMESTAMP_TRUNC(ds, year) AS account__ds__year
     , EXTRACT(year FROM ds) AS account__ds__extract_year
     , EXTRACT(quarter FROM ds) AS account__ds__extract_quarter
     , EXTRACT(month FROM ds) AS account__ds__extract_month
     , EXTRACT(day FROM ds) AS account__ds__extract_day
     , IF(EXTRACT(dayofweek FROM ds) = 1, 7, EXTRACT(dayofweek FROM ds) - 1) AS account__ds__extract_dow
     , EXTRACT(dayofyear FROM ds) AS account__ds__extract_doy
-    , DATETIME_TRUNC(ds_month, month) AS account__ds_month__month
-    , DATETIME_TRUNC(ds_month, quarter) AS account__ds_month__quarter
-    , DATETIME_TRUNC(ds_month, year) AS account__ds_month__year
+    , TIMESTAMP_TRUNC(ds_month, month) AS account__ds_month__month
+    , TIMESTAMP_TRUNC(ds_month, quarter) AS account__ds_month__quarter
+    , TIMESTAMP_TRUNC(ds_month, year) AS account__ds_month__year
     , EXTRACT(year FROM ds_month) AS account__ds_month__extract_year
     , EXTRACT(quarter FROM ds_month) AS account__ds_month__extract_quarter
     , EXTRACT(month FROM ds_month) AS account__ds_month__extract_month
@@ -99,8 +99,8 @@ INNER JOIN (
   -- Read Elements From Semantic Model 'accounts_source'
   -- Filter row on MIN(ds__day)
   SELECT
-    DATETIME_TRUNC(ds, isoweek) AS ds__week
-    , MIN(DATETIME_TRUNC(ds, day)) AS ds__day__complete
+    TIMESTAMP_TRUNC(ds, isoweek) AS ds__week
+    , MIN(TIMESTAMP_TRUNC(ds, day)) AS ds__day__complete
   FROM ***************************.fct_accounts accounts_source_src_28000
   GROUP BY
     ds__week
