@@ -26,6 +26,7 @@ from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
     JoinFromLabel,
     JoinViaLabel,
     MetricTimeLabel,
+    SemanticModelLabel,
     TimeDimensionLabel,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
@@ -166,6 +167,74 @@ class JoinFromModelNode(SemanticGraphNode):
     @cached_property
     def labels(self) -> FrozenOrderedSet[MetricflowGraphLabel]:
         return super(SemanticGraphNode, self).labels.union((JoinFromLabel(),))
+
+    @override
+    @property
+    def attribute_computation_update(self) -> AttributeComputationUpdate:
+        return AttributeComputationUpdate(
+            derived_from_model_id_additions=(self.model_id,),
+        )
+
+
+@singleton_dataclass(order=False)
+class SemanticModelNode(SemanticGraphNode):
+    model_id: SemanticModelId
+
+    @staticmethod
+    def get_instance(model_id: SemanticModelId) -> SemanticModelNode:  # noqa: D102
+        return SemanticModelNode(model_id=model_id)
+
+    @override
+    @cached_property
+    def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
+        return MetricflowGraphNodeDescriptor.get_instance(
+            node_name=f"Model({self.model_id})",
+            cluster_name=self.model_id.cluster_name,
+        )
+
+    @override
+    @property
+    def comparison_key(self) -> ComparisonKey:
+        return self.model_id.comparison_key
+
+    @override
+    @cached_property
+    def labels(self) -> FrozenOrderedSet[MetricflowGraphLabel]:
+        return super(SemanticGraphNode, self).labels.union((SemanticModelLabel(),))
+
+    @override
+    @property
+    def attribute_computation_update(self) -> AttributeComputationUpdate:
+        return AttributeComputationUpdate(
+            derived_from_model_id_additions=(self.model_id,),
+        )
+
+
+@singleton_dataclass(order=False)
+class LocalSemanticModelNode(SemanticGraphNode):
+    model_id: SemanticModelId
+
+    @staticmethod
+    def get_instance(model_id: SemanticModelId) -> LocalSemanticModelNode:  # noqa: D102
+        return LocalSemanticModelNode(model_id=model_id)
+
+    @override
+    @cached_property
+    def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
+        return MetricflowGraphNodeDescriptor.get_instance(
+            node_name=f"LocalModel({self.model_id})",
+            cluster_name=self.model_id.cluster_name,
+        )
+
+    @override
+    @property
+    def comparison_key(self) -> ComparisonKey:
+        return self.model_id.comparison_key
+
+    @override
+    @cached_property
+    def labels(self) -> FrozenOrderedSet[MetricflowGraphLabel]:
+        return super(SemanticGraphNode, self).labels.union((SemanticModelLabel(),))
 
     @override
     @property

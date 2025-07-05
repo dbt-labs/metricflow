@@ -6,9 +6,8 @@ from typing import Iterable, Optional
 from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
-from metricflow_semantics.collection_helpers.syntactic_sugar import mf_flatten
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
-from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
+from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeComputationUpdate
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
     AttributeComputationPath,
@@ -20,8 +19,9 @@ from metricflow_semantics.experimental.semantic_graph.edges.entity_relationship 
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import GroupByAttributeRootNode
 from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
+    AggregationLabel,
     GroupByAttributeLabel,
-    JoinFromLabel,
+    SemanticModelLabel,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
     SemanticGraphEdge,
@@ -52,38 +52,38 @@ class GroupByAttributeSubgraphGenerator:
         self._semantic_graph = semantic_graph
         self._path_finder = path_finder
         self._mutable_path = AttributeComputationPath.create()
-        self._verbose_debug_logs = False
+        self._verbose_debug_logs = True
 
-    def generate_subgraph(self, source_nodes: OrderedSet[SemanticGraphNode]) -> AttributeSubgraphResult:
+    def generate_subgraph(self, source_node: SemanticGraphNode) -> AttributeSubgraphResult:
         path_finder = self._path_finder
         semantic_graph = self._semantic_graph
-        label = JoinFromLabel()
-        # Since we're doing an intersection of the reachable `join_from_nodes` from all metrics, we can reduce the
-        # search space by narrowing the set of target nodes to the current set of reachable nodes.
-        current_common_join_from_nodes = MutableOrderedSet[SemanticGraphNode](semantic_graph.nodes_with_label(label))
+        # Find the required successor nodes for the group-by-attribute root node
+        target_nodes = semantic_graph.nodes_with_label(AggregationLabel()).union(
+            semantic_graph.nodes_with_label(SemanticModelLabel())
+        )
 
-        for i, metric_node in enumerate(source_nodes):
-            result = path_finder.find_descendant_nodes(
-                graph=self._semantic_graph,
-                mutable_path=self._mutable_path,
-                source_node=metric_node,
-                candidate_target_nodes=current_common_join_from_nodes,
-                max_path_weight=GroupByAttributeSubgraphGenerator._MAX_SEARCH_DEPTH,
-                weight_function=BlockMetricDefinitionEdgeWeightFunction(),
-            )
-            current_common_join_from_nodes = current_common_join_from_nodes.intersection(result.descendant_nodes)
+        result = path_finder.find_descendant_nodes(
+            graph=self._semantic_graph,
+            mutable_path=self._mutable_path,
+            source_node=source_node,
+            candidate_target_nodes=target_nodes,
+            max_path_weight=GroupByAttributeSubgraphGenerator._MAX_SEARCH_DEPTH,
+            weight_function=BlockMetricDefinitionEdgeWeightFunction(),
+        )
 
+        found_target_nodes = result.descendant_nodes.intersection(target_nodes)
         if self._verbose_debug_logs:
             logger.debug(
                 LazyFormat(
-                    "Found common join-from nodes",
-                    metric_nodes=source_nodes,
-                    current_common_join_from_nodes=current_common_join_from_nodes,
+                    "Found target nodes",
+                    source_node=source_node,
+                    found_target_nodes=found_target_nodes,
+                    target_nodes=target_nodes,
                 )
             )
 
         subgraph = MutableSemanticGraph.create()
-        if len(current_common_join_from_nodes) == 0:
+        if len(found_target_nodes) == 0:
             subgraph.add_node(GroupByAttributeRootNode())
             return AttributeSubgraphResult(
                 additional_derivative_model_ids=FrozenOrderedSet(),
@@ -91,30 +91,22 @@ class GroupByAttributeSubgraphGenerator:
                 attribute_computation_updates=(),
             )
 
-        for i, join_from_node in enumerate(current_common_join_from_nodes):
-            subgraph_for_join_from_node = self._generate_subgraph_from_join_from_node(join_from_node)
-            if i == 0:
-                subgraph = subgraph_for_join_from_node
-            else:
-                subgraph = subgraph.intersection(subgraph_for_join_from_node)
+        for target_node in found_target_nodes:
+            subgraph.update(self._generate_attribute_subgraph(target_node))
 
-        additional_derivative_model_ids = FrozenOrderedSet[SemanticModelId](
-            mf_flatten(
-                node.attribute_computation_update.derived_from_model_id_additions
-                for node in current_common_join_from_nodes
-            )
+        additional_derivative_model_ids = FrozenOrderedSet(
+            source_node.attribute_computation_update.derived_from_model_id_additions
         )
+
         return AttributeSubgraphResult(
             additional_derivative_model_ids=additional_derivative_model_ids,
-            attribute_computation_updates=tuple(
-                node.attribute_computation_update for node in current_common_join_from_nodes
-            ),
+            attribute_computation_updates=(source_node.attribute_computation_update,),
             subgraph=subgraph,
         )
 
-    def _generate_subgraph_from_join_from_node(
+    def _generate_attribute_subgraph(
         self,
-        join_from_node: SemanticGraphNode,
+        source_node: SemanticGraphNode,
     ) -> MutableSemanticGraph:
         path_finder = self._path_finder
         semantic_graph = self._semantic_graph
@@ -122,14 +114,13 @@ class GroupByAttributeSubgraphGenerator:
         result = path_finder.find_descendant_nodes(
             graph=self._semantic_graph,
             mutable_path=self._mutable_path,
-            source_node=join_from_node,
+            source_node=source_node,
             candidate_target_nodes=semantic_graph.nodes_with_label(GroupByAttributeLabel()),
             max_path_weight=GroupByAttributeSubgraphGenerator._MAX_SEARCH_DEPTH,
             weight_function=EdgeCountWeightFunction(),
         )
 
         nodes_in_path_to_group_by_attribute_nodes = result.descendant_nodes
-        nodes_in_path_to_group_by_attribute_nodes.add(join_from_node)
 
         if self._verbose_debug_logs:
             logger.debug(
@@ -139,11 +130,25 @@ class GroupByAttributeSubgraphGenerator:
                 )
             )
 
-        subgraph_edges = semantic_graph.adjacent_edges(nodes_in_path_to_group_by_attribute_nodes)
-        subgraph_edges = self._replace_join_to_node_with_group_by_attribute_root_node(
-            join_from_node=join_from_node,
-            edges=subgraph_edges,
-        )
+        root_node = GroupByAttributeRootNode()
+        subgraph_edge_candidates = semantic_graph.adjacent_edges(nodes_in_path_to_group_by_attribute_nodes)
+        subgraph_edges = MutableOrderedSet[SemanticGraphEdge]()
+
+        for edge in subgraph_edge_candidates:
+            if (
+                edge.head_node in nodes_in_path_to_group_by_attribute_nodes
+                and edge.tail_node in nodes_in_path_to_group_by_attribute_nodes
+            ):
+                if edge.tail_node is source_node:
+                    subgraph_edges.add(
+                        EntityRelationshipEdge.get_instance(
+                            tail_node=root_node,
+                            relationship=EntityRelationship.VALID,
+                            head_node=edge.head_node,
+                        )
+                    )
+                subgraph_edges.add(edge)
+
         subgraph = MutableSemanticGraph.create()
         subgraph.add_edges(subgraph_edges)
         return subgraph

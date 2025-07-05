@@ -35,8 +35,7 @@ from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node impor
     TimeAttributeNode,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import (
-    JoinFromModelNode,
-    JoinToModelNode,
+    SemanticModelNode,
     TimeDimensionNode,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import SemanticGraphEdge
@@ -64,8 +63,7 @@ class TimeDimensionSubgraphGenerator(SemanticSubgraphGenerator):
         current_subgraph = MutableSemanticGraph.create()
 
         model_id = SemanticModelId(model_name=lookup.semantic_model.name)
-        join_to_semantic_model_node = JoinToModelNode(model_id=model_id)
-        join_from_semantic_model_node = JoinFromModelNode(model_id=model_id)
+        semantic_model_node = SemanticModelNode.get_instance(model_id)
 
         for dimension in lookup.semantic_model.dimensions:
             # Skip non-time dimensions.
@@ -109,7 +107,7 @@ class TimeDimensionSubgraphGenerator(SemanticSubgraphGenerator):
                 )
                 current_subgraph.add_edge(
                     EntityRelationshipEdge.get_instance(
-                        tail_node=join_to_semantic_model_node,
+                        tail_node=semantic_model_node,
                         relationship=EntityRelationship.VALID,
                         head_node=time_dimension_node,
                         # linkable_element_properties=FrozenOrderedSet()
@@ -132,15 +130,6 @@ class TimeDimensionSubgraphGenerator(SemanticSubgraphGenerator):
                         node_time_grain=queryable_time_grain,
                     )
                 )
-
-        for attribute_node in self._get_attribute_nodes_for_entities(lookup):
-            current_subgraph.add_edge(
-                EntityAttributeEdge.get_instance(
-                    tail_node=join_to_semantic_model_node,
-                    head_node=attribute_node,
-                    attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
-                )
-            )
 
         return current_subgraph
 

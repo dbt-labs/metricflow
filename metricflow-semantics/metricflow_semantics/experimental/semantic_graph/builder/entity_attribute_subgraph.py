@@ -21,8 +21,7 @@ from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node impor
     DsiEntityKeyAttributeNode,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import (
-    JoinFromModelNode,
-    JoinToModelNode,
+    SemanticModelNode,
 )
 from metricflow_semantics.experimental.semantic_graph.semantic_graph import MutableSemanticGraph, SemanticGraph
 
@@ -45,19 +44,12 @@ class EntityAttributeSubgraphGenerator(SemanticSubgraphGenerator):
         current_subgraph = MutableSemanticGraph.create()
 
         model_id = SemanticModelId(model_name=lookup.semantic_model.name)
-        join_to_semantic_model_node = JoinToModelNode(model_id=model_id)
-        join_from_semantic_model_node = JoinFromModelNode(model_id=model_id)
+        semantic_model_node = SemanticModelNode.get_instance(model_id)
+
         for attribute_node in self._get_attribute_nodes_for_entities(lookup):
             current_subgraph.add_edge(
                 EntityAttributeEdge.get_instance(
-                    tail_node=join_to_semantic_model_node,
-                    head_node=attribute_node,
-                    attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
-                )
-            )
-            current_subgraph.add_edge(
-                EntityAttributeEdge.get_instance(
-                    tail_node=join_from_semantic_model_node,
+                    tail_node=semantic_model_node,
                     head_node=attribute_node,
                     attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
                 )

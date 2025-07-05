@@ -83,3 +83,8 @@ class JoinFromLabel(MetricflowGraphLabel):
 @singleton_dataclass()
 class JoinViaLabel(MetricflowGraphLabel):
     pass
+
+
+@singleton_dataclass()
+class SemanticModelLabel(MetricflowGraphLabel):
+    pass

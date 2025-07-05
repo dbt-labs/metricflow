@@ -7,7 +7,6 @@ from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.references import MeasureReference
-from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
     AttributeComputationPath,
 )
@@ -159,7 +158,7 @@ def test_group_by_attribute_subgraph(  # noqa: D103
         path_finder=MetricflowGraphPathFinder(path_finder_cache=path_finder_cache),
     )
 
-    result = subgraph_generator.generate_subgraph(FrozenOrderedSet((metric_node,)))
+    result = subgraph_generator.generate_subgraph(metric_node)
     subgraph = result.subgraph
     write_svg_snapshot_for_review(
         request=request, snapshot_configuration=mf_test_configuration, svg_file_contents=subgraph.format(SvgFormatter())
@@ -225,14 +224,15 @@ def test_linkable_spec_resolvers(
 ) -> None:
     element_filter = LinkableElementFilter()
 
-    # semantic_manifest = sg_02_single_join_manifest
-    semantic_manifest = simple_semantic_manifest
+    semantic_manifest = sg_02_single_join_manifest
+    # semantic_manifest = simple_semantic_manifest
     # semantic_manifest = sg_04_common_primary_entity_manifest
 
     manifest_lookup = SemanticManifestLookup(semantic_manifest)
 
     # measure_references = manifest_lookup.semantic_model_lookup.measure_references
-    measure_references = (MeasureReference(element_name="bookings"),)
+    # measure_references = (MeasureReference(element_name="bookings"),)
+    measure_references = (MeasureReference(element_name="sm_0_measure_0"),)
 
     legacy_linkable_spec_resolver = _create_legacy_resolver(semantic_manifest)
     sg_linkable_spec_resolver = _create_sg_resolver(semantic_manifest)
