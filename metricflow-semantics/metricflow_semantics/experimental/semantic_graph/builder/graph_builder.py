@@ -5,7 +5,7 @@ import time
 from typing import Iterable, Optional, Type
 
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
-    AttributeComputationPath,
+    AttributeRecipeWriterPath,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.categorical_dimension_attribute_subgraph import (
     CategoricalDimensionAttributeSubgraphGenerator,
@@ -26,6 +26,7 @@ from metricflow_semantics.experimental.semantic_graph.builder.metric_subgraph im
 from metricflow_semantics.experimental.semantic_graph.builder.time_dimension_subgraph import (
     TimeDimensionSubgraphGenerator,
 )
+from metricflow_semantics.experimental.semantic_graph.builder.time_entity_subgraph import TimeEntitySubgraphGenerator
 from metricflow_semantics.experimental.semantic_graph.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
     SemanticGraphEdge,
@@ -45,6 +46,7 @@ class SemanticGraphBuilder:
         EntityJoinSubgraphGenerator,
         MeasureAttributeSubgraphGenerator,
         TimeDimensionSubgraphGenerator,
+        TimeEntitySubgraphGenerator,
         MetricSubgraphGenerator,
         GroupByMetricSubgraph,
     )
@@ -52,7 +54,7 @@ class SemanticGraphBuilder:
     def __init__(
         self,
         manifest_object_lookup: ManifestObjectLookup,
-        path_finder: MetricflowGraphPathFinder[SemanticGraphNode, SemanticGraphEdge, AttributeComputationPath],
+        path_finder: MetricflowGraphPathFinder[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath],
     ) -> None:
         self._path_finder = path_finder
         self._generator_argument_set = SubgraphGeneratorArgumentSet(

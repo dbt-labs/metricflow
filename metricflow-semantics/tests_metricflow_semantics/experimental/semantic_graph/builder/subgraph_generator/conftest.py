@@ -5,7 +5,7 @@ from typing import Iterable, Type
 
 from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
-    AttributeComputationPath,
+    AttributeRecipeWriterPath,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.graph_builder import SemanticGraphBuilder
 from metricflow_semantics.experimental.semantic_graph.builder.graph_change_rule import (
@@ -33,8 +33,8 @@ def check_subgraph_generation(
     manifest_object_lookup: ManifestObjectLookup,
     subgraph_generators: Iterable[Type[SemanticSubgraphGenerator]],
 ) -> None:
-    path_finder_cache = PathFinderCache[SemanticGraphNode, SemanticGraphEdge, AttributeComputationPath]()
-    path_finder = MetricflowGraphPathFinder[SemanticGraphNode, SemanticGraphEdge, AttributeComputationPath](
+    path_finder_cache = PathFinderCache[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath]()
+    path_finder = MetricflowGraphPathFinder[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath](
         path_finder_cache=path_finder_cache,
     )
     graph_builder = SemanticGraphBuilder(

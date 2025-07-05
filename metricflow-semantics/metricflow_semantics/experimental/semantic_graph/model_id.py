@@ -19,6 +19,10 @@ logger = logging.getLogger(__name__)
 class SemanticModelId(MetricFlowPrettyFormattable, Comparable):
     model_name: str
 
+    @staticmethod
+    def get_instance(model_name: str) -> SemanticModelId:
+        return SemanticModelId(model_name=model_name)
+
     @property
     def cluster_name(self) -> str:
         return self.model_name

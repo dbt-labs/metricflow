@@ -10,4 +10,6 @@ logger = logging.getLogger(__name__)
 
 @singleton_dataclass()
 class MetricDefinitionLabel(MetricflowGraphLabel):
-    pass
+    @staticmethod
+    def get_instance() -> MetricDefinitionLabel:
+        return MetricDefinitionLabel()

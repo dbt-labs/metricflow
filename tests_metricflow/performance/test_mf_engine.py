@@ -12,7 +12,7 @@ from dbt_semantic_interfaces.transformations.semantic_manifest_transformer impor
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
-    AttributeComputationPath,
+    AttributeRecipeWriterPath,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.graph_builder import SemanticGraphBuilder
 from metricflow_semantics.experimental.semantic_graph.manifest_object_lookup import (
@@ -156,8 +156,8 @@ def _time_original_init(semantic_manifest: SemanticManifest) -> float:
 def _time_new_init(semantic_manifest: SemanticManifest) -> float:
     start_time = time.perf_counter()
 
-    path_finder_cache = PathFinderCache[SemanticGraphNode, SemanticGraphEdge, AttributeComputationPath]()
-    path_finder = MetricflowGraphPathFinder[SemanticGraphNode, SemanticGraphEdge, AttributeComputationPath](
+    path_finder_cache = PathFinderCache[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath]()
+    path_finder = MetricflowGraphPathFinder[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath](
         path_finder_cache=path_finder_cache,
     )
     manifest_object_lookup = NewManifestObjectLookup(semantic_manifest)

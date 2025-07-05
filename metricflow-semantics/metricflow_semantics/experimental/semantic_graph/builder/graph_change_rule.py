@@ -8,7 +8,7 @@ from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_data
 from metricflow_semantics.experimental.orderd_enum import OrderedEnum
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
-    AttributeComputationPath,
+    AttributeRecipeWriterPath,
 )
 from metricflow_semantics.experimental.semantic_graph.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
@@ -43,7 +43,7 @@ class SemanticGraphChangeSet:
 @fast_frozen_dataclass()
 class SubgraphGeneratorArgumentSet:
     manifest_object_lookup: ManifestObjectLookup
-    path_finder: MetricflowGraphPathFinder[SemanticGraphNode, SemanticGraphEdge, AttributeComputationPath]
+    path_finder: MetricflowGraphPathFinder[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath]
 
 
 class SemanticSubgraphGenerator(ABC):

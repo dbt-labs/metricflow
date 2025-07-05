@@ -5,6 +5,7 @@ from functools import cached_property
 from typing import Optional, override
 
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
+from dbt_semantic_interfaces.type_enums import TimeGranularity
 
 from metricflow_semantics.experimental.mf_graph.comparable import ComparisonKey
 from metricflow_semantics.experimental.mf_graph.formatting.dot_attributes import (
@@ -15,7 +16,7 @@ from metricflow_semantics.experimental.mf_graph.graph_labeling import Metricflow
 from metricflow_semantics.experimental.mf_graph.node_descriptor import MetricflowGraphNodeDescriptor
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_computation import (
-    AttributeComputationUpdate,
+    AttributeRecipeUpdate,
 )
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
@@ -23,15 +24,19 @@ from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
     DsiEntityLabel,
     DunderNameElementLabel,
     GroupByAttributeRootLabel,
+    JoinedModelLabel,
     JoinFromLabel,
     JoinViaLabel,
+    KeyEntityClusterLabel,
+    LocalModelLabel,
+    MetricLabel,
     MetricTimeLabel,
-    SemanticModelLabel,
-    TimeDimensionLabel,
+    TimeClusterLabel,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
     SemanticGraphNode,
 )
+from metricflow_semantics.experimental.semantic_graph.sg_constant import ClusterName
 from metricflow_semantics.experimental.singleton_decorator import singleton_dataclass
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
@@ -65,7 +70,8 @@ class DsiEntityNode(SemanticGraphNode):
     @cached_property
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
         return MetricflowGraphNodeDescriptor.get_instance(
-            node_name=f"DsiEntity({self.entity_name})", cluster_name="dsi_entity"
+            node_name=f"DsiEntity({self.entity_name})",
+            cluster_name=ClusterName.DSI_ENTITY,
         )
 
     @override
@@ -79,8 +85,8 @@ class DsiEntityNode(SemanticGraphNode):
 
     @override
     @cached_property
-    def attribute_computation_update(self) -> AttributeComputationUpdate:
-        return AttributeComputationUpdate(dundered_name_element_addition=self.entity_name)
+    def attribute_recipe_update(self) -> AttributeRecipeUpdate:
+        return AttributeRecipeUpdate(add_entity_link=self.entity_name, add_dunder_name_element=self.entity_name)
 
 
 @singleton_dataclass(order=False)
@@ -100,26 +106,75 @@ class TimeBaseNode(SemanticGraphNode):
 
 
 @singleton_dataclass(order=False)
-class AggregationNode(SemanticGraphNode):
-    model_id: SemanticModelId
-    aggregation_time_dimension_name: str
+class TimeAggregationNode(SemanticGraphNode):
+    min_time_grain: TimeGranularity
+
+    @staticmethod
+    def get_instance(min_time_grain: TimeGranularity) -> TimeAggregationNode:
+        return TimeAggregationNode(
+            min_time_grain=min_time_grain,
+        )
 
     @override
     @cached_property
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
         return MetricflowGraphNodeDescriptor.get_instance(
-            node_name=f"Agg({self.model_id.model_name}, {self.aggregation_time_dimension_name})",
-            cluster_name=self.model_id.cluster_name,
+            node_name=f"TimeAgg({self.min_time_grain.value})",
+            cluster_name=ClusterName.TIME,
         )
 
     @property
     def comparison_key(self) -> ComparisonKey:
-        return (self.model_id.comparison_key, self.aggregation_time_dimension_name)
+        return (self.min_time_grain.value,)
 
     @override
     @cached_property
     def labels(self) -> FrozenOrderedSet[MetricflowGraphLabel]:
-        return super(AggregationNode, self).labels.union((AggregationLabel(),))
+        return super(TimeAggregationNode, self).labels.union((AggregationLabel(),))
+
+    @override
+    @cached_property
+    def attribute_recipe_update(self) -> AttributeRecipeUpdate:
+        return AttributeRecipeUpdate(add_min_time_grain=self.min_time_grain)
+
+
+# @singleton_dataclass(order=False)
+# class TimeAggregationNode(SemanticGraphNode):
+#     model_id: SemanticModelId
+#     aggregation_time_dimension_name: str
+#     min_time_grain: TimeGranularity
+#
+#     @staticmethod
+#     def get_instance(
+#         model_id: SemanticModelId, aggregation_time_dimension_name: str, min_time_grain: TimeGranularity
+#     ) -> TimeAggregationNode:
+#         return TimeAggregationNode(
+#             model_id=model_id,
+#             aggregation_time_dimension_name=aggregation_time_dimension_name,
+#             min_time_grain=min_time_grain,
+#         )
+#
+#     @override
+#     @cached_property
+#     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
+#         return MetricflowGraphNodeDescriptor.get_instance(
+#             node_name=f"Agg({self.model_id.model_name}, {self.aggregation_time_dimension_name})",
+#             cluster_name=self.model_id.cluster_name,
+#         )
+#
+#     @property
+#     def comparison_key(self) -> ComparisonKey:
+#         return (self.model_id.comparison_key, self.aggregation_time_dimension_name)
+#
+#     @override
+#     @cached_property
+#     def labels(self) -> FrozenOrderedSet[MetricflowGraphLabel]:
+#         return super(TimeAggregationNode, self).labels.union((AggregationLabel(),))
+#
+#     @override
+#     @cached_property
+#     def attribute_computation_update(self) -> AttributeComputationUpdate:
+#         return AttributeComputationUpdate(min_time_grain=self.min_time_grain)
 
 
 @singleton_dataclass(order=False)
@@ -140,9 +195,9 @@ class JoinToModelNode(SemanticGraphNode):
 
     @override
     @cached_property
-    def attribute_computation_update(self) -> AttributeComputationUpdate:
-        return AttributeComputationUpdate(
-            derived_from_model_id_additions=(self.model_id,),
+    def attribute_recipe_update(self) -> AttributeRecipeUpdate:
+        return AttributeRecipeUpdate(
+            join_model=self.model_id,
         )
 
 
@@ -170,25 +225,25 @@ class JoinFromModelNode(SemanticGraphNode):
 
     @override
     @property
-    def attribute_computation_update(self) -> AttributeComputationUpdate:
-        return AttributeComputationUpdate(
-            derived_from_model_id_additions=(self.model_id,),
+    def attribute_recipe_update(self) -> AttributeRecipeUpdate:
+        return AttributeRecipeUpdate(
+            join_model=self.model_id,
         )
 
 
 @singleton_dataclass(order=False)
-class SemanticModelNode(SemanticGraphNode):
+class JoinedModelNode(SemanticGraphNode):
     model_id: SemanticModelId
 
     @staticmethod
-    def get_instance(model_id: SemanticModelId) -> SemanticModelNode:  # noqa: D102
-        return SemanticModelNode(model_id=model_id)
+    def get_instance(model_id: SemanticModelId) -> JoinedModelNode:  # noqa: D102
+        return JoinedModelNode(model_id=model_id)
 
     @override
     @cached_property
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
         return MetricflowGraphNodeDescriptor.get_instance(
-            node_name=f"Model({self.model_id})",
+            node_name=f"JoinedModel({self.model_id})",
             cluster_name=self.model_id.cluster_name,
         )
 
@@ -200,23 +255,23 @@ class SemanticModelNode(SemanticGraphNode):
     @override
     @cached_property
     def labels(self) -> FrozenOrderedSet[MetricflowGraphLabel]:
-        return super(SemanticGraphNode, self).labels.union((SemanticModelLabel(),))
+        return super(SemanticGraphNode, self).labels.union((JoinedModelLabel(),))
 
     @override
-    @property
-    def attribute_computation_update(self) -> AttributeComputationUpdate:
-        return AttributeComputationUpdate(
-            derived_from_model_id_additions=(self.model_id,),
+    @cached_property
+    def attribute_recipe_update(self) -> AttributeRecipeUpdate:
+        return AttributeRecipeUpdate(
+            join_model=self.model_id,
         )
 
 
 @singleton_dataclass(order=False)
-class LocalSemanticModelNode(SemanticGraphNode):
+class LocalModelNode(SemanticGraphNode):
     model_id: SemanticModelId
 
     @staticmethod
-    def get_instance(model_id: SemanticModelId) -> LocalSemanticModelNode:  # noqa: D102
-        return LocalSemanticModelNode(model_id=model_id)
+    def get_instance(model_id: SemanticModelId) -> LocalModelNode:  # noqa: D102
+        return LocalModelNode(model_id=model_id)
 
     @override
     @cached_property
@@ -234,27 +289,30 @@ class LocalSemanticModelNode(SemanticGraphNode):
     @override
     @cached_property
     def labels(self) -> FrozenOrderedSet[MetricflowGraphLabel]:
-        return super(SemanticGraphNode, self).labels.union((SemanticModelLabel(),))
+        return super(SemanticGraphNode, self).labels.union((LocalModelLabel.get_instance(),))
 
     @override
-    @property
-    def attribute_computation_update(self) -> AttributeComputationUpdate:
-        return AttributeComputationUpdate(
-            derived_from_model_id_additions=(self.model_id,),
+    @cached_property
+    def attribute_recipe_update(self) -> AttributeRecipeUpdate:
+        return AttributeRecipeUpdate(
+            join_model=self.model_id,
         )
 
 
 @singleton_dataclass(order=False)
 class TimeDimensionNode(SemanticGraphNode):
     dimension_name: str
-    time_grain_name: str
+
+    @staticmethod
+    def get_instance(dimension_name: str) -> TimeDimensionNode:
+        return TimeDimensionNode(dimension_name=dimension_name)
 
     @override
     @cached_property
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
         return MetricflowGraphNodeDescriptor.get_instance(
-            node_name=f"TimeDimension({self.dimension_name}, {self.time_grain_name})",
-            cluster_name="time_entity",
+            node_name=f"TimeDimension({self.dimension_name})",
+            cluster_name=ClusterName.TIME,
         )
 
     @property
@@ -264,7 +322,7 @@ class TimeDimensionNode(SemanticGraphNode):
     @override
     @cached_property
     def labels(self) -> FrozenOrderedSet[MetricflowGraphLabel]:
-        return super(TimeDimensionNode, self).labels.union((TimeDimensionLabel(),))
+        return super(TimeDimensionNode, self).labels.union((TimeClusterLabel.get_instance(),))
 
     @override
     @cached_property
@@ -272,52 +330,55 @@ class TimeDimensionNode(SemanticGraphNode):
         return DunderNameElementLabel(element_name=self.dimension_name)
 
     @override
-    @property
-    def attribute_computation_update(self) -> AttributeComputationUpdate:
-        return AttributeComputationUpdate(
-            dundered_name_element_addition=self.dimension_name,
-            element_type_addition=LinkableElementType.TIME_DIMENSION,
+    @cached_property
+    def attribute_recipe_update(self) -> AttributeRecipeUpdate:
+        return AttributeRecipeUpdate(
+            add_dunder_name_element=self.dimension_name,
+            set_element_type=LinkableElementType.TIME_DIMENSION,
         )
 
 
 @singleton_dataclass(order=False)
-class MetricTimeDimensionNode(TimeDimensionNode):
+class MetricTimeNode(SemanticGraphNode):
     @staticmethod
-    def get_instance(time_grain_name: str) -> MetricTimeDimensionNode:
-        return MetricTimeDimensionNode(
-            dimension_name=METRIC_TIME_ELEMENT_NAME,
-            time_grain_name=time_grain_name,
-        )
+    def get_instance() -> MetricTimeNode:
+        return MetricTimeNode()
 
     @override
     @cached_property
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
         return MetricflowGraphNodeDescriptor.get_instance(
-            node_name=f"MetricTimeDimension({self.time_grain_name})", cluster_name="time_dimension"
+            node_name="MetricTime",
+            cluster_name=ClusterName.TIME,
         )
 
     @property
     def comparison_key(self) -> ComparisonKey:
-        return (self.time_grain_name,)
+        return ()
 
     @override
     @cached_property
     def labels(self) -> FrozenOrderedSet[MetricflowGraphLabel]:
-        return super(MetricTimeDimensionNode, self).labels.union((MetricTimeLabel(),))
+        return super(MetricTimeNode, self).labels.union(
+            (MetricTimeLabel.get_instance(), TimeClusterLabel.get_instance())
+        )
 
     @override
     @property
-    def attribute_computation_update(self) -> AttributeComputationUpdate:
-        return AttributeComputationUpdate(
-            dundered_name_element_addition=self.dimension_name,
-            linkable_element_property_additions=(LinkableElementProperty.METRIC_TIME,),
-            element_type_addition=LinkableElementType.TIME_DIMENSION,
+    def attribute_recipe_update(self) -> AttributeRecipeUpdate:
+        return AttributeRecipeUpdate(
+            add_dunder_name_element=METRIC_TIME_ELEMENT_NAME,
+            add_properties=(LinkableElementProperty.METRIC_TIME,),
+            set_element_type=LinkableElementType.TIME_DIMENSION,
         )
 
 
 @singleton_dataclass(order=False)
 class GroupByAttributeRootNode(SemanticGraphNode):
-    @override
+    @staticmethod
+    def get_instance() -> GroupByAttributeRootNode:
+        return GroupByAttributeRootNode()
+
     @override
     @property
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
@@ -368,7 +429,89 @@ class JoinViaModelNode(SemanticGraphNode):
 
     @override
     @property
-    def attribute_computation_update(self) -> AttributeComputationUpdate:
-        return AttributeComputationUpdate(
-            derived_from_model_id_additions=(self.model_id,),
+    def attribute_recipe_update(self) -> AttributeRecipeUpdate:
+        return AttributeRecipeUpdate(
+            join_model=self.model_id,
         )
+
+
+@singleton_dataclass(order=False)
+class TimeEntityNode(SemanticGraphNode):
+    @staticmethod
+    def get_instance() -> TimeEntityNode:
+        return TimeEntityNode()
+
+    @override
+    @cached_property
+    def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
+        return MetricflowGraphNodeDescriptor.get_instance(
+            node_name="TimeEntity",
+            cluster_name=ClusterName.TIME,
+        )
+
+    @override
+    @property
+    def comparison_key(self) -> ComparisonKey:
+        return ()
+
+    @override
+    @cached_property
+    def labels(self) -> FrozenOrderedSet[MetricflowGraphLabel]:
+        return super(SemanticGraphNode, self).labels.union((TimeClusterLabel.get_instance(),))
+
+
+@singleton_dataclass(order=False)
+class MetricNode(SemanticGraphNode):
+    metric_name: str
+
+    @staticmethod
+    def get_instance(metric_name: str) -> MetricNode:  # noqa: D102
+        return MetricNode(metric_name=metric_name)
+
+    @override
+    @property
+    def comparison_key(self) -> ComparisonKey:
+        return (self.metric_name,)
+
+    @property
+    @override
+    def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
+        return MetricflowGraphNodeDescriptor.get_instance(
+            node_name=f"Metric({self.metric_name})", cluster_name="metric"
+        )
+
+    @override
+    @cached_property
+    def labels(self) -> FrozenOrderedSet[MetricflowGraphLabel]:
+        return super(MetricNode, self).labels.union(
+            (
+                MetricLabel.get_instance(),
+                MetricLabel.get_instance(self.metric_name),
+            )
+        )
+
+
+@singleton_dataclass(order=False)
+class KeyEntityNode(SemanticGraphNode):
+    dsi_entity_name: str
+
+    @staticmethod
+    def get_instance(dsi_entity_name: str) -> KeyEntityNode:  # noqa: D102
+        return KeyEntityNode(dsi_entity_name=dsi_entity_name)
+
+    @override
+    @property
+    def comparison_key(self) -> ComparisonKey:
+        return (self.dsi_entity_name,)
+
+    @property
+    @override
+    def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
+        return MetricflowGraphNodeDescriptor.get_instance(
+            node_name=f"KeyEntity({self.dsi_entity_name})", cluster_name=ClusterName.KEY
+        )
+
+    @override
+    @cached_property
+    def labels(self) -> FrozenOrderedSet[MetricflowGraphLabel]:
+        return super(KeyEntityNode, self).labels.union((KeyEntityClusterLabel.get_instance(),))

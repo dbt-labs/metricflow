@@ -6,11 +6,13 @@ from collections.abc import Generator, Set
 from dataclasses import dataclass
 from typing import Generic, Optional, TypeVar
 
+import tabulate
+
 from metricflow_semantics.experimental.mf_graph.mf_graph import (
     MetricflowGraph,
 )
 from metricflow_semantics.experimental.mf_graph.mutable_graph import EdgeT, NodeT
-from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet
+from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
 from metricflow_semantics.experimental.semantic_graph.path_finding.graph_path import PathT
 from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_cache import (
     FindCommonReachableTargetsCacheKey,
@@ -28,6 +30,7 @@ from metricflow_semantics.experimental.semantic_graph.path_finding.traversal_eve
 )
 from metricflow_semantics.experimental.semantic_graph.path_finding.weight_function import WeightFunction
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +51,7 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
         self._mutable_path: Optional[PathT] = None
         self._cumulative_stat = MutablePathFinderStat()
 
-        self._verbose_debug_logs = False
+        self._verbose_debug_logs = True
 
     def _current_mutable_path(self) -> PathT:
         if self._mutable_path is None:
@@ -109,7 +112,7 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
             descendant_nodes=descendant_nodes,
         )
 
-    def find_reachable_targets_simple(
+    def find_reachable_targets_dfs(
         self,
         graph: MetricflowGraph[NodeT, EdgeT],
         mutable_path: PathT,
@@ -117,7 +120,7 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
         candidate_target_nodes: Set[NodeT],
         weight_function: WeightFunction[NodeT, EdgeT, PathT],
         max_path_weight: int,
-    ) -> FindReachableTargetsSimpleResult:
+    ) -> FindReachableTargetsSimpleResult[NodeT]:
         start_stat = self._cumulative_stat.copy()
         found_target_nodes = MutableOrderedSet[NodeT]()
 
@@ -139,6 +142,17 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
             reachable_targets=found_target_nodes.as_frozen(),
         )
 
+    def _filter_edges_from_node_by_traversable_nodes(
+        self,
+        source_node: NodeT,
+        graph: MetricflowGraph[NodeT, EdgeT],
+        traversable_nodes: Optional[OrderedSet[NodeT]],
+    ) -> list[EdgeT]:
+        if traversable_nodes is None:
+            return list(graph.edges_with_tail_node(source_node))
+
+        return list(edge for edge in graph.edges_with_tail_node(source_node) if edge.head_node in traversable_nodes)
+
     def traverse_dfs(
         self,
         graph: MetricflowGraph[NodeT, EdgeT],
@@ -149,17 +163,23 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
         max_path_weight: int,
         allow_node_revisits: bool,
         # allow_simple_cycle: bool,
+        traversable_nodes: Optional[OrderedSet[NodeT]] = None,
     ) -> Generator[WalkStopEvent, None, None]:
         # Visit the descendants in DFS, starting from the source node.
         mutable_path.reset_to_start_node(source_node)
         self._mutable_path = mutable_path
 
         self._finished_visiting_nodes = MutableOrderedSet()
+
         self._node_visit_contexts = [
             TraversalVisitContext(
                 node=source_node,
                 weight_added_by_edge_to_this_node=0,
-                edges_to_process_from_this_node=list(graph.edges_with_tail_node(source_node)),
+                edges_to_process_from_this_node=self._filter_edges_from_node_by_traversable_nodes(
+                    source_node=source_node,
+                    graph=graph,
+                    traversable_nodes=traversable_nodes,
+                ),
             )
         ]
 
@@ -169,12 +189,12 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
             logger.debug(
                 LazyFormat(
                     "Starting DFS traversal",
-                    graph=graph,
                     source_node=source_node,
                     target_nodes=target_nodes,
                     weight_function=weight_function,
                     max_path_weight=max_path_weight,
                     allow_node_revisits=allow_node_revisits,
+                    traversable_nodes=traversable_nodes,
                 )
             )
 
@@ -195,14 +215,12 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
             current_path = self._current_mutable_path()
 
             if self._verbose_debug_logs:
-                logger.debug(
-                    LazyFormat(
-                        "Evaluating next node in traversal",
-                        current_node=current_node.node_descriptor.node_name,
-                        current_node_visit_context=current_node_visit_context,
-                        current_path=current_path,
-                    )
-                )
+                lines = [
+                    "Visiting next node",
+                    "",
+                    tabulate.tabulate(tuple((mf_pformat(node),) for node in current_path.nodes), tablefmt="simple_grid"),
+                ]
+                logger.debug("\n".join(lines))
 
             # If we've hit one of the target nodes, so return the path to the node and stop visiting
             # descendants of the current node.
@@ -213,7 +231,6 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
                     logger.debug(
                         LazyFormat(
                             "Reached target node, so returning current path",
-                            current_node=current_node,
                             current_path=current_path,
                         )
                     )
@@ -314,11 +331,14 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
                         "Taking edge", next_edge_to_take=next_edge_to_take, current_path=self._current_mutable_path()
                     )
                 )
+
             self._traverse_dfs__walk_via_edge(
                 edge_to_take=next_edge_to_take,
                 weight_added_by_edge=next_edge_weight,
-                edges_to_visit=list(
-                    graph.edges_with_tail_node(next_edge_to_take.head_node),
+                edges_to_visit=self._filter_edges_from_node_by_traversable_nodes(
+                    source_node=next_edge_to_take.head_node,
+                    graph=graph,
+                    traversable_nodes=traversable_nodes,
                 ),
             )
 
@@ -398,6 +418,74 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
             descendant_nodes=descendant_nodes,
             reachable_targets=common_reachable_targets,
         )
+
+    def descendant_edges(
+        self,
+        graph: MetricflowGraph[NodeT, EdgeT],
+        source_nodes: OrderedSet[NodeT],
+        candidate_target_nodes: OrderedSet[NodeT],
+    ) -> FrozenOrderedSet[EdgeT]:
+        finished_nodes = MutableOrderedSet[NodeT]()
+        nodes_to_evaluate = list(source_nodes)
+        descendant_subgraph_edges = MutableOrderedSet[EdgeT]()
+
+        while True:
+            if len(nodes_to_evaluate) == 0:
+                break
+
+            current_node = nodes_to_evaluate.pop(0)
+
+            if current_node in finished_nodes or current_node in candidate_target_nodes:
+                continue
+
+            for edge in graph.edges_with_tail_node(current_node):
+                descendant_subgraph_edges.add(edge)
+                nodes_to_evaluate.append(edge.head_node)
+            finished_nodes.add(current_node)
+
+        return descendant_subgraph_edges.as_frozen()
+
+    def find_reachable_targets(
+        self,
+        graph: MetricflowGraph[NodeT, EdgeT],
+        source_nodes: OrderedSet[NodeT],
+        candidate_target_nodes: OrderedSet[NodeT],
+        traversable_nodes: OrderedSet[NodeT],
+    ) -> OrderedSet[NodeT]:
+        finished_nodes = MutableOrderedSet[NodeT]()
+        nodes_to_evaluate = list(source_nodes)
+        matching_target_nodes = MutableOrderedSet[NodeT]()
+
+        if self._verbose_debug_logs:
+            logger.debug(
+                LazyFormat(
+                    "Starting search for reachable targets",
+                    source_nodes=source_nodes,
+                    candidate_target_nodes=candidate_target_nodes,
+                    traversable_nodes=traversable_nodes,
+                )
+            )
+
+        while True:
+            if len(nodes_to_evaluate) == 0:
+                break
+
+            current_node = nodes_to_evaluate.pop(0)
+
+            if current_node in finished_nodes:
+                continue
+
+            if current_node in candidate_target_nodes:
+                matching_target_nodes.add(current_node)
+                finished_nodes.add(current_node)
+                continue
+
+            for edge in graph.edges_with_tail_node(current_node):
+                head_node = edge.head_node
+                if head_node in traversable_nodes:
+                    nodes_to_evaluate.append(head_node)
+
+        return matching_target_nodes
 
 
 @dataclass

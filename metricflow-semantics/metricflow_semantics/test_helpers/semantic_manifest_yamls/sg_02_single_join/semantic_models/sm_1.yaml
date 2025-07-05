@@ -9,6 +9,8 @@ semantic_model:
   entities:
     - name: sm_1_primary_entity
       type: primary
+    - name: sm_2_primary_entity
+      type: foreign
   dimensions:
     - name: dim_0
       type: categorical

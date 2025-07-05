@@ -6,14 +6,14 @@ from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from dbt_semantic_interfaces.references import MeasureReference
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
-    AttributeComputationPath,
+    AttributeRecipeWriterPath,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.graph_builder import SemanticGraphBuilder
 from metricflow_semantics.experimental.semantic_graph.builder.group_by_attribute_subgraph import (
     GroupByAttributeSubgraphGenerator,
 )
 from metricflow_semantics.experimental.semantic_graph.manifest_object_lookup import ManifestObjectLookup
-from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import MetricNode
+from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import MetricAttributeNode
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
     SemanticGraphEdge,
     SemanticGraphNode,
@@ -59,8 +59,8 @@ def test_group_by_attribute_subgraph(  # noqa: D103
     sg_04_common_primary_entity_manifest: PydanticSemanticManifest,
 ) -> None:
     manifest_object_lookup = ManifestObjectLookup(sg_04_common_primary_entity_manifest)
-    path_finder_cache = PathFinderCache[SemanticGraphNode, SemanticGraphEdge, AttributeComputationPath]()
-    path_finder = MetricflowGraphPathFinder[SemanticGraphNode, SemanticGraphEdge, AttributeComputationPath](
+    path_finder_cache = PathFinderCache[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath]()
+    path_finder = MetricflowGraphPathFinder[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath](
         path_finder_cache
     )
     builder = SemanticGraphBuilder(
@@ -68,7 +68,7 @@ def test_group_by_attribute_subgraph(  # noqa: D103
         path_finder=path_finder,
     )
     graph = builder.build()
-    metric_node = MetricNode(attribute_name="sm_0_measure_0_metric")
+    metric_node = MetricAttributeNode(attribute_name="sm_0_measure_0_metric")
 
     subgraph_generator = GroupByAttributeSubgraphGenerator(
         semantic_graph=graph,

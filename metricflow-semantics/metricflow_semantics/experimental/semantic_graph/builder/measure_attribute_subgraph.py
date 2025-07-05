@@ -4,18 +4,12 @@ import logging
 
 from typing_extensions import override
 
+from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeRecipeUpdate
 from metricflow_semantics.experimental.semantic_graph.builder.graph_change_rule import (
+    SemanticSubgraphGenerator,
     SubgraphGeneratorArgumentSet,
 )
-from metricflow_semantics.experimental.semantic_graph.builder.time_dimension_subgraph import (
-    TimeDimensionSubgraphGenerator,
-)
-from metricflow_semantics.experimental.semantic_graph.edges.entity_attribute import (
-    AttributeEdgeType,
-    EntityAttributeEdge,
-)
 from metricflow_semantics.experimental.semantic_graph.edges.entity_relationship import (
-    EntityRelationship,
     EntityRelationshipEdge,
 )
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
@@ -26,16 +20,16 @@ from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node impor
     MeasureNode,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import (
-    AggregationNode,
-    SemanticModelNode,
+    JoinedModelNode,
+    LocalModelNode,
+    MetricTimeNode,
 )
-from metricflow_semantics.experimental.semantic_graph.nodes.named_node import SemanticGraphNodeFactory
 from metricflow_semantics.experimental.semantic_graph.semantic_graph import MutableSemanticGraph, SemanticGraph
 
 logger = logging.getLogger(__name__)
 
 
-class MeasureAttributeSubgraphGenerator(TimeDimensionSubgraphGenerator):
+class MeasureAttributeSubgraphGenerator(SemanticSubgraphGenerator):
     def __init__(self, argument_set: SubgraphGeneratorArgumentSet) -> None:
         super().__init__(argument_set)
 
@@ -44,98 +38,47 @@ class MeasureAttributeSubgraphGenerator(TimeDimensionSubgraphGenerator):
     ) -> MutableSemanticGraph:
         current_subgraph = MutableSemanticGraph.create()
         model_id = SemanticModelId(model_name=lookup.semantic_model.name)
-        semantic_model_node = SemanticModelNode.get_instance(model_id)
+        semantic_model_node = JoinedModelNode.get_instance(model_id)
+        local_semantic_model_node = LocalModelNode.get_instance(model_id)
 
+        metric_time_node = MetricTimeNode.get_instance()
         for aggregation_configuration, measures in lookup.aggregation_configuration_to_measures.items():
-            aggregation_entity_node = AggregationNode(
-                model_id=model_id,
-                aggregation_time_dimension_name=aggregation_configuration.time_dimension_name,
-            )
-
-            # Add an edge from the aggregation entity to the metric time nodes.
-            for queryable_time_grain in self._time_grain_to_queryable_time_grains[aggregation_configuration.time_grain]:
-                metric_time_node = SemanticGraphNodeFactory.get_metric_time_base_node(
-                    base_grain=queryable_time_grain,
-                )
-
-                current_subgraph.add_edge(
-                    EntityRelationshipEdge.get_instance(
-                        tail_node=aggregation_entity_node,
-                        relationship=EntityRelationship.VALID,
-                        head_node=metric_time_node,
-                    )
-                )
-
-                # Add edges to the time attributes (e.g. `day`, `year`).
-                current_subgraph.add_edges(
-                    self._generate_attribute_edges(
-                        time_dimension_node=metric_time_node,
-                        element_time_grain=aggregation_configuration.time_grain,
-                        node_time_grain=queryable_time_grain,
-                    )
-                )
-
-                # Add an edge from the aggregation entity node to the semantic-model node.
-                # current_subgraph.add_edge(
-                #     EntityRelationshipEdge.get_instance(
-                #         tail_node=aggregation_entity_node,
-                #         relationship=EntityRelationship.VALID,
-                #         head_node=semantic_model_node,
-                #     )
-                # )
-
-                # In the case that the primary entity is not an element in the semantic model, the primary
-                # entity node is only reachable from measure attribute nodes in the semantic model.
-                # To model this, add an edge from the primary entity to the model entity and the reverse.
-                # if primary_entity_field_defined:
-                #     current_subgraph.add_edge(
-                #         EntityRelationshipEdge.get_instance(
-                #             tail_node=aggregation_entity_node,
-                #             relationship=EntityRelationship.LEFT_CARDINALITY_ONE,
-                #             head_node=primary_entity_node,
-                #             weight=0,
-                #         )
-                #     )
-                #     current_subgraph.add_edge(
-                #         EntityRelationshipEdge.get_instance(
-                #             tail_node=primary_entity_node,
-                #             relationship=EntityRelationship.LEFT_CARDINALITY_ONE,
-                #             head_node=join_to_semantic_model_node,
-                #             weight=1,
-                #         )
-                #     )
-                # else:
-                #     current_subgraph.add_edge(
-                #         EntityRelationshipEdge.get_instance(
-                #             tail_node=aggregation_entity_node,
-                #             relationship=EntityRelationship.LEFT_CARDINALITY_ONE,
-                #             head_node=join_to_semantic_model_node,
-                #             weight=0,
-                #         )
-                #     )
+            # aggregation_entity_node = TimeAggregationNode.get_instance(
+            #     # model_id=model_id,
+            #     # aggregation_time_dimension_name=aggregation_configuration.time_dimension_name,
+            #     min_time_grain=aggregation_configuration.time_grain,
+            # )
+            # current_subgraph.add_edge(
+            #     EntityRelationshipEdge.get_instance(
+            #         tail_node=aggregation_entity_node,
+            #         head_node=metric_time_node,
+            #
+            #     )
+            # )
 
             # Add edges from the measure attribute nodes to the aggregation nodes.
             for measure in measures:
                 measure_name = measure.name
 
-                measure_attribute_node = MeasureNode.get_instance(
+                measure_node = MeasureNode.get_instance(
                     measure_name=measure_name,
                     model_id=model_id,
                 )
 
                 current_subgraph.add_edge(
-                    EntityAttributeEdge.get_instance(
-                        tail_node=measure_attribute_node,
-                        head_node=semantic_model_node,
-                        attribute_edge_type=AttributeEdgeType.ATTRIBUTE_TO_ENTITY,
+                    EntityRelationshipEdge.get_instance(
+                        tail_node=measure_node,
+                        head_node=metric_time_node,
+                        attribute_computation_update=AttributeRecipeUpdate(
+                            add_min_time_grain=aggregation_configuration.time_grain,
+                        ),
                     )
                 )
 
                 current_subgraph.add_edge(
-                    EntityAttributeEdge.get_instance(
-                        tail_node=measure_attribute_node,
-                        head_node=aggregation_entity_node,
-                        attribute_edge_type=AttributeEdgeType.ATTRIBUTE_TO_ENTITY,
+                    EntityRelationshipEdge.get_instance(
+                        tail_node=measure_node,
+                        head_node=local_semantic_model_node,
                     )
                 )
 

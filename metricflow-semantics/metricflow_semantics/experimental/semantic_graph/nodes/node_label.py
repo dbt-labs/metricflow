@@ -21,7 +21,8 @@ class MeasureAttributeLabel(MetricflowGraphLabel):
 
     measure_name: Optional[str]
 
-    def get_instance(self, measure_name: str) -> MeasureAttributeLabel:  # noqa: D102
+    @staticmethod
+    def get_instance(measure_name: Optional[str] = None) -> MeasureAttributeLabel:  # noqa: D102
         return MeasureAttributeLabel(measure_name=measure_name)
 
     def get_instance_from_reference(self, measure_reference: MeasureReference) -> MeasureAttributeLabel:  # noqa: D102
@@ -34,20 +35,23 @@ class MetricAttributeLabel(MetricflowGraphLabel):
 
     metric_name: Optional[str]
 
+    @staticmethod
+    def get_instance(metric_name: Optional[str] = None) -> MetricAttributeLabel:
+        return MetricAttributeLabel(metric_name=metric_name)
+
 
 @singleton_dataclass()
 class GroupByAttributeLabel(MetricflowGraphLabel):
-    pass
+    @staticmethod
+    def get_instance() -> GroupByAttributeLabel:
+        return GroupByAttributeLabel()
 
 
 @singleton_dataclass()
 class DsiEntityLabel(MetricflowGraphLabel):
-    pass
-
-
-@singleton_dataclass()
-class DsiEntityKeyAttributeLabel(MetricflowGraphLabel):
-    pass
+    @staticmethod
+    def get_instance() -> DsiEntityLabel:
+        return DsiEntityLabel()
 
 
 @singleton_dataclass()
@@ -61,8 +65,26 @@ class TimeDimensionLabel(MetricflowGraphLabel):
 
 
 @singleton_dataclass()
+class TimeClusterLabel(MetricflowGraphLabel):
+    @staticmethod
+    def get_instance() -> TimeClusterLabel:
+        return TimeClusterLabel()
+
+
+@singleton_dataclass()
 class MetricTimeLabel(MetricflowGraphLabel):
-    pass
+    @staticmethod
+    def get_instance() -> MetricTimeLabel:
+        return MetricTimeLabel()
+
+
+@singleton_dataclass()
+class MetricLabel(MetricflowGraphLabel):
+    metric_name: Optional[str]
+
+    @staticmethod
+    def get_instance(metric_name: Optional[str] = None) -> MetricLabel:
+        return MetricLabel(metric_name=metric_name)
 
 
 @singleton_dataclass()
@@ -72,7 +94,9 @@ class GroupByAttributeRootLabel(MetricflowGraphLabel):
 
 @singleton_dataclass()
 class AggregationLabel(MetricflowGraphLabel):
-    pass
+    @staticmethod
+    def get_instance() -> AggregationLabel:
+        return AggregationLabel()
 
 
 @singleton_dataclass()
@@ -86,5 +110,21 @@ class JoinViaLabel(MetricflowGraphLabel):
 
 
 @singleton_dataclass()
-class SemanticModelLabel(MetricflowGraphLabel):
-    pass
+class JoinedModelLabel(MetricflowGraphLabel):
+    @staticmethod
+    def get_instance() -> JoinedModelLabel:
+        return JoinedModelLabel()
+
+
+@singleton_dataclass()
+class LocalModelLabel(MetricflowGraphLabel):
+    @staticmethod
+    def get_instance() -> LocalModelLabel:
+        return LocalModelLabel()
+
+
+@singleton_dataclass()
+class KeyEntityClusterLabel(MetricflowGraphLabel):
+    @staticmethod
+    def get_instance() -> KeyEntityClusterLabel:
+        return KeyEntityClusterLabel()

@@ -1,210 +1,190 @@
 from __future__ import annotations
 
 import logging
-from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
+from abc import ABC
 from functools import cached_property
 from typing import Optional, override
 
-from dbt_semantic_interfaces.references import SemanticModelReference
-from dbt_semantic_interfaces.type_enums import DatePart
+from dbt_semantic_interfaces.type_enums import DatePart, TimeGranularity
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
+from metricflow_semantics.experimental.mf_graph.comparable import Comparable, ComparisonKey
 from metricflow_semantics.experimental.mf_graph.graph_element import HasDisplayedProperty
-from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, OrderedSet
+from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
-from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 logger = logging.getLogger(__name__)
 
 
-class AttributeComputation(SemanticModelDerivation, ABC):
+# class AttributeRecipeWriter(SemanticModelDerivation, ABC):
+#     @property
+#     @abstractmethod
+#     def latest_recipe(self) -> Optional[AttributeRecipe]:
+#         raise NotImplementedError()
+
+
+@fast_frozen_dataclass(order=False)
+class AttributeRecipeUpdate(HasDisplayedProperty, Comparable):
+    add_dunder_name_element: Optional[str] = None
+    add_properties: AnyLengthTuple[LinkableElementProperty] = ()
+    join_model: Optional[SemanticModelId] = None
+    add_min_time_grain: Optional[TimeGranularity] = None
+    add_subquery_model_ids: AnyLengthTuple[SemanticModelId] = ()
+
+    # The fields below are specifically to support current definition of `*Spec` objects.
+    set_element_type: Optional[LinkableElementType] = None
+    add_entity_link: Optional[str] = None
+    set_time_grain: Optional[ExpandedTimeGranularity] = None
+    set_date_part: Optional[DatePart] = None
+
+    @override
     @property
-    @abstractmethod
-    def linkable_element_properties(self) -> OrderedSet[LinkableElementProperty]:
-        raise NotImplementedError()
-
-    @property
-    @abstractmethod
-    def attribute_descriptor(self) -> Optional[AttributeDescriptor]:
-        raise NotImplementedError()
-
-
-@fast_frozen_dataclass()
-class AttributeComputationUpdate(HasDisplayedProperty):
-    dundered_name_element_addition: Optional[str] = None
-    linkable_element_property_additions: AnyLengthTuple[LinkableElementProperty] = ()
-    derived_from_model_id_additions: AnyLengthTuple[SemanticModelId] = ()
-    # The fields below should be removable after migration
-    element_type_addition: Optional[LinkableElementType] = None
-    dsi_entity_addition: Optional[str] = None
-    time_grain_addition: Optional[ExpandedTimeGranularity] = None
-    date_part_addition: Optional[DatePart] = None
+    def comparison_key(self) -> ComparisonKey:
+        return (
+            self.add_dunder_name_element,
+            self.add_properties,
+            self.join_model,
+            self.add_min_time_grain.value if self.add_min_time_grain is not None else None,
+            self.set_element_type,
+            self.add_entity_link,
+            self.set_time_grain,
+            self.set_date_part.to_int() if self.set_date_part is not None else None,
+            self.add_subquery_model_ids,
+        )
 
     @override
     @cached_property
     def displayed_properties(self) -> AnyLengthTuple[DisplayedProperty]:
         properties = list(super().displayed_properties)
 
-        if self.dundered_name_element_addition is not None:
+        if self.add_dunder_name_element is not None:
             properties.append(
-                DisplayedProperty("add_name", self.dundered_name_element_addition),
+                DisplayedProperty("add_name", self.add_dunder_name_element),
             )
-        for linkable_element_property_addition in self.linkable_element_property_additions:
+        for linkable_element_property_addition in self.add_properties:
             properties.append(DisplayedProperty("add_prop", linkable_element_property_addition.name))
 
-        for derived_from_model_id_addition in self.derived_from_model_id_additions:
-            properties.append(DisplayedProperty("add_model", derived_from_model_id_addition.model_name))
-        if self.element_type_addition is not None:
-            properties.append(DisplayedProperty("add_type", self.element_type_addition.name))
-        if self.dsi_entity_addition is not None:
-            properties.append(DisplayedProperty("add_dsi_entity", self.dsi_entity_addition))
-        if self.time_grain_addition is not None:
-            properties.append(DisplayedProperty("add_time_grain", self.time_grain_addition.name))
+        if self.join_model is not None:
+            properties.append(DisplayedProperty("join_model", self.join_model.model_name))
+        if self.add_min_time_grain is not None:
+            properties.append(DisplayedProperty("set_min_grain", self.add_min_time_grain.value))
+        for subquery_model_id in self.add_subquery_model_ids:
+            properties.append(DisplayedProperty("add_subquery_model", subquery_model_id))
+        if self.set_element_type is not None:
+            properties.append(DisplayedProperty("add_type", self.set_element_type.name))
+        if self.add_entity_link is not None:
+            properties.append(DisplayedProperty("add_entity_link", self.add_entity_link))
+        if self.set_time_grain is not None:
+            properties.append(DisplayedProperty("set_time_grain", self.set_time_grain.name))
+        if self.set_date_part is not None:
+            properties.append(DisplayedProperty("set_date_part", self.set_date_part.name))
+
         return tuple(properties)
 
 
 @fast_frozen_dataclass()
-class AttributeDescriptor:
-    dundered_name_elements: AnyLengthTuple[str] = ()
-    model_ids: FrozenOrderedSet[SemanticModelId] = FrozenOrderedSet()
+class AttributeRecipe:
+    dunder_name_elements: AnyLengthTuple[str] = ()
+    models_in_join: AnyLengthTuple[SemanticModelId] = ()
     properties: FrozenOrderedSet[LinkableElementProperty] = FrozenOrderedSet()
-    element_types: FrozenOrderedSet[LinkableElementType] = FrozenOrderedSet()
-    dsi_entity_names: AnyLengthTuple[str] = ()
-    time_grains: FrozenOrderedSet[ExpandedTimeGranularity] = FrozenOrderedSet()
-    date_parts: FrozenOrderedSet[DatePart] = FrozenOrderedSet()
+    entity_link_names: AnyLengthTuple[str] = ()
+    subquery_model_ids: FrozenOrderedSet[SemanticModelId] = FrozenOrderedSet()
+
+    element_type: Optional[LinkableElementType] = None
+    min_time_grain: Optional[TimeGranularity] = None
+    time_grain: Optional[ExpandedTimeGranularity] = None
+    date_part: Optional[DatePart] = None
 
     @cached_property
     def last_model_id(self) -> Optional[SemanticModelId]:
-        if len(self.model_ids) == 0:
+        if len(self.models_in_join) == 0:
             return None
 
-        return tuple(self.model_ids)[-1]
+        return tuple(self.models_in_join)[-1]
 
+    def with_update(self, update: AttributeRecipeUpdate) -> AttributeRecipe:
+        dundered_name_elements = self.dunder_name_elements
+        if update.add_dunder_name_element is not None:
+            dundered_name_elements = dundered_name_elements + (update.add_dunder_name_element,)
+        entity_link_names = self.entity_link_names
+        if update.add_entity_link is not None:
+            entity_link_names = entity_link_names + (update.add_entity_link,)
+        models_in_join = self.models_in_join
+        if update.join_model is not None:
+            if len(models_in_join) == 0:
+                models_in_join = (update.join_model,)
+            elif models_in_join[-1] != update.join_model:
+                models_in_join = models_in_join + (update.join_model,)
 
-@dataclass
-class MutableAttributeComputation(AttributeComputation):
-    ordered_attribute_descriptors: list[AttributeDescriptor] = field(default_factory=list)
-
-    @property
-    def linkable_element_properties(self) -> FrozenOrderedSet[LinkableElementProperty]:
-        if len(self.ordered_attribute_descriptors) == 0:
-            return FrozenOrderedSet()
-
-        return FrozenOrderedSet(self.ordered_attribute_descriptors[-1].properties)
-
-    @property
-    def element_types(self) -> FrozenOrderedSet[LinkableElementType]:
-        if len(self.ordered_attribute_descriptors) == 0:
-            return FrozenOrderedSet()
-
-        return FrozenOrderedSet(self.ordered_attribute_descriptors[-1].element_types)
-
-    @property
-    def derived_from_semantic_models(self) -> AnyLengthTuple[SemanticModelReference]:
-        if len(self.ordered_attribute_descriptors) == 0:
-            return ()
-        return tuple(
-            SemanticModelReference(semantic_model_name=model_id.model_name)
-            for model_id in self.ordered_attribute_descriptors[-1].model_ids
+        return AttributeRecipe(
+            dunder_name_elements=dundered_name_elements,
+            models_in_join=models_in_join,
+            properties=self.properties.union(update.add_properties),
+            element_type=update.set_element_type or self.element_type,
+            entity_link_names=entity_link_names,
+            min_time_grain=update.add_min_time_grain or self.min_time_grain,
+            time_grain=update.set_time_grain or self.time_grain,
+            date_part=update.set_date_part or self.date_part,
+            subquery_model_ids=self.subquery_model_ids.union(update.add_subquery_model_ids),
         )
 
-    @property
-    def derivative_semantic_model_ids(self) -> FrozenOrderedSet[SemanticModelId]:
-        if len(self.ordered_attribute_descriptors) == 0:
-            return FrozenOrderedSet()
 
-        return self.ordered_attribute_descriptors[-1].model_ids
+class AttributeRecipeWriter:
+    def __init__(self) -> None:
+        self._recipe_versions: list[AttributeRecipe] = list()
 
-    def append_update(self, update: AttributeComputationUpdate) -> None:
-        if len(self.ordered_attribute_descriptors) == 0:
-            dundered_name_elements = (
-                (update.dundered_name_element_addition,) if update.dundered_name_element_addition is not None else ()
-            )
-            dsi_entity_names = (update.dsi_entity_addition,) if update.dsi_entity_addition is not None else ()
-            time_grains = (
-                FrozenOrderedSet((update.time_grain_addition,))
-                if update.time_grain_addition is not None
-                else FrozenOrderedSet()
-            )
-            date_parts = (
-                FrozenOrderedSet((update.date_part_addition,))
-                if update.date_part_addition is not None
-                else FrozenOrderedSet()
-            )
+    def append_update(self, update: AttributeRecipeUpdate) -> None:
+        if len(self._recipe_versions) == 0:
+            dunder_name_elements: AnyLengthTuple[str] = ()
+            if update.add_dunder_name_element is not None:
+                dunder_name_elements = (update.add_dunder_name_element,)
+            entity_link_names: AnyLengthTuple[str] = ()
+            if update.add_entity_link is not None:
+                entity_link_names = (update.add_entity_link,)
 
-            element_types = (
-                FrozenOrderedSet((update.element_type_addition,))
-                if update.element_type_addition is not None
-                else FrozenOrderedSet()
-            )
-
-            self.ordered_attribute_descriptors.append(
-                AttributeDescriptor(
-                    dundered_name_elements=dundered_name_elements,
-                    model_ids=FrozenOrderedSet(update.derived_from_model_id_additions),
-                    properties=FrozenOrderedSet(update.linkable_element_property_additions),
-                    element_types=element_types,
-                    dsi_entity_names=dsi_entity_names,
-                    time_grains=time_grains,
-                    date_parts=date_parts,
+            self._recipe_versions.append(
+                AttributeRecipe(
+                    dunder_name_elements=dunder_name_elements,
+                    models_in_join=(update.join_model,) if update.join_model is not None else (),
+                    properties=FrozenOrderedSet(update.add_properties),
+                    element_type=update.set_element_type,
+                    entity_link_names=entity_link_names,
+                    min_time_grain=update.add_min_time_grain,
+                    time_grain=update.set_time_grain,
+                    date_part=update.set_date_part,
                 )
             )
             return
-        previous_attribute_descriptor = self.ordered_attribute_descriptors[-1]
-        dundered_name_elements = previous_attribute_descriptor.dundered_name_elements
-        if update.dundered_name_element_addition is not None:
-            dundered_name_elements = dundered_name_elements + (update.dundered_name_element_addition,)
-        element_types = previous_attribute_descriptor.element_types
-        if update.element_type_addition is not None:
-            element_types = element_types.union((update.element_type_addition,))
-        dsi_entity_names = previous_attribute_descriptor.dsi_entity_names
-        if update.dsi_entity_addition is not None:
-            dsi_entity_names = dsi_entity_names + (update.dsi_entity_addition,)
-        time_grains = previous_attribute_descriptor.time_grains
-        if update.time_grain_addition is not None:
-            time_grains = time_grains.union((update.time_grain_addition,))
-        date_parts = previous_attribute_descriptor.date_parts
-        if update.date_part_addition is not None:
-            date_parts = date_parts.union((update.date_part_addition,))
 
-        self.ordered_attribute_descriptors.append(
-            AttributeDescriptor(
-                dundered_name_elements=dundered_name_elements,
-                model_ids=previous_attribute_descriptor.model_ids.union(update.derived_from_model_id_additions),
-                properties=previous_attribute_descriptor.properties.union(update.linkable_element_property_additions),
-                element_types=element_types,
-                dsi_entity_names=dsi_entity_names,
-                time_grains=time_grains,
-                date_parts=date_parts,
-            )
-        )
+        previous_recipe = self._recipe_versions[-1]
+
+        self._recipe_versions.append(previous_recipe.with_update(update))
         return
 
     def pop_update(self) -> None:
-        self.ordered_attribute_descriptors.pop()
+        self._recipe_versions.pop()
 
     @property
-    def attribute_descriptor(self) -> AttributeDescriptor:
-        if len(self.ordered_attribute_descriptors) == 0:
-            return AttributeDescriptor()
+    def latest_recipe(self) -> AttributeRecipe:
+        if len(self._recipe_versions) == 0:
+            return AttributeRecipe()
 
-        return self.ordered_attribute_descriptors[-1]
+        return self._recipe_versions[-1]
 
     @property
-    def previous_attribute_descriptor(self) -> AttributeDescriptor:
-        if len(self.ordered_attribute_descriptors) == 1:
-            return AttributeDescriptor()
+    def previous_recipe(self) -> AttributeRecipe:
+        if len(self._recipe_versions) <= 1:
+            return AttributeRecipe()
 
-        return self.ordered_attribute_descriptors[-2]
+        return self._recipe_versions[-2]
 
 
-class AttributeComputationUpdater(HasDisplayedProperty, ABC):
+class AttributeRecipeUpdateSource(HasDisplayedProperty, ABC):
     @cached_property
-    def attribute_computation_update(self) -> AttributeComputationUpdate:
-        return AttributeComputationUpdate()
+    def attribute_recipe_update(self) -> AttributeRecipeUpdate:
+        return AttributeRecipeUpdate()

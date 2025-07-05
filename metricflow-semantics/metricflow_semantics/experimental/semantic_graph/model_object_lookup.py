@@ -6,6 +6,7 @@ from collections.abc import Mapping, Sequence
 from functools import cached_property
 from typing import Optional
 
+from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols import Dimension, Entity, Measure, SemanticModel
 from dbt_semantic_interfaces.type_enums import DimensionType, EntityType, TimeGranularity
 
@@ -67,6 +68,31 @@ class SemanticModelObjectLookup:
             return primary_entity_element.name
 
         return None
+
+    @cached_property
+    def time_dimension_name_to_grain(self) -> Mapping[str, TimeGranularity]:
+        time_dimension_name_to_grain: dict[str, TimeGranularity] = {}
+        for dimension in self._semantic_model.dimensions:
+            # Skip non-time dimensions.
+            if dimension.type is DimensionType.TIME:
+                pass
+            elif dimension.type is DimensionType.CATEGORICAL:
+                continue
+            else:
+                assert_values_exhausted(dimension.type)
+
+            type_params = mf_first_non_none_or_raise(
+                dimension.type_params,
+                error_supplier=lambda: InvalidManifestException(
+                    LazyFormat(
+                        "`type_params` should not be `None` for a time dimension.",
+                        dimension=dimension,
+                        semantic_model=self._semantic_model,
+                    )
+                ),
+            )
+            time_dimension_name_to_grain[dimension.name] = type_params.time_granularity
+        return time_dimension_name_to_grain
 
 
 @singleton_dataclass()

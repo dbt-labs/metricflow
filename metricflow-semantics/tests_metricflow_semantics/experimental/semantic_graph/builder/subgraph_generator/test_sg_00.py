@@ -4,7 +4,7 @@ import logging
 
 from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
-    AttributeComputationPath,
+    AttributeRecipeWriterPath,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.categorical_dimension_attribute_subgraph import (
     CategoricalDimensionAttributeSubgraphGenerator,
@@ -110,8 +110,8 @@ def test_all(  # noqa: D103
     mf_test_configuration: MetricFlowTestConfiguration,
     sg_00_minimal_manifest_lookup: ManifestObjectLookup,
 ) -> None:
-    path_finder_cache = PathFinderCache[SemanticGraphNode, SemanticGraphEdge, AttributeComputationPath]()
-    path_finder = MetricflowGraphPathFinder[SemanticGraphNode, SemanticGraphEdge, AttributeComputationPath](
+    path_finder_cache = PathFinderCache[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath]()
+    path_finder = MetricflowGraphPathFinder[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath](
         path_finder_cache=path_finder_cache,
     )
     builder = SemanticGraphBuilder(

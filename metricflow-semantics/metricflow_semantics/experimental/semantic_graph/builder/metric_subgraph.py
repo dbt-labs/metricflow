@@ -12,12 +12,9 @@ from metricflow_semantics.experimental.semantic_graph.builder.graph_change_rule 
     SubgraphGeneratorArgumentSet,
 )
 from metricflow_semantics.experimental.semantic_graph.edges.entity_relationship import MetricDefinitionEdge
-from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import (
-    MetricNode,
-)
+from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import MetricNode
 from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
     MeasureAttributeLabel,
-    MetricAttributeLabel,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
     SemanticGraphNode,
@@ -32,11 +29,12 @@ class MetricSubgraphGenerator(SemanticSubgraphGenerator):
     def __init__(self, argument_set: SubgraphGeneratorArgumentSet) -> None:
         super().__init__(argument_set)
         self._verbose_debug_logs = False
+        self._finished_metric_names = set[str]()
 
     def _generate_subgraph_for_any_metric(
         self, current_graph: SemanticGraph, current_subgraph: MutableSemanticGraph, metric: Metric
     ) -> None:
-        if len(current_subgraph.nodes_with_label(MetricAttributeLabel(metric_name=metric.name))) > 0:
+        if metric.name in self._finished_metric_names:
             return
 
         parent_metric_inputs = metric.type_params.metrics
@@ -52,15 +50,15 @@ class MetricSubgraphGenerator(SemanticSubgraphGenerator):
                 self._generate_subgraph_for_any_metric(current_graph, current_subgraph, parent_metric)
             current_subgraph.add_edge(
                 MetricDefinitionEdge.get_instance(
-                    tail_node=MetricNode(attribute_name=metric.name),
-                    head_node=MetricNode(attribute_name=parent_metric_input.name),
+                    tail_node=MetricNode.get_instance(metric.name),
+                    head_node=MetricNode.get_instance(parent_metric_input.name),
                 )
             )
 
     def _generate_subgraph_for_base_metric(
         self, current_graph: SemanticGraph, current_subgraph: MutableSemanticGraph, metric: Metric
     ) -> None:
-        if len(current_subgraph.nodes_with_label(MetricAttributeLabel(metric_name=metric.name))) > 0:
+        if metric.name in self._finished_metric_names:
             return
         required_measure_nodes = MutableOrderedSet[SemanticGraphNode]()
         for measure in metric.input_measures:
@@ -72,7 +70,7 @@ class MetricSubgraphGenerator(SemanticSubgraphGenerator):
         for measure_node in required_measure_nodes:
             current_subgraph.add_edge(
                 MetricDefinitionEdge.get_instance(
-                    tail_node=MetricNode(attribute_name=metric.name), head_node=measure_node
+                    tail_node=MetricNode.get_instance(metric.name), head_node=measure_node
                 )
             )
 

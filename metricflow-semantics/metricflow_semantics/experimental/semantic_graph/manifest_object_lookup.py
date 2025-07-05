@@ -57,6 +57,14 @@ class ManifestObjectLookup:
         )
 
     @cached_property
+    def measure_name_to_model_id(self) -> Mapping[str, SemanticModelId]:
+        return {
+            measure.name: SemanticModelId.get_instance(semantic_model.name)
+            for semantic_model in self.semantic_models
+            for measure in semantic_model.measures
+        }
+
+    @cached_property
     def entity_name_to_joinable_semantic_model_id(self) -> Mapping[str, OrderedSet[SemanticModelId]]:
         result: dict[str, MutableOrderedSet[SemanticModelId]] = defaultdict(MutableOrderedSet[SemanticModelId])
         for semantic_model in self.semantic_models:
@@ -90,10 +98,17 @@ class ManifestObjectLookup:
             name_to_object_mapping=self._entity_name_to_semantic_model,
         )
 
-    def get_semantic_model(self, semantic_model_name: str) -> SemanticModel:  # noqa: D102
+    def get_semantic_model_by_name(self, semantic_model_name: str) -> SemanticModel:  # noqa: D102
         return self._lookup_object(
             object_type="semantic_model",
             name=semantic_model_name,
+            name_to_object_mapping=self._semantic_model_name_to_semantic_model,
+        )
+
+    def get_semantic_model_by_id(self, semantic_model_id: SemanticModelId) -> SemanticModel:  # noqa: D102
+        return self._lookup_object(
+            object_type="semantic_model",
+            name=semantic_model_id.model_name,
             name_to_object_mapping=self._semantic_model_name_to_semantic_model,
         )
 
@@ -178,7 +193,7 @@ class ManifestObjectLookup:
         measure_name_to_semantic_model: dict[str, SemanticModel] = {}
         for semantic_model in self._semantic_manifest.semantic_models:
             for measure in semantic_model.measures:
-                if measure.name in self._measure_name_to_semantic_model:
+                if measure.name in measure_name_to_semantic_model:
                     raise MetricflowAssertionError(
                         LazyFormat(
                             "Measure was found in multiple semantic models. This should have been caught in validation.",
@@ -187,4 +202,5 @@ class ManifestObjectLookup:
                             other_semantic_model=semantic_model.name,
                         )
                     )
+                measure_name_to_semantic_model[measure.name] = semantic_model
         return measure_name_to_semantic_model

@@ -10,7 +10,7 @@ from typing_extensions import override
 from metricflow_semantics.experimental.mf_graph.comparable import ComparisonKey
 from metricflow_semantics.experimental.orderd_enum import OrderedEnum
 from metricflow_semantics.experimental.semantic_graph.attribute_computation import (
-    AttributeComputationUpdate,
+    AttributeRecipeUpdate,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
     SemanticGraphEdge,
@@ -38,26 +38,26 @@ class AttributeEdgeType(OrderedEnum):
 @singleton_dataclass(order=False)
 class EntityAttributeEdge(SemanticGraphEdge):
     attribute_edge_type: AttributeEdgeType
-    _attribute_computation_update: AttributeComputationUpdate
+    _recipe_update: AttributeRecipeUpdate
 
     @staticmethod
     def get_instance(
         tail_node: SemanticGraphNode,
         head_node: SemanticGraphNode,
         attribute_edge_type: AttributeEdgeType,
-        attribute_computation_update: Optional[AttributeComputationUpdate] = None,
+        attribute_computation_update: Optional[AttributeRecipeUpdate] = None,
     ) -> EntityAttributeEdge:
         return EntityAttributeEdge(
             _tail_node=tail_node,
             _head_node=head_node,
             attribute_edge_type=attribute_edge_type,
-            _attribute_computation_update=attribute_computation_update or AttributeComputationUpdate(),
+            _recipe_update=attribute_computation_update or AttributeRecipeUpdate(),
         )
 
     @override
     @cached_property
     def comparison_key(self) -> ComparisonKey:
-        return (self._tail_node, self._head_node, self.attribute_edge_type, self._attribute_computation_update)
+        return (self._tail_node, self._head_node, self.attribute_edge_type, self._recipe_update)
 
     @override
     @cached_property
@@ -65,11 +65,11 @@ class EntityAttributeEdge(SemanticGraphEdge):
         return EntityAttributeEdge.get_instance(
             tail_node=self._head_node,
             head_node=self._tail_node,
-            attribute_computation_update=self._attribute_computation_update,
+            attribute_computation_update=self._recipe_update,
             attribute_edge_type=self.attribute_edge_type.inverse,
         )
 
     @override
     @property
-    def attribute_computation_update(self) -> AttributeComputationUpdate:
-        return self._attribute_computation_update
+    def attribute_recipe_update(self) -> AttributeRecipeUpdate:
+        return self._recipe_update

@@ -8,8 +8,7 @@ from typing_extensions import override
 
 from metricflow_semantics.experimental.mf_graph.comparable import ComparisonKey
 from metricflow_semantics.experimental.orderd_enum import OrderedEnum
-from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeComputationUpdate
-from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
+from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeRecipeUpdate
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
     SemanticGraphEdge,
     SemanticGraphNode,
@@ -35,52 +34,58 @@ class AttributeEdgeType(OrderedEnum):
 
 @singleton_dataclass(order=False)
 class JoinToModelEdge(SemanticGraphEdge):
-    source_model: SemanticModelId
+    # joined_model: SemanticModelId
 
     @staticmethod
     def get_instance(
         tail_node: SemanticGraphNode,
         head_node: SemanticGraphNode,
-        left_model_id: SemanticModelId,
+        # joined_model: SemanticModelId,
     ) -> JoinToModelEdge:
         return JoinToModelEdge(
             _tail_node=tail_node,
             _head_node=head_node,
-            source_model=left_model_id,
+            # joined_model=joined_model,
         )
 
     @override
     @cached_property
     def comparison_key(self) -> ComparisonKey:
-        return (self._tail_node, self._head_node, self.source_model)
+        # return (self._tail_node, self._head_node, self.joined_model)
+        return (
+            self._tail_node,
+            self._head_node,
+        )
 
     @override
     @cached_property
     def inverse(self) -> JoinToModelEdge:
-        return JoinToModelEdge(
-            _tail_node=self._tail_node,
-            _head_node=self._head_node,
-            source_model=self.source_model,
+        return JoinToModelEdge.get_instance(
+            tail_node=self._tail_node,
+            head_node=self._head_node,
+            # joined_model=self.joined_model,
         )
+
+    # @override
+    # @cached_property
+    # def attribute_computation_update(self) -> AttributeComputationUpdate:
+    #     return AttributeComputationUpdate(derived_from_model_id_additions=(self.joined_model,))
 
 
 @singleton_dataclass(order=False)
 class JoinFromModelEdge(SemanticGraphEdge):
-    right_model_id: SemanticModelId
-    _attribute_computation_update: AttributeComputationUpdate
+    _recipe_update: AttributeRecipeUpdate
 
     @staticmethod
     def get_instance(
         tail_node: SemanticGraphNode,
         head_node: SemanticGraphNode,
-        right_model_id: SemanticModelId,
-        attribute_computation_update: AttributeComputationUpdate,
+        recipe_update: AttributeRecipeUpdate,
     ) -> JoinFromModelEdge:
         return JoinFromModelEdge(
             _tail_node=tail_node,
             _head_node=head_node,
-            right_model_id=right_model_id,
-            _attribute_computation_update=attribute_computation_update,
+            _recipe_update=recipe_update,
         )
 
     @override
@@ -97,11 +102,10 @@ class JoinFromModelEdge(SemanticGraphEdge):
         return JoinFromModelEdge(
             _tail_node=self._tail_node,
             _head_node=self._head_node,
-            right_model_id=self.right_model_id,
-            _attribute_computation_update=self._attribute_computation_update,
+            _recipe_update=self._recipe_update,
         )
 
     @override
     @property
-    def attribute_computation_update(self) -> AttributeComputationUpdate:
-        return self._attribute_computation_update
+    def attribute_recipe_update(self) -> AttributeRecipeUpdate:
+        return self._recipe_update

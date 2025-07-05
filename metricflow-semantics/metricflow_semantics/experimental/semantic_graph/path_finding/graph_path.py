@@ -118,11 +118,11 @@ class MutableGraphPath(MetricflowGraphPath[NodeT, EdgeT]):
         head_node = edge.head_node
         if len(self._nodes) == 0:
             self._append_node(tail_node)
+        self._edge_addition_callback(edge)
         self._append_node(head_node)
         self._edges.append(edge)
         self._weight_addition_order.append(weight)
         self._current_weight += weight
-        self._edge_addition_callback(edge)
 
     @property
     def weights(self) -> Sequence[int]:

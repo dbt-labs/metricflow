@@ -13,7 +13,7 @@ from metricflow_semantics.experimental.mf_graph.graph_labeling import Metricflow
 from metricflow_semantics.experimental.mf_graph.mf_graph import MetricflowGraphEdge, MetricflowGraphNode
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_computation import (
-    AttributeComputationUpdater,
+    AttributeRecipeUpdateSource,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.node_label import DunderNameElementLabel
 from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
@@ -24,7 +24,7 @@ from metricflow_semantics.mf_logging.pretty_formatter import (
 logger = logging.getLogger(__name__)
 
 
-class SemanticGraphNode(MetricflowGraphNode, AttributeComputationUpdater, MetricFlowPrettyFormattable, ABC):
+class SemanticGraphNode(MetricflowGraphNode, AttributeRecipeUpdateSource, MetricFlowPrettyFormattable, ABC):
     @property
     def dunder_name_element_label(self) -> Optional[DunderNameElementLabel]:
         return None
@@ -44,13 +44,13 @@ class SemanticGraphNode(MetricflowGraphNode, AttributeComputationUpdater, Metric
     def displayed_properties(self) -> AnyLengthTuple[DisplayedProperty]:
         properties: list[DisplayedProperty] = []
         properties.extend(super().displayed_properties)
-        if self.attribute_computation_update is not None:
-            properties.extend(self.attribute_computation_update.displayed_properties)
+        if self.attribute_recipe_update is not None:
+            properties.extend(self.attribute_recipe_update.displayed_properties)
 
         return tuple(properties)
 
 
-class SemanticGraphEdge(MetricflowGraphEdge[SemanticGraphNode], AttributeComputationUpdater, ABC):
+class SemanticGraphEdge(MetricflowGraphEdge[SemanticGraphNode], AttributeRecipeUpdateSource, ABC):
     @override
     def pretty_format(self, format_context: PrettyFormatContext) -> Optional[str]:
         formatter = format_context.formatter
@@ -66,7 +66,7 @@ class SemanticGraphEdge(MetricflowGraphEdge[SemanticGraphNode], AttributeComputa
     @cached_property
     def displayed_properties(self) -> AnyLengthTuple[DisplayedProperty]:
         properties: list[DisplayedProperty] = list(super().displayed_properties)
-        if self.attribute_computation_update is not None:
-            properties.extend(self.attribute_computation_update.displayed_properties)
+        if self.attribute_recipe_update is not None:
+            properties.extend(self.attribute_recipe_update.displayed_properties)
 
         return tuple(properties)

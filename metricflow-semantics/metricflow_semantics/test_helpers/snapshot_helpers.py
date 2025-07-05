@@ -310,7 +310,6 @@ def convert_linkable_element_set_to_rows(
     ):
         # row: LinkableElementSetSnapshotRow = [annotated_spec.element_type.name, annotated_spec.spec.qualified_name]
         row_dict: dict[str, str] = {
-            "Type": annotated_spec.element_type.name.ljust(14),
             "Dunder Name": annotated_spec.spec.qualified_name.ljust(78),
         }
         spec_set = group_spec_by_type(annotated_spec.spec)
@@ -326,7 +325,7 @@ def convert_linkable_element_set_to_rows(
             )
         else:
             raise RuntimeError(LazyFormat("There should have been at most 1 group-by-metric spec", spec_set=spec_set))
-
+        row_dict["Type"] = annotated_spec.element_type.name.ljust(14)
         # row.extend(
         #     (
         #         sorted(linkable_element_property.name for linkable_element_property in annotated_spec.properties),
@@ -358,7 +357,7 @@ def assert_linkable_element_set_snapshot_equal(  # noqa: D103
     set_id: str = "result",
     expectation_description: Optional[str] = None,
 ) -> None:
-    headers = ("Type", "Dunder Name", "Metric-Subquery Entity-Links", "Properties", "Derived-From Semantic Models")
+    headers = ("Dunder Name", "Metric-Subquery Entity-Links", "Type", "Properties", "Derived-From Semantic Models")
     rows = convert_linkable_element_set_to_rows(linkable_element_set)
 
     # rows: list[LinkableElementSetSnapshotRow] = []

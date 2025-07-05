@@ -8,7 +8,7 @@ from typing_extensions import override
 from metricflow_semantics.experimental.mf_graph.comparable import ComparisonKey
 from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
-from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeComputationUpdate
+from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeRecipeUpdate
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
     SemanticGraphEdge,
@@ -61,7 +61,7 @@ class JoinedDsiEntityEdge(SemanticGraphEdge):
 
     @override
     @property
-    def attribute_computation_update(self) -> AttributeComputationUpdate:
-        return AttributeComputationUpdate(
-            derived_from_model_id_additions=(self.model_id,),
+    def attribute_recipe_update(self) -> AttributeRecipeUpdate:
+        return AttributeRecipeUpdate(
+            join_model=self.model_id,
         )

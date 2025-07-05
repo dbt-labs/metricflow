@@ -9,14 +9,13 @@ from metricflow_semantics.experimental.mf_graph.comparable import ComparisonKey
 from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
 from metricflow_semantics.experimental.orderd_enum import OrderedEnum
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
-from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeComputationUpdate
+from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeRecipeUpdate
 from metricflow_semantics.experimental.semantic_graph.edges.edge_labels import MetricDefinitionLabel
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
     SemanticGraphEdge,
     SemanticGraphNode,
 )
 from metricflow_semantics.experimental.singleton_decorator import singleton_dataclass
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 
 logger = logging.getLogger(__name__)
 
@@ -37,26 +36,26 @@ class EntityRelationship(OrderedEnum):
 @singleton_dataclass(order=False)
 class EntityRelationshipEdge(SemanticGraphEdge):
     relationship: EntityRelationship
-    linkable_element_properties: FrozenOrderedSet[LinkableElementProperty]
+    _attribute_computation_update: AttributeRecipeUpdate
 
     @staticmethod
     def get_instance(
         tail_node: SemanticGraphNode,
-        relationship: EntityRelationship,
         head_node: SemanticGraphNode,
-        linkable_element_properties: FrozenOrderedSet[LinkableElementProperty] = FrozenOrderedSet(),
+        relationship: EntityRelationship = EntityRelationship.VALID,
+        attribute_computation_update: AttributeRecipeUpdate = AttributeRecipeUpdate(),
     ) -> EntityRelationshipEdge:
         return EntityRelationshipEdge(
             _tail_node=tail_node,
             _head_node=head_node,
             relationship=relationship,
-            linkable_element_properties=linkable_element_properties,
+            _attribute_computation_update=attribute_computation_update,
         )
 
     @override
     @cached_property
     def comparison_key(self) -> ComparisonKey:
-        return (self._tail_node, self._head_node, self.relationship, tuple(self.linkable_element_properties))
+        return (self._tail_node, self._head_node, self.relationship, self._attribute_computation_update)
 
     @override
     @cached_property
@@ -65,13 +64,13 @@ class EntityRelationshipEdge(SemanticGraphEdge):
             tail_node=self._head_node,
             relationship=self.relationship.inverse,
             head_node=self._tail_node,
-            linkable_element_properties=self.linkable_element_properties,
+            attribute_computation_update=self._attribute_computation_update,
         )
 
     @override
-    @cached_property
-    def attribute_computation_update(self) -> AttributeComputationUpdate:
-        return AttributeComputationUpdate(linkable_element_property_additions=tuple(self.linkable_element_properties))
+    @property
+    def attribute_recipe_update(self) -> AttributeRecipeUpdate:
+        return self._attribute_computation_update
 
 
 @singleton_dataclass(order=False)
@@ -105,4 +104,4 @@ class MetricDefinitionEdge(SemanticGraphEdge):
     @override
     @cached_property
     def labels(self) -> FrozenOrderedSet[MetricflowGraphLabel]:
-        return FrozenOrderedSet((MetricDefinitionLabel(),))
+        return FrozenOrderedSet((MetricDefinitionLabel.get_instance(),))
