@@ -1,0 +1,19 @@
+test_name: test_dot_text
+test_filename: test_dot.py
+docstring:
+  Check formatting of the graph using DOT notation.
+---
+digraph {
+	graph [name=FlowGraph]
+	sink
+	subgraph cluster_intermediate_nodes {
+		label=intermediate_nodes
+		a
+		b
+	}
+	source -> a
+	source -> b
+	a -> b
+	a -> sink
+	b -> sink
+}
