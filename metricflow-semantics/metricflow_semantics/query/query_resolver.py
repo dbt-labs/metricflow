@@ -309,11 +309,11 @@ class MetricFlowQueryResolver:
         # The pattern needs to be used because there are cases where the order-by-item is specified in a different way
         # from the group-by-item, so an equality comparison won't work.
         for resolver_input_for_order_by in resolver_inputs_for_order_by_items:
-            matching_specs: List[InstanceSpec] = []
+            matching_specs: Set[InstanceSpec] = set()
             for possible_input in resolver_input_for_order_by.possible_inputs:
                 spec_pattern = possible_input.spec_pattern
-                matching_specs.extend(spec_pattern.match(metric_specs))
-                matching_specs.extend(spec_pattern.match(group_by_item_specs))
+                matching_specs.update(spec_pattern.match(metric_specs))
+                matching_specs.update(spec_pattern.match(group_by_item_specs))
 
             if len(matching_specs) != 1:
                 mapping_items.append(
@@ -331,7 +331,7 @@ class MetricFlowQueryResolver:
                 order_by_specs.append(
                     OrderBySpec(
                         # Ignore aliases in the order by since we'll render the expression instead of the alias.
-                        instance_spec=matching_specs[0].with_alias(None),
+                        instance_spec=matching_specs.pop().with_alias(None),
                         descending=resolver_input_for_order_by.descending,
                     )
                 )
