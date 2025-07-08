@@ -306,7 +306,7 @@ def test_build_saved_query_tasks(  # noqa: D103
         manifest=simple_semantic_manifest,
         sql_client=sql_client,
     )
-    assert len(tasks) == 4
+    assert len(tasks) == 5
 
     tasks = DataWarehouseTaskBuilder.gen_saved_query_tasks(
         manifest=simple_semantic_manifest, sql_client=sql_client, saved_query_filters=["p0_booking"]
