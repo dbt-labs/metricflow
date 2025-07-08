@@ -82,11 +82,8 @@ class MetricFlowQueryParser:
         where_filter_pattern_factory: WhereFilterPatternFactory = DefaultWhereFilterPatternFactory(),
     ) -> None:
         self._manifest_lookup = semantic_manifest_lookup
-        self._metric_naming_schemes = (MetricNamingScheme(),)
-        self._group_by_item_naming_schemes = (
-            ObjectBuilderNamingScheme(),
-            DunderNamingScheme(),
-        )
+        self._metric_naming_schemes = (MetricNamingScheme(), ObjectBuilderNamingScheme())
+        self._group_by_item_naming_schemes = (ObjectBuilderNamingScheme(), DunderNamingScheme())
         self._where_filter_pattern_factory = where_filter_pattern_factory
         self._time_period_adjuster = DateutilTimePeriodAdjuster()
 
@@ -113,6 +110,12 @@ class MetricFlowQueryParser:
             parsed_where_filters.extend(saved_query.query_params.where.where_filters)
         if where_filters is not None:
             parsed_where_filters.extend(where_filters)
+
+        # Order by and limit passed into the query directly should override those in the YAML.
+        if order_by_names is None and order_by_parameters is None:
+            order_by_names = saved_query.query_params.order_by
+        if limit is None:
+            limit = saved_query.query_params.limit
 
         return self._parse_and_validate_query(
             metric_names=saved_query.query_params.metrics,

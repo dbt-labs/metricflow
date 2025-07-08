@@ -20,6 +20,7 @@ from metricflow_semantics.specs.patterns.entity_link_pattern import (
     ParameterSetField,
     SpecPatternParameterSet,
 )
+from metricflow_semantics.specs.patterns.metric_pattern import MetricSpecPattern
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.specs.patterns.typed_patterns import DimensionPattern, TimeDimensionPattern
 
@@ -99,19 +100,22 @@ class ObjectBuilderNamingScheme(QueryItemNamingScheme):
             )
 
         for metric_call_parameter_set in call_parameter_sets.metric_call_parameter_sets:
-            return EntityLinkPattern(
-                SpecPatternParameterSet.from_parameters(
-                    element_name=metric_call_parameter_set.metric_reference.element_name,
-                    entity_links=tuple(
-                        EntityReference(element_name=group_by_ref.element_name)
-                        for group_by_ref in metric_call_parameter_set.group_by
-                    ),
-                    fields_to_compare=(
-                        ParameterSetField.ELEMENT_NAME,
-                        ParameterSetField.ENTITY_LINKS,
-                    ),
+            if metric_call_parameter_set.group_by:
+                return EntityLinkPattern(
+                    SpecPatternParameterSet.from_parameters(
+                        element_name=metric_call_parameter_set.metric_reference.element_name,
+                        entity_links=tuple(
+                            EntityReference(element_name=group_by_ref.element_name)
+                            for group_by_ref in metric_call_parameter_set.group_by
+                        ),
+                        fields_to_compare=(
+                            ParameterSetField.ELEMENT_NAME,
+                            ParameterSetField.ENTITY_LINKS,
+                        ),
+                    )
                 )
-            )
+            else:
+                return MetricSpecPattern(metric_reference=metric_call_parameter_set.metric_reference)
 
         raise RuntimeError("There should have been a return associated with one of the CallParameterSets.")
 
