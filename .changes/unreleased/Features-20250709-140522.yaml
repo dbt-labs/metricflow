@@ -1,0 +1,6 @@
+kind: Features
+body: Support for order_by and limit on saved queries
+time: 2025-07-09T14:05:22.828237-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1759"
