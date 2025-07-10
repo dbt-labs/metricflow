@@ -172,29 +172,29 @@ def _time_new_init(semantic_manifest: SemanticManifest) -> float:
 
 
 def test_semantic_graph_init_time() -> None:
-    parameter_set = SyntheticManifestParameterSet(
-        measure_semantic_model_count=20,
-        measures_per_semantic_model=20,
-        dimension_semantic_model_count=20,
-        categorical_dimensions_per_semantic_model=10,
-        max_metric_depth=3,
-        max_metric_width=50,
-        saved_query_count=0,
-        metrics_per_saved_query=0,
-        categorical_dimensions_per_saved_query=0,
-    )
-
     # parameter_set = SyntheticManifestParameterSet(
-    #     measure_semantic_model_count=100,
+    #     measure_semantic_model_count=20,
     #     measures_per_semantic_model=20,
-    #     dimension_semantic_model_count=100,
-    #     categorical_dimensions_per_semantic_model=20,
-    #     max_metric_depth=2,
+    #     dimension_semantic_model_count=20,
+    #     categorical_dimensions_per_semantic_model=10,
+    #     max_metric_depth=3,
     #     max_metric_width=50,
     #     saved_query_count=0,
     #     metrics_per_saved_query=0,
     #     categorical_dimensions_per_saved_query=0,
     # )
+
+    parameter_set = SyntheticManifestParameterSet(
+        measure_semantic_model_count=100,
+        measures_per_semantic_model=20,
+        dimension_semantic_model_count=100,
+        categorical_dimensions_per_semantic_model=20,
+        max_metric_depth=2,
+        max_metric_width=50,
+        saved_query_count=0,
+        metrics_per_saved_query=0,
+        categorical_dimensions_per_saved_query=0,
+    )
 
     generator = SyntheticManifestGenerator(parameter_set)
     semantic_manifest = generator.generate_manifest()

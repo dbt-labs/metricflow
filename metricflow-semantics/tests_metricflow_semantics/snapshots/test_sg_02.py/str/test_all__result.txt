@@ -6,155 +6,2709 @@ dot_notation:
   	graph [name=MutableSemanticGraph]
   	subgraph cluster_dimension {
   		label=dimension
-  		"Dimension(dim_0)"
+  		"Dimension(account_type)"
+  		"Dimension(capacity_latest)"
+  		"Dimension(company_name)"
+  		"Dimension(country_latest)"
+  		"Dimension(home_state)"
+  		"Dimension(home_state_latest)"
+  		"Dimension(is_instant)"
+  		"Dimension(is_lux_latest)"
+  		"Dimension(referrer_id)"
+  		"Dimension(verification_type)"
   	}
-  	subgraph cluster_sm_0_primary_entity {
-  		label=sm_0_primary_entity
-  		"sm_0.sm_0_primary_entity"
+  	subgraph cluster_account {
+  		label=account
+  		"accounts_source.account"
   	}
-  	subgraph cluster_sm_1_primary_entity {
-  		label=sm_1_primary_entity
-  		"sm_1.sm_1_primary_entity"
+  	subgraph cluster_booking {
+  		label=booking
+  		"bookings_source.booking"
+  	}
+  	subgraph cluster_buy {
+  		label=buy
+  		"buys_source.buy"
+  	}
+  	subgraph cluster_company {
+  		label=company
+  		"companies.company"
+  	}
+  	subgraph cluster_listing {
+  		label=listing
+  		"listings_latest.listing"
+  		"lux_listing_mapping.listing"
+  	}
+  	subgraph cluster_revenue_instance {
+  		label=revenue_instance
+  		"revenue.revenue_instance"
+  	}
+  	subgraph cluster_user {
+  		label=user
+  		"companies.user"
+  		"users_ds_source.user"
+  		"users_latest.user"
+  	}
+  	subgraph cluster_verification {
+  		label=verification
+  		"id_verifications.verification"
+  	}
+  	subgraph cluster_view {
+  		label=view
+  		"views_source.view"
+  	}
+  	subgraph cluster_visit {
+  		label=visit
+  		"visits_source.visit"
   	}
   	subgraph cluster_key {
   		label=key
-  		"KeyAttribute(sm_0_primary_entity)"
-  		"KeyAttribute(sm_1_primary_entity)"
-  		"KeyAttribute(sm_2_primary_entity)"
-  		"KeyEntity(sm_0_primary_entity)"
-  		"KeyEntity(sm_1_primary_entity)"
-  		"KeyEntity(sm_2_primary_entity)"
+  		"KeyAttribute(company)"
+  		"KeyAttribute(guest)"
+  		"KeyAttribute(host)"
+  		"KeyAttribute(listing)"
+  		"KeyAttribute(lux_listing)"
+  		"KeyAttribute(session)"
+  		"KeyAttribute(session_id)"
+  		"KeyAttribute(user)"
+  		"KeyAttribute(verification)"
+  		"KeyEntity(company)"
+  		"KeyEntity(guest)"
+  		"KeyEntity(host)"
+  		"KeyEntity(listing)"
+  		"KeyEntity(lux_listing)"
+  		"KeyEntity(session)"
+  		"KeyEntity(session_id)"
+  		"KeyEntity(user)"
+  		"KeyEntity(verification)"
   	}
-  	subgraph cluster_sm_0 {
-  		label=sm_0
-  		"Measure(sm_0_measure_0)"
+  	subgraph cluster_accounts_source {
+  		label=accounts_source
+  		"Measure(total_account_balance_first_day)"
+  		"Measure(total_account_balance_first_day_of_month)"
   	}
-  	subgraph cluster_sm_1 {
-  		label=sm_1
-  		"LocalModel(sm_1)"
+  	subgraph cluster_bookings_source {
+  		label=bookings_source
+  		"Measure(referred_bookings)"
+  	}
+  	subgraph cluster_buys_source {
+  		label=buys_source
+  		"Measure(buyers)"
+  		"Measure(buys)"
+  		"Measure(buys_month)"
+  	}
+  	subgraph cluster_companies {
+  		label=companies
+  		"LocalModel(companies)"
+  	}
+  	subgraph cluster_id_verifications {
+  		label=id_verifications
+  		"Measure(identity_verifications)"
+  	}
+  	subgraph cluster_listings_latest {
+  		label=listings_latest
+  		"Measure(smallest_listing)"
+  	}
+  	subgraph cluster_lux_listing_mapping {
+  		label=lux_listing_mapping
+  		"LocalModel(lux_listing_mapping)"
+  	}
+  	subgraph cluster_revenue {
+  		label=revenue
+  		"Measure(txn_revenue)"
+  	}
+  	subgraph cluster_users_ds_source {
+  		label=users_ds_source
+  		"Measure(new_users)"
+  	}
+  	subgraph cluster_users_latest {
+  		label=users_latest
+  		"LocalModel(users_latest)"
+  	}
+  	subgraph cluster_views_source {
+  		label=views_source
+  		"Measure(views)"
+  	}
+  	subgraph cluster_visits_source {
+  		label=visits_source
+  		"Measure(visitors)"
+  		"Measure(visits)"
   	}
   	subgraph cluster_metric {
   		label=metric
-  		"Metric(sm_0_measure_0_metric)"
+  		"Metric(active_listings)"
+  		"Metric(approximate_continuous_booking_value_p99)"
+  		"Metric(approximate_discrete_booking_value_p99)"
+  		"Metric(archived_users)"
+  		"Metric(archived_users_join_to_time_spine)"
+  		"Metric(average_booking_value)"
+  		"Metric(average_instant_booking_value)"
+  		"Metric(bookers)"
+  		"Metric(booking_fees)"
+  		"Metric(booking_fees_last_week_per_booker_this_week)"
+  		"Metric(booking_fees_per_booker)"
+  		"Metric(booking_fees_since_start_of_month)"
+  		"Metric(booking_payments)"
+  		"Metric(booking_value)"
+  		"Metric(booking_value_for_non_null_listing_id)"
+  		"Metric(booking_value_p99)"
+  		"Metric(booking_value_per_view)"
+  		"Metric(booking_value_sub_instant)"
+  		"Metric(booking_value_sub_instant_add_10)"
+  		"Metric(bookings)"
+  		"Metric(bookings_5_day_lag)"
+  		"Metric(bookings_alien_day_over_alien_day)"
+  		"Metric(bookings_at_start_of_month)"
+  		"Metric(bookings_fill_nulls_with_0)"
+  		"Metric(bookings_fill_nulls_with_0_without_time_spine)"
+  		"Metric(bookings_growth_2_weeks)"
+  		"Metric(bookings_growth_2_weeks_fill_nulls_with_0)"
+  		"Metric(bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset)"
+  		"Metric(bookings_growth_since_start_of_month)"
+  		"Metric(bookings_join_to_time_spine)"
+  		"Metric(bookings_join_to_time_spine_with_tiered_filters)"
+  		"Metric(bookings_month_start_compared_to_1_month_prior)"
+  		"Metric(bookings_offset_alien_day)"
+  		"Metric(bookings_offset_once)"
+  		"Metric(bookings_offset_one_alien_day)"
+  		"Metric(bookings_offset_twice)"
+  		"Metric(bookings_per_booker)"
+  		"Metric(bookings_per_dollar)"
+  		"Metric(bookings_per_listing)"
+  		"Metric(bookings_per_lux_listing_derived)"
+  		"Metric(bookings_per_view)"
+  		"Metric(current_account_balance_by_user)"
+  		"Metric(derived_bookings_0)"
+  		"Metric(derived_bookings_1)"
+  		"Metric(derived_shared_alias_1a)"
+  		"Metric(derived_shared_alias_1b)"
+  		"Metric(derived_shared_alias_2)"
+  		"Metric(discrete_booking_value_p99)"
+  		"Metric(double_counted_delayed_bookings)"
+  		"Metric(every_2_days_bookers_2_days_ago)"
+  		"Metric(every_two_days_bookers)"
+  		"Metric(every_two_days_bookers_fill_nulls_with_0)"
+  		"Metric(identity_verifications)"
+  		"Metric(instant_booking_fraction_of_max_value)"
+  		"Metric(instant_booking_value)"
+  		"Metric(instant_booking_value_ratio)"
+  		"Metric(instant_bookings)"
+  		"Metric(instant_bookings_with_measure_filter)"
+  		"Metric(instant_lux_booking_value_rate)"
+  		"Metric(instant_plus_non_referred_bookings_pct)"
+  		"Metric(largest_listing)"
+  		"Metric(listings)"
+  		"Metric(lux_booking_fraction_of_max_value)"
+  		"Metric(lux_booking_value_rate_expr)"
+  		"Metric(lux_listings)"
+  		"Metric(max_booking_value)"
+  		"Metric(median_booking_value)"
+  		"Metric(min_booking_value)"
+  		"Metric(nested_fill_nulls_without_time_spine)"
+  		"Metric(new_users)"
+  		"Metric(non_referred_bookings_pct)"
+  		"Metric(popular_listing_bookings_per_booker)"
+  		"Metric(referred_bookings)"
+  		"Metric(regional_starting_balance_ratios)"
+  		"Metric(revenue)"
+  		"Metric(revenue_all_time)"
+  		"Metric(revenue_mtd)"
+  		"Metric(simple_subdaily_metric_default_day)"
+  		"Metric(simple_subdaily_metric_default_hour)"
+  		"Metric(smallest_listing)"
+  		"Metric(subdaily_cumulative_grain_to_date_metric)"
+  		"Metric(subdaily_cumulative_window_metric)"
+  		"Metric(subdaily_join_to_time_spine_metric)"
+  		"Metric(subdaily_offset_grain_to_date_metric)"
+  		"Metric(subdaily_offset_window_metric)"
+  		"Metric(total_account_balance_first_day)"
+  		"Metric(total_account_balance_first_day_of_month)"
+  		"Metric(trailing_2_months_revenue)"
+  		"Metric(trailing_2_months_revenue_sub_10)"
+  		"Metric(twice_bookings_fill_nulls_with_0_without_time_spine)"
+  		"Metric(views)"
+  		"Metric(views_times_booking_value)"
+  		"Metric(visit_buy_conversion_rate)"
+  		"Metric(visit_buy_conversion_rate_7days)"
+  		"Metric(visit_buy_conversion_rate_7days_fill_nulls_with_0)"
+  		"Metric(visit_buy_conversion_rate_by_session)"
+  		"Metric(visit_buy_conversion_rate_with_monthly_conversion)"
+  		"Metric(visit_buy_conversions)"
   	}
   	subgraph cluster_time {
   		label=time
   		MetricTime
-  		"TimeAttribute(custom_year)"
+  		"TimeAttribute(alien_day)"
+  		"TimeAttribute(day)"
+  		"TimeAttribute(extract_day)"
+  		"TimeAttribute(extract_dow)"
+  		"TimeAttribute(extract_doy)"
+  		"TimeAttribute(extract_month)"
   		"TimeAttribute(extract_quarter)"
   		"TimeAttribute(extract_year)"
+  		"TimeAttribute(hour)"
+  		"TimeAttribute(millisecond)"
+  		"TimeAttribute(minute)"
+  		"TimeAttribute(month)"
   		"TimeAttribute(quarter)"
+  		"TimeAttribute(second)"
+  		"TimeAttribute(week)"
   		"TimeAttribute(year)"
+  		"TimeDimension(archived_at)"
+  		"TimeDimension(bio_added_ts)"
+  		"TimeDimension(created_at)"
   		"TimeDimension(ds)"
+  		"TimeDimension(ds_latest)"
+  		"TimeDimension(ds_month)"
+  		"TimeDimension(ds_partitioned)"
+  		"TimeDimension(last_login_ts)"
+  		"TimeDimension(last_profile_edit_ts)"
+  		"TimeDimension(paid_at)"
   		TimeEntity
   	}
-  	"JoinedModel(sm_0)" -> "KeyEntity(sm_0_primary_entity)"
-  	"JoinedModel(sm_0)" -> "KeyEntity(sm_1_primary_entity)"
-  	"JoinedModel(sm_0)" -> "KeyEntity(sm_2_primary_entity)"
-  	"JoinedModel(sm_1)" -> "Dimension(dim_0)"
-  	"JoinedModel(sm_1)" -> "KeyEntity(sm_1_primary_entity)"
-  	"JoinedModel(sm_1)" -> "KeyEntity(sm_2_primary_entity)"
-  	"KeyEntity(sm_0_primary_entity)" -> "MetricAttribute(sm_0_measure_0_metric)"
-  	"KeyEntity(sm_1_primary_entity)" -> "MetricAttribute(sm_0_measure_0_metric)"
-  	"KeyEntity(sm_2_primary_entity)" -> "MetricAttribute(sm_0_measure_0_metric)"
-  	"LocalModel(sm_0)" -> "KeyEntity(sm_0_primary_entity)"
-  	"LocalModel(sm_0)" -> "KeyEntity(sm_1_primary_entity)"
-  	"LocalModel(sm_0)" -> "KeyEntity(sm_2_primary_entity)"
-  	"LocalModel(sm_1)" -> "KeyEntity(sm_1_primary_entity)"
-  	"LocalModel(sm_1)" -> "KeyEntity(sm_2_primary_entity)"
-  	TimeEntity -> "TimeAttribute(custom_year)"
+  	"JoinedModel(accounts_source)" -> "Dimension(account_type)"
+  	"JoinedModel(accounts_source)" -> "KeyEntity(user)"
+  	"JoinedModel(bookings_source)" -> "Dimension(is_instant)"
+  	"JoinedModel(bookings_source)" -> "KeyEntity(guest)"
+  	"JoinedModel(bookings_source)" -> "KeyEntity(host)"
+  	"JoinedModel(bookings_source)" -> "KeyEntity(listing)"
+  	"JoinedModel(buys_source)" -> "KeyEntity(session_id)"
+  	"JoinedModel(buys_source)" -> "KeyEntity(user)"
+  	"JoinedModel(companies)" -> "Dimension(company_name)"
+  	"JoinedModel(companies)" -> "KeyEntity(company)"
+  	"JoinedModel(companies)" -> "KeyEntity(user)"
+  	"JoinedModel(id_verifications)" -> "Dimension(verification_type)"
+  	"JoinedModel(id_verifications)" -> "KeyEntity(user)"
+  	"JoinedModel(id_verifications)" -> "KeyEntity(verification)"
+  	"JoinedModel(listings_latest)" -> "Dimension(capacity_latest)"
+  	"JoinedModel(listings_latest)" -> "Dimension(country_latest)"
+  	"JoinedModel(listings_latest)" -> "Dimension(is_lux_latest)"
+  	"JoinedModel(listings_latest)" -> "KeyEntity(listing)"
+  	"JoinedModel(listings_latest)" -> "KeyEntity(user)"
+  	"JoinedModel(lux_listing_mapping)" -> "KeyEntity(listing)"
+  	"JoinedModel(lux_listing_mapping)" -> "KeyEntity(lux_listing)"
+  	"JoinedModel(revenue)" -> "KeyEntity(user)"
+  	"JoinedModel(users_ds_source)" -> "Dimension(home_state)"
+  	"JoinedModel(users_ds_source)" -> "KeyEntity(user)"
+  	"JoinedModel(users_latest)" -> "Dimension(home_state_latest)"
+  	"JoinedModel(users_latest)" -> "KeyEntity(user)"
+  	"JoinedModel(views_source)" -> "KeyEntity(listing)"
+  	"JoinedModel(views_source)" -> "KeyEntity(user)"
+  	"JoinedModel(visits_source)" -> "Dimension(referrer_id)"
+  	"JoinedModel(visits_source)" -> "KeyEntity(session)"
+  	"JoinedModel(visits_source)" -> "KeyEntity(user)"
+  	"KeyEntity(company)" -> "GroupByMetric(active_listings)"
+  	"KeyEntity(company)" -> "GroupByMetric(approximate_continuous_booking_value_p99)"
+  	"KeyEntity(company)" -> "GroupByMetric(approximate_discrete_booking_value_p99)"
+  	"KeyEntity(company)" -> "GroupByMetric(archived_users)"
+  	"KeyEntity(company)" -> "GroupByMetric(archived_users_join_to_time_spine)"
+  	"KeyEntity(company)" -> "GroupByMetric(average_booking_value)"
+  	"KeyEntity(company)" -> "GroupByMetric(average_instant_booking_value)"
+  	"KeyEntity(company)" -> "GroupByMetric(bookers)"
+  	"KeyEntity(company)" -> "GroupByMetric(booking_fees)"
+  	"KeyEntity(company)" -> "GroupByMetric(booking_fees_last_week_per_booker_this_week)"
+  	"KeyEntity(company)" -> "GroupByMetric(booking_fees_per_booker)"
+  	"KeyEntity(company)" -> "GroupByMetric(booking_fees_since_start_of_month)"
+  	"KeyEntity(company)" -> "GroupByMetric(booking_payments)"
+  	"KeyEntity(company)" -> "GroupByMetric(booking_value)"
+  	"KeyEntity(company)" -> "GroupByMetric(booking_value_for_non_null_listing_id)"
+  	"KeyEntity(company)" -> "GroupByMetric(booking_value_p99)"
+  	"KeyEntity(company)" -> "GroupByMetric(booking_value_per_view)"
+  	"KeyEntity(company)" -> "GroupByMetric(booking_value_sub_instant)"
+  	"KeyEntity(company)" -> "GroupByMetric(booking_value_sub_instant_add_10)"
+  	"KeyEntity(company)" -> "GroupByMetric(bookings)"
+  	"KeyEntity(company)" -> "GroupByMetric(bookings_5_day_lag)"
+  	"KeyEntity(company)" -> "GroupByMetric(bookings_alien_day_over_alien_day)"
+  	"KeyEntity(company)" -> "GroupByMetric(bookings_at_start_of_month)"
+  	"KeyEntity(company)" -> "GroupByMetric(bookings_fill_nulls_with_0)"
+  	"KeyEntity(company)" -> "GroupByMetric(bookings_fill_nulls_with_0_without_time_spine)"
+  	"KeyEntity(company)" -> "GroupByMetric(bookings_growth_2_weeks)"
+  	"KeyEntity(company)" -> "GroupByMetric(bookings_growth_2_weeks_fill_nulls_with_0)"
+  	"KeyEntity(company)" -> "GroupByMetric(bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset)"
+  	"KeyEntity(company)" -> "GroupByMetric(bookings_growth_since_start_of_month)"
+  	"KeyEntity(company)" -> "GroupByMetric(bookings_join_to_time_spine)"
+  	"KeyEntity(company)" -> "GroupByMetric(bookings_join_to_time_spine_with_tiered_filters)"
+  	"KeyEntity(company)" -> "GroupByMetric(bookings_month_start_compared_to_1_month_prior)"
+  	"KeyEntity(company)" -> "GroupByMetric(bookings_offset_alien_day)"
+  	"KeyEntity(company)" -> "GroupByMetric(bookings_offset_once)"
+  	"KeyEntity(company)" -> "GroupByMetric(bookings_offset_one_alien_day)"
+  	"KeyEntity(company)" -> "GroupByMetric(bookings_offset_twice)"
+  	"KeyEntity(company)" -> "GroupByMetric(bookings_per_booker)"
+  	"KeyEntity(company)" -> "GroupByMetric(bookings_per_dollar)"
+  	"KeyEntity(company)" -> "GroupByMetric(bookings_per_view)"
+  	"KeyEntity(company)" -> "GroupByMetric(current_account_balance_by_user)"
+  	"KeyEntity(company)" -> "GroupByMetric(derived_bookings_0)"
+  	"KeyEntity(company)" -> "GroupByMetric(derived_bookings_1)"
+  	"KeyEntity(company)" -> "GroupByMetric(derived_shared_alias_1a)"
+  	"KeyEntity(company)" -> "GroupByMetric(derived_shared_alias_1b)"
+  	"KeyEntity(company)" -> "GroupByMetric(derived_shared_alias_2)"
+  	"KeyEntity(company)" -> "GroupByMetric(discrete_booking_value_p99)"
+  	"KeyEntity(company)" -> "GroupByMetric(double_counted_delayed_bookings)"
+  	"KeyEntity(company)" -> "GroupByMetric(every_2_days_bookers_2_days_ago)"
+  	"KeyEntity(company)" -> "GroupByMetric(every_two_days_bookers)"
+  	"KeyEntity(company)" -> "GroupByMetric(every_two_days_bookers_fill_nulls_with_0)"
+  	"KeyEntity(company)" -> "GroupByMetric(identity_verifications)"
+  	"KeyEntity(company)" -> "GroupByMetric(instant_booking_fraction_of_max_value)"
+  	"KeyEntity(company)" -> "GroupByMetric(instant_booking_value)"
+  	"KeyEntity(company)" -> "GroupByMetric(instant_booking_value_ratio)"
+  	"KeyEntity(company)" -> "GroupByMetric(instant_bookings)"
+  	"KeyEntity(company)" -> "GroupByMetric(instant_bookings_with_measure_filter)"
+  	"KeyEntity(company)" -> "GroupByMetric(instant_lux_booking_value_rate)"
+  	"KeyEntity(company)" -> "GroupByMetric(instant_plus_non_referred_bookings_pct)"
+  	"KeyEntity(company)" -> "GroupByMetric(largest_listing)"
+  	"KeyEntity(company)" -> "GroupByMetric(listings)"
+  	"KeyEntity(company)" -> "GroupByMetric(lux_booking_fraction_of_max_value)"
+  	"KeyEntity(company)" -> "GroupByMetric(lux_booking_value_rate_expr)"
+  	"KeyEntity(company)" -> "GroupByMetric(lux_listings)"
+  	"KeyEntity(company)" -> "GroupByMetric(max_booking_value)"
+  	"KeyEntity(company)" -> "GroupByMetric(median_booking_value)"
+  	"KeyEntity(company)" -> "GroupByMetric(min_booking_value)"
+  	"KeyEntity(company)" -> "GroupByMetric(nested_fill_nulls_without_time_spine)"
+  	"KeyEntity(company)" -> "GroupByMetric(new_users)"
+  	"KeyEntity(company)" -> "GroupByMetric(non_referred_bookings_pct)"
+  	"KeyEntity(company)" -> "GroupByMetric(popular_listing_bookings_per_booker)"
+  	"KeyEntity(company)" -> "GroupByMetric(referred_bookings)"
+  	"KeyEntity(company)" -> "GroupByMetric(regional_starting_balance_ratios)"
+  	"KeyEntity(company)" -> "GroupByMetric(revenue)"
+  	"KeyEntity(company)" -> "GroupByMetric(revenue_all_time)"
+  	"KeyEntity(company)" -> "GroupByMetric(revenue_mtd)"
+  	"KeyEntity(company)" -> "GroupByMetric(simple_subdaily_metric_default_day)"
+  	"KeyEntity(company)" -> "GroupByMetric(simple_subdaily_metric_default_hour)"
+  	"KeyEntity(company)" -> "GroupByMetric(smallest_listing)"
+  	"KeyEntity(company)" -> "GroupByMetric(subdaily_cumulative_grain_to_date_metric)"
+  	"KeyEntity(company)" -> "GroupByMetric(subdaily_cumulative_window_metric)"
+  	"KeyEntity(company)" -> "GroupByMetric(subdaily_join_to_time_spine_metric)"
+  	"KeyEntity(company)" -> "GroupByMetric(subdaily_offset_grain_to_date_metric)"
+  	"KeyEntity(company)" -> "GroupByMetric(subdaily_offset_window_metric)"
+  	"KeyEntity(company)" -> "GroupByMetric(total_account_balance_first_day)"
+  	"KeyEntity(company)" -> "GroupByMetric(total_account_balance_first_day_of_month)"
+  	"KeyEntity(company)" -> "GroupByMetric(trailing_2_months_revenue)"
+  	"KeyEntity(company)" -> "GroupByMetric(trailing_2_months_revenue_sub_10)"
+  	"KeyEntity(company)" -> "GroupByMetric(twice_bookings_fill_nulls_with_0_without_time_spine)"
+  	"KeyEntity(company)" -> "GroupByMetric(views)"
+  	"KeyEntity(company)" -> "GroupByMetric(views_times_booking_value)"
+  	"KeyEntity(company)" -> "GroupByMetric(visit_buy_conversion_rate)"
+  	"KeyEntity(company)" -> "GroupByMetric(visit_buy_conversion_rate_7days)"
+  	"KeyEntity(company)" -> "GroupByMetric(visit_buy_conversion_rate_7days_fill_nulls_with_0)"
+  	"KeyEntity(company)" -> "GroupByMetric(visit_buy_conversion_rate_by_session)"
+  	"KeyEntity(company)" -> "GroupByMetric(visit_buy_conversion_rate_with_monthly_conversion)"
+  	"KeyEntity(company)" -> "GroupByMetric(visit_buy_conversions)"
+  	"KeyEntity(guest)" -> "GroupByMetric(approximate_continuous_booking_value_p99)"
+  	"KeyEntity(guest)" -> "GroupByMetric(approximate_discrete_booking_value_p99)"
+  	"KeyEntity(guest)" -> "GroupByMetric(average_booking_value)"
+  	"KeyEntity(guest)" -> "GroupByMetric(average_instant_booking_value)"
+  	"KeyEntity(guest)" -> "GroupByMetric(bookers)"
+  	"KeyEntity(guest)" -> "GroupByMetric(booking_fees)"
+  	"KeyEntity(guest)" -> "GroupByMetric(booking_fees_last_week_per_booker_this_week)"
+  	"KeyEntity(guest)" -> "GroupByMetric(booking_fees_per_booker)"
+  	"KeyEntity(guest)" -> "GroupByMetric(booking_fees_since_start_of_month)"
+  	"KeyEntity(guest)" -> "GroupByMetric(booking_payments)"
+  	"KeyEntity(guest)" -> "GroupByMetric(booking_value)"
+  	"KeyEntity(guest)" -> "GroupByMetric(booking_value_for_non_null_listing_id)"
+  	"KeyEntity(guest)" -> "GroupByMetric(booking_value_p99)"
+  	"KeyEntity(guest)" -> "GroupByMetric(booking_value_sub_instant)"
+  	"KeyEntity(guest)" -> "GroupByMetric(booking_value_sub_instant_add_10)"
+  	"KeyEntity(guest)" -> "GroupByMetric(bookings)"
+  	"KeyEntity(guest)" -> "GroupByMetric(bookings_5_day_lag)"
+  	"KeyEntity(guest)" -> "GroupByMetric(bookings_alien_day_over_alien_day)"
+  	"KeyEntity(guest)" -> "GroupByMetric(bookings_at_start_of_month)"
+  	"KeyEntity(guest)" -> "GroupByMetric(bookings_fill_nulls_with_0)"
+  	"KeyEntity(guest)" -> "GroupByMetric(bookings_fill_nulls_with_0_without_time_spine)"
+  	"KeyEntity(guest)" -> "GroupByMetric(bookings_growth_2_weeks)"
+  	"KeyEntity(guest)" -> "GroupByMetric(bookings_growth_2_weeks_fill_nulls_with_0)"
+  	"KeyEntity(guest)" -> "GroupByMetric(bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset)"
+  	"KeyEntity(guest)" -> "GroupByMetric(bookings_growth_since_start_of_month)"
+  	"KeyEntity(guest)" -> "GroupByMetric(bookings_join_to_time_spine)"
+  	"KeyEntity(guest)" -> "GroupByMetric(bookings_join_to_time_spine_with_tiered_filters)"
+  	"KeyEntity(guest)" -> "GroupByMetric(bookings_month_start_compared_to_1_month_prior)"
+  	"KeyEntity(guest)" -> "GroupByMetric(bookings_offset_alien_day)"
+  	"KeyEntity(guest)" -> "GroupByMetric(bookings_offset_once)"
+  	"KeyEntity(guest)" -> "GroupByMetric(bookings_offset_one_alien_day)"
+  	"KeyEntity(guest)" -> "GroupByMetric(bookings_offset_twice)"
+  	"KeyEntity(guest)" -> "GroupByMetric(bookings_per_booker)"
+  	"KeyEntity(guest)" -> "GroupByMetric(bookings_per_dollar)"
+  	"KeyEntity(guest)" -> "GroupByMetric(derived_bookings_0)"
+  	"KeyEntity(guest)" -> "GroupByMetric(derived_bookings_1)"
+  	"KeyEntity(guest)" -> "GroupByMetric(derived_shared_alias_1a)"
+  	"KeyEntity(guest)" -> "GroupByMetric(derived_shared_alias_1b)"
+  	"KeyEntity(guest)" -> "GroupByMetric(derived_shared_alias_2)"
+  	"KeyEntity(guest)" -> "GroupByMetric(discrete_booking_value_p99)"
+  	"KeyEntity(guest)" -> "GroupByMetric(double_counted_delayed_bookings)"
+  	"KeyEntity(guest)" -> "GroupByMetric(every_2_days_bookers_2_days_ago)"
+  	"KeyEntity(guest)" -> "GroupByMetric(every_two_days_bookers)"
+  	"KeyEntity(guest)" -> "GroupByMetric(every_two_days_bookers_fill_nulls_with_0)"
+  	"KeyEntity(guest)" -> "GroupByMetric(instant_booking_fraction_of_max_value)"
+  	"KeyEntity(guest)" -> "GroupByMetric(instant_booking_value)"
+  	"KeyEntity(guest)" -> "GroupByMetric(instant_booking_value_ratio)"
+  	"KeyEntity(guest)" -> "GroupByMetric(instant_bookings)"
+  	"KeyEntity(guest)" -> "GroupByMetric(instant_bookings_with_measure_filter)"
+  	"KeyEntity(guest)" -> "GroupByMetric(instant_lux_booking_value_rate)"
+  	"KeyEntity(guest)" -> "GroupByMetric(instant_plus_non_referred_bookings_pct)"
+  	"KeyEntity(guest)" -> "GroupByMetric(lux_booking_fraction_of_max_value)"
+  	"KeyEntity(guest)" -> "GroupByMetric(lux_booking_value_rate_expr)"
+  	"KeyEntity(guest)" -> "GroupByMetric(max_booking_value)"
+  	"KeyEntity(guest)" -> "GroupByMetric(median_booking_value)"
+  	"KeyEntity(guest)" -> "GroupByMetric(min_booking_value)"
+  	"KeyEntity(guest)" -> "GroupByMetric(nested_fill_nulls_without_time_spine)"
+  	"KeyEntity(guest)" -> "GroupByMetric(non_referred_bookings_pct)"
+  	"KeyEntity(guest)" -> "GroupByMetric(referred_bookings)"
+  	"KeyEntity(guest)" -> "GroupByMetric(twice_bookings_fill_nulls_with_0_without_time_spine)"
+  	"KeyEntity(host)" -> "GroupByMetric(approximate_continuous_booking_value_p99)"
+  	"KeyEntity(host)" -> "GroupByMetric(approximate_discrete_booking_value_p99)"
+  	"KeyEntity(host)" -> "GroupByMetric(average_booking_value)"
+  	"KeyEntity(host)" -> "GroupByMetric(average_instant_booking_value)"
+  	"KeyEntity(host)" -> "GroupByMetric(bookers)"
+  	"KeyEntity(host)" -> "GroupByMetric(booking_fees)"
+  	"KeyEntity(host)" -> "GroupByMetric(booking_fees_last_week_per_booker_this_week)"
+  	"KeyEntity(host)" -> "GroupByMetric(booking_fees_per_booker)"
+  	"KeyEntity(host)" -> "GroupByMetric(booking_fees_since_start_of_month)"
+  	"KeyEntity(host)" -> "GroupByMetric(booking_payments)"
+  	"KeyEntity(host)" -> "GroupByMetric(booking_value)"
+  	"KeyEntity(host)" -> "GroupByMetric(booking_value_for_non_null_listing_id)"
+  	"KeyEntity(host)" -> "GroupByMetric(booking_value_p99)"
+  	"KeyEntity(host)" -> "GroupByMetric(booking_value_sub_instant)"
+  	"KeyEntity(host)" -> "GroupByMetric(booking_value_sub_instant_add_10)"
+  	"KeyEntity(host)" -> "GroupByMetric(bookings)"
+  	"KeyEntity(host)" -> "GroupByMetric(bookings_5_day_lag)"
+  	"KeyEntity(host)" -> "GroupByMetric(bookings_alien_day_over_alien_day)"
+  	"KeyEntity(host)" -> "GroupByMetric(bookings_at_start_of_month)"
+  	"KeyEntity(host)" -> "GroupByMetric(bookings_fill_nulls_with_0)"
+  	"KeyEntity(host)" -> "GroupByMetric(bookings_fill_nulls_with_0_without_time_spine)"
+  	"KeyEntity(host)" -> "GroupByMetric(bookings_growth_2_weeks)"
+  	"KeyEntity(host)" -> "GroupByMetric(bookings_growth_2_weeks_fill_nulls_with_0)"
+  	"KeyEntity(host)" -> "GroupByMetric(bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset)"
+  	"KeyEntity(host)" -> "GroupByMetric(bookings_growth_since_start_of_month)"
+  	"KeyEntity(host)" -> "GroupByMetric(bookings_join_to_time_spine)"
+  	"KeyEntity(host)" -> "GroupByMetric(bookings_join_to_time_spine_with_tiered_filters)"
+  	"KeyEntity(host)" -> "GroupByMetric(bookings_month_start_compared_to_1_month_prior)"
+  	"KeyEntity(host)" -> "GroupByMetric(bookings_offset_alien_day)"
+  	"KeyEntity(host)" -> "GroupByMetric(bookings_offset_once)"
+  	"KeyEntity(host)" -> "GroupByMetric(bookings_offset_one_alien_day)"
+  	"KeyEntity(host)" -> "GroupByMetric(bookings_offset_twice)"
+  	"KeyEntity(host)" -> "GroupByMetric(bookings_per_booker)"
+  	"KeyEntity(host)" -> "GroupByMetric(bookings_per_dollar)"
+  	"KeyEntity(host)" -> "GroupByMetric(derived_bookings_0)"
+  	"KeyEntity(host)" -> "GroupByMetric(derived_bookings_1)"
+  	"KeyEntity(host)" -> "GroupByMetric(derived_shared_alias_1a)"
+  	"KeyEntity(host)" -> "GroupByMetric(derived_shared_alias_1b)"
+  	"KeyEntity(host)" -> "GroupByMetric(derived_shared_alias_2)"
+  	"KeyEntity(host)" -> "GroupByMetric(discrete_booking_value_p99)"
+  	"KeyEntity(host)" -> "GroupByMetric(double_counted_delayed_bookings)"
+  	"KeyEntity(host)" -> "GroupByMetric(every_2_days_bookers_2_days_ago)"
+  	"KeyEntity(host)" -> "GroupByMetric(every_two_days_bookers)"
+  	"KeyEntity(host)" -> "GroupByMetric(every_two_days_bookers_fill_nulls_with_0)"
+  	"KeyEntity(host)" -> "GroupByMetric(instant_booking_fraction_of_max_value)"
+  	"KeyEntity(host)" -> "GroupByMetric(instant_booking_value)"
+  	"KeyEntity(host)" -> "GroupByMetric(instant_booking_value_ratio)"
+  	"KeyEntity(host)" -> "GroupByMetric(instant_bookings)"
+  	"KeyEntity(host)" -> "GroupByMetric(instant_bookings_with_measure_filter)"
+  	"KeyEntity(host)" -> "GroupByMetric(instant_lux_booking_value_rate)"
+  	"KeyEntity(host)" -> "GroupByMetric(instant_plus_non_referred_bookings_pct)"
+  	"KeyEntity(host)" -> "GroupByMetric(lux_booking_fraction_of_max_value)"
+  	"KeyEntity(host)" -> "GroupByMetric(lux_booking_value_rate_expr)"
+  	"KeyEntity(host)" -> "GroupByMetric(max_booking_value)"
+  	"KeyEntity(host)" -> "GroupByMetric(median_booking_value)"
+  	"KeyEntity(host)" -> "GroupByMetric(min_booking_value)"
+  	"KeyEntity(host)" -> "GroupByMetric(nested_fill_nulls_without_time_spine)"
+  	"KeyEntity(host)" -> "GroupByMetric(non_referred_bookings_pct)"
+  	"KeyEntity(host)" -> "GroupByMetric(referred_bookings)"
+  	"KeyEntity(host)" -> "GroupByMetric(twice_bookings_fill_nulls_with_0_without_time_spine)"
+  	"KeyEntity(listing)" -> "GroupByMetric(active_listings)"
+  	"KeyEntity(listing)" -> "GroupByMetric(approximate_continuous_booking_value_p99)"
+  	"KeyEntity(listing)" -> "GroupByMetric(approximate_discrete_booking_value_p99)"
+  	"KeyEntity(listing)" -> "GroupByMetric(average_booking_value)"
+  	"KeyEntity(listing)" -> "GroupByMetric(average_instant_booking_value)"
+  	"KeyEntity(listing)" -> "GroupByMetric(bookers)"
+  	"KeyEntity(listing)" -> "GroupByMetric(booking_fees)"
+  	"KeyEntity(listing)" -> "GroupByMetric(booking_fees_last_week_per_booker_this_week)"
+  	"KeyEntity(listing)" -> "GroupByMetric(booking_fees_per_booker)"
+  	"KeyEntity(listing)" -> "GroupByMetric(booking_fees_since_start_of_month)"
+  	"KeyEntity(listing)" -> "GroupByMetric(booking_payments)"
+  	"KeyEntity(listing)" -> "GroupByMetric(booking_value)"
+  	"KeyEntity(listing)" -> "GroupByMetric(booking_value_for_non_null_listing_id)"
+  	"KeyEntity(listing)" -> "GroupByMetric(booking_value_p99)"
+  	"KeyEntity(listing)" -> "GroupByMetric(booking_value_per_view)"
+  	"KeyEntity(listing)" -> "GroupByMetric(booking_value_sub_instant)"
+  	"KeyEntity(listing)" -> "GroupByMetric(booking_value_sub_instant_add_10)"
+  	"KeyEntity(listing)" -> "GroupByMetric(bookings)"
+  	"KeyEntity(listing)" -> "GroupByMetric(bookings_5_day_lag)"
+  	"KeyEntity(listing)" -> "GroupByMetric(bookings_alien_day_over_alien_day)"
+  	"KeyEntity(listing)" -> "GroupByMetric(bookings_at_start_of_month)"
+  	"KeyEntity(listing)" -> "GroupByMetric(bookings_fill_nulls_with_0)"
+  	"KeyEntity(listing)" -> "GroupByMetric(bookings_fill_nulls_with_0_without_time_spine)"
+  	"KeyEntity(listing)" -> "GroupByMetric(bookings_growth_2_weeks)"
+  	"KeyEntity(listing)" -> "GroupByMetric(bookings_growth_2_weeks_fill_nulls_with_0)"
+  	"KeyEntity(listing)" -> "GroupByMetric(bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset)"
+  	"KeyEntity(listing)" -> "GroupByMetric(bookings_growth_since_start_of_month)"
+  	"KeyEntity(listing)" -> "GroupByMetric(bookings_join_to_time_spine)"
+  	"KeyEntity(listing)" -> "GroupByMetric(bookings_join_to_time_spine_with_tiered_filters)"
+  	"KeyEntity(listing)" -> "GroupByMetric(bookings_month_start_compared_to_1_month_prior)"
+  	"KeyEntity(listing)" -> "GroupByMetric(bookings_offset_alien_day)"
+  	"KeyEntity(listing)" -> "GroupByMetric(bookings_offset_once)"
+  	"KeyEntity(listing)" -> "GroupByMetric(bookings_offset_one_alien_day)"
+  	"KeyEntity(listing)" -> "GroupByMetric(bookings_offset_twice)"
+  	"KeyEntity(listing)" -> "GroupByMetric(bookings_per_booker)"
+  	"KeyEntity(listing)" -> "GroupByMetric(bookings_per_dollar)"
+  	"KeyEntity(listing)" -> "GroupByMetric(bookings_per_listing)"
+  	"KeyEntity(listing)" -> "GroupByMetric(bookings_per_lux_listing_derived)"
+  	"KeyEntity(listing)" -> "GroupByMetric(bookings_per_view)"
+  	"KeyEntity(listing)" -> "GroupByMetric(derived_bookings_0)"
+  	"KeyEntity(listing)" -> "GroupByMetric(derived_bookings_1)"
+  	"KeyEntity(listing)" -> "GroupByMetric(derived_shared_alias_1a)"
+  	"KeyEntity(listing)" -> "GroupByMetric(derived_shared_alias_1b)"
+  	"KeyEntity(listing)" -> "GroupByMetric(derived_shared_alias_2)"
+  	"KeyEntity(listing)" -> "GroupByMetric(discrete_booking_value_p99)"
+  	"KeyEntity(listing)" -> "GroupByMetric(double_counted_delayed_bookings)"
+  	"KeyEntity(listing)" -> "GroupByMetric(every_2_days_bookers_2_days_ago)"
+  	"KeyEntity(listing)" -> "GroupByMetric(every_two_days_bookers)"
+  	"KeyEntity(listing)" -> "GroupByMetric(every_two_days_bookers_fill_nulls_with_0)"
+  	"KeyEntity(listing)" -> "GroupByMetric(instant_booking_fraction_of_max_value)"
+  	"KeyEntity(listing)" -> "GroupByMetric(instant_booking_value)"
+  	"KeyEntity(listing)" -> "GroupByMetric(instant_booking_value_ratio)"
+  	"KeyEntity(listing)" -> "GroupByMetric(instant_bookings)"
+  	"KeyEntity(listing)" -> "GroupByMetric(instant_bookings_with_measure_filter)"
+  	"KeyEntity(listing)" -> "GroupByMetric(instant_lux_booking_value_rate)"
+  	"KeyEntity(listing)" -> "GroupByMetric(instant_plus_non_referred_bookings_pct)"
+  	"KeyEntity(listing)" -> "GroupByMetric(largest_listing)"
+  	"KeyEntity(listing)" -> "GroupByMetric(listings)"
+  	"KeyEntity(listing)" -> "GroupByMetric(lux_booking_fraction_of_max_value)"
+  	"KeyEntity(listing)" -> "GroupByMetric(lux_booking_value_rate_expr)"
+  	"KeyEntity(listing)" -> "GroupByMetric(lux_listings)"
+  	"KeyEntity(listing)" -> "GroupByMetric(max_booking_value)"
+  	"KeyEntity(listing)" -> "GroupByMetric(median_booking_value)"
+  	"KeyEntity(listing)" -> "GroupByMetric(min_booking_value)"
+  	"KeyEntity(listing)" -> "GroupByMetric(nested_fill_nulls_without_time_spine)"
+  	"KeyEntity(listing)" -> "GroupByMetric(non_referred_bookings_pct)"
+  	"KeyEntity(listing)" -> "GroupByMetric(popular_listing_bookings_per_booker)"
+  	"KeyEntity(listing)" -> "GroupByMetric(referred_bookings)"
+  	"KeyEntity(listing)" -> "GroupByMetric(smallest_listing)"
+  	"KeyEntity(listing)" -> "GroupByMetric(twice_bookings_fill_nulls_with_0_without_time_spine)"
+  	"KeyEntity(listing)" -> "GroupByMetric(views)"
+  	"KeyEntity(listing)" -> "GroupByMetric(views_times_booking_value)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(active_listings)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(approximate_continuous_booking_value_p99)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(approximate_discrete_booking_value_p99)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(average_booking_value)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(average_instant_booking_value)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(bookers)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(booking_fees)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(booking_fees_last_week_per_booker_this_week)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(booking_fees_per_booker)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(booking_fees_since_start_of_month)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(booking_payments)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(booking_value)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(booking_value_for_non_null_listing_id)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(booking_value_p99)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(booking_value_per_view)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(booking_value_sub_instant)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(booking_value_sub_instant_add_10)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(bookings)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(bookings_5_day_lag)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(bookings_alien_day_over_alien_day)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(bookings_at_start_of_month)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(bookings_fill_nulls_with_0)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(bookings_fill_nulls_with_0_without_time_spine)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(bookings_growth_2_weeks)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(bookings_growth_2_weeks_fill_nulls_with_0)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(bookings_growth_since_start_of_month)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(bookings_join_to_time_spine)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(bookings_join_to_time_spine_with_tiered_filters)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(bookings_month_start_compared_to_1_month_prior)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(bookings_offset_alien_day)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(bookings_offset_once)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(bookings_offset_one_alien_day)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(bookings_offset_twice)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(bookings_per_booker)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(bookings_per_dollar)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(bookings_per_listing)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(bookings_per_lux_listing_derived)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(bookings_per_view)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(derived_bookings_0)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(derived_bookings_1)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(derived_shared_alias_1a)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(derived_shared_alias_1b)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(derived_shared_alias_2)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(discrete_booking_value_p99)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(double_counted_delayed_bookings)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(every_2_days_bookers_2_days_ago)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(every_two_days_bookers)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(every_two_days_bookers_fill_nulls_with_0)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(instant_booking_fraction_of_max_value)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(instant_booking_value)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(instant_booking_value_ratio)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(instant_bookings)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(instant_bookings_with_measure_filter)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(instant_lux_booking_value_rate)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(instant_plus_non_referred_bookings_pct)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(largest_listing)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(listings)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(lux_booking_fraction_of_max_value)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(lux_booking_value_rate_expr)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(lux_listings)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(max_booking_value)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(median_booking_value)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(min_booking_value)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(nested_fill_nulls_without_time_spine)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(non_referred_bookings_pct)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(popular_listing_bookings_per_booker)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(referred_bookings)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(smallest_listing)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(twice_bookings_fill_nulls_with_0_without_time_spine)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(views)"
+  	"KeyEntity(lux_listing)" -> "GroupByMetric(views_times_booking_value)"
+  	"KeyEntity(user)" -> "GroupByMetric(active_listings)"
+  	"KeyEntity(user)" -> "GroupByMetric(approximate_continuous_booking_value_p99)"
+  	"KeyEntity(user)" -> "GroupByMetric(approximate_discrete_booking_value_p99)"
+  	"KeyEntity(user)" -> "GroupByMetric(archived_users)"
+  	"KeyEntity(user)" -> "GroupByMetric(archived_users_join_to_time_spine)"
+  	"KeyEntity(user)" -> "GroupByMetric(average_booking_value)"
+  	"KeyEntity(user)" -> "GroupByMetric(average_instant_booking_value)"
+  	"KeyEntity(user)" -> "GroupByMetric(bookers)"
+  	"KeyEntity(user)" -> "GroupByMetric(booking_fees)"
+  	"KeyEntity(user)" -> "GroupByMetric(booking_fees_last_week_per_booker_this_week)"
+  	"KeyEntity(user)" -> "GroupByMetric(booking_fees_per_booker)"
+  	"KeyEntity(user)" -> "GroupByMetric(booking_fees_since_start_of_month)"
+  	"KeyEntity(user)" -> "GroupByMetric(booking_payments)"
+  	"KeyEntity(user)" -> "GroupByMetric(booking_value)"
+  	"KeyEntity(user)" -> "GroupByMetric(booking_value_for_non_null_listing_id)"
+  	"KeyEntity(user)" -> "GroupByMetric(booking_value_p99)"
+  	"KeyEntity(user)" -> "GroupByMetric(booking_value_per_view)"
+  	"KeyEntity(user)" -> "GroupByMetric(booking_value_sub_instant)"
+  	"KeyEntity(user)" -> "GroupByMetric(booking_value_sub_instant_add_10)"
+  	"KeyEntity(user)" -> "GroupByMetric(bookings)"
+  	"KeyEntity(user)" -> "GroupByMetric(bookings_5_day_lag)"
+  	"KeyEntity(user)" -> "GroupByMetric(bookings_alien_day_over_alien_day)"
+  	"KeyEntity(user)" -> "GroupByMetric(bookings_at_start_of_month)"
+  	"KeyEntity(user)" -> "GroupByMetric(bookings_fill_nulls_with_0)"
+  	"KeyEntity(user)" -> "GroupByMetric(bookings_fill_nulls_with_0_without_time_spine)"
+  	"KeyEntity(user)" -> "GroupByMetric(bookings_growth_2_weeks)"
+  	"KeyEntity(user)" -> "GroupByMetric(bookings_growth_2_weeks_fill_nulls_with_0)"
+  	"KeyEntity(user)" -> "GroupByMetric(bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset)"
+  	"KeyEntity(user)" -> "GroupByMetric(bookings_growth_since_start_of_month)"
+  	"KeyEntity(user)" -> "GroupByMetric(bookings_join_to_time_spine)"
+  	"KeyEntity(user)" -> "GroupByMetric(bookings_join_to_time_spine_with_tiered_filters)"
+  	"KeyEntity(user)" -> "GroupByMetric(bookings_month_start_compared_to_1_month_prior)"
+  	"KeyEntity(user)" -> "GroupByMetric(bookings_offset_alien_day)"
+  	"KeyEntity(user)" -> "GroupByMetric(bookings_offset_once)"
+  	"KeyEntity(user)" -> "GroupByMetric(bookings_offset_one_alien_day)"
+  	"KeyEntity(user)" -> "GroupByMetric(bookings_offset_twice)"
+  	"KeyEntity(user)" -> "GroupByMetric(bookings_per_booker)"
+  	"KeyEntity(user)" -> "GroupByMetric(bookings_per_dollar)"
+  	"KeyEntity(user)" -> "GroupByMetric(bookings_per_listing)"
+  	"KeyEntity(user)" -> "GroupByMetric(bookings_per_lux_listing_derived)"
+  	"KeyEntity(user)" -> "GroupByMetric(bookings_per_view)"
+  	"KeyEntity(user)" -> "GroupByMetric(current_account_balance_by_user)"
+  	"KeyEntity(user)" -> "GroupByMetric(derived_bookings_0)"
+  	"KeyEntity(user)" -> "GroupByMetric(derived_bookings_1)"
+  	"KeyEntity(user)" -> "GroupByMetric(derived_shared_alias_1a)"
+  	"KeyEntity(user)" -> "GroupByMetric(derived_shared_alias_1b)"
+  	"KeyEntity(user)" -> "GroupByMetric(derived_shared_alias_2)"
+  	"KeyEntity(user)" -> "GroupByMetric(discrete_booking_value_p99)"
+  	"KeyEntity(user)" -> "GroupByMetric(double_counted_delayed_bookings)"
+  	"KeyEntity(user)" -> "GroupByMetric(every_2_days_bookers_2_days_ago)"
+  	"KeyEntity(user)" -> "GroupByMetric(every_two_days_bookers)"
+  	"KeyEntity(user)" -> "GroupByMetric(every_two_days_bookers_fill_nulls_with_0)"
+  	"KeyEntity(user)" -> "GroupByMetric(identity_verifications)"
+  	"KeyEntity(user)" -> "GroupByMetric(instant_booking_fraction_of_max_value)"
+  	"KeyEntity(user)" -> "GroupByMetric(instant_booking_value)"
+  	"KeyEntity(user)" -> "GroupByMetric(instant_booking_value_ratio)"
+  	"KeyEntity(user)" -> "GroupByMetric(instant_bookings)"
+  	"KeyEntity(user)" -> "GroupByMetric(instant_bookings_with_measure_filter)"
+  	"KeyEntity(user)" -> "GroupByMetric(instant_lux_booking_value_rate)"
+  	"KeyEntity(user)" -> "GroupByMetric(instant_plus_non_referred_bookings_pct)"
+  	"KeyEntity(user)" -> "GroupByMetric(largest_listing)"
+  	"KeyEntity(user)" -> "GroupByMetric(listings)"
+  	"KeyEntity(user)" -> "GroupByMetric(lux_booking_fraction_of_max_value)"
+  	"KeyEntity(user)" -> "GroupByMetric(lux_booking_value_rate_expr)"
+  	"KeyEntity(user)" -> "GroupByMetric(lux_listings)"
+  	"KeyEntity(user)" -> "GroupByMetric(max_booking_value)"
+  	"KeyEntity(user)" -> "GroupByMetric(median_booking_value)"
+  	"KeyEntity(user)" -> "GroupByMetric(min_booking_value)"
+  	"KeyEntity(user)" -> "GroupByMetric(nested_fill_nulls_without_time_spine)"
+  	"KeyEntity(user)" -> "GroupByMetric(new_users)"
+  	"KeyEntity(user)" -> "GroupByMetric(non_referred_bookings_pct)"
+  	"KeyEntity(user)" -> "GroupByMetric(popular_listing_bookings_per_booker)"
+  	"KeyEntity(user)" -> "GroupByMetric(referred_bookings)"
+  	"KeyEntity(user)" -> "GroupByMetric(regional_starting_balance_ratios)"
+  	"KeyEntity(user)" -> "GroupByMetric(revenue)"
+  	"KeyEntity(user)" -> "GroupByMetric(revenue_all_time)"
+  	"KeyEntity(user)" -> "GroupByMetric(revenue_mtd)"
+  	"KeyEntity(user)" -> "GroupByMetric(simple_subdaily_metric_default_day)"
+  	"KeyEntity(user)" -> "GroupByMetric(simple_subdaily_metric_default_hour)"
+  	"KeyEntity(user)" -> "GroupByMetric(smallest_listing)"
+  	"KeyEntity(user)" -> "GroupByMetric(subdaily_cumulative_grain_to_date_metric)"
+  	"KeyEntity(user)" -> "GroupByMetric(subdaily_cumulative_window_metric)"
+  	"KeyEntity(user)" -> "GroupByMetric(subdaily_join_to_time_spine_metric)"
+  	"KeyEntity(user)" -> "GroupByMetric(subdaily_offset_grain_to_date_metric)"
+  	"KeyEntity(user)" -> "GroupByMetric(subdaily_offset_window_metric)"
+  	"KeyEntity(user)" -> "GroupByMetric(total_account_balance_first_day)"
+  	"KeyEntity(user)" -> "GroupByMetric(total_account_balance_first_day_of_month)"
+  	"KeyEntity(user)" -> "GroupByMetric(trailing_2_months_revenue)"
+  	"KeyEntity(user)" -> "GroupByMetric(trailing_2_months_revenue_sub_10)"
+  	"KeyEntity(user)" -> "GroupByMetric(twice_bookings_fill_nulls_with_0_without_time_spine)"
+  	"KeyEntity(user)" -> "GroupByMetric(views)"
+  	"KeyEntity(user)" -> "GroupByMetric(views_times_booking_value)"
+  	"KeyEntity(user)" -> "GroupByMetric(visit_buy_conversion_rate)"
+  	"KeyEntity(user)" -> "GroupByMetric(visit_buy_conversion_rate_7days)"
+  	"KeyEntity(user)" -> "GroupByMetric(visit_buy_conversion_rate_7days_fill_nulls_with_0)"
+  	"KeyEntity(user)" -> "GroupByMetric(visit_buy_conversion_rate_by_session)"
+  	"KeyEntity(user)" -> "GroupByMetric(visit_buy_conversion_rate_with_monthly_conversion)"
+  	"KeyEntity(user)" -> "GroupByMetric(visit_buy_conversions)"
+  	"KeyEntity(verification)" -> "GroupByMetric(identity_verifications)"
+  	"LocalModel(accounts_source)" -> "KeyEntity(user)"
+  	"LocalModel(bookings_source)" -> "KeyEntity(guest)"
+  	"LocalModel(bookings_source)" -> "KeyEntity(host)"
+  	"LocalModel(bookings_source)" -> "KeyEntity(listing)"
+  	"LocalModel(buys_source)" -> "KeyEntity(session_id)"
+  	"LocalModel(buys_source)" -> "KeyEntity(user)"
+  	"LocalModel(companies)" -> "KeyEntity(company)"
+  	"LocalModel(companies)" -> "KeyEntity(user)"
+  	"LocalModel(id_verifications)" -> "KeyEntity(user)"
+  	"LocalModel(id_verifications)" -> "KeyEntity(verification)"
+  	"LocalModel(listings_latest)" -> "KeyEntity(listing)"
+  	"LocalModel(listings_latest)" -> "KeyEntity(user)"
+  	"LocalModel(lux_listing_mapping)" -> "KeyEntity(listing)"
+  	"LocalModel(lux_listing_mapping)" -> "KeyEntity(lux_listing)"
+  	"LocalModel(revenue)" -> "KeyEntity(user)"
+  	"LocalModel(users_ds_source)" -> "KeyEntity(user)"
+  	"LocalModel(users_latest)" -> "KeyEntity(user)"
+  	"LocalModel(views_source)" -> "KeyEntity(listing)"
+  	"LocalModel(views_source)" -> "KeyEntity(user)"
+  	"LocalModel(visits_source)" -> "KeyEntity(session)"
+  	"LocalModel(visits_source)" -> "KeyEntity(user)"
+  	TimeEntity -> "TimeAttribute(alien_day)"
+  	TimeEntity -> "TimeAttribute(day)"
+  	TimeEntity -> "TimeAttribute(extract_day)"
+  	TimeEntity -> "TimeAttribute(extract_dow)"
+  	TimeEntity -> "TimeAttribute(extract_doy)"
+  	TimeEntity -> "TimeAttribute(extract_month)"
   	TimeEntity -> "TimeAttribute(extract_quarter)"
   	TimeEntity -> "TimeAttribute(extract_year)"
+  	TimeEntity -> "TimeAttribute(hour)"
+  	TimeEntity -> "TimeAttribute(millisecond)"
+  	TimeEntity -> "TimeAttribute(minute)"
+  	TimeEntity -> "TimeAttribute(month)"
   	TimeEntity -> "TimeAttribute(quarter)"
+  	TimeEntity -> "TimeAttribute(second)"
+  	TimeEntity -> "TimeAttribute(week)"
   	TimeEntity -> "TimeAttribute(year)"
-  	"JoinedModel(sm_0)" -> "TimeDimension(ds)"
-  	"KeyEntity(sm_0_primary_entity)" -> "KeyAttribute(sm_0_primary_entity)"
-  	"KeyEntity(sm_1_primary_entity)" -> "KeyAttribute(sm_1_primary_entity)"
-  	"KeyEntity(sm_2_primary_entity)" -> "KeyAttribute(sm_2_primary_entity)"
-  	"Measure(sm_0_measure_0)" -> "LocalModel(sm_0)"
-  	"Measure(sm_0_measure_0)" -> MetricTime
+  	"JoinedModel(accounts_source)" -> "TimeDimension(ds)"
+  	"JoinedModel(accounts_source)" -> "TimeDimension(ds_month)"
+  	"JoinedModel(bookings_source)" -> "TimeDimension(ds)"
+  	"JoinedModel(bookings_source)" -> "TimeDimension(ds_partitioned)"
+  	"JoinedModel(bookings_source)" -> "TimeDimension(paid_at)"
+  	"JoinedModel(buys_source)" -> "TimeDimension(ds)"
+  	"JoinedModel(buys_source)" -> "TimeDimension(ds_month)"
+  	"JoinedModel(id_verifications)" -> "TimeDimension(ds)"
+  	"JoinedModel(id_verifications)" -> "TimeDimension(ds_partitioned)"
+  	"JoinedModel(listings_latest)" -> "TimeDimension(created_at)"
+  	"JoinedModel(listings_latest)" -> "TimeDimension(ds)"
+  	"JoinedModel(revenue)" -> "TimeDimension(ds)"
+  	"JoinedModel(users_ds_source)" -> "TimeDimension(archived_at)"
+  	"JoinedModel(users_ds_source)" -> "TimeDimension(bio_added_ts)"
+  	"JoinedModel(users_ds_source)" -> "TimeDimension(created_at)"
+  	"JoinedModel(users_ds_source)" -> "TimeDimension(ds)"
+  	"JoinedModel(users_ds_source)" -> "TimeDimension(ds_partitioned)"
+  	"JoinedModel(users_ds_source)" -> "TimeDimension(last_login_ts)"
+  	"JoinedModel(users_ds_source)" -> "TimeDimension(last_profile_edit_ts)"
+  	"JoinedModel(users_latest)" -> "TimeDimension(ds_latest)"
+  	"JoinedModel(views_source)" -> "TimeDimension(ds)"
+  	"JoinedModel(views_source)" -> "TimeDimension(ds_partitioned)"
+  	"JoinedModel(visits_source)" -> "TimeDimension(ds)"
+  	"KeyEntity(company)" -> "KeyAttribute(company)"
+  	"KeyEntity(guest)" -> "KeyAttribute(guest)"
+  	"KeyEntity(host)" -> "KeyAttribute(host)"
+  	"KeyEntity(listing)" -> "KeyAttribute(listing)"
+  	"KeyEntity(lux_listing)" -> "KeyAttribute(lux_listing)"
+  	"KeyEntity(session)" -> "KeyAttribute(session)"
+  	"KeyEntity(session_id)" -> "KeyAttribute(session_id)"
+  	"KeyEntity(user)" -> "KeyAttribute(user)"
+  	"KeyEntity(verification)" -> "KeyAttribute(verification)"
+  	"Measure(account_balance)" -> "LocalModel(accounts_source)"
+  	"Measure(account_balance)" -> MetricTime
+  	"Measure(approximate_continuous_booking_value_p99)" -> "LocalModel(bookings_source)"
+  	"Measure(approximate_continuous_booking_value_p99)" -> MetricTime
+  	"Measure(approximate_discrete_booking_value_p99)" -> "LocalModel(bookings_source)"
+  	"Measure(approximate_discrete_booking_value_p99)" -> MetricTime
+  	"Measure(archived_users)" -> "LocalModel(users_ds_source)"
+  	"Measure(archived_users)" -> MetricTime
+  	"Measure(average_booking_value)" -> "LocalModel(bookings_source)"
+  	"Measure(average_booking_value)" -> MetricTime
+  	"Measure(bookers)" -> "LocalModel(bookings_source)"
+  	"Measure(bookers)" -> MetricTime
+  	"Measure(booking_payments)" -> "LocalModel(bookings_source)"
+  	"Measure(booking_payments)" -> MetricTime
+  	"Measure(booking_value)" -> "LocalModel(bookings_source)"
+  	"Measure(booking_value)" -> MetricTime
+  	"Measure(booking_value_p99)" -> "LocalModel(bookings_source)"
+  	"Measure(booking_value_p99)" -> MetricTime
+  	"Measure(bookings)" -> "LocalModel(bookings_source)"
+  	"Measure(bookings)" -> MetricTime
+  	"Measure(buyers)" -> "LocalModel(buys_source)"
+  	"Measure(buyers)" -> MetricTime
+  	"Measure(buys)" -> "LocalModel(buys_source)"
+  	"Measure(buys)" -> MetricTime
+  	"Measure(buys_month)" -> "LocalModel(buys_source)"
+  	"Measure(buys_month)" -> MetricTime
+  	"Measure(current_account_balance_by_user)" -> "LocalModel(accounts_source)"
+  	"Measure(current_account_balance_by_user)" -> MetricTime
+  	"Measure(discrete_booking_value_p99)" -> "LocalModel(bookings_source)"
+  	"Measure(discrete_booking_value_p99)" -> MetricTime
+  	"Measure(identity_verifications)" -> "LocalModel(id_verifications)"
+  	"Measure(identity_verifications)" -> MetricTime
+  	"Measure(instant_bookings)" -> "LocalModel(bookings_source)"
+  	"Measure(instant_bookings)" -> MetricTime
+  	"Measure(largest_listing)" -> "LocalModel(listings_latest)"
+  	"Measure(largest_listing)" -> MetricTime
+  	"Measure(listings)" -> "LocalModel(listings_latest)"
+  	"Measure(listings)" -> MetricTime
+  	"Measure(max_booking_value)" -> "LocalModel(bookings_source)"
+  	"Measure(max_booking_value)" -> MetricTime
+  	"Measure(median_booking_value)" -> "LocalModel(bookings_source)"
+  	"Measure(median_booking_value)" -> MetricTime
+  	"Measure(min_booking_value)" -> "LocalModel(bookings_source)"
+  	"Measure(min_booking_value)" -> MetricTime
+  	"Measure(new_users)" -> "LocalModel(users_ds_source)"
+  	"Measure(new_users)" -> MetricTime
+  	"Measure(referred_bookings)" -> "LocalModel(bookings_source)"
+  	"Measure(referred_bookings)" -> MetricTime
+  	"Measure(smallest_listing)" -> "LocalModel(listings_latest)"
+  	"Measure(smallest_listing)" -> MetricTime
+  	"Measure(total_account_balance_first_day)" -> "LocalModel(accounts_source)"
+  	"Measure(total_account_balance_first_day)" -> MetricTime
+  	"Measure(total_account_balance_first_day_of_month)" -> "LocalModel(accounts_source)"
+  	"Measure(total_account_balance_first_day_of_month)" -> MetricTime
+  	"Measure(txn_revenue)" -> "LocalModel(revenue)"
+  	"Measure(txn_revenue)" -> MetricTime
+  	"Measure(views)" -> "LocalModel(views_source)"
+  	"Measure(views)" -> MetricTime
+  	"Measure(visitors)" -> "LocalModel(visits_source)"
+  	"Measure(visitors)" -> MetricTime
+  	"Measure(visits)" -> "LocalModel(visits_source)"
+  	"Measure(visits)" -> MetricTime
   	MetricTime -> TimeEntity
+  	"TimeDimension(archived_at)" -> TimeEntity
+  	"TimeDimension(bio_added_ts)" -> TimeEntity
+  	"TimeDimension(created_at)" -> TimeEntity
   	"TimeDimension(ds)" -> TimeEntity
-  	"JoinedModel(sm_0)" -> "sm_1.sm_1_primary_entity"
-  	"LocalModel(sm_0)" -> "sm_0.sm_0_primary_entity"
-  	"LocalModel(sm_0)" -> "sm_1.sm_1_primary_entity"
-  	"LocalModel(sm_1)" -> "sm_1.sm_1_primary_entity"
-  	"sm_0.sm_0_primary_entity" -> "JoinedModel(sm_0)"
-  	"sm_1.sm_1_primary_entity" -> "JoinedModel(sm_1)"
-  	"Metric(sm_0_measure_0_metric)" -> "Measure(sm_0_measure_0)"
+  	"TimeDimension(ds_latest)" -> TimeEntity
+  	"TimeDimension(ds_month)" -> TimeEntity
+  	"TimeDimension(ds_partitioned)" -> TimeEntity
+  	"TimeDimension(last_login_ts)" -> TimeEntity
+  	"TimeDimension(last_profile_edit_ts)" -> TimeEntity
+  	"TimeDimension(paid_at)" -> TimeEntity
+  	"JoinedModel(accounts_source)" -> "companies.user"
+  	"JoinedModel(accounts_source)" -> "users_ds_source.user"
+  	"JoinedModel(accounts_source)" -> "users_latest.user"
+  	"JoinedModel(bookings_source)" -> "listings_latest.listing"
+  	"JoinedModel(bookings_source)" -> "lux_listing_mapping.listing"
+  	"JoinedModel(buys_source)" -> "companies.user"
+  	"JoinedModel(buys_source)" -> "users_ds_source.user"
+  	"JoinedModel(buys_source)" -> "users_latest.user"
+  	"JoinedModel(companies)" -> "users_ds_source.user"
+  	"JoinedModel(companies)" -> "users_latest.user"
+  	"JoinedModel(id_verifications)" -> "companies.user"
+  	"JoinedModel(id_verifications)" -> "users_ds_source.user"
+  	"JoinedModel(id_verifications)" -> "users_latest.user"
+  	"JoinedModel(listings_latest)" -> "lux_listing_mapping.listing"
+  	"JoinedModel(listings_latest)" -> "companies.user"
+  	"JoinedModel(listings_latest)" -> "users_ds_source.user"
+  	"JoinedModel(listings_latest)" -> "users_latest.user"
+  	"JoinedModel(lux_listing_mapping)" -> "listings_latest.listing"
+  	"JoinedModel(revenue)" -> "companies.user"
+  	"JoinedModel(revenue)" -> "users_ds_source.user"
+  	"JoinedModel(revenue)" -> "users_latest.user"
+  	"JoinedModel(users_ds_source)" -> "companies.user"
+  	"JoinedModel(users_ds_source)" -> "users_latest.user"
+  	"JoinedModel(users_latest)" -> "companies.user"
+  	"JoinedModel(users_latest)" -> "users_ds_source.user"
+  	"JoinedModel(views_source)" -> "listings_latest.listing"
+  	"JoinedModel(views_source)" -> "lux_listing_mapping.listing"
+  	"JoinedModel(views_source)" -> "companies.user"
+  	"JoinedModel(views_source)" -> "users_ds_source.user"
+  	"JoinedModel(views_source)" -> "users_latest.user"
+  	"JoinedModel(visits_source)" -> "companies.user"
+  	"JoinedModel(visits_source)" -> "users_ds_source.user"
+  	"JoinedModel(visits_source)" -> "users_latest.user"
+  	"LocalModel(accounts_source)" -> "accounts_source.account"
+  	"LocalModel(accounts_source)" -> "companies.user"
+  	"LocalModel(accounts_source)" -> "users_ds_source.user"
+  	"LocalModel(accounts_source)" -> "users_latest.user"
+  	"LocalModel(bookings_source)" -> "bookings_source.booking"
+  	"LocalModel(bookings_source)" -> "listings_latest.listing"
+  	"LocalModel(bookings_source)" -> "lux_listing_mapping.listing"
+  	"LocalModel(buys_source)" -> "buys_source.buy"
+  	"LocalModel(buys_source)" -> "companies.user"
+  	"LocalModel(buys_source)" -> "users_ds_source.user"
+  	"LocalModel(buys_source)" -> "users_latest.user"
+  	"LocalModel(companies)" -> "companies.company"
+  	"LocalModel(companies)" -> "companies.user"
+  	"LocalModel(companies)" -> "users_ds_source.user"
+  	"LocalModel(companies)" -> "users_latest.user"
+  	"LocalModel(id_verifications)" -> "companies.user"
+  	"LocalModel(id_verifications)" -> "users_ds_source.user"
+  	"LocalModel(id_verifications)" -> "users_latest.user"
+  	"LocalModel(id_verifications)" -> "id_verifications.verification"
+  	"LocalModel(listings_latest)" -> "listings_latest.listing"
+  	"LocalModel(listings_latest)" -> "lux_listing_mapping.listing"
+  	"LocalModel(listings_latest)" -> "companies.user"
+  	"LocalModel(listings_latest)" -> "users_ds_source.user"
+  	"LocalModel(listings_latest)" -> "users_latest.user"
+  	"LocalModel(lux_listing_mapping)" -> "listings_latest.listing"
+  	"LocalModel(lux_listing_mapping)" -> "lux_listing_mapping.listing"
+  	"LocalModel(revenue)" -> "revenue.revenue_instance"
+  	"LocalModel(revenue)" -> "companies.user"
+  	"LocalModel(revenue)" -> "users_ds_source.user"
+  	"LocalModel(revenue)" -> "users_latest.user"
+  	"LocalModel(users_ds_source)" -> "companies.user"
+  	"LocalModel(users_ds_source)" -> "users_ds_source.user"
+  	"LocalModel(users_ds_source)" -> "users_latest.user"
+  	"LocalModel(users_latest)" -> "companies.user"
+  	"LocalModel(users_latest)" -> "users_ds_source.user"
+  	"LocalModel(users_latest)" -> "users_latest.user"
+  	"LocalModel(views_source)" -> "listings_latest.listing"
+  	"LocalModel(views_source)" -> "lux_listing_mapping.listing"
+  	"LocalModel(views_source)" -> "companies.user"
+  	"LocalModel(views_source)" -> "users_ds_source.user"
+  	"LocalModel(views_source)" -> "users_latest.user"
+  	"LocalModel(views_source)" -> "views_source.view"
+  	"LocalModel(visits_source)" -> "companies.user"
+  	"LocalModel(visits_source)" -> "users_ds_source.user"
+  	"LocalModel(visits_source)" -> "users_latest.user"
+  	"LocalModel(visits_source)" -> "visits_source.visit"
+  	"accounts_source.account" -> "JoinedModel(accounts_source)"
+  	"bookings_source.booking" -> "JoinedModel(bookings_source)"
+  	"buys_source.buy" -> "JoinedModel(buys_source)"
+  	"companies.company" -> "JoinedModel(companies)"
+  	"listings_latest.listing" -> "JoinedModel(listings_latest)"
+  	"lux_listing_mapping.listing" -> "JoinedModel(lux_listing_mapping)"
+  	"revenue.revenue_instance" -> "JoinedModel(revenue)"
+  	"companies.user" -> "JoinedModel(companies)"
+  	"users_ds_source.user" -> "JoinedModel(users_ds_source)"
+  	"users_latest.user" -> "JoinedModel(users_latest)"
+  	"id_verifications.verification" -> "JoinedModel(id_verifications)"
+  	"views_source.view" -> "JoinedModel(views_source)"
+  	"visits_source.visit" -> "JoinedModel(visits_source)"
+  	"Metric(active_listings)" -> "Measure(listings)"
+  	"Metric(approximate_continuous_booking_value_p99)" -> "Measure(approximate_continuous_booking_value_p99)"
+  	"Metric(approximate_discrete_booking_value_p99)" -> "Measure(approximate_discrete_booking_value_p99)"
+  	"Metric(archived_users)" -> "Measure(archived_users)"
+  	"Metric(archived_users_join_to_time_spine)" -> "Measure(archived_users)"
+  	"Metric(average_booking_value)" -> "Measure(average_booking_value)"
+  	"Metric(average_instant_booking_value)" -> "Measure(average_booking_value)"
+  	"Metric(bookers)" -> "Measure(bookers)"
+  	"Metric(booking_fees)" -> "Metric(booking_value)"
+  	"Metric(booking_fees_last_week_per_booker_this_week)" -> "Metric(bookers)"
+  	"Metric(booking_fees_last_week_per_booker_this_week)" -> "Metric(booking_value)"
+  	"Metric(booking_fees_per_booker)" -> "Metric(bookers)"
+  	"Metric(booking_fees_per_booker)" -> "Metric(booking_value)"
+  	"Metric(booking_fees_since_start_of_month)" -> "Metric(booking_fees)"
+  	"Metric(booking_payments)" -> "Measure(booking_payments)"
+  	"Metric(booking_value)" -> "Measure(booking_value)"
+  	"Metric(booking_value_for_non_null_listing_id)" -> "Measure(booking_value)"
+  	"Metric(booking_value_p99)" -> "Measure(booking_value_p99)"
+  	"Metric(booking_value_per_view)" -> "Metric(booking_value)"
+  	"Metric(booking_value_per_view)" -> "Metric(views)"
+  	"Metric(booking_value_sub_instant)" -> "Metric(booking_value)"
+  	"Metric(booking_value_sub_instant)" -> "Metric(instant_booking_value)"
+  	"Metric(booking_value_sub_instant_add_10)" -> "Metric(booking_value_sub_instant)"
+  	"Metric(bookings)" -> "Measure(bookings)"
+  	"Metric(bookings_5_day_lag)" -> "Metric(bookings)"
+  	"Metric(bookings_alien_day_over_alien_day)" -> "Metric(bookings)"
+  	"Metric(bookings_at_start_of_month)" -> "Metric(bookings)"
+  	"Metric(bookings_fill_nulls_with_0)" -> "Measure(bookings)"
+  	"Metric(bookings_fill_nulls_with_0_without_time_spine)" -> "Measure(bookings)"
+  	"Metric(bookings_growth_2_weeks)" -> "Metric(bookings)"
+  	"Metric(bookings_growth_2_weeks_fill_nulls_with_0)" -> "Metric(bookings_fill_nulls_with_0)"
+  	"Metric(bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset)" -> "Metric(bookings)"
+  	"Metric(bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset)" -> "Metric(bookings_fill_nulls_with_0)"
+  	"Metric(bookings_growth_since_start_of_month)" -> "Metric(bookings)"
+  	"Metric(bookings_join_to_time_spine)" -> "Measure(bookings)"
+  	"Metric(bookings_join_to_time_spine_with_tiered_filters)" -> "Measure(bookings)"
+  	"Metric(bookings_month_start_compared_to_1_month_prior)" -> "Metric(bookings)"
+  	"Metric(bookings_offset_alien_day)" -> "Metric(bookings)"
+  	"Metric(bookings_offset_once)" -> "Metric(bookings)"
+  	"Metric(bookings_offset_one_alien_day)" -> "Metric(bookings)"
+  	"Metric(bookings_offset_twice)" -> "Metric(bookings_offset_once)"
+  	"Metric(bookings_per_booker)" -> "Measure(bookers)"
+  	"Metric(bookings_per_booker)" -> "Measure(bookings)"
+  	"Metric(bookings_per_dollar)" -> "Measure(booking_value)"
+  	"Metric(bookings_per_dollar)" -> "Measure(bookings)"
+  	"Metric(bookings_per_listing)" -> "Measure(bookings)"
+  	"Metric(bookings_per_listing)" -> "Measure(listings)"
+  	"Metric(bookings_per_lux_listing_derived)" -> "Metric(bookings)"
+  	"Metric(bookings_per_lux_listing_derived)" -> "Metric(listings)"
+  	"Metric(bookings_per_view)" -> "Measure(bookings)"
+  	"Metric(bookings_per_view)" -> "Measure(views)"
+  	"Metric(current_account_balance_by_user)" -> "Measure(current_account_balance_by_user)"
+  	"Metric(derived_bookings_0)" -> "Metric(bookings)"
+  	"Metric(derived_bookings_1)" -> "Metric(bookings)"
+  	"Metric(derived_shared_alias_1a)" -> "Metric(bookings)"
+  	"Metric(derived_shared_alias_1b)" -> "Metric(bookings)"
+  	"Metric(derived_shared_alias_2)" -> "Metric(instant_bookings)"
+  	"Metric(discrete_booking_value_p99)" -> "Measure(discrete_booking_value_p99)"
+  	"Metric(double_counted_delayed_bookings)" -> "Metric(bookings)"
+  	"Metric(every_2_days_bookers_2_days_ago)" -> "Metric(every_two_days_bookers)"
+  	"Metric(every_two_days_bookers)" -> "Measure(bookers)"
+  	"Metric(every_two_days_bookers_fill_nulls_with_0)" -> "Measure(bookers)"
+  	"Metric(identity_verifications)" -> "Measure(identity_verifications)"
+  	"Metric(instant_booking_fraction_of_max_value)" -> "Measure(average_booking_value)"
+  	"Metric(instant_booking_fraction_of_max_value)" -> "Measure(max_booking_value)"
+  	"Metric(instant_booking_value)" -> "Measure(booking_value)"
+  	"Metric(instant_booking_value_ratio)" -> "Measure(booking_value)"
+  	"Metric(instant_bookings)" -> "Measure(instant_bookings)"
+  	"Metric(instant_bookings_with_measure_filter)" -> "Measure(bookings)"
+  	"Metric(instant_lux_booking_value_rate)" -> "Metric(lux_booking_value_rate_expr)"
+  	"Metric(instant_plus_non_referred_bookings_pct)" -> "Metric(bookings)"
+  	"Metric(instant_plus_non_referred_bookings_pct)" -> "Metric(instant_bookings)"
+  	"Metric(instant_plus_non_referred_bookings_pct)" -> "Metric(non_referred_bookings_pct)"
+  	"Metric(largest_listing)" -> "Measure(largest_listing)"
+  	"Metric(listings)" -> "Measure(listings)"
+  	"Metric(lux_booking_fraction_of_max_value)" -> "Measure(average_booking_value)"
+  	"Metric(lux_booking_fraction_of_max_value)" -> "Measure(max_booking_value)"
+  	"Metric(lux_booking_value_rate_expr)" -> "Metric(average_booking_value)"
+  	"Metric(lux_booking_value_rate_expr)" -> "Metric(booking_value)"
+  	"Metric(lux_booking_value_rate_expr)" -> "Metric(bookings)"
+  	"Metric(lux_listings)" -> "Measure(listings)"
+  	"Metric(max_booking_value)" -> "Measure(max_booking_value)"
+  	"Metric(median_booking_value)" -> "Measure(median_booking_value)"
+  	"Metric(min_booking_value)" -> "Measure(min_booking_value)"
+  	"Metric(nested_fill_nulls_without_time_spine)" -> "Metric(twice_bookings_fill_nulls_with_0_without_time_spine)"
+  	"Metric(new_users)" -> "Measure(new_users)"
+  	"Metric(non_referred_bookings_pct)" -> "Metric(bookings)"
+  	"Metric(non_referred_bookings_pct)" -> "Metric(referred_bookings)"
+  	"Metric(popular_listing_bookings_per_booker)" -> "Measure(listings)"
+  	"Metric(referred_bookings)" -> "Measure(referred_bookings)"
+  	"Metric(regional_starting_balance_ratios)" -> "Measure(total_account_balance_first_day)"
+  	"Metric(revenue)" -> "Measure(txn_revenue)"
+  	"Metric(revenue_all_time)" -> "Measure(txn_revenue)"
+  	"Metric(revenue_mtd)" -> "Measure(txn_revenue)"
+  	"Metric(simple_subdaily_metric_default_day)" -> "Measure(archived_users)"
+  	"Metric(simple_subdaily_metric_default_hour)" -> "Measure(archived_users)"
+  	"Metric(smallest_listing)" -> "Measure(smallest_listing)"
+  	"Metric(subdaily_cumulative_grain_to_date_metric)" -> "Measure(archived_users)"
+  	"Metric(subdaily_cumulative_window_metric)" -> "Measure(archived_users)"
+  	"Metric(subdaily_join_to_time_spine_metric)" -> "Measure(archived_users)"
+  	"Metric(subdaily_offset_grain_to_date_metric)" -> "Metric(archived_users)"
+  	"Metric(subdaily_offset_window_metric)" -> "Metric(archived_users)"
+  	"Metric(total_account_balance_first_day)" -> "Measure(total_account_balance_first_day)"
+  	"Metric(total_account_balance_first_day_of_month)" -> "Measure(total_account_balance_first_day_of_month)"
+  	"Metric(trailing_2_months_revenue)" -> "Measure(txn_revenue)"
+  	"Metric(trailing_2_months_revenue_sub_10)" -> "Metric(trailing_2_months_revenue)"
+  	"Metric(twice_bookings_fill_nulls_with_0_without_time_spine)" -> "Metric(bookings_fill_nulls_with_0_without_time_spine)"
+  	"Metric(views)" -> "Measure(views)"
+  	"Metric(views_times_booking_value)" -> "Metric(booking_value)"
+  	"Metric(views_times_booking_value)" -> "Metric(views)"
+  	"Metric(visit_buy_conversion_rate)" -> "Measure(buys)"
+  	"Metric(visit_buy_conversion_rate)" -> "Measure(visits)"
+  	"Metric(visit_buy_conversion_rate_7days)" -> "Measure(buys)"
+  	"Metric(visit_buy_conversion_rate_7days)" -> "Measure(visits)"
+  	"Metric(visit_buy_conversion_rate_7days_fill_nulls_with_0)" -> "Measure(buys)"
+  	"Metric(visit_buy_conversion_rate_7days_fill_nulls_with_0)" -> "Measure(visits)"
+  	"Metric(visit_buy_conversion_rate_by_session)" -> "Measure(buys)"
+  	"Metric(visit_buy_conversion_rate_by_session)" -> "Measure(visits)"
+  	"Metric(visit_buy_conversion_rate_with_monthly_conversion)" -> "Measure(buys_month)"
+  	"Metric(visit_buy_conversion_rate_with_monthly_conversion)" -> "Measure(visits)"
+  	"Metric(visit_buy_conversions)" -> "Measure(buys)"
+  	"Metric(visit_buy_conversions)" -> "Measure(visits)"
   }
 
 pretty_format:
   MutableSemanticGraph(
     nodes={
-      Dimension(dim_0),
-      sm_0.sm_0_primary_entity,
-      sm_1.sm_1_primary_entity,
-      MetricAttribute(sm_0_measure_0_metric),
-      JoinedModel(sm_0),
-      JoinedModel(sm_1),
-      KeyAttribute(sm_0_primary_entity),
-      KeyAttribute(sm_1_primary_entity),
-      KeyAttribute(sm_2_primary_entity),
-      KeyEntity(sm_0_primary_entity),
-      KeyEntity(sm_1_primary_entity),
-      KeyEntity(sm_2_primary_entity),
-      LocalModel(sm_0),
-      LocalModel(sm_1),
-      Measure(sm_0_measure_0),
-      Metric(sm_0_measure_0_metric),
+      Dimension(account_type),
+      Dimension(capacity_latest),
+      Dimension(company_name),
+      Dimension(country_latest),
+      Dimension(home_state),
+      Dimension(home_state_latest),
+      Dimension(is_instant),
+      Dimension(is_lux_latest),
+      Dimension(referrer_id),
+      Dimension(verification_type),
+      accounts_source.account,
+      bookings_source.booking,
+      buys_source.buy,
+      companies.company,
+      listings_latest.listing,
+      lux_listing_mapping.listing,
+      revenue.revenue_instance,
+      companies.user,
+      users_ds_source.user,
+      users_latest.user,
+      id_verifications.verification,
+      views_source.view,
+      visits_source.visit,
+      GroupByMetric(active_listings),
+      GroupByMetric(approximate_continuous_booking_value_p99),
+      GroupByMetric(approximate_discrete_booking_value_p99),
+      GroupByMetric(archived_users),
+      GroupByMetric(archived_users_join_to_time_spine),
+      GroupByMetric(average_booking_value),
+      GroupByMetric(average_instant_booking_value),
+      GroupByMetric(bookers),
+      GroupByMetric(booking_fees),
+      GroupByMetric(booking_fees_last_week_per_booker_this_week),
+      GroupByMetric(booking_fees_per_booker),
+      GroupByMetric(booking_fees_since_start_of_month),
+      GroupByMetric(booking_payments),
+      GroupByMetric(booking_value),
+      GroupByMetric(booking_value_for_non_null_listing_id),
+      GroupByMetric(booking_value_p99),
+      GroupByMetric(booking_value_per_view),
+      GroupByMetric(booking_value_sub_instant),
+      GroupByMetric(booking_value_sub_instant_add_10),
+      GroupByMetric(bookings),
+      GroupByMetric(bookings_5_day_lag),
+      GroupByMetric(bookings_alien_day_over_alien_day),
+      GroupByMetric(bookings_at_start_of_month),
+      GroupByMetric(bookings_fill_nulls_with_0),
+      GroupByMetric(bookings_fill_nulls_with_0_without_time_spine),
+      GroupByMetric(bookings_growth_2_weeks),
+      GroupByMetric(bookings_growth_2_weeks_fill_nulls_with_0),
+      GroupByMetric(bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset),
+      GroupByMetric(bookings_growth_since_start_of_month),
+      GroupByMetric(bookings_join_to_time_spine),
+      GroupByMetric(bookings_join_to_time_spine_with_tiered_filters),
+      GroupByMetric(bookings_month_start_compared_to_1_month_prior),
+      GroupByMetric(bookings_offset_alien_day),
+      GroupByMetric(bookings_offset_once),
+      GroupByMetric(bookings_offset_one_alien_day),
+      GroupByMetric(bookings_offset_twice),
+      GroupByMetric(bookings_per_booker),
+      GroupByMetric(bookings_per_dollar),
+      GroupByMetric(bookings_per_listing),
+      GroupByMetric(bookings_per_lux_listing_derived),
+      GroupByMetric(bookings_per_view),
+      GroupByMetric(current_account_balance_by_user),
+      GroupByMetric(derived_bookings_0),
+      GroupByMetric(derived_bookings_1),
+      GroupByMetric(derived_shared_alias_1a),
+      GroupByMetric(derived_shared_alias_1b),
+      GroupByMetric(derived_shared_alias_2),
+      GroupByMetric(discrete_booking_value_p99),
+      GroupByMetric(double_counted_delayed_bookings),
+      GroupByMetric(every_2_days_bookers_2_days_ago),
+      GroupByMetric(every_two_days_bookers),
+      GroupByMetric(every_two_days_bookers_fill_nulls_with_0),
+      GroupByMetric(identity_verifications),
+      GroupByMetric(instant_booking_fraction_of_max_value),
+      GroupByMetric(instant_booking_value),
+      GroupByMetric(instant_booking_value_ratio),
+      GroupByMetric(instant_bookings),
+      GroupByMetric(instant_bookings_with_measure_filter),
+      GroupByMetric(instant_lux_booking_value_rate),
+      GroupByMetric(instant_plus_non_referred_bookings_pct),
+      GroupByMetric(largest_listing),
+      GroupByMetric(listings),
+      GroupByMetric(lux_booking_fraction_of_max_value),
+      GroupByMetric(lux_booking_value_rate_expr),
+      GroupByMetric(lux_listings),
+      GroupByMetric(max_booking_value),
+      GroupByMetric(median_booking_value),
+      GroupByMetric(min_booking_value),
+      GroupByMetric(nested_fill_nulls_without_time_spine),
+      GroupByMetric(new_users),
+      GroupByMetric(non_referred_bookings_pct),
+      GroupByMetric(popular_listing_bookings_per_booker),
+      GroupByMetric(referred_bookings),
+      GroupByMetric(regional_starting_balance_ratios),
+      GroupByMetric(revenue),
+      GroupByMetric(revenue_all_time),
+      GroupByMetric(revenue_mtd),
+      GroupByMetric(simple_subdaily_metric_default_day),
+      GroupByMetric(simple_subdaily_metric_default_hour),
+      GroupByMetric(smallest_listing),
+      GroupByMetric(subdaily_cumulative_grain_to_date_metric),
+      GroupByMetric(subdaily_cumulative_window_metric),
+      GroupByMetric(subdaily_join_to_time_spine_metric),
+      GroupByMetric(subdaily_offset_grain_to_date_metric),
+      GroupByMetric(subdaily_offset_window_metric),
+      GroupByMetric(total_account_balance_first_day),
+      GroupByMetric(total_account_balance_first_day_of_month),
+      GroupByMetric(trailing_2_months_revenue),
+      GroupByMetric(trailing_2_months_revenue_sub_10),
+      GroupByMetric(twice_bookings_fill_nulls_with_0_without_time_spine),
+      GroupByMetric(views),
+      GroupByMetric(views_times_booking_value),
+      GroupByMetric(visit_buy_conversion_rate),
+      GroupByMetric(visit_buy_conversion_rate_7days),
+      GroupByMetric(visit_buy_conversion_rate_7days_fill_nulls_with_0),
+      GroupByMetric(visit_buy_conversion_rate_by_session),
+      GroupByMetric(visit_buy_conversion_rate_with_monthly_conversion),
+      GroupByMetric(visit_buy_conversions),
+      JoinedModel(accounts_source),
+      JoinedModel(bookings_source),
+      JoinedModel(buys_source),
+      JoinedModel(companies),
+      JoinedModel(id_verifications),
+      JoinedModel(listings_latest),
+      JoinedModel(lux_listing_mapping),
+      JoinedModel(revenue),
+      JoinedModel(users_ds_source),
+      JoinedModel(users_latest),
+      JoinedModel(views_source),
+      JoinedModel(visits_source),
+      KeyAttribute(company),
+      KeyAttribute(guest),
+      KeyAttribute(host),
+      KeyAttribute(listing),
+      KeyAttribute(lux_listing),
+      KeyAttribute(session),
+      KeyAttribute(session_id),
+      KeyAttribute(user),
+      KeyAttribute(verification),
+      KeyEntity(company),
+      KeyEntity(guest),
+      KeyEntity(host),
+      KeyEntity(listing),
+      KeyEntity(lux_listing),
+      KeyEntity(session),
+      KeyEntity(session_id),
+      KeyEntity(user),
+      KeyEntity(verification),
+      LocalModel(accounts_source),
+      LocalModel(bookings_source),
+      LocalModel(buys_source),
+      LocalModel(companies),
+      LocalModel(id_verifications),
+      LocalModel(listings_latest),
+      LocalModel(lux_listing_mapping),
+      LocalModel(revenue),
+      LocalModel(users_ds_source),
+      LocalModel(users_latest),
+      LocalModel(views_source),
+      LocalModel(visits_source),
+      Measure(account_balance),
+      Measure(approximate_continuous_booking_value_p99),
+      Measure(approximate_discrete_booking_value_p99),
+      Measure(archived_users),
+      Measure(average_booking_value),
+      Measure(bookers),
+      Measure(booking_payments),
+      Measure(booking_value),
+      Measure(booking_value_p99),
+      Measure(bookings),
+      Measure(buyers),
+      Measure(buys),
+      Measure(buys_month),
+      Measure(current_account_balance_by_user),
+      Measure(discrete_booking_value_p99),
+      Measure(identity_verifications),
+      Measure(instant_bookings),
+      Measure(largest_listing),
+      Measure(listings),
+      Measure(max_booking_value),
+      Measure(median_booking_value),
+      Measure(min_booking_value),
+      Measure(new_users),
+      Measure(referred_bookings),
+      Measure(smallest_listing),
+      Measure(total_account_balance_first_day),
+      Measure(total_account_balance_first_day_of_month),
+      Measure(txn_revenue),
+      Measure(views),
+      Measure(visitors),
+      Measure(visits),
+      Metric(active_listings),
+      Metric(approximate_continuous_booking_value_p99),
+      Metric(approximate_discrete_booking_value_p99),
+      Metric(archived_users),
+      Metric(archived_users_join_to_time_spine),
+      Metric(average_booking_value),
+      Metric(average_instant_booking_value),
+      Metric(bookers),
+      Metric(booking_fees),
+      Metric(booking_fees_last_week_per_booker_this_week),
+      Metric(booking_fees_per_booker),
+      Metric(booking_fees_since_start_of_month),
+      Metric(booking_payments),
+      Metric(booking_value),
+      Metric(booking_value_for_non_null_listing_id),
+      Metric(booking_value_p99),
+      Metric(booking_value_per_view),
+      Metric(booking_value_sub_instant),
+      Metric(booking_value_sub_instant_add_10),
+      Metric(bookings),
+      Metric(bookings_5_day_lag),
+      Metric(bookings_alien_day_over_alien_day),
+      Metric(bookings_at_start_of_month),
+      Metric(bookings_fill_nulls_with_0),
+      Metric(bookings_fill_nulls_with_0_without_time_spine),
+      Metric(bookings_growth_2_weeks),
+      Metric(bookings_growth_2_weeks_fill_nulls_with_0),
+      Metric(bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset),
+      Metric(bookings_growth_since_start_of_month),
+      Metric(bookings_join_to_time_spine),
+      Metric(bookings_join_to_time_spine_with_tiered_filters),
+      Metric(bookings_month_start_compared_to_1_month_prior),
+      Metric(bookings_offset_alien_day),
+      Metric(bookings_offset_once),
+      Metric(bookings_offset_one_alien_day),
+      Metric(bookings_offset_twice),
+      Metric(bookings_per_booker),
+      Metric(bookings_per_dollar),
+      Metric(bookings_per_listing),
+      Metric(bookings_per_lux_listing_derived),
+      Metric(bookings_per_view),
+      Metric(current_account_balance_by_user),
+      Metric(derived_bookings_0),
+      Metric(derived_bookings_1),
+      Metric(derived_shared_alias_1a),
+      Metric(derived_shared_alias_1b),
+      Metric(derived_shared_alias_2),
+      Metric(discrete_booking_value_p99),
+      Metric(double_counted_delayed_bookings),
+      Metric(every_2_days_bookers_2_days_ago),
+      Metric(every_two_days_bookers),
+      Metric(every_two_days_bookers_fill_nulls_with_0),
+      Metric(identity_verifications),
+      Metric(instant_booking_fraction_of_max_value),
+      Metric(instant_booking_value),
+      Metric(instant_booking_value_ratio),
+      Metric(instant_bookings),
+      Metric(instant_bookings_with_measure_filter),
+      Metric(instant_lux_booking_value_rate),
+      Metric(instant_plus_non_referred_bookings_pct),
+      Metric(largest_listing),
+      Metric(listings),
+      Metric(lux_booking_fraction_of_max_value),
+      Metric(lux_booking_value_rate_expr),
+      Metric(lux_listings),
+      Metric(max_booking_value),
+      Metric(median_booking_value),
+      Metric(min_booking_value),
+      Metric(nested_fill_nulls_without_time_spine),
+      Metric(new_users),
+      Metric(non_referred_bookings_pct),
+      Metric(popular_listing_bookings_per_booker),
+      Metric(referred_bookings),
+      Metric(regional_starting_balance_ratios),
+      Metric(revenue),
+      Metric(revenue_all_time),
+      Metric(revenue_mtd),
+      Metric(simple_subdaily_metric_default_day),
+      Metric(simple_subdaily_metric_default_hour),
+      Metric(smallest_listing),
+      Metric(subdaily_cumulative_grain_to_date_metric),
+      Metric(subdaily_cumulative_window_metric),
+      Metric(subdaily_join_to_time_spine_metric),
+      Metric(subdaily_offset_grain_to_date_metric),
+      Metric(subdaily_offset_window_metric),
+      Metric(total_account_balance_first_day),
+      Metric(total_account_balance_first_day_of_month),
+      Metric(trailing_2_months_revenue),
+      Metric(trailing_2_months_revenue_sub_10),
+      Metric(twice_bookings_fill_nulls_with_0_without_time_spine),
+      Metric(views),
+      Metric(views_times_booking_value),
+      Metric(visit_buy_conversion_rate),
+      Metric(visit_buy_conversion_rate_7days),
+      Metric(visit_buy_conversion_rate_7days_fill_nulls_with_0),
+      Metric(visit_buy_conversion_rate_by_session),
+      Metric(visit_buy_conversion_rate_with_monthly_conversion),
+      Metric(visit_buy_conversions),
       MetricTime,
-      TimeAttribute(custom_year),
+      TimeAttribute(alien_day),
+      TimeAttribute(day),
+      TimeAttribute(extract_day),
+      TimeAttribute(extract_dow),
+      TimeAttribute(extract_doy),
+      TimeAttribute(extract_month),
       TimeAttribute(extract_quarter),
       TimeAttribute(extract_year),
+      TimeAttribute(hour),
+      TimeAttribute(millisecond),
+      TimeAttribute(minute),
+      TimeAttribute(month),
       TimeAttribute(quarter),
+      TimeAttribute(second),
+      TimeAttribute(week),
       TimeAttribute(year),
+      TimeDimension(archived_at),
+      TimeDimension(bio_added_ts),
+      TimeDimension(created_at),
       TimeDimension(ds),
+      TimeDimension(ds_latest),
+      TimeDimension(ds_month),
+      TimeDimension(ds_partitioned),
+      TimeDimension(last_login_ts),
+      TimeDimension(last_profile_edit_ts),
+      TimeDimension(paid_at),
       TimeEntity,
     },
     edges={
-      EntityAttributeEdge(tail_node=JoinedModel(sm_0), head_node=KeyEntity(sm_0_primary_entity)),
-      EntityAttributeEdge(tail_node=JoinedModel(sm_0), head_node=KeyEntity(sm_1_primary_entity)),
-      EntityAttributeEdge(tail_node=JoinedModel(sm_0), head_node=KeyEntity(sm_2_primary_entity)),
-      EntityAttributeEdge(tail_node=JoinedModel(sm_1), head_node=Dimension(dim_0)),
-      EntityAttributeEdge(tail_node=JoinedModel(sm_1), head_node=KeyEntity(sm_1_primary_entity)),
-      EntityAttributeEdge(tail_node=JoinedModel(sm_1), head_node=KeyEntity(sm_2_primary_entity)),
+      EntityAttributeEdge(tail_node=JoinedModel(accounts_source), head_node=Dimension(account_type)),
+      EntityAttributeEdge(tail_node=JoinedModel(accounts_source), head_node=KeyEntity(user)),
+      EntityAttributeEdge(tail_node=JoinedModel(bookings_source), head_node=Dimension(is_instant)),
+      EntityAttributeEdge(tail_node=JoinedModel(bookings_source), head_node=KeyEntity(guest)),
+      EntityAttributeEdge(tail_node=JoinedModel(bookings_source), head_node=KeyEntity(host)),
+      EntityAttributeEdge(tail_node=JoinedModel(bookings_source), head_node=KeyEntity(listing)),
+      EntityAttributeEdge(tail_node=JoinedModel(buys_source), head_node=KeyEntity(session_id)),
+      EntityAttributeEdge(tail_node=JoinedModel(buys_source), head_node=KeyEntity(user)),
+      EntityAttributeEdge(tail_node=JoinedModel(companies), head_node=Dimension(company_name)),
+      EntityAttributeEdge(tail_node=JoinedModel(companies), head_node=KeyEntity(company)),
+      EntityAttributeEdge(tail_node=JoinedModel(companies), head_node=KeyEntity(user)),
+      EntityAttributeEdge(tail_node=JoinedModel(id_verifications), head_node=Dimension(verification_type)),
+      EntityAttributeEdge(tail_node=JoinedModel(id_verifications), head_node=KeyEntity(user)),
+      EntityAttributeEdge(tail_node=JoinedModel(id_verifications), head_node=KeyEntity(verification)),
+      EntityAttributeEdge(tail_node=JoinedModel(listings_latest), head_node=Dimension(capacity_latest)),
+      EntityAttributeEdge(tail_node=JoinedModel(listings_latest), head_node=Dimension(country_latest)),
+      EntityAttributeEdge(tail_node=JoinedModel(listings_latest), head_node=Dimension(is_lux_latest)),
+      EntityAttributeEdge(tail_node=JoinedModel(listings_latest), head_node=KeyEntity(listing)),
+      EntityAttributeEdge(tail_node=JoinedModel(listings_latest), head_node=KeyEntity(user)),
+      EntityAttributeEdge(tail_node=JoinedModel(lux_listing_mapping), head_node=KeyEntity(listing)),
+      EntityAttributeEdge(tail_node=JoinedModel(lux_listing_mapping), head_node=KeyEntity(lux_listing)),
+      EntityAttributeEdge(tail_node=JoinedModel(revenue), head_node=KeyEntity(user)),
+      EntityAttributeEdge(tail_node=JoinedModel(users_ds_source), head_node=Dimension(home_state)),
+      EntityAttributeEdge(tail_node=JoinedModel(users_ds_source), head_node=KeyEntity(user)),
+      EntityAttributeEdge(tail_node=JoinedModel(users_latest), head_node=Dimension(home_state_latest)),
+      EntityAttributeEdge(tail_node=JoinedModel(users_latest), head_node=KeyEntity(user)),
+      EntityAttributeEdge(tail_node=JoinedModel(views_source), head_node=KeyEntity(listing)),
+      EntityAttributeEdge(tail_node=JoinedModel(views_source), head_node=KeyEntity(user)),
+      EntityAttributeEdge(tail_node=JoinedModel(visits_source), head_node=Dimension(referrer_id)),
+      EntityAttributeEdge(tail_node=JoinedModel(visits_source), head_node=KeyEntity(session)),
+      EntityAttributeEdge(tail_node=JoinedModel(visits_source), head_node=KeyEntity(user)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(active_listings)),
       EntityAttributeEdge(
-        tail_node=KeyEntity(sm_0_primary_entity),
-        head_node=MetricAttribute(sm_0_measure_0_metric),
+        tail_node=KeyEntity(company),
+        head_node=GroupByMetric(approximate_continuous_booking_value_p99),
       ),
       EntityAttributeEdge(
-        tail_node=KeyEntity(sm_1_primary_entity),
-        head_node=MetricAttribute(sm_0_measure_0_metric),
+        tail_node=KeyEntity(company),
+        head_node=GroupByMetric(approximate_discrete_booking_value_p99),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(archived_users)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(archived_users_join_to_time_spine)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(average_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(average_instant_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(bookers)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(booking_fees)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(company),
+        head_node=GroupByMetric(booking_fees_last_week_per_booker_this_week),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(booking_fees_per_booker)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(booking_fees_since_start_of_month)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(booking_payments)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(booking_value)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(company),
+        head_node=GroupByMetric(booking_value_for_non_null_listing_id),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(booking_value_p99)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(booking_value_per_view)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(booking_value_sub_instant)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(booking_value_sub_instant_add_10)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(bookings)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(bookings_5_day_lag)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(bookings_alien_day_over_alien_day)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(bookings_at_start_of_month)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(bookings_fill_nulls_with_0)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(company),
+        head_node=GroupByMetric(bookings_fill_nulls_with_0_without_time_spine),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(bookings_growth_2_weeks)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(company),
+        head_node=GroupByMetric(bookings_growth_2_weeks_fill_nulls_with_0),
       ),
       EntityAttributeEdge(
-        tail_node=KeyEntity(sm_2_primary_entity),
-        head_node=MetricAttribute(sm_0_measure_0_metric),
+        tail_node=KeyEntity(company),
+        head_node=GroupByMetric(bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset),
       ),
-      EntityAttributeEdge(tail_node=LocalModel(sm_0), head_node=KeyEntity(sm_0_primary_entity)),
-      EntityAttributeEdge(tail_node=LocalModel(sm_0), head_node=KeyEntity(sm_1_primary_entity)),
-      EntityAttributeEdge(tail_node=LocalModel(sm_0), head_node=KeyEntity(sm_2_primary_entity)),
-      EntityAttributeEdge(tail_node=LocalModel(sm_1), head_node=KeyEntity(sm_1_primary_entity)),
-      EntityAttributeEdge(tail_node=LocalModel(sm_1), head_node=KeyEntity(sm_2_primary_entity)),
-      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(custom_year)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(company),
+        head_node=GroupByMetric(bookings_growth_since_start_of_month),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(bookings_join_to_time_spine)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(company),
+        head_node=GroupByMetric(bookings_join_to_time_spine_with_tiered_filters),
+      ),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(company),
+        head_node=GroupByMetric(bookings_month_start_compared_to_1_month_prior),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(bookings_offset_alien_day)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(bookings_offset_once)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(bookings_offset_one_alien_day)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(bookings_offset_twice)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(bookings_per_booker)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(bookings_per_dollar)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(bookings_per_view)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(current_account_balance_by_user)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(derived_bookings_0)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(derived_bookings_1)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(derived_shared_alias_1a)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(derived_shared_alias_1b)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(derived_shared_alias_2)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(discrete_booking_value_p99)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(double_counted_delayed_bookings)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(every_2_days_bookers_2_days_ago)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(every_two_days_bookers)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(company),
+        head_node=GroupByMetric(every_two_days_bookers_fill_nulls_with_0),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(identity_verifications)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(company),
+        head_node=GroupByMetric(instant_booking_fraction_of_max_value),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(instant_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(instant_booking_value_ratio)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(instant_bookings)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(company),
+        head_node=GroupByMetric(instant_bookings_with_measure_filter),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(instant_lux_booking_value_rate)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(company),
+        head_node=GroupByMetric(instant_plus_non_referred_bookings_pct),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(largest_listing)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(listings)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(lux_booking_fraction_of_max_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(lux_booking_value_rate_expr)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(lux_listings)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(max_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(median_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(min_booking_value)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(company),
+        head_node=GroupByMetric(nested_fill_nulls_without_time_spine),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(new_users)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(non_referred_bookings_pct)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(company),
+        head_node=GroupByMetric(popular_listing_bookings_per_booker),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(referred_bookings)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(regional_starting_balance_ratios)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(revenue)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(revenue_all_time)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(revenue_mtd)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(simple_subdaily_metric_default_day)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(company),
+        head_node=GroupByMetric(simple_subdaily_metric_default_hour),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(smallest_listing)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(company),
+        head_node=GroupByMetric(subdaily_cumulative_grain_to_date_metric),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(subdaily_cumulative_window_metric)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(subdaily_join_to_time_spine_metric)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(company),
+        head_node=GroupByMetric(subdaily_offset_grain_to_date_metric),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(subdaily_offset_window_metric)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(total_account_balance_first_day)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(company),
+        head_node=GroupByMetric(total_account_balance_first_day_of_month),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(trailing_2_months_revenue)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(trailing_2_months_revenue_sub_10)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(company),
+        head_node=GroupByMetric(twice_bookings_fill_nulls_with_0_without_time_spine),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(views)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(views_times_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(visit_buy_conversion_rate)),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(visit_buy_conversion_rate_7days)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(company),
+        head_node=GroupByMetric(visit_buy_conversion_rate_7days_fill_nulls_with_0),
+      ),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(company),
+        head_node=GroupByMetric(visit_buy_conversion_rate_by_session),
+      ),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(company),
+        head_node=GroupByMetric(visit_buy_conversion_rate_with_monthly_conversion),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(company), head_node=GroupByMetric(visit_buy_conversions)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(guest),
+        head_node=GroupByMetric(approximate_continuous_booking_value_p99),
+      ),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(guest),
+        head_node=GroupByMetric(approximate_discrete_booking_value_p99),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(average_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(average_instant_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(bookers)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(booking_fees)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(guest),
+        head_node=GroupByMetric(booking_fees_last_week_per_booker_this_week),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(booking_fees_per_booker)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(booking_fees_since_start_of_month)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(booking_payments)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(booking_value)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(guest),
+        head_node=GroupByMetric(booking_value_for_non_null_listing_id),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(booking_value_p99)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(booking_value_sub_instant)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(booking_value_sub_instant_add_10)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(bookings)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(bookings_5_day_lag)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(bookings_alien_day_over_alien_day)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(bookings_at_start_of_month)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(bookings_fill_nulls_with_0)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(guest),
+        head_node=GroupByMetric(bookings_fill_nulls_with_0_without_time_spine),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(bookings_growth_2_weeks)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(guest),
+        head_node=GroupByMetric(bookings_growth_2_weeks_fill_nulls_with_0),
+      ),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(guest),
+        head_node=GroupByMetric(bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(bookings_growth_since_start_of_month)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(bookings_join_to_time_spine)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(guest),
+        head_node=GroupByMetric(bookings_join_to_time_spine_with_tiered_filters),
+      ),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(guest),
+        head_node=GroupByMetric(bookings_month_start_compared_to_1_month_prior),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(bookings_offset_alien_day)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(bookings_offset_once)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(bookings_offset_one_alien_day)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(bookings_offset_twice)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(bookings_per_booker)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(bookings_per_dollar)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(derived_bookings_0)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(derived_bookings_1)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(derived_shared_alias_1a)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(derived_shared_alias_1b)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(derived_shared_alias_2)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(discrete_booking_value_p99)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(double_counted_delayed_bookings)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(every_2_days_bookers_2_days_ago)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(every_two_days_bookers)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(guest),
+        head_node=GroupByMetric(every_two_days_bookers_fill_nulls_with_0),
+      ),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(guest),
+        head_node=GroupByMetric(instant_booking_fraction_of_max_value),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(instant_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(instant_booking_value_ratio)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(instant_bookings)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(instant_bookings_with_measure_filter)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(instant_lux_booking_value_rate)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(guest),
+        head_node=GroupByMetric(instant_plus_non_referred_bookings_pct),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(lux_booking_fraction_of_max_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(lux_booking_value_rate_expr)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(max_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(median_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(min_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(nested_fill_nulls_without_time_spine)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(non_referred_bookings_pct)),
+      EntityAttributeEdge(tail_node=KeyEntity(guest), head_node=GroupByMetric(referred_bookings)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(guest),
+        head_node=GroupByMetric(twice_bookings_fill_nulls_with_0_without_time_spine),
+      ),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(host),
+        head_node=GroupByMetric(approximate_continuous_booking_value_p99),
+      ),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(host),
+        head_node=GroupByMetric(approximate_discrete_booking_value_p99),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(average_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(average_instant_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(bookers)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(booking_fees)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(host),
+        head_node=GroupByMetric(booking_fees_last_week_per_booker_this_week),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(booking_fees_per_booker)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(booking_fees_since_start_of_month)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(booking_payments)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(booking_value_for_non_null_listing_id)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(booking_value_p99)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(booking_value_sub_instant)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(booking_value_sub_instant_add_10)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(bookings)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(bookings_5_day_lag)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(bookings_alien_day_over_alien_day)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(bookings_at_start_of_month)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(bookings_fill_nulls_with_0)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(host),
+        head_node=GroupByMetric(bookings_fill_nulls_with_0_without_time_spine),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(bookings_growth_2_weeks)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(host),
+        head_node=GroupByMetric(bookings_growth_2_weeks_fill_nulls_with_0),
+      ),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(host),
+        head_node=GroupByMetric(bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(bookings_growth_since_start_of_month)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(bookings_join_to_time_spine)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(host),
+        head_node=GroupByMetric(bookings_join_to_time_spine_with_tiered_filters),
+      ),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(host),
+        head_node=GroupByMetric(bookings_month_start_compared_to_1_month_prior),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(bookings_offset_alien_day)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(bookings_offset_once)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(bookings_offset_one_alien_day)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(bookings_offset_twice)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(bookings_per_booker)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(bookings_per_dollar)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(derived_bookings_0)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(derived_bookings_1)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(derived_shared_alias_1a)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(derived_shared_alias_1b)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(derived_shared_alias_2)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(discrete_booking_value_p99)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(double_counted_delayed_bookings)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(every_2_days_bookers_2_days_ago)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(every_two_days_bookers)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(host),
+        head_node=GroupByMetric(every_two_days_bookers_fill_nulls_with_0),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(instant_booking_fraction_of_max_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(instant_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(instant_booking_value_ratio)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(instant_bookings)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(instant_bookings_with_measure_filter)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(instant_lux_booking_value_rate)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(host),
+        head_node=GroupByMetric(instant_plus_non_referred_bookings_pct),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(lux_booking_fraction_of_max_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(lux_booking_value_rate_expr)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(max_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(median_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(min_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(nested_fill_nulls_without_time_spine)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(non_referred_bookings_pct)),
+      EntityAttributeEdge(tail_node=KeyEntity(host), head_node=GroupByMetric(referred_bookings)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(host),
+        head_node=GroupByMetric(twice_bookings_fill_nulls_with_0_without_time_spine),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(active_listings)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(listing),
+        head_node=GroupByMetric(approximate_continuous_booking_value_p99),
+      ),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(listing),
+        head_node=GroupByMetric(approximate_discrete_booking_value_p99),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(average_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(average_instant_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(bookers)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(booking_fees)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(listing),
+        head_node=GroupByMetric(booking_fees_last_week_per_booker_this_week),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(booking_fees_per_booker)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(booking_fees_since_start_of_month)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(booking_payments)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(booking_value)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(listing),
+        head_node=GroupByMetric(booking_value_for_non_null_listing_id),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(booking_value_p99)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(booking_value_per_view)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(booking_value_sub_instant)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(booking_value_sub_instant_add_10)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(bookings)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(bookings_5_day_lag)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(bookings_alien_day_over_alien_day)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(bookings_at_start_of_month)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(bookings_fill_nulls_with_0)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(listing),
+        head_node=GroupByMetric(bookings_fill_nulls_with_0_without_time_spine),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(bookings_growth_2_weeks)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(listing),
+        head_node=GroupByMetric(bookings_growth_2_weeks_fill_nulls_with_0),
+      ),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(listing),
+        head_node=GroupByMetric(bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset),
+      ),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(listing),
+        head_node=GroupByMetric(bookings_growth_since_start_of_month),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(bookings_join_to_time_spine)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(listing),
+        head_node=GroupByMetric(bookings_join_to_time_spine_with_tiered_filters),
+      ),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(listing),
+        head_node=GroupByMetric(bookings_month_start_compared_to_1_month_prior),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(bookings_offset_alien_day)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(bookings_offset_once)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(bookings_offset_one_alien_day)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(bookings_offset_twice)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(bookings_per_booker)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(bookings_per_dollar)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(bookings_per_listing)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(bookings_per_lux_listing_derived)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(bookings_per_view)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(derived_bookings_0)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(derived_bookings_1)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(derived_shared_alias_1a)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(derived_shared_alias_1b)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(derived_shared_alias_2)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(discrete_booking_value_p99)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(double_counted_delayed_bookings)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(every_2_days_bookers_2_days_ago)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(every_two_days_bookers)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(listing),
+        head_node=GroupByMetric(every_two_days_bookers_fill_nulls_with_0),
+      ),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(listing),
+        head_node=GroupByMetric(instant_booking_fraction_of_max_value),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(instant_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(instant_booking_value_ratio)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(instant_bookings)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(listing),
+        head_node=GroupByMetric(instant_bookings_with_measure_filter),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(instant_lux_booking_value_rate)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(listing),
+        head_node=GroupByMetric(instant_plus_non_referred_bookings_pct),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(largest_listing)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(listings)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(lux_booking_fraction_of_max_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(lux_booking_value_rate_expr)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(lux_listings)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(max_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(median_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(min_booking_value)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(listing),
+        head_node=GroupByMetric(nested_fill_nulls_without_time_spine),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(non_referred_bookings_pct)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(listing),
+        head_node=GroupByMetric(popular_listing_bookings_per_booker),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(referred_bookings)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(smallest_listing)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(listing),
+        head_node=GroupByMetric(twice_bookings_fill_nulls_with_0_without_time_spine),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(views)),
+      EntityAttributeEdge(tail_node=KeyEntity(listing), head_node=GroupByMetric(views_times_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(active_listings)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(lux_listing),
+        head_node=GroupByMetric(approximate_continuous_booking_value_p99),
+      ),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(lux_listing),
+        head_node=GroupByMetric(approximate_discrete_booking_value_p99),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(average_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(average_instant_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(bookers)),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(booking_fees)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(lux_listing),
+        head_node=GroupByMetric(booking_fees_last_week_per_booker_this_week),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(booking_fees_per_booker)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(lux_listing),
+        head_node=GroupByMetric(booking_fees_since_start_of_month),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(booking_payments)),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(booking_value)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(lux_listing),
+        head_node=GroupByMetric(booking_value_for_non_null_listing_id),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(booking_value_p99)),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(booking_value_per_view)),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(booking_value_sub_instant)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(lux_listing),
+        head_node=GroupByMetric(booking_value_sub_instant_add_10),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(bookings)),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(bookings_5_day_lag)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(lux_listing),
+        head_node=GroupByMetric(bookings_alien_day_over_alien_day),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(bookings_at_start_of_month)),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(bookings_fill_nulls_with_0)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(lux_listing),
+        head_node=GroupByMetric(bookings_fill_nulls_with_0_without_time_spine),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(bookings_growth_2_weeks)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(lux_listing),
+        head_node=GroupByMetric(bookings_growth_2_weeks_fill_nulls_with_0),
+      ),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(lux_listing),
+        head_node=GroupByMetric(bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset),
+      ),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(lux_listing),
+        head_node=GroupByMetric(bookings_growth_since_start_of_month),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(bookings_join_to_time_spine)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(lux_listing),
+        head_node=GroupByMetric(bookings_join_to_time_spine_with_tiered_filters),
+      ),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(lux_listing),
+        head_node=GroupByMetric(bookings_month_start_compared_to_1_month_prior),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(bookings_offset_alien_day)),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(bookings_offset_once)),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(bookings_offset_one_alien_day)),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(bookings_offset_twice)),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(bookings_per_booker)),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(bookings_per_dollar)),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(bookings_per_listing)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(lux_listing),
+        head_node=GroupByMetric(bookings_per_lux_listing_derived),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(bookings_per_view)),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(derived_bookings_0)),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(derived_bookings_1)),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(derived_shared_alias_1a)),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(derived_shared_alias_1b)),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(derived_shared_alias_2)),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(discrete_booking_value_p99)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(lux_listing),
+        head_node=GroupByMetric(double_counted_delayed_bookings),
+      ),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(lux_listing),
+        head_node=GroupByMetric(every_2_days_bookers_2_days_ago),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(every_two_days_bookers)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(lux_listing),
+        head_node=GroupByMetric(every_two_days_bookers_fill_nulls_with_0),
+      ),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(lux_listing),
+        head_node=GroupByMetric(instant_booking_fraction_of_max_value),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(instant_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(instant_booking_value_ratio)),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(instant_bookings)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(lux_listing),
+        head_node=GroupByMetric(instant_bookings_with_measure_filter),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(instant_lux_booking_value_rate)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(lux_listing),
+        head_node=GroupByMetric(instant_plus_non_referred_bookings_pct),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(largest_listing)),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(listings)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(lux_listing),
+        head_node=GroupByMetric(lux_booking_fraction_of_max_value),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(lux_booking_value_rate_expr)),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(lux_listings)),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(max_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(median_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(min_booking_value)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(lux_listing),
+        head_node=GroupByMetric(nested_fill_nulls_without_time_spine),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(non_referred_bookings_pct)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(lux_listing),
+        head_node=GroupByMetric(popular_listing_bookings_per_booker),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(referred_bookings)),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(smallest_listing)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(lux_listing),
+        head_node=GroupByMetric(twice_bookings_fill_nulls_with_0_without_time_spine),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(views)),
+      EntityAttributeEdge(tail_node=KeyEntity(lux_listing), head_node=GroupByMetric(views_times_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(active_listings)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(user),
+        head_node=GroupByMetric(approximate_continuous_booking_value_p99),
+      ),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(user),
+        head_node=GroupByMetric(approximate_discrete_booking_value_p99),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(archived_users)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(archived_users_join_to_time_spine)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(average_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(average_instant_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(bookers)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(booking_fees)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(user),
+        head_node=GroupByMetric(booking_fees_last_week_per_booker_this_week),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(booking_fees_per_booker)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(booking_fees_since_start_of_month)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(booking_payments)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(booking_value_for_non_null_listing_id)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(booking_value_p99)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(booking_value_per_view)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(booking_value_sub_instant)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(booking_value_sub_instant_add_10)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(bookings)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(bookings_5_day_lag)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(bookings_alien_day_over_alien_day)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(bookings_at_start_of_month)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(bookings_fill_nulls_with_0)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(user),
+        head_node=GroupByMetric(bookings_fill_nulls_with_0_without_time_spine),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(bookings_growth_2_weeks)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(user),
+        head_node=GroupByMetric(bookings_growth_2_weeks_fill_nulls_with_0),
+      ),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(user),
+        head_node=GroupByMetric(bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(bookings_growth_since_start_of_month)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(bookings_join_to_time_spine)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(user),
+        head_node=GroupByMetric(bookings_join_to_time_spine_with_tiered_filters),
+      ),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(user),
+        head_node=GroupByMetric(bookings_month_start_compared_to_1_month_prior),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(bookings_offset_alien_day)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(bookings_offset_once)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(bookings_offset_one_alien_day)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(bookings_offset_twice)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(bookings_per_booker)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(bookings_per_dollar)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(bookings_per_listing)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(bookings_per_lux_listing_derived)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(bookings_per_view)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(current_account_balance_by_user)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(derived_bookings_0)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(derived_bookings_1)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(derived_shared_alias_1a)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(derived_shared_alias_1b)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(derived_shared_alias_2)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(discrete_booking_value_p99)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(double_counted_delayed_bookings)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(every_2_days_bookers_2_days_ago)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(every_two_days_bookers)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(user),
+        head_node=GroupByMetric(every_two_days_bookers_fill_nulls_with_0),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(identity_verifications)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(instant_booking_fraction_of_max_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(instant_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(instant_booking_value_ratio)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(instant_bookings)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(instant_bookings_with_measure_filter)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(instant_lux_booking_value_rate)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(user),
+        head_node=GroupByMetric(instant_plus_non_referred_bookings_pct),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(largest_listing)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(listings)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(lux_booking_fraction_of_max_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(lux_booking_value_rate_expr)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(lux_listings)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(max_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(median_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(min_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(nested_fill_nulls_without_time_spine)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(new_users)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(non_referred_bookings_pct)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(popular_listing_bookings_per_booker)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(referred_bookings)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(regional_starting_balance_ratios)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(revenue)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(revenue_all_time)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(revenue_mtd)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(simple_subdaily_metric_default_day)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(simple_subdaily_metric_default_hour)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(smallest_listing)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(user),
+        head_node=GroupByMetric(subdaily_cumulative_grain_to_date_metric),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(subdaily_cumulative_window_metric)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(subdaily_join_to_time_spine_metric)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(subdaily_offset_grain_to_date_metric)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(subdaily_offset_window_metric)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(total_account_balance_first_day)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(user),
+        head_node=GroupByMetric(total_account_balance_first_day_of_month),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(trailing_2_months_revenue)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(trailing_2_months_revenue_sub_10)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(user),
+        head_node=GroupByMetric(twice_bookings_fill_nulls_with_0_without_time_spine),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(views)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(views_times_booking_value)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(visit_buy_conversion_rate)),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(visit_buy_conversion_rate_7days)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(user),
+        head_node=GroupByMetric(visit_buy_conversion_rate_7days_fill_nulls_with_0),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(visit_buy_conversion_rate_by_session)),
+      EntityAttributeEdge(
+        tail_node=KeyEntity(user),
+        head_node=GroupByMetric(visit_buy_conversion_rate_with_monthly_conversion),
+      ),
+      EntityAttributeEdge(tail_node=KeyEntity(user), head_node=GroupByMetric(visit_buy_conversions)),
+      EntityAttributeEdge(tail_node=KeyEntity(verification), head_node=GroupByMetric(identity_verifications)),
+      EntityAttributeEdge(tail_node=LocalModel(accounts_source), head_node=KeyEntity(user)),
+      EntityAttributeEdge(tail_node=LocalModel(bookings_source), head_node=KeyEntity(guest)),
+      EntityAttributeEdge(tail_node=LocalModel(bookings_source), head_node=KeyEntity(host)),
+      EntityAttributeEdge(tail_node=LocalModel(bookings_source), head_node=KeyEntity(listing)),
+      EntityAttributeEdge(tail_node=LocalModel(buys_source), head_node=KeyEntity(session_id)),
+      EntityAttributeEdge(tail_node=LocalModel(buys_source), head_node=KeyEntity(user)),
+      EntityAttributeEdge(tail_node=LocalModel(companies), head_node=KeyEntity(company)),
+      EntityAttributeEdge(tail_node=LocalModel(companies), head_node=KeyEntity(user)),
+      EntityAttributeEdge(tail_node=LocalModel(id_verifications), head_node=KeyEntity(user)),
+      EntityAttributeEdge(tail_node=LocalModel(id_verifications), head_node=KeyEntity(verification)),
+      EntityAttributeEdge(tail_node=LocalModel(listings_latest), head_node=KeyEntity(listing)),
+      EntityAttributeEdge(tail_node=LocalModel(listings_latest), head_node=KeyEntity(user)),
+      EntityAttributeEdge(tail_node=LocalModel(lux_listing_mapping), head_node=KeyEntity(listing)),
+      EntityAttributeEdge(tail_node=LocalModel(lux_listing_mapping), head_node=KeyEntity(lux_listing)),
+      EntityAttributeEdge(tail_node=LocalModel(revenue), head_node=KeyEntity(user)),
+      EntityAttributeEdge(tail_node=LocalModel(users_ds_source), head_node=KeyEntity(user)),
+      EntityAttributeEdge(tail_node=LocalModel(users_latest), head_node=KeyEntity(user)),
+      EntityAttributeEdge(tail_node=LocalModel(views_source), head_node=KeyEntity(listing)),
+      EntityAttributeEdge(tail_node=LocalModel(views_source), head_node=KeyEntity(user)),
+      EntityAttributeEdge(tail_node=LocalModel(visits_source), head_node=KeyEntity(session)),
+      EntityAttributeEdge(tail_node=LocalModel(visits_source), head_node=KeyEntity(user)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(alien_day)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(day)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(extract_day)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(extract_dow)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(extract_doy)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(extract_month)),
       EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(extract_quarter)),
       EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(extract_year)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(hour)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(millisecond)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(minute)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(month)),
       EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(quarter)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(second)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(week)),
       EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(year)),
-      EntityRelationshipEdge(tail_node=JoinedModel(sm_0), head_node=TimeDimension(ds)),
-      EntityRelationshipEdge(tail_node=KeyEntity(sm_0_primary_entity), head_node=KeyAttribute(sm_0_primary_entity)),
-      EntityRelationshipEdge(tail_node=KeyEntity(sm_1_primary_entity), head_node=KeyAttribute(sm_1_primary_entity)),
-      EntityRelationshipEdge(tail_node=KeyEntity(sm_2_primary_entity), head_node=KeyAttribute(sm_2_primary_entity)),
-      EntityRelationshipEdge(tail_node=Measure(sm_0_measure_0), head_node=LocalModel(sm_0)),
-      EntityRelationshipEdge(tail_node=Measure(sm_0_measure_0), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=JoinedModel(accounts_source), head_node=TimeDimension(ds)),
+      EntityRelationshipEdge(tail_node=JoinedModel(accounts_source), head_node=TimeDimension(ds_month)),
+      EntityRelationshipEdge(tail_node=JoinedModel(bookings_source), head_node=TimeDimension(ds)),
+      EntityRelationshipEdge(tail_node=JoinedModel(bookings_source), head_node=TimeDimension(ds_partitioned)),
+      EntityRelationshipEdge(tail_node=JoinedModel(bookings_source), head_node=TimeDimension(paid_at)),
+      EntityRelationshipEdge(tail_node=JoinedModel(buys_source), head_node=TimeDimension(ds)),
+      EntityRelationshipEdge(tail_node=JoinedModel(buys_source), head_node=TimeDimension(ds_month)),
+      EntityRelationshipEdge(tail_node=JoinedModel(id_verifications), head_node=TimeDimension(ds)),
+      EntityRelationshipEdge(tail_node=JoinedModel(id_verifications), head_node=TimeDimension(ds_partitioned)),
+      EntityRelationshipEdge(tail_node=JoinedModel(listings_latest), head_node=TimeDimension(created_at)),
+      EntityRelationshipEdge(tail_node=JoinedModel(listings_latest), head_node=TimeDimension(ds)),
+      EntityRelationshipEdge(tail_node=JoinedModel(revenue), head_node=TimeDimension(ds)),
+      EntityRelationshipEdge(tail_node=JoinedModel(users_ds_source), head_node=TimeDimension(archived_at)),
+      EntityRelationshipEdge(tail_node=JoinedModel(users_ds_source), head_node=TimeDimension(bio_added_ts)),
+      EntityRelationshipEdge(tail_node=JoinedModel(users_ds_source), head_node=TimeDimension(created_at)),
+      EntityRelationshipEdge(tail_node=JoinedModel(users_ds_source), head_node=TimeDimension(ds)),
+      EntityRelationshipEdge(tail_node=JoinedModel(users_ds_source), head_node=TimeDimension(ds_partitioned)),
+      EntityRelationshipEdge(tail_node=JoinedModel(users_ds_source), head_node=TimeDimension(last_login_ts)),
+      EntityRelationshipEdge(tail_node=JoinedModel(users_ds_source), head_node=TimeDimension(last_profile_edit_ts)),
+      EntityRelationshipEdge(tail_node=JoinedModel(users_latest), head_node=TimeDimension(ds_latest)),
+      EntityRelationshipEdge(tail_node=JoinedModel(views_source), head_node=TimeDimension(ds)),
+      EntityRelationshipEdge(tail_node=JoinedModel(views_source), head_node=TimeDimension(ds_partitioned)),
+      EntityRelationshipEdge(tail_node=JoinedModel(visits_source), head_node=TimeDimension(ds)),
+      EntityRelationshipEdge(tail_node=KeyEntity(company), head_node=KeyAttribute(company)),
+      EntityRelationshipEdge(tail_node=KeyEntity(guest), head_node=KeyAttribute(guest)),
+      EntityRelationshipEdge(tail_node=KeyEntity(host), head_node=KeyAttribute(host)),
+      EntityRelationshipEdge(tail_node=KeyEntity(listing), head_node=KeyAttribute(listing)),
+      EntityRelationshipEdge(tail_node=KeyEntity(lux_listing), head_node=KeyAttribute(lux_listing)),
+      EntityRelationshipEdge(tail_node=KeyEntity(session), head_node=KeyAttribute(session)),
+      EntityRelationshipEdge(tail_node=KeyEntity(session_id), head_node=KeyAttribute(session_id)),
+      EntityRelationshipEdge(tail_node=KeyEntity(user), head_node=KeyAttribute(user)),
+      EntityRelationshipEdge(tail_node=KeyEntity(verification), head_node=KeyAttribute(verification)),
+      EntityRelationshipEdge(tail_node=Measure(account_balance), head_node=LocalModel(accounts_source)),
+      EntityRelationshipEdge(tail_node=Measure(account_balance), head_node=MetricTime),
+      EntityRelationshipEdge(
+        tail_node=Measure(approximate_continuous_booking_value_p99),
+        head_node=LocalModel(bookings_source),
+      ),
+      EntityRelationshipEdge(tail_node=Measure(approximate_continuous_booking_value_p99), head_node=MetricTime),
+      EntityRelationshipEdge(
+        tail_node=Measure(approximate_discrete_booking_value_p99),
+        head_node=LocalModel(bookings_source),
+      ),
+      EntityRelationshipEdge(tail_node=Measure(approximate_discrete_booking_value_p99), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=Measure(archived_users), head_node=LocalModel(users_ds_source)),
+      EntityRelationshipEdge(tail_node=Measure(archived_users), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=Measure(average_booking_value), head_node=LocalModel(bookings_source)),
+      EntityRelationshipEdge(tail_node=Measure(average_booking_value), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=Measure(bookers), head_node=LocalModel(bookings_source)),
+      EntityRelationshipEdge(tail_node=Measure(bookers), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=Measure(booking_payments), head_node=LocalModel(bookings_source)),
+      EntityRelationshipEdge(tail_node=Measure(booking_payments), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=Measure(booking_value), head_node=LocalModel(bookings_source)),
+      EntityRelationshipEdge(tail_node=Measure(booking_value), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=Measure(booking_value_p99), head_node=LocalModel(bookings_source)),
+      EntityRelationshipEdge(tail_node=Measure(booking_value_p99), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=Measure(bookings), head_node=LocalModel(bookings_source)),
+      EntityRelationshipEdge(tail_node=Measure(bookings), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=Measure(buyers), head_node=LocalModel(buys_source)),
+      EntityRelationshipEdge(tail_node=Measure(buyers), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=Measure(buys), head_node=LocalModel(buys_source)),
+      EntityRelationshipEdge(tail_node=Measure(buys), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=Measure(buys_month), head_node=LocalModel(buys_source)),
+      EntityRelationshipEdge(tail_node=Measure(buys_month), head_node=MetricTime),
+      EntityRelationshipEdge(
+        tail_node=Measure(current_account_balance_by_user),
+        head_node=LocalModel(accounts_source),
+      ),
+      EntityRelationshipEdge(tail_node=Measure(current_account_balance_by_user), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=Measure(discrete_booking_value_p99), head_node=LocalModel(bookings_source)),
+      EntityRelationshipEdge(tail_node=Measure(discrete_booking_value_p99), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=Measure(identity_verifications), head_node=LocalModel(id_verifications)),
+      EntityRelationshipEdge(tail_node=Measure(identity_verifications), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=Measure(instant_bookings), head_node=LocalModel(bookings_source)),
+      EntityRelationshipEdge(tail_node=Measure(instant_bookings), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=Measure(largest_listing), head_node=LocalModel(listings_latest)),
+      EntityRelationshipEdge(tail_node=Measure(largest_listing), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=Measure(listings), head_node=LocalModel(listings_latest)),
+      EntityRelationshipEdge(tail_node=Measure(listings), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=Measure(max_booking_value), head_node=LocalModel(bookings_source)),
+      EntityRelationshipEdge(tail_node=Measure(max_booking_value), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=Measure(median_booking_value), head_node=LocalModel(bookings_source)),
+      EntityRelationshipEdge(tail_node=Measure(median_booking_value), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=Measure(min_booking_value), head_node=LocalModel(bookings_source)),
+      EntityRelationshipEdge(tail_node=Measure(min_booking_value), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=Measure(new_users), head_node=LocalModel(users_ds_source)),
+      EntityRelationshipEdge(tail_node=Measure(new_users), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=Measure(referred_bookings), head_node=LocalModel(bookings_source)),
+      EntityRelationshipEdge(tail_node=Measure(referred_bookings), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=Measure(smallest_listing), head_node=LocalModel(listings_latest)),
+      EntityRelationshipEdge(tail_node=Measure(smallest_listing), head_node=MetricTime),
+      EntityRelationshipEdge(
+        tail_node=Measure(total_account_balance_first_day),
+        head_node=LocalModel(accounts_source),
+      ),
+      EntityRelationshipEdge(tail_node=Measure(total_account_balance_first_day), head_node=MetricTime),
+      EntityRelationshipEdge(
+        tail_node=Measure(total_account_balance_first_day_of_month),
+        head_node=LocalModel(accounts_source),
+      ),
+      EntityRelationshipEdge(tail_node=Measure(total_account_balance_first_day_of_month), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=Measure(txn_revenue), head_node=LocalModel(revenue)),
+      EntityRelationshipEdge(tail_node=Measure(txn_revenue), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=Measure(views), head_node=LocalModel(views_source)),
+      EntityRelationshipEdge(tail_node=Measure(views), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=Measure(visitors), head_node=LocalModel(visits_source)),
+      EntityRelationshipEdge(tail_node=Measure(visitors), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=Measure(visits), head_node=LocalModel(visits_source)),
+      EntityRelationshipEdge(tail_node=Measure(visits), head_node=MetricTime),
       EntityRelationshipEdge(tail_node=MetricTime, head_node=TimeEntity),
+      EntityRelationshipEdge(tail_node=TimeDimension(archived_at), head_node=TimeEntity),
+      EntityRelationshipEdge(tail_node=TimeDimension(bio_added_ts), head_node=TimeEntity),
+      EntityRelationshipEdge(tail_node=TimeDimension(created_at), head_node=TimeEntity),
       EntityRelationshipEdge(tail_node=TimeDimension(ds), head_node=TimeEntity),
-      JoinFromModelEdge(tail_node=JoinedModel(sm_0), head_node=sm_1.sm_1_primary_entity),
-      JoinFromModelEdge(tail_node=LocalModel(sm_0), head_node=sm_0.sm_0_primary_entity),
-      JoinFromModelEdge(tail_node=LocalModel(sm_0), head_node=sm_1.sm_1_primary_entity),
-      JoinFromModelEdge(tail_node=LocalModel(sm_1), head_node=sm_1.sm_1_primary_entity),
-      JoinToModelEdge(tail_node=sm_0.sm_0_primary_entity, head_node=JoinedModel(sm_0)),
-      JoinToModelEdge(tail_node=sm_1.sm_1_primary_entity, head_node=JoinedModel(sm_1)),
-      MetricDefinitionEdge(tail_node=Metric(sm_0_measure_0_metric), head_node=Measure(sm_0_measure_0)),
+      EntityRelationshipEdge(tail_node=TimeDimension(ds_latest), head_node=TimeEntity),
+      EntityRelationshipEdge(tail_node=TimeDimension(ds_month), head_node=TimeEntity),
+      EntityRelationshipEdge(tail_node=TimeDimension(ds_partitioned), head_node=TimeEntity),
+      EntityRelationshipEdge(tail_node=TimeDimension(last_login_ts), head_node=TimeEntity),
+      EntityRelationshipEdge(tail_node=TimeDimension(last_profile_edit_ts), head_node=TimeEntity),
+      EntityRelationshipEdge(tail_node=TimeDimension(paid_at), head_node=TimeEntity),
+      JoinFromModelEdge(tail_node=JoinedModel(accounts_source), head_node=companies.user),
+      JoinFromModelEdge(tail_node=JoinedModel(accounts_source), head_node=users_ds_source.user),
+      JoinFromModelEdge(tail_node=JoinedModel(accounts_source), head_node=users_latest.user),
+      JoinFromModelEdge(tail_node=JoinedModel(bookings_source), head_node=listings_latest.listing),
+      JoinFromModelEdge(tail_node=JoinedModel(bookings_source), head_node=lux_listing_mapping.listing),
+      JoinFromModelEdge(tail_node=JoinedModel(buys_source), head_node=companies.user),
+      JoinFromModelEdge(tail_node=JoinedModel(buys_source), head_node=users_ds_source.user),
+      JoinFromModelEdge(tail_node=JoinedModel(buys_source), head_node=users_latest.user),
+      JoinFromModelEdge(tail_node=JoinedModel(companies), head_node=users_ds_source.user),
+      JoinFromModelEdge(tail_node=JoinedModel(companies), head_node=users_latest.user),
+      JoinFromModelEdge(tail_node=JoinedModel(id_verifications), head_node=companies.user),
+      JoinFromModelEdge(tail_node=JoinedModel(id_verifications), head_node=users_ds_source.user),
+      JoinFromModelEdge(tail_node=JoinedModel(id_verifications), head_node=users_latest.user),
+      JoinFromModelEdge(tail_node=JoinedModel(listings_latest), head_node=lux_listing_mapping.listing),
+      JoinFromModelEdge(tail_node=JoinedModel(listings_latest), head_node=companies.user),
+      JoinFromModelEdge(tail_node=JoinedModel(listings_latest), head_node=users_ds_source.user),
+      JoinFromModelEdge(tail_node=JoinedModel(listings_latest), head_node=users_latest.user),
+      JoinFromModelEdge(tail_node=JoinedModel(lux_listing_mapping), head_node=listings_latest.listing),
+      JoinFromModelEdge(tail_node=JoinedModel(revenue), head_node=companies.user),
+      JoinFromModelEdge(tail_node=JoinedModel(revenue), head_node=users_ds_source.user),
+      JoinFromModelEdge(tail_node=JoinedModel(revenue), head_node=users_latest.user),
+      JoinFromModelEdge(tail_node=JoinedModel(users_ds_source), head_node=companies.user),
+      JoinFromModelEdge(tail_node=JoinedModel(users_ds_source), head_node=users_latest.user),
+      JoinFromModelEdge(tail_node=JoinedModel(users_latest), head_node=companies.user),
+      JoinFromModelEdge(tail_node=JoinedModel(users_latest), head_node=users_ds_source.user),
+      JoinFromModelEdge(tail_node=JoinedModel(views_source), head_node=listings_latest.listing),
+      JoinFromModelEdge(tail_node=JoinedModel(views_source), head_node=lux_listing_mapping.listing),
+      JoinFromModelEdge(tail_node=JoinedModel(views_source), head_node=companies.user),
+      JoinFromModelEdge(tail_node=JoinedModel(views_source), head_node=users_ds_source.user),
+      JoinFromModelEdge(tail_node=JoinedModel(views_source), head_node=users_latest.user),
+      JoinFromModelEdge(tail_node=JoinedModel(visits_source), head_node=companies.user),
+      JoinFromModelEdge(tail_node=JoinedModel(visits_source), head_node=users_ds_source.user),
+      JoinFromModelEdge(tail_node=JoinedModel(visits_source), head_node=users_latest.user),
+      JoinFromModelEdge(tail_node=LocalModel(accounts_source), head_node=accounts_source.account),
+      JoinFromModelEdge(tail_node=LocalModel(accounts_source), head_node=companies.user),
+      JoinFromModelEdge(tail_node=LocalModel(accounts_source), head_node=users_ds_source.user),
+      JoinFromModelEdge(tail_node=LocalModel(accounts_source), head_node=users_latest.user),
+      JoinFromModelEdge(tail_node=LocalModel(bookings_source), head_node=bookings_source.booking),
+      JoinFromModelEdge(tail_node=LocalModel(bookings_source), head_node=listings_latest.listing),
+      JoinFromModelEdge(tail_node=LocalModel(bookings_source), head_node=lux_listing_mapping.listing),
+      JoinFromModelEdge(tail_node=LocalModel(buys_source), head_node=buys_source.buy),
+      JoinFromModelEdge(tail_node=LocalModel(buys_source), head_node=companies.user),
+      JoinFromModelEdge(tail_node=LocalModel(buys_source), head_node=users_ds_source.user),
+      JoinFromModelEdge(tail_node=LocalModel(buys_source), head_node=users_latest.user),
+      JoinFromModelEdge(tail_node=LocalModel(companies), head_node=companies.company),
+      JoinFromModelEdge(tail_node=LocalModel(companies), head_node=companies.user),
+      JoinFromModelEdge(tail_node=LocalModel(companies), head_node=users_ds_source.user),
+      JoinFromModelEdge(tail_node=LocalModel(companies), head_node=users_latest.user),
+      JoinFromModelEdge(tail_node=LocalModel(id_verifications), head_node=companies.user),
+      JoinFromModelEdge(tail_node=LocalModel(id_verifications), head_node=users_ds_source.user),
+      JoinFromModelEdge(tail_node=LocalModel(id_verifications), head_node=users_latest.user),
+      JoinFromModelEdge(tail_node=LocalModel(id_verifications), head_node=id_verifications.verification),
+      JoinFromModelEdge(tail_node=LocalModel(listings_latest), head_node=listings_latest.listing),
+      JoinFromModelEdge(tail_node=LocalModel(listings_latest), head_node=lux_listing_mapping.listing),
+      JoinFromModelEdge(tail_node=LocalModel(listings_latest), head_node=companies.user),
+      JoinFromModelEdge(tail_node=LocalModel(listings_latest), head_node=users_ds_source.user),
+      JoinFromModelEdge(tail_node=LocalModel(listings_latest), head_node=users_latest.user),
+      JoinFromModelEdge(tail_node=LocalModel(lux_listing_mapping), head_node=listings_latest.listing),
+      JoinFromModelEdge(tail_node=LocalModel(lux_listing_mapping), head_node=lux_listing_mapping.listing),
+      JoinFromModelEdge(tail_node=LocalModel(revenue), head_node=revenue.revenue_instance),
+      JoinFromModelEdge(tail_node=LocalModel(revenue), head_node=companies.user),
+      JoinFromModelEdge(tail_node=LocalModel(revenue), head_node=users_ds_source.user),
+      JoinFromModelEdge(tail_node=LocalModel(revenue), head_node=users_latest.user),
+      JoinFromModelEdge(tail_node=LocalModel(users_ds_source), head_node=companies.user),
+      JoinFromModelEdge(tail_node=LocalModel(users_ds_source), head_node=users_ds_source.user),
+      JoinFromModelEdge(tail_node=LocalModel(users_ds_source), head_node=users_latest.user),
+      JoinFromModelEdge(tail_node=LocalModel(users_latest), head_node=companies.user),
+      JoinFromModelEdge(tail_node=LocalModel(users_latest), head_node=users_ds_source.user),
+      JoinFromModelEdge(tail_node=LocalModel(users_latest), head_node=users_latest.user),
+      JoinFromModelEdge(tail_node=LocalModel(views_source), head_node=listings_latest.listing),
+      JoinFromModelEdge(tail_node=LocalModel(views_source), head_node=lux_listing_mapping.listing),
+      JoinFromModelEdge(tail_node=LocalModel(views_source), head_node=companies.user),
+      JoinFromModelEdge(tail_node=LocalModel(views_source), head_node=users_ds_source.user),
+      JoinFromModelEdge(tail_node=LocalModel(views_source), head_node=users_latest.user),
+      JoinFromModelEdge(tail_node=LocalModel(views_source), head_node=views_source.view),
+      JoinFromModelEdge(tail_node=LocalModel(visits_source), head_node=companies.user),
+      JoinFromModelEdge(tail_node=LocalModel(visits_source), head_node=users_ds_source.user),
+      JoinFromModelEdge(tail_node=LocalModel(visits_source), head_node=users_latest.user),
+      JoinFromModelEdge(tail_node=LocalModel(visits_source), head_node=visits_source.visit),
+      JoinToModelEdge(tail_node=accounts_source.account, head_node=JoinedModel(accounts_source)),
+      JoinToModelEdge(tail_node=bookings_source.booking, head_node=JoinedModel(bookings_source)),
+      JoinToModelEdge(tail_node=buys_source.buy, head_node=JoinedModel(buys_source)),
+      JoinToModelEdge(tail_node=companies.company, head_node=JoinedModel(companies)),
+      JoinToModelEdge(tail_node=listings_latest.listing, head_node=JoinedModel(listings_latest)),
+      JoinToModelEdge(tail_node=lux_listing_mapping.listing, head_node=JoinedModel(lux_listing_mapping)),
+      JoinToModelEdge(tail_node=revenue.revenue_instance, head_node=JoinedModel(revenue)),
+      JoinToModelEdge(tail_node=companies.user, head_node=JoinedModel(companies)),
+      JoinToModelEdge(tail_node=users_ds_source.user, head_node=JoinedModel(users_ds_source)),
+      JoinToModelEdge(tail_node=users_latest.user, head_node=JoinedModel(users_latest)),
+      JoinToModelEdge(tail_node=id_verifications.verification, head_node=JoinedModel(id_verifications)),
+      JoinToModelEdge(tail_node=views_source.view, head_node=JoinedModel(views_source)),
+      JoinToModelEdge(tail_node=visits_source.visit, head_node=JoinedModel(visits_source)),
+      MetricDefinitionEdge(tail_node=Metric(active_listings), head_node=Measure(listings)),
+      MetricDefinitionEdge(
+        tail_node=Metric(approximate_continuous_booking_value_p99),
+        head_node=Measure(approximate_continuous_booking_value_p99),
+      ),
+      MetricDefinitionEdge(
+        tail_node=Metric(approximate_discrete_booking_value_p99),
+        head_node=Measure(approximate_discrete_booking_value_p99),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(archived_users), head_node=Measure(archived_users)),
+      MetricDefinitionEdge(tail_node=Metric(archived_users_join_to_time_spine), head_node=Measure(archived_users)),
+      MetricDefinitionEdge(tail_node=Metric(average_booking_value), head_node=Measure(average_booking_value)),
+      MetricDefinitionEdge(
+        tail_node=Metric(average_instant_booking_value),
+        head_node=Measure(average_booking_value),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(bookers), head_node=Measure(bookers)),
+      MetricDefinitionEdge(tail_node=Metric(booking_fees), head_node=Metric(booking_value)),
+      MetricDefinitionEdge(tail_node=Metric(booking_fees_last_week_per_booker_this_week), head_node=Metric(bookers)),
+      MetricDefinitionEdge(
+        tail_node=Metric(booking_fees_last_week_per_booker_this_week),
+        head_node=Metric(booking_value),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(booking_fees_per_booker), head_node=Metric(bookers)),
+      MetricDefinitionEdge(tail_node=Metric(booking_fees_per_booker), head_node=Metric(booking_value)),
+      MetricDefinitionEdge(tail_node=Metric(booking_fees_since_start_of_month), head_node=Metric(booking_fees)),
+      MetricDefinitionEdge(tail_node=Metric(booking_payments), head_node=Measure(booking_payments)),
+      MetricDefinitionEdge(tail_node=Metric(booking_value), head_node=Measure(booking_value)),
+      MetricDefinitionEdge(
+        tail_node=Metric(booking_value_for_non_null_listing_id),
+        head_node=Measure(booking_value),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(booking_value_p99), head_node=Measure(booking_value_p99)),
+      MetricDefinitionEdge(tail_node=Metric(booking_value_per_view), head_node=Metric(booking_value)),
+      MetricDefinitionEdge(tail_node=Metric(booking_value_per_view), head_node=Metric(views)),
+      MetricDefinitionEdge(tail_node=Metric(booking_value_sub_instant), head_node=Metric(booking_value)),
+      MetricDefinitionEdge(tail_node=Metric(booking_value_sub_instant), head_node=Metric(instant_booking_value)),
+      MetricDefinitionEdge(
+        tail_node=Metric(booking_value_sub_instant_add_10),
+        head_node=Metric(booking_value_sub_instant),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(bookings), head_node=Measure(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_5_day_lag), head_node=Metric(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_alien_day_over_alien_day), head_node=Metric(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_at_start_of_month), head_node=Metric(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_fill_nulls_with_0), head_node=Measure(bookings)),
+      MetricDefinitionEdge(
+        tail_node=Metric(bookings_fill_nulls_with_0_without_time_spine),
+        head_node=Measure(bookings),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(bookings_growth_2_weeks), head_node=Metric(bookings)),
+      MetricDefinitionEdge(
+        tail_node=Metric(bookings_growth_2_weeks_fill_nulls_with_0),
+        head_node=Metric(bookings_fill_nulls_with_0),
+      ),
+      MetricDefinitionEdge(
+        tail_node=Metric(bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset),
+        head_node=Metric(bookings),
+      ),
+      MetricDefinitionEdge(
+        tail_node=Metric(bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset),
+        head_node=Metric(bookings_fill_nulls_with_0),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(bookings_growth_since_start_of_month), head_node=Metric(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_join_to_time_spine), head_node=Measure(bookings)),
+      MetricDefinitionEdge(
+        tail_node=Metric(bookings_join_to_time_spine_with_tiered_filters),
+        head_node=Measure(bookings),
+      ),
+      MetricDefinitionEdge(
+        tail_node=Metric(bookings_month_start_compared_to_1_month_prior),
+        head_node=Metric(bookings),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(bookings_offset_alien_day), head_node=Metric(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_offset_once), head_node=Metric(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_offset_one_alien_day), head_node=Metric(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_offset_twice), head_node=Metric(bookings_offset_once)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_per_booker), head_node=Measure(bookers)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_per_booker), head_node=Measure(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_per_dollar), head_node=Measure(booking_value)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_per_dollar), head_node=Measure(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_per_listing), head_node=Measure(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_per_listing), head_node=Measure(listings)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_per_lux_listing_derived), head_node=Metric(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_per_lux_listing_derived), head_node=Metric(listings)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_per_view), head_node=Measure(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(bookings_per_view), head_node=Measure(views)),
+      MetricDefinitionEdge(
+        tail_node=Metric(current_account_balance_by_user),
+        head_node=Measure(current_account_balance_by_user),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(derived_bookings_0), head_node=Metric(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(derived_bookings_1), head_node=Metric(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(derived_shared_alias_1a), head_node=Metric(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(derived_shared_alias_1b), head_node=Metric(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(derived_shared_alias_2), head_node=Metric(instant_bookings)),
+      MetricDefinitionEdge(
+        tail_node=Metric(discrete_booking_value_p99),
+        head_node=Measure(discrete_booking_value_p99),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(double_counted_delayed_bookings), head_node=Metric(bookings)),
+      MetricDefinitionEdge(
+        tail_node=Metric(every_2_days_bookers_2_days_ago),
+        head_node=Metric(every_two_days_bookers),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(every_two_days_bookers), head_node=Measure(bookers)),
+      MetricDefinitionEdge(tail_node=Metric(every_two_days_bookers_fill_nulls_with_0), head_node=Measure(bookers)),
+      MetricDefinitionEdge(tail_node=Metric(identity_verifications), head_node=Measure(identity_verifications)),
+      MetricDefinitionEdge(
+        tail_node=Metric(instant_booking_fraction_of_max_value),
+        head_node=Measure(average_booking_value),
+      ),
+      MetricDefinitionEdge(
+        tail_node=Metric(instant_booking_fraction_of_max_value),
+        head_node=Measure(max_booking_value),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(instant_booking_value), head_node=Measure(booking_value)),
+      MetricDefinitionEdge(tail_node=Metric(instant_booking_value_ratio), head_node=Measure(booking_value)),
+      MetricDefinitionEdge(tail_node=Metric(instant_bookings), head_node=Measure(instant_bookings)),
+      MetricDefinitionEdge(tail_node=Metric(instant_bookings_with_measure_filter), head_node=Measure(bookings)),
+      MetricDefinitionEdge(
+        tail_node=Metric(instant_lux_booking_value_rate),
+        head_node=Metric(lux_booking_value_rate_expr),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(instant_plus_non_referred_bookings_pct), head_node=Metric(bookings)),
+      MetricDefinitionEdge(
+        tail_node=Metric(instant_plus_non_referred_bookings_pct),
+        head_node=Metric(instant_bookings),
+      ),
+      MetricDefinitionEdge(
+        tail_node=Metric(instant_plus_non_referred_bookings_pct),
+        head_node=Metric(non_referred_bookings_pct),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(largest_listing), head_node=Measure(largest_listing)),
+      MetricDefinitionEdge(tail_node=Metric(listings), head_node=Measure(listings)),
+      MetricDefinitionEdge(
+        tail_node=Metric(lux_booking_fraction_of_max_value),
+        head_node=Measure(average_booking_value),
+      ),
+      MetricDefinitionEdge(
+        tail_node=Metric(lux_booking_fraction_of_max_value),
+        head_node=Measure(max_booking_value),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(lux_booking_value_rate_expr), head_node=Metric(average_booking_value)),
+      MetricDefinitionEdge(tail_node=Metric(lux_booking_value_rate_expr), head_node=Metric(booking_value)),
+      MetricDefinitionEdge(tail_node=Metric(lux_booking_value_rate_expr), head_node=Metric(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(lux_listings), head_node=Measure(listings)),
+      MetricDefinitionEdge(tail_node=Metric(max_booking_value), head_node=Measure(max_booking_value)),
+      MetricDefinitionEdge(tail_node=Metric(median_booking_value), head_node=Measure(median_booking_value)),
+      MetricDefinitionEdge(tail_node=Metric(min_booking_value), head_node=Measure(min_booking_value)),
+      MetricDefinitionEdge(
+        tail_node=Metric(nested_fill_nulls_without_time_spine),
+        head_node=Metric(twice_bookings_fill_nulls_with_0_without_time_spine),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(new_users), head_node=Measure(new_users)),
+      MetricDefinitionEdge(tail_node=Metric(non_referred_bookings_pct), head_node=Metric(bookings)),
+      MetricDefinitionEdge(tail_node=Metric(non_referred_bookings_pct), head_node=Metric(referred_bookings)),
+      MetricDefinitionEdge(tail_node=Metric(popular_listing_bookings_per_booker), head_node=Measure(listings)),
+      MetricDefinitionEdge(tail_node=Metric(referred_bookings), head_node=Measure(referred_bookings)),
+      MetricDefinitionEdge(
+        tail_node=Metric(regional_starting_balance_ratios),
+        head_node=Measure(total_account_balance_first_day),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(revenue), head_node=Measure(txn_revenue)),
+      MetricDefinitionEdge(tail_node=Metric(revenue_all_time), head_node=Measure(txn_revenue)),
+      MetricDefinitionEdge(tail_node=Metric(revenue_mtd), head_node=Measure(txn_revenue)),
+      MetricDefinitionEdge(tail_node=Metric(simple_subdaily_metric_default_day), head_node=Measure(archived_users)),
+      MetricDefinitionEdge(tail_node=Metric(simple_subdaily_metric_default_hour), head_node=Measure(archived_users)),
+      MetricDefinitionEdge(tail_node=Metric(smallest_listing), head_node=Measure(smallest_listing)),
+      MetricDefinitionEdge(
+        tail_node=Metric(subdaily_cumulative_grain_to_date_metric),
+        head_node=Measure(archived_users),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(subdaily_cumulative_window_metric), head_node=Measure(archived_users)),
+      MetricDefinitionEdge(tail_node=Metric(subdaily_join_to_time_spine_metric), head_node=Measure(archived_users)),
+      MetricDefinitionEdge(tail_node=Metric(subdaily_offset_grain_to_date_metric), head_node=Metric(archived_users)),
+      MetricDefinitionEdge(tail_node=Metric(subdaily_offset_window_metric), head_node=Metric(archived_users)),
+      MetricDefinitionEdge(
+        tail_node=Metric(total_account_balance_first_day),
+        head_node=Measure(total_account_balance_first_day),
+      ),
+      MetricDefinitionEdge(
+        tail_node=Metric(total_account_balance_first_day_of_month),
+        head_node=Measure(total_account_balance_first_day_of_month),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(trailing_2_months_revenue), head_node=Measure(txn_revenue)),
+      MetricDefinitionEdge(
+        tail_node=Metric(trailing_2_months_revenue_sub_10),
+        head_node=Metric(trailing_2_months_revenue),
+      ),
+      MetricDefinitionEdge(
+        tail_node=Metric(twice_bookings_fill_nulls_with_0_without_time_spine),
+        head_node=Metric(bookings_fill_nulls_with_0_without_time_spine),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(views), head_node=Measure(views)),
+      MetricDefinitionEdge(tail_node=Metric(views_times_booking_value), head_node=Metric(booking_value)),
+      MetricDefinitionEdge(tail_node=Metric(views_times_booking_value), head_node=Metric(views)),
+      MetricDefinitionEdge(tail_node=Metric(visit_buy_conversion_rate), head_node=Measure(buys)),
+      MetricDefinitionEdge(tail_node=Metric(visit_buy_conversion_rate), head_node=Measure(visits)),
+      MetricDefinitionEdge(tail_node=Metric(visit_buy_conversion_rate_7days), head_node=Measure(buys)),
+      MetricDefinitionEdge(tail_node=Metric(visit_buy_conversion_rate_7days), head_node=Measure(visits)),
+      MetricDefinitionEdge(
+        tail_node=Metric(visit_buy_conversion_rate_7days_fill_nulls_with_0),
+        head_node=Measure(buys),
+      ),
+      MetricDefinitionEdge(
+        tail_node=Metric(visit_buy_conversion_rate_7days_fill_nulls_with_0),
+        head_node=Measure(visits),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(visit_buy_conversion_rate_by_session), head_node=Measure(buys)),
+      MetricDefinitionEdge(tail_node=Metric(visit_buy_conversion_rate_by_session), head_node=Measure(visits)),
+      MetricDefinitionEdge(
+        tail_node=Metric(visit_buy_conversion_rate_with_monthly_conversion),
+        head_node=Measure(buys_month),
+      ),
+      MetricDefinitionEdge(
+        tail_node=Metric(visit_buy_conversion_rate_with_monthly_conversion),
+        head_node=Measure(visits),
+      ),
+      MetricDefinitionEdge(tail_node=Metric(visit_buy_conversions), head_node=Measure(buys)),
+      MetricDefinitionEdge(tail_node=Metric(visit_buy_conversions), head_node=Measure(visits)),
     },
   )

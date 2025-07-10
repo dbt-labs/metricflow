@@ -217,7 +217,7 @@ class GroupByMetricNode(AttributeNode):
     @override
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
         return MetricflowGraphNodeDescriptor.get_instance(
-            node_name=f"MetricAttribute({self.attribute_name})", cluster_name=ClusterName.KEY
+            node_name=f"GroupByMetric({self.attribute_name})", cluster_name=ClusterName.KEY
         )
 
     @override

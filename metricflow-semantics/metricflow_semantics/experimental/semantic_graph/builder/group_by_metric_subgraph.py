@@ -117,7 +117,7 @@ class _GenerateGroupByMetricSubgraphContext:
         self._metric_node_to_key_query_set: dict[SemanticGraphNode, DsiEntityKeyQuerySet] = {}
         metric_nodes = current_graph.nodes_with_label(MetricLabel.get_instance())
         self._metric_nodes = metric_nodes
-        self._verbose_debug_logs = True
+        self._verbose_debug_logs = False
 
     # def get_key_entity_node_to_entity_key_queries(
     #     self, local_model_node: SemanticGraphNode
@@ -184,7 +184,7 @@ class _GenerateGroupByMetricSubgraphContext:
             )
 
         current_graph = self._current_graph
-        parent_metric_nodes = current_graph.predecessors(metric_node)
+        parent_metric_nodes = current_graph.successors(metric_node)
 
         key_query_sets_to_intersect = []
         for parent_metric_node in parent_metric_nodes:
@@ -291,8 +291,17 @@ class _GenerateGroupByMetricSubgraphContext:
                         recipe_update=metric_node.attribute_recipe_update,
                     )
                 )
-            metric_name_to_key_queries[metric_name] = key_query_set
 
+            if metric_name == "booking_fees":
+                logger.debug(
+                    LazyFormat(
+                        "Got key query set",
+                        metric_name=metric_name,
+                        key_query_set=key_query_set,
+                    )
+                )
+
+            metric_name_to_key_queries[metric_name] = key_query_set
             group_by_metric_node = GroupByMetricNode.get_instance(metric_name)
 
             key_names = FrozenOrderedSet(

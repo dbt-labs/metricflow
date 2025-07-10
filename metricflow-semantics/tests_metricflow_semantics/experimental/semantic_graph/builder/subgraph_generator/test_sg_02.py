@@ -71,7 +71,7 @@ def test_all(  # noqa: D103
     check_subgraph_generation(
         request=request,
         mf_test_configuration=mf_test_configuration,
-        manifest_object_lookup=ManifestObjectLookup(sg_02_single_join_manifest),
+        manifest_object_lookup=ManifestObjectLookup(simple_semantic_manifest),
         subgraph_generators=SemanticGraphBuilder._ALL_SUBGRAPH_GENERATORS,
     )
 
@@ -327,4 +327,4 @@ def test_resolver_outputs(
     sg_06_ambiguous_join_manifest: PydanticSemanticManifest,
     simple_semantic_manifest: PydanticSemanticManifest,
 ) -> None:
-    LinkableSpecResolverTester.compare_resolver_outputs_for_measures(sg_02_single_join_manifest)
+    LinkableSpecResolverTester.compare_resolver_outputs_for_measures(simple_semantic_manifest, measure_name="bookings")

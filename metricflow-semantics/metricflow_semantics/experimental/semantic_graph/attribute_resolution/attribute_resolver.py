@@ -67,7 +67,7 @@ class AttributeResolver:
         self._semantic_graph = semantic_graph
         self._path_finder = path_finder
         self._mutable_path = AttributeRecipeWriterPath.create()
-        self._verbose_debug_logs = True
+        self._verbose_debug_logs = False
         self._semantic_model_id_to_metric_subqueries: dict[SemanticModelId, OrderedSet[MetricSubquery]] = {}
 
     def _generate_non_metric_time_recipes(self, model_node: SemanticGraphNode) -> Sequence[AttributeRecipe]:
@@ -349,13 +349,14 @@ class AttributeResolver:
         mutable_path = AttributeRecipeWriterPath.create()
         attribute_recipes = []
         target_nodes = self._semantic_graph.nodes_with_label(GroupByAttributeLabel.get_instance())
-        logger.debug(
-            LazyFormat(
-                "Generating attribute recipes",
-                source_node=source_node,
-                target_nodes=target_nodes,
+        if self._verbose_debug_logs:
+            logger.debug(
+                LazyFormat(
+                    "Generating attribute recipes",
+                    source_node=source_node,
+                    target_nodes=target_nodes,
+                )
             )
-        )
         for stop_event in self._path_finder.traverse_dfs(
             graph=self._semantic_graph,
             mutable_path=mutable_path,

@@ -32,7 +32,7 @@ class DunderNameWeightFunction(WeightFunction[SemanticGraphNode, SemanticGraphEd
     _METRIC_DEFINITION_LABEL = MetricDefinitionLabel()
 
     def __init__(self) -> None:  # noqa: D107
-        self._verbose_debug_logs = True
+        self._verbose_debug_logs = False
 
     @override
     def incremental_weight(
@@ -67,13 +67,14 @@ class DunderNameWeightFunction(WeightFunction[SemanticGraphNode, SemanticGraphEd
         # so return `None` to indicate a blocked edge.
         unique_dunder_name_element_count = len(set(dundered_name_elements))
         if unique_dunder_name_element_count != len(dundered_name_elements) and len(dundered_name_elements) > 1:
-            logger.debug(
-                LazyFormat(
-                    "Blocking edge due to dunder name uniqueness.",
-                    next_edge=next_edge,
-                    dundered_name_elements=dundered_name_elements,
+            if self._verbose_debug_logs:
+                logger.debug(
+                    LazyFormat(
+                        "Blocking edge due to dunder name uniqueness.",
+                        next_edge=next_edge,
+                        dundered_name_elements=dundered_name_elements,
+                    )
                 )
-            )
             return None
 
         # Don't allow joining a semantic model multiple times.

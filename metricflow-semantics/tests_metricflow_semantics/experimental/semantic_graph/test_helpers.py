@@ -2,8 +2,11 @@ from __future__ import annotations
 
 import difflib
 import logging
+from typing import Optional
 
 from dbt_semantic_interfaces.protocols import SemanticManifest
+from dbt_semantic_interfaces.references import MeasureReference
+
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
     AttributeRecipeWriterPath,
 )
@@ -74,18 +77,16 @@ class LinkableSpecResolverTester:
     @staticmethod
     def compare_resolver_outputs_for_measures(
         semantic_manifest: SemanticManifest,
+        measure_name: Optional[str] = None,
     ) -> None:
         element_filter = LinkableElementFilter()
 
-        # semantic_manifest = sg_02_single_join_manifest
-        # semantic_manifest = simple_semantic_manifest
-        # semantic_manifest = sg_04_common_primary_entity_manifest
-
         manifest_lookup = SemanticManifestLookup(semantic_manifest)
 
-        measure_references = manifest_lookup.semantic_model_lookup.measure_references
-        # measure_references = (MeasureReference(element_name="bookings"),)
-        # measure_references = (MeasureReference(element_name="sm_0_measure_0"),)
+        if measure_name is None:
+            measure_references = manifest_lookup.semantic_model_lookup.measure_references
+        else:
+            measure_references = (MeasureReference(measure_name),)
 
         legacy_resolver = LinkableSpecResolverTester.create_legacy_resolver(semantic_manifest)
         sg_resolver = LinkableSpecResolverTester.create_sg_resolver(semantic_manifest)
