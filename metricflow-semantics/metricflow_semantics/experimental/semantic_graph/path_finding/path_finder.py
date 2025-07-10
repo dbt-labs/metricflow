@@ -218,7 +218,9 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
                 lines = [
                     "Visiting next node",
                     "",
-                    tabulate.tabulate(tuple((mf_pformat(node),) for node in current_path.nodes), tablefmt="simple_grid"),
+                    tabulate.tabulate(
+                        tuple((mf_pformat(node),) for node in current_path.nodes), tablefmt="simple_grid"
+                    ),
                 ]
                 logger.debug("\n".join(lines))
 

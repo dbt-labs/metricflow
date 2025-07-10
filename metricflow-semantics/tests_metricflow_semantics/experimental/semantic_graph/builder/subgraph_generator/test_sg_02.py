@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import itertools
 import logging
 
 from _pytest.fixtures import FixtureRequest
@@ -47,7 +46,6 @@ from metricflow_semantics.test_helpers.snapshot_helpers import (
     assert_linkable_element_set_snapshot_equal,
     assert_object_snapshot_equal,
     assert_str_snapshot_equal,
-    convert_linkable_element_set_to_rows,
 )
 from metricflow_semantics.test_helpers.svg_snapshot import write_svg_snapshot_for_review
 
@@ -55,6 +53,10 @@ from tests_metricflow_semantics.experimental.mf_graph.formatting.svg_formatter i
 from tests_metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator.conftest import (
     check_subgraph_generation,
 )
+from tests_metricflow_semantics.experimental.semantic_graph.linkable_element_set_helpers import (
+    assert_linkable_element_sets_equal,
+)
+from tests_metricflow_semantics.experimental.semantic_graph.test_helpers import LinkableSpecResolverTester
 
 logger = logging.getLogger(__name__)
 
@@ -217,8 +219,8 @@ def test_linkable_spec_resolvers(
     # measure_references = (MeasureReference(element_name="bookings"),)
     measure_references = (MeasureReference(element_name="sm_0_measure_0"),)
 
-    legacy_linkable_spec_resolver = _create_legacy_resolver(semantic_manifest)
-    sg_linkable_spec_resolver = _create_sg_resolver(semantic_manifest)
+    legacy_linkable_spec_resolver = LinkableSpecResolverTester.create_legacy_resolver(semantic_manifest)
+    sg_linkable_spec_resolver = LinkableSpecResolverTester.create_sg_resolver(semantic_manifest)
 
     for measure_reference in measure_references:
         logger.debug(
@@ -236,41 +238,45 @@ def test_linkable_spec_resolvers(
             measure_reference, element_filter
         )
 
-        assert_linkable_element_set_snapshot_equal(
-            request=request,
-            snapshot_configuration=mf_test_configuration,
-            linkable_element_set=legacy_linkable_element_set,
-            set_id="legacy_result",
+        assert_linkable_element_sets_equal(
+            left_set=legacy_linkable_element_set,
+            right_set=sg_linkable_element_set,
         )
-
-        assert_linkable_element_set_snapshot_equal(
-            request=request,
-            snapshot_configuration=mf_test_configuration,
-            linkable_element_set=sg_linkable_element_set,
-            set_id="sg_result",
-        )
-
-        legacy_rows = convert_linkable_element_set_to_rows(legacy_linkable_element_set)
-        sg_rows = convert_linkable_element_set_to_rows(sg_linkable_element_set)
-
-        for row_index, (legacy_row, sg_row) in enumerate(itertools.zip_longest(legacy_rows, sg_rows)):
-            assert legacy_row is not None, LazyFormat(
-                "Missing row from `legacy_rows`",
-                measure_reference=measure_reference,
-                row_index=row_index,
-                legacy_row=legacy_row,
-                sg_row=sg_row,
-            )
-            assert sg_row is not None, LazyFormat(
-                "Missing row from `sg_rows`",
-                measure_reference=measure_reference,
-                row_index=row_index,
-                legacy_row=legacy_row,
-                sg_row=sg_row,
-            )
-            assert legacy_row == sg_row, LazyFormat(
-                "Row mismatch", measure_reference=measure_reference, legacy_row=legacy_row, sg_row=sg_row
-            )
+        # assert_linkable_element_set_snapshot_equal(
+        #     request=request,
+        #     snapshot_configuration=mf_test_configuration,
+        #     linkable_element_set=legacy_linkable_element_set,
+        #     set_id="legacy_result",
+        # )
+        #
+        # assert_linkable_element_set_snapshot_equal(
+        #     request=request,
+        #     snapshot_configuration=mf_test_configuration,
+        #     linkable_element_set=sg_linkable_element_set,
+        #     set_id="sg_result",
+        # )
+        #
+        # legacy_rows = convert_linkable_element_set_to_rows(legacy_linkable_element_set)
+        # sg_rows = convert_linkable_element_set_to_rows(sg_linkable_element_set)
+        #
+        # for row_index, (legacy_row, sg_row) in enumerate(itertools.zip_longest(legacy_rows, sg_rows)):
+        #     assert legacy_row is not None, LazyFormat(
+        #         "Missing row from `legacy_rows`",
+        #         measure_reference=measure_reference,
+        #         row_index=row_index,
+        #         legacy_row=legacy_row,
+        #         sg_row=sg_row,
+        #     )
+        #     assert sg_row is not None, LazyFormat(
+        #         "Missing row from `sg_rows`",
+        #         measure_reference=measure_reference,
+        #         row_index=row_index,
+        #         legacy_row=legacy_row,
+        #         sg_row=sg_row,
+        #     )
+        #     assert legacy_row == sg_row, LazyFormat(
+        #         "Row mismatch", measure_reference=measure_reference, legacy_row=legacy_row, sg_row=sg_row
+        #     )
 
 
 def _create_legacy_resolver(semantic_manifest: SemanticManifest) -> LegacyLinkableSpecResolver:
