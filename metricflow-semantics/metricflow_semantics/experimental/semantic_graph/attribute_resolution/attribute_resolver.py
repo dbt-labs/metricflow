@@ -381,7 +381,7 @@ class AttributeResolver:
     def generate_entity_key_queries(self, local_model_node: SemanticGraphNode) -> AnyLengthTuple[DsiEntityKeyQuery]:
         attribute_recipes = self._generate_recipes(
             source_node=local_model_node,
-            max_entity_links=2,
+            max_entity_links=1,
             allowed_nodes=self._traversable_nodes_for_finding_metric_subqueries,
         )
         attribute_recipes = self._remove_ambiguous_recipes(attribute_recipes)

@@ -36,7 +36,7 @@ class DunderNameWeightFunction(WeightFunction[SemanticGraphNode, SemanticGraphEd
 
     @override
     def incremental_weight(
-        self, path_to_node: AttributeRecipeWriterPath, next_edge: SemanticGraphEdge
+        self, path_to_node: AttributeRecipeWriterPath, next_edge: SemanticGraphEdge, path_weight_limit: int
     ) -> Optional[int]:
         # Don't allow traversal of the metric definition edges unless the previous edge in the path was also a metric
         # definition edge. This prevents unnecessary traversal when searching for group-by items as it prevents
