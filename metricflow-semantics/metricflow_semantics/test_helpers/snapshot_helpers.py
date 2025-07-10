@@ -357,7 +357,6 @@ def assert_linkable_element_set_snapshot_equal(  # noqa: D103
     set_id: str = "result",
     expectation_description: Optional[str] = None,
 ) -> None:
-    headers = ("Dunder Name", "Metric-Subquery Entity-Links", "Type", "Properties", "Derived-From Semantic Models")
     rows = convert_linkable_element_set_to_rows(linkable_element_set)
 
     assert_str_snapshot_equal(
@@ -365,7 +364,7 @@ def assert_linkable_element_set_snapshot_equal(  # noqa: D103
         snapshot_configuration=snapshot_configuration,
         snapshot_id=set_id,
         snapshot_str=tabulate.tabulate(
-            headers=headers,
+            headers="keys",
             tabular_data=sorted(rows, key=lambda row: tuple(row.values())),  # type: ignore[attr-defined]
         ),
         expectation_description=expectation_description,

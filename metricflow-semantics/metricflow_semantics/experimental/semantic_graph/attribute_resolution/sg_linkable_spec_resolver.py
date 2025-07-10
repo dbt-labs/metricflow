@@ -16,7 +16,7 @@ from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attri
 )
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_resolver import AttributeResolver
 from metricflow_semantics.experimental.semantic_graph.manifest_object_lookup import ManifestObjectLookup
-from metricflow_semantics.experimental.semantic_graph.nodes.node_label import MeasureAttributeLabel
+from metricflow_semantics.experimental.semantic_graph.nodes.node_label import MeasureLabel
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
     SemanticGraphEdge,
     SemanticGraphNode,
@@ -49,7 +49,7 @@ class SemanticGraphLinkableSpecResolver(LinkableSpecResolver):
         self, measure_reference: MeasureReference, element_filter: LinkableElementFilter
     ) -> BaseLinkableElementSet:
         matching_nodes = self._semantic_graph.nodes_with_label(
-            MeasureAttributeLabel(measure_name=measure_reference.element_name)
+            MeasureLabel(measure_name=measure_reference.element_name)
         )
         source_node = mf_first_item(
             matching_nodes,

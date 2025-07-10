@@ -57,7 +57,7 @@ class TimeEntitySubgraphGenerator(SemanticSubgraphGenerator):
                     tail_node=time_entity_node,
                     head_node=TimeAttributeNode.get_instance_for_time_grain(time_grain),
                     attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
-                    attribute_computation_update=AttributeRecipeUpdate(
+                    attribute_recipe_update=AttributeRecipeUpdate(
                         set_time_grain=ExpandedTimeGranularity(name=time_grain.value, base_granularity=time_grain),
                     ),
                 )
@@ -70,7 +70,7 @@ class TimeEntitySubgraphGenerator(SemanticSubgraphGenerator):
                     tail_node=time_entity_node,
                     head_node=attribute_node,
                     attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
-                    attribute_computation_update=AttributeRecipeUpdate(
+                    attribute_recipe_update=AttributeRecipeUpdate(
                         add_properties=(LinkableElementProperty.DATE_PART,),
                         set_date_part=queryable_date_part,
                     ),
@@ -85,7 +85,7 @@ class TimeEntitySubgraphGenerator(SemanticSubgraphGenerator):
                         tail_node=time_entity_node,
                         head_node=attribute_node,
                         attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
-                        attribute_computation_update=AttributeRecipeUpdate(
+                        attribute_recipe_update=AttributeRecipeUpdate(
                             add_properties=(LinkableElementProperty.DERIVED_TIME_GRANULARITY,),
                             set_time_grain=expanded_time_grain,
                         ),

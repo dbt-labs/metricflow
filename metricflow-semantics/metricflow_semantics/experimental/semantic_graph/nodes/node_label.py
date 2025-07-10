@@ -16,28 +16,28 @@ class SemanticGraphLabel(MetricflowGraphLabel):
 
 
 @singleton_dataclass()
-class MeasureAttributeLabel(MetricflowGraphLabel):
+class MeasureLabel(MetricflowGraphLabel):
     """The name of the measure or `None` for any measure."""
 
     measure_name: Optional[str]
 
     @staticmethod
-    def get_instance(measure_name: Optional[str] = None) -> MeasureAttributeLabel:  # noqa: D102
-        return MeasureAttributeLabel(measure_name=measure_name)
+    def get_instance(measure_name: Optional[str] = None) -> MeasureLabel:  # noqa: D102
+        return MeasureLabel(measure_name=measure_name)
 
-    def get_instance_from_reference(self, measure_reference: MeasureReference) -> MeasureAttributeLabel:  # noqa: D102
-        return MeasureAttributeLabel(measure_name=measure_reference.element_name)
+    def get_instance_from_reference(self, measure_reference: MeasureReference) -> MeasureLabel:  # noqa: D102
+        return MeasureLabel(measure_name=measure_reference.element_name)
 
 
 @singleton_dataclass()
-class MetricAttributeLabel(MetricflowGraphLabel):
+class GroupByMetricLabel(MetricflowGraphLabel):
     """The name of the metric or `None` for any metric."""
 
     metric_name: Optional[str]
 
     @staticmethod
-    def get_instance(metric_name: Optional[str] = None) -> MetricAttributeLabel:
-        return MetricAttributeLabel(metric_name=metric_name)
+    def get_instance(metric_name: Optional[str] = None) -> GroupByMetricLabel:
+        return GroupByMetricLabel(metric_name=metric_name)
 
 
 @singleton_dataclass()

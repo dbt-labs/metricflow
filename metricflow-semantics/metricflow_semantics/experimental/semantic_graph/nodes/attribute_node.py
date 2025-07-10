@@ -20,9 +20,9 @@ from metricflow_semantics.experimental.semantic_graph.attribute_computation impo
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
     GroupByAttributeLabel,
+    GroupByMetricLabel,
     KeyEntityClusterLabel,
-    MeasureAttributeLabel,
-    MetricAttributeLabel,
+    MeasureLabel,
     TimeClusterLabel,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
@@ -117,9 +117,7 @@ class MeasureNode(AttributeNode):
         return MeasureNode(
             attribute_name=measure_name,
             model_id=model_id,
-            _labels=FrozenOrderedSet(
-                (MeasureAttributeLabel(measure_name=None), MeasureAttributeLabel(measure_name=measure_name))
-            ),
+            _labels=FrozenOrderedSet((MeasureLabel(measure_name=None), MeasureLabel(measure_name=measure_name))),
         )
 
     @property
@@ -210,10 +208,10 @@ class CategoricalDimensionAttributeNode(AttributeNode):
 
 
 @singleton_dataclass(order=False)
-class MetricAttributeNode(AttributeNode):
+class GroupByMetricNode(AttributeNode):
     @staticmethod
-    def get_instance(metric_name: str) -> MetricAttributeNode:  # noqa: D102
-        return MetricAttributeNode(attribute_name=metric_name)
+    def get_instance(metric_name: str) -> GroupByMetricNode:  # noqa: D102
+        return GroupByMetricNode(attribute_name=metric_name)
 
     @property
     @override
@@ -235,10 +233,10 @@ class MetricAttributeNode(AttributeNode):
     @override
     @cached_property
     def labels(self) -> FrozenOrderedSet[MetricflowGraphLabel]:
-        return super(MetricAttributeNode, self).labels.union(
+        return super(GroupByMetricNode, self).labels.union(
             (
                 GroupByAttributeLabel.get_instance(),
-                MetricAttributeLabel.get_instance(),
-                MetricAttributeLabel.get_instance(metric_name=self.attribute_name),
+                GroupByMetricLabel.get_instance(),
+                GroupByMetricLabel.get_instance(metric_name=self.attribute_name),
             )
         )

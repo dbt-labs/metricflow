@@ -105,6 +105,16 @@ class MutableOrderedSet(Generic[HashableT], OrderedSet[HashableT], MutableSet[Ha
             for item in iterable:
                 self._set_as_dict[item] = None
 
+    def intersection_update(self, *sets_to_interset: Set[HashableT]) -> None:  # noqa: D102
+        common_items: set[HashableT] = set(self._set_as_dict)
+        for set_to_intersect in sets_to_interset:
+            common_items.intersection_update(set_to_intersect)
+        keys_to_delete = set(self._set_as_dict.keys())
+        keys_to_delete.difference_update(common_items)
+
+        for key_to_delete in keys_to_delete:
+            del self._set_as_dict[key_to_delete]
+
     @override
     def add(self, value: HashableT) -> None:
         self._set_as_dict[value] = None

@@ -45,13 +45,13 @@ class EntityAttributeEdge(SemanticGraphEdge):
         tail_node: SemanticGraphNode,
         head_node: SemanticGraphNode,
         attribute_edge_type: AttributeEdgeType,
-        attribute_computation_update: Optional[AttributeRecipeUpdate] = None,
+        attribute_recipe_update: Optional[AttributeRecipeUpdate] = None,
     ) -> EntityAttributeEdge:
         return EntityAttributeEdge(
             _tail_node=tail_node,
             _head_node=head_node,
             attribute_edge_type=attribute_edge_type,
-            _recipe_update=attribute_computation_update or AttributeRecipeUpdate(),
+            _recipe_update=attribute_recipe_update or AttributeRecipeUpdate(),
         )
 
     @override
@@ -65,7 +65,7 @@ class EntityAttributeEdge(SemanticGraphEdge):
         return EntityAttributeEdge.get_instance(
             tail_node=self._head_node,
             head_node=self._tail_node,
-            attribute_computation_update=self._recipe_update,
+            attribute_recipe_update=self._recipe_update,
             attribute_edge_type=self.attribute_edge_type.inverse,
         )
 

@@ -69,7 +69,7 @@ class MeasureAttributeSubgraphGenerator(SemanticSubgraphGenerator):
                     EntityRelationshipEdge.get_instance(
                         tail_node=measure_node,
                         head_node=metric_time_node,
-                        attribute_computation_update=AttributeRecipeUpdate(
+                        recipe_update=AttributeRecipeUpdate(
                             add_min_time_grain=aggregation_configuration.time_grain,
                         ),
                     )

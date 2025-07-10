@@ -14,7 +14,7 @@ from metricflow_semantics.experimental.semantic_graph.builder.graph_change_rule 
 from metricflow_semantics.experimental.semantic_graph.edges.entity_relationship import MetricDefinitionEdge
 from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import MetricNode
 from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
-    MeasureAttributeLabel,
+    MeasureLabel,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
     SemanticGraphNode,
@@ -62,9 +62,7 @@ class MetricSubgraphGenerator(SemanticSubgraphGenerator):
             return
         required_measure_nodes = MutableOrderedSet[SemanticGraphNode]()
         for measure in metric.input_measures:
-            measure_node = mf_first_item(
-                current_graph.nodes_with_label(MeasureAttributeLabel(measure_name=measure.name))
-            )
+            measure_node = mf_first_item(current_graph.nodes_with_label(MeasureLabel(measure_name=measure.name)))
             required_measure_nodes.add(measure_node)
 
         for measure_node in required_measure_nodes:

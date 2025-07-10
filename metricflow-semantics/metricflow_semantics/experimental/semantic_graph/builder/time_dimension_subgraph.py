@@ -59,7 +59,7 @@ class TimeDimensionSubgraphGenerator(SemanticSubgraphGenerator):
                 EntityRelationshipEdge.get_instance(
                     tail_node=semantic_model_node,
                     head_node=time_dimension_node,
-                    attribute_computation_update=AttributeRecipeUpdate(
+                    recipe_update=AttributeRecipeUpdate(
                         add_min_time_grain=time_grain,
                     ),
                 )

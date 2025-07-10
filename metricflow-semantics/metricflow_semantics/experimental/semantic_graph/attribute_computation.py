@@ -13,6 +13,7 @@ from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_data
 from metricflow_semantics.experimental.mf_graph.comparable import Comparable, ComparisonKey
 from metricflow_semantics.experimental.mf_graph.graph_element import HasDisplayedProperty
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
+from metricflow_semantics.experimental.semantic_graph.attribute_resolution.key_query_set import DsiEntityKeyQuerySet
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
@@ -34,7 +35,7 @@ class AttributeRecipeUpdate(HasDisplayedProperty, Comparable):
     add_properties: AnyLengthTuple[LinkableElementProperty] = ()
     join_model: Optional[SemanticModelId] = None
     add_min_time_grain: Optional[TimeGranularity] = None
-    add_subquery_model_ids: AnyLengthTuple[SemanticModelId] = ()
+    provide_key_query_set: Optional[DsiEntityKeyQuerySet] = None
 
     # The fields below are specifically to support current definition of `*Spec` objects.
     set_element_type: Optional[LinkableElementType] = None
@@ -54,7 +55,7 @@ class AttributeRecipeUpdate(HasDisplayedProperty, Comparable):
             self.add_entity_link,
             self.set_time_grain,
             self.set_date_part.to_int() if self.set_date_part is not None else None,
-            self.add_subquery_model_ids,
+            self.provide_key_query_set,
         )
 
     @override
@@ -73,8 +74,11 @@ class AttributeRecipeUpdate(HasDisplayedProperty, Comparable):
             properties.append(DisplayedProperty("join_model", self.join_model.model_name))
         if self.add_min_time_grain is not None:
             properties.append(DisplayedProperty("set_min_grain", self.add_min_time_grain.name))
-        for subquery_model_id in self.add_subquery_model_ids:
-            properties.append(DisplayedProperty("add_subquery_model", subquery_model_id))
+        if self.provide_key_query_set is not None:
+            for model_id in self.provide_key_query_set.source_model_ids:
+                properties.append(DisplayedProperty("key_query_model", model_id))
+            for key_query in self.provide_key_query_set.entity_key_queries:
+                properties.append(DisplayedProperty("key_query", key_query))
         if self.set_element_type is not None:
             properties.append(DisplayedProperty("add_type", self.set_element_type.name))
         if self.add_entity_link is not None:
@@ -93,7 +97,7 @@ class AttributeRecipe:
     models_in_join: AnyLengthTuple[SemanticModelId] = ()
     properties: FrozenOrderedSet[LinkableElementProperty] = FrozenOrderedSet()
     entity_link_names: AnyLengthTuple[str] = ()
-    subquery_model_ids: FrozenOrderedSet[SemanticModelId] = FrozenOrderedSet()
+    key_query_set: Optional[DsiEntityKeyQuerySet] = None
 
     element_type: Optional[LinkableElementType] = None
     min_time_grain: Optional[TimeGranularity] = None
@@ -130,7 +134,7 @@ class AttributeRecipe:
             min_time_grain=update.add_min_time_grain or self.min_time_grain,
             time_grain=update.set_time_grain or self.time_grain,
             date_part=update.set_date_part or self.date_part,
-            subquery_model_ids=self.subquery_model_ids.union(update.add_subquery_model_ids),
+            key_query_set=update.provide_key_query_set or self.key_query_set,
         )
 
 

@@ -15,6 +15,10 @@ from metricflow_semantics.experimental.semantic_graph.attribute_computation impo
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
     AttributeRecipeWriterPath,
 )
+from metricflow_semantics.experimental.semantic_graph.attribute_resolution.key_query_set import (
+    DsiEntityKeyQuerySet,
+    EntityKeyQuery,
+)
 from metricflow_semantics.experimental.semantic_graph.builder.dunder_name_weight import DunderNameWeightFunction
 from metricflow_semantics.experimental.semantic_graph.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
@@ -22,11 +26,11 @@ from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import L
 from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
     DsiEntityLabel,
     GroupByAttributeLabel,
+    GroupByMetricLabel,
     JoinedModelLabel,
     KeyEntityClusterLabel,
     LocalModelLabel,
-    MeasureAttributeLabel,
-    MetricAttributeLabel,
+    MeasureLabel,
     TimeClusterLabel,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
@@ -98,8 +102,8 @@ class AttributeResolver:
         nodes = MutableOrderedSet[SemanticGraphNode]()
 
         for label in (
-            MetricAttributeLabel.get_instance(),
-            MeasureAttributeLabel.get_instance(),
+            GroupByMetricLabel.get_instance(),
+            MeasureLabel.get_instance(),
         ):
             nodes.update(self._semantic_graph.nodes_with_label(label))
         return nodes
@@ -109,8 +113,8 @@ class AttributeResolver:
         nodes = MutableOrderedSet[SemanticGraphNode]()
 
         for label in (
-            MetricAttributeLabel.get_instance(),
-            MeasureAttributeLabel.get_instance(),
+            GroupByMetricLabel.get_instance(),
+            MeasureLabel.get_instance(),
             LocalModelLabel.get_instance(),
         ):
             nodes.update(self._semantic_graph.nodes_with_label(label))
@@ -121,8 +125,8 @@ class AttributeResolver:
         nodes = MutableOrderedSet[SemanticGraphNode]()
 
         for label in (
-            MetricAttributeLabel.get_instance(),
-            MeasureAttributeLabel.get_instance(),
+            GroupByMetricLabel.get_instance(),
+            MeasureLabel.get_instance(),
             TimeClusterLabel.get_instance(),
         ):
             nodes.update(self._semantic_graph.nodes_with_label(label))
@@ -136,7 +140,7 @@ class AttributeResolver:
                 graph=self._semantic_graph,
                 source_nodes=FrozenOrderedSet((source_node,)),
                 candidate_target_nodes=candidate_target_nodes,
-                traversable_nodes=traversable_nodes,
+                allowed_nodes=traversable_nodes,
             )
         )
         if len(model_nodes) != 1:
@@ -152,14 +156,14 @@ class AttributeResolver:
         return model_nodes[0]
 
     def _find_nearest_measure_node(self, source_node: SemanticGraphNode) -> SemanticGraphNode:
-        candidate_target_nodes = self._semantic_graph.nodes_with_label(MeasureAttributeLabel.get_instance())
+        candidate_target_nodes = self._semantic_graph.nodes_with_label(MeasureLabel.get_instance())
         traversable_nodes = self._traversable_nodes_for_finding_measure_nodes
         measure_nodes = tuple(
             self._path_finder.find_reachable_targets(
                 graph=self._semantic_graph,
                 source_nodes=FrozenOrderedSet((source_node,)),
                 candidate_target_nodes=candidate_target_nodes,
-                traversable_nodes=traversable_nodes,
+                allowed_nodes=traversable_nodes,
             )
         )
         if len(measure_nodes) != 1:
@@ -264,13 +268,20 @@ class AttributeResolver:
             origin_model_ids = FrozenOrderedSet((last_model_id,))
 
             if element_type is LinkableElementType.METRIC:
+                if recipe.key_query_set is None:
+                    raise RuntimeError(
+                        LazyFormat(
+                            "Missing key-query set to generate a group-by-metric spec",
+                            recipe=recipe,
+                        )
+                    )
                 dunder_name_to_annotated_spec.update(
                     self._generate_group_by_metric_specs(
                         metric_name=default_element_name,
                         entity_links=default_entity_links,
                         properties=properties,
                         source_models=derived_from_semantic_models,
-                        subquery_model_ids=recipe.subquery_model_ids,
+                        key_query_set=recipe.key_query_set,
                     )
                 )
             elif element_type is LinkableElementType.ENTITY:
@@ -366,6 +377,16 @@ class AttributeResolver:
 
         return attribute_recipes
 
+    def generate_entity_key_queries(self, local_model_node: SemanticGraphNode) -> MutableOrderedSet[EntityKeyQuery]:
+        attribute_recipes = self._generate_recipes(
+            source_node=local_model_node,
+            max_entity_links=2,
+            traversable_nodes=self._traversable_nodes_for_finding_metric_subqueries,
+        )
+        attribute_recipes = self._remove_ambiguous_recipes(attribute_recipes)
+
+        return MutableOrderedSet(recipe.dunder_name_elements for recipe in attribute_recipes)
+
     def _get_metric_subqueries_for_model(self, model_id: SemanticModelId) -> OrderedSet[MetricSubquery]:
         metric_subqueries = self._semantic_model_id_to_metric_subqueries.get(model_id)
         if metric_subqueries is not None:
@@ -440,19 +461,19 @@ class AttributeResolver:
         entity_links: Sequence[EntityReference],
         properties: OrderedSet[LinkableElementProperty],
         source_models: OrderedSet[SemanticModelReference],
-        subquery_model_ids: OrderedSet[SemanticModelId],
+        key_query_set: DsiEntityKeyQuerySet,
     ) -> dict[str, AnnotatedSpec]:
         dunder_name_to_annotated_spec: dict[str, AnnotatedSpec] = {}
 
-        for metric_subquery in self._get_metric_subqueries_for_models(tuple(subquery_model_ids)):
-            if entity_links[-1].element_name != metric_subquery.metric_subquery_elements[-1]:
-                continue
+        # for metric_subquery in self._get_metric_subqueries_for_models(tuple(subquery_model_ids)):
+        for key_query in key_query_set.entity_key_queries:
+            # if entity_links[-1].element_name != key_query[-1]:
+            #     continue
+
             spec = GroupByMetricSpec(
                 element_name=metric_name,
                 entity_links=tuple(entity_links),
-                metric_subquery_entity_links=tuple(
-                    EntityReference(element_name) for element_name in metric_subquery.metric_subquery_elements
-                ),
+                metric_subquery_entity_links=tuple(EntityReference(element_name) for element_name in key_query),
             )
 
             dunder_name_to_annotated_spec[spec.qualified_name] = AnnotatedSpec.create(
@@ -465,7 +486,7 @@ class AttributeResolver:
                     ),
                 ),
                 derived_from_semantic_models=source_models.union(
-                    model_id.semantic_model_reference for model_id in metric_subquery.source_model_ids
+                    model_id.semantic_model_reference for model_id in key_query_set.source_model_ids
                 ),
             )
         return dunder_name_to_annotated_spec

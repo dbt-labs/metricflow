@@ -14,7 +14,7 @@ from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node impor
 from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
     DsiEntityLabel,
     GroupByAttributeLabel,
-    MeasureAttributeLabel,
+    MeasureLabel,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
     SemanticGraphEdge,
@@ -66,7 +66,7 @@ def test_labels(  # noqa: D103
         path_finder=path_finder,
     )
     graph = builder.build()
-    labels = (DsiEntityLabel(), MeasureAttributeLabel(measure_name=None), GroupByAttributeLabel())
+    labels = (DsiEntityLabel(), MeasureLabel(measure_name=None), GroupByAttributeLabel())
     assert_object_snapshot_equal(
         request=request,
         snapshot_configuration=mf_test_configuration,

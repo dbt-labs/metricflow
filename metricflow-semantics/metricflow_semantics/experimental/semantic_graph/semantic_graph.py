@@ -58,7 +58,7 @@ class MutableSemanticGraph(MutableGraph[SemanticGraphNode, SemanticGraphEdge], S
 
     @override
     def inverse(self) -> MutableSemanticGraph:
-        inverse_graph = MutableSemanticGraph.create(graph_id=self.graph_id)
+        inverse_graph = MutableSemanticGraph.create()
         for edge in self.edges:
             inverse_graph.add_edge(edge.inverse)
         return inverse_graph

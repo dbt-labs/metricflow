@@ -13,7 +13,7 @@ from metricflow_semantics.experimental.semantic_graph.builder.group_by_attribute
     GroupByAttributeSubgraphGenerator,
 )
 from metricflow_semantics.experimental.semantic_graph.manifest_object_lookup import ManifestObjectLookup
-from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import MetricAttributeNode
+from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import GroupByMetricNode
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
     SemanticGraphEdge,
     SemanticGraphNode,
@@ -68,7 +68,7 @@ def test_group_by_attribute_subgraph(  # noqa: D103
         path_finder=path_finder,
     )
     graph = builder.build()
-    metric_node = MetricAttributeNode(attribute_name="sm_0_measure_0_metric")
+    metric_node = GroupByMetricNode(attribute_name="sm_0_measure_0_metric")
 
     subgraph_generator = GroupByAttributeSubgraphGenerator(
         semantic_graph=graph,

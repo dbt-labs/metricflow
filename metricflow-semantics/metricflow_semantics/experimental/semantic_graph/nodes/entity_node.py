@@ -359,7 +359,7 @@ class MetricTimeNode(SemanticGraphNode):
         )
 
     @override
-    @property
+    @cached_property
     def attribute_recipe_update(self) -> AttributeRecipeUpdate:
         return AttributeRecipeUpdate(
             add_dunder_name_element=METRIC_TIME_ELEMENT_NAME,
@@ -483,6 +483,13 @@ class MetricNode(SemanticGraphNode):
                 MetricLabel.get_instance(),
                 MetricLabel.get_instance(self.metric_name),
             )
+        )
+
+    @override
+    @property
+    def attribute_recipe_update(self) -> AttributeRecipeUpdate:
+        return AttributeRecipeUpdate(
+            add_dunder_name_element=self.metric_name,
         )
 
 

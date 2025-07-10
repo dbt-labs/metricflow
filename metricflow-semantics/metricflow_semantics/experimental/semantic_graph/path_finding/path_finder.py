@@ -452,7 +452,7 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
         graph: MetricflowGraph[NodeT, EdgeT],
         source_nodes: OrderedSet[NodeT],
         candidate_target_nodes: OrderedSet[NodeT],
-        traversable_nodes: OrderedSet[NodeT],
+        allowed_nodes: OrderedSet[NodeT],
     ) -> OrderedSet[NodeT]:
         finished_nodes = MutableOrderedSet[NodeT]()
         nodes_to_evaluate = list(source_nodes)
@@ -464,7 +464,7 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
                     "Starting search for reachable targets",
                     source_nodes=source_nodes,
                     candidate_target_nodes=candidate_target_nodes,
-                    traversable_nodes=traversable_nodes,
+                    allowed_nodes=allowed_nodes,
                 )
             )
 
@@ -484,7 +484,7 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
 
             for edge in graph.edges_with_tail_node(current_node):
                 head_node = edge.head_node
-                if head_node in traversable_nodes:
+                if head_node in allowed_nodes:
                     nodes_to_evaluate.append(head_node)
 
         return matching_target_nodes

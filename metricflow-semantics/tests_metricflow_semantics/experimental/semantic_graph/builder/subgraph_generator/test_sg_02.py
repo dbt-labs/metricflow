@@ -23,7 +23,7 @@ from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node impor
 from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
     DsiEntityLabel,
     GroupByAttributeLabel,
-    MeasureAttributeLabel,
+    MeasureLabel,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
     SemanticGraphEdge,
@@ -65,12 +65,13 @@ def test_all(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     simple_semantic_manifest: PydanticSemanticManifest,
+    sg_02_single_join_manifest: PydanticSemanticManifest,
     sg_04_common_unique_entity_manifest: PydanticSemanticManifest,
 ) -> None:
     check_subgraph_generation(
         request=request,
         mf_test_configuration=mf_test_configuration,
-        manifest_object_lookup=ManifestObjectLookup(simple_semantic_manifest),
+        manifest_object_lookup=ManifestObjectLookup(sg_02_single_join_manifest),
         subgraph_generators=SemanticGraphBuilder._ALL_SUBGRAPH_GENERATORS,
     )
 
@@ -89,7 +90,7 @@ def test_labels(  # noqa: D103
         path_finder=path_finder,
     )
     graph = builder.build()
-    labels = (DsiEntityLabel(), MeasureAttributeLabel(measure_name=None), GroupByAttributeLabel())
+    labels = (DsiEntityLabel(), MeasureLabel(measure_name=None), GroupByAttributeLabel())
     assert_object_snapshot_equal(
         request=request,
         snapshot_configuration=mf_test_configuration,
@@ -155,7 +156,7 @@ def test_group_by_attribute_subgraph(  # noqa: D103
     graph = builder.build()
     # source_node = MetricNode(attribute_name="sm_0_measure_0_metric")
     measure_name = "sm_0_measure_0"
-    matching_nodes = graph.nodes_with_label(MeasureAttributeLabel.get_instance(measure_name))
+    matching_nodes = graph.nodes_with_label(MeasureLabel.get_instance(measure_name))
     if len(matching_nodes) != 1:
         raise RuntimeError(LazyFormat("Found more than one matching measure node"))
     measure_node = mf_first_item(matching_nodes)
@@ -326,4 +327,4 @@ def test_resolver_outputs(
     sg_06_ambiguous_join_manifest: PydanticSemanticManifest,
     simple_semantic_manifest: PydanticSemanticManifest,
 ) -> None:
-    LinkableSpecResolverTester.compare_resolver_outputs_for_measures(simple_semantic_manifest)
+    LinkableSpecResolverTester.compare_resolver_outputs_for_measures(sg_02_single_join_manifest)

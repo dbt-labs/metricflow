@@ -36,26 +36,26 @@ class EntityRelationship(OrderedEnum):
 @singleton_dataclass(order=False)
 class EntityRelationshipEdge(SemanticGraphEdge):
     relationship: EntityRelationship
-    _attribute_computation_update: AttributeRecipeUpdate
+    _recipe_update: AttributeRecipeUpdate
 
     @staticmethod
     def get_instance(
         tail_node: SemanticGraphNode,
         head_node: SemanticGraphNode,
         relationship: EntityRelationship = EntityRelationship.VALID,
-        attribute_computation_update: AttributeRecipeUpdate = AttributeRecipeUpdate(),
+        recipe_update: AttributeRecipeUpdate = AttributeRecipeUpdate(),
     ) -> EntityRelationshipEdge:
         return EntityRelationshipEdge(
             _tail_node=tail_node,
             _head_node=head_node,
             relationship=relationship,
-            _attribute_computation_update=attribute_computation_update,
+            _recipe_update=recipe_update,
         )
 
     @override
     @cached_property
     def comparison_key(self) -> ComparisonKey:
-        return (self._tail_node, self._head_node, self.relationship, self._attribute_computation_update)
+        return (self._tail_node, self._head_node, self.relationship, self._recipe_update)
 
     @override
     @cached_property
@@ -64,13 +64,13 @@ class EntityRelationshipEdge(SemanticGraphEdge):
             tail_node=self._head_node,
             relationship=self.relationship.inverse,
             head_node=self._tail_node,
-            attribute_computation_update=self._attribute_computation_update,
+            recipe_update=self._recipe_update,
         )
 
     @override
     @property
     def attribute_recipe_update(self) -> AttributeRecipeUpdate:
-        return self._attribute_computation_update
+        return self._recipe_update
 
 
 @singleton_dataclass(order=False)

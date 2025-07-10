@@ -12,11 +12,11 @@ from metricflow_semantics.experimental.semantic_graph.builder.group_by_attribute
 )
 from metricflow_semantics.experimental.semantic_graph.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
-from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import MeasureNode, MetricAttributeNode
+from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import GroupByMetricNode, MeasureNode
 from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
     DsiEntityLabel,
     GroupByAttributeLabel,
-    MeasureAttributeLabel,
+    MeasureLabel,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
     SemanticGraphEdge,
@@ -70,7 +70,7 @@ def test_labels(  # noqa: D103
         path_finder=path_finder,
     )
     graph = builder.build()
-    labels = (DsiEntityLabel(), MeasureAttributeLabel(measure_name=None), GroupByAttributeLabel())
+    labels = (DsiEntityLabel(), MeasureLabel(measure_name=None), GroupByAttributeLabel())
     assert_object_snapshot_equal(
         request=request,
         snapshot_configuration=mf_test_configuration,
@@ -133,7 +133,7 @@ def test_group_by_attribute_subgraph(  # noqa: D103
         path_finder=path_finder,
     )
     graph = builder.build()
-    metric_node = MetricAttributeNode(attribute_name="sm_0_measure_0_metric")
+    metric_node = GroupByMetricNode(attribute_name="sm_0_measure_0_metric")
 
     subgraph_generator = GroupByAttributeSubgraphGenerator(
         semantic_graph=graph,
