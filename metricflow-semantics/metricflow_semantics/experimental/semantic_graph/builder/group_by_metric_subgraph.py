@@ -152,10 +152,7 @@ class _GenerateGroupByMetricSubgraphContext:
                     )
                 )
             result[local_model_node] = DsiEntityKeyQuerySet(
-                source_model_ids=FrozenOrderedSet((model_id,)),
-                entity_key_queries=FrozenOrderedSet(
-                    self._attribute_resolver.generate_entity_key_queries(local_model_node)
-                ),
+                entity_key_queries=self._attribute_resolver.generate_entity_key_queries(local_model_node),
             )
         return result
 
@@ -298,7 +295,9 @@ class _GenerateGroupByMetricSubgraphContext:
 
             group_by_metric_node = GroupByMetricNode.get_instance(metric_name)
 
-            key_names = FrozenOrderedSet(entity_key_query[-1] for entity_key_query in key_query_set.entity_key_queries)
+            key_names = FrozenOrderedSet(
+                entity_key_query.query_dunder_name_elements[-1] for entity_key_query in key_query_set.entity_key_queries
+            )
 
             for key_name in key_names:
                 key_entity_node = KeyEntityNode.get_instance(key_name)
@@ -308,6 +307,8 @@ class _GenerateGroupByMetricSubgraphContext:
                         attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
                         head_node=group_by_metric_node,
                         attribute_recipe_update=AttributeRecipeUpdate(
+                            add_dunder_name_element=key_name,
+                            add_entity_link=key_name,
                             provide_key_query_set=key_query_set.filter_by_key_name(key_name),
                         ),
                     )

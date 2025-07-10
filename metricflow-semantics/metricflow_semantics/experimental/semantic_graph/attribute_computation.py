@@ -75,10 +75,13 @@ class AttributeRecipeUpdate(HasDisplayedProperty, Comparable):
         if self.add_min_time_grain is not None:
             properties.append(DisplayedProperty("set_min_grain", self.add_min_time_grain.name))
         if self.provide_key_query_set is not None:
-            for model_id in self.provide_key_query_set.source_model_ids:
-                properties.append(DisplayedProperty("key_query_model", model_id))
-            for key_query in self.provide_key_query_set.entity_key_queries:
-                properties.append(DisplayedProperty("key_query", key_query))
+            for i, key_query in enumerate(self.provide_key_query_set.entity_key_queries):
+                properties.append(DisplayedProperty(f"key_query_{i}", key_query.query_dunder_name_elements))
+                properties.append(
+                    DisplayedProperty(
+                        f"key_query_{i}_models", [model_id.model_name for model_id in key_query.accessed_model_ids]
+                    )
+                )
         if self.set_element_type is not None:
             properties.append(DisplayedProperty("add_type", self.set_element_type.name))
         if self.add_entity_link is not None:

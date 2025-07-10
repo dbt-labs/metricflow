@@ -163,7 +163,7 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
         max_path_weight: int,
         allow_node_revisits: bool,
         # allow_simple_cycle: bool,
-        traversable_nodes: Optional[OrderedSet[NodeT]] = None,
+        allowed_nodes: Optional[OrderedSet[NodeT]] = None,
     ) -> Generator[WalkStopEvent, None, None]:
         # Visit the descendants in DFS, starting from the source node.
         mutable_path.reset_to_start_node(source_node)
@@ -178,7 +178,7 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
                 edges_to_process_from_this_node=self._filter_edges_from_node_by_traversable_nodes(
                     source_node=source_node,
                     graph=graph,
-                    traversable_nodes=traversable_nodes,
+                    traversable_nodes=allowed_nodes,
                 ),
             )
         ]
@@ -194,7 +194,7 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
                     weight_function=weight_function,
                     max_path_weight=max_path_weight,
                     allow_node_revisits=allow_node_revisits,
-                    traversable_nodes=traversable_nodes,
+                    traversable_nodes=allowed_nodes,
                 )
             )
 
@@ -340,7 +340,7 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
                 edges_to_visit=self._filter_edges_from_node_by_traversable_nodes(
                     source_node=next_edge_to_take.head_node,
                     graph=graph,
-                    traversable_nodes=traversable_nodes,
+                    traversable_nodes=allowed_nodes,
                 ),
             )
 
