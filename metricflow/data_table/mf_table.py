@@ -8,7 +8,7 @@ import threading
 import typing
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import Iterable, Iterator, List, Optional, Sequence, Tuple, Type
+from typing import Iterable, Iterator, List, Mapping, Optional, Sequence, Tuple, Type, Union
 
 import tabulate
 from metricflow_semantics.helpers.string_helpers import mf_indent
@@ -310,9 +310,10 @@ class _IsolatedTabulateRunner:
     @classmethod
     def tabulate(
         cls,
-        tabular_data: Sequence[Sequence[CellValue]],
-        headers: Sequence[str],
-        column_alignment: Optional[Sequence[str]],
+        tabular_data: Sequence[Union[Mapping[str, CellValue], Sequence[CellValue]]],
+        headers: Union[str, Sequence[str]],
+        column_alignment: Optional[Sequence[str]] = None,
+        tablefmt: str = "simple",
     ) -> str:
         """Produce a text table from the given data. Also see class docstring."""
         with _IsolatedTabulateRunner._STATE_LOCK:
@@ -349,6 +350,7 @@ class _IsolatedTabulateRunner:
                 headers=headers,
                 disable_numparse=disable_numparse,
                 colalign=column_alignment,
+                tablefmt=tablefmt,
             )
 
         return _IsolatedTabulateRunner._TABULATE_MODULE_COPY.tabulate(
@@ -356,4 +358,5 @@ class _IsolatedTabulateRunner:
             headers=headers,
             disable_numparse=disable_numparse,
             colalign=column_alignment,
+            tablefmt=tablefmt,
         )
