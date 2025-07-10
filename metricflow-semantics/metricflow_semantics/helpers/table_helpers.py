@@ -13,7 +13,7 @@ from metricflow.data_table.column_types import CellValue
 logger = logging.getLogger(__name__)
 
 
-class _IsolatedTabulateRunner:
+class IsolatedTabulateRunner:
     """Helps run `tabulate` with different module options.
 
     The `tabulate.tabulate` method uses some options defined in the module instead of being provided as arguments to
@@ -33,9 +33,9 @@ class _IsolatedTabulateRunner:
         tablefmt: str = "simple",
     ) -> str:
         """Produce a text table from the given data. Also see class docstring."""
-        with _IsolatedTabulateRunner._STATE_LOCK:
+        with IsolatedTabulateRunner._STATE_LOCK:
             try:
-                if _IsolatedTabulateRunner._TABULATE_MODULE_COPY is None:
+                if IsolatedTabulateRunner._TABULATE_MODULE_COPY is None:
                     tabulate_module_spec = importlib.util.find_spec("tabulate")
                     if tabulate_module_spec is None:
                         raise RuntimeError("Unable to find spec for `tabulate`.")
@@ -46,7 +46,7 @@ class _IsolatedTabulateRunner:
                         raise RuntimeError(f"Loader missing for {tabulate_module_spec=}")
                     tabulate_module_spec.loader.exec_module(tabulate_module_copy)
                     tabulate_module_copy.PRESERVE_WHITESPACE = True  # type: ignore[attr-defined]
-                    _IsolatedTabulateRunner._TABULATE_MODULE_COPY = tabulate_module_copy
+                    IsolatedTabulateRunner._TABULATE_MODULE_COPY = tabulate_module_copy
             except Exception:
                 logger.exception(
                     "Failed to load a copy of the `tabulate` module. This means that some table-formatting options "
@@ -57,7 +57,7 @@ class _IsolatedTabulateRunner:
         # result in unexpected values when coupled with the `--decimals` option, so disabling that feature.
         disable_numparse = True
 
-        if _IsolatedTabulateRunner._TABULATE_MODULE_COPY is None:
+        if IsolatedTabulateRunner._TABULATE_MODULE_COPY is None:
             logger.warning(
                 "Generating text table without required options set as there was an error loading the "
                 "`tabulate` module."
@@ -70,7 +70,7 @@ class _IsolatedTabulateRunner:
                 tablefmt=tablefmt,
             )
 
-        return _IsolatedTabulateRunner._TABULATE_MODULE_COPY.tabulate(
+        return IsolatedTabulateRunner._TABULATE_MODULE_COPY.tabulate(
             tabular_data=tabular_data,
             headers=headers,
             disable_numparse=disable_numparse,
