@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional
+from functools import cached_property
+from typing import Mapping, Optional
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
+from dbt_semantic_interfaces.type_enums import DatePart, TimeGranularity
 from typing_extensions import override
 
 from metricflow_semantics.experimental.semantic_graph.edges.edge_labels import MetricDefinitionLabel
@@ -159,6 +161,40 @@ class DunderNameWeightFunction(WeightFunction[SemanticGraphNode, SemanticGraphEd
                         )
                     )
                 return None
+        min_time_grain = next_attribute_recipe.min_time_grain
+        time_grain = next_attribute_recipe.time_grain
+        if (
+            min_time_grain is not None
+            and time_grain is not None
+            and time_grain.base_granularity.to_int() < min_time_grain.to_int()
+        ):
+            if self._verbose_debug_logs:
+                logger.debug(
+                    LazyFormat(
+                        "Blocking edge to time grain due to min time grain",
+                        next_node=next_edge.head_node,
+                        min_time_grain=min_time_grain,
+                        time_grain=time_grain,
+                    )
+                )
+            return None
+
+        date_part = next_attribute_recipe.date_part
+        if (
+            min_time_grain is not None
+            and date_part is not None
+            and min_time_grain > self._date_part_to_min_time_grain[date_part]
+        ):
+            if self._verbose_debug_logs:
+                logger.debug(
+                    LazyFormat(
+                        "Blocking edge to date part due to min time grain",
+                        next_node=next_edge.head_node,
+                        min_time_grain=next_attribute_recipe.min_time_grain,
+                        date_part=date_part,
+                    )
+                )
+            return None
 
         # if next_attribute_descriptor.element_type is not None:
         #     if (
@@ -216,3 +252,7 @@ class DunderNameWeightFunction(WeightFunction[SemanticGraphNode, SemanticGraphEd
             weight_added_by_taking_edge += 1
 
         return weight_added_by_taking_edge
+
+    @cached_property
+    def _date_part_to_min_time_grain(self) -> Mapping[DatePart, TimeGranularity]:
+        return {date_part: max(date_part.compatible_granularities) for date_part in DatePart}

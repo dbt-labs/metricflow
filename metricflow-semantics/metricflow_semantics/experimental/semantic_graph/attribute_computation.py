@@ -72,7 +72,7 @@ class AttributeRecipeUpdate(HasDisplayedProperty, Comparable):
         if self.join_model is not None:
             properties.append(DisplayedProperty("join_model", self.join_model.model_name))
         if self.add_min_time_grain is not None:
-            properties.append(DisplayedProperty("set_min_grain", self.add_min_time_grain.value))
+            properties.append(DisplayedProperty("set_min_grain", self.add_min_time_grain.name))
         for subquery_model_id in self.add_subquery_model_ids:
             properties.append(DisplayedProperty("add_subquery_model", subquery_model_id))
         if self.set_element_type is not None:

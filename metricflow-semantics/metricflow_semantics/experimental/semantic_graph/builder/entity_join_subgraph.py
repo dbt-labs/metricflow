@@ -99,6 +99,18 @@ class EntityJoinSubgraphGenerator(SemanticSubgraphGenerator):
                     )
                 )
 
+        # This is the primary entity written as a field value instead of an entity element.
+        primary_entity_name = lookup.semantic_model.primary_entity
+        if primary_entity_name is not None:
+            head_node = DsiEntityNode.get_instance(entity_name=primary_entity_name, model_id=model_id)
+            current_subgraph.add_edge(
+                JoinFromModelEdge.get_instance(
+                    tail_node=local_semantic_model_node,
+                    head_node=head_node,
+                    # recipe_update=update_recipe,
+                )
+            )
+
             # Handle the case where a foreign entity is defined in a semantic model, but a corresponding
             # primary / unique / ... entity is not defined in another semantic model.
             # if len(right_model_ids) == 0:

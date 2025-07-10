@@ -26,7 +26,6 @@ from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder i
 from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_cache import PathFinderCache
 from metricflow_semantics.experimental.singleton_decorator import singleton_dataclass
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.mf_logging.runtime import log_block_runtime
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.linkable_spec_index import LinkableSpecIndex
 from metricflow_semantics.model.semantics.linkable_spec_index_builder import LinkableSpecIndexBuilder
@@ -223,6 +222,7 @@ def test_semantic_graph_init_time() -> None:
 
     # with log_block_runtime("original init"):
     #     _time_original_init(semantic_manifest)
+
 
 @fast_frozen_dataclass()
 class DataclassId:

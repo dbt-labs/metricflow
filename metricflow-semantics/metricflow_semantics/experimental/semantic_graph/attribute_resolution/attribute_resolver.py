@@ -373,7 +373,7 @@ class AttributeResolver:
 
         attribute_recipes = self._generate_recipes(
             source_node=LocalModelNode.get_instance(model_id),
-            max_entity_links=1,
+            max_entity_links=2,
             traversable_nodes=self._traversable_nodes_for_finding_metric_subqueries,
         )
 

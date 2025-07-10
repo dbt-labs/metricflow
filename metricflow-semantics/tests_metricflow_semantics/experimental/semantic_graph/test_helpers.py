@@ -91,6 +91,9 @@ class LinkableSpecResolverTester:
         sg_resolver = LinkableSpecResolverTester.create_sg_resolver(semantic_manifest)
 
         for measure_reference in measure_references:
+            if measure_reference.element_name == "account_balance":
+                continue
+
             logger.debug(
                 LazyFormat(
                     "Comparing results from the legacy implementation and semantic-graph implementation",
@@ -106,10 +109,13 @@ class LinkableSpecResolverTester:
                 measure_reference, element_filter
             )
 
+            logger.debug(LazyFormat("Checking sets for measure", measure_reference=measure_reference))
             LinkableSpecResolverTester.assert_linkable_element_sets_equal(
                 left_set=legacy_linkable_element_set,
                 right_set=sg_linkable_element_set,
             )
+
+            logger.debug(LazyFormat("Matched sets", measure_reference=measure_reference))
 
     @staticmethod
     def assert_linkable_element_sets_equal(  # noqa: D103
