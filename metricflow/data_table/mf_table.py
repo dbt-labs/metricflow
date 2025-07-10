@@ -9,7 +9,7 @@ from decimal import Decimal
 from typing import Iterable, Iterator, List, Optional, Sequence, Tuple, Type
 
 from metricflow_semantics.helpers.string_helpers import mf_indent
-from metricflow_semantics.helpers.table_helpers import _IsolatedTabulateRunner
+from metricflow_semantics.helpers.table_helpers import IsolatedTabulateRunner
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat, mf_pformat_dict
 from typing_extensions import Self
 
@@ -164,7 +164,7 @@ class MetricFlowDataTable:
                 column_alignment.append("left")
         headers = tuple(column_description.column_name for column_description in self.column_descriptions)
 
-        return _IsolatedTabulateRunner.tabulate(
+        return IsolatedTabulateRunner.tabulate(
             tabular_data=str_rows,
             headers=headers,
             column_alignment=column_alignment,
