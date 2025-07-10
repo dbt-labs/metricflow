@@ -3,8 +3,6 @@ from __future__ import annotations
 import logging
 from collections import defaultdict
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.type_enums import EntityType
 from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import Pair

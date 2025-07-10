@@ -12,9 +12,6 @@ from typing import Any, Callable, Mapping, Optional, Tuple, TypeVar
 import _pytest.fixtures
 import tabulate
 from _pytest.fixtures import FixtureRequest
-from tests_metricflow_semantics.experimental.semantic_graph.linkable_element_set_helpers import (
-    convert_linkable_element_set_to_rows,
-)
 
 from metricflow_semantics.dag.mf_dag import MetricFlowDag
 from metricflow_semantics.helpers.string_helpers import mf_indent
@@ -23,7 +20,7 @@ from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseLinkableElementSet
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
-from metricflow_semantics.specs.spec_set import InstanceSpecSet
+from metricflow_semantics.specs.spec_set import InstanceSpecSet, group_spec_by_type
 from metricflow_semantics.test_helpers.terminal_helpers import mf_colored_link_text
 
 logger = logging.getLogger(__name__)
@@ -298,6 +295,59 @@ def assert_plan_snapshot_text_equal(
 
 
 LinkableElementSetSnapshotRowDict = dict[str, str]
+
+
+def convert_linkable_element_set_to_rows(
+    linkable_element_set: BaseLinkableElementSet,
+) -> list[dict[str, str]]:
+    rows: list[dict[str, str]] = []
+
+    # ("Type", "Dunder Name", "Metric-Subquery Entity-Links", "Properties", "Derived-From Semantic Models")
+
+    for annotated_spec in sorted(
+        linkable_element_set.annotated_specs,
+        key=lambda annotated_spec_in_lambda: annotated_spec_in_lambda.spec.qualified_name,
+    ):
+        # row: LinkableElementSetSnapshotRow = [annotated_spec.element_type.name, annotated_spec.spec.qualified_name]
+        row_dict: dict[str, str] = {
+            "Dunder Name": annotated_spec.spec.qualified_name.ljust(78),
+        }
+        spec_set = group_spec_by_type(annotated_spec.spec)
+
+        if len(spec_set.group_by_metric_specs) == 0:
+            # row.append(None)
+            row_dict["Metric-Subquery Entity-Links"] = ""
+        elif len(spec_set.group_by_metric_specs) == 1:
+            group_by_metric_spec = spec_set.group_by_metric_specs[0]
+            # row.append([entity_link.element_name for entity_link in group_by_metric_spec.metric_subquery_entity_links])
+            row_dict["Metric-Subquery Entity-Links"] = ",".join(
+                entity_link.element_name for entity_link in group_by_metric_spec.metric_subquery_entity_links
+            )
+        else:
+            raise RuntimeError(LazyFormat("There should have been at most 1 group-by-metric spec", spec_set=spec_set))
+        row_dict["Type"] = annotated_spec.element_type.name.ljust(14)
+        # row.extend(
+        #     (
+        #         sorted(linkable_element_property.name for linkable_element_property in annotated_spec.properties),
+        #         sorted(
+        #             model_reference.semantic_model_name
+        #             for model_reference in annotated_spec.derived_from_semantic_models
+        #         ),
+        #     )
+        # )
+
+        row_dict["Properties"] = ",".join(
+            sorted(linkable_element_property.name for linkable_element_property in annotated_spec.properties)
+        )
+        row_dict["Derived-From Semantic Models"] = ",".join(
+            sorted(
+                model_reference.semantic_model_name for model_reference in annotated_spec.derived_from_semantic_models
+            )
+        )
+
+        rows.append(row_dict)
+
+    return rows
 
 
 def assert_linkable_element_set_snapshot_equal(  # noqa: D103

@@ -87,6 +87,23 @@ class GroupByMetricSubgraph(SemanticSubgraphGenerator):
                 self._metric_name_to_edge_argument[other_parent_metric_input.name]
             )
 
+        metric_attribute_node = MetricAttributeNode.get_instance(metric_name)
+
+        for tail_node in edge_argument.predecessor_nodes:
+            subgraph.add_edge(
+                EntityRelationshipEdge.get_instance(
+                    tail_node=tail_node,
+                    head_node=metric_attribute_node,
+                    attribute_computation_update=AttributeRecipeUpdate(
+                        add_entity_link=tail_node.dsi_entity_name,
+                        add_dunder_name_element=tail_node.dsi_entity_name,
+                        add_subquery_model_ids=tuple(edge_argument.model_ids),
+                    ),
+                )
+            )
+
+        self._metric_name_to_edge_argument[metric_name] = edge_argument
+
         # reachable_dsi_entity_nodes = FrozenOrderedSet[SemanticGraphNode]()
         # source_model_ids = FrozenOrderedSet[SemanticModelId]()
         #

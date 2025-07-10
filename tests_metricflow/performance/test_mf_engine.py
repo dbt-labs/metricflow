@@ -26,6 +26,7 @@ from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder i
 from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_cache import PathFinderCache
 from metricflow_semantics.experimental.singleton_decorator import singleton_dataclass
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.mf_logging.runtime import log_block_runtime
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.linkable_spec_index import LinkableSpecIndex
 from metricflow_semantics.model.semantics.linkable_spec_index_builder import LinkableSpecIndexBuilder
@@ -171,12 +172,24 @@ def _time_new_init(semantic_manifest: SemanticManifest) -> float:
 
 
 def test_semantic_graph_init_time() -> None:
+    # parameter_set = SyntheticManifestParameterSet(
+    #     measure_semantic_model_count=20,
+    #     measures_per_semantic_model=20,
+    #     dimension_semantic_model_count=20,
+    #     categorical_dimensions_per_semantic_model=10,
+    #     max_metric_depth=3,
+    #     max_metric_width=50,
+    #     saved_query_count=0,
+    #     metrics_per_saved_query=0,
+    #     categorical_dimensions_per_saved_query=0,
+    # )
+
     parameter_set = SyntheticManifestParameterSet(
-        measure_semantic_model_count=20,
+        measure_semantic_model_count=100,
         measures_per_semantic_model=20,
-        dimension_semantic_model_count=20,
-        categorical_dimensions_per_semantic_model=10,
-        max_metric_depth=3,
+        dimension_semantic_model_count=100,
+        categorical_dimensions_per_semantic_model=20,
+        max_metric_depth=2,
         max_metric_width=50,
         saved_query_count=0,
         metrics_per_saved_query=0,
@@ -189,15 +202,27 @@ def test_semantic_graph_init_time() -> None:
     # original_init_time = _time_original_init(semantic_manifest)
     # new_init_time = _time_new_init(semantic_manifest)
     # ratio = original_init_time / new_init_time
-    # logger.info(LazyFormat("Compared init times", original_init_time=original_init_time, new_init_time=new_init_time, ratio=f"{ratio:.2f}"))
+    # logger.info(
+    #     LazyFormat(
+    #         "Compared init times",
+    #         original_init_time=original_init_time,
+    #         new_init_time=new_init_time,
+    #         ratio=f"{ratio:.2f}",
+    #     )
+    # )
 
-    cProfile.runctx(
-        statement="_time_new_init(semantic_manifest)",
-        filename=CPROFILE_OUTPUT_FILE_NAME,
-        locals=locals(),
-        globals=globals(),
-    )
+    # cProfile.runctx(
+    #     statement="_time_new_init(semantic_manifest)",
+    #     filename=CPROFILE_OUTPUT_FILE_NAME,
+    #     locals=locals(),
+    #     globals=globals(),
+    # )
 
+    # with log_block_runtime("new init"):
+    #     _time_new_init(semantic_manifest)
+
+    # with log_block_runtime("original init"):
+    #     _time_original_init(semantic_manifest)
 
 @fast_frozen_dataclass()
 class DataclassId:
