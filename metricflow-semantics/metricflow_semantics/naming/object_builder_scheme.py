@@ -4,11 +4,9 @@ import logging
 import re
 from typing import Optional
 
-from dbt_semantic_interfaces.call_parameter_sets import (
-    ParseWhereFilterException,
-)
+from dbt_semantic_interfaces.call_parameter_sets import ParseJinjaObjectException
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
-from dbt_semantic_interfaces.parsing.where_filter.where_filter_parser import WhereFilterParser
+from dbt_semantic_interfaces.parsing.where_filter.jinja_object_parser import JinjaObjectParser, QueryItemLocation
 from dbt_semantic_interfaces.references import EntityReference
 from typing_extensions import override
 
@@ -49,7 +47,7 @@ class ObjectBuilderNamingScheme(QueryItemNamingScheme):
             call_parameter_sets = PydanticWhereFilter(where_sql_template="{{ " + input_str + " }}").call_parameter_sets(
                 custom_granularity_names=semantic_manifest_lookup.semantic_model_lookup.custom_granularity_names
             )
-        except ParseWhereFilterException as e:
+        except ParseJinjaObjectException as e:
             raise ValueError(f"A spec pattern can't be generated from the input string {repr(input_str)}") from e
 
         num_parameter_sets = (
@@ -122,9 +120,10 @@ class ObjectBuilderNamingScheme(QueryItemNamingScheme):
         if ObjectBuilderNamingScheme._NAME_REGEX.match(input_str) is None:
             return False
         try:
-            call_parameter_sets = WhereFilterParser.parse_call_parameter_sets(
+            call_parameter_sets = JinjaObjectParser.parse_call_parameter_sets(
                 where_sql_template="{{ " + input_str + " }}",
                 custom_granularity_names=semantic_manifest_lookup.semantic_model_lookup.custom_granularity_names,
+                query_item_location=QueryItemLocation.NON_ORDER_BY,
             )
             return_value = (
                 len(call_parameter_sets.dimension_call_parameter_sets)
@@ -133,7 +132,7 @@ class ObjectBuilderNamingScheme(QueryItemNamingScheme):
                 + len(call_parameter_sets.metric_call_parameter_sets)
             ) == 1
             return return_value
-        except ParseWhereFilterException:
+        except ParseJinjaObjectException:
             return False
 
     @override

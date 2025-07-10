@@ -119,8 +119,8 @@ PydanticSemanticManifest(
   project_configuration=PydanticProjectConfiguration(
     dsi_package_version=PydanticSemanticVersion(
       major_version='0',
-      minor_version='8',
-      patch_version='4',
+      minor_version='9',
+      patch_version='0',
     ),
     time_spines=[
       PydanticTimeSpine(

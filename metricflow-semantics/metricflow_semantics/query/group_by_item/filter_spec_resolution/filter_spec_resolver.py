@@ -5,7 +5,7 @@ import logging
 from collections import defaultdict
 from typing import Dict, List, Sequence, Set
 
-from dbt_semantic_interfaces.call_parameter_sets import FilterCallParameterSets, MetricCallParameterSet
+from dbt_semantic_interfaces.call_parameter_sets import JinjaCallParameterSets, MetricCallParameterSet
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
 from dbt_semantic_interfaces.protocols import WhereFilter
 from dbt_semantic_interfaces.references import EntityReference
@@ -109,10 +109,9 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
 
     @staticmethod
     def _dedupe_filter_call_parameter_sets(
-        filter_call_parameter_sets_sequence: Sequence[FilterCallParameterSets],
-    ) -> FilterCallParameterSets:
-        # FilterCallParameterSets needs an update.
-        return FilterCallParameterSets(
+        filter_call_parameter_sets_sequence: Sequence[JinjaCallParameterSets],
+    ) -> JinjaCallParameterSets:
+        return JinjaCallParameterSets(
             dimension_call_parameter_sets=tuple(
                 dict.fromkeys(
                     itertools.chain.from_iterable(
@@ -149,7 +148,7 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
 
     def _map_filter_parameter_sets_to_pattern(
         self,
-        filter_call_parameter_sets: FilterCallParameterSets,
+        filter_call_parameter_sets: JinjaCallParameterSets,
     ) -> Sequence[PatternAssociationForWhereFilterGroupByItem]:
         """Given the call parameter sets in a filter, map them to spec patterns.
 
@@ -324,7 +323,7 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
             resolution_dag=resolution_dag,
         )
         non_parsable_resolutions: List[NonParsableFilterResolution] = []
-        filter_call_parameter_sets_by_location: Dict[WhereFilterLocation, List[FilterCallParameterSets]] = defaultdict(
+        filter_call_parameter_sets_by_location: Dict[WhereFilterLocation, List[JinjaCallParameterSets]] = defaultdict(
             list
         )
         # No input metric in locations when we get here
