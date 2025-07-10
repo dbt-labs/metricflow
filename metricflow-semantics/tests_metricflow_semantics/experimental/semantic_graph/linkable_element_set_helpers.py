@@ -3,11 +3,11 @@ from __future__ import annotations
 import difflib
 import logging
 
+from metricflow_semantics.helpers.table_helpers import IsolatedTabulateRunner
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseLinkableElementSet
 from metricflow_semantics.specs.spec_set import group_spec_by_type
 
-from metricflow.data_table.mf_table import _IsolatedTabulateRunner
 from tests_metricflow_semantics.experimental.semantic_graph.table_helpers import RowColumnWidthEqualizer
 
 logger = logging.getLogger(__name__)
@@ -31,8 +31,8 @@ def assert_linkable_element_sets_equal(  # noqa: D103
     new_left_rows = equalizer.reformat_rows(left_rows)
     new_right_rows = equalizer.reformat_rows(right_rows)
 
-    left_table = _IsolatedTabulateRunner.tabulate(tabular_data=new_left_rows, headers="keys", tablefmt="simple_outline")
-    right_table = _IsolatedTabulateRunner.tabulate(
+    left_table = IsolatedTabulateRunner.tabulate(tabular_data=new_left_rows, headers="keys", tablefmt="simple_outline")
+    right_table = IsolatedTabulateRunner.tabulate(
         tabular_data=new_right_rows, headers="keys", tablefmt="simple_outline"
     )
 
