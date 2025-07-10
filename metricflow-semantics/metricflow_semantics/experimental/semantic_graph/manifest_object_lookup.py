@@ -6,7 +6,7 @@ from functools import cached_property
 from typing import Iterable, Mapping, TypeVar
 
 from dbt_semantic_interfaces.protocols import Metric, SemanticManifest, SemanticModel
-from dbt_semantic_interfaces.type_enums import DimensionType, EntityType, TimeGranularity
+from dbt_semantic_interfaces.type_enums import DimensionType, TimeGranularity
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.experimental.metricflow_exception import MetricflowAssertionError
@@ -70,11 +70,7 @@ class ManifestObjectLookup:
         for semantic_model in self.semantic_models:
             model_id = SemanticModelId(model_name=semantic_model.name)
             for entity in semantic_model.entities:
-                if (
-                    entity.type is EntityType.NATURAL
-                    or entity.type is EntityType.UNIQUE
-                    or entity.type is EntityType.PRIMARY
-                ):
+                if entity.is_linkable_entity_type:
                     result[entity.name].add(model_id)
 
         return result

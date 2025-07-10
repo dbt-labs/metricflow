@@ -19,7 +19,6 @@ from metricflow_semantics.experimental.semantic_graph.attribute_computation impo
 )
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
-    DunderNameElementLabel,
     GroupByAttributeLabel,
     KeyEntityClusterLabel,
     MeasureAttributeLabel,
@@ -56,11 +55,6 @@ class AttributeNode(SemanticGraphNode, ABC):
         if include_graphical_attributes:
             dot_node = dot_node.with_attributes(color=DotColor.SALMON_PINK)
         return dot_node
-
-    @override
-    @cached_property
-    def dunder_name_element_label(self) -> DunderNameElementLabel:
-        return DunderNameElementLabel(element_name=self.attribute_name)
 
     @override
     @cached_property

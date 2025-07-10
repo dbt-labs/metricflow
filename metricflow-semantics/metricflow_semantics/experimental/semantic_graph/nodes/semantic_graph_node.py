@@ -9,13 +9,10 @@ from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
-from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
 from metricflow_semantics.experimental.mf_graph.mf_graph import MetricflowGraphEdge, MetricflowGraphNode
-from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_computation import (
     AttributeRecipeUpdateSource,
 )
-from metricflow_semantics.experimental.semantic_graph.nodes.node_label import DunderNameElementLabel
 from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
 from metricflow_semantics.mf_logging.pretty_formatter import (
     PrettyFormatContext,
@@ -25,16 +22,6 @@ logger = logging.getLogger(__name__)
 
 
 class SemanticGraphNode(MetricflowGraphNode, AttributeRecipeUpdateSource, MetricFlowPrettyFormattable, ABC):
-    @property
-    def dunder_name_element_label(self) -> Optional[DunderNameElementLabel]:
-        return None
-
-    @cached_property
-    def labels(self) -> FrozenOrderedSet[MetricflowGraphLabel]:
-        if self.dunder_name_element_label is not None:
-            return FrozenOrderedSet((self.dunder_name_element_label,))
-        return FrozenOrderedSet()
-
     @override
     def pretty_format(self, format_context: PrettyFormatContext) -> Optional[str]:
         return self.node_descriptor.node_name

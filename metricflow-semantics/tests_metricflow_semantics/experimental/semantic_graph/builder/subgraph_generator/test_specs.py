@@ -17,7 +17,5 @@ def test_linkable_spec_resolvers(
     sg_02_single_join_manifest: PydanticSemanticManifest,
 ) -> None:
     LinkableSpecResolverTester.compare_resolver_outputs_for_measures(
-        request=request,
-        mf_test_configuration=mf_test_configuration,
         semantic_manifest=sg_02_single_join_manifest,
     )

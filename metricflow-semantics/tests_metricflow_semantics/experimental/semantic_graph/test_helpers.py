@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-import itertools
+import difflib
 import logging
 
-from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
     AttributeRecipeWriterPath,
@@ -19,19 +18,20 @@ from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node 
 )
 from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder import MetricflowGraphPathFinder
 from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_cache import PathFinderCache
+from metricflow_semantics.helpers.table_helpers import IsolatedTabulateRunner
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
+from metricflow_semantics.model.semantics.linkable_element_set_base import BaseLinkableElementSet
 from metricflow_semantics.model.semantics.linkable_spec_index_builder import LinkableSpecIndexBuilder
 from metricflow_semantics.model.semantics.linkable_spec_resolver import LegacyLinkableSpecResolver
 from metricflow_semantics.model.semantics.manifest_object_lookup import SemanticManifestObjectLookup
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
-from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
-from metricflow_semantics.test_helpers.snapshot_helpers import assert_linkable_element_set_snapshot_equal
 
 from tests_metricflow_semantics.experimental.semantic_graph.linkable_element_set_helpers import (
     convert_linkable_element_set_to_rows,
 )
+from tests_metricflow_semantics.experimental.semantic_graph.table_helpers import RowColumnWidthEqualizer
 
 logger = logging.getLogger(__name__)
 
@@ -75,8 +75,6 @@ class LinkableSpecResolverTester:
 
     @staticmethod
     def compare_resolver_outputs_for_measures(
-        request: FixtureRequest,
-        mf_test_configuration: MetricFlowTestConfiguration,
         semantic_manifest: SemanticManifest,
     ) -> None:
         element_filter = LinkableElementFilter()
@@ -110,38 +108,47 @@ class LinkableSpecResolverTester:
                 measure_reference, element_filter
             )
 
-            assert_linkable_element_set_snapshot_equal(
-                request=request,
-                snapshot_configuration=mf_test_configuration,
-                linkable_element_set=legacy_linkable_element_set,
-                set_id=f"{measure_reference.element_name}_legacy",
+            LinkableSpecResolverTester.assert_linkable_element_sets_equal(
+                left_set=legacy_linkable_element_set,
+                right_set=sg_linkable_element_set,
             )
 
-            assert_linkable_element_set_snapshot_equal(
-                request=request,
-                snapshot_configuration=mf_test_configuration,
-                linkable_element_set=sg_linkable_element_set,
-                set_id=f"{measure_reference.element_name}_legacy",
+    @staticmethod
+    def assert_linkable_element_sets_equal(  # noqa: D103
+        left_set: BaseLinkableElementSet,
+        right_set: BaseLinkableElementSet,
+    ) -> None:
+        headers = ("Dunder Name", "Metric-Subquery Entity-Links", "Type", "Properties", "Derived-From Semantic Models")
+
+        left_rows = convert_linkable_element_set_to_rows(left_set)
+        right_rows = convert_linkable_element_set_to_rows(right_set)
+
+        equalizer = RowColumnWidthEqualizer()
+
+        equalizer.add_headers(headers)
+        equalizer.add_rows(left_rows)
+        equalizer.add_rows(right_rows)
+
+        new_left_rows = equalizer.reformat_rows(left_rows)
+        new_right_rows = equalizer.reformat_rows(right_rows)
+
+        left_table = IsolatedTabulateRunner.tabulate(
+            tabular_data=new_left_rows, headers="keys", tablefmt="simple_outline"
+        )
+        right_table = IsolatedTabulateRunner.tabulate(
+            tabular_data=new_right_rows, headers="keys", tablefmt="simple_outline"
+        )
+
+        if left_table != right_table:
+            diff_lines = difflib.unified_diff(
+                a=left_table.splitlines(keepends=True),
+                b=right_table.splitlines(keepends=True),
+                fromfile="Left Result",
+                tofile="Right Result",
             )
+            diff = "".join(diff_lines)
+            assert False, LazyFormat(
+                "Mismatch between left and right sets", left_table=left_table, right_table=right_table, diff=diff
+            ).evaluated_value
 
-            legacy_rows = convert_linkable_element_set_to_rows(legacy_linkable_element_set)
-            sg_rows = convert_linkable_element_set_to_rows(sg_linkable_element_set)
-
-            for row_index, (legacy_row, sg_row) in enumerate(itertools.zip_longest(legacy_rows, sg_rows)):
-                assert legacy_row is not None, LazyFormat(
-                    "Missing row from `legacy_rows`",
-                    measure_reference=measure_reference,
-                    row_index=row_index,
-                    legacy_row=legacy_row,
-                    sg_row=sg_row,
-                )
-                assert sg_row is not None, LazyFormat(
-                    "Missing row from `sg_rows`",
-                    measure_reference=measure_reference,
-                    row_index=row_index,
-                    legacy_row=legacy_row,
-                    sg_row=sg_row,
-                )
-                assert legacy_row == sg_row, LazyFormat(
-                    "Row mismatch", measure_reference=measure_reference, legacy_row=legacy_row, sg_row=sg_row
-                )
+        logger.debug(LazyFormat("Left and right sets match", matching_table=left_table))

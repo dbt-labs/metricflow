@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from functools import cached_property
-from typing import Optional, override
+from typing import override
 
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.type_enums import TimeGranularity
@@ -22,7 +22,6 @@ from metricflow_semantics.experimental.semantic_graph.model_id import SemanticMo
 from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
     AggregationLabel,
     DsiEntityLabel,
-    DunderNameElementLabel,
     GroupByAttributeRootLabel,
     JoinedModelLabel,
     JoinFromLabel,
@@ -47,17 +46,19 @@ logger = logging.getLogger(__name__)
 @singleton_dataclass(order=False)
 class DsiEntityNode(SemanticGraphNode):
     entity_name: str
+    model_id: SemanticModelId
 
     @staticmethod
-    def get_instance(entity_name: str) -> DsiEntityNode:
+    def get_instance(entity_name: str, model_id: SemanticModelId) -> DsiEntityNode:
         return DsiEntityNode(
             entity_name=entity_name,
+            model_id=model_id,
         )
 
     @property
     @override
     def comparison_key(self) -> ComparisonKey:
-        return (self.entity_name,)
+        return (self.entity_name, self.model_id)
 
     @override
     def as_dot_node(self, include_graphical_attributes: bool) -> DotNodeAttributeSet:
@@ -70,23 +71,22 @@ class DsiEntityNode(SemanticGraphNode):
     @cached_property
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
         return MetricflowGraphNodeDescriptor.get_instance(
-            node_name=f"DsiEntity({self.entity_name})",
-            cluster_name=ClusterName.DSI_ENTITY,
+            node_name=f"{self.model_id}.{self.entity_name}",
+            cluster_name=self.entity_name,
         )
-
-    @override
-    @cached_property
-    def dunder_name_element_label(self) -> DunderNameElementLabel:
-        return DunderNameElementLabel(element_name=self.entity_name)
 
     @cached_property
     def labels(self) -> FrozenOrderedSet[MetricflowGraphLabel]:
-        return FrozenOrderedSet((self.dunder_name_element_label, DsiEntityLabel()))
+        return FrozenOrderedSet((DsiEntityLabel.get_instance(),))
 
     @override
     @cached_property
     def attribute_recipe_update(self) -> AttributeRecipeUpdate:
-        return AttributeRecipeUpdate(add_entity_link=self.entity_name, add_dunder_name_element=self.entity_name)
+        return AttributeRecipeUpdate(
+            add_entity_link=self.entity_name,
+            add_dunder_name_element=self.entity_name,
+            join_model=self.model_id,
+        )
 
 
 @singleton_dataclass(order=False)
@@ -323,11 +323,6 @@ class TimeDimensionNode(SemanticGraphNode):
     @cached_property
     def labels(self) -> FrozenOrderedSet[MetricflowGraphLabel]:
         return super(TimeDimensionNode, self).labels.union((TimeClusterLabel.get_instance(),))
-
-    @override
-    @cached_property
-    def dunder_name_element_label(self) -> Optional[DunderNameElementLabel]:
-        return DunderNameElementLabel(element_name=self.dimension_name)
 
     @override
     @cached_property

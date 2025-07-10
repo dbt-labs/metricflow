@@ -8,7 +8,6 @@ from typing_extensions import override
 
 from metricflow_semantics.experimental.mf_graph.comparable import ComparisonKey
 from metricflow_semantics.experimental.orderd_enum import OrderedEnum
-from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeRecipeUpdate
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
     SemanticGraphEdge,
     SemanticGraphNode,
@@ -74,18 +73,18 @@ class JoinToModelEdge(SemanticGraphEdge):
 
 @singleton_dataclass(order=False)
 class JoinFromModelEdge(SemanticGraphEdge):
-    _recipe_update: AttributeRecipeUpdate
+    # _recipe_update: AttributeRecipeUpdate
 
     @staticmethod
     def get_instance(
         tail_node: SemanticGraphNode,
         head_node: SemanticGraphNode,
-        recipe_update: AttributeRecipeUpdate,
+        # recipe_update: AttributeRecipeUpdate,
     ) -> JoinFromModelEdge:
         return JoinFromModelEdge(
             _tail_node=tail_node,
             _head_node=head_node,
-            _recipe_update=recipe_update,
+            # _recipe_update=recipe_update,
         )
 
     @override
@@ -102,10 +101,10 @@ class JoinFromModelEdge(SemanticGraphEdge):
         return JoinFromModelEdge(
             _tail_node=self._tail_node,
             _head_node=self._head_node,
-            _recipe_update=self._recipe_update,
+            # _recipe_update=self._recipe_update,
         )
 
-    @override
-    @property
-    def attribute_recipe_update(self) -> AttributeRecipeUpdate:
-        return self._recipe_update
+    # @override
+    # @property
+    # def attribute_recipe_update(self) -> AttributeRecipeUpdate:
+    #     return self._recipe_update

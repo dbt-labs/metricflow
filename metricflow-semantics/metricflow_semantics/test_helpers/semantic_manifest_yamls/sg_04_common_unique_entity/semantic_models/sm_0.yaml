@@ -12,12 +12,14 @@ semantic_model:
   entities:
     - name: sm_0_primary_entity
       type: primary
-    - name: common_primary_entity
+    - name: common_unique_entity
       type: foreign
+
   measures:
     - name: sm_0_measure_0
       expr: "1"
       agg: sum
+
   dimensions:
     - name: ds
       type: time

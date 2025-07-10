@@ -31,8 +31,8 @@ from metricflow_semantics.test_helpers.semantic_manifest_yamls.sg_01_primary_ent
 )
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.sg_02_single_join import SG_02_SINGLE_JOIN
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.sg_03_multi_entity_join import SG_03_MULTI_ENTITY_JOIN
-from metricflow_semantics.test_helpers.semantic_manifest_yamls.sg_04_common_primary_entity import (
-    SG_04_COMMON_PRIMARY_ENTITY,
+from metricflow_semantics.test_helpers.semantic_manifest_yamls.sg_04_common_unique_entity import (
+    SG_04_COMMON_UNIQUE_ENTITY,
 )
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.sg_05_derived_metric import SG_05_DERIVED_METRIC_MANIFEST
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.sg_06_ambiguous_join import SG_06_AMBIGUOUS_JOIN
@@ -200,8 +200,8 @@ def sg_03_multi_entity_join_manifest(template_mapping: Dict[str, str]) -> Manife
 
 
 @pytest.fixture(scope="session")
-def sg_04_common_primary_entity_manifest(template_mapping: Dict[str, str]) -> ManifestObjectLookup:  # noqa: D103
-    return load_semantic_manifest(SG_04_COMMON_PRIMARY_ENTITY.directory, template_mapping)
+def sg_04_common_unique_entity_manifest(template_mapping: Dict[str, str]) -> ManifestObjectLookup:  # noqa: D103
+    return load_semantic_manifest(SG_04_COMMON_UNIQUE_ENTITY.directory, template_mapping)
 
 
 @pytest.fixture(scope="session")

@@ -9,7 +9,6 @@ from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import Pair
 from metricflow_semantics.experimental.ordered_set import MutableOrderedSet, OrderedSet
-from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeRecipeUpdate
 from metricflow_semantics.experimental.semantic_graph.builder.graph_change_rule import (
     SemanticSubgraphGenerator,
     SubgraphGeneratorArgumentSet,
@@ -53,24 +52,17 @@ class EntityJoinSubgraphGenerator(SemanticSubgraphGenerator):
         primary_entity_name = lookup.primary_entity_name
 
         if primary_entity_name is not None:
-            dsi_entity_node = DsiEntityNode.get_instance(entity_name=primary_entity_name)
+            dsi_entity_node = DsiEntityNode.get_instance(
+                entity_name=primary_entity_name,
+                model_id=model_id,
+            )
             valid_target_dsi_entity_nodes_for_joins_to_this_model.add(dsi_entity_node)
             valid_target_dsi_entity_nodes_for_joins_from_this_model.add(dsi_entity_node)
 
         for entity in lookup.semantic_model.entities:
-            dsi_entity_node = DsiEntityNode.get_instance(entity_name=entity.name)
-            entity_type = entity.type
-            if (
-                entity_type is EntityType.PRIMARY
-                or entity_type is EntityType.UNIQUE
-                or entity_type is EntityType.NATURAL
-            ):
+            dsi_entity_node = DsiEntityNode.get_instance(entity_name=entity.name, model_id=model_id)
+            if entity.is_linkable_entity_type:
                 valid_target_dsi_entity_nodes_for_joins_to_this_model.add(dsi_entity_node)
-                valid_target_dsi_entity_nodes_for_joins_from_this_model.add(dsi_entity_node)
-            elif entity_type is EntityType.FOREIGN:
-                valid_target_dsi_entity_nodes_for_joins_from_this_model.add(dsi_entity_node)
-            else:
-                assert_values_exhausted(entity_type)
 
         for entity_node in valid_target_dsi_entity_nodes_for_joins_to_this_model:
             current_subgraph.add_edge(
@@ -81,31 +73,31 @@ class EntityJoinSubgraphGenerator(SemanticSubgraphGenerator):
                 )
             )
         primary_entity_name = lookup.primary_entity_name
-        for entity_node in valid_target_dsi_entity_nodes_for_joins_from_this_model:
-            right_model_ids = self._manifest_object_lookup.entity_name_to_joinable_semantic_model_id[
-                entity_node.entity_name
-            ]
+        # for entity_node in valid_target_dsi_entity_nodes_for_joins_from_this_model:
+        for entity in lookup.semantic_model.entities:
+            right_model_ids = self._manifest_object_lookup.entity_name_to_joinable_semantic_model_id[entity.name]
             for right_model_id in right_model_ids:
-                recipe_update = AttributeRecipeUpdate(
-                    # linkable_element_property_additions=(
-                    #     (LinkableElementProperty.LOCAL_LINKED,)
-                    #     if entity_node.entity_name == primary_entity_name
-                    #     else ()
-                    # ),
-                    join_model=right_model_id,
-                )
-                # current_subgraph.add_edge(
-                #     JoinFromModelEdge.get_instance(
-                #         tail_node=semantic_model_node,
-                #         head_node=entity_node,
-                #         attribute_computation_update=attribute_computation_update,
-                #     )
+                head_node = DsiEntityNode.get_instance(entity_name=entity.name, model_id=right_model_id)
+                # update_recipe = AttributeRecipeUpdate(
+                #     # linkable_element_property_additions=(
+                #     #     (LinkableElementProperty.LOCAL_LINKED,)
+                #     #     if entity_node.entity_name == primary_entity_name
+                #     #     else ()
+                #     # ),
+                #     join_model=right_model_id,
                 # )
+                if model_id != right_model_id:
+                    current_subgraph.add_edge(
+                        JoinFromModelEdge.get_instance(
+                            tail_node=semantic_model_node,
+                            head_node=head_node,
+                        )
+                    )
                 current_subgraph.add_edge(
                     JoinFromModelEdge.get_instance(
                         tail_node=local_semantic_model_node,
-                        head_node=entity_node,
-                        recipe_update=recipe_update,
+                        head_node=head_node,
+                        # recipe_update=update_recipe,
                     )
                 )
 
@@ -164,18 +156,18 @@ class EntityJoinSubgraphGenerator(SemanticSubgraphGenerator):
 
         entity_link_edges: MutableOrderedSet[JoinedDsiEntityEdge] = MutableOrderedSet()
 
-        for source_entity_node in valid_target_dsi_entity_nodes_for_joins_to_this_model:
-            for target_entity_node in valid_target_dsi_entity_nodes_for_joins_from_this_model:
-                if source_entity_node is not target_entity_node:
-                    for model_id in self._manifest_object_lookup.entity_name_to_joinable_semantic_model_id[
-                        target_entity_node.entity_name
-                    ]:
-                        entity_link_edge = JoinedDsiEntityEdge.get_instance(
-                            tail_node=source_entity_node,
-                            head_node=target_entity_node,
-                            model_id=model_id,
-                        )
-                        entity_link_edges.add(entity_link_edge)
+        # for source_entity_node in valid_target_dsi_entity_nodes_for_joins_to_this_model:
+        #     for target_entity_node in valid_target_dsi_entity_nodes_for_joins_from_this_model:
+        #         if source_entity_node is not target_entity_node:
+        #             for model_id in self._manifest_object_lookup.entity_name_to_joinable_semantic_model_id[
+        #                 target_entity_node.entity_name
+        #             ]:
+        #                 entity_link_edge = JoinedDsiEntityEdge.get_instance(
+        #                     tail_node=source_entity_node,
+        #                     head_node=target_entity_node,
+        #                     model_id=model_id,
+        #                 )
+        #                 entity_link_edges.add(entity_link_edge)
 
         return current_subgraph, entity_link_edges
 

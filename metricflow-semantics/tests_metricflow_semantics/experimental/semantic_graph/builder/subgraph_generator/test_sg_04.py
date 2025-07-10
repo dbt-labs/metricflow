@@ -43,12 +43,12 @@ logger = logging.getLogger(__name__)
 def test_semantic_graph(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    sg_04_common_primary_entity_manifest: PydanticSemanticManifest,
+    sg_04_common_unique_entity_manifest: PydanticSemanticManifest,
 ) -> None:
     check_subgraph_generation(
         request=request,
         mf_test_configuration=mf_test_configuration,
-        manifest_object_lookup=ManifestObjectLookup(sg_04_common_primary_entity_manifest),
+        manifest_object_lookup=ManifestObjectLookup(sg_04_common_unique_entity_manifest),
         subgraph_generators=SemanticGraphBuilder._ALL_SUBGRAPH_GENERATORS,
     )
 
@@ -56,9 +56,9 @@ def test_semantic_graph(  # noqa: D103
 def test_group_by_attribute_subgraph(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    sg_04_common_primary_entity_manifest: PydanticSemanticManifest,
+    sg_04_common_unique_entity_manifest: PydanticSemanticManifest,
 ) -> None:
-    manifest_object_lookup = ManifestObjectLookup(sg_04_common_primary_entity_manifest)
+    manifest_object_lookup = ManifestObjectLookup(sg_04_common_unique_entity_manifest)
     path_finder_cache = PathFinderCache[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath]()
     path_finder = MetricflowGraphPathFinder[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath](
         path_finder_cache
@@ -85,10 +85,10 @@ def test_group_by_attribute_subgraph(  # noqa: D103
 def test_specs(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    sg_04_common_primary_entity_manifest: PydanticSemanticManifest,
+    sg_04_common_unique_entity_manifest: PydanticSemanticManifest,
 ) -> None:
     element_filter = LinkableElementFilter()
-    semantic_manifest = sg_04_common_primary_entity_manifest
+    semantic_manifest = sg_04_common_unique_entity_manifest
     sg_linkable_spec_resolver = _create_sg_resolver(semantic_manifest)
 
     measure_reference = MeasureReference(element_name="sm_0_measure_0")

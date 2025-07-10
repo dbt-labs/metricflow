@@ -64,12 +64,12 @@ logger = logging.getLogger(__name__)
 def test_all(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    sg_02_single_join_lookup: ManifestObjectLookup,
+    sg_04_common_unique_entity_manifest: PydanticSemanticManifest,
 ) -> None:
     check_subgraph_generation(
         request=request,
         mf_test_configuration=mf_test_configuration,
-        manifest_object_lookup=sg_02_single_join_lookup,
+        manifest_object_lookup=ManifestObjectLookup(sg_04_common_unique_entity_manifest),
         subgraph_generators=SemanticGraphBuilder._ALL_SUBGRAPH_GENERATORS,
     )
 
@@ -204,7 +204,7 @@ def test_linkable_spec_resolvers(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     sg_02_single_join_manifest: PydanticSemanticManifest,
-    sg_04_common_primary_entity_manifest: PydanticSemanticManifest,
+    sg_04_common_unique_entity_manifest: PydanticSemanticManifest,
     simple_semantic_manifest: PydanticSemanticManifest,
 ) -> None:
     element_filter = LinkableElementFilter()
@@ -313,3 +313,14 @@ def _create_sg_resolver(semantic_manifest: SemanticManifest) -> SemanticGraphLin
     return SemanticGraphLinkableSpecResolver(
         manifest_object_lookup=manifest_object_lookup, semantic_graph=semantic_graph, path_finder=path_finder
     )
+
+
+def test_resolver_outputs(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sg_02_single_join_manifest: PydanticSemanticManifest,
+    sg_03_multi_entity_join_manifest: PydanticSemanticManifest,
+    sg_04_common_unique_entity_manifest: PydanticSemanticManifest,
+    simple_semantic_manifest: PydanticSemanticManifest,
+) -> None:
+    LinkableSpecResolverTester.compare_resolver_outputs_for_measures(sg_02_single_join_manifest)

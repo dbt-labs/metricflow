@@ -81,8 +81,8 @@ class AttributeResolver:
         measure_node = self._find_nearest_measure_node(source_node)
         model_node = self._find_nearest_local_semantic_model_node(measure_node)
 
-        # non_metric_time_recipes = tuple(self._generate_non_metric_time_recipes(model_node))
-        non_metric_time_recipes = ()
+        non_metric_time_recipes = tuple(self._generate_non_metric_time_recipes(model_node))
+        # non_metric_time_recipes = ()
         metric_time_recipes = tuple(self._generate_metric_time_recipes(measure_node))
         all_recipes = metric_time_recipes + non_metric_time_recipes
         logger.debug(

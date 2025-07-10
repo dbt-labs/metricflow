@@ -6,24 +6,42 @@ dot_notation:
   	graph [name=MutableSemanticGraph]
   	subgraph cluster_dimension {
   		label=dimension
-  		"Dimension(dim_0)"
+  		"Dimension(common_dimension)"
+  		"Dimension(sm_1_dim_0)"
+  		"Dimension(sm_2_dim_0)"
   	}
-  	subgraph cluster_dsi_entity {
-  		label=dsi_entity
-  		"DsiEntity(sm_0_primary_entity)"
-  		"DsiEntity(sm_1_primary_entity)"
+  	subgraph cluster_common_unique_entity {
+  		label=common_unique_entity
+  		"sm_1.common_unique_entity"
+  		"sm_2.common_unique_entity"
+  	}
+  	subgraph cluster_sm_0_primary_entity {
+  		label=sm_0_primary_entity
+  		"sm_0.sm_0_primary_entity"
+  	}
+  	subgraph cluster_sm_1_primary_entity {
+  		label=sm_1_primary_entity
+  		"sm_1.sm_1_primary_entity"
+  	}
+  	subgraph cluster_sm_2_primary_entity {
+  		label=sm_2_primary_entity
+  		"sm_2.sm_2_primary_entity"
+  	}
+  	subgraph cluster_sm_0 {
+  		label=sm_0
+  		"Measure(sm_0_measure_0)"
+  	}
+  	subgraph cluster_sm_1 {
+  		label=sm_1
+  		"LocalModel(sm_1)"
+  	}
+  	subgraph cluster_sm_2 {
+  		label=sm_2
+  		"LocalModel(sm_2)"
   	}
   	subgraph cluster_key {
   		label=key
   		"MetricAttribute(sm_0_measure_0_metric)"
-  	}
-  	subgraph cluster_sm_0 {
-  		label=sm_0
-  		"Model(sm_0)"
-  	}
-  	subgraph cluster_sm_1 {
-  		label=sm_1
-  		"Model(sm_1)"
   	}
   	subgraph cluster_metric {
   		label=metric
@@ -31,6 +49,7 @@ dot_notation:
   	}
   	subgraph cluster_time {
   		label=time
+  		MetricTime
   		"TimeAttribute(custom_year)"
   		"TimeAttribute(extract_quarter)"
   		"TimeAttribute(extract_year)"
@@ -39,60 +58,88 @@ dot_notation:
   		"TimeDimension(ds)"
   		TimeEntity
   	}
+  	"JoinedModel(sm_0)" -> "KeyEntity(common_unique_entity)"
+  	"JoinedModel(sm_0)" -> "KeyEntity(sm_0_primary_entity)"
+  	"JoinedModel(sm_1)" -> "Dimension(common_dimension)"
+  	"JoinedModel(sm_1)" -> "Dimension(sm_1_dim_0)"
+  	"JoinedModel(sm_1)" -> "KeyEntity(common_unique_entity)"
+  	"JoinedModel(sm_1)" -> "KeyEntity(sm_1_primary_entity)"
+  	"JoinedModel(sm_2)" -> "Dimension(common_dimension)"
+  	"JoinedModel(sm_2)" -> "Dimension(sm_2_dim_0)"
+  	"JoinedModel(sm_2)" -> "KeyEntity(common_unique_entity)"
+  	"JoinedModel(sm_2)" -> "KeyEntity(sm_2_primary_entity)"
+  	"LocalModel(sm_0)" -> "KeyEntity(common_unique_entity)"
   	"LocalModel(sm_0)" -> "KeyEntity(sm_0_primary_entity)"
-  	"LocalModel(sm_0)" -> "KeyEntity(sm_1_primary_entity)"
-  	"LocalModel(sm_0)" -> "KeyEntity(sm_2_primary_entity)"
+  	"LocalModel(sm_1)" -> "KeyEntity(common_unique_entity)"
   	"LocalModel(sm_1)" -> "KeyEntity(sm_1_primary_entity)"
-  	"Model(sm_0)" -> "KeyEntity(sm_0_primary_entity)"
-  	"Model(sm_0)" -> "KeyEntity(sm_1_primary_entity)"
-  	"Model(sm_0)" -> "KeyEntity(sm_2_primary_entity)"
-  	"Model(sm_1)" -> "Dimension(dim_0)"
-  	"Model(sm_1)" -> "KeyEntity(sm_1_primary_entity)"
+  	"LocalModel(sm_2)" -> "KeyEntity(common_unique_entity)"
+  	"LocalModel(sm_2)" -> "KeyEntity(sm_2_primary_entity)"
   	TimeEntity -> "TimeAttribute(custom_year)"
   	TimeEntity -> "TimeAttribute(extract_quarter)"
   	TimeEntity -> "TimeAttribute(extract_year)"
   	TimeEntity -> "TimeAttribute(quarter)"
   	TimeEntity -> "TimeAttribute(year)"
+  	"JoinedModel(sm_0)" -> "TimeDimension(ds)"
+  	"KeyEntity(common_unique_entity)" -> "KeyAttribute(common_unique_entity)"
+  	"KeyEntity(common_unique_entity)" -> "MetricAttribute(sm_0_measure_0_metric)"
   	"KeyEntity(sm_0_primary_entity)" -> "KeyAttribute(sm_0_primary_entity)"
   	"KeyEntity(sm_0_primary_entity)" -> "MetricAttribute(sm_0_measure_0_metric)"
   	"KeyEntity(sm_1_primary_entity)" -> "KeyAttribute(sm_1_primary_entity)"
-  	"KeyEntity(sm_1_primary_entity)" -> "MetricAttribute(sm_0_measure_0_metric)"
   	"KeyEntity(sm_2_primary_entity)" -> "KeyAttribute(sm_2_primary_entity)"
-  	"KeyEntity(sm_2_primary_entity)" -> "MetricAttribute(sm_0_measure_0_metric)"
   	"Measure(sm_0_measure_0)" -> "LocalModel(sm_0)"
   	"Measure(sm_0_measure_0)" -> MetricTime
   	MetricTime -> TimeEntity
-  	"Model(sm_0)" -> "TimeDimension(ds)"
   	"TimeDimension(ds)" -> TimeEntity
-  	"LocalModel(sm_0)" -> "DsiEntity(sm_0_primary_entity)"
-  	"LocalModel(sm_0)" -> "DsiEntity(sm_1_primary_entity)"
-  	"LocalModel(sm_1)" -> "DsiEntity(sm_1_primary_entity)"
-  	"DsiEntity(sm_0_primary_entity)" -> "Model(sm_0)"
-  	"DsiEntity(sm_1_primary_entity)" -> "Model(sm_1)"
-  	"DsiEntity(sm_0_primary_entity)" -> "DsiEntity(sm_1_primary_entity)"
+  	"JoinedModel(sm_0)" -> "sm_1.common_unique_entity"
+  	"JoinedModel(sm_0)" -> "sm_2.common_unique_entity"
+  	"JoinedModel(sm_1)" -> "sm_2.common_unique_entity"
+  	"JoinedModel(sm_2)" -> "sm_1.common_unique_entity"
+  	"LocalModel(sm_0)" -> "sm_1.common_unique_entity"
+  	"LocalModel(sm_0)" -> "sm_2.common_unique_entity"
+  	"LocalModel(sm_0)" -> "sm_0.sm_0_primary_entity"
+  	"LocalModel(sm_1)" -> "sm_1.common_unique_entity"
+  	"LocalModel(sm_1)" -> "sm_2.common_unique_entity"
+  	"LocalModel(sm_1)" -> "sm_1.sm_1_primary_entity"
+  	"LocalModel(sm_2)" -> "sm_1.common_unique_entity"
+  	"LocalModel(sm_2)" -> "sm_2.common_unique_entity"
+  	"LocalModel(sm_2)" -> "sm_2.sm_2_primary_entity"
+  	"sm_1.common_unique_entity" -> "JoinedModel(sm_1)"
+  	"sm_2.common_unique_entity" -> "JoinedModel(sm_2)"
+  	"sm_0.sm_0_primary_entity" -> "JoinedModel(sm_0)"
+  	"sm_1.sm_1_primary_entity" -> "JoinedModel(sm_1)"
+  	"sm_2.sm_2_primary_entity" -> "JoinedModel(sm_2)"
   	"Metric(sm_0_measure_0_metric)" -> "Measure(sm_0_measure_0)"
   }
 
 pretty_format:
   MutableSemanticGraph(
     nodes={
-      Dimension(dim_0),
-      DsiEntity(sm_0_primary_entity),
-      DsiEntity(sm_1_primary_entity),
+      Dimension(common_dimension),
+      Dimension(sm_1_dim_0),
+      Dimension(sm_2_dim_0),
+      sm_1.common_unique_entity,
+      sm_2.common_unique_entity,
+      sm_0.sm_0_primary_entity,
+      sm_1.sm_1_primary_entity,
+      sm_2.sm_2_primary_entity,
+      JoinedModel(sm_0),
+      JoinedModel(sm_1),
+      JoinedModel(sm_2),
+      KeyAttribute(common_unique_entity),
       KeyAttribute(sm_0_primary_entity),
       KeyAttribute(sm_1_primary_entity),
       KeyAttribute(sm_2_primary_entity),
+      KeyEntity(common_unique_entity),
       KeyEntity(sm_0_primary_entity),
       KeyEntity(sm_1_primary_entity),
       KeyEntity(sm_2_primary_entity),
       LocalModel(sm_0),
       LocalModel(sm_1),
+      LocalModel(sm_2),
       Measure(sm_0_measure_0),
       MetricAttribute(sm_0_measure_0_metric),
       Metric(sm_0_measure_0_metric),
       MetricTime,
-      Model(sm_0),
-      Model(sm_1),
       TimeAttribute(custom_year),
       TimeAttribute(extract_quarter),
       TimeAttribute(extract_year),
@@ -102,46 +149,65 @@ pretty_format:
       TimeEntity,
     },
     edges={
+      EntityAttributeEdge(tail_node=JoinedModel(sm_0), head_node=KeyEntity(common_unique_entity)),
+      EntityAttributeEdge(tail_node=JoinedModel(sm_0), head_node=KeyEntity(sm_0_primary_entity)),
+      EntityAttributeEdge(tail_node=JoinedModel(sm_1), head_node=Dimension(common_dimension)),
+      EntityAttributeEdge(tail_node=JoinedModel(sm_1), head_node=Dimension(sm_1_dim_0)),
+      EntityAttributeEdge(tail_node=JoinedModel(sm_1), head_node=KeyEntity(common_unique_entity)),
+      EntityAttributeEdge(tail_node=JoinedModel(sm_1), head_node=KeyEntity(sm_1_primary_entity)),
+      EntityAttributeEdge(tail_node=JoinedModel(sm_2), head_node=Dimension(common_dimension)),
+      EntityAttributeEdge(tail_node=JoinedModel(sm_2), head_node=Dimension(sm_2_dim_0)),
+      EntityAttributeEdge(tail_node=JoinedModel(sm_2), head_node=KeyEntity(common_unique_entity)),
+      EntityAttributeEdge(tail_node=JoinedModel(sm_2), head_node=KeyEntity(sm_2_primary_entity)),
+      EntityAttributeEdge(tail_node=LocalModel(sm_0), head_node=KeyEntity(common_unique_entity)),
       EntityAttributeEdge(tail_node=LocalModel(sm_0), head_node=KeyEntity(sm_0_primary_entity)),
-      EntityAttributeEdge(tail_node=LocalModel(sm_0), head_node=KeyEntity(sm_1_primary_entity)),
-      EntityAttributeEdge(tail_node=LocalModel(sm_0), head_node=KeyEntity(sm_2_primary_entity)),
+      EntityAttributeEdge(tail_node=LocalModel(sm_1), head_node=KeyEntity(common_unique_entity)),
       EntityAttributeEdge(tail_node=LocalModel(sm_1), head_node=KeyEntity(sm_1_primary_entity)),
-      EntityAttributeEdge(tail_node=Model(sm_0), head_node=KeyEntity(sm_0_primary_entity)),
-      EntityAttributeEdge(tail_node=Model(sm_0), head_node=KeyEntity(sm_1_primary_entity)),
-      EntityAttributeEdge(tail_node=Model(sm_0), head_node=KeyEntity(sm_2_primary_entity)),
-      EntityAttributeEdge(tail_node=Model(sm_1), head_node=Dimension(dim_0)),
-      EntityAttributeEdge(tail_node=Model(sm_1), head_node=KeyEntity(sm_1_primary_entity)),
+      EntityAttributeEdge(tail_node=LocalModel(sm_2), head_node=KeyEntity(common_unique_entity)),
+      EntityAttributeEdge(tail_node=LocalModel(sm_2), head_node=KeyEntity(sm_2_primary_entity)),
       EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(custom_year)),
       EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(extract_quarter)),
       EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(extract_year)),
       EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(quarter)),
       EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(year)),
+      EntityRelationshipEdge(tail_node=JoinedModel(sm_0), head_node=TimeDimension(ds)),
+      EntityRelationshipEdge(
+        tail_node=KeyEntity(common_unique_entity),
+        head_node=KeyAttribute(common_unique_entity),
+      ),
+      EntityRelationshipEdge(
+        tail_node=KeyEntity(common_unique_entity),
+        head_node=MetricAttribute(sm_0_measure_0_metric),
+      ),
       EntityRelationshipEdge(tail_node=KeyEntity(sm_0_primary_entity), head_node=KeyAttribute(sm_0_primary_entity)),
       EntityRelationshipEdge(
         tail_node=KeyEntity(sm_0_primary_entity),
         head_node=MetricAttribute(sm_0_measure_0_metric),
       ),
       EntityRelationshipEdge(tail_node=KeyEntity(sm_1_primary_entity), head_node=KeyAttribute(sm_1_primary_entity)),
-      EntityRelationshipEdge(
-        tail_node=KeyEntity(sm_1_primary_entity),
-        head_node=MetricAttribute(sm_0_measure_0_metric),
-      ),
       EntityRelationshipEdge(tail_node=KeyEntity(sm_2_primary_entity), head_node=KeyAttribute(sm_2_primary_entity)),
-      EntityRelationshipEdge(
-        tail_node=KeyEntity(sm_2_primary_entity),
-        head_node=MetricAttribute(sm_0_measure_0_metric),
-      ),
       EntityRelationshipEdge(tail_node=Measure(sm_0_measure_0), head_node=LocalModel(sm_0)),
       EntityRelationshipEdge(tail_node=Measure(sm_0_measure_0), head_node=MetricTime),
       EntityRelationshipEdge(tail_node=MetricTime, head_node=TimeEntity),
-      EntityRelationshipEdge(tail_node=Model(sm_0), head_node=TimeDimension(ds)),
       EntityRelationshipEdge(tail_node=TimeDimension(ds), head_node=TimeEntity),
-      JoinFromModelEdge(tail_node=LocalModel(sm_0), head_node=DsiEntity(sm_0_primary_entity)),
-      JoinFromModelEdge(tail_node=LocalModel(sm_0), head_node=DsiEntity(sm_1_primary_entity)),
-      JoinFromModelEdge(tail_node=LocalModel(sm_1), head_node=DsiEntity(sm_1_primary_entity)),
-      JoinToModelEdge(tail_node=DsiEntity(sm_0_primary_entity), head_node=Model(sm_0)),
-      JoinToModelEdge(tail_node=DsiEntity(sm_1_primary_entity), head_node=Model(sm_1)),
-      JoinedDsiEntityEdge(tail_node=DsiEntity(sm_0_primary_entity), head_node=DsiEntity(sm_1_primary_entity)),
+      JoinFromModelEdge(tail_node=JoinedModel(sm_0), head_node=sm_1.common_unique_entity),
+      JoinFromModelEdge(tail_node=JoinedModel(sm_0), head_node=sm_2.common_unique_entity),
+      JoinFromModelEdge(tail_node=JoinedModel(sm_1), head_node=sm_2.common_unique_entity),
+      JoinFromModelEdge(tail_node=JoinedModel(sm_2), head_node=sm_1.common_unique_entity),
+      JoinFromModelEdge(tail_node=LocalModel(sm_0), head_node=sm_1.common_unique_entity),
+      JoinFromModelEdge(tail_node=LocalModel(sm_0), head_node=sm_2.common_unique_entity),
+      JoinFromModelEdge(tail_node=LocalModel(sm_0), head_node=sm_0.sm_0_primary_entity),
+      JoinFromModelEdge(tail_node=LocalModel(sm_1), head_node=sm_1.common_unique_entity),
+      JoinFromModelEdge(tail_node=LocalModel(sm_1), head_node=sm_2.common_unique_entity),
+      JoinFromModelEdge(tail_node=LocalModel(sm_1), head_node=sm_1.sm_1_primary_entity),
+      JoinFromModelEdge(tail_node=LocalModel(sm_2), head_node=sm_1.common_unique_entity),
+      JoinFromModelEdge(tail_node=LocalModel(sm_2), head_node=sm_2.common_unique_entity),
+      JoinFromModelEdge(tail_node=LocalModel(sm_2), head_node=sm_2.sm_2_primary_entity),
+      JoinToModelEdge(tail_node=sm_1.common_unique_entity, head_node=JoinedModel(sm_1)),
+      JoinToModelEdge(tail_node=sm_2.common_unique_entity, head_node=JoinedModel(sm_2)),
+      JoinToModelEdge(tail_node=sm_0.sm_0_primary_entity, head_node=JoinedModel(sm_0)),
+      JoinToModelEdge(tail_node=sm_1.sm_1_primary_entity, head_node=JoinedModel(sm_1)),
+      JoinToModelEdge(tail_node=sm_2.sm_2_primary_entity, head_node=JoinedModel(sm_2)),
       MetricDefinitionEdge(tail_node=Metric(sm_0_measure_0_metric), head_node=Measure(sm_0_measure_0)),
     },
   )
