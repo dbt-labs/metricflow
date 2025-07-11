@@ -299,7 +299,11 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
             next_edge_to_take = edges_to_process_in_current_node.pop()
             self._cumulative_stat.increment_edge_examined_count()
 
-            next_edge_weight = weight_function.incremental_weight(self._current_mutable_path(), next_edge_to_take)
+            next_edge_weight = weight_function.incremental_weight(
+                path_to_node=self._current_mutable_path(),
+                next_edge=next_edge_to_take,
+                max_path_weight=max_path_weight,
+            )
 
             if next_edge_weight is None:
                 if self._verbose_debug_logs:

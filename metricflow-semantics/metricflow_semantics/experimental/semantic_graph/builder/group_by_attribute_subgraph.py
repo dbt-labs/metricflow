@@ -352,9 +352,9 @@ class BlockMetricDefinitionEdgeWeightFunction(
 
     @override
     def incremental_weight(
-        self, path_to_node: AttributeRecipeWriterPath, edge_from_node: SemanticGraphEdge
+        self, path_to_node: AttributeRecipeWriterPath, next_edge: SemanticGraphEdge, max_path_weight: int
     ) -> Optional[int]:
-        if self._blocked_label in edge_from_node.labels:
+        if self._blocked_label in next_edge.labels:
             return None
         return 1
 

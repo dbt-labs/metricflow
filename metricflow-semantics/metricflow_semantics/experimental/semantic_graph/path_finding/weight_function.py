@@ -14,11 +14,11 @@ logger = logging.getLogger(__name__)
 
 class WeightFunction(Generic[NodeT, EdgeT, PathT], ABC):
     @abstractmethod
-    def incremental_weight(self, path_to_node: PathT, edge_from_node: EdgeT, path_weight_limit: int) -> Optional[int]:
+    def incremental_weight(self, path_to_node: PathT, next_edge: EdgeT, max_path_weight: int) -> Optional[int]:
         raise NotImplementedError()
 
 
 class EdgeCountWeightFunction(Generic[NodeT, EdgeT, PathT], WeightFunction[NodeT, EdgeT, PathT]):
     @override
-    def incremental_weight(self, path_to_node: PathT, edge_from_node: EdgeT, path_weight_limit: int) -> Optional[int]:
+    def incremental_weight(self, path_to_node: PathT, next_edge: EdgeT, max_path_weight: int) -> Optional[int]:
         return 1

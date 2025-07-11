@@ -36,17 +36,17 @@ class DunderNameWeightFunction(WeightFunction[SemanticGraphNode, SemanticGraphEd
 
     @override
     def incremental_weight(
-        self, path_to_node: AttributeRecipeWriterPath, next_edge: SemanticGraphEdge, path_weight_limit: int
+        self, path_to_node: AttributeRecipeWriterPath, next_edge: SemanticGraphEdge, max_path_weight: int
     ) -> Optional[int]:
         # Don't allow traversal of the metric definition edges unless the previous edge in the path was also a metric
         # definition edge. This prevents unnecessary traversal when searching for group-by items as it prevents
         # traversal from the metric node (which is a successor of the `JoinToModelNode` and represents a group-by
         # metric).
-        path_edges = path_to_node.edges
-        if len(path_edges) > 0 and DunderNameWeightFunction._METRIC_DEFINITION_LABEL in next_edge.labels:
-            last_edge = path_edges[-1]
-            if DunderNameWeightFunction._METRIC_DEFINITION_LABEL not in last_edge.labels:
-                return None
+        # path_edges = path_to_node.edges
+        # if len(path_edges) > 0 and DunderNameWeightFunction._METRIC_DEFINITION_LABEL in next_edge.labels:
+        #     last_edge = path_edges[-1]
+        #     if DunderNameWeightFunction._METRIC_DEFINITION_LABEL not in last_edge.labels:
+        #         return None
 
         recipe_writer = path_to_node.recipe_writer
         current_recipe = recipe_writer.latest_recipe
@@ -54,6 +54,10 @@ class DunderNameWeightFunction(WeightFunction[SemanticGraphNode, SemanticGraphEd
         next_node_update = next_edge.head_node.attribute_recipe_update
         next_attribute_recipe = current_recipe.with_update(next_edge_update)
         next_attribute_recipe = next_attribute_recipe.with_update(next_node_update)
+
+        # Return quickly with a weight check.
+        if len(next_attribute_recipe.entity_link_names) > max_path_weight:
+            return None
 
         # dundered_name_elements = (
         #     current_attribute_descriptor.dundered_name_elements

@@ -6,7 +6,6 @@ from typing import Optional
 
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.references import MeasureReference
-
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
     AttributeRecipeWriterPath,
 )
