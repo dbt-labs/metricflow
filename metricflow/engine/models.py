@@ -30,7 +30,7 @@ from dbt_semantic_interfaces.protocols.saved_query import (
     SavedQueryQueryParams,
 )
 from dbt_semantic_interfaces.protocols.where_filter import WhereFilterIntersection
-from dbt_semantic_interfaces.references import EntityReference
+from dbt_semantic_interfaces.references import EntityReference, SemanticModelReference
 from dbt_semantic_interfaces.transformations.add_input_metric_measures import AddInputMetricMeasuresRule
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.entity_type import EntityType
@@ -61,9 +61,15 @@ class Metric(SearchableElement):
     dimensions: List[Dimension]
     label: Optional[str]
     config: Optional[SemanticLayerElementConfig]
+    semantic_models: List[SemanticModelReference]
 
     @classmethod
-    def from_pydantic(cls, pydantic_metric: SemanticManifestMetric, dimensions: List[Dimension]) -> Metric:
+    def from_pydantic(
+        cls,
+        pydantic_metric: SemanticManifestMetric,
+        dimensions: List[Dimension],
+        semantic_models: List[SemanticModelReference],
+    ) -> Metric:
         """Build from pydantic Metric object and list of Dimensions."""
         return cls(
             name=pydantic_metric.name,
@@ -75,6 +81,7 @@ class Metric(SearchableElement):
             dimensions=dimensions,
             label=pydantic_metric.label,
             config=pydantic_metric.config,
+            semantic_models=semantic_models,
         )
 
     @property
@@ -102,6 +109,7 @@ class Dimension(SearchableElement):
     entity_links: Tuple[EntityReference, ...]
     type_params: Optional[DimensionTypeParams]
     metadata: Optional[Metadata]
+    semantic_model_reference: Optional[SemanticModelReference]
     config: Optional[SemanticLayerElementConfig] = None
     is_partition: bool = False
     expr: Optional[str] = None
@@ -112,6 +120,7 @@ class Dimension(SearchableElement):
         cls,
         pydantic_dimension: SemanticManifestDimension,
         entity_links: Tuple[EntityReference, ...],
+        semantic_model_reference: SemanticModelReference,
     ) -> Dimension:
         """Build from pydantic Dimension and entity_key."""
         qualified_name = DimensionSpec(element_name=pydantic_dimension.name, entity_links=entity_links).qualified_name
@@ -133,6 +142,7 @@ class Dimension(SearchableElement):
             expr=pydantic_dimension.expr,
             label=pydantic_dimension.label,
             entity_links=entity_links,
+            semantic_model_reference=semantic_model_reference,
         )
 
     @property
