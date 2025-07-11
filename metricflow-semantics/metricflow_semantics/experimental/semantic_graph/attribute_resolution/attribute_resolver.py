@@ -16,8 +16,7 @@ from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attri
     AttributeRecipeWriterPath,
 )
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.key_query_set import (
-    DsiEntityKeyQuery,
-    DsiEntityKeyQuerySet,
+    DsiEntityKeyQueryGroup,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.dunder_name_weight import DunderNameWeightFunction
 from metricflow_semantics.experimental.semantic_graph.manifest_object_lookup import ManifestObjectLookup
@@ -281,7 +280,7 @@ class AttributeResolver:
                         entity_links=default_entity_links,
                         properties=properties,
                         source_models=derived_from_semantic_models,
-                        key_query_set=recipe.key_query_set,
+                        key_query_group=recipe.key_query_set,
                     )
                 )
             elif element_type is LinkableElementType.ENTITY:
@@ -378,21 +377,21 @@ class AttributeResolver:
 
         return attribute_recipes
 
-    def generate_entity_key_queries(self, local_model_node: SemanticGraphNode) -> AnyLengthTuple[DsiEntityKeyQuery]:
-        attribute_recipes = self._generate_recipes(
-            source_node=local_model_node,
-            max_entity_links=1,
-            allowed_nodes=self._traversable_nodes_for_finding_metric_subqueries,
-        )
-        attribute_recipes = self._remove_ambiguous_recipes(attribute_recipes)
-
-        return tuple(
-            DsiEntityKeyQuery(
-                accessed_model_ids=recipe.models_in_join,
-                query_dunder_name_elements=recipe.dunder_name_elements,
-            )
-            for recipe in attribute_recipes
-        )
+    # def generate_entity_key_queries(self, local_model_node: SemanticGraphNode) -> AnyLengthTuple[DsiEntityKeyQuery]:
+    #     attribute_recipes = self._generate_recipes(
+    #         source_node=local_model_node,
+    #         max_entity_links=1,
+    #         allowed_nodes=self._traversable_nodes_for_finding_metric_subqueries,
+    #     )
+    #     attribute_recipes = self._remove_ambiguous_recipes(attribute_recipes)
+    #
+    #     return tuple(
+    #         DsiEntityKeyQuery(
+    #             accessed_model_ids=recipe.models_in_join,
+    #             query_dunder_name_elements=recipe.dunder_name_elements,
+    #         )
+    #         for recipe in attribute_recipes
+    #     )
 
     def _get_metric_subqueries_for_model(self, model_id: SemanticModelId) -> OrderedSet[MetricSubquery]:
         metric_subqueries = self._semantic_model_id_to_metric_subqueries.get(model_id)
@@ -468,21 +467,19 @@ class AttributeResolver:
         entity_links: Sequence[EntityReference],
         properties: OrderedSet[LinkableElementProperty],
         source_models: OrderedSet[SemanticModelReference],
-        key_query_set: DsiEntityKeyQuerySet,
+        key_query_group: DsiEntityKeyQueryGroup,
     ) -> dict[str, AnnotatedSpec]:
         dunder_name_to_annotated_spec: dict[str, AnnotatedSpec] = {}
 
         # for metric_subquery in self._get_metric_subqueries_for_models(tuple(subquery_model_ids)):
-        for key_query in key_query_set.entity_key_queries:
+        for key_query, model_ids in key_query_group.items():
             # if entity_links[-1].element_name != key_query[-1]:
             #     continue
 
             spec = GroupByMetricSpec(
                 element_name=metric_name,
                 entity_links=tuple(entity_links),
-                metric_subquery_entity_links=tuple(
-                    EntityReference(element_name) for element_name in key_query.query_dunder_name_elements
-                ),
+                metric_subquery_entity_links=tuple(EntityReference(element_name) for element_name in key_query),
             )
 
             dunder_name_to_annotated_spec[spec.qualified_name] = AnnotatedSpec.create(
@@ -495,7 +492,7 @@ class AttributeResolver:
                     ),
                 ),
                 derived_from_semantic_models=source_models.union(
-                    model_id.semantic_model_reference for model_id in key_query.accessed_model_ids
+                    model_id.semantic_model_reference for model_id in model_ids
                 ),
             )
         return dunder_name_to_annotated_spec

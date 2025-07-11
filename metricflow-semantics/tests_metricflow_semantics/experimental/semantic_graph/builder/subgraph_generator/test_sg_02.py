@@ -349,7 +349,7 @@ def test_key_query_resolver(sg_02_single_join_manifest: PydanticSemanticManifest
 
     key_query_resolver = DsiEntityKeyQueryResolver()
 
-    result = key_query_resolver.find_key_queries(
+    result = key_query_resolver.find_key_query_groups(
         semantic_graph=semantic_graph,
         # source_nodes=FrozenOrderedSet(
         #     (mf_first_item(semantic_graph.nodes_with_label(LocalModelLabel.get_instance())),)

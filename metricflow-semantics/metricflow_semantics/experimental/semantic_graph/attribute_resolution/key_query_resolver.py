@@ -8,6 +8,10 @@ from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTup
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.ordered_set import MutableOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeRecipe
+from metricflow_semantics.experimental.semantic_graph.attribute_resolution.key_query_set import (
+    DsiEntityKeyQueryGroup,
+    DsiEntityKeyQueryGrouper,
+)
 from metricflow_semantics.experimental.semantic_graph.builder.dunder_name_weight import DunderNameWeightFunction
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
@@ -43,10 +47,10 @@ class DsiEntityKeyQueryResolver:
     def __init__(self) -> None:  # noqa: D
         self._verbose_debug_logs = False
 
-    def find_key_queries(
+    def find_key_query_groups(
         self,
         semantic_graph: SemanticGraph,
-    ) -> dict[QueryGroupingKey, list[DunderNameTuple]]:
+    ) -> dict[SemanticGraphNode, DsiEntityKeyQueryGroup]:
         local_model_nodes = semantic_graph.nodes_with_label(LocalModelLabel.get_instance())
         key_attribute_nodes = semantic_graph.nodes_with_label(KeyAttributeLabel.get_instance())
 
@@ -129,12 +133,14 @@ class DsiEntityKeyQueryResolver:
             notifications_to_process = next_notifications_to_process
             step_index += 1
 
-        result: dict[QueryGroupingKey, list[DunderNameTuple]] = defaultdict(list)
+        source_node_to_query_grouper: dict[SemanticGraphNode, DsiEntityKeyQueryGrouper] = defaultdict(
+            DsiEntityKeyQueryGrouper
+        )
         for source_node, notifications in found_source_to_target_path_notifications.items():
             found_entity_key_queries: MutableOrderedSet[DunderNameTuple] = MutableOrderedSet()
             ambiguous_entity_key_queries: MutableOrderedSet[DunderNameTuple] = MutableOrderedSet()
 
-            key_query_to_model_ids: dict[DunderNameTuple, AnyLengthTuple[SemanticModelId]] = {}
+            key_query_to_queried_model_ids: dict[DunderNameTuple, AnyLengthTuple[SemanticModelId]] = {}
             for notification in notifications:
                 key_query = notification.recipe.dunder_name_elements
                 if key_query in ambiguous_entity_key_queries:
@@ -143,11 +149,10 @@ class DsiEntityKeyQueryResolver:
                     ambiguous_entity_key_queries.add(key_query)
                     found_entity_key_queries.discard(key_query)
                 found_entity_key_queries.add(key_query)
-                key_query_to_model_ids[key_query] = notification.recipe.models_in_join
+                key_query_to_queried_model_ids[key_query] = notification.recipe.models_in_join
 
             for key_query in found_entity_key_queries:
-                model_ids = key_query_to_model_ids[key_query]
-                query_grouping_key = QueryGroupingKey(source_node=source_node, model_ids=model_ids)
-                result[query_grouping_key].append(key_query)
+                queried_model_ids = key_query_to_queried_model_ids[key_query]
+                source_node_to_query_grouper[source_node].add(key_query, queried_model_ids)
 
-        return result
+        return {source_node: source_node_to_query_grouper[source_node].group() for source_node in source_nodes}

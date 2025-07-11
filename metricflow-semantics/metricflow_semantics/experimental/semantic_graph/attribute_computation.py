@@ -13,7 +13,9 @@ from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_data
 from metricflow_semantics.experimental.mf_graph.comparable import Comparable, ComparisonKey
 from metricflow_semantics.experimental.mf_graph.graph_element import HasDisplayedProperty
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
-from metricflow_semantics.experimental.semantic_graph.attribute_resolution.key_query_set import DsiEntityKeyQuerySet
+from metricflow_semantics.experimental.semantic_graph.attribute_resolution.key_query_set import (
+    DsiEntityKeyQueryGroup,
+)
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
@@ -35,7 +37,7 @@ class AttributeRecipeUpdate(HasDisplayedProperty, Comparable):
     add_properties: AnyLengthTuple[LinkableElementProperty] = ()
     join_model: Optional[SemanticModelId] = None
     add_min_time_grain: Optional[TimeGranularity] = None
-    provide_key_query_set: Optional[DsiEntityKeyQuerySet] = None
+    provide_key_query_group: Optional[DsiEntityKeyQueryGroup] = None
 
     # The fields below are specifically to support current definition of `*Spec` objects.
     set_element_type: Optional[LinkableElementType] = None
@@ -55,7 +57,7 @@ class AttributeRecipeUpdate(HasDisplayedProperty, Comparable):
             self.add_entity_link,
             self.set_time_grain,
             self.set_date_part.to_int() if self.set_date_part is not None else None,
-            self.provide_key_query_set,
+            self.provide_key_query_group,
         )
 
     @override
@@ -74,14 +76,10 @@ class AttributeRecipeUpdate(HasDisplayedProperty, Comparable):
             properties.append(DisplayedProperty("join_model", self.join_model.model_name))
         if self.add_min_time_grain is not None:
             properties.append(DisplayedProperty("set_min_grain", self.add_min_time_grain.name))
-        if self.provide_key_query_set is not None:
-            for i, key_query in enumerate(self.provide_key_query_set.entity_key_queries):
-                properties.append(DisplayedProperty(f"key_query_{i}", key_query.query_dunder_name_elements))
-                properties.append(
-                    DisplayedProperty(
-                        f"key_query_{i}_models", [model_id.model_name for model_id in key_query.accessed_model_ids]
-                    )
-                )
+        if self.provide_key_query_group is not None:
+            for i, (key_query, model_ids) in enumerate(self.provide_key_query_group.items()):
+                properties.append(DisplayedProperty(f"key_query_{i}", key_query))
+                properties.append(DisplayedProperty(f"key_query_{i}_models", model_ids))
         if self.set_element_type is not None:
             properties.append(DisplayedProperty("add_type", self.set_element_type.name))
         if self.add_entity_link is not None:
@@ -100,7 +98,7 @@ class AttributeRecipe:
     models_in_join: AnyLengthTuple[SemanticModelId] = ()
     properties: FrozenOrderedSet[LinkableElementProperty] = FrozenOrderedSet()
     entity_link_names: AnyLengthTuple[str] = ()
-    key_query_set: Optional[DsiEntityKeyQuerySet] = None
+    key_query_set: Optional[DsiEntityKeyQueryGroup] = None
 
     element_type: Optional[LinkableElementType] = None
     min_time_grain: Optional[TimeGranularity] = None
@@ -140,7 +138,7 @@ class AttributeRecipe:
             min_time_grain=update.add_min_time_grain or self.min_time_grain,
             time_grain=update.set_time_grain or self.time_grain,
             date_part=update.set_date_part or self.date_part,
-            key_query_set=update.provide_key_query_set or self.key_query_set,
+            key_query_set=update.provide_key_query_group or self.key_query_set,
         )
 
     def push_updates(self, *updates: AttributeRecipeUpdate) -> AttributeRecipe:
@@ -175,7 +173,7 @@ class AttributeRecipe:
             min_time_grain=self.min_time_grain or update.add_min_time_grain,
             time_grain=self.time_grain or update.set_time_grain,
             date_part=self.date_part or update.set_date_part,
-            key_query_set=self.key_query_set or update.provide_key_query_set,
+            key_query_set=self.key_query_set or update.provide_key_query_group,
         )
 
 
