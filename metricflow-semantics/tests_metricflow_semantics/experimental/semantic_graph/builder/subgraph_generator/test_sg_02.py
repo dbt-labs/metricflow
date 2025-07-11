@@ -7,6 +7,7 @@ from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSe
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.references import MeasureReference
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item
+from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
     AttributeRecipeWriterPath,
 )
@@ -351,8 +352,12 @@ def test_key_query_resolver(sg_02_single_join_manifest: PydanticSemanticManifest
 
     result = key_query_resolver.find_paths(
         graph=semantic_graph,
-        source_nodes=semantic_graph.nodes_with_label(LocalModelLabel.get_instance()),
-        target_nodes=semantic_graph.nodes_with_label(KeyAttributeLabel.get_instance()),
+        source_nodes=FrozenOrderedSet(
+            (mf_first_item(semantic_graph.nodes_with_label(LocalModelLabel.get_instance())),)
+        ),
+        target_nodes=FrozenOrderedSet(
+            (mf_first_item(semantic_graph.nodes_with_label(KeyAttributeLabel.get_instance())),),
+        )
     )
 
     logger.debug(LazyFormat("Got result", result=result))

@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Sequence
+from typing import Sequence, Tuple
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.experimental.ordered_set import OrderedSet
@@ -56,13 +56,23 @@ DunderNameTuple = AnyLengthTuple[str]
 
 @dataclass
 class NodeReachabilityContext:
+    def __init__(self):
+        self._key_query_to_weight: dict[DunderNameTuple, int] = {}
+
     def get_key_queries(self) -> Sequence[DunderNameTuple]:
-        pass
+        return tuple(self._key_query_to_weight.keys())
 
-    def get_weight_for_key_query(self, key_query: DunderNameTuple):
-        pass
+    def get_weight_for_key_query(self, key_query: DunderNameTuple) -> int:
+        return self._key_query_to_weight[key_query]
 
-    def add_key_query(self, key_query: DunderNameTuple):
+    def add_key_query(self, key_query: DunderNameTuple, weight: int) -> None:
+        self._key_query_to_weight[key_query] = weight
+
+    def key_query_to_weight(self) -> AnyLengthTuple[Tuple[DunderNameTuple, int]]:
+        return tuple((key, value) for key, value in self._key_query_to_weight.items())
+
+    # def replace_key_query_if_appropriate(self, key_query: DunderNameTuple, weight: int) -> None:
+    #     weight = self._key_query_to_weight
 
 
 class KeyQueryResolver:
@@ -107,7 +117,11 @@ class KeyQueryResolver:
                 )
             )
 
-        node_to_reachable_targets: dict[SemanticGraphNode, list[tuple[DunderNameTuple, int]]] = defaultdict(list)
+        # node_to_reachable_targets: dict[SemanticGraphNode, list[tuple[DunderNameTuple, int]]] = defaultdict(list)
+
+        node_to_reachable_targets: dict[SemanticGraphNode, NodeReachabilityContext] = defaultdict(
+            NodeReachabilityContext
+        )
 
         for target_node in target_nodes:
             dunder_name_element = target_node.attribute_recipe_update.add_dunder_name_element
@@ -119,20 +133,30 @@ class KeyQueryResolver:
                         recipe_update=target_node.attribute_recipe_update,
                     )
                 )
-            node_to_reachable_targets[target_node].append(((dunder_name_element,), 1))
+            # node_to_reachable_targets[target_node].append(((dunder_name_element,), 1))
+            node_to_reachable_targets[target_node].add_key_query(key_query=(dunder_name_element,), weight=1)
 
         nodes_to_process = list(target_nodes)
 
         while len(nodes_to_process) > 0:
             current_node = nodes_to_process.pop()
-
+            if self._verbose_debug_logs:
+                logger.debug(LazyFormat("Visiting node", current_node=current_node))
             if current_node in source_nodes:
                 continue
 
             current_node_reachable_targets = node_to_reachable_targets[current_node]
             predecessor_edges = graph.edges_with_head_node(current_node)
             for predecessor_edge in predecessor_edges:
+
                 predecessor_node = predecessor_edge.tail_node
+                if self._verbose_debug_logs:
+                    logger.debug(
+                        LazyFormat(
+                            "Visiting predecessor node",
+                            predecessor_node=predecessor_node,
+                        )
+                    )
 
                 if predecessor_node not in allowed_nodes:
                     continue
@@ -155,18 +179,32 @@ class KeyQueryResolver:
 
                 process_predecessor_node = False
 
-                for dunder_name_tuple, weight in current_node_reachable_targets:
-                    new_weight = weight + added_weight_from_predecessor
-                    if new_weight <= max_dunder_name_length:
-                        new_dunder_name_tuple = added_dunder_name_elements + dunder_name_tuple
-                        logger.debug(LazyFormat("Created new dunder name", new_dunder_name_tuple=new_dunder_name_tuple, predecessor_node=predecessor_node))
-                        predecessor_node_reachable_targets.append(
-                            (
+                if not added_dunder_name_elements:
+                    for dunder_name_tuple, weight in current_node_reachable_targets.key_query_to_weight():
+                        predecessor_node_reachable_targets.add_key_query(
+                            dunder_name_tuple,
+                            weight,
+                        )
+
+                    process_predecessor_node = True
+                else:
+                    for dunder_name_tuple, weight in current_node_reachable_targets.key_query_to_weight():
+                        # new_dunder_name_tuple = added_dunder_name_elements + dunder_name_tuple
+                        new_weight = weight + added_weight_from_predecessor
+                        if new_weight <= max_dunder_name_length:
+                            new_dunder_name_tuple = added_dunder_name_elements + dunder_name_tuple
+                            # logger.debug(
+                            #     LazyFormat(
+                            #         "Created new dunder name",
+                            #         new_dunder_name_tuple=new_dunder_name_tuple,
+                            #         predecessor_node=predecessor_node,
+                            #     )
+                            # )
+                            predecessor_node_reachable_targets.add_key_query(
                                 new_dunder_name_tuple,
                                 new_weight,
                             )
-                        )
-                        process_predecessor_node = True
+                            process_predecessor_node = True
 
                 if process_predecessor_node:
                     nodes_to_process.append(predecessor_node)
@@ -174,9 +212,7 @@ class KeyQueryResolver:
         # (('listing',), 1), (('user',), 1)
         node_to_key_queries: dict[SemanticGraphNode, AnyLengthTuple[DunderNameTuple]] = {}
         for source_node in source_nodes:
-            node_to_key_queries[source_node] = tuple(
-                key_query for key_query, _ in node_to_reachable_targets[source_node]
-            )
+            node_to_key_queries[source_node] = node_to_reachable_targets[source_node].get_key_queries()
             # node_to_key_queries[source_node] = node_to_reachable_targets[source_node]
 
         return node_to_key_queries
