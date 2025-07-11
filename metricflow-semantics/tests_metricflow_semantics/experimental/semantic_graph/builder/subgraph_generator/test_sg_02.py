@@ -10,6 +10,7 @@ from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_ite
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
     AttributeRecipeWriterPath,
 )
+from metricflow_semantics.experimental.semantic_graph.attribute_resolution.key_query_resolver import KeyQueryResolver
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.sg_linkable_spec_resolver import (
     SemanticGraphLinkableSpecResolver,
 )
@@ -23,6 +24,8 @@ from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node impor
 from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
     DsiEntityLabel,
     GroupByAttributeLabel,
+    KeyAttributeLabel,
+    LocalModelLabel,
     MeasureLabel,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
@@ -329,3 +332,27 @@ def test_resolver_outputs(
 ) -> None:
     # LinkableSpecResolverTester.compare_resolver_outputs_for_measures(simple_semantic_manifest, measure_name="bookings")
     LinkableSpecResolverTester.compare_resolver_outputs_for_measures(sg_02_single_join_manifest)
+
+
+def test_key_query_resolver(sg_02_single_join_manifest: PydanticSemanticManifest) -> None:
+    semantic_manifest = sg_02_single_join_manifest
+    manifest_object_lookup = ManifestObjectLookup(semantic_manifest)
+    path_finder_cache = PathFinderCache[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath]()
+    path_finder = MetricflowGraphPathFinder[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath](
+        path_finder_cache
+    )
+    builder = SemanticGraphBuilder(
+        manifest_object_lookup=manifest_object_lookup,
+        path_finder=path_finder,
+    )
+    semantic_graph = builder.build()
+
+    key_query_resolver = KeyQueryResolver()
+
+    result = key_query_resolver.find_paths(
+        graph=semantic_graph,
+        source_nodes=semantic_graph.nodes_with_label(LocalModelLabel.get_instance()),
+        target_nodes=semantic_graph.nodes_with_label(KeyAttributeLabel.get_instance()),
+    )
+
+    logger.debug(LazyFormat("Got result", result=result))

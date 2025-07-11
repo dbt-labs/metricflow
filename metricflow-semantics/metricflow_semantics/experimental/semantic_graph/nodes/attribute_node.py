@@ -21,6 +21,7 @@ from metricflow_semantics.experimental.semantic_graph.model_id import SemanticMo
 from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
     GroupByAttributeLabel,
     GroupByMetricLabel,
+    KeyAttributeLabel,
     KeyEntityClusterLabel,
     MeasureLabel,
     TimeClusterLabel,
@@ -186,7 +187,9 @@ class KeyAttributeNode(AttributeNode):
     @override
     @cached_property
     def labels(self) -> FrozenOrderedSet[MetricflowGraphLabel]:
-        return super(KeyAttributeNode, self).labels.union((KeyEntityClusterLabel.get_instance(),))
+        return super(KeyAttributeNode, self).labels.union(
+            (KeyEntityClusterLabel.get_instance(), KeyAttributeLabel.get_instance())
+        )
 
 
 @singleton_dataclass(order=False)

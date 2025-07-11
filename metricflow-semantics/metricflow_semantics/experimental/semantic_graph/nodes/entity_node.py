@@ -255,7 +255,7 @@ class JoinedModelNode(SemanticGraphNode):
     @override
     @cached_property
     def labels(self) -> FrozenOrderedSet[MetricflowGraphLabel]:
-        return super(SemanticGraphNode, self).labels.union((JoinedModelLabel(),))
+        return super(SemanticGraphNode, self).labels.union((JoinedModelLabel.get_instance(),))
 
     @override
     @cached_property

@@ -128,3 +128,10 @@ class KeyEntityClusterLabel(MetricflowGraphLabel):
     @staticmethod
     def get_instance() -> KeyEntityClusterLabel:
         return KeyEntityClusterLabel()
+
+
+@singleton_dataclass()
+class KeyAttributeLabel(MetricflowGraphLabel):
+    @staticmethod
+    def get_instance() -> KeyAttributeLabel:
+        return KeyAttributeLabel()
