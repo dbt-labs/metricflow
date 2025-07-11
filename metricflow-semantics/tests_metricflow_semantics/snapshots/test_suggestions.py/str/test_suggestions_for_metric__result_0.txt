@@ -14,7 +14,3 @@ Error #1:
   Query Input:
 
     booking
-
-  Issue Location:
-
-    [Resolve Query(['booking'])]

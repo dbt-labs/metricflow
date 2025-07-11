@@ -16,7 +16,3 @@ Error #1:
   Query Input:
 
     long_invalid_metric_name__________________________________________________
-
-  Issue Location:
-
-    [Resolve Query(['bookings', 'long_invalid_metric_name______________________...)]

@@ -54,6 +54,7 @@ class SpecPatternParameterSet:
     time_granularity_name: Optional[str] = None
     date_part: Optional[DatePart] = None
     metric_subquery_entity_links: Optional[Tuple[EntityReference, ...]] = None
+    descending: Optional[bool] = None
 
     @staticmethod
     def from_parameters(  # noqa: D102
@@ -63,6 +64,7 @@ class SpecPatternParameterSet:
         time_granularity_name: Optional[str] = None,
         date_part: Optional[DatePart] = None,
         metric_subquery_entity_links: Optional[Tuple[EntityReference, ...]] = None,
+        descending: Optional[bool] = None,
     ) -> SpecPatternParameterSet:
         return SpecPatternParameterSet(
             fields_to_compare=tuple(sorted(fields_to_compare)),
@@ -71,6 +73,7 @@ class SpecPatternParameterSet:
             time_granularity_name=time_granularity_name,
             date_part=date_part,
             metric_subquery_entity_links=metric_subquery_entity_links,
+            descending=descending,
         )
 
     def __post_init__(self) -> None:

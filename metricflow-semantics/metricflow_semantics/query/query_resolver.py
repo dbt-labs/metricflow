@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import itertools
 import logging
+import time
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Set, Tuple
@@ -64,6 +65,7 @@ from metricflow_semantics.query.validation_rules.unique_column_names import Uniq
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.order_by_spec import OrderBySpec
+from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_set import group_specs_by_type
 from metricflow_semantics.workarounds.reference import sorted_semantic_model_references
@@ -176,6 +178,20 @@ class MetricFlowQueryResolver:
             resolution = resolution.with_alias(group_by_item_input.alias)
         return resolution
 
+    def _resolve_metric_input(
+        self, spec_pattern: SpecPattern, available_metric_specs: Sequence[MetricSpec]
+    ) -> List[MetricSpec]:
+        start_time = time.perf_counter()
+        matching_specs = set(spec_pattern.match(available_metric_specs))
+
+        filtered_metric_specs: List[MetricSpec] = []
+        for metric_spec in available_metric_specs:
+            if metric_spec in matching_specs:
+                filtered_metric_specs.append(metric_spec)
+
+        logger.debug(LazyFormat(lambda: f"Filtering valid metrics took: {time.perf_counter() - start_time:.2f}s"))
+        return filtered_metric_specs
+
     def _resolve_metric_inputs(
         self,
         metric_inputs: Sequence[ResolverInputForMetric],
@@ -196,7 +212,9 @@ class MetricFlowQueryResolver:
 
         # Find the metric that matches the metric pattern from the input.
         for metric_input in metric_inputs:
-            matching_specs = metric_input.spec_pattern.match(available_metric_specs)
+            matching_specs = self._resolve_metric_input(
+                spec_pattern=metric_input.spec_pattern, available_metric_specs=available_metric_specs
+            )
             if len(matching_specs) == 1:
                 matching_spec = matching_specs[0]
                 alias = metric_input.alias
@@ -291,11 +309,11 @@ class MetricFlowQueryResolver:
         # The pattern needs to be used because there are cases where the order-by-item is specified in a different way
         # from the group-by-item, so an equality comparison won't work.
         for resolver_input_for_order_by in resolver_inputs_for_order_by_items:
-            matching_specs: List[InstanceSpec] = []
+            matching_specs: Set[InstanceSpec] = set()
             for possible_input in resolver_input_for_order_by.possible_inputs:
                 spec_pattern = possible_input.spec_pattern
-                matching_specs.extend(spec_pattern.match(metric_specs))
-                matching_specs.extend(spec_pattern.match(group_by_item_specs))
+                matching_specs.update(spec_pattern.match(metric_specs))
+                matching_specs.update(spec_pattern.match(group_by_item_specs))
 
             if len(matching_specs) != 1:
                 mapping_items.append(
@@ -313,7 +331,7 @@ class MetricFlowQueryResolver:
                 order_by_specs.append(
                     OrderBySpec(
                         # Ignore aliases in the order by since we'll render the expression instead of the alias.
-                        instance_spec=matching_specs[0].with_alias(None),
+                        instance_spec=matching_specs.pop().with_alias(None),
                         descending=resolver_input_for_order_by.descending,
                     )
                 )
@@ -425,30 +443,30 @@ class MetricFlowQueryResolver:
         min_max_only_input = resolver_input_for_query.min_max_only
         apply_group_by_input = resolver_input_for_query.apply_group_by
 
+        mappings_to_merge: List[InputToIssueSetMapping] = []
+
+        # Resolve metrics.
+        resolve_metrics_result = self._resolve_metric_inputs(
+            metric_inputs=metric_inputs,
+            query_resolution_path=MetricFlowQueryResolutionPath.empty_instance(),
+        )
+        mappings_to_merge.append(resolve_metrics_result.input_to_issue_set_mapping)
+        metric_specs = resolve_metrics_result.metric_specs
+
         # Define a resolution path for issues where the input is considered to be the whole query.
         query_resolution_path = MetricFlowQueryResolutionPath.from_path_item(
             QueryGroupByItemResolutionNode.create(
                 parent_nodes=(),
-                metrics_in_query=tuple(metric_input.spec_pattern.metric_reference for metric_input in metric_inputs),
+                metrics_in_query=tuple(metric_spec.reference for metric_spec in metric_specs),
                 where_filter_intersection=query_level_filter_input.where_filter_intersection,
             )
         )
-
-        mappings_to_merge: List[InputToIssueSetMapping] = []
 
         # Check that the query contains metrics or group by items.
         resolve_metrics_or_group_by_result = self._resolve_has_metric_or_group_by_inputs(
             resolver_input_for_query=resolver_input_for_query, query_resolution_path=query_resolution_path
         )
         mappings_to_merge.append(resolve_metrics_or_group_by_result.input_to_issue_set_mapping)
-
-        # Resolve metrics.
-        resolve_metrics_result = self._resolve_metric_inputs(
-            metric_inputs=metric_inputs,
-            query_resolution_path=query_resolution_path,
-        )
-        mappings_to_merge.append(resolve_metrics_result.input_to_issue_set_mapping)
-        metric_specs = resolve_metrics_result.metric_specs
 
         # Resolve limit
         resolve_limit_result = self._resolve_limit_input(

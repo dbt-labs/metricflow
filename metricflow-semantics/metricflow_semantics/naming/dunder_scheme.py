@@ -10,7 +10,7 @@ from typing_extensions import override
 from metricflow_semantics.errors.error_classes import InvalidQuerySyntax
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
-from metricflow_semantics.naming.naming_scheme import QueryItemNamingScheme
+from metricflow_semantics.naming.naming_scheme import QueryItemLocation, QueryItemNamingScheme
 from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.patterns.entity_link_pattern import (
     EntityLinkPattern,
@@ -51,8 +51,15 @@ class DunderNamingScheme(QueryItemNamingScheme):
         return names[0]
 
     @override
-    def spec_pattern(self, input_str: str, semantic_manifest_lookup: SemanticManifestLookup) -> EntityLinkPattern:
-        if not self.input_str_follows_scheme(input_str, semantic_manifest_lookup=semantic_manifest_lookup):
+    def spec_pattern(
+        self,
+        input_str: str,
+        semantic_manifest_lookup: SemanticManifestLookup,
+        query_item_location: QueryItemLocation = QueryItemLocation.NON_ORDER_BY,
+    ) -> EntityLinkPattern:
+        if not self.input_str_follows_scheme(
+            input_str, semantic_manifest_lookup=semantic_manifest_lookup, query_item_location=query_item_location
+        ):
             raise InvalidQuerySyntax(f"{repr(input_str)} does not follow this scheme.")
 
         input_str = input_str.lower()
@@ -76,7 +83,12 @@ class DunderNamingScheme(QueryItemNamingScheme):
         )
 
     @override
-    def input_str_follows_scheme(self, input_str: str, semantic_manifest_lookup: SemanticManifestLookup) -> bool:
+    def input_str_follows_scheme(
+        self,
+        input_str: str,
+        semantic_manifest_lookup: SemanticManifestLookup,
+        query_item_location: QueryItemLocation = QueryItemLocation.NON_ORDER_BY,
+    ) -> bool:
         # This naming scheme is case-insensitive.
         input_str = input_str.lower()
         if DunderNamingScheme._INPUT_REGEX.match(input_str) is None:

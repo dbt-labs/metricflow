@@ -13,6 +13,23 @@ saved_query:
       - "{{ Dimension('listing__capacity_latest') }} > 3"
 ---
 saved_query:
+  name: p0_booking_with_order_by_and_limit
+  description: p0 bookings with order by and limit
+  query_params:
+    metrics:
+      - bookings
+      - views
+    group_by:
+      - TimeDimension('metric_time', 'day')
+      - Dimension('listing__capacity_latest')
+    order_by:
+      - TimeDimension('metric_time', 'day').descending(True)
+      - Dimension('listing__capacity_latest')
+      - Metric('bookings').descending(True)
+      - Metric('views')
+    limit: 10
+---
+saved_query:
   name: saved_query_with_cumulative_metric
   description: |
     Saved query that includes a cumulative metric. Added as cumulative metrics have a branch in the CLI for

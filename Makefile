@@ -119,6 +119,11 @@ testx:
 testx-snap:
 	make test ADDITIONAL_PYTEST_OPTIONS='-x --overwrite-snapshots'
 
+.PHONY: test-snap-slow
+test-snap-slow:
+	cd metricflow-semantics && hatch -v run dev-env:pytest -vv -n $(PARALLELISM) --overwrite-snapshots $(TESTS_METRICFLOW_SEMANTICS)/
+	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) --overwrite-snapshots $(TESTS_METRICFLOW)/
+
 .PHONY: test-build-packages
 test-build-packages:
 	PYTHONPATH=. python scripts/ci_tests/run_package_build_tests.py --metricflow-repo-directory=.
