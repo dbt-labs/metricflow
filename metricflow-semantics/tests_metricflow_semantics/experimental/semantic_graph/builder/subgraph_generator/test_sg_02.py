@@ -7,11 +7,12 @@ from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSe
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.references import MeasureReference
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item
-from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
     AttributeRecipeWriterPath,
 )
-from metricflow_semantics.experimental.semantic_graph.attribute_resolution.key_query_resolver import KeyQueryResolver
+from metricflow_semantics.experimental.semantic_graph.attribute_resolution.key_query_resolver import (
+    DsiEntityKeyQueryResolver,
+)
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.sg_linkable_spec_resolver import (
     SemanticGraphLinkableSpecResolver,
 )
@@ -25,8 +26,6 @@ from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node impor
 from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
     DsiEntityLabel,
     GroupByAttributeLabel,
-    KeyAttributeLabel,
-    LocalModelLabel,
     MeasureLabel,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
@@ -348,16 +347,16 @@ def test_key_query_resolver(sg_02_single_join_manifest: PydanticSemanticManifest
     )
     semantic_graph = builder.build()
 
-    key_query_resolver = KeyQueryResolver()
+    key_query_resolver = DsiEntityKeyQueryResolver()
 
-    result = key_query_resolver.find_paths(
-        graph=semantic_graph,
-        source_nodes=FrozenOrderedSet(
-            (mf_first_item(semantic_graph.nodes_with_label(LocalModelLabel.get_instance())),)
-        ),
-        target_nodes=FrozenOrderedSet(
-            (mf_first_item(semantic_graph.nodes_with_label(KeyAttributeLabel.get_instance())),),
-        )
+    result = key_query_resolver.find_key_queries(
+        semantic_graph=semantic_graph,
+        # source_nodes=FrozenOrderedSet(
+        #     (mf_first_item(semantic_graph.nodes_with_label(LocalModelLabel.get_instance())),)
+        # ),
+        # target_nodes=FrozenOrderedSet(
+        #     (mf_first_item(semantic_graph.nodes_with_label(KeyAttributeLabel.get_instance())),),
+        # ),
     )
 
     logger.debug(LazyFormat("Got result", result=result))

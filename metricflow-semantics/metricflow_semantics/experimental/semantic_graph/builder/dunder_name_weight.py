@@ -8,6 +8,7 @@ from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums import DatePart, TimeGranularity
 from typing_extensions import override
 
+from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeRecipe
 from metricflow_semantics.experimental.semantic_graph.edges.edge_labels import MetricDefinitionLabel
 from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
     SemanticGraphEdge,
@@ -34,6 +35,20 @@ class DunderNameWeightFunction(WeightFunction[SemanticGraphNode, SemanticGraphEd
     def __init__(self) -> None:  # noqa: D107
         self._verbose_debug_logs = False
 
+    @staticmethod
+    def recipe_weight(next_attribute_recipe: AttributeRecipe) -> Optional[int]:
+        dundered_name_elements = next_attribute_recipe.dunder_name_elements
+        # We do not allow repeated element names in the dundered name (e.g. `listing__listing`),
+        # so return `None` to indicate a blocked edge.
+        unique_dunder_name_element_count = len(set(dundered_name_elements))
+        if unique_dunder_name_element_count != len(dundered_name_elements) and len(dundered_name_elements) > 1:
+            return None
+
+        if len(next_attribute_recipe.models_in_join) != len(set(next_attribute_recipe.models_in_join)):
+            return None
+
+        return len(next_attribute_recipe.entity_link_names)
+
     @override
     def incremental_weight(
         self, path_to_node: AttributeRecipeWriterPath, next_edge: SemanticGraphEdge, max_path_weight: int
@@ -52,8 +67,8 @@ class DunderNameWeightFunction(WeightFunction[SemanticGraphNode, SemanticGraphEd
         current_recipe = recipe_writer.latest_recipe
         next_edge_update = next_edge.attribute_recipe_update
         next_node_update = next_edge.head_node.attribute_recipe_update
-        next_attribute_recipe = current_recipe.with_update(next_edge_update)
-        next_attribute_recipe = next_attribute_recipe.with_update(next_node_update)
+        next_attribute_recipe = current_recipe.append_update(next_edge_update)
+        next_attribute_recipe = next_attribute_recipe.append_update(next_node_update)
 
         # Return quickly with a weight check.
         if len(next_attribute_recipe.entity_link_names) > max_path_weight:

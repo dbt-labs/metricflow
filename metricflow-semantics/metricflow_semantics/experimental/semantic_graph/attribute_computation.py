@@ -114,7 +114,10 @@ class AttributeRecipe:
 
         return tuple(self.models_in_join)[-1]
 
-    def with_update(self, update: AttributeRecipeUpdate) -> AttributeRecipe:
+    def append_update(self, update: AttributeRecipeUpdate) -> AttributeRecipe:
+        if update == AttributeRecipe():
+            return self
+
         dundered_name_elements = self.dunder_name_elements
         if update.add_dunder_name_element is not None:
             dundered_name_elements = dundered_name_elements + (update.add_dunder_name_element,)
@@ -138,6 +141,41 @@ class AttributeRecipe:
             time_grain=update.set_time_grain or self.time_grain,
             date_part=update.set_date_part or self.date_part,
             key_query_set=update.provide_key_query_set or self.key_query_set,
+        )
+
+    def push_updates(self, *updates: AttributeRecipeUpdate) -> AttributeRecipe:
+        result = self
+        for update in updates:
+            result = self.push_update(update)
+        return result
+
+    def push_update(self, update: AttributeRecipeUpdate) -> AttributeRecipe:
+        if update == AttributeRecipe():
+            return self
+
+        dundered_name_elements = self.dunder_name_elements
+        if update.add_dunder_name_element is not None:
+            dundered_name_elements = (update.add_dunder_name_element,) + dundered_name_elements
+        entity_link_names = self.entity_link_names
+        if update.add_entity_link is not None:
+            entity_link_names = (update.add_entity_link,) + entity_link_names
+        models_in_join = self.models_in_join
+        if update.join_model is not None:
+            if len(models_in_join) == 0:
+                models_in_join = (update.join_model,)
+            elif models_in_join[0] != update.join_model:
+                models_in_join = (update.join_model,) + models_in_join
+
+        return AttributeRecipe(
+            dunder_name_elements=dundered_name_elements,
+            models_in_join=models_in_join,
+            properties=FrozenOrderedSet(update.add_properties).union(self.properties),
+            element_type=self.element_type or update.set_element_type,
+            entity_link_names=entity_link_names,
+            min_time_grain=self.min_time_grain or update.add_min_time_grain,
+            time_grain=self.time_grain or update.set_time_grain,
+            date_part=self.date_part or update.set_date_part,
+            key_query_set=self.key_query_set or update.provide_key_query_set,
         )
 
 
@@ -170,7 +208,7 @@ class AttributeRecipeWriter:
 
         previous_recipe = self._recipe_versions[-1]
 
-        self._recipe_versions.append(previous_recipe.with_update(update))
+        self._recipe_versions.append(previous_recipe.append_update(update))
         return
 
     def pop_update(self) -> None:
