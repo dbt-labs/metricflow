@@ -523,7 +523,7 @@ class LinkableSpecIndexBuilder:
             if time_granularity != defined_granularity:
                 properties.add(LinkableElementProperty.DERIVED_TIME_GRANULARITY)
             linkable_dimension = LinkableDimension.create(
-                defined_in_semantic_model=measure_semantic_model.reference if measure_semantic_model else None,
+                defined_in_semantic_model=None,
                 element_name=MetricFlowReservedKeywords.METRIC_TIME.value,
                 dimension_type=DimensionType.TIME,
                 entity_links=(),

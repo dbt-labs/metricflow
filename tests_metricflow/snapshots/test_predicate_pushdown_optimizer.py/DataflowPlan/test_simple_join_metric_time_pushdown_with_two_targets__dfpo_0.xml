@@ -29,9 +29,6 @@ docstring:
             <!--                 properties=(                                            -->
             <!--                   METRIC_TIME,                                          -->
             <!--                 ),                                                      -->
-            <!--                 defined_in_semantic_model=SemanticModelReference(       -->
-            <!--                   semantic_model_name='bookings_source',                -->
-            <!--                 ),                                                      -->
             <!--                 element_name='metric_time',                             -->
             <!--                 dimension_type=TIME,                                    -->
             <!--                 join_path=SemanticModelJoinPath(                        -->
@@ -85,9 +82,6 @@ docstring:
                         <!--       LinkableElementUnion(                                       -->
                         <!--         linkable_dimension=LinkableDimension(                     -->
                         <!--           properties=(METRIC_TIME,),                              -->
-                        <!--           defined_in_semantic_model=SemanticModelReference(       -->
-                        <!--             semantic_model_name='bookings_source',                -->
-                        <!--           ),                                                      -->
                         <!--           element_name='metric_time',                             -->
                         <!--           dimension_type=TIME,                                    -->
                         <!--           join_path=SemanticModelJoinPath(                        -->
