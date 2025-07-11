@@ -109,6 +109,7 @@ class Dimension(SearchableElement):
     entity_links: Tuple[EntityReference, ...]
     type_params: Optional[DimensionTypeParams]
     metadata: Optional[Metadata]
+    semantic_model_reference: Optional[SemanticModelReference]
     config: Optional[SemanticLayerElementConfig] = None
     is_partition: bool = False
     expr: Optional[str] = None
@@ -119,6 +120,7 @@ class Dimension(SearchableElement):
         cls,
         pydantic_dimension: SemanticManifestDimension,
         entity_links: Tuple[EntityReference, ...],
+        semantic_model_reference: SemanticModelReference,
     ) -> Dimension:
         """Build from pydantic Dimension and entity_key."""
         qualified_name = DimensionSpec(element_name=pydantic_dimension.name, entity_links=entity_links).qualified_name
@@ -140,6 +142,7 @@ class Dimension(SearchableElement):
             expr=pydantic_dimension.expr,
             label=pydantic_dimension.label,
             entity_links=entity_links,
+            semantic_model_reference=semantic_model_reference,
         )
 
     @property

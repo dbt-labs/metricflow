@@ -660,6 +660,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             ),
             is_partition=False,
             type=DimensionType.TIME,
+            semantic_model_reference=None,
         )
 
     def simple_dimensions_for_metrics(  # noqa: D102
@@ -695,6 +696,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                             dimension_reference=linkable_dimension.reference,
                         ),
                         entity_links=path_key.entity_links,
+                        semantic_model_reference=linkable_dimension.defined_in_semantic_model,
                     )
                 dimensions.append(dimension)
 
@@ -715,6 +717,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                             semantic_model=semantic_model, dimension_reference=dimension_reference
                         ),
                         entity_links=(SemanticModelHelper.resolved_primary_entity(semantic_model),),
+                        semantic_model_reference=semantic_model.reference,
                     )
                     dimensions.append(dimension)
 
