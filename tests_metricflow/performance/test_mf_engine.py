@@ -219,11 +219,11 @@ def test_semantic_graph_init_time() -> None:
     #     globals=globals(),
     # )
 
-    # with log_block_runtime("new init"):
-    #     _time_new_init(semantic_manifest)
+    with log_block_runtime("new init"):
+        _time_new_init(semantic_manifest)
 
-    with log_block_runtime("original init"):
-        _time_original_init(semantic_manifest)
+    # with log_block_runtime("original init"):
+    #     _time_original_init(semantic_manifest)
 
 
 @fast_frozen_dataclass()

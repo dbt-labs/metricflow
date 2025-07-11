@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from collections import defaultdict
 from collections.abc import Set
 from dataclasses import dataclass
 from functools import cached_property
@@ -16,7 +17,10 @@ from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attri
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_resolver import (
     AttributeResolver,
 )
-from metricflow_semantics.experimental.semantic_graph.attribute_resolution.key_query_set import DsiEntityKeyQuerySet
+from metricflow_semantics.experimental.semantic_graph.attribute_resolution.key_query_resolver import \
+    DsiEntityKeyQueryResolver
+from metricflow_semantics.experimental.semantic_graph.attribute_resolution.key_query_set import DsiEntityKeyQuerySet, \
+    DsiEntityKeyQuery
 from metricflow_semantics.experimental.semantic_graph.builder.graph_change_rule import (
     SemanticSubgraphGenerator,
     SubgraphGeneratorArgumentSet,
@@ -45,6 +49,7 @@ from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node 
 from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder import MetricflowGraphPathFinder
 from metricflow_semantics.experimental.semantic_graph.semantic_graph import MutableSemanticGraph, SemanticGraph
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.mf_logging.runtime import log_block_runtime
 
 logger = logging.getLogger(__name__)
 
@@ -136,24 +141,62 @@ class _GenerateGroupByMetricSubgraphContext:
 
     @cached_property
     def _model_node_to_key_query_set(self) -> dict[SemanticGraphNode, DsiEntityKeyQuerySet]:
-        current_graph = self._current_graph
-        local_model_nodes = current_graph.nodes_with_label(LocalModelLabel.get_instance())
-        result = {}
+        # current_graph = self._current_graph
+        # local_model_nodes = current_graph.nodes_with_label(LocalModelLabel.get_instance())
+        # result = {}
+        #
+        # for local_model_node in local_model_nodes:
+        #     recipe_update = local_model_node.attribute_recipe_update
+        #     model_id = recipe_update.join_model
+        #     if model_id is None:
+        #         raise RuntimeError(
+        #             LazyFormat(
+        #                 "Expected a local model node to have an associated model ID",
+        #                 local_model_node=local_model_node,
+        #                 recipe_update=recipe_update,
+        #             )
+        #         )
+        #     result[local_model_node] = DsiEntityKeyQuerySet(
+        #         entity_key_queries=self._attribute_resolver.generate_entity_key_queries(local_model_node),
+        #     )
 
-        for local_model_node in local_model_nodes:
-            recipe_update = local_model_node.attribute_recipe_update
-            model_id = recipe_update.join_model
-            if model_id is None:
-                raise RuntimeError(
-                    LazyFormat(
-                        "Expected a local model node to have an associated model ID",
-                        local_model_node=local_model_node,
-                        recipe_update=recipe_update,
+
+        with log_block_runtime("Resolve key queries"):
+            resolver = DsiEntityKeyQueryResolver()
+
+            node_to_key_queries: dict[SemanticGraphNode, list[DsiEntityKeyQuery]] = defaultdict(list)
+            resolver_result = resolver.find_key_queries(self._current_graph)
+            # logger.debug(
+            #     LazyFormat(
+            #         "Got resolver result",
+            #         resolver_result=resolver_result,
+            #     )
+            # )
+            for group_id, dunder_name_tuples in resolver_result.items():
+                node = group_id.source_node
+                source_model_ids = group_id.model_ids
+
+                key_queries: list[DsiEntityKeyQuery] = []
+
+                for dunder_name_tuple in dunder_name_tuples:
+                    key_queries.append(
+                        DsiEntityKeyQuery(
+                            accessed_model_ids=source_model_ids,
+                            query_dunder_name_elements=dunder_name_tuple,
+                        )
                     )
-                )
-            result[local_model_node] = DsiEntityKeyQuerySet(
-                entity_key_queries=self._attribute_resolver.generate_entity_key_queries(local_model_node),
-            )
+                node_to_key_queries[node].extend(key_queries)
+
+        result = {
+            node: DsiEntityKeyQuerySet(entity_key_queries=tuple(key_queries))
+            for node, key_queries in node_to_key_queries.items()
+        }
+        # logger.debug(
+        #     LazyFormat(
+        #         "Got key query result",
+        #         result=result,
+        #     )
+        # )
         return result
 
     def _get_key_query_set_for_metric_node(
