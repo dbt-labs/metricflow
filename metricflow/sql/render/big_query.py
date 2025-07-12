@@ -133,7 +133,7 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
             prefix = "iso"
 
         return SqlExpressionRenderResult(
-            sql=f"DATETIME_TRUNC({arg_rendered.sql}, {prefix}{node.time_granularity.value})",
+            sql=f"TIMESTAMP_TRUNC({arg_rendered.sql}, {prefix}{node.time_granularity.value})",
             bind_parameter_set=arg_rendered.bind_parameter_set,
         )
 
