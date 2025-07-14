@@ -46,9 +46,6 @@ FilterSpecResolutionLookUp(
                 DERIVED_TIME_GRANULARITY,
                 METRIC_TIME,
               ),
-              defined_in_semantic_model=SemanticModelReference(
-                semantic_model_name='monthly_measures_source',
-              ),
               element_name='metric_time',
               dimension_type=TIME,
               join_path=SemanticModelJoinPath(
@@ -64,9 +61,6 @@ FilterSpecResolutionLookUp(
             LinkableDimension(
               properties=(
                 METRIC_TIME,
-              ),
-              defined_in_semantic_model=SemanticModelReference(
-                semantic_model_name='yearly_measure_source',
               ),
               element_name='metric_time',
               dimension_type=TIME,

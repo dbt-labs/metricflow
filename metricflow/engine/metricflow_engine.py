@@ -660,6 +660,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             ),
             is_partition=False,
             type=DimensionType.TIME,
+            semantic_model_reference=None,
         )
 
     def simple_dimensions_for_metrics(  # noqa: D102
@@ -695,6 +696,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                             dimension_reference=linkable_dimension.reference,
                         ),
                         entity_links=path_key.entity_links,
+                        semantic_model_reference=linkable_dimension.defined_in_semantic_model,
                     )
                 dimensions.append(dimension)
 
@@ -715,6 +717,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                             semantic_model=semantic_model, dimension_reference=dimension_reference
                         ),
                         entity_links=(SemanticModelHelper.resolved_primary_entity(semantic_model),),
+                        semantic_model_reference=semantic_model.reference,
                     )
                     dimensions.append(dimension)
 
@@ -755,9 +758,19 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         metric_lookup = self._semantic_manifest_lookup.metric_lookup
         metrics: List[Metric] = []
         for pydantic_metric in metric_lookup.get_metrics(metric_lookup.metric_references):
+            semantic_models = []
+            for measure in pydantic_metric.input_measures:
+                semantic_model_reference = (
+                    self._semantic_manifest_lookup.semantic_model_lookup.measure_lookup.get_properties(
+                        measure_reference=measure.measure_reference
+                    ).model_reference
+                )
+                if semantic_model_reference not in semantic_models:
+                    semantic_models.append(semantic_model_reference)
             metric = Metric.from_pydantic(
                 pydantic_metric=pydantic_metric,
                 dimensions=self.simple_dimensions_for_metrics([pydantic_metric.name]) if include_dimensions else [],
+                semantic_models=semantic_models,
             )
             metrics.append(metric)
         return sorted(metrics, key=lambda x: x.default_search_and_sort_attribute)

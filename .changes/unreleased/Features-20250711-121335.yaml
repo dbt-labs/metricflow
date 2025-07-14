@@ -1,0 +1,6 @@
+kind: Features
+body: Expose semantic_model(s) on Metrics and Dimensions in API
+time: 2025-07-11T12:13:35.785231-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1776"
