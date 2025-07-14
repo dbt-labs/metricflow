@@ -176,7 +176,7 @@ class LinkableElementSet(SemanticModelDerivation):
                         key=lambda linkable_dimension: (
                             linkable_dimension.semantic_model_origin.semantic_model_name
                             if linkable_dimension.defined_in_semantic_model
-                            else ""
+                            else linkable_dimension.join_path.left_semantic_model_reference.semantic_model_name
                         ),
                     )
                 )
