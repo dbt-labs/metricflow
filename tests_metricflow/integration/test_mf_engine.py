@@ -4,6 +4,7 @@ from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
+from metricflow.engine.metricflow_engine import DimensionOrderByAttribute
 from tests_metricflow.integration.conftest import IntegrationTestHelpers
 from tests_metricflow.snapshot_utils import assert_object_snapshot_equal
 
@@ -58,6 +59,25 @@ def test_list_dimensions_for_metrics_for_multiple_metrics(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         obj_id="result0",
         obj=[dim.qualified_name for dim in multi_metric_dims],
+    )
+
+
+def test_list_dimensions_order_by_semantic_model_name(  # noqa: D103
+    request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, it_helpers: IntegrationTestHelpers
+) -> None:
+    """Test getting dimensions for a single metric."""
+    single_metric_dims = it_helpers.mf_engine.list_dimensions(order_by=DimensionOrderByAttribute.SEMANTIC_MODEL_NAME)
+    assert_object_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        obj_id="result0",
+        obj=[
+            (
+                dim.semantic_model_reference.semantic_model_name if dim.semantic_model_reference else "",
+                dim.qualified_name,
+            )
+            for dim in single_metric_dims
+        ],
     )
 
 
