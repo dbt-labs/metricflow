@@ -733,9 +733,9 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                     )
                     dimensions.append(dimension)
 
-        def sort_dimensions(dimension: Dimension) -> str:
+        def sort_dimensions(dimension: Dimension) -> Tuple[str, ...]:
             if order_by == DimensionOrderByAttribute.QUALIFIED_NAME:
-                return dimension.qualified_name
+                return (dimension.qualified_name,)
             elif order_by == DimensionOrderByAttribute.SEMANTIC_MODEL_NAME:
                 return (
                     (
