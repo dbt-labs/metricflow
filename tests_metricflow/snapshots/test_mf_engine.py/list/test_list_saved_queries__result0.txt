@@ -3,4 +3,10 @@ test_filename: test_mf_engine.py
 docstring:
   Test listing all saved_queries.
 ---
-['dimensions_only', 'p0_booking', 'saved_query_with_cumulative_metric', 'saved_query_with_metric_joins_and_filter']
+[
+  'dimensions_only',
+  'p0_booking',
+  'p0_booking_with_order_by_and_limit',
+  'saved_query_with_cumulative_metric',
+  'saved_query_with_metric_joins_and_filter',
+]

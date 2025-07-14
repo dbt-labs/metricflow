@@ -9,6 +9,8 @@ from dbt_semantic_interfaces.implementations.filters.where_filter import (
     PydanticWhereFilter,
     PydanticWhereFilterIntersection,
 )
+from dbt_semantic_interfaces.parsing.text_input.ti_description import QueryItemType
+from dbt_semantic_interfaces.parsing.where_filter.jinja_object_parser import JinjaObjectParser
 from dbt_semantic_interfaces.protocols import SavedQuery
 from dbt_semantic_interfaces.protocols.where_filter import WhereFilter
 from dbt_semantic_interfaces.references import SemanticModelReference
@@ -24,6 +26,7 @@ from metricflow_semantics.mf_logging.runtime import log_runtime
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.naming.dunder_scheme import DunderNamingScheme
 from metricflow_semantics.naming.metric_scheme import MetricNamingScheme
+from metricflow_semantics.naming.naming_scheme import QueryItemLocation
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow_semantics.protocols.query_parameter import (
     GroupByQueryParameter,
@@ -82,11 +85,8 @@ class MetricFlowQueryParser:
         where_filter_pattern_factory: WhereFilterPatternFactory = DefaultWhereFilterPatternFactory(),
     ) -> None:
         self._manifest_lookup = semantic_manifest_lookup
-        self._metric_naming_schemes = (MetricNamingScheme(),)
-        self._group_by_item_naming_schemes = (
-            ObjectBuilderNamingScheme(),
-            DunderNamingScheme(),
-        )
+        self._metric_naming_schemes = (MetricNamingScheme(), ObjectBuilderNamingScheme())
+        self._group_by_item_naming_schemes = (ObjectBuilderNamingScheme(), DunderNamingScheme())
         self._where_filter_pattern_factory = where_filter_pattern_factory
         self._time_period_adjuster = DateutilTimePeriodAdjuster()
 
@@ -113,6 +113,12 @@ class MetricFlowQueryParser:
             parsed_where_filters.extend(saved_query.query_params.where.where_filters)
         if where_filters is not None:
             parsed_where_filters.extend(where_filters)
+
+        # Order by and limit passed into the query directly should override those in the YAML.
+        if order_by_names is None and order_by_parameters is None:
+            order_by_names = saved_query.query_params.order_by
+        if limit is None:
+            limit = saved_query.query_params.limit
 
         return self._parse_and_validate_query(
             metric_names=saved_query.query_params.metrics,
@@ -205,41 +211,108 @@ class MetricFlowQueryParser:
 
         for order_by_name in order_by_names:
             possible_inputs: List[Union[ResolverInputForMetric, ResolverInputForGroupByItem]] = []
+            descending = False
             if order_by_name[0] == "-":
                 descending = True
                 order_by_name_without_prefix = order_by_name[1:]
             else:
-                descending = False
                 order_by_name_without_prefix = order_by_name
 
-            for group_by_item_naming_scheme in self._group_by_item_naming_schemes:
-                if group_by_item_naming_scheme.input_str_follows_scheme(
-                    order_by_name_without_prefix, semantic_manifest_lookup=self._manifest_lookup
-                ):
-                    possible_inputs.append(
-                        ResolverInputForGroupByItem(
-                            input_obj=order_by_name,
-                            input_obj_naming_scheme=group_by_item_naming_scheme,
-                            spec_pattern=group_by_item_naming_scheme.spec_pattern(
-                                order_by_name_without_prefix, semantic_manifest_lookup=self._manifest_lookup
-                            ),
-                        )
-                    )
-                    break
+            # Aside from the string syntax parsed above, object is the only naming scheme that supports `descending`.
+            # Parse objects here to determine `descending` value before moving on to the other naming schemes.
+            object_builder_scheme = ObjectBuilderNamingScheme()
+            if object_builder_scheme.input_str_follows_scheme(
+                order_by_name_without_prefix,
+                semantic_manifest_lookup=self._manifest_lookup,
+                query_item_location=QueryItemLocation.ORDER_BY,
+            ):
+                call_parameter_sets = JinjaObjectParser.parse_call_parameter_sets(
+                    where_sql_template="{{ " + order_by_name_without_prefix + " }}",
+                    custom_granularity_names=self._manifest_lookup.semantic_model_lookup.custom_granularity_names,
+                    query_item_location=QueryItemLocation.ORDER_BY,
+                )
+                if len(call_parameter_sets.dimension_call_parameter_sets) > 0:
+                    for dimension_call_parameter_set in call_parameter_sets.dimension_call_parameter_sets:
+                        query_item_type = QueryItemType.DIMENSION
+                        if dimension_call_parameter_set.descending is not None:
+                            descending = dimension_call_parameter_set.descending
+                elif len(call_parameter_sets.time_dimension_call_parameter_sets) > 0:
+                    for time_dimension_call_parameter_set in call_parameter_sets.time_dimension_call_parameter_sets:
+                        query_item_type = QueryItemType.TIME_DIMENSION
+                        if time_dimension_call_parameter_set.descending is not None:
+                            descending = time_dimension_call_parameter_set.descending
+                elif len(call_parameter_sets.entity_call_parameter_sets) > 0:
+                    for entity_call_parameter_set in call_parameter_sets.entity_call_parameter_sets:
+                        query_item_type = QueryItemType.ENTITY
+                        if entity_call_parameter_set.descending is not None:
+                            descending = entity_call_parameter_set.descending
+                elif len(call_parameter_sets.metric_call_parameter_sets) > 0:
+                    for metric_call_parameter_set in call_parameter_sets.metric_call_parameter_sets:
+                        query_item_type = QueryItemType.METRIC
+                        if metric_call_parameter_set.descending is not None:
+                            descending = metric_call_parameter_set.descending
 
-            for metric_naming_scheme in self._metric_naming_schemes:
-                if metric_naming_scheme.input_str_follows_scheme(
-                    order_by_name_without_prefix, semantic_manifest_lookup=self._manifest_lookup
-                ):
+                spec_pattern = object_builder_scheme.spec_pattern(
+                    order_by_name_without_prefix,
+                    semantic_manifest_lookup=self._manifest_lookup,
+                    query_item_location=QueryItemLocation.ORDER_BY,
+                )
+                if query_item_type == QueryItemType.METRIC:
                     possible_inputs.append(
                         ResolverInputForMetric(
                             input_obj=order_by_name,
-                            naming_scheme=metric_naming_scheme,
-                            spec_pattern=metric_naming_scheme.spec_pattern(
-                                order_by_name_without_prefix, semantic_manifest_lookup=self._manifest_lookup
-                            ),
+                            naming_scheme=object_builder_scheme,
+                            spec_pattern=spec_pattern,
                         )
                     )
+                else:
+                    possible_inputs.append(
+                        ResolverInputForGroupByItem(
+                            input_obj=order_by_name,
+                            input_obj_naming_scheme=object_builder_scheme,
+                            spec_pattern=spec_pattern,
+                        )
+                    )
+            else:
+                for group_by_item_naming_scheme in set(self._group_by_item_naming_schemes).difference(
+                    {object_builder_scheme}
+                ):
+                    if group_by_item_naming_scheme.input_str_follows_scheme(
+                        order_by_name_without_prefix,
+                        semantic_manifest_lookup=self._manifest_lookup,
+                        query_item_location=QueryItemLocation.ORDER_BY,
+                    ):
+                        spec_pattern = group_by_item_naming_scheme.spec_pattern(
+                            order_by_name_without_prefix,
+                            semantic_manifest_lookup=self._manifest_lookup,
+                            query_item_location=QueryItemLocation.ORDER_BY,
+                        )
+                        possible_inputs.append(
+                            ResolverInputForGroupByItem(
+                                input_obj=order_by_name,
+                                input_obj_naming_scheme=group_by_item_naming_scheme,
+                                spec_pattern=spec_pattern,
+                            )
+                        )
+
+                for metric_naming_scheme in set(self._metric_naming_schemes).difference({object_builder_scheme}):
+                    if metric_naming_scheme.input_str_follows_scheme(
+                        order_by_name_without_prefix,
+                        semantic_manifest_lookup=self._manifest_lookup,
+                        query_item_location=QueryItemLocation.ORDER_BY,
+                    ):
+                        spec_pattern = metric_naming_scheme.spec_pattern(
+                            order_by_name_without_prefix,
+                            semantic_manifest_lookup=self._manifest_lookup,
+                            query_item_location=QueryItemLocation.ORDER_BY,
+                        )
+                        possible_inputs.append(
+                            ResolverInputForMetric(
+                                input_obj=order_by_name,
+                                naming_scheme=metric_naming_scheme,
+                                spec_pattern=spec_pattern,
+                            )
+                        )
 
             resolver_inputs.append(
                 ResolverInputForOrderByItem(

@@ -51,6 +51,7 @@ class DimensionPattern(EntityLinkPattern):
                 ),
                 element_name=dimension_call_parameter_set.dimension_reference.element_name,
                 entity_links=dimension_call_parameter_set.entity_path,
+                descending=dimension_call_parameter_set.descending,
             )
         )
 
@@ -111,6 +112,7 @@ class TimeDimensionPattern(EntityLinkPattern):
                 entity_links=time_dimension_call_parameter_set.entity_path,
                 time_granularity_name=time_dimension_call_parameter_set.time_granularity_name,
                 date_part=time_dimension_call_parameter_set.date_part,
+                descending=time_dimension_call_parameter_set.descending,
             )
         )
 
@@ -144,6 +146,7 @@ class EntityPattern(EntityLinkPattern):
                 ),
                 element_name=entity_call_parameter_set.entity_reference.element_name,
                 entity_links=entity_call_parameter_set.entity_path,
+                descending=entity_call_parameter_set.descending,
             )
         )
 
@@ -195,5 +198,6 @@ class GroupByMetricPattern(EntityLinkPattern):
                 element_name=metric_call_parameter_set.metric_reference.element_name,
                 entity_links=entity_links,
                 metric_subquery_entity_links=metric_subquery_entity_links,
+                descending=metric_call_parameter_set.descending,
             )
         )

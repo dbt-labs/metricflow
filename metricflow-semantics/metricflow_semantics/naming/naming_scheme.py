@@ -3,6 +3,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Optional
 
+from dbt_semantic_interfaces.parsing.where_filter.jinja_object_parser import QueryItemLocation
+
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 
@@ -30,7 +32,12 @@ class QueryItemNamingScheme(ABC):
         pass
 
     @abstractmethod
-    def spec_pattern(self, input_str: str, semantic_manifest_lookup: SemanticManifestLookup) -> SpecPattern:
+    def spec_pattern(
+        self,
+        input_str: str,
+        semantic_manifest_lookup: SemanticManifestLookup,
+        query_item_location: QueryItemLocation = QueryItemLocation.NON_ORDER_BY,
+    ) -> SpecPattern:
         """Given an input that follows this scheme, return a spec pattern that matches the described input.
 
         This is used to generate suggestions from available group-by-items if the user specifies a group-by-item that is
@@ -42,7 +49,12 @@ class QueryItemNamingScheme(ABC):
         pass
 
     @abstractmethod
-    def input_str_follows_scheme(self, input_str: str, semantic_manifest_lookup: SemanticManifestLookup) -> bool:
+    def input_str_follows_scheme(
+        self,
+        input_str: str,
+        semantic_manifest_lookup: SemanticManifestLookup,
+        query_item_location: QueryItemLocation = QueryItemLocation.NON_ORDER_BY,
+    ) -> bool:
         """Returns true if the given input string follows this naming scheme.
 
         Consider adding a structured result that indicates why it does not match the scheme.

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Sequence
+from typing import Optional, Sequence
 
 from dbt_semantic_interfaces.references import MetricReference
 from typing_extensions import override
@@ -17,6 +17,7 @@ class MetricSpecPattern(SpecPattern):
     """Matches MetricSpecs that have the given metric_reference."""
 
     metric_reference: MetricReference
+    descending: Optional[bool] = None
 
     @override
     def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[MetricSpec]:

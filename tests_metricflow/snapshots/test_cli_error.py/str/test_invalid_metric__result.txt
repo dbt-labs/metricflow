@@ -25,10 +25,6 @@ Error #1:
 
     invalid_metric_0
 
-  Issue Location:
-
-    [Resolve Query(['invalid_metric_0', 'invalid_metric_1'])]
-
 Error #2:
   Message:
 
@@ -47,10 +43,6 @@ Error #2:
   Query Input:
 
     invalid_metric_1
-
-  Issue Location:
-
-    [Resolve Query(['invalid_metric_0', 'invalid_metric_1'])]
 
 Log File: ***
 Artifact Path: ***
