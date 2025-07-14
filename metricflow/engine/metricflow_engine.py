@@ -738,7 +738,12 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 return dimension.qualified_name
             elif order_by == DimensionOrderByAttribute.SEMANTIC_MODEL_NAME:
                 return (
-                    dimension.semantic_model_reference.semantic_model_name if dimension.semantic_model_reference else ""
+                    (
+                        dimension.semantic_model_reference.semantic_model_name
+                        if dimension.semantic_model_reference
+                        else ""
+                    ),
+                    dimension.qualified_name,
                 )
             else:
                 assert_values_exhausted(order_by)
