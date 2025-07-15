@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import FrozenSet, List, Optional, Sequence, Set, Tuple
 
+from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimensionTypeParams
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
@@ -84,6 +85,13 @@ SIMPLE_DIMENSIONS_WITHOUT_ANY_PROPERTIES: Set[LinkableElementProperty] = {
 ENTITY_WITH_ANY_PROPERTIES: Set[LinkableElementProperty] = {LinkableElementProperty.ENTITY}
 
 SearchableElementGeneric = TypeVar("SearchableElementGeneric", bound=SearchableElement)
+
+
+class DimensionOrderByAttribute(Enum):
+    """Supported dimension attributes to order them by."""
+
+    SEMANTIC_MODEL_NAME = "semantic_model_name"
+    QUALIFIED_NAME = "qualified_name"
 
 
 @dataclass(frozen=True)
@@ -703,7 +711,11 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         return sorted(set(dimensions), key=lambda x: x.default_search_and_sort_attribute)
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-    def list_dimensions(self, metric_names: Optional[List[str]] = None) -> List[Dimension]:
+    def list_dimensions(
+        self,
+        metric_names: Optional[List[str]] = None,
+        order_by: DimensionOrderByAttribute = DimensionOrderByAttribute.QUALIFIED_NAME,
+    ) -> List[Dimension]:
         """Get full dimension object for all dimensions in the semantic manifest."""
         dimensions: List[Dimension] = []
         if metric_names:
@@ -721,7 +733,22 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                     )
                     dimensions.append(dimension)
 
-        return sorted(set(dimensions), key=lambda x: x.default_search_and_sort_attribute)
+        def sort_dimensions(dimension: Dimension) -> Tuple[str, ...]:
+            if order_by == DimensionOrderByAttribute.QUALIFIED_NAME:
+                return (dimension.qualified_name,)
+            elif order_by == DimensionOrderByAttribute.SEMANTIC_MODEL_NAME:
+                return (
+                    (
+                        dimension.semantic_model_reference.semantic_model_name
+                        if dimension.semantic_model_reference
+                        else ""
+                    ),
+                    dimension.qualified_name,
+                )
+            else:
+                assert_values_exhausted(order_by)
+
+        return sorted(set(dimensions), key=sort_dimensions)
 
     def entities_for_metrics(self, metric_names: List[str]) -> List[Entity]:  # noqa: D102
         linkable_element_set = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_metrics(
