@@ -73,7 +73,7 @@ class NoCommonItemsInParents(MetricFlowQueryResolutionIssue):
             f"{mf_indent(last_path_item_parent_descriptions)}.\n"
             f"However, the given input does not match to a common item that is available to those parents:\n\n"
             f"{mf_indent(mf_pformat(parent_to_available_items, format_option=PrettyFormatDictOption(max_line_length=80)))}\n\n"
-            f"For time dimension inputs, please specify a time grain as ambiguous resolution only allows "
+            f"\nFor time dimension inputs, please specify a time grain as ambiguous resolution only allows "
             f"resolution when the parents have the same defined time gain."
         )
 
