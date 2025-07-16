@@ -4,10 +4,11 @@ from metricflow_semantics.experimental.mf_graph.formatting.graph_formatter impor
     MetricflowGraphFormatter,
 )
 from metricflow_semantics.experimental.mf_graph.mf_graph import MetricflowGraph
+from typing_extensions import override
+
 from tests_metricflow_semantics.experimental.mf_graph.formatting.mf_to_dot import (
     MetricflowGraphToDotConverter,
 )
-from typing_extensions import override
 
 
 class DotNotationFormatter(MetricflowGraphFormatter):
