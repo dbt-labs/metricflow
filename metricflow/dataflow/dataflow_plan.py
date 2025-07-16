@@ -12,6 +12,7 @@ from typing import FrozenSet, Optional, Sequence, Set, Type, TypeVar
 import more_itertools
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId, DagNode, MetricFlowDag
+from metricflow_semantics.experimental.comparison_helpers import ComparisonOtherType
 from metricflow_semantics.visitor import Visitable, VisitorOutputT
 
 if typing.TYPE_CHECKING:
@@ -23,9 +24,6 @@ if typing.TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 NodeSelfT = TypeVar("NodeSelfT", bound="DataflowPlanNode")
-
-# Make it so that we only have to suppress errors here instead of both at the method and the class.
-ComparisonAnyType = typing.Any  # type: ignore[misc]
 
 
 @functools.total_ordering
@@ -89,7 +87,7 @@ class DataflowPlanNode(DagNode["DataflowPlanNode"], Visitable, ABC):
         """Indicates that the node has been aggregated to these specs, guaranteeing uniqueness in all combinations."""
         return set()
 
-    def __lt__(self, other: ComparisonAnyType) -> bool:  # noqa: D105
+    def __lt__(self, other: ComparisonOtherType) -> bool:  # noqa: D105
         if not isinstance(other, DataflowPlanNode):
             raise NotImplementedError
 

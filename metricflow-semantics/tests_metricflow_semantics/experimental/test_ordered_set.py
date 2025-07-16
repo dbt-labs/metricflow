@@ -89,7 +89,7 @@ def test_pop() -> None:  # noqa: D103
 
     popped_items = []
     i = 0
-    while i < len(example_set) + 1:
+    while i < len(example_set) + 2:
         try:
             popped_items.append(example_set.pop())
         except KeyError:

@@ -1,14 +1,14 @@
 from __future__ import annotations
 
+import itertools
 import logging
 from abc import ABC, abstractmethod
+from functools import cached_property
 from typing import Optional
 
 from typing_extensions import override
 
-from metricflow_semantics.dag.id_prefix import DynamicIdPrefix
-from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
-from metricflow_semantics.experimental.singleton_decorator import singleton_dataclass
+from metricflow_semantics.experimental.comparison_helpers import ComparisonOtherType
 from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
 from metricflow_semantics.mf_logging.pretty_formatter import PrettyFormatContext
 
@@ -25,19 +25,20 @@ class MetricflowGraphId(ABC):
         raise NotImplementedError
 
 
-@singleton_dataclass()
 class SequentialGraphId(MetricflowGraphId, MetricFlowPrettyFormattable):
     """Graph IDs that are generated sequentially."""
 
-    _str_value: str
+    # `itertools.count()` returns an iterable that is thread-safe, so this is a way of generating sequential
+    # IDs without using a lock.
+    _ID_COUNTER = itertools.count()
+
+    def __init__(self) -> None:  # noqa: D107
+        self._str_value = "id_" + str(next(SequentialGraphId._ID_COUNTER))
 
     @staticmethod
     def create() -> SequentialGraphId:  # noqa: D102
-        return SequentialGraphId(
-            _str_value=SequentialIdGenerator.create_next_id(
-                DynamicIdPrefix(SequentialGraphId.__class__.__name__)
-            ).str_value
-        )
+        """TODO: Remove and update call sites."""
+        return SequentialGraphId()
 
     @override
     @property
@@ -47,3 +48,18 @@ class SequentialGraphId(MetricflowGraphId, MetricFlowPrettyFormattable):
     @override
     def pretty_format(self, format_context: PrettyFormatContext) -> Optional[str]:
         return self._str_value
+
+    @override
+    def __eq__(self, other: ComparisonOtherType) -> bool:
+        if self.__class__ is not other.__class__:
+            return False
+
+        return self._str_value == other._str_value
+
+    @cached_property
+    def _cached_hash(self) -> int:
+        return hash(self._str_value)
+
+    @override
+    def __hash__(self) -> int:
+        return self._cached_hash
