@@ -72,8 +72,7 @@ def _recreate_dataclass_as_singleton(inner_cls: Type[DataclassInstance]) -> Type
         ):
             raise ValueError(
                 LazyFormat(
-                    "Default values for fields are current not supported for singletons to simplify "
-                    " field value resolution.",
+                    "Default values for fields are currently not supported to simplify field-value resolution.",
                     class_name=class_to_return.__name__,
                     dataclass_field=dataclass_field,
                 )
