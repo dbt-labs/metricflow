@@ -14,6 +14,8 @@ from dbt_semantic_interfaces.references import (
 )
 from dbt_semantic_interfaces.type_enums import DimensionType, EntityType, TimeGranularity
 
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+
 
 class SemanticModelHelper:
     """Static helper methods for retrieving items from a semantic model."""
@@ -68,7 +70,7 @@ class SemanticModelHelper:
                 return measure
 
         raise ValueError(
-            f"No dimension with name ({measure_reference.element_name}) in semantic_model with name ({semantic_model.name})"
+            f"No measure with name ({measure_reference.element_name}) in semantic_model with name ({semantic_model.name})"
         )
 
     @staticmethod
@@ -80,7 +82,12 @@ class SemanticModelHelper:
             if dim.reference == dimension_reference:
                 return dim
         raise ValueError(
-            f"No dimension with name ({dimension_reference}) in semantic_model with name ({semantic_model.name})"
+            LazyFormat(
+                "Unable to find matching dimension for the given reference.",
+                dimension_reference=dimension_reference,
+                semantic_model_name=semantic_model.name,
+                dimensions=lambda: [dimension.name for dimension in semantic_model.dimensions],
+            )
         )
 
     @staticmethod
