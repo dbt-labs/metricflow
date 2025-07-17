@@ -1,7 +1,6 @@
 test_name: test_one_property
 test_filename: test_linkable_spec_resolver.py
 ---
-Model Join-Path       Entity Links    Name     Time Granularity    Date Part    Properties
---------------------  --------------  -------  ------------------  -----------  -------------------
-('bookings_source',)  ()              listing                                   ['ENTITY', 'LOCAL']
-('views_source',)     ()              listing                                   ['ENTITY', 'LOCAL']
+Dunder Name    Metric-Subquery Entity-Links    Type    Properties    Derived-From Semantic Models
+-------------  ------------------------------  ------  ------------  ------------------------------
+listing                                        ENTITY  ENTITY,LOCAL  bookings_source,views_source

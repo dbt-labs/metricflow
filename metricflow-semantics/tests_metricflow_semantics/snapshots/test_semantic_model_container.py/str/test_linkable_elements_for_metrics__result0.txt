@@ -1,162 +1,162 @@
 test_name: test_linkable_elements_for_metrics
 test_filename: test_semantic_model_container.py
 ---
-Model Join-Path                                         Entity Links         Name                  Time Granularity    Date Part    Properties
-------------------------------------------------------  -------------------  --------------------  ------------------  -----------  ------------------------------------
-('views_source',)                                       ()                   listing                                                ['ENTITY', 'LOCAL']
-('views_source',)                                       ()                   user                                                   ['ENTITY', 'LOCAL']
-('views_source',)                                       ('view',)            ds                                        DAY          ['DATE_PART', 'LOCAL']
-('views_source',)                                       ('view',)            ds                                        DOW          ['DATE_PART', 'LOCAL']
-('views_source',)                                       ('view',)            ds                                        DOY          ['DATE_PART', 'LOCAL']
-('views_source',)                                       ('view',)            ds                                        MONTH        ['DATE_PART', 'LOCAL']
-('views_source',)                                       ('view',)            ds                                        QUARTER      ['DATE_PART', 'LOCAL']
-('views_source',)                                       ('view',)            ds                                        YEAR         ['DATE_PART', 'LOCAL']
-('views_source',)                                       ('view',)            ds                    day                              ['LOCAL']
-('views_source',)                                       ('view',)            ds_partitioned                            DAY          ['DATE_PART', 'LOCAL']
-('views_source',)                                       ('view',)            ds_partitioned                            DOW          ['DATE_PART', 'LOCAL']
-('views_source',)                                       ('view',)            ds_partitioned                            DOY          ['DATE_PART', 'LOCAL']
-('views_source',)                                       ('view',)            ds_partitioned                            MONTH        ['DATE_PART', 'LOCAL']
-('views_source',)                                       ('view',)            ds_partitioned                            QUARTER      ['DATE_PART', 'LOCAL']
-('views_source',)                                       ('view',)            ds_partitioned                            YEAR         ['DATE_PART', 'LOCAL']
-('views_source',)                                       ('view',)            ds_partitioned        day                              ['LOCAL']
-('views_source',)                                       ('view',)            listing                                                ['ENTITY', 'LOCAL']
-('views_source',)                                       ('view',)            user                                                   ['ENTITY', 'LOCAL']
-('views_source', 'companies')                           ('user',)            company                                                ['ENTITY', 'JOINED']
-('views_source', 'companies')                           ('user',)            company_name                                           ['JOINED']
-('views_source', 'listings_latest')                     ('listing',)         capacity_latest                                        ['JOINED']
-('views_source', 'listings_latest')                     ('listing',)         country_latest                                         ['JOINED']
-('views_source', 'listings_latest')                     ('listing',)         created_at                                DAY          ['DATE_PART', 'JOINED']
-('views_source', 'listings_latest')                     ('listing',)         created_at                                DOW          ['DATE_PART', 'JOINED']
-('views_source', 'listings_latest')                     ('listing',)         created_at                                DOY          ['DATE_PART', 'JOINED']
-('views_source', 'listings_latest')                     ('listing',)         created_at                                MONTH        ['DATE_PART', 'JOINED']
-('views_source', 'listings_latest')                     ('listing',)         created_at                                QUARTER      ['DATE_PART', 'JOINED']
-('views_source', 'listings_latest')                     ('listing',)         created_at                                YEAR         ['DATE_PART', 'JOINED']
-('views_source', 'listings_latest')                     ('listing',)         created_at            day                              ['JOINED']
-('views_source', 'listings_latest')                     ('listing',)         ds                                        DAY          ['DATE_PART', 'JOINED']
-('views_source', 'listings_latest')                     ('listing',)         ds                                        DOW          ['DATE_PART', 'JOINED']
-('views_source', 'listings_latest')                     ('listing',)         ds                                        DOY          ['DATE_PART', 'JOINED']
-('views_source', 'listings_latest')                     ('listing',)         ds                                        MONTH        ['DATE_PART', 'JOINED']
-('views_source', 'listings_latest')                     ('listing',)         ds                                        QUARTER      ['DATE_PART', 'JOINED']
-('views_source', 'listings_latest')                     ('listing',)         ds                                        YEAR         ['DATE_PART', 'JOINED']
-('views_source', 'listings_latest')                     ('listing',)         ds                    day                              ['JOINED']
-('views_source', 'listings_latest')                     ('listing',)         is_lux_latest                                          ['JOINED']
-('views_source', 'listings_latest')                     ('listing',)         user                                                   ['ENTITY', 'JOINED']
-('views_source', 'listings_latest', 'companies')        ('listing', 'user')  company                                                ['ENTITY', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'companies')        ('listing', 'user')  company_name                                           ['JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  archived_at                               DAY          ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  archived_at                               DOW          ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  archived_at                               DOY          ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  archived_at                               MONTH        ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  archived_at                               QUARTER      ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  archived_at                               YEAR         ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  archived_at           hour                             ['JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  bio_added_ts                              DAY          ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  bio_added_ts                              DOW          ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  bio_added_ts                              DOY          ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  bio_added_ts                              MONTH        ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  bio_added_ts                              QUARTER      ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  bio_added_ts                              YEAR         ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  bio_added_ts          second                           ['JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  created_at                                DAY          ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  created_at                                DOW          ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  created_at                                DOY          ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  created_at                                MONTH        ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  created_at                                QUARTER      ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  created_at                                YEAR         ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  created_at            day                              ['JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  ds                                        DAY          ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  ds                                        DOW          ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  ds                                        DOY          ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  ds                                        MONTH        ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  ds                                        QUARTER      ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  ds                                        YEAR         ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  ds                    day                              ['JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  ds_partitioned                            DAY          ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  ds_partitioned                            DOW          ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  ds_partitioned                            DOY          ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  ds_partitioned                            MONTH        ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  ds_partitioned                            QUARTER      ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  ds_partitioned                            YEAR         ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  ds_partitioned        day                              ['JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  home_state                                             ['JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  last_login_ts                             DAY          ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  last_login_ts                             DOW          ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  last_login_ts                             DOY          ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  last_login_ts                             MONTH        ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  last_login_ts                             QUARTER      ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  last_login_ts                             YEAR         ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  last_login_ts         minute                           ['JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  last_profile_edit_ts                      DAY          ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  last_profile_edit_ts                      DOW          ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  last_profile_edit_ts                      DOY          ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  last_profile_edit_ts                      MONTH        ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  last_profile_edit_ts                      QUARTER      ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  last_profile_edit_ts                      YEAR         ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_ds_source')  ('listing', 'user')  last_profile_edit_ts  millisecond                      ['JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_latest')     ('listing', 'user')  ds_latest                                 DAY          ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_latest')     ('listing', 'user')  ds_latest                                 DOW          ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_latest')     ('listing', 'user')  ds_latest                                 DOY          ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_latest')     ('listing', 'user')  ds_latest                                 MONTH        ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_latest')     ('listing', 'user')  ds_latest                                 QUARTER      ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_latest')     ('listing', 'user')  ds_latest                                 YEAR         ['DATE_PART', 'JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_latest')     ('listing', 'user')  ds_latest             day                              ['JOINED', 'MULTI_HOP']
-('views_source', 'listings_latest', 'users_latest')     ('listing', 'user')  home_state_latest                                      ['JOINED', 'MULTI_HOP']
-('views_source', 'lux_listing_mapping')                 ('listing',)         lux_listing                                            ['ENTITY', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            archived_at                               DAY          ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            archived_at                               DOW          ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            archived_at                               DOY          ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            archived_at                               MONTH        ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            archived_at                               QUARTER      ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            archived_at                               YEAR         ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            archived_at           hour                             ['JOINED']
-('views_source', 'users_ds_source')                     ('user',)            bio_added_ts                              DAY          ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            bio_added_ts                              DOW          ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            bio_added_ts                              DOY          ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            bio_added_ts                              MONTH        ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            bio_added_ts                              QUARTER      ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            bio_added_ts                              YEAR         ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            bio_added_ts          second                           ['JOINED']
-('views_source', 'users_ds_source')                     ('user',)            created_at                                DAY          ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            created_at                                DOW          ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            created_at                                DOY          ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            created_at                                MONTH        ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            created_at                                QUARTER      ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            created_at                                YEAR         ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            created_at            day                              ['JOINED']
-('views_source', 'users_ds_source')                     ('user',)            ds                                        DAY          ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            ds                                        DOW          ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            ds                                        DOY          ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            ds                                        MONTH        ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            ds                                        QUARTER      ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            ds                                        YEAR         ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            ds                    day                              ['JOINED']
-('views_source', 'users_ds_source')                     ('user',)            ds_partitioned                            DAY          ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            ds_partitioned                            DOW          ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            ds_partitioned                            DOY          ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            ds_partitioned                            MONTH        ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            ds_partitioned                            QUARTER      ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            ds_partitioned                            YEAR         ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            ds_partitioned        day                              ['JOINED']
-('views_source', 'users_ds_source')                     ('user',)            home_state                                             ['JOINED']
-('views_source', 'users_ds_source')                     ('user',)            last_login_ts                             DAY          ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            last_login_ts                             DOW          ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            last_login_ts                             DOY          ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            last_login_ts                             MONTH        ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            last_login_ts                             QUARTER      ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            last_login_ts                             YEAR         ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            last_login_ts         minute                           ['JOINED']
-('views_source', 'users_ds_source')                     ('user',)            last_profile_edit_ts                      DAY          ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            last_profile_edit_ts                      DOW          ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            last_profile_edit_ts                      DOY          ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            last_profile_edit_ts                      MONTH        ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            last_profile_edit_ts                      QUARTER      ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            last_profile_edit_ts                      YEAR         ['DATE_PART', 'JOINED']
-('views_source', 'users_ds_source')                     ('user',)            last_profile_edit_ts  millisecond                      ['JOINED']
-('views_source', 'users_latest')                        ('user',)            ds_latest                                 DAY          ['DATE_PART', 'JOINED']
-('views_source', 'users_latest')                        ('user',)            ds_latest                                 DOW          ['DATE_PART', 'JOINED']
-('views_source', 'users_latest')                        ('user',)            ds_latest                                 DOY          ['DATE_PART', 'JOINED']
-('views_source', 'users_latest')                        ('user',)            ds_latest                                 MONTH        ['DATE_PART', 'JOINED']
-('views_source', 'users_latest')                        ('user',)            ds_latest                                 QUARTER      ['DATE_PART', 'JOINED']
-('views_source', 'users_latest')                        ('user',)            ds_latest                                 YEAR         ['DATE_PART', 'JOINED']
-('views_source', 'users_latest')                        ('user',)            ds_latest             day                              ['JOINED']
-('views_source', 'users_latest')                        ('user',)            home_state_latest                                      ['JOINED']
+Dunder Name                                           Metric-Subquery Entity-Links    Type            Properties                  Derived-From Semantic Models
+----------------------------------------------------  ------------------------------  --------------  --------------------------  --------------------------------------------
+listing                                                                               ENTITY          ENTITY,LOCAL                views_source
+listing__capacity_latest                                                              DIMENSION       JOINED                      listings_latest,views_source
+listing__country_latest                                                               DIMENSION       JOINED                      listings_latest,views_source
+listing__created_at__day                                                              TIME_DIMENSION  JOINED                      listings_latest,views_source
+listing__created_at__extract_day                                                      TIME_DIMENSION  DATE_PART,JOINED            listings_latest,views_source
+listing__created_at__extract_dow                                                      TIME_DIMENSION  DATE_PART,JOINED            listings_latest,views_source
+listing__created_at__extract_doy                                                      TIME_DIMENSION  DATE_PART,JOINED            listings_latest,views_source
+listing__created_at__extract_month                                                    TIME_DIMENSION  DATE_PART,JOINED            listings_latest,views_source
+listing__created_at__extract_quarter                                                  TIME_DIMENSION  DATE_PART,JOINED            listings_latest,views_source
+listing__created_at__extract_year                                                     TIME_DIMENSION  DATE_PART,JOINED            listings_latest,views_source
+listing__ds__day                                                                      TIME_DIMENSION  JOINED                      listings_latest,views_source
+listing__ds__extract_day                                                              TIME_DIMENSION  DATE_PART,JOINED            listings_latest,views_source
+listing__ds__extract_dow                                                              TIME_DIMENSION  DATE_PART,JOINED            listings_latest,views_source
+listing__ds__extract_doy                                                              TIME_DIMENSION  DATE_PART,JOINED            listings_latest,views_source
+listing__ds__extract_month                                                            TIME_DIMENSION  DATE_PART,JOINED            listings_latest,views_source
+listing__ds__extract_quarter                                                          TIME_DIMENSION  DATE_PART,JOINED            listings_latest,views_source
+listing__ds__extract_year                                                             TIME_DIMENSION  DATE_PART,JOINED            listings_latest,views_source
+listing__is_lux_latest                                                                DIMENSION       JOINED                      listings_latest,views_source
+listing__lux_listing                                                                  ENTITY          ENTITY,JOINED               lux_listing_mapping,views_source
+listing__user                                                                         ENTITY          ENTITY,JOINED               listings_latest,views_source
+listing__user__archived_at__extract_day                                               TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__archived_at__extract_dow                                               TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__archived_at__extract_doy                                               TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__archived_at__extract_month                                             TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__archived_at__extract_quarter                                           TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__archived_at__extract_year                                              TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__archived_at__hour                                                      TIME_DIMENSION  JOINED,MULTI_HOP            listings_latest,users_ds_source,views_source
+listing__user__bio_added_ts__extract_day                                              TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__bio_added_ts__extract_dow                                              TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__bio_added_ts__extract_doy                                              TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__bio_added_ts__extract_month                                            TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__bio_added_ts__extract_quarter                                          TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__bio_added_ts__extract_year                                             TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__bio_added_ts__second                                                   TIME_DIMENSION  JOINED,MULTI_HOP            listings_latest,users_ds_source,views_source
+listing__user__company                                                                ENTITY          ENTITY,JOINED,MULTI_HOP     companies,listings_latest,views_source
+listing__user__company_name                                                           DIMENSION       JOINED,MULTI_HOP            companies,listings_latest,views_source
+listing__user__created_at__day                                                        TIME_DIMENSION  JOINED,MULTI_HOP            listings_latest,users_ds_source,views_source
+listing__user__created_at__extract_day                                                TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__created_at__extract_dow                                                TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__created_at__extract_doy                                                TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__created_at__extract_month                                              TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__created_at__extract_quarter                                            TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__created_at__extract_year                                               TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__ds__day                                                                TIME_DIMENSION  JOINED,MULTI_HOP            listings_latest,users_ds_source,views_source
+listing__user__ds__extract_day                                                        TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__ds__extract_dow                                                        TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__ds__extract_doy                                                        TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__ds__extract_month                                                      TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__ds__extract_quarter                                                    TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__ds__extract_year                                                       TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__ds_latest__day                                                         TIME_DIMENSION  JOINED,MULTI_HOP            listings_latest,users_latest,views_source
+listing__user__ds_latest__extract_day                                                 TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_latest,views_source
+listing__user__ds_latest__extract_dow                                                 TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_latest,views_source
+listing__user__ds_latest__extract_doy                                                 TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_latest,views_source
+listing__user__ds_latest__extract_month                                               TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_latest,views_source
+listing__user__ds_latest__extract_quarter                                             TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_latest,views_source
+listing__user__ds_latest__extract_year                                                TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_latest,views_source
+listing__user__ds_partitioned__day                                                    TIME_DIMENSION  JOINED,MULTI_HOP            listings_latest,users_ds_source,views_source
+listing__user__ds_partitioned__extract_day                                            TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__ds_partitioned__extract_dow                                            TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__ds_partitioned__extract_doy                                            TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__ds_partitioned__extract_month                                          TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__ds_partitioned__extract_quarter                                        TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__ds_partitioned__extract_year                                           TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__home_state                                                             DIMENSION       JOINED,MULTI_HOP            listings_latest,users_ds_source,views_source
+listing__user__home_state_latest                                                      DIMENSION       JOINED,MULTI_HOP            listings_latest,users_latest,views_source
+listing__user__last_login_ts__extract_day                                             TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__last_login_ts__extract_dow                                             TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__last_login_ts__extract_doy                                             TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__last_login_ts__extract_month                                           TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__last_login_ts__extract_quarter                                         TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__last_login_ts__extract_year                                            TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__last_login_ts__minute                                                  TIME_DIMENSION  JOINED,MULTI_HOP            listings_latest,users_ds_source,views_source
+listing__user__last_profile_edit_ts__extract_day                                      TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__last_profile_edit_ts__extract_dow                                      TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__last_profile_edit_ts__extract_doy                                      TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__last_profile_edit_ts__extract_month                                    TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__last_profile_edit_ts__extract_quarter                                  TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__last_profile_edit_ts__extract_year                                     TIME_DIMENSION  DATE_PART,JOINED,MULTI_HOP  listings_latest,users_ds_source,views_source
+listing__user__last_profile_edit_ts__millisecond                                      TIME_DIMENSION  JOINED,MULTI_HOP            listings_latest,users_ds_source,views_source
+user                                                                                  ENTITY          ENTITY,LOCAL                views_source
+user__archived_at__extract_day                                                        TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__archived_at__extract_dow                                                        TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__archived_at__extract_doy                                                        TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__archived_at__extract_month                                                      TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__archived_at__extract_quarter                                                    TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__archived_at__extract_year                                                       TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__archived_at__hour                                                               TIME_DIMENSION  JOINED                      users_ds_source,views_source
+user__bio_added_ts__extract_day                                                       TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__bio_added_ts__extract_dow                                                       TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__bio_added_ts__extract_doy                                                       TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__bio_added_ts__extract_month                                                     TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__bio_added_ts__extract_quarter                                                   TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__bio_added_ts__extract_year                                                      TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__bio_added_ts__second                                                            TIME_DIMENSION  JOINED                      users_ds_source,views_source
+user__company                                                                         ENTITY          ENTITY,JOINED               companies,views_source
+user__company_name                                                                    DIMENSION       JOINED                      companies,views_source
+user__created_at__day                                                                 TIME_DIMENSION  JOINED                      users_ds_source,views_source
+user__created_at__extract_day                                                         TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__created_at__extract_dow                                                         TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__created_at__extract_doy                                                         TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__created_at__extract_month                                                       TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__created_at__extract_quarter                                                     TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__created_at__extract_year                                                        TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__ds__day                                                                         TIME_DIMENSION  JOINED                      users_ds_source,views_source
+user__ds__extract_day                                                                 TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__ds__extract_dow                                                                 TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__ds__extract_doy                                                                 TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__ds__extract_month                                                               TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__ds__extract_quarter                                                             TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__ds__extract_year                                                                TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__ds_latest__day                                                                  TIME_DIMENSION  JOINED                      users_latest,views_source
+user__ds_latest__extract_day                                                          TIME_DIMENSION  DATE_PART,JOINED            users_latest,views_source
+user__ds_latest__extract_dow                                                          TIME_DIMENSION  DATE_PART,JOINED            users_latest,views_source
+user__ds_latest__extract_doy                                                          TIME_DIMENSION  DATE_PART,JOINED            users_latest,views_source
+user__ds_latest__extract_month                                                        TIME_DIMENSION  DATE_PART,JOINED            users_latest,views_source
+user__ds_latest__extract_quarter                                                      TIME_DIMENSION  DATE_PART,JOINED            users_latest,views_source
+user__ds_latest__extract_year                                                         TIME_DIMENSION  DATE_PART,JOINED            users_latest,views_source
+user__ds_partitioned__day                                                             TIME_DIMENSION  JOINED                      users_ds_source,views_source
+user__ds_partitioned__extract_day                                                     TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__ds_partitioned__extract_dow                                                     TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__ds_partitioned__extract_doy                                                     TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__ds_partitioned__extract_month                                                   TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__ds_partitioned__extract_quarter                                                 TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__ds_partitioned__extract_year                                                    TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__home_state                                                                      DIMENSION       JOINED                      users_ds_source,views_source
+user__home_state_latest                                                               DIMENSION       JOINED                      users_latest,views_source
+user__last_login_ts__extract_day                                                      TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__last_login_ts__extract_dow                                                      TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__last_login_ts__extract_doy                                                      TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__last_login_ts__extract_month                                                    TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__last_login_ts__extract_quarter                                                  TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__last_login_ts__extract_year                                                     TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__last_login_ts__minute                                                           TIME_DIMENSION  JOINED                      users_ds_source,views_source
+user__last_profile_edit_ts__extract_day                                               TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__last_profile_edit_ts__extract_dow                                               TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__last_profile_edit_ts__extract_doy                                               TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__last_profile_edit_ts__extract_month                                             TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__last_profile_edit_ts__extract_quarter                                           TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__last_profile_edit_ts__extract_year                                              TIME_DIMENSION  DATE_PART,JOINED            users_ds_source,views_source
+user__last_profile_edit_ts__millisecond                                               TIME_DIMENSION  JOINED                      users_ds_source,views_source
+view__ds__day                                                                         TIME_DIMENSION  LOCAL                       views_source
+view__ds__extract_day                                                                 TIME_DIMENSION  DATE_PART,LOCAL             views_source
+view__ds__extract_dow                                                                 TIME_DIMENSION  DATE_PART,LOCAL             views_source
+view__ds__extract_doy                                                                 TIME_DIMENSION  DATE_PART,LOCAL             views_source
+view__ds__extract_month                                                               TIME_DIMENSION  DATE_PART,LOCAL             views_source
+view__ds__extract_quarter                                                             TIME_DIMENSION  DATE_PART,LOCAL             views_source
+view__ds__extract_year                                                                TIME_DIMENSION  DATE_PART,LOCAL             views_source
+view__ds_partitioned__day                                                             TIME_DIMENSION  LOCAL                       views_source
+view__ds_partitioned__extract_day                                                     TIME_DIMENSION  DATE_PART,LOCAL             views_source
+view__ds_partitioned__extract_dow                                                     TIME_DIMENSION  DATE_PART,LOCAL             views_source
+view__ds_partitioned__extract_doy                                                     TIME_DIMENSION  DATE_PART,LOCAL             views_source
+view__ds_partitioned__extract_month                                                   TIME_DIMENSION  DATE_PART,LOCAL             views_source
+view__ds_partitioned__extract_quarter                                                 TIME_DIMENSION  DATE_PART,LOCAL             views_source
+view__ds_partitioned__extract_year                                                    TIME_DIMENSION  DATE_PART,LOCAL             views_source
+view__listing                                                                         ENTITY          ENTITY,LOCAL                views_source
+view__user                                                                            ENTITY          ENTITY,LOCAL                views_source
