@@ -402,10 +402,17 @@ class PreJoinNodeProcessor:
         """Processes where filter specs and evaluates their fitness for pushdown against the provided node set."""
         eligible_filter_specs_by_model: Dict[SemanticModelReference, Sequence[WhereFilterSpec]] = {}
         for spec in where_filter_specs:
-            semantic_models = set(element.semantic_model_origin for element in spec.linkable_elements)
-            invalid_element_types = [
-                element for element in spec.linkable_elements if element.element_type not in enabled_element_types
-            ]
+            semantic_models = {
+                semantic_model_reference
+                for annotated_spec in spec.element_set.annotated_specs
+                for semantic_model_reference in annotated_spec.origin_semantic_model_references
+            }
+
+            invalid_element_types = {
+                annotated_spec.element_type
+                for annotated_spec in spec.element_set.annotated_specs
+                if annotated_spec.element_type not in enabled_element_types
+            }
             if len(semantic_models) == 1 and len(invalid_element_types) == 0:
                 model = semantic_models.pop()
                 eligible_filter_specs_by_model[model] = tuple(eligible_filter_specs_by_model.get(model, tuple())) + (
