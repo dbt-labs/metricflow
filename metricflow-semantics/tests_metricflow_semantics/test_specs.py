@@ -5,11 +5,13 @@ from typing import Sequence
 import pytest
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
+    AnnotatedSpecLinkableElementSet,
+)
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec, LinklessEntitySpec
 from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
-from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.measure_spec import MeasureSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
@@ -225,21 +227,21 @@ def where_filter_spec_set() -> WhereFilterSpecSet:  # noqa: D103
             WhereFilterSpec(
                 where_sql="measure is true",
                 bind_parameters=SqlBindParameterSet(),
-                linkable_spec_set=LinkableSpecSet(),
+                element_set=AnnotatedSpecLinkableElementSet(),
             ),
         ),
         metric_level_filter_specs=(
             WhereFilterSpec(
                 where_sql="metric is true",
                 bind_parameters=SqlBindParameterSet(),
-                linkable_spec_set=LinkableSpecSet(),
+                element_set=AnnotatedSpecLinkableElementSet(),
             ),
         ),
         query_level_filter_specs=(
             WhereFilterSpec(
                 where_sql="query is true",
                 bind_parameters=SqlBindParameterSet(),
-                linkable_spec_set=LinkableSpecSet(),
+                element_set=AnnotatedSpecLinkableElementSet(),
             ),
         ),
     )
@@ -250,17 +252,17 @@ def test_where_filter_spec_set_all_specs(where_filter_spec_set: WhereFilterSpecS
         WhereFilterSpec(
             where_sql="measure is true",
             bind_parameters=SqlBindParameterSet(),
-            linkable_spec_set=LinkableSpecSet(),
+            element_set=AnnotatedSpecLinkableElementSet(),
         ),
         WhereFilterSpec(
             where_sql="metric is true",
             bind_parameters=SqlBindParameterSet(),
-            linkable_spec_set=LinkableSpecSet(),
+            element_set=AnnotatedSpecLinkableElementSet(),
         ),
         WhereFilterSpec(
             where_sql="query is true",
             bind_parameters=SqlBindParameterSet(),
-            linkable_spec_set=LinkableSpecSet(),
+            element_set=AnnotatedSpecLinkableElementSet(),
         ),
     }
 
@@ -270,12 +272,12 @@ def test_where_filter_spec_set_post_aggregation_specs(where_filter_spec_set: Whe
         WhereFilterSpec(
             where_sql="metric is true",
             bind_parameters=SqlBindParameterSet(),
-            linkable_spec_set=LinkableSpecSet(),
+            element_set=AnnotatedSpecLinkableElementSet(),
         ),
         WhereFilterSpec(
             where_sql="query is true",
             bind_parameters=SqlBindParameterSet(),
-            linkable_spec_set=LinkableSpecSet(),
+            element_set=AnnotatedSpecLinkableElementSet(),
         ),
     }
 
@@ -286,7 +288,7 @@ def test_where_filter_spec_set_merge(where_filter_spec_set: WhereFilterSpecSet) 
             WhereFilterSpec(
                 where_sql="measure is true",
                 bind_parameters=SqlBindParameterSet(),
-                linkable_spec_set=LinkableSpecSet(),
+                element_set=AnnotatedSpecLinkableElementSet(),
             ),
         ),
     )
@@ -295,7 +297,7 @@ def test_where_filter_spec_set_merge(where_filter_spec_set: WhereFilterSpecSet) 
             WhereFilterSpec(
                 where_sql="metric is true",
                 bind_parameters=SqlBindParameterSet(),
-                linkable_spec_set=LinkableSpecSet(),
+                element_set=AnnotatedSpecLinkableElementSet(),
             ),
         ),
     )
@@ -305,14 +307,14 @@ def test_where_filter_spec_set_merge(where_filter_spec_set: WhereFilterSpecSet) 
             WhereFilterSpec(
                 where_sql="measure is true",
                 bind_parameters=SqlBindParameterSet(),
-                linkable_spec_set=LinkableSpecSet(),
+                element_set=AnnotatedSpecLinkableElementSet(),
             ),
         ),
         metric_level_filter_specs=(
             WhereFilterSpec(
                 where_sql="metric is true",
                 bind_parameters=SqlBindParameterSet(),
-                linkable_spec_set=LinkableSpecSet(),
+                element_set=AnnotatedSpecLinkableElementSet(),
             ),
         ),
     )
