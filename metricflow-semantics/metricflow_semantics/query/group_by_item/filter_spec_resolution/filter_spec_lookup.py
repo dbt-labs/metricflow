@@ -16,15 +16,13 @@ from typing_extensions import override
 from metricflow_semantics.collection_helpers.merger import Mergeable
 from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
-from metricflow_semantics.model.semantics.linkable_element_set_base import BaseLinkableElementSet
+from metricflow_semantics.model.semantics.linkable_element_set_base import AnnotatedSpec, BaseLinkableElementSet
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow_semantics.query.group_by_item.path_prefixable import PathPrefixable
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow_semantics.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 
-if TYPE_CHECKING:
-    from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 
 logger = logging.getLogger(__name__)
 
@@ -89,7 +87,7 @@ class FilterSpecResolutionLookUp(Mergeable):
 
         return resolution
 
-    def checked_resolved_spec(self, resolved_spec_lookup_key: ResolvedSpecLookUpKey) -> LinkableInstanceSpec:
+    def checked_resolved_spec(self, resolved_spec_lookup_key: ResolvedSpecLookUpKey) -> AnnotatedSpec:
         """Returns the resolved spec for the given key.
 
         If a resolution does not exist, or there is no spec associated with the resolution, this raises a RuntimeError.
@@ -184,13 +182,13 @@ class FilterSpecResolution:
         )
 
     @property
-    def resolved_spec(self) -> Optional[LinkableInstanceSpec]:
+    def resolved_spec(self) -> Optional[AnnotatedSpec]:
         """Returns the lone resolved spec, if one was found.
 
         The final ValueError should not be reachable due to the post-init validation, but is in place in case someone
         updates or removes the latter without accounting for the possibility of runtime divergence.
         """
-        specs = self.resolved_linkable_element_set.specs
+        specs = self.resolved_linkable_element_set.annotated_specs
         if len(specs) == 0:
             return None
         elif len(specs) == 1:
