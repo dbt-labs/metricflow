@@ -19,7 +19,8 @@ from metricflow_semantics.model.semantics.linkable_element_set_base import BaseL
 from metricflow_semantics.model.semantics.linkable_spec_index import LinkableSpecIndex
 from metricflow_semantics.model.semantics.linkable_spec_index_builder import LinkableSpecIndexBuilder
 from metricflow_semantics.model.semantics.linkable_spec_resolver import (
-    ValidLinkableSpecResolver,
+    LegacyLinkableSpecResolver,
+    LinkableSpecResolver,
 )
 from metricflow_semantics.model.semantics.manifest_object_lookup import SemanticManifestObjectLookup
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
@@ -63,7 +64,7 @@ class MetricLookup:
         linkable_spec_index: LinkableSpecIndex,
     ) -> MetricLookup:
         manifest_object_lookup = SemanticManifestObjectLookup(semantic_manifest)
-        linkable_spec_resolver = ValidLinkableSpecResolver(
+        linkable_spec_resolver = LegacyLinkableSpecResolver(
             semantic_manifest=semantic_manifest,
             semantic_model_lookup=semantic_model_lookup,
             manifest_object_lookup=manifest_object_lookup,
@@ -82,7 +83,7 @@ class MetricLookup:
         semantic_manifest: SemanticManifest,
         semantic_model_lookup: SemanticModelLookup,
         custom_granularities: Dict[str, ExpandedTimeGranularity],
-        linkable_spec_resolver: ValidLinkableSpecResolver,
+        linkable_spec_resolver: LinkableSpecResolver,
     ) -> None:
         """Initializer.
 
