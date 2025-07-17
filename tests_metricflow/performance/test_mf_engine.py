@@ -12,9 +12,10 @@ from dbt_semantic_interfaces.transformations.semantic_manifest_transformer impor
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
-    AttributeComputationPath,
+    AttributeRecipeWriterPath,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.graph_builder import SemanticGraphBuilder
+from metricflow_semantics.experimental.semantic_graph.builder.graph_change_rule import SubgraphGeneratorArgumentSet
 from metricflow_semantics.experimental.semantic_graph.manifest_object_lookup import (
     ManifestObjectLookup as NewManifestObjectLookup,
 )
@@ -26,6 +27,7 @@ from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder i
 from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_cache import PathFinderCache
 from metricflow_semantics.experimental.singleton_decorator import singleton_dataclass
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.mf_logging.runtime import log_block_runtime
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.linkable_spec_index import LinkableSpecIndex
 from metricflow_semantics.model.semantics.linkable_spec_index_builder import LinkableSpecIndexBuilder
@@ -156,32 +158,62 @@ def _time_original_init(semantic_manifest: SemanticManifest) -> float:
 def _time_new_init(semantic_manifest: SemanticManifest) -> float:
     start_time = time.perf_counter()
 
-    path_finder_cache = PathFinderCache[SemanticGraphNode, SemanticGraphEdge, AttributeComputationPath]()
-    path_finder = MetricflowGraphPathFinder[SemanticGraphNode, SemanticGraphEdge, AttributeComputationPath](
+    path_finder_cache = PathFinderCache[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath]()
+    path_finder = MetricflowGraphPathFinder[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath](
         path_finder_cache=path_finder_cache,
     )
     manifest_object_lookup = NewManifestObjectLookup(semantic_manifest)
     graph_builder = SemanticGraphBuilder(
-        manifest_object_lookup=manifest_object_lookup,
-        path_finder=path_finder,
+        SubgraphGeneratorArgumentSet(
+            manifest_object_lookup=manifest_object_lookup,
+            path_finder=path_finder,
+        )
     )
     semantic_graph = graph_builder.build()
 
     return time.perf_counter() - start_time
 
 
-def test_semantic_graph_init_time() -> None:
+def _time_engine_init(
+    semantic_manifest: SemanticManifest,
+    sql_client: SqlClient,
+) -> float:
+    start_time = time.perf_counter()
+
+    manifest_lookup = SemanticManifestLookup(semantic_manifest)
+    mf_engine = MetricFlowEngine(
+        semantic_manifest_lookup=manifest_lookup,
+        sql_client=sql_client,
+    )
+
+    return time.perf_counter() - start_time
+
+
+def test_semantic_graph_init_time(sql_client: SqlClient) -> None:
+    # parameter_set = SyntheticManifestParameterSet(
+    #     measure_semantic_model_count=20,
+    #     measures_per_semantic_model=20,
+    #     dimension_semantic_model_count=20,
+    #     categorical_dimensions_per_semantic_model=10,
+    #     max_metric_depth=3,
+    #     max_metric_width=50,
+    #     saved_query_count=0,
+    #     metrics_per_saved_query=0,
+    #     categorical_dimensions_per_saved_query=0,
+    # )
+
     parameter_set = SyntheticManifestParameterSet(
-        measure_semantic_model_count=20,
+        measure_semantic_model_count=100,
         measures_per_semantic_model=20,
-        dimension_semantic_model_count=20,
-        categorical_dimensions_per_semantic_model=10,
-        max_metric_depth=3,
+        dimension_semantic_model_count=100,
+        categorical_dimensions_per_semantic_model=20,
+        max_metric_depth=2,
         max_metric_width=50,
         saved_query_count=0,
         metrics_per_saved_query=0,
         categorical_dimensions_per_saved_query=0,
     )
+
     generator = SyntheticManifestGenerator(parameter_set)
     semantic_manifest = generator.generate_manifest()
     semantic_manifest = PydanticSemanticManifestTransformer.transform(semantic_manifest)
@@ -189,14 +221,30 @@ def test_semantic_graph_init_time() -> None:
     # original_init_time = _time_original_init(semantic_manifest)
     # new_init_time = _time_new_init(semantic_manifest)
     # ratio = original_init_time / new_init_time
-    # logger.info(LazyFormat("Compared init times", original_init_time=original_init_time, new_init_time=new_init_time, ratio=f"{ratio:.2f}"))
+    # logger.info(
+    #     LazyFormat(
+    #         "Compared init times",
+    #         original_init_time=original_init_time,
+    #         new_init_time=new_init_time,
+    #         ratio=f"{ratio:.2f}",
+    #     )
+    # )
 
-    cProfile.runctx(
-        statement="_time_new_init(semantic_manifest)",
-        filename=CPROFILE_OUTPUT_FILE_NAME,
-        locals=locals(),
-        globals=globals(),
-    )
+    # cProfile.runctx(
+    #     statement="_time_new_init(semantic_manifest)",
+    #     filename=CPROFILE_OUTPUT_FILE_NAME,
+    #     locals=locals(),
+    #     globals=globals(),
+    # )
+
+    # with log_block_runtime("new init"):
+    #     _time_new_init(semantic_manifest)
+
+    with log_block_runtime("New engine init"):
+        _time_engine_init(semantic_manifest, sql_client)
+
+    # with log_block_runtime("original init"):
+    #     _time_original_init(semantic_manifest)
 
 
 @fast_frozen_dataclass()

@@ -1,0 +1,16 @@
+---
+semantic_model:
+  name: sm_1
+
+  node_relation:
+    schema_name: $source_schema
+    alias: sm_1
+
+  entities:
+    - name: sm_1_primary_entity
+      type: primary
+    - name: sm_2_primary_entity
+      type: foreign
+  dimensions:
+    - name: dim_0
+      type: categorical

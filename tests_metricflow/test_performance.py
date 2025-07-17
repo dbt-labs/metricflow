@@ -240,6 +240,69 @@ def test_run_explain_one_saved_query(  # noqa: D103
     engine.explain(MetricFlowQueryRequest.create_with_random_request_id(saved_query_name=saved_query_name))
 
 
+def test_sg_run_explain_one_saved_query(  # noqa: D103
+    simple_semantic_manifest: PydanticSemanticManifest,
+    sql_client: SqlClient,
+) -> None:
+    conf_source = simple_semantic_manifest
+    semantic_manifest = _create_manifest(conf_source)
+    saved_query_name = "sq_act_trigger_dashboard_export_ytd_subregion_metrics_wo_sales"
+
+    with log_block_runtime("Engine Init"):
+        manifest_lookup = SemanticManifestLookup(semantic_manifest)
+        mf_engine = MetricFlowEngine(
+            semantic_manifest_lookup=manifest_lookup,
+            sql_client=sql_client,
+        )
+
+    # cProfile.runctx(
+    #     statement="mf_engine.explain(MetricFlowQueryRequest.create_with_random_request_id(saved_query_name=saved_query_name))",
+    #     filename=CPROFILE_OUTPUT_FILE_NAME,
+    #     locals=locals(),
+    #     globals=globals(),
+    # )
+
+    with log_block_runtime("Query Explain - Run 1"):
+        mf_engine.explain(MetricFlowQueryRequest.create_with_random_request_id(saved_query_name=saved_query_name))
+
+    # with log_block_runtime("Query Explain - Run 2"):
+    #     mf_engine.explain(MetricFlowQueryRequest.create_with_random_request_id(saved_query_name=saved_query_name))
+
+
+def test_sg_run_explain_many_saved_queries(  # noqa: D103
+    simple_semantic_manifest: PydanticSemanticManifest,
+    sql_client: SqlClient,
+) -> None:
+    conf_source = simple_semantic_manifest
+    semantic_manifest = _create_manifest(conf_source)
+
+    with log_block_runtime("Engine Init"):
+        manifest_lookup = SemanticManifestLookup(semantic_manifest)
+        mf_engine = MetricFlowEngine(
+            semantic_manifest_lookup=manifest_lookup,
+            sql_client=sql_client,
+        )
+
+    # cProfile.runctx(
+    #     statement="mf_engine.explain(MetricFlowQueryRequest.create_with_random_request_id(saved_query_name=saved_query_name))",
+    #     filename=CPROFILE_OUTPUT_FILE_NAME,
+    #     locals=locals(),
+    #     globals=globals(),
+    # )
+
+    with log_block_runtime("Explain Queries"):
+        for saved_query in semantic_manifest.saved_queries[:40]:
+            try:
+                mf_engine.explain(
+                    MetricFlowQueryRequest.create_with_random_request_id(saved_query_name=saved_query.name)
+                )
+            except Exception:
+                logger.exception("Ignoring exception for the test")
+
+    # with log_block_runtime("Query Explain - Run 2"):
+    #     mf_engine.explain(MetricFlowQueryRequest.create_with_random_request_id(saved_query_name=saved_query_name))
+
+
 def test_profile_explain_one_saved_query(  # noqa: D103
     simple_semantic_manifest: PydanticSemanticManifest,
     sql_client: SqlClient,

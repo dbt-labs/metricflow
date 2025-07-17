@@ -19,6 +19,7 @@ semantic_model:
       agg: sum_boolean
     - name: booking_value
       agg: sum
+      create_metric: true
     - name: max_booking_value
       agg: max
       expr: booking_value
