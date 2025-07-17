@@ -31,45 +31,23 @@ docstring:
                 <WhereConstraintNode>
                     <!-- description = 'Constrain Output with WHERE' -->
                     <!-- node_id = NodeId(id_str='wcc_0') -->
-                    <!-- where_condition =                                                 -->
-                    <!--   WhereFilterSpec(                                                -->
-                    <!--     where_sql="listing__country_latest = 'us'",                   -->
-                    <!--     bind_parameters=SqlBindParameterSet(),                        -->
-                    <!--     linkable_element_unions=(                                     -->
-                    <!--       LinkableElementUnion(                                       -->
-                    <!--         linkable_dimension=LinkableDimension(                     -->
-                    <!--           properties=(LOCAL,),                                    -->
-                    <!--           defined_in_semantic_model=SemanticModelReference(       -->
-                    <!--             semantic_model_name='listings_latest',                -->
-                    <!--           ),                                                      -->
-                    <!--           element_name='country_latest',                          -->
-                    <!--           dimension_type=CATEGORICAL,                             -->
-                    <!--           entity_links=(                                          -->
-                    <!--             EntityReference(                                      -->
-                    <!--               element_name='listing',                             -->
-                    <!--             ),                                                    -->
-                    <!--           ),                                                      -->
-                    <!--           join_path=SemanticModelJoinPath(                        -->
-                    <!--             left_semantic_model_reference=SemanticModelReference( -->
-                    <!--               semantic_model_name='listings_latest',              -->
-                    <!--             ),                                                    -->
-                    <!--           ),                                                      -->
-                    <!--         ),                                                        -->
-                    <!--       ),                                                          -->
-                    <!--     ),                                                            -->
-                    <!--     linkable_spec_set=LinkableSpecSet(                            -->
-                    <!--       dimension_specs=(                                           -->
-                    <!--         DimensionSpec(                                            -->
-                    <!--           element_name='country_latest',                          -->
-                    <!--           entity_links=(                                          -->
-                    <!--             EntityReference(                                      -->
-                    <!--               element_name='listing',                             -->
-                    <!--             ),                                                    -->
-                    <!--           ),                                                      -->
-                    <!--         ),                                                        -->
-                    <!--       ),                                                          -->
-                    <!--     ),                                                            -->
-                    <!--   )                                                               -->
+                    <!-- where_condition =                                           -->
+                    <!--   WhereFilterSpec(                                          -->
+                    <!--     where_sql="listing__country_latest = 'us'",             -->
+                    <!--     bind_parameters=SqlBindParameterSet(),                  -->
+                    <!--     element_set=AnnotatedSpecLinkableElementSet(            -->
+                    <!--       annotated_specs=(                                     -->
+                    <!--         AnnotatedSpec(                                      -->
+                    <!--           element_type=DIMENSION,                           -->
+                    <!--           element_name='country_latest',                    -->
+                    <!--           entity_link_names=('listing',),                   -->
+                    <!--           element_properties=(LOCAL,),                      -->
+                    <!--           origin_semantic_model_names=('listings_latest',), -->
+                    <!--           source_semantic_model_names=('listings_latest',), -->
+                    <!--         ),                                                  -->
+                    <!--       ),                                                    -->
+                    <!--     ),                                                      -->
+                    <!--   )                                                         -->
                     <ReadSqlSourceNode>
                         <!-- description = "Read From SemanticModelDataSet('listings_latest')" -->
                         <!-- node_id = NodeId(id_str='rss_28024') -->
