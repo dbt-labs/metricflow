@@ -66,7 +66,7 @@ class WhereFilterMetric(ProtocolHint[QueryInterfaceMetric]):
 
         resolved_spec = self._resolved_spec_lookup.checked_resolved_spec(resolved_spec_key)
         self._rendered_spec_tracker.record_rendered_spec(resolved_spec)
-        column_association = self._column_association_resolver.resolve_spec(resolved_spec)
+        column_association = self._column_association_resolver.resolve_spec(resolved_spec.spec)
 
         return column_association.column_name
 
