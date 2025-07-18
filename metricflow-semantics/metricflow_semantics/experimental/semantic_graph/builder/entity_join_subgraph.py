@@ -35,7 +35,7 @@ class EntityJoinSubgraphGenerator(SemanticSubgraphGenerator):
     def _get_subgraph_for_model(self, lookup: SemanticModelObjectLookup) -> MutableSemanticGraph:
         current_subgraph = MutableSemanticGraph.create()
 
-        left_model_id = SemanticModelId(model_name=lookup.semantic_model.name)
+        left_model_id = SemanticModelId.get_instance(model_name=lookup.semantic_model.name)
         left_model_node = JoinedModelNode.get_instance(left_model_id)
         left_local_model_node = LocalModelNode.get_instance(left_model_id)
         left_model = lookup.semantic_model

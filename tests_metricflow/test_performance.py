@@ -19,7 +19,7 @@ from metricflow_semantics.api.v0_1.saved_query_dependency_resolver import SavedQ
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.runtime import log_block_runtime
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from run_pstats import CPROFILE_OUTPUT_FILE_NAME
+from run_pstats import CPROFILE_OUTPUT_FILE_PATH
 
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowQueryRequest
 from metricflow.protocols.sql_client import SqlClient
@@ -86,7 +86,7 @@ def _run_resolution(semantic_manifest: PydanticSemanticManifest, resolver: Saved
 
 # cProfile.runctx(
 #     statement="_run_resolution(semantic_manifest, resolver)",
-#     filename=CPROFILE_OUTPUT_FILE_NAME,
+#     filename=str(CPROFILE_OUTPUT_FILE_PATH),
 #     locals=locals(),
 #     globals=globals(),
 # )
@@ -128,7 +128,7 @@ def test_profile_100_queries(  # noqa: D103
 
         # cProfile.runctx(
         #     statement="_create_manifest(simple_semantic_manifest)",
-        #     filename=CPROFILE_OUTPUT_FILE_NAME,
+        #     filename=str(CPROFILE_OUTPUT_FILE_PATH),
         #     locals=locals(),
         #     globals=globals(),
         # )
@@ -141,7 +141,7 @@ def test_profile_100_queries(  # noqa: D103
 
         cProfile.runctx(
             statement="_run_resolution(semantic_manifest, resolver)",
-            filename=CPROFILE_OUTPUT_FILE_NAME,
+            filename=str(CPROFILE_OUTPUT_FILE_PATH),
             locals=locals(),
             globals=globals(),
         )
@@ -161,7 +161,7 @@ def test_profile_resolve_one_saved_query(  # noqa: D103
     resolver = _create_resolver(semantic_manifest)
     cProfile.runctx(
         statement="_run_resolve_one_saved_query(resolver)",
-        filename=CPROFILE_OUTPUT_FILE_NAME,
+        filename=str(CPROFILE_OUTPUT_FILE_PATH),
         locals=locals(),
         globals=globals(),
     )
@@ -181,7 +181,7 @@ def test_profile_all_saved_queries(  # noqa: D103
     resolver = _create_resolver(semantic_manifest)
     cProfile.runctx(
         statement="_run_resolve_all_saved_queries(semantic_manifest, resolver)",
-        filename=CPROFILE_OUTPUT_FILE_NAME,
+        filename=str(CPROFILE_OUTPUT_FILE_PATH),
         locals=locals(),
         globals=globals(),
     )
@@ -257,7 +257,7 @@ def test_sg_run_explain_one_saved_query(  # noqa: D103
 
     # cProfile.runctx(
     #     statement="mf_engine.explain(MetricFlowQueryRequest.create_with_random_request_id(saved_query_name=saved_query_name))",
-    #     filename=CPROFILE_OUTPUT_FILE_NAME,
+    #     filename=str(CPROFILE_OUTPUT_FILE_PATH),
     #     locals=locals(),
     #     globals=globals(),
     # )
@@ -285,7 +285,7 @@ def test_sg_run_explain_many_saved_queries(  # noqa: D103
 
     # cProfile.runctx(
     #     statement="mf_engine.explain(MetricFlowQueryRequest.create_with_random_request_id(saved_query_name=saved_query_name))",
-    #     filename=CPROFILE_OUTPUT_FILE_NAME,
+    #     filename=str(CPROFILE_OUTPUT_FILE_PATH),
     #     locals=locals(),
     #     globals=globals(),
     # )
@@ -311,7 +311,7 @@ def test_profile_explain_one_saved_query(  # noqa: D103
     engine = _create_engine(semantic_manifest, sql_client)
     cProfile.runctx(
         statement="_run_explain_one_saved_query(engine)",
-        filename=CPROFILE_OUTPUT_FILE_NAME,
+        filename=str(CPROFILE_OUTPUT_FILE_PATH),
         locals=locals(),
         globals=globals(),
     )
@@ -331,7 +331,7 @@ def test_profile_explain_many_saved_queries(  # noqa: D103
     engine = _create_engine(semantic_manifest, sql_client)
     cProfile.runctx(
         statement="_run_explain_many_saved_queries(semantic_manifest, engine)",
-        filename=CPROFILE_OUTPUT_FILE_NAME,
+        filename=str(CPROFILE_OUTPUT_FILE_PATH),
         locals=locals(),
         globals=globals(),
     )

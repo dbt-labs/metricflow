@@ -37,7 +37,7 @@ from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
 from metricflow_semantics.test_helpers.time_helpers import ConfigurableTimeSource
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
-from run_pstats import CPROFILE_OUTPUT_FILE_NAME
+from run_pstats import CPROFILE_OUTPUT_FILE_PATH
 from tests_metricflow_semantics.model.test_semantic_model_container import build_semantic_model_lookup_from_manifest
 
 from metricflow.engine.metricflow_engine import MetricFlowEngine
@@ -227,18 +227,20 @@ def test_semantic_graph_init_time(sql_client: SqlClient) -> None:
     #     )
     # )
 
+    # output_filename = str(CPROFILE_OUTPUT_FILE_PATH)
+    # logger.info(LazyFormat("Running performance profiling", output_filename=output_filename))
     # cProfile.runctx(
     #     statement="_time_new_init(semantic_manifest)",
-    #     filename=CPROFILE_OUTPUT_FILE_NAME,
+    #     filename=str(CPROFILE_OUTPUT_FILE_PATH),
     #     locals=locals(),
     #     globals=globals(),
     # )
 
-    # with log_block_runtime("new init"):
-    #     _time_new_init(semantic_manifest)
+    with log_block_runtime("new init"):
+        _time_new_init(semantic_manifest)
 
-    with log_block_runtime("New engine init"):
-        _time_engine_init(semantic_manifest, sql_client)
+    # with log_block_runtime("New engine init"):
+    #     _time_engine_init(semantic_manifest, sql_client)
 
     # with log_block_runtime("original init"):
     #     _time_original_init(semantic_manifest)
@@ -285,7 +287,7 @@ def _test_factory() -> None:
 def test_singleton_approach() -> None:
     cProfile.runctx(
         statement="_test_factory()",
-        filename=CPROFILE_OUTPUT_FILE_NAME,
+        filename=str(CPROFILE_OUTPUT_FILE_PATH),
         locals=locals(),
         globals=globals(),
     )

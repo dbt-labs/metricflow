@@ -12,6 +12,7 @@ from dbt_semantic_interfaces.type_enums import EntityType, TimeGranularity
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple, T
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item
+from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.dsi.model_object_lookup import (
     MeasureContainingModelObjectLookup,
     SemanticModelObjectLookup,
@@ -19,7 +20,6 @@ from metricflow_semantics.experimental.dsi.model_object_lookup import (
 from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
-from metricflow_semantics.experimental.singleton_decorator import singleton_dataclass
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
@@ -202,33 +202,17 @@ class _ManifestObjectType(Enum):
     MODEL = "model"
 
 
-@singleton_dataclass()
+@fast_frozen_dataclass()
 class EntityJoinType:
     left_entity_type: EntityType
     right_entity_type: EntityType
 
-    def get_instance(self, left_entity_type: EntityType, right_entity_type: EntityType) -> EntityJoinType:
-        return EntityJoinType(
-            left_entity_type=left_entity_type,
-            right_entity_type=right_entity_type,
-        )
 
-
-@singleton_dataclass()
+@fast_frozen_dataclass()
 class JoinModelOnRightDescriptor:
     entity_name: str
     right_model_id: SemanticModelId
     join_type: EntityJoinType
-
-    @staticmethod
-    def get_instance(
-        entity_name: str, right_model_id: SemanticModelId, join_type: EntityJoinType
-    ) -> JoinModelOnRightDescriptor:
-        return JoinModelOnRightDescriptor(
-            entity_name=entity_name,
-            right_model_id=right_model_id,
-            join_type=join_type,
-        )
 
 
 class SemanticModelJoinLookup:
@@ -349,7 +333,7 @@ class SemanticModelJoinLookup:
                     continue
 
                 right_model_id_to_join_descriptors[right_model_id].add(
-                    JoinModelOnRightDescriptor.get_instance(
+                    JoinModelOnRightDescriptor(
                         entity_name=left_entity_name,
                         right_model_id=right_model_id,
                         join_type=join_type,

@@ -69,7 +69,7 @@ class GroupByMetricSubgraphGenerator(SemanticSubgraphGenerator):
         self._metric_name_to_derivative_semantic_model_ids: dict[str, FrozenOrderedSet[SemanticModelId]] = {}
 
         self._current_graph: SemanticGraph = MutableSemanticGraph.create()
-        self._traversable_nodes_for_dsi_entity_node_search: OrderedSet[SemanticGraphNode] = FrozenOrderedSet()
+        self._allowed_nodes_for_configured_entity_node_search: OrderedSet[SemanticGraphNode] = FrozenOrderedSet()
         # self._measure_name_to_edge_argument: dict[str, MetricAttributeEdgeArgument] = {}
         # self._metric_name_to_edge_argument: dict[str, MetricAttributeEdgeArgument] = {}
 
@@ -83,10 +83,9 @@ class GroupByMetricSubgraphGenerator(SemanticSubgraphGenerator):
     @override
     def generate_subgraph(self, predecessor_graph: SemanticGraph) -> MutableSemanticGraph:
         self._current_graph = predecessor_graph
-        self._traversable_nodes_for_dsi_entity_node_search = predecessor_graph.nodes_with_label(
+        self._allowed_nodes_for_configured_entity_node_search = predecessor_graph.nodes_with_label(
             LocalModelLabel.get_instance()
         ).union(predecessor_graph.nodes_with_label(ConfiguredEntityLabel.get_instance()))
-        # self._measure_name_to_edge_argument.clear()
 
         generate_subgraph_context = _GenerateGroupByMetricSubgraphContext(
             current_graph=predecessor_graph,
@@ -99,11 +98,7 @@ class GroupByMetricSubgraphGenerator(SemanticSubgraphGenerator):
         )
 
         if self._verbose_debug_logs:
-            logger.debug(LazyFormat("Starting with graph", current_graph=predecessor_graph))
-
-        # for metric in self._manifest_object_lookup.get_metrics():
-        #     if metric.name not in self._metric_name_to_edge_argument:
-        #         self._generate_subgraph_for_any_metric(current_subgraph, metric)
+            logger.debug(LazyFormat("Starting with graph", predecessor_graph=predecessor_graph))
 
         return generate_subgraph_context.generate()
 
@@ -173,7 +168,7 @@ class _GenerateGroupByMetricSubgraphContext:
         for edge_to_successor in current_graph.edges_with_tail_node(metric_node):
             parent_metric_node = edge_to_successor.head_node
             if deny_label in edge_to_successor.labels or deny_label in edge_to_successor.head_node.labels:
-                parent_metric_nodes.clear()
+                parent_metric_nodes = MutableOrderedSet()
                 break
             else:
                 parent_metric_nodes.add(parent_metric_node)

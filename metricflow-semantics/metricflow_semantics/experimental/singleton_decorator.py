@@ -78,7 +78,7 @@ def _recreate_dataclass_as_singleton(inner_cls: Type[DataclassInstance]) -> Type
                 )
             )
 
-    instance_lock = threading.Lock()
+    instance_lock = threading.RLock()
     # Might change to  `WeakValueDictionary`.
     instance_args_to_instance: dict[AnyLengthTuple, SingletonInstance] = {}
 

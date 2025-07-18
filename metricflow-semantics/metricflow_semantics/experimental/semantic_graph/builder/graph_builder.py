@@ -49,7 +49,7 @@ class SemanticGraphBuilder:
         generator_argument_set: SubgraphGeneratorArgumentSet,
     ) -> None:
         self._generator_argument_set = generator_argument_set
-        self._verbose_debug_logs = False
+        self._verbose_debug_logs = True
 
     def build(
         self,
@@ -68,10 +68,11 @@ class SemanticGraphBuilder:
             if self._verbose_debug_logs:
                 logger.debug(
                     LazyFormat(
-                        "Generated subgraph from a generator",
+                        "Generated subgraph",
                         generator=generator.__name__,
-                        subgraph=subgraph,
                         runtime=f"{runtime:.2f}s",
+                        subgraph_node_count=len(subgraph.nodes),
+                        subgraph_edge_count=len(subgraph.edges),
                     )
                 )
             current_graph.add_nodes(subgraph.nodes)
