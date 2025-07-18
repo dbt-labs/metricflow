@@ -3,362 +3,352 @@ test_filename: test_semantic_model_container.py
 docstring:
   Tests extracting linkable elements for a given measure input.
 ---
-Model Join-Path                             Entity Links                                   Name                                                 Time Granularity    Date Part    Properties
-------------------------------------------  ---------------------------------------------  ---------------------------------------------------  ------------------  -----------  -------------------------------------------
-('listings_latest',)                        ()                                             listing                                                                               ['ENTITY', 'LOCAL']
-('listings_latest',)                        ()                                             metric_time                                                              DAY          ['DATE_PART', 'METRIC_TIME']
-('listings_latest',)                        ()                                             metric_time                                                              DOW          ['DATE_PART', 'METRIC_TIME']
-('listings_latest',)                        ()                                             metric_time                                                              DOY          ['DATE_PART', 'METRIC_TIME']
-('listings_latest',)                        ()                                             metric_time                                                              MONTH        ['DATE_PART', 'METRIC_TIME']
-('listings_latest',)                        ()                                             metric_time                                                              QUARTER      ['DATE_PART', 'METRIC_TIME']
-('listings_latest',)                        ()                                             metric_time                                                              YEAR         ['DATE_PART', 'METRIC_TIME']
-('listings_latest',)                        ()                                             metric_time                                          alien_day                        ['DERIVED_TIME_GRANULARITY', 'METRIC_TIME']
-('listings_latest',)                        ()                                             metric_time                                          day                              ['METRIC_TIME']
-('listings_latest',)                        ()                                             metric_time                                          month                            ['DERIVED_TIME_GRANULARITY', 'METRIC_TIME']
-('listings_latest',)                        ()                                             metric_time                                          quarter                          ['DERIVED_TIME_GRANULARITY', 'METRIC_TIME']
-('listings_latest',)                        ()                                             metric_time                                          week                             ['DERIVED_TIME_GRANULARITY', 'METRIC_TIME']
-('listings_latest',)                        ()                                             metric_time                                          year                             ['DERIVED_TIME_GRANULARITY', 'METRIC_TIME']
-('listings_latest',)                        ()                                             user                                                                                  ['ENTITY', 'LOCAL']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     approximate_continuous_booking_value_p99                                              ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     approximate_discrete_booking_value_p99                                                ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     average_booking_value                                                                 ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     average_instant_booking_value                                                         ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     bookers                                                                               ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     booking_fees                                                                          ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     booking_fees_per_booker                                                               ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     booking_payments                                                                      ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     booking_value                                                                         ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     booking_value_for_non_null_listing_id                                                 ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     booking_value_p99                                                                     ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     booking_value_sub_instant                                                             ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     booking_value_sub_instant_add_10                                                      ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     bookings                                                                              ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     bookings_fill_nulls_with_0                                                            ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     bookings_fill_nulls_with_0_without_time_spine                                         ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     bookings_join_to_time_spine                                                           ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     bookings_join_to_time_spine_with_tiered_filters                                       ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     bookings_per_booker                                                                   ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     bookings_per_dollar                                                                   ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     derived_bookings_0                                                                    ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     derived_bookings_1                                                                    ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     derived_shared_alias_1a                                                               ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     derived_shared_alias_1b                                                               ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     derived_shared_alias_2                                                                ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     discrete_booking_value_p99                                                            ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     double_counted_delayed_bookings                                                       ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     instant_booking_fraction_of_max_value                                                 ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     instant_booking_value                                                                 ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     instant_booking_value_ratio                                                           ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     instant_bookings                                                                      ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     instant_bookings_with_measure_filter                                                  ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     instant_lux_booking_value_rate                                                        ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     instant_plus_non_referred_bookings_pct                                                ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     lux_booking_fraction_of_max_value                                                     ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     lux_booking_value_rate_expr                                                           ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     max_booking_value                                                                     ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     median_booking_value                                                                  ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     min_booking_value                                                                     ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     nested_fill_nulls_without_time_spine                                                  ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     non_referred_bookings_pct                                                             ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     referred_bookings                                                                     ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('booking', 'listing')")     twice_bookings_fill_nulls_with_0_without_time_spine                                   ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               active_listings                                                                       ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               approximate_continuous_booking_value_p99                                              ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               approximate_discrete_booking_value_p99                                                ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               average_booking_value                                                                 ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               average_instant_booking_value                                                         ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               bookers                                                                               ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               booking_fees                                                                          ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               booking_fees_per_booker                                                               ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               booking_payments                                                                      ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               booking_value                                                                         ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               booking_value_for_non_null_listing_id                                                 ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               booking_value_p99                                                                     ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               booking_value_per_view                                                                ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               booking_value_per_view                                                                ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               booking_value_sub_instant                                                             ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               booking_value_sub_instant_add_10                                                      ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               bookings                                                                              ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               bookings_fill_nulls_with_0                                                            ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               bookings_fill_nulls_with_0_without_time_spine                                         ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               bookings_join_to_time_spine                                                           ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               bookings_join_to_time_spine_with_tiered_filters                                       ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               bookings_per_booker                                                                   ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               bookings_per_dollar                                                                   ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               bookings_per_listing                                                                  ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               bookings_per_listing                                                                  ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               bookings_per_lux_listing_derived                                                      ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               bookings_per_lux_listing_derived                                                      ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               bookings_per_view                                                                     ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               bookings_per_view                                                                     ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               derived_bookings_0                                                                    ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               derived_bookings_1                                                                    ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               derived_shared_alias_1a                                                               ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               derived_shared_alias_1b                                                               ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               derived_shared_alias_2                                                                ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               discrete_booking_value_p99                                                            ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               double_counted_delayed_bookings                                                       ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               instant_booking_fraction_of_max_value                                                 ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               instant_booking_value                                                                 ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               instant_booking_value_ratio                                                           ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               instant_bookings                                                                      ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               instant_bookings_with_measure_filter                                                  ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               instant_lux_booking_value_rate                                                        ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               instant_plus_non_referred_bookings_pct                                                ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               largest_listing                                                                       ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               listings                                                                              ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               lux_booking_fraction_of_max_value                                                     ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               lux_booking_value_rate_expr                                                           ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               lux_listings                                                                          ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               max_booking_value                                                                     ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               median_booking_value                                                                  ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               min_booking_value                                                                     ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               nested_fill_nulls_without_time_spine                                                  ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               non_referred_bookings_pct                                                             ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               popular_listing_bookings_per_booker                                                   ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               referred_bookings                                                                     ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               smallest_listing                                                                      ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               twice_bookings_fill_nulls_with_0_without_time_spine                                   ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               views                                                                                 ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               views_times_booking_value                                                             ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('listing',)")               views_times_booking_value                                                             ['JOINED', 'METRIC']
-('listings_latest',)                        ("('listing',)", "('view', 'listing')")        views                                                                                 ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('account', 'user')")           current_account_balance_by_user                                                       ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('account', 'user')")           regional_starting_balance_ratios                                                      ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('account', 'user')")           total_account_balance_first_day                                                       ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('account', 'user')")           total_account_balance_first_day_of_month                                              ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           active_listings                                                                       ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           approximate_continuous_booking_value_p99                                              ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           approximate_discrete_booking_value_p99                                                ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           average_booking_value                                                                 ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           average_instant_booking_value                                                         ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           bookers                                                                               ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           booking_fees                                                                          ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           booking_fees_per_booker                                                               ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           booking_payments                                                                      ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           booking_value                                                                         ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           booking_value_for_non_null_listing_id                                                 ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           booking_value_p99                                                                     ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           booking_value_per_view                                                                ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           booking_value_per_view                                                                ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           booking_value_sub_instant                                                             ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           booking_value_sub_instant_add_10                                                      ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           bookings                                                                              ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           bookings_fill_nulls_with_0                                                            ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           bookings_fill_nulls_with_0_without_time_spine                                         ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           bookings_join_to_time_spine                                                           ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           bookings_join_to_time_spine_with_tiered_filters                                       ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           bookings_per_booker                                                                   ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           bookings_per_dollar                                                                   ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           bookings_per_listing                                                                  ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           bookings_per_listing                                                                  ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           bookings_per_lux_listing_derived                                                      ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           bookings_per_lux_listing_derived                                                      ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           bookings_per_view                                                                     ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           bookings_per_view                                                                     ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           derived_bookings_0                                                                    ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           derived_bookings_1                                                                    ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           derived_shared_alias_1a                                                               ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           derived_shared_alias_1b                                                               ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           derived_shared_alias_2                                                                ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           discrete_booking_value_p99                                                            ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           double_counted_delayed_bookings                                                       ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           instant_booking_fraction_of_max_value                                                 ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           instant_booking_value                                                                 ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           instant_booking_value_ratio                                                           ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           instant_bookings                                                                      ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           instant_bookings_with_measure_filter                                                  ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           instant_lux_booking_value_rate                                                        ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           instant_plus_non_referred_bookings_pct                                                ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           largest_listing                                                                       ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           listings                                                                              ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           lux_booking_fraction_of_max_value                                                     ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           lux_booking_value_rate_expr                                                           ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           lux_listings                                                                          ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           max_booking_value                                                                     ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           median_booking_value                                                                  ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           min_booking_value                                                                     ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           nested_fill_nulls_without_time_spine                                                  ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           non_referred_bookings_pct                                                             ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           popular_listing_bookings_per_booker                                                   ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           referred_bookings                                                                     ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           smallest_listing                                                                      ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           twice_bookings_fill_nulls_with_0_without_time_spine                                   ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           views                                                                                 ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           views_times_booking_value                                                             ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('listing', 'user')")           views_times_booking_value                                                             ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('revenue_instance', 'user')")  revenue                                                                               ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('revenue_instance', 'user')")  revenue_all_time                                                                      ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('user',)")                     active_listings                                                                       ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('user',)")                     archived_users                                                                        ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('user',)")                     archived_users_join_to_time_spine                                                     ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('user',)")                     current_account_balance_by_user                                                       ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('user',)")                     identity_verifications                                                                ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('user',)")                     largest_listing                                                                       ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('user',)")                     listings                                                                              ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('user',)")                     lux_listings                                                                          ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('user',)")                     new_users                                                                             ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('user',)")                     popular_listing_bookings_per_booker                                                   ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('user',)")                     regional_starting_balance_ratios                                                      ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('user',)")                     revenue                                                                               ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('user',)")                     revenue_all_time                                                                      ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('user',)")                     simple_subdaily_metric_default_day                                                    ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('user',)")                     simple_subdaily_metric_default_hour                                                   ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('user',)")                     smallest_listing                                                                      ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('user',)")                     subdaily_join_to_time_spine_metric                                                    ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('user',)")                     total_account_balance_first_day                                                       ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('user',)")                     total_account_balance_first_day_of_month                                              ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('user',)")                     views                                                                                 ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('user',)")                     visit_buy_conversion_rate                                                             ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('user',)")                     visit_buy_conversion_rate_7days                                                       ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('user',)")                     visit_buy_conversion_rate_7days_fill_nulls_with_0                                     ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('user',)")                     visit_buy_conversion_rate_by_session                                                  ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('user',)")                     visit_buy_conversion_rate_with_monthly_conversion                                     ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('user',)")                     visit_buy_conversions                                                                 ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('verification', 'user')")      identity_verifications                                                                ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('view', 'user')")              views                                                                                 ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('visit', 'user')")             visit_buy_conversion_rate                                                             ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('visit', 'user')")             visit_buy_conversion_rate_7days                                                       ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('visit', 'user')")             visit_buy_conversion_rate_7days_fill_nulls_with_0                                     ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('visit', 'user')")             visit_buy_conversion_rate_by_session                                                  ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('visit', 'user')")             visit_buy_conversion_rate_with_monthly_conversion                                     ['JOINED', 'METRIC']
-('listings_latest',)                        ("('user',)", "('visit', 'user')")             visit_buy_conversions                                                                 ['JOINED', 'METRIC']
-('listings_latest',)                        ('listing',)                                   capacity_latest                                                                       ['LOCAL']
-('listings_latest',)                        ('listing',)                                   country_latest                                                                        ['LOCAL']
-('listings_latest',)                        ('listing',)                                   created_at                                                               DAY          ['DATE_PART', 'LOCAL']
-('listings_latest',)                        ('listing',)                                   created_at                                                               DOW          ['DATE_PART', 'LOCAL']
-('listings_latest',)                        ('listing',)                                   created_at                                                               DOY          ['DATE_PART', 'LOCAL']
-('listings_latest',)                        ('listing',)                                   created_at                                                               MONTH        ['DATE_PART', 'LOCAL']
-('listings_latest',)                        ('listing',)                                   created_at                                                               QUARTER      ['DATE_PART', 'LOCAL']
-('listings_latest',)                        ('listing',)                                   created_at                                                               YEAR         ['DATE_PART', 'LOCAL']
-('listings_latest',)                        ('listing',)                                   created_at                                           alien_day                        ['DERIVED_TIME_GRANULARITY', 'LOCAL']
-('listings_latest',)                        ('listing',)                                   created_at                                           day                              ['LOCAL']
-('listings_latest',)                        ('listing',)                                   created_at                                           month                            ['DERIVED_TIME_GRANULARITY', 'LOCAL']
-('listings_latest',)                        ('listing',)                                   created_at                                           quarter                          ['DERIVED_TIME_GRANULARITY', 'LOCAL']
-('listings_latest',)                        ('listing',)                                   created_at                                           week                             ['DERIVED_TIME_GRANULARITY', 'LOCAL']
-('listings_latest',)                        ('listing',)                                   created_at                                           year                             ['DERIVED_TIME_GRANULARITY', 'LOCAL']
-('listings_latest',)                        ('listing',)                                   ds                                                                       DAY          ['DATE_PART', 'LOCAL']
-('listings_latest',)                        ('listing',)                                   ds                                                                       DOW          ['DATE_PART', 'LOCAL']
-('listings_latest',)                        ('listing',)                                   ds                                                                       DOY          ['DATE_PART', 'LOCAL']
-('listings_latest',)                        ('listing',)                                   ds                                                                       MONTH        ['DATE_PART', 'LOCAL']
-('listings_latest',)                        ('listing',)                                   ds                                                                       QUARTER      ['DATE_PART', 'LOCAL']
-('listings_latest',)                        ('listing',)                                   ds                                                                       YEAR         ['DATE_PART', 'LOCAL']
-('listings_latest',)                        ('listing',)                                   ds                                                   alien_day                        ['DERIVED_TIME_GRANULARITY', 'LOCAL']
-('listings_latest',)                        ('listing',)                                   ds                                                   day                              ['LOCAL']
-('listings_latest',)                        ('listing',)                                   ds                                                   month                            ['DERIVED_TIME_GRANULARITY', 'LOCAL']
-('listings_latest',)                        ('listing',)                                   ds                                                   quarter                          ['DERIVED_TIME_GRANULARITY', 'LOCAL']
-('listings_latest',)                        ('listing',)                                   ds                                                   week                             ['DERIVED_TIME_GRANULARITY', 'LOCAL']
-('listings_latest',)                        ('listing',)                                   ds                                                   year                             ['DERIVED_TIME_GRANULARITY', 'LOCAL']
-('listings_latest',)                        ('listing',)                                   is_lux_latest                                                                         ['LOCAL']
-('listings_latest',)                        ('listing',)                                   user                                                                                  ['ENTITY', 'LOCAL']
-('listings_latest', 'companies')            ('user',)                                      company                                                                               ['ENTITY', 'JOINED']
-('listings_latest', 'companies')            ('user',)                                      company_name                                                                          ['JOINED']
-('listings_latest', 'lux_listing_mapping')  ('listing',)                                   lux_listing                                                                           ['ENTITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      archived_at                                                              DAY          ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      archived_at                                                              DOW          ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      archived_at                                                              DOY          ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      archived_at                                                              MONTH        ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      archived_at                                                              QUARTER      ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      archived_at                                                              YEAR         ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      archived_at                                          alien_day                        ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      archived_at                                          day                              ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      archived_at                                          hour                             ['JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      archived_at                                          month                            ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      archived_at                                          quarter                          ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      archived_at                                          week                             ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      archived_at                                          year                             ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      bio_added_ts                                                             DAY          ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      bio_added_ts                                                             DOW          ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      bio_added_ts                                                             DOY          ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      bio_added_ts                                                             MONTH        ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      bio_added_ts                                                             QUARTER      ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      bio_added_ts                                                             YEAR         ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      bio_added_ts                                         alien_day                        ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      bio_added_ts                                         day                              ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      bio_added_ts                                         hour                             ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      bio_added_ts                                         minute                           ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      bio_added_ts                                         month                            ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      bio_added_ts                                         quarter                          ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      bio_added_ts                                         second                           ['JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      bio_added_ts                                         week                             ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      bio_added_ts                                         year                             ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      created_at                                                               DAY          ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      created_at                                                               DOW          ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      created_at                                                               DOY          ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      created_at                                                               MONTH        ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      created_at                                                               QUARTER      ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      created_at                                                               YEAR         ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      created_at                                           alien_day                        ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      created_at                                           day                              ['JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      created_at                                           month                            ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      created_at                                           quarter                          ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      created_at                                           week                             ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      created_at                                           year                             ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      ds                                                                       DAY          ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      ds                                                                       DOW          ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      ds                                                                       DOY          ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      ds                                                                       MONTH        ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      ds                                                                       QUARTER      ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      ds                                                                       YEAR         ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      ds                                                   alien_day                        ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      ds                                                   day                              ['JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      ds                                                   month                            ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      ds                                                   quarter                          ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      ds                                                   week                             ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      ds                                                   year                             ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      ds_partitioned                                                           DAY          ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      ds_partitioned                                                           DOW          ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      ds_partitioned                                                           DOY          ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      ds_partitioned                                                           MONTH        ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      ds_partitioned                                                           QUARTER      ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      ds_partitioned                                                           YEAR         ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      ds_partitioned                                       alien_day                        ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      ds_partitioned                                       day                              ['JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      ds_partitioned                                       month                            ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      ds_partitioned                                       quarter                          ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      ds_partitioned                                       week                             ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      ds_partitioned                                       year                             ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      home_state                                                                            ['JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      last_login_ts                                                            DAY          ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      last_login_ts                                                            DOW          ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      last_login_ts                                                            DOY          ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      last_login_ts                                                            MONTH        ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      last_login_ts                                                            QUARTER      ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      last_login_ts                                                            YEAR         ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      last_login_ts                                        alien_day                        ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      last_login_ts                                        day                              ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      last_login_ts                                        hour                             ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      last_login_ts                                        minute                           ['JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      last_login_ts                                        month                            ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      last_login_ts                                        quarter                          ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      last_login_ts                                        week                             ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      last_login_ts                                        year                             ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      last_profile_edit_ts                                                     DAY          ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      last_profile_edit_ts                                                     DOW          ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      last_profile_edit_ts                                                     DOY          ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      last_profile_edit_ts                                                     MONTH        ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      last_profile_edit_ts                                                     QUARTER      ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      last_profile_edit_ts                                                     YEAR         ['DATE_PART', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      last_profile_edit_ts                                 alien_day                        ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      last_profile_edit_ts                                 day                              ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      last_profile_edit_ts                                 hour                             ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      last_profile_edit_ts                                 millisecond                      ['JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      last_profile_edit_ts                                 minute                           ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      last_profile_edit_ts                                 month                            ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      last_profile_edit_ts                                 quarter                          ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      last_profile_edit_ts                                 second                           ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      last_profile_edit_ts                                 week                             ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_ds_source')      ('user',)                                      last_profile_edit_ts                                 year                             ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_latest')         ('user',)                                      ds_latest                                                                DAY          ['DATE_PART', 'JOINED']
-('listings_latest', 'users_latest')         ('user',)                                      ds_latest                                                                DOW          ['DATE_PART', 'JOINED']
-('listings_latest', 'users_latest')         ('user',)                                      ds_latest                                                                DOY          ['DATE_PART', 'JOINED']
-('listings_latest', 'users_latest')         ('user',)                                      ds_latest                                                                MONTH        ['DATE_PART', 'JOINED']
-('listings_latest', 'users_latest')         ('user',)                                      ds_latest                                                                QUARTER      ['DATE_PART', 'JOINED']
-('listings_latest', 'users_latest')         ('user',)                                      ds_latest                                                                YEAR         ['DATE_PART', 'JOINED']
-('listings_latest', 'users_latest')         ('user',)                                      ds_latest                                            alien_day                        ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_latest')         ('user',)                                      ds_latest                                            day                              ['JOINED']
-('listings_latest', 'users_latest')         ('user',)                                      ds_latest                                            month                            ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_latest')         ('user',)                                      ds_latest                                            quarter                          ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_latest')         ('user',)                                      ds_latest                                            week                             ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_latest')         ('user',)                                      ds_latest                                            year                             ['DERIVED_TIME_GRANULARITY', 'JOINED']
-('listings_latest', 'users_latest')         ('user',)                                      home_state_latest                                                                     ['JOINED']
+Dunder Name                                                                     Metric-Subquery Entity-Links    Type            Properties                            Derived-From Semantic Models
+------------------------------------------------------------------------------  ------------------------------  --------------  ------------------------------------  --------------------------------------------
+listing                                                                                                         ENTITY          ENTITY,LOCAL                          listings_latest
+listing__active_listings                                                        listing                         METRIC          JOINED,METRIC                         listings_latest
+listing__approximate_continuous_booking_value_p99                               listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__approximate_discrete_booking_value_p99                                 listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__average_booking_value                                                  listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__average_instant_booking_value                                          listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__bookers                                                                listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__approximate_continuous_booking_value_p99             booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__approximate_discrete_booking_value_p99               booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__average_booking_value                                booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__average_instant_booking_value                        booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__bookers                                              booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__booking_fees                                         booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__booking_fees_per_booker                              booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__booking_payments                                     booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__booking_value                                        booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__booking_value_for_non_null_listing_id                booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__booking_value_p99                                    booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__booking_value_sub_instant                            booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__booking_value_sub_instant_add_10                     booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__bookings                                             booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__bookings_fill_nulls_with_0                           booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__bookings_fill_nulls_with_0_without_time_spine        booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__bookings_join_to_time_spine                          booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__bookings_join_to_time_spine_with_tiered_filters      booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__bookings_per_booker                                  booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__bookings_per_dollar                                  booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__derived_bookings_0                                   booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__derived_bookings_1                                   booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__derived_shared_alias_1a                              booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__derived_shared_alias_1b                              booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__derived_shared_alias_2                               booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__discrete_booking_value_p99                           booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__double_counted_delayed_bookings                      booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__instant_booking_fraction_of_max_value                booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__instant_booking_value                                booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__instant_booking_value_ratio                          booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__instant_bookings                                     booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__instant_bookings_with_measure_filter                 booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__instant_lux_booking_value_rate                       booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__instant_plus_non_referred_bookings_pct               booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__lux_booking_fraction_of_max_value                    booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__lux_booking_value_rate_expr                          booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__max_booking_value                                    booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__median_booking_value                                 booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__min_booking_value                                    booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__nested_fill_nulls_without_time_spine                 booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__non_referred_bookings_pct                            booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__referred_bookings                                    booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking__listing__twice_bookings_fill_nulls_with_0_without_time_spine  booking,listing                 METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking_fees                                                           listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking_fees_per_booker                                                listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking_payments                                                       listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking_value                                                          listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking_value_for_non_null_listing_id                                  listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking_value_p99                                                      listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking_value_per_view                                                 listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest,views_source
+listing__booking_value_sub_instant                                              listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__booking_value_sub_instant_add_10                                       listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__bookings                                                               listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__bookings_fill_nulls_with_0                                             listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__bookings_fill_nulls_with_0_without_time_spine                          listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__bookings_join_to_time_spine                                            listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__bookings_join_to_time_spine_with_tiered_filters                        listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__bookings_per_booker                                                    listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__bookings_per_dollar                                                    listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__bookings_per_listing                                                   listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__bookings_per_lux_listing_derived                                       listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__bookings_per_view                                                      listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest,views_source
+listing__capacity_latest                                                                                        DIMENSION       LOCAL                                 listings_latest
+listing__country_latest                                                                                         DIMENSION       LOCAL                                 listings_latest
+listing__created_at__alien_day                                                                                  TIME_DIMENSION  DERIVED_TIME_GRANULARITY,LOCAL        listings_latest
+listing__created_at__day                                                                                        TIME_DIMENSION  LOCAL                                 listings_latest
+listing__created_at__extract_day                                                                                TIME_DIMENSION  DATE_PART,LOCAL                       listings_latest
+listing__created_at__extract_dow                                                                                TIME_DIMENSION  DATE_PART,LOCAL                       listings_latest
+listing__created_at__extract_doy                                                                                TIME_DIMENSION  DATE_PART,LOCAL                       listings_latest
+listing__created_at__extract_month                                                                              TIME_DIMENSION  DATE_PART,LOCAL                       listings_latest
+listing__created_at__extract_quarter                                                                            TIME_DIMENSION  DATE_PART,LOCAL                       listings_latest
+listing__created_at__extract_year                                                                               TIME_DIMENSION  DATE_PART,LOCAL                       listings_latest
+listing__created_at__month                                                                                      TIME_DIMENSION  DERIVED_TIME_GRANULARITY,LOCAL        listings_latest
+listing__created_at__quarter                                                                                    TIME_DIMENSION  DERIVED_TIME_GRANULARITY,LOCAL        listings_latest
+listing__created_at__week                                                                                       TIME_DIMENSION  DERIVED_TIME_GRANULARITY,LOCAL        listings_latest
+listing__created_at__year                                                                                       TIME_DIMENSION  DERIVED_TIME_GRANULARITY,LOCAL        listings_latest
+listing__derived_bookings_0                                                     listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__derived_bookings_1                                                     listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__derived_shared_alias_1a                                                listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__derived_shared_alias_1b                                                listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__derived_shared_alias_2                                                 listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__discrete_booking_value_p99                                             listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__double_counted_delayed_bookings                                        listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__ds__alien_day                                                                                          TIME_DIMENSION  DERIVED_TIME_GRANULARITY,LOCAL        listings_latest
+listing__ds__day                                                                                                TIME_DIMENSION  LOCAL                                 listings_latest
+listing__ds__extract_day                                                                                        TIME_DIMENSION  DATE_PART,LOCAL                       listings_latest
+listing__ds__extract_dow                                                                                        TIME_DIMENSION  DATE_PART,LOCAL                       listings_latest
+listing__ds__extract_doy                                                                                        TIME_DIMENSION  DATE_PART,LOCAL                       listings_latest
+listing__ds__extract_month                                                                                      TIME_DIMENSION  DATE_PART,LOCAL                       listings_latest
+listing__ds__extract_quarter                                                                                    TIME_DIMENSION  DATE_PART,LOCAL                       listings_latest
+listing__ds__extract_year                                                                                       TIME_DIMENSION  DATE_PART,LOCAL                       listings_latest
+listing__ds__month                                                                                              TIME_DIMENSION  DERIVED_TIME_GRANULARITY,LOCAL        listings_latest
+listing__ds__quarter                                                                                            TIME_DIMENSION  DERIVED_TIME_GRANULARITY,LOCAL        listings_latest
+listing__ds__week                                                                                               TIME_DIMENSION  DERIVED_TIME_GRANULARITY,LOCAL        listings_latest
+listing__ds__year                                                                                               TIME_DIMENSION  DERIVED_TIME_GRANULARITY,LOCAL        listings_latest
+listing__instant_booking_fraction_of_max_value                                  listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__instant_booking_value                                                  listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__instant_booking_value_ratio                                            listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__instant_bookings                                                       listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__instant_bookings_with_measure_filter                                   listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__instant_lux_booking_value_rate                                         listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__instant_plus_non_referred_bookings_pct                                 listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__is_lux_latest                                                                                          DIMENSION       LOCAL                                 listings_latest
+listing__largest_listing                                                        listing                         METRIC          JOINED,METRIC                         listings_latest
+listing__listings                                                               listing                         METRIC          JOINED,METRIC                         listings_latest
+listing__lux_booking_fraction_of_max_value                                      listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__lux_booking_value_rate_expr                                            listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__lux_listing                                                                                            ENTITY          ENTITY,JOINED                         listings_latest,lux_listing_mapping
+listing__lux_listings                                                           listing                         METRIC          JOINED,METRIC                         listings_latest
+listing__max_booking_value                                                      listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__median_booking_value                                                   listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__min_booking_value                                                      listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__nested_fill_nulls_without_time_spine                                   listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__non_referred_bookings_pct                                              listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__popular_listing_bookings_per_booker                                    listing                         METRIC          JOINED,METRIC                         listings_latest
+listing__referred_bookings                                                      listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__smallest_listing                                                       listing                         METRIC          JOINED,METRIC                         listings_latest
+listing__twice_bookings_fill_nulls_with_0_without_time_spine                    listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest
+listing__user                                                                                                   ENTITY          ENTITY,LOCAL                          listings_latest
+listing__view__listing__views                                                   view,listing                    METRIC          JOINED,METRIC                         listings_latest,views_source
+listing__views                                                                  listing                         METRIC          JOINED,METRIC                         listings_latest,views_source
+listing__views_times_booking_value                                              listing                         METRIC          JOINED,METRIC                         bookings_source,listings_latest,views_source
+metric_time__alien_day                                                                                          TIME_DIMENSION  DERIVED_TIME_GRANULARITY,METRIC_TIME  listings_latest
+metric_time__day                                                                                                TIME_DIMENSION  METRIC_TIME                           listings_latest
+metric_time__extract_day                                                                                        TIME_DIMENSION  DATE_PART,METRIC_TIME                 listings_latest
+metric_time__extract_dow                                                                                        TIME_DIMENSION  DATE_PART,METRIC_TIME                 listings_latest
+metric_time__extract_doy                                                                                        TIME_DIMENSION  DATE_PART,METRIC_TIME                 listings_latest
+metric_time__extract_month                                                                                      TIME_DIMENSION  DATE_PART,METRIC_TIME                 listings_latest
+metric_time__extract_quarter                                                                                    TIME_DIMENSION  DATE_PART,METRIC_TIME                 listings_latest
+metric_time__extract_year                                                                                       TIME_DIMENSION  DATE_PART,METRIC_TIME                 listings_latest
+metric_time__month                                                                                              TIME_DIMENSION  DERIVED_TIME_GRANULARITY,METRIC_TIME  listings_latest
+metric_time__quarter                                                                                            TIME_DIMENSION  DERIVED_TIME_GRANULARITY,METRIC_TIME  listings_latest
+metric_time__week                                                                                               TIME_DIMENSION  DERIVED_TIME_GRANULARITY,METRIC_TIME  listings_latest
+metric_time__year                                                                                               TIME_DIMENSION  DERIVED_TIME_GRANULARITY,METRIC_TIME  listings_latest
+user                                                                                                            ENTITY          ENTITY,LOCAL                          listings_latest
+user__account__user__current_account_balance_by_user                            account,user                    METRIC          JOINED,METRIC                         accounts_source,listings_latest
+user__account__user__regional_starting_balance_ratios                           account,user                    METRIC          JOINED,METRIC                         accounts_source,listings_latest
+user__account__user__total_account_balance_first_day                            account,user                    METRIC          JOINED,METRIC                         accounts_source,listings_latest
+user__account__user__total_account_balance_first_day_of_month                   account,user                    METRIC          JOINED,METRIC                         accounts_source,listings_latest
+user__active_listings                                                           user                            METRIC          JOINED,METRIC                         listings_latest
+user__archived_at__alien_day                                                                                    TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__archived_at__day                                                                                          TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__archived_at__extract_day                                                                                  TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__archived_at__extract_dow                                                                                  TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__archived_at__extract_doy                                                                                  TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__archived_at__extract_month                                                                                TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__archived_at__extract_quarter                                                                              TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__archived_at__extract_year                                                                                 TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__archived_at__hour                                                                                         TIME_DIMENSION  JOINED                                listings_latest,users_ds_source
+user__archived_at__month                                                                                        TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__archived_at__quarter                                                                                      TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__archived_at__week                                                                                         TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__archived_at__year                                                                                         TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__archived_users                                                            user                            METRIC          JOINED,METRIC                         listings_latest,users_ds_source
+user__archived_users_join_to_time_spine                                         user                            METRIC          JOINED,METRIC                         listings_latest,users_ds_source
+user__bio_added_ts__alien_day                                                                                   TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__bio_added_ts__day                                                                                         TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__bio_added_ts__extract_day                                                                                 TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__bio_added_ts__extract_dow                                                                                 TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__bio_added_ts__extract_doy                                                                                 TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__bio_added_ts__extract_month                                                                               TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__bio_added_ts__extract_quarter                                                                             TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__bio_added_ts__extract_year                                                                                TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__bio_added_ts__hour                                                                                        TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__bio_added_ts__minute                                                                                      TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__bio_added_ts__month                                                                                       TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__bio_added_ts__quarter                                                                                     TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__bio_added_ts__second                                                                                      TIME_DIMENSION  JOINED                                listings_latest,users_ds_source
+user__bio_added_ts__week                                                                                        TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__bio_added_ts__year                                                                                        TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__company                                                                                                   ENTITY          ENTITY,JOINED                         companies,listings_latest
+user__company_name                                                                                              DIMENSION       JOINED                                companies,listings_latest
+user__created_at__alien_day                                                                                     TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__created_at__day                                                                                           TIME_DIMENSION  JOINED                                listings_latest,users_ds_source
+user__created_at__extract_day                                                                                   TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__created_at__extract_dow                                                                                   TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__created_at__extract_doy                                                                                   TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__created_at__extract_month                                                                                 TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__created_at__extract_quarter                                                                               TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__created_at__extract_year                                                                                  TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__created_at__month                                                                                         TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__created_at__quarter                                                                                       TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__created_at__week                                                                                          TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__created_at__year                                                                                          TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__current_account_balance_by_user                                           user                            METRIC          JOINED,METRIC                         accounts_source,listings_latest
+user__ds__alien_day                                                                                             TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__ds__day                                                                                                   TIME_DIMENSION  JOINED                                listings_latest,users_ds_source
+user__ds__extract_day                                                                                           TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__ds__extract_dow                                                                                           TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__ds__extract_doy                                                                                           TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__ds__extract_month                                                                                         TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__ds__extract_quarter                                                                                       TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__ds__extract_year                                                                                          TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__ds__month                                                                                                 TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__ds__quarter                                                                                               TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__ds__week                                                                                                  TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__ds__year                                                                                                  TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__ds_latest__alien_day                                                                                      TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_latest
+user__ds_latest__day                                                                                            TIME_DIMENSION  JOINED                                listings_latest,users_latest
+user__ds_latest__extract_day                                                                                    TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_latest
+user__ds_latest__extract_dow                                                                                    TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_latest
+user__ds_latest__extract_doy                                                                                    TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_latest
+user__ds_latest__extract_month                                                                                  TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_latest
+user__ds_latest__extract_quarter                                                                                TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_latest
+user__ds_latest__extract_year                                                                                   TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_latest
+user__ds_latest__month                                                                                          TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_latest
+user__ds_latest__quarter                                                                                        TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_latest
+user__ds_latest__week                                                                                           TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_latest
+user__ds_latest__year                                                                                           TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_latest
+user__ds_partitioned__alien_day                                                                                 TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__ds_partitioned__day                                                                                       TIME_DIMENSION  JOINED                                listings_latest,users_ds_source
+user__ds_partitioned__extract_day                                                                               TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__ds_partitioned__extract_dow                                                                               TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__ds_partitioned__extract_doy                                                                               TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__ds_partitioned__extract_month                                                                             TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__ds_partitioned__extract_quarter                                                                           TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__ds_partitioned__extract_year                                                                              TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__ds_partitioned__month                                                                                     TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__ds_partitioned__quarter                                                                                   TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__ds_partitioned__week                                                                                      TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__ds_partitioned__year                                                                                      TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__home_state                                                                                                DIMENSION       JOINED                                listings_latest,users_ds_source
+user__home_state_latest                                                                                         DIMENSION       JOINED                                listings_latest,users_latest
+user__identity_verifications                                                    user                            METRIC          JOINED,METRIC                         id_verifications,listings_latest
+user__largest_listing                                                           user                            METRIC          JOINED,METRIC                         listings_latest
+user__last_login_ts__alien_day                                                                                  TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__last_login_ts__day                                                                                        TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__last_login_ts__extract_day                                                                                TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__last_login_ts__extract_dow                                                                                TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__last_login_ts__extract_doy                                                                                TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__last_login_ts__extract_month                                                                              TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__last_login_ts__extract_quarter                                                                            TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__last_login_ts__extract_year                                                                               TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__last_login_ts__hour                                                                                       TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__last_login_ts__minute                                                                                     TIME_DIMENSION  JOINED                                listings_latest,users_ds_source
+user__last_login_ts__month                                                                                      TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__last_login_ts__quarter                                                                                    TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__last_login_ts__week                                                                                       TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__last_login_ts__year                                                                                       TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__last_profile_edit_ts__alien_day                                                                           TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__last_profile_edit_ts__day                                                                                 TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__last_profile_edit_ts__extract_day                                                                         TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__last_profile_edit_ts__extract_dow                                                                         TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__last_profile_edit_ts__extract_doy                                                                         TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__last_profile_edit_ts__extract_month                                                                       TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__last_profile_edit_ts__extract_quarter                                                                     TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__last_profile_edit_ts__extract_year                                                                        TIME_DIMENSION  DATE_PART,JOINED                      listings_latest,users_ds_source
+user__last_profile_edit_ts__hour                                                                                TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__last_profile_edit_ts__millisecond                                                                         TIME_DIMENSION  JOINED                                listings_latest,users_ds_source
+user__last_profile_edit_ts__minute                                                                              TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__last_profile_edit_ts__month                                                                               TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__last_profile_edit_ts__quarter                                                                             TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__last_profile_edit_ts__second                                                                              TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__last_profile_edit_ts__week                                                                                TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__last_profile_edit_ts__year                                                                                TIME_DIMENSION  DERIVED_TIME_GRANULARITY,JOINED       listings_latest,users_ds_source
+user__listing__user__active_listings                                            listing,user                    METRIC          JOINED,METRIC                         listings_latest
+user__listing__user__approximate_continuous_booking_value_p99                   listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__approximate_discrete_booking_value_p99                     listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__average_booking_value                                      listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__average_instant_booking_value                              listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__bookers                                                    listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__booking_fees                                               listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__booking_fees_per_booker                                    listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__booking_payments                                           listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__booking_value                                              listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__booking_value_for_non_null_listing_id                      listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__booking_value_p99                                          listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__booking_value_per_view                                     listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest,views_source
+user__listing__user__booking_value_sub_instant                                  listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__booking_value_sub_instant_add_10                           listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__bookings                                                   listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__bookings_fill_nulls_with_0                                 listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__bookings_fill_nulls_with_0_without_time_spine              listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__bookings_join_to_time_spine                                listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__bookings_join_to_time_spine_with_tiered_filters            listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__bookings_per_booker                                        listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__bookings_per_dollar                                        listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__bookings_per_listing                                       listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__bookings_per_lux_listing_derived                           listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__bookings_per_view                                          listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest,views_source
+user__listing__user__derived_bookings_0                                         listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__derived_bookings_1                                         listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__derived_shared_alias_1a                                    listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__derived_shared_alias_1b                                    listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__derived_shared_alias_2                                     listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__discrete_booking_value_p99                                 listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__double_counted_delayed_bookings                            listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__instant_booking_fraction_of_max_value                      listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__instant_booking_value                                      listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__instant_booking_value_ratio                                listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__instant_bookings                                           listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__instant_bookings_with_measure_filter                       listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__instant_lux_booking_value_rate                             listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__instant_plus_non_referred_bookings_pct                     listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__largest_listing                                            listing,user                    METRIC          JOINED,METRIC                         listings_latest
+user__listing__user__listings                                                   listing,user                    METRIC          JOINED,METRIC                         listings_latest
+user__listing__user__lux_booking_fraction_of_max_value                          listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__lux_booking_value_rate_expr                                listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__lux_listings                                               listing,user                    METRIC          JOINED,METRIC                         listings_latest
+user__listing__user__max_booking_value                                          listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__median_booking_value                                       listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__min_booking_value                                          listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__nested_fill_nulls_without_time_spine                       listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__non_referred_bookings_pct                                  listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__popular_listing_bookings_per_booker                        listing,user                    METRIC          JOINED,METRIC                         listings_latest
+user__listing__user__referred_bookings                                          listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__smallest_listing                                           listing,user                    METRIC          JOINED,METRIC                         listings_latest
+user__listing__user__twice_bookings_fill_nulls_with_0_without_time_spine        listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest
+user__listing__user__views                                                      listing,user                    METRIC          JOINED,METRIC                         listings_latest,views_source
+user__listing__user__views_times_booking_value                                  listing,user                    METRIC          JOINED,METRIC                         bookings_source,listings_latest,views_source
+user__listings                                                                  user                            METRIC          JOINED,METRIC                         listings_latest
+user__lux_listings                                                              user                            METRIC          JOINED,METRIC                         listings_latest
+user__new_users                                                                 user                            METRIC          JOINED,METRIC                         listings_latest,users_ds_source
+user__popular_listing_bookings_per_booker                                       user                            METRIC          JOINED,METRIC                         listings_latest
+user__regional_starting_balance_ratios                                          user                            METRIC          JOINED,METRIC                         accounts_source,listings_latest
+user__revenue                                                                   user                            METRIC          JOINED,METRIC                         listings_latest,revenue
+user__revenue_all_time                                                          user                            METRIC          JOINED,METRIC                         listings_latest,revenue
+user__revenue_instance__user__revenue                                           revenue_instance,user           METRIC          JOINED,METRIC                         listings_latest,revenue
+user__revenue_instance__user__revenue_all_time                                  revenue_instance,user           METRIC          JOINED,METRIC                         listings_latest,revenue
+user__simple_subdaily_metric_default_day                                        user                            METRIC          JOINED,METRIC                         listings_latest,users_ds_source
+user__simple_subdaily_metric_default_hour                                       user                            METRIC          JOINED,METRIC                         listings_latest,users_ds_source
+user__smallest_listing                                                          user                            METRIC          JOINED,METRIC                         listings_latest
+user__subdaily_join_to_time_spine_metric                                        user                            METRIC          JOINED,METRIC                         listings_latest,users_ds_source
+user__total_account_balance_first_day                                           user                            METRIC          JOINED,METRIC                         accounts_source,listings_latest
+user__total_account_balance_first_day_of_month                                  user                            METRIC          JOINED,METRIC                         accounts_source,listings_latest
+user__verification__user__identity_verifications                                verification,user               METRIC          JOINED,METRIC                         id_verifications,listings_latest
+user__view__user__views                                                         view,user                       METRIC          JOINED,METRIC                         listings_latest,views_source
+user__views                                                                     user                            METRIC          JOINED,METRIC                         listings_latest,views_source
+user__visit__user__visit_buy_conversion_rate                                    visit,user                      METRIC          JOINED,METRIC                         buys_source,listings_latest,visits_source
+user__visit__user__visit_buy_conversion_rate_7days                              visit,user                      METRIC          JOINED,METRIC                         buys_source,listings_latest,visits_source
+user__visit__user__visit_buy_conversion_rate_7days_fill_nulls_with_0            visit,user                      METRIC          JOINED,METRIC                         buys_source,listings_latest,visits_source
+user__visit__user__visit_buy_conversion_rate_by_session                         visit,user                      METRIC          JOINED,METRIC                         buys_source,listings_latest,visits_source
+user__visit__user__visit_buy_conversion_rate_with_monthly_conversion            visit,user                      METRIC          JOINED,METRIC                         buys_source,listings_latest,visits_source
+user__visit__user__visit_buy_conversions                                        visit,user                      METRIC          JOINED,METRIC                         buys_source,listings_latest,visits_source
+user__visit_buy_conversion_rate                                                 user                            METRIC          JOINED,METRIC                         buys_source,listings_latest,visits_source
+user__visit_buy_conversion_rate_7days                                           user                            METRIC          JOINED,METRIC                         buys_source,listings_latest,visits_source
+user__visit_buy_conversion_rate_7days_fill_nulls_with_0                         user                            METRIC          JOINED,METRIC                         buys_source,listings_latest,visits_source
+user__visit_buy_conversion_rate_by_session                                      user                            METRIC          JOINED,METRIC                         buys_source,listings_latest,visits_source
+user__visit_buy_conversion_rate_with_monthly_conversion                         user                            METRIC          JOINED,METRIC                         buys_source,listings_latest,visits_source
+user__visit_buy_conversions                                                     user                            METRIC          JOINED,METRIC                         buys_source,listings_latest,visits_source
