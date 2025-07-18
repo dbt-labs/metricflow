@@ -31,11 +31,13 @@ from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attri
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.key_query_set import (
     KeyQueryGroup,
 )
-from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import (
-    ConfiguredEntityLabel,
+from metricflow_semantics.experimental.semantic_graph.edges.edge_labels import (
     CumulativeMeasureLabel,
     DenyDatePartLabel,
     DenyVisibleAttributesLabel,
+)
+from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import (
+    ConfiguredEntityLabel,
     GroupByAttributeLabel,
     GroupByMetricLabel,
     JoinedModelLabel,

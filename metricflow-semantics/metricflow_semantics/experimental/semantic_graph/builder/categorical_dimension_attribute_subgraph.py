@@ -18,11 +18,11 @@ from metricflow_semantics.experimental.semantic_graph.edges.entity_attribute imp
     EntityAttributeEdge,
 )
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
-from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import (
+from metricflow_semantics.experimental.semantic_graph.nodes.attribute_nodes import (
     AttributeNode,
     CategoricalDimensionAttributeNode,
 )
-from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import (
+from metricflow_semantics.experimental.semantic_graph.nodes.entity_nodes import (
     JoinedModelNode,
 )
 from metricflow_semantics.experimental.semantic_graph.sg_interfaces import MutableSemanticGraph, SemanticGraph

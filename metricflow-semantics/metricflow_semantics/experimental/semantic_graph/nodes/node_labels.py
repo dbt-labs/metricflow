@@ -3,21 +3,18 @@ from __future__ import annotations
 import logging
 from typing import Optional
 
-from dbt_semantic_interfaces.references import MeasureReference
-
 from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
 from metricflow_semantics.experimental.singleton_decorator import singleton_dataclass
 
 logger = logging.getLogger(__name__)
 
 
-class SemanticGraphLabel(MetricflowGraphLabel):
-    pass
-
-
 @singleton_dataclass()
 class MeasureLabel(MetricflowGraphLabel):
-    """The name of the measure or `None` for any measure."""
+    """Used to label measure nodes.
+
+    `measure_name = None` is a label applied to all measure nodes.
+    """
 
     measure_name: Optional[str]
 
@@ -25,63 +22,73 @@ class MeasureLabel(MetricflowGraphLabel):
     def get_instance(measure_name: Optional[str] = None) -> MeasureLabel:  # noqa: D102
         return MeasureLabel(measure_name=measure_name)
 
-    def get_instance_from_reference(self, measure_reference: MeasureReference) -> MeasureLabel:  # noqa: D102
-        return MeasureLabel(measure_name=measure_reference.element_name)
-
 
 @singleton_dataclass()
 class GroupByMetricLabel(MetricflowGraphLabel):
-    """The name of the metric or `None` for any metric."""
+    """Label for group-by-metric nodes.
+
+    `metric_name = None` is a label applied to group-by-metric nodes.
+    """
 
     metric_name: Optional[str]
 
     @staticmethod
-    def get_instance(metric_name: Optional[str] = None) -> GroupByMetricLabel:
+    def get_instance(metric_name: Optional[str] = None) -> GroupByMetricLabel:  # noqa: D102
         return GroupByMetricLabel(metric_name=metric_name)
 
 
 @singleton_dataclass()
 class GroupByAttributeLabel(MetricflowGraphLabel):
+    """Label for any attribute node that can be used in the group-by argument of an MF query."""
+
     @staticmethod
-    def get_instance() -> GroupByAttributeLabel:
+    def get_instance() -> GroupByAttributeLabel:  # noqa: D102
         return GroupByAttributeLabel()
 
 
 @singleton_dataclass()
 class ConfiguredEntityLabel(MetricflowGraphLabel):
+    """Label for nodes that correspond to entities configured in a semantic model / manifest."""
+
     @staticmethod
-    def get_instance() -> ConfiguredEntityLabel:
+    def get_instance() -> ConfiguredEntityLabel:  # noqa: D102
         return ConfiguredEntityLabel()
 
 
 @singleton_dataclass()
-class DunderNameElementLabel(MetricflowGraphLabel):
-    element_name: str
-
-
-@singleton_dataclass()
 class TimeDimensionLabel(MetricflowGraphLabel):
+    """Label for time dimension nodes."""
+
     @staticmethod
-    def get_instance() -> TimeDimensionLabel:
+    def get_instance() -> TimeDimensionLabel:  # noqa: D102
         return TimeDimensionLabel()
 
 
 @singleton_dataclass()
 class TimeClusterLabel(MetricflowGraphLabel):
+    """Label for nodes that should be clustered together in the `time` section when visualizing the graph."""
+
     @staticmethod
-    def get_instance() -> TimeClusterLabel:
+    def get_instance() -> TimeClusterLabel:  # noqa: D102
         return TimeClusterLabel()
 
 
 @singleton_dataclass()
 class MetricTimeLabel(MetricflowGraphLabel):
+    """Label for the node that represents metric-time."""
+
     @staticmethod
-    def get_instance() -> MetricTimeLabel:
+    def get_instance() -> MetricTimeLabel:  # noqa: D102
         return MetricTimeLabel()
 
 
 @singleton_dataclass()
 class MetricLabel(MetricflowGraphLabel):
+    """Label for the node that corresponds to a configured metric in the semantic manifest.
+
+    `metric_name = None` is a label applied to all metric nodes.
+    """
+
     metric_name: Optional[str]
 
     @staticmethod
@@ -91,6 +98,11 @@ class MetricLabel(MetricflowGraphLabel):
 
 @singleton_dataclass()
 class BaseMetricLabel(MetricflowGraphLabel):
+    """Label for nodes that represent a non-derived metric.
+
+    `metric_name = None` is a label applied to all such nodes.
+    """
+
     metric_name: Optional[str]
 
     @staticmethod
@@ -100,6 +112,11 @@ class BaseMetricLabel(MetricflowGraphLabel):
 
 @singleton_dataclass()
 class DerivedMetricLabel(MetricflowGraphLabel):
+    """Label for nodes that represent a derived metric.
+
+    `metric_name = None` is a label applied to all such nodes.
+    """
+
     metric_name: Optional[str]
 
     @staticmethod
@@ -108,92 +125,51 @@ class DerivedMetricLabel(MetricflowGraphLabel):
 
 
 @singleton_dataclass()
-class CumulativeMeasureLabel(MetricflowGraphLabel):
-    @staticmethod
-    def get_instance() -> CumulativeMeasureLabel:
-        return CumulativeMeasureLabel()
-
-
-@singleton_dataclass()
-class GroupByAttributeRootLabel(MetricflowGraphLabel):
-    pass
-
-
-@singleton_dataclass()
-class AggregationLabel(MetricflowGraphLabel):
-    @staticmethod
-    def get_instance() -> AggregationLabel:
-        return AggregationLabel()
-
-
-@singleton_dataclass()
-class JoinFromLabel(MetricflowGraphLabel):
-    pass
-
-
-@singleton_dataclass()
-class JoinViaLabel(MetricflowGraphLabel):
-    pass
-
-
-@singleton_dataclass()
 class JoinedModelLabel(MetricflowGraphLabel):
+    """Label for nodes that represent a joined semantic model.
+
+    See `JoinedModelNode`.
+    """
+
     @staticmethod
-    def get_instance() -> JoinedModelLabel:
+    def get_instance() -> JoinedModelLabel:  # noqa: D102
         return JoinedModelLabel()
 
 
 @singleton_dataclass()
 class LocalModelLabel(MetricflowGraphLabel):
+    """Label for nodes that represent a local semantic model.
+
+    See `LocalModelNode`.
+    """
+
     @staticmethod
-    def get_instance() -> LocalModelLabel:
+    def get_instance() -> LocalModelLabel:  # noqa: D102
         return LocalModelLabel()
 
 
 @singleton_dataclass()
-class KeyEntityClusterLabel(MetricflowGraphLabel):
+class KeyEntityClusterLabel(MetricflowGraphLabel):  # noqa: D102
+    """Label for nodes that are associated with the entity-key nodes."""
+
     @staticmethod
-    def get_instance() -> KeyEntityClusterLabel:
+    def get_instance() -> KeyEntityClusterLabel:  # noqa: D102
         return KeyEntityClusterLabel()
 
 
 @singleton_dataclass()
 class KeyAttributeLabel(MetricflowGraphLabel):
+    """Label for nodes that correspond to the entity-key attribute nodes."""
+
     @staticmethod
-    def get_instance() -> KeyAttributeLabel:
+    def get_instance() -> KeyAttributeLabel:  # noqa: D102
         return KeyAttributeLabel()
 
 
 @singleton_dataclass()
 class KeyEntityLabel(MetricflowGraphLabel):
+    """Label for nodes that correspond to the configured-entity-key node."""
+
     @staticmethod
-    def get_instance() -> KeyEntityLabel:
+    def get_instance() -> KeyEntityLabel:  # noqa: D102
         return KeyEntityLabel()
-
-
-@singleton_dataclass()
-class DenyDatePartLabel(MetricflowGraphLabel):
-    @staticmethod
-    def get_instance() -> DenyDatePartLabel:
-        return DenyDatePartLabel()
-
-
-@singleton_dataclass()
-class DenyEntityKeyQueryResolutionLabel(MetricflowGraphLabel):
-    @staticmethod
-    def get_instance() -> DenyEntityKeyQueryResolutionLabel:
-        return DenyEntityKeyQueryResolutionLabel()
-
-
-@singleton_dataclass()
-class DenyVisibleAttributesLabel(MetricflowGraphLabel):
-    @staticmethod
-    def get_instance() -> DenyVisibleAttributesLabel:
-        return DenyVisibleAttributesLabel()
-
-
-@singleton_dataclass()
-class ConversionMeasureLabel(MetricflowGraphLabel):
-    @staticmethod
-    def get_instance() -> ConversionMeasureLabel:
-        return ConversionMeasureLabel()

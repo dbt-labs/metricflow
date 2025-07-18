@@ -19,18 +19,18 @@ from metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator
     SemanticSubgraphGenerator,
     SubgraphGeneratorArgumentSet,
 )
-from metricflow_semantics.experimental.semantic_graph.edges.sg_edges import MetricDefinitionEdge
-from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import MeasureNode
-from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import (
-    BaseMetricNode,
-    DerivedMetricNode,
-    MetricNode,
-)
-from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import (
+from metricflow_semantics.experimental.semantic_graph.edges.edge_labels import (
     CumulativeMeasureLabel,
     DenyDatePartLabel,
     DenyEntityKeyQueryResolutionLabel,
     DenyVisibleAttributesLabel,
+)
+from metricflow_semantics.experimental.semantic_graph.edges.sg_edges import MetricDefinitionEdge
+from metricflow_semantics.experimental.semantic_graph.nodes.entity_nodes import (
+    BaseMetricNode,
+    DerivedMetricNode,
+    MeasureNode,
+    MetricNode,
 )
 from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
     MutableSemanticGraph,

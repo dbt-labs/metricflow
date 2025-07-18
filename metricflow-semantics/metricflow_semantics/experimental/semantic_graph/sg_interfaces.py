@@ -50,8 +50,8 @@ class SemanticGraphNode(MetricflowGraphNode, QueryRecipeStepAppender, MetricFlow
     def pretty_format(self, format_context: PrettyFormatContext) -> Optional[str]:
         return self.node_descriptor.node_name
 
-    @override
     @cached_property
+    @override
     def displayed_properties(self) -> AnyLengthTuple[DisplayedProperty]:
         properties: list[DisplayedProperty] = list(super().displayed_properties)
         if self.recipe_step is not None:
@@ -93,8 +93,8 @@ class SemanticGraphEdge(MetricflowGraphEdge[SemanticGraphNode], QueryRecipeStepA
             },
         )
 
-    @override
     @cached_property
+    @override
     def displayed_properties(self) -> AnyLengthTuple[DisplayedProperty]:
         properties: list[DisplayedProperty] = list(super().displayed_properties)
         if self.recipe_step is not None:
@@ -114,7 +114,7 @@ class SemanticGraph(MetricflowGraph[SemanticGraphNode, SemanticGraphEdge], ABC):
     First see: `SemanticGraphNode` and `SemanticGraphEdge`.
 
     The semantic graph helps to model entity relationships that are defined in the semantic manifest and encodes
-    context on how attributes for entities can be computed (e.g. by joining semantic models).
+    context on how attributes for entities can be queried (e.g. by joining semantic models).
 
     Currently, the edges in the graph are oriented so that a path from a metric node to an attribute node describes
     the query required to compute that metric. However, additional edge types can be added to better model associative

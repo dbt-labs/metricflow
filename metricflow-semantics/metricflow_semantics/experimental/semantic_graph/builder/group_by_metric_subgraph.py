@@ -28,22 +28,24 @@ from metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator
     SemanticSubgraphGenerator,
     SubgraphGeneratorArgumentSet,
 )
+from metricflow_semantics.experimental.semantic_graph.edges.edge_labels import (
+    DenyEntityKeyQueryResolutionLabel,
+    DenyVisibleAttributesLabel,
+)
 from metricflow_semantics.experimental.semantic_graph.edges.entity_attribute import (
     AttributeEdgeType,
     EntityAttributeEdge,
 )
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
-from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import (
+from metricflow_semantics.experimental.semantic_graph.nodes.attribute_nodes import (
     GroupByMetricNode,
 )
-from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import (
+from metricflow_semantics.experimental.semantic_graph.nodes.entity_nodes import (
     KeyEntityNode,
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import (
     BaseMetricLabel,
     ConfiguredEntityLabel,
-    DenyEntityKeyQueryResolutionLabel,
-    DenyVisibleAttributesLabel,
     LocalModelLabel,
     MeasureLabel,
     MetricLabel,

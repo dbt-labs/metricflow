@@ -14,7 +14,7 @@ from metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator
 )
 from metricflow_semantics.experimental.semantic_graph.edges.sg_edges import JoinFromModelEdge, JoinToModelEdge
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
-from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import (
+from metricflow_semantics.experimental.semantic_graph.nodes.entity_nodes import (
     ConfiguredEntityNode,
     JoinedModelNode,
     LocalModelNode,

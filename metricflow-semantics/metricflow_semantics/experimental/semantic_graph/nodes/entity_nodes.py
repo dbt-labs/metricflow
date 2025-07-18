@@ -19,6 +19,7 @@ from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attri
     QueryRecipeStep,
 )
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
+from metricflow_semantics.experimental.semantic_graph.nodes.attribute_nodes import AttributeNode
 from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import (
     BaseMetricLabel,
     ConfiguredEntityLabel,
@@ -27,6 +28,7 @@ from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import (
     KeyEntityClusterLabel,
     KeyEntityLabel,
     LocalModelLabel,
+    MeasureLabel,
     MetricLabel,
     MetricTimeLabel,
     TimeClusterLabel,
@@ -42,11 +44,17 @@ logger = logging.getLogger(__name__)
 
 @singleton_dataclass(order=False)
 class ConfiguredEntityNode(SemanticGraphNode):
+    """Represents the `entity` elements as configured in a semantic model / manifest.
+
+    This node is named "configured" to avoid confusion between entities in the semantic manifest and entities in the
+    semantic graph.
+    """
+
     entity_name: str
     model_id: SemanticModelId
 
     @staticmethod
-    def get_instance(entity_name: str, model_id: SemanticModelId) -> ConfiguredEntityNode:
+    def get_instance(entity_name: str, model_id: SemanticModelId) -> ConfiguredEntityNode:  # noqa: D102
         return ConfiguredEntityNode(
             entity_name=entity_name,
             model_id=model_id,
@@ -87,23 +95,13 @@ class ConfiguredEntityNode(SemanticGraphNode):
 
 
 @singleton_dataclass(order=False)
-class TimeBaseNode(SemanticGraphNode):
-    time_grain_name: str
-
-    @override
-    @cached_property
-    def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
-        return MetricflowGraphNodeDescriptor.get_instance(
-            node_name=f"TimeBase({self.time_grain_name})", cluster_name="time_base"
-        )
-
-    @property
-    def comparison_key(self) -> ComparisonKey:
-        return (self.time_grain_name,)
-
-
-@singleton_dataclass(order=False)
 class JoinedModelNode(SemanticGraphNode):
+    """Represents the semantic model.
+
+    The query interface allows some elements to be referenced in multiple ways. When querying for a configured-entity
+    key,
+    """
+
     model_id: SemanticModelId
 
     @staticmethod
@@ -372,3 +370,41 @@ class KeyEntityNode(SemanticGraphNode):
     @cached_property
     def labels(self) -> OrderedSet[MetricflowGraphLabel]:
         return FrozenOrderedSet((KeyEntityClusterLabel.get_instance(), KeyEntityLabel.get_instance()))
+
+
+@singleton_dataclass(order=False)
+class MeasureNode(AttributeNode):
+    # The model ID is needed to cluster the node with the semantic model in graph visualizations.
+    source_model_id: SemanticModelId
+
+    @staticmethod
+    def get_instance(measure_name: str, source_model_id: SemanticModelId) -> MeasureNode:
+        return MeasureNode(
+            attribute_name=measure_name,
+            source_model_id=source_model_id,
+        )
+
+    @override
+    @cached_property
+    def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
+        return MetricflowGraphNodeDescriptor.get_instance(
+            node_name=f"Measure({self.attribute_name})",
+            cluster_name=ClusterNameFactory.get_name_for_model(self.source_model_id),
+        )
+
+    @override
+    def as_dot_node(self, include_graphical_attributes: bool) -> DotNodeAttributeSet:
+        dot_node = super(AttributeNode, self).as_dot_node(include_graphical_attributes)
+        if include_graphical_attributes:
+            dot_node = dot_node.with_attributes(color=DotColor.LIME_GREEN)
+        return dot_node
+
+    @override
+    @cached_property
+    def labels(self) -> FrozenOrderedSet[MetricflowGraphLabel]:
+        return FrozenOrderedSet((MeasureLabel(measure_name=None), MeasureLabel(measure_name=self.attribute_name)))
+
+    @override
+    @cached_property
+    def recipe_step(self) -> QueryRecipeStep:
+        return QueryRecipeStep(join_model=self.source_model_id)

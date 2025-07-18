@@ -20,10 +20,10 @@ from metricflow_semantics.experimental.semantic_graph.edges.entity_attribute imp
     EntityAttributeEdge,
 )
 from metricflow_semantics.experimental.semantic_graph.edges.sg_edges import EntityRelationshipEdge
-from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import (
+from metricflow_semantics.experimental.semantic_graph.nodes.attribute_nodes import (
     TimeAttributeNode,
 )
-from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import (
+from metricflow_semantics.experimental.semantic_graph.nodes.entity_nodes import (
     MetricTimeNode,
     TimeEntityNode,
 )
