@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import functools
+import itertools
 from abc import ABC, abstractmethod
 from typing import Union
 
@@ -31,7 +32,26 @@ class Comparable(SupportsLessThan, ABC):
         if not isinstance(other, Comparable):
             return NotImplemented
 
-        self_comparison_key = (self.__class__.__module__, self.__class__.__qualname__, *self.comparison_key)
-        other_comparison_key = (other.__class__.__module__, other.__class__.__qualname__, *other.comparison_key)
+        self_comparison_key: AnyLengthTuple[ComparisonOtherType] = (
+            self.__class__.__module__,
+            self.__class__.__qualname__,
+            *self.comparison_key,
+        )
+        other_comparison_key: AnyLengthTuple[ComparisonOtherType] = (
+            other.__class__.__module__,
+            other.__class__.__qualname__,
+            *other.comparison_key,
+        )
 
-        return self_comparison_key < other_comparison_key
+        for self_key_item, other_key_item in itertools.zip_longest(self_comparison_key, other_comparison_key):
+            if self_key_item is None:
+                return True
+            elif other_key_item is None:
+                return False
+            elif self_key_item < other_key_item:
+                return True
+            elif self_key_item > other_key_item:
+                return False
+            # Must be equal, so compare the next item.
+
+        return False

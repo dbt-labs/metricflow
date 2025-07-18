@@ -37,16 +37,28 @@ class OrderedSet(Generic[HashableT_co], Set[HashableT_co], ABC):
             iterable: Create the set using the given iterable.
             _set_as_dict: For internal use - create a copy of this and use it for the internal representation.
         """
+        # TODO: Remove copy.
         self._set_as_dict = _set_as_dict.copy() if _set_as_dict is not None else {}
         if iterable is not None:
             self._set_as_dict.update({item: None for item in iterable})
 
-    def intersection(self, other: Iterable[HashableT_co]) -> Self:  # noqa: D102
-        other_set = set(other)
-        return self.__class__(item for item in self if item in other_set)
+    def difference(self, *others: Iterable[HashableT_co]) -> Self:  # noqa: D102
+        items_to_remove = set(item for other in others for item in other)
+        return self.__class__(_set_as_dict={item: None for item in self._set_as_dict if item not in items_to_remove})
 
-    def union(self, other: Iterable[HashableT_co]) -> Self:  # noqa: D102
-        return self.__class__(tuple(self._set_as_dict.keys()) + tuple(other))
+    def intersection(self, *others: Iterable[HashableT_co]) -> Self:  # noqa: D102
+        common_keys = set(self._set_as_dict).intersection(*others)
+        return self.__class__(
+            _set_as_dict={
+                key: value
+                # Iterating through the dict instead of `common_keys` to retain order.
+                for key, value in self._set_as_dict.items()
+                if key in common_keys
+            }
+        )
+
+    def union(self, *others: Iterable[HashableT_co]) -> Self:  # noqa: D102
+        return self.__class__(_set_as_dict={item: None for other_set in (self,) + tuple(others) for item in other_set})
 
     @override
     def __contains__(self, obj: ComparisonOtherType) -> bool:
@@ -72,13 +84,17 @@ class OrderedSet(Generic[HashableT_co], Set[HashableT_co], ABC):
     def as_frozen(self) -> FrozenOrderedSet[HashableT_co]:  # noqa: D102
         raise NotImplementedError
 
+    def copy(self) -> Self:
+        """Return a shallow copy of this set."""
+        return self.__class__(_set_as_dict=self._set_as_dict)
+
 
 class FrozenOrderedSet(Generic[HashableT_co], OrderedSet[HashableT_co], Hashable):
     """A frozen version of `OrderedSet` that can be hashed."""
 
     @cached_property
     def _cached_hash_value(self) -> int:
-        return hash(frozenset(self._set_as_dict.keys()))
+        return hash(tuple(self._set_as_dict.keys()))
 
     @override
     def __hash__(self) -> int:
@@ -92,10 +108,6 @@ class FrozenOrderedSet(Generic[HashableT_co], OrderedSet[HashableT_co], Hashable
     def as_frozen(self) -> FrozenOrderedSet[HashableT_co]:
         return self
 
-    @override
-    def union(self, other: Iterable[HashableT_co]) -> Self:  # noqa: D102
-        return super().union(other)
-
 
 class MutableOrderedSet(Generic[HashableT], OrderedSet[HashableT], MutableSet[HashableT]):
     """An ordered set that can be modified."""
@@ -104,6 +116,14 @@ class MutableOrderedSet(Generic[HashableT], OrderedSet[HashableT], MutableSet[Ha
         for iterable in iterables:
             for item in iterable:
                 self._set_as_dict[item] = None
+
+    def intersection_update(self, *others: Iterable[HashableT]) -> None:  # noqa: D102
+        intersected_items: set[HashableT] = set(self._set_as_dict).intersection(*others)
+        self._set_as_dict = {item: None for item in self._set_as_dict if item in intersected_items}
+
+    def difference_update(self, *others: Iterable[HashableT]) -> None:  # noqa: D102
+        items_to_remove = {item for other in others for item in other}
+        self._set_as_dict = {item: None for item in self._set_as_dict if item not in items_to_remove}
 
     @override
     def add(self, value: HashableT) -> None:
@@ -121,14 +141,15 @@ class MutableOrderedSet(Generic[HashableT], OrderedSet[HashableT], MutableSet[Ha
     def as_frozen(self) -> FrozenOrderedSet[HashableT]:
         return FrozenOrderedSet(self)
 
-    @override
-    def union(self, other: Iterable[HashableT]) -> Self:  # noqa: D102
-        return super().union(other)
-
-    def copy(self) -> MutableOrderedSet[HashableT]:
-        """Return a copy of this set."""
-        return MutableOrderedSet(iterable=None, _set_as_dict=self._set_as_dict.copy())
-
     def clear(self) -> None:
         """Remove all items from this set."""
         self._set_as_dict.clear()
+
+    def pop(self) -> HashableT:
+        """Removes and returns the first item in the set. Raises `KeyError` if empty (same as `set()`)."""
+        try:
+            item = next(iter(self._set_as_dict))
+            del self._set_as_dict[item]
+            return item
+        except StopIteration:
+            raise KeyError("Can't pop an item as the set is empty.")

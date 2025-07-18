@@ -6,7 +6,8 @@ from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
-from typing import Generic, Optional, TypeVar
+from functools import cached_property
+from typing import ClassVar, Generic, Optional, TypeVar
 
 from typing_extensions import Self, override
 
@@ -43,6 +44,8 @@ NodeT = TypeVar("NodeT", bound="MetricflowGraphNode", covariant=True)
 class MetricflowGraphNode(MetricflowGraphElement, MetricFlowPrettyFormattable, Comparable, ABC):
     """Base class for nodes in a directed graph."""
 
+    _DEFAULT_NODE_LABELS: ClassVar[OrderedSet[MetricflowGraphLabel]] = FrozenOrderedSet()
+
     def as_dot_node(self, include_graphical_attributes: bool) -> DotNodeAttributeSet:
         """Return this as attributes for a DOT node.
 
@@ -61,9 +64,9 @@ class MetricflowGraphNode(MetricflowGraphElement, MetricFlowPrettyFormattable, C
         raise NotImplementedError
 
     @property
-    def labels(self) -> FrozenOrderedSet[MetricflowGraphLabel]:
+    def labels(self) -> OrderedSet[MetricflowGraphLabel]:
         """Return the labels that can be used for lookups to get this node."""
-        return FrozenOrderedSet()
+        return MetricflowGraphNode._DEFAULT_NODE_LABELS
 
     @override
     def pretty_format(self, format_context: PrettyFormatContext) -> Optional[str]:
@@ -86,6 +89,8 @@ class MetricflowGraphEdge(MetricflowGraphElement, MetricFlowPrettyFormattable, C
 
     An edge can be visualized as an arrow that points from the tail node to the head node.
     """
+
+    _DEFAULT_EDGE_LABELS: ClassVar[OrderedSet[MetricflowGraphLabel]] = FrozenOrderedSet()
 
     # TODO: Check if these can be renamed / remove property accessors.
     _tail_node: NodeT
@@ -124,9 +129,9 @@ class MetricflowGraphEdge(MetricflowGraphElement, MetricFlowPrettyFormattable, C
         )
 
     @property
-    def labels(self) -> FrozenOrderedSet[MetricflowGraphLabel]:
+    def labels(self) -> OrderedSet[MetricflowGraphLabel]:
         """Return the labels that can be used for lookups to get this edge."""
-        return FrozenOrderedSet()
+        return MetricflowGraphEdge._DEFAULT_EDGE_LABELS
 
     @override
     def pretty_format(self, format_context: PrettyFormatContext) -> Optional[str]:
@@ -141,6 +146,14 @@ class MetricflowGraphEdge(MetricflowGraphElement, MetricFlowPrettyFormattable, C
                 "edge_str": f"{self._tail_node.node_descriptor.node_name} -> {self._head_node.node_descriptor.node_name}",
             },
         )
+
+    @cached_property
+    def labels_for_path_addition(self) -> OrderedSet[MetricflowGraphLabel]:
+        """Return the labels for this edge and the head node.
+
+        This is useful for collecting labels while building a path by adding an edge.
+        """
+        return self.labels.union(self._head_node.labels)
 
 
 EdgeT = TypeVar("EdgeT", bound="MetricflowGraphEdge", covariant=True)

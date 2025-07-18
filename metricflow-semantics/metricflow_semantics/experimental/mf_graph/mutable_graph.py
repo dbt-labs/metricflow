@@ -51,10 +51,17 @@ class MutableGraph(Generic[NodeT, EdgeT], MetricflowGraph[NodeT, EdgeT], ABC):
             self.add_node(node)
 
     def add_edge(self, edge: EdgeT) -> None:  # noqa: D102
-        self.add_node(edge.tail_node)
-        self.add_node(edge.head_node)
-        self._tail_node_to_edges[edge.tail_node].add(edge)
-        self._head_node_to_edges[edge.head_node].add(edge)
+        tail_node = edge.tail_node
+        head_node = edge.head_node
+        graph_nodes = self._nodes
+
+        if tail_node not in graph_nodes:
+            graph_nodes.add(tail_node)
+        if head_node not in graph_nodes:
+            graph_nodes.add(head_node)
+
+        self._tail_node_to_edges[tail_node].add(edge)
+        self._head_node_to_edges[head_node].add(edge)
         self._edges.add(edge)
         self._graph_id = SequentialGraphId.create()
 

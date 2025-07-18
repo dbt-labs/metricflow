@@ -135,9 +135,9 @@ dmypy.json
 .idea/
 .vscode/
 
-# Performance profiler results.
-**/cprofile_output.bin
-
 # Performance reports
 performance-report.json
 performance-comparison.md
+
+# Directory to consolidate files ignored by git.
+**/git_ignored
