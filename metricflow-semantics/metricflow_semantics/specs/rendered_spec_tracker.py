@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from typing import List, Sequence, Tuple
+from typing import Sequence
 
-from metricflow_semantics.model.semantics.linkable_element import LinkableElement
-from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
+from metricflow_semantics.model.semantics.linkable_element_set_base import AnnotatedSpec
 
 
 class RenderedSpecTracker:
@@ -13,18 +12,13 @@ class RenderedSpecTracker:
     """
 
     def __init__(self) -> None:  # noqa: D107
-        self._rendered_specs_to_elements: List[Tuple[LinkableInstanceSpec, Sequence[LinkableElement]]] = []
+        self._rendered_specs: list[AnnotatedSpec] = []
 
-    def record_rendered_spec_to_elements_mapping(
-        self, spec_to_elements: Tuple[LinkableInstanceSpec, Sequence[LinkableElement]]
-    ) -> None:
-        """Records a spec that was rendered in a where filter and can be retrieved later through rendered_specs().
-
-        The mapping to LinkableElements is to facilitate predicate pushdown evaluation on a filter-by-filter basis.
-        """
-        self._rendered_specs_to_elements.append(spec_to_elements)
+    def record_rendered_spec(self, spec: AnnotatedSpec) -> None:
+        """Records a spec that was rendered in a where filter and can be retrieved later through rendered_specs()."""
+        self._rendered_specs.append(spec)
 
     @property
-    def rendered_specs_to_elements(self) -> Sequence[Tuple[LinkableInstanceSpec, Sequence[LinkableElement]]]:
+    def rendered_specs(self) -> Sequence[AnnotatedSpec]:
         """Returns specs that were recorded by record_rendered_spec()."""
-        return self._rendered_specs_to_elements
+        return self._rendered_specs

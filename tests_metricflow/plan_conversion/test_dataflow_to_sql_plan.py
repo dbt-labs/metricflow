@@ -5,19 +5,21 @@ from typing import List, Mapping
 import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
-from dbt_semantic_interfaces.references import EntityReference, SemanticModelReference, TimeDimensionReference
+from dbt_semantic_interfaces.references import EntityReference, TimeDimensionReference
 from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
-from dbt_semantic_interfaces.type_enums.dimension_type import DimensionType
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.dag.mf_dag import DagId
+from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
+    AnnotatedSpecLinkableElementSet,
+)
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
-from metricflow_semantics.model.semantics.linkable_element import LinkableDimension, SemanticModelJoinPath
+from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
+from metricflow_semantics.model.semantics.linkable_element_set_base import AnnotatedSpec
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
-from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.measure_spec import MeasureSpec, MetricInputMeasureSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDimensionSpec
@@ -189,34 +191,27 @@ def test_filter_with_where_constraint_node(
         parent_node=source_node,
         include_specs=InstanceSpecSet(measure_specs=(measure_spec,), time_dimension_specs=(ds_spec,)),
     )  # need to include ds_spec because where constraint operates on ds
+    time_grain = ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY)
     where_constraint_node = WhereConstraintNode.create(
         parent_node=filter_node,
         where_specs=(
             WhereFilterSpec(
                 where_sql="booking__ds__day = '2020-01-01'",
                 bind_parameters=SqlBindParameterSet(),
-                linkable_spec_set=LinkableSpecSet(
-                    time_dimension_specs=(
-                        TimeDimensionSpec(
+                element_set=AnnotatedSpecLinkableElementSet(
+                    annotated_specs=(
+                        AnnotatedSpec.create(
+                            element_type=LinkableElementType.TIME_DIMENSION,
                             element_name="ds",
                             entity_links=(EntityReference(element_name="booking"),),
-                            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
+                            time_grain=time_grain,
+                            date_part=None,
+                            metric_subquery_entity_links=None,
+                            properties=(),
+                            origin_model_ids=(),
+                            derived_from_semantic_models=(),
                         ),
                     ),
-                ),
-                linkable_element_unions=(
-                    LinkableDimension.create(
-                        defined_in_semantic_model=SemanticModelReference("bookings_source"),
-                        element_name="ds",
-                        dimension_type=DimensionType.TIME,
-                        entity_links=(EntityReference(element_name="booking"),),
-                        properties=frozenset(),
-                        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
-                        date_part=None,
-                        join_path=SemanticModelJoinPath(
-                            left_semantic_model_reference=SemanticModelReference("bookings_source"),
-                        ),
-                    ).as_union,
                 ),
             ),
         ),

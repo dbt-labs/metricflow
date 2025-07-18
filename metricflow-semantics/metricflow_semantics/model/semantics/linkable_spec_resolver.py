@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Dict, FrozenSet, List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.protocols.dimension import Dimension, DimensionType
@@ -16,6 +17,7 @@ from dbt_semantic_interfaces.references import (
 )
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from typing_extensions import override
 
 from metricflow_semantics.errors.error_classes import UnknownMetricLinkingError
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
@@ -30,6 +32,7 @@ from metricflow_semantics.model.semantics.linkable_element import (
     SemanticModelToMetricSubqueryJoinPath,
 )
 from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
+from metricflow_semantics.model.semantics.linkable_element_set_base import BaseLinkableElementSet
 from metricflow_semantics.model.semantics.linkable_spec_index import LinkableSpecIndex
 from metricflow_semantics.model.semantics.manifest_object_lookup import SemanticManifestObjectLookup
 from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY
@@ -43,7 +46,45 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class ValidLinkableSpecResolver:
+class LinkableSpecResolver(ABC):
+    """Resolves available group-by items for measures and metrics."""
+
+    @abstractmethod
+    def get_linkable_element_set_for_measure(
+        self,
+        measure_reference: MeasureReference,
+        element_filter: LinkableElementFilter,
+    ) -> BaseLinkableElementSet:
+        """Get the valid linkable elements for the given measure."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_linkable_elements_for_distinct_values_query(
+        self,
+        element_filter: LinkableElementFilter,
+    ) -> BaseLinkableElementSet:
+        """Returns queryable items for a distinct group-by-item values query.
+
+        A distinct group-by-item values query does not include any metrics.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_linkable_elements_for_metrics(
+        self,
+        metric_references: Sequence[MetricReference],
+        element_filter: LinkableElementFilter = LinkableElementFilter(),
+    ) -> BaseLinkableElementSet:
+        """Gets the valid linkable elements that are common to all requested metrics.
+
+        The results of this method don't actually match what will be allowed for the metric because resolution goes
+        through a separate and more comprehensive resolution process (`GroupByItemResolver`).
+        # TODO: Consolidate resolution processes.
+        """
+        raise NotImplementedError
+
+
+class LegacyLinkableSpecResolver(LinkableSpecResolver):
     """Figures out what linkable specs are valid for a given metric.
 
     e.g. Can you query the metric "bookings" by "listing__country_latest"?
@@ -258,34 +299,30 @@ class ValidLinkableSpecResolver:
             )
         ).filter(element_filter)
 
+    @override
     def get_linkable_element_set_for_measure(
         self,
         measure_reference: MeasureReference,
         element_filter: LinkableElementFilter,
-    ) -> LinkableElementSet:
-        """Get the valid linkable elements for the given measure."""
+    ) -> BaseLinkableElementSet:
         return self._get_linkable_element_set_for_measure(
             measure_reference=measure_reference,
             element_filter=element_filter,
         )
 
+    @override
     def get_linkable_elements_for_distinct_values_query(
         self,
         element_filter: LinkableElementFilter,
-    ) -> LinkableElementSet:
-        """Returns queryable items for a distinct group-by-item values query.
-
-        A distinct group-by-item values query does not include any metrics.
-        """
+    ) -> BaseLinkableElementSet:
         return self._linkable_spec_index.no_metric_linkable_element_set.filter(element_filter)
 
-    # TODO: the results of this method don't actually match what will be allowed for the metric. This method checks
+    @override
     def get_linkable_elements_for_metrics(
         self,
         metric_references: Sequence[MetricReference],
         element_filter: LinkableElementFilter = LinkableElementFilter(),
-    ) -> LinkableElementSet:
-        """Gets the valid linkable elements that are common to all requested metrics."""
+    ) -> BaseLinkableElementSet:
         linkable_element_sets = []
         for metric_reference in metric_references:
             element_sets = self._linkable_spec_index.metric_to_linkable_element_sets.get(metric_reference.element_name)
