@@ -6,32 +6,36 @@ from functools import cached_property
 from typing import Optional, Sequence
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.references import EntityReference, SemanticModelReference
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
-from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item, mf_first_non_none_or_raise
+from metricflow_semantics.collection_helpers.syntactic_sugar import (
+    mf_first_item,
+    mf_first_non_none_or_raise,
+    mf_flatten,
+)
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
+from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.experimental.metricflow_exception import MetricflowInternalError
 from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
+from metricflow_semantics.experimental.mf_graph.path_finding.path_finder import (
+    MetricflowGraphPathFinder,
+)
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
-from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeRecipe
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
     AnnotatedSpecLinkableElementSet,
 )
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
     AttributeRecipeWriterPath,
 )
+from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe import AttributeQueryRecipe
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.key_query_set import (
-    DsiEntityKeyQueryGroup,
+    KeyQueryGroup,
 )
-from metricflow_semantics.experimental.semantic_graph.builder.dunder_name_weight import DunderNameWeightFunction
-from metricflow_semantics.experimental.semantic_graph.manifest_object_lookup import ManifestObjectLookup
-from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
-from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
+from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import (
+    ConfiguredEntityLabel,
     CumulativeMeasureLabel,
     DenyDatePartLabel,
     DenyVisibleAttributesLabel,
-    DsiEntityLabel,
     GroupByAttributeLabel,
     GroupByMetricLabel,
     JoinedModelLabel,
@@ -42,26 +46,18 @@ from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
     MetricTimeLabel,
     TimeClusterLabel,
 )
-from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
+from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
+    SemanticGraph,
     SemanticGraphEdge,
     SemanticGraphNode,
 )
-from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder import (
-    MetricflowGraphPathFinder,
-)
-from metricflow_semantics.experimental.semantic_graph.semantic_graph import SemanticGraph
+from metricflow_semantics.experimental.semantic_graph.weight.dunder_name_weight import DunderNameWeightFunction
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
-from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
 from metricflow_semantics.model.semantics.linkable_element_set_base import AnnotatedSpec
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
-from metricflow_semantics.specs.dimension_spec import DimensionSpec
-from metricflow_semantics.specs.entity_spec import EntitySpec
-from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
-from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
-from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -80,13 +76,12 @@ class AttributeResolver:
         self._verbose_debug_logs = False
         self._cumulative_measure_label = CumulativeMeasureLabel.get_instance()
         self._deny_date_part_label = DenyDatePartLabel.get_instance()
-
-        self._model_node_to_non_metric_time_recipes: dict[ElementSetCacheKey, AnnotatedSpecLinkableElementSet] = {}
-        self._measure_node_to_metric_time_recipes: dict[ElementSetCacheKey, AnnotatedSpecLinkableElementSet] = {}
+        # Cache for results.
+        self._source_nodes_to_element_set: dict[ElementSetCacheKey, AnnotatedSpecLinkableElementSet] = {}
 
     def _generate_non_metric_time_recipes(
         self, model_node: SemanticGraphNode, element_filter: Optional[LinkableElementFilter]
-    ) -> Sequence[AttributeRecipe]:
+    ) -> Sequence[AttributeQueryRecipe]:
         if self._verbose_debug_logs:
             logger.debug(
                 LazyFormat(
@@ -94,13 +89,22 @@ class AttributeResolver:
                     model_node=model_node,
                 )
             )
+
+        node_deny_set: Optional[OrderedSet[SemanticGraphNode]] = None
+        if element_filter is not None and LinkableElementProperty.METRIC in element_filter.without_any_of:
+            node_deny_set = self._group_by_metric_nodes
         return self._remove_ambiguous_recipes(
-            self._generate_recipes(model_node, node_allow_list=None, element_filter=element_filter)
+            self._generate_recipes(
+                model_node,
+                node_allow_set=None,
+                element_filter=element_filter,
+                node_deny_set=node_deny_set,
+            )
         )
 
     def _generate_metric_time_recipes(
         self, measure_node: SemanticGraphNode, element_filter: Optional[LinkableElementFilter]
-    ) -> Sequence[AttributeRecipe]:
+    ) -> Sequence[AttributeQueryRecipe]:
         allowed_nodes = self._traversable_nodes_for_metric_time_recipes
         if self._verbose_debug_logs:
             logger.debug(
@@ -113,8 +117,9 @@ class AttributeResolver:
         return self._remove_ambiguous_recipes(
             self._generate_recipes(
                 source_node=measure_node,
-                node_allow_list=allowed_nodes,
+                node_allow_set=allowed_nodes,
                 element_filter=element_filter,
+                node_deny_set=self._group_by_metric_nodes,
             )
         )
 
@@ -136,7 +141,8 @@ class AttributeResolver:
                 self._generate_recipes(
                     source_node=metric_time_node,
                     element_filter=element_filter,
-                    node_allow_list=self._semantic_graph.nodes_with_label(TimeClusterLabel.get_instance()),
+                    node_allow_set=self._semantic_graph.nodes_with_label(TimeClusterLabel.get_instance()),
+                    node_deny_set=self._group_by_metric_nodes,
                 ),
                 element_filter=element_filter,
             )
@@ -157,6 +163,11 @@ class AttributeResolver:
     def resolve_annotated_specs(
         self, source_nodes: OrderedSet[SemanticGraphNode], element_filter: Optional[LinkableElementFilter]
     ) -> AnnotatedSpecLinkableElementSet:
+        cache_key = ElementSetCacheKey(nodes=source_nodes.as_frozen(), element_filter=element_filter)
+        result = self._source_nodes_to_element_set.get(cache_key)
+        if result is not None:
+            return result
+
         search_result = self._find_nearest_measure_nodes(source_nodes)
         measure_nodes = search_result.measure_nodes
         collected_labels = search_result.collected_labels
@@ -197,8 +208,9 @@ class AttributeResolver:
 
         model_element_sets_to_intersect: list[AnnotatedSpecLinkableElementSet] = []
         for model_node in model_nodes:
-            cache_key = ElementSetCacheKey(node=model_node, element_filter=element_filter)
-            element_set = self._model_node_to_non_metric_time_recipes.get(cache_key)
+            cache_key = ElementSetCacheKey(nodes=FrozenOrderedSet((model_node,)), element_filter=element_filter)
+
+            element_set = self._source_nodes_to_element_set.get(cache_key)
             if element_set is not None:
                 model_element_sets_to_intersect.append(element_set)
                 continue
@@ -219,12 +231,12 @@ class AttributeResolver:
             )
             model_element_sets_to_intersect.append(element_set)
 
-            self._model_node_to_non_metric_time_recipes[cache_key] = element_set
+            self._source_nodes_to_element_set[cache_key] = element_set
 
         metric_time_elements_sets_to_intersect: list[AnnotatedSpecLinkableElementSet] = []
         for measure_node in measure_nodes:
-            cache_key = ElementSetCacheKey(node=measure_node, element_filter=element_filter)
-            element_set = self._measure_node_to_metric_time_recipes.get(cache_key)
+            cache_key = ElementSetCacheKey(nodes=FrozenOrderedSet((measure_node,)), element_filter=element_filter)
+            element_set = self._source_nodes_to_element_set.get(cache_key)
             if element_set is not None:
                 metric_time_elements_sets_to_intersect.append(element_set)
                 continue
@@ -244,7 +256,7 @@ class AttributeResolver:
             element_set = AnnotatedSpecLinkableElementSet.create_from_annotated_specs(
                 self._generate_specs_from_recipes(metric_time_recipes, element_filter=element_filter)
             )
-            self._measure_node_to_metric_time_recipes[cache_key] = element_set
+            self._source_nodes_to_element_set[cache_key] = element_set
             metric_time_elements_sets_to_intersect.append(element_set)
 
         if len(model_element_sets_to_intersect) == 0:
@@ -261,7 +273,14 @@ class AttributeResolver:
                 *metric_time_elements_sets_to_intersect[1:]
             )
 
-        return model_node_element_set.union(metric_time_element_set)
+        result = model_node_element_set.union(metric_time_element_set)
+        cache_key = ElementSetCacheKey(nodes=source_nodes.as_frozen(), element_filter=element_filter)
+        self._source_nodes_to_element_set[cache_key] = result
+        return result
+
+    @cached_property
+    def _group_by_metric_nodes(self) -> OrderedSet[SemanticGraphNode]:
+        return self._semantic_graph.nodes_with_label(GroupByMetricLabel.get_instance())
 
     @cached_property
     def _traversable_nodes_for_finding_measure_nodes(self) -> OrderedSet[SemanticGraphNode]:
@@ -353,7 +372,7 @@ class AttributeResolver:
             collected_labels=result.collected_labels,
         )
 
-    def _remove_ambiguous_recipes(self, recipes: Sequence[AttributeRecipe]) -> Sequence[AttributeRecipe]:
+    def _remove_ambiguous_recipes(self, recipes: Sequence[AttributeQueryRecipe]) -> Sequence[AttributeQueryRecipe]:
         unique_dunder_names = set[AnyLengthTuple[str]]()
         duplicate_dunder_names = set[AnyLengthTuple[str]]()
         for recipe in recipes:
@@ -369,175 +388,140 @@ class AttributeResolver:
         return tuple(recipe for recipe in recipes if recipe.dunder_name_elements in unique_dunder_names)
 
     def _generate_specs_from_recipes(
-        self, attribute_recipes: Sequence[AttributeRecipe], element_filter: Optional[LinkableElementFilter]
+        self, attribute_recipes: Sequence[AttributeQueryRecipe], element_filter: Optional[LinkableElementFilter]
     ) -> Sequence[AnnotatedSpec]:
-        dunder_name_to_annotated_spec: dict[str, AnnotatedSpec] = {}
-        for recipe in attribute_recipes:
-            element_type = mf_first_non_none_or_raise(recipe.element_type)
-            dundered_name_elements = recipe.dunder_name_elements
-            properties = MutableOrderedSet(recipe.properties)
-            default_entity_links = tuple(
-                EntityReference(element_name=element_name) for element_name in recipe.dunder_name_elements[:-1]
-            )
-            default_element_name = dundered_name_elements[-1]
-
-            # Adjust properties to match existing behavior.
-            if element_type is LinkableElementType.METRIC:
-                # Group-by metrics are considered to be joined.
-                properties.add(LinkableElementProperty.JOINED)
-            elif (
-                element_type is LinkableElementType.DIMENSION
-                or element_type is LinkableElementType.TIME_DIMENSION
-                or element_type is LinkableElementType.ENTITY
-            ):
-                pass
-            else:
-                assert_values_exhausted(element_type)
-
-            # Aside from metric time, add the `LOCAL` property if only one semantic model is required to compute the
-            # attribute. Otherwise, it's `JOINED`.
-            model_ids = recipe.models_in_join
-            model_id_count = len(model_ids)
-            if model_id_count == 0:
-                assert LinkableElementProperty.METRIC_TIME in properties
-            elif model_id_count == 1:
-                if (
-                    element_type is not LinkableElementType.METRIC
-                    and LinkableElementProperty.METRIC_TIME not in properties
-                ):
-                    properties.add(LinkableElementProperty.LOCAL)
-            elif model_id_count == 2:
-                properties.add(LinkableElementProperty.JOINED)
-            elif model_id_count >= 3:
-                properties.update(
-                    (
-                        LinkableElementProperty.JOINED,
-                        LinkableElementProperty.MULTI_HOP,
-                    )
-                )
-            else:
-                raise RuntimeError(LazyFormat("Case not handled", model_id_count=model_id_count, recipe=recipe))
-
-            # Add `DERIVED_TIME_GRANULARITY` if the grain is different from the element's grain.
-            # `metric_time` never has the `DERIVED_TIME_GRANULARITY` property.
-            if (
-                recipe.min_time_grain is not None
-                and recipe.time_grain is not None
-                and recipe.min_time_grain is not recipe.time_grain.base_granularity
-            ):
-                properties.add(LinkableElementProperty.DERIVED_TIME_GRANULARITY)
-
-            derived_from_semantic_models = FrozenOrderedSet(
-                SemanticModelReference(semantic_model_name=model_id.model_name) for model_id in model_ids
-            )
-            last_model_id = recipe.last_model_id
-
-            # `last_model_id` may be `None` if the descriptor is for a `metric_time` attribute
-            origin_model_ids: FrozenOrderedSet[SemanticModelId] = (
-                FrozenOrderedSet((last_model_id,)) if last_model_id is not None else FrozenOrderedSet()
-            )
-
-            if element_type is LinkableElementType.METRIC:
-                if recipe.key_query_set is None:
-                    raise RuntimeError(
-                        LazyFormat(
-                            "Missing key-query set to generate a group-by-metric spec",
-                            recipe=recipe,
-                        )
-                    )
-                dunder_name_to_annotated_spec.update(
-                    self._generate_group_by_metric_specs(
-                        metric_name=default_element_name,
-                        entity_links=default_entity_links,
-                        properties=properties,
-                        source_models=derived_from_semantic_models,
-                        key_query_group=recipe.key_query_set,
-                    )
-                )
-            elif element_type is LinkableElementType.ENTITY:
-                entity_spec = EntitySpec(
-                    element_name=default_element_name,
-                    entity_links=default_entity_links,
-                )
-                dunder_name_to_annotated_spec[entity_spec.qualified_name] = AnnotatedSpec.create(
-                    element_type=element_type,
-                    spec=entity_spec,
-                    time_grain=None,
-                    date_part=None,
-                    properties=properties,
-                    origin_model_ids=origin_model_ids,
-                    derived_from_semantic_models=derived_from_semantic_models,
-                )
-            elif element_type is LinkableElementType.TIME_DIMENSION:
-                element_name = dundered_name_elements[-2]
-                entity_links = tuple(
-                    EntityReference(element_name=element_name) for element_name in recipe.dunder_name_elements[:-2]
-                )
-                time_grain: Optional[ExpandedTimeGranularity] = recipe.time_grain
-                time_dimension_spec = TimeDimensionSpec(
-                    element_name=element_name,
-                    entity_links=entity_links,
-                    time_granularity=time_grain,
-                    date_part=recipe.date_part,
-                )
-                dunder_name = time_dimension_spec.qualified_name
-                dunder_name_to_annotated_spec[dunder_name] = AnnotatedSpec.create(
-                    element_type=element_type,
-                    spec=time_dimension_spec,
-                    time_grain=time_grain,
-                    date_part=recipe.date_part,
-                    properties=properties,
-                    origin_model_ids=origin_model_ids,
-                    derived_from_semantic_models=derived_from_semantic_models,
-                )
-            elif element_type is LinkableElementType.DIMENSION:
-                spec = DimensionSpec(
-                    element_name=default_element_name,
-                    entity_links=default_entity_links,
-                )
-
-                dunder_name_to_annotated_spec[spec.qualified_name] = AnnotatedSpec.create(
-                    element_type=element_type,
-                    spec=spec,
-                    time_grain=None,
-                    date_part=None,
-                    properties=properties,
-                    origin_model_ids=origin_model_ids,
-                    derived_from_semantic_models=derived_from_semantic_models,
-                )
-            else:
-                assert_values_exhausted(element_type)
+        annotated_specs = tuple(mf_flatten(self._generate_spec_from_recipe(recipe) for recipe in attribute_recipes))
 
         if element_filter is not None:
-            annotated_specs_to_return: list[AnnotatedSpec] = []
+            filtered_annotated_specs: list[AnnotatedSpec] = []
             filter_element_names = element_filter.element_names
 
-            for annotated_spec in dunder_name_to_annotated_spec.values():
+            for annotated_spec in annotated_specs:
+                properties = annotated_spec.properties
                 if filter_element_names is not None and annotated_spec.spec.element_name not in filter_element_names:
                     continue
-                if len(element_filter.without_any_of.intersection(annotated_spec.properties)) > 0:
+                if len(element_filter.without_any_of.intersection(properties)) > 0:
                     continue
 
-                if len(element_filter.with_any_of.intersection(annotated_spec.properties)) == 0:
+                if len(element_filter.with_any_of.intersection(properties)) == 0:
                     continue
 
                 without_all_of_size = len(element_filter.without_all_of)
                 if 0 < without_all_of_size == len(element_filter.without_all_of.intersection(properties)):
                     continue
 
-                annotated_specs_to_return.append(annotated_spec)
+                filtered_annotated_specs.append(annotated_spec)
 
-            return annotated_specs_to_return
+            return filtered_annotated_specs
+        return annotated_specs
 
-        return tuple(dunder_name_to_annotated_spec.values())
+    def _generate_spec_from_recipe(self, recipe: AttributeQueryRecipe) -> Sequence[AnnotatedSpec]:
+        element_type = mf_first_non_none_or_raise(recipe.element_type)
+        dundered_name_elements = recipe.dunder_name_elements
+        properties = MutableOrderedSet(recipe.properties)
+        entity_link_names = tuple(element_name for element_name in recipe.dunder_name_elements[:-1])
+        element_name = dundered_name_elements[-1]
+
+        # Adjust properties to match existing behavior.
+        if element_type is LinkableElementType.METRIC:
+            # Group-by metrics are considered to be joined.
+            properties.add(LinkableElementProperty.JOINED)
+        elif (
+            element_type is LinkableElementType.DIMENSION
+            or element_type is LinkableElementType.TIME_DIMENSION
+            or element_type is LinkableElementType.ENTITY
+        ):
+            pass
+        else:
+            assert_values_exhausted(element_type)
+
+        # Aside from metric time, add the `LOCAL` property if only one semantic model is required to compute the
+        # attribute. Otherwise, it's `JOINED`.
+        model_ids = recipe.models_in_join
+        model_id_count = len(model_ids)
+        if model_id_count == 0:
+            assert LinkableElementProperty.METRIC_TIME in properties
+        elif model_id_count == 1:
+            if element_type is not LinkableElementType.METRIC and LinkableElementProperty.METRIC_TIME not in properties:
+                properties.add(LinkableElementProperty.LOCAL)
+        elif model_id_count == 2:
+            properties.add(LinkableElementProperty.JOINED)
+        elif model_id_count >= 3:
+            properties.update(
+                (
+                    LinkableElementProperty.JOINED,
+                    LinkableElementProperty.MULTI_HOP,
+                )
+            )
+        else:
+            raise RuntimeError(LazyFormat("Case not handled", model_id_count=model_id_count, recipe=recipe))
+
+        # Add `DERIVED_TIME_GRANULARITY` if the grain is different from the element's grain.
+        # `metric_time` never has the `DERIVED_TIME_GRANULARITY` property.
+        if (
+            recipe.min_time_grain is not None
+            and recipe.time_grain is not None
+            and recipe.min_time_grain is not recipe.time_grain.base_granularity
+        ):
+            properties.add(LinkableElementProperty.DERIVED_TIME_GRANULARITY)
+
+        last_model_id = recipe.last_model_id
+
+        properties_tuple = tuple(properties)
+        source_semantic_model_names = tuple(FrozenOrderedSet(model_id.model_name for model_id in model_ids))
+
+        if element_type is LinkableElementType.METRIC:
+            if recipe.key_query_groups is None:
+                raise RuntimeError(
+                    LazyFormat(
+                        "Missing key-query group for a group-by-metric",
+                        recipe=recipe,
+                    )
+                )
+            return self._generate_group_by_metric_specs(
+                metric_name=element_name,
+                entity_link_names=entity_link_names,
+                properties_tuple=properties_tuple,
+                source_semantic_model_names=source_semantic_model_names,
+                key_query_group=recipe.key_query_groups,
+            )
+        elif element_type is LinkableElementType.TIME_DIMENSION:
+            element_name = dundered_name_elements[-2]
+        elif (
+            element_type is LinkableElementType.ENTITY
+            or element_type is LinkableElementType.METRIC
+            or element_type is LinkableElementType.DIMENSION
+        ):
+            pass
+        else:
+            assert_values_exhausted(element_type)
+
+        time_grain = recipe.time_grain
+        date_part = recipe.date_part
+        origin_semantic_model_names = (last_model_id.model_name,) if last_model_id is not None else ()
+
+        return (
+            AnnotatedSpec(
+                element_type=element_type,
+                element_name=element_name,
+                entity_link_names=recipe.entity_link_names,
+                time_grain=time_grain,
+                date_part=date_part,
+                metric_subquery_entity_link_names=(),
+                element_properties=properties_tuple,
+                origin_semantic_model_names=origin_semantic_model_names,
+                source_semantic_model_names=source_semantic_model_names,
+            ),
+        )
 
     def _generate_recipes(
         self,
         source_node: SemanticGraphNode,
         element_filter: Optional[LinkableElementFilter],
-        node_allow_list: Optional[OrderedSet[SemanticGraphNode]],
+        node_allow_set: Optional[OrderedSet[SemanticGraphNode]],
+        node_deny_set: Optional[OrderedSet[SemanticGraphNode]],
         max_entity_links: int = MAX_JOIN_HOPS,
-    ) -> Sequence[AttributeRecipe]:
+    ) -> Sequence[AttributeQueryRecipe]:
         mutable_path = AttributeRecipeWriterPath.create()
         attribute_recipes = []
         target_nodes = self._semantic_graph.nodes_with_label(GroupByAttributeLabel.get_instance())
@@ -565,7 +549,8 @@ class AttributeResolver:
             ),
             max_path_weight=max_entity_links,
             allow_node_revisits=True,
-            allowed_nodes=node_allow_list,
+            node_allow_set=node_allow_set,
+            node_deny_set=node_deny_set,
         ):
             path = stop_event.current_path
             attribute_recipe = mutable_path.recipe_writer.latest_recipe
@@ -582,40 +567,32 @@ class AttributeResolver:
     def _generate_group_by_metric_specs(
         self,
         metric_name: str,
-        entity_links: Sequence[EntityReference],
-        properties: OrderedSet[LinkableElementProperty],
-        source_models: OrderedSet[SemanticModelReference],
-        key_query_group: DsiEntityKeyQueryGroup,
-    ) -> dict[str, AnnotatedSpec]:
-        dunder_name_to_annotated_spec: dict[str, AnnotatedSpec] = {}
-
+        entity_link_names: AnyLengthTuple[str],
+        properties_tuple: AnyLengthTuple[LinkableElementProperty],
+        source_semantic_model_names: AnyLengthTuple[str],
+        key_query_group: KeyQueryGroup,
+    ) -> Sequence[AnnotatedSpec]:
+        annotated_specs = []
         # for metric_subquery in self._get_metric_subqueries_for_models(tuple(subquery_model_ids)):
         for key_query, model_ids in key_query_group.items():
-            # if entity_links[-1].element_name != key_query[-1]:
-            #     continue
+            source_semantic_model_name_set = MutableOrderedSet(source_semantic_model_names)
+            source_semantic_model_name_set.update(model_id.model_name for model_id in model_ids)
 
-            spec = GroupByMetricSpec(
-                element_name=metric_name,
-                entity_links=tuple(entity_links),
-                metric_subquery_entity_links=tuple(EntityReference(element_name) for element_name in key_query),
+            annotated_specs.append(
+                AnnotatedSpec(
+                    element_type=LinkableElementType.METRIC,
+                    entity_link_names=entity_link_names,
+                    element_name=metric_name,
+                    time_grain=None,
+                    date_part=None,
+                    metric_subquery_entity_link_names=key_query,
+                    element_properties=properties_tuple,
+                    origin_semantic_model_names=(),
+                    source_semantic_model_names=tuple(source_semantic_model_name_set),
+                )
             )
 
-            dunder_name_to_annotated_spec[spec.qualified_name] = AnnotatedSpec.create(
-                element_type=LinkableElementType.METRIC,
-                spec=spec,
-                time_grain=None,
-                date_part=None,
-                properties=properties,
-                origin_model_ids=(
-                    SemanticModelId(
-                        model_name=SemanticModelDerivation.VIRTUAL_SEMANTIC_MODEL_REFERENCE.semantic_model_name
-                    ),
-                ),
-                derived_from_semantic_models=source_models.union(
-                    model_id.semantic_model_reference for model_id in model_ids
-                ),
-            )
-        return dunder_name_to_annotated_spec
+        return annotated_specs
 
     @cached_property
     def _traversable_nodes_for_finding_metric_subqueries(self) -> OrderedSet[SemanticGraphNode]:
@@ -624,7 +601,7 @@ class AttributeResolver:
         for label in (
             JoinedModelLabel.get_instance(),
             LocalModelLabel.get_instance(),
-            DsiEntityLabel.get_instance(),
+            ConfiguredEntityLabel.get_instance(),
             KeyEntityClusterLabel.get_instance(),
         ):
             nodes.update(self._semantic_graph.nodes_with_label(label))
@@ -637,7 +614,13 @@ class FindNearestMeasureNodesResult:
     collected_labels: OrderedSet[MetricflowGraphLabel]
 
 
+# @fast_frozen_dataclass()
+# class ElementSetCacheKey:
+#     node: SemanticGraphNode
+#     element_filter: Optional[LinkableElementFilter]
+
+
 @fast_frozen_dataclass()
 class ElementSetCacheKey:
-    node: SemanticGraphNode
+    nodes: FrozenOrderedSet[SemanticGraphNode]
     element_filter: Optional[LinkableElementFilter]

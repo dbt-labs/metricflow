@@ -8,18 +8,18 @@ from dbt_semantic_interfaces.type_enums import DatePart, TimeGranularity
 from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
-from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeRecipeUpdate
-from metricflow_semantics.experimental.semantic_graph.builder.graph_change_rule import (
+from metricflow_semantics.experimental.dsi.model_object_lookup import (
+    SemanticModelObjectLookup,
+)
+from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe_update import (
+    QueryRecipeStep,
+)
+from metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator import (
     SemanticSubgraphGenerator,
     SubgraphGeneratorArgumentSet,
 )
-from metricflow_semantics.experimental.semantic_graph.edges.entity_relationship import (
-    EntityRelationshipEdge,
-)
+from metricflow_semantics.experimental.semantic_graph.edges.sg_edges import EntityRelationshipEdge
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
-from metricflow_semantics.experimental.semantic_graph.model_object_lookup import (
-    SemanticModelObjectLookup,
-)
 from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import (
     AttributeNode,
     KeyAttributeNode,
@@ -29,7 +29,7 @@ from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import (
     TimeDimensionNode,
     TimeEntityNode,
 )
-from metricflow_semantics.experimental.semantic_graph.semantic_graph import MutableSemanticGraph, SemanticGraph
+from metricflow_semantics.experimental.semantic_graph.sg_interfaces import MutableSemanticGraph, SemanticGraph
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +59,7 @@ class TimeDimensionSubgraphGenerator(SemanticSubgraphGenerator):
                 EntityRelationshipEdge.get_instance(
                     tail_node=semantic_model_node,
                     head_node=time_dimension_node,
-                    recipe_update=AttributeRecipeUpdate(
+                    recipe_update=QueryRecipeStep(
                         add_min_time_grain=time_grain,
                     ),
                 )
@@ -74,7 +74,7 @@ class TimeDimensionSubgraphGenerator(SemanticSubgraphGenerator):
         return current_subgraph
 
     @override
-    def generate_subgraph(self, current_graph: SemanticGraph) -> MutableSemanticGraph:
+    def generate_subgraph(self, predecessor_graph: SemanticGraph) -> MutableSemanticGraph:
         current_subgraph = MutableSemanticGraph.create()
         for lookup in self._manifest_object_lookup.model_object_lookups:
             current_subgraph.update(self._get_subgraph_for_model(lookup))

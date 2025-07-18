@@ -4,8 +4,8 @@ import logging
 from typing import Generic
 
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
+from metricflow_semantics.experimental.mf_graph.path_finding.graph_path import EdgeT, MutableGraphPath, NodeT
 from metricflow_semantics.experimental.orderd_enum import OrderedEnum
-from metricflow_semantics.experimental.semantic_graph.path_finding.graph_path import EdgeT, MutableGraphPath, NodeT
 
 logger = logging.getLogger(__name__)
 

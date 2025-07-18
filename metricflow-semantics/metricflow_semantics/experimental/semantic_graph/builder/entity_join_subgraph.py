@@ -1,29 +1,25 @@
 from __future__ import annotations
 
 import logging
-from collections import defaultdict
 
 from typing_extensions import override
 
-from metricflow_semantics.collection_helpers.mf_type_aliases import Pair
-from metricflow_semantics.experimental.ordered_set import MutableOrderedSet, OrderedSet
-from metricflow_semantics.experimental.semantic_graph.builder.graph_change_rule import (
+from metricflow_semantics.experimental.dsi.manifest_object_lookup import SemanticModelJoinLookup
+from metricflow_semantics.experimental.dsi.model_object_lookup import (
+    SemanticModelObjectLookup,
+)
+from metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator import (
     SemanticSubgraphGenerator,
     SubgraphGeneratorArgumentSet,
 )
-from metricflow_semantics.experimental.semantic_graph.edges.join_edge import JoinFromModelEdge, JoinToModelEdge
-from metricflow_semantics.experimental.semantic_graph.edges.joined_dsi_entity import JoinedDsiEntityEdge
-from metricflow_semantics.experimental.semantic_graph.manifest_object_lookup import SemanticModelJoinLookup
+from metricflow_semantics.experimental.semantic_graph.edges.sg_edges import JoinFromModelEdge, JoinToModelEdge
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
-from metricflow_semantics.experimental.semantic_graph.model_object_lookup import (
-    SemanticModelObjectLookup,
-)
 from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import (
-    DsiEntityNode,
+    ConfiguredEntityNode,
     JoinedModelNode,
     LocalModelNode,
 )
-from metricflow_semantics.experimental.semantic_graph.semantic_graph import MutableSemanticGraph, SemanticGraph
+from metricflow_semantics.experimental.semantic_graph.sg_interfaces import MutableSemanticGraph, SemanticGraph
 
 logger = logging.getLogger(__name__)
 
@@ -36,9 +32,7 @@ class EntityJoinSubgraphGenerator(SemanticSubgraphGenerator):
 
         self._valid_entity_join_types = SemanticModelJoinLookup.valid_join_to_entity_types()
 
-    def _get_subgraph_for_model(
-        self, lookup: SemanticModelObjectLookup
-    ) -> Pair[MutableSemanticGraph, OrderedSet[JoinedDsiEntityEdge]]:
+    def _get_subgraph_for_model(self, lookup: SemanticModelObjectLookup) -> MutableSemanticGraph:
         current_subgraph = MutableSemanticGraph.create()
 
         left_model_id = SemanticModelId(model_name=lookup.semantic_model.name)
@@ -50,7 +44,7 @@ class EntityJoinSubgraphGenerator(SemanticSubgraphGenerator):
             left_model_id=left_model_id
         ).items():
             for join_descriptor in join_descriptors:
-                right_entity_node = DsiEntityNode.get_instance(
+                right_entity_node = ConfiguredEntityNode.get_instance(
                     entity_name=join_descriptor.entity_name,
                     model_id=right_model_id,
                 )
@@ -68,7 +62,7 @@ class EntityJoinSubgraphGenerator(SemanticSubgraphGenerator):
             if entity.type in self._valid_entity_join_types:
                 current_subgraph.add_edge(
                     JoinToModelEdge.get_instance(
-                        tail_node=DsiEntityNode.get_instance(
+                        tail_node=ConfiguredEntityNode.get_instance(
                             entity_name=entity.name,
                             model_id=left_model_id,
                         ),
@@ -78,7 +72,7 @@ class EntityJoinSubgraphGenerator(SemanticSubgraphGenerator):
 
         primary_entity_name = lookup.primary_entity_name
         if primary_entity_name is not None:
-            primary_entity_node = DsiEntityNode.get_instance(
+            primary_entity_node = ConfiguredEntityNode.get_instance(
                 entity_name=primary_entity_name,
                 model_id=left_model_id,
             )
@@ -94,30 +88,14 @@ class EntityJoinSubgraphGenerator(SemanticSubgraphGenerator):
                     head_node=primary_entity_node,
                 )
             )
-
-        entity_link_edges: MutableOrderedSet[JoinedDsiEntityEdge] = MutableOrderedSet()
-
-        return current_subgraph, entity_link_edges
+        return current_subgraph
 
     @override
-    def generate_subgraph(self, current_graph: SemanticGraph) -> MutableSemanticGraph:
+    def generate_subgraph(self, predecessor_graph: SemanticGraph) -> MutableSemanticGraph:
         current_subgraph = MutableSemanticGraph.create()
-        current_entity_link_edges: MutableOrderedSet[JoinedDsiEntityEdge] = MutableOrderedSet()
 
         for lookup in self._manifest_object_lookup.model_object_lookups:
-            # Get subgraph for joins to other entities.
-            subgraph_from_model, entity_link_edges_from_model = self._get_subgraph_for_model(lookup)
-            current_entity_link_edges.update(entity_link_edges_from_model)
+            subgraph_from_model = self._get_subgraph_for_model(lookup)
             current_subgraph.update(subgraph_from_model)
-
-        # Count the number of ways that you can go from one DSI entity to another.
-        entity_link_edge_node_pair_to_edge = defaultdict(list)
-        for entity_link_edge in current_entity_link_edges:
-            entity_link_edge_node_pair_to_edge[entity_link_edge.node_pair].append(entity_link_edge)
-
-        # If the number of ways is 1, then it means it's not ambiguous so we can add an edge.
-        for _, edges in entity_link_edge_node_pair_to_edge.items():
-            if len(edges) == 1:
-                current_subgraph.add_edges(edges)
 
         return current_subgraph

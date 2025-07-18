@@ -7,21 +7,24 @@ from functools import cached_property
 
 from typing_extensions import override
 
+from metricflow_semantics.experimental.mf_graph.path_finding.path_finder import MetricflowGraphPathFinder
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
-from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeRecipeUpdate
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
     AttributeRecipeWriterPath,
+)
+from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe_update import (
+    QueryRecipeStep,
 )
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_resolver import (
     AttributeResolver,
 )
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.key_query_resolver import (
-    DsiEntityKeyQueryResolver,
+    EntityKeyQueryResolver,
 )
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.key_query_set import (
-    DsiEntityKeyQueryGroup,
+    KeyQueryGroup,
 )
-from metricflow_semantics.experimental.semantic_graph.builder.graph_change_rule import (
+from metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator import (
     SemanticSubgraphGenerator,
     SubgraphGeneratorArgumentSet,
 )
@@ -36,21 +39,21 @@ from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node impor
 from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import (
     KeyEntityNode,
 )
-from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
+from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import (
     BaseMetricLabel,
+    ConfiguredEntityLabel,
     DenyEntityKeyQueryResolutionLabel,
     DenyVisibleAttributesLabel,
-    DsiEntityLabel,
     LocalModelLabel,
     MeasureLabel,
     MetricLabel,
 )
-from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
+from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
+    MutableSemanticGraph,
+    SemanticGraph,
     SemanticGraphEdge,
     SemanticGraphNode,
 )
-from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder import MetricflowGraphPathFinder
-from metricflow_semantics.experimental.semantic_graph.semantic_graph import MutableSemanticGraph, SemanticGraph
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.runtime import log_block_runtime
 
@@ -78,25 +81,25 @@ class GroupByMetricSubgraphGenerator(SemanticSubgraphGenerator):
         )
 
     @override
-    def generate_subgraph(self, current_graph: SemanticGraph) -> MutableSemanticGraph:
-        self._current_graph = current_graph
-        self._traversable_nodes_for_dsi_entity_node_search = current_graph.nodes_with_label(
+    def generate_subgraph(self, predecessor_graph: SemanticGraph) -> MutableSemanticGraph:
+        self._current_graph = predecessor_graph
+        self._traversable_nodes_for_dsi_entity_node_search = predecessor_graph.nodes_with_label(
             LocalModelLabel.get_instance()
-        ).union(current_graph.nodes_with_label(DsiEntityLabel.get_instance()))
+        ).union(predecessor_graph.nodes_with_label(ConfiguredEntityLabel.get_instance()))
         # self._measure_name_to_edge_argument.clear()
 
         generate_subgraph_context = _GenerateGroupByMetricSubgraphContext(
-            current_graph=current_graph,
+            current_graph=predecessor_graph,
             path_finder=self._path_finder,
             attribute_resolver=AttributeResolver(
                 manifest_object_lookup=self._manifest_object_lookup,
-                semantic_graph=current_graph,
+                semantic_graph=predecessor_graph,
                 path_finder=self._path_finder,
             ),
         )
 
         if self._verbose_debug_logs:
-            logger.debug(LazyFormat("Starting with graph", current_graph=current_graph))
+            logger.debug(LazyFormat("Starting with graph", current_graph=predecessor_graph))
 
         # for metric in self._manifest_object_lookup.get_metrics():
         #     if metric.name not in self._metric_name_to_edge_argument:
@@ -116,15 +119,15 @@ class _GenerateGroupByMetricSubgraphContext:
         self._current_graph = current_graph
         self._attribute_resolver = attribute_resolver
         self._path_finder = path_finder
-        self._metric_node_to_key_query_group: dict[SemanticGraphNode, DsiEntityKeyQueryGroup] = {}
+        self._metric_node_to_key_query_group: dict[SemanticGraphNode, KeyQueryGroup] = {}
         metric_nodes = current_graph.nodes_with_label(MetricLabel.get_instance())
         self._metric_nodes_in_current_graph = metric_nodes
         self._verbose_debug_logs = False
 
     @cached_property
-    def _model_node_to_key_query_group(self) -> dict[SemanticGraphNode, DsiEntityKeyQueryGroup]:
+    def _model_node_to_key_query_group(self) -> dict[SemanticGraphNode, KeyQueryGroup]:
         with log_block_runtime("Resolve key queries"):
-            resolver = DsiEntityKeyQueryResolver()
+            resolver = EntityKeyQueryResolver()
             resolver_result = resolver.find_key_query_groups(self._current_graph)
             if self._verbose_debug_logs:
                 logger.debug(
@@ -139,7 +142,7 @@ class _GenerateGroupByMetricSubgraphContext:
         self,
         metric_node: SemanticGraphNode,
         _metric_nodes_in_definition_path: Set[SemanticGraphNode] = frozenset(),
-    ) -> DsiEntityKeyQueryGroup:
+    ) -> KeyQueryGroup:
         entity_key_query_set = self._metric_node_to_key_query_group.get(metric_node)
         if entity_key_query_set is not None:
             return entity_key_query_set
@@ -176,7 +179,7 @@ class _GenerateGroupByMetricSubgraphContext:
                 parent_metric_nodes.add(parent_metric_node)
 
         if len(parent_metric_nodes) == 0:
-            result = DsiEntityKeyQueryGroup()
+            result = KeyQueryGroup()
             self._metric_node_to_key_query_group[metric_node] = result
             return result
 
@@ -188,7 +191,7 @@ class _GenerateGroupByMetricSubgraphContext:
                     _metric_nodes_in_definition_path=_metric_nodes_in_definition_path | {metric_node},
                 )
             key_query_sets_to_intersect.append(self._metric_node_to_key_query_group[parent_metric_node])
-        intersected_key_query_set = DsiEntityKeyQueryGroup.intersection(key_query_sets_to_intersect)
+        intersected_key_query_set = KeyQueryGroup.intersection(key_query_sets_to_intersect)
         self._metric_node_to_key_query_group[metric_node] = intersected_key_query_set
 
         return intersected_key_query_set
@@ -276,10 +279,10 @@ class _GenerateGroupByMetricSubgraphContext:
             if len(visible_source_model_nodes) == 0:
                 # Entity-key attributes can't be queried for cumulative metrics (as described by the deny labels),
                 # so set an empty result.
-                self._metric_node_to_key_query_group[base_metric_node] = DsiEntityKeyQueryGroup()
+                self._metric_node_to_key_query_group[base_metric_node] = KeyQueryGroup()
                 continue
 
-            key_query_groups_to_intersect: list[DsiEntityKeyQueryGroup] = []
+            key_query_groups_to_intersect: list[KeyQueryGroup] = []
             for source_model_node in visible_source_model_nodes:
                 key_query_groups_to_intersect.append(self._model_node_to_key_query_group[source_model_node])
 
@@ -303,7 +306,7 @@ class _GenerateGroupByMetricSubgraphContext:
 
             common_source_model_ids: MutableOrderedSet[SemanticModelId] = MutableOrderedSet()
             for model_node in source_model_nodes - visible_source_model_nodes:
-                model_id = model_node.recipe_update.join_model
+                model_id = model_node.recipe_step.join_model
                 assert model_id is not None, LazyFormat(
                     "Model node is missing the model ID in the recipe update",
                     model_id=model_id,
@@ -311,14 +314,14 @@ class _GenerateGroupByMetricSubgraphContext:
                 )
                 common_source_model_ids.add(model_id)
 
-            intersected_key_query_group = DsiEntityKeyQueryGroup.intersection(key_query_groups_to_intersect)
+            intersected_key_query_group = KeyQueryGroup.intersection(key_query_groups_to_intersect)
             self._metric_node_to_key_query_group[
                 base_metric_node
             ] = intersected_key_query_group.with_common_source_models(
                 tuple(common_source_model_ids),
             )
 
-        metric_name_to_key_query_group: dict[str, DsiEntityKeyQueryGroup] = {}
+        metric_name_to_key_query_group: dict[str, KeyQueryGroup] = {}
         subgraph = MutableSemanticGraph.create()
 
         for metric_node in self._metric_nodes_in_current_graph:
@@ -342,7 +345,7 @@ class _GenerateGroupByMetricSubgraphContext:
                         tail_node=key_entity_node,
                         attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
                         head_node=group_by_metric_node,
-                        attribute_recipe_update=AttributeRecipeUpdate(
+                        attribute_recipe_update=QueryRecipeStep(
                             add_dunder_name_element=key_name,
                             add_entity_link=key_name,
                             provide_key_query_group=key_query_group.filter_by_key_name(key_name),

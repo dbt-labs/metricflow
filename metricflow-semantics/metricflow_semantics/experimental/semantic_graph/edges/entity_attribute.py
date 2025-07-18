@@ -9,13 +9,10 @@ from typing_extensions import override
 
 from metricflow_semantics.experimental.mf_graph.comparable import ComparisonKey
 from metricflow_semantics.experimental.orderd_enum import OrderedEnum
-from metricflow_semantics.experimental.semantic_graph.attribute_computation import (
-    AttributeRecipeUpdate,
+from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe_update import (
+    QueryRecipeStep,
 )
-from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
-    SemanticGraphEdge,
-    SemanticGraphNode,
-)
+from metricflow_semantics.experimental.semantic_graph.sg_interfaces import SemanticGraphEdge, SemanticGraphNode
 from metricflow_semantics.experimental.singleton_decorator import singleton_dataclass
 
 logger = logging.getLogger(__name__)
@@ -38,20 +35,20 @@ class AttributeEdgeType(OrderedEnum):
 @singleton_dataclass(order=False)
 class EntityAttributeEdge(SemanticGraphEdge):
     attribute_edge_type: AttributeEdgeType
-    _recipe_update: AttributeRecipeUpdate
+    _recipe_update: QueryRecipeStep
 
     @staticmethod
     def get_instance(
         tail_node: SemanticGraphNode,
         head_node: SemanticGraphNode,
         attribute_edge_type: AttributeEdgeType,
-        attribute_recipe_update: Optional[AttributeRecipeUpdate] = None,
+        attribute_recipe_update: Optional[QueryRecipeStep] = None,
     ) -> EntityAttributeEdge:
         return EntityAttributeEdge(
             _tail_node=tail_node,
             _head_node=head_node,
             attribute_edge_type=attribute_edge_type,
-            _recipe_update=attribute_recipe_update or AttributeRecipeUpdate(),
+            _recipe_update=attribute_recipe_update or QueryRecipeStep(),
         )
 
     @override
@@ -71,5 +68,5 @@ class EntityAttributeEdge(SemanticGraphEdge):
 
     @override
     @property
-    def recipe_update(self) -> AttributeRecipeUpdate:
+    def recipe_step(self) -> QueryRecipeStep:
         return self._recipe_update

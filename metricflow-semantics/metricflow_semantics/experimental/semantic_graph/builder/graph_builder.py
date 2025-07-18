@@ -11,10 +11,6 @@ from metricflow_semantics.experimental.semantic_graph.builder.entity_attribute_s
     EntityAttributeSubgraphGenerator,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.entity_join_subgraph import EntityJoinSubgraphGenerator
-from metricflow_semantics.experimental.semantic_graph.builder.graph_change_rule import (
-    SemanticSubgraphGenerator,
-    SubgraphGeneratorArgumentSet,
-)
 from metricflow_semantics.experimental.semantic_graph.builder.group_by_metric_subgraph import (
     GroupByMetricSubgraphGenerator,
 )
@@ -22,11 +18,15 @@ from metricflow_semantics.experimental.semantic_graph.builder.measure_attribute_
     MeasureAttributeSubgraphGenerator,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.metric_subgraph import MetricSubgraphGenerator
+from metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator import (
+    SemanticSubgraphGenerator,
+    SubgraphGeneratorArgumentSet,
+)
 from metricflow_semantics.experimental.semantic_graph.builder.time_dimension_subgraph import (
     TimeDimensionSubgraphGenerator,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.time_entity_subgraph import TimeEntitySubgraphGenerator
-from metricflow_semantics.experimental.semantic_graph.semantic_graph import MutableSemanticGraph, SemanticGraph
+from metricflow_semantics.experimental.semantic_graph.sg_interfaces import MutableSemanticGraph, SemanticGraph
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 
 logger = logging.getLogger(__name__)

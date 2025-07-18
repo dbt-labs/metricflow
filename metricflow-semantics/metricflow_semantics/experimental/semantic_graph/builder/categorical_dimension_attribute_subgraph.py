@@ -6,7 +6,10 @@ from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums import DimensionType
 from typing_extensions import override
 
-from metricflow_semantics.experimental.semantic_graph.builder.graph_change_rule import (
+from metricflow_semantics.experimental.dsi.model_object_lookup import (
+    SemanticModelObjectLookup,
+)
+from metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator import (
     SemanticSubgraphGenerator,
     SubgraphGeneratorArgumentSet,
 )
@@ -15,9 +18,6 @@ from metricflow_semantics.experimental.semantic_graph.edges.entity_attribute imp
     EntityAttributeEdge,
 )
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
-from metricflow_semantics.experimental.semantic_graph.model_object_lookup import (
-    SemanticModelObjectLookup,
-)
 from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import (
     AttributeNode,
     CategoricalDimensionAttributeNode,
@@ -25,7 +25,7 @@ from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node impor
 from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import (
     JoinedModelNode,
 )
-from metricflow_semantics.experimental.semantic_graph.semantic_graph import MutableSemanticGraph, SemanticGraph
+from metricflow_semantics.experimental.semantic_graph.sg_interfaces import MutableSemanticGraph, SemanticGraph
 
 logger = logging.getLogger(__name__)
 
@@ -68,7 +68,7 @@ class CategoricalDimensionAttributeSubgraphGenerator(SemanticSubgraphGenerator):
         return current_subgraph
 
     @override
-    def generate_subgraph(self, current_graph: SemanticGraph) -> MutableSemanticGraph:
+    def generate_subgraph(self, predecessor_graph: SemanticGraph) -> MutableSemanticGraph:
         current_subgraph = MutableSemanticGraph.create()
         for lookup in self._manifest_object_lookup.model_object_lookups:
             current_subgraph.update(self._get_subgraph_for_model(lookup))

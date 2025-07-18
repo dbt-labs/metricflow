@@ -15,14 +15,14 @@ from metricflow_semantics.experimental.mf_graph.formatting.dot_attributes import
 from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
 from metricflow_semantics.experimental.mf_graph.node_descriptor import MetricflowGraphNodeDescriptor
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, OrderedSet
-from metricflow_semantics.experimental.semantic_graph.attribute_computation import (
-    AttributeRecipeUpdate,
+from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe_update import (
+    QueryRecipeStep,
 )
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
-from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
+from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import (
     BaseMetricLabel,
+    ConfiguredEntityLabel,
     DerivedMetricLabel,
-    DsiEntityLabel,
     JoinedModelLabel,
     KeyEntityClusterLabel,
     KeyEntityLabel,
@@ -31,10 +31,8 @@ from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
     MetricTimeLabel,
     TimeClusterLabel,
 )
-from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
-    SemanticGraphNode,
-)
-from metricflow_semantics.experimental.semantic_graph.sg_constant import ClusterName
+from metricflow_semantics.experimental.semantic_graph.sg_constant import ClusterNameFactory
+from metricflow_semantics.experimental.semantic_graph.sg_interfaces import SemanticGraphNode
 from metricflow_semantics.experimental.singleton_decorator import singleton_dataclass
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
@@ -43,13 +41,13 @@ logger = logging.getLogger(__name__)
 
 
 @singleton_dataclass(order=False)
-class DsiEntityNode(SemanticGraphNode):
+class ConfiguredEntityNode(SemanticGraphNode):
     entity_name: str
     model_id: SemanticModelId
 
     @staticmethod
-    def get_instance(entity_name: str, model_id: SemanticModelId) -> DsiEntityNode:
-        return DsiEntityNode(
+    def get_instance(entity_name: str, model_id: SemanticModelId) -> ConfiguredEntityNode:
+        return ConfiguredEntityNode(
             entity_name=entity_name,
             model_id=model_id,
         )
@@ -61,7 +59,7 @@ class DsiEntityNode(SemanticGraphNode):
 
     @override
     def as_dot_node(self, include_graphical_attributes: bool) -> DotNodeAttributeSet:
-        dot_node = super(DsiEntityNode, self).as_dot_node(include_graphical_attributes)
+        dot_node = super(ConfiguredEntityNode, self).as_dot_node(include_graphical_attributes)
         if include_graphical_attributes:
             dot_node = dot_node.with_attributes(color=DotColor.CORNFLOWER_BLUE)
         return dot_node
@@ -76,12 +74,12 @@ class DsiEntityNode(SemanticGraphNode):
 
     @cached_property
     def labels(self) -> OrderedSet[MetricflowGraphLabel]:
-        return FrozenOrderedSet((DsiEntityLabel.get_instance(),))
+        return FrozenOrderedSet((ConfiguredEntityLabel.get_instance(),))
 
     @override
     @cached_property
-    def recipe_update(self) -> AttributeRecipeUpdate:
-        return AttributeRecipeUpdate(
+    def recipe_step(self) -> QueryRecipeStep:
+        return QueryRecipeStep(
             add_entity_link=self.entity_name,
             add_dunder_name_element=self.entity_name,
             join_model=self.model_id,
@@ -117,7 +115,7 @@ class JoinedModelNode(SemanticGraphNode):
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
         return MetricflowGraphNodeDescriptor.get_instance(
             node_name=f"JoinedModel({self.model_id})",
-            cluster_name=self.model_id.cluster_name,
+            cluster_name=ClusterNameFactory.get_name_for_model(self.model_id),
         )
 
     @override
@@ -132,8 +130,8 @@ class JoinedModelNode(SemanticGraphNode):
 
     @override
     @cached_property
-    def recipe_update(self) -> AttributeRecipeUpdate:
-        return AttributeRecipeUpdate(
+    def recipe_step(self) -> QueryRecipeStep:
+        return QueryRecipeStep(
             join_model=self.model_id,
         )
 
@@ -151,7 +149,7 @@ class LocalModelNode(SemanticGraphNode):
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
         return MetricflowGraphNodeDescriptor.get_instance(
             node_name=f"LocalModel({self.model_id})",
-            cluster_name=self.model_id.cluster_name,
+            cluster_name=ClusterNameFactory.get_name_for_model(self.model_id),
         )
 
     @override
@@ -166,8 +164,8 @@ class LocalModelNode(SemanticGraphNode):
 
     @override
     @cached_property
-    def recipe_update(self) -> AttributeRecipeUpdate:
-        return AttributeRecipeUpdate(
+    def recipe_step(self) -> QueryRecipeStep:
+        return QueryRecipeStep(
             join_model=self.model_id,
         )
 
@@ -185,7 +183,7 @@ class TimeDimensionNode(SemanticGraphNode):
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
         return MetricflowGraphNodeDescriptor.get_instance(
             node_name=f"TimeDimension({self.dimension_name})",
-            cluster_name=ClusterName.TIME,
+            cluster_name=ClusterNameFactory.TIME,
         )
 
     @property
@@ -194,8 +192,8 @@ class TimeDimensionNode(SemanticGraphNode):
 
     @override
     @cached_property
-    def recipe_update(self) -> AttributeRecipeUpdate:
-        return AttributeRecipeUpdate(
+    def recipe_step(self) -> QueryRecipeStep:
+        return QueryRecipeStep(
             add_dunder_name_element=self.dimension_name,
             set_element_type=LinkableElementType.TIME_DIMENSION,
         )
@@ -212,7 +210,7 @@ class MetricTimeNode(SemanticGraphNode):
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
         return MetricflowGraphNodeDescriptor.get_instance(
             node_name="MetricTime",
-            cluster_name=ClusterName.TIME,
+            cluster_name=ClusterNameFactory.TIME,
         )
 
     @property
@@ -226,8 +224,8 @@ class MetricTimeNode(SemanticGraphNode):
 
     @override
     @cached_property
-    def recipe_update(self) -> AttributeRecipeUpdate:
-        return AttributeRecipeUpdate(
+    def recipe_step(self) -> QueryRecipeStep:
+        return QueryRecipeStep(
             add_dunder_name_element=METRIC_TIME_ELEMENT_NAME,
             add_properties=(LinkableElementProperty.METRIC_TIME,),
             set_element_type=LinkableElementType.TIME_DIMENSION,
@@ -272,7 +270,7 @@ class TimeEntityNode(SemanticGraphNode):
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
         return MetricflowGraphNodeDescriptor.get_instance(
             node_name="TimeEntity",
-            cluster_name=ClusterName.TIME,
+            cluster_name=ClusterNameFactory.TIME,
         )
 
     @override
@@ -302,8 +300,8 @@ class MetricNode(SemanticGraphNode, ABC):
 
     @override
     @property
-    def recipe_update(self) -> AttributeRecipeUpdate:
-        return AttributeRecipeUpdate(
+    def recipe_step(self) -> QueryRecipeStep:
+        return QueryRecipeStep(
             add_dunder_name_element=self.metric_name,
         )
 
@@ -318,7 +316,7 @@ class BaseMetricNode(MetricNode):
     @override
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
         return MetricflowGraphNodeDescriptor.get_instance(
-            node_name=f"BaseMetric({self.metric_name})", cluster_name=ClusterName.METRIC
+            node_name=f"BaseMetric({self.metric_name})", cluster_name=ClusterNameFactory.METRIC
         )
 
     @override
@@ -339,7 +337,7 @@ class DerivedMetricNode(MetricNode):
     @override
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
         return MetricflowGraphNodeDescriptor.get_instance(
-            node_name=f"DerivedMetric({self.metric_name})", cluster_name=ClusterName.METRIC
+            node_name=f"DerivedMetric({self.metric_name})", cluster_name=ClusterNameFactory.METRIC
         )
 
     @override
@@ -367,7 +365,7 @@ class KeyEntityNode(SemanticGraphNode):
     @override
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
         return MetricflowGraphNodeDescriptor.get_instance(
-            node_name=f"KeyEntity({self.dsi_entity_name})", cluster_name=ClusterName.KEY
+            node_name=f"KeyEntity({self.dsi_entity_name})", cluster_name=ClusterNameFactory.KEY
         )
 
     @override

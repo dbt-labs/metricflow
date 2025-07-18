@@ -12,13 +12,13 @@ from dbt_semantic_interfaces.type_enums import EntityType, TimeGranularity
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple, T
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item
-from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException
-from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
-from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
-from metricflow_semantics.experimental.semantic_graph.model_object_lookup import (
+from metricflow_semantics.experimental.dsi.model_object_lookup import (
     MeasureContainingModelObjectLookup,
     SemanticModelObjectLookup,
 )
+from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException
+from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
+from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.experimental.singleton_decorator import singleton_dataclass
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity

@@ -13,12 +13,12 @@ from metricflow_semantics.experimental.mf_graph.formatting.dot_attributes import
 )
 from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
 from metricflow_semantics.experimental.mf_graph.node_descriptor import MetricflowGraphNodeDescriptor
-from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
-from metricflow_semantics.experimental.semantic_graph.attribute_computation import (
-    AttributeRecipeUpdate,
+from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, OrderedSet
+from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe_update import (
+    QueryRecipeStep,
 )
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
-from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
+from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import (
     GroupByAttributeLabel,
     GroupByMetricLabel,
     KeyAttributeLabel,
@@ -26,10 +26,8 @@ from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
     MeasureLabel,
     TimeClusterLabel,
 )
-from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
-    SemanticGraphNode,
-)
-from metricflow_semantics.experimental.semantic_graph.sg_constant import ClusterName
+from metricflow_semantics.experimental.semantic_graph.sg_constant import ClusterNameFactory
+from metricflow_semantics.experimental.semantic_graph.sg_interfaces import SemanticGraphNode
 from metricflow_semantics.experimental.singleton_decorator import singleton_dataclass
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
@@ -59,13 +57,13 @@ class AttributeNode(SemanticGraphNode, ABC):
 
     @override
     @cached_property
-    def labels(self) -> FrozenOrderedSet[MetricflowGraphLabel]:
+    def labels(self) -> OrderedSet[MetricflowGraphLabel]:
         return FrozenOrderedSet((GroupByAttributeLabel(),))
 
     @override
     @cached_property
-    def recipe_update(self) -> AttributeRecipeUpdate:
-        return AttributeRecipeUpdate(
+    def recipe_step(self) -> QueryRecipeStep:
+        return QueryRecipeStep(
             add_dunder_name_element=self.attribute_name,
         )
 
@@ -104,7 +102,7 @@ class TimeAttributeNode(AttributeNode):
 
     @override
     @cached_property
-    def labels(self) -> FrozenOrderedSet[MetricflowGraphLabel]:
+    def labels(self) -> OrderedSet[MetricflowGraphLabel]:
         return super(TimeAttributeNode, self).labels.union((TimeClusterLabel.get_instance(),))
 
 
@@ -124,7 +122,8 @@ class MeasureNode(AttributeNode):
     @cached_property
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
         return MetricflowGraphNodeDescriptor.get_instance(
-            node_name=f"Measure({self.attribute_name})", cluster_name=self.source_model_id.cluster_name
+            node_name=f"Measure({self.attribute_name})",
+            cluster_name=ClusterNameFactory.get_name_for_model(self.source_model_id),
         )
 
     @override
@@ -141,23 +140,8 @@ class MeasureNode(AttributeNode):
 
     @override
     @cached_property
-    def recipe_update(self) -> AttributeRecipeUpdate:
-        # return AttributeComputationUpdate(
-        #     derived_from_model_id_additions=(self.model_id,),
-        # )
-        return AttributeRecipeUpdate(join_model=self.source_model_id)
-
-    # @override
-    # def pretty_format(self, format_context: PrettyFormatContext) -> Optional[str]:
-    #     formatter = MetricFlowPrettyFormatter(
-    #         format_option=format_context.formatter.format_option.merge(
-    #             PrettyFormatOption(include_underscore_prefix_fields=True)
-    #         )
-    #     )
-    #     return formatter.pretty_format_object_by_parts(
-    #         class_name=self.__class__.__name__,
-    #         field_mapping=dataclasses.asdict(self),
-    #     )
+    def recipe_step(self) -> QueryRecipeStep:
+        return QueryRecipeStep(join_model=self.source_model_id)
 
 
 @singleton_dataclass(order=False)
@@ -171,13 +155,13 @@ class KeyAttributeNode(AttributeNode):
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
         return MetricflowGraphNodeDescriptor.get_instance(
             node_name=f"KeyAttribute({self.attribute_name})",
-            cluster_name=ClusterName.KEY,
+            cluster_name=ClusterNameFactory.KEY,
         )
 
     @override
     @cached_property
-    def recipe_update(self) -> AttributeRecipeUpdate:
-        return AttributeRecipeUpdate(
+    def recipe_step(self) -> QueryRecipeStep:
+        return QueryRecipeStep(
             add_dunder_name_element=self.attribute_name,
             add_properties=(LinkableElementProperty.ENTITY,),
             set_element_type=LinkableElementType.ENTITY,
@@ -185,7 +169,7 @@ class KeyAttributeNode(AttributeNode):
 
     @override
     @cached_property
-    def labels(self) -> FrozenOrderedSet[MetricflowGraphLabel]:
+    def labels(self) -> OrderedSet[MetricflowGraphLabel]:
         return super(KeyAttributeNode, self).labels.union(
             (KeyEntityClusterLabel.get_instance(), KeyAttributeLabel.get_instance())
         )
@@ -197,13 +181,13 @@ class CategoricalDimensionAttributeNode(AttributeNode):
     @override
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
         return MetricflowGraphNodeDescriptor.get_instance(
-            node_name=f"Dimension({self.attribute_name})", cluster_name=ClusterName.DIMENSION
+            node_name=f"Dimension({self.attribute_name})", cluster_name=ClusterNameFactory.DIMENSION
         )
 
     @override
     @property
-    def recipe_update(self) -> AttributeRecipeUpdate:
-        return AttributeRecipeUpdate(
+    def recipe_step(self) -> QueryRecipeStep:
+        return QueryRecipeStep(
             add_dunder_name_element=self.attribute_name,
             set_element_type=LinkableElementType.DIMENSION,
         )
@@ -219,13 +203,13 @@ class GroupByMetricNode(AttributeNode):
     @override
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
         return MetricflowGraphNodeDescriptor.get_instance(
-            node_name=f"GroupByMetric({self.attribute_name})", cluster_name=ClusterName.KEY
+            node_name=f"GroupByMetric({self.attribute_name})", cluster_name=ClusterNameFactory.KEY
         )
 
     @override
     @cached_property
-    def recipe_update(self) -> AttributeRecipeUpdate:
-        return AttributeRecipeUpdate(
+    def recipe_step(self) -> QueryRecipeStep:
+        return QueryRecipeStep(
             add_dunder_name_element=self.attribute_name,
             # derived_from_model_id_additions=tuple(self.source_semantic_models),
             add_properties=(LinkableElementProperty.METRIC,),
@@ -234,7 +218,7 @@ class GroupByMetricNode(AttributeNode):
 
     @override
     @cached_property
-    def labels(self) -> FrozenOrderedSet[MetricflowGraphLabel]:
+    def labels(self) -> OrderedSet[MetricflowGraphLabel]:
         return super(GroupByMetricNode, self).labels.union(
             (
                 GroupByAttributeLabel.get_instance(),

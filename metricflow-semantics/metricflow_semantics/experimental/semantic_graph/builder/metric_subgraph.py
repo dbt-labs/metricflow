@@ -12,26 +12,31 @@ from typing_extensions import override
 from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException
 from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
-from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeRecipeUpdate
-from metricflow_semantics.experimental.semantic_graph.builder.graph_change_rule import (
+from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe_update import (
+    QueryRecipeStep,
+)
+from metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator import (
     SemanticSubgraphGenerator,
     SubgraphGeneratorArgumentSet,
 )
-from metricflow_semantics.experimental.semantic_graph.edges.entity_relationship import MetricDefinitionEdge
+from metricflow_semantics.experimental.semantic_graph.edges.sg_edges import MetricDefinitionEdge
 from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import MeasureNode
 from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import (
     BaseMetricNode,
     DerivedMetricNode,
     MetricNode,
 )
-from metricflow_semantics.experimental.semantic_graph.nodes.node_label import (
+from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import (
     CumulativeMeasureLabel,
     DenyDatePartLabel,
     DenyEntityKeyQueryResolutionLabel,
     DenyVisibleAttributesLabel,
 )
-from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import SemanticGraphNode
-from metricflow_semantics.experimental.semantic_graph.semantic_graph import MutableSemanticGraph, SemanticGraph
+from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
+    MutableSemanticGraph,
+    SemanticGraph,
+    SemanticGraphNode,
+)
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 
 logger = logging.getLogger(__name__)
@@ -77,7 +82,7 @@ class MetricSubgraphGenerator(SemanticSubgraphGenerator):
         base_metric: Metric,
         metric_name_to_node: dict[str, SemanticGraphNode],
     ) -> None:
-        recipe_update = AttributeRecipeUpdate()
+        recipe_update = QueryRecipeStep()
         metric_type = base_metric.type
 
         measure_name_to_labels_for_metric_to_measure_edge: dict[str, FrozenOrderedSet[MetricflowGraphLabel]] = {}
@@ -92,7 +97,7 @@ class MetricSubgraphGenerator(SemanticSubgraphGenerator):
                 )
             )
         elif metric_type is MetricType.CUMULATIVE:
-            recipe_update = AttributeRecipeUpdate(set_deny_date_part=True)
+            recipe_update = QueryRecipeStep(set_deny_date_part=True)
             if base_metric.type_params.cumulative_type_params and (
                 base_metric.type_params.cumulative_type_params.window is not None
                 or base_metric.type_params.cumulative_type_params.grain_to_date is not None
@@ -216,10 +221,10 @@ class MetricSubgraphGenerator(SemanticSubgraphGenerator):
             assert_values_exhausted(metric_type)
 
     @override
-    def generate_subgraph(self, current_graph: SemanticGraph) -> MutableSemanticGraph:
+    def generate_subgraph(self, predecessor_graph: SemanticGraph) -> MutableSemanticGraph:
         current_subgraph = MutableSemanticGraph.create()
         if self._verbose_debug_logs:
-            logger.debug(LazyFormat("Starting with graph", current_graph=current_graph))
+            logger.debug(LazyFormat("Starting with graph", current_graph=predecessor_graph))
 
         for metric in self._manifest_object_lookup.get_metrics():
             self._add_elements_for_any_metric(

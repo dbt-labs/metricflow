@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 
 from _pytest.fixtures import FixtureRequest
+from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.experimental.semantic_graph.builder.entity_join_subgraph import EntityJoinSubgraphGenerator
 from metricflow_semantics.experimental.semantic_graph.builder.group_by_metric_subgraph import (
     GroupByMetricSubgraphGenerator,
@@ -10,7 +11,6 @@ from metricflow_semantics.experimental.semantic_graph.builder.group_by_metric_su
 from metricflow_semantics.experimental.semantic_graph.builder.measure_attribute_subgraph import (
     MeasureAttributeSubgraphGenerator,
 )
-from metricflow_semantics.experimental.semantic_graph.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from tests_metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator.conftest import (

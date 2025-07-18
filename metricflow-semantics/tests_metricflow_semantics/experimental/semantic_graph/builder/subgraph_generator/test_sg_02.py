@@ -6,23 +6,20 @@ from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.references import MeasureReference
+from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
+from metricflow_semantics.experimental.mf_graph.path_finding.path_finder import (
+    MetricflowGraphPathFinder,
+)
+from metricflow_semantics.experimental.mf_graph.path_finding.path_finder_cache import PathFinderCache
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
     AttributeRecipeWriterPath,
 )
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.key_query_resolver import (
-    DsiEntityKeyQueryResolver,
+    EntityKeyQueryResolver,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.graph_builder import SemanticGraphBuilder
-from metricflow_semantics.experimental.semantic_graph.builder.graph_change_rule import SubgraphGeneratorArgumentSet
-from metricflow_semantics.experimental.semantic_graph.manifest_object_lookup import ManifestObjectLookup
-from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
-    SemanticGraphEdge,
-    SemanticGraphNode,
-)
-from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder import (
-    MetricflowGraphPathFinder,
-)
-from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_cache import PathFinderCache
+from metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator import SubgraphGeneratorArgumentSet
+from metricflow_semantics.experimental.semantic_graph.sg_interfaces import SemanticGraphEdge, SemanticGraphNode
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
@@ -208,8 +205,8 @@ def test_resolver_outputs(
     # LinkableSpecResolverTester.compare_resolver_outputs_for_measures(simple_semantic_manifest, measure_name="bookings")
     tester = LinkableSpecResolverTester(simple_semantic_manifest)
     # tester.compare_resolver_outputs_for_all_metric_pairs()
-    tester.compare_resolver_outputs_for_all_metrics()
-    # tester.compare_resolver_outputs_for_single_measure(MeasureReference("bookings"))
+    # tester.compare_resolver_outputs_for_all_metrics()
+    tester.compare_resolver_outputs_for_a_measure(MeasureReference("bookings"))
 
     # tester.compare_resolver_outputs_for_single_metric(
     #     MetricReference("booking_fees_last_week_per_booker_this_week"),
@@ -281,7 +278,7 @@ def test_key_query_resolver(sg_02_single_join_manifest: PydanticSemanticManifest
     )
     semantic_graph = builder.build()
 
-    key_query_resolver = DsiEntityKeyQueryResolver()
+    key_query_resolver = EntityKeyQueryResolver()
 
     result = key_query_resolver.find_key_query_groups(
         semantic_graph=semantic_graph,

@@ -17,15 +17,15 @@ ModelIdTuple = AnyLengthTuple[SemanticModelId]
 KeyQueryTuple = AnyLengthTuple[DsiEntityKeyQuery]
 
 
-class DsiEntityKeyQueryGrouper:
+class KeyQueryGrouper:
     def __init__(self) -> None:
         self._model_id_tuple_to_key_queries: dict[ModelIdTuple, list[DsiEntityKeyQuery]] = defaultdict(list)
 
     def add(self, key_query: DsiEntityKeyQuery, source_model_ids: ModelIdTuple) -> None:
         self._model_id_tuple_to_key_queries[source_model_ids].append(key_query)
 
-    def group(self) -> DsiEntityKeyQueryGroup:
-        return DsiEntityKeyQueryGroup(
+    def group(self) -> KeyQueryGroup:
+        return KeyQueryGroup(
             pairs_of_model_id_tuple_and_key_query_tuple=tuple(
                 (model_id_tuple, tuple(key_queries))
                 for model_id_tuple, key_queries in self._model_id_tuple_to_key_queries.items()
@@ -34,7 +34,7 @@ class DsiEntityKeyQueryGrouper:
 
 
 @fast_frozen_dataclass()
-class DsiEntityKeyQueryGroup:
+class KeyQueryGroup:
     pairs_of_model_id_tuple_and_key_query_tuple: AnyLengthTuple[
         Pair[
             AnyLengthTuple[SemanticModelId],
@@ -45,13 +45,13 @@ class DsiEntityKeyQueryGroup:
     @staticmethod
     def create(
         model_id_set_by_key_query: Mapping[DsiEntityKeyQuery, OrderedSet[SemanticModelId]],
-    ) -> DsiEntityKeyQueryGroup:
+    ) -> KeyQueryGroup:
         model_id_tuple_to_key_queries: dict[ModelIdTuple, list[DsiEntityKeyQuery]] = defaultdict(list)
 
         for key_query, model_id_set in model_id_set_by_key_query.items():
             model_id_tuple_to_key_queries[tuple(model_id_set)].append(key_query)
 
-        return DsiEntityKeyQueryGroup(
+        return KeyQueryGroup(
             pairs_of_model_id_tuple_and_key_query_tuple=tuple(
                 (model_id_tuple, tuple(key_queries))
                 for model_id_tuple, key_queries in model_id_tuple_to_key_queries.items()
@@ -59,10 +59,10 @@ class DsiEntityKeyQueryGroup:
         )
 
     @staticmethod
-    def intersection(key_query_groups: Sequence[DsiEntityKeyQueryGroup]) -> DsiEntityKeyQueryGroup:
+    def intersection(key_query_groups: Sequence[KeyQueryGroup]) -> KeyQueryGroup:
         group_count = len(key_query_groups)
         if group_count == 0:
-            return DsiEntityKeyQueryGroup()
+            return KeyQueryGroup()
 
         if group_count == 1:
             return key_query_groups[0]
@@ -96,17 +96,17 @@ class DsiEntityKeyQueryGroup:
                     if key_query in common_key_queries:
                         model_id_set_by_key_query[key_query].update(model_id_set)
 
-        return DsiEntityKeyQueryGroup.create(
+        return KeyQueryGroup.create(
             model_id_set_by_key_query=model_id_set_by_key_query,
         )
 
-    def filter_by_key_name(self, key_name: str) -> DsiEntityKeyQueryGroup:
+    def filter_by_key_name(self, key_name: str) -> KeyQueryGroup:
         pairs_with_matching_key_name = tuple(
             (model_id_tuple, tuple(key_query for key_query in key_query_tuple if key_query[-1] == key_name))
             for model_id_tuple, key_query_tuple in self.pairs_of_model_id_tuple_and_key_query_tuple
         )
         pairs_with_empty_key_queries_removed = tuple(pair for pair in pairs_with_matching_key_name if pair[1])
-        return DsiEntityKeyQueryGroup(
+        return KeyQueryGroup(
             pairs_of_model_id_tuple_and_key_query_tuple=pairs_with_empty_key_queries_removed,
         )
 
@@ -126,8 +126,8 @@ class DsiEntityKeyQueryGroup:
             for key_query in key_query_tuple
         )
 
-    def with_common_source_models(self, source_model_ids: AnyLengthTuple[SemanticModelId]) -> DsiEntityKeyQueryGroup:
-        return DsiEntityKeyQueryGroup(
+    def with_common_source_models(self, source_model_ids: AnyLengthTuple[SemanticModelId]) -> KeyQueryGroup:
+        return KeyQueryGroup(
             pairs_of_model_id_tuple_and_key_query_tuple=tuple(
                 (model_ids + source_model_ids, key_queries)
                 for model_ids, key_queries in self.pairs_of_model_id_tuple_and_key_query_tuple

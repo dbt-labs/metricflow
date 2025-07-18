@@ -4,18 +4,18 @@ import logging
 
 from typing_extensions import override
 
-from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeRecipeUpdate
-from metricflow_semantics.experimental.semantic_graph.builder.graph_change_rule import (
+from metricflow_semantics.experimental.dsi.model_object_lookup import (
+    MeasureContainingModelObjectLookup,
+)
+from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe_update import (
+    QueryRecipeStep,
+)
+from metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator import (
     SemanticSubgraphGenerator,
     SubgraphGeneratorArgumentSet,
 )
-from metricflow_semantics.experimental.semantic_graph.edges.entity_relationship import (
-    EntityRelationshipEdge,
-)
+from metricflow_semantics.experimental.semantic_graph.edges.sg_edges import EntityRelationshipEdge
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
-from metricflow_semantics.experimental.semantic_graph.model_object_lookup import (
-    MeasureContainingModelObjectLookup,
-)
 from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import (
     MeasureNode,
 )
@@ -24,7 +24,7 @@ from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import (
     LocalModelNode,
     MetricTimeNode,
 )
-from metricflow_semantics.experimental.semantic_graph.semantic_graph import MutableSemanticGraph, SemanticGraph
+from metricflow_semantics.experimental.semantic_graph.sg_interfaces import MutableSemanticGraph, SemanticGraph
 
 logger = logging.getLogger(__name__)
 
@@ -69,7 +69,7 @@ class MeasureAttributeSubgraphGenerator(SemanticSubgraphGenerator):
                     EntityRelationshipEdge.get_instance(
                         tail_node=measure_node,
                         head_node=metric_time_node,
-                        recipe_update=AttributeRecipeUpdate(
+                        recipe_update=QueryRecipeStep(
                             add_min_time_grain=aggregation_configuration.time_grain,
                         ),
                     )
@@ -85,7 +85,7 @@ class MeasureAttributeSubgraphGenerator(SemanticSubgraphGenerator):
         return current_subgraph
 
     @override
-    def generate_subgraph(self, current_graph: SemanticGraph) -> MutableSemanticGraph:
+    def generate_subgraph(self, predecessor_graph: SemanticGraph) -> MutableSemanticGraph:
         current_subgraph = MutableSemanticGraph.create()
         for lookup in self._manifest_object_lookup.measure_containing_model_lookups:
             current_subgraph.update(self._generate_subgraph_for_measure_containing_model(lookup))

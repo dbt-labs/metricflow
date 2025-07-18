@@ -13,24 +13,24 @@ from metricflow_semantics.experimental.mf_graph.mf_graph import (
     MetricflowGraph,
 )
 from metricflow_semantics.experimental.mf_graph.mutable_graph import EdgeT, NodeT
-from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
-from metricflow_semantics.experimental.semantic_graph.path_finding.graph_path import PathT
-from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_cache import (
+from metricflow_semantics.experimental.mf_graph.path_finding.graph_path import MutablePathT
+from metricflow_semantics.experimental.mf_graph.path_finding.path_finder_cache import (
     FindCommonReachableTargetsCacheKey,
     PathFinderCache,
 )
-from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_result import (
+from metricflow_semantics.experimental.mf_graph.path_finding.path_finder_result import (
     FindCommonReachableTargetsResult,
     FindDescendantsResult,
     FindReachableTargetsResult,
     FindReachableTargetsSimpleResult,
 )
-from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_stat import MutablePathFinderStat
-from metricflow_semantics.experimental.semantic_graph.path_finding.traversal_event import (
+from metricflow_semantics.experimental.mf_graph.path_finding.path_finder_stat import MutablePathFinderStat
+from metricflow_semantics.experimental.mf_graph.path_finding.traversal_event import (
     WalkStopEvent,
     WalkStopReason,
 )
-from metricflow_semantics.experimental.semantic_graph.path_finding.weight_function import WeightFunction
+from metricflow_semantics.experimental.mf_graph.path_finding.weight_function import WeightFunction
+from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 
@@ -40,22 +40,22 @@ logger = logging.getLogger(__name__)
 EdgeWeightFunctionT = TypeVar("EdgeWeightFunctionT", bound="WeightFunction")
 
 
-class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
+class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, MutablePathT], ABC):
     def __init__(
         self,
-        path_finder_cache: PathFinderCache[NodeT, EdgeT, PathT],
+        path_finder_cache: PathFinderCache[NodeT, EdgeT, MutablePathT],
     ) -> None:
         self._path_finder_cache = path_finder_cache
 
         # Variables for `_traverse_dfs`.
         self._finished_visiting_nodes: MutableOrderedSet[NodeT] = MutableOrderedSet()
         self._node_visit_contexts: list[TraversalVisitContext] = []
-        self._mutable_path: Optional[PathT] = None
+        self._mutable_path: Optional[MutablePathT] = None
         self._current_stat = MutablePathFinderStat()
 
         self._verbose_debug_logs = False
 
-    def _current_mutable_path(self) -> PathT:
+    def _current_mutable_path(self) -> MutablePathT:
         if self._mutable_path is None:
             raise RuntimeError("`_mutable_path` should have been set before calling this method.")
         return self._mutable_path
@@ -88,10 +88,10 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
     def find_descendant_nodes(
         self,
         graph: MetricflowGraph[NodeT, EdgeT],
-        mutable_path: PathT,
+        mutable_path: MutablePathT,
         source_node: NodeT,
         candidate_target_nodes: Set[NodeT],
-        weight_function: WeightFunction[NodeT, EdgeT, PathT],
+        weight_function: WeightFunction[NodeT, EdgeT, MutablePathT],
         max_path_weight: int,
     ) -> FindDescendantsResult[NodeT]:
         start_stat = self._current_stat.copy()
@@ -117,10 +117,10 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
     def find_reachable_targets_dfs(
         self,
         graph: MetricflowGraph[NodeT, EdgeT],
-        mutable_path: PathT,
+        mutable_path: MutablePathT,
         source_node: NodeT,
         candidate_target_nodes: Set[NodeT],
-        weight_function: WeightFunction[NodeT, EdgeT, PathT],
+        weight_function: WeightFunction[NodeT, EdgeT, MutablePathT],
         max_path_weight: int,
     ) -> FindReachableTargetsSimpleResult[NodeT]:
         start_stat = self._current_stat.copy()
@@ -148,24 +148,31 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
         self,
         source_node: NodeT,
         graph: MetricflowGraph[NodeT, EdgeT],
-        traversable_nodes: Optional[OrderedSet[NodeT]],
+        node_allow_set: Optional[OrderedSet[NodeT]],
+        node_deny_set: Optional[OrderedSet[NodeT]],
     ) -> list[EdgeT]:
-        if traversable_nodes is None:
-            return list(graph.edges_with_tail_node(source_node))
-
-        return list(edge for edge in graph.edges_with_tail_node(source_node) if edge.head_node in traversable_nodes)
+        return list(
+            edge
+            for edge in graph.edges_with_tail_node(source_node)
+            if (
+                # In allow set.
+                (not node_allow_set or edge.head_node in node_allow_set)
+                # and not in deny set.
+                and (not node_deny_set or edge.head_node not in node_deny_set)
+            )
+        )
 
     def traverse_dfs(
         self,
         graph: MetricflowGraph[NodeT, EdgeT],
-        mutable_path: PathT,
+        mutable_path: MutablePathT,
         source_node: NodeT,
         target_nodes: Set[NodeT],
-        weight_function: WeightFunction[NodeT, EdgeT, PathT],
+        weight_function: WeightFunction[NodeT, EdgeT, MutablePathT],
         max_path_weight: int,
         allow_node_revisits: bool,
-        # allow_simple_cycle: bool,
-        allowed_nodes: Optional[OrderedSet[NodeT]] = None,
+        node_allow_set: Optional[OrderedSet[NodeT]] = None,
+        node_deny_set: Optional[OrderedSet[NodeT]] = None,
     ) -> Generator[WalkStopEvent, None, None]:
         # Visit the descendants in DFS, starting from the source node.
         mutable_path.reset_to_start_node(source_node)
@@ -180,7 +187,8 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
                 edges_to_process_from_this_node=self._filter_edges_from_node_by_traversable_nodes(
                     source_node=source_node,
                     graph=graph,
-                    traversable_nodes=allowed_nodes,
+                    node_allow_set=node_allow_set,
+                    node_deny_set=node_deny_set,
                 ),
             )
         ]
@@ -196,7 +204,8 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
                     weight_function=weight_function,
                     max_path_weight=max_path_weight,
                     allow_node_revisits=allow_node_revisits,
-                    traversable_nodes=allowed_nodes,
+                    node_allow_set=node_allow_set,
+                    node_deny_set=node_deny_set,
                 )
             )
 
@@ -346,7 +355,8 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
                 edges_to_visit=self._filter_edges_from_node_by_traversable_nodes(
                     source_node=next_edge_to_take.head_node,
                     graph=graph,
-                    traversable_nodes=allowed_nodes,
+                    node_allow_set=node_allow_set,
+                    node_deny_set=node_deny_set,
                 ),
             )
 
@@ -355,10 +365,10 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
     def find_common_reachable_targets(
         self,
         graph: MetricflowGraph[NodeT, EdgeT],
-        mutable_path: PathT,
+        mutable_path: MutablePathT,
         source_nodes: FrozenOrderedSet[NodeT],
         candidate_target_nodes: FrozenOrderedSet[NodeT],
-        weight_function: WeightFunction[NodeT, EdgeT, PathT],
+        weight_function: WeightFunction[NodeT, EdgeT, MutablePathT],
         max_path_weight: int,
     ) -> FindCommonReachableTargetsResult[NodeT]:
         cache = self._path_finder_cache.find_common_reachable_targets_cache
@@ -390,10 +400,10 @@ class MetricflowGraphPathFinder(Generic[NodeT, EdgeT, PathT], ABC):
     def _find_common_reachable_targets_non_cached(
         self,
         graph: MetricflowGraph[NodeT, EdgeT],
-        mutable_path: PathT,
+        mutable_path: MutablePathT,
         source_nodes: FrozenOrderedSet[NodeT],
         candidate_target_nodes: FrozenOrderedSet[NodeT],
-        weight_function: WeightFunction[NodeT, EdgeT, PathT],
+        weight_function: WeightFunction[NodeT, EdgeT, MutablePathT],
         max_path_weight: int,
     ) -> FindCommonReachableTargetsResult[NodeT]:
         common_reachable_targets = MutableOrderedSet[NodeT]()

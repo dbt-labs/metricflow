@@ -4,21 +4,18 @@ import logging
 from typing import Iterable, Type
 
 from _pytest.fixtures import FixtureRequest
+from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
+from metricflow_semantics.experimental.mf_graph.path_finding.path_finder import MetricflowGraphPathFinder
+from metricflow_semantics.experimental.mf_graph.path_finding.path_finder_cache import PathFinderCache
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
     AttributeRecipeWriterPath,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.graph_builder import SemanticGraphBuilder
-from metricflow_semantics.experimental.semantic_graph.builder.graph_change_rule import (
+from metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator import (
     SemanticSubgraphGenerator,
     SubgraphGeneratorArgumentSet,
 )
-from metricflow_semantics.experimental.semantic_graph.manifest_object_lookup import ManifestObjectLookup
-from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
-    SemanticGraphEdge,
-    SemanticGraphNode,
-)
-from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder import MetricflowGraphPathFinder
-from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_cache import PathFinderCache
+from metricflow_semantics.experimental.semantic_graph.sg_interfaces import SemanticGraphEdge, SemanticGraphNode
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.svg_snapshot import write_svg_snapshot_for_review
 

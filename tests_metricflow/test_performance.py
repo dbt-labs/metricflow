@@ -249,7 +249,7 @@ def test_sg_run_explain_one_saved_query(  # noqa: D103
     saved_query_name = "sq_act_trigger_dashboard_export_ytd_subregion_metrics_wo_sales"
 
     with log_block_runtime("Engine Init"):
-        manifest_lookup = SemanticManifestLookup(semantic_manifest)
+        manifest_lookup = SemanticManifestLookup(semantic_manifest, use_semantic_graph=False)
         mf_engine = MetricFlowEngine(
             semantic_manifest_lookup=manifest_lookup,
             sql_client=sql_client,
@@ -277,7 +277,7 @@ def test_sg_run_explain_many_saved_queries(  # noqa: D103
     semantic_manifest = _create_manifest(conf_source)
 
     with log_block_runtime("Engine Init"):
-        manifest_lookup = SemanticManifestLookup(semantic_manifest)
+        manifest_lookup = SemanticManifestLookup(semantic_manifest, use_semantic_graph=True)
         mf_engine = MetricFlowEngine(
             semantic_manifest_lookup=manifest_lookup,
             sql_client=sql_client,

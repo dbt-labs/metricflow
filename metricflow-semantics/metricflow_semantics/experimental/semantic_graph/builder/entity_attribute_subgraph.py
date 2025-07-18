@@ -4,8 +4,13 @@ import logging
 
 from typing_extensions import override
 
-from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeRecipeUpdate
-from metricflow_semantics.experimental.semantic_graph.builder.graph_change_rule import (
+from metricflow_semantics.experimental.dsi.model_object_lookup import (
+    SemanticModelObjectLookup,
+)
+from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe_update import (
+    QueryRecipeStep,
+)
+from metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator import (
     SemanticSubgraphGenerator,
     SubgraphGeneratorArgumentSet,
 )
@@ -13,11 +18,8 @@ from metricflow_semantics.experimental.semantic_graph.edges.entity_attribute imp
     AttributeEdgeType,
     EntityAttributeEdge,
 )
-from metricflow_semantics.experimental.semantic_graph.edges.entity_relationship import EntityRelationshipEdge
+from metricflow_semantics.experimental.semantic_graph.edges.sg_edges import EntityRelationshipEdge
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
-from metricflow_semantics.experimental.semantic_graph.model_object_lookup import (
-    SemanticModelObjectLookup,
-)
 from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import (
     KeyAttributeNode,
 )
@@ -26,7 +28,7 @@ from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import (
     KeyEntityNode,
     LocalModelNode,
 )
-from metricflow_semantics.experimental.semantic_graph.semantic_graph import MutableSemanticGraph, SemanticGraph
+from metricflow_semantics.experimental.semantic_graph.sg_interfaces import MutableSemanticGraph, SemanticGraph
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +51,7 @@ class EntityAttributeSubgraphGenerator(SemanticSubgraphGenerator):
         model_id = SemanticModelId(model_name=lookup.semantic_model.name)
         semantic_model_node = JoinedModelNode.get_instance(model_id)
         local_semantic_model_node = LocalModelNode.get_instance(model_id)
-        recipe_update = AttributeRecipeUpdate(join_model=model_id)
+        recipe_update = QueryRecipeStep(join_model=model_id)
 
         for entity in lookup.semantic_model.entities:
             key_entity_node = KeyEntityNode.get_instance(entity.name)
@@ -80,7 +82,7 @@ class EntityAttributeSubgraphGenerator(SemanticSubgraphGenerator):
         return current_subgraph
 
     @override
-    def generate_subgraph(self, current_graph: SemanticGraph) -> MutableSemanticGraph:
+    def generate_subgraph(self, predecessor_graph: SemanticGraph) -> MutableSemanticGraph:
         current_subgraph = MutableSemanticGraph.create()
         for lookup in self._manifest_object_lookup.model_object_lookups:
             current_subgraph.update(self._get_subgraph_for_model(lookup))

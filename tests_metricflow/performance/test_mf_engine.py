@@ -11,20 +11,17 @@ from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.transformations.semantic_manifest_transformer import PydanticSemanticManifestTransformer
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
+from metricflow_semantics.experimental.dsi.manifest_object_lookup import (
+    ManifestObjectLookup as NewManifestObjectLookup,
+)
+from metricflow_semantics.experimental.mf_graph.path_finding.path_finder import MetricflowGraphPathFinder
+from metricflow_semantics.experimental.mf_graph.path_finding.path_finder_cache import PathFinderCache
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
     AttributeRecipeWriterPath,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.graph_builder import SemanticGraphBuilder
-from metricflow_semantics.experimental.semantic_graph.builder.graph_change_rule import SubgraphGeneratorArgumentSet
-from metricflow_semantics.experimental.semantic_graph.manifest_object_lookup import (
-    ManifestObjectLookup as NewManifestObjectLookup,
-)
-from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
-    SemanticGraphEdge,
-    SemanticGraphNode,
-)
-from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder import MetricflowGraphPathFinder
-from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_cache import PathFinderCache
+from metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator import SubgraphGeneratorArgumentSet
+from metricflow_semantics.experimental.semantic_graph.sg_interfaces import SemanticGraphEdge, SemanticGraphNode
 from metricflow_semantics.experimental.singleton_decorator import singleton_dataclass
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.runtime import log_block_runtime

@@ -7,8 +7,8 @@ from typing import Generic
 
 from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
 from metricflow_semantics.experimental.mf_graph.mutable_graph import NodeT
+from metricflow_semantics.experimental.mf_graph.path_finding.path_finder_stat import PathFinderStat
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
-from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_stat import PathFinderStat
 
 logger = logging.getLogger(__name__)
 

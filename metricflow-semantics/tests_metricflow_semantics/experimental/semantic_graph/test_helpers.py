@@ -2,11 +2,16 @@ from __future__ import annotations
 
 import difflib
 import logging
-from typing import Optional, Sequence, Set
+import time
+from typing import ContextManager, Iterable, Optional, Sequence, Set, Type
 
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.references import MeasureReference, MetricReference
-from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
+from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple, ExceptionTracebackAnyType
+from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
+from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
+from metricflow_semantics.experimental.mf_graph.path_finding.path_finder import MetricflowGraphPathFinder
+from metricflow_semantics.experimental.mf_graph.path_finding.path_finder_cache import PathFinderCache
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
     AttributeRecipeWriterPath,
 )
@@ -14,14 +19,8 @@ from metricflow_semantics.experimental.semantic_graph.attribute_resolution.sg_li
     SemanticGraphLinkableSpecResolver,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.graph_builder import SemanticGraphBuilder
-from metricflow_semantics.experimental.semantic_graph.builder.graph_change_rule import SubgraphGeneratorArgumentSet
-from metricflow_semantics.experimental.semantic_graph.manifest_object_lookup import ManifestObjectLookup
-from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
-    SemanticGraphEdge,
-    SemanticGraphNode,
-)
-from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder import MetricflowGraphPathFinder
-from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_cache import PathFinderCache
+from metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator import SubgraphGeneratorArgumentSet
+from metricflow_semantics.experimental.semantic_graph.sg_interfaces import SemanticGraphEdge, SemanticGraphNode
 from metricflow_semantics.helpers.table_helpers import IsolatedTabulateRunner
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
@@ -95,6 +94,7 @@ class LinkableSpecResolverTester:
             for second_index in range(metric_count):
                 test_cases.append((self._metric_references[first_index], self._metric_references[second_index]))
 
+        resolution_times: list[ResolutionTime] = []
         for test_case in test_cases:
             logger.debug(
                 LazyFormat(
@@ -102,7 +102,18 @@ class LinkableSpecResolverTester:
                     test_case=test_case,
                 )
             )
-            self.compare_resolver_outputs(metric_references=test_case, element_filter=element_filter)
+            resolution_times.append(
+                self.compare_resolver_outputs(metric_references=test_case, element_filter=element_filter)
+            )
+
+        cumulative_time = ResolutionTime.sum(resolution_times)
+        logger.debug(
+            LazyFormat(
+                "Cumulative resolution time",
+                time_for_legacy_resolver=lambda: f"{cumulative_time.time_for_legacy_resolver:.2f}s",
+                time_for_sg_resolver=lambda: f"{cumulative_time.time_for_sg_resolver:.2f}s",
+            )
+        )
 
     def compare_resolver_outputs_for_single_metric(
         self, metric_reference: MetricReference, element_filter: LinkableElementFilter = LinkableElementFilter()
@@ -117,21 +128,39 @@ class LinkableSpecResolverTester:
     def compare_resolver_outputs_for_all_metrics(
         self, element_filter: LinkableElementFilter = LinkableElementFilter()
     ) -> None:
+        resolution_times: list[ResolutionTime] = []
         for metric_reference in self._metric_references:
-            self.compare_resolver_outputs(metric_references=(metric_reference,), element_filter=element_filter)
+            resolution_times.append(
+                self.compare_resolver_outputs(metric_references=(metric_reference,), element_filter=element_filter)
+            )
+
+        cumulative_time = ResolutionTime.sum(resolution_times)
+        logger.debug(
+            LazyFormat(
+                "Cumulative resolution time",
+                time_for_legacy_resolver=lambda: f"{cumulative_time.time_for_legacy_resolver:.2f}s",
+                time_for_sg_resolver=lambda: f"{cumulative_time.time_for_sg_resolver:.2f}s",
+            )
+        )
 
     def compare_resolver_outputs(
         self,
         metric_references: Sequence[MetricReference],
         element_filter: LinkableElementFilter = LinkableElementFilter(),
-    ) -> None:
+    ) -> ResolutionTime:
         logger.debug("Generating using legacy implementation")
-        legacy_linkable_element_set = self._legacy_resolver.get_linkable_elements_for_metrics(
-            metric_references, element_filter
-        )
+
+        with PerformanceTimer() as legacy_timer:
+            legacy_linkable_element_set = self._legacy_resolver.get_linkable_elements_for_metrics(
+                metric_references, element_filter
+            )
 
         logger.debug("Generating using semantic graph implementation")
-        sg_linkable_element_set = self._sg_resolver.get_linkable_elements_for_metrics(metric_references, element_filter)
+
+        with PerformanceTimer() as sg_timer:
+            sg_linkable_element_set = self._sg_resolver.get_linkable_elements_for_metrics(
+                metric_references, element_filter
+            )
 
         logger.debug(LazyFormat("Checking results", metric_references=metric_references, element_filter=element_filter))
 
@@ -141,6 +170,11 @@ class LinkableSpecResolverTester:
         )
 
         logger.debug(LazyFormat("Matched sets", metric_references=metric_references))
+
+        return ResolutionTime(
+            time_for_sg_resolver=sg_timer.total_time,
+            time_for_legacy_resolver=legacy_timer.total_time,
+        )
 
     def compare_resolver_outputs_for_a_measure(
         self,
@@ -267,6 +301,49 @@ class LinkableSpecResolverTester:
             significant_diff_lines="".join(significant_diff_lines),
             exclude_diff_prefixes="\n".join(exclude_diff_prefixes) if exclude_diff_prefixes is not None else None,
         ).evaluated_value
+
+
+@fast_frozen_dataclass()
+class ResolutionTime:
+    time_for_legacy_resolver: float
+    time_for_sg_resolver: float
+
+    @staticmethod
+    def sum(resolution_times: Iterable[ResolutionTime]) -> ResolutionTime:
+        total_time_for_legacy_resolver = sum(
+            resolution_time.time_for_legacy_resolver for resolution_time in resolution_times
+        )
+        total_time_for_sg_resolver = sum(resolution_time.time_for_sg_resolver for resolution_time in resolution_times)
+
+        return ResolutionTime(
+            time_for_legacy_resolver=total_time_for_legacy_resolver,
+            time_for_sg_resolver=total_time_for_sg_resolver,
+        )
+
+
+class PerformanceTimer(ContextManager["PerformanceTimer"]):
+    def __init__(self) -> None:
+        self._start_time: Optional[float] = None
+        self._total_time = 0.0
+
+    @property
+    def total_time(self) -> float:
+        return self._total_time
+
+    def __enter__(self) -> PerformanceTimer:
+        self._start_time = time.perf_counter()
+        return self
+
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[ExceptionTracebackAnyType],
+    ) -> None:
+        if self._start_time is None:
+            raise RuntimeError("Context manager shouldn't exit without first entering.")
+
+        self._total_time += time.perf_counter() - self._start_time
 
 
 def convert_linkable_element_set_to_rows(

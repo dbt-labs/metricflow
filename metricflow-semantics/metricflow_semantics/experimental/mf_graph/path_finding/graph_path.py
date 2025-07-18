@@ -4,7 +4,7 @@ import logging
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import ClassVar, Generic, Optional, Sequence, Sized, TypeVar, override
+from typing import Generic, Optional, Sequence, Sized, TypeVar, override
 
 from typing_extensions import override
 
@@ -22,19 +22,24 @@ EdgeT = TypeVar("EdgeT", bound=MetricflowGraphEdge)
 
 
 class MetricflowGraphPath(MetricFlowPrettyFormattable, Sized, Generic[NodeT, EdgeT], ABC):
+    """A read-only interface that describes a path in a directed graph."""
+
     @property
     @abstractmethod
     def edges(self) -> Sequence[EdgeT]:
+        """The edges (in order) that constitute this path."""
         raise NotImplementedError
 
     @property
     @abstractmethod
     def nodes(self) -> Sequence[NodeT]:
+        """The nodes (in order) that constitute this path."""
         raise NotImplementedError
 
     @property
     @abstractmethod
     def weight(self) -> Optional[int]:
+        """The weight of this path as defined by the weight function that was used during traversal."""
         raise NotImplementedError()
 
     @override
@@ -51,6 +56,7 @@ class MetricflowGraphPath(MetricFlowPrettyFormattable, Sized, Generic[NodeT, Edg
     @property
     @abstractmethod
     def node_set(self) -> OrderedSet[NodeT]:
+        """The set of nodes in this path. Useful for fast checks for cycles during path extension."""
         raise NotImplementedError()
 
     @override
@@ -60,17 +66,28 @@ class MetricflowGraphPath(MetricFlowPrettyFormattable, Sized, Generic[NodeT, Edg
 
 @dataclass
 class MutableGraphPath(MetricflowGraphPath[NodeT, EdgeT]):
+    """A path that can be extended and also reverted back to the previous state before extension.
+
+    * This is a mutable class as path-finding can traverse many edges, and using a single mutable object reduces
+      overhead.
+    * The append / pop functionality is useful for DFS traversal.
+    * When an edge is added to the path, the incremental weight added by the edge is specified by the caller (this
+      does not do any weight calculation).
+    """
+
     _nodes: list[NodeT]
     _edges: list[EdgeT]
-    _weight_addition_order: list[int]
     _current_weight: int
     _current_node_set: MutableOrderedSet[NodeT]
+
+    # As this path is extended step-by-step, keep track of the weights added so that when `pop()` is called, the weight
+    # of the path afterward can be easily computed by subtracting the last incremental weight added. Similar situation
+    # for `_node_set_addition_order`.
+    _weight_addition_order: list[int]
     _node_set_addition_order: list[Optional[NodeT]]
 
-    _verbose_debug_logs: ClassVar[bool] = True
-
     @staticmethod
-    def create() -> MutableGraphPath:
+    def create() -> MutableGraphPath:  # noqa: D102
         return MutableGraphPath(
             _nodes=[],
             _edges=[],
@@ -81,24 +98,26 @@ class MutableGraphPath(MetricflowGraphPath[NodeT, EdgeT]):
         )
 
     def reset_to_start_node(self, start_node: NodeT) -> None:
-        self._nodes.clear()
-        self._edges.clear()
-        self._weight_addition_order.clear()
+        """Update the state of the path so that it is of length 1 with just the given node."""
+        self._nodes = []
+        self._edges = []
+        self._weight_addition_order = []
         self._current_weight = 0
-        self._current_node_set.clear()
-        self._node_set_addition_order.clear()
+        self._current_node_set = MutableOrderedSet()
+        self._node_set_addition_order = []
 
         self._append_node(start_node)
 
     @property
-    def edges(self) -> Sequence[EdgeT]:
+    def edges(self) -> Sequence[EdgeT]:  # noqa: D102
         return self._edges
 
     @property
-    def nodes(self) -> Sequence[NodeT]:
+    def nodes(self) -> Sequence[NodeT]:  # noqa: D102
         return self._nodes
 
     def _append_node(self, node: NodeT) -> None:
+        """Helper to add a node to the path."""
         self._nodes.append(node)
         if node in self._current_node_set:
             self._node_set_addition_order.append(None)
@@ -108,12 +127,18 @@ class MutableGraphPath(MetricflowGraphPath[NodeT, EdgeT]):
         self._node_addition_callback(node)
 
     def _node_addition_callback(self, node: NodeT) -> None:
+        """A callback method that is called whenever a node is added to this path.
+
+        This is useful for subclasses that want to update other state / property associated with the path.
+        """
         pass
 
     def _edge_addition_callback(self, edge: EdgeT) -> None:
+        """Similar to `_node_addition_callback` but for edge additions."""
         pass
 
     def append_edge(self, edge: EdgeT, weight: int) -> None:
+        """Add an edge with the given weight to this path."""
         tail_node = edge.tail_node
         head_node = edge.head_node
         if len(self._nodes) == 0:
@@ -126,13 +151,16 @@ class MutableGraphPath(MetricflowGraphPath[NodeT, EdgeT]):
 
     @property
     def weights(self) -> Sequence[int]:
+        """The sequence of weights that were added to compute the total weight of the path."""
         return self._weight_addition_order
 
     @property
     def weight(self) -> int:
+        """The current weight of the path."""
         return self._current_weight
 
     def pop(self) -> None:
+        """Remove the last node / edge added to the path."""
         if len(self._edges) == 0:
             if len(self._nodes) == 0:
                 raise RuntimeError("Can't pop an empty path")
@@ -154,10 +182,8 @@ class MutableGraphPath(MetricflowGraphPath[NodeT, EdgeT]):
 
     @property
     def node_set(self) -> MutableOrderedSet[NodeT]:
+        """A set containing the nodes in this path."""
         return self._current_node_set
 
 
-PathT = TypeVar(
-    "PathT",
-    bound=MutableGraphPath,
-)
+MutablePathT = TypeVar("MutablePathT", bound=MutableGraphPath)

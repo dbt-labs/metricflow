@@ -48,10 +48,10 @@ class GroupByAttributeLabel(MetricflowGraphLabel):
 
 
 @singleton_dataclass()
-class DsiEntityLabel(MetricflowGraphLabel):
+class ConfiguredEntityLabel(MetricflowGraphLabel):
     @staticmethod
-    def get_instance() -> DsiEntityLabel:
-        return DsiEntityLabel()
+    def get_instance() -> ConfiguredEntityLabel:
+        return ConfiguredEntityLabel()
 
 
 @singleton_dataclass()
@@ -61,7 +61,9 @@ class DunderNameElementLabel(MetricflowGraphLabel):
 
 @singleton_dataclass()
 class TimeDimensionLabel(MetricflowGraphLabel):
-    pass
+    @staticmethod
+    def get_instance() -> TimeDimensionLabel:
+        return TimeDimensionLabel()
 
 
 @singleton_dataclass()

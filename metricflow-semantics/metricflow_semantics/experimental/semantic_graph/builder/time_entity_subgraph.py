@@ -8,8 +8,10 @@ from dbt_semantic_interfaces.type_enums import DatePart, TimeGranularity
 from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
-from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeRecipeUpdate
-from metricflow_semantics.experimental.semantic_graph.builder.graph_change_rule import (
+from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe_update import (
+    QueryRecipeStep,
+)
+from metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator import (
     SemanticSubgraphGenerator,
     SubgraphGeneratorArgumentSet,
 )
@@ -17,7 +19,7 @@ from metricflow_semantics.experimental.semantic_graph.edges.entity_attribute imp
     AttributeEdgeType,
     EntityAttributeEdge,
 )
-from metricflow_semantics.experimental.semantic_graph.edges.entity_relationship import EntityRelationshipEdge
+from metricflow_semantics.experimental.semantic_graph.edges.sg_edges import EntityRelationshipEdge
 from metricflow_semantics.experimental.semantic_graph.nodes.attribute_node import (
     TimeAttributeNode,
 )
@@ -25,7 +27,7 @@ from metricflow_semantics.experimental.semantic_graph.nodes.entity_node import (
     MetricTimeNode,
     TimeEntityNode,
 )
-from metricflow_semantics.experimental.semantic_graph.semantic_graph import MutableSemanticGraph, SemanticGraph
+from metricflow_semantics.experimental.semantic_graph.sg_interfaces import MutableSemanticGraph, SemanticGraph
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
@@ -45,7 +47,7 @@ class TimeEntitySubgraphGenerator(SemanticSubgraphGenerator):
                     tail_node=time_entity_node,
                     head_node=TimeAttributeNode.get_instance_for_time_grain(time_grain),
                     attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
-                    attribute_recipe_update=AttributeRecipeUpdate(
+                    attribute_recipe_update=QueryRecipeStep(
                         set_time_grain_access=ExpandedTimeGranularity(
                             name=time_grain.value, base_granularity=time_grain
                         ),
@@ -60,7 +62,7 @@ class TimeEntitySubgraphGenerator(SemanticSubgraphGenerator):
                     tail_node=time_entity_node,
                     head_node=attribute_node,
                     attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
-                    attribute_recipe_update=AttributeRecipeUpdate(
+                    attribute_recipe_update=QueryRecipeStep(
                         add_properties=(LinkableElementProperty.DATE_PART,),
                         set_date_part=queryable_date_part,
                     ),
@@ -75,7 +77,7 @@ class TimeEntitySubgraphGenerator(SemanticSubgraphGenerator):
                         tail_node=time_entity_node,
                         head_node=attribute_node,
                         attribute_edge_type=AttributeEdgeType.ENTITY_TO_ATTRIBUTE,
-                        attribute_recipe_update=AttributeRecipeUpdate(
+                        attribute_recipe_update=QueryRecipeStep(
                             add_properties=(LinkableElementProperty.DERIVED_TIME_GRANULARITY,),
                             set_time_grain_access=expanded_time_grain,
                         ),
@@ -85,7 +87,7 @@ class TimeEntitySubgraphGenerator(SemanticSubgraphGenerator):
         return current_subgraph
 
     @override
-    def generate_subgraph(self, current_graph: SemanticGraph) -> MutableSemanticGraph:
+    def generate_subgraph(self, predecessor_graph: SemanticGraph) -> MutableSemanticGraph:
         current_subgraph = MutableSemanticGraph.create()
         current_subgraph.add_edge(
             EntityRelationshipEdge.get_instance(

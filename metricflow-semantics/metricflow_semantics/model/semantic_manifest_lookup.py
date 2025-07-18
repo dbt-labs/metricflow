@@ -6,6 +6,9 @@ from typing import Optional
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 
 from metricflow_semantics.assert_one_arg import assert_at_most_one_arg_set
+from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
+from metricflow_semantics.experimental.mf_graph.path_finding.path_finder import MetricflowGraphPathFinder
+from metricflow_semantics.experimental.mf_graph.path_finding.path_finder_cache import PathFinderCache
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
     AttributeRecipeWriterPath,
 )
@@ -13,14 +16,8 @@ from metricflow_semantics.experimental.semantic_graph.attribute_resolution.sg_li
     SemanticGraphLinkableSpecResolver,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.graph_builder import SemanticGraphBuilder
-from metricflow_semantics.experimental.semantic_graph.builder.graph_change_rule import SubgraphGeneratorArgumentSet
-from metricflow_semantics.experimental.semantic_graph.manifest_object_lookup import ManifestObjectLookup
-from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
-    SemanticGraphEdge,
-    SemanticGraphNode,
-)
-from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder import MetricflowGraphPathFinder
-from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_cache import PathFinderCache
+from metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator import SubgraphGeneratorArgumentSet
+from metricflow_semantics.experimental.semantic_graph.sg_interfaces import SemanticGraphEdge, SemanticGraphNode
 from metricflow_semantics.model.semantics.linkable_spec_index import LinkableSpecIndex
 from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
@@ -58,7 +55,7 @@ class SemanticManifestLookup:
             linkable_spec_index=linkable_spec_index,
         )
 
-        if use_semantic_graph is not None:
+        if use_semantic_graph:
             path_finder_cache = PathFinderCache[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath]()
             path_finder = MetricflowGraphPathFinder[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath](
                 path_finder_cache=path_finder_cache,

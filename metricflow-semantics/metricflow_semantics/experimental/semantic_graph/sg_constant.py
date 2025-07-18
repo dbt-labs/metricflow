@@ -2,35 +2,33 @@ from __future__ import annotations
 
 import logging
 from abc import ABC
+from typing import Final, final
 
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 
 logger = logging.getLogger(__name__)
 
 
-class Constant(ABC):
-    def __init__(self) -> None:
-        raise RuntimeError(
-            LazyFormat(
-                "Constant class should not be instantiated",
-                constant_class_name=self.__class__.__name__,
-            )
-        )
+@final
+class ClusterNameFactory(ABC):
+    """Creates cluster names for the semantic graph.
 
+    Currently, the cluster name is only used to group related nodes in the semantic graph in graph visualizations.
+    Cluster-name generation could be handled as methods on associated classes as well.
+    """
 
-class ClusterName(Constant):
-    TIME = "time"
-    KEY = "key"
-    GROUP_BY_METRIC = "group_by_metric"
-    DIMENSION = "dimension"
-    METRIC = "metric"
-    TIME_DIMENSION = "time_dimension"
+    TIME: Final[str] = "time"
+    KEY: Final[str] = "key"
+    GROUP_BY_METRIC: Final[str] = "group_by_metric"
+    DIMENSION: Final[str] = "dimension"
+    METRIC: Final[str] = "metric"
+    TIME_DIMENSION: Final[str] = "time_dimension"
 
     @staticmethod
-    def get_name_for_dsi_entity(entity_name: str, model_id: SemanticModelId) -> str:
+    def get_name_for_configured_entity(entity_name: str, model_id: SemanticModelId) -> str:  # noqa: D102
         return f"{model_id}.{entity_name}"
 
-
-class SemanticGraphConstant(Constant):
-    MAX_METRIC_RECURSION_DEPTH = 1000
+    @staticmethod
+    def get_name_for_model(model_id: SemanticModelId) -> str:  # noqa: D102
+        """Return the cluster name that should be used to group nodes associated with a specific semantic model."""
+        return model_id.model_name

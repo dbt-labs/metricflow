@@ -7,20 +7,20 @@ from typing import Optional
 from dbt_semantic_interfaces.references import MeasureReference, MetricReference
 
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item
+from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.experimental.metricflow_exception import MetricflowInternalError
+from metricflow_semantics.experimental.mf_graph.path_finding.path_finder import MetricflowGraphPathFinder
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
     AttributeRecipeWriterPath,
 )
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_resolver import AttributeResolver
-from metricflow_semantics.experimental.semantic_graph.manifest_object_lookup import ManifestObjectLookup
-from metricflow_semantics.experimental.semantic_graph.nodes.node_label import MeasureLabel, MetricLabel
-from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
+from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import MeasureLabel, MetricLabel
+from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
+    SemanticGraph,
     SemanticGraphEdge,
     SemanticGraphNode,
 )
-from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder import MetricflowGraphPathFinder
-from metricflow_semantics.experimental.semantic_graph.semantic_graph import SemanticGraph
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter

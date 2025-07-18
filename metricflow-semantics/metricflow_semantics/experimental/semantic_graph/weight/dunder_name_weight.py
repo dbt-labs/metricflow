@@ -8,14 +8,10 @@ from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums import DatePart, TimeGranularity
 from typing_extensions import override
 
-from metricflow_semantics.experimental.semantic_graph.attribute_computation import AttributeRecipe
-from metricflow_semantics.experimental.semantic_graph.edges.edge_labels import MetricDefinitionLabel
-from metricflow_semantics.experimental.semantic_graph.nodes.node_label import GroupByAttributeLabel
-from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
-    SemanticGraphEdge,
-    SemanticGraphNode,
-)
-from metricflow_semantics.experimental.semantic_graph.path_finding.weight_function import WeightFunction
+from metricflow_semantics.experimental.mf_graph.path_finding.weight_function import WeightFunction
+from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe import AttributeQueryRecipe
+from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import GroupByAttributeLabel, TimeDimensionLabel
+from metricflow_semantics.experimental.semantic_graph.sg_interfaces import SemanticGraphEdge, SemanticGraphNode
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
@@ -31,8 +27,6 @@ from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attri
 class DunderNameWeightFunction(WeightFunction[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath]):
     MAX_ENTITY_LINKS = MAX_JOIN_HOPS
 
-    _METRIC_DEFINITION_LABEL = MetricDefinitionLabel()
-
     def __init__(  # noqa: D107
         self,
         element_name_allow_set: Optional[Set[str]] = None,
@@ -42,9 +36,10 @@ class DunderNameWeightFunction(WeightFunction[SemanticGraphNode, SemanticGraphEd
         self._element_name_allow_set = element_name_allow_set
         self._property_deny_set = property_deny_set
         self._group_by_attribute_label = GroupByAttributeLabel.get_instance()
+        self._time_dimension_label = TimeDimensionLabel.get_instance()
 
     @staticmethod
-    def recipe_weight(next_attribute_recipe: AttributeRecipe) -> Optional[int]:
+    def recipe_weight(next_attribute_recipe: AttributeQueryRecipe) -> Optional[int]:
         dundered_name_elements = next_attribute_recipe.dunder_name_elements
         # We do not allow repeated element names in the dundered name (e.g. `listing__listing`),
         # so return `None` to indicate a blocked edge.
@@ -61,22 +56,21 @@ class DunderNameWeightFunction(WeightFunction[SemanticGraphNode, SemanticGraphEd
     def incremental_weight(
         self, path_to_node: AttributeRecipeWriterPath, next_edge: SemanticGraphEdge, max_path_weight: int
     ) -> Optional[int]:
-        # Don't allow traversal of the metric definition edges unless the previous edge in the path was also a metric
-        # definition edge. This prevents unnecessary traversal when searching for group-by items as it prevents
-        # traversal from the metric node (which is a successor of the `JoinToModelNode` and represents a group-by
-        # metric).
-        # path_edges = path_to_node.edges
-        # if len(path_edges) > 0 and DunderNameWeightFunction._METRIC_DEFINITION_LABEL in next_edge.labels:
-        #     last_edge = path_edges[-1]
-        #     if DunderNameWeightFunction._METRIC_DEFINITION_LABEL not in last_edge.labels:
-        #         return None
         next_node = next_edge.head_node
+
+        element_name_allow_set = self._element_name_allow_set
+        if element_name_allow_set:
+            if self._group_by_attribute_label in next_node.labels or self._time_dimension_label in next_node.labels:
+                next_name_element = next_edge.head_node.dunder_name_element
+                if next_name_element not in element_name_allow_set:
+                    return None
+
         recipe_writer = path_to_node.recipe_writer
         current_recipe = recipe_writer.latest_recipe
-        next_edge_update = next_edge.recipe_update
-        next_node_update = next_edge.head_node.recipe_update
-        next_attribute_recipe = current_recipe.append_update(next_edge_update)
-        next_attribute_recipe = next_attribute_recipe.append_update(next_node_update)
+        next_edge_update = next_edge.recipe_step
+        next_node_update = next_edge.head_node.recipe_step
+        next_attribute_recipe = current_recipe.append_step(next_edge_update)
+        next_attribute_recipe = next_attribute_recipe.append_step(next_node_update)
 
         # Return quickly with a weight check.
         if len(next_attribute_recipe.entity_link_names) > max_path_weight:
@@ -86,13 +80,6 @@ class DunderNameWeightFunction(WeightFunction[SemanticGraphNode, SemanticGraphEd
         if property_deny_set is not None:
             if len(property_deny_set.intersection(next_attribute_recipe.properties)) > 0:
                 return None
-
-        if self._group_by_attribute_label in next_node.labels:
-            element_name_allow_set = self._element_name_allow_set
-            if element_name_allow_set is not None and self._group_by_attribute_label in next_node.labels:
-                element_name = next_attribute_recipe.dunder_name_elements[-1]
-                if element_name not in element_name_allow_set:
-                    return None
 
         dundered_name_elements = next_attribute_recipe.dunder_name_elements
         # We do not allow repeated element names in the dundered name (e.g. `listing__listing`),
@@ -284,7 +271,7 @@ class DunderNameWeightFunction(WeightFunction[SemanticGraphNode, SemanticGraphEd
         weight_added_by_taking_edge = 0
         if next_edge_update.add_entity_link is not None:
             weight_added_by_taking_edge += 1
-        if next_edge.head_node.recipe_update.add_entity_link is not None:
+        if next_edge.head_node.recipe_step.add_entity_link is not None:
             weight_added_by_taking_edge += 1
 
         return weight_added_by_taking_edge
