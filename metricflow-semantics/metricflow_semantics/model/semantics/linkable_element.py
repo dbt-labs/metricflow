@@ -86,7 +86,6 @@ class ElementPathKey(Comparable):
             self.time_granularity if self.time_granularity is not None else None,
             self.date_part.to_int() if self.date_part is not None else None,
             self.metric_subquery_entity_links,
-            self.metric_subquery_entity_links,
         )
 
     @cached_property
