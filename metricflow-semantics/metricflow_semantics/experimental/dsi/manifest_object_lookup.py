@@ -87,7 +87,7 @@ class ManifestObjectLookup:
         return self._lookup_object(
             object_type=_LookupMappingValueType.MODEL_ID,
             name=measure_name,
-            name_to_object_mapping=self._measure_name_to_model_id
+            name_to_object_mapping=self._measure_name_to_model_id,
         )
 
     @cached_property
@@ -100,7 +100,9 @@ class ManifestObjectLookup:
         """Return the expanded time grains as configured in the time spine."""
         return tuple(self._custom_grains.values())
 
-    def _lookup_object(self, object_type: _LookupMappingValueType, name: str, name_to_object_mapping: Mapping[str, T]) -> T:
+    def _lookup_object(
+        self, object_type: _LookupMappingValueType, name: str, name_to_object_mapping: Mapping[str, T]
+    ) -> T:
         """Helper method to look up an object in a mapping and raise a helpful error if it is not found."""
         try:
             return name_to_object_mapping[name]
