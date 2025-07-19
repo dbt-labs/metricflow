@@ -9,7 +9,7 @@ from metricflow_semantics.experimental.semantic_graph.builder.group_by_metric_su
     GroupByMetricSubgraphGenerator,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.measure_attribute_subgraph import (
-    MeasureAttributeSubgraphGenerator,
+    MeasureSubgraphGenerator,
 )
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
@@ -30,7 +30,7 @@ def test_metric_attribute_subgraph_generation(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         manifest_object_lookup=sg_00_minimal_manifest_lookup,
         subgraph_generators=(
-            MeasureAttributeSubgraphGenerator,
+            MeasureSubgraphGenerator,
             EntityJoinSubgraphGenerator,
             GroupByMetricSubgraphGenerator,
         ),

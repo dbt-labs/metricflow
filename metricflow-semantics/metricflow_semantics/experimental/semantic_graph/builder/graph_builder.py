@@ -8,14 +8,14 @@ from metricflow_semantics.experimental.semantic_graph.builder.categorical_dimens
     CategoricalDimensionAttributeSubgraphGenerator,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.entity_attribute_subgraph import (
-    EntityAttributeSubgraphGenerator,
+    EntityKeySubgraphGenerator,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.entity_join_subgraph import EntityJoinSubgraphGenerator
 from metricflow_semantics.experimental.semantic_graph.builder.group_by_metric_subgraph import (
     GroupByMetricSubgraphGenerator,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.measure_attribute_subgraph import (
-    MeasureAttributeSubgraphGenerator,
+    MeasureSubgraphGenerator,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.metric_subgraph import MetricSubgraphGenerator
 from metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator import (
@@ -35,9 +35,9 @@ logger = logging.getLogger(__name__)
 class SemanticGraphBuilder:
     _ALL_SUBGRAPH_GENERATORS = (
         CategoricalDimensionAttributeSubgraphGenerator,
-        EntityAttributeSubgraphGenerator,
+        EntityKeySubgraphGenerator,
         EntityJoinSubgraphGenerator,
-        MeasureAttributeSubgraphGenerator,
+        MeasureSubgraphGenerator,
         TimeDimensionSubgraphGenerator,
         TimeEntitySubgraphGenerator,
         MetricSubgraphGenerator,

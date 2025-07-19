@@ -9,7 +9,7 @@ from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.experimental.dsi.model_object_lookup import (
-    SemanticModelObjectLookup,
+    ModelObjectLookup,
 )
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe_update import (
     QueryRecipeStep,
@@ -39,7 +39,7 @@ class TimeDimensionSubgraphGenerator(SemanticSubgraphGenerator):
         super().__init__(argument_set)
         self._time_entity_node = TimeEntityNode.get_instance()
 
-    def _get_attribute_nodes_for_entities(self, lookup: SemanticModelObjectLookup) -> list[AttributeNode]:
+    def _get_attribute_nodes_for_entities(self, lookup: ModelObjectLookup) -> list[AttributeNode]:
         return [
             KeyAttributeNode(
                 attribute_name=entity.name,
@@ -47,7 +47,7 @@ class TimeDimensionSubgraphGenerator(SemanticSubgraphGenerator):
             for entity in lookup.semantic_model.entities
         ]
 
-    def _get_subgraph_for_model(self, lookup: SemanticModelObjectLookup) -> MutableSemanticGraph:
+    def _get_subgraph_for_model(self, lookup: ModelObjectLookup) -> MutableSemanticGraph:
         current_subgraph = MutableSemanticGraph.create()
 
         model_id = SemanticModelId(model_name=lookup.semantic_model.name)

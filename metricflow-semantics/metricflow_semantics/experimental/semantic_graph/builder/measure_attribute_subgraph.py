@@ -4,9 +4,7 @@ import logging
 
 from typing_extensions import override
 
-from metricflow_semantics.experimental.dsi.model_object_lookup import (
-    MeasureContainingModelObjectLookup,
-)
+from metricflow_semantics.experimental.dsi.measure_model_object_lookup import MeasureContainingModelObjectLookup
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe_update import (
     QueryRecipeStep,
 )
@@ -17,7 +15,6 @@ from metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator
 from metricflow_semantics.experimental.semantic_graph.edges.sg_edges import EntityRelationshipEdge
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.experimental.semantic_graph.nodes.entity_nodes import (
-    JoinedModelNode,
     LocalModelNode,
     MeasureNode,
     MetricTimeNode,
@@ -27,7 +24,7 @@ from metricflow_semantics.experimental.semantic_graph.sg_interfaces import Mutab
 logger = logging.getLogger(__name__)
 
 
-class MeasureAttributeSubgraphGenerator(SemanticSubgraphGenerator):
+class MeasureSubgraphGenerator(SemanticSubgraphGenerator):
     def __init__(self, argument_set: SubgraphGeneratorArgumentSet) -> None:
         super().__init__(argument_set)
 
@@ -36,25 +33,11 @@ class MeasureAttributeSubgraphGenerator(SemanticSubgraphGenerator):
     ) -> MutableSemanticGraph:
         current_subgraph = MutableSemanticGraph.create()
         model_id = SemanticModelId(model_name=lookup.semantic_model.name)
-        semantic_model_node = JoinedModelNode.get_instance(model_id)
         local_semantic_model_node = LocalModelNode.get_instance(model_id)
 
         metric_time_node = MetricTimeNode.get_instance()
         for aggregation_configuration, measures in lookup.aggregation_configuration_to_measures.items():
-            # aggregation_entity_node = TimeAggregationNode.get_instance(
-            #     # model_id=model_id,
-            #     # aggregation_time_dimension_name=aggregation_configuration.time_dimension_name,
-            #     min_time_grain=aggregation_configuration.time_grain,
-            # )
-            # current_subgraph.add_edge(
-            #     EntityRelationshipEdge.get_instance(
-            #         tail_node=aggregation_entity_node,
-            #         head_node=metric_time_node,
-            #
-            #     )
-            # )
-
-            # Add edges from the measure attribute nodes to the aggregation nodes.
+            # Add edges from the measure nodes to the metric-time node.
             for measure in measures:
                 measure_name = measure.name
 

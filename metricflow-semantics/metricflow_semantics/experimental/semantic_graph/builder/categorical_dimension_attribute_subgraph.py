@@ -7,7 +7,7 @@ from dbt_semantic_interfaces.type_enums import DimensionType
 from typing_extensions import override
 
 from metricflow_semantics.experimental.dsi.model_object_lookup import (
-    SemanticModelObjectLookup,
+    ModelObjectLookup,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator import (
     SemanticSubgraphGenerator,
@@ -34,7 +34,7 @@ class CategoricalDimensionAttributeSubgraphGenerator(SemanticSubgraphGenerator):
     def __init__(self, argument_set: SubgraphGeneratorArgumentSet) -> None:
         super().__init__(argument_set)
 
-    def _get_attribute_nodes_for_categorical_dimensions(self, lookup: SemanticModelObjectLookup) -> list[AttributeNode]:
+    def _get_attribute_nodes_for_categorical_dimensions(self, lookup: ModelObjectLookup) -> list[AttributeNode]:
         attribute_nodes: list[AttributeNode] = []
 
         for dimension in lookup.semantic_model.dimensions:
@@ -51,7 +51,7 @@ class CategoricalDimensionAttributeSubgraphGenerator(SemanticSubgraphGenerator):
 
         return attribute_nodes
 
-    def _get_subgraph_for_model(self, lookup: SemanticModelObjectLookup) -> MutableSemanticGraph:
+    def _get_subgraph_for_model(self, lookup: ModelObjectLookup) -> MutableSemanticGraph:
         current_subgraph = MutableSemanticGraph.create()
         model_id = SemanticModelId(model_name=lookup.semantic_model.name)
         semantic_model_node = JoinedModelNode.get_instance(model_id)

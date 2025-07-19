@@ -134,7 +134,7 @@ class MetricSubgraphGenerator(SemanticSubgraphGenerator):
 
         for measure in base_metric.input_measures:
             measure_name = measure.name
-            source_model_id = self._manifest_object_lookup.measure_name_to_model_id[measure_name]
+            source_model_id = self._manifest_object_lookup._measure_name_to_model_id[measure_name]
 
             head_node = MeasureNode.get_instance(
                 measure_name=measure_name,

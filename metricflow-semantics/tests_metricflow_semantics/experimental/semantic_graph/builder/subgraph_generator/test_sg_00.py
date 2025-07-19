@@ -8,11 +8,11 @@ from metricflow_semantics.experimental.semantic_graph.builder.categorical_dimens
     CategoricalDimensionAttributeSubgraphGenerator,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.entity_attribute_subgraph import (
-    EntityAttributeSubgraphGenerator,
+    EntityKeySubgraphGenerator,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.entity_join_subgraph import EntityJoinSubgraphGenerator
 from metricflow_semantics.experimental.semantic_graph.builder.measure_attribute_subgraph import (
-    MeasureAttributeSubgraphGenerator,
+    MeasureSubgraphGenerator,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.time_dimension_subgraph import (
     TimeDimensionSubgraphGenerator,
@@ -35,7 +35,7 @@ def test_measure_subgraph(  # noqa: D103
         request=request,
         mf_test_configuration=mf_test_configuration,
         manifest_object_lookup=sg_00_minimal_manifest_lookup,
-        subgraph_generators=(MeasureAttributeSubgraphGenerator,),
+        subgraph_generators=(MeasureSubgraphGenerator,),
     )
 
 
@@ -49,7 +49,7 @@ def test_time_dimension_subgraph(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         manifest_object_lookup=sg_00_minimal_manifest_lookup,
         subgraph_generators=(
-            MeasureAttributeSubgraphGenerator,
+            MeasureSubgraphGenerator,
             TimeDimensionSubgraphGenerator,
         ),
     )
@@ -77,7 +77,7 @@ def test_entity_attribute_subgraph(  # noqa: D103
         request=request,
         mf_test_configuration=mf_test_configuration,
         manifest_object_lookup=sg_00_minimal_manifest_lookup,
-        subgraph_generators=(EntityAttributeSubgraphGenerator,),
+        subgraph_generators=(EntityKeySubgraphGenerator,),
     )
 
 

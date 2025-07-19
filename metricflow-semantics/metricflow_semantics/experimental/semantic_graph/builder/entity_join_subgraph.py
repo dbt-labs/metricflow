@@ -4,9 +4,9 @@ import logging
 
 from typing_extensions import override
 
-from metricflow_semantics.experimental.dsi.manifest_object_lookup import SemanticModelJoinLookup
+from metricflow_semantics.experimental.dsi.join_lookup import SemanticModelJoinLookup
 from metricflow_semantics.experimental.dsi.model_object_lookup import (
-    SemanticModelObjectLookup,
+    ModelObjectLookup,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator import (
     SemanticSubgraphGenerator,
@@ -32,7 +32,7 @@ class EntityJoinSubgraphGenerator(SemanticSubgraphGenerator):
 
         self._valid_entity_join_types = SemanticModelJoinLookup.valid_join_to_entity_types()
 
-    def _get_subgraph_for_model(self, lookup: SemanticModelObjectLookup) -> MutableSemanticGraph:
+    def _get_subgraph_for_model(self, lookup: ModelObjectLookup) -> MutableSemanticGraph:
         current_subgraph = MutableSemanticGraph.create()
 
         left_model_id = SemanticModelId.get_instance(model_name=lookup.semantic_model.name)
