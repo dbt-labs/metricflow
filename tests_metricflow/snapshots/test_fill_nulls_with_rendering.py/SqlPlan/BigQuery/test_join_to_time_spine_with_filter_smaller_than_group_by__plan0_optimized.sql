@@ -18,7 +18,7 @@ FROM (
     -- Change Column Aliases
     SELECT
       ts AS metric_time__hour
-      , DATETIME_TRUNC(ts, day) AS metric_time__day
+      , TIMESTAMP_TRUNC(ts, day) AS metric_time__day
     FROM ***************************.mf_time_spine_hour time_spine_src_28005
   ) subq_17
   WHERE (metric_time__hour > '2020-01-01 00:09:00') AND (metric_time__day = '2020-01-01')
@@ -36,8 +36,8 @@ LEFT OUTER JOIN (
     -- Read Elements From Semantic Model 'users_ds_source'
     -- Metric Time Dimension 'archived_at'
     SELECT
-      DATETIME_TRUNC(archived_at, hour) AS metric_time__hour
-      , DATETIME_TRUNC(archived_at, day) AS metric_time__day
+      TIMESTAMP_TRUNC(archived_at, hour) AS metric_time__hour
+      , TIMESTAMP_TRUNC(archived_at, day) AS metric_time__day
       , 1 AS archived_users
     FROM ***************************.dim_users users_ds_source_src_28000
   ) subq_12

@@ -11,12 +11,12 @@ WITH ctr_0_cte AS (
   -- Metric Time Dimension 'ds'
   -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-02T00:00:00]
   SELECT
-    DATETIME_TRUNC(ds, day) AS metric_time__day
+    TIMESTAMP_TRUNC(ds, day) AS metric_time__day
     , user_id AS user
     , referrer_id AS visit__referrer_id
     , 1 AS visits
   FROM ***************************.fct_visits visits_source_src_28000
-  WHERE DATETIME_TRUNC(ds, day) BETWEEN '2020-01-01' AND '2020-01-02'
+  WHERE TIMESTAMP_TRUNC(ds, day) BETWEEN '2020-01-01' AND '2020-01-02'
 )
 
 SELECT
@@ -114,7 +114,7 @@ FROM (
         -- Metric Time Dimension 'ds'
         -- Add column with generated UUID
         SELECT
-          DATETIME_TRUNC(ds, day) AS metric_time__day
+          TIMESTAMP_TRUNC(ds, day) AS metric_time__day
           , user_id AS user
           , 1 AS buys
           , GENERATE_UUID() AS mf_internal_uuid

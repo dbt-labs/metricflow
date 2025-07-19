@@ -16,7 +16,7 @@ FROM (
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements: ['bookings', 'ds__day']
   SELECT
-    DATETIME_TRUNC(ds, day) AS ds__day
+    TIMESTAMP_TRUNC(ds, day) AS ds__day
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
 ) subq_8
