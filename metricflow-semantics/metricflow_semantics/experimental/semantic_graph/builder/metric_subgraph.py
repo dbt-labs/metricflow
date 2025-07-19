@@ -112,12 +112,18 @@ class MetricSubgraphGenerator(SemanticSubgraphGenerator):
                 measure_name_to_labels_for_metric_to_measure_edge[measure.name] = edge_labels
         elif metric_type is MetricType.CONVERSION:
             conversion_type_params = base_metric.type_params.conversion_type_params
-            assert conversion_type_params, "A conversion metric should have type_params.conversion_type_params defined."
-            conversion_measure_name = conversion_type_params.conversion_measure.name
-            measure_name_to_labels_for_metric_to_measure_edge[
-                conversion_measure_name
-            ] = self._special_case_to_successor_edge_label[_SpecialCase.CONVERSION_MEASURE]
-
+            if conversion_type_params is not None:
+                conversion_measure_name = conversion_type_params.conversion_measure.name
+                measure_name_to_labels_for_metric_to_measure_edge[
+                    conversion_measure_name
+                ] = self._special_case_to_successor_edge_label[_SpecialCase.CONVERSION_MEASURE]
+            else:
+                raise InvalidManifestException(
+                    LazyFormat(
+                        "A conversion metric is missing type parameters",
+                        base_metric=base_metric,
+                    )
+                )
         else:
             assert_values_exhausted(metric_type)
 
@@ -134,7 +140,7 @@ class MetricSubgraphGenerator(SemanticSubgraphGenerator):
 
         for measure in base_metric.input_measures:
             measure_name = measure.name
-            source_model_id = self._manifest_object_lookup._measure_name_to_model_id[measure_name]
+            source_model_id = self._manifest_object_lookup.get_model_id_for_measure(measure_name)
 
             head_node = MeasureNode.get_instance(
                 measure_name=measure_name,

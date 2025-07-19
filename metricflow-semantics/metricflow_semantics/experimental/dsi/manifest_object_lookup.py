@@ -75,19 +75,19 @@ class ManifestObjectLookup:
 
     def get_metric(self, metric_name: str) -> Metric:  # noqa: D102
         return self._lookup_object(
-            object_type=_ManifestObjectType.METRIC,
+            object_type=_LookupMappingValueType.METRIC,
             name=metric_name,
             name_to_object_mapping=self._metric_name_to_metric,
         )
 
-    def get_metrics(self) -> Iterable[Metric]:
+    def get_metrics(self) -> Iterable[Metric]:  # noqa: D102
         return self._metric_name_to_metric.values()
 
-    def get_model_id_for_measure(self, measure_name: str) -> SemanticModelId:
+    def get_model_id_for_measure(self, measure_name: str) -> SemanticModelId:  # noqa: D102
         return self._lookup_object(
-            object_type=_ManifestObjectType.MODEL,
+            object_type=_LookupMappingValueType.MODEL_ID,
             name=measure_name,
-            name_to_object_mapping=self._measure_name_to_model_id,
+            name_to_object_mapping=self._measure_name_to_model_id
         )
 
     @cached_property
@@ -100,7 +100,8 @@ class ManifestObjectLookup:
         """Return the expanded time grains as configured in the time spine."""
         return tuple(self._custom_grains.values())
 
-    def _lookup_object(self, object_type: _ManifestObjectType, name: str, name_to_object_mapping: Mapping[str, T]) -> T:
+    def _lookup_object(self, object_type: _LookupMappingValueType, name: str, name_to_object_mapping: Mapping[str, T]) -> T:
+        """Helper method to look up an object in a mapping and raise a helpful error if it is not found."""
         try:
             return name_to_object_mapping[name]
         except KeyError as e:
@@ -131,10 +132,11 @@ class ManifestObjectLookup:
         return metric_name_to_metric
 
 
-class _ManifestObjectType(Enum):
+class _LookupMappingValueType(Enum):
     """Different types of objects in the semantic manifest used to key private lookup dictionaries."""
 
     ENTITY = "entity"
     MEASURE = "measure"
     METRIC = "metric"
     MODEL = "model"
+    MODEL_ID = "model_id"
