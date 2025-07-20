@@ -618,6 +618,28 @@ def validate_configs(
     if merged_results.has_blocking_issues:
         exit(1)
 
+@list_command_group.command()
+@pass_config
+@exception_handler
+@log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
+def saved_queries(cfg: CLIConfiguration) -> None:
+    """List all saved queries in the project."""
+    if not cfg.is_setup:
+        cfg.setup()
+    spinner = Halo(text="🔍 Looking for all available saved queries...", spinner="dots")
+    spinner.start()
+
+    saved_queries = cfg.mf.list_saved_queries()
+
+    if not saved_queries:
+        spinner.fail("No saved queries found.")
+        return
+
+    spinner.succeed(f"🌱 We've found {len(saved_queries)} saved queries.")
+    click.echo('The list below shows saved queries with their descriptions:')
+    for sq in saved_queries:
+        description = sq.description if sq.description else "No description provided"
+        click.echo(f"• {click.style(sq.name, bold=True, fg='green')}: {description}")
 
 if __name__ == "__main__":
     cli()

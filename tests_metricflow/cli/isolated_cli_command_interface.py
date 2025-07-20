@@ -25,6 +25,7 @@ class IsolatedCliCommandEnum(Enum):
     MF_METRICS = "mf_metrics"
     MF_LIST = "mf_list"
     MF_QUERY = "mf_query"
+    MF_SAVED_QUERIES = "mf_saved_queries"
     MF_TUTORIAL = "mf_tutorial"
     MF_VALIDATE_CONFIGS = "mf_validate_configs"
 

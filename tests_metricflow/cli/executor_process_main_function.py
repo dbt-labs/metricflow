@@ -23,6 +23,7 @@ from dbt_metricflow.cli.main import (
     list_command_group,
     metrics,
     query,
+    saved_queries,
     tutorial,
     validate_configs,
 )
@@ -216,6 +217,11 @@ class ExecutorProcessMainFunction:
             return self._run_mf_cli_command(
                 parameter_set=parameter_set,
                 click_command=metrics,
+            )
+        elif parameter_set.command_enum is IsolatedCliCommandEnum.MF_SAVED_QUERIES:
+            return self._run_mf_cli_command(
+                parameter_set=parameter_set,
+                click_command=saved_queries,
             )
         elif parameter_set.command_enum is IsolatedCliCommandEnum.MF_QUERY:
             return self._run_mf_cli_command(

@@ -1,0 +1,6 @@
+test_name: test_list_saved_queries
+test_filename: test_cli.py
+---
+The list below shows saved queries with their descriptions:
+• core_transaction_metrics: Important transaction metrics.
+• cumulative_transaction_metrics: Cumulative metrics related to transactions.
