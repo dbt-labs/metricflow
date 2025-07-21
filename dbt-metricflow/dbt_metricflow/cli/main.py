@@ -642,5 +642,6 @@ def saved_queries(cfg: CLIConfiguration) -> None:
         description = sq.description if sq.description else "No description provided"
         click.echo(f"• {click.style(sq.name, bold=True, fg='green')}: {description}")
 
+
 if __name__ == "__main__":
     cli()
