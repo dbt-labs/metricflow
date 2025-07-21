@@ -3,4 +3,4 @@ body: Add new CLI command 'mf list saved-queries' to list all saved queries with
 time: 2025-07-22T05:14:40.000000-07:00
 custom:
 Author: kiwamizamurai
-Issue: "1786"
+Issue: "1787"
