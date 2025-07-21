@@ -637,7 +637,7 @@ def saved_queries(cfg: CLIConfiguration) -> None:
         return
 
     spinner.succeed(f"🌱 We've found {len(saved_queries)} saved queries.")
-    click.echo('The list below shows saved queries with their descriptions:')
+    click.echo("The list below shows saved queries with their descriptions:")
     for sq in saved_queries:
         description = sq.description if sq.description else "No description provided"
         click.echo(f"• {click.style(sq.name, bold=True, fg='green')}: {description}")
