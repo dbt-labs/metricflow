@@ -618,6 +618,7 @@ def validate_configs(
     if merged_results.has_blocking_issues:
         exit(1)
 
+
 @list_command_group.command()
 @pass_config
 @exception_handler
