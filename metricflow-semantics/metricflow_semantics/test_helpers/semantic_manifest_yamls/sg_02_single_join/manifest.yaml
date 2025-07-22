@@ -1,0 +1,50 @@
+# Minimal manifest that contains 2 semantic models that can be joined via a foreign / primary relationship.
+---
+semantic_model:
+  name: sm_0
+
+  node_relation:
+    schema_name: $source_schema
+    alias: sm_0
+
+  defaults:
+    agg_time_dimension: ds
+
+  entities:
+    - name: sm_0_entity
+      type: primary
+    - name: sm_1_entity
+      type: foreign
+
+  measures:
+    - name: sm_0_measure
+      expr: "1"
+      agg: sum
+
+  dimensions:
+    - name: ds
+      type: time
+      type_params:
+        time_granularity: quarter
+
+---
+semantic_model:
+  name: sm_1
+
+  node_relation:
+    schema_name: $source_schema
+    alias: sm_1
+
+  entities:
+    - name: sm_1_entity
+      type: primary
+  dimensions:
+    - name: dim
+      type: categorical
+
+---
+metric:
+  name: metric_measure_sm_0
+  type: simple
+  type_params:
+    measure: sm_0_measure
