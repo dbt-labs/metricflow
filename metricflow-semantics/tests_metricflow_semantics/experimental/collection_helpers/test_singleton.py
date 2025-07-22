@@ -34,7 +34,7 @@ def test_set_equals(setup_statement: str) -> None:
     """Tests performance of set comparison using singletons."""
     size = 4
     assert_performance_factor(
-        slow_code_setup=mf_newline_join(
+        left_setup=mf_newline_join(
             setup_statement,
             mf_dedent(
                 f"""
@@ -43,8 +43,8 @@ def test_set_equals(setup_statement: str) -> None:
                 """
             ),
         ),
-        slow_code_statement="left == right",
-        fast_code_setup=mf_newline_join(
+        left_statement="left == right",
+        right_setup=mf_newline_join(
             setup_statement,
             mf_dedent(
                 f"""
@@ -53,7 +53,7 @@ def test_set_equals(setup_statement: str) -> None:
                 """
             ),
         ),
-        fast_code_statement="left == right",
+        right_statement="left == right",
         min_performance_factor=25.0,
     )
 
@@ -62,16 +62,16 @@ def test_set_in(setup_statement: str) -> None:
     """Tests performance of set inclusion checks."""
     size = 10
     assert_performance_factor(
-        slow_code_setup=mf_newline_join(
+        left_setup=mf_newline_join(
             setup_statement,
             f"id_set = create_id_set({size})",
         ),
-        slow_code_statement="FIRST_ID in id_set",
-        fast_code_setup=mf_newline_join(
+        left_statement="FIRST_ID in id_set",
+        right_setup=mf_newline_join(
             setup_statement,
             f"singleton_id_set = create_singleton_id_set({size})",
         ),
-        fast_code_statement="FIRST_SINGLETON_ID in singleton_id_set",
+        right_statement="FIRST_SINGLETON_ID in singleton_id_set",
         min_performance_factor=5.0,
     )
 
@@ -80,7 +80,7 @@ def test_tuple_equals(setup_statement: str) -> None:
     """Tests performance of tuple comparisons."""
     size = 4
     assert_performance_factor(
-        slow_code_setup=mf_newline_join(
+        left_setup=mf_newline_join(
             setup_statement,
             mf_dedent(
                 f"""
@@ -89,8 +89,8 @@ def test_tuple_equals(setup_statement: str) -> None:
                 """
             ),
         ),
-        slow_code_statement="left == right",
-        fast_code_setup=mf_newline_join(
+        left_statement="left == right",
+        right_setup=mf_newline_join(
             setup_statement,
             mf_dedent(
                 f"""
@@ -99,7 +99,7 @@ def test_tuple_equals(setup_statement: str) -> None:
                 """
             ),
         ),
-        fast_code_statement="left == right",
+        right_statement="left == right",
         min_performance_factor=50.0,
     )
 
@@ -112,8 +112,8 @@ def test_create_new(setup_statement: str) -> None:
     size = 1000
     setup_statement = mf_newline_join(setup_statement, "import random")
     assert_performance_factor(
-        slow_code_setup=setup_statement,
-        slow_code_statement=mf_dedent(
+        left_setup=setup_statement,
+        left_statement=mf_dedent(
             f"""
             start_index = random.randint(0, 1_000_000_000_000)
             for i in range(start_index, start_index + {size}):
@@ -123,8 +123,8 @@ def test_create_new(setup_statement: str) -> None:
                 )
             """
         ),
-        fast_code_setup=setup_statement,
-        fast_code_statement=mf_dedent(
+        right_setup=setup_statement,
+        right_statement=mf_dedent(
             f"""
             start_index = random.randint(0, 1_000_000_000_000)
             for i in range(start_index, start_index + {size}):
@@ -151,8 +151,8 @@ def test_create_existing(setup_statement: str) -> None:
         """
     )
     assert_performance_factor(
-        slow_code_setup=setup_statement,
-        slow_code_statement=mf_dedent(
+        left_setup=setup_statement,
+        left_statement=mf_dedent(
             f"""
             for _ in range({size}):
                 CompositeId(
@@ -161,7 +161,7 @@ def test_create_existing(setup_statement: str) -> None:
                 )
             """
         ),
-        fast_code_setup=mf_newline_join(setup_statement, get_singleton_statement),
-        fast_code_statement=get_singleton_statement,
+        right_setup=mf_newline_join(setup_statement, get_singleton_statement),
+        right_statement=get_singleton_statement,
         min_performance_factor=0.25,
     )

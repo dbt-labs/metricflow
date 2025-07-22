@@ -12,10 +12,10 @@ logger = logging.getLogger(__name__)
 
 
 def assert_performance_factor(
-    slow_code_setup: str,
-    slow_code_statement: str,
-    fast_code_setup: str,
-    fast_code_statement: str,
+    left_setup: str,
+    left_statement: str,
+    right_setup: str,
+    right_statement: str,
     min_performance_factor: float,
 ) -> None:
     """Using `timeit`, check that the fast code is faster than the slow code by the given factor.
@@ -29,13 +29,13 @@ def assert_performance_factor(
             # `autorange()` runs the given code multiple times until 0.2s is spent.
             gc.collect()
             iteration_count, total_time = timeit.Timer(
-                timer=time.thread_time, setup=slow_code_setup, stmt=slow_code_statement
+                timer=time.thread_time, setup=left_setup, stmt=left_statement
             ).autorange()
             average_slow_code_runtime = total_time / iteration_count
 
             gc.collect()
             iteration_count, total_time = timeit.Timer(
-                timer=time.thread_time, setup=fast_code_setup, stmt=fast_code_statement
+                timer=time.thread_time, setup=right_setup, stmt=right_statement
             ).autorange()
             average_fast_code_runtime = total_time / iteration_count
 
@@ -43,10 +43,10 @@ def assert_performance_factor(
             raise RuntimeError(
                 LazyFormat(
                     "Got an exception with the given code",
-                    slow_code_setup=slow_code_setup,
-                    slow_code_statement=slow_code_statement,
-                    fast_code_setup=fast_code_setup,
-                    fast_code_statement=fast_code_statement,
+                    slow_code_setup=left_setup,
+                    slow_code_statement=left_statement,
+                    fast_code_setup=right_setup,
+                    fast_code_statement=right_statement,
                 )
             ) from e
 

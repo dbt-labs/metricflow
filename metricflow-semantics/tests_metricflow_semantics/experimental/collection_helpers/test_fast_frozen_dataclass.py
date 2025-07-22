@@ -26,10 +26,10 @@ def setup_statement() -> str:
 def test_hash(setup_statement: str) -> None:
     """Test that `fast_frozen_dataclass` is faster for repeated hashing."""
     assert_performance_factor(
-        slow_code_setup=setup_statement,
-        slow_code_statement="hash(left)",
-        fast_code_setup=setup_statement,
-        fast_code_statement="hash(fast_left)",
+        left_setup=setup_statement,
+        left_statement="hash(left)",
+        right_setup=setup_statement,
+        right_statement="hash(fast_left)",
         min_performance_factor=10,
     )
 
@@ -37,10 +37,10 @@ def test_hash(setup_statement: str) -> None:
 def test_in_set(setup_statement: str) -> None:
     """Test that `fast_frozen_dataclass` is faster for repeated set-inclusion checks."""
     assert_performance_factor(
-        slow_code_setup=setup_statement,
-        slow_code_statement="left in item_group_set",
-        fast_code_setup=setup_statement,
-        fast_code_statement="fast_left in fast_item_group_set",
+        left_setup=setup_statement,
+        left_statement="left in item_group_set",
+        right_setup=setup_statement,
+        right_statement="fast_left in fast_item_group_set",
         min_performance_factor=10,
     )
 
@@ -48,10 +48,10 @@ def test_in_set(setup_statement: str) -> None:
 def test_in_dict(setup_statement: str) -> None:
     """Test that `fast_frozen_dataclass` is faster for repeated dict-inclusion checks."""
     assert_performance_factor(
-        slow_code_setup=setup_statement,
-        slow_code_statement="left in item_group_dict",
-        fast_code_setup=setup_statement,
-        fast_code_statement="fast_left in fast_item_group_dict",
+        left_setup=setup_statement,
+        left_statement="left in item_group_dict",
+        right_setup=setup_statement,
+        right_statement="fast_left in fast_item_group_dict",
         min_performance_factor=10,
     )
 
@@ -59,10 +59,10 @@ def test_in_dict(setup_statement: str) -> None:
 def test_create(setup_statement: str) -> None:
     """Test that `fast_frozen_dataclass` is faster to create."""
     assert_performance_factor(
-        slow_code_setup=setup_statement,
-        slow_code_statement="create_group('left')",
-        fast_code_setup=setup_statement,
-        fast_code_statement="create_fast_group('left')",
+        left_setup=setup_statement,
+        left_statement="create_group('left')",
+        right_setup=setup_statement,
+        right_statement="create_fast_group('left')",
         min_performance_factor=1.5,
     )
 
@@ -70,10 +70,10 @@ def test_create(setup_statement: str) -> None:
 def test_equals(setup_statement: str) -> None:
     """Test that `fast_frozen_dataclass` has similar equals performance."""
     assert_performance_factor(
-        slow_code_setup=setup_statement,
-        slow_code_statement="left == right",
-        fast_code_setup=setup_statement,
-        fast_code_statement="fast_left == fast_right",
+        left_setup=setup_statement,
+        left_statement="left == right",
+        right_setup=setup_statement,
+        right_statement="fast_left == fast_right",
         # Usually close to 1, but using 0.8 for reduced test flakiness.
         min_performance_factor=0.8,
     )
@@ -82,10 +82,10 @@ def test_equals(setup_statement: str) -> None:
 def test_field_access(setup_statement: str) -> None:
     """Test that `fast_frozen_dataclass` has similar field access performance."""
     assert_performance_factor(
-        slow_code_setup=setup_statement,
-        slow_code_statement="left.item_group_field_0.item_field_0",
-        fast_code_setup=setup_statement,
-        fast_code_statement="fast_left.item_group_field_0.item_field_0",
+        left_setup=setup_statement,
+        left_statement="left.item_group_field_0.item_field_0",
+        right_setup=setup_statement,
+        right_statement="fast_left.item_group_field_0.item_field_0",
         # Usually close to 1, but using 0.8 for reduced test flakiness.
         min_performance_factor=0.8,
     )
@@ -94,10 +94,10 @@ def test_field_access(setup_statement: str) -> None:
 def test_lt(setup_statement: str) -> None:
     """Test that `fast_frozen_dataclass` has similar `<` performance."""
     assert_performance_factor(
-        slow_code_setup=setup_statement,
-        slow_code_statement="left < right",
-        fast_code_setup=setup_statement,
-        fast_code_statement="fast_left < fast_right",
+        left_setup=setup_statement,
+        left_statement="left < right",
+        right_setup=setup_statement,
+        right_statement="fast_left < fast_right",
         # Usually close to 1, but using 0.8 for reduced test flakiness.
         min_performance_factor=0.8,
     )
