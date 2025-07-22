@@ -15,7 +15,7 @@ from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_data
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 from metricflow_semantics.model.semantics.linkable_element_set_base import AnnotatedSpec, BaseLinkableElementSet
-from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
+from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 
 logger = logging.getLogger(__name__)
@@ -95,30 +95,31 @@ class AnnotatedSpecLinkableElementSet(BaseLinkableElementSet, SerializableDatacl
 
     @override
     def filter(self, element_filter: LinkableElementFilter) -> AnnotatedSpecLinkableElementSet:
-        dunder_name_to_annotated_spec = {}
+        allow_element_name_set = element_filter.element_names
+        deny_property_set = element_filter.without_any_of
+        deny_match_all_property_set = element_filter.without_all_of
 
-        filter_element_names = element_filter.element_names
-        filter_without_any_of = element_filter.without_any_of
-        filter_without_all_of = element_filter.without_all_of
-
-        for dunder_name, annotated_spec in self.dunder_name_to_annotated_spec.items():
-            if filter_element_names and annotated_spec.spec.element_name not in filter_element_names:
+        new_specs: list[AnnotatedSpec] = []
+        for annotated_spec in self.annotated_specs:
+            if allow_element_name_set is not None and annotated_spec.element_name not in allow_element_name_set:
                 continue
 
-            spec_properties = annotated_spec.properties
+            property_set = annotated_spec.properties
 
             if not element_filter.with_any_of.intersection(annotated_spec.properties):
                 continue
 
-            if filter_without_any_of and filter_without_any_of.intersection(spec_properties):
+            if deny_property_set and len(deny_property_set.intersection(property_set)) > 0:
                 continue
 
-            if filter_without_all_of and filter_without_all_of.intersection(spec_properties) == filter_without_all_of:
+            if (
+                len(deny_match_all_property_set) > 0
+                and deny_match_all_property_set.intersection(property_set) == deny_match_all_property_set
+            ):
                 continue
+            new_specs.append(annotated_spec)
 
-            dunder_name_to_annotated_spec[dunder_name] = annotated_spec
-
-        return AnnotatedSpecLinkableElementSet.create_from_mapping(dunder_name_to_annotated_spec)
+        return AnnotatedSpecLinkableElementSet(annotated_specs=tuple(new_specs))
 
     @override
     @property
@@ -132,28 +133,20 @@ class AnnotatedSpecLinkableElementSet(BaseLinkableElementSet, SerializableDatacl
 
     @override
     def filter_by_spec_patterns(self, spec_patterns: Sequence[SpecPattern]) -> AnnotatedSpecLinkableElementSet:
-        dunder_name_to_spec = {
-            dunder_name: annotated_spec.spec
-            for dunder_name, annotated_spec in self.dunder_name_to_annotated_spec.items()
+        if len(spec_patterns) == 0:
+            return self
+
+        spec_to_annotated_spec: dict[InstanceSpec, AnnotatedSpec] = {
+            annotated_spec.spec: annotated_spec for annotated_spec in self.annotated_specs
         }
-
-        names_to_keep = set(dunder_name_to_spec)
-
+        specs = tuple(spec_to_annotated_spec.keys())
         for spec_pattern in spec_patterns:
-            names_to_discard = set()
-            for dunder_name in names_to_keep:
-                spec = dunder_name_to_spec[dunder_name]
-                if not spec_pattern.match((spec,)):
-                    names_to_discard.add(dunder_name)
-            names_to_keep.difference_update(names_to_discard)
+            matched_specs = tuple(spec_pattern.match(specs))
+            specs = matched_specs
 
-        dunder_name_to_annotated_spec: dict[str, AnnotatedSpec] = {
-            dunder_name: annotated_spec
-            for dunder_name, annotated_spec in self.dunder_name_to_annotated_spec.items()
-            if dunder_name in names_to_keep
-        }
-
-        return AnnotatedSpecLinkableElementSet.create_from_mapping(dunder_name_to_annotated_spec)
+        return AnnotatedSpecLinkableElementSet(
+            annotated_specs=tuple(spec_to_annotated_spec[matched_spec] for matched_spec in specs)
+        )
 
     @override
     @cached_property
