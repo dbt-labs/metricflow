@@ -1,0 +1,32 @@
+test_name: test_lookup_attributes
+test_filename: test_manifest_object_lookup.py
+docstring:
+  Tests the attributes of the object lookup.
+---
+ManifestObjectLookup(
+  model_object_lookups=(
+    MeasureContainingModelObjectLookup(
+      model_id=sm_0,
+      time_dimension_name_to_grain={'ds': QUARTER},
+      entity_lookup=EntityLookup(
+        entity_name_to_type={'sm_0_entity': PRIMARY, 'sm_1_entity': FOREIGN},
+        entity_type_to_names={PRIMARY: {'sm_0_entity'}, FOREIGN: {'sm_1_entity'}},
+      ),
+      aggregation_configuration_to_measures={
+        MeasureAggregationConfiguration(
+          time_dimension_name='ds',
+          time_grain=QUARTER,
+        ): ['sm_0_measure'],
+      },
+    ),
+    ModelObjectLookup(
+      model_id=sm_1,
+      entity_lookup=EntityLookup(
+        entity_name_to_type={'sm_1_entity': PRIMARY},
+        entity_type_to_names={PRIMARY: {'sm_1_entity'}},
+      ),
+    ),
+  ),
+  min_time_grain=QUARTER,
+  expanded_time_grains=(ExpandedTimeGranularity(name='custom_year', base_granularity=YEAR),),
+)
