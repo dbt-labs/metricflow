@@ -18,7 +18,7 @@ def assert_performance_factor(
     right_statement: str,
     min_performance_factor: float,
 ) -> None:
-    """Using `timeit`, check that the fast code is faster than the slow code by the given factor.
+    """Using `timeit`, check that the right statement is faster than the left statement by the given factor.
 
     See `timeit` for definitions of `setup` and `statement`.
     """
@@ -31,32 +31,32 @@ def assert_performance_factor(
             iteration_count, total_time = timeit.Timer(
                 timer=time.thread_time, setup=left_setup, stmt=left_statement
             ).autorange()
-            average_slow_code_runtime = total_time / iteration_count
+            average_left_code_runtime = total_time / iteration_count
 
             gc.collect()
             iteration_count, total_time = timeit.Timer(
                 timer=time.thread_time, setup=right_setup, stmt=right_statement
             ).autorange()
-            average_fast_code_runtime = total_time / iteration_count
+            average_right_code_runtime = total_time / iteration_count
 
         except Exception as e:
             raise RuntimeError(
                 LazyFormat(
-                    "Got an exception with the given code",
-                    slow_code_setup=left_setup,
-                    slow_code_statement=left_statement,
-                    fast_code_setup=right_setup,
-                    fast_code_statement=right_statement,
+                    "Got an exception with the executed statements.",
+                    left_setup=left_setup,
+                    left_statement=left_statement,
+                    right_setup=right_setup,
+                    right_statement=right_statement,
                 )
             ) from e
 
-        performance_factor = average_slow_code_runtime / average_fast_code_runtime
+        performance_factor = average_left_code_runtime / average_right_code_runtime
 
         logger.debug(
             LazyFormat(
-                "Compared performance of slow code and fast code",
-                slow_code_runtime=lambda: datetime.timedelta(seconds=average_slow_code_runtime),
-                fast_code_runtime=lambda: datetime.timedelta(seconds=average_fast_code_runtime),
+                "Compared performance of left and right statements.",
+                left_statement_runtime=lambda: datetime.timedelta(seconds=average_left_code_runtime),
+                right_statement_runtime=lambda: datetime.timedelta(seconds=average_right_code_runtime),
                 performance_factor=lambda: f"{performance_factor:.2f}",
                 expected_min_performance_factor=lambda: f"{min_performance_factor:.2f}",
             )
