@@ -37,8 +37,11 @@ from metricflow_semantics.mf_logging.pretty_formatter import (
 
 logger = logging.getLogger(__name__)
 
+NodeT = TypeVar("NodeT", bound="MetricflowGraphNode")
+EdgeT = TypeVar("EdgeT", bound="MetricflowGraphEdge")
 
-NodeT = TypeVar("NodeT", bound="MetricflowGraphNode", covariant=True)
+NodeT_co = TypeVar("NodeT_co", bound="MetricflowGraphNode", covariant=True)
+EdgeT_co = TypeVar("EdgeT_co", bound="MetricflowGraphEdge", covariant=True)
 
 
 class MetricflowGraphNode(MetricflowGraphElement, MetricFlowPrettyFormattable, Comparable, ABC):
@@ -84,7 +87,7 @@ class MetricflowGraphNode(MetricflowGraphElement, MetricFlowPrettyFormattable, C
 
 
 @singleton_dataclass(order=False)
-class MetricflowGraphEdge(MetricflowGraphElement, MetricFlowPrettyFormattable, Comparable, Generic[NodeT], ABC):
+class MetricflowGraphEdge(MetricflowGraphElement, MetricFlowPrettyFormattable, Comparable, Generic[NodeT_co], ABC):
     """Base class for edges in a directed graph.
 
     An edge can be visualized as an arrow that points from the tail node to the head node.
@@ -93,19 +96,19 @@ class MetricflowGraphEdge(MetricflowGraphElement, MetricFlowPrettyFormattable, C
     _DEFAULT_EDGE_LABELS: ClassVar[OrderedSet[MetricflowGraphLabel]] = FrozenOrderedSet()
 
     # TODO: Check if these can be renamed / remove property accessors.
-    _tail_node: NodeT
-    _head_node: NodeT
+    _tail_node: NodeT_co
+    _head_node: NodeT_co
 
     @property
-    def tail_node(self) -> NodeT:  # noqa: D102
+    def tail_node(self) -> NodeT_co:  # noqa: D102
         return self._tail_node
 
     @property
-    def head_node(self) -> NodeT:  # noqa: D102
+    def head_node(self) -> NodeT_co:  # noqa: D102
         return self._head_node
 
     @property
-    def node_pair(self) -> Pair[NodeT, NodeT]:
+    def node_pair(self) -> Pair[NodeT_co, NodeT_co]:
         """Return a tuple of the head node and the tail node."""
         return (self._tail_node, self._head_node)
 
@@ -156,41 +159,38 @@ class MetricflowGraphEdge(MetricflowGraphElement, MetricFlowPrettyFormattable, C
         return self.labels.union(self._head_node.labels)
 
 
-EdgeT = TypeVar("EdgeT", bound="MetricflowGraphEdge", covariant=True)
-
-
-class MetricflowGraph(MetricFlowPrettyFormattable, Generic[NodeT, EdgeT], ABC):
+class MetricflowGraph(MetricFlowPrettyFormattable, Generic[NodeT_co, EdgeT_co], ABC):
     """Base class for a directed graph."""
 
     @property
     @abstractmethod
-    def nodes(self) -> OrderedSet[NodeT]:
+    def nodes(self) -> OrderedSet[NodeT_co]:
         """Return the set of nodes in the graph."""
         raise NotImplementedError()
 
     @abstractmethod
-    def nodes_with_label(self, graph_label: MetricflowGraphLabel) -> OrderedSet[NodeT]:
+    def nodes_with_label(self, graph_label: MetricflowGraphLabel) -> OrderedSet[NodeT_co]:
         """Return nodes in the graph with the given label."""
         raise NotImplementedError()
 
     @property
     @abstractmethod
-    def edges(self) -> OrderedSet[EdgeT]:
+    def edges(self) -> OrderedSet[EdgeT_co]:
         """Return the set of edges in a graph."""
         raise NotImplementedError()
 
     @abstractmethod
-    def edges_with_tail_node(self, tail_node: MetricflowGraphNode) -> OrderedSet[EdgeT]:
+    def edges_with_tail_node(self, tail_node: MetricflowGraphNode) -> OrderedSet[EdgeT_co]:
         """Returns edges with the given tail node."""
         raise NotImplementedError()
 
     @abstractmethod
-    def edges_with_head_node(self, tail_node: MetricflowGraphNode) -> OrderedSet[EdgeT]:
+    def edges_with_head_node(self, tail_node: MetricflowGraphNode) -> OrderedSet[EdgeT_co]:
         """Returns edges with the given head node."""
         raise NotImplementedError()
 
     @abstractmethod
-    def edges_with_label(self, label: MetricflowGraphLabel) -> OrderedSet[EdgeT]:
+    def edges_with_label(self, label: MetricflowGraphLabel) -> OrderedSet[EdgeT_co]:
         """Return the set of edges in a graph that have the given label."""
         raise NotImplementedError()
 
@@ -199,7 +199,7 @@ class MetricflowGraph(MetricFlowPrettyFormattable, Generic[NodeT, EdgeT], ABC):
         return formatter.format_graph(self)
 
     @abstractmethod
-    def successors(self, node: MetricflowGraphNode) -> OrderedSet[NodeT]:
+    def successors(self, node: MetricflowGraphNode) -> OrderedSet[NodeT_co]:
         """Returns successors of the given node.
 
         Raises `UnknownNodeException` if the node does not exist in the graph.
@@ -207,7 +207,7 @@ class MetricflowGraph(MetricFlowPrettyFormattable, Generic[NodeT, EdgeT], ABC):
         return FrozenOrderedSet(edge.head_node for edge in self.edges_with_tail_node(node))
 
     @abstractmethod
-    def predecessors(self, node: MetricflowGraphNode) -> OrderedSet[NodeT]:
+    def predecessors(self, node: MetricflowGraphNode) -> OrderedSet[NodeT_co]:
         """Returns predecessors of the given node.
 
         Raises `UnknownNodeException` if the node does not exist in the graph.
@@ -226,20 +226,20 @@ class MetricflowGraph(MetricFlowPrettyFormattable, Generic[NodeT, EdgeT], ABC):
         """Return a copy of this graph with the nodes and edges sorted."""
         raise NotImplementedError
 
-    def _intersect_edges(self, other: MetricflowGraph[NodeT, EdgeT]) -> OrderedSet[EdgeT]:
+    def _intersect_edges(self, other: MetricflowGraph[NodeT_co, EdgeT_co]) -> OrderedSet[EdgeT_co]:
         return self.edges.intersection(other.edges)
 
     @abstractmethod
-    def intersection(self, other: MetricflowGraph[NodeT, EdgeT]) -> Self:  # noqa: D102
+    def intersection(self, other: MetricflowGraph[NodeT_co, EdgeT_co]) -> Self:  # noqa: D102
         raise NotImplementedError()
 
     @abstractmethod
     def inverse(self) -> Self:  # noqa: D102
         raise NotImplementedError()
 
-    def adjacent_edges(self, selected_nodes: OrderedSet[NodeT]) -> OrderedSet[EdgeT]:
+    def adjacent_edges(self, selected_nodes: OrderedSet[NodeT_co]) -> OrderedSet[EdgeT_co]:
         """Return the edges that have an end point in the selected nodes."""
-        subgraph_edges = MutableOrderedSet[EdgeT]()
+        subgraph_edges = MutableOrderedSet[EdgeT_co]()
         for node in selected_nodes:
             for edge in self.edges_with_tail_node(node):
                 if edge.head_node in selected_nodes:

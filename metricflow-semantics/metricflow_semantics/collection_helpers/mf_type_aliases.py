@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Hashable, TypeVar
+from typing import Any, Hashable, TypeVar
 
 T = TypeVar("T")
 T_co = TypeVar("T_co", covariant=True)
@@ -27,3 +27,5 @@ KeyT = TypeVar("KeyT", bound=Hashable)
 ValueT = TypeVar("ValueT")
 MappingItem = tuple[KeyT, ValueT]
 MappingItemsTuple = tuple[tuple[KeyT, ValueT], ...]
+
+ExceptionTracebackAnyType = Any  # type: ignore
