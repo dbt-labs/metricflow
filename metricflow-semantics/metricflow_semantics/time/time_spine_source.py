@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Dict, Optional, Sequence, Tuple
+from typing import Dict, Iterable, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.implementations.time_spine import PydanticTimeSpineCustomGranularityColumn
 from dbt_semantic_interfaces.protocols import SemanticManifest
@@ -95,7 +95,7 @@ class TimeSpineSource:
         }
 
     @staticmethod
-    def build_custom_granularities(time_spine_sources: Sequence[TimeSpineSource]) -> Dict[str, ExpandedTimeGranularity]:
+    def build_custom_granularities(time_spine_sources: Iterable[TimeSpineSource]) -> Dict[str, ExpandedTimeGranularity]:
         """Creates a set of supported custom granularities based on what's in the manifest."""
         return {
             custom_granularity.name: ExpandedTimeGranularity(
