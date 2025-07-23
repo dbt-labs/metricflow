@@ -104,9 +104,9 @@ class AnnotatedSpecLinkableElementSet(BaseLinkableElementSet, SerializableDatacl
             if allow_element_name_set is not None and annotated_spec.element_name not in allow_element_name_set:
                 continue
 
-            property_set = annotated_spec.properties
+            property_set = annotated_spec.property_set
 
-            if not element_filter.with_any_of.intersection(annotated_spec.properties):
+            if not element_filter.with_any_of.intersection(annotated_spec.property_set):
                 continue
 
             if deny_property_set and len(deny_property_set.intersection(property_set)) > 0:

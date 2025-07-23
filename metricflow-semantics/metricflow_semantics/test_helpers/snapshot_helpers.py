@@ -319,7 +319,7 @@ def _convert_linkable_element_set_to_rows(
         row_dict["Type"] = annotated_spec.element_type.name.ljust(14)
 
         row_dict["Properties"] = ",".join(
-            sorted(linkable_element_property.name for linkable_element_property in annotated_spec.properties)
+            sorted(linkable_element_property.name for linkable_element_property in annotated_spec.property_set)
         )
         row_dict["Derived-From Semantic Models"] = ",".join(
             sorted(

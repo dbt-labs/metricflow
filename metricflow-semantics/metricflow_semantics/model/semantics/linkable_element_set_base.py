@@ -112,7 +112,7 @@ class AnnotatedSpec(SerializableDataclass):
     # There can be multiple models if it's a metric / derived metric that references multiple measures, and the join
     # path from the measure to the dimension is different.
     origin_semantic_model_names: Tuple[str, ...]
-    source_semantic_model_names: Tuple[str, ...]
+    derived_from_semantic_model_names: Tuple[str, ...]
 
     @staticmethod
     def create(  # noqa: D102
@@ -127,9 +127,9 @@ class AnnotatedSpec(SerializableDataclass):
         date_part: Optional[DatePart],
     ) -> AnnotatedSpec:
         entity_link_names = tuple(entity_reference.element_name for entity_reference in entity_links)
-        _properties = tuple(FrozenOrderedSet(properties))
-        _origin_model_names = tuple(FrozenOrderedSet(model_id.model_name for model_id in origin_model_ids))
-        _source_semantic_model_names = tuple(
+        element_properties = tuple(FrozenOrderedSet(properties))
+        origin_model_names = tuple(FrozenOrderedSet(model_id.model_name for model_id in origin_model_ids))
+        derived_from_semantic_model_names = tuple(
             FrozenOrderedSet(model_reference.semantic_model_name for model_reference in derived_from_semantic_models)
         )
         metric_subquery_entity_link_names = (
@@ -137,21 +137,17 @@ class AnnotatedSpec(SerializableDataclass):
             if metric_subquery_entity_links is not None
             else ()
         )
-        _source_semantic_model_ids = tuple(
-            SemanticModelId.get_instance(model_reference.semantic_model_name)
-            for model_reference in derived_from_semantic_models
-        )
 
         return AnnotatedSpec(
             element_type=element_type,
             element_name=element_name,
             entity_link_names=entity_link_names,
-            element_properties=_properties,
+            element_properties=element_properties,
             time_grain=time_grain,
             date_part=date_part,
             metric_subquery_entity_link_names=metric_subquery_entity_link_names,
-            origin_semantic_model_names=_origin_model_names,
-            source_semantic_model_names=_source_semantic_model_names,
+            origin_semantic_model_names=origin_model_names,
+            derived_from_semantic_model_names=derived_from_semantic_model_names,
         )
 
     @cached_property
@@ -202,7 +198,7 @@ class AnnotatedSpec(SerializableDataclass):
             assert_values_exhausted(element_type)
 
     @cached_property
-    def properties(self) -> FrozenOrderedSet[LinkableElementProperty]:  # noqa: D102
+    def property_set(self) -> FrozenOrderedSet[LinkableElementProperty]:  # noqa: D102
         return FrozenOrderedSet(self.element_properties)
 
     @cached_property
@@ -213,7 +209,7 @@ class AnnotatedSpec(SerializableDataclass):
 
     @cached_property
     def derived_from_semantic_models(self) -> Sequence[SemanticModelReference]:  # noqa: D102
-        return tuple(SemanticModelReference(model_name) for model_name in self.source_semantic_model_names)
+        return tuple(SemanticModelReference(model_name) for model_name in self.derived_from_semantic_model_names)
 
     def merge(self, other: AnnotatedSpec) -> AnnotatedSpec:  # noqa: D102
         if (
@@ -239,12 +235,12 @@ class AnnotatedSpec(SerializableDataclass):
             time_grain=self.time_grain,
             date_part=self.date_part,
             metric_subquery_entity_link_names=self.metric_subquery_entity_link_names,
-            element_properties=tuple(self.properties.union(other.properties)),
+            element_properties=tuple(self.property_set.union(other.property_set)),
             origin_semantic_model_names=tuple(
                 FrozenOrderedSet(self.origin_semantic_model_names + other.origin_semantic_model_names)
             ),
-            source_semantic_model_names=tuple(
-                FrozenOrderedSet(self.source_semantic_model_names + other.source_semantic_model_names)
+            derived_from_semantic_model_names=tuple(
+                FrozenOrderedSet(self.derived_from_semantic_model_names + other.derived_from_semantic_model_names)
             ),
         )
 
