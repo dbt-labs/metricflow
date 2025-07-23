@@ -75,7 +75,9 @@ docstring:
                             <!--           entity_link_names=('booking',),                   -->
                             <!--           element_properties=(LOCAL,),                      -->
                             <!--           origin_semantic_model_names=('bookings_source',), -->
-                            <!--           source_semantic_model_names=('bookings_source',), -->
+                            <!--           derived_from_semantic_model_names=(               -->
+                            <!--             'bookings_source',                              -->
+                            <!--           ),                                                -->
                             <!--         ),                                                  -->
                             <!--       ),                                                    -->
                             <!--     ),                                                      -->

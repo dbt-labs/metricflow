@@ -32,7 +32,7 @@ docstring:
             <!--                 origin_semantic_model_names=(          -->
             <!--                   'listings_latest',                   -->
             <!--                 ),                                     -->
-            <!--                 source_semantic_model_names=(          -->
+            <!--                 derived_from_semantic_model_names=(    -->
             <!--                   'bookings_source',                   -->
             <!--                   'listings_latest',                   -->
             <!--                 ),                                     -->
@@ -71,7 +71,7 @@ docstring:
                         <!--           entity_link_names=('listing',),                   -->
                         <!--           element_properties=(JOINED,),                     -->
                         <!--           origin_semantic_model_names=('listings_latest',), -->
-                        <!--           source_semantic_model_names=(                     -->
+                        <!--           derived_from_semantic_model_names=(               -->
                         <!--             'bookings_source',                              -->
                         <!--             'listings_latest',                              -->
                         <!--           ),                                                -->

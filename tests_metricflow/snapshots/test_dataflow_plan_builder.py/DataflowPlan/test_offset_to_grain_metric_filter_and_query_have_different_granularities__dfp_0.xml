@@ -33,7 +33,7 @@ docstring:
             <!--                 origin_semantic_model_names=(          -->
             <!--                   '__VIRTUAL__',                       -->
             <!--                 ),                                     -->
-            <!--                 source_semantic_model_names=(          -->
+            <!--                 derived_from_semantic_model_names=(    -->
             <!--                   'bookings_source',                   -->
             <!--                 ),                                     -->
             <!--               ),                                       -->
@@ -69,7 +69,7 @@ docstring:
                 <!--                 origin_semantic_model_names=(          -->
                 <!--                   '__VIRTUAL__',                       -->
                 <!--                 ),                                     -->
-                <!--                 source_semantic_model_names=(          -->
+                <!--                 derived_from_semantic_model_names=(    -->
                 <!--                   'bookings_source',                   -->
                 <!--                 ),                                     -->
                 <!--               ),                                       -->
@@ -97,26 +97,28 @@ docstring:
                         <WhereConstraintNode>
                             <!-- description = 'Constrain Output with WHERE' -->
                             <!-- node_id = NodeId(id_str='wcc_0') -->
-                            <!-- where_condition =                                           -->
-                            <!--   WhereFilterSpec(                                          -->
-                            <!--     where_sql="metric_time__day = '2020-01-01'",            -->
-                            <!--     bind_parameters=SqlBindParameterSet(),                  -->
-                            <!--     element_set=AnnotatedSpecLinkableElementSet(            -->
-                            <!--       annotated_specs=(                                     -->
-                            <!--         AnnotatedSpec(                                      -->
-                            <!--           element_type=TIME_DIMENSION,                      -->
-                            <!--           element_name='metric_time',                       -->
-                            <!--           time_grain=ExpandedTimeGranularity(               -->
-                            <!--             name='day',                                     -->
-                            <!--             base_granularity=DAY,                           -->
-                            <!--           ),                                                -->
-                            <!--           element_properties=(METRIC_TIME,),                -->
-                            <!--           origin_semantic_model_names=('__VIRTUAL__',),     -->
-                            <!--           source_semantic_model_names=('bookings_source',), -->
-                            <!--         ),                                                  -->
-                            <!--       ),                                                    -->
-                            <!--     ),                                                      -->
-                            <!--   )                                                         -->
+                            <!-- where_condition =                                       -->
+                            <!--   WhereFilterSpec(                                      -->
+                            <!--     where_sql="metric_time__day = '2020-01-01'",        -->
+                            <!--     bind_parameters=SqlBindParameterSet(),              -->
+                            <!--     element_set=AnnotatedSpecLinkableElementSet(        -->
+                            <!--       annotated_specs=(                                 -->
+                            <!--         AnnotatedSpec(                                  -->
+                            <!--           element_type=TIME_DIMENSION,                  -->
+                            <!--           element_name='metric_time',                   -->
+                            <!--           time_grain=ExpandedTimeGranularity(           -->
+                            <!--             name='day',                                 -->
+                            <!--             base_granularity=DAY,                       -->
+                            <!--           ),                                            -->
+                            <!--           element_properties=(METRIC_TIME,),            -->
+                            <!--           origin_semantic_model_names=('__VIRTUAL__',), -->
+                            <!--           derived_from_semantic_model_names=(           -->
+                            <!--             'bookings_source',                          -->
+                            <!--           ),                                            -->
+                            <!--         ),                                              -->
+                            <!--       ),                                                -->
+                            <!--     ),                                                  -->
+                            <!--   )                                                     -->
                             <JoinToTimeSpineNode>
                                 <!-- description = 'Join to Time Spine Dataset' -->
                                 <!-- node_id = NodeId(id_str='jts_0') -->

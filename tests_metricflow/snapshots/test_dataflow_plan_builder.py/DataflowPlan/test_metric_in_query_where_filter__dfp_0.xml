@@ -36,7 +36,7 @@ docstring:
             <!--                 origin_semantic_model_names=(          -->
             <!--                   '__VIRTUAL__',                       -->
             <!--                 ),                                     -->
-            <!--                 source_semantic_model_names=(          -->
+            <!--                 derived_from_semantic_model_names=(    -->
             <!--                   'bookings_source',                   -->
             <!--                   'listings_latest',                   -->
             <!--                 ),                                     -->
@@ -71,7 +71,7 @@ docstring:
                         <!--           metric_subquery_entity_link_names=('listing',), -->
                         <!--           element_properties=(JOINED, METRIC),            -->
                         <!--           origin_semantic_model_names=('__VIRTUAL__',),   -->
-                        <!--           source_semantic_model_names=(                   -->
+                        <!--           derived_from_semantic_model_names=(             -->
                         <!--             'bookings_source',                            -->
                         <!--             'listings_latest',                            -->
                         <!--           ),                                              -->

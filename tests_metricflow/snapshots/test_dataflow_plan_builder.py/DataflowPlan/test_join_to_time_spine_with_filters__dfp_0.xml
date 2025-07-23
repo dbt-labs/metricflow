@@ -33,7 +33,7 @@ docstring:
             <!--                 origin_semantic_model_names=(          -->
             <!--                   '__VIRTUAL__',                       -->
             <!--                 ),                                     -->
-            <!--                 source_semantic_model_names=(          -->
+            <!--                 derived_from_semantic_model_names=(    -->
             <!--                   'bookings_source',                   -->
             <!--                 ),                                     -->
             <!--               ),                                       -->
@@ -95,7 +95,7 @@ docstring:
                                 <!--           ),                                            -->
                                 <!--           element_properties=(METRIC_TIME,),            -->
                                 <!--           origin_semantic_model_names=('__VIRTUAL__',), -->
-                                <!--           source_semantic_model_names=(                 -->
+                                <!--           derived_from_semantic_model_names=(           -->
                                 <!--             'bookings_source',                          -->
                                 <!--           ),                                            -->
                                 <!--         ),                                              -->
@@ -154,7 +154,7 @@ docstring:
                                 <!--           ),                                            -->
                                 <!--           element_properties=(METRIC_TIME,),            -->
                                 <!--           origin_semantic_model_names=('__VIRTUAL__',), -->
-                                <!--           source_semantic_model_names=(                 -->
+                                <!--           derived_from_semantic_model_names=(           -->
                                 <!--             'bookings_source',                          -->
                                 <!--           ),                                            -->
                                 <!--         ),                                              -->

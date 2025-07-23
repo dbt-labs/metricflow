@@ -39,7 +39,7 @@ docstring:
                     <!--                 origin_semantic_model_names=(          -->
                     <!--                   'listings_latest',                   -->
                     <!--                 ),                                     -->
-                    <!--                 source_semantic_model_names=(          -->
+                    <!--                 derived_from_semantic_model_names=(    -->
                     <!--                   'bookings_source',                   -->
                     <!--                   'listings_latest',                   -->
                     <!--                 ),                                     -->
@@ -80,7 +80,7 @@ docstring:
                                 <!--           origin_semantic_model_names=(          -->
                                 <!--             'listings_latest',                   -->
                                 <!--           ),                                     -->
-                                <!--           source_semantic_model_names=(          -->
+                                <!--           derived_from_semantic_model_names=(    -->
                                 <!--             'bookings_source',                   -->
                                 <!--             'listings_latest',                   -->
                                 <!--           ),                                     -->
@@ -154,7 +154,7 @@ docstring:
                     <!--                 origin_semantic_model_names=(          -->
                     <!--                   'listings_latest',                   -->
                     <!--                 ),                                     -->
-                    <!--                 source_semantic_model_names=(          -->
+                    <!--                 derived_from_semantic_model_names=(    -->
                     <!--                   'bookings_source',                   -->
                     <!--                   'listings_latest',                   -->
                     <!--                 ),                                     -->
@@ -195,7 +195,7 @@ docstring:
                                 <!--           origin_semantic_model_names=(          -->
                                 <!--             'listings_latest',                   -->
                                 <!--           ),                                     -->
-                                <!--           source_semantic_model_names=(          -->
+                                <!--           derived_from_semantic_model_names=(    -->
                                 <!--             'bookings_source',                   -->
                                 <!--             'listings_latest',                   -->
                                 <!--           ),                                     -->
