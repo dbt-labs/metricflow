@@ -30,7 +30,7 @@ class SemanticModelId(MetricFlowPrettyFormattable, Comparable):
         return SemanticModelId(model_name=model_name)
 
     @override
-    @property
+    @cached_property
     def comparison_key(self) -> ComparisonKey:
         return (self.model_name,)
 
