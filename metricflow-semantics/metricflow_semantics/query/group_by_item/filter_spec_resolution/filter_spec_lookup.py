@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Optional, Sequence, Tuple, Union
+from typing import Optional, Sequence, Tuple, Union
 
 from dbt_semantic_interfaces.call_parameter_sets import (
     DimensionCallParameterSet,
@@ -16,16 +16,12 @@ from typing_extensions import override
 from metricflow_semantics.collection_helpers.merger import Mergeable
 from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
-from metricflow_semantics.model.semantics.linkable_element import LinkableElement
+from metricflow_semantics.model.semantics.linkable_element_set_base import AnnotatedSpec, BaseLinkableElementSet
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow_semantics.query.group_by_item.path_prefixable import PathPrefixable
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow_semantics.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
-
-if TYPE_CHECKING:
-    from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
-    from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 
 logger = logging.getLogger(__name__)
 
@@ -90,7 +86,7 @@ class FilterSpecResolutionLookUp(Mergeable):
 
         return resolution
 
-    def checked_resolved_spec(self, resolved_spec_lookup_key: ResolvedSpecLookUpKey) -> LinkableInstanceSpec:
+    def checked_resolved_spec(self, resolved_spec_lookup_key: ResolvedSpecLookUpKey) -> AnnotatedSpec:
         """Returns the resolved spec for the given key.
 
         If a resolution does not exist, or there is no spec associated with the resolution, this raises a RuntimeError.
@@ -101,17 +97,6 @@ class FilterSpecResolutionLookUp(Mergeable):
             resolved_spec is not None
         ), f"Typechecker hint. Expected a resolution with a resolved spec, but got:\n{mf_pformat(resolution)}"
         return resolved_spec
-
-    def checked_resolved_linkable_elements(
-        self, resolved_spec_lookup_key: ResolvedSpecLookUpKey
-    ) -> Sequence[LinkableElement]:
-        """Returns the sequence of LinkableElements for the given spec lookup key.
-
-        These are the LinkableElements bound to the singular spec/path_key for a given resolved filter item. They are
-        useful for propagating metadata about the origin semantic model across the boundary between the filter resolver
-        and the DataflowPlanBuilder.
-        """
-        return self._checked_resolution(resolved_spec_lookup_key=resolved_spec_lookup_key).resolved_linkable_elements
 
     @override
     def merge(self, other: FilterSpecResolutionLookUp) -> FilterSpecResolutionLookUp:
@@ -177,7 +162,7 @@ class FilterSpecResolution:
 
     lookup_key: ResolvedSpecLookUpKey
     where_filter_intersection: WhereFilterIntersection
-    resolved_linkable_element_set: LinkableElementSet
+    resolved_linkable_element_set: BaseLinkableElementSet
     spec_pattern: SpecPattern
     issue_set: MetricFlowQueryResolutionIssueSet
     # Used for error messages.
@@ -196,13 +181,13 @@ class FilterSpecResolution:
         )
 
     @property
-    def resolved_spec(self) -> Optional[LinkableInstanceSpec]:
+    def resolved_spec(self) -> Optional[AnnotatedSpec]:
         """Returns the lone resolved spec, if one was found.
 
         The final ValueError should not be reachable due to the post-init validation, but is in place in case someone
         updates or removes the latter without accounting for the possibility of runtime divergence.
         """
-        specs = self.resolved_linkable_element_set.specs
+        specs = self.resolved_linkable_element_set.annotated_specs
         if len(specs) == 0:
             return None
         elif len(specs) == 1:
@@ -211,15 +196,6 @@ class FilterSpecResolution:
             raise ValueError(
                 f"Found {len(specs)} in {self.resolved_linkable_element_set}, this should not be possible!"
             )
-
-    @property
-    def resolved_linkable_elements(self) -> Sequence[LinkableElement]:
-        """Returns the resolved linkable elements, if any, for this resolution result."""
-        resolved_spec = self.resolved_spec
-        if resolved_spec is None:
-            return tuple()
-
-        return self.resolved_linkable_element_set.linkable_elements_for_path_key(resolved_spec.element_path_key)
 
 
 CallParameterSet = Union[

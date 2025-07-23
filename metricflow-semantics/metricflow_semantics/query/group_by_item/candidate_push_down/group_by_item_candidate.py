@@ -10,6 +10,7 @@ from typing_extensions import override
 
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
 from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
+from metricflow_semantics.model.semantics.linkable_element_set_base import BaseLinkableElementSet
 from metricflow_semantics.query.group_by_item.path_prefixable import PathPrefixable
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
@@ -35,7 +36,7 @@ class GroupByItemCandidateSet(PathPrefixable, SemanticModelDerivation):
     error messages, you start analyzing from the leaf node.
     """
 
-    linkable_element_set: LinkableElementSet
+    linkable_element_set: BaseLinkableElementSet
     measure_paths: Tuple[MetricFlowQueryResolutionPath, ...]
     path_from_leaf_node: MetricFlowQueryResolutionPath
 
@@ -67,8 +68,15 @@ class GroupByItemCandidateSet(PathPrefixable, SemanticModelDerivation):
                 path_from_leaf_node=path_from_leaf_node,
             )
         linkable_element_set_candidates = tuple(candidate_set.linkable_element_set for candidate_set in candidate_sets)
-        intersection_result = LinkableElementSet.intersection_by_path_key(linkable_element_set_candidates)
-        if intersection_result.spec_count == 0:
+
+        candidates_count = len(linkable_element_set_candidates)
+
+        if candidates_count == 0:
+            return GroupByItemCandidateSet.empty_instance()
+
+        intersection_result = linkable_element_set_candidates[0].intersection(*linkable_element_set_candidates[1:])
+
+        if intersection_result.is_empty:
             return GroupByItemCandidateSet.empty_instance()
 
         measure_paths = tuple(
@@ -103,7 +111,7 @@ class GroupByItemCandidateSet(PathPrefixable, SemanticModelDerivation):
     ) -> GroupByItemCandidateSet:
         """Return a new candidate set that only contains specs that match the given pattern."""
         filtered_element_set = self.linkable_element_set.filter_by_spec_patterns((spec_pattern,))
-        if filtered_element_set.spec_count == 0:
+        if filtered_element_set.is_empty:
             return GroupByItemCandidateSet.empty_instance()
         return GroupByItemCandidateSet(
             linkable_element_set=filtered_element_set,

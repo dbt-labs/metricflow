@@ -218,9 +218,8 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
 
             # The specified patterns don't match to any of the available group-by-items that can be queried for the
             # measure.
-            if matching_items.spec_count == 0:
+            if matching_items.is_empty:
                 input_suggestions: Sequence[str] = ()
-
                 if self._suggestion_generator is not None:
                     candidate_specs = self._group_by_item_resolver_for_query.resolve_available_items(
                         source_spec_patterns=self._suggestion_generator.candidate_filters
@@ -378,7 +377,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
 
             # There were candidates that were common from the ones passed from parents, but after applying the filters,
             # none of the candidates were valid.
-            if matched_items.spec_count == 0:
+            if matched_items.is_empty:
                 issue_sets_to_merge.append(
                     MetricFlowQueryResolutionIssueSet.from_issue(
                         MetricExcludesDatePartIssue.from_parameters(
@@ -415,7 +414,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
                 ),
             )
 
-            if matched_items.spec_count == 0:
+            if matched_items.is_empty:
                 return PushDownResult(
                     candidate_set=GroupByItemCandidateSet.empty_instance(),
                     issue_set=MetricFlowQueryResolutionIssueSet.merge_iterable(issue_sets_to_merge),
@@ -466,7 +465,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
                 logger.debug(LazyFormat(lambda: f"Candidate elements are:\n{mf_pformat(candidate_elements)}"))
             candidates_after_filtering = candidate_elements.filter_by_spec_patterns(self._source_spec_patterns)
 
-            if candidates_after_filtering.spec_count == 0:
+            if candidates_after_filtering.is_empty:
                 return PushDownResult(
                     candidate_set=GroupByItemCandidateSet.empty_instance(),
                     issue_set=MetricFlowQueryResolutionIssueSet.from_issue(

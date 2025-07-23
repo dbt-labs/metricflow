@@ -56,9 +56,9 @@ class MutableGraph(Generic[NodeT, EdgeT], MetricflowGraph[NodeT, EdgeT], ABC):
         graph_nodes = self._nodes
 
         if tail_node not in graph_nodes:
-            graph_nodes.add(tail_node)
+            self.add_node(tail_node)
         if head_node not in graph_nodes:
-            graph_nodes.add(head_node)
+            self.add_node(head_node)
 
         self._tail_node_to_edges[tail_node].add(edge)
         self._head_node_to_edges[head_node].add(edge)

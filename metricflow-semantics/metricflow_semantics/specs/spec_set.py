@@ -4,7 +4,7 @@ import dataclasses
 import itertools
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Generic, List, Sequence, Tuple, TypeVar
+from typing import TYPE_CHECKING, Generic, Iterable, List, Sequence, Tuple, TypeVar
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from typing_extensions import override
@@ -189,7 +189,7 @@ class _GroupSpecByTypeVisitor(InstanceSpecVisitor[None]):
         self.metadata_specs.append(metadata_spec)
 
 
-def group_specs_by_type(specs: Sequence[InstanceSpec]) -> InstanceSpecSet:
+def group_specs_by_type(specs: Iterable[InstanceSpec]) -> InstanceSpecSet:
     """Groups a sequence of specs by type."""
     grouper = _GroupSpecByTypeVisitor()
     for spec in specs:

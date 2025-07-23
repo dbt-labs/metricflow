@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import itertools
 import logging
 from typing import List, Optional, Sequence
 
@@ -9,13 +8,15 @@ from dbt_semantic_interfaces.implementations.filters.where_filter import Pydanti
 from dbt_semantic_interfaces.protocols import WhereFilter, WhereFilterIntersection
 
 from metricflow_semantics.errors.error_classes import RenderSqlTemplateException
+from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
+    AnnotatedSpecLinkableElementSet,
+)
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
     FilterSpecResolutionLookUp,
 )
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
-from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.rendered_spec_tracker import RenderedSpecTracker
 from metricflow_semantics.specs.where_filter.where_filter_dimension import WhereFilterDimensionFactory
 from metricflow_semantics.specs.where_filter.where_filter_entity import WhereFilterEntityFactory
@@ -103,16 +104,14 @@ class WhereSpecFactory:
                 raise RenderSqlTemplateException(
                     f"Error while rendering Jinja template:\n{where_filter.where_sql_template}"
                 ) from e
-            rendered_specs = tuple(result[0] for result in rendered_spec_tracker.rendered_specs_to_elements)
-            linkable_elements = tuple(
-                itertools.chain.from_iterable(result[1] for result in rendered_spec_tracker.rendered_specs_to_elements)
-            )
+
             filter_specs.append(
                 WhereFilterSpec(
                     where_sql=where_sql,
                     bind_parameters=SqlBindParameterSet(),
-                    linkable_spec_set=LinkableSpecSet.create_from_specs(rendered_specs),
-                    linkable_element_unions=tuple(linkable_element.as_union for linkable_element in linkable_elements),
+                    element_set=AnnotatedSpecLinkableElementSet.create_from_annotated_specs(
+                        rendered_spec_tracker.rendered_specs
+                    ),
                 )
             )
 
