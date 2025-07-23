@@ -1,16 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from functools import cached_property
 from typing import Optional
 
 from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
 from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow
 from dbt_semantic_interfaces.references import MetricReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
-from typing_extensions import override
 
-from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.specs.instance_spec import InstanceSpec, InstanceSpecVisitor
 from metricflow_semantics.specs.where_filter.where_filter_spec_set import WhereFilterSpecSet
 from metricflow_semantics.visitor import VisitorOutputT
@@ -29,10 +26,9 @@ class MetricSpec(InstanceSpec):  # noqa: D101
     def from_element_name(element_name: str) -> MetricSpec:  # noqa: D102
         return MetricSpec(element_name=element_name)
 
-    @cached_property
-    @override
-    def structured_name(self) -> StructuredLinkableSpecName:
-        return StructuredLinkableSpecName(entity_link_names=(), element_name=self.element_name)
+    @property
+    def qualified_name(self) -> str:  # noqa: D102
+        return self.element_name
 
     @staticmethod
     def from_reference(reference: MetricReference) -> MetricSpec:
