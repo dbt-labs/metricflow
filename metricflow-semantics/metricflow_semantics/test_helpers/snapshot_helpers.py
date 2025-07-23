@@ -1,24 +1,29 @@
 from __future__ import annotations
 
 import difflib
+import itertools
 import logging
 import os
 import pathlib
 import re
 import webbrowser
 from dataclasses import dataclass
-from typing import Any, Callable, Mapping, Optional, Tuple, TypeVar
+from typing import Any, Callable, Mapping, Optional, Sequence, Tuple, TypeVar
 
 import _pytest.fixtures
 import tabulate
 from _pytest.fixtures import FixtureRequest
+from dbt_semantic_interfaces.references import SemanticModelReference
 
 from metricflow_semantics.dag.mf_dag import MetricFlowDag
 from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
+from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
+from metricflow_semantics.model.semantics.linkable_element import ElementPathKey, LinkableElement
 from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
+from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.test_helpers.terminal_helpers import mf_colored_link_text
@@ -294,82 +299,77 @@ def assert_plan_snapshot_text_equal(
     )
 
 
+LinkableElementSetSnapshotRowDict = dict[str, str]
+
+
+def _create_row(
+    path_key: ElementPathKey, linkable_elements: Sequence[LinkableElement], is_group_by_metric: bool
+) -> dict[str, str]:
+    all_properties: set[LinkableElementProperty]
+    all_model_references: set[SemanticModelReference]
+    if is_group_by_metric:
+        dunder_name = GroupByMetricSpec(
+            element_name=path_key.element_name,
+            entity_links=path_key.entity_links,
+            metric_subquery_entity_links=path_key.metric_subquery_entity_links,
+        ).qualified_name
+    else:
+        dunder_name = path_key.dunder_name
+    row_dict = {
+        "Dunder Name": dunder_name,
+        "Metric-Subquery Entity-Links": ",".join(
+            entity_reference.element_name for entity_reference in path_key.metric_subquery_entity_links
+        ),
+        "Type": path_key.element_type.name,
+    }
+
+    all_properties = set(itertools.chain.from_iterable(element.properties for element in linkable_elements))
+    row_dict["Properties"] = ",".join(
+        sorted(linkable_element_property.name for linkable_element_property in all_properties)
+    )
+
+    all_model_references = set(
+        itertools.chain.from_iterable(element.derived_from_semantic_models for element in linkable_elements)
+    )
+    row_dict["Derived-From Semantic Models"] = ",".join(
+        sorted(model_reference.semantic_model_name for model_reference in all_model_references)
+    )
+    return row_dict
+
+
+def _convert_linkable_element_set_to_rows(
+    linkable_element_set: LinkableElementSet,
+) -> list[dict[str, str]]:
+    rows: list[dict[str, str]] = []
+
+    for path_key, linkable_metrics in linkable_element_set.path_key_to_linkable_metrics.items():
+        rows.append(_create_row(path_key, linkable_metrics, is_group_by_metric=True))
+
+    for path_key, linkable_entities in linkable_element_set.path_key_to_linkable_entities.items():
+        rows.append(_create_row(path_key, linkable_entities, is_group_by_metric=False))
+
+    for path_key, linkable_dimensions in linkable_element_set.path_key_to_linkable_dimensions.items():
+        rows.append(_create_row(path_key, linkable_dimensions, is_group_by_metric=False))
+    return rows
+
+
 def assert_linkable_element_set_snapshot_equal(  # noqa: D103
     request: FixtureRequest,
     snapshot_configuration: SnapshotConfiguration,
-    set_id: str,
     linkable_element_set: LinkableElementSet,
+    set_id: str = "result",
     expectation_description: Optional[str] = None,
 ) -> None:
-    headers = ("Model Join-Path", "Entity Links", "Name", "Time Granularity", "Date Part", "Properties")
-    rows = []
-    for linkable_dimension_iterable in linkable_element_set.path_key_to_linkable_dimensions.values():
-        for linkable_dimension in linkable_dimension_iterable:
-            row_to_add = (
-                # Checking a limited set of fields as the result is large due to the paths in the object.
-                (linkable_dimension.join_path.left_semantic_model_reference.semantic_model_name,)
-                + tuple(
-                    path_element.semantic_model_reference.semantic_model_name
-                    for path_element in linkable_dimension.join_path.path_elements
-                ),
-                tuple(entity_link.element_name for entity_link in linkable_dimension.entity_links),
-                linkable_dimension.element_name,
-                linkable_dimension.time_granularity.name if linkable_dimension.time_granularity is not None else "",
-                linkable_dimension.date_part.name if linkable_dimension.date_part is not None else "",
-                sorted(linkable_element_property.name for linkable_element_property in linkable_dimension.properties),
-            )
-            if row_to_add not in rows:
-                rows.append(row_to_add)
-
-    for linkable_entity_iterable in linkable_element_set.path_key_to_linkable_entities.values():
-        for linkable_entity in linkable_entity_iterable:
-            row_to_add = (
-                # Checking a limited set of fields as the result is large due to the paths in the object.
-                (linkable_entity.join_path.left_semantic_model_reference.semantic_model_name,)
-                + tuple(
-                    path_element.semantic_model_reference.semantic_model_name
-                    for path_element in linkable_entity.join_path.path_elements
-                ),
-                tuple(entity_link.element_name for entity_link in linkable_entity.entity_links),
-                linkable_entity.element_name,
-                "",
-                "",
-                sorted(linkable_element_property.name for linkable_element_property in linkable_entity.properties),
-            )
-            if row_to_add not in rows:
-                rows.append(row_to_add)
-
-    for linkable_metric_iterable in linkable_element_set.path_key_to_linkable_metrics.values():
-        for linkable_metric in linkable_metric_iterable:
-            semantic_model_join_path = linkable_metric.join_path.semantic_model_join_path
-            rows.append(
-                (
-                    # Checking a limited set of fields as the result is large due to the paths in the object.
-                    (semantic_model_join_path.left_semantic_model_reference.semantic_model_name,)
-                    + tuple(
-                        path_element.semantic_model_reference.semantic_model_name
-                        for path_element in semantic_model_join_path.path_elements
-                    ),
-                    (
-                        str(tuple(entity_link.element_name for entity_link in linkable_metric.join_path.entity_links)),
-                        str(
-                            tuple(
-                                entity_link.element_name for entity_link in linkable_metric.metric_subquery_entity_links
-                            )
-                        ),
-                    ),
-                    linkable_metric.element_name,
-                    "",
-                    "",
-                    sorted(linkable_element_property.name for linkable_element_property in linkable_metric.properties),
-                )
-            )
+    rows = _convert_linkable_element_set_to_rows(linkable_element_set)
 
     assert_str_snapshot_equal(
         request=request,
         snapshot_configuration=snapshot_configuration,
         snapshot_id=set_id,
-        snapshot_str=tabulate.tabulate(headers=headers, tabular_data=sorted(rows)),
+        snapshot_str=tabulate.tabulate(
+            headers="keys",
+            tabular_data=sorted(rows, key=lambda row: tuple(row.values())),  # type: ignore[attr-defined]
+        ),
         expectation_description=expectation_description,
     )
 
