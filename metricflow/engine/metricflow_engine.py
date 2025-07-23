@@ -674,13 +674,13 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 without_any_of=frozenset(without_any_property),
             ),
         )
-        return self._filter_linkable_dimensions(linkable_element_set=linkable_element_set)
+        return self._filter_simple_linkable_dimensions(linkable_element_set=linkable_element_set)
 
-    def _filter_linkable_dimensions(self, linkable_element_set: BaseLinkableElementSet) -> List[Dimension]:
+    def _filter_simple_linkable_dimensions(self, linkable_element_set: BaseLinkableElementSet) -> List[Dimension]:
         dimensions: List[Dimension] = []
 
         for annotated_spec in linkable_element_set.annotated_specs:
-            properties = annotated_spec.properties
+            properties = annotated_spec.property_set
             element_type = annotated_spec.element_type
             if element_type is LinkableElementType.TIME_DIMENSION:
                 # Simple dimensions shouldn't show date part items.
@@ -913,7 +913,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             )
             group_bys: Sequence = self._filter_linkable_entities(
                 linkable_element_set=linkable_element_set
-            ) + self._filter_linkable_dimensions(linkable_element_set=linkable_element_set)
+            ) + self._filter_simple_linkable_dimensions(linkable_element_set=linkable_element_set)
         else:
             # TODO: better support for querying entities without metrics; include entities here at that time
             group_bys = self.list_dimensions()
