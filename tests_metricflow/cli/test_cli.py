@@ -204,6 +204,21 @@ def test_list_entities(  # noqa: D103
 
 
 @pytest.mark.slow
+def test_list_saved_queries(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_runner: IsolatedCliCommandRunner,
+) -> None:
+    run_and_check_cli_command(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        cli_runner=cli_runner,
+        command_enum=IsolatedCliCommandEnum.MF_SAVED_QUERIES,
+        args=[],
+    )
+
+
+@pytest.mark.slow
 def test_saved_query(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
