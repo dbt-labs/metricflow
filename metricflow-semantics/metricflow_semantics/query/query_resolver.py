@@ -177,6 +177,62 @@ class MetricFlowQueryResolver:
             spec_pattern=group_by_item_input.spec_pattern,
             suggestion_generator=suggestion_generator,
         )
+
+        # If the resolution succeeded and we have an EntityLinkPattern, check if we need to preserve
+        # the original query's entity links for output column naming
+        if resolution.spec is not None:
+            from metricflow_semantics.specs.dimension_spec import DimensionSpec
+            from metricflow_semantics.specs.entity_spec import EntitySpec
+            from metricflow_semantics.specs.patterns.entity_link_pattern import EntityLinkPattern
+            from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
+
+            if isinstance(group_by_item_input.spec_pattern, EntityLinkPattern):
+                pattern_entity_links = group_by_item_input.spec_pattern.parameter_set.entity_links
+                if pattern_entity_links and resolution.spec.entity_links != pattern_entity_links:
+                    # The resolved spec has different entity links than the pattern
+                    # Check if this is due to PRIMARY/FOREIGN suffix matching
+                    pattern_len = len(pattern_entity_links)
+                    spec_len = len(resolution.spec.entity_links)
+
+                    if pattern_len == spec_len + 1 and pattern_entity_links[-spec_len:] == resolution.spec.entity_links:
+                        # This is a PRIMARY/FOREIGN suffix match - create a spec with the pattern's entity links
+                        # for output column naming while keeping the original for internal resolution
+                        if isinstance(resolution.spec, TimeDimensionSpec):
+                            time_dimension_output_spec = TimeDimensionSpec(
+                                element_name=resolution.spec.element_name,
+                                entity_links=pattern_entity_links,
+                                time_granularity=resolution.spec.time_granularity,
+                                date_part=resolution.spec.date_part,
+                                alias=resolution.spec.alias,
+                            )
+                            resolution = GroupByItemResolution(
+                                spec=time_dimension_output_spec,
+                                linkable_element_set=resolution.linkable_element_set,
+                                issue_set=resolution.issue_set,
+                            )
+                        elif isinstance(resolution.spec, DimensionSpec):
+                            dimension_output_spec = DimensionSpec(
+                                element_name=resolution.spec.element_name,
+                                entity_links=pattern_entity_links,
+                                alias=resolution.spec.alias,
+                            )
+                            resolution = GroupByItemResolution(
+                                spec=dimension_output_spec,
+                                linkable_element_set=resolution.linkable_element_set,
+                                issue_set=resolution.issue_set,
+                            )
+                        elif isinstance(resolution.spec, EntitySpec):
+                            entity_output_spec = EntitySpec(
+                                element_name=resolution.spec.element_name,
+                                entity_links=pattern_entity_links,
+                                alias=resolution.spec.alias,
+                            )
+                            resolution = GroupByItemResolution(
+                                spec=entity_output_spec,
+                                linkable_element_set=resolution.linkable_element_set,
+                                issue_set=resolution.issue_set,
+                            )
+
         if group_by_item_input.alias:
             resolution = resolution.with_alias(group_by_item_input.alias)
         return resolution

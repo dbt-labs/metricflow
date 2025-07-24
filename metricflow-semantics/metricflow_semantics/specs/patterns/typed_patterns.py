@@ -29,7 +29,7 @@ from metricflow_semantics.specs.spec_set import group_specs_by_type
 class DimensionPattern(EntityLinkPattern):
     """Similar to EntityPathPattern but only matches dimensions / time dimensions.
 
-    Analogous pattern for Dimension() in the object builder naming scheme.
+    element_name in parameter_set must be the name of the dimension.
     """
 
     @override
@@ -126,7 +126,7 @@ class TimeDimensionPattern(EntityLinkPattern):
 
 @dataclass(frozen=True)
 class EntityPattern(EntityLinkPattern):
-    """Similar to EntityPathPattern but only matches entities.
+    """Similar to EntityLinkPattern but only matches entities.
 
     Analogous pattern for Entity() in the object builder naming scheme.
     """
