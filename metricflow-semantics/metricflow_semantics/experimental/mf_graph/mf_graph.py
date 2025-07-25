@@ -95,22 +95,13 @@ class MetricflowGraphEdge(MetricflowGraphElement, MetricFlowPrettyFormattable, C
 
     _DEFAULT_EDGE_LABELS: ClassVar[OrderedSet[MetricflowGraphLabel]] = FrozenOrderedSet()
 
-    # TODO: Check if these can be renamed / remove property accessors.
-    _tail_node: NodeT_co
-    _head_node: NodeT_co
+    tail_node: NodeT_co
+    head_node: NodeT_co
 
-    @property
-    def tail_node(self) -> NodeT_co:  # noqa: D102
-        return self._tail_node
-
-    @property
-    def head_node(self) -> NodeT_co:  # noqa: D102
-        return self._head_node
-
-    @property
+    @cached_property
     def node_pair(self) -> Pair[NodeT_co, NodeT_co]:
         """Return a tuple of the head node and the tail node."""
-        return (self._tail_node, self._head_node)
+        return (self.tail_node, self.head_node)
 
     @property
     @abstractmethod
@@ -146,7 +137,7 @@ class MetricflowGraphEdge(MetricflowGraphElement, MetricFlowPrettyFormattable, C
         return formatter.pretty_format_object_by_parts(
             class_name=self.__class__.__name__,
             field_mapping={
-                "edge_str": f"{self._tail_node.node_descriptor.node_name} -> {self._head_node.node_descriptor.node_name}",
+                "edge_str": f"{self.tail_node.node_descriptor.node_name} -> {self.head_node.node_descriptor.node_name}",
             },
         )
 
@@ -156,7 +147,7 @@ class MetricflowGraphEdge(MetricflowGraphElement, MetricFlowPrettyFormattable, C
 
         This is useful for collecting labels while building a path by adding an edge.
         """
-        return self.labels.union(self._head_node.labels)
+        return self.labels.union(self.head_node.labels)
 
 
 class MetricflowGraph(MetricFlowPrettyFormattable, Generic[NodeT_co, EdgeT_co], ABC):
