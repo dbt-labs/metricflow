@@ -25,6 +25,18 @@ def pytest_addoption(parser: _pytest.config.argparsing.Parser) -> None:
     add_display_snapshots_cli_flag(parser)
 
 
+def mf_add_slow_marker(config: _pytest.config.Config) -> None:  # noqa: D103
+    config.addinivalue_line(
+        name="markers",
+        line="slow: mark tests as taking a long time to run.",
+    )
+
+
+def pytest_configure(config: _pytest.config.Config) -> None:
+    """Hook as specified by the pytest API for configuration."""
+    mf_add_slow_marker(config)
+
+
 @pytest.fixture(scope="session")
 def mf_test_configuration(  # noqa: D103
     request: FixtureRequest,
