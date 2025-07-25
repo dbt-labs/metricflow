@@ -38,7 +38,7 @@ class SemanticGraphNode(MetricflowGraphNode, AttributeRecipeStepProvider, Metric
     The entity nodes in the semantic graph are not directly mapped from entities configured in the semantic manifest.
     The one that corresponds to an entity in the manifest are instances of `ConfiguredEntityNode`. However, there
     are other entity nodes that model other relationships. For example, `metric_time` is represented by the
-    metric-time entity node, and there is a time-entity node that relates time dimensions and metric time. to the
+    metric-time entity node, and there is a time-entity node that relates time dimensions and metric time to the
     various time grains (the time grains (e.g. `day`, `year`) map to attribute nodes).
 
     Please see the subclasses for more details.
@@ -70,11 +70,11 @@ class SemanticGraphNode(MetricflowGraphNode, AttributeRecipeStepProvider, Metric
 class SemanticGraphEdge(MetricflowGraphEdge[SemanticGraphNode], AttributeRecipeStepProvider, ABC):
     """An edge in the semantic graph.
 
-    Currently, the edges in the semantic graph represent entity relationships also describes how a related attribute
+    Currently, the edges in the semantic graph represent entity relationships and also describe how a related attribute
     can be computed from the relationship (see `AttributeRecipe`).
 
     For example, if a semantic model contains the `listings` foreign entity and another semantic model contains the
-    `listings` primary entity, there would be a path from the node representing the first semantic model to the 2nd
+    `listings` primary entity, there would be a path from the node representing the first semantic model to the second
     semantic model (via a configured-entity node for `listings`). The path's edges includes a recipe step that
     describes a join between the two semantic models.
     """
@@ -106,7 +106,7 @@ class SemanticGraph(MetricflowGraph[SemanticGraphNode, SemanticGraphEdge], ABC):
     Also see `SemanticGraphNode` and `SemanticGraphEdge`.
 
     The semantic graph helps to model entity relationships that are defined in the semantic manifest and encodes
-    context on how attributes for entities can be queried (e.g. by joining semantic models).
+    context on how attributes for entities can be computed (e.g. by joining semantic models).
 
     Currently, the edges in the graph are oriented so that a path from a metric node to an attribute node describes
     the query required to compute that metric. However, additional edge types can be added to better model associative
