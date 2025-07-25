@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Cache predecessors / successors in graphs
+time: 2025-07-24T21:23:27.274757-07:00
+custom:
+  Author: plypaul
+  Issue: "1790"

@@ -120,6 +120,8 @@ class FlowGraph(MutableGraph[FlowNode, FlowEdge], MetricFlowPrettyFormattable):
             _tail_node_to_edges=defaultdict(MutableOrderedSet),
             _head_node_to_edges=defaultdict(MutableOrderedSet),
             _label_to_edges=defaultdict(MutableOrderedSet),
+            _node_to_successor_nodes=defaultdict(MutableOrderedSet),
+            _node_to_predecessor_nodes=defaultdict(MutableOrderedSet),
         )
         for node in nodes:
             graph.add_node(node)

@@ -10,18 +10,16 @@ from typing_extensions import override
 from metricflow_semantics.experimental.mf_graph.graph_id import MetricflowGraphId, SequentialGraphId
 from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
 from metricflow_semantics.experimental.mf_graph.mf_graph import (
+    EdgeT,
     MetricflowGraph,
-    MetricflowGraphEdge,
     MetricflowGraphNode,
+    NodeT,
 )
-from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
+from metricflow_semantics.experimental.ordered_set import MutableOrderedSet, OrderedSet
 
 logger = logging.getLogger(__name__)
 
 MutableGraphT = TypeVar("MutableGraphT", bound="MutableGraph")
-
-EdgeT = TypeVar("EdgeT", bound=MetricflowGraphEdge)
-NodeT = TypeVar("NodeT", bound=MetricflowGraphNode)
 
 
 @dataclass
@@ -39,6 +37,9 @@ class MutableGraph(Generic[NodeT, EdgeT], MetricflowGraph[NodeT, EdgeT], ABC):
     _tail_node_to_edges: DefaultDict[MetricflowGraphNode, MutableOrderedSet[EdgeT]]
     _head_node_to_edges: DefaultDict[MetricflowGraphNode, MutableOrderedSet[EdgeT]]
     _label_to_edges: DefaultDict[MetricflowGraphLabel, MutableOrderedSet[EdgeT]]
+
+    _node_to_predecessor_nodes: DefaultDict[MetricflowGraphNode, MutableOrderedSet[NodeT]]
+    _node_to_successor_nodes: DefaultDict[MetricflowGraphNode, MutableOrderedSet[NodeT]]
 
     def add_node(self, node: NodeT) -> None:  # noqa: D102
         self._nodes.add(node)
@@ -62,6 +63,8 @@ class MutableGraph(Generic[NodeT, EdgeT], MetricflowGraph[NodeT, EdgeT], ABC):
 
         self._tail_node_to_edges[tail_node].add(edge)
         self._head_node_to_edges[head_node].add(edge)
+        self._node_to_successor_nodes[tail_node].add(head_node)
+        self._node_to_predecessor_nodes[head_node].add(tail_node)
         self._edges.add(edge)
         self._graph_id = SequentialGraphId.create()
 
@@ -106,11 +109,11 @@ class MutableGraph(Generic[NodeT, EdgeT], MetricflowGraph[NodeT, EdgeT], ABC):
 
     @override
     def successors(self, node: MetricflowGraphNode) -> OrderedSet[NodeT]:
-        return FrozenOrderedSet(edge.head_node for edge in self.edges_with_tail_node(node))
+        return self._node_to_successor_nodes[node]
 
     @override
     def predecessors(self, node: MetricflowGraphNode) -> OrderedSet[NodeT]:
-        return FrozenOrderedSet(edge.tail_node for edge in self.edges_with_head_node(node))
+        return self._node_to_predecessor_nodes[node]
 
     @override
     @property
