@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from functools import cached_property
 
-from tests_metricflow.performance.synthetic_manifest_parameter_set import SyntheticManifestParameterSet
+from metricflow_semantics.test_helpers.synthetic_manifest.synthetic_manifest_parameter_set import (
+    SyntheticManifestParameterSet,
+)
 
 
 class CategoricalDimensionGenerator:

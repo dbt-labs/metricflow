@@ -17,13 +17,15 @@ from metricflow_semantics.model.semantics.semantic_model_join_evaluator import M
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
+from metricflow_semantics.test_helpers.synthetic_manifest.semantic_manifest_generator import SyntheticManifestGenerator
+from metricflow_semantics.test_helpers.synthetic_manifest.synthetic_manifest_parameter_set import (
+    SyntheticManifestParameterSet,
+)
 from metricflow_semantics.test_helpers.time_helpers import ConfigurableTimeSource
 from tests_metricflow_semantics.model.test_semantic_model_container import build_semantic_model_lookup_from_manifest
 
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.protocols.sql_client import SqlClient
-from tests_metricflow.performance.semantic_manifest_generator import SyntheticManifestGenerator
-from tests_metricflow.performance.synthetic_manifest_parameter_set import SyntheticManifestParameterSet
 
 logger = logging.getLogger(__name__)
 

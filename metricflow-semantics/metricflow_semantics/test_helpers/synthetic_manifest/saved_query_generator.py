@@ -4,12 +4,16 @@ from typing import Sequence
 
 from dbt_semantic_interfaces.implementations.saved_query import PydanticSavedQuery, PydanticSavedQueryQueryParams
 from dbt_semantic_interfaces.references import EntityReference
+
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
-
-from tests_metricflow.performance.categorical_dimension_generator import CategoricalDimensionGenerator
-from tests_metricflow.performance.metric_generator import MetricGenerator
-from tests_metricflow.performance.synthetic_manifest_parameter_set import SyntheticManifestParameterSet
+from metricflow_semantics.test_helpers.synthetic_manifest.categorical_dimension_generator import (
+    CategoricalDimensionGenerator,
+)
+from metricflow_semantics.test_helpers.synthetic_manifest.metric_generator import MetricGenerator
+from metricflow_semantics.test_helpers.synthetic_manifest.synthetic_manifest_parameter_set import (
+    SyntheticManifestParameterSet,
+)
 
 
 class SavedQueryGenerator:

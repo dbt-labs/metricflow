@@ -9,13 +9,21 @@ from dbt_semantic_interfaces.implementations.semantic_model import PydanticSeman
 from dbt_semantic_interfaces.implementations.time_spine import PydanticTimeSpine, PydanticTimeSpinePrimaryColumn
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 
-from tests_metricflow.performance.categorical_dimension_generator import CategoricalDimensionGenerator
-from tests_metricflow.performance.dimension_semantic_model_generator import DimensionSemanticModelGenerator
-from tests_metricflow.performance.measure_generator import MeasureGenerator
-from tests_metricflow.performance.measure_semantic_model_generator import MeasureSemanticModelGenerator
-from tests_metricflow.performance.metric_generator import MetricGenerator
-from tests_metricflow.performance.saved_query_generator import SavedQueryGenerator
-from tests_metricflow.performance.synthetic_manifest_parameter_set import SyntheticManifestParameterSet
+from metricflow_semantics.test_helpers.synthetic_manifest.categorical_dimension_generator import (
+    CategoricalDimensionGenerator,
+)
+from metricflow_semantics.test_helpers.synthetic_manifest.dimension_semantic_model_generator import (
+    DimensionSemanticModelGenerator,
+)
+from metricflow_semantics.test_helpers.synthetic_manifest.measure_generator import MeasureGenerator
+from metricflow_semantics.test_helpers.synthetic_manifest.measure_semantic_model_generator import (
+    MeasureSemanticModelGenerator,
+)
+from metricflow_semantics.test_helpers.synthetic_manifest.metric_generator import MetricGenerator
+from metricflow_semantics.test_helpers.synthetic_manifest.saved_query_generator import SavedQueryGenerator
+from metricflow_semantics.test_helpers.synthetic_manifest.synthetic_manifest_parameter_set import (
+    SyntheticManifestParameterSet,
+)
 
 
 class SyntheticManifestGenerator:

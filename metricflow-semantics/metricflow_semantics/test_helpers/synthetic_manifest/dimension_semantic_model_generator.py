@@ -8,8 +8,12 @@ from dbt_semantic_interfaces.implementations.node_relation import PydanticNodeRe
 from dbt_semantic_interfaces.implementations.semantic_model import PydanticSemanticModel
 from dbt_semantic_interfaces.type_enums import DimensionType, EntityType
 
-from tests_metricflow.performance.categorical_dimension_generator import CategoricalDimensionGenerator
-from tests_metricflow.performance.synthetic_manifest_parameter_set import SyntheticManifestParameterSet
+from metricflow_semantics.test_helpers.synthetic_manifest.categorical_dimension_generator import (
+    CategoricalDimensionGenerator,
+)
+from metricflow_semantics.test_helpers.synthetic_manifest.synthetic_manifest_parameter_set import (
+    SyntheticManifestParameterSet,
+)
 
 
 class DimensionSemanticModelGenerator:

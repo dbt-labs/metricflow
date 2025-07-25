@@ -11,8 +11,10 @@ from dbt_semantic_interfaces.implementations.metric import (
 )
 from dbt_semantic_interfaces.type_enums import MetricType
 
-from tests_metricflow.performance.measure_generator import MeasureGenerator
-from tests_metricflow.performance.synthetic_manifest_parameter_set import SyntheticManifestParameterSet
+from metricflow_semantics.test_helpers.synthetic_manifest.measure_generator import MeasureGenerator
+from metricflow_semantics.test_helpers.synthetic_manifest.synthetic_manifest_parameter_set import (
+    SyntheticManifestParameterSet,
+)
 
 
 @dataclass(frozen=True)
