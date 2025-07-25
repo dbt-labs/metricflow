@@ -148,6 +148,15 @@ class DotEdgeAttributeSet:
         return kwargs
 
 
+class DotRankKey(Enum):
+    """A key used to group nodes and assign them the same `graphviz` rank.
+
+    Only edge-as-nodes are configured currently, but more nodes may be tagged.
+    """
+
+    EDGE_AS_NODE = "edge"
+
+
 @fast_frozen_dataclass()
 class DotNodeAttributeSet:
     """Attributes for nodes in DOT."""
@@ -158,6 +167,14 @@ class DotNodeAttributeSet:
     label: Optional[str]
     shape: Optional[DotNodeShape]
 
+    # When rendering graphs, nodes with the same rank key are force to have the same rank in the rendering engine.
+    rank_key: Optional[DotRankKey]
+
+    # When rendering an edge `A -> B` as `A -> [Label Node] -> B`, the label node can be placed in a more organized
+    # way if it is place in the same cluster as the one for `A` or `B`. Since the nodes could belong to different
+    # clusters the cluster of the node with the highest priority is selected.
+    cluster_priority_for_edge_as_node: Optional[int]
+
     @staticmethod
     def create(  # noqa: D102
         name: str,
@@ -165,6 +182,8 @@ class DotNodeAttributeSet:
         fill_color: Optional[DotColor] = None,
         label: Optional[str] = None,
         shape: Optional[DotNodeShape] = None,
+        rank_key: Optional[DotRankKey] = None,
+        edge_node_priority: Optional[int] = None,
     ) -> DotNodeAttributeSet:
         return DotNodeAttributeSet(
             name=name,
@@ -172,6 +191,8 @@ class DotNodeAttributeSet:
             fill_color=fill_color,
             label=label,
             shape=shape,
+            rank_key=rank_key,
+            cluster_priority_for_edge_as_node=edge_node_priority,
         )
 
     def merge(self, other: DotNodeAttributeSet) -> DotNodeAttributeSet:  # noqa: D102
@@ -208,6 +229,8 @@ class DotNodeAttributeSet:
         fill_color: Optional[DotColor] = None,
         label: Optional[str] = None,
         shape: Optional[DotNodeShape] = None,
+        rank_key: Optional[DotRankKey] = None,
+        edge_node_priority: Optional[int] = None,
     ) -> DotNodeAttributeSet:
         """Return a copy of this with fields set to the present arguments."""
         return DotNodeAttributeSet(
@@ -216,4 +239,6 @@ class DotNodeAttributeSet:
             fill_color=mf_first_non_none(fill_color, self.fill_color),
             label=mf_first_non_none(label, self.label),
             shape=mf_first_non_none(shape, self.shape),
+            rank_key=mf_first_non_none(rank_key, self.rank_key),
+            cluster_priority_for_edge_as_node=edge_node_priority,
         )

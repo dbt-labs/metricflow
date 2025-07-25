@@ -9,7 +9,6 @@ from typing import ClassVar, DefaultDict, Iterable, Optional
 
 from metricflow_semantics.collection_helpers.syntactic_sugar import (
     mf_ensure_mapping,
-    mf_group_by,
 )
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.experimental.mf_graph.formatting.dot_attributes import (
@@ -18,6 +17,7 @@ from metricflow_semantics.experimental.mf_graph.formatting.dot_attributes import
     DotEdgeAttributeSet,
     DotNodeAttributeSet,
     DotNodeShape,
+    DotRankKey,
 )
 from metricflow_semantics.experimental.mf_graph.graph_converter import MetricflowGraphConverter
 from metricflow_semantics.experimental.mf_graph.mf_graph import (
@@ -26,7 +26,7 @@ from metricflow_semantics.experimental.mf_graph.mf_graph import (
     MetricflowGraphNode,
 )
 from metricflow_semantics.helpers.string_helpers import mf_indent
-from metricflow_semantics.mf_logging.pretty_formatter import PrettyFormatOption
+from metricflow_semantics.mf_logging.format_option import PrettyFormatOption
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from typing_extensions import override
 
@@ -74,6 +74,8 @@ class GraphicalDotConversionArgumentSet(DotConversionArgumentSet):
         # Use straight lines for edges.
         "splines": "false",
         "bgcolor": DotColor.DARK_GRAY.value,
+        "ranksep": "1.0",
+        # "nodesep": "1.0",
     }
 
     # Default attributes for DOT nodes.
@@ -165,11 +167,20 @@ class MetricflowGraphToGraphicalDotConverter(MetricflowGraphConverter[DotGraphCo
     def _create_dot_element_set(self, graph: MetricflowGraph) -> DotAttributeSet:
         # Convert nodes to DOT.
         cluster_name_to_dot_nodes: DefaultDict[Optional[str], list[DotNodeAttributeSet]] = defaultdict(list)
-        for cluster_name, nodes in mf_group_by(graph.nodes, key=lambda n: n.node_descriptor.cluster_name):
-            sorted_nodes = sorted(nodes)
-            for node in sorted_nodes:
-                dot_node = node.as_dot_node(include_graphical_attributes=self._arguments.include_graphical_attributes)
-                dot_node = dot_node.with_attributes(label=self._make_node_label(node))
+
+        cluster_name_to_nodes: dict[str, list] = defaultdict(list)
+        for mf_node in graph.nodes:
+            cluster_name_to_nodes[mf_node.node_descriptor.cluster_name].append(mf_node)
+
+        mf_node_to_dot_node: dict[MetricflowGraphNode, DotNodeAttributeSet] = {}
+        for cluster_name, mf_nodes in cluster_name_to_nodes.items():
+            sorted_mf_nodes = sorted(mf_nodes)
+            for mf_node in sorted_mf_nodes:
+                dot_node = mf_node.as_dot_node(
+                    include_graphical_attributes=self._arguments.include_graphical_attributes
+                )
+                mf_node_to_dot_node[mf_node] = dot_node
+                dot_node = dot_node.with_attributes(label=self._make_node_label(mf_node))
                 cluster_name_to_dot_nodes[cluster_name].append(dot_node)
 
         # Map the original edge to the replacement intermediate DOT node.
@@ -201,16 +212,21 @@ class MetricflowGraphToGraphicalDotConverter(MetricflowGraphConverter[DotGraphCo
                     label=table_builder.build(),
                     shape=DotNodeShape.PLAIN,
                     fill_color=DotColor.TRANSPARENT,
+                    rank_key=DotRankKey.EDGE_AS_NODE,
                 )
                 edge_to_edge_as_dot_node_mapping[edge] = dot_node
                 edge_as_node_index += 1
 
-                tail_node_cluster_name = edge.tail_node.node_descriptor.cluster_name
-                head_node_cluster_name = edge.head_node.node_descriptor.cluster_name
-                edge_as_dot_node_cluster_name = (
-                    tail_node_cluster_name if tail_node_cluster_name == head_node_cluster_name else None
-                )
-                cluster_name_to_dot_nodes[edge_as_dot_node_cluster_name].append(dot_node)
+                max_priority = 0
+                cluster_name_for_edge_as_dot_node: str = edge.head_node.node_descriptor.cluster_name
+
+                for mf_node in (edge.tail_node, edge.head_node):
+                    priority = mf_node_to_dot_node[mf_node].cluster_priority_for_edge_as_node
+                    if priority is not None and priority >= max_priority:
+                        cluster_name_for_edge_as_dot_node = mf_node.node_descriptor.cluster_name
+                        max_priority = priority
+
+                cluster_name_to_dot_nodes[cluster_name_for_edge_as_dot_node].append(dot_node)
 
         # Generate DOT edges using the intermediate nodes.
         dot_edges: list[DotEdgeAttributeSet] = []
