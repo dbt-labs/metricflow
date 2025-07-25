@@ -31,7 +31,7 @@ class ModelObjectLookup(AttributePrettyFormattable):
 
     @cached_property
     def model_id(self) -> SemanticModelId:  # noqa: D102
-        return SemanticModelId(model_name=self._semantic_model.name)
+        return SemanticModelId.get_instance(model_name=self._semantic_model.name)
 
     @cached_property
     def time_dimension_name_to_grain(self) -> Mapping[str, TimeGranularity]:  # noqa: D102

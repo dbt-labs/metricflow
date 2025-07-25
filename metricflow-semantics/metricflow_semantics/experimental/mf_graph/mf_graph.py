@@ -12,6 +12,7 @@ from typing import ClassVar, Generic, Optional, TypeVar
 from typing_extensions import Self, override
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import Pair
+from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.mf_graph.comparable import Comparable
 from metricflow_semantics.experimental.mf_graph.formatting.dot_attributes import (
     DotEdgeAttributeSet,
@@ -27,7 +28,6 @@ from metricflow_semantics.experimental.mf_graph.graph_id import MetricflowGraphI
 from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
 from metricflow_semantics.experimental.mf_graph.node_descriptor import MetricflowGraphNodeDescriptor
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
-from metricflow_semantics.experimental.singleton_decorator import singleton_dataclass
 from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
 from metricflow_semantics.mf_logging.pretty_formatter import (
     MetricFlowPrettyFormatter,
@@ -86,7 +86,7 @@ class MetricflowGraphNode(MetricflowGraphElement, MetricFlowPrettyFormattable, C
         )
 
 
-@singleton_dataclass(order=False)
+@fast_frozen_dataclass(order=False)
 class MetricflowGraphEdge(MetricflowGraphElement, MetricFlowPrettyFormattable, Comparable, Generic[NodeT_co], ABC):
     """Base class for edges in a directed graph.
 

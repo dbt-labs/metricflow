@@ -6,6 +6,7 @@ from functools import cached_property
 from dbt_semantic_interfaces.type_enums import DatePart, TimeGranularity
 from typing_extensions import override
 
+from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.mf_graph.comparable import ComparisonKey
 from metricflow_semantics.experimental.mf_graph.formatting.dot_attributes import (
     DotColor,
@@ -24,14 +25,14 @@ from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import (
 )
 from metricflow_semantics.experimental.semantic_graph.sg_constant import ClusterNameFactory
 from metricflow_semantics.experimental.semantic_graph.sg_interfaces import SemanticGraphNode
-from metricflow_semantics.experimental.singleton_decorator import singleton_dataclass
+from metricflow_semantics.experimental.singleton import Singleton
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 
-@singleton_dataclass(order=False)
+@fast_frozen_dataclass(order=False)
 class AttributeNode(SemanticGraphNode, ABC):
     """ABC for attribute nodes. See `SemanticGraph` for additional context on usage."""
 
@@ -45,7 +46,10 @@ class AttributeNode(SemanticGraphNode, ABC):
     @cached_property
     @override
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
-        return MetricflowGraphNodeDescriptor.get_instance(node_name=f"{self.__class__.__name__}({self.attribute_name})")
+        return MetricflowGraphNodeDescriptor(
+            node_name=f"{self.__class__.__name__}({self.attribute_name})",
+            cluster_name=None,
+        )
 
     @override
     def as_dot_node(self, include_graphical_attributes: bool) -> DotNodeAttributeSet:
@@ -57,7 +61,7 @@ class AttributeNode(SemanticGraphNode, ABC):
     @cached_property
     @override
     def labels(self) -> OrderedSet[MetricflowGraphLabel]:
-        return FrozenOrderedSet((GroupByAttributeLabel(),))
+        return FrozenOrderedSet((GroupByAttributeLabel.get_instance(),))
 
     @cached_property
     @override
@@ -67,8 +71,8 @@ class AttributeNode(SemanticGraphNode, ABC):
         )
 
 
-@singleton_dataclass(order=False)
-class TimeAttributeNode(AttributeNode):
+@fast_frozen_dataclass(order=False)
+class TimeAttributeNode(AttributeNode, Singleton):
     """An attribute node that corresponds to the different time grains available for querying time dimensions.
 
     e.g. the graph would contain instances for `day`, `dow`, `month`...
@@ -76,25 +80,26 @@ class TimeAttributeNode(AttributeNode):
 
     element_property_additions: FrozenOrderedSet[LinkableElementProperty]
 
-    @staticmethod
-    def get_instance_for_time_grain(time_grain: TimeGranularity) -> TimeAttributeNode:  # noqa: D102
-        return TimeAttributeNode(
+    @classmethod
+    def get_instance_for_time_grain(cls, time_grain: TimeGranularity) -> TimeAttributeNode:  # noqa: D102
+        return cls._get_instance(
             attribute_name=time_grain.value,
             element_property_additions=FrozenOrderedSet(),
         )
 
-    @staticmethod
-    def get_instance_for_date_part(date_part: DatePart) -> TimeAttributeNode:  # noqa: D102
-        return TimeAttributeNode(
+    @classmethod
+    def get_instance_for_date_part(cls, date_part: DatePart) -> TimeAttributeNode:  # noqa: D102
+        return cls._get_instance(
             attribute_name=StructuredLinkableSpecName.date_part_suffix(date_part),
             element_property_additions=FrozenOrderedSet((LinkableElementProperty.DATE_PART,)),
         )
 
-    @staticmethod
+    @classmethod
     def get_instance_for_expanded_time_grain(  # noqa: D102
+        cls,
         expanded_time_grain: ExpandedTimeGranularity,
     ) -> TimeAttributeNode:
-        return TimeAttributeNode(
+        return cls._get_instance(
             attribute_name=expanded_time_grain.name,
             element_property_additions=FrozenOrderedSet((LinkableElementProperty.DERIVED_TIME_GRANULARITY,)),
         )
@@ -102,7 +107,7 @@ class TimeAttributeNode(AttributeNode):
     @cached_property
     @override
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
-        return MetricflowGraphNodeDescriptor.get_instance(
+        return MetricflowGraphNodeDescriptor(
             node_name=f"TimeAttribute({self.attribute_name})",
             cluster_name=ClusterNameFactory.TIME,
         )
@@ -113,8 +118,8 @@ class TimeAttributeNode(AttributeNode):
         return super(TimeAttributeNode, self).labels.union((TimeClusterLabel.get_instance(),))
 
 
-@singleton_dataclass(order=False)
-class KeyAttributeNode(AttributeNode):
+@fast_frozen_dataclass(order=False)
+class KeyAttributeNode(AttributeNode, Singleton):
     """Represents the attribute corresponding to the value of a configured entity.
 
     In the current MF interface, a "query for an entity" means a query for the column values associated with the
@@ -125,14 +130,14 @@ class KeyAttributeNode(AttributeNode):
     Consider using the phrase `entity value` instead.
     """
 
-    @staticmethod
-    def get_instance(entity_name: str) -> KeyAttributeNode:  # noqa: D102
-        return KeyAttributeNode(attribute_name=entity_name)
+    @classmethod
+    def get_instance(cls, entity_name: str) -> KeyAttributeNode:  # noqa: D102
+        return cls._get_instance(attribute_name=entity_name)
 
     @property
     @override
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
-        return MetricflowGraphNodeDescriptor.get_instance(
+        return MetricflowGraphNodeDescriptor(
             node_name=f"KeyAttribute({self.attribute_name})",
             cluster_name=ClusterNameFactory.KEY,
         )
@@ -152,14 +157,18 @@ class KeyAttributeNode(AttributeNode):
         return super(KeyAttributeNode, self).labels.union((KeyAttributeLabel.get_instance(),))
 
 
-@singleton_dataclass(order=False)
-class CategoricalDimensionAttributeNode(AttributeNode):
+@fast_frozen_dataclass(order=False)
+class CategoricalDimensionAttributeNode(AttributeNode, Singleton):
     """Represents a dimension in a semantic model with `DimensionType.CATEGORICAL`."""
+
+    @classmethod
+    def get_instance(cls, dimension_name: str) -> CategoricalDimensionAttributeNode:  # noqa: D102
+        return cls._get_instance(attribute_name=dimension_name)
 
     @property
     @override
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
-        return MetricflowGraphNodeDescriptor.get_instance(
+        return MetricflowGraphNodeDescriptor(
             node_name=f"Dimension({self.attribute_name})", cluster_name=ClusterNameFactory.DIMENSION
         )
 

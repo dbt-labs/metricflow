@@ -7,16 +7,17 @@ from typing import Optional
 from dbt_semantic_interfaces.references import SemanticModelReference
 from typing_extensions import override
 
+from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.mf_graph.comparable import Comparable, ComparisonKey
-from metricflow_semantics.experimental.singleton_decorator import singleton_dataclass
+from metricflow_semantics.experimental.singleton import Singleton
 from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
 from metricflow_semantics.mf_logging.pretty_formatter import PrettyFormatContext
 
 logger = logging.getLogger(__name__)
 
 
-@singleton_dataclass(order=False)
-class SemanticModelId(MetricFlowPrettyFormattable, Comparable):
+@fast_frozen_dataclass(order=False)
+class SemanticModelId(Singleton, MetricFlowPrettyFormattable, Comparable):
     """Singleton replacement for `SemanticModelReference`.
 
     This is used as `SemanticModelReference` is defined in `dbt-semantic-interfaces` and is difficult to change. This
@@ -25,9 +26,9 @@ class SemanticModelId(MetricFlowPrettyFormattable, Comparable):
 
     model_name: str
 
-    @staticmethod
-    def get_instance(model_name: str) -> SemanticModelId:  # noqa: D102
-        return SemanticModelId(model_name=model_name)
+    @classmethod
+    def get_instance(cls, model_name: str) -> SemanticModelId:  # noqa: D102
+        return cls._get_instance(model_name=model_name)
 
     @override
     @cached_property

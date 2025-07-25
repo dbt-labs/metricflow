@@ -10,27 +10,21 @@ from dbt_semantic_interfaces.type_enums import DimensionType, TimeGranularity
 from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_non_none_or_raise
+from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.dsi.model_object_lookup import ModelObjectLookup
 from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException, MetricflowInternalError
-from metricflow_semantics.experimental.singleton_decorator import singleton_dataclass
 from metricflow_semantics.mf_logging.attribute_pretty_format import AttributeMapping
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 
 logger = logging.getLogger(__name__)
 
 
-@singleton_dataclass()
+@fast_frozen_dataclass()
 class MeasureAggregationConfiguration:
     """Key that is used to group the measures in a semantic model by the associated aggregation time dimension."""
 
     time_dimension_name: str
     time_grain: TimeGranularity
-
-    @staticmethod
-    def get_instance(  # noqa: D102
-        time_dimension_name: str, time_grain: TimeGranularity
-    ) -> MeasureAggregationConfiguration:
-        return MeasureAggregationConfiguration(time_dimension_name=time_dimension_name, time_grain=time_grain)
 
 
 class MeasureContainingModelObjectLookup(ModelObjectLookup):
@@ -105,7 +99,7 @@ class MeasureContainingModelObjectLookup(ModelObjectLookup):
                 ),
             )
 
-            aggregation_configuration = MeasureAggregationConfiguration.get_instance(
+            aggregation_configuration = MeasureAggregationConfiguration(
                 time_dimension_name=aggregation_time_dimension_name,
                 time_grain=aggregation_time_dimension_grain,
             )

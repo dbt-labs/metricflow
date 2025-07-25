@@ -17,11 +17,11 @@ logger = logging.getLogger(__name__)
 
 def test_is_expression() -> None:
     """Test comparison using `is`."""
-    left = SingletonIdElement(int_value=1)
-    right = SingletonIdElement(int_value=1)
+    left = SingletonIdElement.get_instance(int_value=1)
+    right = SingletonIdElement.get_instance(int_value=1)
 
     assert left is right
-    assert left is not SingletonIdElement(int_value=2)
+    assert left is not SingletonIdElement.get_instance(int_value=2)
 
 
 @pytest.fixture(scope="session")
@@ -128,9 +128,9 @@ def test_create_new(setup_statement: str) -> None:
             f"""
             start_index = random.randint(0, 1_000_000_000_000)
             for i in range(start_index, start_index + {size}):
-                SingletonCompositeId(
-                    id_0=SingletonIdElement(int_value=i),
-                    id_1=SingletonIdElement(int_value=i + 1),
+                SingletonCompositeId.get_instance(
+                    id_0=SingletonIdElement.get_instance(int_value=i),
+                    id_1=SingletonIdElement.get_instance(int_value=i + 1),
                 )
             """
         ),
@@ -144,9 +144,9 @@ def test_create_existing(setup_statement: str) -> None:
     get_singleton_statement = mf_dedent(
         f"""
         for _ in range({size}):
-            SingletonCompositeId(
-                id_0=SingletonIdElement(int_value=0),
-                id_1=SingletonIdElement(int_value=1),
+            SingletonCompositeId.get_instance(
+                id_0=SingletonIdElement.get_instance(int_value=0),
+                id_1=SingletonIdElement.get_instance(int_value=1),
             )
         """
     )
