@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from collections import defaultdict
 from enum import Enum
 from functools import cached_property
 from typing import Iterable, Mapping, Sequence
@@ -15,6 +16,7 @@ from metricflow_semantics.experimental.dsi.measure_model_object_lookup import Me
 from metricflow_semantics.experimental.dsi.model_object_lookup import (
     ModelObjectLookup,
 )
+from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.mf_logging.attribute_pretty_format import AttributeMapping, AttributePrettyFormattable
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
@@ -75,6 +77,27 @@ class ManifestObjectLookup(AttributePrettyFormattable):
     def model_object_lookups(self) -> AnyLengthTuple[ModelObjectLookup]:
         """Return lookups for all semantic models."""
         return self.measure_containing_model_lookups + self.measure_exclusive_model_lookups
+
+    @cached_property
+    def model_id_to_lookup(self) -> Mapping[SemanticModelId, ModelObjectLookup]:  # noqa: D102
+        return {lookup.model_id: lookup for lookup in self.model_object_lookups}
+
+    @cached_property
+    def entity_name_to_model_lookups(self) -> Mapping[str, OrderedSet[ModelObjectLookup]]:
+        """Mapping from the entity name to the model lookups that have the entity."""
+        entity_name_to_model_lookups: dict[str, MutableOrderedSet[ModelObjectLookup]] = defaultdict(MutableOrderedSet)
+        for model_id, lookup in self.model_id_to_lookup.items():
+            for entity in lookup.semantic_model.entities:
+                entity_name_to_model_lookups[entity.name].add(lookup)
+        return entity_name_to_model_lookups
+
+    @cached_property
+    def entity_name_to_model_ids(self) -> Mapping[str, OrderedSet[SemanticModelId]]:
+        """Mapping from the entity name to the IDs of the semantic models that contain it."""
+        return {
+            entity_name: FrozenOrderedSet(model_lookup.model_id for model_lookup in model_lookups)
+            for entity_name, model_lookups in self.entity_name_to_model_lookups.items()
+        }
 
     def get_metric(self, metric_name: str) -> Metric:  # noqa: D102
         return self._lookup_object(
