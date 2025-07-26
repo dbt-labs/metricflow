@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Migrate back to `Singleton` for simplicity / performance
+time: 2025-07-25T16:52:06.726542-07:00
+custom:
+  Author: plypaul
+  Issue: "1793"
