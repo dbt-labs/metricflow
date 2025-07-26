@@ -1,0 +1,31 @@
+test_name: test_minimal_manifest
+test_filename: test_subgraph_0_measure.py
+docstring:
+  Test generation of the measure subgraph using the minimal manifest.
+expectation_description:
+  The graph should show the measure node with edges to the model nodes and metric time.
+---
+dot_notation:
+  digraph {
+  	graph [name=MutableSemanticGraph]
+  	subgraph cluster_bookings_source {
+  		label=bookings_source
+  		"LocalModel(bookings_source)"
+  		"Measure(booking_count)"
+  	}
+  	subgraph cluster_time_dimension {
+  		label=time_dimension
+  		MetricTime
+  	}
+  	"Measure(booking_count)" -> "LocalModel(bookings_source)"
+  	"Measure(booking_count)" -> MetricTime
+  }
+
+pretty_format:
+  MutableSemanticGraph(
+    nodes={LocalModel(bookings_source), Measure(booking_count), MetricTime},
+    edges={
+      EntityRelationshipEdge(tail_node=Measure(booking_count), head_node=LocalModel(bookings_source)),
+      EntityRelationshipEdge(tail_node=Measure(booking_count), head_node=MetricTime),
+    },
+  )

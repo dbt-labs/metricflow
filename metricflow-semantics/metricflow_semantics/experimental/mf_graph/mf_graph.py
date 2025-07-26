@@ -28,11 +28,11 @@ from metricflow_semantics.experimental.mf_graph.graph_id import MetricflowGraphI
 from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
 from metricflow_semantics.experimental.mf_graph.node_descriptor import MetricflowGraphNodeDescriptor
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
+from metricflow_semantics.mf_logging.format_option import PrettyFormatOption
 from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
 from metricflow_semantics.mf_logging.pretty_formatter import (
     MetricFlowPrettyFormatter,
     PrettyFormatContext,
-    PrettyFormatOption,
 )
 
 logger = logging.getLogger(__name__)

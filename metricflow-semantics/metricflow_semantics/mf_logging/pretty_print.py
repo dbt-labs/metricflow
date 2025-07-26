@@ -5,7 +5,8 @@ from typing import Any, Dict, List, Mapping, Optional, Tuple
 
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.helpers.string_helpers import mf_indent
-from metricflow_semantics.mf_logging.pretty_formatter import MetricFlowPrettyFormatter, PrettyFormatOption
+from metricflow_semantics.mf_logging.format_option import PrettyFormatOption
+from metricflow_semantics.mf_logging.pretty_formatter import MetricFlowPrettyFormatter
 
 logger = logging.getLogger(__name__)
 

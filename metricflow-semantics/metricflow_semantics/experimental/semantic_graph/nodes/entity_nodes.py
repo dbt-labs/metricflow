@@ -129,6 +129,13 @@ class JoinedModelNode(SemanticGraphNode, Singleton):
     def labels(self) -> OrderedSet[MetricflowGraphLabel]:
         return FrozenOrderedSet((JoinedModelLabel.get_instance(),))
 
+    @override
+    def as_dot_node(self, include_graphical_attributes: bool) -> DotNodeAttributeSet:
+        dot_node = super(JoinedModelNode, self).as_dot_node(include_graphical_attributes)
+        if include_graphical_attributes:
+            dot_node = dot_node.with_attributes(edge_node_priority=2)
+        return dot_node
+
 
 @fast_frozen_dataclass(order=False)
 class LocalModelNode(SemanticGraphNode, Singleton):
@@ -167,6 +174,13 @@ class LocalModelNode(SemanticGraphNode, Singleton):
     def recipe_step_to_append(self) -> AttributeRecipeStep:
         return AttributeRecipeStep(add_model_join=self.model_id)
 
+    @override
+    def as_dot_node(self, include_graphical_attributes: bool) -> DotNodeAttributeSet:
+        dot_node = super(LocalModelNode, self).as_dot_node(include_graphical_attributes)
+        if include_graphical_attributes:
+            dot_node = dot_node.with_attributes(edge_node_priority=1)
+        return dot_node
+
 
 @fast_frozen_dataclass(order=False)
 class TimeDimensionNode(SemanticGraphNode, Singleton):
@@ -203,6 +217,13 @@ class TimeDimensionNode(SemanticGraphNode, Singleton):
             set_element_type=LinkableElementType.TIME_DIMENSION,
         )
 
+    @override
+    def as_dot_node(self, include_graphical_attributes: bool) -> DotNodeAttributeSet:
+        dot_node = super(TimeDimensionNode, self).as_dot_node(include_graphical_attributes)
+        if include_graphical_attributes:
+            dot_node = dot_node.with_attributes(edge_node_priority=1)
+        return dot_node
+
 
 @fast_frozen_dataclass(order=False)
 class MetricTimeNode(SemanticGraphNode, Singleton):
@@ -238,6 +259,13 @@ class MetricTimeNode(SemanticGraphNode, Singleton):
             add_properties=(LinkableElementProperty.METRIC_TIME,),
             set_element_type=LinkableElementType.TIME_DIMENSION,
         )
+
+    @override
+    def as_dot_node(self, include_graphical_attributes: bool) -> DotNodeAttributeSet:
+        dot_node = super(MetricTimeNode, self).as_dot_node(include_graphical_attributes)
+        if include_graphical_attributes:
+            dot_node = dot_node.with_attributes(edge_node_priority=1)
+        return dot_node
 
 
 @fast_frozen_dataclass(order=False)
@@ -366,7 +394,7 @@ class MeasureNode(SemanticGraphNode, Singleton):
     def as_dot_node(self, include_graphical_attributes: bool) -> DotNodeAttributeSet:
         dot_node = super(SemanticGraphNode, self).as_dot_node(include_graphical_attributes)
         if include_graphical_attributes:
-            dot_node = dot_node.with_attributes(color=DotColor.LIME_GREEN)
+            dot_node = dot_node.with_attributes(color=DotColor.LIME_GREEN, edge_node_priority=2)
         return dot_node
 
     @cached_property

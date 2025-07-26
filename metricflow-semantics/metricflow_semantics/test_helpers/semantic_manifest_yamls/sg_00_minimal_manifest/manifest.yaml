@@ -1,4 +1,4 @@
-# Minimal manifest that contains 2 semantic models that can be joined via a foreign / primary relationship.
+# Manifest containing the minimal number of elements.
 ---
 semantic_model:
   name: bookings_source
@@ -13,8 +13,6 @@ semantic_model:
   entities:
     - name: booking
       type: primary
-    - name: listing
-      type: foreign
 
   measures:
     - name: booking_count
@@ -26,22 +24,6 @@ semantic_model:
       type: time
       type_params:
         time_granularity: quarter
-
----
-semantic_model:
-  name: listings_source
-
-  node_relation:
-    schema_name: $source_schema
-    alias: listings_source
-
-  entities:
-    - name: listing
-      type: primary
-
-  dimensions:
-    - name: country_latest
-      type: categorical
 
 ---
 metric:
