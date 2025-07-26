@@ -68,13 +68,16 @@ class NoCommonItemsInParents(MetricFlowQueryResolutionIssue):
             parent_to_available_items["Matching items for: " + resolution_node.ui_description] = [
                 (spec_str if spec_str is not None else "None") for spec_str in spec_as_strs
             ]
-        return (
-            f"{last_path_item.ui_description} is built from:\n\n"
-            f"{mf_indent(last_path_item_parent_descriptions)}.\n"
-            f"However, the given input does not match to a common item that is available to those parents:\n\n"
-            f"{mf_indent(mf_pformat(parent_to_available_items, format_option=PrettyFormatDictOption(max_line_length=80)))}\n\n"
-            f"For time dimension inputs, please specify a time grain as ambiguous resolution only allows "
-            f"resolution when the parents have the same defined time gain."
+
+        return "\n\n".join(
+            (
+                f"{last_path_item.ui_description} is built from:",
+                f"{mf_indent(last_path_item_parent_descriptions)}.",
+                "However, the given input does not match to a common item that is available to those parents:",
+                f"{mf_indent(mf_pformat(parent_to_available_items, format_option=PrettyFormatDictOption(max_line_length=80)))}",
+                "For time-dimension inputs, please specify a time grain as resolution of ambiguous grains"
+                "\nis successful only when the parents have the same defined time grain.",
+            )
         )
 
     @override
