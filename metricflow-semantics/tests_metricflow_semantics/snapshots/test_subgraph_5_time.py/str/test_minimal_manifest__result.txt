@@ -1,0 +1,63 @@
+test_name: test_minimal_manifest
+test_filename: test_subgraph_5_time.py
+docstring:
+  Test generation of the time-entity subgraph using the minimal manifest.
+expectation_description:
+  The semantic manifest has a minimum grain of `quarter`, so there should only be attribute nodes applicable
+  for that grain.
+---
+dot_notation:
+  digraph {
+  	graph [name=MutableSemanticGraph]
+  	subgraph cluster_time {
+  		label=time
+  		"TimeAttribute(custom_year)"
+  		"TimeAttribute(extract_quarter)"
+  		"TimeAttribute(extract_year)"
+  		"TimeAttribute(quarter)"
+  		"TimeAttribute(year)"
+  		TimeEntity
+  	}
+  	subgraph cluster_bookings_source {
+  		label=bookings_source
+  		"JoinedModel(bookings_source)"
+  	}
+  	subgraph cluster_time_dimension {
+  		label=time_dimension
+  		MetricTime
+  		"TimeDimension(booking_time)"
+  	}
+  	TimeEntity -> "TimeAttribute(custom_year)"
+  	TimeEntity -> "TimeAttribute(extract_quarter)"
+  	TimeEntity -> "TimeAttribute(extract_year)"
+  	TimeEntity -> "TimeAttribute(quarter)"
+  	TimeEntity -> "TimeAttribute(year)"
+  	"JoinedModel(bookings_source)" -> "TimeDimension(booking_time)"
+  	MetricTime -> TimeEntity
+  	"TimeDimension(booking_time)" -> TimeEntity
+  }
+
+pretty_format:
+  MutableSemanticGraph(
+    nodes={
+      TimeAttribute(custom_year),
+      TimeAttribute(extract_quarter),
+      TimeAttribute(extract_year),
+      TimeAttribute(quarter),
+      TimeAttribute(year),
+      JoinedModel(bookings_source),
+      MetricTime,
+      TimeDimension(booking_time),
+      TimeEntity,
+    },
+    edges={
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(custom_year)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(extract_year)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(quarter)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(year)),
+      EntityRelationshipEdge(tail_node=JoinedModel(bookings_source), head_node=TimeDimension(booking_time)),
+      EntityRelationshipEdge(tail_node=MetricTime, head_node=TimeEntity),
+      EntityRelationshipEdge(tail_node=TimeDimension(booking_time), head_node=TimeEntity),
+    },
+  )
