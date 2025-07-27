@@ -32,4 +32,5 @@ def test_derived_metric_manifest(  # noqa: D103
             have edges to measure nodes.
             """
         ),
+        generate_svg=True,
     )
