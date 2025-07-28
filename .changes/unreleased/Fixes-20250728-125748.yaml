@@ -1,0 +1,6 @@
+kind: Fixes
+body: Fix queries failing when the same dimension has PRIMARY relationship to one metric and FOREIGN to another.
+time: 2025-07-28T12:57:48.250577-04:00
+custom:
+    Author: dstein-st
+    Issue: "1780"
