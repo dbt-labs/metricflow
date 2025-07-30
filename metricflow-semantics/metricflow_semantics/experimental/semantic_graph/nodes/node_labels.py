@@ -10,7 +10,7 @@ from metricflow_semantics.experimental.singleton import Singleton
 logger = logging.getLogger(__name__)
 
 
-@fast_frozen_dataclass()
+@fast_frozen_dataclass(order=False)
 class MeasureLabel(MetricflowGraphLabel, Singleton):
     """Used to label measure nodes.
 
@@ -24,7 +24,7 @@ class MeasureLabel(MetricflowGraphLabel, Singleton):
         return cls._get_instance(measure_name=measure_name)
 
 
-@fast_frozen_dataclass()
+@fast_frozen_dataclass(order=False)
 class GroupByAttributeLabel(MetricflowGraphLabel, Singleton):
     """Label for any attribute node that can be used in the group-by argument of an MF query."""
 
@@ -33,7 +33,7 @@ class GroupByAttributeLabel(MetricflowGraphLabel, Singleton):
         return cls._get_instance()
 
 
-@fast_frozen_dataclass()
+@fast_frozen_dataclass(order=False)
 class ConfiguredEntityLabel(MetricflowGraphLabel, Singleton):
     """Label for nodes that correspond to entities configured in a semantic model."""
 
@@ -42,7 +42,7 @@ class ConfiguredEntityLabel(MetricflowGraphLabel, Singleton):
         return cls._get_instance()
 
 
-@fast_frozen_dataclass()
+@fast_frozen_dataclass(order=False)
 class TimeDimensionLabel(MetricflowGraphLabel, Singleton):
     """Label for time dimension nodes."""
 
@@ -51,7 +51,7 @@ class TimeDimensionLabel(MetricflowGraphLabel, Singleton):
         return cls._get_instance()
 
 
-@fast_frozen_dataclass()
+@fast_frozen_dataclass(order=False)
 class TimeClusterLabel(MetricflowGraphLabel, Singleton):
     """Label for nodes that should be clustered together in the `time` section when visualizing the graph."""
 
@@ -60,7 +60,7 @@ class TimeClusterLabel(MetricflowGraphLabel, Singleton):
         return cls._get_instance()
 
 
-@fast_frozen_dataclass()
+@fast_frozen_dataclass(order=False)
 class MetricTimeLabel(MetricflowGraphLabel, Singleton):
     """Label for the node that represents metric-time."""
 
@@ -69,7 +69,7 @@ class MetricTimeLabel(MetricflowGraphLabel, Singleton):
         return cls._get_instance()
 
 
-@fast_frozen_dataclass()
+@fast_frozen_dataclass(order=False)
 class MetricLabel(MetricflowGraphLabel, Singleton):
     """Label for the node that corresponds to a configured metric in the semantic manifest.
 
@@ -83,7 +83,7 @@ class MetricLabel(MetricflowGraphLabel, Singleton):
         return cls._get_instance(metric_name=metric_name)
 
 
-@fast_frozen_dataclass()
+@fast_frozen_dataclass(order=False)
 class BaseMetricLabel(MetricflowGraphLabel, Singleton):
     """Label for nodes that represent a non-derived metric."""
 
@@ -92,7 +92,7 @@ class BaseMetricLabel(MetricflowGraphLabel, Singleton):
         return cls._get_instance()
 
 
-@fast_frozen_dataclass()
+@fast_frozen_dataclass(order=False)
 class DerivedMetricLabel(MetricflowGraphLabel, Singleton):
     """Label for nodes that represent a derived metric."""
 
@@ -101,7 +101,7 @@ class DerivedMetricLabel(MetricflowGraphLabel, Singleton):
         return cls._get_instance()
 
 
-@fast_frozen_dataclass()
+@fast_frozen_dataclass(order=False)
 class JoinedModelLabel(MetricflowGraphLabel, Singleton):
     """Label for nodes that represent a joined semantic model.
 
@@ -113,7 +113,7 @@ class JoinedModelLabel(MetricflowGraphLabel, Singleton):
         return cls._get_instance()
 
 
-@fast_frozen_dataclass()
+@fast_frozen_dataclass(order=False)
 class LocalModelLabel(MetricflowGraphLabel, Singleton):
     """Label for nodes that represent a local semantic model.
 
@@ -125,7 +125,7 @@ class LocalModelLabel(MetricflowGraphLabel, Singleton):
         return cls._get_instance()
 
 
-@fast_frozen_dataclass()
+@fast_frozen_dataclass(order=False)
 class KeyAttributeLabel(MetricflowGraphLabel, Singleton):
     """Label for nodes that correspond to the entity-key attribute nodes."""
 
