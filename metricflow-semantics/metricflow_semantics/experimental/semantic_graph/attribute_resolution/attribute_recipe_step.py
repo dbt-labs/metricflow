@@ -49,7 +49,7 @@ class AttributeRecipeStep(HasDisplayedProperty, Comparable):
     set_element_type: Optional[LinkableElementType] = None
     # To handle the case where time dimensions have a defined grain, the minimum time grain can be set to limit the
     # attribute nodes accessible later in the path.
-    set_min_time_grain: Optional[TimeGranularity] = None
+    set_source_time_grain: Optional[TimeGranularity] = None
     # With `set_min_time_grain`, `set_time_grain_access` can be used to check for valid paths. e.g. the node associated
     # with a time dimension with a `month` defined grain can block access to edges that specify access to `day`.
     set_time_grain_access: Optional[ExpandedTimeGranularity] = None
@@ -64,7 +64,7 @@ class AttributeRecipeStep(HasDisplayedProperty, Comparable):
             self.add_dunder_name_element,
             self.add_properties,
             self.add_model_join,
-            self.set_min_time_grain.value if self.set_min_time_grain is not None else None,
+            self.set_source_time_grain.value if self.set_source_time_grain is not None else None,
             self.set_element_type,
             self.add_entity_link,
             self.set_time_grain_access,
@@ -85,8 +85,8 @@ class AttributeRecipeStep(HasDisplayedProperty, Comparable):
             properties.append(DisplayedProperty("add_prop", linkable_element_property_addition.name))
         if self.add_model_join is not None:
             properties.append(DisplayedProperty("add_model_join", self.add_model_join.model_name))
-        if self.set_min_time_grain is not None:
-            properties.append(DisplayedProperty("set_min_grain", self.set_min_time_grain.name))
+        if self.set_source_time_grain is not None:
+            properties.append(DisplayedProperty("set_min_grain", self.set_source_time_grain.name))
         if self.set_element_type is not None:
             properties.append(DisplayedProperty("add_type", self.set_element_type.name))
         if self.add_entity_link is not None:
