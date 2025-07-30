@@ -1,0 +1,9 @@
+test_name: test_find_ancestors
+test_filename: test_path_finder.py
+---
+FindAncestorsResult(
+  reachable_nodes={SourceNode('source'), SinkNode('sink'), IntermediateNode('a'), IntermediateNode('b')},
+  reachable_source_nodes={SourceNode('source')},
+  source_node_to_reachable_target_nodes={SourceNode('source'): {SinkNode('sink')}},
+  finish_iteration_index=4,
+)
