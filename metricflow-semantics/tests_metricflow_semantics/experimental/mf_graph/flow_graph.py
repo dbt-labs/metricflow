@@ -20,6 +20,8 @@ from metricflow_semantics.experimental.mf_graph.mf_graph import (
 )
 from metricflow_semantics.experimental.mf_graph.mutable_graph import MutableGraph
 from metricflow_semantics.experimental.mf_graph.node_descriptor import MetricflowGraphNodeDescriptor
+from metricflow_semantics.experimental.mf_graph.path_finding.graph_path import MutableGraphPath
+from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricflowPathfinder
 from metricflow_semantics.experimental.ordered_set import MutableOrderedSet
 from metricflow_semantics.experimental.singleton import Singleton
 from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
@@ -142,3 +144,7 @@ class FlowGraph(MutableGraph[FlowNode, FlowEdge], MetricFlowPrettyFormattable):
             updated_graph.add_edge(edge)
 
         return updated_graph
+
+
+FlowGraphPath = MutableGraphPath[FlowNode, FlowEdge]
+FlowGraphPathFinder = MetricflowPathfinder[FlowNode, FlowEdge, FlowGraphPath]
