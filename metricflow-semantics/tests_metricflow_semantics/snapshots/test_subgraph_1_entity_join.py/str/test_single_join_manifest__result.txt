@@ -1,0 +1,64 @@
+test_name: test_single_join_manifest
+test_filename: test_subgraph_1_entity_join.py
+docstring:
+  Test generation of the subgraph that describes joins / entity-link using the single-join manifest.
+expectation_description:
+  The single-join manifest has one model with the `listing` foreign entity and another model with the
+  corresponding primary entity.
+---
+dot_notation:
+  digraph {
+  	graph [name=MutableSemanticGraph]
+  	subgraph cluster_configured_entity {
+  		label=configured_entity
+  		"bookings_source.booking"
+  		"listings_source.listing"
+  	}
+  	subgraph cluster_bookings_source {
+  		label=bookings_source
+  		"JoinedModel(bookings_source)"
+  		"LocalModel(bookings_source)"
+  		"Measure(booking_count)"
+  	}
+  	subgraph cluster_listings_source {
+  		label=listings_source
+  		"JoinedModel(listings_source)"
+  		"LocalModel(listings_source)"
+  	}
+  	subgraph cluster_time_dimension {
+  		label=time_dimension
+  		MetricTime
+  	}
+  	"bookings_source.booking" -> "JoinedModel(bookings_source)"
+  	"listings_source.listing" -> "JoinedModel(listings_source)"
+  	"LocalModel(bookings_source)" -> "bookings_source.booking"
+  	"LocalModel(listings_source)" -> "listings_source.listing"
+  	"Measure(booking_count)" -> "LocalModel(bookings_source)"
+  	"Measure(booking_count)" -> MetricTime
+  	"JoinedModel(bookings_source)" -> "listings_source.listing"
+  	"LocalModel(bookings_source)" -> "listings_source.listing"
+  }
+
+pretty_format:
+  MutableSemanticGraph(
+    nodes={
+      bookings_source.booking,
+      listings_source.listing,
+      JoinedModel(bookings_source),
+      JoinedModel(listings_source),
+      LocalModel(bookings_source),
+      LocalModel(listings_source),
+      Measure(booking_count),
+      MetricTime,
+    },
+    edges={
+      EntityRelationshipEdge(tail_node=bookings_source.booking, head_node=JoinedModel(bookings_source)),
+      EntityRelationshipEdge(tail_node=listings_source.listing, head_node=JoinedModel(listings_source)),
+      EntityRelationshipEdge(tail_node=LocalModel(bookings_source), head_node=bookings_source.booking),
+      EntityRelationshipEdge(tail_node=LocalModel(listings_source), head_node=listings_source.listing),
+      EntityRelationshipEdge(tail_node=Measure(booking_count), head_node=LocalModel(bookings_source)),
+      EntityRelationshipEdge(tail_node=Measure(booking_count), head_node=MetricTime),
+      JoinToModelEdge(tail_node=JoinedModel(bookings_source), head_node=listings_source.listing),
+      JoinToModelEdge(tail_node=LocalModel(bookings_source), head_node=listings_source.listing),
+    },
+  )

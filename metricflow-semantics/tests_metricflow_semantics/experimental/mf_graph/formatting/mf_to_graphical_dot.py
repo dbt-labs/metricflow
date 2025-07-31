@@ -75,7 +75,6 @@ class GraphicalDotConversionArgumentSet(DotConversionArgumentSet):
         "splines": "false",
         "bgcolor": DotColor.DARK_GRAY.value,
         "ranksep": "1.0",
-        # "nodesep": "1.0",
     }
 
     # Default attributes for DOT nodes.
