@@ -1,0 +1,41 @@
+test_name: test_minimal_manifest
+test_filename: test_subgraph_3_entity_key.py
+docstring:
+  Test generation of the entity-key subgraph using the minimal manifest.
+
+      The `EntityJoinSubgraphGenerator` is included in the graphs to show how the keys relate to the configured entities.
+expectation_description:
+  The graph should show an edge to the primary entity.
+---
+dot_notation:
+  digraph {
+  	graph [name=MutableSemanticGraph]
+  	subgraph cluster_key {
+  		label=key
+  		"KeyAttribute(booking)"
+  	}
+  	subgraph cluster_configured_entity {
+  		label=configured_entity
+  		"bookings_source.booking"
+  	}
+  	subgraph cluster_bookings_source {
+  		label=bookings_source
+  		"JoinedModel(bookings_source)"
+  		"LocalModel(bookings_source)"
+  	}
+  	"JoinedModel(bookings_source)" -> "KeyAttribute(booking)"
+  	"LocalModel(bookings_source)" -> "KeyAttribute(booking)"
+  	"bookings_source.booking" -> "JoinedModel(bookings_source)"
+  	"LocalModel(bookings_source)" -> "bookings_source.booking"
+  }
+
+pretty_format:
+  MutableSemanticGraph(
+    nodes={KeyAttribute(booking), bookings_source.booking, JoinedModel(bookings_source), LocalModel(bookings_source)},
+    edges={
+      EntityAttributeEdge(tail_node=JoinedModel(bookings_source), head_node=KeyAttribute(booking)),
+      EntityAttributeEdge(tail_node=LocalModel(bookings_source), head_node=KeyAttribute(booking)),
+      EntityRelationshipEdge(tail_node=bookings_source.booking, head_node=JoinedModel(bookings_source)),
+      EntityRelationshipEdge(tail_node=LocalModel(bookings_source), head_node=bookings_source.booking),
+    },
+  )
