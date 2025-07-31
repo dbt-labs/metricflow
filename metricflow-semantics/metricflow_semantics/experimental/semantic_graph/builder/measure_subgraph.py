@@ -62,7 +62,7 @@ class MeasureSubgraphGenerator(SemanticSubgraphGenerator):
                         tail_node=measure_node,
                         head_node=metric_time_node,
                         recipe_update=AttributeRecipeStep(
-                            set_min_time_grain=aggregation_configuration.time_grain,
+                            set_source_time_grain=aggregation_configuration.time_grain,
                             add_model_join=model_id,
                         ),
                     )
