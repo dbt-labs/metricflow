@@ -1,0 +1,26 @@
+test_name: test_single_join_manifest
+test_filename: test_subgraph_2_categorical_dimension.py
+docstring:
+  Test generation of the categorical-dimension subgraph using the single-join manifest.
+expectation_description:
+  The graph should show an edge to the categorical dimension.
+---
+dot_notation:
+  digraph {
+  	graph [name=MutableSemanticGraph]
+  	subgraph cluster_dimension {
+  		label=dimension
+  		"Dimension(country_latest)"
+  	}
+  	subgraph cluster_listings_source {
+  		label=listings_source
+  		"JoinedModel(listings_source)"
+  	}
+  	"JoinedModel(listings_source)" -> "Dimension(country_latest)"
+  }
+
+pretty_format:
+  MutableSemanticGraph(
+    nodes={Dimension(country_latest), JoinedModel(listings_source)},
+    edges={EntityAttributeEdge(tail_node=JoinedModel(listings_source), head_node=Dimension(country_latest))},
+  )

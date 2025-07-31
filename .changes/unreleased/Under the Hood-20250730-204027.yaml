@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Add subgraph generator for categorical dimensions
+time: 2025-07-30T20:40:27.416138-07:00
+custom:
+  Author: plypaul
+  Issue: "1799"
