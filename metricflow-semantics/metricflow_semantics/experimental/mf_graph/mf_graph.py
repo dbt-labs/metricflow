@@ -4,6 +4,7 @@ The graph object in `networkx` was evaluated, but it was not found to be well-ty
 """
 from __future__ import annotations
 
+import itertools
 import logging
 from abc import ABC, abstractmethod
 from functools import cached_property
@@ -29,6 +30,7 @@ from metricflow_semantics.experimental.mf_graph.graph_labeling import Metricflow
 from metricflow_semantics.experimental.mf_graph.node_descriptor import MetricflowGraphNodeDescriptor
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
 from metricflow_semantics.mf_logging.format_option import PrettyFormatOption
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
 from metricflow_semantics.mf_logging.pretty_formatter import (
     MetricFlowPrettyFormatter,
@@ -160,9 +162,23 @@ class MetricflowGraph(MetricFlowPrettyFormattable, Generic[NodeT_co, EdgeT_co], 
         raise NotImplementedError()
 
     @abstractmethod
-    def nodes_with_label(self, graph_label: MetricflowGraphLabel) -> OrderedSet[NodeT_co]:
-        """Return nodes in the graph with the given label."""
+    def nodes_with_labels(self, *graph_labels: MetricflowGraphLabel) -> OrderedSet[NodeT_co]:
+        """Return nodes in the graph with any one of the given labels."""
         raise NotImplementedError()
+
+    def node_with_label(self, label: MetricflowGraphLabel) -> NodeT_co:
+        """Finds the node with the given label. If not exactly one if found, an error is raised."""
+        nodes = self.nodes_with_labels(label)
+        matching_node_count = len(nodes)
+        if matching_node_count != 1:
+            raise KeyError(
+                LazyFormat(
+                    "Did not find exactly one node with the given label",
+                    matching_node_count=matching_node_count,
+                    first_10_nodes=list(itertools.islice(nodes, 10)),
+                )
+            )
+        return next(iter(nodes))
 
     @property
     @abstractmethod
@@ -221,7 +237,7 @@ class MetricflowGraph(MetricFlowPrettyFormattable, Generic[NodeT_co, EdgeT_co], 
         return self.edges.intersection(other.edges)
 
     @abstractmethod
-    def intersection(self, other: MetricflowGraph[NodeT_co, EdgeT_co]) -> Self:  # noqa: D102
+    def intersection(self, other: Self) -> Self:  # noqa: D102
         raise NotImplementedError()
 
     @abstractmethod

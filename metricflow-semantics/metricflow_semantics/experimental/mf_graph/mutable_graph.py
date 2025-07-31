@@ -7,6 +7,7 @@ from typing import DefaultDict, Generic, Iterable, TypeVar
 
 from typing_extensions import override
 
+from metricflow_semantics.collection_helpers.syntactic_sugar import mf_flatten
 from metricflow_semantics.experimental.mf_graph.graph_id import MetricflowGraphId, SequentialGraphId
 from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
 from metricflow_semantics.experimental.mf_graph.mf_graph import (
@@ -15,7 +16,7 @@ from metricflow_semantics.experimental.mf_graph.mf_graph import (
     MetricflowGraphNode,
     NodeT,
 )
-from metricflow_semantics.experimental.ordered_set import MutableOrderedSet, OrderedSet
+from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
 
 logger = logging.getLogger(__name__)
 
@@ -42,41 +43,41 @@ class MutableGraph(Generic[NodeT, EdgeT], MetricflowGraph[NodeT, EdgeT], ABC):
     _node_to_successor_nodes: DefaultDict[MetricflowGraphNode, MutableOrderedSet[NodeT]]
 
     def add_node(self, node: NodeT) -> None:  # noqa: D102
-        self._nodes.add(node)
-        for node_property in node.labels:
-            self._label_to_nodes[node_property].add(node)
-        self._graph_id = SequentialGraphId.create()
+        self.add_nodes((node,))
 
     def add_nodes(self, nodes: Iterable[NodeT]) -> None:  # noqa: D102
+        self._nodes.update(nodes)
         for node in nodes:
-            self.add_node(node)
-
-    def add_edge(self, edge: EdgeT) -> None:  # noqa: D102
-        tail_node = edge.tail_node
-        head_node = edge.head_node
-        graph_nodes = self._nodes
-
-        if tail_node not in graph_nodes:
-            self.add_node(tail_node)
-        if head_node not in graph_nodes:
-            self.add_node(head_node)
-
-        self._tail_node_to_edges[tail_node].add(edge)
-        self._head_node_to_edges[head_node].add(edge)
-        self._node_to_successor_nodes[tail_node].add(head_node)
-        self._node_to_predecessor_nodes[head_node].add(tail_node)
-        self._edges.add(edge)
+            for node_label in node.labels:
+                self._label_to_nodes[node_label].add(node)
         self._graph_id = SequentialGraphId.create()
 
+    def add_edge(self, edge: EdgeT) -> None:  # noqa: D102
+        self.add_edges((edge,))
+
     def add_edges(self, edges: Iterable[EdgeT]) -> None:  # noqa: D102
+        tail_nodes = [edge.tail_node for edge in edges]
+        head_nodes = [edge.head_node for edge in edges]
+
+        nodes_to_add: MutableOrderedSet[NodeT] = MutableOrderedSet()
+        nodes_to_add.update(tail_nodes, head_nodes)
+        nodes_to_add.difference_update(self.nodes)
+        self.add_nodes(nodes_to_add)
+
         for edge in edges:
-            self.add_edge(edge)
+            tail_node = edge.tail_node
+            head_node = edge.head_node
+
+            self._tail_node_to_edges[tail_node].add(edge)
+            self._head_node_to_edges[head_node].add(edge)
+            self._node_to_successor_nodes[tail_node].add(head_node)
+            self._node_to_predecessor_nodes[head_node].add(tail_node)
+
+        self._edges.update(edges)
+        self._graph_id = SequentialGraphId.create()
 
     def update(self, other: MetricflowGraph[NodeT, EdgeT]) -> None:
         """Add the nodes and edges to this graph."""
-        if len(other.nodes) == 0 and len(other.edges) == 0:
-            return
-
         self.add_nodes(other.nodes)
         self.add_edges(other.edges)
         self._graph_id = SequentialGraphId.create()
@@ -87,8 +88,8 @@ class MutableGraph(Generic[NodeT, EdgeT], MetricflowGraph[NodeT, EdgeT], ABC):
         return self._nodes
 
     @override
-    def nodes_with_label(self, graph_label: MetricflowGraphLabel) -> OrderedSet[NodeT]:
-        return self._label_to_nodes[graph_label]
+    def nodes_with_labels(self, *graph_labels: MetricflowGraphLabel) -> OrderedSet[NodeT]:
+        return FrozenOrderedSet(mf_flatten(self._label_to_nodes[label] for label in graph_labels))
 
     @override
     @property
