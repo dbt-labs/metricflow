@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Add subgraph generator for metrics
+time: 2025-08-01T13:44:57.566969-07:00
+custom:
+  Author: plypaul
+  Issue: "1802"

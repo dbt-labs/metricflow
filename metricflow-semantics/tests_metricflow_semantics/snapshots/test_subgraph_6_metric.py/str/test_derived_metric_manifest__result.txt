@@ -1,0 +1,63 @@
+test_name: test_derived_metric_manifest
+test_filename: test_subgraph_6_metric.py
+docstring:
+  Test generation of the metric subgraph using the derived-metric manifest.
+expectation_description:
+  The graph should show a derived-metric node that has edges to base-metric nodes, and base-metric nodes that
+  have edges to measure nodes.
+---
+dot_notation:
+  digraph {
+  	graph [name=MutableSemanticGraph]
+  	subgraph cluster_metric {
+  		label=metric
+  		"BaseMetric(bookings)"
+  		"BaseMetric(views)"
+  		"DerivedMetric(bookings_per_view)"
+  	}
+  	subgraph cluster_bookings_source {
+  		label=bookings_source
+  		"Measure(booking_count)"
+  	}
+  	subgraph cluster_views_source {
+  		label=views_source
+  		"Measure(view_count)"
+  	}
+  	"BaseMetric(bookings)" -> "Measure(booking_count)"
+  	"BaseMetric(views)" -> "Measure(view_count)"
+  	"DerivedMetric(bookings_per_view)" -> "BaseMetric(bookings)"
+  	"DerivedMetric(bookings_per_view)" -> "BaseMetric(views)"
+  }
+
+pretty_format:
+  MutableSemanticGraph(
+    nodes={
+      BaseMetric(bookings),
+      BaseMetric(views),
+      DerivedMetric(bookings_per_view),
+      Measure(booking_count),
+      Measure(view_count),
+    },
+    edges={
+      MetricDefinitionEdge(
+        tail_node=BaseMetric(bookings),
+        head_node=Measure(booking_count),
+        recipe_step=AttributeRecipeStep(),
+      ),
+      MetricDefinitionEdge(
+        tail_node=BaseMetric(views),
+        head_node=Measure(view_count),
+        recipe_step=AttributeRecipeStep(),
+      ),
+      MetricDefinitionEdge(
+        tail_node=DerivedMetric(bookings_per_view),
+        head_node=BaseMetric(bookings),
+        recipe_step=AttributeRecipeStep(),
+      ),
+      MetricDefinitionEdge(
+        tail_node=DerivedMetric(bookings_per_view),
+        head_node=BaseMetric(views),
+        recipe_step=AttributeRecipeStep(),
+      ),
+    },
+  )

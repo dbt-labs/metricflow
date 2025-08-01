@@ -1,0 +1,77 @@
+# Minimal manifest containing derived metrics.
+---
+semantic_model:
+  name: bookings_source
+
+  node_relation:
+    schema_name: $source_schema
+    alias: bookings_source
+
+  defaults:
+    agg_time_dimension: booking_time
+
+  entities:
+    - name: booking
+      type: primary
+
+  measures:
+    - name: booking_count
+      expr: "1"
+      agg: sum
+
+  dimensions:
+    - name: booking_time
+      type: time
+      type_params:
+        time_granularity: quarter
+
+---
+semantic_model:
+  name: views_source
+
+  node_relation:
+    schema_name: $source_schema
+    alias: views_source
+
+  defaults:
+    agg_time_dimension: view_time
+
+  measures:
+    - name: view_count
+      expr: "1"
+      agg: sum
+
+  dimensions:
+    - name: view_time
+      type: time
+      type_params:
+        time_granularity: quarter
+
+  entities:
+    - name: view
+      type: primary
+    - name: booking
+      type: foreign
+---
+metric:
+  name: bookings
+  type: simple
+  type_params:
+    measure: booking_count
+
+---
+metric:
+  name: views
+  type: simple
+  type_params:
+    measure: view_count
+
+---
+metric:
+  name: bookings_per_view
+  type: ratio
+  type_params:
+    numerator:
+      name: bookings
+    denominator:
+      name: views
