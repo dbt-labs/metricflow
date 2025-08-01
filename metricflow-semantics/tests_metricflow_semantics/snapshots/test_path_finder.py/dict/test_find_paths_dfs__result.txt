@@ -1,0 +1,23 @@
+test_name: test_find_paths_dfs
+test_filename: test_path_finder.py
+expectation_description:
+  The dictionary shows the max. allowed path weight to the paths found.
+---
+{
+  0: [],
+  1: [],
+  2: [
+    MutableGraphPath(nodes=['source', 'a', 'sink'], weight=2),
+    MutableGraphPath(nodes=['source', 'b', 'sink'], weight=2),
+  ],
+  3: [
+    MutableGraphPath(nodes=['source', 'a', 'b', 'sink'], weight=3),
+    MutableGraphPath(nodes=['source', 'a', 'sink'], weight=2),
+    MutableGraphPath(nodes=['source', 'b', 'sink'], weight=2),
+  ],
+  4: [
+    MutableGraphPath(nodes=['source', 'a', 'b', 'sink'], weight=3),
+    MutableGraphPath(nodes=['source', 'a', 'sink'], weight=2),
+    MutableGraphPath(nodes=['source', 'b', 'sink'], weight=2),
+  ],
+}
