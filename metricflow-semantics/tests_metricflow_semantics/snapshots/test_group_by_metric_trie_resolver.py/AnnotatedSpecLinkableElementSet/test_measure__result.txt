@@ -1,0 +1,43 @@
+test_name: test_measure
+test_filename: test_group_by_metric_trie_resolver.py
+---
+AnnotatedSpecLinkableElementSet(
+  annotated_specs=(
+    AnnotatedSpec(
+      element_type=METRIC,
+      element_name='bookings',
+      entity_link_names=('booking',),
+      metric_subquery_entity_link_names=('booking',),
+      element_properties=(JOINED, METRIC),
+      origin_semantic_model_names=('__VIRTUAL__',),
+      derived_from_semantic_model_names=('bookings_source',),
+    ),
+    AnnotatedSpec(
+      element_type=METRIC,
+      element_name='views',
+      entity_link_names=('booking',),
+      metric_subquery_entity_link_names=('booking',),
+      element_properties=(JOINED, METRIC),
+      origin_semantic_model_names=('__VIRTUAL__',),
+      derived_from_semantic_model_names=('bookings_source', 'views_source'),
+    ),
+    AnnotatedSpec(
+      element_type=METRIC,
+      element_name='views',
+      entity_link_names=('booking',),
+      metric_subquery_entity_link_names=('view', 'booking'),
+      element_properties=(JOINED, METRIC),
+      origin_semantic_model_names=('__VIRTUAL__',),
+      derived_from_semantic_model_names=('bookings_source', 'views_source'),
+    ),
+    AnnotatedSpec(
+      element_type=METRIC,
+      element_name='bookings_per_view',
+      entity_link_names=('booking',),
+      metric_subquery_entity_link_names=('booking',),
+      element_properties=(JOINED, METRIC),
+      origin_semantic_model_names=('__VIRTUAL__',),
+      derived_from_semantic_model_names=('bookings_source', 'views_source'),
+    ),
+  ),
+)
