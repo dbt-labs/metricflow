@@ -1,0 +1,45 @@
+test_name: test_add_items
+test_filename: test_dunder_name_trie.py
+expectation_description:
+  `ambiguous` should not show up since the union operation removes common items.
+---
+{
+  'names_after_removing_ambiguous_names': [
+    ('listing',),
+    ('listing', 'user'),
+    ('booking', 'host'),
+    ('booking', 'view'),
+    ('booking', 'host', 'country'),
+  ],
+  'trie': MutableDunderNameTrie(
+    name_element_to_descriptor_dict={'listing': DunderNameDescriptor(element_type=ENTITY)},
+    name_element_to_next_trie_dict={
+      'listing': MutableDunderNameTrie(
+        name_element_to_descriptor_dict={
+          'user': DunderNameDescriptor(
+            element_type=ENTITY,
+          ),
+        },
+      ),
+      'booking': MutableDunderNameTrie(
+        name_element_to_descriptor_dict={
+          'host': DunderNameDescriptor(
+            element_type=ENTITY,
+          ),
+          'view': DunderNameDescriptor(
+            element_type=ENTITY,
+          ),
+        },
+        name_element_to_next_trie_dict={
+          'host': MutableDunderNameTrie(
+            name_element_to_descriptor_dict={
+              'country': DunderNameDescriptor(
+                element_type=ENTITY,
+              ),
+            },
+          ),
+        },
+      ),
+    },
+  ),
+}
