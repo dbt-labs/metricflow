@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import itertools
 import logging
+import typing
 from abc import ABC, abstractmethod
 from functools import cached_property
 from typing import Iterable, Optional, Sequence, Tuple
@@ -27,6 +29,12 @@ from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
+
+if typing.TYPE_CHECKING:
+    from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe import IndexedDunderName
+    from metricflow_semantics.experimental.semantic_graph.trie_resolver.dunder_name_descriptor import (
+        DunderNameDescriptor,
+    )
 
 logger = logging.getLogger(__name__)
 
@@ -149,6 +157,77 @@ class AnnotatedSpec(SerializableDataclass):
             origin_semantic_model_names=origin_model_names,
             derived_from_semantic_model_names=derived_from_semantic_model_names,
         )
+
+    @staticmethod
+    def create_from_indexed_dunder_name(  # noqa: D102
+        indexed_dunder_name: IndexedDunderName, descriptor: DunderNameDescriptor
+    ) -> Sequence[AnnotatedSpec]:
+        items: list[AnnotatedSpec] = []
+
+        element_type = descriptor.element_type
+
+        if (
+            element_type is LinkableElementType.DIMENSION
+            or element_type is LinkableElementType.ENTITY
+            or element_type is LinkableElementType.METRIC
+        ):
+            element_name = indexed_dunder_name[-1]
+            entity_links = tuple(EntityReference(name_element) for name_element in indexed_dunder_name[:-1])
+        elif element_type is LinkableElementType.TIME_DIMENSION:
+            element_name = indexed_dunder_name[-2]
+            entity_links = tuple(EntityReference(name_element) for name_element in indexed_dunder_name[:-2])
+        else:
+            assert_values_exhausted(element_type)
+
+        if (
+            element_type is LinkableElementType.DIMENSION
+            or element_type is LinkableElementType.ENTITY
+            or element_type is LinkableElementType.TIME_DIMENSION
+        ):
+            items.append(
+                AnnotatedSpec.create(
+                    element_type=descriptor.element_type,
+                    element_name=element_name,
+                    properties=descriptor.element_properties,
+                    origin_model_ids=descriptor.origin_model_ids,
+                    derived_from_semantic_models=(
+                        model_id.semantic_model_reference for model_id in descriptor.derived_from_model_ids
+                    ),
+                    entity_links=entity_links,
+                    metric_subquery_entity_links=None,
+                    time_grain=descriptor.time_grain,
+                    date_part=descriptor.date_part,
+                )
+            )
+        elif element_type is LinkableElementType.METRIC:
+            for entity_key_query in descriptor.entity_key_queries_for_group_by_metric:
+                items.append(
+                    AnnotatedSpec.create(
+                        element_type=descriptor.element_type,
+                        element_name=element_name,
+                        properties=descriptor.element_properties,
+                        origin_model_ids=descriptor.origin_model_ids,
+                        derived_from_semantic_models=FrozenOrderedSet(
+                            itertools.chain(
+                                (model_id.semantic_model_reference for model_id in descriptor.derived_from_model_ids),
+                                (
+                                    model_id.semantic_model_reference
+                                    for model_id in entity_key_query.derived_from_model_ids
+                                ),
+                            )
+                        ),
+                        entity_links=entity_links,
+                        metric_subquery_entity_links=tuple(
+                            EntityReference(name_element) for name_element in entity_key_query.entity_key_query
+                        ),
+                        time_grain=None,
+                        date_part=None,
+                    )
+                )
+        else:
+            assert_values_exhausted(element_type)
+
+        return items
 
     @cached_property
     def spec(self) -> LinkableInstanceSpec:
