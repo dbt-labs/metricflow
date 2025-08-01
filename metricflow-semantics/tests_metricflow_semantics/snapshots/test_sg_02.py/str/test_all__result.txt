@@ -1,0 +1,158 @@
+test_name: test_all
+test_filename: test_sg_02.py
+---
+dot_notation:
+  digraph {
+  	graph [name=MutableSemanticGraph]
+  	subgraph cluster_dimension {
+  		label=dimension
+  		"Dimension(country_latest)"
+  	}
+  	subgraph cluster_key {
+  		label=key
+  		"KeyAttribute(booking)"
+  		"KeyAttribute(listing)"
+  		"KeyAttribute(user)"
+  	}
+  	subgraph cluster_time {
+  		label=time
+  		"TimeAttribute(custom_year)"
+  		"TimeAttribute(extract_quarter)"
+  		"TimeAttribute(extract_year)"
+  		"TimeAttribute(quarter)"
+  		"TimeAttribute(year)"
+  		TimeEntity
+  	}
+  	subgraph cluster_metric {
+  		label=metric
+  		"BaseMetric(bookings)"
+  	}
+  	subgraph cluster_configured_entity {
+  		label=configured_entity
+  		"bookings_source.booking"
+  		"listings_source.listing"
+  		"users_source.user"
+  	}
+  	subgraph cluster_bookings_source {
+  		label=bookings_source
+  		"JoinedModel(bookings_source)"
+  		"LocalModel(bookings_source)"
+  		"Measure(booking_count)"
+  	}
+  	subgraph cluster_listings_source {
+  		label=listings_source
+  		"JoinedModel(listings_source)"
+  		"LocalModel(listings_source)"
+  	}
+  	subgraph cluster_users_source {
+  		label=users_source
+  		"JoinedModel(users_source)"
+  		"LocalModel(users_source)"
+  	}
+  	subgraph cluster_time_dimension {
+  		label=time_dimension
+  		MetricTime
+  		"TimeDimension(booking_time)"
+  	}
+  	"JoinedModel(bookings_source)" -> "KeyAttribute(booking)"
+  	"JoinedModel(bookings_source)" -> "KeyAttribute(listing)"
+  	"JoinedModel(listings_source)" -> "Dimension(country_latest)"
+  	"JoinedModel(listings_source)" -> "KeyAttribute(listing)"
+  	"JoinedModel(listings_source)" -> "KeyAttribute(user)"
+  	"JoinedModel(users_source)" -> "Dimension(country_latest)"
+  	"JoinedModel(users_source)" -> "KeyAttribute(user)"
+  	"LocalModel(bookings_source)" -> "KeyAttribute(booking)"
+  	"LocalModel(bookings_source)" -> "KeyAttribute(listing)"
+  	"LocalModel(listings_source)" -> "KeyAttribute(listing)"
+  	"LocalModel(listings_source)" -> "KeyAttribute(user)"
+  	"LocalModel(users_source)" -> "KeyAttribute(user)"
+  	TimeEntity -> "TimeAttribute(custom_year)"
+  	TimeEntity -> "TimeAttribute(extract_quarter)"
+  	TimeEntity -> "TimeAttribute(extract_year)"
+  	TimeEntity -> "TimeAttribute(quarter)"
+  	TimeEntity -> "TimeAttribute(year)"
+  	"bookings_source.booking" -> "JoinedModel(bookings_source)"
+  	"listings_source.listing" -> "JoinedModel(listings_source)"
+  	"users_source.user" -> "JoinedModel(users_source)"
+  	"JoinedModel(bookings_source)" -> "TimeDimension(booking_time)"
+  	"LocalModel(bookings_source)" -> "bookings_source.booking"
+  	"LocalModel(listings_source)" -> "listings_source.listing"
+  	"LocalModel(users_source)" -> "users_source.user"
+  	"Measure(booking_count)" -> "LocalModel(bookings_source)"
+  	"Measure(booking_count)" -> MetricTime
+  	MetricTime -> TimeEntity
+  	"TimeDimension(booking_time)" -> TimeEntity
+  	"JoinedModel(bookings_source)" -> "listings_source.listing"
+  	"JoinedModel(listings_source)" -> "users_source.user"
+  	"LocalModel(bookings_source)" -> "listings_source.listing"
+  	"LocalModel(listings_source)" -> "users_source.user"
+  	"BaseMetric(bookings)" -> "Measure(booking_count)"
+  }
+
+pretty_format:
+  MutableSemanticGraph(
+    nodes={
+      Dimension(country_latest),
+      KeyAttribute(booking),
+      KeyAttribute(listing),
+      KeyAttribute(user),
+      TimeAttribute(custom_year),
+      TimeAttribute(extract_quarter),
+      TimeAttribute(extract_year),
+      TimeAttribute(quarter),
+      TimeAttribute(year),
+      BaseMetric(bookings),
+      bookings_source.booking,
+      listings_source.listing,
+      users_source.user,
+      JoinedModel(bookings_source),
+      JoinedModel(listings_source),
+      JoinedModel(users_source),
+      LocalModel(bookings_source),
+      LocalModel(listings_source),
+      LocalModel(users_source),
+      Measure(booking_count),
+      MetricTime,
+      TimeDimension(booking_time),
+      TimeEntity,
+    },
+    edges={
+      EntityAttributeEdge(tail_node=JoinedModel(bookings_source), head_node=KeyAttribute(booking)),
+      EntityAttributeEdge(tail_node=JoinedModel(bookings_source), head_node=KeyAttribute(listing)),
+      EntityAttributeEdge(tail_node=JoinedModel(listings_source), head_node=Dimension(country_latest)),
+      EntityAttributeEdge(tail_node=JoinedModel(listings_source), head_node=KeyAttribute(listing)),
+      EntityAttributeEdge(tail_node=JoinedModel(listings_source), head_node=KeyAttribute(user)),
+      EntityAttributeEdge(tail_node=JoinedModel(users_source), head_node=Dimension(country_latest)),
+      EntityAttributeEdge(tail_node=JoinedModel(users_source), head_node=KeyAttribute(user)),
+      EntityAttributeEdge(tail_node=LocalModel(bookings_source), head_node=KeyAttribute(booking)),
+      EntityAttributeEdge(tail_node=LocalModel(bookings_source), head_node=KeyAttribute(listing)),
+      EntityAttributeEdge(tail_node=LocalModel(listings_source), head_node=KeyAttribute(listing)),
+      EntityAttributeEdge(tail_node=LocalModel(listings_source), head_node=KeyAttribute(user)),
+      EntityAttributeEdge(tail_node=LocalModel(users_source), head_node=KeyAttribute(user)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(custom_year)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(extract_year)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(quarter)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(year)),
+      EntityRelationshipEdge(tail_node=bookings_source.booking, head_node=JoinedModel(bookings_source)),
+      EntityRelationshipEdge(tail_node=listings_source.listing, head_node=JoinedModel(listings_source)),
+      EntityRelationshipEdge(tail_node=users_source.user, head_node=JoinedModel(users_source)),
+      EntityRelationshipEdge(tail_node=JoinedModel(bookings_source), head_node=TimeDimension(booking_time)),
+      EntityRelationshipEdge(tail_node=LocalModel(bookings_source), head_node=bookings_source.booking),
+      EntityRelationshipEdge(tail_node=LocalModel(listings_source), head_node=listings_source.listing),
+      EntityRelationshipEdge(tail_node=LocalModel(users_source), head_node=users_source.user),
+      EntityRelationshipEdge(tail_node=Measure(booking_count), head_node=LocalModel(bookings_source)),
+      EntityRelationshipEdge(tail_node=Measure(booking_count), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=MetricTime, head_node=TimeEntity),
+      EntityRelationshipEdge(tail_node=TimeDimension(booking_time), head_node=TimeEntity),
+      JoinToModelEdge(tail_node=JoinedModel(bookings_source), head_node=listings_source.listing),
+      JoinToModelEdge(tail_node=JoinedModel(listings_source), head_node=users_source.user),
+      JoinToModelEdge(tail_node=LocalModel(bookings_source), head_node=listings_source.listing),
+      JoinToModelEdge(tail_node=LocalModel(listings_source), head_node=users_source.user),
+      MetricDefinitionEdge(
+        tail_node=BaseMetric(bookings),
+        head_node=Measure(booking_count),
+        recipe_step=AttributeRecipeStep(),
+      ),
+    },
+  )

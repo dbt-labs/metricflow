@@ -102,7 +102,7 @@ class DataflowToSqlPlanConverter:
                     attempted_optimization_level, use_column_alias_in_group_by=use_column_alias_in_group_by
                 )
 
-                logger.info(
+                logger.debug(
                     LazyFormat(
                         "Using option set for SQL generation:",
                         optimization_level=optimization_level,
@@ -130,6 +130,7 @@ class DataflowToSqlPlanConverter:
                             "investigate the cause for the exception.",
                             requested_optimization_level=optimization_level,
                             successful_optimization_level=attempted_optimization_level,
+                            option_set=option_set,
                         )
                     )
 

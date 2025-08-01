@@ -1,0 +1,15 @@
+digraph {
+	graph [name=FlowGraph]
+	subgraph cluster_intermediate_nodes {
+		label=intermediate_nodes
+		a
+		b
+	}
+	sink
+	source
+	a -> b
+	a -> sink
+	b -> sink
+	source -> a
+	source -> b
+}

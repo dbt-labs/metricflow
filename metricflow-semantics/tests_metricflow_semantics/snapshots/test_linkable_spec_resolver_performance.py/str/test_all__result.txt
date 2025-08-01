@@ -1,0 +1,120 @@
+test_name: test_all
+test_filename: test_linkable_spec_resolver_performance.py
+---
+dot_notation:
+  digraph {
+  	graph [name=MutableSemanticGraph]
+  	subgraph cluster_metric {
+  		label=metric
+  		"BaseMetric(metric_measure_sm_0)"
+  	}
+  	subgraph cluster_dimension {
+  		label=dimension
+  		"Dimension(dim)"
+  	}
+  	subgraph cluster_configured_entity {
+  		label=configured_entity
+  		"sm_0.sm_0_entity"
+  		"sm_1.sm_1_entity"
+  	}
+  	subgraph cluster_sm_0 {
+  		label=sm_0
+  		"Measure(sm_0_measure)"
+  	}
+  	subgraph cluster_sm_1 {
+  		label=sm_1
+  		"LocalModel(sm_1)"
+  	}
+  	subgraph cluster_key {
+  		label=key
+  		"KeyAttribute(sm_0_entity)"
+  		"KeyAttribute(sm_1_entity)"
+  	}
+  	subgraph cluster_time_dimension {
+  		label=time_dimension
+  		"TimeDimension(ds)"
+  	}
+  	subgraph cluster_time {
+  		label=time
+  		TimeEntity
+  	}
+  	"JoinedModel(sm_0)" -> "KeyAttribute(sm_0_entity)"
+  	"JoinedModel(sm_0)" -> "KeyAttribute(sm_1_entity)"
+  	"JoinedModel(sm_1)" -> "Dimension(dim)"
+  	"JoinedModel(sm_1)" -> "KeyAttribute(sm_1_entity)"
+  	"LocalModel(sm_0)" -> "KeyAttribute(sm_0_entity)"
+  	"LocalModel(sm_0)" -> "KeyAttribute(sm_1_entity)"
+  	"LocalModel(sm_1)" -> "KeyAttribute(sm_1_entity)"
+  	TimeEntity -> "TimeAttribute(custom_year)"
+  	TimeEntity -> "TimeAttribute(extract_quarter)"
+  	TimeEntity -> "TimeAttribute(extract_year)"
+  	TimeEntity -> "TimeAttribute(quarter)"
+  	TimeEntity -> "TimeAttribute(year)"
+  	"sm_0.sm_0_entity" -> "JoinedModel(sm_0)"
+  	"sm_1.sm_1_entity" -> "JoinedModel(sm_1)"
+  	"JoinedModel(sm_0)" -> "TimeDimension(ds)"
+  	"LocalModel(sm_0)" -> "sm_0.sm_0_entity"
+  	"LocalModel(sm_1)" -> "sm_1.sm_1_entity"
+  	"Measure(sm_0_measure)" -> "LocalModel(sm_0)"
+  	"Measure(sm_0_measure)" -> MetricTime
+  	MetricTime -> TimeEntity
+  	"TimeDimension(ds)" -> TimeEntity
+  	"JoinedModel(sm_0)" -> "sm_1.sm_1_entity"
+  	"LocalModel(sm_0)" -> "sm_1.sm_1_entity"
+  	"BaseMetric(metric_measure_sm_0)" -> "Measure(sm_0_measure)"
+  }
+
+pretty_format:
+  MutableSemanticGraph(
+    nodes={
+      BaseMetric(metric_measure_sm_0),
+      Dimension(dim),
+      sm_0.sm_0_entity,
+      sm_1.sm_1_entity,
+      JoinedModel(sm_0),
+      JoinedModel(sm_1),
+      KeyAttribute(sm_0_entity),
+      KeyAttribute(sm_1_entity),
+      LocalModel(sm_0),
+      LocalModel(sm_1),
+      Measure(sm_0_measure),
+      MetricTime,
+      TimeAttribute(custom_year),
+      TimeAttribute(extract_quarter),
+      TimeAttribute(extract_year),
+      TimeAttribute(quarter),
+      TimeAttribute(year),
+      TimeDimension(ds),
+      TimeEntity,
+    },
+    edges={
+      EntityAttributeEdge(tail_node=JoinedModel(sm_0), head_node=KeyAttribute(sm_0_entity)),
+      EntityAttributeEdge(tail_node=JoinedModel(sm_0), head_node=KeyAttribute(sm_1_entity)),
+      EntityAttributeEdge(tail_node=JoinedModel(sm_1), head_node=Dimension(dim)),
+      EntityAttributeEdge(tail_node=JoinedModel(sm_1), head_node=KeyAttribute(sm_1_entity)),
+      EntityAttributeEdge(tail_node=LocalModel(sm_0), head_node=KeyAttribute(sm_0_entity)),
+      EntityAttributeEdge(tail_node=LocalModel(sm_0), head_node=KeyAttribute(sm_1_entity)),
+      EntityAttributeEdge(tail_node=LocalModel(sm_1), head_node=KeyAttribute(sm_1_entity)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(custom_year)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(extract_year)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(quarter)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(year)),
+      EntityRelationshipEdge(tail_node=sm_0.sm_0_entity, head_node=JoinedModel(sm_0)),
+      EntityRelationshipEdge(tail_node=sm_1.sm_1_entity, head_node=JoinedModel(sm_1)),
+      EntityRelationshipEdge(tail_node=JoinedModel(sm_0), head_node=TimeDimension(ds)),
+      EntityRelationshipEdge(tail_node=LocalModel(sm_0), head_node=sm_0.sm_0_entity),
+      EntityRelationshipEdge(tail_node=LocalModel(sm_1), head_node=sm_1.sm_1_entity),
+      EntityRelationshipEdge(tail_node=Measure(sm_0_measure), head_node=LocalModel(sm_0)),
+      EntityRelationshipEdge(tail_node=Measure(sm_0_measure), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=MetricTime, head_node=TimeEntity),
+      EntityRelationshipEdge(tail_node=TimeDimension(ds), head_node=TimeEntity),
+      JoinToModelEdge(tail_node=JoinedModel(sm_0), head_node=sm_1.sm_1_entity),
+      JoinToModelEdge(tail_node=LocalModel(sm_0), head_node=sm_1.sm_1_entity),
+      MetricDefinitionEdge(
+        tail_node=BaseMetric(metric_measure_sm_0),
+        head_node=Measure(sm_0_measure),
+        recipe_step=AttributeRecipeStep(),
+      ),
+    },
+  )

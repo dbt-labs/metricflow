@@ -588,3 +588,29 @@ def test_parse_and_validate_metric_with_duplicate_metric_alias(
                 DimensionOrEntityParameter(name="revenue_instance__country", alias="revenue"),
             ),
         )
+
+
+# def test_error_case(
+#         request: FixtureRequest,
+#         mf_test_configuration: MetricFlowTestConfiguration,
+#         partitioned_multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
+# ) -> None:
+#     query_parser = MetricFlowQueryParser(partitioned_multi_hop_join_semantic_manifest_lookup)
+#     query_parser.parse_and_validate_query(
+#         metric_names=["third_hop_count"],
+#         group_by_names=["metric_time"],
+#         where_constraint_strs=["{{ Metric('account_customer_combos', group_by=['customer_third_hop_id']) }}"],
+#     )
+
+
+# def test_error_case(
+#         request: FixtureRequest,
+#         mf_test_configuration: MetricFlowTestConfiguration,
+#         simple_semantic_manifest_lookup: SemanticManifestLookup,
+# ) -> None:
+#     query_parser = MetricFlowQueryParser(simple_semantic_manifest_lookup)
+#     query_parser.parse_and_validate_query(
+#         metric_names=["bookings"],
+#         group_by_names=["metric_time"],
+#         where_constraint_strs=["{{ Metric('bookers', group_by=['guest']) }}"],
+#     )

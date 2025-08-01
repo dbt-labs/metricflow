@@ -1,0 +1,18 @@
+test_name: test_dunder_name_tree
+test_filename: test_dunder_name_tree.py
+---
+MutableDunderNameTree(
+  name_element_to_descriptor={'a': DunderNameDescriptor()},
+  name_element_to_next_tree={
+    'a': MutableDunderNameTree(
+      name_element_to_next_tree={
+        'b': MutableDunderNameTree(
+          name_element_to_descriptor={
+            'c': DunderNameDescriptor(),
+            'd': DunderNameDescriptor(),
+          },
+        ),
+      },
+    ),
+  },
+)

@@ -1,0 +1,4 @@
+test_name: test_dunder_name_trie
+test_filename: test_dunder_name_trie.py
+---
+[('a',), ('a', 'b', 'c'), ('a', 'b', 'd')]
