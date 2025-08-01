@@ -1,0 +1,4 @@
+test_name: test_dunder_name_tree
+test_filename: test_dunder_name_tree.py
+---
+[('a',), ('a', 'b', 'c'), ('a', 'b', 'd')]

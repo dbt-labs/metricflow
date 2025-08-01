@@ -103,6 +103,7 @@ class DotEdgeAttributeSet:
     color: Optional[DotColor]
     label: Optional[str]
     arrow_shape: Optional[DotEdgeArrowShape]
+    additional_kwargs: Mapping[str, str]
 
     @staticmethod
     def create(  # noqa: D102
@@ -111,6 +112,7 @@ class DotEdgeAttributeSet:
         color: Optional[DotColor] = None,
         label: Optional[str] = None,
         arrow_shape: Optional[DotEdgeArrowShape] = None,
+        additional_kwargs: Optional[Mapping[str, str]] = None,
     ) -> DotEdgeAttributeSet:
         return DotEdgeAttributeSet(
             tail_name=tail_name,
@@ -118,6 +120,7 @@ class DotEdgeAttributeSet:
             color=color,
             label=label,
             arrow_shape=arrow_shape,
+            additional_kwargs=mf_ensure_mapping(additional_kwargs),
         )
 
     def merge(self, other: DotEdgeAttributeSet) -> DotEdgeAttributeSet:  # noqa: D102
@@ -127,6 +130,7 @@ class DotEdgeAttributeSet:
             color=mf_first_non_none(other.color, self.color),
             label=mf_first_non_none(other.label, self.label),
             arrow_shape=mf_first_non_none(other.arrow_shape, self.arrow_shape),
+            additional_kwargs=dict(**self.additional_kwargs, **other.additional_kwargs),
         )
 
     @property
@@ -144,6 +148,8 @@ class DotEdgeAttributeSet:
 
         if self.arrow_shape is not None:
             kwargs["arrowhead"] = self.arrow_shape.value
+
+        kwargs.update(**self.additional_kwargs)
 
         return kwargs
 
@@ -175,6 +181,9 @@ class DotNodeAttributeSet:
     # clusters the cluster of the node with the highest priority is selected.
     cluster_priority_for_edge_as_node: Optional[int]
 
+    # Additional keyword arguments for the call to create a DOT graph instance.
+    additional_kwargs: Mapping[str, str]
+
     @staticmethod
     def create(  # noqa: D102
         name: str,
@@ -184,6 +193,7 @@ class DotNodeAttributeSet:
         shape: Optional[DotNodeShape] = None,
         rank_key: Optional[DotRankKey] = None,
         edge_node_priority: Optional[int] = None,
+        additional_kwargs: Optional[Mapping[str, str]] = None,
     ) -> DotNodeAttributeSet:
         return DotNodeAttributeSet(
             name=name,
@@ -193,6 +203,7 @@ class DotNodeAttributeSet:
             shape=shape,
             rank_key=rank_key,
             cluster_priority_for_edge_as_node=edge_node_priority,
+            additional_kwargs=mf_ensure_mapping(additional_kwargs),
         )
 
     def merge(self, other: DotNodeAttributeSet) -> DotNodeAttributeSet:  # noqa: D102
@@ -201,6 +212,9 @@ class DotNodeAttributeSet:
             color=other.color or self.color,
             label=other.label or self.label,
             shape=other.shape or self.shape,
+            rank_key=other.rank_key or self.rank_key,
+            edge_node_priority=other.cluster_priority_for_edge_as_node or self.cluster_priority_for_edge_as_node,
+            additional_kwargs=dict(**self.additional_kwargs, **other.additional_kwargs),
         )
 
     @property
@@ -221,6 +235,7 @@ class DotNodeAttributeSet:
         if self.shape is not None:
             kwargs["shape"] = self.shape.value
 
+        kwargs.update(**self.additional_kwargs)
         return kwargs
 
     def with_attributes(
@@ -231,6 +246,7 @@ class DotNodeAttributeSet:
         shape: Optional[DotNodeShape] = None,
         rank_key: Optional[DotRankKey] = None,
         edge_node_priority: Optional[int] = None,
+        additional_kwargs: Optional[Mapping[str, str]] = None,
     ) -> DotNodeAttributeSet:
         """Return a copy of this with fields set to the present arguments."""
         return DotNodeAttributeSet(
@@ -241,4 +257,5 @@ class DotNodeAttributeSet:
             shape=mf_first_non_none(shape, self.shape),
             rank_key=mf_first_non_none(rank_key, self.rank_key),
             cluster_priority_for_edge_as_node=edge_node_priority,
+            additional_kwargs=mf_ensure_mapping(mf_first_non_none(additional_kwargs, self.additional_kwargs)),
         )

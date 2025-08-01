@@ -11,21 +11,18 @@ from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.transformations.semantic_manifest_transformer import PydanticSemanticManifestTransformer
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
-from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_computation_path import (
-    AttributeComputationPath,
-)
-from metricflow_semantics.experimental.semantic_graph.builder.graph_builder import SemanticGraphBuilder
-from metricflow_semantics.experimental.semantic_graph.manifest_object_lookup import (
+from metricflow_semantics.experimental.dsi.manifest_object_lookup import (
     ManifestObjectLookup as NewManifestObjectLookup,
 )
-from metricflow_semantics.experimental.semantic_graph.nodes.semantic_graph_node import (
-    SemanticGraphEdge,
-    SemanticGraphNode,
+from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricflowPathfinder
+from metricflow_semantics.experimental.semantic_graph.attribute_resolution.recipe_writer_path import (
+    AttributeRecipeWriterPath,
 )
-from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder import MetricflowGraphPathFinder
-from metricflow_semantics.experimental.semantic_graph.path_finding.path_finder_cache import PathFinderCache
-from metricflow_semantics.experimental.singleton_decorator import singleton_dataclass
+from metricflow_semantics.experimental.semantic_graph.builder.graph_builder import SemanticGraphBuilder
+from metricflow_semantics.experimental.semantic_graph.sg_interfaces import SemanticGraphEdge, SemanticGraphNode
+from metricflow_semantics.experimental.singleton import Singleton
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.mf_logging.runtime import log_block_runtime
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.linkable_spec_index import LinkableSpecIndex
 from metricflow_semantics.model.semantics.linkable_spec_index_builder import LinkableSpecIndexBuilder
@@ -42,10 +39,10 @@ from metricflow_semantics.test_helpers.synthetic_manifest.synthetic_manifest_par
 )
 from metricflow_semantics.test_helpers.time_helpers import ConfigurableTimeSource
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
-from run_pstats import CPROFILE_OUTPUT_FILE_NAME
+from run_pstats import CPROFILE_OUTPUT_FILE_PATH
 from tests_metricflow_semantics.model.test_semantic_model_container import build_semantic_model_lookup_from_manifest
 
-from metricflow.engine.metricflow_engine import MetricFlowEngine
+from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowQueryRequest
 from metricflow.protocols.sql_client import SqlClient
 
 logger = logging.getLogger(__name__)
@@ -158,32 +155,111 @@ def _time_original_init(semantic_manifest: SemanticManifest) -> float:
 def _time_new_init(semantic_manifest: SemanticManifest) -> float:
     start_time = time.perf_counter()
 
-    path_finder_cache = PathFinderCache[SemanticGraphNode, SemanticGraphEdge, AttributeComputationPath]()
-    path_finder = MetricflowGraphPathFinder[SemanticGraphNode, SemanticGraphEdge, AttributeComputationPath](
-        path_finder_cache=path_finder_cache,
-    )
+    path_finder = MetricflowPathfinder[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath]()
     manifest_object_lookup = NewManifestObjectLookup(semantic_manifest)
-    graph_builder = SemanticGraphBuilder(
-        manifest_object_lookup=manifest_object_lookup,
-        path_finder=path_finder,
-    )
+    graph_builder = SemanticGraphBuilder(manifest_object_lookup=manifest_object_lookup)
     semantic_graph = graph_builder.build()
 
     return time.perf_counter() - start_time
 
 
-def test_semantic_graph_init_time() -> None:
+def _time_new_query(
+    semantic_manifest: SemanticManifest,
+    sql_client: SqlClient,
+) -> None:
+    manifest_lookup = SemanticManifestLookup(semantic_manifest, use_semantic_graph=True)
+    with log_block_runtime("Init engine"):
+        mf_engine = MetricFlowEngine(
+            semantic_manifest_lookup=manifest_lookup,
+            sql_client=sql_client,
+        )
+
+    # with log_block_runtime("Run list dimensions #0"):
+    #     dimension_count = len(mf_engine.list_dimensions(metric_names=["metric_1_000"]))
+    #     logger.info(LazyFormat("Listed dimensions", dimension_count=dimension_count))
+    #
+    # with log_block_runtime("Run list dimensions #1"):
+    #     dimension_count = len(mf_engine.list_dimensions(metric_names=["metric_1_000"]))
+    #     logger.info(LazyFormat("Listed dimensions", dimension_count=dimension_count))
+    #
+    # with log_block_runtime("Run list dimensions #2"):
+    #     dimension_count = len(mf_engine.list_dimensions(metric_names=["metric_1_001"]))
+    #     logger.info(LazyFormat("Listed dimensions", dimension_count=dimension_count))
+
+    metric_names = ["metric_1_000"]
+    group_by_names = ["metric_time", "common_entity__dimension_000"]
+    # where_constraints = ["{{ Metric('metric_1_001', group_by=['common_entity']) }}"]
+    where_constraints: list[str] = []
+    with log_block_runtime("Run explain #0"):
+        mf_engine.explain(
+            MetricFlowQueryRequest.create_with_random_request_id(
+                metric_names=metric_names, group_by_names=group_by_names, where_constraints=where_constraints
+            )
+        )
+
+    with log_block_runtime("Run explain #1"):
+        result = mf_engine.explain(
+            MetricFlowQueryRequest.create_with_random_request_id(
+                metric_names=metric_names,
+                group_by_names=["metric_time", "common_entity__dimension_010"],
+                where_constraints=where_constraints,
+            )
+        )
+        # logger.info(LazyFormat("Generated SQL", sql=result.convert_to_execution_plan_result.render_sql_result.sql))
+
+
+def _time_engine_init(
+    semantic_manifest: SemanticManifest,
+    sql_client: SqlClient,
+) -> float:
+    start_time = time.perf_counter()
+
+    manifest_lookup = SemanticManifestLookup(semantic_manifest)
+    mf_engine = MetricFlowEngine(
+        semantic_manifest_lookup=manifest_lookup,
+        sql_client=sql_client,
+    )
+
+    return time.perf_counter() - start_time
+
+
+def test_semantic_graph_init_time(sql_client: SqlClient) -> None:
+    # parameter_set = SyntheticManifestParameterSet(
+    #     measure_semantic_model_count=20,
+    #     measures_per_semantic_model=20,
+    #     dimension_semantic_model_count=20,
+    #     categorical_dimensions_per_semantic_model=10,
+    #     max_metric_depth=3,
+    #     max_metric_width=50,
+    #     saved_query_count=0,
+    #     metrics_per_saved_query=0,
+    #     categorical_dimensions_per_saved_query=0,
+    # )
+
     parameter_set = SyntheticManifestParameterSet(
-        measure_semantic_model_count=20,
+        measure_semantic_model_count=100,
         measures_per_semantic_model=20,
-        dimension_semantic_model_count=20,
-        categorical_dimensions_per_semantic_model=10,
-        max_metric_depth=3,
+        dimension_semantic_model_count=100,
+        categorical_dimensions_per_semantic_model=20,
+        max_metric_depth=2,
         max_metric_width=50,
         saved_query_count=0,
         metrics_per_saved_query=0,
         categorical_dimensions_per_saved_query=0,
     )
+
+    # parameter_set = SyntheticManifestParameterSet(
+    #     measure_semantic_model_count=1,
+    #     measures_per_semantic_model=1,
+    #     dimension_semantic_model_count=1,
+    #     categorical_dimensions_per_semantic_model=1,
+    #     max_metric_depth=2,
+    #     max_metric_width=1,
+    #     saved_query_count=0,
+    #     metrics_per_saved_query=0,
+    #     categorical_dimensions_per_saved_query=0,
+    # )
+
     generator = SyntheticManifestGenerator(parameter_set)
     semantic_manifest = generator.generate_manifest()
     semantic_manifest = PydanticSemanticManifestTransformer.transform(semantic_manifest)
@@ -191,14 +267,35 @@ def test_semantic_graph_init_time() -> None:
     # original_init_time = _time_original_init(semantic_manifest)
     # new_init_time = _time_new_init(semantic_manifest)
     # ratio = original_init_time / new_init_time
-    # logger.info(LazyFormat("Compared init times", original_init_time=original_init_time, new_init_time=new_init_time, ratio=f"{ratio:.2f}"))
+    # logger.info(
+    #     LazyFormat(
+    #         "Compared init times",
+    #         original_init_time=original_init_time,
+    #         new_init_time=new_init_time,
+    #         ratio=f"{ratio:.2f}",
+    #     )
+    # )
 
-    cProfile.runctx(
-        statement="_time_new_init(semantic_manifest)",
-        filename=CPROFILE_OUTPUT_FILE_NAME,
-        locals=locals(),
-        globals=globals(),
-    )
+    # output_filename = str(CPROFILE_OUTPUT_FILE_PATH)
+    # logger.info(LazyFormat("Running performance profiling", output_filename=output_filename))
+    # cProfile.runctx(
+    #     statement="_time_new_init(semantic_manifest)",
+    #     filename=str(CPROFILE_OUTPUT_FILE_PATH),
+    #     locals=locals(),
+    #     globals=globals(),
+    # )
+
+    # with log_block_runtime("new init"):
+    #     _time_new_init(semantic_manifest)
+
+    with log_block_runtime("new query"):
+        _time_new_query(semantic_manifest=semantic_manifest, sql_client=sql_client)
+
+    # with log_block_runtime("New engine init"):
+    #     _time_engine_init(semantic_manifest, sql_client)
+
+    # with log_block_runtime("original init"):
+    #     _time_original_init(semantic_manifest)
 
 
 @fast_frozen_dataclass()
@@ -206,9 +303,13 @@ class DataclassId:
     int_value: int
 
 
-@singleton_dataclass()
-class SingletonId:
+@fast_frozen_dataclass()
+class SingletonId(Singleton):
     int_value: int
+
+    @classmethod
+    def get_instance(cls, int_value: int) -> SingletonId:  # noqa: D102
+        return cls.get_instance(int_value)
 
 
 class SingletonFactory:
@@ -230,7 +331,7 @@ ID_COUNT = 200_000
 def _test_singleton_dataclass() -> None:
     for _ in range(REPEAT_COUNT):
         for int_value in range(ID_COUNT):
-            SingletonId(int_value=int_value)
+            SingletonId.get_instance(int_value=int_value)
 
 
 def _test_factory() -> None:
@@ -242,7 +343,7 @@ def _test_factory() -> None:
 def test_singleton_approach() -> None:
     cProfile.runctx(
         statement="_test_factory()",
-        filename=CPROFILE_OUTPUT_FILE_NAME,
+        filename=str(CPROFILE_OUTPUT_FILE_PATH),
         locals=locals(),
         globals=globals(),
     )

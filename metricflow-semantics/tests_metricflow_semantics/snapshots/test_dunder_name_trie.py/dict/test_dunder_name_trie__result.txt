@@ -1,0 +1,48 @@
+test_name: test_dunder_name_trie
+test_filename: test_dunder_name_trie.py
+---
+{
+  'names_after_removing_ambiguous_names': [
+    ('listing',),
+    ('listing', 'user'),
+    ('booking', 'host'),
+    ('booking', 'view'),
+    ('booking', 'host', 'country'),
+  ],
+  'trie': MutableDunderNameTrie(
+    next_name_element_to_trie_dict={
+      'listing': MutableDunderNameTrie(
+        descriptor_=DunderNameDescriptor(element_type=DIMENSION),
+        next_name_element_to_trie_dict={
+          'user': MutableDunderNameTrie(
+            descriptor_=DunderNameDescriptor(
+              element_type=DIMENSION,
+            ),
+          ),
+        },
+      ),
+      'booking': MutableDunderNameTrie(
+        next_name_element_to_trie_dict={
+          'host': MutableDunderNameTrie(
+            descriptor_=DunderNameDescriptor(
+              element_type=DIMENSION,
+            ),
+            next_name_element_to_trie_dict={
+              'country': MutableDunderNameTrie(
+                descriptor_=DunderNameDescriptor(
+                  element_type=DIMENSION,
+                ),
+              ),
+            },
+          ),
+          'view': MutableDunderNameTrie(
+            descriptor_=DunderNameDescriptor(
+              element_type=DIMENSION,
+            ),
+          ),
+        },
+      ),
+      'ambiguous': MutableDunderNameTrie(),
+    },
+  ),
+}
