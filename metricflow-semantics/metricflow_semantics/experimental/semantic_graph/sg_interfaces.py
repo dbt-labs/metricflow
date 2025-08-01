@@ -8,12 +8,10 @@ from dataclasses import dataclass
 from typing_extensions import Optional, override
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
-from metricflow_semantics.collection_helpers.syntactic_sugar import mf_flatten
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.mf_graph.formatting.dot_attributes import DotGraphAttributeSet
 from metricflow_semantics.experimental.mf_graph.graph_id import MetricflowGraphId, SequentialGraphId
-from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
 from metricflow_semantics.experimental.mf_graph.mf_graph import (
     MetricflowGraph,
     MetricflowGraphEdge,
@@ -130,10 +128,6 @@ class SemanticGraph(MetricflowGraph[SemanticGraphNode, SemanticGraphEdge], ABC):
                 else {}
             )
         )
-
-    def nodes_with_labels(self, *labels: MetricflowGraphLabel) -> MutableOrderedSet[SemanticGraphNode]:
-        """Return nodes in the graph with any of the given labels."""
-        return MutableOrderedSet(mf_flatten(self.nodes_with_label(label) for label in labels))
 
 
 @dataclass
