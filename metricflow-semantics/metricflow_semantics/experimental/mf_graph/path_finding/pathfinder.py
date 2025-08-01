@@ -318,7 +318,7 @@ class MetricflowPathfinder(Generic[NodeT, EdgeT, MutablePathT], ABC):
         )
 
     @property
-    def counter_set_snapshot(self) -> GraphTraversalProfile:
+    def traversal_profile_snapshot(self) -> GraphTraversalProfile:
         """Return a snapshot of the current counter set for pathfinder metrics.
 
         The counter set is used for logging / debugging.
