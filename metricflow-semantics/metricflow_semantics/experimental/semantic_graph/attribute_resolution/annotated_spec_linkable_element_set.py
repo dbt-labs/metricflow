@@ -13,6 +13,7 @@ from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTup
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_flatten
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet
+from metricflow_semantics.experimental.semantic_graph.trie_resolver.dunder_name_trie import DunderNameTrie
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 from metricflow_semantics.model.semantics.linkable_element_set_base import AnnotatedSpec, BaseLinkableElementSet
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
@@ -45,6 +46,19 @@ class AnnotatedSpecLinkableElementSet(BaseLinkableElementSet, SerializableDatacl
 
         return AnnotatedSpecLinkableElementSet(
             annotated_specs=tuple(dunder_name_to_annotated_spec.values()),
+        )
+
+    @staticmethod
+    def create_from_trie(*dunder_name_tries: DunderNameTrie) -> AnnotatedSpecLinkableElementSet:  # noqa: D102
+        return AnnotatedSpecLinkableElementSet(
+            annotated_specs=tuple(
+                annotated_spec
+                for annotated_spec in mf_flatten(
+                    AnnotatedSpec.create_from_indexed_dunder_name(indexed_dunder_name, descriptor)
+                    for trie in dunder_name_tries
+                    for indexed_dunder_name, descriptor in trie.name_items()
+                )
+            )
         )
 
     @staticmethod
