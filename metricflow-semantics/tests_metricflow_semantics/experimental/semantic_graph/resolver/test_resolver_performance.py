@@ -49,21 +49,21 @@ def test_init_medium_complexity_manifest(
 def test_time_init(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    manifest_with_200_models_100_metrics: SemanticManifest,
+    simple_semantic_manifest: SemanticManifest,
 ) -> None:
     fixture = SemanticGraphTestFixture(
         request=request,
         snapshot_configuration=mf_test_configuration,
-        semantic_manifest=manifest_with_200_models_100_metrics,
+        semantic_manifest=simple_semantic_manifest,
     )
 
     # tester = SemanticGraphTester(fixture)
 
-    with ExecutionTimer("Initialize SG Resolver"):
-        fixture.create_sg_resolver()
+    # with ExecutionTimer("Initialize SG Resolver"):
+    #     fixture.create_sg_resolver()
 
-    # with PerformanceTimer("Initialize Legacy Resolver"):
-    #     fixture.create_legacy_resolver()
+    with ExecutionTimer("Initialize Legacy Resolver"):
+        fixture.create_legacy_resolver()
 
     # logger.info(LazyFormat("Finished SG resolver init", time=f"{timer.total_time:.2f})"))
 
