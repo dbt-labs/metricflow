@@ -8,8 +8,6 @@ from typing import Mapping, Optional, Sequence, Union
 
 import tabulate
 
-from metricflow.data_table.column_types import CellValue
-
 logger = logging.getLogger(__name__)
 
 
@@ -19,6 +17,8 @@ class IsolatedTabulateRunner:
     The `tabulate.tabulate` method uses some options defined in the module instead of being provided as arguments to
     the function. This runner is used to change those options in isolation by loading a copy of the `tabulate` module.
     This helps to ensure that other calls to `tabulate.tabulate` don't see unexpected results.
+
+    The next version of `tabluate` will provide those options as call arguments, so this can be removed then.
     """
 
     _TABULATE_MODULE_COPY: Optional[ModuleType] = None
@@ -27,7 +27,7 @@ class IsolatedTabulateRunner:
     @classmethod
     def tabulate(
         cls,
-        tabular_data: Sequence[Union[Mapping[str, CellValue], Sequence[CellValue]]],
+        tabular_data: Sequence[Union[Mapping[str, object], Sequence[object]]],
         headers: Union[str, Sequence[str]],
         column_alignment: Optional[Sequence[str]] = None,
         tablefmt: str = "simple",
