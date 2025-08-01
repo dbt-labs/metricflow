@@ -30,4 +30,25 @@ def manifest_with_200_models_100_metrics() -> SemanticManifest:
 
     generator = SyntheticManifestGenerator(parameter_set)
     semantic_manifest = generator.generate_manifest()
+    result = PydanticSemanticManifestTransformer.transform(semantic_manifest)
+    return result
+
+
+@pytest.fixture(scope="session")
+def manifest_with_50_models_25_metrics() -> SemanticManifest:
+    """A semantic manifest with 200 models (100 with measures) and 100 metrics (50 of them derived)."""
+    parameter_set = SyntheticManifestParameterSet(
+        measure_semantic_model_count=25,
+        measures_per_semantic_model=20,
+        dimension_semantic_model_count=25,
+        categorical_dimensions_per_semantic_model=20,
+        max_metric_depth=1,
+        max_metric_width=25,
+        saved_query_count=100,
+        metrics_per_saved_query=20,
+        categorical_dimensions_per_saved_query=20,
+    )
+
+    generator = SyntheticManifestGenerator(parameter_set)
+    semantic_manifest = generator.generate_manifest()
     return PydanticSemanticManifestTransformer.transform(semantic_manifest)
