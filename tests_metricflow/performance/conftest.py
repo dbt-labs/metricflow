@@ -8,7 +8,7 @@ import pytest
 from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.test_helpers.config_helpers import DirectoryPathAnchor
-from metricflow_semantics.test_helpers.performance_helpers import (
+from metricflow_semantics.test_helpers.performance.performance_helpers import (
     PerformanceTracker,
     SessionReport,
 )
@@ -29,7 +29,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     parser.addoption(
         "--output-json",
         action="store",
-        default="performance-report.json",
+        default="git_ignored/performance-report.json",
         help="where to store performance results as JSON",
     )
 
