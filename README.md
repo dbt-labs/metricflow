@@ -30,9 +30,10 @@
 
 See our latest updates in the [Metricflow Changelog](https://github.com/dbt-labs/metricflow/blob/main/CHANGELOG.md)!
 
-MetricFlow is a semantic layer that makes it easy to organize metric definitions. It takes those definitions and generates legible and reusable SQL. This makes it easy to get consistent metrics output broken down by attributes (dimensions) of interest.
+MetricFlow is a semantic layer that simplifies defining and managing metrics. It compiles these metric definitions into clear, reusable SQL, ensuring consistent and accurate results when analyzing data by relevant attributes (dimensions).
 
-The name comes from the approach taken to generate metrics. A query is compiled into a query plan (represented below) called a dataflow that constructs metrics. The plan is then optimized and rendered to engine-specific SQL.
+The name “MetricFlow” reflects its approach: metric requests are compiled into a dataflow-based query plan, which is then optimized and translated into engine-specific SQL.
+
 
 <p align="center">
 <img src="https://github.com/dbt-labs/metricflow/raw/main/assets/example_plan.svg" height="500"/>
@@ -98,6 +99,6 @@ To get started on direct contributions, head on over to our [contributor guide](
 MetricFlow is source-available software.
 
 Version 0 to 0.140.0 was covered by the Affero GPL license.
-Version 0.150.0 and greater is covered by the BSL license..
+Version 0.150.0 and greater is covered by the BSL license.
 
 MetricFlow is built by [dbt Labs](https://www.getdbt.com/).
