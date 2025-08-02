@@ -8,8 +8,8 @@ WITH sma_28009_cte AS (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
   SELECT
-    DATETIME_TRUNC(ds, day) AS metric_time__day
-    , DATETIME_TRUNC(ds, isoweek) AS metric_time__week
+    TIMESTAMP_TRUNC(ds, day) AS metric_time__day
+    , TIMESTAMP_TRUNC(ds, isoweek) AS metric_time__week
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
@@ -41,14 +41,14 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      DATETIME_TRUNC(time_spine_src_28006.ds, isoweek) AS metric_time__week
+      TIMESTAMP_TRUNC(time_spine_src_28006.ds, isoweek) AS metric_time__week
       , SUM(sma_28009_cte.bookings) AS bookings_at_start_of_month
     FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN
       sma_28009_cte
     ON
-      DATETIME_TRUNC(time_spine_src_28006.ds, month) = sma_28009_cte.metric_time__day
-    WHERE DATETIME_TRUNC(time_spine_src_28006.ds, isoweek) = time_spine_src_28006.ds
+      TIMESTAMP_TRUNC(time_spine_src_28006.ds, month) = sma_28009_cte.metric_time__day
+    WHERE TIMESTAMP_TRUNC(time_spine_src_28006.ds, isoweek) = time_spine_src_28006.ds
     GROUP BY
       metric_time__week
   ) subq_27

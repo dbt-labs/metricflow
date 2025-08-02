@@ -12,7 +12,7 @@ FROM (
   -- Join Standard Outputs
   SELECT
     users_latest_src_28000.home_state_latest AS user__home_state_latest
-    , DATETIME_TRUNC(time_spine_src_28006.ds, month) AS metric_time__month
+    , TIMESTAMP_TRUNC(time_spine_src_28006.ds, month) AS metric_time__month
     , listings_latest_src_28000.capacity AS listing__capacity_latest
   FROM ***************************.dim_listings_latest listings_latest_src_28000
   CROSS JOIN
