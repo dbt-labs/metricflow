@@ -1,0 +1,52 @@
+test_name: test_time_entity_subgraph_generator
+test_filename: test_time_entity.py
+docstring:
+  Test generation of the time-entity subgraph using the minimal manifest.
+expectation_description:
+  The semantic manifest has a minimum grain for `quarter`, so there should only be attribute nodes applicable
+  for that grain.
+---
+dot_notation:
+  digraph {
+  	graph [name=MutableSemanticGraph]
+  	subgraph cluster_time {
+  		label=time
+  		"TimeAttribute(quarter)"
+  		"TimeAttribute(year)"
+  		"TimeAttribute(extract_year)"
+  		"TimeAttribute(extract_quarter)"
+  		"TimeAttribute(custom_year)"
+  		TimeEntity
+  	}
+  	subgraph cluster_time_dimension {
+  		label=time_dimension
+  		MetricTime
+  	}
+  	TimeEntity -> "TimeAttribute(custom_year)"
+  	TimeEntity -> "TimeAttribute(extract_quarter)"
+  	TimeEntity -> "TimeAttribute(extract_year)"
+  	TimeEntity -> "TimeAttribute(year)"
+  	TimeEntity -> "TimeAttribute(quarter)"
+  	MetricTime -> TimeEntity
+  }
+
+pretty_format:
+  MutableSemanticGraph(
+    nodes={
+      TimeAttribute(quarter),
+      TimeAttribute(year),
+      TimeAttribute(extract_year),
+      TimeAttribute(extract_quarter),
+      TimeAttribute(custom_year),
+      MetricTime,
+      TimeEntity,
+    },
+    edges={
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(custom_year)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(extract_year)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(year)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(quarter)),
+      EntityRelationshipEdge(tail_node=MetricTime, head_node=TimeEntity),
+    },
+  )

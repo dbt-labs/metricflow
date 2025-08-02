@@ -1,0 +1,28 @@
+test_name: test_specs
+test_filename: test_sg_02.py
+---
+Dunder Name                                                                           Metric-Subquery Entity-Links             Type            Properties                            Derived-From Semantic Models
+------------------------------------------------------------------------------------  ---------------------------------------  --------------  ------------------------------------  ------------------------------
+metric_time__custom_year                                                                                                       TIME_DIMENSION  DERIVED_TIME_GRANULARITY,METRIC_TIME  sm_0
+metric_time__extract_quarter                                                                                                   TIME_DIMENSION  DATE_PART,METRIC_TIME                 sm_0
+metric_time__extract_year                                                                                                      TIME_DIMENSION  DATE_PART,METRIC_TIME                 sm_0
+metric_time__quarter                                                                                                           TIME_DIMENSION  METRIC_TIME                           sm_0
+metric_time__year                                                                                                              TIME_DIMENSION  DERIVED_TIME_GRANULARITY,METRIC_TIME  sm_0
+sm_0_primary_entity                                                                                                            ENTITY          ENTITY,LOCAL                          sm_0
+sm_0_primary_entity__ds__custom_year                                                                                           TIME_DIMENSION  DERIVED_TIME_GRANULARITY,LOCAL        sm_0
+sm_0_primary_entity__ds__extract_quarter                                                                                       TIME_DIMENSION  DATE_PART,LOCAL                       sm_0
+sm_0_primary_entity__ds__extract_year                                                                                          TIME_DIMENSION  DATE_PART,LOCAL                       sm_0
+sm_0_primary_entity__ds__quarter                                                                                               TIME_DIMENSION  LOCAL                                 sm_0
+sm_0_primary_entity__ds__year                                                                                                  TIME_DIMENSION  DERIVED_TIME_GRANULARITY,LOCAL        sm_0
+sm_0_primary_entity__sm_0_measure_0_metric                                            sm_0_primary_entity                      METRIC          JOINED,METRIC                         sm_0
+sm_0_primary_entity__sm_1_primary_entity                                                                                       ENTITY          ENTITY,LOCAL                          sm_0
+sm_0_primary_entity__sm_2_primary_entity                                                                                       ENTITY          ENTITY,LOCAL                          sm_0
+sm_1_primary_entity                                                                                                            ENTITY          ENTITY,LOCAL                          sm_0
+sm_1_primary_entity__dim_0                                                                                                     DIMENSION       JOINED                                sm_0,sm_1
+sm_1_primary_entity__sm_0_measure_0_metric                                            sm_1_primary_entity                      METRIC          JOINED,METRIC                         sm_0
+sm_1_primary_entity__sm_0_primary_entity__sm_1_primary_entity__sm_0_measure_0_metric  sm_0_primary_entity,sm_1_primary_entity  METRIC          JOINED,METRIC                         sm_0
+sm_1_primary_entity__sm_2_primary_entity                                                                                       ENTITY          ENTITY,JOINED                         sm_0,sm_1
+sm_2_primary_entity                                                                                                            ENTITY          ENTITY,LOCAL                          sm_0
+sm_2_primary_entity__sm_0_measure_0_metric                                            sm_2_primary_entity                      METRIC          JOINED,METRIC                         sm_0
+sm_2_primary_entity__sm_0_primary_entity__sm_2_primary_entity__sm_0_measure_0_metric  sm_0_primary_entity,sm_2_primary_entity  METRIC          JOINED,METRIC                         sm_0
+sm_2_primary_entity__sm_1_primary_entity__sm_2_primary_entity__sm_0_measure_0_metric  sm_1_primary_entity,sm_2_primary_entity  METRIC          JOINED,METRIC                         sm_0,sm_1

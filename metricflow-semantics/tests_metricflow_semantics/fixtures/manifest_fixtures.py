@@ -5,6 +5,7 @@ from typing import Dict
 
 import pytest
 from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
+from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
@@ -25,8 +26,19 @@ from metricflow_semantics.test_helpers.semantic_manifest_yamls.partitioned_multi
 )
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.scd_manifest import SCD_MANIFEST_ANCHOR
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.sg_00_minimal_manifest import SG_00_MINIMAL_MANIFEST
+from metricflow_semantics.test_helpers.semantic_manifest_yamls.sg_01_primary_entity_defined import (
+    SG_01_PRIMARY_ENTITY_DEFINED,
+)
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.sg_02_single_join import SG_02_SINGLE_JOIN
+from metricflow_semantics.test_helpers.semantic_manifest_yamls.sg_03_multi_hop_join import SG_03_MULTI_HOP_JOIN
+from metricflow_semantics.test_helpers.semantic_manifest_yamls.sg_04_common_unique_entity import (
+    SG_04_COMMON_UNIQUE_ENTITY,
+)
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.sg_05_derived_metric import SG_05_DERIVED_METRIC_MANIFEST
+from metricflow_semantics.test_helpers.semantic_manifest_yamls.sg_06_ambiguous_join import SG_06_AMBIGUOUS_JOIN
+from metricflow_semantics.test_helpers.semantic_manifest_yamls.sg_07_orphan_foreign_entity import (
+    SG_07_ORPHAN_FOREIGN_ENTITY,
+)
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.simple_manifest import SIMPLE_MANIFEST_ANCHOR
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.simple_multi_hop_join_manifest import (
     SIMPLE_MULTI_HOP_JOIN_MANIFEST_ANCHOR,
@@ -156,10 +168,35 @@ def sg_00_minimal_manifest(template_mapping: Dict[str, str]) -> PydanticSemantic
 
 
 @pytest.fixture(scope="session")
+def sg_01_primary_entity_defined(template_mapping: Dict[str, str]) -> PydanticSemanticManifest:  # noqa: D103
+    return load_semantic_manifest(SG_01_PRIMARY_ENTITY_DEFINED.directory, template_mapping)
+
+
+@pytest.fixture(scope="session")
 def sg_02_single_join_manifest(template_mapping: Dict[str, str]) -> PydanticSemanticManifest:  # noqa: D103
     return load_semantic_manifest(SG_02_SINGLE_JOIN.directory, template_mapping)
 
 
 @pytest.fixture(scope="session")
-def sg_05_derived_metric_manifest(template_mapping: Dict[str, str]) -> PydanticSemanticManifest:  # noqa: D103
+def sg_03_multi_hop_join_manifest(template_mapping: Dict[str, str]) -> ManifestObjectLookup:  # noqa: D103
+    return load_semantic_manifest(SG_03_MULTI_HOP_JOIN.directory, template_mapping)
+
+
+@pytest.fixture(scope="session")
+def sg_04_common_unique_entity_manifest(template_mapping: Dict[str, str]) -> ManifestObjectLookup:  # noqa: D103
+    return load_semantic_manifest(SG_04_COMMON_UNIQUE_ENTITY.directory, template_mapping)
+
+
+@pytest.fixture(scope="session")
+def sg_05_derived_metric_manifest(template_mapping: Dict[str, str]) -> ManifestObjectLookup:  # noqa: D103
     return load_semantic_manifest(SG_05_DERIVED_METRIC_MANIFEST.directory, template_mapping)
+
+
+@pytest.fixture(scope="session")
+def sg_06_ambiguous_join_manifest(template_mapping: Dict[str, str]) -> ManifestObjectLookup:  # noqa: D103
+    return load_semantic_manifest(SG_06_AMBIGUOUS_JOIN.directory, template_mapping)
+
+
+@pytest.fixture(scope="session")
+def sg_07_orphan_foreign_entity_manifest(template_mapping: Dict[str, str]) -> ManifestObjectLookup:  # noqa: D103
+    return load_semantic_manifest(SG_07_ORPHAN_FOREIGN_ENTITY.directory, template_mapping)

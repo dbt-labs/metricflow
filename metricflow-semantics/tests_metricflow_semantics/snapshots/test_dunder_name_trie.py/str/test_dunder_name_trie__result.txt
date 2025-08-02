@@ -1,0 +1,17 @@
+test_name: test_dunder_name_trie
+test_filename: test_dunder_name_trie.py
+---
+names_after_removing_ambiguous_names: [('listing',), ('listing', 'user'), ('booking', 'host'), ('booking', 'view'), ('booking', 'host', 'country')]
+trie:
+  {
+    'listing': {
+      'user': {},
+    },
+    'booking': {
+      'host': {
+        'country': {},
+      },
+      'view': {},
+    },
+    'ambiguous': {},
+  }

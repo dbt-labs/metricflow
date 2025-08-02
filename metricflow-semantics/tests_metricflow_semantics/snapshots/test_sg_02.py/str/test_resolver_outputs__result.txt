@@ -1,0 +1,209 @@
+test_name: test_resolver_outputs
+test_filename: test_sg_02.py
+---
+dot_notation:
+  digraph {
+  	graph [name=MutableSemanticGraph]
+  	subgraph cluster_metric {
+  		label=metric
+  		"BaseMetric(metric_0_000)"
+  	}
+  	subgraph cluster_dimension {
+  		label=dimension
+  		"Dimension(dimension_000)"
+  	}
+  	subgraph cluster_common_entity {
+  		label=common_entity
+  		"dimension_model_000.common_entity"
+  		"measure_model_000.common_entity"
+  	}
+  	subgraph cluster_dimension_model_000_primary_entity {
+  		label=dimension_model_000_primary_entity
+  		"dimension_model_000.dimension_model_000_primary_entity"
+  	}
+  	subgraph cluster_measure_model_000_primary_entity {
+  		label=measure_model_000_primary_entity
+  		"measure_model_000.measure_model_000_primary_entity"
+  	}
+  	subgraph cluster_dimension_model_000 {
+  		label=dimension_model_000
+  		"LocalModel(dimension_model_000)"
+  	}
+  	subgraph cluster_measure_model_000 {
+  		label=measure_model_000
+  		"LocalModel(measure_model_000)"
+  		"Measure(measure_000)"
+  	}
+  	subgraph cluster_key {
+  		label=key
+  		"KeyAttribute(common_entity)"
+  		"KeyAttribute(dimension_model_000_primary_entity)"
+  		"KeyAttribute(measure_model_000_primary_entity)"
+  		"KeyEntity(common_entity)"
+  		"KeyEntity(dimension_model_000_primary_entity)"
+  		"KeyEntity(measure_model_000_primary_entity)"
+  	}
+  	subgraph cluster_time_dimension {
+  		label=time_dimension
+  		"TimeDimension(ds)"
+  	}
+  	subgraph cluster_time {
+  		label=time
+  		TimeEntity
+  	}
+  	"JoinedModel(dimension_model_000)" -> "Dimension(dimension_000)"
+  	"JoinedModel(dimension_model_000)" -> "KeyEntity(common_entity)"
+  	"JoinedModel(dimension_model_000)" -> "KeyEntity(dimension_model_000_primary_entity)"
+  	"JoinedModel(measure_model_000)" -> "KeyEntity(common_entity)"
+  	"JoinedModel(measure_model_000)" -> "KeyEntity(measure_model_000_primary_entity)"
+  	"LocalModel(dimension_model_000)" -> "KeyEntity(common_entity)"
+  	"LocalModel(dimension_model_000)" -> "KeyEntity(dimension_model_000_primary_entity)"
+  	"LocalModel(measure_model_000)" -> "KeyEntity(common_entity)"
+  	"LocalModel(measure_model_000)" -> "KeyEntity(measure_model_000_primary_entity)"
+  	TimeEntity -> "TimeAttribute(day)"
+  	TimeEntity -> "TimeAttribute(extract_day)"
+  	TimeEntity -> "TimeAttribute(extract_dow)"
+  	TimeEntity -> "TimeAttribute(extract_doy)"
+  	TimeEntity -> "TimeAttribute(extract_month)"
+  	TimeEntity -> "TimeAttribute(extract_quarter)"
+  	TimeEntity -> "TimeAttribute(extract_year)"
+  	TimeEntity -> "TimeAttribute(month)"
+  	TimeEntity -> "TimeAttribute(quarter)"
+  	TimeEntity -> "TimeAttribute(week)"
+  	TimeEntity -> "TimeAttribute(year)"
+  	"JoinedModel(measure_model_000)" -> "TimeDimension(ds)"
+  	"KeyEntity(common_entity)" -> "KeyAttribute(common_entity)"
+  	"KeyEntity(dimension_model_000_primary_entity)" -> "KeyAttribute(dimension_model_000_primary_entity)"
+  	"KeyEntity(measure_model_000_primary_entity)" -> "KeyAttribute(measure_model_000_primary_entity)"
+  	"Measure(measure_000)" -> "LocalModel(measure_model_000)"
+  	"Measure(measure_000)" -> MetricTime
+  	MetricTime -> TimeEntity
+  	"TimeDimension(ds)" -> TimeEntity
+  	"dimension_model_000.common_entity" -> "JoinedModel(dimension_model_000)"
+  	"measure_model_000.common_entity" -> "JoinedModel(measure_model_000)"
+  	"dimension_model_000.dimension_model_000_primary_entity" -> "JoinedModel(dimension_model_000)"
+  	"measure_model_000.measure_model_000_primary_entity" -> "JoinedModel(measure_model_000)"
+  	"LocalModel(dimension_model_000)" -> "dimension_model_000.common_entity"
+  	"LocalModel(dimension_model_000)" -> "dimension_model_000.dimension_model_000_primary_entity"
+  	"LocalModel(measure_model_000)" -> "measure_model_000.common_entity"
+  	"LocalModel(measure_model_000)" -> "measure_model_000.measure_model_000_primary_entity"
+  	"JoinedModel(dimension_model_000)" -> "measure_model_000.common_entity"
+  	"JoinedModel(measure_model_000)" -> "dimension_model_000.common_entity"
+  	"LocalModel(dimension_model_000)" -> "measure_model_000.common_entity"
+  	"LocalModel(measure_model_000)" -> "dimension_model_000.common_entity"
+  	"BaseMetric(metric_0_000)" -> "Measure(measure_000)"
+  }
+
+pretty_format:
+  MutableSemanticGraph(
+    nodes={
+      BaseMetric(metric_0_000),
+      Dimension(dimension_000),
+      dimension_model_000.common_entity,
+      measure_model_000.common_entity,
+      dimension_model_000.dimension_model_000_primary_entity,
+      measure_model_000.measure_model_000_primary_entity,
+      JoinedModel(dimension_model_000),
+      JoinedModel(measure_model_000),
+      KeyAttribute(common_entity),
+      KeyAttribute(dimension_model_000_primary_entity),
+      KeyAttribute(measure_model_000_primary_entity),
+      KeyEntity(common_entity),
+      KeyEntity(dimension_model_000_primary_entity),
+      KeyEntity(measure_model_000_primary_entity),
+      LocalModel(dimension_model_000),
+      LocalModel(measure_model_000),
+      Measure(measure_000),
+      MetricTime,
+      TimeAttribute(day),
+      TimeAttribute(extract_day),
+      TimeAttribute(extract_dow),
+      TimeAttribute(extract_doy),
+      TimeAttribute(extract_month),
+      TimeAttribute(extract_quarter),
+      TimeAttribute(extract_year),
+      TimeAttribute(month),
+      TimeAttribute(quarter),
+      TimeAttribute(week),
+      TimeAttribute(year),
+      TimeDimension(ds),
+      TimeEntity,
+    },
+    edges={
+      EntityAttributeEdge(tail_node=JoinedModel(dimension_model_000), head_node=Dimension(dimension_000)),
+      EntityAttributeEdge(tail_node=JoinedModel(dimension_model_000), head_node=KeyEntity(common_entity)),
+      EntityAttributeEdge(
+        tail_node=JoinedModel(dimension_model_000),
+        head_node=KeyEntity(dimension_model_000_primary_entity),
+      ),
+      EntityAttributeEdge(tail_node=JoinedModel(measure_model_000), head_node=KeyEntity(common_entity)),
+      EntityAttributeEdge(
+        tail_node=JoinedModel(measure_model_000),
+        head_node=KeyEntity(measure_model_000_primary_entity),
+      ),
+      EntityAttributeEdge(tail_node=LocalModel(dimension_model_000), head_node=KeyEntity(common_entity)),
+      EntityAttributeEdge(
+        tail_node=LocalModel(dimension_model_000),
+        head_node=KeyEntity(dimension_model_000_primary_entity),
+      ),
+      EntityAttributeEdge(tail_node=LocalModel(measure_model_000), head_node=KeyEntity(common_entity)),
+      EntityAttributeEdge(
+        tail_node=LocalModel(measure_model_000),
+        head_node=KeyEntity(measure_model_000_primary_entity),
+      ),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(day)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(extract_day)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(extract_dow)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(extract_doy)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(extract_month)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(extract_year)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(month)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(quarter)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(week)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(year)),
+      EntityRelationshipEdge(tail_node=JoinedModel(measure_model_000), head_node=TimeDimension(ds)),
+      EntityRelationshipEdge(tail_node=KeyEntity(common_entity), head_node=KeyAttribute(common_entity)),
+      EntityRelationshipEdge(
+        tail_node=KeyEntity(dimension_model_000_primary_entity),
+        head_node=KeyAttribute(dimension_model_000_primary_entity),
+      ),
+      EntityRelationshipEdge(
+        tail_node=KeyEntity(measure_model_000_primary_entity),
+        head_node=KeyAttribute(measure_model_000_primary_entity),
+      ),
+      EntityRelationshipEdge(tail_node=Measure(measure_000), head_node=LocalModel(measure_model_000)),
+      EntityRelationshipEdge(tail_node=Measure(measure_000), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=MetricTime, head_node=TimeEntity),
+      EntityRelationshipEdge(tail_node=TimeDimension(ds), head_node=TimeEntity),
+      IntraModelEdge(tail_node=dimension_model_000.common_entity, head_node=JoinedModel(dimension_model_000)),
+      IntraModelEdge(tail_node=measure_model_000.common_entity, head_node=JoinedModel(measure_model_000)),
+      IntraModelEdge(
+        tail_node=dimension_model_000.dimension_model_000_primary_entity,
+        head_node=JoinedModel(dimension_model_000),
+      ),
+      IntraModelEdge(
+        tail_node=measure_model_000.measure_model_000_primary_entity,
+        head_node=JoinedModel(measure_model_000),
+      ),
+      IntraModelEdge(tail_node=LocalModel(dimension_model_000), head_node=dimension_model_000.common_entity),
+      IntraModelEdge(
+        tail_node=LocalModel(dimension_model_000),
+        head_node=dimension_model_000.dimension_model_000_primary_entity,
+      ),
+      IntraModelEdge(tail_node=LocalModel(measure_model_000), head_node=measure_model_000.common_entity),
+      IntraModelEdge(
+        tail_node=LocalModel(measure_model_000),
+        head_node=measure_model_000.measure_model_000_primary_entity,
+      ),
+      JoinToModelEdge(tail_node=JoinedModel(dimension_model_000), head_node=measure_model_000.common_entity),
+      JoinToModelEdge(tail_node=JoinedModel(measure_model_000), head_node=dimension_model_000.common_entity),
+      JoinToModelEdge(tail_node=LocalModel(dimension_model_000), head_node=measure_model_000.common_entity),
+      JoinToModelEdge(tail_node=LocalModel(measure_model_000), head_node=dimension_model_000.common_entity),
+      MetricDefinitionEdge(
+        tail_node=BaseMetric(metric_0_000),
+        head_node=Measure(measure_000),
+        recipe_step=QueryRecipeStep(),
+      ),
+    },
+  )

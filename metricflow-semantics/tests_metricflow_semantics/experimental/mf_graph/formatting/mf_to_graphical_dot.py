@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import textwrap
 from collections import defaultdict
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import ClassVar, DefaultDict, Iterable, Optional
 
@@ -130,7 +130,7 @@ class GraphicalDotConversionArgumentSet(DotConversionArgumentSet):
         node_attributes: Optional[Mapping[str, str]] = DEFAULT_NODE_ATTRIBUTES,
         edge_attributes: Optional[Mapping[str, str]] = DEFAULT_EDGE_ATTRIBUTES,
         default_edge_as_node_attributes: Optional[Mapping[str, str]] = DEFAULT_EDGE_AS_NODE_ATTRIBUTES,
-        include_edge_ends_as_properties: bool = True,
+        include_edge_ends_as_properties: bool = False,
         display_properties_line_wrap_limit: int = 40,
     ) -> GraphicalDotConversionArgumentSet:
         return GraphicalDotConversionArgumentSet(
@@ -167,7 +167,7 @@ class MetricflowGraphToGraphicalDotConverter(MetricflowGraphConverter[DotGraphCo
         # Convert nodes to DOT.
         cluster_name_to_dot_nodes: DefaultDict[Optional[str], list[DotNodeAttributeSet]] = defaultdict(list)
 
-        cluster_name_to_nodes: dict[str, list] = defaultdict(list)
+        cluster_name_to_nodes: dict[str, list[MetricflowGraphNode]] = defaultdict(list)
         for mf_node in graph.nodes:
             cluster_name_to_nodes[mf_node.node_descriptor.cluster_name].append(mf_node)
 
@@ -179,7 +179,15 @@ class MetricflowGraphToGraphicalDotConverter(MetricflowGraphConverter[DotGraphCo
                     include_graphical_attributes=self._arguments.include_graphical_attributes
                 )
                 mf_node_to_dot_node[mf_node] = dot_node
-                dot_node = dot_node.with_attributes(label=self._make_node_label(mf_node))
+
+                # dot_node = DotNodeAttributeSet(
+                #     name=dot_node.name,
+                #     label=
+                # )
+                dot_node = dot_node.with_attributes(
+                    label=self._make_node_label(dot_node, mf_node.displayed_properties),
+                    additional_kwargs=dot_node.additional_kwargs,
+                )
                 cluster_name_to_dot_nodes[cluster_name].append(dot_node)
 
         # Map the original edge to the replacement intermediate DOT node.
@@ -246,12 +254,7 @@ class MetricflowGraphToGraphicalDotConverter(MetricflowGraphConverter[DotGraphCo
                     )
                 )
             else:
-                dot_edges.append(
-                    DotEdgeAttributeSet.create(
-                        tail_name=edge.tail_node.node_descriptor.node_name,
-                        head_name=edge.head_node.node_descriptor.node_name,
-                    )
-                )
+                dot_edges.append(edge.as_dot_edge(include_graphical_attributes=True))
 
         return DotAttributeSet(
             graph_attributes=graph.as_dot_graph(self._arguments.include_graphical_attributes),
@@ -261,7 +264,7 @@ class MetricflowGraphToGraphicalDotConverter(MetricflowGraphConverter[DotGraphCo
             edge_attributes=tuple(dot_edges),
         )
 
-    def _make_node_label(self, node: MetricflowGraphNode) -> str:
+    def _make_node_label(self, dot_node: DotNodeAttributeSet, displayed_properties: Sequence[DisplayedProperty]) -> str:
         """Return a `graphviz` / DOT label to render this node.
 
         Currently, this return a `graphviz` HTML table where the first row is a single column with the ID of
@@ -269,22 +272,21 @@ class MetricflowGraphToGraphicalDotConverter(MetricflowGraphConverter[DotGraphCo
         """
         table_builder = GraphvizHtmlTableBuilder(table_border=0)
 
-        node_name = node.node_descriptor.node_name
+        node_label = dot_node.label or dot_node.name
         with table_builder.new_row_builder() as row_builder:
             row_builder.add_column(
-                GraphvizHtmlText(node_name, style=GraphvizHtmlTextStyle.TITLE),
+                GraphvizHtmlText(node_label, style=GraphvizHtmlTextStyle.TITLE),
                 alignment=GraphvizHtmlAlignment.CENTER,
                 cell_padding=4,
             )
 
-        node_displayed_properties = node.displayed_properties
-        if len(node_displayed_properties) > 0:
+        if len(displayed_properties) > 0:
             # max_key_length = max(len(displayed_property.key) for displayed_property in node_displayed_properties)
             self._add_displayed_properties_to_label_table(
                 table_builder,
-                node_displayed_properties,
+                displayed_properties,
                 # TODO: Tweak this for better appearance.
-                line_wrap_width=len(node_name) * 2,
+                line_wrap_width=len(node_label) * 2,
             )
 
         result = table_builder.build()

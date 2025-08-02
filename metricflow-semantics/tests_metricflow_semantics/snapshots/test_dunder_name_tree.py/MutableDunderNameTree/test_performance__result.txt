@@ -1,0 +1,137 @@
+test_name: test_performance
+test_filename: test_dunder_name_tree.py
+---
+MutableDunderNameTree(
+  name_element_to_next_tree={
+    '66': MutableDunderNameTree(
+      name_element_to_next_tree={
+        '53': MutableDunderNameTree(
+          name_element_to_next_tree={
+            '38': MutableDunderNameTree(
+              name_element_to_descriptor={
+                '46': DunderNameDescriptor(),
+              },
+            ),
+          },
+        ),
+      },
+    ),
+    '37': MutableDunderNameTree(
+      name_element_to_next_tree={
+        '22': MutableDunderNameTree(
+          name_element_to_next_tree={
+            '98': MutableDunderNameTree(
+              name_element_to_descriptor={
+                '90': DunderNameDescriptor(),
+              },
+            ),
+          },
+        ),
+      },
+    ),
+    '90': MutableDunderNameTree(
+      name_element_to_next_tree={
+        '69': MutableDunderNameTree(
+          name_element_to_next_tree={
+            '84': MutableDunderNameTree(
+              name_element_to_descriptor={
+                '35': DunderNameDescriptor(),
+              },
+            ),
+          },
+        ),
+      },
+    ),
+    '14': MutableDunderNameTree(
+      name_element_to_next_tree={
+        '3': MutableDunderNameTree(
+          name_element_to_next_tree={
+            '31': MutableDunderNameTree(
+              name_element_to_descriptor={
+                '49': DunderNameDescriptor(),
+              },
+            ),
+          },
+        ),
+      },
+    ),
+    '95': MutableDunderNameTree(
+      name_element_to_next_tree={
+        '53': MutableDunderNameTree(
+          name_element_to_next_tree={
+            '32': MutableDunderNameTree(
+              name_element_to_descriptor={
+                '64': DunderNameDescriptor(),
+              },
+            ),
+          },
+        ),
+      },
+    ),
+    '40': MutableDunderNameTree(
+      name_element_to_next_tree={
+        '81': MutableDunderNameTree(
+          name_element_to_next_tree={
+            '87': MutableDunderNameTree(
+              name_element_to_descriptor={
+                '92': DunderNameDescriptor(),
+              },
+            ),
+          },
+        ),
+      },
+    ),
+    '51': MutableDunderNameTree(
+      name_element_to_next_tree={
+        '17': MutableDunderNameTree(
+          name_element_to_next_tree={
+            '70': MutableDunderNameTree(
+              name_element_to_descriptor={
+                '7': DunderNameDescriptor(),
+              },
+            ),
+          },
+        ),
+      },
+    ),
+    '17': MutableDunderNameTree(
+      name_element_to_next_tree={
+        '25': MutableDunderNameTree(
+          name_element_to_next_tree={
+            '19': MutableDunderNameTree(
+              name_element_to_descriptor={
+                '90': DunderNameDescriptor(),
+              },
+            ),
+          },
+        ),
+      },
+    ),
+    '68': MutableDunderNameTree(
+      name_element_to_next_tree={
+        '71': MutableDunderNameTree(
+          name_element_to_next_tree={
+            '87': MutableDunderNameTree(
+              name_element_to_descriptor={
+                '26': DunderNameDescriptor(),
+              },
+            ),
+          },
+        ),
+      },
+    ),
+    '42': MutableDunderNameTree(
+      name_element_to_next_tree={
+        '69': MutableDunderNameTree(
+          name_element_to_next_tree={
+            '15': MutableDunderNameTree(
+              name_element_to_descriptor={
+                '91': DunderNameDescriptor(),
+              },
+            ),
+          },
+        ),
+      },
+    ),
+  },
+)

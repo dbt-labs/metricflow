@@ -1,0 +1,40 @@
+test_name: test_minimal_manifest
+test_filename: test_subgraph_2_key_attribute.py
+docstring:
+  Test generation of the entity-key subgraph using the minimal manifest.
+expectation_description:
+  The graph should show the entity keys that can be queried for the measure.
+---
+dot_notation:
+  digraph {
+  	graph [name=MutableSemanticGraph]
+  	subgraph cluster_configured_entity {
+  		label=configured_entity
+  		"sm_0.sm_0_entity"
+  	}
+  	subgraph cluster_sm_0 {
+  		label=sm_0
+  		"JoinedModel(sm_0)"
+  		"LocalModel(sm_0)"
+  		"Measure(sm_0_measure)"
+  	}
+  	subgraph cluster_time_dimension {
+  		label=time_dimension
+  		MetricTime
+  	}
+  	"sm_0.sm_0_entity" -> "JoinedModel(sm_0)"
+  	"LocalModel(sm_0)" -> "sm_0.sm_0_entity"
+  	"Measure(sm_0_measure)" -> "LocalModel(sm_0)"
+  	"Measure(sm_0_measure)" -> MetricTime
+  }
+
+pretty_format:
+  MutableSemanticGraph(
+    nodes={sm_0.sm_0_entity, JoinedModel(sm_0), LocalModel(sm_0), Measure(sm_0_measure), MetricTime},
+    edges={
+      EntityRelationshipEdge(tail_node=sm_0.sm_0_entity, head_node=JoinedModel(sm_0)),
+      EntityRelationshipEdge(tail_node=LocalModel(sm_0), head_node=sm_0.sm_0_entity),
+      EntityRelationshipEdge(tail_node=Measure(sm_0_measure), head_node=LocalModel(sm_0)),
+      EntityRelationshipEdge(tail_node=Measure(sm_0_measure), head_node=MetricTime),
+    },
+  )

@@ -1,0 +1,80 @@
+test_name: test_minimal_manifest
+test_filename: test_subgraph_3_time.py
+docstring:
+  Test generation of the time-entity subgraph using the minimal manifest.
+expectation_description:
+  The semantic manifest has a minimum grain for `quarter`, so there should only be attribute nodes applicable
+  for that grain.
+---
+dot_notation:
+  digraph {
+  	graph [name=MutableSemanticGraph]
+  	subgraph cluster_time {
+  		label=time
+  		"TimeAttribute(quarter)"
+  		"TimeAttribute(year)"
+  		"TimeAttribute(extract_year)"
+  		"TimeAttribute(extract_quarter)"
+  		"TimeAttribute(custom_year)"
+  		TimeEntity
+  	}
+  	subgraph cluster_configured_entity {
+  		label=configured_entity
+  		"sm_0.sm_0_entity"
+  	}
+  	subgraph cluster_sm_0 {
+  		label=sm_0
+  		"JoinedModel(sm_0)"
+  		"LocalModel(sm_0)"
+  		"Measure(sm_0_measure)"
+  	}
+  	subgraph cluster_time_dimension {
+  		label=time_dimension
+  		MetricTime
+  		"TimeDimension(ds)"
+  	}
+  	TimeEntity -> "TimeAttribute(custom_year)"
+  	TimeEntity -> "TimeAttribute(extract_quarter)"
+  	TimeEntity -> "TimeAttribute(extract_year)"
+  	TimeEntity -> "TimeAttribute(year)"
+  	TimeEntity -> "TimeAttribute(quarter)"
+  	"sm_0.sm_0_entity" -> "JoinedModel(sm_0)"
+  	"JoinedModel(sm_0)" -> "TimeDimension(ds)"
+  	"LocalModel(sm_0)" -> "sm_0.sm_0_entity"
+  	"Measure(sm_0_measure)" -> "LocalModel(sm_0)"
+  	"Measure(sm_0_measure)" -> MetricTime
+  	MetricTime -> TimeEntity
+  	"TimeDimension(ds)" -> TimeEntity
+  }
+
+pretty_format:
+  MutableSemanticGraph(
+    nodes={
+      TimeAttribute(quarter),
+      TimeAttribute(year),
+      TimeAttribute(extract_year),
+      TimeAttribute(extract_quarter),
+      TimeAttribute(custom_year),
+      sm_0.sm_0_entity,
+      JoinedModel(sm_0),
+      LocalModel(sm_0),
+      Measure(sm_0_measure),
+      MetricTime,
+      TimeDimension(ds),
+      TimeEntity,
+    },
+    edges={
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(custom_year)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(extract_quarter)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(extract_year)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(year)),
+      EntityAttributeEdge(tail_node=TimeEntity, head_node=TimeAttribute(quarter)),
+      EntityRelationshipEdge(tail_node=sm_0.sm_0_entity, head_node=JoinedModel(sm_0)),
+      EntityRelationshipEdge(tail_node=JoinedModel(sm_0), head_node=TimeDimension(ds)),
+      EntityRelationshipEdge(tail_node=LocalModel(sm_0), head_node=sm_0.sm_0_entity),
+      EntityRelationshipEdge(tail_node=Measure(sm_0_measure), head_node=LocalModel(sm_0)),
+      EntityRelationshipEdge(tail_node=Measure(sm_0_measure), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=MetricTime, head_node=TimeEntity),
+      EntityRelationshipEdge(tail_node=TimeDimension(ds), head_node=TimeEntity),
+    },
+  )

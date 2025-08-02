@@ -123,6 +123,21 @@ class MetricLookup:
             Tuple[Sequence[MetricReference], LinkableElementFilter], BaseLinkableElementSet
         ](128)
 
+    def linkable_elements_for_measure_old(
+        self,
+        measure_reference: MeasureReference,
+        element_filter: LinkableElementFilter = LinkableElementFilter(),
+    ) -> BaseLinkableElementSet:
+        """Return the set of linkable elements reachable from a given measure."""
+        # logger.warning(
+        #     LazyFormat(
+        #         f"Got query with filter",
+        #         measure_reference=measure_reference,
+        #         element_filter=element_filter,
+        #     )
+        # )
+        return self._linkable_spec_resolver.get_linkable_element_set_for_measure(measure_reference, element_filter)
+
     def linkable_elements_for_measure(
         self,
         measure_reference: MeasureReference,

@@ -1,0 +1,19 @@
+---
+semantic_model:
+  name: sm_2
+
+  node_relation:
+    schema_name: $source_schema
+    alias: sm_2
+
+  entities:
+    - name: sm_2_primary_entity
+      type: primary
+    - name: common_unique_entity
+      type: unique
+
+  dimensions:
+    - name: sm_2_dim_0
+      type: categorical
+    - name: common_dimension
+      type: categorical

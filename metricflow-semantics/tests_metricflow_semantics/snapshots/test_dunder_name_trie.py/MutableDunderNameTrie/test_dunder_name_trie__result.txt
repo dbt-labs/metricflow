@@ -1,0 +1,26 @@
+test_name: test_dunder_name_trie
+test_filename: test_dunder_name_trie.py
+---
+MutableDunderNameTrie(
+  next_name_element_to_trie_dict={
+    'a': MutableDunderNameTrie(
+      descriptor_=DunderNameDescriptor(element_type=DIMENSION),
+      next_name_element_to_trie_dict={
+        'b': MutableDunderNameTrie(
+          next_name_element_to_trie_dict={
+            'c': MutableDunderNameTrie(
+              descriptor_=DunderNameDescriptor(
+                element_type=DIMENSION,
+              ),
+            ),
+            'd': MutableDunderNameTrie(
+              descriptor_=DunderNameDescriptor(
+                element_type=DIMENSION,
+              ),
+            ),
+          },
+        ),
+      },
+    ),
+  },
+)

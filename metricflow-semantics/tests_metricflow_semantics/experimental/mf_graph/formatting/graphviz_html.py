@@ -43,7 +43,7 @@ class GraphvizHtmlText:
         if len(self._text) == 0:
             return ""
         if self._style is GraphvizHtmlTextStyle.TITLE:
-            return f'<FONT POINT-SIZE="12">{escaped_text}</FONT>'
+            return f'<FONT POINT-SIZE="16">{escaped_text}</FONT>'
         elif self._style is GraphvizHtmlTextStyle.DESCRIPTION:
             return f'<FONT POINT-SIZE="6">{escaped_text}</FONT>'
         else:

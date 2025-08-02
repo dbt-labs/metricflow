@@ -1,0 +1,72 @@
+# Minimal manifest for a multi-hop join: [Measure Model] JOIN [Dimension Model #0] JOIN [Dimension Model #1]
+---
+semantic_model:
+  name: bookings_source
+
+  node_relation:
+    schema_name: $source_schema
+    alias: bookings_source
+
+  defaults:
+    agg_time_dimension: booking_time
+
+  entities:
+    - name: booking
+      type: primary
+    - name: listing
+      type: foreign
+
+  measures:
+    - name: booking_count
+      expr: "1"
+      agg: sum
+
+  dimensions:
+    - name: booking_time
+      type: time
+      type_params:
+        time_granularity: quarter
+
+---
+semantic_model:
+  name: listings_source
+
+  node_relation:
+    schema_name: $source_schema
+    alias: listings_source
+
+  entities:
+    - name: listing
+      type: primary
+    - name: user
+      type: foreign
+
+  dimensions:
+    - name: country_latest
+      type: categorical
+
+---
+semantic_model:
+  name: users_source
+  description: users_source
+
+  node_relation:
+    schema_name: $source_schema
+    alias: users_source
+
+  entities:
+    - name: user
+      type: primary
+
+  dimensions:
+    - name: country_latest
+      type: categorical
+
+
+
+---
+metric:
+  name: bookings
+  type: simple
+  type_params:
+    measure: booking_count

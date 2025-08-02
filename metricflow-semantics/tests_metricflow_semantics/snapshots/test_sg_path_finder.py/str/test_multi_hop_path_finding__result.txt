@@ -1,0 +1,95 @@
+test_name: test_multi_hop_path_finding
+test_filename: test_sg_path_finder.py
+---
+[weight: 0] LocalModel(bookings_source) -> KeyAttribute(booking)
+AttributeRecipe(
+  dunder_name_elements=('booking',),
+  models_in_join=(bookings_source,),
+  properties={ENTITY},
+  element_type=ENTITY,
+)
+[weight: 0] LocalModel(bookings_source) -> KeyAttribute(listing)
+AttributeRecipe(
+  dunder_name_elements=('listing',),
+  models_in_join=(bookings_source,),
+  properties={ENTITY},
+  element_type=ENTITY,
+)
+[weight: 1] LocalModel(bookings_source) -> bookings_source.booking -> JoinedModel(bookings_source) -> KeyAttribute(listing)
+AttributeRecipe(
+  dunder_name_elements=('booking', 'listing'),
+  models_in_join=(bookings_source,),
+  properties={ENTITY},
+  entity_link_names=('booking',),
+  element_type=ENTITY,
+)
+[weight: 1] LocalModel(bookings_source) -> bookings_source.booking -> JoinedModel(bookings_source) -> TimeDimension(booking_time) -> TimeEntity -> TimeAttribute(custom_year)
+AttributeRecipe(
+  dunder_name_elements=('booking', 'booking_time', 'custom_year'),
+  models_in_join=(bookings_source,),
+  properties={DERIVED_TIME_GRANULARITY},
+  entity_link_names=('booking',),
+  element_type=TIME_DIMENSION,
+  source_time_grain=QUARTER,
+  recipe_time_grain=ExpandedTimeGranularity(name='custom_year', base_granularity=YEAR),
+)
+[weight: 1] LocalModel(bookings_source) -> bookings_source.booking -> JoinedModel(bookings_source) -> TimeDimension(booking_time) -> TimeEntity -> TimeAttribute(extract_quarter)
+AttributeRecipe(
+  dunder_name_elements=('booking', 'booking_time', 'extract_quarter'),
+  models_in_join=(bookings_source,),
+  properties={DATE_PART},
+  entity_link_names=('booking',),
+  element_type=TIME_DIMENSION,
+  source_time_grain=QUARTER,
+  recipe_date_part=QUARTER,
+)
+[weight: 1] LocalModel(bookings_source) -> bookings_source.booking -> JoinedModel(bookings_source) -> TimeDimension(booking_time) -> TimeEntity -> TimeAttribute(extract_year)
+AttributeRecipe(
+  dunder_name_elements=('booking', 'booking_time', 'extract_year'),
+  models_in_join=(bookings_source,),
+  properties={DATE_PART},
+  entity_link_names=('booking',),
+  element_type=TIME_DIMENSION,
+  source_time_grain=QUARTER,
+  recipe_date_part=YEAR,
+)
+[weight: 1] LocalModel(bookings_source) -> bookings_source.booking -> JoinedModel(bookings_source) -> TimeDimension(booking_time) -> TimeEntity -> TimeAttribute(quarter)
+AttributeRecipe(
+  dunder_name_elements=('booking', 'booking_time', 'quarter'),
+  models_in_join=(bookings_source,),
+  entity_link_names=('booking',),
+  element_type=TIME_DIMENSION,
+  source_time_grain=QUARTER,
+  recipe_time_grain=ExpandedTimeGranularity(name='quarter', base_granularity=QUARTER),
+)
+[weight: 1] LocalModel(bookings_source) -> bookings_source.booking -> JoinedModel(bookings_source) -> TimeDimension(booking_time) -> TimeEntity -> TimeAttribute(year)
+AttributeRecipe(
+  dunder_name_elements=('booking', 'booking_time', 'year'),
+  models_in_join=(bookings_source,),
+  entity_link_names=('booking',),
+  element_type=TIME_DIMENSION,
+  source_time_grain=QUARTER,
+  recipe_time_grain=ExpandedTimeGranularity(name='year', base_granularity=YEAR),
+)
+[weight: 1] LocalModel(bookings_source) -> listings_source.listing -> JoinedModel(listings_source) -> Dimension(country_latest)
+AttributeRecipe(
+  dunder_name_elements=('listing', 'country_latest'),
+  models_in_join=(bookings_source, listings_source),
+  entity_link_names=('listing',),
+  element_type=DIMENSION,
+)
+[weight: 1] LocalModel(bookings_source) -> listings_source.listing -> JoinedModel(listings_source) -> KeyAttribute(user)
+AttributeRecipe(
+  dunder_name_elements=('listing', 'user'),
+  models_in_join=(bookings_source, listings_source),
+  properties={ENTITY},
+  entity_link_names=('listing',),
+  element_type=ENTITY,
+)
+[weight: 2] LocalModel(bookings_source) -> listings_source.listing -> JoinedModel(listings_source) -> users_source.user -> JoinedModel(users_source) -> Dimension(country_latest)
+AttributeRecipe(
+  dunder_name_elements=('listing', 'user', 'country_latest'),
+  models_in_join=(bookings_source, listings_source, users_source),
+  entity_link_names=('listing', 'user'),
+  element_type=DIMENSION,
+)

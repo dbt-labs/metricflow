@@ -38,11 +38,11 @@ def manifest_with_200_models_100_metrics() -> SemanticManifest:
 def manifest_with_50_models_25_metrics() -> SemanticManifest:
     """A semantic manifest with 200 models (100 with measures) and 100 metrics (50 of them derived)."""
     parameter_set = SyntheticManifestParameterSet(
-        measure_semantic_model_count=25,
+        measure_semantic_model_count=5,
         measures_per_semantic_model=20,
-        dimension_semantic_model_count=25,
+        dimension_semantic_model_count=5,
         categorical_dimensions_per_semantic_model=20,
-        max_metric_depth=1,
+        max_metric_depth=2,
         max_metric_width=25,
         saved_query_count=100,
         metrics_per_saved_query=20,
