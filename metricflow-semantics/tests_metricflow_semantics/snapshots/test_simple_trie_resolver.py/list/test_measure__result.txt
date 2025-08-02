@@ -1,0 +1,19 @@
+test_name: test_measure
+test_filename: test_simple_trie_resolver.py
+---
+[
+  'booking',
+  'booking__booking_time__custom_year',
+  'booking__booking_time__extract_quarter',
+  'booking__booking_time__extract_year',
+  'booking__booking_time__quarter',
+  'booking__booking_time__year',
+  'booking__listing',
+  'listing',
+  'listing__country_latest',
+  'metric_time__custom_year',
+  'metric_time__extract_quarter',
+  'metric_time__extract_year',
+  'metric_time__quarter',
+  'metric_time__year',
+]
