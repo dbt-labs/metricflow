@@ -8,6 +8,11 @@ from typing import Dict, Generic, Iterator, Optional, TypeVar
 
 from dbt_semantic_interfaces.implementations.base import FrozenBaseModel
 
+from metricflow_semantics.test_helpers.performance.report_formatter import (
+    SessionReportTextFormatter,
+    TableTextFormatter,
+)
+
 logger = logging.getLogger(__name__)
 
 
@@ -169,6 +174,12 @@ class SessionReport(FrozenBaseModel):
                 for func_name in all_functions
             },
         )
+
+    def text_format(self, formatter: Optional[SessionReportTextFormatter] = None) -> str:
+        """Format this report using the provided formatter."""
+        if formatter is None:
+            return TableTextFormatter().format_report(self)
+        return formatter.format_report(self)
 
 
 class SessionReportComparison(FrozenBaseModel):
