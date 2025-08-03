@@ -89,5 +89,7 @@ def measure_compilation_performance(
 
     yield _measure
 
+    output_file_parent_dir = Path(perf_output_json).parent
+    output_file_parent_dir.mkdir(exist_ok=True)
     with open(perf_output_json, "w") as f:
         f.write(perf_tracker.report_set.to_pretty_json())
