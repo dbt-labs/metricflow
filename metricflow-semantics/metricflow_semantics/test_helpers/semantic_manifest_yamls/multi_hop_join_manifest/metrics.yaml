@@ -1,0 +1,8 @@
+---
+metric:
+  name: paraguayan_customers
+  type: SIMPLE
+  type_params:
+    measure: customers_with_other_data
+  filter: |
+    {{ Dimension('customer_id__country') }} = 'paraguay'
