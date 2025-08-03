@@ -13,6 +13,7 @@ Error #1:
     Query(['entity_0_metric', 'entity_1_metric']) is built from:
 
       Metric('entity_0_metric'), Metric('entity_1_metric').
+
     However, the given input does not match to a common item that is available to those parents:
 
       {
@@ -22,7 +23,8 @@ Error #1:
         ],
       }
 
-    For time dimension inputs, please specify a time grain as ambiguous resolution only allows resolution when the parents have the same defined time gain.
+    For time-dimension inputs, please specify a time grain as resolution of ambiguous grains
+    is successful only when the parents have the same defined time grain.
 
   Query Input:
 

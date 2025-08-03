@@ -6,6 +6,7 @@ docstring:
 digraph {
 	graph [name=FlowGraph]
 	sink
+	source
 	subgraph cluster_intermediate_nodes {
 		label=intermediate_nodes
 		a

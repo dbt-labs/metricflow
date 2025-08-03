@@ -1,0 +1,9 @@
+test_name: test_find_descendants
+test_filename: test_path_finder.py
+---
+FindDescendantsResult(
+  reachable_nodes={IntermediateNode('a'), IntermediateNode('b'), SinkNode('sink')},
+  reachable_target_nodes={SinkNode('sink')},
+  finish_iteration_index=3,
+  target_node_to_reachable_source_nodes={SinkNode('sink'): {IntermediateNode('a'), IntermediateNode('b')}},
+)

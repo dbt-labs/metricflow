@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Add path weight-function for the semantic graph
+time: 2025-08-01T14:42:19.117781-07:00
+custom:
+  Author: plypaul
+  Issue: "1804"

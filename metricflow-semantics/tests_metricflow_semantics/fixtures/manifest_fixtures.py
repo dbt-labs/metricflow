@@ -24,7 +24,9 @@ from metricflow_semantics.test_helpers.semantic_manifest_yamls.partitioned_multi
     PARTITIONED_MULTI_HOP_JOIN_MANIFEST_ANCHOR,
 )
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.scd_manifest import SCD_MANIFEST_ANCHOR
+from metricflow_semantics.test_helpers.semantic_manifest_yamls.sg_00_minimal_manifest import SG_00_MINIMAL_MANIFEST
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.sg_02_single_join import SG_02_SINGLE_JOIN
+from metricflow_semantics.test_helpers.semantic_manifest_yamls.sg_05_derived_metric import SG_05_DERIVED_METRIC_MANIFEST
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.simple_manifest import SIMPLE_MANIFEST_ANCHOR
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.simple_multi_hop_join_manifest import (
     SIMPLE_MULTI_HOP_JOIN_MANIFEST_ANCHOR,
@@ -149,5 +151,15 @@ def extended_date_semantic_manifest_lookup(  # noqa: D103
 
 
 @pytest.fixture(scope="session")
+def sg_00_minimal_manifest(template_mapping: Dict[str, str]) -> PydanticSemanticManifest:  # noqa: D103
+    return load_semantic_manifest(SG_00_MINIMAL_MANIFEST.directory, template_mapping)
+
+
+@pytest.fixture(scope="session")
 def sg_02_single_join_manifest(template_mapping: Dict[str, str]) -> PydanticSemanticManifest:  # noqa: D103
     return load_semantic_manifest(SG_02_SINGLE_JOIN.directory, template_mapping)
+
+
+@pytest.fixture(scope="session")
+def sg_05_derived_metric_manifest(template_mapping: Dict[str, str]) -> PydanticSemanticManifest:  # noqa: D103
+    return load_semantic_manifest(SG_05_DERIVED_METRIC_MANIFEST.directory, template_mapping)

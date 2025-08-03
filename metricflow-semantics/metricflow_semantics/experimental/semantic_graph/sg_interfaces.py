@@ -8,11 +8,10 @@ from dataclasses import dataclass
 from typing_extensions import Optional, override
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
-from metricflow_semantics.collection_helpers.syntactic_sugar import mf_flatten
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
+from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.mf_graph.formatting.dot_attributes import DotGraphAttributeSet
 from metricflow_semantics.experimental.mf_graph.graph_id import MetricflowGraphId, SequentialGraphId
-from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
 from metricflow_semantics.experimental.mf_graph.mf_graph import (
     MetricflowGraph,
     MetricflowGraphEdge,
@@ -67,6 +66,7 @@ class SemanticGraphNode(MetricflowGraphNode, AttributeRecipeStepProvider, Metric
         return self.recipe_step_to_append.add_dunder_name_element
 
 
+@fast_frozen_dataclass(order=False)
 class SemanticGraphEdge(MetricflowGraphEdge[SemanticGraphNode], AttributeRecipeStepProvider, ABC):
     """An edge in the semantic graph.
 
@@ -85,8 +85,8 @@ class SemanticGraphEdge(MetricflowGraphEdge[SemanticGraphNode], AttributeRecipeS
         return formatter.pretty_format_object_by_parts(
             class_name=self.__class__.__name__,
             field_mapping={
-                "tail_node": self._tail_node,
-                "head_node": self._head_node,
+                "tail_node": self.tail_node,
+                "head_node": self.head_node,
             },
         )
 
@@ -128,10 +128,6 @@ class SemanticGraph(MetricflowGraph[SemanticGraphNode, SemanticGraphEdge], ABC):
                 else {}
             )
         )
-
-    def nodes_with_labels(self, *labels: MetricflowGraphLabel) -> MutableOrderedSet[SemanticGraphNode]:
-        """Return nodes in the graph with any of the given labels."""
-        return MutableOrderedSet(mf_flatten(self.nodes_with_label(label) for label in labels))
 
 
 @dataclass

@@ -9,7 +9,8 @@ from typing_extensions import override
 
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
-from metricflow_semantics.mf_logging.pretty_formatter import MetricFlowPrettyFormatter, PrettyFormatOption
+from metricflow_semantics.mf_logging.format_option import PrettyFormatOption
+from metricflow_semantics.mf_logging.pretty_formatter import MetricFlowPrettyFormatter
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.base_node import (
     GroupByItemResolutionNode,
     GroupByItemResolutionNodeSet,

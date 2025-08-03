@@ -3,21 +3,22 @@ from __future__ import annotations
 import contextlib
 import logging
 import typing
+from collections import defaultdict
 from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Sequence
 
 import graphviz
 from graphviz import Digraph
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.collection_helpers.syntactic_sugar import (
     mf_ensure_mapping,
-    mf_group_by,
 )
 from metricflow_semantics.experimental.mf_graph.formatting.dot_attributes import (
     DotEdgeAttributeSet,
     DotGraphAttributeSet,
     DotNodeAttributeSet,
+    DotRankKey,
 )
 from metricflow_semantics.experimental.mf_graph.graph_converter import MetricflowGraphConverter
 from typing_extensions import override
@@ -83,7 +84,12 @@ class MetricflowGraphToDotConverter(MetricflowGraphConverter[DotGraphConversionR
         graph: MetricflowGraph,
     ) -> DotAttributeSet:
         cluster_name_to_dot_nodes: dict[Optional[str], AnyLengthTuple[DotNodeAttributeSet]] = {}
-        for cluster_name, nodes in mf_group_by(graph.nodes, key=lambda node: node.node_descriptor.cluster_name):
+
+        cluster_name_to_nodes: dict[str, list] = defaultdict(list)
+        for node in graph.nodes:
+            cluster_name_to_nodes[node.node_descriptor.cluster_name].append(node)
+
+        for cluster_name, nodes in cluster_name_to_nodes.items():
             cluster_name_to_dot_nodes[cluster_name] = tuple(
                 node.as_dot_node(self._arguments.include_graphical_attributes) for node in sorted(nodes)
             )
@@ -122,7 +128,9 @@ class MetricflowGraphToDotConverter(MetricflowGraphConverter[DotGraphConversionR
             # If the cluster is not specified, the node is not created in a subgraph.
             subgraph_context = (
                 # Graphviz needs the subgraph to be prefixed with the constant.
-                dot.subgraph(name="cluster_" + cluster_name)
+                dot.subgraph(
+                    name="cluster_" + cluster_name,
+                )
                 if cluster_name is not None
                 else contextlib.nullcontext(enter_result=dot)
             )
@@ -130,10 +138,10 @@ class MetricflowGraphToDotConverter(MetricflowGraphConverter[DotGraphConversionR
             with subgraph_context as subgraph:
                 if cluster_name is not None:
                     subgraph.attr(label=cluster_name, **converter_arguments.cluster_attributes)
-
-                for dot_node in dot_nodes:
-                    subgraph.node(**dot_node.dot_kwargs)
-                    all_dot_nodes.append(dot_node)
+                added_nodes = MetricflowGraphToDotConverter._add_nodes_with_rank(
+                    converter_arguments=converter_arguments, dot_graph=subgraph, dot_nodes=dot_nodes
+                )
+                all_dot_nodes.extend(added_nodes)
 
         for dot_edge in dot_attribute_set.edge_attributes:
             dot.edge(**dot_edge.dot_kwargs)
@@ -142,6 +150,44 @@ class MetricflowGraphToDotConverter(MetricflowGraphConverter[DotGraphConversionR
             dot_graph=dot,
             dot_element_set=dot_attribute_set,
         )
+
+    @staticmethod
+    def _add_nodes_with_rank(
+        converter_arguments: DotConversionArgumentSet, dot_graph: Digraph, dot_nodes: Sequence[DotNodeAttributeSet]
+    ) -> Sequence[DotNodeAttributeSet]:
+        added_dot_nodes: list[DotNodeAttributeSet] = []
+        if not converter_arguments.include_graphical_attributes:
+            for dot_node in dot_nodes:
+                dot_graph.node(**dot_node.dot_kwargs)
+                added_dot_nodes.append(dot_node)
+                added_dot_nodes.append(dot_node)
+            return added_dot_nodes
+
+        rank_key_to_dot_nodes: dict[Optional[DotRankKey], list[DotNodeAttributeSet]] = defaultdict(list)
+
+        for dot_node in dot_nodes:
+            rank_key_to_dot_nodes[dot_node.rank_key].append(dot_node)
+
+        for rank_key, dot_nodes in rank_key_to_dot_nodes.items():
+            if rank_key is not None:
+                graph_attr = {
+                    "label": "",
+                    "penwidth": "0",
+                    "rank": "same",
+                }
+                subgraph_context = dot_graph.subgraph(
+                    name="cluster_" + rank_key.value,
+                    graph_attr=graph_attr,
+                )
+            else:
+                subgraph_context = contextlib.nullcontext(enter_result=dot_graph)
+
+            with subgraph_context as dot_subgraph:
+                for dot_node in dot_nodes:
+                    dot_subgraph.node(**dot_node.dot_kwargs)
+                    added_dot_nodes.append(dot_node)
+
+        return added_dot_nodes
 
     @override
     def convert_graph(self, graph: MetricflowGraph) -> DotGraphConversionResult:

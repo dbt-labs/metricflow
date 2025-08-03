@@ -1,0 +1,46 @@
+test_name: test_minimal_manifest
+test_filename: test_subgraph_1_entity_join.py
+docstring:
+  Test generation of the subgraph that describes joins / entity-link using the minimal manifest.
+expectation_description:
+  The minimal manifest only has a single primary entity and no joins are possible.
+---
+dot_notation:
+  digraph {
+  	graph [name=MutableSemanticGraph]
+  	subgraph cluster_configured_entity {
+  		label=configured_entity
+  		"bookings_source.booking"
+  	}
+  	subgraph cluster_bookings_source {
+  		label=bookings_source
+  		"JoinedModel(bookings_source)"
+  		"LocalModel(bookings_source)"
+  		"Measure(booking_count)"
+  	}
+  	subgraph cluster_time_dimension {
+  		label=time_dimension
+  		MetricTime
+  	}
+  	"bookings_source.booking" -> "JoinedModel(bookings_source)"
+  	"LocalModel(bookings_source)" -> "bookings_source.booking"
+  	"Measure(booking_count)" -> "LocalModel(bookings_source)"
+  	"Measure(booking_count)" -> MetricTime
+  }
+
+pretty_format:
+  MutableSemanticGraph(
+    nodes={
+      bookings_source.booking,
+      JoinedModel(bookings_source),
+      LocalModel(bookings_source),
+      Measure(booking_count),
+      MetricTime,
+    },
+    edges={
+      EntityRelationshipEdge(tail_node=bookings_source.booking, head_node=JoinedModel(bookings_source)),
+      EntityRelationshipEdge(tail_node=LocalModel(bookings_source), head_node=bookings_source.booking),
+      EntityRelationshipEdge(tail_node=Measure(booking_count), head_node=LocalModel(bookings_source)),
+      EntityRelationshipEdge(tail_node=Measure(booking_count), head_node=MetricTime),
+    },
+  )
