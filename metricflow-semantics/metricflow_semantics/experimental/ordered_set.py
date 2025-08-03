@@ -37,8 +37,7 @@ class OrderedSet(Generic[HashableT_co], Set[HashableT_co], ABC):
             iterable: Create the set using the given iterable.
             _set_as_dict: For internal use - create a copy of this and use it for the internal representation.
         """
-        # TODO: Remove copy.
-        self._set_as_dict = _set_as_dict.copy() if _set_as_dict is not None else {}
+        self._set_as_dict = _set_as_dict if _set_as_dict is not None else {}
         if iterable is not None:
             self._set_as_dict.update({item: None for item in iterable})
 
@@ -84,17 +83,25 @@ class OrderedSet(Generic[HashableT_co], Set[HashableT_co], ABC):
     def as_frozen(self) -> FrozenOrderedSet[HashableT_co]:  # noqa: D102
         raise NotImplementedError
 
+    @abstractmethod
     def copy(self) -> Self:
         """Return a shallow copy of this set."""
-        return self.__class__(_set_as_dict=self._set_as_dict)
+        raise NotImplementedError
 
 
 class FrozenOrderedSet(Generic[HashableT_co], OrderedSet[HashableT_co], Hashable):
     """A frozen version of `OrderedSet` that can be hashed."""
 
+    def __init__(  # noqa: D107
+        self,
+        iterable: Optional[Iterable[HashableT_co]] = None,
+        _set_as_dict: Optional[dict[HashableT_co, None]] = None,
+    ) -> None:
+        super().__init__(iterable, _set_as_dict)
+
     @cached_property
     def _cached_hash_value(self) -> int:
-        return hash(tuple(self._set_as_dict.keys()))
+        return hash(tuple(self._set_as_dict))
 
     @override
     def __hash__(self) -> int:
@@ -102,11 +109,15 @@ class FrozenOrderedSet(Generic[HashableT_co], OrderedSet[HashableT_co], Hashable
 
     @override
     def as_mutable(self) -> MutableOrderedSet[HashableT_co]:
-        return MutableOrderedSet(self)
+        return MutableOrderedSet(_set_as_dict=self._set_as_dict.copy())
 
     @override
     def as_frozen(self) -> FrozenOrderedSet[HashableT_co]:
         return self
+
+    @override
+    def copy(self) -> FrozenOrderedSet[HashableT_co]:
+        return FrozenOrderedSet(_set_as_dict=self._set_as_dict)
 
 
 class MutableOrderedSet(Generic[HashableT], OrderedSet[HashableT], MutableSet[HashableT]):
@@ -153,3 +164,7 @@ class MutableOrderedSet(Generic[HashableT], OrderedSet[HashableT], MutableSet[Ha
             return item
         except StopIteration:
             raise KeyError("Can't pop an item as the set is empty.")
+
+    @override
+    def copy(self) -> MutableOrderedSet[HashableT]:
+        return MutableOrderedSet(_set_as_dict=self._set_as_dict.copy())
