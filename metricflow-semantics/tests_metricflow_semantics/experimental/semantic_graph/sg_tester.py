@@ -141,6 +141,38 @@ class SemanticGraphTester:
             time_for_legacy_resolver=legacy_timer.execution_time,
         )
 
+    def compare_resolver_outputs_for_distinct_values(
+        self,
+        element_filter: LinkableElementFilter,
+        log_result_table: bool = False,
+    ) -> Optional[_ResolutionTimePair]:
+        """Compare the result for the legacy resolver and the semantic-graph resolver for one measure."""
+        logger.debug("Generating using semantic graph implementation")
+        with ExecutionTimer() as sg_timer:
+            sg_linkable_element_set = self._sg_resolver.get_linkable_elements_for_distinct_values_query(element_filter)
+
+        with ExecutionTimer() as legacy_timer:
+            legacy_linkable_element_set = self._legacy_resolver.get_linkable_elements_for_distinct_values_query(
+                element_filter
+            )
+
+        logger.debug(LazyFormat("Checking sets for distinct values", element_filter=element_filter))
+
+        try:
+            self.assert_linkable_element_sets_equal(
+                left_set=legacy_linkable_element_set,
+                right_set=sg_linkable_element_set,
+                log_result_table=log_result_table,
+            )
+        except AssertionError as e:
+            raise AssertionError(LazyFormat("Result mismatch")) from e
+        logger.debug(LazyFormat("Matched sets"))
+
+        return _ResolutionTimePair(
+            time_for_sg_resolver=sg_timer.execution_time,
+            time_for_legacy_resolver=legacy_timer.execution_time,
+        )
+
     @property
     def _semantic_graph(self) -> SemanticGraph:
         return self._fixture.semantic_graph
