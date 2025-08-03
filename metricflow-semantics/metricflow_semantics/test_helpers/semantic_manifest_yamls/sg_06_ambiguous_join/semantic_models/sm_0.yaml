@@ -1,0 +1,37 @@
+---
+semantic_model:
+  name: sm_0
+
+  node_relation:
+    schema_name: $source_schema
+    alias: sm_0
+
+  defaults:
+    agg_time_dimension: ds
+
+  entities:
+    - name: sm_0_primary_entity
+      type: primary
+    - name: sm_1_primary_entity
+      type: foreign
+    - name: sm_2_primary_entity
+      type: foreign
+    - name: common_unique_entity
+      type: foreign
+  measures:
+    - name: sm_0_measure_0
+      expr: "1"
+      agg: sum
+  dimensions:
+    - name: ds
+      type: time
+      type_params:
+        time_granularity: quarter
+
+
+---
+metric:
+  name: sm_0_measure_0_metric
+  type: simple
+  type_params:
+    measure: sm_0_measure_0
