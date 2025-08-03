@@ -75,3 +75,7 @@ def test_derived_metric_correctness(sg_tester: SemanticGraphTester) -> None:  # 
     sg_tester.compare_resolver_outputs_for_metrics(
         (MetricReference("bookings_per_view"),), element_filter=LinkableElementFilter()
     )
+
+
+# def test_distinct_values(sg_tester: SemanticGraphTester) -> None:  # noqa: D103
+#     sg_tester.compare_resolver_outputs_for_distinct_values(element_filter=LinkableElementFilter())
