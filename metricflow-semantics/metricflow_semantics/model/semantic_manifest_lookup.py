@@ -5,6 +5,16 @@ from typing import Optional
 
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 
+from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
+from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricflowPathfinder
+from metricflow_semantics.experimental.semantic_graph.attribute_resolution.recipe_writer_path import (
+    AttributeRecipeWriterPath,
+)
+from metricflow_semantics.experimental.semantic_graph.attribute_resolution.sg_linkable_spec_resolver import (
+    SemanticGraphLinkableSpecResolver,
+)
+from metricflow_semantics.experimental.semantic_graph.builder.graph_builder import SemanticGraphBuilder
+from metricflow_semantics.experimental.semantic_graph.sg_interfaces import SemanticGraphEdge, SemanticGraphNode
 from metricflow_semantics.model.semantics.linkable_spec_index import LinkableSpecIndex
 from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
@@ -17,7 +27,10 @@ class SemanticManifestLookup:
     """Provides convenient lookup methods to get semantic attributes for a manifest."""
 
     def __init__(
-        self, semantic_manifest: SemanticManifest, linkable_spec_index: Optional[LinkableSpecIndex] = None
+        self,
+        semantic_manifest: SemanticManifest,
+        linkable_spec_index: Optional[LinkableSpecIndex] = None,
+        use_semantic_graph: Optional[bool] = None,
     ) -> None:
         """Initializer.
 
@@ -33,19 +46,47 @@ class SemanticManifestLookup:
         self._semantic_model_lookup = SemanticModelLookup(
             model=semantic_manifest, custom_granularities=self.custom_granularities
         )
-        if linkable_spec_index is None:
-            self._metric_lookup = MetricLookup.create(
-                semantic_manifest=self._semantic_manifest,
+
+        if use_semantic_graph and linkable_spec_index:
+            logger.error(
+                "Both `use_semantic_graph` and `linkable_spec_index` have been set, which is not a supported"
+                " configuration. Setting `use_semantic_graph` to `False`."
+            )
+            use_semantic_graph = False
+
+        if use_semantic_graph:
+            pathfinder = MetricflowPathfinder[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath]()
+            manifest_object_lookup = ManifestObjectLookup(semantic_manifest)
+            graph_builder = SemanticGraphBuilder(manifest_object_lookup=manifest_object_lookup)
+            semantic_graph = graph_builder.build()
+
+            linkable_spec_resolver = SemanticGraphLinkableSpecResolver(
+                semantic_graph=semantic_graph,
+                path_finder=pathfinder,
+            )
+
+            self._metric_lookup = MetricLookup(
+                semantic_manifest=semantic_manifest,
                 semantic_model_lookup=self._semantic_model_lookup,
                 custom_granularities=self.custom_granularities,
+                linkable_spec_resolver=linkable_spec_resolver,
             )
-        else:
+            return
+
+        if linkable_spec_index is not None:
             self._metric_lookup = MetricLookup.create_using_index(
                 semantic_manifest=self._semantic_manifest,
                 semantic_model_lookup=self._semantic_model_lookup,
                 custom_granularities=self.custom_granularities,
                 linkable_spec_index=linkable_spec_index,
             )
+            return
+
+        self._metric_lookup = MetricLookup.create(
+            semantic_manifest=self._semantic_manifest,
+            semantic_model_lookup=self._semantic_model_lookup,
+            custom_granularities=self.custom_granularities,
+        )
 
     @property
     def semantic_manifest(self) -> SemanticManifest:  # noqa: D102
