@@ -5,7 +5,7 @@ from collections.abc import Sequence, Set
 from dataclasses import fields, is_dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Any, List, Mapping, Optional, Sized, Union
+from typing import Any, Final, List, Mapping, Optional, Sized, Union
 
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.helpers.string_helpers import mf_indent
@@ -16,17 +16,19 @@ from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyF
 class MetricFlowPrettyFormatter:
     """Creates string representations of objects useful for logging / snapshots."""
 
+    _DEFAULT_FORMAT_OPTION: Final[PrettyFormatOption] = PrettyFormatOption()
+
     def __init__(
         self,
-        format_option: PrettyFormatOption,
+        format_option: Optional[PrettyFormatOption] = None,
     ) -> None:
         """See mf_pformat() for argument descriptions."""
-        self._format_option = format_option
-        max_line_length = format_option.max_line_length
+        self._format_option = (
+            format_option if format_option is not None else MetricFlowPrettyFormatter._DEFAULT_FORMAT_OPTION
+        )
+        max_line_length = self._format_option.max_line_length
         if max_line_length is not None and max_line_length <= 0:
-            raise ValueError(
-                f"max_line_length must be > 0 as required by pprint.pformat(). Got {format_option.max_line_length}"
-            )
+            raise ValueError(f"max_line_length must be > 0 as required by pprint.pformat(). Got {max_line_length}")
 
     def _handle_sequence_like_obj(
         self, sequence_like_obj: Union[Sequence, Set], remaining_line_length: Optional[int]
