@@ -5,13 +5,11 @@ import textwrap
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from metricflow_semantics.errors.error_classes import InvalidQueryException
-from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.query_param_implementations import (
@@ -144,12 +142,6 @@ METRICS_YAML = textwrap.dedent(
 def revenue_query_parser() -> MetricFlowQueryParser:  # noqa
     revenue_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=REVENUE_YAML)
     return query_parser_from_yaml([EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, revenue_yaml_file])
-
-
-@pytest.fixture
-def scd_query_parser(scd_semantic_manifest: PydanticSemanticManifest) -> MetricFlowQueryParser:  # noqa
-    semantic_manifest_lookup = SemanticManifestLookup(scd_semantic_manifest)
-    return MetricFlowQueryParser(semantic_manifest_lookup)
 
 
 def test_query_parser(  # noqa: D103
