@@ -1,0 +1,48 @@
+test_name: test_join_scd_model_to_non_scd_model
+test_filename: test_parse_scd_cases.py
+docstring:
+  Check that a join from a measure model -> SCD model -> non-SCD model is allowed.
+---
+ParseQueryResult(
+  query_spec=MetricFlowQuerySpec(
+    metric_specs=(MetricSpec(element_name='bookings'),),
+    dimension_specs=(
+      DimensionSpec(
+        element_name='home_state_latest',
+        entity_links=(
+          EntityReference(element_name='listing'),
+          EntityReference(element_name='user'),
+        ),
+      ),
+    ),
+    time_dimension_specs=(
+      TimeDimensionSpec(
+        element_name='metric_time',
+        time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY),
+      ),
+    ),
+    filter_intersection=PydanticWhereFilterIntersection(),
+    filter_spec_resolution_lookup=FilterSpecResolutionLookUp(),
+    min_max_only=False,
+    apply_group_by=True,
+    spec_output_order=(
+      TimeDimensionSpec(
+        element_name='metric_time',
+        time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY),
+      ),
+      DimensionSpec(
+        element_name='home_state_latest',
+        entity_links=(
+          EntityReference(element_name='listing'),
+          EntityReference(element_name='user'),
+        ),
+      ),
+      MetricSpec(element_name='bookings'),
+    ),
+  ),
+  queried_semantic_models=(
+    SemanticModelReference(semantic_model_name='bookings_source'),
+    SemanticModelReference(semantic_model_name='listings'),
+    SemanticModelReference(semantic_model_name='users_latest'),
+  ),
+)
