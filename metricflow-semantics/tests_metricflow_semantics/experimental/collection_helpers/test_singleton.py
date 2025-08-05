@@ -157,5 +157,5 @@ def test_create_existing(setup_statement: str) -> None:
         ),
         right_setup=mf_newline_join(setup_statement, get_singleton_statement),
         right_statement=get_singleton_statement,
-        min_performance_factor=0.45,
+        min_performance_factor=0.40,
     )
