@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Add trie-like data structure for dunder names
+time: 2025-08-05T16:30:12.771303-07:00
+custom:
+  Author: plypaul
+  Issue: "1805"
