@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Add semantic-graph-based resolver for simple group-by items
+time: 2025-08-05T16:36:41.974498-07:00
+custom:
+  Author: plypaul
+  Issue: "1806"
