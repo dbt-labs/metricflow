@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Add semantic-graph-based resolver for group-by metrics
+time: 2025-08-05T16:45:25.983688-07:00
+custom:
+  Author: plypaul
+  Issue: "1807"
