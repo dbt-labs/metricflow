@@ -100,5 +100,5 @@ class TrieResolutionResult(GraphTraversalResult):
     Those fields were mostly helpful for debugging - this may be considered for removal.
     """
 
-    execution_time: PrettyDuration
+    duration: PrettyDuration
     dunder_name_trie: DunderNameTrie

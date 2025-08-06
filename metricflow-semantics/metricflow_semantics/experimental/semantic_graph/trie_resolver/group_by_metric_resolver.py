@@ -104,14 +104,14 @@ class GroupByMetricTrieResolver(DunderNameTrieResolver):
         self, source_nodes: OrderedSet[SemanticGraphNode], element_filter: Optional[LinkableElementFilter]
     ) -> TrieResolutionResult:
         execution_timer = ExecutionTimer()
-        pathfinder_counter_set_differ = TraversalProfileDiffer(self._path_finder)
+        pathfinder_profile_differ = TraversalProfileDiffer(self._path_finder)
 
-        with execution_timer, pathfinder_counter_set_differ:
+        with execution_timer, pathfinder_profile_differ:
             trie_result = self._resolve_trie(source_nodes=source_nodes, element_filter=element_filter)
 
         return TrieResolutionResult(
-            execution_time=execution_timer.total_duration,
-            traversal_profile=pathfinder_counter_set_differ.profile_delta,
+            duration=execution_timer.total_duration,
+            traversal_profile=pathfinder_profile_differ.profile_delta,
             dunder_name_trie=trie_result,
         )
 
