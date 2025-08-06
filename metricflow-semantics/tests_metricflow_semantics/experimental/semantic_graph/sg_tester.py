@@ -15,7 +15,7 @@ from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
     SemanticGraph,
 )
 from metricflow_semantics.helpers.performance_helpers import ExecutionTimer
-from metricflow_semantics.helpers.time_helpers import PrettyTimeDelta
+from metricflow_semantics.helpers.time_helpers import PrettyDuration
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseLinkableElementSet
@@ -210,16 +210,16 @@ class _ResolutionTimePair:
     This will be removed after migration.
     """
 
-    time_for_legacy_resolver: PrettyTimeDelta
-    time_for_sg_resolver: PrettyTimeDelta
+    time_for_legacy_resolver: PrettyDuration
+    time_for_sg_resolver: PrettyDuration
 
     @staticmethod
     def sum(resolution_times: Iterable[_ResolutionTimePair]) -> _ResolutionTimePair:  # noqa: D102
         return _ResolutionTimePair(
-            time_for_legacy_resolver=PrettyTimeDelta.sum(
+            time_for_legacy_resolver=PrettyDuration.sum(
                 resolution_time.time_for_legacy_resolver for resolution_time in resolution_times
             ),
-            time_for_sg_resolver=PrettyTimeDelta.sum(
+            time_for_sg_resolver=PrettyDuration.sum(
                 resolution_time.time_for_sg_resolver for resolution_time in resolution_times
             ),
         )

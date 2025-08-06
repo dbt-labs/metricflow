@@ -110,7 +110,7 @@ class GroupByMetricTrieResolver(DunderNameTrieResolver):
             trie_result = self._resolve_trie(source_nodes=source_nodes, element_filter=element_filter)
 
         return TrieResolutionResult(
-            execution_time=execution_timer.execution_time,
+            execution_time=execution_timer.total_duration,
             traversal_profile=pathfinder_counter_set_differ.profile_delta,
             dunder_name_trie=trie_result,
         )

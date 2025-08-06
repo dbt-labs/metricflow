@@ -13,8 +13,8 @@ from metricflow_semantics.mf_logging.pretty_formatter import PrettyFormatContext
 logger = logging.getLogger(__name__)
 
 
-class PrettyTimeDelta(MetricFlowPrettyFormattable):
-    """Wrapper to format times using the MF pretty-printer."""
+class PrettyDuration(MetricFlowPrettyFormattable):
+    """Wrapper to format durations using the MF pretty-printer."""
 
     def __init__(self, seconds: float, decimals: int = 2) -> None:  # noqa: D107
         self.seconds: Final[float] = seconds
@@ -36,8 +36,8 @@ class PrettyTimeDelta(MetricFlowPrettyFormattable):
         return self._pretty_seconds
 
     @staticmethod
-    def sum(pretty_times: Iterable[PrettyTimeDelta]) -> PrettyTimeDelta:  # noqa: D102
-        return PrettyTimeDelta(
-            sum(pretty_time.seconds for pretty_time in pretty_times),
-            max(pretty_time._decimals for pretty_time in pretty_times),
+    def sum(durations: Iterable[PrettyDuration]) -> PrettyDuration:  # noqa: D102
+        return PrettyDuration(
+            sum(duration.seconds for duration in durations),
+            max(duration._decimals for duration in durations),
         )

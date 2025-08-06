@@ -5,7 +5,7 @@ import time
 from typing import ContextManager, Optional, Type, Union
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import ExceptionTracebackAnyType
-from metricflow_semantics.helpers.time_helpers import PrettyTimeDelta
+from metricflow_semantics.helpers.time_helpers import PrettyDuration
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 
@@ -43,9 +43,9 @@ class ExecutionTimer(ContextManager["ExecutionTimer"]):
         description = self._description
         if description is not None:
             logger.info(
-                LazyFormat(lambda: f"[   END   ] {description} in {mf_pformat(PrettyTimeDelta(self._execution_time))}")
+                LazyFormat(lambda: f"[   END   ] {description} in {mf_pformat(PrettyDuration(self._execution_time))}")
             )
 
     @property
-    def total_duration(self) -> PrettyTimeDelta:  # noqa: D102
-        return PrettyTimeDelta(self._execution_time)
+    def total_duration(self) -> PrettyDuration:  # noqa: D102
+        return PrettyDuration(self._execution_time)
