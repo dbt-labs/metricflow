@@ -98,8 +98,8 @@ class SemanticGraphTester:
         logger.debug(LazyFormat("Matched sets", measure_reference=measure_reference))
 
         return _ResolutionTimePair(
-            time_for_sg_resolver=sg_timer.total_duration,
-            time_for_legacy_resolver=legacy_timer.total_duration,
+            duration_for_sg_resolver=sg_timer.total_duration,
+            duration_for_legacy_resolver=legacy_timer.total_duration,
         )
 
     def compare_resolver_outputs_for_all_measures(  # noqa: D102
@@ -138,8 +138,8 @@ class SemanticGraphTester:
         logger.debug(LazyFormat("Matched sets", metric_references=metric_references))
 
         return _ResolutionTimePair(
-            time_for_sg_resolver=sg_timer.total_duration,
-            time_for_legacy_resolver=legacy_timer.total_duration,
+            duration_for_sg_resolver=sg_timer.total_duration,
+            duration_for_legacy_resolver=legacy_timer.total_duration,
         )
 
     @property
@@ -210,16 +210,16 @@ class _ResolutionTimePair:
     This will be removed after migration.
     """
 
-    time_for_legacy_resolver: PrettyDuration
-    time_for_sg_resolver: PrettyDuration
+    duration_for_legacy_resolver: PrettyDuration
+    duration_for_sg_resolver: PrettyDuration
 
     @staticmethod
     def sum(resolution_times: Iterable[_ResolutionTimePair]) -> _ResolutionTimePair:  # noqa: D102
         return _ResolutionTimePair(
-            time_for_legacy_resolver=PrettyDuration.sum(
-                resolution_time.time_for_legacy_resolver for resolution_time in resolution_times
+            duration_for_legacy_resolver=PrettyDuration.sum(
+                resolution_time.duration_for_legacy_resolver for resolution_time in resolution_times
             ),
-            time_for_sg_resolver=PrettyDuration.sum(
-                resolution_time.time_for_sg_resolver for resolution_time in resolution_times
+            duration_for_sg_resolver=PrettyDuration.sum(
+                resolution_time.duration_for_sg_resolver for resolution_time in resolution_times
             ),
         )
