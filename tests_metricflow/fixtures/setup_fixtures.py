@@ -17,6 +17,7 @@ from metricflow_semantics.test_helpers.snapshot_helpers import (
     add_display_snapshots_cli_flag,
     add_overwrite_snapshots_cli_flag,
 )
+from tests_metricflow_semantics.fixtures.setup_fixtures import mf_add_slow_marker
 
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from tests_metricflow import TESTS_METRICFLOW_DIRECTORY_ANCHOR
@@ -72,10 +73,7 @@ def pytest_configure(config: _pytest.config.Config) -> None:
         name="markers",
         line=f"{DUCKDB_ONLY_MARKER_NAME}: mark tests as one that should only be run with DuckDB.",
     )
-    config.addinivalue_line(
-        name="markers",
-        line="slow: mark tests as taking a long time to run.",
-    )
+    mf_add_slow_marker(config)
 
 
 def check_sql_engine_snapshot_marker(request: FixtureRequest) -> None:
