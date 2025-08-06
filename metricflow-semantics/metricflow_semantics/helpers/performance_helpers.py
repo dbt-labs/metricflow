@@ -47,5 +47,5 @@ class ExecutionTimer(ContextManager["ExecutionTimer"]):
             )
 
     @property
-    def execution_time(self) -> PrettyTimeDelta:  # noqa: D102
+    def total_duration(self) -> PrettyTimeDelta:  # noqa: D102
         return PrettyTimeDelta(self._execution_time)

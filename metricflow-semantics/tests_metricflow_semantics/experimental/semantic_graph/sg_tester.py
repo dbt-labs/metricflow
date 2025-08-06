@@ -98,8 +98,8 @@ class SemanticGraphTester:
         logger.debug(LazyFormat("Matched sets", measure_reference=measure_reference))
 
         return _ResolutionTimePair(
-            time_for_sg_resolver=sg_timer.execution_time,
-            time_for_legacy_resolver=legacy_timer.execution_time,
+            time_for_sg_resolver=sg_timer.total_duration,
+            time_for_legacy_resolver=legacy_timer.total_duration,
         )
 
     def compare_resolver_outputs_for_all_measures(  # noqa: D102
@@ -138,8 +138,8 @@ class SemanticGraphTester:
         logger.debug(LazyFormat("Matched sets", metric_references=metric_references))
 
         return _ResolutionTimePair(
-            time_for_sg_resolver=sg_timer.execution_time,
-            time_for_legacy_resolver=legacy_timer.execution_time,
+            time_for_sg_resolver=sg_timer.total_duration,
+            time_for_legacy_resolver=legacy_timer.total_duration,
         )
 
     @property
