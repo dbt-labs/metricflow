@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Add performance tests for the semantic-graph-based resolver
+time: 2025-08-05T16:51:35.070636-07:00
+custom:
+  Author: plypaul
+  Issue: "1809"
