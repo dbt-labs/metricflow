@@ -390,10 +390,10 @@ class _MetricNameToEntityKeyTrieGenerator:
             )
 
         deny_labels = {
+            # For metrics that require metric time to be in a query, it's not possible to query just the entity keys.
+            DenyEntityKeyQueryResolutionLabel.get_instance(),
             # For conversion metrics, the conversion measure is effectively hidden and is not used to generate the
             # available group-by items for a metric.
-            DenyEntityKeyQueryResolutionLabel.get_instance(),
-            # For metrics that require metric time to be in a query, it's not possible to query just the entity keys.
             DenyVisibleAttributesLabel.get_instance(),
         }
 
