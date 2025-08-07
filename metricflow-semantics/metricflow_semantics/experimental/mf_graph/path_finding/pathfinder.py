@@ -84,11 +84,11 @@ class MetricflowPathfinder(Generic[NodeT, EdgeT, MutablePathT], ABC):
             max_path_weight=max_path_weight,
             node_allow_set=node_allow_set,
             node_deny_set=node_deny_set,
-            counter_set=self._local_state.traversal_profile,
+            traversal_profile=self._local_state.traversal_profile,
             traversal_description=traversal_description,
             verbose_debug_logs=self._verbose_debug_logs,
         )
-        return traversal.found_paths()
+        return traversal.find_paths()
 
     def find_descendants(
         self,
@@ -339,7 +339,7 @@ class _DfsTraversal(Generic[NodeT, EdgeT, MutablePathT]):
         max_path_weight: int,
         node_allow_set: Optional[Set[NodeT]],
         node_deny_set: Optional[Set[NodeT]],
-        counter_set: MutableGraphTraversalProfile,
+        traversal_profile: MutableGraphTraversalProfile,
         traversal_description: Optional[str],
         verbose_debug_logs: bool,
     ) -> None:
@@ -359,7 +359,7 @@ class _DfsTraversal(Generic[NodeT, EdgeT, MutablePathT]):
         self._max_path_weight = max_path_weight
         self._node_allow_set = node_allow_set
         self._node_deny_set = node_deny_set
-        self._counter_set = counter_set
+        self._traversal_profile = traversal_profile
         self._verbose_debug_logs = verbose_debug_logs
 
     def _get_valid_next_edges(self, current_node: NodeT) -> Sequence[tuple[EdgeT, int]]:
@@ -395,21 +395,21 @@ class _DfsTraversal(Generic[NodeT, EdgeT, MutablePathT]):
                 continue
 
             valid_next_edges.append((candidate_edge, weight_added_by_candidate_edge))
-        self._counter_set.increment_edge_examined_count(len(candidate_edges))
+        self._traversal_profile.increment_edge_examined_count(len(candidate_edges))
         return valid_next_edges
 
-    def found_paths(self) -> Iterator[MutablePathT]:
+    def find_paths(self) -> Iterator[MutablePathT]:
         traversal_start_node = self._current_path.nodes[-1]
         return self._traverse_dfs(traversal_start_node)
 
     def _traverse_dfs(self, current_node: NodeT) -> Iterator[MutablePathT]:
         if self._verbose_debug_logs:
             logger.debug(LazyFormat("Visiting node", current_node=current_node, current_path=self._current_path))
-        self._counter_set.increment_node_visit_count()
+        self._traversal_profile.increment_node_visit_count()
         current_path = self._current_path
 
         if current_node in self._target_nodes:
-            self._counter_set.increment_generated_paths_count()
+            self._traversal_profile.increment_generated_paths_count()
             yield current_path
             return
 
