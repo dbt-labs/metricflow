@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import logging
+import threading
 import time
-from typing import ContextManager, Optional, Type
+from typing import ContextManager, Optional, Type, Union
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import ExceptionTracebackAnyType
-from metricflow_semantics.helpers.time_helpers import PrettyTimeDelta
+from metricflow_semantics.helpers.time_helpers import PrettyDuration
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 
 logger = logging.getLogger(__name__)
 
@@ -18,15 +18,14 @@ class ExecutionTimer(ContextManager["ExecutionTimer"]):
     This and associates classes are a WIP and may be removed.
     """
 
-    def __init__(self, description: Optional[str] = None) -> None:  # noqa: D107
-        self._start_time = 0.0
-        self._execution_time = 0.0
-        self._description = description
+    def __init__(self, description: Optional[Union[str, LazyFormat]] = None) -> None:  # noqa: D107
+        self._local_state = _ExecutionTimerLocalState(description)
 
     def __enter__(self) -> ExecutionTimer:  # noqa: D105
-        if self._description is not None:
-            logger.info(LazyFormat(lambda: f"[  BEGIN  ] {self._description}"))
-        self._start_time = time.perf_counter()
+        description = self._local_state.description
+        if description is not None:
+            logger.info(LazyFormat(lambda: f"[  BEGIN  ] {description}"))
+        self._local_state.start_time = time.perf_counter()
         return self
 
     def __exit__(  # noqa: D105
@@ -35,17 +34,22 @@ class ExecutionTimer(ContextManager["ExecutionTimer"]):
         exc_val: Optional[BaseException],
         exc_tb: Optional[ExceptionTracebackAnyType],
     ) -> None:
-        if self._start_time is None:
-            raise RuntimeError("Context manager shouldn't exit without first entering.")
-
-        self._execution_time += time.perf_counter() - self._start_time
-        if self._description is not None:
-            logger.info(
-                LazyFormat(
-                    lambda: f"[   END   ] {self._description} in {mf_pformat(PrettyTimeDelta(self._execution_time))}s"
-                )
-            )
+        if self._local_state.start_time is None:
+            logger.error(LazyFormat(lambda: f"{self.__class__.__name__} shouldn't exit context without entering."))
+            return
+        self._local_state.total_duration_for_completed_contexts += time.perf_counter() - self._local_state.start_time
+        description = self._local_state.description
+        if description is not None:
+            total_duration = self._local_state.total_duration_for_completed_contexts
+            logger.info(LazyFormat(lambda: f"[   END   ] {description} in {PrettyDuration(total_duration)}"))
 
     @property
-    def execution_time(self) -> PrettyTimeDelta:  # noqa: D102
-        return PrettyTimeDelta(self._execution_time)
+    def total_duration(self) -> PrettyDuration:  # noqa: D102
+        return PrettyDuration(self._local_state.total_duration_for_completed_contexts)
+
+
+class _ExecutionTimerLocalState(threading.local):
+    def __init__(self, description: Optional[Union[str, LazyFormat]]) -> None:  # noqa: D107
+        self.start_time: Optional[float] = None
+        self.total_duration_for_completed_contexts = 0.0
+        self.description = description

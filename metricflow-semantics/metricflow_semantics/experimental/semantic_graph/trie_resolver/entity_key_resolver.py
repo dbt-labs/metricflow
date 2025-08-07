@@ -26,6 +26,7 @@ from metricflow_semantics.experimental.semantic_graph.trie_resolver.dunder_name_
     DunderNameTrie,
     MutableDunderNameTrie,
 )
+from metricflow_semantics.helpers.performance_helpers import ExecutionTimer
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
@@ -68,6 +69,12 @@ class EntityKeyTrieResolver:
         This is returned as single mapping because to resolve the group-by metrics for any measure, you need them all
         anyway.
         """
+        with ExecutionTimer() as resolution_timer:
+            result = self._resolve_entity_key_trie_mapping()
+        logger.info(LazyFormat("Resolved entity-key trie mapping", duration=resolution_timer.total_duration))
+        return result
+
+    def _resolve_entity_key_trie_mapping(self) -> Mapping[SemanticGraphNode, DunderNameTrie]:
         local_model_nodes = self._semantic_graph.nodes_with_labels(LocalModelLabel.get_instance())
         key_attribute_nodes = self._semantic_graph.nodes_with_labels(KeyAttributeLabel.get_instance())
         joined_model_nodes = self._semantic_graph.nodes_with_labels(JoinedModelLabel.get_instance())
@@ -128,7 +135,15 @@ class EntityKeyTrieResolver:
 
         # At each step, explore the predecessors of the nodes that were discovered in the previous step. Repeat until.
         # there are no more new nodes / new paths discovered.
+        logger.info(
+            LazyFormat(
+                "Starting exploration for entity-key paths",
+                source_node_count=len(source_nodes),
+                target_node_count=len(target_nodes),
+            )
+        )
         step_index = 0
+        processed_notification_count = 0
         while len(notifications_to_process) > 0:
             if self._verbose_debug_logs:
                 logger.debug(
@@ -142,6 +157,7 @@ class EntityKeyTrieResolver:
             )
 
             for current_node, found_new_path_notifications in notifications_to_process.items():
+                processed_notification_count += len(found_new_path_notifications)
                 if current_node in source_nodes:
                     found_path_to_node_notifications[current_node].extend(found_new_path_notifications)
                     continue
@@ -200,10 +216,18 @@ class EntityKeyTrieResolver:
                         next_notifications_to_process[predecessor_node].append(notification)
             notifications_to_process = next_notifications_to_process
             step_index += 1
+        logger.info(
+            LazyFormat(
+                "Finished exploration for entity-key paths",
+                step_index=step_index,
+                processed_notification_count=processed_notification_count,
+            )
+        )
 
         # Once the above loop has finished, the lookup can be used to figure out the possible path (encoded in the
         # recipe).
         source_node_to_trie: dict[SemanticGraphNode, MutableDunderNameTrie] = defaultdict(MutableDunderNameTrie)
+        added_name_item_count = 0
         for source_node, notifications in found_path_to_node_notifications.items():
             items_to_add: list[tuple[IndexedDunderName, DunderNameDescriptor]] = []
             for notification in notifications:
@@ -226,7 +250,8 @@ class EntityKeyTrieResolver:
                 )
 
             source_node_to_trie[source_node].add_name_items(items_to_add)
-
+            added_name_item_count += len(items_to_add)
+        logger.info(LazyFormat("Finished mapping source node to entity-key trie", source_node_count=len(source_nodes)))
         return {source_node: source_node_to_trie[source_node] for source_node in source_nodes}
 
 

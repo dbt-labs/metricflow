@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-import time
+from collections.abc import Sequence
 from typing import Type
 
 from typing_extensions import override
@@ -25,6 +25,7 @@ from metricflow_semantics.experimental.semantic_graph.builder.time_dimension_sub
 )
 from metricflow_semantics.experimental.semantic_graph.builder.time_entity_subgraph import TimeEntitySubgraphGenerator
 from metricflow_semantics.experimental.semantic_graph.sg_interfaces import MutableSemanticGraph, SemanticGraph
+from metricflow_semantics.helpers.performance_helpers import ExecutionTimer
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 
 logger = logging.getLogger(__name__)
@@ -51,26 +52,26 @@ class SemanticGraphBuilder:
         self._manifest_object_lookup = manifest_object_lookup
         self._verbose_debug_logs = True
 
-    def build(self) -> SemanticGraph:  # noqa: D102
+    def _build(self, subgraph_generators: Sequence[Type[SemanticSubgraphGenerator]]) -> SemanticGraph:
         current_graph = MutableSemanticGraph.create()
-        for generator in self._ALL_SUBGRAPH_GENERATORS:
-            start_time = time.perf_counter()
-            generator_instance = generator(self._manifest_object_lookup)
+        for generator in subgraph_generators:
+            generation_timer = ExecutionTimer()
+            with generation_timer:
+                generator_instance = generator(self._manifest_object_lookup)
+                start_node_count = len(current_graph.nodes)
+                start_edge_count = len(current_graph.edges)
+                generated_edges = generator_instance.generate_edges()
+                generated_edge_count = len(generated_edges)
+                current_graph.add_edges(generated_edges)
+                added_node_count = len(current_graph.nodes) - start_node_count
+                added_edge_count = len(current_graph.edges) - start_edge_count
 
-            start_node_count = len(current_graph.nodes)
-            start_edge_count = len(current_graph.edges)
-            generated_edges = generator_instance.generate_edges()
-            generated_edge_count = len(generated_edges)
-            current_graph.add_edges(generated_edges)
-            added_node_count = len(current_graph.nodes) - start_node_count
-            added_edge_count = len(current_graph.edges) - start_edge_count
-            runtime = time.perf_counter() - start_time
             if self._verbose_debug_logs:
                 logger.debug(
                     LazyFormat(
                         "Generated subgraph",
                         generator=generator.__name__,
-                        runtime=f"{runtime:.2f}s",
+                        duration=generation_timer.total_duration,
                         added_node_count=added_node_count,
                         added_edge_count=added_edge_count,
                         generated_edge_count=generated_edge_count,
@@ -78,3 +79,18 @@ class SemanticGraphBuilder:
                 )
 
         return current_graph
+
+    def build(  # noqa: D102
+        self, subgraph_generators: Sequence[Type[SemanticSubgraphGenerator]] = _ALL_SUBGRAPH_GENERATORS
+    ) -> SemanticGraph:
+        with ExecutionTimer() as build_timer:
+            result_graph = self._build(subgraph_generators)
+        logger.info(
+            LazyFormat(
+                "Generated semantic graph.",
+                node_count=len(result_graph.nodes),
+                edge_count=len(result_graph.edges),
+                duration=build_timer.total_duration,
+            )
+        )
+        return result_graph

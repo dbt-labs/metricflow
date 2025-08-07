@@ -52,7 +52,6 @@ from metricflow_semantics.experimental.semantic_graph.trie_resolver.entity_key_r
 )
 from metricflow_semantics.helpers.performance_helpers import ExecutionTimer
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.mf_logging.runtime import log_block_runtime
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
@@ -104,14 +103,14 @@ class GroupByMetricTrieResolver(DunderNameTrieResolver):
         self, source_nodes: OrderedSet[SemanticGraphNode], element_filter: Optional[LinkableElementFilter]
     ) -> TrieResolutionResult:
         execution_timer = ExecutionTimer()
-        pathfinder_counter_set_differ = TraversalProfileDiffer(self._path_finder)
+        pathfinder_profile_differ = TraversalProfileDiffer(self._path_finder)
 
-        with execution_timer, pathfinder_counter_set_differ:
+        with execution_timer, pathfinder_profile_differ:
             trie_result = self._resolve_trie(source_nodes=source_nodes, element_filter=element_filter)
 
         return TrieResolutionResult(
-            execution_time=execution_timer.execution_time,
-            traversal_profile=pathfinder_counter_set_differ.profile_delta,
+            duration=execution_timer.total_duration,
+            traversal_profile=pathfinder_profile_differ.profile_delta,
             dunder_name_trie=trie_result,
         )
 
@@ -254,21 +253,16 @@ class GroupByMetricTrieResolver(DunderNameTrieResolver):
 
     @cached_property
     def _model_node_to_entity_key_trie(self) -> Mapping[SemanticGraphNode, DunderNameTrie]:
-        with log_block_runtime("Resolve key queries"):
-            # resolver = KeyQueryResolver()
-            # resolver_result = resolver.find_key_query_groups(self._current_graph)
-
-            resolver = EntityKeyTrieResolver(self._semantic_graph)
-            resolver_result = resolver.resolve_entity_key_trie_mapping()
-            if self._verbose_debug_logs:
-                logger.debug(
-                    LazyFormat(
-                        "Resolved entity-key trie",
-                        resolver_result=resolver_result,
-                    )
+        resolver = EntityKeyTrieResolver(self._semantic_graph)
+        resolver_result = resolver.resolve_entity_key_trie_mapping()
+        if self._verbose_debug_logs:
+            logger.debug(
+                LazyFormat(
+                    "Resolved entity-key trie",
+                    resolver_result=resolver_result,
                 )
-
-            return resolver_result
+            )
+        return resolver_result
 
 
 class _MetricNameToEntityKeyTrieGenerator:
@@ -396,10 +390,10 @@ class _MetricNameToEntityKeyTrieGenerator:
             )
 
         deny_labels = {
+            # For metrics that require metric time to be in a query, it's not possible to query just the entity keys.
+            DenyEntityKeyQueryResolutionLabel.get_instance(),
             # For conversion metrics, the conversion measure is effectively hidden and is not used to generate the
             # available group-by items for a metric.
-            DenyEntityKeyQueryResolutionLabel.get_instance(),
-            # For metrics that require metric time to be in a query, it's not possible to query just the entity keys.
             DenyVisibleAttributesLabel.get_instance(),
         }
 

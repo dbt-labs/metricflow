@@ -78,7 +78,7 @@ class SimpleTrieResolver(DunderNameTrieResolver):
             result_trie = self._resolve_trie_for_source_nodes(source_nodes=source_nodes, element_filter=element_filter)
 
         return TrieResolutionResult(
-            execution_time=execution_timer.execution_time,
+            duration=execution_timer.total_duration,
             traversal_profile=traversal_stat_differ.profile_delta,
             dunder_name_trie=result_trie,
         )

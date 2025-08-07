@@ -37,7 +37,7 @@ from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
 from metricflow_semantics.experimental.semantic_graph.trie_resolver.dunder_name_trie import (
     DunderNameTrie,
 )
-from metricflow_semantics.helpers.time_helpers import PrettyTimeDelta
+from metricflow_semantics.helpers.time_helpers import PrettyDuration
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 
@@ -100,5 +100,5 @@ class TrieResolutionResult(GraphTraversalResult):
     Those fields were mostly helpful for debugging - this may be considered for removal.
     """
 
-    execution_time: PrettyTimeDelta
+    duration: PrettyDuration
     dunder_name_trie: DunderNameTrie
