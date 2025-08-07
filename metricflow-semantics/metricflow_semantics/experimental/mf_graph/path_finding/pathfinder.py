@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import itertools
 import logging
+import threading
 from abc import ABC
 from collections import defaultdict
 from collections.abc import Set
@@ -44,8 +45,8 @@ class MetricflowPathfinder(Generic[NodeT, EdgeT, MutablePathT], ABC):
     _MAX_BFS_ITERATION_COUNT: Final[int] = 100
 
     def __init__(self) -> None:  # noqa: D107
-        # TODO: `_traversal_profile` should be a `ContextVar`.
-        self._traversal_profile = MutableGraphTraversalProfile()
+        self._local_state = _MetricflowPathfinderLocalState()
+        self._lo = MutableGraphTraversalProfile()
         self._verbose_debug_logs = False
 
     def find_paths_dfs(
@@ -83,7 +84,7 @@ class MetricflowPathfinder(Generic[NodeT, EdgeT, MutablePathT], ABC):
             max_path_weight=max_path_weight,
             node_allow_set=node_allow_set,
             node_deny_set=node_deny_set,
-            counter_set=self._traversal_profile,
+            counter_set=self._local_state.traversal_profile,
             traversal_description=traversal_description,
             verbose_debug_logs=self._verbose_debug_logs,
         )
@@ -170,8 +171,8 @@ class MetricflowPathfinder(Generic[NodeT, EdgeT, MutablePathT], ABC):
 
                 examined_edge_count += len(edges_to_examine)
 
-            self._traversal_profile.increment_edge_examined_count(examined_edge_count)
-            self._traversal_profile.increment_node_visit_count(len(batch_of_nodes_to_evaluate))
+            self._local_state.traversal_profile.increment_edge_examined_count(examined_edge_count)
+            self._local_state.traversal_profile.increment_node_visit_count(len(batch_of_nodes_to_evaluate))
             batch_of_nodes_to_evaluate = next_batch_of_node_to_evaluate
             iteration_index += 1
 
@@ -302,8 +303,8 @@ class MetricflowPathfinder(Generic[NodeT, EdgeT, MutablePathT], ABC):
                     )
                 examined_edges_count += len(edges_to_examine)
 
-            self._traversal_profile.increment_edge_examined_count(examined_edges_count)
-            self._traversal_profile.increment_node_visit_count(len(batch_of_nodes_to_evaluate))
+            self._local_state.traversal_profile.increment_edge_examined_count(examined_edges_count)
+            self._local_state.traversal_profile.increment_node_visit_count(len(batch_of_nodes_to_evaluate))
             batch_of_nodes_to_evaluate = next_batch_of_node_to_evaluate
             iteration_index += 1
 
@@ -323,7 +324,7 @@ class MetricflowPathfinder(Generic[NodeT, EdgeT, MutablePathT], ABC):
 
         The counter set is used for logging / debugging.
         """
-        return self._traversal_profile.copy()
+        return self._local_state.traversal_profile.copy()
 
 
 class _DfsTraversal(Generic[NodeT, EdgeT, MutablePathT]):
@@ -417,3 +418,8 @@ class _DfsTraversal(Generic[NodeT, EdgeT, MutablePathT]):
             for path in self._traverse_dfs(next_edge.head_node):
                 yield path
             current_path.pop_end()
+
+
+class _MetricflowPathfinderLocalState(threading.local):
+    def __init__(self) -> None:  # noqa: D107
+        self.traversal_profile = MutableGraphTraversalProfile()

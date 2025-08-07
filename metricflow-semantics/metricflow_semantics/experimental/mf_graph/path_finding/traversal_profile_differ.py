@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import threading
 from typing import ContextManager, Optional, Type
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import ExceptionTracebackAnyType
@@ -21,11 +22,10 @@ class TraversalProfileDiffer(ContextManager["TraversalProfileDiffer"]):
 
     def __init__(self, path_finder: MetricflowPathfinder) -> None:  # noqa: D107
         self._path_finder = path_finder
-        self._start_profile: GraphTraversalProfile = MutableGraphTraversalProfile()
-        self._profile_delta: GraphTraversalProfile = MutableGraphTraversalProfile()
+        self._local_state = _TraversalProfileDifferLocalState()
 
     def __enter__(self) -> TraversalProfileDiffer:  # noqa: D105
-        self._start_profile = self._path_finder.traversal_profile_snapshot
+        self._local_state.start_profile = self._path_finder.traversal_profile_snapshot
         return self
 
     def __exit__(  # noqa: D105
@@ -34,8 +34,16 @@ class TraversalProfileDiffer(ContextManager["TraversalProfileDiffer"]):
         exc_val: Optional[BaseException],
         exc_tb: Optional[ExceptionTracebackAnyType],
     ) -> None:
-        self._profile_delta = self._path_finder.traversal_profile_snapshot.difference(self._start_profile)
+        self._local_state.profile_delta = self._path_finder.traversal_profile_snapshot.difference(
+            self._local_state.start_profile
+        )
 
     @property
     def profile_delta(self) -> GraphTraversalProfile:  # noqa: D102
-        return self._profile_delta
+        return self._local_state.profile_delta
+
+
+class _TraversalProfileDifferLocalState(threading.local):
+    def __init__(self) -> None:  # noqa: D107
+        self.start_profile: GraphTraversalProfile = MutableGraphTraversalProfile()
+        self.profile_delta: GraphTraversalProfile = MutableGraphTraversalProfile()

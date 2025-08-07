@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import threading
 import time
 from typing import ContextManager, Optional, Type, Union
 
@@ -18,15 +19,13 @@ class ExecutionTimer(ContextManager["ExecutionTimer"]):
     """
 
     def __init__(self, description: Optional[Union[str, LazyFormat]] = None) -> None:  # noqa: D107
-        self._start_time: Optional[float] = None
-        self._total_duration_for_completed_contexts = 0.0
-        self._description = description
+        self._local_state = _ExecutionTimerLocalState(description)
 
     def __enter__(self) -> ExecutionTimer:  # noqa: D105
-        description = self._description
+        description = self._local_state.description
         if description is not None:
             logger.info(LazyFormat(lambda: f"[  BEGIN  ] {description}"))
-        self._start_time = time.perf_counter()
+        self._local_state.start_time = time.perf_counter()
         return self
 
     def __exit__(  # noqa: D105
@@ -35,15 +34,22 @@ class ExecutionTimer(ContextManager["ExecutionTimer"]):
         exc_val: Optional[BaseException],
         exc_tb: Optional[ExceptionTracebackAnyType],
     ) -> None:
-        if self._start_time is None:
+        if self._local_state.start_time is None:
             logger.error(LazyFormat(lambda: f"{self.__class__.__name__} shouldn't exit context without entering."))
             return
-        self._total_duration_for_completed_contexts += time.perf_counter() - self._start_time
-        description = self._description
+        self._local_state.total_duration_for_completed_contexts += time.perf_counter() - self._local_state.start_time
+        description = self._local_state.description
         if description is not None:
-            total_duration = self._total_duration_for_completed_contexts
+            total_duration = self._local_state.total_duration_for_completed_contexts
             logger.info(LazyFormat(lambda: f"[   END   ] {description} in {PrettyDuration(total_duration)}"))
 
     @property
     def total_duration(self) -> PrettyDuration:  # noqa: D102
-        return PrettyDuration(self._total_duration_for_completed_contexts)
+        return PrettyDuration(self._local_state.total_duration_for_completed_contexts)
+
+
+class _ExecutionTimerLocalState(threading.local):
+    def __init__(self, description: Optional[Union[str, LazyFormat]]) -> None:  # noqa: D107
+        self.start_time: Optional[float] = None
+        self.total_duration_for_completed_contexts = 0.0
+        self.description = description
