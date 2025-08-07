@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Add `use_semantic_graph` flag to `SemanticManifestLookup`
+time: 2025-08-07T08:39:16.511789-07:00
+custom:
+  Author: plypaul
+  Issue: "1812"

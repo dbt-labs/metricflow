@@ -240,15 +240,43 @@ def filter_not_supported_features(
     CONFIGURED_INTEGRATION_TESTS_REPOSITORY.all_test_case_names,
     ids=lambda name: f"name={name}",
 )
+@pytest.mark.parametrize(
+    "use_semantic_graph",
+    (False, True),
+    ids=lambda use_semantic_graph: f"sg={use_semantic_graph}",
+)
 def test_case(
     name: str,
     mf_test_configuration: MetricFlowTestConfiguration,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping_sg: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     time_spine_sources: Mapping[TimeGranularity, TimeSpineSource],
     sql_client: SqlClient,
     create_source_tables: bool,
+    use_semantic_graph: bool,
 ) -> None:
     """Runs all integration tests configured in the test case YAML directory."""
+    if use_semantic_graph:
+        engine_test_fixture_mapping = mf_engine_test_fixture_mapping_sg
+    else:
+        engine_test_fixture_mapping = mf_engine_test_fixture_mapping
+
+    _test_case(
+        name=name,
+        mf_test_configuration=mf_test_configuration,
+        engine_test_fixture_mapping=engine_test_fixture_mapping,
+        time_spine_sources=time_spine_sources,
+        sql_client=sql_client,
+    )
+
+
+def _test_case(
+    name: str,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
+    time_spine_sources: Mapping[TimeGranularity, TimeSpineSource],
+    sql_client: SqlClient,
+) -> None:
     case = CONFIGURED_INTEGRATION_TESTS_REPOSITORY.get_test_case(name)
     logger.debug(LazyFormat(lambda: f"Running integration test case: '{case.name}' from file '{case.file_path}'"))
     time_spine_source = time_spine_sources[TimeGranularity.DAY]
@@ -258,19 +286,19 @@ def test_case(
         pytest.skip(f"DW does not support {missing_required_features}")
 
     if case.model is IntegrationTestModel.SIMPLE_MODEL:
-        engine = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].metricflow_engine
+        engine = engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].metricflow_engine
     elif case.model is IntegrationTestModel.SIMPLE_MODEL_NON_DS:
-        engine = mf_engine_test_fixture_mapping[SemanticManifestSetup.NON_SM_MANIFEST].metricflow_engine
+        engine = engine_test_fixture_mapping[SemanticManifestSetup.NON_SM_MANIFEST].metricflow_engine
     elif case.model is IntegrationTestModel.UNPARTITIONED_MULTI_HOP_JOIN_MODEL:
-        engine = mf_engine_test_fixture_mapping[SemanticManifestSetup.MULTI_HOP_JOIN_MANIFEST].metricflow_engine
+        engine = engine_test_fixture_mapping[SemanticManifestSetup.MULTI_HOP_JOIN_MANIFEST].metricflow_engine
     elif case.model is IntegrationTestModel.PARTITIONED_MULTI_HOP_JOIN_MODEL:
-        engine = mf_engine_test_fixture_mapping[
+        engine = engine_test_fixture_mapping[
             SemanticManifestSetup.PARTITIONED_MULTI_HOP_JOIN_MANIFEST
         ].metricflow_engine
     elif case.model is IntegrationTestModel.EXTENDED_DATE_MODEL:
-        engine = mf_engine_test_fixture_mapping[SemanticManifestSetup.EXTENDED_DATE_MANIFEST].metricflow_engine
+        engine = engine_test_fixture_mapping[SemanticManifestSetup.EXTENDED_DATE_MANIFEST].metricflow_engine
     elif case.model is IntegrationTestModel.SCD_MODEL:
-        engine = mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST].metricflow_engine
+        engine = engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST].metricflow_engine
     else:
         assert_values_exhausted(case.model)
 
