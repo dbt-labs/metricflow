@@ -53,7 +53,7 @@ def test_resolver_init_time(high_complexity_manifest_sg_fixture: SemanticGraphTe
     )
 
 
-@pytest.mark.skip("The legacy resolver takes ~240 seconds to initialize.")
+# @pytest.mark.skip("The legacy resolver takes ~240 seconds to initialize.")
 def test_resolver_query_time(high_complexity_manifest_sg_fixture: SemanticGraphTestFixture) -> None:
     """This test demonstrates the (cold) resolution time of the semantic-graph-based resolver w/ a 18x improvement.
 

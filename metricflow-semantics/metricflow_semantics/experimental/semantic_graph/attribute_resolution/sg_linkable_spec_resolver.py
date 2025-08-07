@@ -55,6 +55,7 @@ class SemanticGraphLinkableSpecResolver(LinkableSpecResolver):
         path_finder: MetricflowPathfinder[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath],
     ) -> None:
         self._semantic_graph = semantic_graph
+        self._pathfinder = path_finder
         self._simple_resolver = SimpleTrieResolver(semantic_graph, path_finder)
         self._simple_resolver_limit_one_model = SimpleTrieResolver(semantic_graph, path_finder, max_path_model_count=1)
         self._group_by_metric_resolver = GroupByMetricTrieResolver(semantic_graph, path_finder)
@@ -84,6 +85,8 @@ class SemanticGraphLinkableSpecResolver(LinkableSpecResolver):
         if cached_result:
             return cached_result.value
 
+        initial_traversal_profile = self._pathfinder.traversal_profile_snapshot
+
         matching_measure_nodes = self._semantic_graph.nodes_with_labels(
             MeasureLabel.get_instance(measure_name=measure_reference.element_name)
         )
@@ -105,6 +108,13 @@ class SemanticGraphLinkableSpecResolver(LinkableSpecResolver):
         group_by_metric_trie = self._group_by_metric_resolver.resolve_trie(
             source_nodes, element_filter
         ).dunder_name_trie
+
+        logger.info(
+            LazyFormat(
+                "Logging traversal-profile delta:",
+                delta=self._pathfinder.traversal_profile_snapshot.difference(initial_traversal_profile),
+            )
+        )
 
         return self._result_cache_for_measure.set_and_get(
             cache_key, AnnotatedSpecLinkableElementSet.create_from_trie(simple_trie, group_by_metric_trie)
