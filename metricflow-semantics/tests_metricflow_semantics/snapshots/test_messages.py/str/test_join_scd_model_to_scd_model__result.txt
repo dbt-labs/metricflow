@@ -1,0 +1,38 @@
+test_name: test_join_scd_model_to_scd_model
+test_filename: test_messages.py
+docstring:
+  Check that a join from a measure model -> SCD model -> SCD model raises an error.
+---
+Got error(s) during query resolution.
+
+Error #1:
+  Message:
+
+    The given input does not match any of the available group-by-items for
+    Measure('bookings'). Common issues are:
+
+      * Incorrect names.
+      * No valid join paths exist from the measure to the group-by-item.
+        (fan-out join support is pending).
+      * There are multiple matching join paths.
+        (disambiguation support is pending).
+
+    Suggestions:
+      [
+        'user__account_type',
+        'listing__user__company',
+        'listing__user__company_name',
+        'listing__country',
+        'listing__user__ds__day',
+        'listing__user__home_state_latest',
+      ]
+
+  Query Input:
+
+    listing__user__account_type
+
+  Issue Location:
+
+    [Resolve Query(['bookings'])]
+      -> [Resolve Metric('bookings')]
+        -> [Resolve Measure('bookings')]
