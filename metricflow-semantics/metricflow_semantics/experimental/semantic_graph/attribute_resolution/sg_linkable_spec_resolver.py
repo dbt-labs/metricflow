@@ -90,6 +90,8 @@ class SemanticGraphLinkableSpecResolver(LinkableSpecResolver):
         if cached_result:
             return cached_result.value
 
+        initial_traversal_profile = self._pathfinder.traversal_profile_snapshot
+
         matching_measure_nodes = self._semantic_graph.nodes_with_labels(
             MeasureLabel.get_instance(measure_name=measure_reference.element_name)
         )
@@ -111,6 +113,13 @@ class SemanticGraphLinkableSpecResolver(LinkableSpecResolver):
         group_by_metric_trie = self._group_by_metric_resolver.resolve_trie(
             source_nodes, element_filter
         ).dunder_name_trie
+
+        logger.info(
+            LazyFormat(
+                "Logging traversal-profile delta:",
+                delta=self._pathfinder.traversal_profile_snapshot.difference(initial_traversal_profile),
+            )
+        )
 
         return self._result_cache_for_measure.set_and_get(
             cache_key, AnnotatedSpecLinkableElementSet.create_from_trie(simple_trie, group_by_metric_trie)
