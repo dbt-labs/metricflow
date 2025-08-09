@@ -34,7 +34,7 @@ FROM (
         -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
         SELECT
-          DATETIME_TRUNC(ds, day) AS metric_time__day
+          TIMESTAMP_TRUNC(ds, day) AS metric_time__day
           , listing_id AS listing
           , 1 AS bookings
           , booking_value AS average_booking_value
@@ -56,7 +56,7 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      DATETIME_TRUNC(ds, day) AS metric_time__day
+      TIMESTAMP_TRUNC(ds, day) AS metric_time__day
       , SUM(booking_value) AS booking_value
     FROM ***************************.fct_bookings bookings_source_src_28000
     GROUP BY

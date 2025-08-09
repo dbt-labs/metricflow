@@ -20,7 +20,7 @@ FROM (
     -- Change Column Aliases
     -- Pass Only Elements: ['metric_time__month']
     SELECT
-      DATETIME_TRUNC(ds, month) AS metric_time__month
+      TIMESTAMP_TRUNC(ds, month) AS metric_time__month
     FROM ***************************.mf_time_spine time_spine_src_16006
     GROUP BY
       metric_time__month
@@ -28,7 +28,7 @@ FROM (
   INNER JOIN
     ***************************.fct_bookings_extended_monthly monthly_bookings_source_src_16000
   ON
-    DATE_SUB(CAST(subq_14.metric_time__month AS DATETIME), INTERVAL 1 month) = DATETIME_TRUNC(monthly_bookings_source_src_16000.ds, month)
+    DATE_SUB(CAST(subq_14.metric_time__month AS DATETIME), INTERVAL 1 month) = TIMESTAMP_TRUNC(monthly_bookings_source_src_16000.ds, month)
   GROUP BY
     metric_time__month
 ) subq_18

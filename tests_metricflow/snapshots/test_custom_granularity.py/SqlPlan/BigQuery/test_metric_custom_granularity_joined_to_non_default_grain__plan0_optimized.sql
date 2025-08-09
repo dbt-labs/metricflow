@@ -16,8 +16,8 @@ FROM (
   -- Read Elements From Semantic Model 'listings_latest'
   SELECT
     1 AS listings
-    , DATETIME_TRUNC(created_at, day) AS ds__day
-    , DATETIME_TRUNC(created_at, month) AS listing__ds__month
+    , TIMESTAMP_TRUNC(created_at, day) AS ds__day
+    , TIMESTAMP_TRUNC(created_at, month) AS listing__ds__month
   FROM ***************************.dim_listings_latest listings_latest_src_28000
 ) subq_6
 LEFT OUTER JOIN
