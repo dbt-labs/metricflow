@@ -5,7 +5,7 @@ import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from typing import FrozenSet, List, Optional, Sequence, Set, Tuple
+from typing import FrozenSet, Iterable, List, Optional, Sequence, Set, Tuple
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimensionTypeParams
@@ -21,7 +21,7 @@ from dbt_semantic_interfaces.references import (
 from dbt_semantic_interfaces.type_enums import DimensionType
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
-from metricflow_semantics.errors.error_classes import ExecutionException, InvalidQueryException
+from metricflow_semantics.errors.error_classes import ExecutionException, InvalidQueryException, UnknownMetricError
 from metricflow_semantics.experimental.metricflow_exception import MetricflowInternalError
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
@@ -663,11 +663,27 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             semantic_model_reference=None,
         )
 
+    def _check_metric_names(self, metric_names: Iterable[str]) -> None:
+        """Raise an error that indicates unknown metric names.
+
+        TODO: Check 0-length case. Seems like it's allowed / return an empty result.
+        """
+        unknown_metric_names = tuple(
+            metric_name
+            for metric_name in metric_names
+            if MetricReference(metric_name) not in self._semantic_manifest_lookup.metric_lookup.metric_references
+        )
+
+        if len(unknown_metric_names) > 0:
+            raise UnknownMetricError(unknown_metric_names)
+
     def simple_dimensions_for_metrics(  # noqa: D102
         self,
         metric_names: List[str],
         without_any_property: Sequence[LinkableElementProperty] = tuple(SIMPLE_DIMENSIONS_WITHOUT_ANY_PROPERTIES),
     ) -> List[Dimension]:
+        self._check_metric_names(metric_names)
+
         linkable_element_set = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_metrics(
             metric_references=tuple(MetricReference(element_name=mname) for mname in metric_names),
             element_set_filter=LinkableElementFilter(
