@@ -1,0 +1,9 @@
+test_name: test_simple_dimensions_for_metrics_with_invalid_metric
+test_filename: test_errors.py
+docstring:
+  Check the exception raised when invalid metric names are provided to `simple_dimensions_for_metrics`.
+---
+{
+  'one_invalid_metric': UnknownMetricError("Unknown metric: 'invalid_metric'"),
+  'multiple_invalid_metrics': UnknownMetricError("Unknown metrics: ['invalid_metric_0', 'invalid_metric_1']"),
+}
