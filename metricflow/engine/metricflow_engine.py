@@ -92,7 +92,7 @@ ENTITY_WITH_ANY_PROPERTIES: Set[LinkableElementProperty] = {LinkableElementPrope
 SearchableElementGeneric = TypeVar("SearchableElementGeneric", bound=SearchableElement)
 
 
-class DimensionOrderByAttribute(Enum):
+class GroupByOrderByAttribute(Enum):
     """Supported dimension attributes to order them by."""
 
     SEMANTIC_MODEL_NAME = "semantic_model_name"
@@ -364,6 +364,7 @@ class AbstractMetricFlowEngine(ABC):
         self,
         metric_names: Optional[List[str]] = None,
         include_derived_time_granularities: bool = False,
+        order_by: GroupByOrderByAttribute = GroupByOrderByAttribute.QUALIFIED_NAME,
     ) -> List[Entity | Dimension]:
         """List all group bys in the semantic manifest, with optional filters."""
         pass
@@ -749,7 +750,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     def list_dimensions(
         self,
         metric_names: Optional[List[str]] = None,
-        order_by: DimensionOrderByAttribute = DimensionOrderByAttribute.QUALIFIED_NAME,
+        order_by: GroupByOrderByAttribute = GroupByOrderByAttribute.QUALIFIED_NAME,
     ) -> List[Dimension]:
         """Get full dimension object for all dimensions in the semantic manifest."""
         dimensions: List[Dimension] = []
@@ -769,9 +770,9 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                     dimensions.append(dimension)
 
         def sort_dimensions(dimension: Dimension) -> Tuple[str, ...]:
-            if order_by == DimensionOrderByAttribute.QUALIFIED_NAME:
+            if order_by == GroupByOrderByAttribute.QUALIFIED_NAME:
                 return (dimension.qualified_name,)
-            elif order_by == DimensionOrderByAttribute.SEMANTIC_MODEL_NAME:
+            elif order_by == GroupByOrderByAttribute.SEMANTIC_MODEL_NAME:
                 return (
                     (
                         dimension.semantic_model_reference.semantic_model_name
@@ -918,6 +919,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         self,
         metric_names: Optional[List[str]] = None,
         include_derived_time_granularities: bool = False,
+        order_by: GroupByOrderByAttribute = GroupByOrderByAttribute.QUALIFIED_NAME,
     ) -> List[Entity | Dimension]:
         """List all possible group bys, or all group bys allowed for the selected metrics."""
         if metric_names:
@@ -936,7 +938,24 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         else:
             # TODO: better support for querying entities without metrics; include entities here at that time
             group_bys = self.list_dimensions()
-        return sorted(set(group_bys), key=lambda x: x.default_search_and_sort_attribute)
+
+        def sort_group_bys(group_by: Entity | Dimension) -> Tuple[str, ...]:
+            name_attr = group_by.qualified_name if isinstance(group_by, Dimension) else group_by.name
+            if order_by == GroupByOrderByAttribute.QUALIFIED_NAME:
+                return (name_attr,)
+            elif order_by == GroupByOrderByAttribute.SEMANTIC_MODEL_NAME:
+                return (
+                    (
+                        group_by.semantic_model_reference.semantic_model_name
+                        if group_by.semantic_model_reference
+                        else ""
+                    ),
+                    name_attr,
+                )
+            else:
+                assert_values_exhausted(order_by)
+
+        return sorted(set(group_bys), key=sort_group_bys)
 
     def group_by_exists(self, structured_name: StructuredLinkableSpecName) -> bool:
         """Check if a group by exists in the semantic manifest by its element name."""
