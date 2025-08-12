@@ -172,12 +172,15 @@ class Entity(SearchableElement):
     name: str
     description: Optional[str]
     type: EntityType
+    semantic_model_reference: SemanticModelReference
     role: Optional[str]
     config: Optional[SemanticLayerElementConfig] = None
     expr: Optional[str] = None
 
     @classmethod
-    def from_pydantic(cls, pydantic_entity: SemanticManifestEntity) -> Entity:
+    def from_pydantic(
+        cls, pydantic_entity: SemanticManifestEntity, semantic_model_reference: SemanticModelReference
+    ) -> Entity:
         """Build from pydantic Entity."""
         return cls(
             name=pydantic_entity.name,
@@ -186,6 +189,7 @@ class Entity(SearchableElement):
             role=pydantic_entity.role,
             config=pydantic_entity.config,
             expr=pydantic_entity.expr,
+            semantic_model_reference=semantic_model_reference,
         )
 
     @property

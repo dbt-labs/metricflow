@@ -815,7 +815,10 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                     )
                 )
                 if pydantic_entity:
-                    entity = Entity.from_pydantic(pydantic_entity)
+                    entity = Entity.from_pydantic(
+                        pydantic_entity=pydantic_entity,
+                        semantic_model_reference=semantic_model.reference,
+                    )
                     # Dedupe. Duplicates currently show up because of local linked entities.
                     if entity not in entities:
                         entities.append(entity)
