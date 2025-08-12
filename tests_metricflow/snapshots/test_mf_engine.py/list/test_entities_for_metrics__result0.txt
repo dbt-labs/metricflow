@@ -3,4 +3,11 @@ test_filename: test_mf_engine.py
 docstring:
   Test listing entities with metric filter.
 ---
-['company', 'guest', 'host', 'listing', 'lux_listing', 'user']
+[
+  ('companies', 'company'),
+  ('bookings_source', 'guest'),
+  ('bookings_source', 'host'),
+  ('bookings_source', 'listing'),
+  ('lux_listing_mapping', 'lux_listing'),
+  ('listings_latest', 'user'),
+]
