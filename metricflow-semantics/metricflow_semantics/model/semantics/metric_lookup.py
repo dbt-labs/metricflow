@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import Dict, Optional, Sequence, Set, Tuple
+from typing import Dict, Iterable, Optional, Sequence, Set, Tuple
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols.metric import Metric, MetricInputMeasure, MetricType
@@ -12,6 +12,7 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow_semantics.collection_helpers.lru_cache import LruCache
 from metricflow_semantics.errors.error_classes import DuplicateMetricError, MetricNotFoundError, NonExistentMeasureError
+from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
@@ -199,7 +200,7 @@ class MetricLookup:
         self._linkable_elements_for_metrics_cache.set(cache_key, result)
         return result
 
-    def get_metrics(self, metric_references: Sequence[MetricReference]) -> Sequence[Metric]:  # noqa: D102
+    def get_metrics(self, metric_references: Iterable[MetricReference]) -> Sequence[Metric]:  # noqa: D102
         res = []
         for metric_reference in metric_references:
             if metric_reference not in self._metrics:
@@ -211,8 +212,8 @@ class MetricLookup:
         return res
 
     @property
-    def metric_references(self) -> Sequence[MetricReference]:  # noqa: D102
-        return sorted(self._metrics.keys())
+    def metric_references(self) -> FrozenOrderedSet[MetricReference]:  # noqa: D102
+        return FrozenOrderedSet(sorted(self._metrics.keys()))
 
     def get_metric(self, metric_reference: MetricReference) -> Metric:  # noqa: D102
         if metric_reference not in self._metrics:

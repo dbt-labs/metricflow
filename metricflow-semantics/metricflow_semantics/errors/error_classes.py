@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import textwrap
+from collections.abc import Sequence
 from typing import Dict, Optional
 
 
@@ -69,8 +70,17 @@ class SqlBindParametersNotSupportedError(Exception):
     """Raised when a SqlClient that does not have support for bind parameters receives a non-empty set of params."""
 
 
-class UnknownMetricLinkingError(InformativeUserError):
-    """Raised during linking when a user attempts to use a metric that isn't specified."""
+class UnknownMetricError(InformativeUserError):
+    """Raised when user input contains metric names that are not known."""
+
+    def __init__(self, metric_names: Sequence[str]) -> None:  # noqa: D107
+        name_count = len(metric_names)
+        if name_count == 0:
+            raise RuntimeError(f"Can't create an {self.__class__.__name__} without metric names")
+        elif name_count == 1:
+            super().__init__(f"Unknown metric: {repr(metric_names[0])}")
+        else:
+            super().__init__(f"Unknown metrics: {list(metric_names)}")
 
 
 class InvalidQuerySyntax(InformativeUserError):

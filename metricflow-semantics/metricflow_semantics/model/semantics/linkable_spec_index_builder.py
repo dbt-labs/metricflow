@@ -22,7 +22,7 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 
-from metricflow_semantics.errors.error_classes import UnknownMetricLinkingError
+from metricflow_semantics.errors.error_classes import UnknownMetricError
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
@@ -700,7 +700,7 @@ class LinkableSpecIndexBuilder:
         for metric_reference in metric_references:
             element_sets = self._linkable_spec_index.metric_to_linkable_element_sets.get(metric_reference.element_name)
             if not element_sets:
-                raise UnknownMetricLinkingError(
+                raise UnknownMetricError(
                     LazyFormat(
                         "Did not find a non-empty element set for the given metric",
                         metric_reference=metric_reference,

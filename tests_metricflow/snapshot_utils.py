@@ -70,8 +70,8 @@ def assert_dataflow_plan_text_equal(  # noqa: D103
 def assert_object_snapshot_equal(  # type: ignore[misc]
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    obj_id: str,
     obj: Any,
+    obj_id: str = "result",
     sql_client: Optional[SqlClient] = None,
     expectation_description: Optional[str] = None,
 ) -> None:

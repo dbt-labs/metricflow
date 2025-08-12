@@ -19,7 +19,7 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
 
-from metricflow_semantics.errors.error_classes import UnknownMetricLinkingError
+from metricflow_semantics.errors.error_classes import UnknownMetricError
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
@@ -327,7 +327,7 @@ class LegacyLinkableSpecResolver(LinkableSpecResolver):
         for metric_reference in metric_references:
             element_sets = self._linkable_spec_index.metric_to_linkable_element_sets.get(metric_reference.element_name)
             if not element_sets:
-                raise UnknownMetricLinkingError(f"Unknown metric: {metric_reference} in element set")
+                raise UnknownMetricError(f"Unknown metric: {metric_reference} in element set")
 
             # Using .only_unique_path_keys to exclude ambiguous elements where there are multiple join paths to get
             # a dimension / entity.
