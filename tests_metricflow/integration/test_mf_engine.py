@@ -4,7 +4,7 @@ from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
-from metricflow.engine.metricflow_engine import DimensionOrderByAttribute
+from metricflow.engine.metricflow_engine import GroupByOrderByAttribute
 from tests_metricflow.integration.conftest import IntegrationTestHelpers
 from tests_metricflow.snapshot_utils import assert_object_snapshot_equal
 
@@ -66,7 +66,7 @@ def test_list_dimensions_order_by_semantic_model_name(  # noqa: D103
     request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, it_helpers: IntegrationTestHelpers
 ) -> None:
     """Test getting dimensions for a single metric."""
-    single_metric_dims = it_helpers.mf_engine.list_dimensions(order_by=DimensionOrderByAttribute.SEMANTIC_MODEL_NAME)
+    single_metric_dims = it_helpers.mf_engine.list_dimensions(order_by=GroupByOrderByAttribute.SEMANTIC_MODEL_NAME)
     assert_object_snapshot_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
@@ -77,6 +77,25 @@ def test_list_dimensions_order_by_semantic_model_name(  # noqa: D103
                 dim.qualified_name,
             )
             for dim in single_metric_dims
+        ],
+    )
+
+
+def test_list_group_bys_order_by_semantic_model_name(  # noqa: D103
+    request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, it_helpers: IntegrationTestHelpers
+) -> None:
+    """Test getting group bys ordered by semantic model name."""
+    group_bys = it_helpers.mf_engine.list_group_bys(order_by=GroupByOrderByAttribute.SEMANTIC_MODEL_NAME)
+    assert_object_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        obj_id="result0",
+        obj=[
+            (
+                group_by.semantic_model_reference.semantic_model_name if group_by.semantic_model_reference else "",
+                group_by.qualified_name if hasattr(group_by, "qualified_name") else group_by.name,
+            )
+            for group_by in group_bys
         ],
     )
 
@@ -104,7 +123,13 @@ def test_entities_for_metrics(  # noqa: D103
         request=request,
         mf_test_configuration=mf_test_configuration,
         obj_id="result0",
-        obj=[entity.name for entity in entities],
+        obj=[
+            (
+                entity.semantic_model_reference.semantic_model_name,
+                entity.name,
+            )
+            for entity in entities
+        ],
     )
 
 

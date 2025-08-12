@@ -1,0 +1,40 @@
+test_name: test_list_group_bys_order_by_semantic_model_name
+test_filename: test_mf_engine.py
+docstring:
+  Test getting group bys ordered by semantic model name.
+---
+[
+  ('accounts_source', 'account__account_type'),
+  ('accounts_source', 'account__ds'),
+  ('accounts_source', 'account__ds_month'),
+  ('bookings_source', 'booking__ds'),
+  ('bookings_source', 'booking__ds_partitioned'),
+  ('bookings_source', 'booking__is_instant'),
+  ('bookings_source', 'booking__paid_at'),
+  ('buys_source', 'buy__ds'),
+  ('buys_source', 'buy__ds_month'),
+  ('companies', 'company__company_name'),
+  ('id_verifications', 'verification__ds'),
+  ('id_verifications', 'verification__ds_partitioned'),
+  ('id_verifications', 'verification__verification_type'),
+  ('listings_latest', 'listing__capacity_latest'),
+  ('listings_latest', 'listing__country_latest'),
+  ('listings_latest', 'listing__created_at'),
+  ('listings_latest', 'listing__ds'),
+  ('listings_latest', 'listing__is_lux_latest'),
+  ('revenue', 'revenue_instance__ds'),
+  ('users_ds_source', 'user__archived_at'),
+  ('users_ds_source', 'user__bio_added_ts'),
+  ('users_ds_source', 'user__created_at'),
+  ('users_ds_source', 'user__ds'),
+  ('users_ds_source', 'user__ds_partitioned'),
+  ('users_ds_source', 'user__home_state'),
+  ('users_ds_source', 'user__last_login_ts'),
+  ('users_ds_source', 'user__last_profile_edit_ts'),
+  ('users_latest', 'user__ds_latest'),
+  ('users_latest', 'user__home_state_latest'),
+  ('views_source', 'view__ds'),
+  ('views_source', 'view__ds_partitioned'),
+  ('visits_source', 'visit__ds'),
+  ('visits_source', 'visit__referrer_id'),
+]
