@@ -26,6 +26,6 @@ ON
 LEFT OUTER JOIN
   ***************************.mf_time_spine subq_15
 ON
-  DATETIME_TRUNC(listings_latest_src_28000.created_at, day) = subq_15.ds
+  TIMESTAMP_TRUNC(listings_latest_src_28000.created_at, day) = subq_15.ds
 GROUP BY
   listing__ds__alien_day

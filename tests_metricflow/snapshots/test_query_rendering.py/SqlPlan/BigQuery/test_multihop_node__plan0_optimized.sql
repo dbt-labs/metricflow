@@ -17,7 +17,7 @@ LEFT OUTER JOIN (
   -- Join Standard Outputs
   -- Pass Only Elements: ['customer_id__customer_name', 'ds_partitioned__day', 'account_id']
   SELECT
-    DATETIME_TRUNC(bridge_table_src_22000.ds_partitioned, day) AS ds_partitioned__day
+    TIMESTAMP_TRUNC(bridge_table_src_22000.ds_partitioned, day) AS ds_partitioned__day
     , bridge_table_src_22000.account_id AS account_id
     , customer_table_src_22000.customer_name AS customer_id__customer_name
   FROM ***************************.bridge_table bridge_table_src_22000
@@ -27,14 +27,14 @@ LEFT OUTER JOIN (
     (
       bridge_table_src_22000.customer_id = customer_table_src_22000.customer_id
     ) AND (
-      DATETIME_TRUNC(bridge_table_src_22000.ds_partitioned, day) = DATETIME_TRUNC(customer_table_src_22000.ds_partitioned, day)
+      TIMESTAMP_TRUNC(bridge_table_src_22000.ds_partitioned, day) = TIMESTAMP_TRUNC(customer_table_src_22000.ds_partitioned, day)
     )
 ) subq_24
 ON
   (
     account_month_txns_src_22000.account_id = subq_24.account_id
   ) AND (
-    DATETIME_TRUNC(account_month_txns_src_22000.ds_partitioned, day) = subq_24.ds_partitioned__day
+    TIMESTAMP_TRUNC(account_month_txns_src_22000.ds_partitioned, day) = subq_24.ds_partitioned__day
   )
 GROUP BY
   account_id__customer_id__customer_name

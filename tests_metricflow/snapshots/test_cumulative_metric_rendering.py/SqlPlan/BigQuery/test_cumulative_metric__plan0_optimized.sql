@@ -11,7 +11,7 @@ sql_engine: BigQuery
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  DATETIME_TRUNC(created_at, day) AS ds__day
+  TIMESTAMP_TRUNC(created_at, day) AS ds__day
   , SUM(revenue) AS trailing_2_months_revenue
 FROM ***************************.fct_revenue revenue_src_28000
 GROUP BY
