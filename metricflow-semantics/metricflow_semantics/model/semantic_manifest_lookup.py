@@ -61,6 +61,7 @@ class SemanticManifestLookup:
             semantic_graph = graph_builder.build()
 
             linkable_spec_resolver = SemanticGraphLinkableSpecResolver(
+                manifest_object_lookup=manifest_object_lookup,
                 semantic_graph=semantic_graph,
                 path_finder=pathfinder,
             )

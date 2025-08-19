@@ -8,7 +8,6 @@ from dbt_semantic_interfaces.type_enums import DatePart, TimeGranularity
 from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
-from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe_step import (
     AttributeRecipeStep,
 )
@@ -27,7 +26,6 @@ from metricflow_semantics.experimental.semantic_graph.nodes.entity_nodes import 
 from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
     SemanticGraphEdge,
 )
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
@@ -50,21 +48,7 @@ class TimeEntitySubgraphGenerator(SemanticSubgraphGenerator):
 
     @override
     def add_edges_for_manifest(self, edge_list: list[SemanticGraphEdge]) -> None:
-        min_time_grain = self._manifest_object_lookup.min_time_grain
-
-        if min_time_grain is None:
-            raise InvalidManifestException(
-                LazyFormat(
-                    "Did not find any time dimensions in the manifest",
-                    min_time_grain=min_time_grain,
-                    semantic_models=[
-                        model_lookup.semantic_model
-                        for model_lookup in self._manifest_object_lookup.model_object_lookups
-                    ],
-                )
-            )
-
-        self._add_edges_for_time_entity_subgraph(min_time_grain, edge_list)
+        self._add_edges_for_time_entity_subgraph(self._manifest_object_lookup.min_time_grain_used_in_models, edge_list)
 
     def _add_edges_for_time_entity_subgraph(
         self, min_time_grain: TimeGranularity, edge_list: list[SemanticGraphEdge]
