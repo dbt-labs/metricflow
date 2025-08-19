@@ -9,12 +9,14 @@ from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item
 from metricflow_semantics.experimental.cache.mf_cache import ResultCache
+from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.experimental.metricflow_exception import MetricflowInternalError
 from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricflowPathfinder
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
     AnnotatedSpecLinkableElementSet,
 )
+from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe import IndexedDunderName
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.recipe_writer_path import (
     AttributeRecipeWriterPath,
 )
@@ -29,6 +31,7 @@ from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
     SemanticGraphEdge,
     SemanticGraphNode,
 )
+from metricflow_semantics.experimental.semantic_graph.trie_resolver.dunder_name_descriptor import DunderNameDescriptor
 from metricflow_semantics.experimental.semantic_graph.trie_resolver.dunder_name_trie import (
     DunderNameTrie,
     MutableDunderNameTrie,
@@ -52,9 +55,12 @@ class SemanticGraphLinkableSpecResolver(LinkableSpecResolver):
     def __init__(  # noqa: D107
         self,
         semantic_graph: SemanticGraph,
+        manifest_object_lookup: ManifestObjectLookup,
         path_finder: MetricflowPathfinder[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath],
     ) -> None:
         self._semantic_graph = semantic_graph
+        self._pathfinder = path_finder
+        self._manifest_object_lookup = manifest_object_lookup
         self._simple_resolver = SimpleTrieResolver(semantic_graph, path_finder)
         self._simple_resolver_limit_one_model = SimpleTrieResolver(semantic_graph, path_finder, max_path_model_count=1)
         self._group_by_metric_resolver = GroupByMetricTrieResolver(semantic_graph, path_finder)
@@ -130,9 +136,32 @@ class SemanticGraphLinkableSpecResolver(LinkableSpecResolver):
             tries_to_union.append(local_model_trie)
             tries_to_union.append(group_by_metric_trie)
 
-        tries_to_union.append(
-            self._simple_resolver.resolve_trie(self._metric_time_node_set, element_filter).dunder_name_trie
-        )
+        metric_time_trie = self._simple_resolver.resolve_trie(
+            self._metric_time_node_set, element_filter
+        ).dunder_name_trie
+
+        # Since `TimeEntitySubgraphGenerator` could add time grain nodes that are finer than the grain of time spine,
+        # filter those out.
+        int_value_of_min_time_spine_grain = self._manifest_object_lookup.min_time_grain.to_int()
+        filtered_items_from_metric_time_trie: list[tuple[IndexedDunderName, DunderNameDescriptor]] = []
+
+        for indexed_dunder_name, descriptor in metric_time_trie.name_items():
+            # Allow `metric_time` at grains >= min grain.
+            if (
+                descriptor.time_grain is not None
+                and descriptor.time_grain.base_granularity.to_int() >= int_value_of_min_time_spine_grain
+            ):
+                filtered_items_from_metric_time_trie.append((indexed_dunder_name, descriptor))
+            # Allow `metric_time` with a date part compatible with the min grain.
+            elif (
+                descriptor.date_part is not None and descriptor.date_part.to_int() >= int_value_of_min_time_spine_grain
+            ):
+                filtered_items_from_metric_time_trie.append((indexed_dunder_name, descriptor))
+
+        filtered_metric_time_trie = MutableDunderNameTrie()
+        filtered_metric_time_trie.add_name_items(filtered_items_from_metric_time_trie)
+
+        tries_to_union.append(filtered_metric_time_trie)
         result_trie = MutableDunderNameTrie.union_merge_common(tries_to_union)
 
         return self._result_cache_for_distinct_values.set_and_get(

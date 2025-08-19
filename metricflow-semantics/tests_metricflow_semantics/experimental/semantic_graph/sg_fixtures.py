@@ -66,6 +66,7 @@ class SemanticGraphTestFixture:
 
     def create_sg_resolver(self) -> SemanticGraphLinkableSpecResolver:  # noqa: D102
         return SemanticGraphLinkableSpecResolver(
+            manifest_object_lookup=self.manifest_object_lookup,
             semantic_graph=self.semantic_graph,
             path_finder=self.pathfinder,
         )

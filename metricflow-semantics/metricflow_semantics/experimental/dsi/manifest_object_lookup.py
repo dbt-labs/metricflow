@@ -11,11 +11,12 @@ from dbt_semantic_interfaces.type_enums import TimeGranularity
 from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple, T
-from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item
+from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item, mf_flatten
 from metricflow_semantics.experimental.dsi.measure_model_object_lookup import MeasureContainingModelObjectLookup
 from metricflow_semantics.experimental.dsi.model_object_lookup import (
     ModelObjectLookup,
 )
+from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.mf_logging.attribute_pretty_format import AttributeMapping, AttributePrettyFormattable
@@ -120,6 +121,26 @@ class ManifestObjectLookup(AttributePrettyFormattable):
     def min_time_grain(self) -> TimeGranularity:
         """Return the smallest time grain as configured in the time spine."""
         return mf_first_item(sorted(self._time_spine_sources.keys()))
+
+    @cached_property
+    def min_time_grain_used_in_models(self) -> TimeGranularity:
+        """Return the smallest time grain that's used to define a time dimension."""
+        min_time_grain = min(
+            mf_flatten(
+                model_object_lookup.time_dimension_name_to_grain.values()
+                for model_object_lookup in self.model_object_lookups
+            )
+        )
+
+        if min_time_grain is None:
+            raise InvalidManifestException(
+                LazyFormat(
+                    "Did not find any time dimensions in the manifest",
+                    min_time_grain=min_time_grain,
+                    semantic_model_count=len(self._semantic_manifest.semantic_models),
+                )
+            )
+        return min_time_grain
 
     @cached_property
     def expanded_time_grains(self) -> AnyLengthTuple[ExpandedTimeGranularity]:
