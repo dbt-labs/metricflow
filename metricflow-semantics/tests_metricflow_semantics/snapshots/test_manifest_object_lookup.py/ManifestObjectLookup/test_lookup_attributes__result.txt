@@ -27,6 +27,7 @@ ManifestObjectLookup(
       ),
     ),
   ),
-  min_time_grain=QUARTER,
+  min_time_grain_in_time_spine=QUARTER,
+  min_time_grain_used_in_models=QUARTER,
   expanded_time_grains=(ExpandedTimeGranularity(name='custom_year', base_granularity=YEAR),),
 )
