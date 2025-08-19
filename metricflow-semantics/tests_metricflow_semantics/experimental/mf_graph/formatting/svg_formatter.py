@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import typing
+from typing import Optional
 
 from metricflow_semantics.experimental.metricflow_exception import GraphvizException
 from metricflow_semantics.experimental.mf_graph.formatting.graph_formatter import MetricflowGraphFormatter
@@ -23,8 +24,8 @@ logger = logging.getLogger(__name__)
 class SvgFormatter(MetricflowGraphFormatter):
     """Format a graph as an SVG that can be displayed in a browser."""
 
-    def __init__(self) -> None:  # noqa: D107
-        self._mf_to_dot_graph_converter = MetricflowGraphToGraphicalDotConverter()
+    def __init__(self, converter: Optional[MetricflowGraphToGraphicalDotConverter] = None) -> None:  # noqa: D107
+        self._mf_to_dot_graph_converter = converter or MetricflowGraphToGraphicalDotConverter()
         self._verbose_debug_logs = False
 
     @override

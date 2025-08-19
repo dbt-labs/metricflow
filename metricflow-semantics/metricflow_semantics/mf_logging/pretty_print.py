@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 def mf_pformat(  # type: ignore
     obj: Any,
-    format_option: PrettyFormatOption = PrettyFormatOption(),
+    format_option: Optional[PrettyFormatOption] = None,
 ) -> str:
     """Print objects in a pretty way for logging / test snapshots.
 
