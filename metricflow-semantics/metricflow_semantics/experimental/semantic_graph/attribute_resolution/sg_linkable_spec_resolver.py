@@ -142,7 +142,7 @@ class SemanticGraphLinkableSpecResolver(LinkableSpecResolver):
 
         # Since `TimeEntitySubgraphGenerator` could add time grain nodes that are finer than the grain of time spine,
         # filter those out.
-        int_value_of_min_time_spine_grain = self._manifest_object_lookup.min_time_grain.to_int()
+        int_value_of_min_time_spine_grain = self._manifest_object_lookup.min_time_grain_in_time_spine.to_int()
         filtered_items_from_metric_time_trie: list[tuple[IndexedDunderName, DunderNameDescriptor]] = []
 
         for indexed_dunder_name, descriptor in metric_time_trie.name_items():

@@ -118,7 +118,7 @@ class ManifestObjectLookup(AttributePrettyFormattable):
         )
 
     @cached_property
-    def min_time_grain(self) -> TimeGranularity:
+    def min_time_grain_in_time_spine(self) -> TimeGranularity:
         """Return the smallest time grain as configured in the time spine."""
         return mf_first_item(sorted(self._time_spine_sources.keys()))
 
@@ -185,7 +185,12 @@ class ManifestObjectLookup(AttributePrettyFormattable):
             **super()._attribute_mapping,
             **{
                 attribute_name: getattr(self, attribute_name)
-                for attribute_name in ("model_object_lookups", "min_time_grain", "expanded_time_grains")
+                for attribute_name in (
+                    "model_object_lookups",
+                    "min_time_grain_in_time_spine",
+                    "min_time_grain_used_in_models",
+                    "expanded_time_grains",
+                )
             },
         )
 
