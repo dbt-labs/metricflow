@@ -1,0 +1,11 @@
+test_name: test_format_report_to_text_table
+test_filename: test_report_formatter.py
+docstring:
+  Tests formatting a performance report to a text table.
+---
+Session ID: Profile `_recurse_n_times(2)`
+┌─────────┬────────┬─────────────────────────────────────────────────────────┬─────────┬──────────────┐
+│ total   │ body   │ function_name                                           │ calls   │ base_calls   │
+├─────────┼────────┼─────────────────────────────────────────────────────────┼─────────┼──────────────┤
+│ 0.000   │ 0.000  │ test_report_formatter.py:** :: _recurse_n_times········ │     3   │          1   │
+└─────────┴────────┴─────────────────────────────────────────────────────────┴─────────┴──────────────┘
