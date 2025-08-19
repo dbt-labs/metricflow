@@ -60,6 +60,10 @@ def test_metric_correctness(sg_tester: SemanticGraphTester) -> None:  # noqa: D1
     )
 
 
+def test_metric_correctness_for_empty_set(sg_tester: SemanticGraphTester) -> None:  # noqa: D103
+    sg_tester.compare_resolver_outputs_for_metrics((), element_filter=LinkableElementFilter())
+
+
 def test_multi_metric_correctness(sg_tester: SemanticGraphTester) -> None:  # noqa: D103
     sg_tester.compare_resolver_outputs_for_metrics(
         (MetricReference("bookings"), MetricReference("listings")),

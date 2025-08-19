@@ -145,6 +145,9 @@ class SemanticGraphLinkableSpecResolver(LinkableSpecResolver):
         metric_references: Sequence[MetricReference],
         element_filter: Optional[LinkableElementFilter] = None,
     ) -> BaseLinkableElementSet:
+        if len(metric_references) == 0:
+            return AnnotatedSpecLinkableElementSet()
+
         cache_key = (FrozenOrderedSet(sorted(metric_references)), element_filter)
         cache_result = self._result_cache_for_metrics.get(cache_key)
         if cache_result:
