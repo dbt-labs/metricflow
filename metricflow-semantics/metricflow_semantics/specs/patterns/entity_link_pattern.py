@@ -97,16 +97,43 @@ class EntityLinkPattern(SpecPattern):
     parameter_set: SpecPatternParameterSet
 
     def _match_entity_links(self, candidate_specs: Sequence[LinkableInstanceSpec]) -> Sequence[LinkableInstanceSpec]:
+        """Match entity links.
+
+        Suffix matching allows a pattern to match specs where the entity links are a suffix of the pattern. This is
+        necessary when the pattern is based on the name, and names are given by the user via the object-builder
+        syntax.
+
+        e.g. to query distinct values of "user_id__country", "user_id__country" should match a spec with entity links
+        ("listing", "user_id") since ("user_id") is a suffix of ("user_id")
+        """
         assert self.parameter_set.entity_links is not None
         num_links_to_check = len(self.parameter_set.entity_links)
-        matching_specs: Sequence[LinkableInstanceSpec] = tuple(
-            candidate_spec
-            for candidate_spec in candidate_specs
+        matching_specs: List[LinkableInstanceSpec] = []
+
+        for candidate_spec in candidate_specs:
+            # Check if they match using the existing logic (tail matching)
             if (
                 self.parameter_set.entity_links[-num_links_to_check:]
                 == candidate_spec.entity_links[-num_links_to_check:]
-            )
-        )
+            ):
+                matching_specs.append(candidate_spec)
+                continue
+
+            # Additional check for PRIMARY/FOREIGN entity path equivalence
+            # Only apply to DimensionSpecs (not EntitySpecs) when pattern has exactly one more entity link
+            from metricflow_semantics.specs.dimension_spec import DimensionSpec
+
+            candidate_len = len(candidate_spec.entity_links)
+            if (
+                isinstance(candidate_spec, DimensionSpec)
+                and candidate_len > 0
+                and num_links_to_check == candidate_len + 1
+            ):
+                # Check if the candidate's entity links match the last N entity links of the pattern
+                # where N is the length of the candidate's entity links
+                pattern_suffix = self.parameter_set.entity_links[-candidate_len:]
+                if pattern_suffix == candidate_spec.entity_links:
+                    matching_specs.append(candidate_spec)
 
         if len(matching_specs) <= 1:
             return matching_specs
@@ -114,20 +141,33 @@ class EntityLinkPattern(SpecPattern):
         # If multiple match, then return only the ones with the shortest entity link path. There could be multiple
         # e.g. booking__listing__country and listing__country will match with listing__country.
         shortest_entity_link_length = min(len(matching_spec.entity_links) for matching_spec in matching_specs)
-        return tuple(spec for spec in matching_specs if len(spec.entity_links) == shortest_entity_link_length)
+        return [
+            matching_spec
+            for matching_spec in matching_specs
+            if len(matching_spec.entity_links) == shortest_entity_link_length
+        ]
 
     def _match_time_granularities(
         self, candidate_specs: Sequence[LinkableInstanceSpec]
     ) -> Sequence[LinkableInstanceSpec]:
         """Do a partial match on time granularities."""
-        matching_specs: Sequence[LinkableInstanceSpec] = tuple(
+        grouped_specs = group_specs_by_type(candidate_specs)
+
+        # For time dimension specs, filter by time granularity
+        matching_time_specs: List[LinkableInstanceSpec] = [
             candidate_spec
-            for candidate_spec in group_specs_by_type(candidate_specs).time_dimension_specs
+            for candidate_spec in grouped_specs.time_dimension_specs
             if candidate_spec.time_granularity_name
             == (self.parameter_set.time_granularity_name.lower() if self.parameter_set.time_granularity_name else None)
-        )
+        ]
 
-        return matching_specs
+        # Pass through all non-time dimension specs unchanged
+        return (
+            tuple(matching_time_specs)
+            + grouped_specs.dimension_specs
+            + grouped_specs.entity_specs
+            + grouped_specs.group_by_metric_specs
+        )
 
     @override
     def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[LinkableInstanceSpec]:
