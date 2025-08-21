@@ -493,9 +493,26 @@ metric:
         alias: bookings_2_weeks_ago
 ---
 metric:
+  name: bookings_all_time
+  description: bookings cumulative all time
+  type: cumulative
+  type_params:
+    measure: bookings
+---
+metric:
+  name: bookings_all_time_at_start_of_month
+  description: bookings at the start of the month
+  type: derived
+  type_params:
+    expr: bookings_all_time
+    metrics:
+      - name: bookings_all_time
+        offset_to_grain: month
+---
+metric:
   name: "bookings_growth_since_start_of_month"
   description: |
-    percentage growth of bookings since the start of the month,
+    count of bookings on a given day compared to the start of the month,
     used to test derived metrics with an offset_to_grain.
   type: derived
   type_params:
@@ -505,6 +522,19 @@ metric:
       - name: bookings
         offset_to_grain: month
         alias: bookings_at_start_of_month
+---
+metric:
+  name: bookings_since_start_of_month
+  description: |
+    count of bookings since the start of the month, used to test derived metrics with an offset_to_grain.
+  type: derived
+  type_params:
+    expr: bookings_all_time - bookings_all_time_at_start_of_month
+    metrics:
+      - name: bookings_all_time
+      - name: bookings_all_time
+        offset_to_grain: month
+        alias: bookings_all_time_at_start_of_month
 ---
 metric:
   name: "bookings_month_start_compared_to_1_month_prior"
@@ -753,6 +783,28 @@ metric:
         offset_to_grain: month
         alias: booking_fees_start_of_month
       - name: booking_fees
+---
+metric:
+  name: bookings_1_month_ago
+  description: bookings 1 month ago
+  type: derived
+  type_params:
+    expr: bookings
+    metrics:
+      - name: bookings
+        offset_window: 1 month
+---
+metric:
+  name: bookings_mom
+  description: bookings month over month
+  type: derived
+  type_params:
+    expr: (bookings - bookings_1_month_ago) / NULLIF(bookings_1_month_ago, 0)
+    metrics:
+      - name: bookings
+        offset_window: 1 month
+        alias: bookings_1_month_ago
+      - name: bookings
 ---
 metric:
   name: "derived_bookings_0"
