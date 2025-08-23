@@ -30,10 +30,10 @@ LEFT OUTER JOIN (
     -- Constrain Time Range to [2020-01-01T02:00:00, 2020-01-01T05:00:00]
     -- Pass Only Elements: ['archived_users', 'metric_time__hour']
     SELECT
-      DATETIME_TRUNC(archived_at, hour) AS metric_time__hour
+      TIMESTAMP_TRUNC(archived_at, hour) AS metric_time__hour
       , 1 AS archived_users
     FROM ***************************.dim_users users_ds_source_src_28000
-    WHERE DATETIME_TRUNC(archived_at, hour) BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
+    WHERE TIMESTAMP_TRUNC(archived_at, hour) BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
   ) subq_16
   GROUP BY
     metric_time__hour

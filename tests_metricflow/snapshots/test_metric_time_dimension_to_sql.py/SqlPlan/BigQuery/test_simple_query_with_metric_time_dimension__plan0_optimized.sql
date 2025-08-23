@@ -11,8 +11,8 @@ WITH rss_28020_cte AS (
   SELECT
     1 AS bookings
     , booking_value AS booking_payments
-    , DATETIME_TRUNC(ds, day) AS ds__day
-    , DATETIME_TRUNC(paid_at, day) AS paid_at__day
+    , TIMESTAMP_TRUNC(ds, day) AS ds__day
+    , TIMESTAMP_TRUNC(paid_at, day) AS paid_at__day
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 

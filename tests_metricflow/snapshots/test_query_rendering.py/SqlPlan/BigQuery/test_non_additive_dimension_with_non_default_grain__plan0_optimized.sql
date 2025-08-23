@@ -15,7 +15,7 @@ FROM (
   -- Read Elements From Semantic Model 'accounts_source'
   -- Metric Time Dimension 'ds_month'
   SELECT
-    DATETIME_TRUNC(ds_month, month) AS ds_month__month
+    TIMESTAMP_TRUNC(ds_month, month) AS ds_month__month
     , account_balance AS total_account_balance_first_day_of_month
   FROM ***************************.fct_accounts accounts_source_src_28000
 ) subq_9
@@ -24,7 +24,7 @@ INNER JOIN (
   -- Metric Time Dimension 'ds_month'
   -- Filter row on MIN(ds_month__month)
   SELECT
-    MIN(DATETIME_TRUNC(ds_month, month)) AS ds_month__month__complete
+    MIN(TIMESTAMP_TRUNC(ds_month, month)) AS ds_month__month__complete
   FROM ***************************.fct_accounts accounts_source_src_28000
 ) subq_11
 ON

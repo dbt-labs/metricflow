@@ -29,10 +29,10 @@ INNER JOIN (
   -- Metric Time Dimension 'ds'
   -- Constrain Time Range to [2019-11-01T00:00:00, 2020-01-01T00:00:00]
   SELECT
-    DATETIME_TRUNC(created_at, day) AS metric_time__day
+    TIMESTAMP_TRUNC(created_at, day) AS metric_time__day
     , revenue AS txn_revenue
   FROM ***************************.fct_revenue revenue_src_28000
-  WHERE DATETIME_TRUNC(created_at, day) BETWEEN '2019-11-01' AND '2020-01-01'
+  WHERE TIMESTAMP_TRUNC(created_at, day) BETWEEN '2019-11-01' AND '2020-01-01'
 ) subq_13
 ON
   (

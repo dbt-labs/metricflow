@@ -26,9 +26,9 @@ FROM (
     ***************************.fct_bookings bookings_source_src_28000
   ON
     (
-      DATETIME_TRUNC(bookings_source_src_28000.ds, day) <= subq_12.ds
+      TIMESTAMP_TRUNC(bookings_source_src_28000.ds, day) <= subq_12.ds
     ) AND (
-      DATETIME_TRUNC(bookings_source_src_28000.ds, day) > DATE_SUB(CAST(subq_12.ds AS DATETIME), INTERVAL 2 day)
+      TIMESTAMP_TRUNC(bookings_source_src_28000.ds, day) > DATE_SUB(CAST(subq_12.ds AS DATETIME), INTERVAL 2 day)
     )
 ) subq_13
 WHERE metric_time__day = '2020-01-03' or metric_time__day = '2020-01-07'
