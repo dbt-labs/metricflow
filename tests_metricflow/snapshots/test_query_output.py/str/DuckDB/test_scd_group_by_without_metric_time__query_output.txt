@@ -3,6 +3,6 @@ test_filename: test_query_output.py
 ---
   listing__capacity    family_bookings
 -------------------  -----------------
-                  3                  2
-                  4                  5
-                  5                  2
+                  3                 38
+                  4                 43
+                  5                 39

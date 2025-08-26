@@ -3,4 +3,4 @@ test_filename: test_query_output.py
 ---
   family_bookings
 -----------------
-                9
+              120
