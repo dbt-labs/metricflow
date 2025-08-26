@@ -1365,15 +1365,9 @@ class DataflowPlanBuilder:
             measure_reference=measure_spec.reference, semantic_model_lookup=self._semantic_model_lookup
         )
         smallest_queried_agg_time_grain: Optional[ExpandedTimeGranularity] = None
-
-        # If querying an offset metric, will join to time spine. Typically this join will happen before aggregation,
-        # since aggregation often obscures the grain needed for the offset. However, for offset_window, if the grain
-        # we'll aggregate to matches the offset grain, the results make more sense if the join happens post-aggregation,
-        # so we make an exception for that case (common for period over period metrics).
         before_aggregation_time_spine_join_description = None
         after_aggregation_time_spine_join_description = None
         if child_metric_offset_window is not None or child_metric_offset_to_grain is not None:
-            # Determine the base grain for the offset
             if child_metric_offset_window is not None:
                 offset_grain_name = child_metric_offset_window.granularity
                 if ExpandedTimeGranularity.is_standard_granularity_name(offset_grain_name):
@@ -1408,7 +1402,7 @@ class DataflowPlanBuilder:
             if (
                 offset_grain
                 and smallest_queried_agg_time_grain == offset_grain
-                and not offset_grain.is_custom_granularity
+                and not offset_grain.is_custom_granularity  # custom offset window has special logic handled later
             ):
                 after_aggregation_time_spine_join_description = join_to_time_spine_description
             else:
