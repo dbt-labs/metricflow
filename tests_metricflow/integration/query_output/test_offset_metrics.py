@@ -478,7 +478,6 @@ def test_offset_to_grain_with_multiple_grains(  # noqa: D103
 #             # where_constraints=["{{ TimeDimension('metric_time', 'year') }} < '2021-01-01'"],
 #         )
 #     )
-#     # assert 0, query_result.sql
 #     assert query_result.result_df is not None, "Unexpected empty result."
 
 #     assert_str_snapshot_equal(
@@ -488,3 +487,5 @@ def test_offset_to_grain_with_multiple_grains(  # noqa: D103
 #         snapshot_str=query_result.result_df.text_format(),
 #         sql_engine=sql_client.sql_engine_type,
 #     )
+
+# TODO: is it ever necessary to apply a time spine join both before and after? seems redundant, write some test cases

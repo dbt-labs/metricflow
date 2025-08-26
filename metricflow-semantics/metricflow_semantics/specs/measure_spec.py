@@ -105,3 +105,8 @@ class JoinToTimeSpineDescription:
         if self.offset_window and not self.offset_window.is_standard_granularity:
             return self.offset_window
         return None
+
+    @property
+    def uses_offset(self) -> bool:
+        """Return True if the measure uses an offset."""
+        return self.offset_window is not None or self.offset_to_grain is not None
