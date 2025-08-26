@@ -491,7 +491,6 @@ def test_offset_to_grain_with_multiple_grains(  # noqa: D103
 #             # where_constraints=["{{ TimeDimension('metric_time', 'year') }} < '2021-01-01'"],
 #         )
 #     )
-#     # assert 0, query_result.sql
 #     assert query_result.result_df is not None, "Unexpected empty result."
 
 #     assert_str_snapshot_equal(
