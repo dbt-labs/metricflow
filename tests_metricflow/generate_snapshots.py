@@ -81,34 +81,34 @@ class MetricFlowTestCredentialSetForAllEngines(FrozenBaseModel):  # noqa: D101
     @property
     def as_configurations(self) -> Sequence[MetricFlowEngineConfiguration]:  # noqa: D102
         return (
-            MetricFlowEngineConfiguration(
-                engine=SqlEngine.DUCKDB,
-                credential_set=self.duck_db,
-            ),
-            MetricFlowEngineConfiguration(
-                engine=SqlEngine.REDSHIFT,
-                credential_set=self.redshift,
-            ),
-            MetricFlowEngineConfiguration(
-                engine=SqlEngine.SNOWFLAKE,
-                credential_set=self.snowflake,
-            ),
-            MetricFlowEngineConfiguration(
-                engine=SqlEngine.BIGQUERY,
-                credential_set=self.big_query,
-            ),
+            # MetricFlowEngineConfiguration(
+            #     engine=SqlEngine.DUCKDB,
+            #     credential_set=self.duck_db,
+            # ),
+            # MetricFlowEngineConfiguration(
+            #     engine=SqlEngine.REDSHIFT,
+            #     credential_set=self.redshift,
+            # ),
+            # MetricFlowEngineConfiguration(
+            #     engine=SqlEngine.SNOWFLAKE,
+            #     credential_set=self.snowflake,
+            # ),
+            # MetricFlowEngineConfiguration(
+            #     engine=SqlEngine.BIGQUERY,
+            #     credential_set=self.big_query,
+            # ),
             MetricFlowEngineConfiguration(
                 engine=SqlEngine.DATABRICKS,
                 credential_set=self.databricks,
             ),
-            MetricFlowEngineConfiguration(
-                engine=SqlEngine.POSTGRES,
-                credential_set=self.postgres,
-            ),
-            MetricFlowEngineConfiguration(
-                engine=SqlEngine.TRINO,
-                credential_set=self.trino,
-            ),
+            # MetricFlowEngineConfiguration(
+            #     engine=SqlEngine.POSTGRES,
+            #     credential_set=self.postgres,
+            # ),
+            # MetricFlowEngineConfiguration(
+            #     engine=SqlEngine.TRINO,
+            #     credential_set=self.trino,
+            # ),
         )
 
 
