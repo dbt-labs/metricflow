@@ -3,6 +3,10 @@ test_filename: test_metric_filter_output.py
 ---
 listing      listings    bookings
 ---------  ----------  ----------
-l2718281            1          15
-l3141592            1          15
-l5948301            1           7
+l1234567                       32
+l2718281            1          53
+l3141592            1          51
+l4567890                       33
+l5948301            1          44
+l7654321                       34
+l9876543                       31
