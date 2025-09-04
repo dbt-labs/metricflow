@@ -1,0 +1,7 @@
+kind: Fixes
+body: Apply offset join after aggregation when queried grain is available post-aggregation.
+  This ensures results match user expectations.
+time: 2025-09-03T19:52:52.4573-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1826,1758"
