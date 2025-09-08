@@ -21,7 +21,7 @@ from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 
 
-def load_semantic_manifest(
+def mf_load_manifest_from_yaml_directory(
     yaml_file_directory: pathlib.Path,
     template_mapping: Optional[Dict[str, str]] = None,
 ) -> PydanticSemanticManifest:
