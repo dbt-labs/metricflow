@@ -4,6 +4,7 @@ from __future__ import annotations
 import logging
 from collections.abc import Sequence
 from pathlib import Path
+from typing import Optional
 
 import pytest
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
@@ -21,7 +22,7 @@ from metricflow_semantics.test_helpers.synthetic_manifest.synthetic_manifest_par
     SyntheticManifestParameterSet,
 )
 
-from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowQueryRequest
+from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
 from metricflow.protocols.sql_client import SqlClient
 
 logger = logging.getLogger(__name__)
@@ -53,7 +54,7 @@ def mf_explain_saved_query(
     saved_query_names: Sequence[str],
     use_semantic_graph: bool = False,
     profile: bool = False,
-) -> None:
+) -> Optional[MetricFlowExplainResult]:
     """Helper to profile a set of saved queries in the given manifest."""
     with ExecutionTimer("Create `SemanticManifestLookup`"):
         manifest_lookup = SemanticManifestLookup(semantic_manifest, use_semantic_graph=use_semantic_graph)
@@ -69,6 +70,7 @@ def mf_explain_saved_query(
     run_context = (
         performance_tracker.session(session_id) if performance_tracker is not None else ExecutionTimer(session_id)
     )
+    explain_result: Optional[MetricFlowExplainResult] = None
     with run_context:
         name_to_saved_query = {saved_query.name: saved_query for saved_query in semantic_manifest.saved_queries}
 
@@ -83,7 +85,7 @@ def mf_explain_saved_query(
                 )
             )
             try:
-                mf_engine.explain(
+                explain_result = mf_engine.explain(
                     MetricFlowQueryRequest.create_with_random_request_id(saved_query_name=saved_query.name)
                 )
             except Exception:
@@ -93,6 +95,8 @@ def mf_explain_saved_query(
         logger.info(
             LazyFormat(lambda: "Profiled explain.\n" + mf_indent(performance_tracker.last_session_report.text_format()))
         )
+
+    return explain_result
 
 
 def mf_simulate_validation(
