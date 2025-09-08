@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import functools
 import itertools
+import logging
 from abc import ABC, abstractmethod
 from typing import Union
 
@@ -10,7 +11,10 @@ from typing_extensions import override
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.experimental.comparison_helpers import ComparisonOtherType, SupportsLessThan
 
-ComparisonKey = AnyLengthTuple[Union[None, str, int, float, SupportsLessThan]]
+logger = logging.getLogger(__name__)
+
+
+ComparisonKey = AnyLengthTuple[Union[None, SupportsLessThan]]
 
 
 @functools.total_ordering

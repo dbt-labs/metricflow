@@ -15,6 +15,7 @@ from _pytest.fixtures import FixtureRequest
 
 from metricflow_semantics.dag.mf_dag import MetricFlowDag
 from metricflow_semantics.helpers.string_helpers import mf_indent
+from metricflow_semantics.mf_logging.format_option import PrettyFormatOption
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseLinkableElementSet
@@ -394,6 +395,7 @@ def assert_object_snapshot_equal(  # type: ignore[misc]
     obj: Any,
     obj_id: str = "result",
     expectation_description: Optional[str] = None,
+    format_option: Optional[PrettyFormatOption] = None,
 ) -> None:
     """For tests to compare large objects, this can be used to snapshot a text representation of the object."""
     assert_snapshot_text_equal(
@@ -401,7 +403,7 @@ def assert_object_snapshot_equal(  # type: ignore[misc]
         snapshot_configuration=snapshot_configuration,
         group_id=obj.__class__.__name__,
         snapshot_id=obj_id,
-        snapshot_text=mf_pformat(obj),
+        snapshot_text=mf_pformat(obj, format_option),
         snapshot_file_extension=".txt",
         expectation_description=expectation_description,
     )

@@ -19,7 +19,7 @@ from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.id_helpers import IdNumberSpace
-from metricflow_semantics.test_helpers.manifest_helpers import load_semantic_manifest
+from metricflow_semantics.test_helpers.manifest_helpers import mf_load_manifest_from_yaml_directory
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.ambiguous_resolution_manifest import (
     AMBIGUOUS_RESOLUTION_MANIFEST_ANCHOR,
 )
@@ -268,7 +268,7 @@ def mf_engine_test_fixture_mapping(
         with SequentialIdGenerator.id_number_space(semantic_manifest_setup.id_number_space.start_value):
             fixture_mapping[semantic_manifest_setup] = MetricFlowEngineTestFixture.from_parameters(
                 sql_client,
-                load_semantic_manifest(semantic_manifest_setup.yaml_file_dir, template_mapping),
+                mf_load_manifest_from_yaml_directory(semantic_manifest_setup.yaml_file_dir, template_mapping),
                 use_semantic_graph=False,
             )
 
@@ -286,7 +286,7 @@ def mf_engine_test_fixture_mapping_sg(
         with SequentialIdGenerator.id_number_space(semantic_manifest_setup.id_number_space.start_value):
             fixture_mapping[semantic_manifest_setup] = MetricFlowEngineTestFixture.from_parameters(
                 sql_client,
-                load_semantic_manifest(semantic_manifest_setup.yaml_file_dir, template_mapping),
+                mf_load_manifest_from_yaml_directory(semantic_manifest_setup.yaml_file_dir, template_mapping),
                 use_semantic_graph=True,
             )
 
