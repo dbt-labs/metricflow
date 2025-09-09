@@ -52,12 +52,11 @@ def mf_explain_saved_query(
     semantic_manifest: SemanticManifest,
     sql_client: SqlClient,
     saved_query_names: Sequence[str],
-    use_semantic_graph: bool = False,
     profile: bool = False,
 ) -> Optional[MetricFlowExplainResult]:
     """Helper to profile a set of saved queries in the given manifest."""
     with ExecutionTimer("Create `SemanticManifestLookup`"):
-        manifest_lookup = SemanticManifestLookup(semantic_manifest, use_semantic_graph=use_semantic_graph)
+        manifest_lookup = SemanticManifestLookup(semantic_manifest)
 
     with ExecutionTimer("Create `MetricFlowEngine`"):
         mf_engine = MetricFlowEngine(
@@ -102,12 +101,11 @@ def mf_explain_saved_query(
 def mf_simulate_validation(
     semantic_manifest: SemanticManifest,
     sql_client: SqlClient,
-    use_semantic_graph: bool = False,
     profile: bool = False,
 ) -> None:
     """Simulate generation of queries for the manifest."""
     with ExecutionTimer("Create `SemanticManifestLookup`"):
-        manifest_lookup = SemanticManifestLookup(semantic_manifest, use_semantic_graph=use_semantic_graph)
+        manifest_lookup = SemanticManifestLookup(semantic_manifest)
 
     with ExecutionTimer("Create `MetricFlowEngine`"):
         mf_engine = MetricFlowEngine(
@@ -154,9 +152,7 @@ def test_profile_explain(
 ) -> None:
     """Tests formatting a performance report to a text table."""
     saved_query_names = (manifest_with_50_models_25_metrics.saved_queries[0].name,)
-    mf_explain_saved_query(
-        manifest_with_50_models_25_metrics, sql_client, saved_query_names=saved_query_names, use_semantic_graph=True
-    )
+    mf_explain_saved_query(manifest_with_50_models_25_metrics, sql_client, saved_query_names=saved_query_names)
 
 
 @pytest.mark.skip("Example only.")
@@ -182,7 +178,5 @@ def test_profile_performance_using_json_manifest(
     )
     saved_query_names = tuple(saved_query.name for saved_query in semantic_manifest.saved_queries)[:100]
 
-    mf_explain_saved_query(
-        semantic_manifest, sql_client, saved_query_names=saved_query_names, use_semantic_graph=False, profile=True
-    )
-    mf_simulate_validation(semantic_manifest, sql_client, use_semantic_graph=False, profile=True)
+    mf_explain_saved_query(semantic_manifest, sql_client, saved_query_names=saved_query_names, profile=True)
+    mf_simulate_validation(semantic_manifest, sql_client, profile=True)
