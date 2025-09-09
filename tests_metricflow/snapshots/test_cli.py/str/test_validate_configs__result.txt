@@ -10,15 +10,13 @@ expectation_description:
 Received following error from data warehouse:
 Runtime Error
   Binder Error: Referenced column "non_existent_column" not found in FROM clause!
-  Candidate bindings: "transaction_amount_usd", "transaction_type_name", "id_transaction", "ds", "id_customer"
-  
+  Candidate bindings: "bad_semantic_model_src_0.transaction_amount_usd", "bad_semantic_model_src_0.transaction_type_name", "bad_semantic_model_src_0.id_transaction", "bad_semantic_model_src_0.ds", "bad_semantic_model_src_0.id_customer"
   LINE 28:   , non_existent_column AS bad_dimension
                ^
 • [91m[1mERROR[0m: with dimension `bad_dimension` in semantic model `bad_semantic_model`  - Unable to query dimension `bad_dimension` on semantic model `bad_semantic_model` in data warehouse
 Received following error from data warehouse:
 Runtime Error
   Binder Error: Referenced column "non_existent_column" not found in FROM clause!
-  Candidate bindings: "transaction_amount_usd", "transaction_type_name", "id_transaction", "ds", "id_customer"
-  
+  Candidate bindings: "bad_semantic_model_src_0.transaction_amount_usd", "bad_semantic_model_src_0.transaction_type_name", "bad_semantic_model_src_0.id_transaction", "bad_semantic_model_src_0.ds", "bad_semantic_model_src_0.id_customer"
   LINE 4:   non_existent_column AS bad_dimension
             ^
