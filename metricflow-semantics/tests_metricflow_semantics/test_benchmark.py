@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from abc import ABC
 
-from metricflow_semantics.experimental.test_helpers.performance_helpers import BenchmarkFunction, PerformanceBenchmark
+from metricflow_semantics.experimental.test_helpers.benchmark_helpers import BenchmarkFunction, PerformanceBenchmark
 
 logger = logging.getLogger(__name__)
 
