@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Mapping
 from typing import Iterable, Optional, Sequence
 
 from dbt_semantic_interfaces.references import MeasureReference, MetricReference
@@ -15,12 +16,14 @@ from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
     SemanticGraph,
 )
 from metricflow_semantics.helpers.performance_helpers import ExecutionTimer
+from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.helpers.time_helpers import PrettyDuration
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseLinkableElementSet
 from metricflow_semantics.model.semantics.linkable_spec_resolver import LegacyLinkableSpecResolver
 from metricflow_semantics.specs.spec_set import group_spec_by_type
+from metricflow_semantics.test_helpers.snapshot_helpers import assert_str_snapshot_equal
 from metricflow_semantics.test_helpers.table_helpers import PaddedTextTableBuilder
 
 from tests_metricflow_semantics.experimental.semantic_graph.sg_fixtures import SemanticGraphTestFixture
@@ -48,7 +51,7 @@ class SemanticGraphTester:
         return self._fixture.legacy_resolver
 
     @property
-    def sg_resolver(self) -> SemanticGraphLinkableSpecResolver:
+    def sg_resolver(self) -> SemanticGraphLinkableSpecResolver:  # noqa: D102
         return self._fixture.sg_resolver
 
     def compare_resolver_outputs_for_one_measure(
@@ -161,6 +164,26 @@ class SemanticGraphTester:
         comparison_helper.add_left_rows(left_rows)
         comparison_helper.add_right_rows(right_rows)
         comparison_helper.assert_tables_equal(log_result_table)
+
+    def assert_attribute_set_snapshot_equal(  # noqa: D102
+        self,
+        description_to_set: Mapping[str, BaseLinkableElementSet],
+        expectation_description: Optional[str] = None,
+    ) -> None:
+        lines = []
+        for description, group_by_item_set in description_to_set.items():
+            lines.append(f"{description}:")
+            table_builder = PaddedTextTableBuilder()
+            table_builder.add_left_rows(SemanticGraphTester._convert_linkable_element_set_to_rows(group_by_item_set))
+            lines.append(mf_indent(table_builder.format_left_table()))
+            lines.append("")
+
+        assert_str_snapshot_equal(
+            request=self._fixture.request,
+            snapshot_configuration=self._fixture.snapshot_configuration,
+            snapshot_str="\n".join(lines),
+            expectation_description=expectation_description,
+        )
 
     @staticmethod
     def _convert_linkable_element_set_to_rows(

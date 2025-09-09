@@ -16,7 +16,7 @@ from tests_metricflow_semantics.experimental.semantic_graph.sg_tester import Sem
 logger = logging.getLogger(__name__)
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def sg_tester(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -28,50 +28,77 @@ def sg_tester(  # noqa: D103
     return SemanticGraphTester(fixture)
 
 
-def test_measure_correctness(sg_tester: SemanticGraphTester) -> None:  # noqa: D103
-    sg_tester.compare_resolver_outputs_for_one_measure(
-        MeasureReference("bookings"), element_filter=LinkableElementFilter()
-    )
+def test_set_for_measures(sg_tester: SemanticGraphTester) -> None:
+    """Check the set for a few measures."""
+    cases = ("bookings", "account_balance")
+    description_to_set = {
+        str(measure_name): sg_tester.sg_resolver.get_linkable_element_set_for_measure(MeasureReference(measure_name))
+        for measure_name in cases
+    }
+    sg_tester.assert_attribute_set_snapshot_equal(description_to_set)
 
 
-def test_all_measure_correctness(sg_tester: SemanticGraphTester) -> None:  # noqa: D103
-    sg_tester.compare_resolver_outputs_for_all_measures(element_filter=LinkableElementFilter())
-
-
-def test_filter_without_any_of(sg_tester: SemanticGraphTester) -> None:  # noqa: D103
+def test_set_filtering_for_measure(sg_tester: SemanticGraphTester) -> None:
+    """Check filtering of the set for a measure."""
+    measure_reference = MeasureReference("bookings")
+    complete_set = sg_tester.sg_resolver.get_linkable_element_set_for_measure(measure_reference)
     for element_property in LinkableElementProperty:
-        sg_tester.compare_resolver_outputs_for_one_measure(
-            MeasureReference("bookings"),
-            element_filter=LinkableElementFilter().copy(without_any_of=frozenset((element_property,))),
+        with_any_of_filter = LinkableElementFilter(with_any_of=frozenset((element_property,)))
+        filtered_set = sg_tester.sg_resolver.get_linkable_element_set_for_measure(measure_reference, with_any_of_filter)
+        # The resolver uses the filter to limit graph traversal, so this is not the same logic.
+        expected_items = set(complete_set.filter(with_any_of_filter).annotated_specs)
+        actual_items = set(filtered_set.annotated_specs)
+
+        assert expected_items == actual_items
+
+        without_any_of_filter = LinkableElementFilter(without_any_of=frozenset((element_property,)))
+        filtered_set = sg_tester.sg_resolver.get_linkable_element_set_for_measure(
+            measure_reference, without_any_of_filter
         )
+        expected_items = set(complete_set.filter(without_any_of_filter).annotated_specs)
+        actual_items = set(filtered_set.annotated_specs)
+
+        assert expected_items == actual_items
 
 
-def test_filter_with_any_of(sg_tester: SemanticGraphTester) -> None:  # noqa: D103
+def test_set_for_metrics(sg_tester: SemanticGraphTester) -> None:
+    """Check the set for a few multi-metric cases."""
+    cases = ((), ("bookings",), ("bookings_per_view",))
+    description_to_set = {
+        str(metric_names): sg_tester.sg_resolver.get_linkable_elements_for_metrics(
+            [MetricReference(metric_name) for metric_name in metric_names]
+        )
+        for metric_names in cases
+    }
+    sg_tester.assert_attribute_set_snapshot_equal(description_to_set)
+
+
+def test_set_for_distinct_values_query(sg_tester: SemanticGraphTester) -> None:
+    """Check the attribute set for a distinct-values query / no-metric query."""
+    sg_tester.assert_attribute_set_snapshot_equal(
+        {
+            "Distinct-Values Query": sg_tester.sg_resolver.get_linkable_elements_for_distinct_values_query(
+                LinkableElementFilter()
+            )
+        }
+    )
+
+
+def test_set_filtering_for_distinct_values_query(sg_tester: SemanticGraphTester) -> None:
+    """Check filtering of the set for a distinct values query."""
+    complete_set = sg_tester.sg_resolver.get_linkable_elements_for_distinct_values_query(LinkableElementFilter())
     for element_property in LinkableElementProperty:
-        sg_tester.compare_resolver_outputs_for_one_measure(
-            MeasureReference("bookings"),
-            element_filter=LinkableElementFilter(with_any_of=frozenset((element_property,))),
-        )
+        with_any_of_filter = LinkableElementFilter(with_any_of=frozenset((element_property,)))
+        filtered_set = sg_tester.sg_resolver.get_linkable_elements_for_distinct_values_query(with_any_of_filter)
+        # The resolver uses the filter to limit graph traversal, so this is not the same logic.
+        expected_items = set(complete_set.filter(with_any_of_filter).annotated_specs)
+        actual_items = set(filtered_set.annotated_specs)
 
+        assert expected_items == actual_items
 
-def test_metric_correctness(sg_tester: SemanticGraphTester) -> None:  # noqa: D103
-    sg_tester.compare_resolver_outputs_for_metrics(
-        (MetricReference("bookings"),), element_filter=LinkableElementFilter()
-    )
+        without_any_of_filter = LinkableElementFilter(without_any_of=frozenset((element_property,)))
+        filtered_set = sg_tester.sg_resolver.get_linkable_elements_for_distinct_values_query(without_any_of_filter)
+        expected_items = set(complete_set.filter(without_any_of_filter).annotated_specs)
+        actual_items = set(filtered_set.annotated_specs)
 
-
-def test_metric_correctness_for_empty_set(sg_tester: SemanticGraphTester) -> None:  # noqa: D103
-    sg_tester.compare_resolver_outputs_for_metrics((), element_filter=LinkableElementFilter())
-
-
-def test_multi_metric_correctness(sg_tester: SemanticGraphTester) -> None:  # noqa: D103
-    sg_tester.compare_resolver_outputs_for_metrics(
-        (MetricReference("bookings"), MetricReference("listings")),
-        element_filter=LinkableElementFilter(),
-    )
-
-
-def test_derived_metric_correctness(sg_tester: SemanticGraphTester) -> None:  # noqa: D103
-    sg_tester.compare_resolver_outputs_for_metrics(
-        (MetricReference("bookings_per_view"),), element_filter=LinkableElementFilter()
-    )
+        assert expected_items == actual_items
