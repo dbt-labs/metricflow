@@ -31,34 +31,24 @@ FilterSpecResolutionLookUp(
           ),
         ],
       ),
-      resolved_linkable_element_set=LinkableElementSet(
-        path_key_to_linkable_dimensions={
-          ElementPathKey(
-            element_name='metric_time',
+      resolved_linkable_element_set=AnnotatedSpecLinkableElementSet(
+        annotated_specs=(
+          AnnotatedSpec(
             element_type=TIME_DIMENSION,
-            time_granularity=ExpandedTimeGranularity(
+            element_name='metric_time',
+            time_grain=ExpandedTimeGranularity(
               name='month',
               base_granularity=MONTH,
             ),
-          ): (
-            LinkableDimension(
-              properties=(
-                METRIC_TIME,
-              ),
-              element_name='metric_time',
-              dimension_type=TIME,
-              join_path=SemanticModelJoinPath(
-                left_semantic_model_reference=SemanticModelReference(
-                  semantic_model_name='monthly_measures_source',
-                ),
-              ),
-              time_granularity=ExpandedTimeGranularity(
-                name='month',
-                base_granularity=MONTH,
-              ),
+            element_properties=(METRIC_TIME,),
+            origin_semantic_model_names=(
+              'monthly_measures_source',
+            ),
+            derived_from_semantic_model_names=(
+              'monthly_measures_source',
             ),
           ),
-        },
+        ),
       ),
       spec_pattern=TimeDimensionPattern(
         parameter_set=SpecPatternParameterSet(

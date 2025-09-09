@@ -6,45 +6,22 @@ GroupByItemResolution(
     element_name='metric_time',
     time_granularity=ExpandedTimeGranularity(name='year', base_granularity=YEAR),
   ),
-  linkable_element_set=LinkableElementSet(
-    path_key_to_linkable_dimensions={
-      ElementPathKey(
-        element_name='metric_time',
+  linkable_element_set=AnnotatedSpecLinkableElementSet(
+    annotated_specs=(
+      AnnotatedSpec(
         element_type=TIME_DIMENSION,
-        time_granularity=ExpandedTimeGranularity(
-          name='year',
-          base_granularity=YEAR,
+        element_name='metric_time',
+        time_grain=ExpandedTimeGranularity(name='year', base_granularity=YEAR),
+        element_properties=(METRIC_TIME, DERIVED_TIME_GRANULARITY),
+        origin_semantic_model_names=(
+          'monthly_measures_source',
+          'yearly_measure_source',
         ),
-      ): (
-        LinkableDimension(
-          properties=(DERIVED_TIME_GRANULARITY, METRIC_TIME),
-          element_name='metric_time',
-          dimension_type=TIME,
-          join_path=SemanticModelJoinPath(
-            left_semantic_model_reference=SemanticModelReference(
-              semantic_model_name='monthly_measures_source',
-            ),
-          ),
-          time_granularity=ExpandedTimeGranularity(
-            name='year',
-            base_granularity=YEAR,
-          ),
-        ),
-        LinkableDimension(
-          properties=(METRIC_TIME,),
-          element_name='metric_time',
-          dimension_type=TIME,
-          join_path=SemanticModelJoinPath(
-            left_semantic_model_reference=SemanticModelReference(
-              semantic_model_name='yearly_measure_source',
-            ),
-          ),
-          time_granularity=ExpandedTimeGranularity(
-            name='year',
-            base_granularity=YEAR,
-          ),
+        derived_from_semantic_model_names=(
+          'monthly_measures_source',
+          'yearly_measure_source',
         ),
       ),
-    },
+    ),
   ),
 )
