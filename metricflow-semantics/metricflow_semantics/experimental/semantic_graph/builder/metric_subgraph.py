@@ -142,6 +142,9 @@ class MetricSubgraphGenerator(SemanticSubgraphGenerator):
             # resolving the associated group-by items.
             conversion_type_params = base_metric.type_params.conversion_type_params
             if conversion_type_params is not None:
+                assert (
+                    conversion_type_params.conversion_measure is not None
+                ), "A conversion metric must have a conversion measure."
                 conversion_measure_name = conversion_type_params.conversion_measure.name
                 measure_name_to_labels_for_metric_to_measure_edge[
                     conversion_measure_name

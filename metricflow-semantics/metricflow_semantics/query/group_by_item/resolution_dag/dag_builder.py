@@ -49,6 +49,7 @@ class GroupByItemResolutionDagBuilder:
                 assert (
                     conversion_type_params
                 ), "A conversion metric should have type_params.conversion_type_params defined."
+                assert conversion_type_params.base_measure is not None, "A conversion metric must have a base measure."
                 measure_references_for_metric = (conversion_type_params.base_measure.measure_reference,)
             else:
                 measure_references_for_metric = tuple(
