@@ -665,7 +665,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                     conversion_type_params
                 ), "A conversion metric should have type_params.conversion_type_params defined."
                 base_measure = conversion_type_params.base_measure
+                assert base_measure is not None, "A conversion metric must have a base measure."
                 conversion_measure = conversion_type_params.conversion_measure
+                assert conversion_measure is not None, "A conversion metric must have a conversion measure."
                 base_measure_column = self._column_association_resolver.resolve_spec(
                     MeasureSpec(element_name=base_measure.post_aggregation_measure_reference.element_name)
                 ).column_name

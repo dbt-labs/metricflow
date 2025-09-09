@@ -115,6 +115,9 @@ class LinkableSpecIndexBuilder:
                     assert (
                         conversion_type_params
                     ), "A conversion metric should have type_params.conversion_type_params defined."
+                    assert (
+                        conversion_type_params.base_measure is not None
+                    ), "A conversion metric must have a base measure."
                     if measure == conversion_type_params.base_measure.measure_reference:
                         # Only can query against the base measure's linkable elements
                         # as it joins everything back to the base measure data set so

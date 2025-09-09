@@ -1309,6 +1309,11 @@ class DataflowPlanBuilder:
         if metric.type is not MetricType.CONVERSION:
             raise ValueError("This should only be called for conversion metrics.")
 
+        assert conversion_type_params.base_measure is not None, "A conversion metric must have a base measure."
+        assert (
+            conversion_type_params.conversion_measure is not None
+        ), "A conversion metric must have a conversion measure."
+
         base_input_measure, conversion_input_measure = [
             self._build_input_measure_spec(
                 filter_spec_factory=filter_spec_factory,
