@@ -48,7 +48,7 @@ class SemanticGraphTester:
         return self._fixture.legacy_resolver
 
     @property
-    def _sg_resolver(self) -> SemanticGraphLinkableSpecResolver:
+    def sg_resolver(self) -> SemanticGraphLinkableSpecResolver:
         return self._fixture.sg_resolver
 
     def compare_resolver_outputs_for_one_measure(
@@ -60,7 +60,7 @@ class SemanticGraphTester:
         """Compare the result for the legacy resolver and the semantic-graph resolver for one measure."""
         logger.debug("Generating using semantic graph implementation")
         with ExecutionTimer() as sg_timer:
-            sg_linkable_element_set = self._sg_resolver.get_linkable_element_set_for_measure(
+            sg_linkable_element_set = self.sg_resolver.get_linkable_element_set_for_measure(
                 measure_reference, element_filter
             )
 
@@ -126,7 +126,7 @@ class SemanticGraphTester:
         logger.debug("Generating using semantic graph implementation")
 
         with ExecutionTimer() as sg_timer:
-            sg_linkable_element_set = self._sg_resolver.get_linkable_elements_for_metrics(
+            sg_linkable_element_set = self.sg_resolver.get_linkable_elements_for_metrics(
                 metric_references, element_filter
             )
 
