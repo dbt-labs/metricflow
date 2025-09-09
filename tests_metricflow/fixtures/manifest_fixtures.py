@@ -168,7 +168,7 @@ class MetricFlowEngineTestFixture:
         semantic_manifest: PydanticSemanticManifest,
         use_semantic_graph: bool,
     ) -> MetricFlowEngineTestFixture:
-        semantic_manifest_lookup = SemanticManifestLookup(semantic_manifest, use_semantic_graph=use_semantic_graph)
+        semantic_manifest_lookup = SemanticManifestLookup(semantic_manifest)
         data_set_mapping = MetricFlowEngineTestFixture._create_data_sets(semantic_manifest_lookup)
         read_node_mapping = MetricFlowEngineTestFixture._data_set_to_read_nodes(data_set_mapping)
         column_association_resolver = DunderColumnAssociationResolver()
