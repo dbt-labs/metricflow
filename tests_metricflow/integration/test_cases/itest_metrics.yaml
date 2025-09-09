@@ -1911,17 +1911,11 @@ integration_test:
   check_query: |
     SELECT
       {{ render_extract("a.ds", DatePart.DOY) }} AS booking__ds__extract_doy
-      , b.bookings_5_day_lag
-    FROM {{ mf_time_spine_source }} a
-    INNER JOIN (
-      SELECT
-        ds
-        , SUM(1) AS bookings_5_day_lag
-      FROM {{ source_schema }}.fct_bookings
-      GROUP BY
-        ds
-    ) b
-    ON {{ render_date_sub("a", "ds", 5, TimeGranularity.DAY) }} = b.ds
+      , SUM(1) AS bookings_5_day_lag
+    FROM {{ source_schema }}.mf_time_spine a
+    INNER JOIN {{ source_schema }}.fct_bookings b
+    ON {{ render_date_sub("a", "ds", 5, TimeGranularity.DAY) }} = {{ render_date_trunc("b.ds", TimeGranularity.DAY) }}
+    GROUP BY {{ render_extract("a.ds", DatePart.DOY) }}
 ---
 integration_test:
   name: simple_metric_in_where_filter
