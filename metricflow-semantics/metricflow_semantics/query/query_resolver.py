@@ -709,10 +709,6 @@ class MetricFlowQueryResolver:
                 continue
 
             # The base measure should be in a DAG, but just in case.
-            assert conversion_type_params.base_measure is not None, "A conversion metric must have a base measure."
-            assert (
-                conversion_type_params.conversion_measure is not None
-            ), "A conversion metric must have a conversion measure."
             measure_references.add(conversion_type_params.base_measure.measure_reference)
             measure_references.add(conversion_type_params.conversion_measure.measure_reference)
 
