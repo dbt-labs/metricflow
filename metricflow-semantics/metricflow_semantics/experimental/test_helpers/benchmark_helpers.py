@@ -3,10 +3,14 @@ from __future__ import annotations
 import datetime
 import gc
 import logging
+import math
 import time
 import timeit
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from io import StringIO
+
+from typing_extensions import override
 
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 
@@ -130,3 +134,36 @@ class PerformanceBenchmark:
                 raise RuntimeError(
                     LazyFormat("Got an exception while executing timed code.", exception=fp.getvalue())
                 ) from e
+
+
+@dataclass(frozen=True)
+class _Point:
+    x: int
+    y: int
+
+    @staticmethod
+    def distance(left: _Point, right: _Point) -> float:
+        x_delta = left.x - right.x
+        y_delta = left.y - right.y
+        return math.sqrt(x_delta * x_delta + y_delta * y_delta)
+
+
+class _ReferenceFunction(BenchmarkFunction, ABC):
+    """Function that runs a bunch of dummy operations to provide a reference for relative performance comparisons."""
+
+    def __init__(self, create_object_count: int, function_call_count: int) -> None:
+        self._create_object_count = create_object_count
+        self._function_call_count = function_call_count
+
+    @override
+    def run(self) -> None:
+        points = tuple(_Point(x=i, y=i) for i in range(self._create_object_count))
+        for i in range(self._function_call_count):
+            _Point.distance(points[i], points[self._create_object_count - i - 1])
+
+
+class OneSecondFunction(_ReferenceFunction):
+    """Function that takes about 1s to run."""
+
+    def __init__(self) -> None:  # noqa: D107
+        super().__init__(create_object_count=1_000_000, function_call_count=1_000_000)

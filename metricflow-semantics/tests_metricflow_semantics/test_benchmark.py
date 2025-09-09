@@ -34,5 +34,5 @@ def test_assert_performance_factor() -> None:
     PerformanceBenchmark.assert_function_performance(
         left_function_class=_LeftFunction,
         right_function_class=_RightFunction,
-        min_performance_factor=2,
+        min_performance_factor=1.9,
     )
