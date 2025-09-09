@@ -31,7 +31,7 @@ docstring:
             <!--                   METRIC_TIME,                          -->
             <!--                 ),                                      -->
             <!--                 origin_semantic_model_names=(           -->
-            <!--                   '__VIRTUAL__',                        -->
+            <!--                   'bookings_source',                    -->
             <!--                 ),                                      -->
             <!--                 derived_from_semantic_model_names=(     -->
             <!--                   'bookings_source',                    -->
@@ -73,7 +73,7 @@ docstring:
                         <!--             base_granularity=DAY,                                 -->
                         <!--           ),                                                      -->
                         <!--           element_properties=(METRIC_TIME,),                      -->
-                        <!--           origin_semantic_model_names=('__VIRTUAL__',),           -->
+                        <!--           origin_semantic_model_names=('bookings_source',),       -->
                         <!--           derived_from_semantic_model_names=('bookings_source',), -->
                         <!--         ),                                                        -->
                         <!--       ),                                                          -->
