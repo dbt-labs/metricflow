@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Migrate correctness tests for the semantic-graph-based resolver
+time: 2025-09-10T11:58:02.976063-07:00
+custom:
+  Author: plypaul
+  Issue: "1833"
