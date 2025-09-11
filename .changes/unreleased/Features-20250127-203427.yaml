@@ -1,6 +1,0 @@
-kind: Features
-body: Support for multiple time spines in one query.
-time: 2025-01-27T20:34:27.68611-08:00
-custom:
-  Author: courtneyholcomb
-  Issue: "1644"

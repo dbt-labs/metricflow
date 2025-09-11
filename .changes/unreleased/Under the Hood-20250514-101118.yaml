@@ -1,6 +1,0 @@
-kind: Under the Hood
-body: Rename `mf_test_configuration` -> `snapshot_configuration`
-time: 2025-05-14T10:11:18.903402-07:00
-custom:
-  Author: plypaul
-  Issue: "1750"

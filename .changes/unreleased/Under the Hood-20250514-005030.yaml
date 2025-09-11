@@ -1,6 +1,0 @@
-kind: Under the Hood
-body: Handle `order_output_columns_by_input_order` for filtered metrics
-time: 2025-05-14T00:50:30.226465-07:00
-custom:
-  Author: plypaul
-  Issue: "1753"

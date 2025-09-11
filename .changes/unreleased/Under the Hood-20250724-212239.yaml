@@ -1,6 +1,0 @@
-kind: Under the Hood
-body: Add a helper for writing `timeit`-based performance tests
-time: 2025-07-24T21:22:39.179469-07:00
-custom:
-  Author: plypaul
-  Issue: "1788"

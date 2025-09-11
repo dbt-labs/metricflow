@@ -1,6 +1,0 @@
-kind: Under the Hood
-body: Add support for index object to improve MF engine initialization times.
-time: 2025-04-03T12:01:30.183428-07:00
-custom:
-  Author: plypaul
-  Issue: "1715"

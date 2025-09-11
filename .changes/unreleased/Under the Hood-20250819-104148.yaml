@@ -1,6 +1,0 @@
-kind: Under the Hood
-body: Add text-table formatter for `SessionReport`
-time: 2025-08-19T10:41:48.603165-07:00
-custom:
-  Author: plypaul
-  Issue: "1819"

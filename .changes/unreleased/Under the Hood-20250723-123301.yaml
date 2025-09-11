@@ -1,6 +1,0 @@
-kind: Under the Hood
-body: Add interfaces for `LinkableElementSet` / `LinkableSpecResolver`
-time: 2025-07-23T12:33:01.545701-07:00
-custom:
-  Author: plypaul
-  Issue: "1785"

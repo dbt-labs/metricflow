@@ -1,6 +1,0 @@
-kind: Dependencies
-body: Remove version requirement for dbt adapters in `dbt-metricflow`
-time: 2025-09-10T12:53:04.720881-07:00
-custom:
-  Author: plypaul
-  Issue: "1837"
