@@ -1,6 +1,0 @@
-kind: Fixes
-body: Address display of `None` in the output of `mf query`
-time: 2025-03-28T14:16:54.953964-07:00
-custom:
-  Author: plypaul
-  Issue: "1700"
