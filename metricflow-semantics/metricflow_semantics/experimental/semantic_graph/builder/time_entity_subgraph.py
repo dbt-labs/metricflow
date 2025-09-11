@@ -48,7 +48,14 @@ class TimeEntitySubgraphGenerator(SemanticSubgraphGenerator):
 
     @override
     def add_edges_for_manifest(self, edge_list: list[SemanticGraphEdge]) -> None:
-        self._add_edges_for_time_entity_subgraph(self._manifest_object_lookup.min_time_grain_used_in_models, edge_list)
+        self._add_edges_for_time_entity_subgraph(
+            min_time_grain=min(
+                self._manifest_object_lookup.min_time_grain_used_in_models,
+                self._manifest_object_lookup.min_time_grain_in_time_spine,
+                key=lambda time_grain: time_grain.to_int(),
+            ),
+            edge_list=edge_list,
+        )
 
     def _add_edges_for_time_entity_subgraph(
         self, min_time_grain: TimeGranularity, edge_list: list[SemanticGraphEdge]

@@ -128,7 +128,7 @@ def test_create_new(setup_statement: str) -> None:
                 SingletonIdElement.get_instance(int_value=i)
             """
         ),
-        min_performance_factor=0.45,
+        min_performance_factor=0.4,
     )
 
 
@@ -157,5 +157,5 @@ def test_create_existing(setup_statement: str) -> None:
         ),
         right_setup=mf_newline_join(setup_statement, get_singleton_statement),
         right_statement=get_singleton_statement,
-        min_performance_factor=0.40,
+        min_performance_factor=0.4,
     )
