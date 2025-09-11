@@ -1,3 +1,5 @@
+# Note: See https://github.com/dbt-labs/metricflow/pull/1032 for context on
+# using the same links for issues and PRs.
 changesDir: .changes
 unreleasedDir: unreleased
 headerPath: header.tpl.md
