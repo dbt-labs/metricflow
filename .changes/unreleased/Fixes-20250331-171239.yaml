@@ -1,6 +1,0 @@
-kind: Fixes
-body: Address intermittently missing CSV output file
-time: 2025-03-31T17:12:39.989392-07:00
-custom:
-  Author: plypaul
-  Issue: "1709"
