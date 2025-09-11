@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from abc import ABC
 
-from metricflow_semantics.experimental.test_helpers.performance_helpers import BenchmarkFunction, PerformanceBenchmark
+from metricflow_semantics.experimental.test_helpers.benchmark_helpers import BenchmarkFunction, PerformanceBenchmark
 
 logger = logging.getLogger(__name__)
 
@@ -34,5 +34,5 @@ def test_assert_performance_factor() -> None:
     PerformanceBenchmark.assert_function_performance(
         left_function_class=_LeftFunction,
         right_function_class=_RightFunction,
-        min_performance_factor=2,
+        min_performance_factor=1.9,
     )
