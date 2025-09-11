@@ -57,39 +57,25 @@ ParseQueryResult(
               ),
             ],
           ),
-          resolved_linkable_element_set=LinkableElementSet(
-            path_key_to_linkable_dimensions={
-              ElementPathKey(
-                element_name='is_instant',
+          resolved_linkable_element_set=AnnotatedSpecLinkableElementSet(
+            annotated_specs=(
+              AnnotatedSpec(
                 element_type=DIMENSION,
-                entity_links=(
-                  EntityReference(
-                    element_name='booking',
-                  ),
+                element_name='is_instant',
+                entity_link_names=(
+                  'booking',
                 ),
-              ): (
-                LinkableDimension(
-                  properties=(
-                    LOCAL,
-                  ),
-                  defined_in_semantic_model=SemanticModelReference(
-                    semantic_model_name='bookings_source',
-                  ),
-                  element_name='is_instant',
-                  dimension_type=CATEGORICAL,
-                  entity_links=(
-                    EntityReference(
-                      element_name='booking',
-                    ),
-                  ),
-                  join_path=SemanticModelJoinPath(
-                    left_semantic_model_reference=SemanticModelReference(
-                      semantic_model_name='bookings_source',
-                    ),
-                  ),
+                element_properties=(
+                  LOCAL,
+                ),
+                origin_semantic_model_names=(
+                  'bookings_source',
+                ),
+                derived_from_semantic_model_names=(
+                  'bookings_source',
                 ),
               ),
-            },
+            ),
           ),
           spec_pattern=DimensionPattern(
             parameter_set=SpecPatternParameterSet(

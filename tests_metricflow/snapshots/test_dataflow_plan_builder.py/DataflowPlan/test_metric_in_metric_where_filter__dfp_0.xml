@@ -36,8 +36,8 @@ docstring:
                         <!--           element_properties=(JOINED, METRIC),            -->
                         <!--           origin_semantic_model_names=('__VIRTUAL__',),   -->
                         <!--           derived_from_semantic_model_names=(             -->
-                        <!--             'bookings_source',                            -->
                         <!--             'listings_latest',                            -->
+                        <!--             'bookings_source',                            -->
                         <!--           ),                                              -->
                         <!--         ),                                                -->
                         <!--       ),                                                  -->
