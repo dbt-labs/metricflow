@@ -9,7 +9,7 @@ The following 3rd-party software packages may be used by or distributed with **g
 
 Date generated | Revision ID
 :------------: | :----------:
-01/16/25 | 2f1bb1ca684bc8251b27ca6fc585a179cc56694a
+09/11/25 | 6ba522e505a38f0bc05709f8f2cd7ebbbc7e61d9
 
 ---
 
@@ -28,6 +28,45 @@ No declared license found for git@github.com:dbt-labs/metricflow.git
 
 
 ## Dependencies
+
+
+Package|Licenses
+-------|--------
+**[click (8.1.6)](#click-8-1-6-)**|BSD-3-Clause
+**[dbt-bigquery (1.10.2)](#dbt-bigquery-1-10-2-)**|Apache-2.0
+**[dbt-core (1.10.4)](#dbt-core-1-10-4-)**|Apache-2.0
+**[dbt-databricks (1.10.12)](#dbt-databricks-1-10-12-)**|
+**[dbt-duckdb (1.8.0)](#dbt-duckdb-1-8-0-)**|Apache-2.0
+**[dbt-duckdb (1.9.6)](#dbt-duckdb-1-9-6-)**|Apache-2.0
+**[dbt-postgres (1.9.1)](#dbt-postgres-1-9-1-)**|Apache-2.0
+**[dbt-redshift (1.9.5)](#dbt-redshift-1-9-5-)**|Apache-2.0
+**[dbt-semantic-interfaces (0.9.0)](#dbt-semantic-interfaces-0-9-0-)**|Apache-2.0
+**[dbt-semantic-interfaces (0.9.3.dev1)](#dbt-semantic-interfaces-0-9-3-dev1-)**|Apache-2.0
+**[dbt-snowflake (1.10.2)](#dbt-snowflake-1-10-2-)**|Apache-2.0
+**[dbt-trino (1.9.3)](#dbt-trino-1-9-3-)**|Apache-2.0
+**[duckdb (1.3.2)](#duckdb-1-3-2-)**|
+**[graphviz (0.18.2)](#graphviz-0-18-2-)**|MIT
+**[halo (0.0.31)](#halo-0-0-31-)**|MIT
+**[Jinja2 (3.1.6)](#Jinja2-3-1-6-)**|BSD-3-Clause
+**[metricflow (0.207.1)](#metricflow-0-207-1-)**|business-source-license-1.1, Apache-2.0
+**[more-itertools (8.10.0)](#more-itertools-8-10-0-)**|MIT
+**[mypy (1.7.0)](#mypy-1-7-0-)**|Python-2.0, MIT, PSF-2.0
+**[pre-commit (3.2.2)](#pre-commit-3-2-2-)**|MIT
+**[pydantic (1.10.0)](#pydantic-1-10-0-)**|MIT
+**[Pympler (1.1)](#Pympler-1-1-)**|Apache-2.0
+**[pytest (8.0.0)](#pytest-8-0-0-)**|MIT
+**[pytest-mock (3.14.0)](#pytest-mock-3-14-0-)**|MIT
+**[pytest-xdist (3.6.0)](#pytest-xdist-3-6-0-)**|MIT
+**[python-dateutil (2.9.0)](#python-dateutil-2-9-0-)**|BSD-3-Clause, Apache-2.0
+**[PyYAML (6.0)](#PyYAML-6-0-)**|MIT
+**[RapidFuzz (3.0.0)](#RapidFuzz-3-0-0-)**|MIT
+**[tabulate (0.8.9)](#tabulate-0-8-9-)**|MIT
+**[termcolor (3.0.0)](#termcolor-3-0-0-)**|MIT
+**[types-python-dateutil (2.9.0.20250822)](#types-python-dateutil-2-9-0-20250822-)**|MIT, Apache-2.0
+**[types-PyYAML (6.0.12.20250822)](#types-PyYAML-6-0-12-20250822-)**|MIT, Apache-2.0
+**[types-tabulate (0.9.0.20241207)](#types-tabulate-0-9-0-20241207-)**|MIT, Apache-2.0
+**[typing-extensions (4.4.0)](#typing-extensions-4-4-0-)**|Python-2.0
+**[update-checker (0.18.0)](#update-checker-0-18-0-)**|BSD-2-Clause
 
 
 
@@ -91,9 +130,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 
+
 ---
 
-### [dbt-bigquery (1.8.0)](https://github.com/dbt-labs/dbt-bigquery)
+### [dbt-bigquery (1.10.2)](https://pypi.org/project/dbt-bigquery/)
 
 
 #### Declared Licenses
@@ -325,9 +365,10 @@ Apache-2.0
 
 
 
+
 ---
 
-### [dbt-core (1.9.1)](https://github.com/dbt-labs/dbt-core)
+### [dbt-core (1.10.4)](https://github.com/dbt-labs/dbt-core)
 
 
 #### Declared Licenses
@@ -370,37 +411,18 @@ See the License for the specific language governing permissions and limitations 
 
 
 
+
 ---
 
-### [dbt-databricks (1.8.0)](https://github.com/databricks/dbt-databricks)
+### [dbt-databricks (1.10.12)](https://pypi.org/project/dbt-databricks/)
 
 
 #### Declared Licenses
-Apache-2.0
-
-
-```
-Copyright [yyyy] [name of copyright owner]
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-
-See the License for the specific language governing permissions and limitations under the License.
-```
-
-
-
 
 
 
 #### Other Licenses
+
 
 
 
@@ -649,477 +671,10 @@ Apache-2.0
 
 
 
----
-
-### [dbt-postgres (1.8.0)](https://pypi.org/project/dbt-postgres/)
-
-
-#### Declared Licenses
-Apache-2.0
-
-
-```
-                                 Apache License
-                           Version 2.0, January 2004
-                        http://www.apache.org/licenses/
-
-   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
-
-   1. Definitions.
-
-      "License" shall mean the terms and conditions for use, reproduction,
-      and distribution as defined by Sections 1 through 9 of this document.
-
-      "Licensor" shall mean the copyright owner or entity authorized by
-      the copyright owner that is granting the License.
-
-      "Legal Entity" shall mean the union of the acting entity and all
-      other entities that control, are controlled by, or are under common
-      control with that entity. For the purposes of this definition,
-      "control" means (i) the power, direct or indirect, to cause the
-      direction or management of such entity, whether by contract or
-      otherwise, or (ii) ownership of fifty percent (50%) or more of the
-      outstanding shares, or (iii) beneficial ownership of such entity.
-
-      "You" (or "Your") shall mean an individual or Legal Entity
-      exercising permissions granted by this License.
-
-      "Source" form shall mean the preferred form for making modifications,
-      including but not limited to software source code, documentation
-      source, and configuration files.
-
-      "Object" form shall mean any form resulting from mechanical
-      transformation or translation of a Source form, including but
-      not limited to compiled object code, generated documentation,
-      and conversions to other media types.
-
-      "Work" shall mean the work of authorship, whether in Source or
-      Object form, made available under the License, as indicated by a
-      copyright notice that is included in or attached to the work
-      (an example is provided in the Appendix below).
-
-      "Derivative Works" shall mean any work, whether in Source or Object
-      form, that is based on (or derived from) the Work and for which the
-      editorial revisions, annotations, elaborations, or other modifications
-      represent, as a whole, an original work of authorship. For the purposes
-      of this License, Derivative Works shall not include works that remain
-      separable from, or merely link (or bind by name) to the interfaces of,
-      the Work and Derivative Works thereof.
-
-      "Contribution" shall mean any work of authorship, including
-      the original version of the Work and any modifications or additions
-      to that Work or Derivative Works thereof, that is intentionally
-      submitted to Licensor for inclusion in the Work by the copyright owner
-      or by an individual or Legal Entity authorized to submit on behalf of
-      the copyright owner. For the purposes of this definition, "submitted"
-      means any form of electronic, verbal, or written communication sent
-      to the Licensor or its representatives, including but not limited to
-      communication on electronic mailing lists, source code control systems,
-      and issue tracking systems that are managed by, or on behalf of, the
-      Licensor for the purpose of discussing and improving the Work, but
-      excluding communication that is conspicuously marked or otherwise
-      designated in writing by the copyright owner as "Not a Contribution."
-
-      "Contributor" shall mean Licensor and any individual or Legal Entity
-      on behalf of whom a Contribution has been received by Licensor and
-      subsequently incorporated within the Work.
-
-   2. Grant of Copyright License. Subject to the terms and conditions of
-      this License, each Contributor hereby grants to You a perpetual,
-      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
-      copyright license to reproduce, prepare Derivative Works of,
-      publicly display, publicly perform, sublicense, and distribute the
-      Work and such Derivative Works in Source or Object form.
-
-   3. Grant of Patent License. Subject to the terms and conditions of
-      this License, each Contributor hereby grants to You a perpetual,
-      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
-      (except as stated in this section) patent license to make, have made,
-      use, offer to sell, sell, import, and otherwise transfer the Work,
-      where such license applies only to those patent claims licensable
-      by such Contributor that are necessarily infringed by their
-      Contribution(s) alone or by combination of their Contribution(s)
-      with the Work to which such Contribution(s) was submitted. If You
-      institute patent litigation against any entity (including a
-      cross-claim or counterclaim in a lawsuit) alleging that the Work
-      or a Contribution incorporated within the Work constitutes direct
-      or contributory patent infringement, then any patent licenses
-      granted to You under this License for that Work shall terminate
-      as of the date such litigation is filed.
-
-   4. Redistribution. You may reproduce and distribute copies of the
-      Work or Derivative Works thereof in any medium, with or without
-      modifications, and in Source or Object form, provided that You
-      meet the following conditions:
-
-      (a) You must give any other recipients of the Work or
-          Derivative Works a copy of this License; and
-
-      (b) You must cause any modified files to carry prominent notices
-          stating that You changed the files; and
-
-      (c) You must retain, in the Source form of any Derivative Works
-          that You distribute, all copyright, patent, trademark, and
-          attribution notices from the Source form of the Work,
-          excluding those notices that do not pertain to any part of
-          the Derivative Works; and
-
-      (d) If the Work includes a "NOTICE" text file as part of its
-          distribution, then any Derivative Works that You distribute must
-          include a readable copy of the attribution notices contained
-          within such NOTICE file, excluding those notices that do not
-          pertain to any part of the Derivative Works, in at least one
-          of the following places: within a NOTICE text file distributed
-          as part of the Derivative Works; within the Source form or
-          documentation, if provided along with the Derivative Works; or,
-          within a display generated by the Derivative Works, if and
-          wherever such third-party notices normally appear. The contents
-          of the NOTICE file are for informational purposes only and
-          do not modify the License. You may add Your own attribution
-          notices within Derivative Works that You distribute, alongside
-          or as an addendum to the NOTICE text from the Work, provided
-          that such additional attribution notices cannot be construed
-          as modifying the License.
-
-      You may add Your own copyright statement to Your modifications and
-      may provide additional or different license terms and conditions
-      for use, reproduction, or distribution of Your modifications, or
-      for any such Derivative Works as a whole, provided Your use,
-      reproduction, and distribution of the Work otherwise complies with
-      the conditions stated in this License.
-
-   5. Submission of Contributions. Unless You explicitly state otherwise,
-      any Contribution intentionally submitted for inclusion in the Work
-      by You to the Licensor shall be under the terms and conditions of
-      this License, without any additional terms or conditions.
-      Notwithstanding the above, nothing herein shall supersede or modify
-      the terms of any separate license agreement you may have executed
-      with Licensor regarding such Contributions.
-
-   6. Trademarks. This License does not grant permission to use the trade
-      names, trademarks, service marks, or product names of the Licensor,
-      except as required for reasonable and customary use in describing the
-      origin of the Work and reproducing the content of the NOTICE file.
-
-   7. Disclaimer of Warranty. Unless required by applicable law or
-      agreed to in writing, Licensor provides the Work (and each
-      Contributor provides its Contributions) on an "AS IS" BASIS,
-      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-      implied, including, without limitation, any warranties or conditions
-      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
-      PARTICULAR PURPOSE. You are solely responsible for determining the
-      appropriateness of using or redistributing the Work and assume any
-      risks associated with Your exercise of permissions under this License.
-
-   8. Limitation of Liability. In no event and under no legal theory,
-      whether in tort (including negligence), contract, or otherwise,
-      unless required by applicable law (such as deliberate and grossly
-      negligent acts) or agreed to in writing, shall any Contributor be
-      liable to You for damages, including any direct, indirect, special,
-      incidental, or consequential damages of any character arising as a
-      result of this License or out of the use or inability to use the
-      Work (including but not limited to damages for loss of goodwill,
-      work stoppage, computer failure or malfunction, or any and all
-      other commercial damages or losses), even if such Contributor
-      has been advised of the possibility of such damages.
-
-   9. Accepting Warranty or Additional Liability. While redistributing
-      the Work or Derivative Works thereof, You may choose to offer,
-      and charge a fee for, acceptance of support, warranty, indemnity,
-      or other liability obligations and/or rights consistent with this
-      License. However, in accepting such obligations, You may act only
-      on Your own behalf and on Your sole responsibility, not on behalf
-      of any other Contributor, and only if You agree to indemnify,
-      defend, and hold each Contributor harmless for any liability
-      incurred by, or claims asserted against, such Contributor by reason
-      of your accepting any such warranty or additional liability.
-
-   END OF TERMS AND CONDITIONS
-
-   APPENDIX: How to apply the Apache License to your work.
-
-      To apply the Apache License to your work, attach the following
-      boilerplate notice, with the fields enclosed by brackets "[]"
-      replaced with your own identifying information. (Don't include
-      the brackets!)  The text should be enclosed in the appropriate
-      comment syntax for the file format. We also recommend that a
-      file or class name and description of purpose be included on the
-      same "printed page" as the copyright notice for easier
-      identification within third-party archives.
-
-   Copyright 2024 dbt Labs, Inc.
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-
-```
-
-
-
-
-
-
-#### Other Licenses
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ---
 
-### [dbt-redshift (1.8.0)](https://github.com/dbt-labs/dbt-redshift)
-
-
-#### Declared Licenses
-Apache-2.0
-
-
-```
-                                 Apache License
-                           Version 2.0, January 2004
-                        http://www.apache.org/licenses/
-
-   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
-
-   1. Definitions.
-
-      "License" shall mean the terms and conditions for use, reproduction,
-      and distribution as defined by Sections 1 through 9 of this document.
-
-      "Licensor" shall mean the copyright owner or entity authorized by
-      the copyright owner that is granting the License.
-
-      "Legal Entity" shall mean the union of the acting entity and all
-      other entities that control, are controlled by, or are under common
-      control with that entity. For the purposes of this definition,
-      "control" means (i) the power, direct or indirect, to cause the
-      direction or management of such entity, whether by contract or
-      otherwise, or (ii) ownership of fifty percent (50%) or more of the
-      outstanding shares, or (iii) beneficial ownership of such entity.
-
-      "You" (or "Your") shall mean an individual or Legal Entity
-      exercising permissions granted by this License.
-
-      "Source" form shall mean the preferred form for making modifications,
-      including but not limited to software source code, documentation
-      source, and configuration files.
-
-      "Object" form shall mean any form resulting from mechanical
-      transformation or translation of a Source form, including but
-      not limited to compiled object code, generated documentation,
-      and conversions to other media types.
-
-      "Work" shall mean the work of authorship, whether in Source or
-      Object form, made available under the License, as indicated by a
-      copyright notice that is included in or attached to the work
-      (an example is provided in the Appendix below).
-
-      "Derivative Works" shall mean any work, whether in Source or Object
-      form, that is based on (or derived from) the Work and for which the
-      editorial revisions, annotations, elaborations, or other modifications
-      represent, as a whole, an original work of authorship. For the purposes
-      of this License, Derivative Works shall not include works that remain
-      separable from, or merely link (or bind by name) to the interfaces of,
-      the Work and Derivative Works thereof.
-
-      "Contribution" shall mean any work of authorship, including
-      the original version of the Work and any modifications or additions
-      to that Work or Derivative Works thereof, that is intentionally
-      submitted to Licensor for inclusion in the Work by the copyright owner
-      or by an individual or Legal Entity authorized to submit on behalf of
-      the copyright owner. For the purposes of this definition, "submitted"
-      means any form of electronic, verbal, or written communication sent
-      to the Licensor or its representatives, including but not limited to
-      communication on electronic mailing lists, source code control systems,
-      and issue tracking systems that are managed by, or on behalf of, the
-      Licensor for the purpose of discussing and improving the Work, but
-      excluding communication that is conspicuously marked or otherwise
-      designated in writing by the copyright owner as "Not a Contribution."
-
-      "Contributor" shall mean Licensor and any individual or Legal Entity
-      on behalf of whom a Contribution has been received by Licensor and
-      subsequently incorporated within the Work.
-
-   2. Grant of Copyright License. Subject to the terms and conditions of
-      this License, each Contributor hereby grants to You a perpetual,
-      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
-      copyright license to reproduce, prepare Derivative Works of,
-      publicly display, publicly perform, sublicense, and distribute the
-      Work and such Derivative Works in Source or Object form.
-
-   3. Grant of Patent License. Subject to the terms and conditions of
-      this License, each Contributor hereby grants to You a perpetual,
-      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
-      (except as stated in this section) patent license to make, have made,
-      use, offer to sell, sell, import, and otherwise transfer the Work,
-      where such license applies only to those patent claims licensable
-      by such Contributor that are necessarily infringed by their
-      Contribution(s) alone or by combination of their Contribution(s)
-      with the Work to which such Contribution(s) was submitted. If You
-      institute patent litigation against any entity (including a
-      cross-claim or counterclaim in a lawsuit) alleging that the Work
-      or a Contribution incorporated within the Work constitutes direct
-      or contributory patent infringement, then any patent licenses
-      granted to You under this License for that Work shall terminate
-      as of the date such litigation is filed.
-
-   4. Redistribution. You may reproduce and distribute copies of the
-      Work or Derivative Works thereof in any medium, with or without
-      modifications, and in Source or Object form, provided that You
-      meet the following conditions:
-
-      (a) You must give any other recipients of the Work or
-          Derivative Works a copy of this License; and
-
-      (b) You must cause any modified files to carry prominent notices
-          stating that You changed the files; and
-
-      (c) You must retain, in the Source form of any Derivative Works
-          that You distribute, all copyright, patent, trademark, and
-          attribution notices from the Source form of the Work,
-          excluding those notices that do not pertain to any part of
-          the Derivative Works; and
-
-      (d) If the Work includes a "NOTICE" text file as part of its
-          distribution, then any Derivative Works that You distribute must
-          include a readable copy of the attribution notices contained
-          within such NOTICE file, excluding those notices that do not
-          pertain to any part of the Derivative Works, in at least one
-          of the following places: within a NOTICE text file distributed
-          as part of the Derivative Works; within the Source form or
-          documentation, if provided along with the Derivative Works; or,
-          within a display generated by the Derivative Works, if and
-          wherever such third-party notices normally appear. The contents
-          of the NOTICE file are for informational purposes only and
-          do not modify the License. You may add Your own attribution
-          notices within Derivative Works that You distribute, alongside
-          or as an addendum to the NOTICE text from the Work, provided
-          that such additional attribution notices cannot be construed
-          as modifying the License.
-
-      You may add Your own copyright statement to Your modifications and
-      may provide additional or different license terms and conditions
-      for use, reproduction, or distribution of Your modifications, or
-      for any such Derivative Works as a whole, provided Your use,
-      reproduction, and distribution of the Work otherwise complies with
-      the conditions stated in this License.
-
-   5. Submission of Contributions. Unless You explicitly state otherwise,
-      any Contribution intentionally submitted for inclusion in the Work
-      by You to the Licensor shall be under the terms and conditions of
-      this License, without any additional terms or conditions.
-      Notwithstanding the above, nothing herein shall supersede or modify
-      the terms of any separate license agreement you may have executed
-      with Licensor regarding such Contributions.
-
-   6. Trademarks. This License does not grant permission to use the trade
-      names, trademarks, service marks, or product names of the Licensor,
-      except as required for reasonable and customary use in describing the
-      origin of the Work and reproducing the content of the NOTICE file.
-
-   7. Disclaimer of Warranty. Unless required by applicable law or
-      agreed to in writing, Licensor provides the Work (and each
-      Contributor provides its Contributions) on an "AS IS" BASIS,
-      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-      implied, including, without limitation, any warranties or conditions
-      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
-      PARTICULAR PURPOSE. You are solely responsible for determining the
-      appropriateness of using or redistributing the Work and assume any
-      risks associated with Your exercise of permissions under this License.
-
-   8. Limitation of Liability. In no event and under no legal theory,
-      whether in tort (including negligence), contract, or otherwise,
-      unless required by applicable law (such as deliberate and grossly
-      negligent acts) or agreed to in writing, shall any Contributor be
-      liable to You for damages, including any direct, indirect, special,
-      incidental, or consequential damages of any character arising as a
-      result of this License or out of the use or inability to use the
-      Work (including but not limited to damages for loss of goodwill,
-      work stoppage, computer failure or malfunction, or any and all
-      other commercial damages or losses), even if such Contributor
-      has been advised of the possibility of such damages.
-
-   9. Accepting Warranty or Additional Liability. While redistributing
-      the Work or Derivative Works thereof, You may choose to offer,
-      and charge a fee for, acceptance of support, warranty, indemnity,
-      or other liability obligations and/or rights consistent with this
-      License. However, in accepting such obligations, You may act only
-      on Your own behalf and on Your sole responsibility, not on behalf
-      of any other Contributor, and only if You agree to indemnify,
-      defend, and hold each Contributor harmless for any liability
-      incurred by, or claims asserted against, such Contributor by reason
-      of your accepting any such warranty or additional liability.
-
-   END OF TERMS AND CONDITIONS
-
-   APPENDIX: How to apply the Apache License to your work.
-
-      To apply the Apache License to your work, attach the following
-      boilerplate notice, with the fields enclosed by brackets "{}"
-      replaced with your own identifying information. (Don't include
-      the brackets!)  The text should be enclosed in the appropriate
-      comment syntax for the file format. We also recommend that a
-      file or class name and description of purpose be included on the
-      same "printed page" as the copyright notice for easier
-      identification within third-party archives.
-
-   Copyright 2021 dbt Labs, Inc.
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-
-```
-
-
-
-
-
-
-#### Other Licenses
-
-
-
-
-
-
-
-
-
-
-
-
-
-
----
-
-### [dbt-semantic-interfaces (0.8.3)](https://pypi.org/project/dbt-semantic-interfaces/)
+### [dbt-duckdb (1.9.6)](https://github.com/jwills/dbt-duckdb)
 
 
 #### Declared Licenses
@@ -1351,9 +906,950 @@ Apache-2.0
 
 
 
+
 ---
 
-### [dbt-snowflake (1.8.0)](https://github.com/dbt-labs/dbt-snowflake)
+### [dbt-postgres (1.9.1)](https://pypi.org/project/dbt-postgres/)
+
+
+#### Declared Licenses
+Apache-2.0
+
+
+```
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+   1. Definitions.
+
+      "License" shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
+
+      "Licensor" shall mean the copyright owner or entity authorized by
+      the copyright owner that is granting the License.
+
+      "Legal Entity" shall mean the union of the acting entity and all
+      other entities that control, are controlled by, or are under common
+      control with that entity. For the purposes of this definition,
+      "control" means (i) the power, direct or indirect, to cause the
+      direction or management of such entity, whether by contract or
+      otherwise, or (ii) ownership of fifty percent (50%) or more of the
+      outstanding shares, or (iii) beneficial ownership of such entity.
+
+      "You" (or "Your") shall mean an individual or Legal Entity
+      exercising permissions granted by this License.
+
+      "Source" form shall mean the preferred form for making modifications,
+      including but not limited to software source code, documentation
+      source, and configuration files.
+
+      "Object" form shall mean any form resulting from mechanical
+      transformation or translation of a Source form, including but
+      not limited to compiled object code, generated documentation,
+      and conversions to other media types.
+
+      "Work" shall mean the work of authorship, whether in Source or
+      Object form, made available under the License, as indicated by a
+      copyright notice that is included in or attached to the work
+      (an example is provided in the Appendix below).
+
+      "Derivative Works" shall mean any work, whether in Source or Object
+      form, that is based on (or derived from) the Work and for which the
+      editorial revisions, annotations, elaborations, or other modifications
+      represent, as a whole, an original work of authorship. For the purposes
+      of this License, Derivative Works shall not include works that remain
+      separable from, or merely link (or bind by name) to the interfaces of,
+      the Work and Derivative Works thereof.
+
+      "Contribution" shall mean any work of authorship, including
+      the original version of the Work and any modifications or additions
+      to that Work or Derivative Works thereof, that is intentionally
+      submitted to Licensor for inclusion in the Work by the copyright owner
+      or by an individual or Legal Entity authorized to submit on behalf of
+      the copyright owner. For the purposes of this definition, "submitted"
+      means any form of electronic, verbal, or written communication sent
+      to the Licensor or its representatives, including but not limited to
+      communication on electronic mailing lists, source code control systems,
+      and issue tracking systems that are managed by, or on behalf of, the
+      Licensor for the purpose of discussing and improving the Work, but
+      excluding communication that is conspicuously marked or otherwise
+      designated in writing by the copyright owner as "Not a Contribution."
+
+      "Contributor" shall mean Licensor and any individual or Legal Entity
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
+
+   2. Grant of Copyright License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      copyright license to reproduce, prepare Derivative Works of,
+      publicly display, publicly perform, sublicense, and distribute the
+      Work and such Derivative Works in Source or Object form.
+
+   3. Grant of Patent License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      (except as stated in this section) patent license to make, have made,
+      use, offer to sell, sell, import, and otherwise transfer the Work,
+      where such license applies only to those patent claims licensable
+      by such Contributor that are necessarily infringed by their
+      Contribution(s) alone or by combination of their Contribution(s)
+      with the Work to which such Contribution(s) was submitted. If You
+      institute patent litigation against any entity (including a
+      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      or a Contribution incorporated within the Work constitutes direct
+      or contributory patent infringement, then any patent licenses
+      granted to You under this License for that Work shall terminate
+      as of the date such litigation is filed.
+
+   4. Redistribution. You may reproduce and distribute copies of the
+      Work or Derivative Works thereof in any medium, with or without
+      modifications, and in Source or Object form, provided that You
+      meet the following conditions:
+
+      (a) You must give any other recipients of the Work or
+          Derivative Works a copy of this License; and
+
+      (b) You must cause any modified files to carry prominent notices
+          stating that You changed the files; and
+
+      (c) You must retain, in the Source form of any Derivative Works
+          that You distribute, all copyright, patent, trademark, and
+          attribution notices from the Source form of the Work,
+          excluding those notices that do not pertain to any part of
+          the Derivative Works; and
+
+      (d) If the Work includes a "NOTICE" text file as part of its
+          distribution, then any Derivative Works that You distribute must
+          include a readable copy of the attribution notices contained
+          within such NOTICE file, excluding those notices that do not
+          pertain to any part of the Derivative Works, in at least one
+          of the following places: within a NOTICE text file distributed
+          as part of the Derivative Works; within the Source form or
+          documentation, if provided along with the Derivative Works; or,
+          within a display generated by the Derivative Works, if and
+          wherever such third-party notices normally appear. The contents
+          of the NOTICE file are for informational purposes only and
+          do not modify the License. You may add Your own attribution
+          notices within Derivative Works that You distribute, alongside
+          or as an addendum to the NOTICE text from the Work, provided
+          that such additional attribution notices cannot be construed
+          as modifying the License.
+
+      You may add Your own copyright statement to Your modifications and
+      may provide additional or different license terms and conditions
+      for use, reproduction, or distribution of Your modifications, or
+      for any such Derivative Works as a whole, provided Your use,
+      reproduction, and distribution of the Work otherwise complies with
+      the conditions stated in this License.
+
+   5. Submission of Contributions. Unless You explicitly state otherwise,
+      any Contribution intentionally submitted for inclusion in the Work
+      by You to the Licensor shall be under the terms and conditions of
+      this License, without any additional terms or conditions.
+      Notwithstanding the above, nothing herein shall supersede or modify
+      the terms of any separate license agreement you may have executed
+      with Licensor regarding such Contributions.
+
+   6. Trademarks. This License does not grant permission to use the trade
+      names, trademarks, service marks, or product names of the Licensor,
+      except as required for reasonable and customary use in describing the
+      origin of the Work and reproducing the content of the NOTICE file.
+
+   7. Disclaimer of Warranty. Unless required by applicable law or
+      agreed to in writing, Licensor provides the Work (and each
+      Contributor provides its Contributions) on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied, including, without limitation, any warranties or conditions
+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+      PARTICULAR PURPOSE. You are solely responsible for determining the
+      appropriateness of using or redistributing the Work and assume any
+      risks associated with Your exercise of permissions under this License.
+
+   8. Limitation of Liability. In no event and under no legal theory,
+      whether in tort (including negligence), contract, or otherwise,
+      unless required by applicable law (such as deliberate and grossly
+      negligent acts) or agreed to in writing, shall any Contributor be
+      liable to You for damages, including any direct, indirect, special,
+      incidental, or consequential damages of any character arising as a
+      result of this License or out of the use or inability to use the
+      Work (including but not limited to damages for loss of goodwill,
+      work stoppage, computer failure or malfunction, or any and all
+      other commercial damages or losses), even if such Contributor
+      has been advised of the possibility of such damages.
+
+   9. Accepting Warranty or Additional Liability. While redistributing
+      the Work or Derivative Works thereof, You may choose to offer,
+      and charge a fee for, acceptance of support, warranty, indemnity,
+      or other liability obligations and/or rights consistent with this
+      License. However, in accepting such obligations, You may act only
+      on Your own behalf and on Your sole responsibility, not on behalf
+      of any other Contributor, and only if You agree to indemnify,
+      defend, and hold each Contributor harmless for any liability
+      incurred by, or claims asserted against, such Contributor by reason
+      of your accepting any such warranty or additional liability.
+
+   END OF TERMS AND CONDITIONS
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "[]"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright 2024 dbt Labs, Inc.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+```
+
+
+
+
+
+
+#### Other Licenses
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+### [dbt-redshift (1.9.5)](https://pypi.org/project/dbt-redshift/)
+
+
+#### Declared Licenses
+Apache-2.0
+
+
+```
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+   1. Definitions.
+
+      "License" shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
+
+      "Licensor" shall mean the copyright owner or entity authorized by
+      the copyright owner that is granting the License.
+
+      "Legal Entity" shall mean the union of the acting entity and all
+      other entities that control, are controlled by, or are under common
+      control with that entity. For the purposes of this definition,
+      "control" means (i) the power, direct or indirect, to cause the
+      direction or management of such entity, whether by contract or
+      otherwise, or (ii) ownership of fifty percent (50%) or more of the
+      outstanding shares, or (iii) beneficial ownership of such entity.
+
+      "You" (or "Your") shall mean an individual or Legal Entity
+      exercising permissions granted by this License.
+
+      "Source" form shall mean the preferred form for making modifications,
+      including but not limited to software source code, documentation
+      source, and configuration files.
+
+      "Object" form shall mean any form resulting from mechanical
+      transformation or translation of a Source form, including but
+      not limited to compiled object code, generated documentation,
+      and conversions to other media types.
+
+      "Work" shall mean the work of authorship, whether in Source or
+      Object form, made available under the License, as indicated by a
+      copyright notice that is included in or attached to the work
+      (an example is provided in the Appendix below).
+
+      "Derivative Works" shall mean any work, whether in Source or Object
+      form, that is based on (or derived from) the Work and for which the
+      editorial revisions, annotations, elaborations, or other modifications
+      represent, as a whole, an original work of authorship. For the purposes
+      of this License, Derivative Works shall not include works that remain
+      separable from, or merely link (or bind by name) to the interfaces of,
+      the Work and Derivative Works thereof.
+
+      "Contribution" shall mean any work of authorship, including
+      the original version of the Work and any modifications or additions
+      to that Work or Derivative Works thereof, that is intentionally
+      submitted to Licensor for inclusion in the Work by the copyright owner
+      or by an individual or Legal Entity authorized to submit on behalf of
+      the copyright owner. For the purposes of this definition, "submitted"
+      means any form of electronic, verbal, or written communication sent
+      to the Licensor or its representatives, including but not limited to
+      communication on electronic mailing lists, source code control systems,
+      and issue tracking systems that are managed by, or on behalf of, the
+      Licensor for the purpose of discussing and improving the Work, but
+      excluding communication that is conspicuously marked or otherwise
+      designated in writing by the copyright owner as "Not a Contribution."
+
+      "Contributor" shall mean Licensor and any individual or Legal Entity
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
+
+   2. Grant of Copyright License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      copyright license to reproduce, prepare Derivative Works of,
+      publicly display, publicly perform, sublicense, and distribute the
+      Work and such Derivative Works in Source or Object form.
+
+   3. Grant of Patent License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      (except as stated in this section) patent license to make, have made,
+      use, offer to sell, sell, import, and otherwise transfer the Work,
+      where such license applies only to those patent claims licensable
+      by such Contributor that are necessarily infringed by their
+      Contribution(s) alone or by combination of their Contribution(s)
+      with the Work to which such Contribution(s) was submitted. If You
+      institute patent litigation against any entity (including a
+      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      or a Contribution incorporated within the Work constitutes direct
+      or contributory patent infringement, then any patent licenses
+      granted to You under this License for that Work shall terminate
+      as of the date such litigation is filed.
+
+   4. Redistribution. You may reproduce and distribute copies of the
+      Work or Derivative Works thereof in any medium, with or without
+      modifications, and in Source or Object form, provided that You
+      meet the following conditions:
+
+      (a) You must give any other recipients of the Work or
+          Derivative Works a copy of this License; and
+
+      (b) You must cause any modified files to carry prominent notices
+          stating that You changed the files; and
+
+      (c) You must retain, in the Source form of any Derivative Works
+          that You distribute, all copyright, patent, trademark, and
+          attribution notices from the Source form of the Work,
+          excluding those notices that do not pertain to any part of
+          the Derivative Works; and
+
+      (d) If the Work includes a "NOTICE" text file as part of its
+          distribution, then any Derivative Works that You distribute must
+          include a readable copy of the attribution notices contained
+          within such NOTICE file, excluding those notices that do not
+          pertain to any part of the Derivative Works, in at least one
+          of the following places: within a NOTICE text file distributed
+          as part of the Derivative Works; within the Source form or
+          documentation, if provided along with the Derivative Works; or,
+          within a display generated by the Derivative Works, if and
+          wherever such third-party notices normally appear. The contents
+          of the NOTICE file are for informational purposes only and
+          do not modify the License. You may add Your own attribution
+          notices within Derivative Works that You distribute, alongside
+          or as an addendum to the NOTICE text from the Work, provided
+          that such additional attribution notices cannot be construed
+          as modifying the License.
+
+      You may add Your own copyright statement to Your modifications and
+      may provide additional or different license terms and conditions
+      for use, reproduction, or distribution of Your modifications, or
+      for any such Derivative Works as a whole, provided Your use,
+      reproduction, and distribution of the Work otherwise complies with
+      the conditions stated in this License.
+
+   5. Submission of Contributions. Unless You explicitly state otherwise,
+      any Contribution intentionally submitted for inclusion in the Work
+      by You to the Licensor shall be under the terms and conditions of
+      this License, without any additional terms or conditions.
+      Notwithstanding the above, nothing herein shall supersede or modify
+      the terms of any separate license agreement you may have executed
+      with Licensor regarding such Contributions.
+
+   6. Trademarks. This License does not grant permission to use the trade
+      names, trademarks, service marks, or product names of the Licensor,
+      except as required for reasonable and customary use in describing the
+      origin of the Work and reproducing the content of the NOTICE file.
+
+   7. Disclaimer of Warranty. Unless required by applicable law or
+      agreed to in writing, Licensor provides the Work (and each
+      Contributor provides its Contributions) on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied, including, without limitation, any warranties or conditions
+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+      PARTICULAR PURPOSE. You are solely responsible for determining the
+      appropriateness of using or redistributing the Work and assume any
+      risks associated with Your exercise of permissions under this License.
+
+   8. Limitation of Liability. In no event and under no legal theory,
+      whether in tort (including negligence), contract, or otherwise,
+      unless required by applicable law (such as deliberate and grossly
+      negligent acts) or agreed to in writing, shall any Contributor be
+      liable to You for damages, including any direct, indirect, special,
+      incidental, or consequential damages of any character arising as a
+      result of this License or out of the use or inability to use the
+      Work (including but not limited to damages for loss of goodwill,
+      work stoppage, computer failure or malfunction, or any and all
+      other commercial damages or losses), even if such Contributor
+      has been advised of the possibility of such damages.
+
+   9. Accepting Warranty or Additional Liability. While redistributing
+      the Work or Derivative Works thereof, You may choose to offer,
+      and charge a fee for, acceptance of support, warranty, indemnity,
+      or other liability obligations and/or rights consistent with this
+      License. However, in accepting such obligations, You may act only
+      on Your own behalf and on Your sole responsibility, not on behalf
+      of any other Contributor, and only if You agree to indemnify,
+      defend, and hold each Contributor harmless for any liability
+      incurred by, or claims asserted against, such Contributor by reason
+      of your accepting any such warranty or additional liability.
+
+   END OF TERMS AND CONDITIONS
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "[]"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright 2024 dbt Labs, Inc.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+```
+
+
+
+
+
+
+#### Other Licenses
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+### [dbt-semantic-interfaces (0.9.0)](https://pypi.org/project/dbt-semantic-interfaces/)
+
+
+#### Declared Licenses
+Apache-2.0
+
+
+```
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+   1. Definitions.
+
+      "License" shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
+
+      "Licensor" shall mean the copyright owner or entity authorized by
+      the copyright owner that is granting the License.
+
+      "Legal Entity" shall mean the union of the acting entity and all
+      other entities that control, are controlled by, or are under common
+      control with that entity. For the purposes of this definition,
+      "control" means (i) the power, direct or indirect, to cause the
+      direction or management of such entity, whether by contract or
+      otherwise, or (ii) ownership of fifty percent (50%) or more of the
+      outstanding shares, or (iii) beneficial ownership of such entity.
+
+      "You" (or "Your") shall mean an individual or Legal Entity
+      exercising permissions granted by this License.
+
+      "Source" form shall mean the preferred form for making modifications,
+      including but not limited to software source code, documentation
+      source, and configuration files.
+
+      "Object" form shall mean any form resulting from mechanical
+      transformation or translation of a Source form, including but
+      not limited to compiled object code, generated documentation,
+      and conversions to other media types.
+
+      "Work" shall mean the work of authorship, whether in Source or
+      Object form, made available under the License, as indicated by a
+      copyright notice that is included in or attached to the work
+      (an example is provided in the Appendix below).
+
+      "Derivative Works" shall mean any work, whether in Source or Object
+      form, that is based on (or derived from) the Work and for which the
+      editorial revisions, annotations, elaborations, or other modifications
+      represent, as a whole, an original work of authorship. For the purposes
+      of this License, Derivative Works shall not include works that remain
+      separable from, or merely link (or bind by name) to the interfaces of,
+      the Work and Derivative Works thereof.
+
+      "Contribution" shall mean any work of authorship, including
+      the original version of the Work and any modifications or additions
+      to that Work or Derivative Works thereof, that is intentionally
+      submitted to Licensor for inclusion in the Work by the copyright owner
+      or by an individual or Legal Entity authorized to submit on behalf of
+      the copyright owner. For the purposes of this definition, "submitted"
+      means any form of electronic, verbal, or written communication sent
+      to the Licensor or its representatives, including but not limited to
+      communication on electronic mailing lists, source code control systems,
+      and issue tracking systems that are managed by, or on behalf of, the
+      Licensor for the purpose of discussing and improving the Work, but
+      excluding communication that is conspicuously marked or otherwise
+      designated in writing by the copyright owner as "Not a Contribution."
+
+      "Contributor" shall mean Licensor and any individual or Legal Entity
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
+
+   2. Grant of Copyright License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      copyright license to reproduce, prepare Derivative Works of,
+      publicly display, publicly perform, sublicense, and distribute the
+      Work and such Derivative Works in Source or Object form.
+
+   3. Grant of Patent License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      (except as stated in this section) patent license to make, have made,
+      use, offer to sell, sell, import, and otherwise transfer the Work,
+      where such license applies only to those patent claims licensable
+      by such Contributor that are necessarily infringed by their
+      Contribution(s) alone or by combination of their Contribution(s)
+      with the Work to which such Contribution(s) was submitted. If You
+      institute patent litigation against any entity (including a
+      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      or a Contribution incorporated within the Work constitutes direct
+      or contributory patent infringement, then any patent licenses
+      granted to You under this License for that Work shall terminate
+      as of the date such litigation is filed.
+
+   4. Redistribution. You may reproduce and distribute copies of the
+      Work or Derivative Works thereof in any medium, with or without
+      modifications, and in Source or Object form, provided that You
+      meet the following conditions:
+
+      (a) You must give any other recipients of the Work or
+          Derivative Works a copy of this License; and
+
+      (b) You must cause any modified files to carry prominent notices
+          stating that You changed the files; and
+
+      (c) You must retain, in the Source form of any Derivative Works
+          that You distribute, all copyright, patent, trademark, and
+          attribution notices from the Source form of the Work,
+          excluding those notices that do not pertain to any part of
+          the Derivative Works; and
+
+      (d) If the Work includes a "NOTICE" text file as part of its
+          distribution, then any Derivative Works that You distribute must
+          include a readable copy of the attribution notices contained
+          within such NOTICE file, excluding those notices that do not
+          pertain to any part of the Derivative Works, in at least one
+          of the following places: within a NOTICE text file distributed
+          as part of the Derivative Works; within the Source form or
+          documentation, if provided along with the Derivative Works; or,
+          within a display generated by the Derivative Works, if and
+          wherever such third-party notices normally appear. The contents
+          of the NOTICE file are for informational purposes only and
+          do not modify the License. You may add Your own attribution
+          notices within Derivative Works that You distribute, alongside
+          or as an addendum to the NOTICE text from the Work, provided
+          that such additional attribution notices cannot be construed
+          as modifying the License.
+
+      You may add Your own copyright statement to Your modifications and
+      may provide additional or different license terms and conditions
+      for use, reproduction, or distribution of Your modifications, or
+      for any such Derivative Works as a whole, provided Your use,
+      reproduction, and distribution of the Work otherwise complies with
+      the conditions stated in this License.
+
+   5. Submission of Contributions. Unless You explicitly state otherwise,
+      any Contribution intentionally submitted for inclusion in the Work
+      by You to the Licensor shall be under the terms and conditions of
+      this License, without any additional terms or conditions.
+      Notwithstanding the above, nothing herein shall supersede or modify
+      the terms of any separate license agreement you may have executed
+      with Licensor regarding such Contributions.
+
+   6. Trademarks. This License does not grant permission to use the trade
+      names, trademarks, service marks, or product names of the Licensor,
+      except as required for reasonable and customary use in describing the
+      origin of the Work and reproducing the content of the NOTICE file.
+
+   7. Disclaimer of Warranty. Unless required by applicable law or
+      agreed to in writing, Licensor provides the Work (and each
+      Contributor provides its Contributions) on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied, including, without limitation, any warranties or conditions
+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+      PARTICULAR PURPOSE. You are solely responsible for determining the
+      appropriateness of using or redistributing the Work and assume any
+      risks associated with Your exercise of permissions under this License.
+
+   8. Limitation of Liability. In no event and under no legal theory,
+      whether in tort (including negligence), contract, or otherwise,
+      unless required by applicable law (such as deliberate and grossly
+      negligent acts) or agreed to in writing, shall any Contributor be
+      liable to You for damages, including any direct, indirect, special,
+      incidental, or consequential damages of any character arising as a
+      result of this License or out of the use or inability to use the
+      Work (including but not limited to damages for loss of goodwill,
+      work stoppage, computer failure or malfunction, or any and all
+      other commercial damages or losses), even if such Contributor
+      has been advised of the possibility of such damages.
+
+   9. Accepting Warranty or Additional Liability. While redistributing
+      the Work or Derivative Works thereof, You may choose to offer,
+      and charge a fee for, acceptance of support, warranty, indemnity,
+      or other liability obligations and/or rights consistent with this
+      License. However, in accepting such obligations, You may act only
+      on Your own behalf and on Your sole responsibility, not on behalf
+      of any other Contributor, and only if You agree to indemnify,
+      defend, and hold each Contributor harmless for any liability
+      incurred by, or claims asserted against, such Contributor by reason
+      of your accepting any such warranty or additional liability.
+
+   END OF TERMS AND CONDITIONS
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "[]"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright [yyyy] [name of copyright owner]
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+```
+
+
+
+
+
+
+#### Other Licenses
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+### [dbt-semantic-interfaces (0.9.3.dev1)](https://pypi.org/project/dbt-semantic-interfaces/)
+
+
+#### Declared Licenses
+Apache-2.0
+
+
+```
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+   1. Definitions.
+
+      "License" shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
+
+      "Licensor" shall mean the copyright owner or entity authorized by
+      the copyright owner that is granting the License.
+
+      "Legal Entity" shall mean the union of the acting entity and all
+      other entities that control, are controlled by, or are under common
+      control with that entity. For the purposes of this definition,
+      "control" means (i) the power, direct or indirect, to cause the
+      direction or management of such entity, whether by contract or
+      otherwise, or (ii) ownership of fifty percent (50%) or more of the
+      outstanding shares, or (iii) beneficial ownership of such entity.
+
+      "You" (or "Your") shall mean an individual or Legal Entity
+      exercising permissions granted by this License.
+
+      "Source" form shall mean the preferred form for making modifications,
+      including but not limited to software source code, documentation
+      source, and configuration files.
+
+      "Object" form shall mean any form resulting from mechanical
+      transformation or translation of a Source form, including but
+      not limited to compiled object code, generated documentation,
+      and conversions to other media types.
+
+      "Work" shall mean the work of authorship, whether in Source or
+      Object form, made available under the License, as indicated by a
+      copyright notice that is included in or attached to the work
+      (an example is provided in the Appendix below).
+
+      "Derivative Works" shall mean any work, whether in Source or Object
+      form, that is based on (or derived from) the Work and for which the
+      editorial revisions, annotations, elaborations, or other modifications
+      represent, as a whole, an original work of authorship. For the purposes
+      of this License, Derivative Works shall not include works that remain
+      separable from, or merely link (or bind by name) to the interfaces of,
+      the Work and Derivative Works thereof.
+
+      "Contribution" shall mean any work of authorship, including
+      the original version of the Work and any modifications or additions
+      to that Work or Derivative Works thereof, that is intentionally
+      submitted to Licensor for inclusion in the Work by the copyright owner
+      or by an individual or Legal Entity authorized to submit on behalf of
+      the copyright owner. For the purposes of this definition, "submitted"
+      means any form of electronic, verbal, or written communication sent
+      to the Licensor or its representatives, including but not limited to
+      communication on electronic mailing lists, source code control systems,
+      and issue tracking systems that are managed by, or on behalf of, the
+      Licensor for the purpose of discussing and improving the Work, but
+      excluding communication that is conspicuously marked or otherwise
+      designated in writing by the copyright owner as "Not a Contribution."
+
+      "Contributor" shall mean Licensor and any individual or Legal Entity
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
+
+   2. Grant of Copyright License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      copyright license to reproduce, prepare Derivative Works of,
+      publicly display, publicly perform, sublicense, and distribute the
+      Work and such Derivative Works in Source or Object form.
+
+   3. Grant of Patent License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      (except as stated in this section) patent license to make, have made,
+      use, offer to sell, sell, import, and otherwise transfer the Work,
+      where such license applies only to those patent claims licensable
+      by such Contributor that are necessarily infringed by their
+      Contribution(s) alone or by combination of their Contribution(s)
+      with the Work to which such Contribution(s) was submitted. If You
+      institute patent litigation against any entity (including a
+      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      or a Contribution incorporated within the Work constitutes direct
+      or contributory patent infringement, then any patent licenses
+      granted to You under this License for that Work shall terminate
+      as of the date such litigation is filed.
+
+   4. Redistribution. You may reproduce and distribute copies of the
+      Work or Derivative Works thereof in any medium, with or without
+      modifications, and in Source or Object form, provided that You
+      meet the following conditions:
+
+      (a) You must give any other recipients of the Work or
+          Derivative Works a copy of this License; and
+
+      (b) You must cause any modified files to carry prominent notices
+          stating that You changed the files; and
+
+      (c) You must retain, in the Source form of any Derivative Works
+          that You distribute, all copyright, patent, trademark, and
+          attribution notices from the Source form of the Work,
+          excluding those notices that do not pertain to any part of
+          the Derivative Works; and
+
+      (d) If the Work includes a "NOTICE" text file as part of its
+          distribution, then any Derivative Works that You distribute must
+          include a readable copy of the attribution notices contained
+          within such NOTICE file, excluding those notices that do not
+          pertain to any part of the Derivative Works, in at least one
+          of the following places: within a NOTICE text file distributed
+          as part of the Derivative Works; within the Source form or
+          documentation, if provided along with the Derivative Works; or,
+          within a display generated by the Derivative Works, if and
+          wherever such third-party notices normally appear. The contents
+          of the NOTICE file are for informational purposes only and
+          do not modify the License. You may add Your own attribution
+          notices within Derivative Works that You distribute, alongside
+          or as an addendum to the NOTICE text from the Work, provided
+          that such additional attribution notices cannot be construed
+          as modifying the License.
+
+      You may add Your own copyright statement to Your modifications and
+      may provide additional or different license terms and conditions
+      for use, reproduction, or distribution of Your modifications, or
+      for any such Derivative Works as a whole, provided Your use,
+      reproduction, and distribution of the Work otherwise complies with
+      the conditions stated in this License.
+
+   5. Submission of Contributions. Unless You explicitly state otherwise,
+      any Contribution intentionally submitted for inclusion in the Work
+      by You to the Licensor shall be under the terms and conditions of
+      this License, without any additional terms or conditions.
+      Notwithstanding the above, nothing herein shall supersede or modify
+      the terms of any separate license agreement you may have executed
+      with Licensor regarding such Contributions.
+
+   6. Trademarks. This License does not grant permission to use the trade
+      names, trademarks, service marks, or product names of the Licensor,
+      except as required for reasonable and customary use in describing the
+      origin of the Work and reproducing the content of the NOTICE file.
+
+   7. Disclaimer of Warranty. Unless required by applicable law or
+      agreed to in writing, Licensor provides the Work (and each
+      Contributor provides its Contributions) on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied, including, without limitation, any warranties or conditions
+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+      PARTICULAR PURPOSE. You are solely responsible for determining the
+      appropriateness of using or redistributing the Work and assume any
+      risks associated with Your exercise of permissions under this License.
+
+   8. Limitation of Liability. In no event and under no legal theory,
+      whether in tort (including negligence), contract, or otherwise,
+      unless required by applicable law (such as deliberate and grossly
+      negligent acts) or agreed to in writing, shall any Contributor be
+      liable to You for damages, including any direct, indirect, special,
+      incidental, or consequential damages of any character arising as a
+      result of this License or out of the use or inability to use the
+      Work (including but not limited to damages for loss of goodwill,
+      work stoppage, computer failure or malfunction, or any and all
+      other commercial damages or losses), even if such Contributor
+      has been advised of the possibility of such damages.
+
+   9. Accepting Warranty or Additional Liability. While redistributing
+      the Work or Derivative Works thereof, You may choose to offer,
+      and charge a fee for, acceptance of support, warranty, indemnity,
+      or other liability obligations and/or rights consistent with this
+      License. However, in accepting such obligations, You may act only
+      on Your own behalf and on Your sole responsibility, not on behalf
+      of any other Contributor, and only if You agree to indemnify,
+      defend, and hold each Contributor harmless for any liability
+      incurred by, or claims asserted against, such Contributor by reason
+      of your accepting any such warranty or additional liability.
+
+   END OF TERMS AND CONDITIONS
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "[]"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright [yyyy] [name of copyright owner]
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+```
+
+
+
+
+
+
+#### Other Licenses
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+### [dbt-snowflake (1.10.2)](https://pypi.org/project/dbt-snowflake/)
 
 
 #### Declared Licenses
@@ -1585,9 +2081,10 @@ Apache-2.0
 
 
 
+
 ---
 
-### [dbt-trino (1.8.0)](https://github.com/starburstdata/dbt-trino)
+### [dbt-trino (1.9.3)](https://github.com/starburstdata/dbt-trino)
 
 
 #### Declared Licenses
@@ -1819,9 +2316,199 @@ Apache-2.0
 
 
 
+
 ---
 
-### [graphviz (0.18.2)](https://github.com/xflr6/graphviz)
+### [duckdb (1.3.2)](https://pypi.org/project/duckdb/)
+
+
+#### Declared Licenses
+
+
+
+#### Other Licenses
+GPL-2.0-or-later, Apache-2.0, MIT, GPL-2.0-with-bison-exception, BSD-3-Clause, BSD-2-Clause, GPL-2.0-only, public-domain, Zlib
+
+
+```
+Copyright (C)  The Mbed TLS Contributors
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; version 2 or any later version.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+```
+
+
+
+
+
+
+```
+Copyright  The Mbed TLS Contributors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+
+See the License for the specific language governing permissions and limitations under the License.
+```
+
+
+
+
+
+
+```
+Copyright (c) 2022 Max Bachmann
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+
+
+
+
+
+```
+As a special exception, you may create a larger work that contains part or all of the Bison parser skeleton and distribute that work under terms of your choice, so long as that work isn't itself a parser generator using the skeleton or a modified version thereof as a parser skeleton. Alternatively, if you modify or redistribute the parser skeleton itself, you may (at your option) remove this special exception, which will cause the skeleton and the resulting Bison output files to be licensed under the GNU General Public License without this special exception.
+This special exception was added by the Free Software Foundation in version 2.2 of Bison.
+```
+
+
+
+
+
+
+```
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+   1. Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+
+   2. Redistributions in binary form must reproduce the above copyright notice,
+      this list of conditions and the following disclaimer in the documentation
+      and/or other materials provided with the distribution.
+
+   3. Neither the name of the copyright holder nor the names of its
+      contributors may be used to endorse or promote products derived from
+      this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+```
+
+
+
+
+
+
+```
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+   1. Redistributions of source code must retain the above copyright notice, this
+      list of conditions and the following disclaimer.
+
+   2. Redistributions in binary form must reproduce the above copyright notice,
+      this list of conditions and the following disclaimer in the documentation
+
+      and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+```
+
+
+
+
+
+
+```
+Copyright (C)  Meta Platforms, Inc. and affiliates.
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; version 2.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+```
+
+
+
+
+
+
+
+
+
+
+
+```
+This software is provided 'as-is', without any express or implied warranty. In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose, including commercial applications, and to alter it and redistribute it freely, subject to the following restrictions:
+   1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+   2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+   3. This notice may not be removed or altered from any source distribution.
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+### [graphviz (0.18.2)](https://pypi.org/project/graphviz/)
 
 
 #### Declared Licenses
@@ -1859,6 +2546,7 @@ THE SOFTWARE.
 
 
 #### Other Licenses
+
 
 
 
@@ -1927,9 +2615,10 @@ SOFTWARE.
 
 
 
+
 ---
 
-### [Jinja2 (3.1.3)](https://pypi.org/project/Jinja2/)
+### [Jinja2 (3.1.6)](https://pypi.org/project/Jinja2/)
 
 
 #### Declared Licenses
@@ -1988,9 +2677,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 
+
 ---
 
-### [metricflow (0.206.0)](https://pypi.org/project/metricflow/)
+### [metricflow (0.207.1)](https://pypi.org/project/metricflow/)
 
 
 #### Declared Licenses
@@ -2133,7 +2823,7 @@ the Adopting and Developing Business Source License FAQ.
 
 
 #### Other Licenses
-Zlib, NCSA, Unlicense, SunPro, Python-2.0, PSF-2.0, openssl-ssleay, openpub, OLDAP-1.1, OPL-1.0, MPL-2.0, mit-taylor-variant, mit-old-style-no-advert, mit-nagy, mit-0, MIT, LGPL-3.0-or-later, IPA, ISC, Info-ZIP, GPL-3.0-with-GCC-exception, GPL-3.0-or-later, GPL-3.0-only, GPL-2.0-or-later, GPL-2.0-only, GPL-1.0-or-later, GPL-1.0-only, CNRI-Python, CC0-1.0, CC-BY-SA-4.0, CC-BY-SA-3.0, CC-BY-4.0, 0BSD, BSD-2-Clause, BSD-3-Clause, bsd-3-clause-open-mpi, bsd-2-clause-views, BSL-1.0, AAL, Artistic-1.0-Perl, Artistic-1.0, AGPL-3.0-or-later
+Zlib, X11, NCSA, Unlicense, SunPro, Python-2.0, PSF-2.0, Protobuf, openssl-ssleay, openpub, OLDAP-1.1, OPL-1.0, MPL-2.0, mit-taylor-variant, mit-old-style-no-advert, mit-nagy, mit-0, MIT, LGPL-3.0-or-later, ISC, IPA, Info-ZIP, GPL-3.0-with-GCC-exception, GPL-3.0-or-later, GPL-3.0-only, gpl-2.0-plus WITH bison-exception-2.2, GPL-2.0-or-later, GPL-2.0-only, GPL-1.0-or-later, GPL-1.0-only, CNRI-Python, BSD-3-Clause-Clear, CC0-1.0, CC-BY-SA-4.0, CC-BY-SA-3.0, CC-BY-4.0, 0BSD, BSD-2-Clause, BSD-3-Clause, bsd-3-clause-open-mpi, bsd-2-clause-views, BSL-1.0, GPL-2.0-with-bison-exception, AAL, Artistic-1.0-Perl, Artistic-1.0, AGPL-3.0-or-later
 
 
 ```
@@ -2150,7 +2840,21 @@ Permission is granted to anyone to use this software for any purpose, including 
 
 
 ```
-Copyright (c) 2014 Pallets . All rights reserved.
+Copyright (C) 1996 X Consortium
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE X CONSORTIUM BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+Except as contained in this notice, the name of the X Consortium shall not be used in advertising or otherwise to promote the sale, use or other dealings in this Software without prior written authorization from the X Consortium.
+X Window System is a trademark of X Consortium, Inc.
+```
+
+
+
+
+
+
+```
+Copyright (c) 2017 Christopher Groskopf and contributors . All rights reserved.
 Developed by: 
 <Name of Development Group>
 <Name of Institution>
@@ -2241,6 +2945,46 @@ PYTHON SOFTWARE FOUNDATION LICENSE VERSION 2
   6. This License Agreement will automatically terminate upon a material breach of its terms and conditions.
   7. Nothing in this License Agreement shall be deemed to create any relationship of agency, partnership, or joint venture between PSF and Licensee. This License Agreement does not grant permission to use PSF trademarks or trade name in a trademark sense to endorse or promote products or services of Licensee, or any third party.
   8. By copying, installing or otherwise using Python, Licensee agrees to be bound by the terms and conditions of this License Agreement.
+```
+
+
+
+
+
+
+```
+Copyright 2008 Google Inc.  All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+    * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+    * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Code generated by the Protocol Buffer compiler is owned by the owner
+of the input file used when generating it.  This code is not
+standalone and requires a support library to be linked with it.  This
+support library is itself covered by the above license.
 ```
 
 
@@ -2724,7 +3468,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 ```
-Copyright (c) 2014 Pallets
+Copyright (c) 2017 Christopher Groskopf and contributors
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -2801,6 +3545,17 @@ This version of the GNU Lesser General Public License incorporates the terms and
 
 
 ```
+Copyright (c) 2017 Christopher Groskopf and contributors
+Permission to use, copy, modify, and distribute this software for any purpose with or without fee is hereby granted, provided that the above copyright notice and this permission notice appear in all copies.
+THE SOFTWARE IS PROVIDED "AS IS" AND ISC DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL ISC BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+```
+
+
+
+
+
+
+```
 The Licensor provides the Licensed Program (as defined in Article 1 below) under the terms of this license agreement ("Agreement"). Any use, reproduction or distribution of the Licensed Program, or any exercise of rights under this Agreement by a Recipient (as defined in Article 1 below) constitutes the Recipient's acceptance of this Agreement.
 Article 1 (Definitions)
    1. "Digital Font Program" shall mean a computer program containing, or used to render or display fonts.
@@ -2842,17 +3597,6 @@ Article 4 (Termination of Agreement)
 Article 5 (Governing Law)
    1. IPA may publish revised and/or new versions of this License. In such an event, the Recipient may select either this Agreement or any subsequent version of the Agreement in using, conducting the Reproduction and Other Exploitation of, or Redistributing the Licensed Program or a Derived Program. Other matters not specified above shall be subject to the Copyright Law of Japan and other related laws and regulations of Japan.
    2. This Agreement shall be construed under the laws of Japan.
-```
-
-
-
-
-
-
-```
-Copyright (c) 2014 Pallets
-Permission to use, copy, modify, and distribute this software for any purpose with or without fee is hereby granted, provided that the above copyright notice and this permission notice appear in all copies.
-THE SOFTWARE IS PROVIDED "AS IS" AND ISC DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL ISC BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ```
 
 
@@ -2903,7 +3647,7 @@ The availability of this Exception does not imply any general presumption that t
 
 
 ```
-Copyright (C) 2014 Pallets
+Copyright (C) 2017 Christopher Groskopf and contributors
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3 or any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with this program. If not, see http://www.gnu.org/licenses/
@@ -2915,7 +3659,7 @@ You should have received a copy of the GNU General Public License along with thi
 
 
 ```
-Copyright (C) 2014 Pallets
+Copyright (C) 2017 Christopher Groskopf and contributors
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with this program. If not, see http://www.gnu.org/licenses/
@@ -2927,7 +3671,39 @@ You should have received a copy of the GNU General Public License along with thi
 
 
 ```
-Copyright (C) 2014 Pallets
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the Free
+    Software Foundation; either version 2, or (at your option) any later
+    version.
+    This program is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+    more details.
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the
+    Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor,
+    Boston, MA 02110-1301, USA.
+    As a special exception, you may create a larger work that contains part or
+    all of the Bison parser skeleton and distribute that work under terms of
+    your choice, so long as that work isn't itself a parser generator using the
+    skeleton or a modified version thereof as a parser skeleton. Alternatively,
+    if you modify or redistribute the parser skeleton itself, you may (at your
+    option) remove this special exception, which will cause the skeleton and
+    the resulting Bison output files to be licensed under the GNU General
+    Public License without this special exception.
+    This special exception was added by the Free Software Foundation in version
+    2.2 of Bison.
+
+```
+
+
+
+
+
+
+```
+Copyright (C) 2017 Christopher Groskopf and contributors
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; version 2 or any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -2939,7 +3715,7 @@ You should have received a copy of the GNU General Public License along with thi
 
 
 ```
-Copyright (C) 2014 Pallets
+Copyright (C) 2017 Christopher Groskopf and contributors
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; version 2.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -2951,7 +3727,7 @@ You should have received a copy of the GNU General Public License along with thi
 
 
 ```
-Copyright (C) 2014 Pallets
+Copyright (C) 2017 Christopher Groskopf and contributors
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; version 1 or any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -2963,7 +3739,7 @@ You should have received a copy of the GNU General Public License along with thi
 
 
 ```
-Copyright (C) 2014 Pallets
+Copyright (C) 2017 Christopher Groskopf and contributors
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; version 1.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -2987,6 +3763,21 @@ BY CLICKING ON "ACCEPT" WHERE INDICATED BELOW, OR BY COPYING, INSTALLING OR OTHE
    7. This License Agreement shall be governed by and interpreted in all respects by the law of the State of Virginia, excluding conflict of law provisions. Nothing in this License Agreement shall be deemed to create any relationship of agency, partnership, or joint venture between CNRI and Licensee. This License Agreement does not grant permission to use CNRI trademarks or trade name in a trademark sense to endorse or promote products or services of Licensee, or any third party.
    8. By clicking on the "ACCEPT" button where indicated, or by copying, installing or otherwise using Python 1.6b1, Licensee agrees to be bound by the terms and conditions of this License Agreement.
 ACCEPT
+```
+
+
+
+
+
+
+```
+Copyright (c) 2017 Christopher Groskopf and contributors
+All rights reserved.
+Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the limitations in the disclaimer below) provided that the following conditions are met:
+      * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+      * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+      * Neither the name of [Owner Organization] nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ```
 
 
@@ -3264,7 +4055,7 @@ THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH RE
 
 
 ```
-Copyright (c) 2014 Pallets
+Copyright (c) 2017 Christopher Groskopf and contributors
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -3295,7 +4086,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 ```
-Copyright (c) 2014 Pallets . All rights reserved.
+Copyright (c) 2017 Christopher Groskopf and contributors . All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -3414,7 +4205,17 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 
 ```
-Copyright (c) 2014 Pallets
+As a special exception, you may create a larger work that contains part or all of the Bison parser skeleton and distribute that work under terms of your choice, so long as that work isn't itself a parser generator using the skeleton or a modified version thereof as a parser skeleton. Alternatively, if you modify or redistribute the parser skeleton itself, you may (at your option) remove this special exception, which will cause the skeleton and the resulting Bison output files to be licensed under the GNU General Public License without this special exception.
+This special exception was added by the Free Software Foundation in version 2.2 of Bison.
+```
+
+
+
+
+
+
+```
+Copyright (c) 2017 Christopher Groskopf and contributors
 All Rights Reserved
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the conditions below are met. These conditions require a modest attribution to <AUTHOR> (the "Author"), who hopes that its promotional value may help justify the thousands of dollars in otherwise billable time invested in writing this and other freely available, open-source software.
    1. Redistributions of source code, in whole or part and with or without modification (the "Code"), must prominently display this GPG-signed text in verifiable form.
@@ -3502,11 +4303,12 @@ Definitions:
 
 
 ```
-Copyright (C) 2014 Pallets
+Copyright (C) 2017 Christopher Groskopf and contributors
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along with this program. If not, see <http ://www.gnu.org/licenses/>
 ```
+
 
 
 
@@ -3576,6 +4378,442 @@ SOFTWARE.
 
 
 
+
+---
+
+### [mypy (1.7.0)](https://pypi.org/project/mypy/)
+
+
+#### Declared Licenses
+Python-2.0, MIT, PSF-2.0
+
+
+```
+1\. This LICENSE AGREEMENT is between the Python Software Foundation ("PSF"), and the Individual or Organization ("Licensee") accessing and otherwise using this software ("Python") in source or binary form and its associated documentation.
+   2. Subject to the terms and conditions of this License Agreement, PSF hereby grants Licensee a nonexclusive, royalty-free, world-wide license to reproduce, analyze, test, perform and/or display publicly, prepare derivative works, distribute, and otherwise use Python alone or in any derivative version, provided, however, that PSF's License Agreement and PSF's notice of copyright, i.e., "Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved" are retained in Python alone or in any derivative version prepared by Licensee.
+   3. In the event Licensee prepares a derivative work that is based on or incorporates Python or any part thereof, and wants to make the derivative work available to others as provided herein, then Licensee hereby agrees to include in any such work a brief summary of the changes made to Python.
+   4. PSF is making Python available to Licensee on an "AS IS" basis. PSF MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED. BY WAY OF EXAMPLE, BUT NOT LIMITATION, PSF MAKES NO AND DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF PYTHON WILL NOT INFRINGE ANY THIRD PARTY RIGHTS.
+   5. PSF SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF PYTHON FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS AS A RESULT OF MODIFYING, DISTRIBUTING, OR OTHERWISE USING PYTHON, OR ANY DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
+   6. This License Agreement will automatically terminate upon a material breach of its terms and conditions.
+   7. Nothing in this License Agreement shall be deemed to create any relationship of agency, partnership, or joint venture between PSF and Licensee. This License Agreement does not grant permission to use PSF trademarks or trade name in a trademark sense to endorse or promote products or services of Licensee, or any third party.
+   8. By copying, installing or otherwise using Python, Licensee agrees to be bound by the terms and conditions of this License Agreement.
+   1. This LICENSE AGREEMENT is between BeOpen.com ("BeOpen"), having an office at 160 Saratoga Avenue, Santa Clara, CA 95051, and the Individual or Organization ("Licensee") accessing and otherwise using this software in source or binary form and its associated documentation ("the Software").
+   2. Subject to the terms and conditions of this BeOpen Python License Agreement, BeOpen hereby grants Licensee a non-exclusive, royalty-free, world-wide license to reproduce, analyze, test, perform and/or display publicly, prepare derivative works, distribute, and otherwise use the Software alone or in any derivative version, provided, however, that the BeOpen Python License is retained in the Software, alone or in any derivative version prepared by Licensee.
+   3. BeOpen is making the Software available to Licensee on an "AS IS" basis. BEOPEN MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED. BY WAY OF EXAMPLE, BUT NOT LIMITATION, BEOPEN MAKES NO AND DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE SOFTWARE WILL NOT INFRINGE ANY THIRD PARTY RIGHTS.
+   4. BEOPEN SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF THE SOFTWARE FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS AS A RESULT OF USING, MODIFYING OR DISTRIBUTING THE SOFTWARE, OR ANY DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
+   5. This License Agreement will automatically terminate upon a material breach of its terms and conditions.
+   6. This License Agreement shall be governed by and interpreted in all respects by the law of the State of California, excluding conflict of law provisions. Nothing in this License Agreement shall be deemed to create any relationship of agency, partnership, or joint venture between BeOpen and Licensee. This License Agreement does not grant permission to use BeOpen trademarks or trade names in a trademark sense to endorse or promote products or services of Licensee, or any third party. As an exception, the "BeOpen Python" logos available at http://www.pythonlabs.com/logos.html may be used according to the permissions granted on that web page.
+   7. By copying, installing or otherwise using the software, Licensee agrees to be bound by the terms and conditions of this License Agreement.
+   1. This LICENSE AGREEMENT is between the Corporation for National Research Initiatives, having an office at 1895 Preston White Drive, Reston, VA 20191 ("CNRI"), and the Individual or Organization ("Licensee") accessing and otherwise using Python 1.6, beta 1 software in source or binary form and its associated documentation, as released at the www.python.org Internet site on August 4, 2000 ("Python 1.6b1").
+   2. Subject to the terms and conditions of this License Agreement, CNRI hereby grants Licensee a non-exclusive, royalty-free, world-wide license to reproduce, analyze, test, perform and/or display publicly, prepare derivative works, distribute, and otherwise use Python 1.6b1 alone or in any derivative version, provided, however, that CNRIs License Agreement is retained in Python 1.6b1, alone or in any derivative version prepared by Licensee.
+   Alternately, in lieu of CNRIs License Agreement, Licensee may substitute the following text (omitting the quotes): "Python 1.6, beta 1, is made available subject to the terms and conditions in CNRIs License Agreement. This Agreement may be located on the Internet using the following unique, persistent identifier (known as a handle): 1895.22/1011. This Agreement may also be obtained from a proxy server on the Internet using the URL:http://hdl.handle.net/1895.22/1011".
+   3. In the event Licensee prepares a derivative work that is based on or incorporates Python 1.6b1 or any part thereof, and wants to make the derivative work available to the public as provided herein, then Licensee hereby agrees to indicate in any such work the nature of the modifications made to Python 1.6b1.
+   4. CNRI is making Python 1.6b1 available to Licensee on an "AS IS" basis. CNRI MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED. BY WAY OF EXAMPLE, BUT NOT LIMITATION, CNRI MAKES NO AND DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF PYTHON 1.6b1 WILL NOT INFRINGE ANY THIRD PARTY RIGHTS.
+   5. CNRI SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF THE SOFTWARE FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS AS A RESULT OF USING, MODIFYING OR DISTRIBUTING PYTHON 1.6b1, OR ANY DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
+   6. This License Agreement will automatically terminate upon a material breach of its terms and conditions.
+   7. This License Agreement shall be governed by and interpreted in all respects by the law of the State of Virginia, excluding conflict of law provisions. Nothing in this License Agreement shall be deemed to create any relationship of agency, partnership, or joint venture between CNRI and Licensee. This License Agreement does not grant permission to use CNRI trademarks or trade name in a trademark sense to endorse or promote products or services of Licensee, or any third party.
+   8. By clicking on the "ACCEPT" button where indicated, or by copying, installing or otherwise using Python 1.6b1, Licensee agrees to be bound by the terms and conditions of this License Agreement.
+Copyright (c) 1991 - 1995, Stichting Mathematisch Centrum Amsterdam, The Netherlands. All rights reserved.
+Permission to use, copy, modify, and distribute this software and its documentation for any purpose and without fee is hereby granted, provided that the above copyright notice appear in all copies and that both that copyright notice and this permission notice appear in supporting documentation, and that the name of Stichting Mathematisch Centrum or CWI not be used in advertising or publicity pertaining to distribution of the software without specific, written prior permission.
+STICHTING MATHEMATISCH CENTRUM DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT SHALL STICHTING MATHEMATISCH CENTRUM BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+```
+
+
+
+
+
+
+```
+Mypy (and mypyc) are licensed under the terms of the MIT license, reproduced below.
+
+= = = = =
+
+The MIT License
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+= = = = =
+
+Portions of mypy and mypyc are licensed under different licenses.
+The files
+mypyc/lib-rt/pythonsupport.h, mypyc/lib-rt/getargs.c and
+mypyc/lib-rt/getargsfast.c are licensed under the PSF 2 License, reproduced
+below.
+
+= = = = =
+
+PYTHON SOFTWARE FOUNDATION LICENSE VERSION 2
+--------------------------------------------
+
+1\. This LICENSE AGREEMENT is between the Python Software Foundation
+("PSF"), and the Individual or Organization ("Licensee") accessing and
+otherwise using this software ("Python") in source or binary form and
+its associated documentation.
+
+2\. Subject to the terms and conditions of this License Agreement, PSF hereby
+grants Licensee a nonexclusive, royalty-free, world-wide license to reproduce,
+analyze, test, perform and/or display publicly, prepare derivative works,
+distribute, and otherwise use Python alone or in any derivative version,
+provided, however, that PSF's License Agreement and PSF's notice of copyright,
+i.e., "Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
+2011, 2012 Python Software Foundation; All Rights Reserved" are retained in Python
+alone or in any derivative version prepared by Licensee.
+
+3\. In the event Licensee prepares a derivative work that is based on
+or incorporates Python or any part thereof, and wants to make
+the derivative work available to others as provided herein, then
+Licensee hereby agrees to include in any such work a brief summary of
+the changes made to Python.
+
+4\. PSF is making Python available to Licensee on an "AS IS"
+basis.  PSF MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR
+IMPLIED.  BY WAY OF EXAMPLE, BUT NOT LIMITATION, PSF MAKES NO AND
+DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS
+FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF PYTHON WILL NOT
+INFRINGE ANY THIRD PARTY RIGHTS.
+
+5\. PSF SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF PYTHON
+FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS AS
+A RESULT OF MODIFYING, DISTRIBUTING, OR OTHERWISE USING PYTHON,
+OR ANY DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
+
+6\. This License Agreement will automatically terminate upon a material
+breach of its terms and conditions.
+
+7\. Nothing in this License Agreement shall be deemed to create any
+relationship of agency, partnership, or joint venture between PSF and
+Licensee.  This License Agreement does not grant permission to use PSF
+trademarks or trade name in a trademark sense to endorse or promote
+products or services of Licensee, or any third party.
+
+8\. By copying, installing or otherwise using Python, Licensee
+agrees to be bound by the terms and conditions of this License
+Agreement.
+
+
+BEOPEN.COM LICENSE AGREEMENT FOR PYTHON 2.0
+-------------------------------------------
+
+BEOPEN PYTHON OPEN SOURCE LICENSE AGREEMENT VERSION 1
+
+1\. This LICENSE AGREEMENT is between BeOpen.com ("BeOpen"), having an
+office at 160 Saratoga Avenue, Santa Clara, CA 95051, and the
+Individual or Organization ("Licensee") accessing and otherwise using
+this software in source or binary form and its associated
+documentation ("the Software").
+
+2\. Subject to the terms and conditions of this BeOpen Python License
+Agreement, BeOpen hereby grants Licensee a non-exclusive,
+royalty-free, world-wide license to reproduce, analyze, test, perform
+and/or display publicly, prepare derivative works, distribute, and
+otherwise use the Software alone or in any derivative version,
+provided, however, that the BeOpen Python License is retained in the
+Software, alone or in any derivative version prepared by Licensee.
+
+3\. BeOpen is making the Software available to Licensee on an "AS IS"
+basis.  BEOPEN MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR
+IMPLIED.  BY WAY OF EXAMPLE, BUT NOT LIMITATION, BEOPEN MAKES NO AND
+DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS
+FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE SOFTWARE WILL NOT
+INFRINGE ANY THIRD PARTY RIGHTS.
+
+4\. BEOPEN SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF THE
+SOFTWARE FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS
+AS A RESULT OF USING, MODIFYING OR DISTRIBUTING THE SOFTWARE, OR ANY
+DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
+
+5\. This License Agreement will automatically terminate upon a material
+breach of its terms and conditions.
+
+6\. This License Agreement shall be governed by and interpreted in all
+respects by the law of the State of California, excluding conflict of
+law provisions.  Nothing in this License Agreement shall be deemed to
+create any relationship of agency, partnership, or joint venture
+between BeOpen and Licensee.  This License Agreement does not grant
+permission to use BeOpen trademarks or trade names in a trademark
+sense to endorse or promote products or services of Licensee, or any
+third party.  As an exception, the "BeOpen Python" logos available at
+http://www.pythonlabs.com/logos.html may be used according to the
+permissions granted on that web page.
+
+7\. By copying, installing or otherwise using the software, Licensee
+agrees to be bound by the terms and conditions of this License
+Agreement.
+
+
+CNRI LICENSE AGREEMENT FOR PYTHON 1.6.1
+---------------------------------------
+
+1\. This LICENSE AGREEMENT is between the Corporation for National
+Research Initiatives, having an office at 1895 Preston White Drive,
+Reston, VA 20191 ("CNRI"), and the Individual or Organization
+("Licensee") accessing and otherwise using Python 1.6.1 software in
+source or binary form and its associated documentation.
+
+2\. Subject to the terms and conditions of this License Agreement, CNRI
+hereby grants Licensee a nonexclusive, royalty-free, world-wide
+license to reproduce, analyze, test, perform and/or display publicly,
+prepare derivative works, distribute, and otherwise use Python 1.6.1
+alone or in any derivative version, provided, however, that CNRI's
+License Agreement and CNRI's notice of copyright, i.e., "Copyright (c)
+1995-2001 Corporation for National Research Initiatives; All Rights
+Reserved" are retained in Python 1.6.1 alone or in any derivative
+version prepared by Licensee.  Alternately, in lieu of CNRI's License
+Agreement, Licensee may substitute the following text (omitting the
+quotes): "Python 1.6.1 is made available subject to the terms and
+conditions in CNRI's License Agreement.  This Agreement together with
+Python 1.6.1 may be located on the Internet using the following
+unique, persistent identifier (known as a handle): 1895.22/1013.  This
+Agreement may also be obtained from a proxy server on the Internet
+using the following URL: http://hdl.handle.net/1895.22/1013".
+
+3\. In the event Licensee prepares a derivative work that is based on
+or incorporates Python 1.6.1 or any part thereof, and wants to make
+the derivative work available to others as provided herein, then
+Licensee hereby agrees to include in any such work a brief summary of
+the changes made to Python 1.6.1.
+
+4\. CNRI is making Python 1.6.1 available to Licensee on an "AS IS"
+basis.  CNRI MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR
+IMPLIED.  BY WAY OF EXAMPLE, BUT NOT LIMITATION, CNRI MAKES NO AND
+DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS
+FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF PYTHON 1.6.1 WILL NOT
+INFRINGE ANY THIRD PARTY RIGHTS.
+
+5\. CNRI SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF PYTHON
+1.6.1 FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS AS
+A RESULT OF MODIFYING, DISTRIBUTING, OR OTHERWISE USING PYTHON 1.6.1,
+OR ANY DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
+
+6\. This License Agreement will automatically terminate upon a material
+breach of its terms and conditions.
+
+7\. This License Agreement shall be governed by the federal
+intellectual property law of the United States, including without
+limitation the federal copyright law, and, to the extent such
+U.S. federal law does not apply, by the law of the Commonwealth of
+Virginia, excluding Virginia's conflict of law provisions.
+Notwithstanding the foregoing, with regard to derivative works based
+on Python 1.6.1 that incorporate non-separable material that was
+previously distributed under the GNU General Public License (GPL), the
+law of the Commonwealth of Virginia shall govern this License
+Agreement only as to issues arising under or with respect to
+Paragraphs 4, 5, and 7 of this License Agreement.  Nothing in this
+License Agreement shall be deemed to create any relationship of
+agency, partnership, or joint venture between CNRI and Licensee.  This
+License Agreement does not grant permission to use CNRI trademarks or
+trade name in a trademark sense to endorse or promote products or
+services of Licensee, or any third party.
+
+8\. By clicking on the "ACCEPT" button where indicated, or by copying,
+installing or otherwise using Python 1.6.1, Licensee agrees to be
+bound by the terms and conditions of this License Agreement.
+
+        ACCEPT
+
+
+CWI LICENSE AGREEMENT FOR PYTHON 0.9.0 THROUGH 1.2
+--------------------------------------------------
+
+Copyright (c) 1991 - 1995, Stichting Mathematisch Centrum Amsterdam,
+The Netherlands.  All rights reserved.
+
+Permission to use, copy, modify, and distribute this software and its
+documentation for any purpose and without fee is hereby granted,
+provided that the above copyright notice appear in all copies and that
+both that copyright notice and this permission notice appear in
+supporting documentation, and that the name of Stichting Mathematisch
+Centrum or CWI not be used in advertising or publicity pertaining to
+distribution of the software without specific, written prior
+permission.
+
+STICHTING MATHEMATISCH CENTRUM DISCLAIMS ALL WARRANTIES WITH REGARD TO
+THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+FITNESS, IN NO EVENT SHALL STICHTING MATHEMATISCH CENTRUM BE LIABLE
+FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+```
+
+
+
+
+
+
+```
+PYTHON SOFTWARE FOUNDATION LICENSE VERSION 2
+
+  1. This LICENSE AGREEMENT is between the Python Software Foundation ("PSF"), and the Individual or Organization ("Licensee") accessing and otherwise using this software ("Python") in source or binary form and its associated documentation.
+  2. Subject to the terms and conditions of this License Agreement, PSF hereby grants Licensee a nonexclusive, royalty-free, world-wide license to reproduce, analyze, test, perform and/or display publicly, prepare derivative works, distribute, and otherwise use Python alone or in any derivative version, provided, however, that PSF's License Agreement and PSF's notice of copyright, i.e., "Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved" are retained in Python alone or in any derivative version prepared by Licensee.
+  3. In the event Licensee prepares a derivative work that is based on or incorporates Python or any part thereof, and wants to make the derivative work available to others as provided herein, then Licensee hereby agrees to include in any such work a brief summary of the changes made to Python.
+  4. PSF is making Python available to Licensee on an "AS IS" basis. PSF MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED. BY WAY OF EXAMPLE, BUT NOT LIMITATION, PSF MAKES NO AND DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF PYTHON WILL NOT INFRINGE ANY THIRD PARTY RIGHTS.
+  5. PSF SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF PYTHON FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS AS A RESULT OF MODIFYING, DISTRIBUTING, OR OTHERWISE USING PYTHON, OR ANY DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
+  6. This License Agreement will automatically terminate upon a material breach of its terms and conditions.
+  7. Nothing in this License Agreement shall be deemed to create any relationship of agency, partnership, or joint venture between PSF and Licensee. This License Agreement does not grant permission to use PSF trademarks or trade name in a trademark sense to endorse or promote products or services of Licensee, or any third party.
+  8. By copying, installing or otherwise using Python, Licensee agrees to be bound by the terms and conditions of this License Agreement.
+```
+
+
+
+
+
+
+#### Other Licenses
+0BSD, Apache-2.0, BSD-3-Clause
+
+
+```
+Copyright (C) 2006 by Rob Landley <rob@landley.net>
+Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted.
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+```
+
+
+
+
+
+
+```
+Copyright 2015 Jukka Lehtosalo and contributors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+
+See the License for the specific language governing permissions and limitations under the License.
+```
+
+
+
+
+
+
+```
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+   1. Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+
+   2. Redistributions in binary form must reproduce the above copyright notice,
+      this list of conditions and the following disclaimer in the documentation
+      and/or other materials provided with the distribution.
+
+   3. Neither the name of the copyright holder nor the names of its
+      contributors may be used to endorse or promote products derived from
+      this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+### [pre-commit (3.2.2)](https://github.com/pre-commit/pre-commit)
+
+
+#### Declared Licenses
+MIT
+
+
+```
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+```
+
+
+
+
+
+
+#### Other Licenses
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ---
 
 ### [pydantic (1.10.0)](https://pypi.org/project/pydantic/)
@@ -3616,6 +4854,442 @@ SOFTWARE.
 
 
 #### Other Licenses
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+### [Pympler (1.1)](https://github.com/pympler/pympler)
+
+
+#### Declared Licenses
+Apache-2.0
+
+
+```
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+   1. Definitions.
+
+      "License" shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
+
+      "Licensor" shall mean the copyright owner or entity authorized by
+      the copyright owner that is granting the License.
+
+      "Legal Entity" shall mean the union of the acting entity and all
+      other entities that control, are controlled by, or are under common
+      control with that entity. For the purposes of this definition,
+      "control" means (i) the power, direct or indirect, to cause the
+      direction or management of such entity, whether by contract or
+      otherwise, or (ii) ownership of fifty percent (50%) or more of the
+      outstanding shares, or (iii) beneficial ownership of such entity.
+
+      "You" (or "Your") shall mean an individual or Legal Entity
+      exercising permissions granted by this License.
+
+      "Source" form shall mean the preferred form for making modifications,
+      including but not limited to software source code, documentation
+      source, and configuration files.
+
+      "Object" form shall mean any form resulting from mechanical
+      transformation or translation of a Source form, including but
+      not limited to compiled object code, generated documentation,
+      and conversions to other media types.
+
+      "Work" shall mean the work of authorship, whether in Source or
+      Object form, made available under the License, as indicated by a
+      copyright notice that is included in or attached to the work
+      (an example is provided in the Appendix below).
+
+      "Derivative Works" shall mean any work, whether in Source or Object
+      form, that is based on (or derived from) the Work and for which the
+      editorial revisions, annotations, elaborations, or other modifications
+      represent, as a whole, an original work of authorship. For the purposes
+      of this License, Derivative Works shall not include works that remain
+      separable from, or merely link (or bind by name) to the interfaces of,
+      the Work and Derivative Works thereof.
+
+      "Contribution" shall mean any work of authorship, including
+      the original version of the Work and any modifications or additions
+      to that Work or Derivative Works thereof, that is intentionally
+      submitted to Licensor for inclusion in the Work by the copyright owner
+      or by an individual or Legal Entity authorized to submit on behalf of
+      the copyright owner. For the purposes of this definition, "submitted"
+      means any form of electronic, verbal, or written communication sent
+      to the Licensor or its representatives, including but not limited to
+      communication on electronic mailing lists, source code control systems,
+      and issue tracking systems that are managed by, or on behalf of, the
+      Licensor for the purpose of discussing and improving the Work, but
+      excluding communication that is conspicuously marked or otherwise
+      designated in writing by the copyright owner as "Not a Contribution."
+
+      "Contributor" shall mean Licensor and any individual or Legal Entity
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
+
+   2. Grant of Copyright License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      copyright license to reproduce, prepare Derivative Works of,
+      publicly display, publicly perform, sublicense, and distribute the
+      Work and such Derivative Works in Source or Object form.
+
+   3. Grant of Patent License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      (except as stated in this section) patent license to make, have made,
+      use, offer to sell, sell, import, and otherwise transfer the Work,
+      where such license applies only to those patent claims licensable
+      by such Contributor that are necessarily infringed by their
+      Contribution(s) alone or by combination of their Contribution(s)
+      with the Work to which such Contribution(s) was submitted. If You
+      institute patent litigation against any entity (including a
+      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      or a Contribution incorporated within the Work constitutes direct
+      or contributory patent infringement, then any patent licenses
+      granted to You under this License for that Work shall terminate
+      as of the date such litigation is filed.
+
+   4. Redistribution. You may reproduce and distribute copies of the
+      Work or Derivative Works thereof in any medium, with or without
+      modifications, and in Source or Object form, provided that You
+      meet the following conditions:
+
+      (a) You must give any other recipients of the Work or
+          Derivative Works a copy of this License; and
+
+      (b) You must cause any modified files to carry prominent notices
+          stating that You changed the files; and
+
+      (c) You must retain, in the Source form of any Derivative Works
+          that You distribute, all copyright, patent, trademark, and
+          attribution notices from the Source form of the Work,
+          excluding those notices that do not pertain to any part of
+          the Derivative Works; and
+
+      (d) If the Work includes a "NOTICE" text file as part of its
+          distribution, then any Derivative Works that You distribute must
+          include a readable copy of the attribution notices contained
+          within such NOTICE file, excluding those notices that do not
+          pertain to any part of the Derivative Works, in at least one
+          of the following places: within a NOTICE text file distributed
+          as part of the Derivative Works; within the Source form or
+          documentation, if provided along with the Derivative Works; or,
+          within a display generated by the Derivative Works, if and
+          wherever such third-party notices normally appear. The contents
+          of the NOTICE file are for informational purposes only and
+          do not modify the License. You may add Your own attribution
+          notices within Derivative Works that You distribute, alongside
+          or as an addendum to the NOTICE text from the Work, provided
+          that such additional attribution notices cannot be construed
+          as modifying the License.
+
+      You may add Your own copyright statement to Your modifications and
+      may provide additional or different license terms and conditions
+      for use, reproduction, or distribution of Your modifications, or
+      for any such Derivative Works as a whole, provided Your use,
+      reproduction, and distribution of the Work otherwise complies with
+      the conditions stated in this License.
+
+   5. Submission of Contributions. Unless You explicitly state otherwise,
+      any Contribution intentionally submitted for inclusion in the Work
+      by You to the Licensor shall be under the terms and conditions of
+      this License, without any additional terms or conditions.
+      Notwithstanding the above, nothing herein shall supersede or modify
+      the terms of any separate license agreement you may have executed
+      with Licensor regarding such Contributions.
+
+   6. Trademarks. This License does not grant permission to use the trade
+      names, trademarks, service marks, or product names of the Licensor,
+      except as required for reasonable and customary use in describing the
+      origin of the Work and reproducing the content of the NOTICE file.
+
+   7. Disclaimer of Warranty. Unless required by applicable law or
+      agreed to in writing, Licensor provides the Work (and each
+      Contributor provides its Contributions) on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied, including, without limitation, any warranties or conditions
+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+      PARTICULAR PURPOSE. You are solely responsible for determining the
+      appropriateness of using or redistributing the Work and assume any
+      risks associated with Your exercise of permissions under this License.
+
+   8. Limitation of Liability. In no event and under no legal theory,
+      whether in tort (including negligence), contract, or otherwise,
+      unless required by applicable law (such as deliberate and grossly
+      negligent acts) or agreed to in writing, shall any Contributor be
+      liable to You for damages, including any direct, indirect, special,
+      incidental, or consequential damages of any character arising as a
+      result of this License or out of the use or inability to use the
+      Work (including but not limited to damages for loss of goodwill,
+      work stoppage, computer failure or malfunction, or any and all
+      other commercial damages or losses), even if such Contributor
+      has been advised of the possibility of such damages.
+
+   9. Accepting Warranty or Additional Liability. While redistributing
+      the Work or Derivative Works thereof, You may choose to offer,
+      and charge a fee for, acceptance of support, warranty, indemnity,
+      or other liability obligations and/or rights consistent with this
+      License. However, in accepting such obligations, You may act only
+      on Your own behalf and on Your sole responsibility, not on behalf
+      of any other Contributor, and only if You agree to indemnify,
+      defend, and hold each Contributor harmless for any liability
+      incurred by, or claims asserted against, such Contributor by reason
+      of your accepting any such warranty or additional liability.
+
+   END OF TERMS AND CONDITIONS
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "[]"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright [yyyy] [name of copyright owner]
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+
+```
+
+
+
+
+
+
+#### Other Licenses
+BSD-3-Clause
+
+
+```
+Copyright (c) 2002-2022 ProphICy Semiconductor, Inc. . All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+   1. Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+
+   2. Redistributions in binary form must reproduce the above copyright notice,
+      this list of conditions and the following disclaimer in the documentation
+      and/or other materials provided with the distribution.
+
+   3. Neither the name of the copyright holder nor the names of its
+      contributors may be used to endorse or promote products derived from
+      this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+### [pytest (8.0.0)](https://pypi.org/project/pytest/)
+
+
+#### Declared Licenses
+MIT
+
+
+```
+The MIT License (MIT)
+
+Copyright (c) 2004 Holger Krekel and others
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+```
+
+
+
+
+
+
+#### Other Licenses
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+### [pytest-mock (3.14.0)](https://pypi.org/project/pytest-mock/)
+
+
+#### Declared Licenses
+MIT
+
+
+```
+MIT License
+
+Copyright (c) [2016] [Bruno Oliveira]
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+```
+
+
+
+
+
+
+#### Other Licenses
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+### [pytest-xdist (3.6.0)](https://pypi.org/project/pytest-xdist/)
+
+
+#### Declared Licenses
+MIT
+
+
+```
+MIT License
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+```
+
+
+
+
+
+
+#### Other Licenses
+
 
 
 
@@ -3736,6 +5410,61 @@ The above BSD License Applies to all code, even that also covered by Apache 2.0.
 
 
 #### Other Licenses
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+### [PyYAML (6.0)](https://pyyaml.org/)
+
+
+#### Declared Licenses
+MIT
+
+
+```
+Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2006-2016 Kirill Simonov
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+```
+
+
+
+
+
+
+#### Other Licenses
+
 
 
 
@@ -3899,6 +5628,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 
 
+
 ---
 
 ### [tabulate (0.8.9)](https://pypi.org/project/tabulate/)
@@ -3938,6 +5668,951 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 #### Other Licenses
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+### [termcolor (3.0.0)](https://pypi.org/project/termcolor/)
+
+
+#### Declared Licenses
+MIT
+
+
+```
+Copyright (c) 2008-2011 Volvox Development Team
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+```
+
+
+
+
+
+
+#### Other Licenses
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+### [types-python-dateutil (2.9.0.20250822)](https://pypi.org/project/types-python-dateutil/)
+
+
+#### Declared Licenses
+MIT, Apache-2.0
+
+
+```
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+
+
+
+
+
+```
+The "typeshed" project is licensed under the terms of the Apache license, as
+reproduced below.
+
+= = = = =
+
+Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+   1. Definitions.
+
+      "License" shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
+
+      "Licensor" shall mean the copyright owner or entity authorized by
+      the copyright owner that is granting the License.
+
+      "Legal Entity" shall mean the union of the acting entity and all
+      other entities that control, are controlled by, or are under common
+      control with that entity. For the purposes of this definition,
+      "control" means (i) the power, direct or indirect, to cause the
+      direction or management of such entity, whether by contract or
+      otherwise, or (ii) ownership of fifty percent (50%) or more of the
+      outstanding shares, or (iii) beneficial ownership of such entity.
+
+      "You" (or "Your") shall mean an individual or Legal Entity
+      exercising permissions granted by this License.
+
+      "Source" form shall mean the preferred form for making modifications,
+      including but not limited to software source code, documentation
+      source, and configuration files.
+
+      "Object" form shall mean any form resulting from mechanical
+      transformation or translation of a Source form, including but
+      not limited to compiled object code, generated documentation,
+      and conversions to other media types.
+
+      "Work" shall mean the work of authorship, whether in Source or
+      Object form, made available under the License, as indicated by a
+      copyright notice that is included in or attached to the work
+      (an example is provided in the Appendix below).
+
+      "Derivative Works" shall mean any work, whether in Source or Object
+      form, that is based on (or derived from) the Work and for which the
+      editorial revisions, annotations, elaborations, or other modifications
+      represent, as a whole, an original work of authorship. For the purposes
+      of this License, Derivative Works shall not include works that remain
+      separable from, or merely link (or bind by name) to the interfaces of,
+      the Work and Derivative Works thereof.
+
+      "Contribution" shall mean any work of authorship, including
+      the original version of the Work and any modifications or additions
+      to that Work or Derivative Works thereof, that is intentionally
+      submitted to Licensor for inclusion in the Work by the copyright owner
+      or by an individual or Legal Entity authorized to submit on behalf of
+      the copyright owner. For the purposes of this definition, "submitted"
+      means any form of electronic, verbal, or written communication sent
+      to the Licensor or its representatives, including but not limited to
+      communication on electronic mailing lists, source code control systems,
+      and issue tracking systems that are managed by, or on behalf of, the
+      Licensor for the purpose of discussing and improving the Work, but
+      excluding communication that is conspicuously marked or otherwise
+      designated in writing by the copyright owner as "Not a Contribution."
+
+      "Contributor" shall mean Licensor and any individual or Legal Entity
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
+
+   2. Grant of Copyright License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      copyright license to reproduce, prepare Derivative Works of,
+      publicly display, publicly perform, sublicense, and distribute the
+      Work and such Derivative Works in Source or Object form.
+
+   3. Grant of Patent License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      (except as stated in this section) patent license to make, have made,
+      use, offer to sell, sell, import, and otherwise transfer the Work,
+      where such license applies only to those patent claims licensable
+      by such Contributor that are necessarily infringed by their
+      Contribution(s) alone or by combination of their Contribution(s)
+      with the Work to which such Contribution(s) was submitted. If You
+      institute patent litigation against any entity (including a
+      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      or a Contribution incorporated within the Work constitutes direct
+      or contributory patent infringement, then any patent licenses
+      granted to You under this License for that Work shall terminate
+      as of the date such litigation is filed.
+
+   4. Redistribution. You may reproduce and distribute copies of the
+      Work or Derivative Works thereof in any medium, with or without
+      modifications, and in Source or Object form, provided that You
+      meet the following conditions:
+
+      (a) You must give any other recipients of the Work or
+          Derivative Works a copy of this License; and
+
+      (b) You must cause any modified files to carry prominent notices
+          stating that You changed the files; and
+
+      (c) You must retain, in the Source form of any Derivative Works
+          that You distribute, all copyright, patent, trademark, and
+          attribution notices from the Source form of the Work,
+          excluding those notices that do not pertain to any part of
+          the Derivative Works; and
+
+      (d) If the Work includes a "NOTICE" text file as part of its
+          distribution, then any Derivative Works that You distribute must
+          include a readable copy of the attribution notices contained
+          within such NOTICE file, excluding those notices that do not
+          pertain to any part of the Derivative Works, in at least one
+          of the following places: within a NOTICE text file distributed
+          as part of the Derivative Works; within the Source form or
+          documentation, if provided along with the Derivative Works; or,
+          within a display generated by the Derivative Works, if and
+          wherever such third-party notices normally appear. The contents
+          of the NOTICE file are for informational purposes only and
+          do not modify the License. You may add Your own attribution
+          notices within Derivative Works that You distribute, alongside
+          or as an addendum to the NOTICE text from the Work, provided
+          that such additional attribution notices cannot be construed
+          as modifying the License.
+
+      You may add Your own copyright statement to Your modifications and
+      may provide additional or different license terms and conditions
+      for use, reproduction, or distribution of Your modifications, or
+      for any such Derivative Works as a whole, provided Your use,
+      reproduction, and distribution of the Work otherwise complies with
+      the conditions stated in this License.
+
+   5. Submission of Contributions. Unless You explicitly state otherwise,
+      any Contribution intentionally submitted for inclusion in the Work
+      by You to the Licensor shall be under the terms and conditions of
+      this License, without any additional terms or conditions.
+      Notwithstanding the above, nothing herein shall supersede or modify
+      the terms of any separate license agreement you may have executed
+      with Licensor regarding such Contributions.
+
+   6. Trademarks. This License does not grant permission to use the trade
+      names, trademarks, service marks, or product names of the Licensor,
+      except as required for reasonable and customary use in describing the
+      origin of the Work and reproducing the content of the NOTICE file.
+
+   7. Disclaimer of Warranty. Unless required by applicable law or
+      agreed to in writing, Licensor provides the Work (and each
+      Contributor provides its Contributions) on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied, including, without limitation, any warranties or conditions
+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+      PARTICULAR PURPOSE. You are solely responsible for determining the
+      appropriateness of using or redistributing the Work and assume any
+      risks associated with Your exercise of permissions under this License.
+
+   8. Limitation of Liability. In no event and under no legal theory,
+      whether in tort (including negligence), contract, or otherwise,
+      unless required by applicable law (such as deliberate and grossly
+      negligent acts) or agreed to in writing, shall any Contributor be
+      liable to You for damages, including any direct, indirect, special,
+      incidental, or consequential damages of any character arising as a
+      result of this License or out of the use or inability to use the
+      Work (including but not limited to damages for loss of goodwill,
+      work stoppage, computer failure or malfunction, or any and all
+      other commercial damages or losses), even if such Contributor
+      has been advised of the possibility of such damages.
+
+   9. Accepting Warranty or Additional Liability. While redistributing
+      the Work or Derivative Works thereof, You may choose to offer,
+      and charge a fee for, acceptance of support, warranty, indemnity,
+      or other liability obligations and/or rights consistent with this
+      License. However, in accepting such obligations, You may act only
+      on Your own behalf and on Your sole responsibility, not on behalf
+      of any other Contributor, and only if You agree to indemnify,
+      defend, and hold each Contributor harmless for any liability
+      incurred by, or claims asserted against, such Contributor by reason
+      of your accepting any such warranty or additional liability.
+
+   END OF TERMS AND CONDITIONS
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "{}"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright {yyyy} {name of copyright owner}
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+= = = = =
+
+Parts of typeshed are licensed under different licenses (like the MIT
+license), reproduced below.
+
+= = = = =
+
+The MIT License
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+= = = = =
+
+```
+
+
+
+
+
+
+#### Other Licenses
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+### [types-PyYAML (6.0.12.20250822)](https://pypi.org/project/types-PyYAML/)
+
+
+#### Declared Licenses
+MIT, Apache-2.0
+
+
+```
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+
+
+
+
+
+```
+The "typeshed" project is licensed under the terms of the Apache license, as
+reproduced below.
+
+= = = = =
+
+Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+   1. Definitions.
+
+      "License" shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
+
+      "Licensor" shall mean the copyright owner or entity authorized by
+      the copyright owner that is granting the License.
+
+      "Legal Entity" shall mean the union of the acting entity and all
+      other entities that control, are controlled by, or are under common
+      control with that entity. For the purposes of this definition,
+      "control" means (i) the power, direct or indirect, to cause the
+      direction or management of such entity, whether by contract or
+      otherwise, or (ii) ownership of fifty percent (50%) or more of the
+      outstanding shares, or (iii) beneficial ownership of such entity.
+
+      "You" (or "Your") shall mean an individual or Legal Entity
+      exercising permissions granted by this License.
+
+      "Source" form shall mean the preferred form for making modifications,
+      including but not limited to software source code, documentation
+      source, and configuration files.
+
+      "Object" form shall mean any form resulting from mechanical
+      transformation or translation of a Source form, including but
+      not limited to compiled object code, generated documentation,
+      and conversions to other media types.
+
+      "Work" shall mean the work of authorship, whether in Source or
+      Object form, made available under the License, as indicated by a
+      copyright notice that is included in or attached to the work
+      (an example is provided in the Appendix below).
+
+      "Derivative Works" shall mean any work, whether in Source or Object
+      form, that is based on (or derived from) the Work and for which the
+      editorial revisions, annotations, elaborations, or other modifications
+      represent, as a whole, an original work of authorship. For the purposes
+      of this License, Derivative Works shall not include works that remain
+      separable from, or merely link (or bind by name) to the interfaces of,
+      the Work and Derivative Works thereof.
+
+      "Contribution" shall mean any work of authorship, including
+      the original version of the Work and any modifications or additions
+      to that Work or Derivative Works thereof, that is intentionally
+      submitted to Licensor for inclusion in the Work by the copyright owner
+      or by an individual or Legal Entity authorized to submit on behalf of
+      the copyright owner. For the purposes of this definition, "submitted"
+      means any form of electronic, verbal, or written communication sent
+      to the Licensor or its representatives, including but not limited to
+      communication on electronic mailing lists, source code control systems,
+      and issue tracking systems that are managed by, or on behalf of, the
+      Licensor for the purpose of discussing and improving the Work, but
+      excluding communication that is conspicuously marked or otherwise
+      designated in writing by the copyright owner as "Not a Contribution."
+
+      "Contributor" shall mean Licensor and any individual or Legal Entity
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
+
+   2. Grant of Copyright License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      copyright license to reproduce, prepare Derivative Works of,
+      publicly display, publicly perform, sublicense, and distribute the
+      Work and such Derivative Works in Source or Object form.
+
+   3. Grant of Patent License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      (except as stated in this section) patent license to make, have made,
+      use, offer to sell, sell, import, and otherwise transfer the Work,
+      where such license applies only to those patent claims licensable
+      by such Contributor that are necessarily infringed by their
+      Contribution(s) alone or by combination of their Contribution(s)
+      with the Work to which such Contribution(s) was submitted. If You
+      institute patent litigation against any entity (including a
+      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      or a Contribution incorporated within the Work constitutes direct
+      or contributory patent infringement, then any patent licenses
+      granted to You under this License for that Work shall terminate
+      as of the date such litigation is filed.
+
+   4. Redistribution. You may reproduce and distribute copies of the
+      Work or Derivative Works thereof in any medium, with or without
+      modifications, and in Source or Object form, provided that You
+      meet the following conditions:
+
+      (a) You must give any other recipients of the Work or
+          Derivative Works a copy of this License; and
+
+      (b) You must cause any modified files to carry prominent notices
+          stating that You changed the files; and
+
+      (c) You must retain, in the Source form of any Derivative Works
+          that You distribute, all copyright, patent, trademark, and
+          attribution notices from the Source form of the Work,
+          excluding those notices that do not pertain to any part of
+          the Derivative Works; and
+
+      (d) If the Work includes a "NOTICE" text file as part of its
+          distribution, then any Derivative Works that You distribute must
+          include a readable copy of the attribution notices contained
+          within such NOTICE file, excluding those notices that do not
+          pertain to any part of the Derivative Works, in at least one
+          of the following places: within a NOTICE text file distributed
+          as part of the Derivative Works; within the Source form or
+          documentation, if provided along with the Derivative Works; or,
+          within a display generated by the Derivative Works, if and
+          wherever such third-party notices normally appear. The contents
+          of the NOTICE file are for informational purposes only and
+          do not modify the License. You may add Your own attribution
+          notices within Derivative Works that You distribute, alongside
+          or as an addendum to the NOTICE text from the Work, provided
+          that such additional attribution notices cannot be construed
+          as modifying the License.
+
+      You may add Your own copyright statement to Your modifications and
+      may provide additional or different license terms and conditions
+      for use, reproduction, or distribution of Your modifications, or
+      for any such Derivative Works as a whole, provided Your use,
+      reproduction, and distribution of the Work otherwise complies with
+      the conditions stated in this License.
+
+   5. Submission of Contributions. Unless You explicitly state otherwise,
+      any Contribution intentionally submitted for inclusion in the Work
+      by You to the Licensor shall be under the terms and conditions of
+      this License, without any additional terms or conditions.
+      Notwithstanding the above, nothing herein shall supersede or modify
+      the terms of any separate license agreement you may have executed
+      with Licensor regarding such Contributions.
+
+   6. Trademarks. This License does not grant permission to use the trade
+      names, trademarks, service marks, or product names of the Licensor,
+      except as required for reasonable and customary use in describing the
+      origin of the Work and reproducing the content of the NOTICE file.
+
+   7. Disclaimer of Warranty. Unless required by applicable law or
+      agreed to in writing, Licensor provides the Work (and each
+      Contributor provides its Contributions) on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied, including, without limitation, any warranties or conditions
+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+      PARTICULAR PURPOSE. You are solely responsible for determining the
+      appropriateness of using or redistributing the Work and assume any
+      risks associated with Your exercise of permissions under this License.
+
+   8. Limitation of Liability. In no event and under no legal theory,
+      whether in tort (including negligence), contract, or otherwise,
+      unless required by applicable law (such as deliberate and grossly
+      negligent acts) or agreed to in writing, shall any Contributor be
+      liable to You for damages, including any direct, indirect, special,
+      incidental, or consequential damages of any character arising as a
+      result of this License or out of the use or inability to use the
+      Work (including but not limited to damages for loss of goodwill,
+      work stoppage, computer failure or malfunction, or any and all
+      other commercial damages or losses), even if such Contributor
+      has been advised of the possibility of such damages.
+
+   9. Accepting Warranty or Additional Liability. While redistributing
+      the Work or Derivative Works thereof, You may choose to offer,
+      and charge a fee for, acceptance of support, warranty, indemnity,
+      or other liability obligations and/or rights consistent with this
+      License. However, in accepting such obligations, You may act only
+      on Your own behalf and on Your sole responsibility, not on behalf
+      of any other Contributor, and only if You agree to indemnify,
+      defend, and hold each Contributor harmless for any liability
+      incurred by, or claims asserted against, such Contributor by reason
+      of your accepting any such warranty or additional liability.
+
+   END OF TERMS AND CONDITIONS
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "{}"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright {yyyy} {name of copyright owner}
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+= = = = =
+
+Parts of typeshed are licensed under different licenses (like the MIT
+license), reproduced below.
+
+= = = = =
+
+The MIT License
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+= = = = =
+
+```
+
+
+
+
+
+
+#### Other Licenses
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+### [types-tabulate (0.9.0.20241207)](https://github.com/python/typeshed)
+
+
+#### Declared Licenses
+MIT, Apache-2.0
+
+
+```
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+
+
+
+
+
+```
+The "typeshed" project is licensed under the terms of the Apache license, as
+reproduced below.
+
+= = = = =
+
+Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+   1. Definitions.
+
+      "License" shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
+
+      "Licensor" shall mean the copyright owner or entity authorized by
+      the copyright owner that is granting the License.
+
+      "Legal Entity" shall mean the union of the acting entity and all
+      other entities that control, are controlled by, or are under common
+      control with that entity. For the purposes of this definition,
+      "control" means (i) the power, direct or indirect, to cause the
+      direction or management of such entity, whether by contract or
+      otherwise, or (ii) ownership of fifty percent (50%) or more of the
+      outstanding shares, or (iii) beneficial ownership of such entity.
+
+      "You" (or "Your") shall mean an individual or Legal Entity
+      exercising permissions granted by this License.
+
+      "Source" form shall mean the preferred form for making modifications,
+      including but not limited to software source code, documentation
+      source, and configuration files.
+
+      "Object" form shall mean any form resulting from mechanical
+      transformation or translation of a Source form, including but
+      not limited to compiled object code, generated documentation,
+      and conversions to other media types.
+
+      "Work" shall mean the work of authorship, whether in Source or
+      Object form, made available under the License, as indicated by a
+      copyright notice that is included in or attached to the work
+      (an example is provided in the Appendix below).
+
+      "Derivative Works" shall mean any work, whether in Source or Object
+      form, that is based on (or derived from) the Work and for which the
+      editorial revisions, annotations, elaborations, or other modifications
+      represent, as a whole, an original work of authorship. For the purposes
+      of this License, Derivative Works shall not include works that remain
+      separable from, or merely link (or bind by name) to the interfaces of,
+      the Work and Derivative Works thereof.
+
+      "Contribution" shall mean any work of authorship, including
+      the original version of the Work and any modifications or additions
+      to that Work or Derivative Works thereof, that is intentionally
+      submitted to Licensor for inclusion in the Work by the copyright owner
+      or by an individual or Legal Entity authorized to submit on behalf of
+      the copyright owner. For the purposes of this definition, "submitted"
+      means any form of electronic, verbal, or written communication sent
+      to the Licensor or its representatives, including but not limited to
+      communication on electronic mailing lists, source code control systems,
+      and issue tracking systems that are managed by, or on behalf of, the
+      Licensor for the purpose of discussing and improving the Work, but
+      excluding communication that is conspicuously marked or otherwise
+      designated in writing by the copyright owner as "Not a Contribution."
+
+      "Contributor" shall mean Licensor and any individual or Legal Entity
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
+
+   2. Grant of Copyright License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      copyright license to reproduce, prepare Derivative Works of,
+      publicly display, publicly perform, sublicense, and distribute the
+      Work and such Derivative Works in Source or Object form.
+
+   3. Grant of Patent License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      (except as stated in this section) patent license to make, have made,
+      use, offer to sell, sell, import, and otherwise transfer the Work,
+      where such license applies only to those patent claims licensable
+      by such Contributor that are necessarily infringed by their
+      Contribution(s) alone or by combination of their Contribution(s)
+      with the Work to which such Contribution(s) was submitted. If You
+      institute patent litigation against any entity (including a
+      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      or a Contribution incorporated within the Work constitutes direct
+      or contributory patent infringement, then any patent licenses
+      granted to You under this License for that Work shall terminate
+      as of the date such litigation is filed.
+
+   4. Redistribution. You may reproduce and distribute copies of the
+      Work or Derivative Works thereof in any medium, with or without
+      modifications, and in Source or Object form, provided that You
+      meet the following conditions:
+
+      (a) You must give any other recipients of the Work or
+          Derivative Works a copy of this License; and
+
+      (b) You must cause any modified files to carry prominent notices
+          stating that You changed the files; and
+
+      (c) You must retain, in the Source form of any Derivative Works
+          that You distribute, all copyright, patent, trademark, and
+          attribution notices from the Source form of the Work,
+          excluding those notices that do not pertain to any part of
+          the Derivative Works; and
+
+      (d) If the Work includes a "NOTICE" text file as part of its
+          distribution, then any Derivative Works that You distribute must
+          include a readable copy of the attribution notices contained
+          within such NOTICE file, excluding those notices that do not
+          pertain to any part of the Derivative Works, in at least one
+          of the following places: within a NOTICE text file distributed
+          as part of the Derivative Works; within the Source form or
+          documentation, if provided along with the Derivative Works; or,
+          within a display generated by the Derivative Works, if and
+          wherever such third-party notices normally appear. The contents
+          of the NOTICE file are for informational purposes only and
+          do not modify the License. You may add Your own attribution
+          notices within Derivative Works that You distribute, alongside
+          or as an addendum to the NOTICE text from the Work, provided
+          that such additional attribution notices cannot be construed
+          as modifying the License.
+
+      You may add Your own copyright statement to Your modifications and
+      may provide additional or different license terms and conditions
+      for use, reproduction, or distribution of Your modifications, or
+      for any such Derivative Works as a whole, provided Your use,
+      reproduction, and distribution of the Work otherwise complies with
+      the conditions stated in this License.
+
+   5. Submission of Contributions. Unless You explicitly state otherwise,
+      any Contribution intentionally submitted for inclusion in the Work
+      by You to the Licensor shall be under the terms and conditions of
+      this License, without any additional terms or conditions.
+      Notwithstanding the above, nothing herein shall supersede or modify
+      the terms of any separate license agreement you may have executed
+      with Licensor regarding such Contributions.
+
+   6. Trademarks. This License does not grant permission to use the trade
+      names, trademarks, service marks, or product names of the Licensor,
+      except as required for reasonable and customary use in describing the
+      origin of the Work and reproducing the content of the NOTICE file.
+
+   7. Disclaimer of Warranty. Unless required by applicable law or
+      agreed to in writing, Licensor provides the Work (and each
+      Contributor provides its Contributions) on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied, including, without limitation, any warranties or conditions
+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+      PARTICULAR PURPOSE. You are solely responsible for determining the
+      appropriateness of using or redistributing the Work and assume any
+      risks associated with Your exercise of permissions under this License.
+
+   8. Limitation of Liability. In no event and under no legal theory,
+      whether in tort (including negligence), contract, or otherwise,
+      unless required by applicable law (such as deliberate and grossly
+      negligent acts) or agreed to in writing, shall any Contributor be
+      liable to You for damages, including any direct, indirect, special,
+      incidental, or consequential damages of any character arising as a
+      result of this License or out of the use or inability to use the
+      Work (including but not limited to damages for loss of goodwill,
+      work stoppage, computer failure or malfunction, or any and all
+      other commercial damages or losses), even if such Contributor
+      has been advised of the possibility of such damages.
+
+   9. Accepting Warranty or Additional Liability. While redistributing
+      the Work or Derivative Works thereof, You may choose to offer,
+      and charge a fee for, acceptance of support, warranty, indemnity,
+      or other liability obligations and/or rights consistent with this
+      License. However, in accepting such obligations, You may act only
+      on Your own behalf and on Your sole responsibility, not on behalf
+      of any other Contributor, and only if You agree to indemnify,
+      defend, and hold each Contributor harmless for any liability
+      incurred by, or claims asserted against, such Contributor by reason
+      of your accepting any such warranty or additional liability.
+
+   END OF TERMS AND CONDITIONS
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "{}"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright {yyyy} {name of copyright owner}
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+= = = = =
+
+Parts of typeshed are licensed under different licenses (like the MIT
+license), reproduced below.
+
+= = = = =
+
+The MIT License
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+= = = = =
+
+```
+
+
+
+
+
+
+#### Other Licenses
+
 
 
 
@@ -4011,6 +6686,7 @@ STICHTING MATHEMATISCH CENTRUM DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFT
 
 
 
+
 ---
 
 ### [update-checker (0.18.0)](https://github.com/bboe/update_checker)
@@ -4052,6 +6728,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #### Other Licenses
+
 
 
 
@@ -4488,6 +7165,215 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+
+```
+
+
+### Apache-2.0
+
+```
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+   1. Definitions.
+
+      &quot;License&quot; shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
+
+      &quot;Licensor&quot; shall mean the copyright owner or entity authorized by
+      the copyright owner that is granting the License.
+
+      &quot;Legal Entity&quot; shall mean the union of the acting entity and all
+      other entities that control, are controlled by, or are under common
+      control with that entity. For the purposes of this definition,
+      &quot;control&quot; means (i) the power, direct or indirect, to cause the
+      direction or management of such entity, whether by contract or
+      otherwise, or (ii) ownership of fifty percent (50%) or more of the
+      outstanding shares, or (iii) beneficial ownership of such entity.
+
+      &quot;You&quot; (or &quot;Your&quot;) shall mean an individual or Legal Entity
+      exercising permissions granted by this License.
+
+      &quot;Source&quot; form shall mean the preferred form for making modifications,
+      including but not limited to software source code, documentation
+      source, and configuration files.
+
+      &quot;Object&quot; form shall mean any form resulting from mechanical
+      transformation or translation of a Source form, including but
+      not limited to compiled object code, generated documentation,
+      and conversions to other media types.
+
+      &quot;Work&quot; shall mean the work of authorship, whether in Source or
+      Object form, made available under the License, as indicated by a
+      copyright notice that is included in or attached to the work
+      (an example is provided in the Appendix below).
+
+      &quot;Derivative Works&quot; shall mean any work, whether in Source or Object
+      form, that is based on (or derived from) the Work and for which the
+      editorial revisions, annotations, elaborations, or other modifications
+      represent, as a whole, an original work of authorship. For the purposes
+      of this License, Derivative Works shall not include works that remain
+      separable from, or merely link (or bind by name) to the interfaces of,
+      the Work and Derivative Works thereof.
+
+      &quot;Contribution&quot; shall mean any work of authorship, including
+      the original version of the Work and any modifications or additions
+      to that Work or Derivative Works thereof, that is intentionally
+      submitted to Licensor for inclusion in the Work by the copyright owner
+      or by an individual or Legal Entity authorized to submit on behalf of
+      the copyright owner. For the purposes of this definition, &quot;submitted&quot;
+      means any form of electronic, verbal, or written communication sent
+      to the Licensor or its representatives, including but not limited to
+      communication on electronic mailing lists, source code control systems,
+      and issue tracking systems that are managed by, or on behalf of, the
+      Licensor for the purpose of discussing and improving the Work, but
+      excluding communication that is conspicuously marked or otherwise
+      designated in writing by the copyright owner as &quot;Not a Contribution.&quot;
+
+      &quot;Contributor&quot; shall mean Licensor and any individual or Legal Entity
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
+
+   2. Grant of Copyright License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      copyright license to reproduce, prepare Derivative Works of,
+      publicly display, publicly perform, sublicense, and distribute the
+      Work and such Derivative Works in Source or Object form.
+
+   3. Grant of Patent License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      (except as stated in this section) patent license to make, have made,
+      use, offer to sell, sell, import, and otherwise transfer the Work,
+      where such license applies only to those patent claims licensable
+      by such Contributor that are necessarily infringed by their
+      Contribution(s) alone or by combination of their Contribution(s)
+      with the Work to which such Contribution(s) was submitted. If You
+      institute patent litigation against any entity (including a
+      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      or a Contribution incorporated within the Work constitutes direct
+      or contributory patent infringement, then any patent licenses
+      granted to You under this License for that Work shall terminate
+      as of the date such litigation is filed.
+
+   4. Redistribution. You may reproduce and distribute copies of the
+      Work or Derivative Works thereof in any medium, with or without
+      modifications, and in Source or Object form, provided that You
+      meet the following conditions:
+
+      (a) You must give any other recipients of the Work or
+          Derivative Works a copy of this License; and
+
+      (b) You must cause any modified files to carry prominent notices
+          stating that You changed the files; and
+
+      (c) You must retain, in the Source form of any Derivative Works
+          that You distribute, all copyright, patent, trademark, and
+          attribution notices from the Source form of the Work,
+          excluding those notices that do not pertain to any part of
+          the Derivative Works; and
+
+      (d) If the Work includes a &quot;NOTICE&quot; text file as part of its
+          distribution, then any Derivative Works that You distribute must
+          include a readable copy of the attribution notices contained
+          within such NOTICE file, excluding those notices that do not
+          pertain to any part of the Derivative Works, in at least one
+          of the following places: within a NOTICE text file distributed
+          as part of the Derivative Works; within the Source form or
+          documentation, if provided along with the Derivative Works; or,
+          within a display generated by the Derivative Works, if and
+          wherever such third-party notices normally appear. The contents
+          of the NOTICE file are for informational purposes only and
+          do not modify the License. You may add Your own attribution
+          notices within Derivative Works that You distribute, alongside
+          or as an addendum to the NOTICE text from the Work, provided
+          that such additional attribution notices cannot be construed
+          as modifying the License.
+
+      You may add Your own copyright statement to Your modifications and
+      may provide additional or different license terms and conditions
+      for use, reproduction, or distribution of Your modifications, or
+      for any such Derivative Works as a whole, provided Your use,
+      reproduction, and distribution of the Work otherwise complies with
+      the conditions stated in this License.
+
+   5. Submission of Contributions. Unless You explicitly state otherwise,
+      any Contribution intentionally submitted for inclusion in the Work
+      by You to the Licensor shall be under the terms and conditions of
+      this License, without any additional terms or conditions.
+      Notwithstanding the above, nothing herein shall supersede or modify
+      the terms of any separate license agreement you may have executed
+      with Licensor regarding such Contributions.
+
+   6. Trademarks. This License does not grant permission to use the trade
+      names, trademarks, service marks, or product names of the Licensor,
+      except as required for reasonable and customary use in describing the
+      origin of the Work and reproducing the content of the NOTICE file.
+
+   7. Disclaimer of Warranty. Unless required by applicable law or
+      agreed to in writing, Licensor provides the Work (and each
+      Contributor provides its Contributions) on an &quot;AS IS&quot; BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied, including, without limitation, any warranties or conditions
+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+      PARTICULAR PURPOSE. You are solely responsible for determining the
+      appropriateness of using or redistributing the Work and assume any
+      risks associated with Your exercise of permissions under this License.
+
+   8. Limitation of Liability. In no event and under no legal theory,
+      whether in tort (including negligence), contract, or otherwise,
+      unless required by applicable law (such as deliberate and grossly
+      negligent acts) or agreed to in writing, shall any Contributor be
+      liable to You for damages, including any direct, indirect, special,
+      incidental, or consequential damages of any character arising as a
+      result of this License or out of the use or inability to use the
+      Work (including but not limited to damages for loss of goodwill,
+      work stoppage, computer failure or malfunction, or any and all
+      other commercial damages or losses), even if such Contributor
+      has been advised of the possibility of such damages.
+
+   9. Accepting Warranty or Additional Liability. While redistributing
+      the Work or Derivative Works thereof, You may choose to offer,
+      and charge a fee for, acceptance of support, warranty, indemnity,
+      or other liability obligations and/or rights consistent with this
+      License. However, in accepting such obligations, You may act only
+      on Your own behalf and on Your sole responsibility, not on behalf
+      of any other Contributor, and only if You agree to indemnify,
+      defend, and hold each Contributor harmless for any liability
+      incurred by, or claims asserted against, such Contributor by reason
+      of your accepting any such warranty or additional liability.
+
+   END OF TERMS AND CONDITIONS
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets &quot;[]&quot;
+      replaced with your own identifying information. (Don&#39;t include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same &quot;printed page&quot; as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright [yyyy] [name of copyright owner]
+
+   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
 
 ```
 
@@ -5249,6 +8135,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ```
 
 
+### BSD-3-Clause-Clear
+
+```
+The Clear BSD License
+Copyright (c) [xxxx]-[xxxx] [Owner Organization]
+All rights reserved.
+Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the limitations in the disclaimer below) provided that the following conditions are met:
+      * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+      * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+      * Neither the name of [Owner Organization] nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY&#39;S PATENT RIGHTS ARE GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+```
+
+
 ### BSL-1.0
 
 ```
@@ -5537,6 +8437,32 @@ ACCEPT
 ### MIT
 
 ```
+Copyright (c) 2008-2011 Volvox Development Team
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the &quot;Software&quot;), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+```
+
+
+### MIT
+
+```
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
 Permission is hereby granted, free of charge, to any person obtaining
@@ -5612,6 +8538,59 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+```
+
+
+### MIT
+
+```
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the &quot;Software&quot;), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+```
+
+
+### MIT
+
+```
+Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2006-2016 Kirill Simonov
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the &quot;Software&quot;), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 ```
 
@@ -6027,6 +9006,15 @@ The hypothetical commands `show w&#39; and `show c&#39; should show the appropri
 You should also get your employer (if you work as a programmer) or your school, if any, to sign a &quot;copyright disclaimer&quot; for the program, if necessary. Here is a sample; alter the names:
 Yoyodyne, Inc., hereby disclaims all copyright interest in the program `Gnomovision&#39; (which makes passes at compilers) written by James Hacker.
 &lt; signature of Ty Coon &gt; , 1 April 1989 Ty Coon, President of Vice
+```
+
+
+### GPL-2.0-with-bison-exception
+
+```
+Bison Exception
+As a special exception, you may create a larger work that contains part or all of the Bison parser skeleton and distribute that work under terms of your choice, so long as that work isn&#39;t itself a parser generator using the skeleton or a modified version thereof as a parser skeleton. Alternatively, if you modify or redistribute the parser skeleton itself, you may (at your option) remove this special exception, which will cause the skeleton and the resulting Bison output files to be licensed under the GNU General Public License without this special exception.
+This special exception was added by the Free Software Foundation in version 2.2 of Bison.
 ```
 
 
@@ -6572,7 +9560,63 @@ SOFTWARE.
 ```
 MIT License
 
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the &quot;Software&quot;), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+```
+
+
+### MIT
+
+```
+MIT License
+
 Copyright (c) 2017 Manraj Singh
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the &quot;Software&quot;), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+```
+
+
+### MIT
+
+```
+MIT License
+
+Copyright (c) [2016] [Bruno Oliveira]
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the &quot;Software&quot;), to deal
@@ -6680,6 +9724,242 @@ If it is not possible or desirable to put the notice in a particular file, then 
 You may add additional accurate notices of copyright ownership.
 Exhibit B - &quot;Incompatible With Secondary Licenses&quot; Notice
 This Source Code Form is &quot;Incompatible With Secondary Licenses&quot;, as defined by the Mozilla Public License, v. 2.0.
+```
+
+
+### MIT
+
+```
+Mypy (and mypyc) are licensed under the terms of the MIT license, reproduced below.
+
+= = = = =
+
+The MIT License
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the &quot;Software&quot;),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+= = = = =
+
+Portions of mypy and mypyc are licensed under different licenses.
+The files
+mypyc/lib-rt/pythonsupport.h, mypyc/lib-rt/getargs.c and
+mypyc/lib-rt/getargsfast.c are licensed under the PSF 2 License, reproduced
+below.
+
+= = = = =
+
+PYTHON SOFTWARE FOUNDATION LICENSE VERSION 2
+--------------------------------------------
+
+1. This LICENSE AGREEMENT is between the Python Software Foundation
+(&quot;PSF&quot;), and the Individual or Organization (&quot;Licensee&quot;) accessing and
+otherwise using this software (&quot;Python&quot;) in source or binary form and
+its associated documentation.
+
+2. Subject to the terms and conditions of this License Agreement, PSF hereby
+grants Licensee a nonexclusive, royalty-free, world-wide license to reproduce,
+analyze, test, perform and/or display publicly, prepare derivative works,
+distribute, and otherwise use Python alone or in any derivative version,
+provided, however, that PSF&#39;s License Agreement and PSF&#39;s notice of copyright,
+i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
+2011, 2012 Python Software Foundation; All Rights Reserved&quot; are retained in Python
+alone or in any derivative version prepared by Licensee.
+
+3. In the event Licensee prepares a derivative work that is based on
+or incorporates Python or any part thereof, and wants to make
+the derivative work available to others as provided herein, then
+Licensee hereby agrees to include in any such work a brief summary of
+the changes made to Python.
+
+4. PSF is making Python available to Licensee on an &quot;AS IS&quot;
+basis.  PSF MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR
+IMPLIED.  BY WAY OF EXAMPLE, BUT NOT LIMITATION, PSF MAKES NO AND
+DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS
+FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF PYTHON WILL NOT
+INFRINGE ANY THIRD PARTY RIGHTS.
+
+5. PSF SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF PYTHON
+FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS AS
+A RESULT OF MODIFYING, DISTRIBUTING, OR OTHERWISE USING PYTHON,
+OR ANY DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
+
+6. This License Agreement will automatically terminate upon a material
+breach of its terms and conditions.
+
+7. Nothing in this License Agreement shall be deemed to create any
+relationship of agency, partnership, or joint venture between PSF and
+Licensee.  This License Agreement does not grant permission to use PSF
+trademarks or trade name in a trademark sense to endorse or promote
+products or services of Licensee, or any third party.
+
+8. By copying, installing or otherwise using Python, Licensee
+agrees to be bound by the terms and conditions of this License
+Agreement.
+
+
+BEOPEN.COM LICENSE AGREEMENT FOR PYTHON 2.0
+-------------------------------------------
+
+BEOPEN PYTHON OPEN SOURCE LICENSE AGREEMENT VERSION 1
+
+1. This LICENSE AGREEMENT is between BeOpen.com (&quot;BeOpen&quot;), having an
+office at 160 Saratoga Avenue, Santa Clara, CA 95051, and the
+Individual or Organization (&quot;Licensee&quot;) accessing and otherwise using
+this software in source or binary form and its associated
+documentation (&quot;the Software&quot;).
+
+2. Subject to the terms and conditions of this BeOpen Python License
+Agreement, BeOpen hereby grants Licensee a non-exclusive,
+royalty-free, world-wide license to reproduce, analyze, test, perform
+and/or display publicly, prepare derivative works, distribute, and
+otherwise use the Software alone or in any derivative version,
+provided, however, that the BeOpen Python License is retained in the
+Software, alone or in any derivative version prepared by Licensee.
+
+3. BeOpen is making the Software available to Licensee on an &quot;AS IS&quot;
+basis.  BEOPEN MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR
+IMPLIED.  BY WAY OF EXAMPLE, BUT NOT LIMITATION, BEOPEN MAKES NO AND
+DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS
+FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE SOFTWARE WILL NOT
+INFRINGE ANY THIRD PARTY RIGHTS.
+
+4. BEOPEN SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF THE
+SOFTWARE FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS
+AS A RESULT OF USING, MODIFYING OR DISTRIBUTING THE SOFTWARE, OR ANY
+DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
+
+5. This License Agreement will automatically terminate upon a material
+breach of its terms and conditions.
+
+6. This License Agreement shall be governed by and interpreted in all
+respects by the law of the State of California, excluding conflict of
+law provisions.  Nothing in this License Agreement shall be deemed to
+create any relationship of agency, partnership, or joint venture
+between BeOpen and Licensee.  This License Agreement does not grant
+permission to use BeOpen trademarks or trade names in a trademark
+sense to endorse or promote products or services of Licensee, or any
+third party.  As an exception, the &quot;BeOpen Python&quot; logos available at
+http://www.pythonlabs.com/logos.html may be used according to the
+permissions granted on that web page.
+
+7. By copying, installing or otherwise using the software, Licensee
+agrees to be bound by the terms and conditions of this License
+Agreement.
+
+
+CNRI LICENSE AGREEMENT FOR PYTHON 1.6.1
+---------------------------------------
+
+1. This LICENSE AGREEMENT is between the Corporation for National
+Research Initiatives, having an office at 1895 Preston White Drive,
+Reston, VA 20191 (&quot;CNRI&quot;), and the Individual or Organization
+(&quot;Licensee&quot;) accessing and otherwise using Python 1.6.1 software in
+source or binary form and its associated documentation.
+
+2. Subject to the terms and conditions of this License Agreement, CNRI
+hereby grants Licensee a nonexclusive, royalty-free, world-wide
+license to reproduce, analyze, test, perform and/or display publicly,
+prepare derivative works, distribute, and otherwise use Python 1.6.1
+alone or in any derivative version, provided, however, that CNRI&#39;s
+License Agreement and CNRI&#39;s notice of copyright, i.e., &quot;Copyright (c)
+1995-2001 Corporation for National Research Initiatives; All Rights
+Reserved&quot; are retained in Python 1.6.1 alone or in any derivative
+version prepared by Licensee.  Alternately, in lieu of CNRI&#39;s License
+Agreement, Licensee may substitute the following text (omitting the
+quotes): &quot;Python 1.6.1 is made available subject to the terms and
+conditions in CNRI&#39;s License Agreement.  This Agreement together with
+Python 1.6.1 may be located on the Internet using the following
+unique, persistent identifier (known as a handle): 1895.22/1013.  This
+Agreement may also be obtained from a proxy server on the Internet
+using the following URL: http://hdl.handle.net/1895.22/1013&quot;.
+
+3. In the event Licensee prepares a derivative work that is based on
+or incorporates Python 1.6.1 or any part thereof, and wants to make
+the derivative work available to others as provided herein, then
+Licensee hereby agrees to include in any such work a brief summary of
+the changes made to Python 1.6.1.
+
+4. CNRI is making Python 1.6.1 available to Licensee on an &quot;AS IS&quot;
+basis.  CNRI MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR
+IMPLIED.  BY WAY OF EXAMPLE, BUT NOT LIMITATION, CNRI MAKES NO AND
+DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS
+FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF PYTHON 1.6.1 WILL NOT
+INFRINGE ANY THIRD PARTY RIGHTS.
+
+5. CNRI SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF PYTHON
+1.6.1 FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS AS
+A RESULT OF MODIFYING, DISTRIBUTING, OR OTHERWISE USING PYTHON 1.6.1,
+OR ANY DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
+
+6. This License Agreement will automatically terminate upon a material
+breach of its terms and conditions.
+
+7. This License Agreement shall be governed by the federal
+intellectual property law of the United States, including without
+limitation the federal copyright law, and, to the extent such
+U.S. federal law does not apply, by the law of the Commonwealth of
+Virginia, excluding Virginia&#39;s conflict of law provisions.
+Notwithstanding the foregoing, with regard to derivative works based
+on Python 1.6.1 that incorporate non-separable material that was
+previously distributed under the GNU General Public License (GPL), the
+law of the Commonwealth of Virginia shall govern this License
+Agreement only as to issues arising under or with respect to
+Paragraphs 4, 5, and 7 of this License Agreement.  Nothing in this
+License Agreement shall be deemed to create any relationship of
+agency, partnership, or joint venture between CNRI and Licensee.  This
+License Agreement does not grant permission to use CNRI trademarks or
+trade name in a trademark sense to endorse or promote products or
+services of Licensee, or any third party.
+
+8. By clicking on the &quot;ACCEPT&quot; button where indicated, or by copying,
+installing or otherwise using Python 1.6.1, Licensee agrees to be
+bound by the terms and conditions of this License Agreement.
+
+        ACCEPT
+
+
+CWI LICENSE AGREEMENT FOR PYTHON 0.9.0 THROUGH 1.2
+--------------------------------------------------
+
+Copyright (c) 1991 - 1995, Stichting Mathematisch Centrum Amsterdam,
+The Netherlands.  All rights reserved.
+
+Permission to use, copy, modify, and distribute this software and its
+documentation for any purpose and without fee is hereby granted,
+provided that the above copyright notice appear in all copies and that
+both that copyright notice and this permission notice appear in
+supporting documentation, and that the name of Stichting Mathematisch
+Centrum or CWI not be used in advertising or publicity pertaining to
+distribution of the software without specific, written prior
+permission.
+
+STICHTING MATHEMATISCH CENTRUM DISCLAIMS ALL WARRANTIES WITH REGARD TO
+THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+FITNESS, IN NO EVENT SHALL STICHTING MATHEMATISCH CENTRUM BE LIABLE
+FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
 ```
 
 
@@ -6826,6 +10106,44 @@ PYTHON SOFTWARE FOUNDATION LICENSE VERSION 2
 ```
 
 
+### Protobuf
+
+```
+Copyright 2008 Google Inc.  All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+    * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+    * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+&quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Code generated by the Protocol Buffer compiler is owned by the owner
+of the input file used when generating it.  This code is not
+standalone and requires a support library to be linked with it.  This
+support library is itself covered by the above license.
+```
+
+
 ### Python-2.0
 
 ```
@@ -6871,6 +10189,278 @@ Developed at SunPro, a Sun Microsystems, Inc. business.
 Permission to use, copy, modify, and distribute this
 software is freely granted, provided that this notice
 is preserved.
+```
+
+
+### Apache-2.0
+
+```
+The &quot;typeshed&quot; project is licensed under the terms of the Apache license, as
+reproduced below.
+
+= = = = =
+
+Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+   1. Definitions.
+
+      &quot;License&quot; shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
+
+      &quot;Licensor&quot; shall mean the copyright owner or entity authorized by
+      the copyright owner that is granting the License.
+
+      &quot;Legal Entity&quot; shall mean the union of the acting entity and all
+      other entities that control, are controlled by, or are under common
+      control with that entity. For the purposes of this definition,
+      &quot;control&quot; means (i) the power, direct or indirect, to cause the
+      direction or management of such entity, whether by contract or
+      otherwise, or (ii) ownership of fifty percent (50%) or more of the
+      outstanding shares, or (iii) beneficial ownership of such entity.
+
+      &quot;You&quot; (or &quot;Your&quot;) shall mean an individual or Legal Entity
+      exercising permissions granted by this License.
+
+      &quot;Source&quot; form shall mean the preferred form for making modifications,
+      including but not limited to software source code, documentation
+      source, and configuration files.
+
+      &quot;Object&quot; form shall mean any form resulting from mechanical
+      transformation or translation of a Source form, including but
+      not limited to compiled object code, generated documentation,
+      and conversions to other media types.
+
+      &quot;Work&quot; shall mean the work of authorship, whether in Source or
+      Object form, made available under the License, as indicated by a
+      copyright notice that is included in or attached to the work
+      (an example is provided in the Appendix below).
+
+      &quot;Derivative Works&quot; shall mean any work, whether in Source or Object
+      form, that is based on (or derived from) the Work and for which the
+      editorial revisions, annotations, elaborations, or other modifications
+      represent, as a whole, an original work of authorship. For the purposes
+      of this License, Derivative Works shall not include works that remain
+      separable from, or merely link (or bind by name) to the interfaces of,
+      the Work and Derivative Works thereof.
+
+      &quot;Contribution&quot; shall mean any work of authorship, including
+      the original version of the Work and any modifications or additions
+      to that Work or Derivative Works thereof, that is intentionally
+      submitted to Licensor for inclusion in the Work by the copyright owner
+      or by an individual or Legal Entity authorized to submit on behalf of
+      the copyright owner. For the purposes of this definition, &quot;submitted&quot;
+      means any form of electronic, verbal, or written communication sent
+      to the Licensor or its representatives, including but not limited to
+      communication on electronic mailing lists, source code control systems,
+      and issue tracking systems that are managed by, or on behalf of, the
+      Licensor for the purpose of discussing and improving the Work, but
+      excluding communication that is conspicuously marked or otherwise
+      designated in writing by the copyright owner as &quot;Not a Contribution.&quot;
+
+      &quot;Contributor&quot; shall mean Licensor and any individual or Legal Entity
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
+
+   2. Grant of Copyright License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      copyright license to reproduce, prepare Derivative Works of,
+      publicly display, publicly perform, sublicense, and distribute the
+      Work and such Derivative Works in Source or Object form.
+
+   3. Grant of Patent License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      (except as stated in this section) patent license to make, have made,
+      use, offer to sell, sell, import, and otherwise transfer the Work,
+      where such license applies only to those patent claims licensable
+      by such Contributor that are necessarily infringed by their
+      Contribution(s) alone or by combination of their Contribution(s)
+      with the Work to which such Contribution(s) was submitted. If You
+      institute patent litigation against any entity (including a
+      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      or a Contribution incorporated within the Work constitutes direct
+      or contributory patent infringement, then any patent licenses
+      granted to You under this License for that Work shall terminate
+      as of the date such litigation is filed.
+
+   4. Redistribution. You may reproduce and distribute copies of the
+      Work or Derivative Works thereof in any medium, with or without
+      modifications, and in Source or Object form, provided that You
+      meet the following conditions:
+
+      (a) You must give any other recipients of the Work or
+          Derivative Works a copy of this License; and
+
+      (b) You must cause any modified files to carry prominent notices
+          stating that You changed the files; and
+
+      (c) You must retain, in the Source form of any Derivative Works
+          that You distribute, all copyright, patent, trademark, and
+          attribution notices from the Source form of the Work,
+          excluding those notices that do not pertain to any part of
+          the Derivative Works; and
+
+      (d) If the Work includes a &quot;NOTICE&quot; text file as part of its
+          distribution, then any Derivative Works that You distribute must
+          include a readable copy of the attribution notices contained
+          within such NOTICE file, excluding those notices that do not
+          pertain to any part of the Derivative Works, in at least one
+          of the following places: within a NOTICE text file distributed
+          as part of the Derivative Works; within the Source form or
+          documentation, if provided along with the Derivative Works; or,
+          within a display generated by the Derivative Works, if and
+          wherever such third-party notices normally appear. The contents
+          of the NOTICE file are for informational purposes only and
+          do not modify the License. You may add Your own attribution
+          notices within Derivative Works that You distribute, alongside
+          or as an addendum to the NOTICE text from the Work, provided
+          that such additional attribution notices cannot be construed
+          as modifying the License.
+
+      You may add Your own copyright statement to Your modifications and
+      may provide additional or different license terms and conditions
+      for use, reproduction, or distribution of Your modifications, or
+      for any such Derivative Works as a whole, provided Your use,
+      reproduction, and distribution of the Work otherwise complies with
+      the conditions stated in this License.
+
+   5. Submission of Contributions. Unless You explicitly state otherwise,
+      any Contribution intentionally submitted for inclusion in the Work
+      by You to the Licensor shall be under the terms and conditions of
+      this License, without any additional terms or conditions.
+      Notwithstanding the above, nothing herein shall supersede or modify
+      the terms of any separate license agreement you may have executed
+      with Licensor regarding such Contributions.
+
+   6. Trademarks. This License does not grant permission to use the trade
+      names, trademarks, service marks, or product names of the Licensor,
+      except as required for reasonable and customary use in describing the
+      origin of the Work and reproducing the content of the NOTICE file.
+
+   7. Disclaimer of Warranty. Unless required by applicable law or
+      agreed to in writing, Licensor provides the Work (and each
+      Contributor provides its Contributions) on an &quot;AS IS&quot; BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied, including, without limitation, any warranties or conditions
+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+      PARTICULAR PURPOSE. You are solely responsible for determining the
+      appropriateness of using or redistributing the Work and assume any
+      risks associated with Your exercise of permissions under this License.
+
+   8. Limitation of Liability. In no event and under no legal theory,
+      whether in tort (including negligence), contract, or otherwise,
+      unless required by applicable law (such as deliberate and grossly
+      negligent acts) or agreed to in writing, shall any Contributor be
+      liable to You for damages, including any direct, indirect, special,
+      incidental, or consequential damages of any character arising as a
+      result of this License or out of the use or inability to use the
+      Work (including but not limited to damages for loss of goodwill,
+      work stoppage, computer failure or malfunction, or any and all
+      other commercial damages or losses), even if such Contributor
+      has been advised of the possibility of such damages.
+
+   9. Accepting Warranty or Additional Liability. While redistributing
+      the Work or Derivative Works thereof, You may choose to offer,
+      and charge a fee for, acceptance of support, warranty, indemnity,
+      or other liability obligations and/or rights consistent with this
+      License. However, in accepting such obligations, You may act only
+      on Your own behalf and on Your sole responsibility, not on behalf
+      of any other Contributor, and only if You agree to indemnify,
+      defend, and hold each Contributor harmless for any liability
+      incurred by, or claims asserted against, such Contributor by reason
+      of your accepting any such warranty or additional liability.
+
+   END OF TERMS AND CONDITIONS
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets &quot;{}&quot;
+      replaced with your own identifying information. (Don&#39;t include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same &quot;printed page&quot; as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright {yyyy} {name of copyright owner}
+
+   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+= = = = =
+
+Parts of typeshed are licensed under different licenses (like the MIT
+license), reproduced below.
+
+= = = = =
+
+The MIT License
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the &quot;Software&quot;),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+= = = = =
+
+```
+
+
+### MIT
+
+```
+The MIT License (MIT)
+
+Copyright (c) 2004 Holger Krekel and others
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the &quot;Software&quot;), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
 ```
 
 
@@ -6939,6 +10529,19 @@ In jurisdictions that recognize copyright laws, the author or authors of this so
 successors. We intend this dedication to be an overt act of relinquishment in perpetuity of all present and future rights to this software under copyright law.
 THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 For more information, please refer to &lt;http://unlicense.org/&gt;
+```
+
+
+### X11
+
+```
+X11 License
+Copyright (C) 1996 X Consortium
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the &quot;Software&quot;), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE X CONSORTIUM BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+Except as contained in this notice, the name of the X Consortium shall not be used in advertising or otherwise to promote the sale, use or other dealings in this Software without prior written authorization from the X Consortium.
+X Window System is a trademark of X Consortium, Inc.
 ```
 
 
@@ -7055,6 +10658,36 @@ Notice
 The Business Source License (this document, or the “License”) is not an Open Source license. However, the Licensed Work will eventually be made available under an Open Source License, as stated in this License.
 
 For more information on the use of the Business Source License for MariaDB products, please visit the MariaDB Business Source License FAQ. For more information on the use of the Business Source License generally, please visit the Adopting and Developing Business Source License FAQ.
+```
+
+
+### gpl-2.0-plus WITH bison-exception-2.2
+
+```
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the Free
+    Software Foundation; either version 2, or (at your option) any later
+    version.
+    This program is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+    more details.
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the
+    Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor,
+    Boston, MA 02110-1301, USA.
+    As a special exception, you may create a larger work that contains part or
+    all of the Bison parser skeleton and distribute that work under terms of
+    your choice, so long as that work isn&#39;t itself a parser generator using the
+    skeleton or a modified version thereof as a parser skeleton. Alternatively,
+    if you modify or redistribute the parser skeleton itself, you may (at your
+    option) remove this special exception, which will cause the skeleton and
+    the resulting Bison output files to be licensed under the GNU General
+    Public License without this special exception.
+    This special exception was added by the Free Software Foundation in version
+    2.2 of Bison.
+
 ```
 
 
@@ -7332,6 +10965,13 @@ copied and put under another distribution licence
 ```
 
 
+### public-domain
+
+```
+
+```
+
+
 
 
 
@@ -7340,19 +10980,61 @@ copied and put under another distribution licence
 
 ### BSD Zero Clause License
 
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) Contributors to the pythoncapi_compat project.
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -7371,12 +11053,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -7428,39 +11104,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -7476,19 +11154,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -7506,9 +11200,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -7538,13 +11238,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -7553,6 +11249,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -7564,19 +11362,59 @@ THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHOR DISCLAIMS ALL WARRANTI
 
 ### Attribution Assurance License
 
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -7595,12 +11433,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -7652,39 +11484,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -7700,19 +11534,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -7730,9 +11580,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -7762,13 +11618,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -7777,6 +11629,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -7797,19 +11751,59 @@ THIS FREE SOFTWARE IS PROVIDED BY THE AUTHOR &quot;AS IS&quot; AND ANY EXPRESS O
 
 ### GNU Affero General Public License v3.0 or later
 
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -7828,12 +11822,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -7885,39 +11873,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -7933,19 +11923,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -7963,9 +11969,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -7995,13 +12007,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -8010,6 +12018,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -8143,9 +12253,21 @@ You should also get your employer (if you work as a programmer) or school, if an
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2008 Jean Brouwers
+
+Copyright (c) 2008 Ludwig Hähne
+
+Copyright (c) 2008 Robert Schuppenies
+
+Copyright (c) 2002-2008 ProphICy
+
 Copyright (c) 2021 Starburst Data, Inc.
 
 Copyright (c) 2021 dbt Labs, Inc.
+
+Copyright (c) The Mbed TLS Contributors
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -8161,15 +12283,55 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2014 Pallets
+Copyright (c) 2017 Christopher Groskopf and contributors
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
+Copyright (c) 2014 Pallets
+
+Copyright (c) 2010 Jonathan Hartley
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
+
 Copyright (c) 2013-2021 Sebastian Bank
+
+Copyright (c) 2013-2024 Sebastian Bank
 
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2014 Pallets . All rights reserved.
 
@@ -8186,12 +12348,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -8243,53 +12399,71 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
-
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2014 Will Roberts
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -8307,9 +12481,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -8339,13 +12519,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -8354,6 +12530,106 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -8411,19 +12687,59 @@ limitations under the License.
 
 ### Artistic License 1.0
 
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -8442,12 +12758,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -8499,39 +12809,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -8547,19 +12859,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -8577,9 +12905,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -8609,13 +12943,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -8624,6 +12954,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -8659,19 +13091,59 @@ Definitions:
 
 ### Artistic License 1.0 (Perl)
 
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -8690,12 +13162,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -8747,39 +13213,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -8795,19 +13263,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -8825,9 +13309,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -8857,13 +13347,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -8872,6 +13358,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -8908,219 +13496,13 @@ Definitions:
 
 ### BSD 2-Clause &quot;Simplified&quot; License
 
-Copyright (c) 2014 Pallets
+Copyright (c) 2013-2016 Cameron Desrochers.
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2017 Christopher Groskopf and contributors
 
-Copyright (c) 2024 dbt Labs, Inc.
-
-Copyright (c) 2021 Starburst Data, Inc.
-
-Copyright (c) 2013-2021 Sebastian Bank
-
-Copyright (c) 2017 Manraj Singh
-
-Copyright (c) 2007 Pallets
-
-Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
-
-Copyright (c) 2014 Pallets . All rights reserved.
-
-Copyright (c) 1993 by Sun Microsystems, Inc. All rights reserved.
-
-Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
-
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
-
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam, The Netherlands. All rights reserved.
-
-Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
-
-Copyright (c)  terms
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
-
-Copyright (c)  to each Open Publication is owned by its author(s) or designee.
-
-Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved.
-
-Copyright (c)  or copyrights for the package.
-
-Copyright (c)  of this Package, but belong to whomever generated them, and may be sold commercially, and may be aggregated with this Package.
-
-Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
-
-Copyright (c) 1990-2009 Info-ZIP. All rights reserved.
-
-Copyright (c) 2009 Free Software Foundation, Inc. &lt;http://fsf.org/&gt;
-
-Copyright (c)  and certain other rights specified in the public license below. The following considerations are for informational purposes only, are not exhaustive, and do not form part of our licenses.
-
-Copyright (c)  and certain other rights. Our licenses are irrevocable. Licensors should read and understand the terms and conditions of the license they choose before applying it. Licensors should also secure all rights necessary before applying our licenses so that the public can reuse the material as expected. Licensors should clearly mark any material not subject to the license. This includes other CC-licensed material, or material used under an exception or limitation to copyright. More considerations for licensors : wiki.creativecommons.org/Considerations_for_licensors
-
-Copyright (c)  More considerations for licensors : wiki.creativecommons.org/Considerations_for_licensors
-
-Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described.
-
-Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described.
-
-Copyright (c)  and Similar Rights that is derived from or based upon the Licensed Material and in which the Licensed Material is translated, altered, arranged, transformed, or otherwise modified in a manner requiring permission under the Copyright and Similar Rights held by the Licensor. For purposes of this Public License, where the Licensed Material is a musical work, performance, or sound recording, Adapted Material is always produced where the Licensed Material is synched in timed relation with a moving image.
-
-Copyright (c)  and Similar Rights held by the Licensor. For purposes of this Public License, where the Licensed Material is a musical work, performance, or sound recording, Adapted Material is always produced where the Licensed Material is synched in timed relation with a moving image.
-
-Copyright (c)  and Similar Rights in Your contributions to Adapted Material in accordance with the terms and conditions of this Public License.
-
-Copyright (c)  and Similar Rights means copyright and/or similar rights closely related to copyright including, without limitation, performance, broadcast, sound recording, and Sui Generis Database Rights, without regard to how the rights are labeled or categorized. For purposes of this Public License, the rights specified in Section 2(b)(1)-(2) are not Copyright and Similar Rights.
-
-Copyright (c)  and/or similar rights closely related to copyright including, without limitation, performance, broadcast, sound recording, and Sui Generis Database Rights, without regard to how the rights are labeled or categorized. For purposes of this Public License, the rights specified in Section 2(b)(1)-(2) are not Copyright and Similar Rights.
-
-Copyright (c)  and Similar Rights.
-
-Copyright (c)  and Similar Rights that applies to Your use of the Licensed Material.
-
-Copyright (c)  and Similar Rights that apply to Your use of the Licensed Material and that the Licensor has authority to license.
-
-Copyright (c)  and Similar Rights licensed here. However, if You fail to comply with this Public License, then Your rights under this Public License terminate automatically.
-
-Copyright (c)  AND/OR OTHER APPLICABLE LAW. ANY USE OF THE WORK OTHER THAN AS AUTHORIZED UNDER THIS LICENSE OR COPYRIGHT LAW IS PROHIBITED.
-
-Copyright (c)  or rights arising from limitations or exceptions that are provided for in connection with the copyright protection under copyright law or other applicable laws.
-
-Copyright (c)  protection under copyright law or other applicable laws.
-
-Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
-
-Copyright (c)  or any other
-
-Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
-
-Copyright (c) 2012 Erik Rose
-
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
-
-Copyright (c) 2015-2023 Dropbox, Inc.
-
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
-
-Copyright (c)  i.e., &quot;Copyright (c)
-
-Copyright (c)  
-
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
-
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
-
-Copyright (c) 2008 Google Inc. . All rights reserved.
-
-Copyright (c) 2015 Jukka Lehtosalo and contributors
-
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
-
-Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
-
-Copyright (c) 2004 Holger Krekel and others
-
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
-
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
-
-Copyright (c) 2017 dateutil contributors (see AUTHORS file)
-
-Copyright (c) 2003-2011 Gustavo Niemeyer &lt;gustavo@niemeyer.net&gt;
-
-Copyright (c) 2012-2014 Tomi Pieviläinen &lt;tomi.pievilainen@iki.fi&gt;
-
-Copyright (c) 2014-2016 Yaron de Leeuw &lt;me@jarondl.net&gt;
-
-Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
-
-Copyright (c) 2015 dateutil contributors (see AUTHORS file)
-
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
-
-Copyright (c) 2017-2021 Ingy döt Net
-
-Copyright (c) 2006-2016 Kirill Simonov
-
-Copyright (c) 2020 present Max Bachmann
-
-Copyright (c) 2011 Adam Cohen
-
-Copyright (c) 2011-2020 Sergey Astanin and contributors
+Copyright (c) 2016 Tino Reichardt
 
 Copyright (c) 2012 Bryce Boe
-
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
-
-Copyright (c) 2002 by AUTHOR PROFESSIONAL IDENTIFICATION * URL &quot;PROMOTIONAL SLOGAN FOR AUTHOR&#39;S PROFESSIONAL PRACTICE&quot;
-
-Copyright (c) 2007 Free Software Foundation, Inc. &lt;http s ://fsf.org/&gt;
-
-Copyright (c)  quot; also means copyright-like laws that apply to other kinds of works, such as semiconductor masks.
-
-Copyright (c)  quot; line and a pointer to where the full notice is found.
-
-Copyright (c)  lt;year&gt; &lt;name of author&gt;
-
-Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
-
-Copyright (c)  lt;year&gt; &lt;owner&gt;
-
-Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
-
-Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
-
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
-
-Copyright (c) 2003-2011 Gustavo Niemeyer &lt;gustavo@niemeyer.net&gt;
-
-Copyright (c) 2012-2014 Tomi Pieviläinen &lt;tomi.pievilainen@iki.fi&gt;
-
-Copyright (c) 2014-2016 Yaron de Leeuw &lt;me@jarondl.net&gt;
-
-Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
-
-Copyright (c) 1989 Free Software Foundation, Inc. 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
-Copyright (c)  19yy &lt;name of author&gt;
-
-Copyright (c)  19xx name of author Gnomovision comes with ABSOLUTELY NO WARRANTY; for details type `show w&#39;. This is free software, and you are welcome to redistribute it under certain conditions; type `show c&#39; for details.
-
-Copyright (c) 1989, 1991 Free Software Foundation, Inc.
-
-Copyright (c)  lt; yyyy &gt; &lt; name of author &gt;
-
-Copyright (c) 2009 Free Software Foundation, Inc. &lt;http://fsf.org/&gt;
-
-Copyright (c) 2004-2010 by Internet Systems Consortium, Inc. (&quot;ISC&quot;)
-
-Copyright (c) 1995-2003 by Internet Software Consortium
-
-Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
-
-Copyright (c)  i.e., &quot;Copyright (c)
-
-Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
-
-Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
-
-Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
-
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
-
-Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
 
 
 ```
@@ -9153,219 +13535,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ### BSD 3-Clause &quot;New&quot; or &quot;Revised&quot; License
 
-Copyright (c) 2014 Pallets
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2008 Google Inc.
+
+Copyright (c) 2002-2022 ProphICy Semiconductor, Inc.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
-Copyright (c) 2021 dbt Labs, Inc.
-
-Copyright (c) 2024 dbt Labs, Inc.
-
-Copyright (c) 2021 Starburst Data, Inc.
-
-Copyright (c) 2013-2021 Sebastian Bank
-
-Copyright (c) 2017 Manraj Singh
+Copyright (c) 2012 the V8 project authors. All rights reserved.
 
 Copyright (c) 2007 Pallets
 
-Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
-
-Copyright (c) 2014 Pallets . All rights reserved.
-
-Copyright (c) 1993 by Sun Microsystems, Inc. All rights reserved.
-
-Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
-
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
-
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam, The Netherlands. All rights reserved.
-
-Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
-
-Copyright (c)  terms
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
-
-Copyright (c)  to each Open Publication is owned by its author(s) or designee.
-
-Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved.
-
-Copyright (c)  or copyrights for the package.
-
-Copyright (c)  of this Package, but belong to whomever generated them, and may be sold commercially, and may be aggregated with this Package.
-
-Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
-
-Copyright (c) 1990-2009 Info-ZIP. All rights reserved.
-
-Copyright (c) 2009 Free Software Foundation, Inc. &lt;http://fsf.org/&gt;
-
-Copyright (c)  and certain other rights specified in the public license below. The following considerations are for informational purposes only, are not exhaustive, and do not form part of our licenses.
-
-Copyright (c)  and certain other rights. Our licenses are irrevocable. Licensors should read and understand the terms and conditions of the license they choose before applying it. Licensors should also secure all rights necessary before applying our licenses so that the public can reuse the material as expected. Licensors should clearly mark any material not subject to the license. This includes other CC-licensed material, or material used under an exception or limitation to copyright. More considerations for licensors : wiki.creativecommons.org/Considerations_for_licensors
-
-Copyright (c)  More considerations for licensors : wiki.creativecommons.org/Considerations_for_licensors
-
-Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described.
-
-Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described.
-
-Copyright (c)  and Similar Rights that is derived from or based upon the Licensed Material and in which the Licensed Material is translated, altered, arranged, transformed, or otherwise modified in a manner requiring permission under the Copyright and Similar Rights held by the Licensor. For purposes of this Public License, where the Licensed Material is a musical work, performance, or sound recording, Adapted Material is always produced where the Licensed Material is synched in timed relation with a moving image.
-
-Copyright (c)  and Similar Rights held by the Licensor. For purposes of this Public License, where the Licensed Material is a musical work, performance, or sound recording, Adapted Material is always produced where the Licensed Material is synched in timed relation with a moving image.
-
-Copyright (c)  and Similar Rights in Your contributions to Adapted Material in accordance with the terms and conditions of this Public License.
-
-Copyright (c)  and Similar Rights means copyright and/or similar rights closely related to copyright including, without limitation, performance, broadcast, sound recording, and Sui Generis Database Rights, without regard to how the rights are labeled or categorized. For purposes of this Public License, the rights specified in Section 2(b)(1)-(2) are not Copyright and Similar Rights.
-
-Copyright (c)  and/or similar rights closely related to copyright including, without limitation, performance, broadcast, sound recording, and Sui Generis Database Rights, without regard to how the rights are labeled or categorized. For purposes of this Public License, the rights specified in Section 2(b)(1)-(2) are not Copyright and Similar Rights.
-
-Copyright (c)  and Similar Rights.
-
-Copyright (c)  and Similar Rights that applies to Your use of the Licensed Material.
-
-Copyright (c)  and Similar Rights that apply to Your use of the Licensed Material and that the Licensor has authority to license.
-
-Copyright (c)  and Similar Rights licensed here. However, if You fail to comply with this Public License, then Your rights under this Public License terminate automatically.
-
-Copyright (c)  AND/OR OTHER APPLICABLE LAW. ANY USE OF THE WORK OTHER THAN AS AUTHORIZED UNDER THIS LICENSE OR COPYRIGHT LAW IS PROHIBITED.
-
-Copyright (c)  or rights arising from limitations or exceptions that are provided for in connection with the copyright protection under copyright law or other applicable laws.
-
-Copyright (c)  protection under copyright law or other applicable laws.
-
-Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
-
-Copyright (c)  or any other
-
-Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
-
-Copyright (c) 2012 Erik Rose
-
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
-
-Copyright (c) 2015-2023 Dropbox, Inc.
-
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
-
-Copyright (c)  i.e., &quot;Copyright (c)
-
-Copyright (c)  
-
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
-
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
-
-Copyright (c) 2008 Google Inc. . All rights reserved.
-
-Copyright (c) 2015 Jukka Lehtosalo and contributors
-
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
-
-Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
-
-Copyright (c) 2004 Holger Krekel and others
-
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
-
-Copyright (c) 2017 dateutil contributors (see AUTHORS file)
-
-Copyright (c) 2003-2011 Gustavo Niemeyer &lt;gustavo@niemeyer.net&gt;
-
-Copyright (c) 2012-2014 Tomi Pieviläinen &lt;tomi.pievilainen@iki.fi&gt;
-
-Copyright (c) 2014-2016 Yaron de Leeuw &lt;me@jarondl.net&gt;
-
-Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
-
-Copyright (c) 2015 dateutil contributors (see AUTHORS file)
-
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
-
-Copyright (c) 2017-2021 Ingy döt Net
-
-Copyright (c) 2006-2016 Kirill Simonov
-
-Copyright (c) 2020 present Max Bachmann
-
-Copyright (c) 2011 Adam Cohen
-
-Copyright (c) 2011-2020 Sergey Astanin and contributors
-
-Copyright (c) 2012 Bryce Boe
-
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
-
-Copyright (c) 2002 by AUTHOR PROFESSIONAL IDENTIFICATION * URL &quot;PROMOTIONAL SLOGAN FOR AUTHOR&#39;S PROFESSIONAL PRACTICE&quot;
-
-Copyright (c) 2007 Free Software Foundation, Inc. &lt;http s ://fsf.org/&gt;
-
-Copyright (c)  quot; also means copyright-like laws that apply to other kinds of works, such as semiconductor masks.
-
-Copyright (c)  quot; line and a pointer to where the full notice is found.
-
-Copyright (c)  lt;year&gt; &lt;name of author&gt;
-
-Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
-
-Copyright (c)  lt;year&gt; &lt;owner&gt;
-
-Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
-
-Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
-
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
-
-Copyright (c) 2003-2011 Gustavo Niemeyer &lt;gustavo@niemeyer.net&gt;
-
-Copyright (c) 2012-2014 Tomi Pieviläinen &lt;tomi.pievilainen@iki.fi&gt;
-
-Copyright (c) 2014-2016 Yaron de Leeuw &lt;me@jarondl.net&gt;
-
-Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
-
-Copyright (c) 1989 Free Software Foundation, Inc. 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
-Copyright (c)  19yy &lt;name of author&gt;
-
-Copyright (c)  19xx name of author Gnomovision comes with ABSOLUTELY NO WARRANTY; for details type `show w&#39;. This is free software, and you are welcome to redistribute it under certain conditions; type `show c&#39; for details.
-
-Copyright (c) 1989, 1991 Free Software Foundation, Inc.
-
-Copyright (c)  lt; yyyy &gt; &lt; name of author &gt;
-
-Copyright (c) 2009 Free Software Foundation, Inc. &lt;http://fsf.org/&gt;
-
-Copyright (c) 2004-2010 by Internet Systems Consortium, Inc. (&quot;ISC&quot;)
-
-Copyright (c) 1995-2003 by Internet Software Consortium
-
-Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
-
-Copyright (c)  i.e., &quot;Copyright (c)
-
-Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
-
-Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
-
-Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
-
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
-
-Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+Copyright (c) 2014 Pallets
 
 
 ```
@@ -9399,23 +13583,61 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ```
 
 
-### Boost Software License 1.0
+### BSD 3-Clause Clear License
+
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
 
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2006 Andy Tompkins.
-
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -9434,12 +13656,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -9491,39 +13707,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -9539,19 +13757,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -9569,9 +13803,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -9601,13 +13841,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -9616,6 +13852,493 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
+
+
+```
+The Clear BSD License
+Copyright (c) [xxxx]-[xxxx] [Owner Organization]
+All rights reserved.
+Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the limitations in the disclaimer below) provided that the following conditions are met:
+      * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+      * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+      * Neither the name of [Owner Organization] nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY&#39;S PATENT RIGHTS ARE GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+```
+
+
+### Boost Software License 1.0
+
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
+Copyright (c) 2014 Pallets
+
+Copyright (c) 2010 Jonathan Hartley
+
+Copyright (c) 2024 dbt Labs, Inc.
+
+Copyright (c) 2021 dbt Labs, Inc.
+
+Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
+
+Copyright (c) 2013-2021 Sebastian Bank
+
+Copyright (c) 2013-2024 Sebastian Bank
+
+Copyright (c) 2017 Manraj Singh
+
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
+Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
+
+Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
+
+Copyright (c) 2014 Pallets . All rights reserved.
+
+Copyright (c) 1993 by Sun Microsystems, Inc. All rights reserved.
+
+Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam, The Netherlands. All rights reserved.
+
+Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
+
+Copyright (c)  terms
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  to each Open Publication is owned by its author(s) or designee.
+
+Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved.
+
+Copyright (c)  or copyrights for the package.
+
+Copyright (c)  of this Package, but belong to whomever generated them, and may be sold commercially, and may be aggregated with this Package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 1990-2009 Info-ZIP. All rights reserved.
+
+Copyright (c) 2009 Free Software Foundation, Inc. &lt;http://fsf.org/&gt;
+
+Copyright (c)  and certain other rights specified in the public license below. The following considerations are for informational purposes only, are not exhaustive, and do not form part of our licenses.
+
+Copyright (c)  and certain other rights. Our licenses are irrevocable. Licensors should read and understand the terms and conditions of the license they choose before applying it. Licensors should also secure all rights necessary before applying our licenses so that the public can reuse the material as expected. Licensors should clearly mark any material not subject to the license. This includes other CC-licensed material, or material used under an exception or limitation to copyright. More considerations for licensors : wiki.creativecommons.org/Considerations_for_licensors
+
+Copyright (c)  More considerations for licensors : wiki.creativecommons.org/Considerations_for_licensors
+
+Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described.
+
+Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described.
+
+Copyright (c)  and Similar Rights that is derived from or based upon the Licensed Material and in which the Licensed Material is translated, altered, arranged, transformed, or otherwise modified in a manner requiring permission under the Copyright and Similar Rights held by the Licensor. For purposes of this Public License, where the Licensed Material is a musical work, performance, or sound recording, Adapted Material is always produced where the Licensed Material is synched in timed relation with a moving image.
+
+Copyright (c)  and Similar Rights held by the Licensor. For purposes of this Public License, where the Licensed Material is a musical work, performance, or sound recording, Adapted Material is always produced where the Licensed Material is synched in timed relation with a moving image.
+
+Copyright (c)  and Similar Rights in Your contributions to Adapted Material in accordance with the terms and conditions of this Public License.
+
+Copyright (c)  and Similar Rights means copyright and/or similar rights closely related to copyright including, without limitation, performance, broadcast, sound recording, and Sui Generis Database Rights, without regard to how the rights are labeled or categorized. For purposes of this Public License, the rights specified in Section 2(b)(1)-(2) are not Copyright and Similar Rights.
+
+Copyright (c)  and/or similar rights closely related to copyright including, without limitation, performance, broadcast, sound recording, and Sui Generis Database Rights, without regard to how the rights are labeled or categorized. For purposes of this Public License, the rights specified in Section 2(b)(1)-(2) are not Copyright and Similar Rights.
+
+Copyright (c)  and Similar Rights.
+
+Copyright (c)  and Similar Rights that applies to Your use of the Licensed Material.
+
+Copyright (c)  and Similar Rights that apply to Your use of the Licensed Material and that the Licensor has authority to license.
+
+Copyright (c)  and Similar Rights licensed here. However, if You fail to comply with this Public License, then Your rights under this Public License terminate automatically.
+
+Copyright (c)  AND/OR OTHER APPLICABLE LAW. ANY USE OF THE WORK OTHER THAN AS AUTHORIZED UNDER THIS LICENSE OR COPYRIGHT LAW IS PROHIBITED.
+
+Copyright (c)  or rights arising from limitations or exceptions that are provided for in connection with the copyright protection under copyright law or other applicable laws.
+
+Copyright (c)  protection under copyright law or other applicable laws.
+
+Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
+
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
+Copyright (c)  or any other
+
+Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
+
+Copyright (c) 2012 Erik Rose
+
+Copyright (c) 2004-2024 NetworkX Developers
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 2015 Thomson Licensing, SAS
+
+Copyright (c) 2012-2022 Elia Robyn Lake
+
+Copyright (c)  Donald Stufft and individual contributors.
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c) 1996 X Consortium
+
+Copyright (c) 2008 Google Inc.  All rights reserved.
+
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
+
+Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
+
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
+
+Copyright (c) 2017 dateutil contributors (see AUTHORS file)
+
+Copyright (c) 2003-2011 Gustavo Niemeyer &lt;gustavo@niemeyer.net&gt;
+
+Copyright (c) 2012-2014 Tomi Pieviläinen &lt;tomi.pievilainen@iki.fi&gt;
+
+Copyright (c) 2014-2016 Yaron de Leeuw &lt;me@jarondl.net&gt;
+
+Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
+
+Copyright (c) 2015 dateutil contributors (see AUTHORS file)
+
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
+
+Copyright (c) 2014 Will Roberts
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2020 present Max Bachmann
+
+Copyright (c) 2011 Adam Cohen
+
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
+Copyright (c) 2011-2020 Sergey Astanin and contributors
+
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
+Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
+
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
+Copyright (c) 2002 by AUTHOR PROFESSIONAL IDENTIFICATION * URL &quot;PROMOTIONAL SLOGAN FOR AUTHOR&#39;S PROFESSIONAL PRACTICE&quot;
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http s ://fsf.org/&gt;
+
+Copyright (c)  quot; also means copyright-like laws that apply to other kinds of works, such as semiconductor masks.
+
+Copyright (c)  quot; line and a pointer to where the full notice is found.
+
+Copyright (c)  lt;year&gt; &lt;name of author&gt;
+
+Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
+
+Copyright (c)  lt;year&gt; &lt;owner&gt;
+
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
+Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
+
+Copyright (c) 2003-2011 Gustavo Niemeyer &lt;gustavo@niemeyer.net&gt;
+
+Copyright (c) 2012-2014 Tomi Pieviläinen &lt;tomi.pievilainen@iki.fi&gt;
+
+Copyright (c) 2014-2016 Yaron de Leeuw &lt;me@jarondl.net&gt;
+
+Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
+
+Copyright (c) 1989 Free Software Foundation, Inc. 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+
+Copyright (c)  19yy &lt;name of author&gt;
+
+Copyright (c)  19xx name of author Gnomovision comes with ABSOLUTELY NO WARRANTY; for details type `show w&#39;. This is free software, and you are welcome to redistribute it under certain conditions; type `show c&#39; for details.
+
+Copyright (c) 1989, 1991 Free Software Foundation, Inc.
+
+Copyright (c)  lt; yyyy &gt; &lt; name of author &gt;
+
+Copyright (c) 2009 Free Software Foundation, Inc. &lt;http://fsf.org/&gt;
+
+Copyright (c) 2004-2010 by Internet Systems Consortium, Inc. (&quot;ISC&quot;)
+
+Copyright (c) 1995-2003 by Internet Software Consortium
+
+Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
+
+Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
+
+Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
+
+Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
+
+Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -9628,19 +14351,59 @@ THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRES
 
 ### Creative Commons Attribution 4.0
 
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -9659,12 +14422,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -9716,39 +14473,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -9764,19 +14523,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -9794,9 +14569,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -9826,13 +14607,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -9841,6 +14618,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -9926,19 +14805,59 @@ Creative Commons may be contacted at creativecommons.org.
 
 ### Creative Commons Attribution Share Alike 3.0
 
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -9957,12 +14876,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -10014,39 +14927,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -10062,19 +14977,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -10092,9 +15023,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -10124,13 +15061,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -10139,6 +15072,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -10196,19 +15231,59 @@ Creative Commons may be contacted at http://creativecommons.org/.
 
 ### Creative Commons Attribution Share Alike 4.0
 
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -10227,12 +15302,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -10284,39 +15353,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -10332,19 +15403,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -10362,9 +15449,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -10394,13 +15487,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -10409,6 +15498,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -10502,19 +15693,59 @@ Creative Commons may be contacted at creativecommons.org.
 
 ### Creative Commons Zero v1.0 Universal
 
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -10533,12 +15764,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -10590,39 +15815,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -10638,19 +15865,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -10668,9 +15911,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -10700,13 +15949,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -10715,6 +15960,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -10744,19 +16091,59 @@ For these and/or other purposes and motivations, and without any expectation of 
 
 ### CNRI Python License
 
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -10775,12 +16162,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -10832,39 +16213,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -10880,19 +16263,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -10910,9 +16309,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -10942,13 +16347,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -10957,6 +16358,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -10978,19 +16481,59 @@ ACCEPT
 
 ### GNU General Public License v1.0 only
 
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -11009,12 +16552,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -11066,39 +16603,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -11114,19 +16653,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -11144,9 +16699,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -11176,13 +16737,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -11191,6 +16748,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -11260,19 +16919,59 @@ That&#39;s all there is to it!
 
 ### GNU General Public License v1.0 or later
 
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -11291,12 +16990,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -11348,39 +17041,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -11396,19 +17091,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -11426,9 +17137,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -11458,13 +17175,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -11473,6 +17186,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -11532,219 +17347,11 @@ That&#39;s all there is to it!
 
 ### GNU General Public License v2.0 only
 
-Copyright (c) 2014 Pallets
+Copyright (c) Meta Platforms, Inc. and affiliates.
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2017 Christopher Groskopf and contributors
 
-Copyright (c) 2024 dbt Labs, Inc.
-
-Copyright (c) 2021 Starburst Data, Inc.
-
-Copyright (c) 2013-2021 Sebastian Bank
-
-Copyright (c) 2017 Manraj Singh
-
-Copyright (c) 2007 Pallets
-
-Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
-
-Copyright (c) 2014 Pallets . All rights reserved.
-
-Copyright (c) 1993 by Sun Microsystems, Inc. All rights reserved.
-
-Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
-
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
-
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam, The Netherlands. All rights reserved.
-
-Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
-
-Copyright (c)  terms
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
-
-Copyright (c)  to each Open Publication is owned by its author(s) or designee.
-
-Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved.
-
-Copyright (c)  or copyrights for the package.
-
-Copyright (c)  of this Package, but belong to whomever generated them, and may be sold commercially, and may be aggregated with this Package.
-
-Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
-
-Copyright (c) 1990-2009 Info-ZIP. All rights reserved.
-
-Copyright (c) 2009 Free Software Foundation, Inc. &lt;http://fsf.org/&gt;
-
-Copyright (c)  and certain other rights specified in the public license below. The following considerations are for informational purposes only, are not exhaustive, and do not form part of our licenses.
-
-Copyright (c)  and certain other rights. Our licenses are irrevocable. Licensors should read and understand the terms and conditions of the license they choose before applying it. Licensors should also secure all rights necessary before applying our licenses so that the public can reuse the material as expected. Licensors should clearly mark any material not subject to the license. This includes other CC-licensed material, or material used under an exception or limitation to copyright. More considerations for licensors : wiki.creativecommons.org/Considerations_for_licensors
-
-Copyright (c)  More considerations for licensors : wiki.creativecommons.org/Considerations_for_licensors
-
-Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described.
-
-Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described.
-
-Copyright (c)  and Similar Rights that is derived from or based upon the Licensed Material and in which the Licensed Material is translated, altered, arranged, transformed, or otherwise modified in a manner requiring permission under the Copyright and Similar Rights held by the Licensor. For purposes of this Public License, where the Licensed Material is a musical work, performance, or sound recording, Adapted Material is always produced where the Licensed Material is synched in timed relation with a moving image.
-
-Copyright (c)  and Similar Rights held by the Licensor. For purposes of this Public License, where the Licensed Material is a musical work, performance, or sound recording, Adapted Material is always produced where the Licensed Material is synched in timed relation with a moving image.
-
-Copyright (c)  and Similar Rights in Your contributions to Adapted Material in accordance with the terms and conditions of this Public License.
-
-Copyright (c)  and Similar Rights means copyright and/or similar rights closely related to copyright including, without limitation, performance, broadcast, sound recording, and Sui Generis Database Rights, without regard to how the rights are labeled or categorized. For purposes of this Public License, the rights specified in Section 2(b)(1)-(2) are not Copyright and Similar Rights.
-
-Copyright (c)  and/or similar rights closely related to copyright including, without limitation, performance, broadcast, sound recording, and Sui Generis Database Rights, without regard to how the rights are labeled or categorized. For purposes of this Public License, the rights specified in Section 2(b)(1)-(2) are not Copyright and Similar Rights.
-
-Copyright (c)  and Similar Rights.
-
-Copyright (c)  and Similar Rights that applies to Your use of the Licensed Material.
-
-Copyright (c)  and Similar Rights that apply to Your use of the Licensed Material and that the Licensor has authority to license.
-
-Copyright (c)  and Similar Rights licensed here. However, if You fail to comply with this Public License, then Your rights under this Public License terminate automatically.
-
-Copyright (c)  AND/OR OTHER APPLICABLE LAW. ANY USE OF THE WORK OTHER THAN AS AUTHORIZED UNDER THIS LICENSE OR COPYRIGHT LAW IS PROHIBITED.
-
-Copyright (c)  or rights arising from limitations or exceptions that are provided for in connection with the copyright protection under copyright law or other applicable laws.
-
-Copyright (c)  protection under copyright law or other applicable laws.
-
-Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
-
-Copyright (c)  or any other
-
-Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
-
-Copyright (c) 2012 Erik Rose
-
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
-
-Copyright (c) 2015-2023 Dropbox, Inc.
-
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
-
-Copyright (c)  i.e., &quot;Copyright (c)
-
-Copyright (c)  
-
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
-
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
-
-Copyright (c) 2008 Google Inc. . All rights reserved.
-
-Copyright (c) 2015 Jukka Lehtosalo and contributors
-
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
-
-Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
-
-Copyright (c) 2004 Holger Krekel and others
-
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
-
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
-
-Copyright (c) 2017 dateutil contributors (see AUTHORS file)
-
-Copyright (c) 2003-2011 Gustavo Niemeyer &lt;gustavo@niemeyer.net&gt;
-
-Copyright (c) 2012-2014 Tomi Pieviläinen &lt;tomi.pievilainen@iki.fi&gt;
-
-Copyright (c) 2014-2016 Yaron de Leeuw &lt;me@jarondl.net&gt;
-
-Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
-
-Copyright (c) 2015 dateutil contributors (see AUTHORS file)
-
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
-
-Copyright (c) 2017-2021 Ingy döt Net
-
-Copyright (c) 2006-2016 Kirill Simonov
-
-Copyright (c) 2020 present Max Bachmann
-
-Copyright (c) 2011 Adam Cohen
-
-Copyright (c) 2011-2020 Sergey Astanin and contributors
-
-Copyright (c) 2012 Bryce Boe
-
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
-
-Copyright (c) 2002 by AUTHOR PROFESSIONAL IDENTIFICATION * URL &quot;PROMOTIONAL SLOGAN FOR AUTHOR&#39;S PROFESSIONAL PRACTICE&quot;
-
-Copyright (c) 2007 Free Software Foundation, Inc. &lt;http s ://fsf.org/&gt;
-
-Copyright (c)  quot; also means copyright-like laws that apply to other kinds of works, such as semiconductor masks.
-
-Copyright (c)  quot; line and a pointer to where the full notice is found.
-
-Copyright (c)  lt;year&gt; &lt;name of author&gt;
-
-Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
-
-Copyright (c)  lt;year&gt; &lt;owner&gt;
-
-Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
-
-Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
-
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
-
-Copyright (c) 2003-2011 Gustavo Niemeyer &lt;gustavo@niemeyer.net&gt;
-
-Copyright (c) 2012-2014 Tomi Pieviläinen &lt;tomi.pievilainen@iki.fi&gt;
-
-Copyright (c) 2014-2016 Yaron de Leeuw &lt;me@jarondl.net&gt;
-
-Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
-
-Copyright (c) 1989 Free Software Foundation, Inc. 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
-Copyright (c)  19yy &lt;name of author&gt;
-
-Copyright (c)  19xx name of author Gnomovision comes with ABSOLUTELY NO WARRANTY; for details type `show w&#39;. This is free software, and you are welcome to redistribute it under certain conditions; type `show c&#39; for details.
-
-Copyright (c) 1989, 1991 Free Software Foundation, Inc.
-
-Copyright (c)  lt; yyyy &gt; &lt; name of author &gt;
-
-Copyright (c) 2009 Free Software Foundation, Inc. &lt;http://fsf.org/&gt;
-
-Copyright (c) 2004-2010 by Internet Systems Consortium, Inc. (&quot;ISC&quot;)
-
-Copyright (c) 1995-2003 by Internet Software Consortium
-
-Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
-
-Copyright (c)  i.e., &quot;Copyright (c)
-
-Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
-
-Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
-
-Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
-
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
-
-Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+Copyright (c)  Meta Platforms, Inc. and affiliates.
 
 
 ```
@@ -11813,219 +17420,11 @@ Yoyodyne, Inc., hereby disclaims all copyright interest in the program `Gnomovis
 
 ### GNU General Public License v2.0 or later
 
-Copyright (c) 2014 Pallets
+Copyright (c) The Mbed TLS Contributors
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2017 Christopher Groskopf and contributors
 
-Copyright (c) 2024 dbt Labs, Inc.
-
-Copyright (c) 2021 Starburst Data, Inc.
-
-Copyright (c) 2013-2021 Sebastian Bank
-
-Copyright (c) 2017 Manraj Singh
-
-Copyright (c) 2007 Pallets
-
-Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
-
-Copyright (c) 2014 Pallets . All rights reserved.
-
-Copyright (c) 1993 by Sun Microsystems, Inc. All rights reserved.
-
-Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
-
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
-
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam, The Netherlands. All rights reserved.
-
-Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
-
-Copyright (c)  terms
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
-
-Copyright (c)  to each Open Publication is owned by its author(s) or designee.
-
-Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved.
-
-Copyright (c)  or copyrights for the package.
-
-Copyright (c)  of this Package, but belong to whomever generated them, and may be sold commercially, and may be aggregated with this Package.
-
-Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
-
-Copyright (c) 1990-2009 Info-ZIP. All rights reserved.
-
-Copyright (c) 2009 Free Software Foundation, Inc. &lt;http://fsf.org/&gt;
-
-Copyright (c)  and certain other rights specified in the public license below. The following considerations are for informational purposes only, are not exhaustive, and do not form part of our licenses.
-
-Copyright (c)  and certain other rights. Our licenses are irrevocable. Licensors should read and understand the terms and conditions of the license they choose before applying it. Licensors should also secure all rights necessary before applying our licenses so that the public can reuse the material as expected. Licensors should clearly mark any material not subject to the license. This includes other CC-licensed material, or material used under an exception or limitation to copyright. More considerations for licensors : wiki.creativecommons.org/Considerations_for_licensors
-
-Copyright (c)  More considerations for licensors : wiki.creativecommons.org/Considerations_for_licensors
-
-Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described.
-
-Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described.
-
-Copyright (c)  and Similar Rights that is derived from or based upon the Licensed Material and in which the Licensed Material is translated, altered, arranged, transformed, or otherwise modified in a manner requiring permission under the Copyright and Similar Rights held by the Licensor. For purposes of this Public License, where the Licensed Material is a musical work, performance, or sound recording, Adapted Material is always produced where the Licensed Material is synched in timed relation with a moving image.
-
-Copyright (c)  and Similar Rights held by the Licensor. For purposes of this Public License, where the Licensed Material is a musical work, performance, or sound recording, Adapted Material is always produced where the Licensed Material is synched in timed relation with a moving image.
-
-Copyright (c)  and Similar Rights in Your contributions to Adapted Material in accordance with the terms and conditions of this Public License.
-
-Copyright (c)  and Similar Rights means copyright and/or similar rights closely related to copyright including, without limitation, performance, broadcast, sound recording, and Sui Generis Database Rights, without regard to how the rights are labeled or categorized. For purposes of this Public License, the rights specified in Section 2(b)(1)-(2) are not Copyright and Similar Rights.
-
-Copyright (c)  and/or similar rights closely related to copyright including, without limitation, performance, broadcast, sound recording, and Sui Generis Database Rights, without regard to how the rights are labeled or categorized. For purposes of this Public License, the rights specified in Section 2(b)(1)-(2) are not Copyright and Similar Rights.
-
-Copyright (c)  and Similar Rights.
-
-Copyright (c)  and Similar Rights that applies to Your use of the Licensed Material.
-
-Copyright (c)  and Similar Rights that apply to Your use of the Licensed Material and that the Licensor has authority to license.
-
-Copyright (c)  and Similar Rights licensed here. However, if You fail to comply with this Public License, then Your rights under this Public License terminate automatically.
-
-Copyright (c)  AND/OR OTHER APPLICABLE LAW. ANY USE OF THE WORK OTHER THAN AS AUTHORIZED UNDER THIS LICENSE OR COPYRIGHT LAW IS PROHIBITED.
-
-Copyright (c)  or rights arising from limitations or exceptions that are provided for in connection with the copyright protection under copyright law or other applicable laws.
-
-Copyright (c)  protection under copyright law or other applicable laws.
-
-Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
-
-Copyright (c)  or any other
-
-Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
-
-Copyright (c) 2012 Erik Rose
-
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
-
-Copyright (c) 2015-2023 Dropbox, Inc.
-
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
-
-Copyright (c)  i.e., &quot;Copyright (c)
-
-Copyright (c)  
-
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
-
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
-
-Copyright (c) 2008 Google Inc. . All rights reserved.
-
-Copyright (c) 2015 Jukka Lehtosalo and contributors
-
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
-
-Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
-
-Copyright (c) 2004 Holger Krekel and others
-
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
-
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
-
-Copyright (c) 2017 dateutil contributors (see AUTHORS file)
-
-Copyright (c) 2003-2011 Gustavo Niemeyer &lt;gustavo@niemeyer.net&gt;
-
-Copyright (c) 2012-2014 Tomi Pieviläinen &lt;tomi.pievilainen@iki.fi&gt;
-
-Copyright (c) 2014-2016 Yaron de Leeuw &lt;me@jarondl.net&gt;
-
-Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
-
-Copyright (c) 2015 dateutil contributors (see AUTHORS file)
-
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
-
-Copyright (c) 2017-2021 Ingy döt Net
-
-Copyright (c) 2006-2016 Kirill Simonov
-
-Copyright (c) 2020 present Max Bachmann
-
-Copyright (c) 2011 Adam Cohen
-
-Copyright (c) 2011-2020 Sergey Astanin and contributors
-
-Copyright (c) 2012 Bryce Boe
-
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
-
-Copyright (c) 2002 by AUTHOR PROFESSIONAL IDENTIFICATION * URL &quot;PROMOTIONAL SLOGAN FOR AUTHOR&#39;S PROFESSIONAL PRACTICE&quot;
-
-Copyright (c) 2007 Free Software Foundation, Inc. &lt;http s ://fsf.org/&gt;
-
-Copyright (c)  quot; also means copyright-like laws that apply to other kinds of works, such as semiconductor masks.
-
-Copyright (c)  quot; line and a pointer to where the full notice is found.
-
-Copyright (c)  lt;year&gt; &lt;name of author&gt;
-
-Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
-
-Copyright (c)  lt;year&gt; &lt;owner&gt;
-
-Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
-
-Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
-
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
-
-Copyright (c) 2003-2011 Gustavo Niemeyer &lt;gustavo@niemeyer.net&gt;
-
-Copyright (c) 2012-2014 Tomi Pieviläinen &lt;tomi.pievilainen@iki.fi&gt;
-
-Copyright (c) 2014-2016 Yaron de Leeuw &lt;me@jarondl.net&gt;
-
-Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
-
-Copyright (c) 1989 Free Software Foundation, Inc. 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
-Copyright (c)  19yy &lt;name of author&gt;
-
-Copyright (c)  19xx name of author Gnomovision comes with ABSOLUTELY NO WARRANTY; for details type `show w&#39;. This is free software, and you are welcome to redistribute it under certain conditions; type `show c&#39; for details.
-
-Copyright (c) 1989, 1991 Free Software Foundation, Inc.
-
-Copyright (c)  lt; yyyy &gt; &lt; name of author &gt;
-
-Copyright (c) 2009 Free Software Foundation, Inc. &lt;http://fsf.org/&gt;
-
-Copyright (c) 2004-2010 by Internet Systems Consortium, Inc. (&quot;ISC&quot;)
-
-Copyright (c) 1995-2003 by Internet Software Consortium
-
-Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
-
-Copyright (c)  i.e., &quot;Copyright (c)
-
-Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
-
-Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
-
-Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
-
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
-
-Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+Copyright (c)  The Mbed TLS Contributors
 
 
 ```
@@ -12092,21 +17491,77 @@ Yoyodyne, Inc., hereby disclaims all copyright interest in the program `Gnomovis
 ```
 
 
+### GNU General Public License v2.0 w/Bison exception
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
+
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+
+```
+Bison Exception
+As a special exception, you may create a larger work that contains part or all of the Bison parser skeleton and distribute that work under terms of your choice, so long as that work isn&#39;t itself a parser generator using the skeleton or a modified version thereof as a parser skeleton. Alternatively, if you modify or redistribute the parser skeleton itself, you may (at your option) remove this special exception, which will cause the skeleton and the resulting Bison output files to be licensed under the GNU General Public License without this special exception.
+This special exception was added by the Free Software Foundation in version 2.2 of Bison.
+```
+
+
 ### GNU General Public License v3.0 only
+
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
 
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -12125,12 +17580,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -12182,39 +17631,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -12230,19 +17681,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -12260,9 +17727,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -12292,13 +17765,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -12307,6 +17776,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -12441,19 +18012,59 @@ The GNU General Public License does not permit incorporating your program into p
 
 ### GNU General Public License v3.0 or later
 
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -12472,12 +18083,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -12529,39 +18134,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -12577,19 +18184,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -12607,9 +18230,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -12639,13 +18268,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -12654,6 +18279,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -12788,19 +18515,59 @@ The GNU General Public License does not permit incorporating your program into p
 
 ### GNU General Public License v3.0 w/GCC Runtime Library exception
 
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -12819,12 +18586,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -12876,39 +18637,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -12924,19 +18687,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -12954,9 +18733,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -12986,13 +18771,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -13001,6 +18782,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -13027,19 +18910,59 @@ The availability of this Exception does not imply any general presumption that t
 
 ### IPA Font License
 
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -13058,12 +18981,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -13115,39 +19032,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -13163,19 +19082,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -13193,9 +19128,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -13225,13 +19166,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -13240,6 +19177,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -13290,19 +19329,59 @@ Article 5 (Governing Law)
 
 ### ISC License
 
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -13321,12 +19400,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -13378,39 +19451,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -13426,19 +19501,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -13456,9 +19547,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -13488,13 +19585,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -13503,6 +19596,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -13516,19 +19711,59 @@ THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND ISC DISCLAIMS ALL WARRANTIES WITH
 
 ### Info-ZIP License
 
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -13547,12 +19782,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -13604,39 +19833,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -13652,19 +19883,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -13682,9 +19929,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -13714,13 +19967,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -13729,6 +19978,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -13747,19 +20098,59 @@ Permission is granted to anyone to use this software for any purpose, including 
 
 ### GNU Lesser General Public License v3.0 or later
 
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -13778,12 +20169,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -13835,39 +20220,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -13883,19 +20270,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -13913,9 +20316,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -13945,13 +20354,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -13960,6 +20365,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -14013,117 +20520,45 @@ This version of the GNU Lesser General Public License incorporates the terms and
 
 ### MIT License
 
+Copyright (c) 2008-2011 Volvox Development Team
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
 Copyright (c) 2012 Erik Rose
 
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2021 RStudio, PBC
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
 Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2011 Adam Cohen
 
 Copyright (c) 2022 present Max Bachmann
 
-Copyright (c) 2021 Max Bachmann
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
 
 Copyright (c) 2023 Max Bachmann
 
 Copyright (c) 2020 present Max Bachmann
 
-Copyright (c) 2020 Max Bachmann
+Copyright (c) 2017 Christopher Groskopf and contributors
 
-Copyright (c) 2021 present Max Bachmann
+Copyright (c) 2015 Jukka Lehtosalo and contributors
 
-Copyright (c) 2011 Adam Cohen
-
-Copyright (c) 2014 Pallets
-
-Copyright (c) 2021 dbt Labs, Inc.
-
-Copyright (c) 2024 dbt Labs, Inc.
-
-Copyright (c) 2021 Starburst Data, Inc.
-
-Copyright (c) 2013-2021 Sebastian Bank
+Copyright (c) 2010 Holger Krekel and contributors.
 
 Copyright (c) 2017 Manraj Singh
 
-Copyright (c) 2007 Pallets
-
-Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
-
-Copyright (c) 2014 Pallets . All rights reserved.
-
-Copyright (c) 1993 by Sun Microsystems, Inc. All rights reserved.
-
-Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
-
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
-
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam, The Netherlands. All rights reserved.
-
-Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
-
-Copyright (c)  terms
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
-
-Copyright (c)  to each Open Publication is owned by its author(s) or designee.
-
-Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved.
-
-Copyright (c)  or copyrights for the package.
-
-Copyright (c)  of this Package, but belong to whomever generated them, and may be sold commercially, and may be aggregated with this Package.
-
-Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
-
-Copyright (c) 1990-2009 Info-ZIP. All rights reserved.
-
-Copyright (c) 2009 Free Software Foundation, Inc. &lt;http://fsf.org/&gt;
-
-Copyright (c)  and certain other rights specified in the public license below. The following considerations are for informational purposes only, are not exhaustive, and do not form part of our licenses.
-
-Copyright (c)  and certain other rights. Our licenses are irrevocable. Licensors should read and understand the terms and conditions of the license they choose before applying it. Licensors should also secure all rights necessary before applying our licenses so that the public can reuse the material as expected. Licensors should clearly mark any material not subject to the license. This includes other CC-licensed material, or material used under an exception or limitation to copyright. More considerations for licensors : wiki.creativecommons.org/Considerations_for_licensors
-
-Copyright (c)  More considerations for licensors : wiki.creativecommons.org/Considerations_for_licensors
-
-Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described.
-
-Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described.
-
-Copyright (c)  and Similar Rights that is derived from or based upon the Licensed Material and in which the Licensed Material is translated, altered, arranged, transformed, or otherwise modified in a manner requiring permission under the Copyright and Similar Rights held by the Licensor. For purposes of this Public License, where the Licensed Material is a musical work, performance, or sound recording, Adapted Material is always produced where the Licensed Material is synched in timed relation with a moving image.
-
-Copyright (c)  and Similar Rights held by the Licensor. For purposes of this Public License, where the Licensed Material is a musical work, performance, or sound recording, Adapted Material is always produced where the Licensed Material is synched in timed relation with a moving image.
-
-Copyright (c)  and Similar Rights in Your contributions to Adapted Material in accordance with the terms and conditions of this Public License.
-
-Copyright (c)  and Similar Rights means copyright and/or similar rights closely related to copyright including, without limitation, performance, broadcast, sound recording, and Sui Generis Database Rights, without regard to how the rights are labeled or categorized. For purposes of this Public License, the rights specified in Section 2(b)(1)-(2) are not Copyright and Similar Rights.
-
-Copyright (c)  and/or similar rights closely related to copyright including, without limitation, performance, broadcast, sound recording, and Sui Generis Database Rights, without regard to how the rights are labeled or categorized. For purposes of this Public License, the rights specified in Section 2(b)(1)-(2) are not Copyright and Similar Rights.
-
-Copyright (c)  and Similar Rights.
-
-Copyright (c)  and Similar Rights that applies to Your use of the Licensed Material.
-
-Copyright (c)  and Similar Rights that apply to Your use of the Licensed Material and that the Licensor has authority to license.
-
-Copyright (c)  and Similar Rights licensed here. However, if You fail to comply with this Public License, then Your rights under this Public License terminate automatically.
-
-Copyright (c)  AND/OR OTHER APPLICABLE LAW. ANY USE OF THE WORK OTHER THAN AS AUTHORIZED UNDER THIS LICENSE OR COPYRIGHT LAW IS PROHIBITED.
-
-Copyright (c)  or rights arising from limitations or exceptions that are provided for in connection with the copyright protection under copyright law or other applicable laws.
-
-Copyright (c)  protection under copyright law or other applicable laws.
-
-Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
-
-Copyright (c)  or any other
-
-Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
+Copyright (c) 2016 Bruno Oliveira]
 
 Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
 
@@ -14137,107 +20572,13 @@ Copyright (c)
 
 Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2004 Holger Krekel and others
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
-
-Copyright (c) 2015 Jukka Lehtosalo and contributors
-
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2014 Gregory Boissinot
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
-
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
-
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
-
-Copyright (c) 2017 dateutil contributors (see AUTHORS file)
-
-Copyright (c) 2003-2011 Gustavo Niemeyer &lt;gustavo@niemeyer.net&gt;
-
-Copyright (c) 2012-2014 Tomi Pieviläinen &lt;tomi.pievilainen@iki.fi&gt;
-
-Copyright (c) 2014-2016 Yaron de Leeuw &lt;me@jarondl.net&gt;
-
-Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
-
-Copyright (c) 2015 dateutil contributors (see AUTHORS file)
-
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
-
-Copyright (c) 2017-2021 Ingy döt Net
-
-Copyright (c) 2006-2016 Kirill Simonov
-
-Copyright (c) 2012 Bryce Boe
-
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
-
-Copyright (c) 2002 by AUTHOR PROFESSIONAL IDENTIFICATION * URL &quot;PROMOTIONAL SLOGAN FOR AUTHOR&#39;S PROFESSIONAL PRACTICE&quot;
-
-Copyright (c) 2007 Free Software Foundation, Inc. &lt;http s ://fsf.org/&gt;
-
-Copyright (c)  quot; also means copyright-like laws that apply to other kinds of works, such as semiconductor masks.
-
-Copyright (c)  quot; line and a pointer to where the full notice is found.
-
-Copyright (c)  lt;year&gt; &lt;name of author&gt;
-
-Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
-
-Copyright (c)  lt;year&gt; &lt;owner&gt;
-
-Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
-
-Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
-
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
-
-Copyright (c) 2003-2011 Gustavo Niemeyer &lt;gustavo@niemeyer.net&gt;
-
-Copyright (c) 2012-2014 Tomi Pieviläinen &lt;tomi.pievilainen@iki.fi&gt;
-
-Copyright (c) 2014-2016 Yaron de Leeuw &lt;me@jarondl.net&gt;
-
-Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
-
-Copyright (c) 1989 Free Software Foundation, Inc. 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
-Copyright (c)  19yy &lt;name of author&gt;
-
-Copyright (c)  19xx name of author Gnomovision comes with ABSOLUTELY NO WARRANTY; for details type `show w&#39;. This is free software, and you are welcome to redistribute it under certain conditions; type `show c&#39; for details.
-
-Copyright (c) 1989, 1991 Free Software Foundation, Inc.
-
-Copyright (c)  lt; yyyy &gt; &lt; name of author &gt;
-
-Copyright (c) 2009 Free Software Foundation, Inc. &lt;http://fsf.org/&gt;
-
-Copyright (c) 2004-2010 by Internet Systems Consortium, Inc. (&quot;ISC&quot;)
-
-Copyright (c) 1995-2003 by Internet Software Consortium
-
-Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
-
-Copyright (c)  i.e., &quot;Copyright (c)
-
-Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
-
-Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
-
-Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
-
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
-
-Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+Copyright (c) 2013-2021 Sebastian Bank
 
 
 ```
@@ -14266,21 +20607,61 @@ SOFTWARE.
 
 ### Mozilla Public License 2.0
 
-Copyright (c) 2014 Pallets
+Copyright (c) 2017 Christopher Groskopf and contributors
 
 Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
+Copyright (c) 2014 Pallets
+
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -14299,12 +20680,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -14356,39 +20731,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -14404,19 +20781,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -14434,9 +20827,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -14466,13 +20865,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -14481,6 +20876,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -14571,19 +21068,59 @@ This Source Code Form is &quot;Incompatible With Secondary Licenses&quot;, as de
 
 ### University of Illinois/NCSA Open Source License
 
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -14602,12 +21139,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -14659,39 +21190,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -14707,19 +21240,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -14737,9 +21286,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -14769,13 +21324,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -14784,6 +21335,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -14801,21 +21454,617 @@ THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRES
 ```
 
 
+### No Associated License
+
+Copyright (c) 2001-2006 Gregory P. Ward. All rights reserved.
+
+Copyright (c) 2002-2006 Python Software Foundation. All rights reserved.
+
+Copyright (c) 2001-2006 Gregory P. Ward
+
+Copyright (c) 2002-2006 Python Software Foundation
+
+Copyright (c) 2011-2012 International Business Machines
+
+Copyright (c) 2007-2012 International Business Machines
+
+Copyright (c) 2007 International Business Machines
+
+Copyright (c) 2006-2016 International Business Machines Corporation
+
+Copyright (c) 2006-2012 International Business Machines Corporation and others.
+
+Copyright (c) 1997-2015 International Business Machines Corporation and
+
+Copyright (c) 2009-2011 International Business Machines
+
+Copyright (c) 2007 Google Inc. All Rights Reserved.
+
+Copyright (c) 2010-2012 International Business Machines
+
+Copyright (c) 2010-2011 International Business Machines
+
+Copyright (c) 1996-2015 International Business Machines Corporation and
+
+Copyright (c) 1999-2011 International Business Machines
+
+Copyright (c) 2010-2015 International Business Machines
+
+Copyright (c) 2001-2015 International Business Machines
+
+Copyright (c) 2002-2015 International Business Machines
+
+Copyright (c) 1997-2016 International Business Machines
+
+Copyright (c) 1997-2011 International Business Machines
+
+Copyright (c) 2015-2016 International Business Machines
+
+Copyright (c) 2016 International Business Machines
+
+Copyright (c) 1997-2012 International Business Machines
+
+Copyright (c) 2001 International Business Machines
+
+Copyright (c) 2006-2014 International Business Machines Corporation
+
+Copyright (c) 2014-2016 International Business Machines
+
+Copyright (c) 2014 International Business Machines
+
+Copyright (c) 2008 International Business Machines Corporation and
+
+Copyright (c) 2014-2015 International Business Machines Corporation and
+
+Copyright (c) 2009-2012 International Business Machines
+
+Copyright (c) 1997-2014 International Business Machines
+
+Copyright (c) 2009-2015 International Business Machines
+
+Copyright (c) 2006 International Business Machines Corporation
+
+Copyright (c) 1997-2013 International Business Machines
+
+Copyright (c) 2004-2014 International Business Machines
+
+Copyright (c) 2010-2016 International Business Machines Corporation and
+
+Copyright (c) 1996-2016 International Business Machines
+
+Copyright (c) 1996-2013 International Business Machines
+
+Copyright (c) 2002-2014 International Business Machines Corporation and
+
+Copyright (c) 2002-2005 International Business Machines Corporation and
+
+Copyright (c) 2011 International Business Machines
+
+Copyright (c) 2003-2010 International Business Machines
+
+Copyright (c) 1999-2016 International Business Machines
+
+Copyright (c) 2009-2016 International Business Machines
+
+Copyright (c) 2009-2014 International Business Machines
+
+Copyright (c) 1996-2012 International Business Machines Corporation and
+
+Copyright (c) 2003-2003 International Business Machines
+
+Copyright (c) 2015 International Business Machines Corporation and
+
+Copyright (c) 2002-2014 International Business Machines
+
+Copyright (c) 2002-2011 International Business Machines
+
+Copyright (c) 2002-2010 International Business Machines
+
+Copyright (c) 2002-2003 International Business Machines
+
+Copyright (c)  U_COPYRIGHT_STRING;
+
+Copyright (c)  STRING;
+
+Copyright (c) 2016 and later: Unicode, Inc. and others.
+
+Copyright (c) 1999-2016 International Business Machines Corporation
+
+Copyright (c) 1999-2014 International Business Machines Corporation
+
+Copyright (c) 1999-2014 International Business Machines
+
+Copyright (c) 2002-2016 International Business Machines Corporation
+
+Copyright (c) 2001-2016 International Business Machines Corporation and
+
+Copyright (c) 2002-2011 International Business Machines Corporation and others.
+
+Copyright (c) 2002-2008 International Business Machines Corporation and others.
+
+Copyright (c) 2002-2016 International Business Machines Corporation and others.
+
+Copyright (c) 2002-2008 International Business Machines Corporation
+
+Copyright (c) 2001-2005 International Business Machines
+
+Copyright (c) 2002-2014 International Business Machines Corporation
+
+Copyright (c) 2002-2016 International Business Machines
+
+Copyright (c) 1997-2006 International Business Machines
+
+Copyright (c) 2003-2011 International Business Machines
+
+Copyright (c) 1998-2012 International Business Machines Corporation and
+
+Copyright (c) 2001-2014 International Business Machines Corporation.
+
+Copyright (c) 2001-2011 International Business Machines Corporation.
+
+Copyright (c) 2001-2014 International Business Machines Corporation and
+
+Copyright (c) 2001-2011 International Business Machines Corporation and
+
+Copyright (c) 2001-2012 International Business Machines Corporation and
+
+Copyright (c) 2015 International Business Machines
+
+Copyright (c) 2003-2006 International Business Machines
+
+Copyright (c) 2009-2013 International Business Machines
+
+Copyright (c) 2004 and onwards Google Inc.
+
+Copyright (c) 2003-2013 International Business Machines
+
+Copyright (c) 1999-2015 International Business Machines
+
+Copyright (c) 2000-2015 International Business Machines
+
+Copyright (c) 1996-2015 International Business Machines
+
+Copyright (c) 2006 International Business Machines
+
+Copyright (c) 2004-2012 International Business Machines
+
+Copyright (c) 2005-2016 International Business Machines
+
+Copyright (c) 2003 International Business Machines
+
+Copyright (c) 2001-2014 International Business Machines
+
+Copyright (c) 2001-2016 International Business Machines
+
+Copyright (c) 2001-2013 International Business Machines
+
+Copyright (c) 2000-2016 International Business Machines
+
+Copyright (c) 1996-2016 International Business Machines Corporation and
+
+Copyright (c) 2000-2006 International Business Machines
+
+Copyright (c) 1999-2004 International Business Machines
+
+Copyright (c) 1998-2016 International Business Machines
+
+Copyright (c) 1998-2004 International Business Machines
+
+Copyright (c) 1999-2006 International Business Machines
+
+Copyright (c) 2008-2011 International Business Machines
+
+Copyright (c) 2003-2007 International Business Machines
+
+Copyright (c) 2000-2011 International Business Machines
+
+Copyright (c) 2003-2015 International Business Machines
+
+Copyright (c) 2003-2014 International Business Machines
+
+Copyright (c) 1999-2010 International Business Machines
+
+Copyright (c) 2002-2012 International Business Machines
+
+Copyright (c) 2002-2006 International Business Machines
+
+Copyright (c) 1997-2015 International Business Machines
+
+Copyright (c) 2004-2016 International Business Machines
+
+Copyright (c) 1999-2013 International Business Machines
+
+Copyright (c) 2010-2016 International Business Machines
+
+Copyright (c) 1996-2014 International Business Machines Corporation and
+
+Copyright (c) 2008-2009 International Business Machines Corporation and
+
+Copyright (c) 2012,2014 International Business Machines
+
+Copyright (c) 2011-2013 International Business Machines
+
+Copyright (c) 1999-2005 International Business Machines
+
+Copyright (c) 1997-2005 International Business Machines Corporation and others. All Rights Reserved.
+
+Copyright (c) 1999-2012 International Business Machines Corporation and
+
+Copyright (c) 1996-2013 International Business Machines Corporation
+
+Copyright (c) 1998-2005 International Business Machines
+
+Copyright (c) 2001 and onwards Google Inc.
+
+Copyright (c) 2010-2012,2014 International Business Machines
+
+Copyright (c) 2000-2005 International Business Machines
+
+Copyright (c) 1996-2015 International Business Machines Corporation and others.
+
+Copyright (c) 2005-2012 International Business Machines
+
+Copyright (c) 2003-2004 International Business Machines
+
+Copyright (c) 2000-2004 International Business Machines
+
+Copyright (c) 1999-2009 International Business Machines
+
+Copyright (c) 2002-2013 International Business Machines
+
+Copyright (c) 1999-2010 International Business Machines Corporation and others.
+
+Copyright (c) 2002-2005 International Business Machines Corporation
+
+Copyright (c) 2001-2005 International Business Machines Corporation and others. All Rights Reserved.
+
+Copyright (c) 1996-2016 International Business Machines Corporation
+
+Copyright (c) 1997-2010 International Business Machines
+
+Copyright (c) 2000-2012 International Business Machines
+
+Copyright (c) 1998-2014 International Business Machines
+
+Copyright (c) 1999-2012 International Business Machines
+
+Copyright (c)  string.
+
+Copyright (c) 2001-2012 International Business Machines
+
+Copyright (c) 2002-2004 International Business Machines
+
+Copyright (c) 1999-2016 International Business Machines Corporation and
+
+Copyright (c) 1996-2014 International Business Machines
+
+Copyright (c) 2001-2011 International Business Machines
+
+Copyright (c) 2011-2015 International Business Machines
+
+Copyright (c) 1997-2016 International Business Machines Corporation and
+
+Copyright (c) 2013-2016 International Business Machines
+
+Copyright (c) 2004-2007 International Business Machines
+
+Copyright (c) 2003-2016 International Business Machines
+
+Copyright (c) 2001-2006 International Business Machines
+
+Copyright (c) 2003-2009 International Business Machines
+
+Copyright (c) 2001-2008 International Business Machines
+
+Copyright (c) 2012-2016 International Business Machines
+
+Copyright (c) 1999-2013 International Business Machines Corporation and
+
+Copyright (c) 1999-2015 International Business Machines Corporation and
+
+Copyright (c) 2005-2015 International Business Machines
+
+Copyright (c) 2005-2011 International Business Machines
+
+Copyright (c) 2009-2014 International Business Machines Corporation and
+
+Copyright (c) 2002-2007 International Business Machines Corporation
+
+Copyright (c) 1996-2012 International Business Machines Corporation
+
+Copyright (c) 1996-2008 International Business Machines Corporation
+
+Copyright (c) 2007-2013 International Business Machines Corporation and
+
+Copyright (c) 2008-2015 International Business Machines
+
+Copyright (c) 2003-2013 International Business Machines Corporation and
+
+Copyright (c) 2003-2013 International Business Machines Corporation
+
+Copyright (c) 2003 - 2009 International Business Machines Corporation and
+
+Copyright (c) 2003 - 2008 International Business Machines Corporation and
+
+Copyright (c) 2007-2014 International Business Machines Corporation
+
+Copyright (c) 2007-2013 International Business Machines Corporation
+
+Copyright (c) 1997-2013 International Business Machines Corporation and
+
+Copyright (c) 2013-2014 International Business Machines
+
+Copyright (c) 2010-2014 International Business Machines
+
+Copyright (c) 2012-2015 International Business Machines
+
+Copyright (c) 2012-2014 International Business Machines
+
+Copyright (c) 2013-2015 International Business Machines
+
+Copyright (c) 2015-2016 International Business Machines Corporation and others.
+
+Copyright (c) 2003 - 2013 International Business Machines Corporation and
+
+Copyright (c) 2004 International Business Machines
+
+Copyright (c) 2013 International Business Machines Corporation
+
+Copyright (c)  IBM Corporation, 2000-2012.  All rights reserved.
+
+Copyright (c)  IBM Corporation, 2000-2011.   All rights reserved.
+
+Copyright (c)  IBM Corporation, 2000-2014.  All rights reserved.
+
+Copyright (c)  IBM Corporation, 2000-2010.   All rights reserved.
+
+Copyright (c)  IBM Corporation, 2000-2016.   All rights reserved.
+
+Copyright (c) 2007-2016 International Business Machines Corporation and
+
+Copyright (c) 2008-2016 International Business Machines Corporation and
+
+Copyright (c) 2007-2012 International Business Machines Corporation and
+
+Copyright (c) 2001-2007 International Business Machines
+
+Copyright (c) 1997-2010 International Business Machines Corporation and
+
+Copyright (c) 2010-2014 International Business Machines Corporation and
+
+Copyright (c) 1997-2012 International Business Machines Corporation and
+
+Copyright (c) 2009-2015 International Business Machines Corporation and
+
+Copyright (c) 2009-2012 International Business Machines Corporation and
+
+Copyright (c) 2008-2013 International Business Machines Corporation and
+
+Copyright (c) 2003-2008 International Business Machines
+
+Copyright (c) 2003-2016 International Business Machines Corporation
+
+Copyright (c) 2003-2014 International Business Machines Corporation
+
+Copyright (c) 2003-2008 International Business Machines Corporation
+
+Copyright (c) 2003-2015 International Business Machines Corporation
+
+Copyright (c) 2003-2009,2012,2016 International Business Machines Corporation and
+
+Copyright (c) 2007-2008 International Business Machines Corporation and
+
+Copyright (c) 2001-2010 International Business Machines
+
+Copyright (c) 2000-2007 International Business Machines
+
+Copyright (c) 2010-2015 International Business Machines Corporation and
+
+Copyright (c) 1997-2015 International Business Machines Corporation
+
+Copyright (c) 1999-2007 International Business Machines Corporation
+
+Copyright (c) 1999-2007 International Business Machines
+
+Copyright (c) 1999-2011 International Business Machines Corporation
+
+Copyright (c) 2014-2016 International Business Machines Corporation and
+
+Copyright (c) 2013 International Business Machines Corporation and
+
+Copyright (c) 2001-2008,2010 IBM and others. All rights reserved.
+
+Copyright (c) 2010 Yahoo! Inc.
+
+Copyright (c) 1997-2011 International Business Machines Corporation and
+
+Copyright (c) 2009-2013 International Business Machines Corporation and
+
+Copyright (c) 2015 International Business Machines Corporation
+
+Copyright (c) 2001-2014 IBM and others. All rights reserved.
+
+Copyright (c) 2008-2014 Google, International Business Machines Corporation and
+
+Copyright (c) 2008 Google, International Business Machines Corporation and
+
+Copyright (c) 2008-2015 Google, International Business Machines Corporation
+
+Copyright (c) 2002-2010 International Business Machines Corporation
+
+Copyright (c) 2011-2015 International Business Machines Corporation and
+
+Copyright (c) 2011-2016 International Business Machines Corporation and
+
+Copyright (c) 2011-2012 International Business Machines Corporation and
+
+Copyright (c)  Suppress unused variable warning with clang.
+
+Copyright (c) 2011-2014 International Business Machines
+
+Copyright (c) 2004-2006 International Business Machines
+
+Copyright (c) 1997-2011 International Business Machines Corporation and others.
+
+Copyright (c) 1997-2013 International Business Machines Corporation and others.
+
+Copyright (c) 2004-2015 International Business Machines
+
+Copyright (c) 2009-2017 International Business Machines Corporation,
+
+Copyright (c) 1997-2016 International Business Machines Corporation and others.
+
+Copyright (c) 2007-2014 International Business Machines Corporation and
+
+Copyright (c) 2008-2015 International Business Machines Corporation and
+
+Copyright (c) 1997-2015 International Business Machines Corporation and others.
+
+Copyright (c) 2014-2016 International Business Machines Corporation and others.
+
+Copyright (c) 2001-2011 IBM and others. All rights reserved.
+
+Copyright (c) 1996-2014 International Business Machines Corporation and others.
+
+Copyright (c) 1997-2016 International Business Machines Corporation
+
+Copyright (c) 2009-2016 International Business Machines Corporation,
+
+Copyright (c) 2009-2010 Google, International Business Machines Corporation and
+
+Copyright (c) 2008-2014 Google, International Business Machines Corporation
+
+Copyright (c) 2010-2012,2015 International Business Machines
+
+Copyright (c) 2007-2015 International Business Machines
+
+Copyright (c) 2013-2014 International Business Machines Corporation and others.
+
+Copyright (c) 2010-2013 International Business Machines
+
+Copyright (c) 2001-2011,2014 IBM and others. All rights reserved.
+
+Copyright (c) 2004 - 2008 International Business Machines Corporation and
+
+Copyright (c) 1997-2011,2014-2015 International Business Machines
+
+Copyright (c) 2013 International Business Machines Corporation and others.
+
+Copyright (c) 2013-2015 International Business Machines Corporation and others.
+
+Copyright (c) 2001-2015 IBM and others. All rights reserved.
+
+Copyright (c) 2004-2012 International Business Machines Corporation and
+
+Copyright (c) 2009-2011 International Business Machines Corporation and
+
+Copyright (c) 2009-2016 International Business Machines Corporation and
+
+Copyright (c) 2009-2010 International Business Machines Corporation and
+
+Copyright (c) 2018-2021 Martin Ankerl
+
+Copyright (c) 2012 - 2016 Victor Zverovich
+
+Copyright (c) 2012 present, Victor Zverovich
+
+Copyright (c) 2023 Yuji Hirose. All rights reserved.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2003-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 2014-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1996-2015 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1996-2018 PostgreSQL Global Development Group
+
+Copyright (c) 2002 by Lucent Technologies.
+
+Copyright (c) 2017 Paul Ross. All rights reserved.
+
+Copyright (c) 2013-2021 Sebastian Bank&#39;
+
+Copyright (c) 2008 by &lt;a href=&quot;http://domain.invalid/&quot;&gt;you&lt;/a&gt;.
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c)  True
+
+Copyright (c)  None:
+
+Copyright (c)  str
+
+Copyright (c) 2007-2014 IOLA and Ole Laursen.
+
+Copyright (c) 2016 Marcel Hellkamp.
+
+Copyright (c)  dates in LICENSE, README.rst and in the documentation.
+
+Copyright (c)  Holger Krekel and others, 2004.
+
+Copyright (c)  header caused problems with python2.7 on some platforms (see #70)
+
+
+
 ### Open LDAP Public License v1.1
+
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
 
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -14834,12 +22083,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -14891,39 +22134,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -14939,19 +22184,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -14969,9 +22230,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -15001,13 +22268,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -15016,6 +22279,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -15053,19 +22418,59 @@ Definitions:
 
 ### Open Public License v1.0
 
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -15084,12 +22489,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -15141,39 +22540,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -15189,19 +22590,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -15219,9 +22636,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -15251,13 +22674,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -15266,6 +22685,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -15343,19 +22864,61 @@ Text for this Exhibit B is found in the corresponding addendum, described in sec
 
 ### Python Software License Agreement 2.0
 
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -15374,12 +22937,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -15431,39 +22988,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -15479,19 +23038,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -15509,9 +23084,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -15541,13 +23122,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -15556,6 +23133,106 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -15572,23 +23249,61 @@ PYTHON SOFTWARE FOUNDATION LICENSE VERSION 2
 ```
 
 
-### Python License 2.0
+### Protobuf
+
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
 
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
-
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -15607,12 +23322,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -15664,39 +23373,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -15712,19 +23423,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -15742,9 +23469,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -15774,13 +23507,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -15789,6 +23518,519 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
+
+
+```
+Copyright 2008 Google Inc.  All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+    * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+    * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+&quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Code generated by the Protocol Buffer compiler is owned by the owner
+of the input file used when generating it.  This code is not
+standalone and requires a support library to be linked with it.  This
+support library is itself covered by the above license.
+```
+
+
+### Python License 2.0
+
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
+Copyright (c) 2014 Pallets
+
+Copyright (c) 2010 Jonathan Hartley
+
+Copyright (c) 2024 dbt Labs, Inc.
+
+Copyright (c) 2021 dbt Labs, Inc.
+
+Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
+
+Copyright (c) 2013-2021 Sebastian Bank
+
+Copyright (c) 2013-2024 Sebastian Bank
+
+Copyright (c) 2017 Manraj Singh
+
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
+Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
+
+Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
+
+Copyright (c) 2014 Pallets . All rights reserved.
+
+Copyright (c) 1993 by Sun Microsystems, Inc. All rights reserved.
+
+Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam, The Netherlands. All rights reserved.
+
+Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
+
+Copyright (c)  terms
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  to each Open Publication is owned by its author(s) or designee.
+
+Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved.
+
+Copyright (c)  or copyrights for the package.
+
+Copyright (c)  of this Package, but belong to whomever generated them, and may be sold commercially, and may be aggregated with this Package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 1990-2009 Info-ZIP. All rights reserved.
+
+Copyright (c) 2009 Free Software Foundation, Inc. &lt;http://fsf.org/&gt;
+
+Copyright (c)  and certain other rights specified in the public license below. The following considerations are for informational purposes only, are not exhaustive, and do not form part of our licenses.
+
+Copyright (c)  and certain other rights. Our licenses are irrevocable. Licensors should read and understand the terms and conditions of the license they choose before applying it. Licensors should also secure all rights necessary before applying our licenses so that the public can reuse the material as expected. Licensors should clearly mark any material not subject to the license. This includes other CC-licensed material, or material used under an exception or limitation to copyright. More considerations for licensors : wiki.creativecommons.org/Considerations_for_licensors
+
+Copyright (c)  More considerations for licensors : wiki.creativecommons.org/Considerations_for_licensors
+
+Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described.
+
+Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described.
+
+Copyright (c)  and Similar Rights that is derived from or based upon the Licensed Material and in which the Licensed Material is translated, altered, arranged, transformed, or otherwise modified in a manner requiring permission under the Copyright and Similar Rights held by the Licensor. For purposes of this Public License, where the Licensed Material is a musical work, performance, or sound recording, Adapted Material is always produced where the Licensed Material is synched in timed relation with a moving image.
+
+Copyright (c)  and Similar Rights held by the Licensor. For purposes of this Public License, where the Licensed Material is a musical work, performance, or sound recording, Adapted Material is always produced where the Licensed Material is synched in timed relation with a moving image.
+
+Copyright (c)  and Similar Rights in Your contributions to Adapted Material in accordance with the terms and conditions of this Public License.
+
+Copyright (c)  and Similar Rights means copyright and/or similar rights closely related to copyright including, without limitation, performance, broadcast, sound recording, and Sui Generis Database Rights, without regard to how the rights are labeled or categorized. For purposes of this Public License, the rights specified in Section 2(b)(1)-(2) are not Copyright and Similar Rights.
+
+Copyright (c)  and/or similar rights closely related to copyright including, without limitation, performance, broadcast, sound recording, and Sui Generis Database Rights, without regard to how the rights are labeled or categorized. For purposes of this Public License, the rights specified in Section 2(b)(1)-(2) are not Copyright and Similar Rights.
+
+Copyright (c)  and Similar Rights.
+
+Copyright (c)  and Similar Rights that applies to Your use of the Licensed Material.
+
+Copyright (c)  and Similar Rights that apply to Your use of the Licensed Material and that the Licensor has authority to license.
+
+Copyright (c)  and Similar Rights licensed here. However, if You fail to comply with this Public License, then Your rights under this Public License terminate automatically.
+
+Copyright (c)  AND/OR OTHER APPLICABLE LAW. ANY USE OF THE WORK OTHER THAN AS AUTHORIZED UNDER THIS LICENSE OR COPYRIGHT LAW IS PROHIBITED.
+
+Copyright (c)  or rights arising from limitations or exceptions that are provided for in connection with the copyright protection under copyright law or other applicable laws.
+
+Copyright (c)  protection under copyright law or other applicable laws.
+
+Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
+
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
+Copyright (c)  or any other
+
+Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
+
+Copyright (c) 2012 Erik Rose
+
+Copyright (c) 2004-2024 NetworkX Developers
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 2015 Thomson Licensing, SAS
+
+Copyright (c) 2012-2022 Elia Robyn Lake
+
+Copyright (c)  Donald Stufft and individual contributors.
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c) 1996 X Consortium
+
+Copyright (c) 2008 Google Inc.  All rights reserved.
+
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
+
+Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
+
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
+
+Copyright (c) 2017 dateutil contributors (see AUTHORS file)
+
+Copyright (c) 2003-2011 Gustavo Niemeyer &lt;gustavo@niemeyer.net&gt;
+
+Copyright (c) 2012-2014 Tomi Pieviläinen &lt;tomi.pievilainen@iki.fi&gt;
+
+Copyright (c) 2014-2016 Yaron de Leeuw &lt;me@jarondl.net&gt;
+
+Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
+
+Copyright (c) 2015 dateutil contributors (see AUTHORS file)
+
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
+
+Copyright (c) 2014 Will Roberts
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2020 present Max Bachmann
+
+Copyright (c) 2011 Adam Cohen
+
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
+Copyright (c) 2011-2020 Sergey Astanin and contributors
+
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
+Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
+
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
+Copyright (c) 2002 by AUTHOR PROFESSIONAL IDENTIFICATION * URL &quot;PROMOTIONAL SLOGAN FOR AUTHOR&#39;S PROFESSIONAL PRACTICE&quot;
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http s ://fsf.org/&gt;
+
+Copyright (c)  quot; also means copyright-like laws that apply to other kinds of works, such as semiconductor masks.
+
+Copyright (c)  quot; line and a pointer to where the full notice is found.
+
+Copyright (c)  lt;year&gt; &lt;name of author&gt;
+
+Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
+
+Copyright (c)  lt;year&gt; &lt;owner&gt;
+
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
+Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
+
+Copyright (c) 2003-2011 Gustavo Niemeyer &lt;gustavo@niemeyer.net&gt;
+
+Copyright (c) 2012-2014 Tomi Pieviläinen &lt;tomi.pievilainen@iki.fi&gt;
+
+Copyright (c) 2014-2016 Yaron de Leeuw &lt;me@jarondl.net&gt;
+
+Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
+
+Copyright (c) 1989 Free Software Foundation, Inc. 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+
+Copyright (c)  19yy &lt;name of author&gt;
+
+Copyright (c)  19xx name of author Gnomovision comes with ABSOLUTELY NO WARRANTY; for details type `show w&#39;. This is free software, and you are welcome to redistribute it under certain conditions; type `show c&#39; for details.
+
+Copyright (c) 1989, 1991 Free Software Foundation, Inc.
+
+Copyright (c)  lt; yyyy &gt; &lt; name of author &gt;
+
+Copyright (c) 2009 Free Software Foundation, Inc. &lt;http://fsf.org/&gt;
+
+Copyright (c) 2004-2010 by Internet Systems Consortium, Inc. (&quot;ISC&quot;)
+
+Copyright (c) 1995-2003 by Internet Software Consortium
+
+Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
+
+Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
+
+Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
+
+Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
+
+Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -15827,19 +24069,59 @@ STICHTING MATHEMATISCH CENTRUM DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFT
 
 ### SunPro Attribution License
 
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -15858,12 +24140,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -15915,39 +24191,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -15963,19 +24241,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -15993,9 +24287,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -16025,13 +24325,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -16040,6 +24336,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -16054,19 +24452,59 @@ is preserved.
 
 ### The Unlicense
 
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -16085,12 +24523,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -16142,39 +24574,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -16190,19 +24624,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -16220,9 +24670,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -16252,13 +24708,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -16267,6 +24719,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -16279,21 +24833,61 @@ For more information, please refer to &lt;http://unlicense.org/&gt;
 ```
 
 
-### zlib License
+### X11 License
+
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
 
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -16312,12 +24906,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -16369,39 +24957,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -16417,19 +25007,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -16447,9 +25053,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -16479,13 +25091,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -16494,6 +25102,126 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
+
+
+```
+X11 License
+Copyright (C) 1996 X Consortium
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the &quot;Software&quot;), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE X CONSORTIUM BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+Except as contained in this notice, the name of the X Consortium shall not be used in advertising or otherwise to promote the sale, use or other dealings in this Software without prior written authorization from the X Consortium.
+X Window System is a trademark of X Consortium, Inc.
+```
+
+
+### zlib License
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c) 2017 Christopher Groskopf and contributors
 
 
 ```
@@ -16508,19 +25236,59 @@ Permission is granted to anyone to use this software for any purpose, including 
 
 ### BSD 2-Clause with views sentence
 
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -16539,12 +25307,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -16596,39 +25358,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -16644,19 +25408,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -16674,9 +25454,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -16706,13 +25492,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -16721,6 +25503,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -16753,19 +25637,59 @@ either expressed or implied, of the FreeBSD Project.
 
 ### BSD 3-Clause Open MPI variant
 
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -16784,12 +25708,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -16841,39 +25759,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -16889,19 +25809,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -16919,9 +25855,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -16951,13 +25893,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -16966,6 +25904,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -17008,21 +26048,61 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ### Business Source License 1.1
 
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
+
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
 
 Copyright (c) 2007 Pallets
 
-Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2014 Pallets . All rights reserved.
 
@@ -17039,12 +26119,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -17096,39 +26170,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -17144,19 +26220,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -17174,9 +26266,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -17206,13 +26304,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -17221,6 +26315,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -17255,21 +26451,61 @@ For more information on the use of the Business Source License for MariaDB produ
 ```
 
 
-### MIT No Attribution
+### gpl-2.0-plus WITH bison-exception-2.2
+
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
 
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -17288,12 +26524,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -17345,39 +26575,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -17393,19 +26625,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -17423,9 +26671,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -17455,13 +26709,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -17470,6 +26720,509 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
+
+
+```
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the Free
+    Software Foundation; either version 2, or (at your option) any later
+    version.
+    This program is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+    more details.
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the
+    Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor,
+    Boston, MA 02110-1301, USA.
+    As a special exception, you may create a larger work that contains part or
+    all of the Bison parser skeleton and distribute that work under terms of
+    your choice, so long as that work isn&#39;t itself a parser generator using the
+    skeleton or a modified version thereof as a parser skeleton. Alternatively,
+    if you modify or redistribute the parser skeleton itself, you may (at your
+    option) remove this special exception, which will cause the skeleton and
+    the resulting Bison output files to be licensed under the GNU General
+    Public License without this special exception.
+    This special exception was added by the Free Software Foundation in version
+    2.2 of Bison.
+
+```
+
+
+### MIT No Attribution
+
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
+Copyright (c) 2014 Pallets
+
+Copyright (c) 2010 Jonathan Hartley
+
+Copyright (c) 2024 dbt Labs, Inc.
+
+Copyright (c) 2021 dbt Labs, Inc.
+
+Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
+
+Copyright (c) 2013-2021 Sebastian Bank
+
+Copyright (c) 2013-2024 Sebastian Bank
+
+Copyright (c) 2017 Manraj Singh
+
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
+Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
+
+Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
+
+Copyright (c) 2014 Pallets . All rights reserved.
+
+Copyright (c) 1993 by Sun Microsystems, Inc. All rights reserved.
+
+Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam, The Netherlands. All rights reserved.
+
+Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
+
+Copyright (c)  terms
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  to each Open Publication is owned by its author(s) or designee.
+
+Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved.
+
+Copyright (c)  or copyrights for the package.
+
+Copyright (c)  of this Package, but belong to whomever generated them, and may be sold commercially, and may be aggregated with this Package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 1990-2009 Info-ZIP. All rights reserved.
+
+Copyright (c) 2009 Free Software Foundation, Inc. &lt;http://fsf.org/&gt;
+
+Copyright (c)  and certain other rights specified in the public license below. The following considerations are for informational purposes only, are not exhaustive, and do not form part of our licenses.
+
+Copyright (c)  and certain other rights. Our licenses are irrevocable. Licensors should read and understand the terms and conditions of the license they choose before applying it. Licensors should also secure all rights necessary before applying our licenses so that the public can reuse the material as expected. Licensors should clearly mark any material not subject to the license. This includes other CC-licensed material, or material used under an exception or limitation to copyright. More considerations for licensors : wiki.creativecommons.org/Considerations_for_licensors
+
+Copyright (c)  More considerations for licensors : wiki.creativecommons.org/Considerations_for_licensors
+
+Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described.
+
+Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described.
+
+Copyright (c)  and Similar Rights that is derived from or based upon the Licensed Material and in which the Licensed Material is translated, altered, arranged, transformed, or otherwise modified in a manner requiring permission under the Copyright and Similar Rights held by the Licensor. For purposes of this Public License, where the Licensed Material is a musical work, performance, or sound recording, Adapted Material is always produced where the Licensed Material is synched in timed relation with a moving image.
+
+Copyright (c)  and Similar Rights held by the Licensor. For purposes of this Public License, where the Licensed Material is a musical work, performance, or sound recording, Adapted Material is always produced where the Licensed Material is synched in timed relation with a moving image.
+
+Copyright (c)  and Similar Rights in Your contributions to Adapted Material in accordance with the terms and conditions of this Public License.
+
+Copyright (c)  and Similar Rights means copyright and/or similar rights closely related to copyright including, without limitation, performance, broadcast, sound recording, and Sui Generis Database Rights, without regard to how the rights are labeled or categorized. For purposes of this Public License, the rights specified in Section 2(b)(1)-(2) are not Copyright and Similar Rights.
+
+Copyright (c)  and/or similar rights closely related to copyright including, without limitation, performance, broadcast, sound recording, and Sui Generis Database Rights, without regard to how the rights are labeled or categorized. For purposes of this Public License, the rights specified in Section 2(b)(1)-(2) are not Copyright and Similar Rights.
+
+Copyright (c)  and Similar Rights.
+
+Copyright (c)  and Similar Rights that applies to Your use of the Licensed Material.
+
+Copyright (c)  and Similar Rights that apply to Your use of the Licensed Material and that the Licensor has authority to license.
+
+Copyright (c)  and Similar Rights licensed here. However, if You fail to comply with this Public License, then Your rights under this Public License terminate automatically.
+
+Copyright (c)  AND/OR OTHER APPLICABLE LAW. ANY USE OF THE WORK OTHER THAN AS AUTHORIZED UNDER THIS LICENSE OR COPYRIGHT LAW IS PROHIBITED.
+
+Copyright (c)  or rights arising from limitations or exceptions that are provided for in connection with the copyright protection under copyright law or other applicable laws.
+
+Copyright (c)  protection under copyright law or other applicable laws.
+
+Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
+
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
+Copyright (c)  or any other
+
+Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
+
+Copyright (c) 2012 Erik Rose
+
+Copyright (c) 2004-2024 NetworkX Developers
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 2015 Thomson Licensing, SAS
+
+Copyright (c) 2012-2022 Elia Robyn Lake
+
+Copyright (c)  Donald Stufft and individual contributors.
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c) 1996 X Consortium
+
+Copyright (c) 2008 Google Inc.  All rights reserved.
+
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
+
+Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
+
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
+
+Copyright (c) 2017 dateutil contributors (see AUTHORS file)
+
+Copyright (c) 2003-2011 Gustavo Niemeyer &lt;gustavo@niemeyer.net&gt;
+
+Copyright (c) 2012-2014 Tomi Pieviläinen &lt;tomi.pievilainen@iki.fi&gt;
+
+Copyright (c) 2014-2016 Yaron de Leeuw &lt;me@jarondl.net&gt;
+
+Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
+
+Copyright (c) 2015 dateutil contributors (see AUTHORS file)
+
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
+
+Copyright (c) 2014 Will Roberts
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2020 present Max Bachmann
+
+Copyright (c) 2011 Adam Cohen
+
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
+Copyright (c) 2011-2020 Sergey Astanin and contributors
+
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
+Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
+
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
+Copyright (c) 2002 by AUTHOR PROFESSIONAL IDENTIFICATION * URL &quot;PROMOTIONAL SLOGAN FOR AUTHOR&#39;S PROFESSIONAL PRACTICE&quot;
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http s ://fsf.org/&gt;
+
+Copyright (c)  quot; also means copyright-like laws that apply to other kinds of works, such as semiconductor masks.
+
+Copyright (c)  quot; line and a pointer to where the full notice is found.
+
+Copyright (c)  lt;year&gt; &lt;name of author&gt;
+
+Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
+
+Copyright (c)  lt;year&gt; &lt;owner&gt;
+
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
+Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
+
+Copyright (c) 2003-2011 Gustavo Niemeyer &lt;gustavo@niemeyer.net&gt;
+
+Copyright (c) 2012-2014 Tomi Pieviläinen &lt;tomi.pievilainen@iki.fi&gt;
+
+Copyright (c) 2014-2016 Yaron de Leeuw &lt;me@jarondl.net&gt;
+
+Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
+
+Copyright (c) 1989 Free Software Foundation, Inc. 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+
+Copyright (c)  19yy &lt;name of author&gt;
+
+Copyright (c)  19xx name of author Gnomovision comes with ABSOLUTELY NO WARRANTY; for details type `show w&#39;. This is free software, and you are welcome to redistribute it under certain conditions; type `show c&#39; for details.
+
+Copyright (c) 1989, 1991 Free Software Foundation, Inc.
+
+Copyright (c)  lt; yyyy &gt; &lt; name of author &gt;
+
+Copyright (c) 2009 Free Software Foundation, Inc. &lt;http://fsf.org/&gt;
+
+Copyright (c) 2004-2010 by Internet Systems Consortium, Inc. (&quot;ISC&quot;)
+
+Copyright (c) 1995-2003 by Internet Software Consortium
+
+Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
+
+Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
+
+Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
+
+Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
+
+Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -17490,19 +27243,59 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ### MIT Szabolcs Nagy Variant
 
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -17521,12 +27314,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -17578,39 +27365,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -17626,19 +27415,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -17656,9 +27461,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -17688,13 +27499,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -17703,6 +27510,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -17714,19 +27623,59 @@ There is no warranty.
 
 ### MIT Old Style no advertising
 
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -17745,12 +27694,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -17802,39 +27745,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -17850,19 +27795,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -17880,9 +27841,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -17912,13 +27879,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -17927,6 +27890,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -17944,19 +28009,59 @@ purpose. It is provided &quot;as is&quot; without express or implied warranty.
 
 ### MIT Taylor Variant
 
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -17975,12 +28080,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -18032,39 +28131,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -18080,19 +28181,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -18110,9 +28227,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -18142,13 +28265,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -18157,6 +28276,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -18174,19 +28395,59 @@ in connection with the software or the use or other dealings in the software.
 
 ### Open Publication License v1.0
 
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -18205,12 +28466,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -18262,39 +28517,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -18310,19 +28567,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -18340,9 +28613,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -18372,13 +28651,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -18387,6 +28662,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -18480,19 +28857,59 @@ Send E-mail to opal-request@opencontent.org with the word &quot;unsubscribe&quot
 
 ### OpenSSL/SSLeay License
 
+Copyright (c) 2017 Christopher Groskopf and contributors
+
+Copyright (c) 2022 the contributors
+
+Copyright (c) 2015 Hynek Schlawack and the attrs contributors
+
+Copyright (c) 2025 TAHRI Ahmed R.
+
 Copyright (c) 2014 Pallets
 
-Copyright (c) 2021 dbt Labs, Inc.
+Copyright (c) 2010 Jonathan Hartley
 
 Copyright (c) 2024 dbt Labs, Inc.
 
+Copyright (c) 2021 dbt Labs, Inc.
+
 Copyright (c) 2021 Starburst Data, Inc.
+
+Copyright (c) 2014 - 2021 Sep Dehpour (Seperman) and contributors
+
+Copyright (c) 2022 Max Bachmann
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team . All rights reserved.
+
+Copyright (c) 2013-2016 Cameron Desrochers.
+
+Copyright (c) 2016-2020 Yann Collet, Facebook, Inc.
 
 Copyright (c) 2013-2021 Sebastian Bank
 
+Copyright (c) 2013-2024 Sebastian Bank
+
 Copyright (c) 2017 Manraj Singh
 
+Copyright (c) 2013-2024 Kim Davies and contributors.
+
+Copyright (c) 2009 Gerhard Weis . All rights reserved.
+
 Copyright (c) 2007 Pallets
+
+Copyright (c) 2013 Julian Berman
+
+Copyright (c) 2022 Julian Berman
+
+Copyright (c) 2016 Christopher Groskopf and contributors
+
+Copyright (c) 2010 Pallets
+
+Copyright (c) 2017 Alexander Tikhonov
 
 Copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 
@@ -18511,12 +28928,6 @@ Copyright (c) 1995-1998 Eric Young (eay@cryptsoft.com)
 Copyright (c)  terms
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
-
-Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
-
-Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  to each Open Publication is owned by its author(s) or designee.
 
@@ -18568,39 +28979,41 @@ Copyright (c)  protection under copyright law or other applicable laws.
 
 Copyright (c)  Convention (as revised on July 24, 1971). These rights and subject matter take effect in the relevant jurisdiction in which the License terms are sought to be enforced according to the corresponding provisions of the implementation of those treaty provisions in the applicable national law. If the standard suite of rights granted under applicable copyright law includes additional rights not granted under this License, such additional rights are deemed to be included in the License; this License is not intended to restrict the license of any rights under applicable law.
 
+Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+
 Copyright (c)  or any other
 
 Copyright (c)  of this Package, but belong to whoever generated them, and may be sold commercially, and may be aggregated with this Package. If such scripts or library files are aggregated with this Package via the so-called &quot;undump&quot; or &quot;unexec&quot; methods of producing a binary executable image, then distribution of such an image shall neither be construed as a distribution of this Package nor shall it fall under the restrictions of Paragraphs 3 and 4, provided that you do not represent such an executable image as a Standard Version of this Package.
 
 Copyright (c) 2012 Erik Rose
 
-Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+Copyright (c) 2004-2024 NetworkX Developers
 
-Copyright (c) 2015-2023 Dropbox, Inc.
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+Copyright (c) 2001-2019 Python Software Foundation; All Rights
 
-Copyright (c)  i.e., &quot;Copyright (c)
+Copyright (c) 2015 Thomson Licensing, SAS
 
-Copyright (c)  
+Copyright (c) 2012-2022 Elia Robyn Lake
 
-Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+Copyright (c)  Donald Stufft and individual contributors.
 
-Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
 
-Copyright (c) 2008 Google Inc. . All rights reserved.
+Copyright (c) 1996 X Consortium
 
-Copyright (c) 2015 Jukka Lehtosalo and contributors
+Copyright (c) 2008 Google Inc.  All rights reserved.
 
-Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+Copyright (c) 2008 Google Inc.  All rights reserved. . All rights reserved.
+
+Copyright (c) 2023 Google LLC
 
 Copyright (c) 2017, 2018, 2019, 2020, 2021 Samuel Colvin and other contributors
 
-Copyright (c) 2004 Holger Krekel and others
+Copyright (c) 2017 to present Pydantic Services Inc. and individual contributors.
 
-Copyright (c) 2016 Bruno Oliveira]
-
-Copyright (c) 2010 Holger Krekel and contributors.
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -18616,19 +29029,35 @@ Copyright (c) 2015 Paul Ganssle &lt;paul@ganssle.io&gt;
 
 Copyright (c) 2015 dateutil contributors (see AUTHORS file)
 
-Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+Copyright (c)  Val Neekman @ Neekware Inc. http://neekware.com
 
-Copyright (c) 2017-2021 Ingy döt Net
+Copyright (c) 2014 Will Roberts
 
-Copyright (c) 2006-2016 Kirill Simonov
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
 
 Copyright (c) 2020 present Max Bachmann
 
 Copyright (c) 2011 Adam Cohen
 
+Copyright (c) 2023 Julian Berman
+
+Copyright (c) 2010-2024 Benjamin Peterson
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd.
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
+
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
+Copyright (c) 2008-2011 Volvox Development Team
+
+Copyright (c)  or
+
+Copyright (c)  of this Package, but belong to whoever generated
+
 Copyright (c) 2012 Bryce Boe
+
+Copyright (c) 2008-2020 Andrey Petrov and contributors.
 
 Copyright (c) 2006 by Rob Landley &lt;rob@landley.net&gt;
 
@@ -18646,9 +29075,15 @@ Copyright (c)  of this Package, but belong to whoever generated them, and may be
 
 Copyright (c)  lt;year&gt; &lt;owner&gt;
 
+Copyright (c)  xxxx]-[xxxx] [Owner Organization]
+
 Copyright (c)  then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
 
 Copyright (c)  and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public : wiki.creativecommons.org/Considerations_for_licensees Creative Commons Attribution 4.0 International Public License
+
+Copyright (c) 2003-2019 Stuart Bishop &lt;stuart@stuartbishop.net&gt;
+
+Copyright (c) 2016 Andi Albrecht &lt;albrecht.andi@gmail.com&gt;
 
 Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt;
 
@@ -18678,13 +29113,9 @@ Copyright (c) 1995-2003 by Internet Software Consortium
 
 Copyright (c)  lt;year&gt; &lt;copyright holders&gt;
 
-Copyright (c)  i.e., &quot;Copyright (c)
-
 Copyright (c)  lt;Year&gt; &lt;Owner Organization Name&gt; . All rights reserved.
 
 Copyright (c) 1998 The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
-
-Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
 
 Copyright (c)  i.e., &quot;Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved&quot; are retained in Python alone or in any derivative version prepared by Licensee.
 
@@ -18693,6 +29124,108 @@ Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All
 Copyright (c)  lt;year&gt; by &lt;author&#39;s name or designee&gt;. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, vX.Y or later (the latest version is presently available at http://www.opencontent.org/openpub/).
 
 Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in
+
+Copyright (c)  i.e., &quot;Copyright © 2001-2019 Python Software Foundation; All Rights
+
+Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
+
+Copyright (c)  terms except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright (c)  remains Eric Young&#39;s, and as such any Copyright notices in the code are not to be removed. If this package is used in a product, Eric Young should be given attribution as the author of the parts of the library used. This can be in the form of a textual message at program startup or in documentation (online or textual) provided with the package.
+
+Copyright (c) 2007 Free Software Foundation, Inc. &lt;http ://fsf.org/&gt;
+
+Copyright (c) 2012-2023 Jukka Lehtosalo and contributors
+
+Copyright (c) 2015-2023 Dropbox, Inc.
+
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 
+
+Copyright (c)  i.e., &quot;Copyright (c)
+
+Copyright (c)  
+
+Copyright (c) 1991 - 1995 Stichting Mathematisch Centrum Amsterdam,
+
+Copyright (c) 2008 Google Inc. . All rights reserved.
+
+Copyright (c) 2015 Jukka Lehtosalo and contributors
+
+Copyright (c) 2014 pre-commit dev team: Anthony Sottile, Ken Struys
+
+Copyright (c) 2004 Holger Krekel and others
+
+Copyright (c) 2016 Bruno Oliveira]
+
+Copyright (c) 2010 Holger Krekel and contributors.
+
+Copyright (c) 2017 Paul Ganssle &lt;paul@ganssle.io&gt; . All rights reserved.
+
+Copyright (c) 2017-2021 Ingy döt Net
+
+Copyright (c) 2006-2016 Kirill Simonov
+
+Copyright (c) 2013-2023 Snowplow Analytics Ltd. All rights reserved.
+
+Copyright (c) 2013-2023 Snowplow Analytics
+
+Copyright (c) 2004-2006 Mike Taylor
+
+Copyright (c) 2006 Darshana Chhajed
+
+Copyright (c) 2004-2019 Mike Taylor
+
+Copyright (c) 2002-2006 Mark Pilgrim, All rights reserved.
+
+Copyright (c) 2014-2017 Melissa O&#39;Neill &lt;oneill@pcg-random.org&gt;,
+
+Copyright (c) 2008-2011 AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+
+Copyright (c) 2009 Gerhard Weis
+
+Copyright (c) 2009-2020 the sqlparse authors and contributors
+
+Copyright (c) 2006 Andy Tompkins.
+
+Copyright (c) 1996-2017 PostgreSQL Global Development PGGroup
+
+Copyright (c) 1994 Regents of the University of California
+
+Copyright (c) 2012 Julian Berman
+
+Copyright (c) 2022 Tobias Gustafsson
+
+Copyright (c) 2021 Max Bachmann
+
+Copyright (c) 2022 present Max Bachmann
+
+Copyright (c) 2023 Max Bachmann
+
+Copyright (c) 2020 Max Bachmann
+
+Copyright (c) 2021 present Max Bachmann
+
+Copyright (c) 2017 present Ofek Lev &lt;oss@ofek.dev&gt;
+
+Copyright (c)  Ahmed TAHRI @Ousret](https://github.com/Ousret).&lt;br
+
+Copyright (c)  is shown in the HTML footer. Default is True.
+
+Copyright (c) 2016 Dmitry Vyukov &lt;dvyukov@google.com&gt;
+
+Copyright (c) 2019-2022 Pyodide contributors and Mozilla
+
+Copyright (c)  years
+
+Copyright (c)  text
+
+Copyright (c) 2021 Orson Peters
+
+Copyright (c)  owned by the Transaction Processing Performance Council.
+
+Copyright (c)  Gradient Systems Inc. 2003
+
+Copyright (c)  is claimed.
 
 
 ```
@@ -18819,10 +29352,18 @@ copied and put under another distribution licence
 ```
 
 
+### Public Domain
+
+Copyright (c) is claimed.
+
+Copyright (c)  is claimed.
+
+
+
 
 
 
 
 [FOSSA]: # (Do not touch the comments below)
 
-[FOSSA]: # (==depsig=18307b0566135aa572cbfae928b133ce90f05eabce6cea6c7d34d14d61770c2a==)
+[FOSSA]: # (==depsig=16e3f8c916462aa27bb04cd0920d935d2cd510c4d25bdb429f69b52a76ee266b==)
