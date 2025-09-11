@@ -1,6 +1,0 @@
-kind: Fixes
-body: Fix ambiguity error for time dimensions in Dimension Jinja block
-time: 2025-06-20T15:32:26.019251-07:00
-custom:
-  Author: courtneyholcomb
-  Issue: "1772"

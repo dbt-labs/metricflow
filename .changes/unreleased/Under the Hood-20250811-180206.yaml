@@ -1,6 +1,0 @@
-kind: Under the Hood
-body: Update error handling for `simple_dimensions_for_metrics`
-time: 2025-08-11T18:02:06.615091-07:00
-custom:
-  Author: plypaul
-  Issue: "1816"

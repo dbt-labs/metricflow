@@ -1,6 +1,0 @@
-kind: Fixes
-body: Fix error message with empty queries
-time: 2025-04-29T14:54:26.748859-07:00
-custom:
-  Author: plypaul
-  Issue: "1740"

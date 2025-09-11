@@ -1,6 +1,0 @@
-kind: Under the Hood
-body: Skip rendering of the table alias in SQL if not needed
-time: 2025-05-27T16:36:42.913803-07:00
-custom:
-  Author: plypaul
-  Issue: "1757"

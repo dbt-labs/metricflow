@@ -1,6 +1,0 @@
-kind: Under the Hood
-body: Update `SequentialIdGenerator` to support async methods
-time: 2025-04-29T15:46:09.063545-07:00
-custom:
-  Author: plypaul
-  Issue: "1741"

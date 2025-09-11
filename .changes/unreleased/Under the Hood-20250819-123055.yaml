@@ -1,6 +1,0 @@
-kind: Under the Hood
-body: Switch back to using minimum time grain from models
-time: 2025-08-19T12:30:55.758428-07:00
-custom:
-  Author: plypaul
-  Issue: "1822"

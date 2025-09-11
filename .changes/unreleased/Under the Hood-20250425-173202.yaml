@@ -1,6 +1,0 @@
-kind: Under the Hood
-body: Provide context in `MetricFlowPrettyFormattable.pretty_format()`
-time: 2025-04-25T17:32:02.857627-07:00
-custom:
-  Author: plypaul
-  Issue: "1733"

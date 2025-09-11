@@ -1,6 +1,0 @@
-kind: Under the Hood
-body: Remove predicate pushdown optimizer for now
-time: 2025-07-18T14:50:27.691136-07:00
-custom:
-  Author: plypaul
-  Issue: "1783"

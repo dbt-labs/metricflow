@@ -1,6 +1,0 @@
-kind: Features
-body: Improve engine initialization speed via semantic graph
-time: 2025-09-10T11:44:56.51024-07:00
-custom:
-  Author: plypaul
-  Issue: "1835"
