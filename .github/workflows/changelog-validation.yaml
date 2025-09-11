@@ -1,0 +1,30 @@
+name: Changelog Validation
+# Runs `changie` to check for invalid changelog files.
+permissions:
+  contents: read
+on:
+  workflow_dispatch:
+  # run these jobs against the PR + master.  To run tests against just the PR, use "push" instead of "pull_request"
+  pull_request:
+    # run these jobs when a PR is opened, edited, reopened, or updated (synchronize)
+    # edited = title, body, or the base branch of the PR is modified
+    # synchronize = commit(s) pushed to the pull request
+    types:
+      - opened
+      - edited
+      - reopened
+      - synchronize
+
+jobs:
+  check_batch:
+    name: Check Batch
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run `changie batch`
+        uses: miniscruff/changie-action@v2
+        with:
+          version: latest
+          # Using a dummy version.
+          args: batch --dry-run 999.999.999
