@@ -1,0 +1,13 @@
+test_name: test_offset_to_grain_with_custom_grain
+test_filename: test_offset_metrics.py
+docstring:
+  Test offset to grain metric queried with custom grain.
+
+      Not a very useful query, but still demonstrates that we can handle this query.
+---
+metric_time__alien_day      bookings_all_time    bookings_all_time_at_start_of_month    bookings_since_start_of_month
+------------------------  -------------------  -------------------------------------  -------------------------------
+2020-01-02T00:00:00                         1                                      1                                0
+2020-01-03T00:00:00                        36                                     36                                0
+2020-01-04T00:00:00                       287                                    287                                0
+2020-01-05T00:00:00                       287                                    287                                0

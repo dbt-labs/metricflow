@@ -146,3 +146,384 @@ def test_custom_offset_window_with_matching_custom_grain(
         snapshot_str=query_result.result_df.text_format(),
         sql_engine=sql_client.sql_engine_type,
     )
+
+
+# Offset window tests
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
+def test_offset_window_with_grain_smaller_than_offset(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+    it_helpers: IntegrationTestHelpers,
+) -> None:
+    """Test offset window metric queried with grain smaller than offset grain."""
+    query_result = it_helpers.mf_engine.query(
+        MetricFlowQueryRequest.create_with_random_request_id(
+            metric_names=["bookings", "bookings_1_month_ago", "bookings_mom"],
+            group_by_names=["metric_time__day"],
+            order_by_names=["metric_time__day"],
+        )
+    )
+    assert query_result.result_df is not None, "Unexpected empty result."
+
+    assert_str_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.text_format(),
+        sql_engine=sql_client.sql_engine_type,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
+def test_offset_window_with_grain_matching_offset(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+    it_helpers: IntegrationTestHelpers,
+) -> None:
+    """Test offset window metric queried with grain matching offset grain."""
+    query_result = it_helpers.mf_engine.query(
+        MetricFlowQueryRequest.create_with_random_request_id(
+            metric_names=["bookings", "bookings_1_month_ago", "bookings_mom"],
+            group_by_names=["metric_time__month"],
+            order_by_names=["metric_time__month"],
+            where_constraints=["{{ TimeDimension('metric_time', 'day') }} < '2021-01-01'"],
+        )
+    )
+    assert query_result.result_df is not None, "Unexpected empty result."
+
+    assert_str_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.text_format(),
+        sql_engine=sql_client.sql_engine_type,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
+def test_offset_window_with_grain_larger_than_offset(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+    it_helpers: IntegrationTestHelpers,
+) -> None:
+    """Test offset window metric queried with grain larger than offset grain.
+
+    Not a very useful query, but still demonstrates that we can handle these params.
+    """
+    query_result = it_helpers.mf_engine.query(
+        MetricFlowQueryRequest.create_with_random_request_id(
+            metric_names=["bookings", "bookings_1_month_ago", "bookings_mom"],
+            group_by_names=["metric_time__year"],
+            order_by_names=["metric_time__year"],
+        )
+    )
+    assert query_result.result_df is not None, "Unexpected empty result."
+
+    assert_str_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.text_format(),
+        sql_engine=sql_client.sql_engine_type,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
+def test_offset_window_with_custom_grain(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+    it_helpers: IntegrationTestHelpers,
+) -> None:
+    """Test offset window metric queried with custom grain.
+
+    Not a very useful query, but still demonstrates that we can handle this query.
+    """
+    query_result = it_helpers.mf_engine.query(
+        MetricFlowQueryRequest.create_with_random_request_id(
+            metric_names=["bookings", "bookings_1_month_ago", "bookings_mom"],
+            group_by_names=["metric_time__alien_day"],
+            order_by_names=["metric_time__alien_day"],
+        )
+    )
+    assert query_result.result_df is not None, "Unexpected empty result."
+
+    assert_str_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.text_format(),
+        sql_engine=sql_client.sql_engine_type,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
+def test_offset_window_with_multiple_grains(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+    it_helpers: IntegrationTestHelpers,
+) -> None:
+    """Test offset window metric queried with multiple grains."""
+    query_result = it_helpers.mf_engine.query(
+        MetricFlowQueryRequest.create_with_random_request_id(
+            metric_names=["bookings", "bookings_1_month_ago", "bookings_mom"],
+            group_by_names=["metric_time__day", "metric_time__month", "metric_time__year"],
+            order_by_names=["metric_time__day", "metric_time__month", "metric_time__year"],
+        )
+    )
+    assert query_result.result_df is not None, "Unexpected empty result."
+
+    assert_str_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.text_format(),
+        sql_engine=sql_client.sql_engine_type,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
+def test_offset_window_with_date_part_only(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+    it_helpers: IntegrationTestHelpers,
+) -> None:
+    """Test offset window metric queried with date part only (no grain specified).
+
+    Not a very useful query, but still demonstrates that we can handle this query.
+    Note: date part is allowed for offset_window but not for offset_to_grain.
+    """
+    query_result = it_helpers.mf_engine.query(
+        MetricFlowQueryRequest.create_with_random_request_id(
+            metric_names=["bookings", "bookings_1_month_ago", "bookings_mom"],
+            group_by=(TimeDimensionParameter(name="metric_time", date_part=DatePart.MONTH),),
+            order_by=(OrderByParameter(TimeDimensionParameter(name="metric_time", date_part=DatePart.MONTH)),),
+        )
+    )
+    assert query_result.result_df is not None, "Unexpected empty result."
+
+    assert_str_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.text_format(),
+        sql_engine=sql_client.sql_engine_type,
+    )
+
+
+# Offset to grain tests
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
+def test_offset_to_grain_with_grain_smaller_than_offset(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+    it_helpers: IntegrationTestHelpers,
+) -> None:
+    """Test offset to grain metric queried with grain smaller than offset grain."""
+    query_result = it_helpers.mf_engine.query(
+        MetricFlowQueryRequest.create_with_random_request_id(
+            metric_names=["bookings_all_time", "bookings_all_time_at_start_of_month", "bookings_since_start_of_month"],
+            group_by_names=["metric_time__day"],
+            order_by_names=["metric_time__day"],
+            where_constraints=["{{ TimeDimension('metric_time', 'day') }} < '2021-01-01'"],
+        )
+    )
+    assert query_result.result_df is not None, "Unexpected empty result."
+
+    assert_str_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.text_format(),
+        sql_engine=sql_client.sql_engine_type,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
+def test_offset_to_grain_with_grain_matching_offset(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+    it_helpers: IntegrationTestHelpers,
+) -> None:
+    """Test offset to grain metric queried with grain matching offset grain.
+
+    Not likely a useful query, but still demonstrates that we do this correctly.
+    """
+    query_result = it_helpers.mf_engine.query(
+        MetricFlowQueryRequest.create_with_random_request_id(
+            metric_names=["bookings_all_time", "bookings_all_time_at_start_of_month", "bookings_since_start_of_month"],
+            group_by_names=["metric_time__month"],
+            order_by_names=["metric_time__month"],
+            where_constraints=["{{ TimeDimension('metric_time', 'day') }} < '2021-01-01'"],
+        )
+    )
+    assert query_result.result_df is not None, "Unexpected empty result."
+
+    assert_str_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.text_format(),
+        sql_engine=sql_client.sql_engine_type,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
+def test_offset_to_grain_with_grain_larger_than_offset(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+    it_helpers: IntegrationTestHelpers,
+) -> None:
+    """Test offset to grain metric queried with grain larger than offset grain.
+
+    Not likely a useful query, but still demonstrates that we do this correctly.
+    """
+    query_result = it_helpers.mf_engine.query(
+        MetricFlowQueryRequest.create_with_random_request_id(
+            metric_names=["bookings_all_time", "bookings_all_time_at_start_of_month", "bookings_since_start_of_month"],
+            group_by_names=["metric_time__year"],
+            order_by_names=["metric_time__year"],
+        )
+    )
+    assert query_result.result_df is not None, "Unexpected empty result."
+
+    assert_str_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.text_format(),
+        sql_engine=sql_client.sql_engine_type,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
+def test_offset_to_grain_with_custom_grain(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+    it_helpers: IntegrationTestHelpers,
+) -> None:
+    """Test offset to grain metric queried with custom grain.
+
+    Not a very useful query, but still demonstrates that we can handle this query.
+    """
+    query_result = it_helpers.mf_engine.query(
+        MetricFlowQueryRequest.create_with_random_request_id(
+            metric_names=["bookings_all_time", "bookings_all_time_at_start_of_month", "bookings_since_start_of_month"],
+            group_by_names=["metric_time__alien_day"],
+            order_by_names=["metric_time__alien_day"],
+        )
+    )
+    assert query_result.result_df is not None, "Unexpected empty result."
+
+    assert_str_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.text_format(),
+        sql_engine=sql_client.sql_engine_type,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
+def test_offset_to_grain_with_multiple_grains(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+    it_helpers: IntegrationTestHelpers,
+) -> None:
+    """Test offset to grain metric queried with multiple grains."""
+    query_result = it_helpers.mf_engine.query(
+        MetricFlowQueryRequest.create_with_random_request_id(
+            metric_names=["bookings_all_time", "bookings_all_time_at_start_of_month", "bookings_since_start_of_month"],
+            group_by_names=["metric_time__day", "metric_time__month", "metric_time__year"],
+            order_by_names=["metric_time__day", "metric_time__month", "metric_time__year"],
+        )
+    )
+    assert query_result.result_df is not None, "Unexpected empty result."
+
+    assert_str_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.text_format(),
+        sql_engine=sql_client.sql_engine_type,
+    )
+
+
+# TODO: bug to fix if the constraint below is applied. All agg time dims need to be selected from time spine in
+# JoinOverTimeRangeNod & JoinToTimeSpineNode for constraint to work.
+# @pytest.mark.sql_engine_snapshot
+# @pytest.mark.duckdb_only
+# def test_offset_to_grain_with_grain_matching_offset(  # noqa: D103
+#     request: FixtureRequest,
+#     mf_test_configuration: MetricFlowTestConfiguration,
+#     sql_client: SqlClient,
+#     it_helpers: IntegrationTestHelpers,
+# ) -> None:
+#     """Test offset to grain metric queried with grain matching offset grain.
+
+#     Not likely a useful query, but still demonstrates that we do this correctly.
+#     """
+#     query_result = it_helpers.mf_engine.query(
+#         MetricFlowQueryRequest.create_with_random_request_id(
+#             metric_names=["bookings_all_time", "bookings_all_time_at_start_of_month", "bookings_since_start_of_month"],
+#             group_by_names=["metric_time__month"],
+#             order_by_names=["metric_time__month"],
+#             # where_constraints=["{{ TimeDimension('metric_time', 'year') }} < '2021-01-01'"],
+#         )
+#     )
+#     assert query_result.result_df is not None, "Unexpected empty result."
+
+#     assert_str_snapshot_equal(
+#         request=request,
+#         mf_test_configuration=mf_test_configuration,
+#         snapshot_id="query_output",
+#         snapshot_str=query_result.result_df.text_format(),
+#         sql_engine=sql_client.sql_engine_type,
+#     )
+
+
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
+def test_offset_window_with_cumulative_input_metric(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+    it_helpers: IntegrationTestHelpers,
+) -> None:
+    """Test offset window metric that uses a cumulative metric with window as input."""
+    query_result = it_helpers.mf_engine.query(
+        MetricFlowQueryRequest.create_with_random_request_id(
+            metric_names=["trailing_7_days_bookings", "trailing_7_days_bookings_offset_1_week"],
+            group_by_names=["metric_time__day"],
+            order_by_names=["metric_time__day"],
+        )
+    )
+    assert query_result.result_df is not None, "Unexpected empty result."
+
+    assert_str_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.text_format(),
+        sql_engine=sql_client.sql_engine_type,
+    )

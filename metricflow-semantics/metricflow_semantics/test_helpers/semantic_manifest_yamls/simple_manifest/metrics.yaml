@@ -933,3 +933,23 @@ metric:
         offset_window: 1 alien_day
         alias: bookings_offset
       - name: bookings
+---
+metric:
+  name: trailing_7_days_bookings
+  description: "trailing 7 days bookings - cumulative metric with window"
+  type: cumulative
+  type_params:
+    measure: bookings
+    cumulative_type_params:
+      window: 7 days
+---
+metric:
+  name: trailing_7_days_bookings_offset_1_week
+  description: "trailing 7 days bookings offset by 1 week - offset_window metric using cumulative input"
+  type: derived
+  type_params:
+    expr: trailing_7_days_bookings_1_week_ago
+    metrics:
+      - name: trailing_7_days_bookings
+        offset_window: 1 week
+        alias: trailing_7_days_bookings_1_week_ago

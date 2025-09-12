@@ -10,24 +10,38 @@ SELECT
 FROM (
   -- Join to Time Spine Dataset
   -- Constrain Time Range to [2019-12-19T00:00:00, 2020-01-02T00:00:00]
-  -- Pass Only Elements: ['bookings', 'metric_time__day']
-  -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
-    time_spine_src_28006.ds AS metric_time__day
-    , SUM(subq_12.bookings) AS bookings_5_days_ago
-  FROM ***************************.mf_time_spine time_spine_src_28006
-  INNER JOIN (
-    -- Read Elements From Semantic Model 'bookings_source'
-    -- Metric Time Dimension 'ds'
+    subq_19.metric_time__day AS metric_time__day
+    , subq_15.bookings AS bookings_5_days_ago
+  FROM (
+    -- Read From Time Spine 'mf_time_spine'
+    -- Change Column Aliases
+    -- Constrain Time Range to [2019-12-19T00:00:00, 2020-01-02T00:00:00]
+    -- Pass Only Elements: ['metric_time__day']
     SELECT
-      DATE_TRUNC('day', ds) AS metric_time__day
-      , 1 AS bookings
-    FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_12
+      ds AS metric_time__day
+    FROM ***************************.mf_time_spine time_spine_src_28006
+    WHERE ds BETWEEN '2019-12-19' AND '2020-01-02'
+  ) subq_19
+  INNER JOIN (
+    -- Aggregate Measures
+    SELECT
+      metric_time__day
+      , SUM(bookings) AS bookings
+    FROM (
+      -- Read Elements From Semantic Model 'bookings_source'
+      -- Metric Time Dimension 'ds'
+      -- Pass Only Elements: ['bookings', 'metric_time__day']
+      SELECT
+        DATE_TRUNC('day', ds) AS metric_time__day
+        , 1 AS bookings
+      FROM ***************************.fct_bookings bookings_source_src_28000
+    ) subq_14
+    GROUP BY
+      metric_time__day
+  ) subq_15
   ON
-    DATEADD(day, -5, time_spine_src_28006.ds) = subq_12.metric_time__day
-  WHERE time_spine_src_28006.ds BETWEEN '2019-12-19' AND '2020-01-02'
-  GROUP BY
-    time_spine_src_28006.ds
-) subq_20
+    DATEADD(day, -5, subq_19.metric_time__day) = subq_15.metric_time__day
+  WHERE subq_19.metric_time__day BETWEEN '2019-12-19' AND '2020-01-02'
+) subq_22

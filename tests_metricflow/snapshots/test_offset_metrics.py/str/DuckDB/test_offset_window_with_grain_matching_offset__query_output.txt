@@ -1,0 +1,14 @@
+test_name: test_offset_window_with_grain_matching_offset
+test_filename: test_offset_metrics.py
+docstring:
+  Test offset window metric queried with grain matching offset grain.
+---
+metric_time__month      bookings    bookings_1_month_ago    bookings_mom
+--------------------  ----------  ----------------------  --------------
+2019-12-01T00:00:00           31
+2020-01-01T00:00:00           15                      31      -0.516129
+2020-02-01T00:00:00           55                      15       2.66667
+2020-03-01T00:00:00           57                      55       0.0363636
+2020-04-01T00:00:00           60                      57       0.0526316
+2020-05-01T00:00:00                                   60
+2020-12-01T00:00:00           69

@@ -1,0 +1,22 @@
+test_name: test_offset_to_grain_with_grain_matching_offset
+test_filename: test_offset_metrics.py
+docstring:
+  Test offset to grain metric queried with grain matching offset grain.
+
+      Not likely a useful query, but still demonstrates that we do this correctly.
+---
+metric_time__month      bookings_all_time    bookings_all_time_at_start_of_month    bookings_since_start_of_month
+--------------------  -------------------  -------------------------------------  -------------------------------
+2019-12-01T00:00:00                     1                                      1                                0
+2020-01-01T00:00:00                    36                                     36                                0
+2020-02-01T00:00:00                    48                                     48                                0
+2020-03-01T00:00:00                   103                                    103                                0
+2020-04-01T00:00:00                   162                                    162                                0
+2020-05-01T00:00:00                   218                                    218                                0
+2020-06-01T00:00:00                   218                                    218                                0
+2020-07-01T00:00:00                   218                                    218                                0
+2020-08-01T00:00:00                   218                                    218                                0
+2020-09-01T00:00:00                   218                                    218                                0
+2020-10-01T00:00:00                   218                                    218                                0
+2020-11-01T00:00:00                   218                                    218                                0
+2020-12-01T00:00:00                   220                                    220                                0

@@ -98,6 +98,8 @@ docstring:
   'total_account_balance_first_day_of_month',
   'trailing_2_months_revenue',
   'trailing_2_months_revenue_sub_10',
+  'trailing_7_days_bookings',
+  'trailing_7_days_bookings_offset_1_week',
   'twice_bookings_fill_nulls_with_0_without_time_spine',
   'views',
   'views_times_booking_value',

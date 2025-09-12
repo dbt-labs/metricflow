@@ -35,28 +35,34 @@ FROM (
         , 2 * bookings AS bookings_offset_once
       FROM (
         -- Join to Time Spine Dataset
-        -- Pass Only Elements: ['bookings', 'booking__is_instant', 'metric_time__day']
-        -- Aggregate Measures
         -- Compute Metrics via Expressions
         SELECT
           rss_28018_cte.ds__day AS metric_time__day
-          , subq_18.booking__is_instant AS booking__is_instant
-          , SUM(subq_18.bookings) AS bookings
+          , subq_20.booking__is_instant AS booking__is_instant
+          , subq_20.bookings AS bookings
         FROM rss_28018_cte
         INNER JOIN (
-          -- Read Elements From Semantic Model 'bookings_source'
-          -- Metric Time Dimension 'ds'
+          -- Aggregate Measures
           SELECT
-            DATE_TRUNC('day', ds) AS metric_time__day
-            , is_instant AS booking__is_instant
-            , 1 AS bookings
-          FROM ***************************.fct_bookings bookings_source_src_28000
-        ) subq_18
+            metric_time__day
+            , booking__is_instant
+            , SUM(bookings) AS bookings
+          FROM (
+            -- Read Elements From Semantic Model 'bookings_source'
+            -- Metric Time Dimension 'ds'
+            -- Pass Only Elements: ['bookings', 'booking__is_instant', 'metric_time__day']
+            SELECT
+              DATE_TRUNC('day', ds) AS metric_time__day
+              , is_instant AS booking__is_instant
+              , 1 AS bookings
+            FROM ***************************.fct_bookings bookings_source_src_28000
+          ) subq_19
+          GROUP BY
+            metric_time__day
+            , booking__is_instant
+        ) subq_20
         ON
-          rss_28018_cte.ds__day - MAKE_INTERVAL(days => 5) = subq_18.metric_time__day
-        GROUP BY
-          rss_28018_cte.ds__day
-          , subq_18.booking__is_instant
+          rss_28018_cte.ds__day - MAKE_INTERVAL(days => 5) = subq_20.metric_time__day
       ) subq_25
     ) subq_26
     ON

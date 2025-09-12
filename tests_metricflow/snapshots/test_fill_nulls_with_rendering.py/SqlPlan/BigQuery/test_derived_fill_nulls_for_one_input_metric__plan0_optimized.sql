@@ -57,19 +57,24 @@ FROM (
   ) subq_27
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
-    -- Pass Only Elements: ['bookings', 'metric_time__day']
-    -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
       rss_28018_cte.ds__day AS metric_time__day
-      , SUM(sma_28009_cte.bookings) AS bookings_2_weeks_ago
+      , subq_30.bookings AS bookings_2_weeks_ago
     FROM rss_28018_cte
-    INNER JOIN
-      sma_28009_cte
+    INNER JOIN (
+      -- Read From CTE For node_id=sma_28009
+      -- Pass Only Elements: ['bookings', 'metric_time__day']
+      -- Aggregate Measures
+      SELECT
+        metric_time__day
+        , SUM(bookings) AS bookings
+      FROM sma_28009_cte
+      GROUP BY
+        metric_time__day
+    ) subq_30
     ON
-      DATE_SUB(CAST(rss_28018_cte.ds__day AS DATETIME), INTERVAL 14 day) = sma_28009_cte.metric_time__day
-    GROUP BY
-      metric_time__day
+      DATE_SUB(CAST(rss_28018_cte.ds__day AS DATETIME), INTERVAL 14 day) = subq_30.metric_time__day
   ) subq_35
   ON
     subq_27.metric_time__day = subq_35.metric_time__day
