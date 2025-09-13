@@ -19,10 +19,10 @@ Error #1:
       [
         'listing__ds__day',
         'listing__user',
+        'listing__user__ds__day',
         'listing__lux_listing',
         'listing__is_lux_latest',
-        'listing__country_latest',
-        'listing__capacity_latest',
+        'listing__user__company',
       ]
 
   Query Input:

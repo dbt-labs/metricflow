@@ -8,7 +8,10 @@ from metricflow_semantics.errors.error_classes import InvalidQueryException
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
-from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_snapshot_equal, assert_str_snapshot_equal
+from metricflow_semantics.test_helpers.snapshot_helpers import (
+    assert_object_snapshot_equal,
+    assert_str_snapshot_equal,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -85,19 +88,30 @@ def test_non_resolvable_ambiguous_entity_path_due_to_mismatch(
     mf_test_configuration: MetricFlowTestConfiguration,
     multi_hop_query_parser: MetricFlowQueryParser,
 ) -> None:
-    """Tests an input with an ambiguous entity-path that can't be resolved due to a mismatch between metrics.
+    """Tests an input with a seemingly ambiguous entity-path.
 
     'entity_0__country' matches ['entity_1__entity_0__country', 'entity_0__country']
-    """
-    with pytest.raises(InvalidQueryException) as e:
-        multi_hop_query_parser.parse_and_validate_query(
-            metric_names=["entity_0_metric", "entity_1_metric"],
-            group_by_names=["entity_0__country"],
-        ).query_spec
 
-    assert_str_snapshot_equal(
+    With the PRIMARY/FOREIGN suffix matching enhancement, this now succeeds because
+    entity_0__country can match entity_1__entity_0__country when the difference in
+    entity link length is exactly 1.
+    """
+    # This used to raise InvalidQueryException, but with suffix matching it now succeeds
+    query_spec = multi_hop_query_parser.parse_and_validate_query(
+        metric_names=["entity_0_metric", "entity_1_metric"],
+        group_by_names=["entity_0__country"],
+    ).query_spec
+
+    # Create a snapshot of the successful query structure
+    assert_object_snapshot_equal(
         request=request,
         snapshot_configuration=mf_test_configuration,
-        snapshot_id="result_0",
-        snapshot_str=str(e.value),
+        obj_id="result_0",
+        obj={
+            "query_succeeded": True,
+            "num_metric_specs": len(query_spec.metric_specs),
+            "metric_names": sorted([spec.qualified_name for spec in query_spec.metric_specs]),
+            "num_dimension_specs": len(query_spec.dimension_specs),
+            "dimension_names": sorted([spec.qualified_name for spec in query_spec.dimension_specs]),
+        },
     )
