@@ -129,10 +129,13 @@ class ManifestObjectLookup(AttributePrettyFormattable):
             model_object_lookup.time_dimension_name_to_grain.values()
             for model_object_lookup in self.model_object_lookups
         )
-        if not peekable(time_grains):
+        peekable_grains = peekable(time_grains)
+        try:
+            peekable_grains.peek()
+        except StopIteration:
             return None
 
-        return min(time_grains)
+        return min(peekable_grains)
 
     @cached_property
     def expanded_time_grains(self) -> AnyLengthTuple[ExpandedTimeGranularity]:
