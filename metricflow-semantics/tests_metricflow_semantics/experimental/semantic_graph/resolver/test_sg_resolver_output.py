@@ -6,7 +6,6 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.references import MeasureReference, MetricReference
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseLinkableElementSet
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
@@ -53,11 +52,18 @@ def test_set_filtering_for_measure(sg_tester: SemanticGraphTester) -> None:
 
 
 def test_set_for_metrics(sg_tester: SemanticGraphTester) -> None:
-    """Check the set for a few multi-metric cases."""
+    """Check the set for a few different types of inputs for metrics."""
     sg_resolver = sg_tester.sg_resolver
     description_to_set: dict[str, BaseLinkableElementSet] = {}
 
-    for metric_names in ((), ("bookings",), ("bookings_per_view",)):
+    # Include cases: no metrics, simple metric, derived metric, multiple metrics, cumulative metric.
+    for metric_names in (
+        (),
+        ("bookings",),
+        ("bookings_per_view",),
+        ("bookings", "views"),
+        ("trailing_2_months_revenue",),
+    ):
         metric_references = [MetricReference(metric_name) for metric_name in metric_names]
         complete_set = sg_resolver.get_linkable_elements_for_metrics(metric_references)
         description_to_set[str(metric_names)] = complete_set
@@ -85,18 +91,9 @@ def test_set_for_distinct_values_query(sg_tester: SemanticGraphTester) -> None:
 def test_set_filtering_for_distinct_values_query(sg_tester: SemanticGraphTester) -> None:
     """Check filtering of the set for a distinct values query."""
     complete_set = sg_tester.sg_resolver.get_linkable_elements_for_distinct_values_query(LinkableElementFilter())
-    for element_property in LinkableElementProperty:
-        with_any_of_filter = LinkableElementFilter(with_any_of=frozenset((element_property,)))
-        filtered_set = sg_tester.sg_resolver.get_linkable_elements_for_distinct_values_query(with_any_of_filter)
-        # The resolver uses the filter to limit graph traversal, so this is not the same logic.
-        expected_items = set(complete_set.filter(with_any_of_filter).annotated_specs)
-        actual_items = set(filtered_set.annotated_specs)
-
-        assert expected_items == actual_items
-
-        without_any_of_filter = LinkableElementFilter(without_any_of=frozenset((element_property,)))
-        filtered_set = sg_tester.sg_resolver.get_linkable_elements_for_distinct_values_query(without_any_of_filter)
-        expected_items = set(complete_set.filter(without_any_of_filter).annotated_specs)
-        actual_items = set(filtered_set.annotated_specs)
-
-        assert expected_items == actual_items
+    sg_tester.check_set_filtering(
+        complete_set=complete_set,
+        filtered_set_callable=lambda set_filter: sg_tester.sg_resolver.get_linkable_elements_for_distinct_values_query(
+            set_filter
+        ),
+    )
