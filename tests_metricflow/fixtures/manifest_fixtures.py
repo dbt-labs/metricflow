@@ -166,7 +166,6 @@ class MetricFlowEngineTestFixture:
     def from_parameters(  # noqa: D102
         sql_client: SqlClient,
         semantic_manifest: PydanticSemanticManifest,
-        use_semantic_graph: bool,
     ) -> MetricFlowEngineTestFixture:
         semantic_manifest_lookup = SemanticManifestLookup(semantic_manifest)
         data_set_mapping = MetricFlowEngineTestFixture._create_data_sets(semantic_manifest_lookup)
@@ -269,25 +268,6 @@ def mf_engine_test_fixture_mapping(
             fixture_mapping[semantic_manifest_setup] = MetricFlowEngineTestFixture.from_parameters(
                 sql_client,
                 mf_load_manifest_from_yaml_directory(semantic_manifest_setup.yaml_file_dir, template_mapping),
-                use_semantic_graph=False,
-            )
-
-    return fixture_mapping
-
-
-@pytest.fixture(scope="session")
-def mf_engine_test_fixture_mapping_sg(
-    template_mapping: Dict[str, str],
-    sql_client: SqlClient,
-) -> Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture]:
-    """Similar to `mf_engine_test_fixture_mapping`, but with the semantic graph enabled."""
-    fixture_mapping: Dict[SemanticManifestSetup, MetricFlowEngineTestFixture] = {}
-    for semantic_manifest_setup in SemanticManifestSetup:
-        with SequentialIdGenerator.id_number_space(semantic_manifest_setup.id_number_space.start_value):
-            fixture_mapping[semantic_manifest_setup] = MetricFlowEngineTestFixture.from_parameters(
-                sql_client,
-                mf_load_manifest_from_yaml_directory(semantic_manifest_setup.yaml_file_dir, template_mapping),
-                use_semantic_graph=True,
             )
 
     return fixture_mapping
