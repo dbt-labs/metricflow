@@ -26,19 +26,17 @@ def test_where_filter_spec_serialization() -> None:  # noqa: D103
         bind_parameters=SqlBindParameterSet(
             param_items=(SqlBindParameter(key="key", value=SqlBindParameterValue(str_value="str_value")),)
         ),
-        element_set=AnnotatedSpecLinkableElementSet.create_from_annotated_specs(
-            annotated_specs=(
-                AnnotatedSpec.create(
-                    element_type=LinkableElementType.TIME_DIMENSION,
-                    element_name="element_name",
-                    entity_links=(EntityReference(element_name="element_name"),),
-                    date_part=None,
-                    metric_subquery_entity_links=None,
-                    time_grain=time_grain,
-                    properties=(LinkableElementProperty.LOCAL,),
-                    origin_model_ids=(SemanticModelId.get_instance("model_name"),),
-                    derived_from_semantic_models=(SemanticModelReference("model_name"),),
-                ),
+        element_set=AnnotatedSpecLinkableElementSet.create(
+            AnnotatedSpec.create(
+                element_type=LinkableElementType.TIME_DIMENSION,
+                element_name="element_name",
+                entity_links=(EntityReference(element_name="element_name"),),
+                date_part=None,
+                metric_subquery_entity_links=None,
+                time_grain=time_grain,
+                properties=(LinkableElementProperty.LOCAL,),
+                origin_model_ids=(SemanticModelId.get_instance("model_name"),),
+                derived_from_semantic_models=(SemanticModelReference("model_name"),),
             ),
         ),
     )
