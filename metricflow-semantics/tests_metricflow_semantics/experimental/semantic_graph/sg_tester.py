@@ -166,6 +166,18 @@ class SemanticGraphTester:
         comparison_helper.add_right_rows(right_rows)
         comparison_helper.assert_tables_equal(log_result_table)
 
+    def assert_attribute_set_snapshot_equal_for_a_measure(  # noqa: D102
+        self,
+        measure_names: Sequence[str],
+        expectation_description: Optional[str] = None,
+    ) -> None:
+        sg_resolver = self.sg_resolver
+        description_to_set = {
+            str(measure_name): sg_resolver.get_linkable_element_set_for_measure(MeasureReference(measure_name))
+            for measure_name in measure_names
+        }
+        self.assert_attribute_set_snapshot_equal(description_to_set, expectation_description)
+
     def assert_attribute_set_snapshot_equal(  # noqa: D102
         self,
         description_to_set: Mapping[str, BaseLinkableElementSet],

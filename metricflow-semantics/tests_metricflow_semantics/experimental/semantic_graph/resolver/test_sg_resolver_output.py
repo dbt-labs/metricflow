@@ -31,11 +31,7 @@ def sg_tester(  # noqa: D103
 def test_set_for_measures(sg_tester: SemanticGraphTester) -> None:
     """Check the set for a few measures."""
     cases = ("bookings", "account_balance")
-    description_to_set = {
-        str(measure_name): sg_tester.sg_resolver.get_linkable_element_set_for_measure(MeasureReference(measure_name))
-        for measure_name in cases
-    }
-    sg_tester.assert_attribute_set_snapshot_equal(description_to_set)
+    sg_tester.assert_attribute_set_snapshot_equal_for_a_measure(cases)
 
 
 def test_set_filtering_for_measure(sg_tester: SemanticGraphTester) -> None:
