@@ -22,22 +22,16 @@ from dbt_semantic_interfaces.references import (
     SemanticModelReference,
     TimeDimensionReference,
 )
-from dbt_semantic_interfaces.type_enums import DimensionType
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
+    AnnotatedSpecLinkableElementSet,
+)
+from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow_semantics.model.semantics.linkable_element import (
-    ElementPathKey,
-    LinkableDimension,
-    LinkableElementType,
-    LinkableEntity,
-    LinkableMetric,
-    MetricSubqueryJoinPathElement,
-    SemanticModelJoinPath,
-    SemanticModelToMetricSubqueryJoinPath,
-)
-from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
+from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
+from metricflow_semantics.model.semantics.linkable_element_set_base import AnnotatedSpec, BaseLinkableElementSet
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
@@ -67,7 +61,7 @@ logger = logging.getLogger(__name__)
 def create_spec_lookup(
     call_parameter_set: CallParameterSet,
     resolved_spec: LinkableInstanceSpec,
-    resolved_linkable_element_set: LinkableElementSet,
+    resolved_linkable_element_set: BaseLinkableElementSet,
     semantic_manifest_lookup: SemanticManifestLookup,
 ) -> FilterSpecResolutionLookUp:
     """Create a FilterSpecResolutionLookUp where the call_parameter_set maps to resolved_spec."""
@@ -110,29 +104,18 @@ def test_dimension_in_filter(  # noqa: D103
                 dimension_reference=DimensionReference("country_latest"),
             ),
             resolved_spec=DimensionSpec(element_name="country_latest", entity_links=(EntityReference("listing"),)),
-            resolved_linkable_element_set=LinkableElementSet(
-                path_key_to_linkable_dimensions={
-                    ElementPathKey(
-                        element_name="country_latest",
-                        element_type=LinkableElementType.DIMENSION,
-                        entity_links=(EntityReference("listing"),),
-                        time_granularity=None,
-                        date_part=None,
-                    ): (
-                        LinkableDimension.create(
-                            defined_in_semantic_model=SemanticModelReference("bookings"),
-                            dimension_type=DimensionType.CATEGORICAL,
-                            element_name="country_latest",
-                            entity_links=(EntityReference("listing"),),
-                            join_path=SemanticModelJoinPath(
-                                left_semantic_model_reference=SemanticModelReference("bookings_source"),
-                            ),
-                            properties=frozenset(),
-                            time_granularity=None,
-                            date_part=None,
-                        ),
-                    )
-                }
+            resolved_linkable_element_set=AnnotatedSpecLinkableElementSet.create(
+                AnnotatedSpec.create(
+                    element_type=LinkableElementType.DIMENSION,
+                    element_name="country_latest",
+                    entity_links=(EntityReference("listing"),),
+                    time_grain=None,
+                    date_part=None,
+                    metric_subquery_entity_links=None,
+                    properties=frozenset(),
+                    origin_model_ids=[SemanticModelId.get_instance("bookings")],
+                    derived_from_semantic_models=[SemanticModelReference("bookings_source")],
+                ),
             ),
             semantic_manifest_lookup=simple_semantic_manifest_lookup,
         ),
@@ -171,29 +154,18 @@ def test_dimension_in_filter_with_grain(  # noqa: D103
                 entity_links=(EntityReference("listing"),),
                 time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.WEEK),
             ),
-            resolved_linkable_element_set=LinkableElementSet(
-                path_key_to_linkable_dimensions={
-                    ElementPathKey(
-                        element_name="created_at",
-                        element_type=LinkableElementType.TIME_DIMENSION,
-                        entity_links=(EntityReference("listing"),),
-                        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.WEEK),
-                        date_part=None,
-                    ): (
-                        LinkableDimension.create(
-                            defined_in_semantic_model=SemanticModelReference("listings_source"),
-                            dimension_type=DimensionType.TIME,
-                            element_name="created_at",
-                            entity_links=(EntityReference("listing"),),
-                            join_path=SemanticModelJoinPath(
-                                left_semantic_model_reference=SemanticModelReference("bookings_source"),
-                            ),
-                            properties=frozenset(),
-                            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.WEEK),
-                            date_part=None,
-                        ),
-                    )
-                }
+            resolved_linkable_element_set=AnnotatedSpecLinkableElementSet.create(
+                AnnotatedSpec.create(
+                    element_type=LinkableElementType.TIME_DIMENSION,
+                    element_name="created_at",
+                    entity_links=(EntityReference("listing"),),
+                    time_grain=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.WEEK),
+                    date_part=None,
+                    metric_subquery_entity_links=None,
+                    properties=frozenset(),
+                    origin_model_ids=[SemanticModelId.get_instance("listings_source")],
+                    derived_from_semantic_models=[SemanticModelReference("bookings_source")],
+                ),
             ),
             semantic_manifest_lookup=simple_semantic_manifest_lookup,
         ),
@@ -238,29 +210,18 @@ def test_time_dimension_in_filter(  # noqa: D103
                 entity_links=(EntityReference("listing"),),
                 time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
             ),
-            resolved_linkable_element_set=LinkableElementSet(
-                path_key_to_linkable_dimensions={
-                    ElementPathKey(
-                        element_name="created_at",
-                        element_type=LinkableElementType.TIME_DIMENSION,
-                        entity_links=(EntityReference("listing"),),
-                        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
-                        date_part=None,
-                    ): (
-                        LinkableDimension.create(
-                            defined_in_semantic_model=SemanticModelReference("listings_source"),
-                            dimension_type=DimensionType.TIME,
-                            element_name="created_at",
-                            entity_links=(EntityReference("listing"),),
-                            join_path=SemanticModelJoinPath(
-                                left_semantic_model_reference=SemanticModelReference("bookings_source"),
-                            ),
-                            properties=frozenset(),
-                            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
-                            date_part=None,
-                        ),
-                    )
-                }
+            resolved_linkable_element_set=AnnotatedSpecLinkableElementSet.create(
+                AnnotatedSpec.create(
+                    element_type=LinkableElementType.TIME_DIMENSION,
+                    element_name="created_at",
+                    entity_links=(EntityReference("listing"),),
+                    time_grain=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
+                    date_part=None,
+                    metric_subquery_entity_links=None,
+                    properties=frozenset(),
+                    origin_model_ids=[SemanticModelId.get_instance("listings_source")],
+                    derived_from_semantic_models=[SemanticModelReference("bookings_source")],
+                ),
             ),
             semantic_manifest_lookup=simple_semantic_manifest_lookup,
         ),
@@ -305,29 +266,18 @@ def test_time_dimension_with_grain_in_name(  # noqa: D103
                 entity_links=(EntityReference("listing"),),
                 time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
             ),
-            resolved_linkable_element_set=LinkableElementSet(
-                path_key_to_linkable_dimensions={
-                    ElementPathKey(
-                        element_name="created_at",
-                        element_type=LinkableElementType.TIME_DIMENSION,
-                        entity_links=(EntityReference("listing"),),
-                        time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
-                        date_part=None,
-                    ): (
-                        LinkableDimension.create(
-                            defined_in_semantic_model=SemanticModelReference("listings_source"),
-                            dimension_type=DimensionType.TIME,
-                            element_name="created_at",
-                            entity_links=(EntityReference("listing"),),
-                            join_path=SemanticModelJoinPath(
-                                left_semantic_model_reference=SemanticModelReference("bookings_source"),
-                            ),
-                            properties=frozenset(),
-                            time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
-                            date_part=None,
-                        ),
-                    )
-                }
+            resolved_linkable_element_set=AnnotatedSpecLinkableElementSet.create(
+                AnnotatedSpec.create(
+                    element_type=LinkableElementType.TIME_DIMENSION,
+                    element_name="created_at",
+                    entity_links=(EntityReference("listing"),),
+                    time_grain=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
+                    date_part=None,
+                    metric_subquery_entity_links=None,
+                    properties=frozenset(),
+                    origin_model_ids=[SemanticModelId.get_instance("listings_source")],
+                    derived_from_semantic_models=[SemanticModelReference("bookings_source")],
+                ),
             ),
             semantic_manifest_lookup=simple_semantic_manifest_lookup,
         ),
@@ -372,27 +322,18 @@ def test_date_part_in_filter(  # noqa: D103
                 entity_links=(),
                 date_part=DatePart.YEAR,
             ),
-            resolved_linkable_element_set=LinkableElementSet(
-                path_key_to_linkable_dimensions={
-                    ElementPathKey(
-                        element_name="metric_time",
-                        element_type=LinkableElementType.TIME_DIMENSION,
-                        entity_links=(),
-                        date_part=DatePart.YEAR,
-                    ): (
-                        LinkableDimension.create(
-                            defined_in_semantic_model=SemanticModelReference("bookings"),
-                            dimension_type=DimensionType.TIME,
-                            element_name="metric_time",
-                            entity_links=(),
-                            join_path=SemanticModelJoinPath(
-                                left_semantic_model_reference=SemanticModelReference("bookings_source"),
-                            ),
-                            properties=frozenset(),
-                            date_part=DatePart.YEAR,
-                        ),
-                    )
-                }
+            resolved_linkable_element_set=AnnotatedSpecLinkableElementSet.create(
+                AnnotatedSpec.create(
+                    element_type=LinkableElementType.TIME_DIMENSION,
+                    element_name="metric_time",
+                    entity_links=(),
+                    time_grain=None,
+                    date_part=DatePart.YEAR,
+                    metric_subquery_entity_links=None,
+                    properties=frozenset(),
+                    origin_model_ids=[SemanticModelId.get_instance("bookings")],
+                    derived_from_semantic_models=[SemanticModelReference("bookings_source")],
+                ),
             ),
             semantic_manifest_lookup=simple_semantic_manifest_lookup,
         ),
@@ -441,27 +382,18 @@ def resolved_spec_lookup(
                 where_filter_intersection=create_where_filter_intersection(
                     "TimeDimension('metric_time', 'week', 'year')"
                 ),
-                resolved_linkable_element_set=LinkableElementSet(
-                    path_key_to_linkable_dimensions={
-                        ElementPathKey(
-                            element_name="metric_time",
-                            element_type=LinkableElementType.TIME_DIMENSION,
-                            entity_links=(),
-                            date_part=DatePart.YEAR,
-                        ): (
-                            LinkableDimension.create(
-                                defined_in_semantic_model=SemanticModelReference("bookings"),
-                                dimension_type=DimensionType.TIME,
-                                element_name="metric_time",
-                                entity_links=(),
-                                join_path=SemanticModelJoinPath(
-                                    left_semantic_model_reference=SemanticModelReference("bookings_source"),
-                                ),
-                                properties=frozenset(),
-                                date_part=DatePart.YEAR,
-                            ),
-                        )
-                    }
+                resolved_linkable_element_set=AnnotatedSpecLinkableElementSet.create(
+                    AnnotatedSpec.create(
+                        element_type=LinkableElementType.TIME_DIMENSION,
+                        element_name="metric_time",
+                        entity_links=(),
+                        time_grain=None,
+                        date_part=DatePart.YEAR,
+                        metric_subquery_entity_links=None,
+                        properties=frozenset(),
+                        origin_model_ids=[SemanticModelId.get_instance("bookings")],
+                        derived_from_semantic_models=[SemanticModelReference("bookings_source")],
+                    ),
                 ),
                 spec_pattern=ObjectBuilderNamingScheme().spec_pattern(
                     "Dimension('dummy__dimension')", semantic_manifest_lookup=simple_semantic_manifest_lookup
@@ -527,26 +459,18 @@ def test_entity_in_filter(  # noqa: D103
                 entity_reference=EntityReference("user"),
             ),
             resolved_spec=EntitySpec(element_name="user", entity_links=(EntityReference("listing"),)),
-            resolved_linkable_element_set=LinkableElementSet(
-                path_key_to_linkable_entities={
-                    ElementPathKey(
-                        element_name="user",
-                        element_type=LinkableElementType.ENTITY,
-                        entity_links=(EntityReference("listing"),),
-                        time_granularity=None,
-                        date_part=None,
-                    ): (
-                        LinkableEntity.create(
-                            defined_in_semantic_model=SemanticModelReference("bookings"),
-                            element_name="user",
-                            entity_links=(EntityReference("listing"),),
-                            join_path=SemanticModelJoinPath(
-                                left_semantic_model_reference=SemanticModelReference("bookings_source"),
-                            ),
-                            properties=frozenset(),
-                        ),
-                    )
-                }
+            resolved_linkable_element_set=AnnotatedSpecLinkableElementSet.create(
+                AnnotatedSpec.create(
+                    element_type=LinkableElementType.ENTITY,
+                    element_name="user",
+                    entity_links=(EntityReference("listing"),),
+                    time_grain=None,
+                    date_part=None,
+                    metric_subquery_entity_links=None,
+                    properties=frozenset(),
+                    origin_model_ids=[SemanticModelId.get_instance("bookings")],
+                    derived_from_semantic_models=[SemanticModelReference("bookings_source")],
+                ),
             ),
             semantic_manifest_lookup=simple_semantic_manifest_lookup,
         ),
@@ -581,32 +505,18 @@ def test_metric_in_filter(  # noqa: D103
                 metric_reference=MetricReference("bookings"),
             ),
             resolved_spec=group_by_metric_spec,
-            resolved_linkable_element_set=LinkableElementSet(
-                path_key_to_linkable_metrics={
-                    ElementPathKey(
-                        element_name="bookings",
-                        element_type=LinkableElementType.METRIC,
-                        entity_links=(EntityReference("listing"),),
-                        time_granularity=None,
-                        date_part=None,
-                        metric_subquery_entity_links=(EntityReference("listing"),),
-                    ): (
-                        LinkableMetric.create(
-                            properties=frozenset({LinkableElementProperty.METRIC, LinkableElementProperty.JOINED}),
-                            join_path=SemanticModelToMetricSubqueryJoinPath(
-                                metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
-                                    metric_reference=MetricReference("bookings"),
-                                    derived_from_semantic_models=(SemanticModelReference("bookings"),),
-                                    join_on_entity=EntityReference("listing"),
-                                    entity_links=(),
-                                ),
-                                semantic_model_join_path=SemanticModelJoinPath(
-                                    left_semantic_model_reference=SemanticModelReference("listings_latest")
-                                ),
-                            ),
-                        ),
-                    )
-                }
+            resolved_linkable_element_set=AnnotatedSpecLinkableElementSet.create(
+                AnnotatedSpec.create(
+                    element_type=LinkableElementType.METRIC,
+                    element_name="bookings",
+                    entity_links=(EntityReference("listing"),),
+                    time_grain=None,
+                    date_part=None,
+                    metric_subquery_entity_links=(EntityReference("listing"),),
+                    properties=frozenset({LinkableElementProperty.METRIC, LinkableElementProperty.JOINED}),
+                    origin_model_ids=[SemanticModelId.get_instance("listings_latest")],
+                    derived_from_semantic_models=[SemanticModelReference("bookings")],
+                ),
             ),
             semantic_manifest_lookup=simple_semantic_manifest_lookup,
         ),
@@ -644,31 +554,18 @@ def test_dimension_time_dimension_parity(  # noqa: D103
                         ),
                         filter_location_path=MetricFlowQueryResolutionPath(()),
                         where_filter_intersection=PydanticWhereFilterIntersection(where_filters=[where_filter]),
-                        resolved_linkable_element_set=LinkableElementSet(
-                            path_key_to_linkable_dimensions={
-                                ElementPathKey(
-                                    element_name=METRIC_TIME_ELEMENT_NAME,
-                                    element_type=LinkableElementType.TIME_DIMENSION,
-                                    entity_links=(EntityReference("listing"),),
-                                    time_granularity=ExpandedTimeGranularity.from_time_granularity(
-                                        TimeGranularity.WEEK
-                                    ),
-                                ): (
-                                    LinkableDimension.create(
-                                        defined_in_semantic_model=SemanticModelReference("bookings"),
-                                        dimension_type=DimensionType.TIME,
-                                        element_name=METRIC_TIME_ELEMENT_NAME,
-                                        entity_links=(),
-                                        join_path=SemanticModelJoinPath(
-                                            left_semantic_model_reference=SemanticModelReference("bookings_source"),
-                                        ),
-                                        properties=frozenset(),
-                                        time_granularity=ExpandedTimeGranularity.from_time_granularity(
-                                            TimeGranularity.WEEK
-                                        ),
-                                    ),
-                                )
-                            }
+                        resolved_linkable_element_set=AnnotatedSpecLinkableElementSet.create(
+                            AnnotatedSpec.create(
+                                element_type=LinkableElementType.TIME_DIMENSION,
+                                element_name=METRIC_TIME_ELEMENT_NAME,
+                                entity_links=(EntityReference("listing"),),
+                                time_grain=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.WEEK),
+                                date_part=None,
+                                metric_subquery_entity_links=None,
+                                properties=frozenset(),
+                                origin_model_ids=[SemanticModelId.get_instance("bookings")],
+                                derived_from_semantic_models=[SemanticModelReference("bookings_source")],
+                            ),
                         ),
                         spec_pattern=ObjectBuilderNamingScheme().spec_pattern(
                             "Dimension('dummy__dimension')", semantic_manifest_lookup=simple_semantic_manifest_lookup

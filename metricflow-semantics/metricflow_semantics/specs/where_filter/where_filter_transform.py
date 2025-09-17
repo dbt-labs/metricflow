@@ -109,9 +109,7 @@ class WhereSpecFactory:
                 WhereFilterSpec(
                     where_sql=where_sql,
                     bind_parameters=SqlBindParameterSet(),
-                    element_set=AnnotatedSpecLinkableElementSet.create_from_annotated_specs(
-                        rendered_spec_tracker.rendered_specs
-                    ),
+                    element_set=AnnotatedSpecLinkableElementSet.create(*rendered_spec_tracker.rendered_specs),
                 )
             )
 
