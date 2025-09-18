@@ -1,0 +1,6 @@
+kind: Fixes
+body: Pin to the latest non-dev release of dbt-semantic-interfaces.
+time: 2025-09-18T07:01:22.294658-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1854"
