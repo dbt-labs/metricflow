@@ -2,7 +2,7 @@ test_name: test_invalid_group_by_item
 test_filename: test_matching_item_for_querying.py
 ---
 GroupByItemResolution(
-  linkable_element_set=LinkableElementSet(),
+  linkable_element_set=AnnotatedSpecLinkableElementSet(),
   issue_set=MetricFlowQueryResolutionIssueSet(
     issues=(
       NoMatchingItemsForMeasure(
