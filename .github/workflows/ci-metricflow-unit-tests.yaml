@@ -12,6 +12,8 @@ jobs:
   metricflow-unit-tests-duckdb:
     name: MetricFlow Tests (DuckDB)
     runs-on: ubuntu-latest
+    env:
+      TZ: UTC
     strategy:
       matrix:
         python-version: ["3.9", "3.12"]
@@ -27,6 +29,8 @@ jobs:
   metricflow-unit-tests-postgres:
     name: MetricFlow Tests (PostgreSQL)
     runs-on: ubuntu-latest
+    env:
+      TZ: UTC
     services:
       postgres:
         image: postgres
@@ -71,6 +75,8 @@ jobs:
   metricflow-package-tests:
     name: MetricFlow Packages Tests
     runs-on: ubuntu-latest
+    env:
+      TZ: UTC
     strategy:
       matrix:
         python-version: [ "3.9", "3.12" ]
