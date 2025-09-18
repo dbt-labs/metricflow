@@ -67,41 +67,43 @@ FROM (
       , listing__country_latest
   ) subq_33
   FULL OUTER JOIN (
-    -- Join to Time Spine Dataset
+    -- Constrain Output with WHERE
+    -- Pass Only Elements: ['bookings', 'listing__country_latest', 'metric_time__day']
+    -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      time_spine_src_28006.ds AS metric_time__day
-      , subq_40.listing__country_latest AS listing__country_latest
-      , subq_40.bookings AS bookings_2_weeks_ago
-    FROM ***************************.mf_time_spine time_spine_src_28006
-    INNER JOIN (
-      -- Constrain Output with WHERE
-      -- Pass Only Elements: ['bookings', 'listing__country_latest', 'metric_time__day']
-      -- Aggregate Measures
+      metric_time__day
+      , listing__country_latest
+      , SUM(bookings) AS bookings_2_weeks_ago
+    FROM (
+      -- Join Standard Outputs
       SELECT
-        metric_time__day
-        , listing__country_latest
-        , SUM(bookings) AS bookings
+        sma_28014_cte.country_latest AS listing__country_latest
+        , subq_38.metric_time__day AS metric_time__day
+        , subq_38.booking__is_instant AS booking__is_instant
+        , subq_38.bookings AS bookings
       FROM (
-        -- Join Standard Outputs
+        -- Join to Time Spine Dataset
         SELECT
-          sma_28014_cte.country_latest AS listing__country_latest
-          , sma_28009_cte.metric_time__day AS metric_time__day
+          time_spine_src_28006.ds AS metric_time__day
+          , sma_28009_cte.listing AS listing
           , sma_28009_cte.booking__is_instant AS booking__is_instant
           , sma_28009_cte.bookings AS bookings
-        FROM sma_28009_cte
-        LEFT OUTER JOIN
-          sma_28014_cte
+        FROM ***************************.mf_time_spine time_spine_src_28006
+        INNER JOIN
+          sma_28009_cte
         ON
-          sma_28009_cte.listing = sma_28014_cte.listing
-      ) subq_37
-      WHERE booking__is_instant
-      GROUP BY
-        metric_time__day
-        , listing__country_latest
-    ) subq_40
-    ON
-      time_spine_src_28006.ds - INTERVAL 14 day = subq_40.metric_time__day
+          time_spine_src_28006.ds - INTERVAL 14 day = sma_28009_cte.metric_time__day
+      ) subq_38
+      LEFT OUTER JOIN
+        sma_28014_cte
+      ON
+        subq_38.listing = sma_28014_cte.listing
+    ) subq_41
+    WHERE booking__is_instant
+    GROUP BY
+      metric_time__day
+      , listing__country_latest
   ) subq_45
   ON
     (

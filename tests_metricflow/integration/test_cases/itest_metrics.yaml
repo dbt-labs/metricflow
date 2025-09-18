@@ -1743,10 +1743,8 @@ integration_test:
         {{ source_schema }}.fct_bookings b
       ON ({{ render_date_trunc("b.ds", TimeGranularity.DAY) }} <= subq_3.ds)
         AND ({{ render_date_trunc("b.ds", TimeGranularity.DAY) }} > {{ render_date_sub("subq_3", "ds", 2, TimeGranularity.DAY) }})
-      WHERE {{ render_time_constraint("subq_3.ds", "2019-12-19", "2020-01-02") }}
     ) subq_4
     ON {{ render_date_sub("subq_5", "metric_time__day", 2, TimeGranularity.DAY) }} = subq_4.metric_time__day
-    WHERE {{ render_time_constraint("subq_5.metric_time__day", "2019-12-19", "2020-01-02") }}
     GROUP BY subq_5.metric_time__day
 ---
 integration_test:

@@ -1366,67 +1366,31 @@ class DataflowPlanBuilder:
             ),
         )
 
-        queried_agg_time_dimension_specs = queried_linkable_specs.included_agg_time_dimension_specs_for_measure(
-            measure_reference=measure_spec.reference, semantic_model_lookup=self._semantic_model_lookup
-        )
-        smallest_queried_agg_time_grain: Optional[ExpandedTimeGranularity] = None
         before_aggregation_time_spine_join_description = None
-        after_aggregation_time_spine_join_description = None
+        # If querying an offset metric, join to time spine.
         if child_metric_offset_window is not None or child_metric_offset_to_grain is not None:
-            if child_metric_offset_window is not None:
-                offset_grain_name = child_metric_offset_window.granularity
-                if ExpandedTimeGranularity.is_standard_granularity_name(offset_grain_name):
-                    offset_grain = ExpandedTimeGranularity.from_time_granularity(TimeGranularity(offset_grain_name))
-                else:
-                    offset_grain = ExpandedTimeGranularity(
-                        name=offset_grain_name,
-                        base_granularity=self._get_base_grain_for_custom_grain(offset_grain_name),
-                    )
-            else:
-                assert (
-                    child_metric_offset_to_grain is not None
-                ), "Offset to grain must be specified if no offset window is specified."
-                offset_grain = ExpandedTimeGranularity.from_time_granularity(child_metric_offset_to_grain)
-
-            # Determine the smallest queried agg time dimension grain (this is the grain we'll aggregate to)
-            if len(queried_agg_time_dimension_specs) == 0:
-                raise ValueError(
-                    "No agg_time_dimension requested in offset metric query. This should have been validated earlier."
-                )
-            smallest_queried_agg_time_grain = self._sort_by_base_granularity(queried_agg_time_dimension_specs)[
-                0
-            ].time_granularity
-
-            # If the smallest queried grain is equal to the offset grain, join after aggregation. Otherwise, the grain
-            # needed for offset will not be available anymore, so join before aggregation.
-            join_to_time_spine_description = JoinToTimeSpineDescription(
+            before_aggregation_time_spine_join_description = JoinToTimeSpineDescription(
                 join_type=SqlJoinType.INNER,
                 offset_window=child_metric_offset_window,
                 offset_to_grain=child_metric_offset_to_grain,
             )
-            if (
-                offset_grain
-                and smallest_queried_agg_time_grain == offset_grain
-                and not offset_grain.is_custom_granularity  # custom offset window has special logic handled later
-            ):
-                after_aggregation_time_spine_join_description = join_to_time_spine_description
-            else:
-                before_aggregation_time_spine_join_description = join_to_time_spine_description
 
-        # Measures configured to join to time spine will join to time spine after aggregation using LEFT OUTER JOIN.
-        # If there's no agg_time_dimension in the query, skip time spine join since all time will be aggregated.
-        # If we already need to join to time spine after aggregation due to offset, and the measure is also configured
-        # to join to time spine, update to use LEFT OUTER JOIN.
-        if input_measure.join_to_timespine and (len(queried_agg_time_dimension_specs) > 0):
-            if after_aggregation_time_spine_join_description is not None:
+        # Even if the measure is configured to join to time spine, if there's no agg_time_dimension in the query,
+        # there's no need to join to the time spine since all time will be aggregated.
+        after_aggregation_time_spine_join_description = None
+        if input_measure.join_to_timespine:
+            if (
+                len(
+                    queried_linkable_specs.included_agg_time_dimension_specs_for_measure(
+                        measure_reference=measure_spec.reference, semantic_model_lookup=self._semantic_model_lookup
+                    )
+                )
+                > 0
+            ):
                 after_aggregation_time_spine_join_description = JoinToTimeSpineDescription(
                     join_type=SqlJoinType.LEFT_OUTER,
-                    offset_window=after_aggregation_time_spine_join_description.offset_window,
-                    offset_to_grain=after_aggregation_time_spine_join_description.offset_to_grain,
-                )
-            else:
-                after_aggregation_time_spine_join_description = JoinToTimeSpineDescription(
-                    join_type=SqlJoinType.LEFT_OUTER, offset_window=None, offset_to_grain=None
+                    offset_window=None,
+                    offset_to_grain=None,
                 )
 
         return MetricInputMeasureSpec(
@@ -1580,7 +1544,7 @@ class DataflowPlanBuilder:
 
         return required_linkable_specs
 
-    def _build_time_spine_join_node_for_after_aggregation(
+    def _build_time_spine_join_node_for_measure_config(
         self,
         join_description: JoinToTimeSpineDescription,
         measure_reference: MeasureReference,
@@ -1590,6 +1554,11 @@ class DataflowPlanBuilder:
         after_aggregation_where_filter_specs: Sequence[WhereFilterSpec],
         time_range_constraint: Optional[TimeRangeConstraint],
     ) -> DataflowPlanNode:
+        assert join_description.join_type is SqlJoinType.LEFT_OUTER, (
+            f"Expected {SqlJoinType.LEFT_OUTER} for joining to time spine after aggregation. Remove this if "
+            f"there's a new use case."
+        )
+
         # Find filters that contain only metric_time or agg_time_dimension. They will be applied to the time spine table.
         agg_time_only_filters: List[WhereFilterSpec] = []
         non_agg_time_filters: List[WhereFilterSpec] = []
@@ -1615,8 +1584,6 @@ class DataflowPlanBuilder:
             requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
             join_on_time_dimension_spec=join_spec,
             join_type=join_description.join_type,
-            standard_offset_window=join_description.standard_offset_window,
-            offset_to_grain=join_description.offset_to_grain,
         )
 
         # Since new rows might have been added due to time spine join, re-apply constraints here. Only re-apply filters
@@ -1687,7 +1654,7 @@ class DataflowPlanBuilder:
             )
         return output_node
 
-    def _build_time_spine_join_node_for_before_aggregation(
+    def _build_time_spine_join_node_for_offset(
         self,
         join_description: JoinToTimeSpineDescription,
         measure_properties: MeasureSpecProperties,
@@ -1695,6 +1662,7 @@ class DataflowPlanBuilder:
         metric_source_node: DataflowPlanNode,
         use_offset_custom_granularity_node: bool,
     ) -> DataflowPlanNode:
+        """Build a node to join to the time spine for a measure with the `join_to_timespine: true` YAML config."""
         assert join_description.join_type is SqlJoinType.INNER, (
             f"Expected {SqlJoinType.INNER} for joining to time spine before aggregation. Remove this if there's a "
             f"new use case."
@@ -1793,15 +1761,6 @@ class DataflowPlanBuilder:
         before_aggregation_time_spine_join_description = (
             metric_input_measure_spec.before_aggregation_time_spine_join_description
         )
-        after_aggregation_time_spine_join_description = (
-            metric_input_measure_spec.after_aggregation_time_spine_join_description
-        )
-        uses_offset = (
-            before_aggregation_time_spine_join_description
-            and before_aggregation_time_spine_join_description.uses_offset
-        ) or (
-            after_aggregation_time_spine_join_description and after_aggregation_time_spine_join_description.uses_offset
-        )
 
         if measure_recipe is None:
             logger.debug(
@@ -1813,7 +1772,8 @@ class DataflowPlanBuilder:
             )
             measure_time_constraint = (
                 (cumulative_metric_adjusted_time_constraint or predicate_pushdown_state.time_range_constraint)
-                if not uses_offset  # Time constraints will be applied after offset
+                # If joining to time spine for time offset, constraints will be applied after that join.
+                if not before_aggregation_time_spine_join_description
                 else None
             )
             if measure_time_constraint is None:
@@ -1845,14 +1805,10 @@ class DataflowPlanBuilder:
                 f"Unable to join all items in request. Measure: {measure_spec.element_name}; Specs to join: {required_linkable_specs}"
             )
 
-        queried_agg_time_dimension_specs = tuple(
-            queried_linkable_specs.included_agg_time_dimension_specs_for_measure(
-                measure_reference=measure_spec.reference, semantic_model_lookup=self._semantic_model_lookup
-            )
+        queried_agg_time_dimension_specs = queried_linkable_specs.included_agg_time_dimension_specs_for_measure(
+            measure_reference=measure_spec.reference, semantic_model_lookup=self._semantic_model_lookup
         )
-        base_queried_agg_time_dimension_specs = tuple(
-            TimeDimensionSpec.with_base_grains(queried_agg_time_dimension_specs)
-        )
+        base_queried_agg_time_dimension_specs = TimeDimensionSpec.with_base_grains(queried_agg_time_dimension_specs)
 
         # If a cumulative metric is queried with metric_time / agg_time_dimension, join over time range.
         # Otherwise, the measure will be aggregated over all time.
@@ -1865,7 +1821,11 @@ class DataflowPlanBuilder:
                 grain_to_date=cumulative_grain_to_date,
                 # Note: we use the original constraint here because the JoinOverTimeRangeNode will eventually get
                 # rendered with an interval that expands the join window
-                time_range_constraint=(predicate_pushdown_state.time_range_constraint if not uses_offset else None),
+                time_range_constraint=(
+                    predicate_pushdown_state.time_range_constraint
+                    if not before_aggregation_time_spine_join_description
+                    else None
+                ),
             )
 
         # If querying an offset metric, join to time spine before aggregation.
@@ -1876,10 +1836,10 @@ class DataflowPlanBuilder:
             == {before_aggregation_time_spine_join_description.custom_offset_window.granularity}
         )
         if before_aggregation_time_spine_join_description and queried_agg_time_dimension_specs:
-            unaggregated_measure_node = self._build_time_spine_join_node_for_before_aggregation(
+            unaggregated_measure_node = self._build_time_spine_join_node_for_offset(
                 join_description=before_aggregation_time_spine_join_description,
                 measure_properties=measure_properties,
-                queried_agg_time_dimension_specs=queried_agg_time_dimension_specs,
+                queried_agg_time_dimension_specs=tuple(queried_agg_time_dimension_specs),
                 metric_source_node=unaggregated_measure_node,
                 use_offset_custom_granularity_node=use_offset_custom_granularity_node,
             )
@@ -1914,16 +1874,21 @@ class DataflowPlanBuilder:
             parent_node=unaggregated_measure_node, metric_input_measure_specs=(metric_input_measure_spec,)
         )
 
+        # Joining to time spine after aggregation is for measures that specify `join_to_timespine: true` in the YAML spec.
+        after_aggregation_time_spine_join_description = (
+            metric_input_measure_spec.after_aggregation_time_spine_join_description
+        )
+        queried_agg_time_dimension_specs = queried_linkable_specs.included_agg_time_dimension_specs_for_measure(
+            measure_reference=measure_spec.reference, semantic_model_lookup=self._semantic_model_lookup
+        )
         if after_aggregation_time_spine_join_description and queried_agg_time_dimension_specs:
-            return self._build_time_spine_join_node_for_after_aggregation(
+            return self._build_time_spine_join_node_for_measure_config(
                 join_description=after_aggregation_time_spine_join_description,
                 measure_reference=measure_spec.reference,
                 measure_source_node=aggregate_measures_node,
-                queried_agg_time_dimension_specs=queried_agg_time_dimension_specs,
+                queried_agg_time_dimension_specs=tuple(queried_agg_time_dimension_specs),
                 queried_linkable_specs=queried_linkable_specs.as_tuple,
-                after_aggregation_where_filter_specs=(
-                    metric_input_measure_spec.filter_spec_set.after_measure_aggregation_filter_specs
-                ),
+                after_aggregation_where_filter_specs=metric_input_measure_spec.filter_spec_set.after_measure_aggregation_filter_specs,
                 time_range_constraint=predicate_pushdown_state.time_range_constraint,
             )
 

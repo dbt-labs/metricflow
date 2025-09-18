@@ -42,10 +42,10 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_41.metric_time__day, subq_53.metric_time__day) AS metric_time__day
-    , COALESCE(subq_41.listing__country_latest, subq_53.listing__country_latest) AS listing__country_latest
-    , COALESCE(MAX(subq_41.bookings_fill_nulls_with_0), 0) AS bookings_fill_nulls_with_0
-    , COALESCE(MAX(subq_53.bookings_2_weeks_ago), 0) AS bookings_2_weeks_ago
+    COALESCE(subq_45.metric_time__day, subq_61.metric_time__day) AS metric_time__day
+    , COALESCE(subq_45.listing__country_latest, subq_61.listing__country_latest) AS listing__country_latest
+    , COALESCE(MAX(subq_45.bookings_fill_nulls_with_0), 0) AS bookings_fill_nulls_with_0
+    , COALESCE(MAX(subq_61.bookings_2_weeks_ago), 0) AS bookings_2_weeks_ago
   FROM (
     -- Compute Metrics via Expressions
     SELECT
@@ -56,8 +56,8 @@ FROM (
       -- Join to Time Spine Dataset
       SELECT
         rss_28018_cte.ds__day AS metric_time__day
-        , subq_36.listing__country_latest AS listing__country_latest
-        , subq_36.bookings AS bookings
+        , subq_40.listing__country_latest AS listing__country_latest
+        , subq_40.bookings AS bookings
       FROM rss_28018_cte
       LEFT OUTER JOIN (
         -- Constrain Output with WHERE
@@ -79,16 +79,16 @@ FROM (
             sma_28014_cte
           ON
             sma_28009_cte.listing = sma_28014_cte.listing
-        ) subq_33
+        ) subq_37
         WHERE booking__is_instant
         GROUP BY
           metric_time__day
           , listing__country_latest
-      ) subq_36
+      ) subq_40
       ON
-        rss_28018_cte.ds__day = subq_36.metric_time__day
-    ) subq_40
-  ) subq_41
+        rss_28018_cte.ds__day = subq_40.metric_time__day
+    ) subq_44
+  ) subq_45
   FULL OUTER JOIN (
     -- Compute Metrics via Expressions
     SELECT
@@ -99,8 +99,8 @@ FROM (
       -- Join to Time Spine Dataset
       SELECT
         rss_28018_cte.ds__day AS metric_time__day
-        , subq_48.listing__country_latest AS listing__country_latest
-        , subq_48.bookings AS bookings
+        , subq_56.listing__country_latest AS listing__country_latest
+        , subq_56.bookings AS bookings
       FROM rss_28018_cte
       LEFT OUTER JOIN (
         -- Constrain Output with WHERE
@@ -114,31 +114,43 @@ FROM (
           -- Join Standard Outputs
           SELECT
             sma_28014_cte.country_latest AS listing__country_latest
-            , sma_28009_cte.metric_time__day AS metric_time__day
-            , sma_28009_cte.booking__is_instant AS booking__is_instant
-            , sma_28009_cte.bookings AS bookings
-          FROM sma_28009_cte
+            , subq_50.metric_time__day AS metric_time__day
+            , subq_50.booking__is_instant AS booking__is_instant
+            , subq_50.bookings AS bookings
+          FROM (
+            -- Join to Time Spine Dataset
+            SELECT
+              rss_28018_cte.ds__day AS metric_time__day
+              , sma_28009_cte.listing AS listing
+              , sma_28009_cte.booking__is_instant AS booking__is_instant
+              , sma_28009_cte.bookings AS bookings
+            FROM rss_28018_cte
+            INNER JOIN
+              sma_28009_cte
+            ON
+              DATE_SUB(CAST(rss_28018_cte.ds__day AS DATETIME), INTERVAL 14 day) = sma_28009_cte.metric_time__day
+          ) subq_50
           LEFT OUTER JOIN
             sma_28014_cte
           ON
-            sma_28009_cte.listing = sma_28014_cte.listing
-        ) subq_45
+            subq_50.listing = sma_28014_cte.listing
+        ) subq_53
         WHERE booking__is_instant
         GROUP BY
           metric_time__day
           , listing__country_latest
-      ) subq_48
+      ) subq_56
       ON
-        DATE_SUB(CAST(rss_28018_cte.ds__day AS DATETIME), INTERVAL 14 day) = subq_48.metric_time__day
-    ) subq_52
-  ) subq_53
+        rss_28018_cte.ds__day = subq_56.metric_time__day
+    ) subq_60
+  ) subq_61
   ON
     (
-      subq_41.listing__country_latest = subq_53.listing__country_latest
+      subq_45.listing__country_latest = subq_61.listing__country_latest
     ) AND (
-      subq_41.metric_time__day = subq_53.metric_time__day
+      subq_45.metric_time__day = subq_61.metric_time__day
     )
   GROUP BY
     metric_time__day
     , listing__country_latest
-) subq_54
+) subq_62
