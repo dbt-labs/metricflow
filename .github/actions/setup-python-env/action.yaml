@@ -67,7 +67,10 @@ runs:
 
   - name: Install Hatch
     shell: bash
-    run: pip3 install hatch
+    # Pin click to avoid bug in 8.3.0 - can remove when a fix is released
+    run: |
+      pip3 install "click<8.3.0"
+      pip3 install hatch
 
   # Running any command will install the dependencies for the project. Add this step so that the `hatch` environment is
   # cached.
