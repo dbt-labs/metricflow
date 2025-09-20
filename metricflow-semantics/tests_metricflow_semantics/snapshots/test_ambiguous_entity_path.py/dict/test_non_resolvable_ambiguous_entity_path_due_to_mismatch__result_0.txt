@@ -1,0 +1,18 @@
+test_name: test_non_resolvable_ambiguous_entity_path_due_to_mismatch
+test_filename: test_ambiguous_entity_path.py
+docstring:
+  Tests an input with a seemingly ambiguous entity-path.
+
+      'entity_0__country' matches ['entity_1__entity_0__country', 'entity_0__country']
+
+      With the PRIMARY/FOREIGN suffix matching enhancement, this now succeeds because
+      entity_0__country can match entity_1__entity_0__country when the difference in
+      entity link length is exactly 1.
+---
+{
+  'query_succeeded': True,
+  'num_metric_specs': 2,
+  'metric_names': ['entity_0_metric', 'entity_1_metric'],
+  'num_dimension_specs': 1,
+  'dimension_names': ['entity_1__entity_0__country'],
+}

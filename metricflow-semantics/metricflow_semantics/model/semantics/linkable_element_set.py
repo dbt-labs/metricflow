@@ -96,6 +96,54 @@ class LinkableElementSet(BaseLinkableElementSet):
         )
 
     @staticmethod
+    def _path_keys_are_semantically_equivalent(key1: ElementPathKey, key2: ElementPathKey) -> bool:
+        """Check if two path keys are semantically equivalent.
+
+        This handles the case where a PRIMARY entity path (shorter entity_links) can be equivalent
+        to a FOREIGN entity path when they refer to the same logical dimension.
+
+        For example:
+        - businessunit__businessunit_name (from PRIMARY job entity) has entity_links=(businessunit,)
+        - job__businessunit__businessunit_name (from FOREIGN job entity) has entity_links=(job, businessunit)
+
+        These are semantically equivalent when:
+        1. The element names match
+        2. The element types match
+        3. Time granularity and date parts match (for time dimensions)
+        4. One path has exactly one more entity link than the other (PRIMARY vs FOREIGN relationship)
+        5. The shorter path's entity_links are a suffix of the longer path's entity_links
+        """
+        # Quick exact match check
+        if key1 == key2:
+            return True
+
+        # Must have same element name and type
+        if key1.element_name != key2.element_name or key1.element_type != key2.element_type:
+            return False
+
+        # Time-specific attributes must match
+        if key1.time_granularity != key2.time_granularity or key1.date_part != key2.date_part:
+            return False
+
+        # Check for PRIMARY/FOREIGN entity path equivalence
+        # This only applies when one path has exactly one more entity link than the other
+
+        len1 = len(key1.entity_links)
+        len2 = len(key2.entity_links)
+
+        # Must have exactly one difference in length for PRIMARY/FOREIGN equivalence
+        if abs(len1 - len2) != 1:
+            return False
+
+        # Check if the shorter path is a suffix of the longer path
+        if len1 < len2:
+            # key1 is shorter, check if it's a suffix of key2
+            return key2.entity_links[-len1:] == key1.entity_links
+        else:
+            # key2 is shorter, check if it's a suffix of key1
+            return key1.entity_links[-len2:] == key2.entity_links
+
+    @staticmethod
     def merge_by_path_key(linkable_element_sets: Sequence[LinkableElementSet]) -> LinkableElementSet:
         """Combine multiple sets together by the path key.
 
@@ -130,74 +178,155 @@ class LinkableElementSet(BaseLinkableElementSet):
 
     @staticmethod
     def intersection_by_path_key(linkable_element_sets: Sequence[LinkableElementSet]) -> LinkableElementSet:
-        """Find the intersection of all elements in the sets by path key.
+        """Perform an intersection across all LinkableElementSets by path key.
 
-        This will return the intersection of all path keys defined in the sets, but the union of elements associated
-        with each path key. In other words, it filters out path keys (i.e., linkable specs) that are not referenced
-        in every set in the input sequence, but it preserves all of the various potentially ambiguous LinkableElement
-        instances associated with the path keys that remain.
+        Elements are considered to be the same if they have the same path key, or if their path keys are
+        semantically equivalent (e.g., PRIMARY vs FOREIGN entity paths to the same dimension).
 
-        This is useful to figure out the common dimensions that are possible to query with multiple metrics. You would
-        find the LinkableSpecSet for each metric in the query, then do an intersection of the sets.
+        When a path key exists in all sets, the union of all elements with that path key is returned.
         """
         if len(linkable_element_sets) == 0:
-            return LinkableElementSet()
+            return LinkableElementSet(
+                path_key_to_linkable_dimensions={},
+                path_key_to_linkable_entities={},
+                path_key_to_linkable_metrics={},
+            )
         elif len(linkable_element_sets) == 1:
             return linkable_element_sets[0]
 
-        # Find path keys that are common to all LinkableElementSets.
-        dimension_path_keys: List[Set[ElementPathKey]] = []
-        entity_path_keys: List[Set[ElementPathKey]] = []
-        metric_path_keys: List[Set[ElementPathKey]] = []
-        for linkable_element_set in linkable_element_sets:
-            dimension_path_keys.append(set(linkable_element_set.path_key_to_linkable_dimensions.keys()))
-            entity_path_keys.append(set(linkable_element_set.path_key_to_linkable_entities.keys()))
-            metric_path_keys.append(set(linkable_element_set.path_key_to_linkable_metrics.keys()))
-        common_linkable_dimension_path_keys = set.intersection(*dimension_path_keys) if dimension_path_keys else set()
-        common_linkable_entity_path_keys = set.intersection(*entity_path_keys) if entity_path_keys else set()
-        common_linkable_metric_path_keys = set.intersection(*metric_path_keys) if metric_path_keys else set()
-        # Create a new LinkableElementSet that only includes items where the path key is common to all sets.
-        join_path_to_linkable_dimensions: Dict[ElementPathKey, Set[LinkableDimension]] = defaultdict(set)
-        join_path_to_linkable_entities: Dict[ElementPathKey, Set[LinkableEntity]] = defaultdict(set)
-        join_path_to_linkable_metrics: Dict[ElementPathKey, Set[LinkableMetric]] = defaultdict(set)
+        # Build equivalence groups across all sets
+        # Map from a representative path key to all elements from all sets
+        dimension_equivalence_groups: Dict[ElementPathKey, List[LinkableDimension]] = {}
+        entity_equivalence_groups: Dict[ElementPathKey, List[LinkableEntity]] = {}
+        metric_equivalence_groups: Dict[ElementPathKey, List[LinkableMetric]] = {}
 
-        for linkable_element_set in linkable_element_sets:
-            for path_key, linkable_dimensions in linkable_element_set.path_key_to_linkable_dimensions.items():
-                if path_key in common_linkable_dimension_path_keys:
-                    join_path_to_linkable_dimensions[path_key].update(linkable_dimensions)
-            for path_key, linkable_entities in linkable_element_set.path_key_to_linkable_entities.items():
-                if path_key in common_linkable_entity_path_keys:
-                    join_path_to_linkable_entities[path_key].update(linkable_entities)
-            for path_key, linkable_metrics in linkable_element_set.path_key_to_linkable_metrics.items():
-                if path_key in common_linkable_metric_path_keys:
-                    join_path_to_linkable_metrics[path_key].update(linkable_metrics)
+        # Track which sets contributed to each equivalence group
+        dimension_set_coverage: Dict[ElementPathKey, Set[int]] = {}
+        entity_set_coverage: Dict[ElementPathKey, Set[int]] = {}
+        metric_set_coverage: Dict[ElementPathKey, Set[int]] = {}
 
+        # Process each set and group semantically equivalent elements
+        for set_idx, linkable_element_set in enumerate(linkable_element_sets):
+            # Process dimensions
+            for path_key, dimensions in linkable_element_set.path_key_to_linkable_dimensions.items():
+                # Find if this path key belongs to an existing equivalence group
+                found_group = False
+                for group_key in list(dimension_equivalence_groups.keys()):
+                    if path_key == group_key or LinkableElementSet._path_keys_are_semantically_equivalent(
+                        path_key, group_key
+                    ):
+                        dimension_equivalence_groups[group_key].extend(dimensions)
+                        dimension_set_coverage[group_key].add(set_idx)
+                        found_group = True
+                        break
+
+                if not found_group:
+                    # Create a new equivalence group
+                    dimension_equivalence_groups[path_key] = list(dimensions)
+                    dimension_set_coverage[path_key] = {set_idx}
+
+            # Process entities (similar logic)
+            for path_key, entities in linkable_element_set.path_key_to_linkable_entities.items():
+                found_group = False
+                for group_key in list(entity_equivalence_groups.keys()):
+                    if path_key == group_key or LinkableElementSet._path_keys_are_semantically_equivalent(
+                        path_key, group_key
+                    ):
+                        entity_equivalence_groups[group_key].extend(entities)
+                        entity_set_coverage[group_key].add(set_idx)
+                        found_group = True
+                        break
+
+                if not found_group:
+                    entity_equivalence_groups[path_key] = list(entities)
+                    entity_set_coverage[path_key] = {set_idx}
+
+            # Process metrics (similar logic)
+            for path_key, metrics in linkable_element_set.path_key_to_linkable_metrics.items():
+                found_group = False
+                for group_key in list(metric_equivalence_groups.keys()):
+                    if path_key == group_key or LinkableElementSet._path_keys_are_semantically_equivalent(
+                        path_key, group_key
+                    ):
+                        metric_equivalence_groups[group_key].extend(metrics)
+                        metric_set_coverage[group_key].add(set_idx)
+                        found_group = True
+                        break
+
+                if not found_group:
+                    metric_equivalence_groups[path_key] = list(metrics)
+                    metric_set_coverage[path_key] = {set_idx}
+
+        # Now find groups that appear in all sets
+        num_sets = len(linkable_element_sets)
+        final_dimensions: Dict[ElementPathKey, Set[LinkableDimension]] = {}
+        final_entities: Dict[ElementPathKey, Set[LinkableEntity]] = {}
+        final_metrics: Dict[ElementPathKey, Set[LinkableMetric]] = {}
+
+        # Process dimension groups
+        for group_key, dimension_elements in dimension_equivalence_groups.items():
+            if len(dimension_set_coverage[group_key]) == num_sets:
+                # This group appears in all sets - include all unique elements
+                # If there's semantic equivalence involved, choose the representative path key
+                representative_key = group_key
+                # Find if any element in the group has more entity links (FOREIGN path)
+                for dim_element in dimension_elements:
+                    if len(dim_element.path_key.entity_links) > len(representative_key.entity_links):
+                        representative_key = dim_element.path_key
+                        break
+
+                # Add all elements from this group, but use the representative key
+                if representative_key not in final_dimensions:
+                    final_dimensions[representative_key] = set()
+                final_dimensions[representative_key].update(dimension_elements)
+
+        # Process entity groups (similar logic)
+        for group_key, entity_elements in entity_equivalence_groups.items():
+            if len(entity_set_coverage[group_key]) == num_sets:
+                representative_key = group_key
+                for entity_element in entity_elements:
+                    if len(entity_element.path_key.entity_links) > len(representative_key.entity_links):
+                        representative_key = entity_element.path_key
+                        break
+
+                if representative_key not in final_entities:
+                    final_entities[representative_key] = set()
+                final_entities[representative_key].update(entity_elements)
+
+        # Process metric groups (similar logic)
+        for group_key, metric_elements in metric_equivalence_groups.items():
+            if len(metric_set_coverage[group_key]) == num_sets:
+                representative_key = group_key
+                for metric_element in metric_elements:
+                    if len(metric_element.path_key.entity_links) > len(representative_key.entity_links):
+                        representative_key = metric_element.path_key
+                        break
+
+                if representative_key not in final_metrics:
+                    final_metrics[representative_key] = set()
+                final_metrics[representative_key].update(metric_elements)
+
+        # Convert sets to sorted tuples for consistency
         return LinkableElementSet(
             path_key_to_linkable_dimensions={
-                path_key: tuple(
+                k: tuple(
                     sorted(
-                        dimensions,
-                        key=lambda linkable_dimension: (
-                            linkable_dimension.semantic_model_origin.semantic_model_name
-                            if linkable_dimension.defined_in_semantic_model
-                            else linkable_dimension.join_path.left_semantic_model_reference.semantic_model_name
+                        v,
+                        key=lambda d: (
+                            d.semantic_model_origin.semantic_model_name
+                            if d.defined_in_semantic_model
+                            else d.join_path.left_semantic_model_reference.semantic_model_name
                         ),
                     )
                 )
-                for path_key, dimensions in join_path_to_linkable_dimensions.items()
+                for k, v in final_dimensions.items()
             },
             path_key_to_linkable_entities={
-                path_key: tuple(
-                    sorted(
-                        entities,
-                        key=lambda linkable_entity: linkable_entity.defined_in_semantic_model.semantic_model_name,
-                    )
-                )
-                for path_key, entities in join_path_to_linkable_entities.items()
+                k: tuple(sorted(v, key=lambda e: e.defined_in_semantic_model.semantic_model_name))
+                for k, v in final_entities.items()
             },
             path_key_to_linkable_metrics={
-                path_key: tuple(sorted(metrics, key=lambda linkable_metric: linkable_metric.element_name))
-                for path_key, metrics in join_path_to_linkable_metrics.items()
+                k: tuple(sorted(v, key=lambda m: m.element_name)) for k, v in final_metrics.items()
             },
         )
 
@@ -422,7 +551,7 @@ class LinkableElementSet(BaseLinkableElementSet):
             assert_values_exhausted(path_key.element_type)
 
     def filter_by_spec_patterns(self, spec_patterns: Sequence[SpecPattern]) -> LinkableElementSet:
-        """Filter the elements in the set by the given spec patters.
+        """Filter the elements in the set by the given spec patterns.
 
         Returns a new set consisting of the elements in the `LinkableElementSet` that have a corresponding spec that
         match all the given spec patterns.
@@ -508,5 +637,5 @@ class LinkableElementSet(BaseLinkableElementSet):
         return LinkableElementSet.intersection_by_path_key((self,) + others)
 
     @override
-    def union(self, *others: LinkableElementSet) -> LinkableElementSet:
+    def union(self, *others: LinkableElementSet) -> LinkableElementSet:  # noqa: D102
         return LinkableElementSet.merge_by_path_key((self,) + others)
