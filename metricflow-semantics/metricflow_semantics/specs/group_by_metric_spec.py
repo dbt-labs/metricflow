@@ -7,7 +7,6 @@ from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclas
 from dbt_semantic_interfaces.references import EntityReference, GroupByMetricReference
 from typing_extensions import override
 
-from metricflow_semantics.model.semantics.linkable_element import ElementPathKey, LinkableElementType
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.instance_spec import InstanceSpecVisitor, LinkableInstanceSpec
@@ -98,13 +97,6 @@ class GroupByMetricSpec(LinkableInstanceSpec, SerializableDataclass):
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_group_by_metric_spec(self)
-
-    @property
-    @override
-    def element_path_key(self) -> ElementPathKey:
-        return ElementPathKey(
-            element_name=self.element_name, element_type=LinkableElementType.METRIC, entity_links=self.entity_links
-        )
 
     def with_entity_prefix(self, entity_prefix: EntityReference) -> GroupByMetricSpec:  # noqa: D102
         return GroupByMetricSpec(

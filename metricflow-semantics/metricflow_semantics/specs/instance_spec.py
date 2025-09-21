@@ -8,7 +8,6 @@ from typing import Generic, List, Optional, Sequence, Tuple, TypeVar
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.references import EntityReference, LinkableElementReference
 
-from metricflow_semantics.model.semantics.linkable_element import ElementPathKey
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 
 if typing.TYPE_CHECKING:
@@ -137,12 +136,6 @@ class LinkableInstanceSpec(InstanceSpec, ABC):
     @abstractmethod
     def reference(self) -> LinkableElementReference:
         """Return the LinkableElementReference associated with the spec instance."""
-        raise NotImplementedError()
-
-    @property
-    @abstractmethod
-    def element_path_key(self) -> ElementPathKey:
-        """Return the ElementPathKey representation of the LinkableInstanceSpec subtype."""
         raise NotImplementedError()
 
     @abstractmethod

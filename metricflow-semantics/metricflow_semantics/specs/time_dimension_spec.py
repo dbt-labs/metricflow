@@ -12,7 +12,6 @@ from typing_extensions import override
 from metricflow_semantics.aggregation_properties import AggregationState
 from metricflow_semantics.assert_one_arg import assert_exactly_one_arg_set
 from metricflow_semantics.collection_helpers.lru_cache import typed_lru_cache
-from metricflow_semantics.model.semantics.linkable_element import ElementPathKey, LinkableElementType
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.instance_spec import InstanceSpecVisitor
@@ -156,17 +155,6 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
             time_granularity_name=self.time_granularity_name,
             date_part=self.date_part,
         ).qualified_name
-
-    @property
-    @override
-    def element_path_key(self) -> ElementPathKey:
-        return ElementPathKey(
-            element_name=self.element_name,
-            element_type=LinkableElementType.TIME_DIMENSION,
-            entity_links=self.entity_links,
-            time_granularity=self.time_granularity,
-            date_part=self.date_part,
-        )
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_time_dimension_spec(self)
