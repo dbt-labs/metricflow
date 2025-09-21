@@ -7,7 +7,6 @@ from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclas
 from dbt_semantic_interfaces.references import DimensionReference, EntityReference
 from typing_extensions import override
 
-from metricflow_semantics.model.semantics.linkable_element import ElementPathKey, LinkableElementType
 from metricflow_semantics.specs.instance_spec import InstanceSpecVisitor, LinkableInstanceSpec
 from metricflow_semantics.visitor import VisitorOutputT
 
@@ -33,13 +32,6 @@ class DimensionSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D101
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_dimension_spec(self)
-
-    @property
-    @override
-    def element_path_key(self) -> ElementPathKey:
-        return ElementPathKey(
-            element_name=self.element_name, element_type=LinkableElementType.DIMENSION, entity_links=self.entity_links
-        )
 
     def with_entity_prefix(self, entity_prefix: EntityReference) -> DimensionSpec:  # noqa: D102
         return DimensionSpec(element_name=self.element_name, entity_links=(entity_prefix,) + self.entity_links)
