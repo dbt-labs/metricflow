@@ -107,3 +107,8 @@ class MeasureLookup:
             )
 
         return measure
+
+    @property
+    def measure_references(self) -> Sequence[MeasureReference]:
+        """Return all measure references from the collection of semantic models."""
+        return tuple(self._measure_reference_to_measure.keys())
