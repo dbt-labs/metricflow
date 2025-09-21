@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Mapping
-from typing import Callable, Iterable, Optional, Sequence
+from typing import Callable, Iterable, Optional
 
-from dbt_semantic_interfaces.references import MeasureReference, MetricReference
+from dbt_semantic_interfaces.references import MetricReference
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.recipe_writer_path import (
     RecipeWriterPathfinder,
@@ -15,14 +15,12 @@ from metricflow_semantics.experimental.semantic_graph.attribute_resolution.sg_li
 from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
     SemanticGraph,
 )
-from metricflow_semantics.helpers.performance_helpers import ExecutionTimer
 from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.helpers.time_helpers import PrettyDuration
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseLinkableElementSet
-from metricflow_semantics.model.semantics.linkable_spec_resolver import LegacyLinkableSpecResolver
 from metricflow_semantics.specs.spec_set import group_spec_by_type
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_str_snapshot_equal
 from metricflow_semantics.test_helpers.table_helpers import PaddedTextTableBuilder
@@ -48,103 +46,8 @@ class SemanticGraphTester:
         )
 
     @property
-    def _legacy_resolver(self) -> LegacyLinkableSpecResolver:
-        return self._fixture.legacy_resolver
-
-    @property
     def sg_resolver(self) -> SemanticGraphLinkableSpecResolver:  # noqa: D102
         return self._fixture.sg_resolver
-
-    def compare_resolver_outputs_for_one_measure(
-        self,
-        measure_reference: MeasureReference,
-        element_filter: Optional[LinkableElementFilter],
-        log_result_table: bool = False,
-    ) -> Optional[_ResolutionTimePair]:
-        """Compare the result for the legacy resolver and the semantic-graph resolver for one measure."""
-        logger.debug("Generating using semantic graph implementation")
-        with ExecutionTimer() as sg_timer:
-            sg_linkable_element_set = self.sg_resolver.get_linkable_element_set_for_measure(
-                measure_reference, element_filter
-            )
-
-        try:
-            logger.debug("Generating using legacy implementation")
-            with ExecutionTimer() as legacy_timer:
-                legacy_linkable_element_set = self._legacy_resolver.get_linkable_element_set_for_measure(
-                    measure_reference, element_filter or LinkableElementFilter()
-                )
-        except KeyError:
-            logger.warning(
-                LazyFormat(
-                    "Skipping comparison of the linkable-element set for a measure due to a bug in the legacy implementation. "
-                    "It should be possible to make the request for the given measure, but it is not.",
-                    measure_reference=measure_reference,
-                ),
-                exc_info=True,
-            )
-            return None
-
-        logger.debug(
-            LazyFormat("Checking sets for measure", measure_reference=measure_reference, element_filter=element_filter)
-        )
-
-        try:
-            self.assert_linkable_element_sets_equal(
-                left_set=legacy_linkable_element_set,
-                right_set=sg_linkable_element_set,
-                log_result_table=log_result_table,
-            )
-        except AssertionError as e:
-            raise AssertionError(
-                LazyFormat("Result mismatch", measure_reference=measure_reference, element_filter=element_filter)
-            ) from e
-        logger.debug(LazyFormat("Matched sets", measure_reference=measure_reference))
-
-        return _ResolutionTimePair(
-            duration_for_sg_resolver=sg_timer.total_duration,
-            duration_for_legacy_resolver=legacy_timer.total_duration,
-        )
-
-    def compare_resolver_outputs_for_all_measures(  # noqa: D102
-        self,
-        element_filter: Optional[LinkableElementFilter],
-        log_result_table: bool = False,
-    ) -> None:
-        for measure_reference in self._measure_references:
-            self.compare_resolver_outputs_for_one_measure(measure_reference, element_filter, log_result_table)
-
-    def compare_resolver_outputs_for_metrics(  # noqa: D102
-        self,
-        metric_references: Sequence[MetricReference],
-        element_filter: LinkableElementFilter,
-        log_result_table: bool = False,
-    ) -> _ResolutionTimePair:
-        logger.debug("Generating using legacy implementation")
-
-        with ExecutionTimer() as legacy_timer:
-            legacy_linkable_element_set = self._legacy_resolver.get_linkable_elements_for_metrics(
-                metric_references, element_filter
-            )
-
-        logger.debug("Generating using semantic graph implementation")
-
-        with ExecutionTimer() as sg_timer:
-            sg_linkable_element_set = self.sg_resolver.get_linkable_elements_for_metrics(
-                metric_references, element_filter
-            )
-
-        logger.debug(LazyFormat("Checking results", metric_references=metric_references, element_filter=element_filter))
-
-        self.assert_linkable_element_sets_equal(
-            left_set=legacy_linkable_element_set, right_set=sg_linkable_element_set, log_result_table=log_result_table
-        )
-        logger.debug(LazyFormat("Matched sets", metric_references=metric_references))
-
-        return _ResolutionTimePair(
-            duration_for_sg_resolver=sg_timer.total_duration,
-            duration_for_legacy_resolver=legacy_timer.total_duration,
-        )
 
     @property
     def _semantic_graph(self) -> SemanticGraph:
