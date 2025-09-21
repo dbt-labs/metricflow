@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import cached_property
 from typing import Dict, Mapping, Sequence, Tuple
 
 from dbt_semantic_interfaces.protocols import Measure, SemanticModel
@@ -107,3 +108,8 @@ class MeasureLookup:
             )
 
         return measure
+
+    @cached_property
+    def measure_references(self) -> Sequence[MeasureReference]:
+        """Return all measure references from the collection of semantic models."""
+        return tuple(self._measure_reference_to_measure.keys())

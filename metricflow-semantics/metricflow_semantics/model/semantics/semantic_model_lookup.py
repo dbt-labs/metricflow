@@ -45,7 +45,6 @@ class SemanticModelLookup:
             model: the semantic manifest used for loading semantic model definitions
         """
         self.custom_granularities = custom_granularities
-        self._measure_index: Dict[MeasureReference, SemanticModel] = {}
         self._measure_non_additive_dimension_specs: Dict[MeasureReference, NonAdditiveDimensionSpec] = {}
         self._dimension_index: Dict[DimensionReference, List[SemanticModel]] = {}
         self.entity_index: Dict[EntityReference, List[SemanticModel]] = {}
@@ -73,11 +72,6 @@ class SemanticModelLookup:
     def get_dimension_references(self) -> Sequence[DimensionReference]:
         """Retrieve all dimension references from the collection of semantic models."""
         return tuple(self._dimension_index.keys())
-
-    @property
-    def measure_references(self) -> Sequence[MeasureReference]:
-        """Return all measure references from the collection of semantic models."""
-        return list(self._measure_index.keys())
 
     @property
     def non_additive_dimension_specs_by_measure(self) -> Dict[MeasureReference, NonAdditiveDimensionSpec]:
@@ -122,7 +116,6 @@ class SemanticModelLookup:
         ]()
 
         for measure in semantic_model.measures:
-            self._measure_index[measure.reference] = semantic_model
             agg_time_dimension_reference = semantic_model.checked_agg_time_dimension_for_measure(measure.reference)
             # Ensure agg_time_dimension is lowercased - this transformation was not enforced on earlier manifests
             agg_time_dimension_reference = TimeDimensionReference(agg_time_dimension_reference.element_name.lower())
