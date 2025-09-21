@@ -10,7 +10,6 @@ from dbt_semantic_interfaces.protocols.semantic_model import SemanticModel
 from dbt_semantic_interfaces.references import (
     DimensionReference,
     EntityReference,
-    MeasureReference,
     SemanticModelElementReference,
     SemanticModelReference,
     TimeDimensionReference,
@@ -28,7 +27,6 @@ from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.measure_spec import MeasureSpec
-from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDimensionSpec
 from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY, TimeDimensionSpec
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
@@ -45,7 +43,6 @@ class SemanticModelLookup:
             model: the semantic manifest used for loading semantic model definitions
         """
         self.custom_granularities = custom_granularities
-        self._measure_non_additive_dimension_specs: Dict[MeasureReference, NonAdditiveDimensionSpec] = {}
         self._dimension_index: Dict[DimensionReference, List[SemanticModel]] = {}
         self.entity_index: Dict[EntityReference, List[SemanticModel]] = {}
 
@@ -72,14 +69,6 @@ class SemanticModelLookup:
     def get_dimension_references(self) -> Sequence[DimensionReference]:
         """Retrieve all dimension references from the collection of semantic models."""
         return tuple(self._dimension_index.keys())
-
-    @property
-    def non_additive_dimension_specs_by_measure(self) -> Dict[MeasureReference, NonAdditiveDimensionSpec]:
-        """Return a mapping from all semi-additive measures to their corresponding non additive dimension parameters.
-
-        This includes all measures with non-additive dimension parameters, if any, from the collection of semantic models.
-        """
-        return self._measure_non_additive_dimension_specs
 
     def get_entity_references(self) -> Sequence[EntityReference]:
         """Retrieve all entity references from the collection of semantic models."""
@@ -146,13 +135,6 @@ class SemanticModelLookup:
                 value=MeasureConverter.convert_to_measure_spec(measure=measure),
             )
 
-            if measure.non_additive_dimension:
-                non_additive_dimension_spec = NonAdditiveDimensionSpec(
-                    name=measure.non_additive_dimension.name,
-                    window_choice=measure.non_additive_dimension.window_choice,
-                    window_groupings=tuple(measure.non_additive_dimension.window_groupings),
-                )
-                self._measure_non_additive_dimension_specs[measure.reference] = non_additive_dimension_spec
         for dim in semantic_model.dimensions:
             semantic_models_for_dimension = self._dimension_index.get(dim.reference, []) + [semantic_model]
             self._dimension_index[dim.reference] = semantic_models_for_dimension

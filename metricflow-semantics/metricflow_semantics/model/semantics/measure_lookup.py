@@ -15,6 +15,7 @@ from dbt_semantic_interfaces.type_enums import TimeGranularity
 
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantics.semantic_model_helper import SemanticModelHelper
+from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDimensionSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
@@ -49,6 +50,7 @@ class MeasureLookup:
     ) -> None:
         self._measure_reference_to_property_set: Dict[MeasureReference, MeasureRelationshipPropertySet] = {}
         self._measure_reference_to_measure: Dict[MeasureReference, Measure] = {}
+        self._measure_non_additive_dimension_specs: Dict[MeasureReference, NonAdditiveDimensionSpec] = {}
         for semantic_model in semantic_models:
             semantic_model_reference = semantic_model.reference
 
@@ -58,6 +60,15 @@ class MeasureLookup:
             for measure in semantic_model.measures:
                 measure_reference = measure.reference
                 self._measure_reference_to_measure[measure_reference] = measure
+
+                # Handle non-additive dimension specs
+                if measure.non_additive_dimension:
+                    non_additive_dimension_spec = NonAdditiveDimensionSpec(
+                        name=measure.non_additive_dimension.name,
+                        window_choice=measure.non_additive_dimension.window_choice,
+                        window_groupings=tuple(measure.non_additive_dimension.window_groupings),
+                    )
+                    self._measure_non_additive_dimension_specs[measure.reference] = non_additive_dimension_spec
 
                 agg_time_dimension_reference = semantic_model.checked_agg_time_dimension_for_measure(measure_reference)
                 agg_time_granularity = time_dimension_reference_to_grain.get(agg_time_dimension_reference)
@@ -113,3 +124,11 @@ class MeasureLookup:
     def measure_references(self) -> Sequence[MeasureReference]:
         """Return all measure references from the collection of semantic models."""
         return tuple(self._measure_reference_to_measure.keys())
+
+    @cached_property
+    def non_additive_dimension_specs_by_measure(self) -> Mapping[MeasureReference, NonAdditiveDimensionSpec]:
+        """Return a mapping from all semi-additive measures to their corresponding non-additive dimension parameters.
+
+        This includes all measures with non-additive dimension parameters, if any, from the collection of semantic models.
+        """
+        return self._measure_non_additive_dimension_specs
