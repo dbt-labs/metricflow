@@ -64,7 +64,10 @@ def _create_data_sets(
     semantic_models: Sequence[SemanticModel] = semantic_manifest_lookup.semantic_manifest.semantic_models
     semantic_models = sorted(semantic_models, key=lambda x: x.name)
 
-    converter = SemanticModelToDataSetConverter(column_association_resolver=DunderColumnAssociationResolver())
+    converter = SemanticModelToDataSetConverter(
+        column_association_resolver=DunderColumnAssociationResolver(),
+        manifest_lookup=semantic_manifest_lookup,
+    )
 
     for semantic_model in semantic_models:
         data_sets[semantic_model.name] = converter.create_sql_source_data_set(semantic_model)

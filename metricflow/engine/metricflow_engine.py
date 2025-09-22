@@ -427,7 +427,10 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             semantic_manifest_lookup.semantic_manifest
         )
         self._source_data_sets: List[SemanticModelDataSet] = []
-        converter = SemanticModelToDataSetConverter(column_association_resolver=self._column_association_resolver)
+        converter = SemanticModelToDataSetConverter(
+            column_association_resolver=self._column_association_resolver,
+            manifest_lookup=self._semantic_manifest_lookup,
+        )
         for semantic_model in sorted(
             self._semantic_manifest_lookup.semantic_manifest.semantic_models, key=lambda model: model.name
         ):

@@ -66,7 +66,10 @@ class QueryRenderingTools:
             column_association_resolver=DunderColumnAssociationResolver(),
             semantic_manifest_lookup=self.semantic_manifest_lookup,
         )
-        self.converter = SemanticModelToDataSetConverter(column_association_resolver=DunderColumnAssociationResolver())
+        self.converter = SemanticModelToDataSetConverter(
+            column_association_resolver=DunderColumnAssociationResolver(),
+            manifest_lookup=self.semantic_manifest_lookup,
+        )
         self.plan_converter = DataflowToSqlPlanConverter(
             column_association_resolver=DunderColumnAssociationResolver(),
             semantic_manifest_lookup=self.semantic_manifest_lookup,

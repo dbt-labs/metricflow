@@ -26,6 +26,7 @@ from metricflow_semantics.instances import (
     MeasureInstance,
     TimeDimensionInstance,
 )
+from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.semantic_model_helper import SemanticModelHelper
 from metricflow_semantics.model.spec_converters import MeasureConverter
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
@@ -76,8 +77,13 @@ class SemanticModelToDataSetConverter:
     # Regex for inferring whether an expression for an element is a column reference.
     _SQL_IDENTIFIER_REGEX = re.compile("^[a-zA-Z_][a-zA-Z_0-9]*$")
 
-    def __init__(self, column_association_resolver: ColumnAssociationResolver) -> None:  # noqa: D107
+    def __init__(  # noqa: D107
+        self,
+        column_association_resolver: ColumnAssociationResolver,
+        manifest_lookup: SemanticManifestLookup,
+    ) -> None:
         self._column_association_resolver = column_association_resolver
+        self._manifest_lookup = manifest_lookup
 
     def _create_dimension_instance(
         self,
