@@ -5,14 +5,12 @@ import logging
 import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.references import EntityReference, MeasureReference, MetricReference
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
-from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
+from dbt_semantic_interfaces.references import EntityReference, MetricReference
+from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import (
-    assert_linkable_element_set_snapshot_equal,
     assert_object_snapshot_equal,
 )
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
@@ -39,25 +37,13 @@ def multi_hop_semantic_model_lookup(  # noqa: D103
 
 
 @pytest.fixture
-def metric_lookup(  # noqa: D103
-    simple_semantic_manifest: SemanticManifest, semantic_model_lookup: SemanticModelLookup
-) -> MetricLookup:
-    return MetricLookup.create(
-        semantic_manifest=simple_semantic_manifest,
-        semantic_model_lookup=semantic_model_lookup,
-        custom_granularities=semantic_model_lookup.custom_granularities,
-    )
+def metric_lookup(simple_semantic_manifest: SemanticManifest) -> MetricLookup:  # noqa: D103
+    return SemanticManifestLookup(simple_semantic_manifest).metric_lookup
 
 
 @pytest.fixture
-def multi_hop_metric_lookup(  # noqa: D103
-    multi_hop_join_manifest: SemanticManifest, multi_hop_semantic_model_lookup: SemanticModelLookup
-) -> MetricLookup:
-    return MetricLookup.create(
-        semantic_manifest=multi_hop_join_manifest,
-        semantic_model_lookup=multi_hop_semantic_model_lookup,
-        custom_granularities=multi_hop_semantic_model_lookup.custom_granularities,
-    )
+def multi_hop_metric_lookup(multi_hop_join_manifest: SemanticManifest) -> MetricLookup:  # noqa: D103
+    return SemanticManifestLookup(multi_hop_join_manifest).metric_lookup
 
 
 def test_get_names(  # noqa: D103
@@ -77,124 +63,10 @@ def test_get_names(  # noqa: D103
     )
 
 
-def test_local_linked_elements_for_metric(  # noqa: D103
-    request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, metric_lookup: MetricLookup
-) -> None:
-    linkable_elements = metric_lookup.linkable_elements_for_metrics(
-        (MetricReference(element_name="listings"),),
-        LinkableElementFilter(
-            with_any_of=frozenset({LinkableElementProperty.LOCAL_LINKED}),
-            without_any_of=frozenset({LinkableElementProperty.DERIVED_TIME_GRANULARITY}),
-        ),
-    )
-    sorted_specs = sorted(linkable_elements.specs, key=lambda x: x.qualified_name)
-    assert_object_snapshot_equal(
-        request=request,
-        snapshot_configuration=mf_test_configuration,
-        obj_id="result0",
-        obj=tuple(spec.qualified_name for spec in sorted_specs),
-    )
-
-
 def test_get_semantic_models_for_entity(semantic_model_lookup: SemanticModelLookup) -> None:  # noqa: D103
     entity_reference = EntityReference(element_name="user")
     linked_semantic_models = semantic_model_lookup.get_semantic_models_for_entity(entity_reference=entity_reference)
     assert len(linked_semantic_models) == 10
-
-
-def test_linkable_elements_for_metrics(  # noqa: D103
-    request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, metric_lookup: MetricLookup
-) -> None:
-    assert_linkable_element_set_snapshot_equal(
-        request=request,
-        snapshot_configuration=mf_test_configuration,
-        set_id="result0",
-        linkable_element_set=metric_lookup.linkable_elements_for_metrics(
-            (MetricReference(element_name="views"),),
-            LinkableElementFilter(
-                without_any_of=frozenset(
-                    {
-                        LinkableElementProperty.DERIVED_TIME_GRANULARITY,
-                        LinkableElementProperty.METRIC_TIME,
-                    }
-                )
-            ),
-        ),
-    )
-
-
-def test_linkable_elements_for_measure(
-    request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
-    metric_lookup: MetricLookup,
-) -> None:
-    """Tests extracting linkable elements for a given measure input."""
-    assert_linkable_element_set_snapshot_equal(
-        request=request,
-        snapshot_configuration=mf_test_configuration,
-        set_id="result0",
-        linkable_element_set=metric_lookup.linkable_elements_for_measure(
-            measure_reference=MeasureReference(element_name="listings"),
-        ),
-    )
-
-
-def test_linkable_elements_for_measure_multi_hop_model(
-    request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
-    multi_hop_metric_lookup: MetricLookup,
-) -> None:
-    """Tests extracting linkable elements for a given measure input."""
-    assert_linkable_element_set_snapshot_equal(
-        request=request,
-        snapshot_configuration=mf_test_configuration,
-        set_id="result0",
-        linkable_element_set=multi_hop_metric_lookup.linkable_elements_for_measure(
-            measure_reference=MeasureReference(element_name="txn_count"),
-        ),
-    )
-
-
-def test_linkable_elements_for_no_metrics_query(
-    request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
-    metric_lookup: MetricLookup,
-) -> None:
-    """Tests extracting linkable elements for a dimension values query with no metrics."""
-    linkable_elements = metric_lookup.linkable_elements_for_no_metrics_query(
-        LinkableElementFilter(without_any_of=frozenset({LinkableElementProperty.DERIVED_TIME_GRANULARITY}))
-    )
-    sorted_specs = sorted(linkable_elements.specs, key=lambda x: x.qualified_name)
-    assert_object_snapshot_equal(
-        request=request,
-        snapshot_configuration=mf_test_configuration,
-        obj_id="result0",
-        obj=tuple(spec.qualified_name for spec in sorted_specs),
-    )
-
-
-def test_linkable_set_for_common_dimensions_in_different_models(
-    request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, metric_lookup: MetricLookup
-) -> None:
-    """Tests case where a metric has dimensions with the same path.
-
-    In this example, "ds" is defined in both "bookings_source" and "views_source".
-    """
-    assert_linkable_element_set_snapshot_equal(
-        request=request,
-        snapshot_configuration=mf_test_configuration,
-        set_id="result0",
-        linkable_element_set=metric_lookup.linkable_elements_for_metrics(
-            (MetricReference(element_name="bookings_per_view"),),
-            LinkableElementFilter(
-                without_any_of=frozenset(
-                    {
-                        LinkableElementProperty.DERIVED_TIME_GRANULARITY,
-                    }
-                ),
-            ),
-        ),
-    )
 
 
 def test_get_valid_agg_time_dimensions_for_metric(  # noqa: D103

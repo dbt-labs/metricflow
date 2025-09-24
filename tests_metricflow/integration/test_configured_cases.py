@@ -240,31 +240,19 @@ def filter_not_supported_features(
     CONFIGURED_INTEGRATION_TESTS_REPOSITORY.all_test_case_names,
     ids=lambda name: f"name={name}",
 )
-@pytest.mark.parametrize(
-    "use_semantic_graph",
-    (False, True),
-    ids=lambda use_semantic_graph: f"sg={use_semantic_graph}",
-)
 def test_case(
     name: str,
     mf_test_configuration: MetricFlowTestConfiguration,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
-    mf_engine_test_fixture_mapping_sg: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     time_spine_sources: Mapping[TimeGranularity, TimeSpineSource],
     sql_client: SqlClient,
     create_source_tables: bool,
-    use_semantic_graph: bool,
 ) -> None:
     """Runs all integration tests configured in the test case YAML directory."""
-    if use_semantic_graph:
-        engine_test_fixture_mapping = mf_engine_test_fixture_mapping_sg
-    else:
-        engine_test_fixture_mapping = mf_engine_test_fixture_mapping
-
     _test_case(
         name=name,
         mf_test_configuration=mf_test_configuration,
-        engine_test_fixture_mapping=engine_test_fixture_mapping,
+        engine_test_fixture_mapping=mf_engine_test_fixture_mapping,
         time_spine_sources=time_spine_sources,
         sql_client=sql_client,
     )

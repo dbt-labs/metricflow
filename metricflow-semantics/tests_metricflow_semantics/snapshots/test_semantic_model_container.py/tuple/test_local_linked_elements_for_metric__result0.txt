@@ -1,4 +1,0 @@
-test_name: test_local_linked_elements_for_metric
-test_filename: test_semantic_model_container.py
----
-()

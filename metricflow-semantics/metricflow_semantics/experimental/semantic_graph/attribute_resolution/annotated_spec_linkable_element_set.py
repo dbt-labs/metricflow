@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from collections.abc import Sequence
 from functools import cached_property
-from typing import Iterable, Mapping, Tuple
+from typing import Mapping, Tuple
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.references import SemanticModelReference
@@ -32,8 +32,8 @@ class AnnotatedSpecLinkableElementSet(BaseLinkableElementSet, SerializableDatacl
     annotated_specs: Tuple[AnnotatedSpec, ...] = ()
 
     @staticmethod
-    def create_from_annotated_specs(  # noqa: D102
-        annotated_specs: Iterable[AnnotatedSpec],
+    def create(  # noqa: D102
+        *annotated_specs: AnnotatedSpec,
     ) -> AnnotatedSpecLinkableElementSet:
         dunder_name_to_annotated_spec: dict[str, AnnotatedSpec] = {}
         for annotated_spec in annotated_specs:
