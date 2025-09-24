@@ -107,13 +107,12 @@ class DataWarehouseTaskBuilder:
         render_tools: QueryRenderingTools, semantic_model: SemanticModel
     ) -> Sequence[DataflowPlanNode]:
         """Builds and returns the SemanticModelDataSet node for the given semantic model."""
-        fetched_semantic_model = render_tools.semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
-            SemanticModelReference(semantic_model_name=semantic_model.name)
-        )
-        assert fetched_semantic_model is not None
-
         source_nodes = render_tools.source_node_builder.create_from_data_sets(
-            (render_tools.converter.create_sql_source_data_set(fetched_semantic_model),)
+            (
+                render_tools.converter.create_sql_source_data_set(
+                    SemanticModelReference(semantic_model_name=semantic_model.name)
+                ),
+            )
         ).source_nodes_for_metric_queries
 
         assert len(source_nodes) >= 1
@@ -179,7 +178,8 @@ class DataWarehouseTaskBuilder:
         render_tools = QueryRenderingTools(manifest=manifest)
 
         tasks: List[DataWarehouseValidationTask] = []
-        for semantic_model in manifest.semantic_models:
+        model_lookup = render_tools.semantic_manifest_lookup.semantic_model_lookup
+        for model_reference, semantic_model in model_lookup.model_reference_to_model.items():
             if not semantic_model.dimensions:
                 continue
 
@@ -189,7 +189,7 @@ class DataWarehouseTaskBuilder:
             source_node = cls._semantic_model_nodes(render_tools=render_tools, semantic_model=semantic_model)[0]
 
             semantic_model_sub_tasks: List[DataWarehouseValidationTask] = []
-            dataset = render_tools.converter.create_sql_source_data_set(semantic_model)
+            dataset = render_tools.converter.create_sql_source_data_set(model_reference)
 
             dimension_specs = DataWarehouseTaskBuilder._remove_entity_link_specs(
                 dataset.instance_set.spec_set.dimension_specs
@@ -286,7 +286,8 @@ class DataWarehouseTaskBuilder:
         render_tools = QueryRenderingTools(manifest=manifest)
 
         tasks: List[DataWarehouseValidationTask] = []
-        for semantic_model in manifest.semantic_models:
+        model_lookup = render_tools.semantic_manifest_lookup.semantic_model_lookup
+        for model_reference, semantic_model in model_lookup.model_reference_to_model.items():
             if not semantic_model.entities:
                 continue
             if semantic_model_filters is not None and semantic_model.name not in semantic_model_filters:
@@ -295,7 +296,7 @@ class DataWarehouseTaskBuilder:
             source_node = cls._semantic_model_nodes(render_tools=render_tools, semantic_model=semantic_model)[0]
 
             semantic_model_sub_tasks: List[DataWarehouseValidationTask] = []
-            dataset = render_tools.converter.create_sql_source_data_set(semantic_model)
+            dataset = render_tools.converter.create_sql_source_data_set(model_reference)
             semantic_model_specs = DataWarehouseTaskBuilder._remove_entity_link_specs(
                 dataset.instance_set.spec_set.entity_specs
             )
@@ -368,15 +369,17 @@ class DataWarehouseTaskBuilder:
         render_tools = QueryRenderingTools(manifest=manifest)
 
         tasks: List[DataWarehouseValidationTask] = []
-        for semantic_model in manifest.semantic_models:
-            if not semantic_model.measures:
+        model_lookup = render_tools.semantic_manifest_lookup.semantic_model_lookup
+        for model_reference, semantic_model in model_lookup.model_reference_to_model.items():
+            measures = model_lookup.measure_lookup.get_measures_by_model(model_reference)
+            if not measures:
                 continue
 
             if semantic_model_filters is not None and semantic_model.name not in semantic_model_filters:
                 continue
 
             source_nodes = cls._semantic_model_nodes(render_tools=render_tools, semantic_model=semantic_model)
-            dataset = render_tools.converter.create_sql_source_data_set(semantic_model)
+            dataset = render_tools.converter.create_sql_source_data_set(model_reference)
             semantic_model_specs = dataset.instance_set.spec_set.measure_specs
 
             source_node_by_measure_spec: Dict[MeasureSpec, DataflowPlanNode] = {}

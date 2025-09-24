@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from functools import cached_property
-from typing import Dict, List, Optional, Sequence, Set, Tuple
+from typing import Dict, List, Mapping, Optional, Sequence, Set, Tuple
 
 from dbt_semantic_interfaces.protocols.entity import Entity
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
@@ -204,3 +204,10 @@ class SemanticModelLookup:
     @property
     def dimension_lookup(self) -> DimensionLookup:  # noqa: D102
         return self._dimension_lookup
+
+    @cached_property
+    def model_reference_to_model(self) -> Mapping[SemanticModelReference, SemanticModel]:  # noqa: D102
+        return {
+            model_reference: self._semantic_model_reference_to_semantic_model[model_reference]
+            for model_reference in sorted(self._semantic_model_reference_to_semantic_model)
+        }

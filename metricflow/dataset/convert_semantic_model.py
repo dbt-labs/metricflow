@@ -8,7 +8,6 @@ from typing import List, Optional, Sequence, Tuple
 from dbt_semantic_interfaces.protocols.dimension import Dimension, DimensionType
 from dbt_semantic_interfaces.protocols.entity import Entity
 from dbt_semantic_interfaces.protocols.measure import Measure
-from dbt_semantic_interfaces.protocols.semantic_model import SemanticModel
 from dbt_semantic_interfaces.references import (
     EntityReference,
     SemanticModelElementReference,
@@ -26,6 +25,7 @@ from metricflow_semantics.instances import (
     MeasureInstance,
     TimeDimensionInstance,
 )
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.semantic_model_helper import SemanticModelHelper
 from metricflow_semantics.model.spec_converters import MeasureConverter
@@ -419,7 +419,7 @@ class SemanticModelToDataSetConverter:
             )
         return entity_instances, select_columns
 
-    def create_sql_source_data_set(self, semantic_model: SemanticModel) -> SemanticModelDataSet:
+    def create_sql_source_data_set(self, model_reference: SemanticModelReference) -> SemanticModelDataSet:
         """Create an SQL source data set from a semantic model in the model."""
         # Gather all instances and columns from all semantic models.
         all_measure_instances: List[MeasureInstance] = []
@@ -428,14 +428,15 @@ class SemanticModelToDataSetConverter:
         all_entity_instances: List[EntityInstance] = []
 
         all_select_columns: List[SqlSelectColumn] = []
-        from_source_alias = SequentialIdGenerator.create_next_id(
-            DynamicIdPrefix(prefix=f"{semantic_model.name}_src")
-        ).str_value
+        model_name = model_reference.semantic_model_name
+        from_source_alias = SequentialIdGenerator.create_next_id(DynamicIdPrefix(prefix=f"{model_name}_src")).str_value
         # Handle measures
-        if len(semantic_model.measures) > 0:
+        measure_lookup = self._manifest_lookup.semantic_model_lookup.measure_lookup
+        measures = measure_lookup.get_measures_by_model(model_reference)
+        if len(measures) > 0:
             measure_instances, select_columns = self._convert_measures(
-                semantic_model_name=semantic_model.name,
-                measures=semantic_model.measures,
+                semantic_model_name=model_name,
+                measures=measures,
                 table_alias=from_source_alias,
             )
             all_measure_instances.extend(measure_instances)
@@ -446,6 +447,11 @@ class SemanticModelToDataSetConverter:
             (),
         ]
 
+        semantic_model = self._manifest_lookup.semantic_model_lookup.get_by_reference(model_reference)
+        if semantic_model is None:
+            raise RuntimeError(
+                LazyFormat("Did not find a semantic model with the given reference", model_reference=model_reference)
+            )
         for entity_link in SemanticModelHelper.entity_links_for_local_elements(semantic_model):
             possible_entity_links.append((entity_link,))
 

@@ -5,11 +5,10 @@ import pathlib
 from collections import OrderedDict
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, Mapping, Sequence
+from typing import Dict, Mapping
 
 import pytest
 from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
-from dbt_semantic_interfaces.protocols import SemanticModel
 from dbt_semantic_interfaces.test_utils import as_datetime
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
@@ -245,16 +244,13 @@ class MetricFlowEngineTestFixture:
 
         # Use ordered dict and sort by name to get consistency when running tests.
         data_sets = OrderedDict()
-        semantic_models: Sequence[SemanticModel] = semantic_manifest_lookup.semantic_manifest.semantic_models
-        semantic_models = sorted(semantic_models, key=lambda x: x.name)
-
         converter = SemanticModelToDataSetConverter(
             column_association_resolver=DunderColumnAssociationResolver(),
             manifest_lookup=semantic_manifest_lookup,
         )
-
-        for semantic_model in semantic_models:
-            data_sets[semantic_model.name] = converter.create_sql_source_data_set(semantic_model)
+        model_lookup = semantic_manifest_lookup.semantic_model_lookup
+        for model_reference, semantic_model in model_lookup.model_reference_to_model.items():
+            data_sets[semantic_model.name] = converter.create_sql_source_data_set(model_reference)
 
         return data_sets
 

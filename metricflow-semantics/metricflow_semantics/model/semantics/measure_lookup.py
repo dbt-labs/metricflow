@@ -142,7 +142,7 @@ class MeasureLookup:
         except KeyError:
             raise KeyError(
                 LazyFormat(
-                    "The given model is not known",
+                    "Unable to get measures as the given model is not known",
                     model_name=model_reference.semantic_model_name,
                     known_model_names=[
                         model_reference.semantic_model_name for model_reference in self._model_reference_to_measures

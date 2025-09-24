@@ -431,12 +431,11 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             column_association_resolver=self._column_association_resolver,
             manifest_lookup=self._semantic_manifest_lookup,
         )
-        for semantic_model in sorted(
-            self._semantic_manifest_lookup.semantic_manifest.semantic_models, key=lambda model: model.name
-        ):
-            data_set = converter.create_sql_source_data_set(semantic_model)
+        model_lookup = semantic_manifest_lookup.semantic_model_lookup
+        for model_reference, semantic_model in model_lookup.model_reference_to_model.items():
+            data_set = converter.create_sql_source_data_set(model_reference)
             self._source_data_sets.append(data_set)
-            logger.debug(LazyFormat(lambda: f"Created source dataset from semantic model '{semantic_model.name}'"))
+            logger.debug(LazyFormat("Created source dataset from semantic model", model_reference=model_reference))
 
         source_node_builder = SourceNodeBuilder(
             column_association_resolver=self._column_association_resolver,
