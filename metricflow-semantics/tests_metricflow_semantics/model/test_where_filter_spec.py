@@ -74,7 +74,7 @@ def create_spec_lookup(
                 ),
                 filter_location_path=MetricFlowQueryResolutionPath.empty_instance(),
                 where_filter_intersection=create_where_filter_intersection("Dimension('dummy__dimension')"),
-                resolved_linkable_element_set=resolved_linkable_element_set,
+                resolved_group_by_item_set=resolved_linkable_element_set,
                 issue_set=MetricFlowQueryResolutionIssueSet.empty_instance(),
                 spec_pattern=ObjectBuilderNamingScheme().spec_pattern(
                     "Dimension('dummy__dimension')",
@@ -382,7 +382,7 @@ def resolved_spec_lookup(
                 where_filter_intersection=create_where_filter_intersection(
                     "TimeDimension('metric_time', 'week', 'year')"
                 ),
-                resolved_linkable_element_set=GroupByItemSet.create(
+                resolved_group_by_item_set=GroupByItemSet.create(
                     AnnotatedSpec.create(
                         element_type=LinkableElementType.TIME_DIMENSION,
                         element_name="metric_time",
@@ -554,7 +554,7 @@ def test_dimension_time_dimension_parity(  # noqa: D103
                         ),
                         filter_location_path=MetricFlowQueryResolutionPath(()),
                         where_filter_intersection=PydanticWhereFilterIntersection(where_filters=[where_filter]),
-                        resolved_linkable_element_set=GroupByItemSet.create(
+                        resolved_group_by_item_set=GroupByItemSet.create(
                             AnnotatedSpec.create(
                                 element_type=LinkableElementType.TIME_DIMENSION,
                                 element_name=METRIC_TIME_ELEMENT_NAME,

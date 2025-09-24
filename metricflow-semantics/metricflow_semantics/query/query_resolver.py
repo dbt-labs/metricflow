@@ -632,7 +632,7 @@ class MetricFlowQueryResolver:
         model_reference_set = set(resolve_group_by_item_result.linkable_element_set.derived_from_semantic_models)
         for filter_spec_resolution in filter_spec_lookup.spec_resolutions:
             model_reference_set.update(
-                set(filter_spec_resolution.resolved_linkable_element_set.derived_from_semantic_models)
+                set(filter_spec_resolution.resolved_group_by_item_set.derived_from_semantic_models)
             )
 
         # Collect all semantic models referenced by the query.
@@ -641,7 +641,7 @@ class MetricFlowQueryResolver:
         )
         semantic_models_in_filters = set(
             itertools.chain.from_iterable(
-                filter_spec_resolution.resolved_linkable_element_set.derived_from_semantic_models
+                filter_spec_resolution.resolved_group_by_item_set.derived_from_semantic_models
                 for filter_spec_resolution in filter_spec_lookup.spec_resolutions
             )
         )

@@ -162,7 +162,7 @@ class FilterSpecResolution:
 
     lookup_key: ResolvedSpecLookUpKey
     where_filter_intersection: WhereFilterIntersection
-    resolved_linkable_element_set: BaseGroupByItemSet
+    resolved_group_by_item_set: BaseGroupByItemSet
     spec_pattern: SpecPattern
     issue_set: MetricFlowQueryResolutionIssueSet
     # Used for error messages.
@@ -174,9 +174,9 @@ class FilterSpecResolution:
 
         Due to the way the FilterSpecResolution is structured, the final output should contain a single spec.
         """
-        num_specs = len(self.resolved_linkable_element_set.specs)
+        num_specs = len(self.resolved_group_by_item_set.specs)
         assert num_specs <= 1, (
-            f"Found {num_specs} in {self.resolved_linkable_element_set}, but a valid FilterSpecResolution should "
+            f"Found {num_specs} in {self.resolved_group_by_item_set}, but a valid FilterSpecResolution should "
             "contain either 0 or 1 resolved specs."
         )
 
@@ -187,15 +187,13 @@ class FilterSpecResolution:
         The final ValueError should not be reachable due to the post-init validation, but is in place in case someone
         updates or removes the latter without accounting for the possibility of runtime divergence.
         """
-        specs = self.resolved_linkable_element_set.annotated_specs
+        specs = self.resolved_group_by_item_set.annotated_specs
         if len(specs) == 0:
             return None
         elif len(specs) == 1:
             return specs[0]
         else:
-            raise ValueError(
-                f"Found {len(specs)} in {self.resolved_linkable_element_set}, this should not be possible!"
-            )
+            raise ValueError(f"Found {len(specs)} in {self.resolved_group_by_item_set}, this should not be possible!")
 
 
 CallParameterSet = Union[

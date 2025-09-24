@@ -391,7 +391,7 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
                             call_parameter_set=group_by_item_in_where_filter.call_parameter_set,
                         ),
                         filter_location_path=resolution_path,
-                        resolved_linkable_element_set=group_by_item_resolution.linkable_element_set,
+                        resolved_group_by_item_set=group_by_item_resolution.linkable_element_set,
                         where_filter_intersection=PydanticWhereFilterIntersection(
                             where_filters=list(where_filters_and_locations[filter_location])
                         ),
