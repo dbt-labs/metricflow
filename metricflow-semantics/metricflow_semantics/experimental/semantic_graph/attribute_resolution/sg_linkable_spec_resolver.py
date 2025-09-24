@@ -42,7 +42,7 @@ from metricflow_semantics.experimental.semantic_graph.trie_resolver.group_by_met
 from metricflow_semantics.experimental.semantic_graph.trie_resolver.simple_resolver import SimpleTrieResolver
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
-from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
+from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
 from metricflow_semantics.model.semantics.linkable_spec_resolver import GroupByItemSetResolver
 
@@ -70,20 +70,20 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
         )
 
         self._result_cache_for_measure: ResultCache[
-            tuple[MeasureReference, Optional[LinkableElementFilter]], BaseGroupByItemSet
+            tuple[MeasureReference, Optional[GroupByItemSetFilter]], BaseGroupByItemSet
         ] = ResultCache()
 
         self._result_cache_for_metrics: ResultCache[
-            tuple[FrozenOrderedSet[MetricReference], Optional[LinkableElementFilter]], BaseGroupByItemSet
+            tuple[FrozenOrderedSet[MetricReference], Optional[GroupByItemSetFilter]], BaseGroupByItemSet
         ] = ResultCache()
 
         self._result_cache_for_distinct_values: ResultCache[
-            tuple[Optional[LinkableElementFilter]], BaseGroupByItemSet
+            tuple[Optional[GroupByItemSetFilter]], BaseGroupByItemSet
         ] = ResultCache()
 
     @override
     def get_linkable_element_set_for_measure(
-        self, measure_reference: MeasureReference, element_filter: Optional[LinkableElementFilter] = None
+        self, measure_reference: MeasureReference, element_filter: Optional[GroupByItemSetFilter] = None
     ) -> BaseGroupByItemSet:
         cache_key = (measure_reference, element_filter)
         cached_result = self._result_cache_for_measure.get(cache_key)
@@ -118,7 +118,7 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
 
     @override
     def get_linkable_elements_for_distinct_values_query(
-        self, element_filter: LinkableElementFilter
+        self, element_filter: GroupByItemSetFilter
     ) -> BaseGroupByItemSet:
         cache_key = (element_filter,)
         cache_result = self._result_cache_for_distinct_values.get(cache_key)
@@ -172,7 +172,7 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
     def get_linkable_elements_for_metrics(
         self,
         metric_references: Sequence[MetricReference],
-        element_filter: Optional[LinkableElementFilter] = None,
+        element_filter: Optional[GroupByItemSetFilter] = None,
     ) -> BaseGroupByItemSet:
         if len(metric_references) == 0:
             return GroupByItemSet()
@@ -186,8 +186,8 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
 
         # Handling old behavior - you can't use this method to get group-by metrics.
         without_any_of_set = frozenset((LinkableElementProperty.METRIC,))
-        if element_filter is None or element_filter == LinkableElementFilter():
-            element_filter = LinkableElementFilter(without_any_of=without_any_of_set)
+        if element_filter is None or element_filter == GroupByItemSetFilter():
+            element_filter = GroupByItemSetFilter(without_any_of=without_any_of_set)
         else:
             element_filter = element_filter.copy(without_any_of=element_filter.without_any_of.union(without_any_of_set))
 

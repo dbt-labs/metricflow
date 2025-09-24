@@ -9,7 +9,7 @@ from dbt_semantic_interfaces.references import (
     MetricReference,
 )
 
-from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
+from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
 
 logger = logging.getLogger(__name__)
@@ -22,7 +22,7 @@ class GroupByItemSetResolver(ABC):
     def get_linkable_element_set_for_measure(
         self,
         measure_reference: MeasureReference,
-        element_filter: LinkableElementFilter,
+        element_filter: GroupByItemSetFilter,
     ) -> BaseGroupByItemSet:
         """Get the valid linkable elements for the given measure."""
         raise NotImplementedError
@@ -30,7 +30,7 @@ class GroupByItemSetResolver(ABC):
     @abstractmethod
     def get_linkable_elements_for_distinct_values_query(
         self,
-        element_filter: LinkableElementFilter,
+        element_filter: GroupByItemSetFilter,
     ) -> BaseGroupByItemSet:
         """Returns queryable items for a distinct group-by-item values query.
 
@@ -42,7 +42,7 @@ class GroupByItemSetResolver(ABC):
     def get_linkable_elements_for_metrics(
         self,
         metric_references: Sequence[MetricReference],
-        element_filter: LinkableElementFilter = LinkableElementFilter(),
+        element_filter: GroupByItemSetFilter = GroupByItemSetFilter(),
     ) -> BaseGroupByItemSet:
         """Gets the valid linkable elements that are common to all requested metrics.
 

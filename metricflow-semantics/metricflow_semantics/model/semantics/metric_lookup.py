@@ -15,7 +15,7 @@ from metricflow_semantics.errors.error_classes import DuplicateMetricError, Metr
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
-from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
+from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
 from metricflow_semantics.model.semantics.linkable_spec_resolver import (
     GroupByItemSetResolver,
@@ -62,21 +62,21 @@ class MetricLookup:
 
         # Cache for `linkable_elements_for_measure()`.
         self._linkable_element_set_for_measure_cache: Dict[
-            Tuple[MeasureReference, LinkableElementFilter], BaseGroupByItemSet
+            Tuple[MeasureReference, GroupByItemSetFilter], BaseGroupByItemSet
         ] = {}
 
         self._linkable_elements_including_group_by_metrics_cache = LruCache[
-            Tuple[MeasureReference, LinkableElementFilter], BaseGroupByItemSet
+            Tuple[MeasureReference, GroupByItemSetFilter], BaseGroupByItemSet
         ](128)
-        self._linkable_elements_for_no_metrics_query_cache = LruCache[LinkableElementFilter, BaseGroupByItemSet](128)
+        self._linkable_elements_for_no_metrics_query_cache = LruCache[GroupByItemSetFilter, BaseGroupByItemSet](128)
         self._linkable_elements_for_metrics_cache = LruCache[
-            Tuple[Sequence[MetricReference], LinkableElementFilter], BaseGroupByItemSet
+            Tuple[Sequence[MetricReference], GroupByItemSetFilter], BaseGroupByItemSet
         ](128)
 
     def linkable_elements_for_measure(
         self,
         measure_reference: MeasureReference,
-        element_filter: LinkableElementFilter = LinkableElementFilter(),
+        element_filter: GroupByItemSetFilter = GroupByItemSetFilter(),
     ) -> BaseGroupByItemSet:
         """Return the set of linkable elements reachable from a given measure."""
         start_time = time.perf_counter()
@@ -122,7 +122,7 @@ class MetricLookup:
         return result.filter(element_filter)
 
     def linkable_elements_for_no_metrics_query(
-        self, element_set_filter: LinkableElementFilter = LinkableElementFilter()
+        self, element_set_filter: GroupByItemSetFilter = GroupByItemSetFilter()
     ) -> BaseGroupByItemSet:
         """Return the reachable linkable elements for a dimension values query with no metrics."""
         cache_key = element_set_filter
@@ -135,7 +135,7 @@ class MetricLookup:
         return result
 
     def linkable_elements_for_metrics(
-        self, metric_references: Sequence[MetricReference], element_set_filter: LinkableElementFilter
+        self, metric_references: Sequence[MetricReference], element_set_filter: GroupByItemSetFilter
     ) -> BaseGroupByItemSet:
         """Retrieve the matching set of linkable elements common to all metrics requested (intersection)."""
         cache_key = (metric_references, element_set_filter)

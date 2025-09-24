@@ -14,7 +14,7 @@ from typing_extensions import override
 
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
+from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow_semantics.query.issues.issues_base import (
     MetricFlowQueryResolutionIssue,
@@ -57,7 +57,7 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
         )
 
         self._query_includes_metric_time = not self._resolve_group_by_item_result.linkable_element_set.filter(
-            LinkableElementFilter(with_any_of=frozenset({LinkableElementProperty.METRIC_TIME}))
+            GroupByItemSetFilter(with_any_of=frozenset({LinkableElementProperty.METRIC_TIME}))
         ).is_empty
 
     def _query_includes_agg_time_dimension_of_metric(self, metric_reference: MetricReference) -> bool:

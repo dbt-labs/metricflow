@@ -20,7 +20,7 @@ from metricflow_semantics.experimental.semantic_graph.model_id import SemanticMo
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
-from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
+from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
@@ -45,7 +45,7 @@ class BaseGroupByItemSet(SemanticModelDerivation, ABC):
     @abstractmethod
     def filter(
         self,
-        element_filter: LinkableElementFilter,
+        element_filter: GroupByItemSetFilter,
     ) -> Self:
         """Filter elements in the set.
 

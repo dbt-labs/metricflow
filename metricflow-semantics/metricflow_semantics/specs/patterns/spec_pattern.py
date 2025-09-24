@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Sequence
 
-from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
+from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 
 if TYPE_CHECKING:
     from metricflow_semantics.specs.instance_spec import InstanceSpec
@@ -25,9 +25,9 @@ class SpecPattern(ABC):
         return len(self.match(candidate_specs)) > 0
 
     @property
-    def element_pre_filter(self) -> LinkableElementFilter:
+    def element_pre_filter(self) -> GroupByItemSetFilter:
         """Returns a filter for a `LinkableElementSet` that can reduce the number of items to match.
 
         i.e. the filter can produce a superset of the elements that will match.
         """
-        return LinkableElementFilter()
+        return GroupByItemSetFilter()

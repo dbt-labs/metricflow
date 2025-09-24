@@ -53,7 +53,7 @@ from metricflow_semantics.experimental.semantic_graph.trie_resolver.entity_key_r
 from metricflow_semantics.helpers.performance_helpers import ExecutionTimer
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
-from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
+from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
 
 logger = logging.getLogger(__name__)
@@ -100,7 +100,7 @@ class GroupByMetricTrieResolver(DunderNameTrieResolver):
 
     @override
     def resolve_trie(
-        self, source_nodes: OrderedSet[SemanticGraphNode], element_filter: Optional[LinkableElementFilter]
+        self, source_nodes: OrderedSet[SemanticGraphNode], element_filter: Optional[GroupByItemSetFilter]
     ) -> TrieResolutionResult:
         execution_timer = ExecutionTimer()
         pathfinder_profile_differ = TraversalProfileDiffer(self._path_finder)
@@ -134,7 +134,7 @@ class GroupByMetricTrieResolver(DunderNameTrieResolver):
     def _resolve_trie(
         self,
         source_nodes: OrderedSet[SemanticGraphNode],
-        element_filter: Optional[LinkableElementFilter],
+        element_filter: Optional[GroupByItemSetFilter],
     ) -> DunderNameTrie:
         trie_to_update = MutableDunderNameTrie()
 

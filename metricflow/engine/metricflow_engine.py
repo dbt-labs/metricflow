@@ -29,7 +29,7 @@ from metricflow_semantics.mf_logging.runtime import log_block_runtime
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
-from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
+from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
 from metricflow_semantics.model.semantics.linkable_element_set_base import AnnotatedSpec, BaseGroupByItemSet
 from metricflow_semantics.model.semantics.semantic_model_helper import SemanticModelHelper
@@ -689,7 +689,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
         linkable_element_set = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_metrics(
             metric_references=tuple(MetricReference(element_name=mname) for mname in metric_names),
-            element_set_filter=LinkableElementFilter(
+            element_set_filter=GroupByItemSetFilter(
                 without_any_of=frozenset(without_any_property),
             ),
         )
@@ -791,7 +791,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     def entities_for_metrics(self, metric_names: List[str]) -> List[Entity]:  # noqa: D102
         linkable_element_set = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_metrics(
             metric_references=tuple(MetricReference(element_name=mname) for mname in metric_names),
-            element_set_filter=LinkableElementFilter(
+            element_set_filter=GroupByItemSetFilter(
                 with_any_of=frozenset(ENTITY_WITH_ANY_PROPERTIES),
             ),
         )
@@ -930,7 +930,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 without_any_of = without_any_of - {LinkableElementProperty.DERIVED_TIME_GRANULARITY}
             linkable_element_set = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_metrics(
                 metric_references=tuple(MetricReference(element_name=mname) for mname in metric_names),
-                element_set_filter=LinkableElementFilter(
+                element_set_filter=GroupByItemSetFilter(
                     without_any_of=frozenset(without_any_of),
                 ),
             )

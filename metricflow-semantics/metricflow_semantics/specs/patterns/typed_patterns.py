@@ -14,7 +14,7 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from typing_extensions import override
 
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
-from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
+from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.patterns.entity_link_pattern import (
@@ -57,9 +57,9 @@ class DimensionPattern(EntityLinkPattern):
 
     @property
     @override
-    def element_pre_filter(self) -> LinkableElementFilter:
+    def element_pre_filter(self) -> GroupByItemSetFilter:
         return super().element_pre_filter.merge(
-            LinkableElementFilter(without_any_of=frozenset({LinkableElementProperty.METRIC}))
+            GroupByItemSetFilter(without_any_of=frozenset({LinkableElementProperty.METRIC}))
         )
 
 
@@ -118,9 +118,9 @@ class TimeDimensionPattern(EntityLinkPattern):
 
     @property
     @override
-    def element_pre_filter(self) -> LinkableElementFilter:
+    def element_pre_filter(self) -> GroupByItemSetFilter:
         return super().element_pre_filter.merge(
-            LinkableElementFilter(without_any_of=frozenset({LinkableElementProperty.METRIC}))
+            GroupByItemSetFilter(without_any_of=frozenset({LinkableElementProperty.METRIC}))
         )
 
 
@@ -152,8 +152,8 @@ class EntityPattern(EntityLinkPattern):
 
     @property
     @override
-    def element_pre_filter(self) -> LinkableElementFilter:
-        return LinkableElementFilter(without_any_of=frozenset({LinkableElementProperty.METRIC}))
+    def element_pre_filter(self) -> GroupByItemSetFilter:
+        return GroupByItemSetFilter(without_any_of=frozenset({LinkableElementProperty.METRIC}))
 
 
 @dataclass(frozen=True)

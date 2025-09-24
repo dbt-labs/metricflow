@@ -17,7 +17,7 @@ from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat, mf_pformat_dict
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
+from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.query.group_by_item.candidate_push_down.group_by_item_candidate import GroupByItemCandidateSet
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import (
     WhereFilterLocation,
@@ -176,7 +176,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
 
             items_available_for_measure = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_measure(
                 measure_reference=node.measure_reference,
-                element_filter=LinkableElementFilter.merge_iterable(
+                element_filter=GroupByItemSetFilter.merge_iterable(
                     spec_pattern.element_pre_filter for spec_pattern in self._source_spec_patterns
                 ),
             )

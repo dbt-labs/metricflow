@@ -14,7 +14,7 @@ from metricflow_semantics.collection_helpers.syntactic_sugar import mf_flatten
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet
 from metricflow_semantics.experimental.semantic_graph.trie_resolver.dunder_name_trie import DunderNameTrie
-from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
+from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element_set_base import AnnotatedSpec, BaseGroupByItemSet
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
@@ -103,7 +103,7 @@ class GroupByItemSet(BaseGroupByItemSet, SerializableDataclass):
         return GroupByItemSet.create_from_mapping(new_dunder_name_to_annotated_spec)
 
     @override
-    def filter(self, element_filter: LinkableElementFilter) -> GroupByItemSet:
+    def filter(self, element_filter: GroupByItemSetFilter) -> GroupByItemSet:
         allow_element_name_set = element_filter.element_names
         deny_property_set = element_filter.without_any_of
         deny_match_all_property_set = element_filter.without_all_of
