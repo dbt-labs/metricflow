@@ -43,7 +43,7 @@ from metricflow_semantics.experimental.semantic_graph.trie_resolver.simple_resol
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
-from metricflow_semantics.model.semantics.linkable_element_set_base import BaseLinkableElementSet
+from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
 from metricflow_semantics.model.semantics.linkable_spec_resolver import LinkableSpecResolver
 
 logger = logging.getLogger(__name__)
@@ -70,21 +70,21 @@ class SemanticGraphLinkableSpecResolver(LinkableSpecResolver):
         )
 
         self._result_cache_for_measure: ResultCache[
-            tuple[MeasureReference, Optional[LinkableElementFilter]], BaseLinkableElementSet
+            tuple[MeasureReference, Optional[LinkableElementFilter]], BaseGroupByItemSet
         ] = ResultCache()
 
         self._result_cache_for_metrics: ResultCache[
-            tuple[FrozenOrderedSet[MetricReference], Optional[LinkableElementFilter]], BaseLinkableElementSet
+            tuple[FrozenOrderedSet[MetricReference], Optional[LinkableElementFilter]], BaseGroupByItemSet
         ] = ResultCache()
 
         self._result_cache_for_distinct_values: ResultCache[
-            tuple[Optional[LinkableElementFilter]], BaseLinkableElementSet
+            tuple[Optional[LinkableElementFilter]], BaseGroupByItemSet
         ] = ResultCache()
 
     @override
     def get_linkable_element_set_for_measure(
         self, measure_reference: MeasureReference, element_filter: Optional[LinkableElementFilter] = None
-    ) -> BaseLinkableElementSet:
+    ) -> BaseGroupByItemSet:
         cache_key = (measure_reference, element_filter)
         cached_result = self._result_cache_for_measure.get(cache_key)
         if cached_result:
@@ -119,7 +119,7 @@ class SemanticGraphLinkableSpecResolver(LinkableSpecResolver):
     @override
     def get_linkable_elements_for_distinct_values_query(
         self, element_filter: LinkableElementFilter
-    ) -> BaseLinkableElementSet:
+    ) -> BaseGroupByItemSet:
         cache_key = (element_filter,)
         cache_result = self._result_cache_for_distinct_values.get(cache_key)
         if cache_result:
@@ -173,7 +173,7 @@ class SemanticGraphLinkableSpecResolver(LinkableSpecResolver):
         self,
         metric_references: Sequence[MetricReference],
         element_filter: Optional[LinkableElementFilter] = None,
-    ) -> BaseLinkableElementSet:
+    ) -> BaseGroupByItemSet:
         if len(metric_references) == 0:
             return AnnotatedSpecLinkableElementSet()
 

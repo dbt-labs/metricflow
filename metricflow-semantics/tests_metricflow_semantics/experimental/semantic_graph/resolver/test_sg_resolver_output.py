@@ -7,7 +7,7 @@ from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.references import MeasureReference, MetricReference
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
-from metricflow_semantics.model.semantics.linkable_element_set_base import BaseLinkableElementSet
+from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from tests_metricflow_semantics.experimental.semantic_graph.sg_fixtures import SemanticGraphTestFixture
@@ -50,7 +50,7 @@ def test_set_filtering_for_measure(sg_tester: SemanticGraphTester) -> None:
 def test_set_for_metrics(sg_tester: SemanticGraphTester) -> None:
     """Check the set for a few different types of inputs for metrics."""
     sg_resolver = sg_tester.sg_resolver
-    description_to_set: dict[str, BaseLinkableElementSet] = {}
+    description_to_set: dict[str, BaseGroupByItemSet] = {}
 
     # Include cases: no metrics, simple metric, derived metric, multiple metrics, cumulative metric.
     for metric_names in (

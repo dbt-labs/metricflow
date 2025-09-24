@@ -31,7 +31,7 @@ from metricflow_semantics.experimental.semantic_graph.model_id import SemanticMo
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
-from metricflow_semantics.model.semantics.linkable_element_set_base import AnnotatedSpec, BaseLinkableElementSet
+from metricflow_semantics.model.semantics.linkable_element_set_base import AnnotatedSpec, BaseGroupByItemSet
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
@@ -61,7 +61,7 @@ logger = logging.getLogger(__name__)
 def create_spec_lookup(
     call_parameter_set: CallParameterSet,
     resolved_spec: LinkableInstanceSpec,
-    resolved_linkable_element_set: BaseLinkableElementSet,
+    resolved_linkable_element_set: BaseGroupByItemSet,
     semantic_manifest_lookup: SemanticManifestLookup,
 ) -> FilterSpecResolutionLookUp:
     """Create a FilterSpecResolutionLookUp where the call_parameter_set maps to resolved_spec."""

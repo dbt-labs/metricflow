@@ -12,7 +12,7 @@ from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annot
     AnnotatedSpecLinkableElementSet,
 )
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
-from metricflow_semantics.model.semantics.linkable_element_set_base import BaseLinkableElementSet
+from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
 from metricflow_semantics.query.group_by_item.path_prefixable import PathPrefixable
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
@@ -38,7 +38,7 @@ class GroupByItemCandidateSet(PathPrefixable, SemanticModelDerivation):
     error messages, you start analyzing from the leaf node.
     """
 
-    linkable_element_set: BaseLinkableElementSet
+    linkable_element_set: BaseGroupByItemSet
     measure_paths: Tuple[MetricFlowQueryResolutionPath, ...]
     path_from_leaf_node: MetricFlowQueryResolutionPath
 

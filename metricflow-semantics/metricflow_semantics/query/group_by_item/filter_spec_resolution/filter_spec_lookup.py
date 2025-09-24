@@ -16,7 +16,7 @@ from typing_extensions import override
 from metricflow_semantics.collection_helpers.merger import Mergeable
 from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
-from metricflow_semantics.model.semantics.linkable_element_set_base import AnnotatedSpec, BaseLinkableElementSet
+from metricflow_semantics.model.semantics.linkable_element_set_base import AnnotatedSpec, BaseGroupByItemSet
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow_semantics.query.group_by_item.path_prefixable import PathPrefixable
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
@@ -162,7 +162,7 @@ class FilterSpecResolution:
 
     lookup_key: ResolvedSpecLookUpKey
     where_filter_intersection: WhereFilterIntersection
-    resolved_linkable_element_set: BaseLinkableElementSet
+    resolved_linkable_element_set: BaseGroupByItemSet
     spec_pattern: SpecPattern
     issue_set: MetricFlowQueryResolutionIssueSet
     # Used for error messages.

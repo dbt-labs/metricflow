@@ -31,7 +31,7 @@ from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifest
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
-from metricflow_semantics.model.semantics.linkable_element_set_base import AnnotatedSpec, BaseLinkableElementSet
+from metricflow_semantics.model.semantics.linkable_element_set_base import AnnotatedSpec, BaseGroupByItemSet
 from metricflow_semantics.model.semantics.semantic_model_helper import SemanticModelHelper
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.protocols.query_parameter import (
@@ -695,7 +695,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         )
         return self._filter_simple_linkable_dimensions(linkable_element_set=linkable_element_set)
 
-    def _filter_simple_linkable_dimensions(self, linkable_element_set: BaseLinkableElementSet) -> List[Dimension]:
+    def _filter_simple_linkable_dimensions(self, linkable_element_set: BaseGroupByItemSet) -> List[Dimension]:
         dimensions: List[Dimension] = []
 
         for annotated_spec in linkable_element_set.annotated_specs:
@@ -799,7 +799,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         entities = self._filter_linkable_entities(linkable_element_set=linkable_element_set)
         return sorted(set(entities), key=lambda x: x.default_search_and_sort_attribute)
 
-    def _filter_linkable_entities(self, linkable_element_set: BaseLinkableElementSet) -> List[Entity]:
+    def _filter_linkable_entities(self, linkable_element_set: BaseGroupByItemSet) -> List[Entity]:
         entities: List[Entity] = []
 
         for annotated_spec in linkable_element_set.annotated_specs:

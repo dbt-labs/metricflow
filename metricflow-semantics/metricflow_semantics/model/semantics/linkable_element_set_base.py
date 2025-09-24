@@ -39,11 +39,8 @@ if typing.TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class BaseLinkableElementSet(SemanticModelDerivation, ABC):
-    """Temporary interface used to migrate `LinkableElementSet`.
-
-    This class will be updated / renamed.
-    """
+class BaseGroupByItemSet(SemanticModelDerivation, ABC):
+    """ABC for a set that represents possible group-by items."""
 
     @abstractmethod
     def filter(
