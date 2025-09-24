@@ -19,7 +19,7 @@ from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annot
     GroupByItemSet,
 )
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.linkable_element import (
     LinkableElementType,
 )
@@ -95,7 +95,7 @@ def linkable_set() -> GroupByItemSet:  # noqa: D103
             time_grain=None,
             date_part=None,
             metric_subquery_entity_links=(entity_2,),
-            properties=frozenset([LinkableElementProperty.METRIC, LinkableElementProperty.JOINED]),
+            properties=frozenset([GroupByItemProperty.METRIC, GroupByItemProperty.JOINED]),
             origin_model_ids=(SemanticModelId.get_instance("metric_semantic_model"),),
             derived_from_semantic_models=(
                 SemanticModelReference("metric_semantic_model"),

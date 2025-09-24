@@ -18,7 +18,7 @@ from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
 from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.helpers.time_helpers import PrettyDuration
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
 from metricflow_semantics.specs.spec_set import group_spec_by_type
@@ -111,7 +111,7 @@ class SemanticGraphTester:
         This calls `BaseGroupByItemSet.filter()` so the callable should have differences in logic for filtered
         set generation.
         """
-        for element_property in LinkableElementProperty:
+        for element_property in GroupByItemProperty:
             with_any_of_filter = GroupByItemSetFilter(with_any_of=frozenset((element_property,)))
             filtered_set = filtered_set_callable(with_any_of_filter)
             # The resolver uses the filter to limit graph traversal, so this is not the same logic.

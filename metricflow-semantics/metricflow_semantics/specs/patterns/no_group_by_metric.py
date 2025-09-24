@@ -5,7 +5,7 @@ from typing import List, Sequence
 
 from typing_extensions import override
 
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
@@ -32,4 +32,4 @@ class NoGroupByMetricPattern(SpecPattern):
     @property
     @override
     def element_pre_filter(self) -> GroupByItemSetFilter:
-        return GroupByItemSetFilter(without_any_of=frozenset({LinkableElementProperty.METRIC}))
+        return GroupByItemSetFilter(without_any_of=frozenset({GroupByItemProperty.METRIC}))

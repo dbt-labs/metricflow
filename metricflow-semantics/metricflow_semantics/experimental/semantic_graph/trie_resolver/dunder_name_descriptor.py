@@ -9,7 +9,7 @@ from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTup
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe import IndexedDunderName
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
@@ -43,7 +43,7 @@ class DunderNameDescriptor:
     time_grain: Optional[ExpandedTimeGranularity]
     date_part: Optional[DatePart]
 
-    element_properties: AnyLengthTuple[LinkableElementProperty]
+    element_properties: AnyLengthTuple[GroupByItemProperty]
     origin_model_ids: AnyLengthTuple[SemanticModelId]
     derived_from_model_ids: AnyLengthTuple[SemanticModelId]
     entity_key_queries_for_group_by_metric: AnyLengthTuple[EntityKeyQueryForGroupByMetric]

@@ -26,7 +26,7 @@ from metricflow_semantics.experimental.semantic_graph.nodes.entity_nodes import 
 from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
     SemanticGraphEdge,
 )
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 logger = logging.getLogger(__name__)
@@ -83,7 +83,7 @@ class TimeEntitySubgraphGenerator(SemanticSubgraphGenerator):
                     tail_node=time_entity_node,
                     head_node=attribute_node,
                     recipe_step=AttributeRecipeStep(
-                        add_properties=(LinkableElementProperty.DATE_PART,),
+                        add_properties=(GroupByItemProperty.DATE_PART,),
                         set_date_part_access=queryable_date_part,
                     ),
                 )
@@ -98,7 +98,7 @@ class TimeEntitySubgraphGenerator(SemanticSubgraphGenerator):
                         tail_node=time_entity_node,
                         head_node=attribute_node,
                         recipe_step=AttributeRecipeStep(
-                            add_properties=(LinkableElementProperty.DERIVED_TIME_GRANULARITY,),
+                            add_properties=(GroupByItemProperty.DERIVED_TIME_GRANULARITY,),
                             set_time_grain_access=expanded_time_grain,
                         ),
                     )

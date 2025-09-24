@@ -26,7 +26,7 @@ from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import (
 from metricflow_semantics.experimental.semantic_graph.sg_exceptions import SemanticGraphTraversalError
 from metricflow_semantics.experimental.semantic_graph.sg_interfaces import SemanticGraphEdge, SemanticGraphNode
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
@@ -314,7 +314,7 @@ class AttributeRecipeWriterWeightFunction(
             next_recipe_element_type is LinkableElementType.TIME_DIMENSION
             or next_recipe_element_type is LinkableElementType.DIMENSION
         ):
-            if LinkableElementProperty.METRIC_TIME in next_recipe.element_properties:
+            if GroupByItemProperty.METRIC_TIME in next_recipe.element_properties:
                 min_entity_link_length = 0
 
         elif next_recipe_element_type is LinkableElementType.METRIC:

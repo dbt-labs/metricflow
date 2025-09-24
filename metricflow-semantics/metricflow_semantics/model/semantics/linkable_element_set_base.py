@@ -18,7 +18,7 @@ from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_data
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
@@ -112,7 +112,7 @@ class AnnotatedSpec(SerializableDataclass):
     date_part: Optional[DatePart]
     metric_subquery_entity_link_names: Tuple[str, ...]
 
-    element_properties: Tuple[LinkableElementProperty, ...]
+    element_properties: Tuple[GroupByItemProperty, ...]
     # The semantic model(s) where the element (e.g. the categorical dimension) was defined.
     # There can be multiple models if it's a metric / derived metric that references multiple measures, and the join
     # path from the measure to the dimension is different.
@@ -123,7 +123,7 @@ class AnnotatedSpec(SerializableDataclass):
     def create(  # noqa: D102
         element_type: LinkableElementType,
         element_name: str,
-        properties: Iterable[LinkableElementProperty],
+        properties: Iterable[GroupByItemProperty],
         origin_model_ids: Iterable[SemanticModelId],
         derived_from_semantic_models: Iterable[SemanticModelReference],
         entity_links: Sequence[EntityReference],
@@ -274,7 +274,7 @@ class AnnotatedSpec(SerializableDataclass):
             assert_values_exhausted(element_type)
 
     @cached_property
-    def property_set(self) -> FrozenOrderedSet[LinkableElementProperty]:  # noqa: D102
+    def property_set(self) -> FrozenOrderedSet[GroupByItemProperty]:  # noqa: D102
         return FrozenOrderedSet(self.element_properties)
 
     @cached_property

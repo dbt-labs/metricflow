@@ -6,7 +6,7 @@ from typing_extensions import Self, override
 
 from metricflow_semantics.collection_helpers.merger import Mergeable
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 
 
 @fast_frozen_dataclass()
@@ -15,16 +15,16 @@ class GroupByItemSetFilter(Mergeable):
 
     # A `None` value for element names means no filtering on element names.
     element_names: Optional[FrozenSet[str]] = None
-    with_any_of: FrozenSet[LinkableElementProperty] = LinkableElementProperty.all_properties()
-    without_any_of: FrozenSet[LinkableElementProperty] = frozenset()
-    without_all_of: FrozenSet[LinkableElementProperty] = frozenset()
+    with_any_of: FrozenSet[GroupByItemProperty] = GroupByItemProperty.all_properties()
+    without_any_of: FrozenSet[GroupByItemProperty] = frozenset()
+    without_all_of: FrozenSet[GroupByItemProperty] = frozenset()
 
     def copy(
         self,
         element_names: Optional[FrozenSet[str]] = None,
-        with_any_of: Optional[FrozenSet[LinkableElementProperty]] = None,
-        without_any_of: Optional[FrozenSet[LinkableElementProperty]] = None,
-        without_all_of: Optional[FrozenSet[LinkableElementProperty]] = None,
+        with_any_of: Optional[FrozenSet[GroupByItemProperty]] = None,
+        without_any_of: Optional[FrozenSet[GroupByItemProperty]] = None,
+        without_all_of: Optional[FrozenSet[GroupByItemProperty]] = None,
     ) -> GroupByItemSetFilter:
         """Create a copy of this with the given non-None fields replaced."""
         return GroupByItemSetFilter(
@@ -60,9 +60,7 @@ class GroupByItemSetFilter(Mergeable):
             without_all_of=self.without_all_of,
         )
 
-    def allow(
-        self, element_name: Optional[str], element_properties: Optional[Iterable[LinkableElementProperty]]
-    ) -> bool:
+    def allow(self, element_name: Optional[str], element_properties: Optional[Iterable[GroupByItemProperty]]) -> bool:
         """Return true if this allows an item with the given name and properties.
 
         `None` can be specified in cases of incomplete context.

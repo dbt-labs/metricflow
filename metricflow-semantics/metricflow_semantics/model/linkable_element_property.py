@@ -4,8 +4,8 @@ from enum import Enum
 from typing import Any, FrozenSet
 
 
-class LinkableElementProperty(Enum):
-    """The properties associated with a valid linkable element.
+class GroupByItemProperty(Enum):
+    """The properties associated with the items in a `BaseGroupByItemSet`.
 
     Local means an element that is defined within the same semantic model as the measure. This definition is used
     throughout the related classes.
@@ -31,12 +31,12 @@ class LinkableElementProperty(Enum):
     DATE_PART = "date_part"
 
     @staticmethod
-    def all_properties() -> FrozenSet[LinkableElementProperty]:  # noqa: D102
-        return frozenset({linkable_element_property for linkable_element_property in LinkableElementProperty})
+    def all_properties() -> FrozenSet[GroupByItemProperty]:  # noqa: D102
+        return frozenset({linkable_element_property for linkable_element_property in GroupByItemProperty})
 
     def __lt__(self, other: Any) -> bool:  # type: ignore[misc]
         """When ordering, order by the enum name."""
-        if not isinstance(other, LinkableElementProperty):
+        if other.__class__ is not self.__class__:
             return NotImplemented
 
         return self.name < other.name

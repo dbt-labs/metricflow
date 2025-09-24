@@ -41,7 +41,7 @@ from metricflow_semantics.experimental.semantic_graph.trie_resolver.group_by_met
 )
 from metricflow_semantics.experimental.semantic_graph.trie_resolver.simple_resolver import SimpleTrieResolver
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
 from metricflow_semantics.model.semantics.linkable_spec_resolver import GroupByItemSetResolver
@@ -185,7 +185,7 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
         all_metric_nodes: MutableOrderedSet[SemanticGraphNode] = MutableOrderedSet()
 
         # Handling old behavior - you can't use this method to get group-by metrics.
-        without_any_of_set = frozenset((LinkableElementProperty.METRIC,))
+        without_any_of_set = frozenset((GroupByItemProperty.METRIC,))
         if element_filter is None or element_filter == GroupByItemSetFilter():
             element_filter = GroupByItemSetFilter(without_any_of=without_any_of_set)
         else:

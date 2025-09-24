@@ -28,7 +28,7 @@ from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annot
     GroupByItemSet,
 )
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
 from metricflow_semantics.model.semantics.linkable_element_set_base import AnnotatedSpec, BaseGroupByItemSet
@@ -513,7 +513,7 @@ def test_metric_in_filter(  # noqa: D103
                     time_grain=None,
                     date_part=None,
                     metric_subquery_entity_links=(EntityReference("listing"),),
-                    properties=frozenset({LinkableElementProperty.METRIC, LinkableElementProperty.JOINED}),
+                    properties=frozenset({GroupByItemProperty.METRIC, GroupByItemProperty.JOINED}),
                     origin_model_ids=[SemanticModelId.get_instance("listings_latest")],
                     derived_from_semantic_models=[SemanticModelReference("bookings")],
                 ),

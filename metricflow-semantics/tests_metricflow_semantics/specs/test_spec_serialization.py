@@ -9,7 +9,7 @@ from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annot
     GroupByItemSet,
 )
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
 from metricflow_semantics.model.semantics.linkable_element_set_base import AnnotatedSpec
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
@@ -34,7 +34,7 @@ def test_where_filter_spec_serialization() -> None:  # noqa: D103
                 date_part=None,
                 metric_subquery_entity_links=None,
                 time_grain=time_grain,
-                properties=(LinkableElementProperty.LOCAL,),
+                properties=(GroupByItemProperty.LOCAL,),
                 origin_model_ids=(SemanticModelId.get_instance("model_name"),),
                 derived_from_semantic_models=(SemanticModelReference("model_name"),),
             ),

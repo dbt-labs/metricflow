@@ -36,7 +36,7 @@ from metricflow_semantics.experimental.semantic_graph.trie_resolver.dunder_name_
 )
 from metricflow_semantics.helpers.performance_helpers import ExecutionTimer
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 
@@ -121,7 +121,7 @@ class SimpleTrieResolver(DunderNameTrieResolver):
             if element_filter is None:
                 element_filter = GroupByItemSetFilter()
             element_filter = element_filter.copy(
-                without_any_of=element_filter.without_any_of.union((LinkableElementProperty.DATE_PART,))
+                without_any_of=element_filter.without_any_of.union((GroupByItemProperty.DATE_PART,))
             )
 
         result_intersection_source_nodes = tuple(find_descendants_result.reachable_target_nodes)

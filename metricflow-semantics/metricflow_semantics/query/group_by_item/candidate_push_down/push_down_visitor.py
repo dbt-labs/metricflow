@@ -158,7 +158,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
             suggestion_generator: If there are issues with matching patterns to specs, use this to generate suggestions
             that will go in the issue.
             source_spec_patterns: The patterns to apply to the specs available at the measure nodes.
-            LinkableElementProperty).
+            GroupByItemProperty).
             filter_location: If resolving a where filter item, where this filter was defined.
         """
         self._semantic_manifest_lookup = manifest_lookup

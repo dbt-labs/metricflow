@@ -14,7 +14,7 @@ from metricflow_semantics.collection_helpers.lru_cache import LruCache
 from metricflow_semantics.errors.error_classes import DuplicateMetricError, MetricNotFoundError, NonExistentMeasureError
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
 from metricflow_semantics.model.semantics.linkable_spec_resolver import (
@@ -84,8 +84,8 @@ class MetricLookup:
         # Cache the result when group-by-metrics are selected in an LRU cache as there can be many of them and may
         # significantly increase memory usage.
         if (
-            LinkableElementProperty.METRIC in element_filter.with_any_of
-            and LinkableElementProperty.METRIC not in element_filter.without_any_of
+            GroupByItemProperty.METRIC in element_filter.with_any_of
+            and GroupByItemProperty.METRIC not in element_filter.without_any_of
         ):
             cache_key = (measure_reference, element_filter)
             result = self._linkable_elements_including_group_by_metrics_cache.get(cache_key)
