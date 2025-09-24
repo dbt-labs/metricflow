@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
-from typing import Sequence
+from typing import Iterable, Optional, Sequence
 
 from dbt_semantic_interfaces.references import (
     MeasureReference,
@@ -50,4 +50,14 @@ class GroupByItemSetResolver(ABC):
         through a separate and more comprehensive resolution process (`GroupByItemResolver`).
         # TODO: Consolidate resolution processes.
         """
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_common_set(
+        self,
+        measure_references: Iterable[MeasureReference] = (),
+        metric_references: Iterable[MetricReference] = (),
+        set_filter: Optional[GroupByItemSetFilter] = None,
+    ) -> BaseGroupByItemSet:
+        """Gets the set of the valid group-by items common to all inputs."""
         raise NotImplementedError
