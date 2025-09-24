@@ -55,7 +55,11 @@ class SemanticModelLookup:
         for semantic_model in sorted_semantic_models:
             self._add_semantic_model(semantic_model)
 
-        self._measure_lookup = MeasureLookup(sorted_semantic_models, custom_granularities)
+        self._measure_lookup = MeasureLookup(
+            semantic_models=sorted_semantic_models,
+            metrics=semantic_manifest.metrics,
+            custom_granularities=custom_granularities,
+        )
         self._dimension_lookup = DimensionLookup(sorted_semantic_models)
 
     @cached_property
