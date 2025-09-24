@@ -11,11 +11,14 @@ from dbt_semantic_interfaces.references import (
     SemanticModelReference,
     TimeDimensionReference,
 )
-from dbt_semantic_interfaces.type_enums import TimeGranularity
+from dbt_semantic_interfaces.type_enums import DimensionType, TimeGranularity
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.model.semantics.element_group import ElementGrouper
 from metricflow_semantics.model.semantics.semantic_model_helper import SemanticModelHelper
+from metricflow_semantics.model.spec_converters import MeasureConverter
+from metricflow_semantics.specs.measure_spec import MeasureSpec
 from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDimensionSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
@@ -53,10 +56,17 @@ class MeasureLookup:
         self._measure_reference_to_measure: Dict[MeasureReference, Measure] = {}
         self._measure_non_additive_dimension_specs: Dict[MeasureReference, NonAdditiveDimensionSpec] = {}
         self._model_reference_to_measures: dict[SemanticModelReference, AnyLengthTuple[Measure]] = {}
+        self._model_reference_to_aggregation_time_dimensions: dict[
+            SemanticModelReference, ElementGrouper[TimeDimensionReference, MeasureSpec]
+        ] = {}
 
         for semantic_model in semantic_models:
             semantic_model_reference = semantic_model.reference
             self._model_reference_to_measures[semantic_model_reference] = tuple(semantic_model.measures)
+            self._model_reference_to_aggregation_time_dimensions[semantic_model_reference] = ElementGrouper[
+                TimeDimensionReference, MeasureSpec
+            ]()
+
             primary_entity = SemanticModelHelper.resolved_primary_entity(semantic_model)
             time_dimension_reference_to_grain = SemanticModelHelper.get_time_dimension_grains(semantic_model)
 
@@ -93,6 +103,37 @@ class MeasureLookup:
                             custom_granularities=custom_granularities,
                         )
                     ),
+                )
+
+                # Populate `_model_reference_to_aggregation_time_dimensions`.
+                agg_time_dimension_reference = semantic_model.checked_agg_time_dimension_for_measure(measure.reference)
+                # Ensure agg_time_dimension is lowercased - this transformation was not enforced on earlier manifests
+                agg_time_dimension_reference = TimeDimensionReference(agg_time_dimension_reference.element_name.lower())
+
+                matching_dimensions = tuple(
+                    dimension
+                    for dimension in semantic_model.dimensions
+                    if dimension.type == DimensionType.TIME
+                    and dimension.time_dimension_reference == agg_time_dimension_reference
+                )
+
+                matching_dimensions_count = len(matching_dimensions)
+                if matching_dimensions_count != 1:
+                    raise RuntimeError(
+                        f"Found {matching_dimensions_count} matching dimensions for {agg_time_dimension_reference} "
+                        f"in {semantic_model}"
+                    )
+                agg_time_dimension = matching_dimensions[0]
+                if agg_time_dimension.type_params is None or agg_time_dimension.type_params.time_granularity is None:
+                    raise RuntimeError(
+                        f"Aggregation time dimension does not have a time granularity set: {agg_time_dimension}"
+                    )
+
+                self._model_reference_to_aggregation_time_dimensions[semantic_model.reference].add_value(
+                    key=TimeDimensionReference(
+                        element_name=agg_time_dimension.name,
+                    ),
+                    value=MeasureConverter.convert_to_measure_spec(measure=measure),
                 )
 
     def get_properties(self, measure_reference: MeasureReference) -> MeasureRelationshipPropertySet:
@@ -144,6 +185,23 @@ class MeasureLookup:
                 LazyFormat(
                     "Unable to get measures as the given model is not known",
                     model_name=model_reference.semantic_model_name,
+                    known_model_names=[
+                        model_reference.semantic_model_name for model_reference in self._model_reference_to_measures
+                    ],
+                )
+            )
+
+    def get_aggregation_time_dimensions_with_measures(
+        self, semantic_model_reference: SemanticModelReference
+    ) -> ElementGrouper[TimeDimensionReference, MeasureSpec]:
+        """Return all time dimensions in a semantic model with their associated measures."""
+        try:
+            return self._model_reference_to_aggregation_time_dimensions[semantic_model_reference]
+        except KeyError:
+            raise KeyError(
+                LazyFormat(
+                    "Can't get aggregation time dimensions as the given model is not known",
+                    model_name=semantic_model_reference.semantic_model_name,
                     known_model_names=[
                         model_reference.semantic_model_name for model_reference in self._model_reference_to_measures
                     ],
