@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Remove `LegacyLinkableSpecResolver`
+time: 2025-09-24T12:36:04.048278-07:00
+custom:
+  Author: plypaul
+  Issue: "1865"
