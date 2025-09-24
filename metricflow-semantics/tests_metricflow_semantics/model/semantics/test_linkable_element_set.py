@@ -16,7 +16,7 @@ from dbt_semantic_interfaces.references import (
 )
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
-    AnnotatedSpecLinkableElementSet,
+    GroupByItemSet,
 )
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
@@ -34,7 +34,7 @@ from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 
 @pytest.fixture(scope="session")
-def linkable_set() -> AnnotatedSpecLinkableElementSet:  # noqa: D103
+def linkable_set() -> GroupByItemSet:  # noqa: D103
     measure_source = SemanticModelReference("measure_source")
     entity_0 = EntityReference("entity_0")
     entity_1 = EntityReference("entity_1")
@@ -42,7 +42,7 @@ def linkable_set() -> AnnotatedSpecLinkableElementSet:  # noqa: D103
     entity_3 = EntityReference("entity_3")
     entity_4 = EntityReference("entity_4")
 
-    return AnnotatedSpecLinkableElementSet.create(
+    return GroupByItemSet.create(
         AnnotatedSpec.create(
             element_type=LinkableElementType.DIMENSION,
             element_name="dimension_element",
@@ -107,7 +107,7 @@ def linkable_set() -> AnnotatedSpecLinkableElementSet:  # noqa: D103
     )
 
 
-def test_derived_semantic_models(linkable_set: AnnotatedSpecLinkableElementSet) -> None:
+def test_derived_semantic_models(linkable_set: GroupByItemSet) -> None:
     """Tests that the semantic models in the element set are returned via `derived_from_semantic_models`."""
     assert set(linkable_set.derived_from_semantic_models) == {
         SemanticModelReference(semantic_model_name="dimension_source"),
@@ -123,7 +123,7 @@ def test_derived_semantic_models(linkable_set: AnnotatedSpecLinkableElementSet) 
     }
 
 
-def test_filter_by_pattern(linkable_set: AnnotatedSpecLinkableElementSet) -> None:
+def test_filter_by_pattern(linkable_set: GroupByItemSet) -> None:
     """Tests that the specs produced by the set are properly filtered by spec patterns."""
     spec_pattern = EntityLinkPattern(
         SpecPatternParameterSet(

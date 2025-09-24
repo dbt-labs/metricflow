@@ -11,7 +11,7 @@ from dbt_semantic_interfaces.type_enums import TimeGranularity
 from typing_extensions import override
 
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
-    AnnotatedSpecLinkableElementSet,
+    GroupByItemSet,
 )
 from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
@@ -112,7 +112,7 @@ class GroupByItemResolver:
         if push_down_result.candidate_set.num_candidates == 0:
             return GroupByItemResolution(
                 spec=None,
-                linkable_element_set=AnnotatedSpecLinkableElementSet(),
+                linkable_element_set=GroupByItemSet(),
                 issue_set=push_down_result.issue_set,
             )
 
@@ -134,7 +134,7 @@ class GroupByItemResolver:
         if push_down_result.candidate_set.num_candidates > 1:
             return GroupByItemResolution(
                 spec=None,
-                linkable_element_set=AnnotatedSpecLinkableElementSet(),
+                linkable_element_set=GroupByItemSet(),
                 issue_set=push_down_result.issue_set.add_issue(
                     AmbiguousGroupByItemIssue.from_parameters(
                         candidate_set=push_down_result.candidate_set,
@@ -192,14 +192,14 @@ class GroupByItemResolver:
         if push_down_result.candidate_set.num_candidates == 0:
             return GroupByItemResolution(
                 spec=None,
-                linkable_element_set=AnnotatedSpecLinkableElementSet(),
+                linkable_element_set=GroupByItemSet(),
                 issue_set=push_down_result.issue_set,
             )
 
         if push_down_result.candidate_set.num_candidates > 1:
             return GroupByItemResolution(
                 spec=None,
-                linkable_element_set=AnnotatedSpecLinkableElementSet(),
+                linkable_element_set=GroupByItemSet(),
                 issue_set=push_down_result.issue_set.add_issue(
                     AmbiguousGroupByItemIssue.from_parameters(
                         candidate_set=push_down_result.candidate_set,

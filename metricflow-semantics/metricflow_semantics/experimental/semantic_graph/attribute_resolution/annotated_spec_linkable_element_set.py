@@ -23,18 +23,15 @@ logger = logging.getLogger(__name__)
 
 
 @fast_frozen_dataclass()
-class AnnotatedSpecLinkableElementSet(BaseGroupByItemSet, SerializableDataclass):
-    """Temporary implementation of `BaseGroupByItemSet` based on `AnnotatedSpec`.
-
-    This class will be updated / renamed.
-    """
+class GroupByItemSet(BaseGroupByItemSet, SerializableDataclass):
+    """Implementation of `BaseGroupByItemSet` based on `AnnotatedSpec`."""
 
     annotated_specs: Tuple[AnnotatedSpec, ...] = ()
 
     @staticmethod
     def create(  # noqa: D102
         *annotated_specs: AnnotatedSpec,
-    ) -> AnnotatedSpecLinkableElementSet:
+    ) -> GroupByItemSet:
         dunder_name_to_annotated_spec: dict[str, AnnotatedSpec] = {}
         for annotated_spec in annotated_specs:
             dunder_name = annotated_spec.spec.qualified_name
@@ -44,13 +41,13 @@ class AnnotatedSpecLinkableElementSet(BaseGroupByItemSet, SerializableDataclass)
             else:
                 dunder_name_to_annotated_spec[dunder_name] = existing_annotated_spec.merge(annotated_spec)
 
-        return AnnotatedSpecLinkableElementSet(
+        return GroupByItemSet(
             annotated_specs=tuple(dunder_name_to_annotated_spec.values()),
         )
 
     @staticmethod
-    def create_from_trie(*dunder_name_tries: DunderNameTrie) -> AnnotatedSpecLinkableElementSet:  # noqa: D102
-        return AnnotatedSpecLinkableElementSet(
+    def create_from_trie(*dunder_name_tries: DunderNameTrie) -> GroupByItemSet:  # noqa: D102
+        return GroupByItemSet(
             annotated_specs=tuple(
                 annotated_spec
                 for annotated_spec in mf_flatten(
@@ -62,10 +59,8 @@ class AnnotatedSpecLinkableElementSet(BaseGroupByItemSet, SerializableDataclass)
         )
 
     @staticmethod
-    def create_from_mapping(  # noqa: D102
-        dunder_name_to_annotated_spec: dict[str, AnnotatedSpec]
-    ) -> AnnotatedSpecLinkableElementSet:
-        return AnnotatedSpecLinkableElementSet(annotated_specs=tuple(dunder_name_to_annotated_spec.values()))
+    def create_from_mapping(dunder_name_to_annotated_spec: dict[str, AnnotatedSpec]) -> GroupByItemSet:  # noqa: D102
+        return GroupByItemSet(annotated_specs=tuple(dunder_name_to_annotated_spec.values()))
 
     @cached_property
     def dunder_name_to_annotated_spec(self) -> Mapping[str, AnnotatedSpec]:
@@ -73,7 +68,7 @@ class AnnotatedSpecLinkableElementSet(BaseGroupByItemSet, SerializableDataclass)
         return {annotated_spec.spec.qualified_name: annotated_spec for annotated_spec in self.annotated_specs}
 
     @override
-    def intersection(self, *other_element_sets: AnnotatedSpecLinkableElementSet) -> AnnotatedSpecLinkableElementSet:
+    def intersection(self, *other_element_sets: GroupByItemSet) -> GroupByItemSet:
         if len(other_element_sets) == 0:
             return self
 
@@ -89,10 +84,10 @@ class AnnotatedSpecLinkableElementSet(BaseGroupByItemSet, SerializableDataclass)
                 annotated_spec = annotated_spec.merge(other_element_set.dunder_name_to_annotated_spec[common_key])
             intersected_dunder_name_to_annotated_spec[common_key] = annotated_spec
 
-        return AnnotatedSpecLinkableElementSet.create_from_mapping(intersected_dunder_name_to_annotated_spec)
+        return GroupByItemSet.create_from_mapping(intersected_dunder_name_to_annotated_spec)
 
     @override
-    def union(self, *others: AnnotatedSpecLinkableElementSet) -> AnnotatedSpecLinkableElementSet:
+    def union(self, *others: GroupByItemSet) -> GroupByItemSet:
         new_dunder_name_to_annotated_spec: dict[str, AnnotatedSpec] = dict(**self.dunder_name_to_annotated_spec)
 
         for other in others:
@@ -105,10 +100,10 @@ class AnnotatedSpecLinkableElementSet(BaseGroupByItemSet, SerializableDataclass)
 
                 new_dunder_name_to_annotated_spec[dunder_name] = annotated_spec
 
-        return AnnotatedSpecLinkableElementSet.create_from_mapping(new_dunder_name_to_annotated_spec)
+        return GroupByItemSet.create_from_mapping(new_dunder_name_to_annotated_spec)
 
     @override
-    def filter(self, element_filter: LinkableElementFilter) -> AnnotatedSpecLinkableElementSet:
+    def filter(self, element_filter: LinkableElementFilter) -> GroupByItemSet:
         allow_element_name_set = element_filter.element_names
         deny_property_set = element_filter.without_any_of
         deny_match_all_property_set = element_filter.without_all_of
@@ -133,7 +128,7 @@ class AnnotatedSpecLinkableElementSet(BaseGroupByItemSet, SerializableDataclass)
                 continue
             new_specs.append(annotated_spec)
 
-        return AnnotatedSpecLinkableElementSet(annotated_specs=tuple(new_specs))
+        return GroupByItemSet(annotated_specs=tuple(new_specs))
 
     @override
     @property
@@ -146,7 +141,7 @@ class AnnotatedSpecLinkableElementSet(BaseGroupByItemSet, SerializableDataclass)
         return tuple(annotated_spec.spec for annotated_spec in self.annotated_specs)
 
     @override
-    def filter_by_spec_patterns(self, spec_patterns: Sequence[SpecPattern]) -> AnnotatedSpecLinkableElementSet:
+    def filter_by_spec_patterns(self, spec_patterns: Sequence[SpecPattern]) -> GroupByItemSet:
         if len(spec_patterns) == 0:
             return self
 
@@ -158,9 +153,7 @@ class AnnotatedSpecLinkableElementSet(BaseGroupByItemSet, SerializableDataclass)
             matched_specs = tuple(spec_pattern.match(specs))
             specs = matched_specs
 
-        return AnnotatedSpecLinkableElementSet(
-            annotated_specs=tuple(spec_to_annotated_spec[matched_spec] for matched_spec in specs)
-        )
+        return GroupByItemSet(annotated_specs=tuple(spec_to_annotated_spec[matched_spec] for matched_spec in specs))
 
     @override
     @cached_property

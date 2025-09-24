@@ -9,7 +9,7 @@ from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.merger import Mergeable
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
-    AnnotatedSpecLinkableElementSet,
+    GroupByItemSet,
 )
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
@@ -49,9 +49,7 @@ class WhereFilterSpec(Mergeable, SerializableDataclass):
     # quoted identifiers later.
     where_sql: str
     bind_parameters: SqlBindParameterSet
-    # Temporarily use `AnnotatedSpecLinkableElementSet` to simplify migration. This should be changed to a simpler type
-    # as this class needs to be serializable.
-    element_set: AnnotatedSpecLinkableElementSet
+    element_set: GroupByItemSet
 
     @cached_property
     def linkable_spec_set(self) -> LinkableSpecSet:
@@ -94,5 +92,5 @@ class WhereFilterSpec(Mergeable, SerializableDataclass):
         return WhereFilterSpec(
             where_sql="TRUE",
             bind_parameters=SqlBindParameterSet(),
-            element_set=AnnotatedSpecLinkableElementSet(),
+            element_set=GroupByItemSet(),
         )

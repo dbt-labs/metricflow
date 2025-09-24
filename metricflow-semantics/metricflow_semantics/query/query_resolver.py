@@ -10,7 +10,7 @@ from typing import Dict, List, Optional, Sequence, Set, Tuple
 from dbt_semantic_interfaces.references import MeasureReference, MetricReference, SemanticModelReference
 
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
-    AnnotatedSpecLinkableElementSet,
+    GroupByItemSet,
 )
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat, mf_pformat_dict
@@ -293,7 +293,7 @@ class MetricFlowQueryResolver:
 
         linkable_element_set: BaseGroupByItemSet
         if len(linkable_element_sets) == 0:
-            linkable_element_set = AnnotatedSpecLinkableElementSet()
+            linkable_element_set = GroupByItemSet()
         else:
             linkable_element_set = linkable_element_sets[0].union(*linkable_element_sets[1:])
 

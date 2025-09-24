@@ -11,7 +11,7 @@ from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
-    AnnotatedSpecLinkableElementSet,
+    GroupByItemSet,
 )
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
@@ -198,7 +198,7 @@ def test_filter_with_where_constraint_node(
             WhereFilterSpec(
                 where_sql="booking__ds__day = '2020-01-01'",
                 bind_parameters=SqlBindParameterSet(),
-                element_set=AnnotatedSpecLinkableElementSet(
+                element_set=GroupByItemSet(
                     annotated_specs=(
                         AnnotatedSpec.create(
                             element_type=LinkableElementType.TIME_DIMENSION,

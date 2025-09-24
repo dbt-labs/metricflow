@@ -9,7 +9,7 @@ from dbt_semantic_interfaces.protocols import WhereFilter, WhereFilterIntersecti
 
 from metricflow_semantics.errors.error_classes import RenderSqlTemplateException
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
-    AnnotatedSpecLinkableElementSet,
+    GroupByItemSet,
 )
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
@@ -109,7 +109,7 @@ class WhereSpecFactory:
                 WhereFilterSpec(
                     where_sql=where_sql,
                     bind_parameters=SqlBindParameterSet(),
-                    element_set=AnnotatedSpecLinkableElementSet.create(*rendered_spec_tracker.rendered_specs),
+                    element_set=GroupByItemSet.create(*rendered_spec_tracker.rendered_specs),
                 )
             )
 

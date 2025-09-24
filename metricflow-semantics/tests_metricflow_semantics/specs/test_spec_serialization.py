@@ -6,7 +6,7 @@ from dbt_semantic_interfaces.dataclass_serialization import DataClassDeserialize
 from dbt_semantic_interfaces.references import EntityReference, SemanticModelReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
-    AnnotatedSpecLinkableElementSet,
+    GroupByItemSet,
 )
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
@@ -26,7 +26,7 @@ def test_where_filter_spec_serialization() -> None:  # noqa: D103
         bind_parameters=SqlBindParameterSet(
             param_items=(SqlBindParameter(key="key", value=SqlBindParameterValue(str_value="str_value")),)
         ),
-        element_set=AnnotatedSpecLinkableElementSet.create(
+        element_set=GroupByItemSet.create(
             AnnotatedSpec.create(
                 element_type=LinkableElementType.TIME_DIMENSION,
                 element_name="element_name",

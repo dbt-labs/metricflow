@@ -14,7 +14,7 @@ from metricflow_semantics.experimental.metricflow_exception import MetricflowInt
 from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricflowPathfinder
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
-    AnnotatedSpecLinkableElementSet,
+    GroupByItemSet,
 )
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe import IndexedDunderName
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.recipe_writer_path import (
@@ -113,7 +113,7 @@ class SemanticGraphLinkableSpecResolver(LinkableSpecResolver):
         ).dunder_name_trie
 
         return self._result_cache_for_measure.set_and_get(
-            cache_key, AnnotatedSpecLinkableElementSet.create_from_trie(simple_trie, group_by_metric_trie)
+            cache_key, GroupByItemSet.create_from_trie(simple_trie, group_by_metric_trie)
         )
 
     @override
@@ -165,7 +165,7 @@ class SemanticGraphLinkableSpecResolver(LinkableSpecResolver):
         result_trie = MutableDunderNameTrie.union_merge_common(tries_to_union)
 
         return self._result_cache_for_distinct_values.set_and_get(
-            cache_key, AnnotatedSpecLinkableElementSet.create_from_trie(result_trie)
+            cache_key, GroupByItemSet.create_from_trie(result_trie)
         )
 
     @override
@@ -175,7 +175,7 @@ class SemanticGraphLinkableSpecResolver(LinkableSpecResolver):
         element_filter: Optional[LinkableElementFilter] = None,
     ) -> BaseGroupByItemSet:
         if len(metric_references) == 0:
-            return AnnotatedSpecLinkableElementSet()
+            return GroupByItemSet()
 
         cache_key = (FrozenOrderedSet(sorted(metric_references)), element_filter)
         cache_result = self._result_cache_for_metrics.get(cache_key)
@@ -211,5 +211,5 @@ class SemanticGraphLinkableSpecResolver(LinkableSpecResolver):
             all_metric_nodes, element_filter
         ).dunder_name_trie
         return self._result_cache_for_metrics.set_and_get(
-            cache_key, AnnotatedSpecLinkableElementSet.create_from_trie(simple_trie, group_by_metric_trie)
+            cache_key, GroupByItemSet.create_from_trie(simple_trie, group_by_metric_trie)
         )
