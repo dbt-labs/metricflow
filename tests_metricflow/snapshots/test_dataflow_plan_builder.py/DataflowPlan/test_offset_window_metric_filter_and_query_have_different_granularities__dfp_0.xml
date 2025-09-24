@@ -18,7 +18,7 @@ docstring:
             <!--         WhereFilterSpec(                                        -->
             <!--           where_sql="metric_time__day = '2020-01-01'",          -->
             <!--           bind_parameters=SqlBindParameterSet(),                -->
-            <!--           element_set=AnnotatedSpecLinkableElementSet(          -->
+            <!--           element_set=GroupByItemSet(                           -->
             <!--             annotated_specs=(                                   -->
             <!--               AnnotatedSpec(                                    -->
             <!--                 element_type=TIME_DIMENSION,                    -->
@@ -57,7 +57,7 @@ docstring:
                     <!--         WhereFilterSpec(                                                 -->
                     <!--           where_sql="metric_time__day = '2020-01-01'",                   -->
                     <!--           bind_parameters=SqlBindParameterSet(),                         -->
-                    <!--           element_set=AnnotatedSpecLinkableElementSet(                   -->
+                    <!--           element_set=GroupByItemSet(                                    -->
                     <!--             annotated_specs=(                                            -->
                     <!--               AnnotatedSpec(                                             -->
                     <!--                 element_type=TIME_DIMENSION,                             -->
@@ -103,7 +103,7 @@ docstring:
                                 <!--   WhereFilterSpec(                               -->
                                 <!--     where_sql="metric_time__day = '2020-01-01'", -->
                                 <!--     bind_parameters=SqlBindParameterSet(),       -->
-                                <!--     element_set=AnnotatedSpecLinkableElementSet( -->
+                                <!--     element_set=GroupByItemSet(                  -->
                                 <!--       annotated_specs=(                          -->
                                 <!--         AnnotatedSpec(                           -->
                                 <!--           element_type=TIME_DIMENSION,           -->
@@ -235,7 +235,7 @@ docstring:
                     <!--         WhereFilterSpec(                               -->
                     <!--           where_sql="metric_time__day = '2020-01-01'", -->
                     <!--           bind_parameters=SqlBindParameterSet(),       -->
-                    <!--           element_set=AnnotatedSpecLinkableElementSet( -->
+                    <!--           element_set=GroupByItemSet(                  -->
                     <!--             annotated_specs=(                          -->
                     <!--               AnnotatedSpec(                           -->
                     <!--                 element_type=TIME_DIMENSION,           -->
@@ -280,7 +280,7 @@ docstring:
                                 <!--   WhereFilterSpec(                               -->
                                 <!--     where_sql="metric_time__day = '2020-01-01'", -->
                                 <!--     bind_parameters=SqlBindParameterSet(),       -->
-                                <!--     element_set=AnnotatedSpecLinkableElementSet( -->
+                                <!--     element_set=GroupByItemSet(                  -->
                                 <!--       annotated_specs=(                          -->
                                 <!--         AnnotatedSpec(                           -->
                                 <!--           element_type=TIME_DIMENSION,           -->

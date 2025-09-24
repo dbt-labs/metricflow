@@ -38,7 +38,7 @@ MetricFlowQuerySpec(
             ),
           ],
         ),
-        resolved_linkable_element_set=AnnotatedSpecLinkableElementSet(
+        resolved_group_by_item_set=GroupByItemSet(
           annotated_specs=(
             AnnotatedSpec(
               element_type=TIME_DIMENSION,
@@ -106,7 +106,7 @@ MetricFlowQuerySpec(
             ),
           ],
         ),
-        resolved_linkable_element_set=AnnotatedSpecLinkableElementSet(
+        resolved_group_by_item_set=GroupByItemSet(
           annotated_specs=(
             AnnotatedSpec(
               element_type=TIME_DIMENSION,

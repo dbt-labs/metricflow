@@ -17,39 +17,39 @@ docstring:
                 <ComputeMetricsNode>
                     <!-- description = 'Compute Metrics via Expressions' -->
                     <!-- node_id = NodeId(id_str='cm_0') -->
-                    <!-- metric_spec =                                          -->
-                    <!--   MetricSpec(                                          -->
-                    <!--     element_name='booking_value',                      -->
-                    <!--     filter_spec_set=WhereFilterSpecSet(                -->
-                    <!--       metric_level_filter_specs=(                      -->
-                    <!--         WhereFilterSpec(                               -->
-                    <!--           where_sql='booking__is_instant',             -->
-                    <!--           bind_parameters=SqlBindParameterSet(),       -->
-                    <!--           element_set=AnnotatedSpecLinkableElementSet( -->
-                    <!--             annotated_specs=(                          -->
-                    <!--               AnnotatedSpec(                           -->
-                    <!--                 element_type=DIMENSION,                -->
-                    <!--                 element_name='is_instant',             -->
-                    <!--                 entity_link_names=(                    -->
-                    <!--                   'booking',                           -->
-                    <!--                 ),                                     -->
-                    <!--                 element_properties=(                   -->
-                    <!--                   LOCAL,                               -->
-                    <!--                 ),                                     -->
-                    <!--                 origin_semantic_model_names=(          -->
-                    <!--                   'bookings_source',                   -->
-                    <!--                 ),                                     -->
-                    <!--                 derived_from_semantic_model_names=(    -->
-                    <!--                   'bookings_source',                   -->
-                    <!--                 ),                                     -->
-                    <!--               ),                                       -->
-                    <!--             ),                                         -->
-                    <!--           ),                                           -->
-                    <!--         ),                                             -->
-                    <!--       ),                                               -->
-                    <!--     ),                                                 -->
-                    <!--     alias='booking_value_with_is_instant_constraint',  -->
-                    <!--   )                                                    -->
+                    <!-- metric_spec =                                         -->
+                    <!--   MetricSpec(                                         -->
+                    <!--     element_name='booking_value',                     -->
+                    <!--     filter_spec_set=WhereFilterSpecSet(               -->
+                    <!--       metric_level_filter_specs=(                     -->
+                    <!--         WhereFilterSpec(                              -->
+                    <!--           where_sql='booking__is_instant',            -->
+                    <!--           bind_parameters=SqlBindParameterSet(),      -->
+                    <!--           element_set=GroupByItemSet(                 -->
+                    <!--             annotated_specs=(                         -->
+                    <!--               AnnotatedSpec(                          -->
+                    <!--                 element_type=DIMENSION,               -->
+                    <!--                 element_name='is_instant',            -->
+                    <!--                 entity_link_names=(                   -->
+                    <!--                   'booking',                          -->
+                    <!--                 ),                                    -->
+                    <!--                 element_properties=(                  -->
+                    <!--                   LOCAL,                              -->
+                    <!--                 ),                                    -->
+                    <!--                 origin_semantic_model_names=(         -->
+                    <!--                   'bookings_source',                  -->
+                    <!--                 ),                                    -->
+                    <!--                 derived_from_semantic_model_names=(   -->
+                    <!--                   'bookings_source',                  -->
+                    <!--                 ),                                    -->
+                    <!--               ),                                      -->
+                    <!--             ),                                        -->
+                    <!--           ),                                          -->
+                    <!--         ),                                            -->
+                    <!--       ),                                              -->
+                    <!--     ),                                                -->
+                    <!--     alias='booking_value_with_is_instant_constraint', -->
+                    <!--   )                                                   -->
                     <AggregateMeasuresNode>
                         <!-- description = 'Aggregate Measures' -->
                         <!-- node_id = NodeId(id_str='am_0') -->
@@ -66,27 +66,27 @@ docstring:
                             <WhereConstraintNode>
                                 <!-- description = 'Constrain Output with WHERE' -->
                                 <!-- node_id = NodeId(id_str='wcc_0') -->
-                                <!-- where_condition =                                -->
-                                <!--   WhereFilterSpec(                               -->
-                                <!--     where_sql='booking__is_instant',             -->
-                                <!--     bind_parameters=SqlBindParameterSet(),       -->
-                                <!--     element_set=AnnotatedSpecLinkableElementSet( -->
-                                <!--       annotated_specs=(                          -->
-                                <!--         AnnotatedSpec(                           -->
-                                <!--           element_type=DIMENSION,                -->
-                                <!--           element_name='is_instant',             -->
-                                <!--           entity_link_names=('booking',),        -->
-                                <!--           element_properties=(LOCAL,),           -->
-                                <!--           origin_semantic_model_names=(          -->
-                                <!--             'bookings_source',                   -->
-                                <!--           ),                                     -->
-                                <!--           derived_from_semantic_model_names=(    -->
-                                <!--             'bookings_source',                   -->
-                                <!--           ),                                     -->
-                                <!--         ),                                       -->
-                                <!--       ),                                         -->
-                                <!--     ),                                           -->
-                                <!--   )                                              -->
+                                <!-- where_condition =                             -->
+                                <!--   WhereFilterSpec(                            -->
+                                <!--     where_sql='booking__is_instant',          -->
+                                <!--     bind_parameters=SqlBindParameterSet(),    -->
+                                <!--     element_set=GroupByItemSet(               -->
+                                <!--       annotated_specs=(                       -->
+                                <!--         AnnotatedSpec(                        -->
+                                <!--           element_type=DIMENSION,             -->
+                                <!--           element_name='is_instant',          -->
+                                <!--           entity_link_names=('booking',),     -->
+                                <!--           element_properties=(LOCAL,),        -->
+                                <!--           origin_semantic_model_names=(       -->
+                                <!--             'bookings_source',                -->
+                                <!--           ),                                  -->
+                                <!--           derived_from_semantic_model_names=( -->
+                                <!--             'bookings_source',                -->
+                                <!--           ),                                  -->
+                                <!--         ),                                    -->
+                                <!--       ),                                      -->
+                                <!--     ),                                        -->
+                                <!--   )                                           -->
                                 <MetricTimeDimensionTransformNode>
                                     <!-- description = "Metric Time Dimension 'ds'" -->
                                     <!-- node_id = NodeId(id_str='sma_28009') -->
