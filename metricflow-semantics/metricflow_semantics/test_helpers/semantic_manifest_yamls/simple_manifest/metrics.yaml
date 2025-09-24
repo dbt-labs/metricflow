@@ -4,10 +4,7 @@ metric:
   description: "bookings metric"
   type: simple
   type_params:
-    metric_aggregation_params:
-      name: bookings
-      expr: "1"
-      agg: sum
+    measure: bookings
 ---
 metric:
   name: "average_booking_value"
