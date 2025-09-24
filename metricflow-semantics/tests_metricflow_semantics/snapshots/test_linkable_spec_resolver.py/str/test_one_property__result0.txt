@@ -1,6 +1,0 @@
-test_name: test_one_property
-test_filename: test_linkable_spec_resolver.py
----
-Dunder Name    Metric-Subquery Entity-Links    Type    Properties    Derived-From Semantic Models
--------------  ------------------------------  ------  ------------  ------------------------------
-listing                                        ENTITY  ENTITY,LOCAL  bookings_source,views_source

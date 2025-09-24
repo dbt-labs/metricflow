@@ -4,7 +4,7 @@ docstring:
   Tests a group-by-item that's only available in one of the parent metrics of a derived metric.
 ---
 GroupByItemResolution(
-  linkable_element_set=LinkableElementSet(),
+  linkable_element_set=AnnotatedSpecLinkableElementSet(),
   issue_set=MetricFlowQueryResolutionIssueSet(
     issues=(
       NoMatchingItemsForMeasure(
