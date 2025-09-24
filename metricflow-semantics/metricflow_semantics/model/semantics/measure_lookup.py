@@ -13,6 +13,7 @@ from dbt_semantic_interfaces.references import (
 )
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 
+from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantics.semantic_model_helper import SemanticModelHelper
 from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDimensionSpec
@@ -51,9 +52,11 @@ class MeasureLookup:
         self._measure_reference_to_property_set: Dict[MeasureReference, MeasureRelationshipPropertySet] = {}
         self._measure_reference_to_measure: Dict[MeasureReference, Measure] = {}
         self._measure_non_additive_dimension_specs: Dict[MeasureReference, NonAdditiveDimensionSpec] = {}
+        self._model_reference_to_measures: dict[SemanticModelReference, AnyLengthTuple[Measure]] = {}
+
         for semantic_model in semantic_models:
             semantic_model_reference = semantic_model.reference
-
+            self._model_reference_to_measures[semantic_model_reference] = tuple(semantic_model.measures)
             primary_entity = SemanticModelHelper.resolved_primary_entity(semantic_model)
             time_dimension_reference_to_grain = SemanticModelHelper.get_time_dimension_grains(semantic_model)
 
@@ -132,3 +135,17 @@ class MeasureLookup:
         This includes all measures with non-additive dimension parameters, if any, from the collection of semantic models.
         """
         return self._measure_non_additive_dimension_specs
+
+    def get_measures_by_model(self, model_reference: SemanticModelReference) -> Sequence[Measure]:  # noqa: D102
+        try:
+            return self._model_reference_to_measures[model_reference]
+        except KeyError:
+            raise KeyError(
+                LazyFormat(
+                    "The given model is not known",
+                    model_name=model_reference.semantic_model_name,
+                    known_model_names=[
+                        model_reference.semantic_model_name for model_reference in self._model_reference_to_measures
+                    ],
+                )
+            )
