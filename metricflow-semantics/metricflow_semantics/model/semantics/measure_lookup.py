@@ -1,17 +1,23 @@
 from __future__ import annotations
 
+from collections import defaultdict
 from dataclasses import dataclass
 from functools import cached_property
-from typing import Dict, Mapping, Sequence, Tuple
+from typing import Dict, Mapping, Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.protocols import Measure, SemanticModel
+from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
+from dbt_semantic_interfaces.implementations.elements.measure import (
+    PydanticMeasure,
+)
+from dbt_semantic_interfaces.protocols import Measure, Metric, SemanticModel
+from dbt_semantic_interfaces.protocols.metric import MetricAggregationParams
 from dbt_semantic_interfaces.references import (
     EntityReference,
     MeasureReference,
     SemanticModelReference,
     TimeDimensionReference,
 )
-from dbt_semantic_interfaces.type_enums import DimensionType, TimeGranularity
+from dbt_semantic_interfaces.type_enums import DimensionType, MetricType, TimeGranularity
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
@@ -50,6 +56,7 @@ class MeasureLookup:
     def __init__(  # noqa: D107
         self,
         semantic_models: Sequence[SemanticModel],
+        metrics: Sequence[Metric],
         custom_granularities: Mapping[str, ExpandedTimeGranularity],
     ) -> None:
         self._measure_reference_to_property_set: Dict[MeasureReference, MeasureRelationshipPropertySet] = {}
@@ -60,6 +67,34 @@ class MeasureLookup:
             SemanticModelReference, ElementGrouper[TimeDimensionReference, MeasureSpec]
         ] = {}
 
+        model_reference_to_additional_measures: defaultdict[SemanticModelReference, list[Measure]] = defaultdict(list)
+        for metric in metrics:
+            metric_type = metric.type
+            if metric_type is MetricType.SIMPLE:
+                metric_aggregation_params = metric.type_params.metric_aggregation_params
+                if metric_aggregation_params is not None:
+                    model_reference_to_additional_measures[
+                        SemanticModelReference(metric_aggregation_params.semantic_model)
+                    ].append(
+                        MeasureLookup._convert_metric_aggregation_to_measure(
+                            metric_name=metric.name,
+                            expr=metric.type_params.expr,
+                            metric_aggregation_params=metric_aggregation_params,
+                        )
+                    )
+            elif (
+                metric_type is MetricType.CONVERSION
+                or metric_type is MetricType.CUMULATIVE
+                or metric_type is MetricType.CONVERSION
+                or metric_type is MetricType.DERIVED
+                or metric_type is MetricType.RATIO
+            ):
+                pass
+            else:
+                assert_values_exhausted(metric_type)
+
+        collected_measure_reference_to_measure: dict[MeasureReference, Measure] = {}
+
         for semantic_model in semantic_models:
             semantic_model_reference = semantic_model.reference
             self._model_reference_to_measures[semantic_model_reference] = tuple(semantic_model.measures)
@@ -67,13 +102,16 @@ class MeasureLookup:
                 TimeDimensionReference, MeasureSpec
             ]()
 
+            measure_reference_to_measure = {measure.reference: measure for measure in semantic_model.measures}
+            # If there are duplicate names, the ones from `metrics` take precedence.
+            for measure in model_reference_to_additional_measures[semantic_model_reference]:
+                measure_reference_to_measure[measure.reference] = measure
+            collected_measure_reference_to_measure.update(measure_reference_to_measure)
+
             primary_entity = SemanticModelHelper.resolved_primary_entity(semantic_model)
             time_dimension_reference_to_grain = SemanticModelHelper.get_time_dimension_grains(semantic_model)
 
-            for measure in semantic_model.measures:
-                measure_reference = measure.reference
-                self._measure_reference_to_measure[measure_reference] = measure
-
+            for measure_reference, measure in measure_reference_to_measure.items():
                 # Handle non-additive dimension specs
                 if measure.non_additive_dimension:
                     non_additive_dimension_spec = NonAdditiveDimensionSpec(
@@ -135,6 +173,14 @@ class MeasureLookup:
                     ),
                     value=MeasureConverter.convert_to_measure_spec(measure=measure),
                 )
+
+        self._measure_reference_to_measure = {
+            measure_reference: collected_measure_reference_to_measure[measure_reference]
+            for measure_reference in sorted(
+                collected_measure_reference_to_measure.keys(),
+                key=lambda ref: ref.element_name,
+            )
+        }
 
     def get_properties(self, measure_reference: MeasureReference) -> MeasureRelationshipPropertySet:
         """Return properties of the measure as it relates to other elements in the semantic model."""
@@ -207,3 +253,22 @@ class MeasureLookup:
                     ],
                 )
             )
+
+    @staticmethod
+    def _convert_metric_aggregation_to_measure(
+        metric_name: str, expr: Optional[str], metric_aggregation_params: MetricAggregationParams
+    ) -> Measure:
+        # noinspection PyTypeChecker
+        return PydanticMeasure(
+            name=metric_name,
+            agg=metric_aggregation_params.agg,
+            expr=expr,
+            agg_params=metric_aggregation_params.agg_params,
+            non_additive_dimension=metric_aggregation_params.non_additive_dimension,
+            agg_time_dimension=metric_aggregation_params.agg_time_dimension,
+            description=None,
+            label=None,
+            config=None,
+            create_metric=False,
+            metadata=None,
+        )
