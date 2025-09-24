@@ -18,7 +18,7 @@ from metricflow_semantics.model.linkable_element_property import LinkableElement
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
 from metricflow_semantics.model.semantics.linkable_spec_resolver import (
-    LinkableSpecResolver,
+    GroupByItemSetResolver,
 )
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
@@ -35,7 +35,7 @@ class MetricLookup:
         semantic_manifest: SemanticManifest,
         semantic_model_lookup: SemanticModelLookup,
         custom_granularities: Dict[str, ExpandedTimeGranularity],
-        linkable_spec_resolver: LinkableSpecResolver,
+        linkable_spec_resolver: GroupByItemSetResolver,
     ) -> None:
         """Initializer.
 

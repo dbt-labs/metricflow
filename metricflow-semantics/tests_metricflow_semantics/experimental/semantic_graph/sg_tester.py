@@ -10,7 +10,7 @@ from metricflow_semantics.experimental.semantic_graph.attribute_resolution.recip
     RecipeWriterPathfinder,
 )
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.sg_linkable_spec_resolver import (
-    SemanticGraphLinkableSpecResolver,
+    SemanticGraphGroupByItemSetResolver,
 )
 from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
     SemanticGraph,
@@ -46,7 +46,7 @@ class SemanticGraphTester:
         )
 
     @property
-    def sg_resolver(self) -> SemanticGraphLinkableSpecResolver:  # noqa: D102
+    def sg_resolver(self) -> SemanticGraphGroupByItemSetResolver:  # noqa: D102
         return self._fixture.sg_resolver
 
     @property

@@ -15,7 +15,7 @@ from metricflow_semantics.model.semantics.linkable_element_set_base import BaseG
 logger = logging.getLogger(__name__)
 
 
-class LinkableSpecResolver(ABC):
+class GroupByItemSetResolver(ABC):
     """Resolves available group-by items for measures and metrics."""
 
     @abstractmethod

@@ -10,7 +10,7 @@ from metricflow_semantics.experimental.semantic_graph.attribute_resolution.recip
     AttributeRecipeWriterPath,
 )
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.sg_linkable_spec_resolver import (
-    SemanticGraphLinkableSpecResolver,
+    SemanticGraphGroupByItemSetResolver,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.graph_builder import SemanticGraphBuilder
 from metricflow_semantics.experimental.semantic_graph.sg_interfaces import SemanticGraphEdge, SemanticGraphNode
@@ -42,7 +42,7 @@ class SemanticManifestLookup:
         graph_builder = SemanticGraphBuilder(manifest_object_lookup=manifest_object_lookup)
         semantic_graph = graph_builder.build()
 
-        linkable_spec_resolver = SemanticGraphLinkableSpecResolver(
+        linkable_spec_resolver = SemanticGraphGroupByItemSetResolver(
             manifest_object_lookup=manifest_object_lookup,
             semantic_graph=semantic_graph,
             path_finder=pathfinder,

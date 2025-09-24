@@ -44,13 +44,13 @@ from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
-from metricflow_semantics.model.semantics.linkable_spec_resolver import LinkableSpecResolver
+from metricflow_semantics.model.semantics.linkable_spec_resolver import GroupByItemSetResolver
 
 logger = logging.getLogger(__name__)
 
 
-class SemanticGraphLinkableSpecResolver(LinkableSpecResolver):
-    """An implementation of `LinkableSpecResolver` using the semantic graph."""
+class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
+    """An implementation of `GroupByItemSetResolver` using the semantic graph."""
 
     def __init__(  # noqa: D107
         self,
