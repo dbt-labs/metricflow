@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Add tests for the filtering of `AnnotatedSpecLinkableElementSet`
+time: 2025-09-24T12:35:36.884127-07:00
+custom:
+  Author: plypaul
+  Issue: "1864"
