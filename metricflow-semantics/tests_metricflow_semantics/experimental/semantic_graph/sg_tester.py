@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Mapping
-from typing import Iterable, Optional, Sequence
+from typing import Callable, Iterable, Optional, Sequence
 
 from dbt_semantic_interfaces.references import MeasureReference, MetricReference
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
@@ -19,6 +19,7 @@ from metricflow_semantics.helpers.performance_helpers import ExecutionTimer
 from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.helpers.time_helpers import PrettyDuration
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseLinkableElementSet
 from metricflow_semantics.model.semantics.linkable_spec_resolver import LegacyLinkableSpecResolver
@@ -184,6 +185,32 @@ class SemanticGraphTester:
             snapshot_str="\n".join(lines),
             expectation_description=expectation_description,
         )
+
+    def check_set_filtering(
+        self,
+        complete_set: BaseLinkableElementSet,
+        filtered_set_callable: Callable[[LinkableElementFilter], BaseLinkableElementSet],
+    ) -> None:
+        """Given the set containing all items, check that the given callable returns correctly filtered results.
+
+        This calls `BaseLinkableElementSet.filter()` so the callable should have differences in logic for filtered
+        set generation.
+        """
+        for element_property in LinkableElementProperty:
+            with_any_of_filter = LinkableElementFilter(with_any_of=frozenset((element_property,)))
+            filtered_set = filtered_set_callable(with_any_of_filter)
+            # The resolver uses the filter to limit graph traversal, so this is not the same logic.
+            expected_items = set(complete_set.filter(with_any_of_filter).annotated_specs)
+            actual_items = set(filtered_set.annotated_specs)
+
+            assert expected_items == actual_items
+
+            without_any_of_filter = LinkableElementFilter(without_any_of=frozenset((element_property,)))
+            filtered_set = filtered_set_callable(without_any_of_filter)
+            expected_items = set(complete_set.filter(without_any_of_filter).annotated_specs)
+            actual_items = set(filtered_set.annotated_specs)
+
+            assert expected_items == actual_items
 
     @staticmethod
     def _convert_linkable_element_set_to_rows(
