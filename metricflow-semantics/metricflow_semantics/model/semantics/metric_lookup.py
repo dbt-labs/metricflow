@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import Dict, Iterable, Optional, Sequence, Set, Tuple
+from typing import Dict, Final, Iterable, Optional, Sequence, Set, Tuple
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols.metric import Metric, MetricInputMeasure, MetricType
@@ -13,6 +13,9 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.collection_helpers.lru_cache import LruCache
 from metricflow_semantics.errors.error_classes import DuplicateMetricError, MetricNotFoundError, NonExistentMeasureError
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
+from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
+    GroupByItemSet,
+)
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
@@ -25,6 +28,11 @@ from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 logger = logging.getLogger(__name__)
+
+
+DEFAULT_COMMON_SET_FILTER: Final[GroupByItemSetFilter] = GroupByItemSetFilter(
+    without_any_of=frozenset((GroupByItemProperty.METRIC,))
+)
 
 
 class MetricLookup:
@@ -152,6 +160,39 @@ class MetricLookup:
         )
         self._group_by_items_for_metrics_cache.set(cache_key, result)
         return result
+
+    def get_common_group_by_items(
+        self,
+        measure_references: Iterable[MeasureReference] = (),
+        metric_references: Iterable[MetricReference] = (),
+        set_filter: GroupByItemSetFilter = DEFAULT_COMMON_SET_FILTER,
+    ) -> BaseGroupByItemSet:
+        """Gets the set of the valid group-by items common to all inputs."""
+
+        if set_filter.element_names is None:
+            return self._group_by_item_set_resolver.get_common_set(
+                measure_references=measure_references,
+                metric_references=metric_references,
+                set_filter=set_filter,
+            )
+
+        # If the filter specifies element names, make the call to the resolver without element names to get better
+        # cache hit rates.
+        filter_without_element_name_condition = set_filter.without_element_names()
+
+        result_superset = self._group_by_item_set_resolver.get_common_set(
+            measure_references=measure_references,
+            metric_references=metric_references,
+            set_filter=filter_without_element_name_condition,
+        )
+
+        return GroupByItemSet(
+            annotated_specs=tuple(
+                annotated_spec
+                for annotated_spec in result_superset.annotated_specs
+                if annotated_spec.element_name in set_filter.element_names
+            )
+        )
 
     def get_metrics(self, metric_references: Iterable[MetricReference]) -> Sequence[Metric]:  # noqa: D102
         res = []
