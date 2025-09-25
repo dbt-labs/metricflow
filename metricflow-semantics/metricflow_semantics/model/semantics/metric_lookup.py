@@ -135,16 +135,20 @@ class MetricLookup:
         return result
 
     def linkable_elements_for_metrics(
-        self, metric_references: Sequence[MetricReference], element_set_filter: GroupByItemSetFilter
+        self, metric_references: Sequence[MetricReference], set_filter: GroupByItemSetFilter
     ) -> BaseGroupByItemSet:
         """Retrieve the matching set of linkable elements common to all metrics requested (intersection)."""
-        cache_key = (metric_references, element_set_filter)
+        cache_key = (metric_references, set_filter)
         result = self._group_by_items_for_metrics_cache.get(cache_key)
         if result is not None:
             return result
 
-        result = self._group_by_item_set_resolver.get_linkable_elements_for_metrics(
-            metric_references=metric_references, element_filter=element_set_filter
+        # This method has never returned group-by metrics, so ensure via filter.
+        effective_filter = set_filter.copy(
+            without_any_of=set_filter.without_any_of.union((GroupByItemProperty.METRIC,))
+        )
+        result = self._group_by_item_set_resolver.get_common_set(
+            metric_references=metric_references, set_filter=effective_filter
         )
         self._group_by_items_for_metrics_cache.set(cache_key, result)
         return result

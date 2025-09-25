@@ -460,10 +460,11 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
         with self._path_from_start_node_tracker.track_node_visit(node) as current_traversal_path:
             logger.debug(LazyFormat(lambda: f"Handling {node.ui_description}"))
             # This is a case for distinct dimension values from semantic models.
-            candidate_elements = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_no_metrics_query()
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(LazyFormat(lambda: f"Candidate elements are:\n{mf_pformat(candidate_elements)}"))
-            candidates_after_filtering = candidate_elements.filter_by_spec_patterns(self._source_spec_patterns)
+            candidate_group_by_items = (
+                self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_no_metrics_query()
+            )
+            logger.debug(LazyFormat("Retrieved candidates", candidate_group_by_items=candidate_group_by_items))
+            candidates_after_filtering = candidate_group_by_items.filter_by_spec_patterns(self._source_spec_patterns)
 
             if candidates_after_filtering.is_empty:
                 return PushDownResult(

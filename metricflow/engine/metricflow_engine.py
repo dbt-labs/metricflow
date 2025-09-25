@@ -687,18 +687,18 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     ) -> List[Dimension]:
         self._check_metric_names(metric_names)
 
-        linkable_element_set = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_metrics(
+        group_by_item_set = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_metrics(
             metric_references=tuple(MetricReference(element_name=mname) for mname in metric_names),
-            element_set_filter=GroupByItemSetFilter(
+            set_filter=GroupByItemSetFilter(
                 without_any_of=frozenset(without_any_property),
             ),
         )
-        return self._filter_simple_linkable_dimensions(linkable_element_set=linkable_element_set)
+        return self._filter_simple_linkable_dimensions(group_by_item_set=group_by_item_set)
 
-    def _filter_simple_linkable_dimensions(self, linkable_element_set: BaseGroupByItemSet) -> List[Dimension]:
+    def _filter_simple_linkable_dimensions(self, group_by_item_set: BaseGroupByItemSet) -> List[Dimension]:
         dimensions: List[Dimension] = []
 
-        for annotated_spec in linkable_element_set.annotated_specs:
+        for annotated_spec in group_by_item_set.annotated_specs:
             properties = annotated_spec.property_set
             element_type = annotated_spec.element_type
             if element_type is LinkableElementType.TIME_DIMENSION:
@@ -789,20 +789,20 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         return sorted(set(dimensions), key=sort_dimensions)
 
     def entities_for_metrics(self, metric_names: List[str]) -> List[Entity]:  # noqa: D102
-        linkable_element_set = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_metrics(
+        group_by_item_set = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_metrics(
             metric_references=tuple(MetricReference(element_name=mname) for mname in metric_names),
-            element_set_filter=GroupByItemSetFilter(
+            set_filter=GroupByItemSetFilter(
                 with_any_of=frozenset(ENTITY_WITH_ANY_PROPERTIES),
             ),
         )
 
-        entities = self._filter_linkable_entities(linkable_element_set=linkable_element_set)
+        entities = self._filter_linkable_entities(group_by_item_set=group_by_item_set)
         return sorted(set(entities), key=lambda x: x.default_search_and_sort_attribute)
 
-    def _filter_linkable_entities(self, linkable_element_set: BaseGroupByItemSet) -> List[Entity]:
+    def _filter_linkable_entities(self, group_by_item_set: BaseGroupByItemSet) -> List[Entity]:
         entities: List[Entity] = []
 
-        for annotated_spec in linkable_element_set.annotated_specs:
+        for annotated_spec in group_by_item_set.annotated_specs:
             element_type = annotated_spec.element_type
             if element_type is LinkableElementType.ENTITY:
                 semantic_model = self._semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
@@ -928,15 +928,15 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             without_any_of = SIMPLE_DIMENSIONS_WITHOUT_ANY_PROPERTIES - ENTITY_WITH_ANY_PROPERTIES
             if include_derived_time_granularities:
                 without_any_of = without_any_of - {GroupByItemProperty.DERIVED_TIME_GRANULARITY}
-            linkable_element_set = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_metrics(
+            group_by_item_set = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_metrics(
                 metric_references=tuple(MetricReference(element_name=mname) for mname in metric_names),
-                element_set_filter=GroupByItemSetFilter(
+                set_filter=GroupByItemSetFilter(
                     without_any_of=frozenset(without_any_of),
                 ),
             )
             group_bys: Sequence = self._filter_linkable_entities(
-                linkable_element_set=linkable_element_set
-            ) + self._filter_simple_linkable_dimensions(linkable_element_set=linkable_element_set)
+                group_by_item_set=group_by_item_set
+            ) + self._filter_simple_linkable_dimensions(group_by_item_set=group_by_item_set)
         else:
             # TODO: better support for querying entities without metrics; include entities here at that time
             group_bys = self.list_dimensions()

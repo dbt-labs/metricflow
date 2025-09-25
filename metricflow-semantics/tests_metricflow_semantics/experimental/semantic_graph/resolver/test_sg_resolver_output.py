@@ -6,6 +6,7 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.references import MeasureReference, MetricReference
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
@@ -60,13 +61,16 @@ def test_set_for_metrics(sg_tester: SemanticGraphTester) -> None:
         ("bookings", "views"),
         ("trailing_2_months_revenue",),
     ):
-        metric_references = [MetricReference(metric_name) for metric_name in metric_names]
-        complete_set = sg_resolver.get_linkable_elements_for_metrics(metric_references)
+        # Group-by metrics should not be called for metrics, so skip them for smaller snapshots.
+        metric_references = tuple(MetricReference(metric_name) for metric_name in metric_names)
+        set_filter = GroupByItemSetFilter(without_any_of=frozenset((GroupByItemProperty.METRIC,)))
+        complete_set = sg_resolver.get_common_set(metric_references=metric_references, set_filter=set_filter)
         description_to_set[str(metric_names)] = complete_set
         sg_tester.check_set_filtering(
             complete_set=complete_set,
-            filtered_set_callable=lambda set_filter: sg_resolver.get_linkable_elements_for_metrics(
-                metric_references, set_filter
+            filtered_set_callable=lambda _filter: sg_resolver.get_common_set(
+                metric_references=metric_references,
+                set_filter=_filter.copy(without_any_of=_filter.without_any_of.union((GroupByItemProperty.METRIC,))),
             ),
         )
 
