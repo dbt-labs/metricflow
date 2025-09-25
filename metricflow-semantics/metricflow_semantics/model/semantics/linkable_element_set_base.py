@@ -50,8 +50,7 @@ class BaseGroupByItemSet(SemanticModelDerivation, ABC):
         """Filter elements in the set.
 
         First, only elements with at least one property in the "with_any_of" set are retained. Then, any elements with
-        a property in "without_any_of" set are removed. Lastly, any elements with all properties in without_all_of
-        are removed.
+        a property in "without_any_of" set are removed.
         """
         raise NotImplementedError()
 

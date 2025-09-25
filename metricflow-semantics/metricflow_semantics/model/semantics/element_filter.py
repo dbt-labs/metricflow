@@ -17,21 +17,18 @@ class GroupByItemSetFilter(Mergeable):
     element_names: Optional[FrozenSet[str]] = None
     with_any_of: FrozenSet[GroupByItemProperty] = GroupByItemProperty.all_properties()
     without_any_of: FrozenSet[GroupByItemProperty] = frozenset()
-    without_all_of: FrozenSet[GroupByItemProperty] = frozenset()
 
     def copy(
         self,
         element_names: Optional[FrozenSet[str]] = None,
         with_any_of: Optional[FrozenSet[GroupByItemProperty]] = None,
         without_any_of: Optional[FrozenSet[GroupByItemProperty]] = None,
-        without_all_of: Optional[FrozenSet[GroupByItemProperty]] = None,
     ) -> GroupByItemSetFilter:
         """Create a copy of this with the given non-None fields replaced."""
         return GroupByItemSetFilter(
             element_names=element_names if element_names is not None else self.element_names,
             with_any_of=with_any_of if with_any_of is not None else self.with_any_of,
             without_any_of=without_any_of if without_any_of is not None else self.without_any_of,
-            without_all_of=without_all_of if without_all_of is not None else self.without_all_of,
         )
 
     @override
@@ -44,7 +41,6 @@ class GroupByItemSetFilter(Mergeable):
             element_names=element_names,
             with_any_of=self.with_any_of.union(other.with_any_of),
             without_any_of=self.without_any_of.union(other.without_any_of),
-            without_all_of=self.without_all_of.union(other.without_all_of),
         )
 
     @classmethod
@@ -57,7 +53,6 @@ class GroupByItemSetFilter(Mergeable):
         return GroupByItemSetFilter(
             with_any_of=self.with_any_of,
             without_any_of=self.without_any_of,
-            without_all_of=self.without_all_of,
         )
 
     def allow(self, element_name: Optional[str], element_properties: Optional[Iterable[GroupByItemProperty]]) -> bool:
@@ -76,12 +71,5 @@ class GroupByItemSetFilter(Mergeable):
             denied_property_set = self.without_any_of
             if denied_property_set and len(denied_property_set.intersection(element_properties)) > 0:
                 return False
-            denied_full_match_property_set = self.without_all_of
-            if denied_full_match_property_set:
-                denied_full_match_property_set_length = len(denied_full_match_property_set)
-                if denied_full_match_property_set_length > 0 and denied_full_match_property_set_length == len(
-                    denied_full_match_property_set.intersection(element_properties)
-                ):
-                    return False
 
         return True

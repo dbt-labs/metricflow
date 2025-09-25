@@ -106,7 +106,6 @@ class GroupByItemSet(BaseGroupByItemSet, SerializableDataclass):
     def filter(self, element_filter: GroupByItemSetFilter) -> GroupByItemSet:
         allow_element_name_set = element_filter.element_names
         deny_property_set = element_filter.without_any_of
-        deny_match_all_property_set = element_filter.without_all_of
 
         new_specs: list[AnnotatedSpec] = []
         for annotated_spec in self.annotated_specs:
@@ -121,11 +120,6 @@ class GroupByItemSet(BaseGroupByItemSet, SerializableDataclass):
             if deny_property_set and len(deny_property_set.intersection(property_set)) > 0:
                 continue
 
-            if (
-                len(deny_match_all_property_set) > 0
-                and deny_match_all_property_set.intersection(property_set) == deny_match_all_property_set
-            ):
-                continue
             new_specs.append(annotated_spec)
 
         return GroupByItemSet(annotated_specs=tuple(new_specs))
