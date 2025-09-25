@@ -1348,7 +1348,7 @@ def test_all_available_metric_filters(
     metric_lookup = mf_engine_test_fixture.semantic_manifest_lookup.metric_lookup
     bookings_group_by_item_set = metric_lookup.get_common_group_by_items(
         measure_references=(MeasureReference("bookings"),),
-        set_filter=GroupByItemSetFilter(with_any_of=frozenset((GroupByItemProperty.METRIC,))),
+        set_filter=GroupByItemSetFilter(any_properties_allowlist=frozenset((GroupByItemProperty.METRIC,))),
     )
     for group_by_metric_spec in group_specs_by_type(bookings_group_by_item_set.specs).group_by_metric_specs:
         entity_spec = group_by_metric_spec.metric_subquery_entity_spec

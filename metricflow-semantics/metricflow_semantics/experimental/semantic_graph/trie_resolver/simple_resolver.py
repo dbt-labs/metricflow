@@ -121,7 +121,7 @@ class SimpleTrieResolver(DunderNameTrieResolver):
             if element_filter is None:
                 element_filter = GroupByItemSetFilter()
             element_filter = element_filter.copy(
-                without_any_of=element_filter.without_any_of.union((GroupByItemProperty.DATE_PART,))
+                any_properties_denylist=element_filter.any_properties_denylist.union((GroupByItemProperty.DATE_PART,))
             )
 
         result_intersection_source_nodes = tuple(find_descendants_result.reachable_target_nodes)

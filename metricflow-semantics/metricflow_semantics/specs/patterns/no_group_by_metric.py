@@ -32,4 +32,4 @@ class NoGroupByMetricPattern(SpecPattern):
     @property
     @override
     def element_pre_filter(self) -> GroupByItemSetFilter:
-        return GroupByItemSetFilter(without_any_of=frozenset({GroupByItemProperty.METRIC}))
+        return GroupByItemSetFilter(any_properties_denylist=frozenset({GroupByItemProperty.METRIC}))
