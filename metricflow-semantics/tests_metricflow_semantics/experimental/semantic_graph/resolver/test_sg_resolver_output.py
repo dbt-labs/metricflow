@@ -38,11 +38,11 @@ def test_set_filtering_for_measure(sg_tester: SemanticGraphTester) -> None:
     """Check filtering of the set for a measure."""
     measure_reference = MeasureReference("bookings")
     sg_resolver = sg_tester.sg_resolver
-    complete_set = sg_resolver.get_linkable_element_set_for_measure(measure_reference)
+    complete_set = sg_resolver.get_common_set(measure_references=(measure_reference,))
     sg_tester.check_set_filtering(
         complete_set=complete_set,
-        filtered_set_callable=lambda set_filter: sg_resolver.get_linkable_element_set_for_measure(
-            measure_reference, set_filter
+        filtered_set_callable=lambda set_filter: sg_resolver.get_common_set(
+            measure_references=(measure_reference,), set_filter=set_filter
         ),
     )
 
