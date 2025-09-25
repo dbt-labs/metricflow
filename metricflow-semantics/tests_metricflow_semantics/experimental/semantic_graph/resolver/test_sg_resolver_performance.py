@@ -60,7 +60,7 @@ def test_resolver_query_time(high_complexity_manifest_sg_fixture: SemanticGraphT
         @override
         def run(self) -> None:
             # Replicate the behavior of get_linkable_elements_for_metrics which filters out METRIC properties
-            base_filter = GroupByItemSetFilter(without_any_of=frozenset((GroupByItemProperty.METRIC,)))
+            base_filter = GroupByItemSetFilter(any_properties_denylist=frozenset((GroupByItemProperty.METRIC,)))
             self._resolver.get_common_set(metric_references=metric_references, set_filter=base_filter)
 
     PerformanceBenchmark.assert_function_performance(
